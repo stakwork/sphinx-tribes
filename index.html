@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMQ MQTT</title>
+  <link rel="stylesheet" href="https://unpkg.com/bulma@0.6.1/css/bulma.css">
+</head>
+
+<body>
+  <section id="app">
+    <section class="section">
+      <div class="container">
+        <h1 class="title">Connection
+          <small v-bind:class="{'has-text-danger': connection.error, 'has-text-grey': !connection.error}">{{ connection.state }}
+            <span v-if="connection.error">({{ connection.error }})</span>
+          </small>
+        </h1>
+        <div class="field is-grouped">
+          <p class="control">
+            <input class="input" v-model="username" placeholder="Username">
+          </p>
+          <p class="control">
+            <input class="input" v-model="password" placeholder="Password">
+          </p>
+          <p class="control">
+            <button class="button is-primary" v-on:click="mqtt.connect()" v-bind:disabled="connected">Connect</button>
+          </p>
+          <p class="control">
+            <button class="button" v-on:click="mqtt.disconnect()" v-bind:disabled="!connected">Disconnect</button>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h1 class="title">Subscriptions</h1>
+        <div class="field is-grouped">
+          <p class="control">
+            <input class="input" v-model="subscribe.filter" placeholder="Topic">
+          </p>
+          <p class="control">
+            <input class="input" v-model="subscribe.qos" placeholder="QoS">
+          </p>
+          <p class="control">
+            <button class="button" v-on:click="mqtt.subscribe(subscribe.filter, subscribe.qos)" v-bind:disabled="!connected">Subscribe</button>
+          </p>
+        </div>
+        <ul>
+          <li v-for="(info, filter) in subscriptions" class="field is-grouped">
+            <div class="control">
+              <div class="tags has-addons">
+                <span class="tag">QoS</span>
+                <span class="tag is-dark">{{ info.qos }}</span>
+              </div>
+            </div>
+            <div class="control">
+              <div class="tags has-addons">
+                <span class="tag">Topic</span>
+                <span class="tag is-primary">{{ filter }}</span>
+              </div>
+            </div>
+            <a class="tag is-delete is-danger" v-on:click="mqtt.unsubscribe(filter)" v-bind:disabled="!connected"></a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h1 class="title">Messages</h1>
+        <div class="field is-grouped">
+          <p class="control">
+            <input class="input" v-model="publish.topic" placeholder="Topic">
+          </p>
+          <p class="control">
+            <input class="input" v-model="publish.payload" placeholder="Payload">
+          </p>
+          <p class="control">
+            <button class="button" v-on:click="mqtt.publish(publish.topic, publish.payload)" v-bind:disabled="!connected">Publish</button>
+          </p>
+        </div>
+        <ul>
+          <li v-for="message in messages">
+            <code>{{ message.topic }}</code>:
+            <code>{{ message.payload }}</code>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </section>
+
+  <script src="https://unpkg.com/paho-mqtt@1.0.3"></script>
+  <script src="https://unpkg.com/vue@2.5.9"></script>
+  <script src="https://unpkg.com/mqtt@2.18.8/dist/mqtt.min.js"></script>
+  <script>
+
+    // var url = 'wss://hmq-broker.herokuapp.com/mqtt'
+    // url = 'ws://127.0.0.1:1880'
+    // var client = mqtt.connect(url, {})
+    // client.on('connect', ()=>{
+    //   console.log("CONNECTED!!!!")
+    // })
+    // client.on('close', ()=>{
+    //   console.log("CLOSED")
+    // })
+
+    const hostname = '127.0.0.1'
+    const port = 1880
+
+    var app = new Vue({
+      el: '#app',
+      created() {
+        var mqtt = new Paho.MQTT.Client(hostname, port, "/mqtt", "clientId");
+        mqtt.onConnectionLost = ({ errorCode, errorMessage }) => {
+          this.connection.state = 'disconnected';
+          this.connection.error = (errorCode === 0) ? '' : errorMessage;
+        }
+        mqtt.onMessageArrived = ({ payloadBytes, destinationName, qos }) => {
+          this.messages.unshift({
+            received: new Date(),
+            payload: String.fromCharCode.apply(String, payloadBytes),
+            payload_raw: payloadBytes,
+            topic: destinationName,
+            qos,
+          })
+          this.messages = this.messages.slice(0, 10)
+        },
+          this.mqtt = {
+            connect: () => {
+              this.connection.state = 'connecting';
+              this.connection.error = '';
+              mqtt.connect({
+                userName: this.username,
+                password: this.password,
+                onSuccess: () => {
+                  this.connection.state = 'connected';
+                },
+                onFailure: ({ errorCode, errorMessage }) => {
+                  this.connection.state = 'connection failed';
+                  this.connection.error = errorMessage;
+                },
+              });
+            },
+            disconnect: () => {
+              mqtt.disconnect();
+              this.subscriptions = {};
+            },
+            publish: (topic, payload) => {
+              mqtt.send(topic, payload);
+            },
+            subscribe: (filter, qos) => {
+              qos = parseInt(qos);
+              Vue.set(this.subscriptions, filter, {
+                state: 'subscribing',
+                qos,
+              })
+              mqtt.subscribe(filter, {
+                qos,
+                onSuccess: () => {
+                  this.subscriptions[filter].state = 'subscribed';
+                }
+              });
+            },
+            unsubscribe: (filter) => {
+              if (this.subscriptions[filter]) {
+                this.subscriptions[filter].state = 'unsubscribing';
+                mqtt.unsubscribe(filter, {
+                  onSuccess: () => {
+                    Vue.delete(this.subscriptions, filter);
+                  }
+                });
+              }
+            },
+          }
+      },
+      data: {
+        username: '',
+        password: '',
+        connection: {
+          state: 'idle',
+          error: '',
+        },
+        subscribe: {
+          filter: '',
+          qos: 0,
+        },
+        publish: {
+          topic: '',
+          payload: '',
+        },
+        subscriptions: {},
+        messages: [],
+      },
+      computed: {
+        connected() { return this.connection.state == 'connected'; },
+      }
+    });
+  </script>
+</body>
+
+</html>
