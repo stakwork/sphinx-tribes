@@ -28,7 +28,9 @@ func connectToLocal(port, pubkey, pwd string) {
 	opts.SetUsername(pubkey)
 	opts.SetPassword(pwd)
 	opts.SetCleanSession(false)
-	opts.SetOnConnectHandler(connectedToLocalCallback)
+	opts.SetOnConnectHandler(func(c mqtt.Client) {
+		connectedToLocalCallback(c, pubkey)
+	})
 
 	client = mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
@@ -36,10 +38,10 @@ func connectToLocal(port, pubkey, pwd string) {
 	}
 }
 
-func connectedToLocalCallback(c mqtt.Client) {
+func connectedToLocalCallback(c mqtt.Client, pubkey string) {
 	fmt.Println(" ===> CONNECTED!")
 
-	client.Subscribe("messages/#", 0, func(c mqtt.Client, msg mqtt.Message) {
+	client.Subscribe(pubkey+"/#", 0, func(c mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
 		// topic := msg.Topic()
 		// if string([]rune(topic)[0]) == "/" {
@@ -60,6 +62,9 @@ func connectedToLocalCallback(c mqtt.Client) {
 		// 	fmt.Println(token.Error())
 		// }
 	})
+
+	pwd, pubkey := signTimestamp()
+	client.Publish(pubkey+"/"+pwd, 0, false, "hi")
 }
 
 /*
@@ -86,9 +91,8 @@ func signTimestamp() (string, string) {
 	binary.BigEndian.PutUint32(timeBuf, uint32(time))
 	sig := Sign(timeBuf, priv)
 
-	timeBase64 := base64.URLEncoding.EncodeToString(timeBuf)
-	pwd := timeBase64 + ":" + sig
-	return pwd, pubBase64
+	pwdBuf := append(timeBuf, sig...)
+	return base64.URLEncoding.EncodeToString(pwdBuf), pubBase64
 }
 
 var zekesPrivKey = []byte{
@@ -120,7 +124,7 @@ func newNodeSigner(key *btcec.PrivateKey) *nodeSigner {
 }
 
 // Sign ...
-func Sign(msg []byte, privKey *btcec.PrivateKey) string {
+func Sign(msg []byte, privKey *btcec.PrivateKey) []byte {
 
 	msg = append(signedMsgPrefix, msg...)
 	digest := chainhash.DoubleHashB(msg)
@@ -128,11 +132,11 @@ func Sign(msg []byte, privKey *btcec.PrivateKey) string {
 
 	sigBytes, err := btcec.SignCompact(btcec.S256(), privKey, digest, true)
 	if err != nil {
-		return ""
+		return nil
 	}
 
-	sig := base64.URLEncoding.EncodeToString(sigBytes)
-	return sig
+	// sig := base64.URLEncoding.EncodeToString(sigBytes)
+	return sigBytes
 }
 
 var (
