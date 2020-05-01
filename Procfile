@@ -1,1 +1,1 @@
-web: hmq-broker
+web: sphinx-tribes
