@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"time"
@@ -79,11 +81,14 @@ func signTimestamp() (string, string) {
 	privKey := os.Getenv("PRIV_KEY")
 	thePrivKey, err := base64.URLEncoding.DecodeString(privKey)
 	if err != nil {
-		thePrivKey = zekesPrivKey
+		b := make([]byte, 32)
+		rand.Read(b)
+		thePrivKey = b
 	}
 
 	priv, pub := btcec.PrivKeyFromBytes(btcec.S256(), thePrivKey)
-	pubBase64 := base64.URLEncoding.EncodeToString(pub.SerializeCompressed())
+	// pubBase64 := base64.URLEncoding.EncodeToString(pub.SerializeCompressed())
+	pubHex := hex.EncodeToString(pub.SerializeCompressed())
 	signer = newNodeSigner(priv)
 
 	time := time.Now().Unix()
@@ -92,14 +97,7 @@ func signTimestamp() (string, string) {
 	sig := Sign(timeBuf, priv)
 
 	pwdBuf := append(timeBuf, sig...)
-	return base64.URLEncoding.EncodeToString(pwdBuf), pubBase64
-}
-
-var zekesPrivKey = []byte{
-	0x2c, 0xd8, 0x07, 0xc9, 0x7f, 0x0e, 0x00, 0xaf,
-	0x1a, 0x1f, 0xc3, 0x32, 0x8f, 0xa7, 0x63, 0xa9,
-	0x26, 0x97, 0x23, 0xc8, 0xdb, 0x8f, 0xac, 0x4f,
-	0x93, 0xaf, 0x52, 0xdb, 0x18, 0x6d, 0x6e, 0x90,
+	return base64.URLEncoding.EncodeToString(pwdBuf), pubHex
 }
 
 var signer *nodeSigner
