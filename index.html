@@ -98,14 +98,14 @@
   <script>
 
     // var url = 'wss://hmq-broker.herokuapp.com/mqtt'
-    // url = 'ws://127.0.0.1:1880'
-    // var client = mqtt.connect(url, {})
-    // client.on('connect', ()=>{
-    //   console.log("CONNECTED!!!!")
-    // })
-    // client.on('close', ()=>{
-    //   console.log("CLOSED")
-    // })
+    var url = 'ws://127.0.0.1:1880/mqtt'
+    var client = mqtt.connect(url, {})
+    client.on('connect', ()=>{
+      console.log("CONNECTED!!!!")
+    })
+    client.on('close', ()=>{
+      console.log("CLOSED")
+    })
 
     const hostname = '127.0.0.1'
     const port = 1880
