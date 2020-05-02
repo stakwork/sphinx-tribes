@@ -1,3 +1,5 @@
 .DS_Store
 sphinx-tribes
 .env
+
+frontend/app/node_modules
