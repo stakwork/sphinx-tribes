@@ -14,4 +14,14 @@ Under the hood, sphinx-tribes uses an MQTT broker to route messages to subscribi
 
 ### Authentication
 
-Authentication is handled by the sphinx-auth microservice. 
+Authentication is handled by the sphinx-tribes microservice. 
+
+### run
+
+**build**
+docker build --no-cache -t sphinx-tribes .
+
+**restart**
+docker stop sphinx-tribes && docker rm sphinx-tribes && docker create -p 0.0.0.0:80:9090/tcp --name sphinx-tribes --restart on-failure sphinx-tribes:latest && docker cp config.json sphinx-tribes:/config.json && docker start sphinx-tribes
+
+docker logs sphinx-tribes --since 10m --follow
