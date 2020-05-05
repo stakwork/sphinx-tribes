@@ -23,8 +23,14 @@ func NewBroker() (*Broker, error) {
 		wsPort = "1880"
 	}
 
+	configFilePath := "config.json"
+	config := os.Getenv("")
+	if config != "" {
+		configFilePath = config
+	}
+
 	params := []string{
-		fmt.Sprintf("--config=config.json"),
+		fmt.Sprintf("--config=" + configFilePath),
 	}
 
 	c, err := broker.ConfigureConfig(params)
