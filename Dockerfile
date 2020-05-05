@@ -27,6 +27,5 @@ COPY --from=builder /app/plugins/auth/authhttp/http.json /plugins/auth/authhttp/
 
 RUN ls app
 
-EXPOSE 5002
-EXPOSE 1883
+EXPOSE 5002 1883
 ENTRYPOINT ["/app/sphinx-tribes"]
