@@ -22,8 +22,8 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates openssl
 
 COPY --from=builder /app/sphinx-tribes /app/
-COPY --from=builder /app/config.json /
-COPY --from=builder /app/plugins/auth/authhttp/http.json /
+COPY --from=builder /app/config.json /config.json
+COPY --from=builder /app/plugins/auth/authhttp/http.json /plugins/auth/authhttp/http.json
 
 RUN ls app
 
