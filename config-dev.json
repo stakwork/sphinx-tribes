@@ -1,0 +1,19 @@
+{
+	"workerNum": 4096,
+	"port": "1883",
+	"host": "127.0.0.1",
+	"cluster": {
+		"host": "",
+		"port": ""
+	},
+	"router": "",
+	"wsPort": "1880",
+	"wsPath": "/mqtt",
+	"wsTLS": false,
+	"tlsPort": "",
+	"tlsHost": "",
+	"tlsInfo": {},
+	"plugins": {
+		"auth": "authhttp-dev"
+	}
+}
