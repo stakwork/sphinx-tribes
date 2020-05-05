@@ -1,6 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,400i,700,700i');
 @import url('https://rsms.me/inter/inter-ui.css');
-
+html{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
 body {
   margin: 0;
   font-family: "Inter UI", Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -18,3 +25,13 @@ code {
   top:0;right:0;bottom:0;left:0;
 }
 
+.euiCheckableCard__children{
+  width:100%;
+  padding:0 !important;
+}
+.euiCheckableCard__control{
+  display:none !important;
+}
+.euiCheckableCard__row:first-child{
+  display: none;
+}

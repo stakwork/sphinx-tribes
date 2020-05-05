@@ -3,3 +3,5 @@ sphinx-tribes
 .env
 
 frontend/app/node_modules
+
+notes.md

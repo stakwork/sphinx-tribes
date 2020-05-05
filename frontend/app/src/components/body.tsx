@@ -1,14 +1,74 @@
 import React, {useState} from 'react'
 import styled from 'styled-components'
+import { useObserver } from 'mobx-react-lite'
+import { useStores } from '../store'
+import {
+  EuiFormFieldset,
+} from '@elastic/eui';
+import Tribe from './tribe'
+import Fuse from 'fuse.js'
+
+const fuseOptions = {
+  keys: ['name','description'],
+  shouldSort: true,
+  // matchAllTokens: true,
+  includeMatches: true,
+  threshold: 0.35,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+};
 
 export default function BodyComponent() {
-  return <Body>
+  const { main, ui } = useStores()
+  const [selected, setSelected] = useState('')
+  return useObserver(() => {
+    const tagsFilter = ui.tags.filter(t=>t.checked==='on').map(t=>t.label)
+    const tribes = main.tribes.map(t=>{
+      const matchCount = tagsFilter.reduce((a,item)=>t.tags.includes(item)?a+1:a, 0)
+      return {...t,matchCount}
+    }).filter(t=>{
+      if(tagsFilter.length===0) return true
+      return t.matchCount&&t.matchCount>0
+    })
+    tribes.sort((a,b)=>b.matchCount-a.matchCount)
 
-  </Body>
-}
+    let theTribes = tribes
+    if(ui.searchText){
+      var fuse = new Fuse(tribes, fuseOptions)
+      const res = fuse.search(ui.searchText)
+      theTribes = res.map(r=>r.item)
+    }
+
+    return <Body>
+      <Column>
+        <EuiFormFieldset>
+          {theTribes.map(t=> <Tribe {...t} key={t.uuid} 
+            selected={selected===t.uuid}
+            select={setSelected}
+          />)}
+        </EuiFormFieldset>
+      </Column>
+    </Body>
+  }
+)}
 
 const Body = styled.div`
   flex:1;
+  padding:50px;
+  height:calc(100vh - 50px);
+  width:100%;
+  overflow:scroll;
+  background:#272c4b;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+`
+const Column = styled.div`
+  display:flex;
+  flex-direction:column;
+  max-width:900px;
+  width:100%;
 `
 
-var qr = 'XqzlKB-h8IWHQ1fx2x0yCkcWW2zbmynWfNREJz7nZiWeLUhWrUfYjMKHlRxGCEa6p7VZdmyHw6UWEoYiTai_nt11kZWr'
