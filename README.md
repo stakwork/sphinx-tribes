@@ -22,6 +22,6 @@ Authentication is handled by the sphinx-tribes microservice.
 docker build --no-cache -t sphinx-tribes .
 
 **restart**
-docker stop sphinx-tribes && docker rm sphinx-tribes && docker create -p 0.0.0.0:80:9090/tcp --name sphinx-tribes --restart on-failure sphinx-tribes:latest && docker cp config.json sphinx-tribes:/config.json && docker start sphinx-tribes
+docker stop sphinx-tribes && docker rm sphinx-tribes && docker create -p 0.0.0.0:80:5002/tcp -p 0.0.0.0:1883:1883/tcp --name sphinx-tribes --restart on-failure sphinx-tribes:latest && docker cp config.json sphinx-tribes:/config.json && docker start sphinx-tribes
 
 docker logs sphinx-tribes --since 10m --follow
