@@ -6,57 +6,40 @@ import styled from 'styled-components'
 
 import {
   EuiHeader,
-  EuiHeaderBreadcrumbs,
   EuiPopover,
-  EuiPopoverTitle,
   EuiSelectable,
   EuiHeaderSection,
-  EuiHeaderSectionItem,
-  EuiHeaderSectionItemButton,
-  EuiHeaderLogo,
   EuiButton,
-  EuiIcon,
   EuiFieldSearch,
-  EuiComboBox,
-  EuiComboBoxOptionProps,
+  EuiHighlight,
 } from '@elastic/eui';
 
-// import HeaderAppMenu from './header_app_menu';
-// import HeaderUserMenu from './header_user_menu';
-// import HeaderSpacesMenu from './header_spaces_menu';
+import Tag from './tag'
+import tags from './tags'
 
 export default function Header() {
-  const { main } = useStores()
-  const [text, setText] = useState<string>('')
-  const [selectedTags, setSelectedTags] = useState<any[]>([
-    {label:'hi'},{label:'lo'}
-  ])
+  const { main, ui } = useStores()
+
   const [tagsPop, setTagsPop] = useState(false)
 
-  const button = (
-    <EuiButton
+  const selectedTags = ui.tags.filter(t=>t.checked==='on')
+  const showTagCount = selectedTags.length>0?true:false
+  return useObserver(() => {
+    const button = (<EuiButton
+      style={{width:142}}
       iconType="arrowDown"
       iconSide="right"
       size="s"
       onClick={()=>{
-        setSelectedTags(orderBy(selectedTags, ['checked'], ['asc']))
+        ui.setTags(orderBy(ui.tags, ['checked'], ['asc']))
         setTagsPop(!tagsPop)
       }}>
-      Tags
-    </EuiButton>
-  );
-
-  return useObserver(() =>
-    <EuiHeader style={{justifyContent:'space-between',alignItems:'center',maxHeight:50,height:50,minHeight:50}}>
+      {`Tags ${showTagCount?`(${selectedTags.length})`:''}`}
+    </EuiButton>)
+    return <EuiHeader style={{justifyContent:'space-between',alignItems:'center',maxHeight:50,height:50,minHeight:50}}>
       <EuiHeaderSection grow={false}>
-        {/* <EuiHeaderSectionItem border="right">
-          <Image src="static/icon-1024.png" size="50" />
-          Sphinx Tribes
-        </EuiHeaderSectionItem>
-        <EuiHeaderSectionItem border="right">
-        </EuiHeaderSectionItem> */}
         <Image src="static/icon-1024.png" size="50" />
-        <Title>Sphinx Tribes</Title>
+        <Title>Tribes</Title>
       </EuiHeaderSection>
 
       <EuiHeaderSection side="right" style={{display:'flex',alignItems:'center'}}>
@@ -67,32 +50,38 @@ export default function Header() {
           isOpen={tagsPop}
           closePopover={()=>setTagsPop(false)}>
           <EuiSelectable
-            options={selectedTags}
-            onChange={opts=>{
-              console.log(opts)
-              setSelectedTags(opts)
-            }}>
-            {(list, search) => (
-              <div style={{ width: 240 }}>
-                {list}
-              </div>
-            )}
+            searchable
+            options={ui.tags}
+            renderOption={(option,searchValue)=><div style={{display:'flex',alignItems:'center'}}>
+              <Tag type={option.label} iconOnly />
+              <EuiHighlight search={searchValue} style={{
+                fontSize:11,marginLeft:5,color:tags[option.label].color
+              }}>
+                {option.label}
+              </EuiHighlight>
+            </div>}
+            listProps={{rowHeight: 30}} // showIcons:false
+            onChange={opts=> ui.setTags(opts)}>
+            {(list, search) => <div style={{ width: 220 }}>
+              {search}
+              {list}
+            </div>}
           </EuiSelectable>
         </EuiPopover>
         <div style={{margin:'0 6px'}}>
           <EuiFieldSearch
-            style={{width:'50vw'}}
+            style={{width:'40vw'}}
             placeholder="Search Tribes"
-            value={text}
-            onChange={e=> setText(e.target.value)}
+            value={ui.searchText}
+            onChange={e=> ui.setSearchText(e.target.value)}
             // isClearable={this.state.isClearable}
-            aria-label="Use aria labels when no actual label is in use"
+            aria-label="search"
           />
         </div>
       </EuiHeaderSection>
 
     </EuiHeader>
-  )
+  })
 }
 
 interface ImageProps {
