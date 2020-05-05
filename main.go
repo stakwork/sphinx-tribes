@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var mqttBroker *Broker
@@ -21,6 +23,8 @@ func main() {
 
 // Start the MQTT plugin
 func run() {
+
+	router := NewRouter()
 
 	go func() {
 		if err := mqttBroker.Start(); err != nil {
@@ -44,11 +48,17 @@ func run() {
 	signal.Notify(shutdownSignal, syscall.SIGINT, syscall.SIGTERM)
 	<-shutdownSignal
 
-	fmt.Printf("Stopping MQTT Broker ...\n")
-
+	// shut down MQTT broker
 	if err := mqttBroker.Shutdown(); err != nil {
 		fmt.Printf("Stopping MQTT Broker: %s\n", err.Error())
 	} else {
 		fmt.Printf("Stopping MQTT Broker ... done\n")
+	}
+
+	// shutdown web server
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := router.Shutdown(ctx); err != nil {
+		fmt.Printf("error shutting down server: %s", err.Error())
 	}
 }
