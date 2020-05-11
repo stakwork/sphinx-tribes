@@ -24,11 +24,6 @@ func NewBroker() (*Broker, error) {
 	}
 
 	configFilePath := "config.json"
-	config := os.Getenv("")
-	if config != "" {
-		configFilePath = config
-	}
-
 	params := []string{
 		fmt.Sprintf("--config=" + configFilePath),
 	}
@@ -37,6 +32,8 @@ func NewBroker() (*Broker, error) {
 	if err != nil {
 		log.Fatal("configure broker config error: ", err)
 	}
+
+	fmt.Printf("CNOFIG %+v\n", c)
 
 	b, err := broker.NewBroker(c)
 	if err != nil {
