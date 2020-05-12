@@ -14,8 +14,10 @@ require (
 	github.com/gobuffalo/packr/v2 v2.8.0
 	github.com/gohornet/hornet v0.3.0
 	github.com/iotaledger/hive.go v0.0.0-20200107205115-986a54f82a30
+	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
 	github.com/karrick/godirwalk v1.15.6 // indirect
+	github.com/lib/pq v1.5.2
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/spf13/cobra v1.0.0 // indirect

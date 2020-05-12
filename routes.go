@@ -27,6 +27,11 @@ func NewRouter() *http.Server {
 		r.Get("/", frontend.IndexRoute)
 		r.Get("/static/*", frontend.StaticRoute)
 		r.Get("/manifest.json", frontend.ManifestRoute)
+		r.Get("/favicon.ico", frontend.FaviconRoute)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Get("/tribes", getAllTribes)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -43,6 +48,12 @@ func NewRouter() *http.Server {
 	}()
 
 	return server
+}
+
+func getAllTribes(w http.ResponseWriter, r *http.Request) {
+	tribes := DB.getAllTribes()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribes)
 }
 
 func initChi() *chi.Mux {
