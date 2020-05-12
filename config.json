@@ -1,7 +1,7 @@
 {
 	"workerNum": 4096,
 	"port": "1883",
-	"host": "localhost",
+	"host": "0.0.0.0",
 	"cluster": {
 		"host": "",
 		"port": ""
