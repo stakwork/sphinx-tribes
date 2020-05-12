@@ -33,6 +33,18 @@ func ManifestRoute(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(manifest))
 }
 
+// FaviconRoute favicon.ico
+func FaviconRoute(w http.ResponseWriter, r *http.Request) {
+	favicon, err := appBox.Find("favicon.ico")
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(favicon))
+}
+
 // StaticRoute - css and js
 func StaticRoute(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.RequestURI()
