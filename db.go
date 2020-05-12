@@ -48,7 +48,7 @@ func (db database) createTribe(m Tribe) (Tribe, error) {
 	if m.OwnerPubKey == "" {
 		return Tribe{}, errors.New("no pub key")
 	}
-	onConflict := "ON CONFLICT (id) DO UPDATE SET"
+	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
 	for i, u := range updatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
 		if i < len(updatables)-1 {
@@ -83,6 +83,12 @@ func (db database) getAllTribes() []Tribe {
 	return ms
 }
 
+func (db database) getTribe(uuid string) Tribe {
+	m := Tribe{}
+	db.db.Where("uuid = ?", uuid).Find(&m)
+	return m
+}
+
 func (db database) searchTribes(s string) []Tribe {
 	ms := []Tribe{}
 	if s == "" {
@@ -90,7 +96,7 @@ func (db database) searchTribes(s string) []Tribe {
 	}
 	// set limit
 	db.db.Raw(
-		`SELECT id, owner_pub_key, name, description, ts_rank(tsv, q) as rank
+		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
 		FROM tribes, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
 		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
