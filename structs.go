@@ -13,9 +13,11 @@ import (
 type Tribe struct {
 	UUID            string         `json:"uuid"`
 	OwnerPubKey     string         `json:"ownerPubkey"`
+	GroupKey        string         `json:"groupKey"`
 	Name            string         `json:"name"`
 	Description     string         `json:"description"`
 	Tags            pq.StringArray `json:"tags"`
+	Img             string         `json:"img"`
 	PriceToJoin     int64          `json:"priceToJoin"`
 	PricePerMessage int64          `json:"pricePerMessage"`
 	Created         *time.Time     `json:"created"`

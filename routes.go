@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -32,6 +33,7 @@ func NewRouter() *http.Server {
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getAllTribes)
+		r.Post("/tribes", createTribe)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -54,6 +56,80 @@ func getAllTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := DB.getAllTribes()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
+}
+
+func createTribe(w http.ResponseWriter, r *http.Request) {
+
+	tribe := Tribe{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &tribe)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if tribe.UUID == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := DB.getTribe(tribe.UUID)
+	if existing.UUID != "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extracted, err := getFromAuth("/extract?sig=" + tribe.UUID)
+	fmt.Printf("EXTRACTED %+v\n", extracted)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if !extracted.Valid || extracted.Pubkey == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	tribe.OwnerPubKey = extracted.Pubkey
+
+	DB.createTribe(tribe)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribe)
+}
+
+type extractResponse struct {
+	Pubkey string `json:"pubkey"`
+	Valid  bool   `json:"valid"`
+}
+
+func getFromAuth(path string) (*extractResponse, error) {
+
+	authURL := "http://auth:9090"
+	resp, err := http.Get(authURL + path)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body2, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var inter map[string]interface{}
+	err = json.Unmarshal(body2, &inter)
+	if err != nil {
+		return nil, err
+	}
+	pubkey, _ := inter["pubkey"].(string)
+	valid, _ := inter["valid"].(bool)
+	return &extractResponse{
+		Pubkey: pubkey,
+		Valid:  valid,
+	}, nil
 }
 
 func initChi() *chi.Mux {
