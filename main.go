@@ -7,16 +7,26 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 var mqttBroker *Broker
 
 func main() {
 	var err error
+
+	err = godotenv.Load()
+	if err != nil {
+		fmt.Println("no .env file")
+	}
+
 	mqttBroker, err = NewBroker()
 	if err != nil {
 		fmt.Printf("MQTT broker init failed! %v\n", err)
 	}
+
+	initDB()
 
 	run()
 }
