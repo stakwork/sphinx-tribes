@@ -1,3 +1,4 @@
+
 class API {
   constructor(){
     this.get = addMethod('GET')
@@ -12,17 +13,11 @@ class API {
 }
 
 function addMethod(m: string): Function {
-  const tokenName = 'token'
-  const rootUrl = 'http://localhost:5001/'
+  const host = window.location.hostname
+  const rootUrl = host.includes('localhost')?'https://tribes.sphinx.chat/':`https://${host}/`
   const func = async function (url: string, data: any, fields: any) {
     try {
-      const token = await getToken(tokenName)
-      const skip = isPublic(rootUrl + url)
-      if (tokenName && !token && !skip) {
-        throw new Error("no token")
-      }
       const headers: {[key:string]:string} = {}
-      if (tokenName && token) headers['authorization'] = 'Bearer ' + token
       const opts: {[key:string]:any} = { mode: 'cors' }
       if (m === 'POST' || m === 'PUT') {
         headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -49,9 +44,6 @@ function addMethod(m: string): Function {
       if (m === 'BLOB') res = await r.blob()
       else {
         res = await r.json();
-        if (res.token) {
-          localStorage.setItem(tokenName, res.token)
-        }
       }
       return res
     } catch (e) {
@@ -61,14 +53,4 @@ function addMethod(m: string): Function {
   return func
 }
 
-function isPublic(url: string) {
-  return url.endsWith('login') ||
-    url.endsWith('errs/all')
-}
-
 export default new API()
-
-async function getToken(name: string) {
-  if (!name) return ""
-  return localStorage.getItem(name)
-}
