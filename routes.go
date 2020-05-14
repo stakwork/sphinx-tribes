@@ -33,6 +33,7 @@ func NewRouter() *http.Server {
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getAllTribes)
+		r.Get("/tribes/{uuid}", getTribe)
 		r.Post("/tribes", createTribe)
 	})
 
@@ -56,6 +57,13 @@ func getAllTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := DB.getAllTribes()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
+}
+
+func getTribe(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	tribe := DB.getTribe(uuid)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribe)
 }
 
 func createTribe(w http.ResponseWriter, r *http.Request) {
