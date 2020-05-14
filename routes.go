@@ -101,7 +101,10 @@ func createTribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	now := time.Now()
 	tribe.OwnerPubKey = extracted.Pubkey
+	tribe.Created = &now
+	tribe.Updated = &now
 
 	DB.createTribe(tribe)
 
