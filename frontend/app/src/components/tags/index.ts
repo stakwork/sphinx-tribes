@@ -7,7 +7,7 @@ import {ReactComponent as tech} from './svg/tech.svg'
 import {ReactComponent as altcoins} from './svg/altcoins.svg'
 
 const tags:{[k:string]:any} = {
-    BTC: {
+    Bitcoin: {
         icon: btc,
         color: '#FAC917'
     },
