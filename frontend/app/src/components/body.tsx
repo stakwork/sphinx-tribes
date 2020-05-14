@@ -4,6 +4,7 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
 import {
   EuiFormFieldset,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import Tribe from './tribe'
 import Fuse from 'fuse.js'
@@ -24,6 +25,8 @@ export default function BodyComponent() {
   const { main, ui } = useStores()
   const [selected, setSelected] = useState('')
   return useObserver(() => {
+    const loading = main.tribes.length===0
+
     const tagsFilter = ui.tags.filter(t=>t.checked==='on').map(t=>t.label)
     const tribes = main.tribes.map(t=>{
       const matchCount = tagsFilter.reduce((a,item)=>t.tags.includes(item)?a+1:a, 0)
@@ -43,12 +46,13 @@ export default function BodyComponent() {
 
     return <Body>
       <Column>
-        <EuiFormFieldset>
+        {loading && <EuiLoadingSpinner size="xl" />}
+        {!loading && <EuiFormFieldset style={{width:'100%'}}>    
           {theTribes.map(t=> <Tribe {...t} key={t.uuid} 
             selected={selected===t.uuid}
             select={setSelected}
           />)}
-        </EuiFormFieldset>
+        </EuiFormFieldset>}
       </Column>
     </Body>
   }
@@ -68,6 +72,7 @@ const Body = styled.div`
 const Column = styled.div`
   display:flex;
   flex-direction:column;
+  align-items:center;
   max-width:900px;
   width:100%;
 `

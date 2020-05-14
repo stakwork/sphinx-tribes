@@ -8,6 +8,10 @@ import {
 } from '@elastic/eui';
 import Tag from './tag'
 
+function makeQR(uuid:string){
+  return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${window.location.hostname}`
+}
+
 export default function Tribe({uuid,name,img,tags,description,selected,select}:any){
   const showTags = tags&&tags.length&&tags.length>0?true:false
   return <>
@@ -53,7 +57,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
           fgColor="#000000"
           level="Q"
           style={{width:256}}
-          value={uuid}
+          value={makeQR(uuid)}
         />}
       </Content>
     </EuiCheckableCard>
