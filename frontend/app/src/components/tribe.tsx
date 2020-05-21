@@ -52,13 +52,15 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
             </Description>
           </div>}
         </Left>
-        {selected && <QRCode
-          bgColor={selected?'#FFFFFF':'#666'}
-          fgColor="#000000"
-          level="Q"
-          style={{width:256}}
-          value={makeQR(uuid)}
-        />}
+        {selected && <QRWrap>
+          <QRCode
+            bgColor={selected?'#FFFFFF':'#666'}
+            fgColor="#000000"
+            level="Q"
+            style={{width:246}}
+            value={makeQR(uuid)}
+          />
+        </QRWrap>}
       </Content>
     </EuiCheckableCard>
     <EuiSpacer size="m" />
@@ -90,6 +92,10 @@ const Content = styled.div<ContentProps>`
       color:#bebebe;
     }
   `}
+`
+const QRWrap = styled.div`
+  background:white;
+  padding:5px;
 `
 const Left = styled.div`
   height:100%;
