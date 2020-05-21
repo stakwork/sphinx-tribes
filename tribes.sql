@@ -2,6 +2,7 @@
 CREATE TABLE tribes (
   uuid TEXT NOT NULL PRIMARY KEY,
   owner_pub_key TEXT NOT NULL,
+  owner_alias TEXT,
   group_key TEXT,
   name TEXT,
   description TEXT,

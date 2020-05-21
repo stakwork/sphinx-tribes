@@ -13,6 +13,7 @@ import (
 type Tribe struct {
 	UUID            string         `json:"uuid"`
 	OwnerPubKey     string         `json:"ownerPubkey"`
+	OwnerAlias      string         `json:"ownerAlias"`
 	GroupKey        string         `json:"groupKey"`
 	Name            string         `json:"name"`
 	Description     string         `json:"description"`
