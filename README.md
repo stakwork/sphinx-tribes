@@ -14,9 +14,8 @@ Decentralized message broker for public groups in Sphinx. Anyone can run a **sph
 
 ### Authentication
 
-Authentication is handled by the sphinx-auth microservice. 
+Authentication is handled by [sphinx-auth](https://github.com/stakwork/sphinx-auth)
 
-### run
+### build
 
-**build**
 docker build --no-cache -t sphinx-tribes .
