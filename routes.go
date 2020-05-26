@@ -37,6 +37,10 @@ func NewRouter() *http.Server {
 		r.Post("/tribes", createTribe)
 	})
 
+	r.Group(func(r chi.Router) {
+		r.Use(PubKeyContext)
+	})
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "5002"
