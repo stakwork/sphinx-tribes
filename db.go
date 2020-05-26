@@ -45,7 +45,7 @@ var updatables = []string{
 }
 
 // check that update owner_pub_key does in fact throw error
-func (db database) createTribe(m Tribe) (Tribe, error) {
+func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	if m.OwnerPubKey == "" {
 		return Tribe{}, errors.New("no pub key")
 	}
