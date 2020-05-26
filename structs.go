@@ -12,15 +12,15 @@ import (
 // Tribe struct
 type Tribe struct {
 	UUID            string         `json:"uuid"`
-	OwnerPubKey     string         `json:"ownerPubkey"`
-	OwnerAlias      string         `json:"ownerAlias"`
-	GroupKey        string         `json:"groupKey"`
+	OwnerPubKey     string         `json:"owner_pubkey"`
+	OwnerAlias      string         `json:"owner_alias"`
+	GroupKey        string         `json:"group_key"`
 	Name            string         `json:"name"`
 	Description     string         `json:"description"`
 	Tags            pq.StringArray `json:"tags"`
 	Img             string         `json:"img"`
-	PriceToJoin     int64          `json:"priceToJoin"`
-	PricePerMessage int64          `json:"pricePerMessage"`
+	PriceToJoin     int64          `json:"price_to_join"`
+	PricePerMessage int64          `json:"price_per_message"`
 	Created         *time.Time     `json:"created"`
 	Updated         *time.Time     `json:"updated"`
 }
