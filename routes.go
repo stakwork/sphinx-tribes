@@ -34,11 +34,12 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getAllTribes)
 		r.Get("/tribes/{uuid}", getTribe)
-		r.Post("/tribes", createTribe)
+		r.Post("/tribes", createOrEditTribe)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(PubKeyContext)
+		r.Put("/tribe", createOrEditTribe)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -70,7 +71,9 @@ func getTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tribe)
 }
 
-func createTribe(w http.ResponseWriter, r *http.Request) {
+func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
 
 	tribe := Tribe{}
 	body, err := ioutil.ReadAll(r.Body)
@@ -87,30 +90,34 @@ func createTribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := DB.getTribe(tribe.UUID)
-	if existing.UUID != "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
+	now := time.Now()
 
-	extracted, err := getFromAuth("/extract?sig=" + tribe.UUID)
-	fmt.Printf("EXTRACTED %+v\n", extracted)
+	extractedPubkey, err := VerifyTribeUUID(tribe.UUID)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	if !extracted.Valid || extracted.Pubkey == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+
+	if pubKeyFromAuth == "" {
+		tribe.Created = &now
+	} else { // IF PUBKEY IN CONTEXT, MUST AUTH!
+		if pubKeyFromAuth != extractedPubkey {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
 
-	now := time.Now()
-	tribe.OwnerPubKey = extracted.Pubkey
-	tribe.Created = &now
+	// existing := DB.getTribe(tribe.UUID)
+	// if existing.UUID != "" {
+	// 	w.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
+
+	tribe.OwnerPubKey = extractedPubkey
 	tribe.Updated = &now
 
-	DB.createTribe(tribe)
+	DB.createOrEditTribe(tribe)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribe)

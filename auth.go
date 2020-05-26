@@ -26,16 +26,8 @@ func PubKeyContext(next http.Handler) http.Handler {
 			return
 		}
 
-		sigByes, err := base64.URLEncoding.DecodeString(token)
+		pubkey, err := VerifyTribeUUID(token)
 		if err != nil {
-			http.Error(w, http.StatusText(401), 401)
-			return
-		}
-
-		timeBuf := sigByes[:4] // unix timestamp is 4 bytes, or uint32
-		sigBuf := sigByes[4:]
-		pubkey, valid, err := VerifyAndExtract(timeBuf, sigBuf)
-		if err != nil || !valid {
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}
@@ -43,6 +35,22 @@ func PubKeyContext(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), ContextKey, pubkey)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+// VerifyTribeUUID takes base64 uuid and returns hex pubkey
+func VerifyTribeUUID(uuid string) (string, error) {
+	sigByes, err := base64.URLEncoding.DecodeString(uuid)
+	if err != nil {
+		return "", err
+	}
+
+	timeBuf := sigByes[:4] // unix timestamp is 4 bytes, or uint32
+	sigBuf := sigByes[4:]
+	pubkey, valid, err := VerifyAndExtract(timeBuf, sigBuf)
+	if err != nil || !valid || pubkey == "" {
+		return "", err
+	}
+	return pubkey, nil
 }
 
 // VerifyAndExtract ... pubkey comes out hex encoded
