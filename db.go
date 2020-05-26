@@ -40,7 +40,8 @@ func initDB() {
 }
 
 var updatables = []string{
-	"name", "description", "tags", "owner_alias",
+	"name", "description", "tags", "img",
+	"owner_alias", "price_to_join", "price_per_message",
 }
 
 // check that update owner_pub_key does in fact throw error
