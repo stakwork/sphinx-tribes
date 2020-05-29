@@ -23,44 +23,40 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
       checked={selected}
       onChange={() => select(uuid)}>
       <Content onClick={() => select(selected?'':uuid)} style={{
-        height:selected?256:100
+        height:selected?'auto':100
       }} selected={selected}>
-        <Left style={selected?{maxWidth:'calc(100% - 256px)'}:{}}>
+        <Left >
           <Row>
+            <div className="placeholder-img-tribe"></div>
             <Img src={img} />
             <Left style={{padding:'22px 22px 20px',maxHeight:100,maxWidth:'calc(100% - 100px)'}}>
               <Row style={selected?{flexDirection:'column',alignItems:'flex-start'}:{}}>
-                <Title style={selected?{color:'white',fontSize:32,minHeight:34}:{}}>
+                <Title>
                   {name}
                 </Title>
-                {showTags && <Tokens style={selected?{marginTop:16}:{}}>
-                  {tags.map((t:string)=> <Tag type={t} key={t} />)}
-                </Tokens>}
               </Row>
-              {!selected && <>
-                <EuiSpacer size="m" />
-                <Description oneLine={true} style={{minHeight:20}}>
-                  {description}
-                </Description>
-              </>}
+
+              <EuiSpacer size="m" />
+              <Description oneLine={true} style={{minHeight:20}}>
+                {description}
+              </Description>
+
+              {showTags && <Tokens>
+                {tags.map((t:string)=> <Tag type={t} key={t} />)}
+              </Tokens>}
             </Left>
           </Row>
-          {selected && <div style={{padding:'6px 17px'}}>
-            <EuiSpacer size="s" />
-            <Description oneLine={false}>
-              {description}
-            </Description>
-          </div>}
+
+          {selected && <QRWrap id="qr-wrap">
+            <QRCode
+              bgColor={selected?'#FFFFFF':'#666'}
+              fgColor="#000000"
+              level="Q"
+              style={{width:246}}
+              value={makeQR(uuid)}
+            />
+          </QRWrap>}
         </Left>
-        {selected && <QRWrap>
-          <QRCode
-            bgColor={selected?'#FFFFFF':'#666'}
-            fgColor="#000000"
-            level="Q"
-            style={{width:246}}
-            value={makeQR(uuid)}
-          />
-        </QRWrap>}
       </Content>
     </EuiCheckableCard>
     <EuiSpacer size="m" />
@@ -138,8 +134,9 @@ const Img = styled.div<ImageProps>`
   background-image:url("${(p)=> p.src}");
   background-position:center;
   background-size:cover;
-  height:100px;
-  width:100px;
+  height:90px;
+  width:90px;
+  border-radius: 5px;
   position:relative;
 `
 const Tokens=styled.div`
