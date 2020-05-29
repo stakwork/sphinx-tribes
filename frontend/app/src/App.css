@@ -42,15 +42,96 @@ code {
   /*justify-content: space-between;
   align-items: center;*/
   display: block;
-  max-height: 130px;
+  max-height: 105px;
   height: auto;
   min-height: auto;
-  background: #1f2931;
+  background: #161e29;
+  border: 0;
 }
 
+#logo {
+  width: 200px;
+  height: 30px;
+}
+#search-input {
+  width: 270px;
+  box-shadow: none;
+  border-radius: 5px;
+  color: #3B4755;
+  background: #101821;
+}
+#header .euiButton{
+  min-width: 80px;
+  width: 80px;
+  height: 35px;
+  border: 1px solid #5D8FDD;
+  color: #5D8FDD;
+}
+#header .euiButton__text {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+#header .euiFieldSearch::placeholder {
+  color: #3B4755;
+}
+#header .euiFieldSearch:focus {
+  background-image: linear-gradient(to top, #5D8FDD, #5D8FDD 2px, transparent 2px, transparent 100%);
+}
+.euiPanel.euiPanel {
+  background-color: #161e29;
+  border: 1px solid #161e29;
+}
+.euiPanel.euiPanel .euiSelectableListItem:not(:last-of-type) {
+    border-bottom: 1px solid transparent;
+}
+.euiFieldSearch.euiFieldSearch {
+  background-color: #101821;
+}
+/* main */
+#main {
+  background: #17212a;
+  padding-top: 6px;
+}
+#main .euiSpacer--m {
+  height: 6px;
+}
+fieldset.container {
+  padding: 0;
+}
+
+#main .euiCheckableCard {
+  min-height: 137px;
+  padding: 24px;
+  border: 0;
+  background: #1a2430;
+  position: relative;
+}
+#main .euiCheckableCard h5 {
+  color: #6B7A8D;
+  font-size: 12px;
+}
+
+.placeholder-img-tribe {
+  position: absolute;
+  left: 24px;
+  top: 28px;
+  width: 90px;
+  height: 90px;
+  border-radius: 5px;
+  background: url(/static/placeholder.svg);
+  background-repeat: no-repeat;
+  background-size: 40px 33px;
+  background-position: center center;
+  background-color: #161e29;
+}
+
+#qr-wrap {
+  width: 256px;
+  margin-top: 20px;
+}
 @media (max-width: 767px) {
   #header-right {
-    margin-top: 15px;
+    margin-top: 10px;
     margin-bottom: 10px;
     padding: 0;
   }

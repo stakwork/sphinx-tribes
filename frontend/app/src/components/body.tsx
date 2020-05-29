@@ -44,7 +44,7 @@ export default function BodyComponent() {
       theTribes = res.map(r=>r.item)
     }
 
-    return <Body>
+    return <Body id="main">
       <Column>
         {loading && <EuiLoadingSpinner size="xl" />}
         {!loading && <EuiFormFieldset style={{width:'100%'}} className="container">

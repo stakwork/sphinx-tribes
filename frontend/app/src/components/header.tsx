@@ -39,14 +39,14 @@ export default function Header() {
       <div className="container">
         <div className="row">
           <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            <img src="static/logo.png" alt="Logo"/>
+            <img id="logo" src="static/tribes_logo.svg" alt="Logo"/>
             {/*<Title>Tribes</Title>*/}
           </EuiHeaderSection>
 
           <EuiHeaderSection id="header-right" side="right" className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             {/* <EuiHeaderSectionItem> */}
             <div style={{margin:'0 6px'}}>
-              <EuiFieldSearch
+              <EuiFieldSearch id="search-input"
                 placeholder="Search Tribes"
                 value={ui.searchText}
                 onChange={e=> ui.setSearchText(e.target.value)}
