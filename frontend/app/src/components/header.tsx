@@ -26,7 +26,6 @@ export default function Header() {
   const showTagCount = selectedTags.length>0?true:false
   return useObserver(() => {
     const button = (<EuiButton
-      style={{width:142}}
       iconType="arrowDown"
       iconSide="right"
       size="s"
@@ -36,50 +35,52 @@ export default function Header() {
       }}>
       {`Tags ${showTagCount?`(${selectedTags.length})`:''}`}
     </EuiButton>)
-    return <EuiHeader style={{justifyContent:'space-between',alignItems:'center',maxHeight:50,height:50,minHeight:50}}>
-      <EuiHeaderSection grow={false}>
-        <Image src="static/icon-1024.png" size="50" />
-        <Title>Tribes</Title>
-      </EuiHeaderSection>
+    return <EuiHeader id="header" >
+      <div className="container">
+        <div className="row">
+          <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <img src="static/logo.png" alt="Logo"/>
+            {/*<Title>Tribes</Title>*/}
+          </EuiHeaderSection>
 
-      <EuiHeaderSection side="right" style={{display:'flex',alignItems:'center'}}>
-        {/* <EuiHeaderSectionItem> */}
-        <EuiPopover
-          panelPaddingSize="none"
-          button={button}
-          isOpen={tagsPop}
-          closePopover={()=>setTagsPop(false)}>
-          <EuiSelectable
-            searchable
-            options={ui.tags}
-            renderOption={(option,searchValue)=><div style={{display:'flex',alignItems:'center'}}>
-              <Tag type={option.label} iconOnly />
-              <EuiHighlight search={searchValue} style={{
-                fontSize:11,marginLeft:5,color:tags[option.label].color
-              }}>
-                {option.label}
-              </EuiHighlight>
-            </div>}
-            listProps={{rowHeight: 30}} // showIcons:false
-            onChange={opts=> ui.setTags(opts)}>
-            {(list, search) => <div style={{ width: 220 }}>
-              {search}
-              {list}
-            </div>}
-          </EuiSelectable>
-        </EuiPopover>
-        <div style={{margin:'0 6px'}}>
-          <EuiFieldSearch
-            style={{width:'40vw'}}
-            placeholder="Search Tribes"
-            value={ui.searchText}
-            onChange={e=> ui.setSearchText(e.target.value)}
-            // isClearable={this.state.isClearable}
-            aria-label="search"
-          />
+          <EuiHeaderSection id="header-right" side="right" className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            {/* <EuiHeaderSectionItem> */}
+            <div style={{margin:'0 6px'}}>
+              <EuiFieldSearch
+                placeholder="Search Tribes"
+                value={ui.searchText}
+                onChange={e=> ui.setSearchText(e.target.value)}
+                // isClearable={this.state.isClearable}
+                aria-label="search"
+              />
+            </div>
+            <EuiPopover
+              panelPaddingSize="none"
+              button={button}
+              isOpen={tagsPop}
+              closePopover={()=>setTagsPop(false)}>
+              <EuiSelectable
+                searchable
+                options={ui.tags}
+                renderOption={(option,searchValue)=><div style={{display:'flex',alignItems:'center'}}>
+                  <Tag type={option.label} iconOnly />
+                  <EuiHighlight search={searchValue} style={{
+                    fontSize:11,marginLeft:5,color:tags[option.label].color
+                  }}>
+                    {option.label}
+                  </EuiHighlight>
+                </div>}
+                listProps={{rowHeight: 30}} // showIcons:false
+                onChange={opts=> ui.setTags(opts)}>
+                {(list, search) => <div style={{ width: 220 }}>
+                  {search}
+                  {list}
+                </div>}
+              </EuiSelectable>
+            </EuiPopover>
+          </EuiHeaderSection>
         </div>
-      </EuiHeaderSection>
-
+      </div>
     </EuiHeader>
   })
 }

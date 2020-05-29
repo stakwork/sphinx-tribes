@@ -9,6 +9,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@types/styled-components": "^5.1.0",
+    "bootstrap": "^4.5.0",
     "dateformat": "^3.0.3",
     "fuse.js": "^5.2.3",
     "lodash": "^4.17.15",
