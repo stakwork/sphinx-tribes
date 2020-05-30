@@ -126,9 +126,43 @@ fieldset.container {
 }
 
 #qr-wrap {
-  width: 256px;
-  margin-top: 20px;
+  width: 219px;
 }
+.qr-left {
+  color: #6B7A8D;
+  font-size: 12px;
+}
+.qr-left .lighter-color {
+  color: #fff;
+}
+.qr-left .disabled , .qr-left .disabled .lighter-color{
+  color: #3B4755;
+}
+.qr-left .info {
+  display: block;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.qr-left .section-separator {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#main .item-cont {
+  align-items: inherit;
+}
+.info-section {
+  color: #556171;
+  font-size: 10px;
+}
+.lighter-color {
+  color: #68798b;
+}
+.section-separator {
+  border: 1px solid #151E27;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
 @media (max-width: 767px) {
   #header-right {
     margin-top: 10px;

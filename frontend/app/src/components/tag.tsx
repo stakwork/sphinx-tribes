@@ -11,7 +11,7 @@ export default function T(props:any){
     <IconWrap style={{borderColor:color,background:color+'22'}}>
       <Icon height="8" width="8" />
     </IconWrap>
-    {!props.iconOnly && <Name style={{color}}>{type}</Name>}
+    {!props.iconOnly && <Name style={{color: '#556171'}}>{type}</Name>}
   </Wrap>
 }
 
