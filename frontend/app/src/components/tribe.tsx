@@ -41,24 +41,24 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
                 {description}
               </Description>
 
-              {showTags && <Tokens>
+              {showTags && <Tokens className="tags-wrapper">
                 {tags.map((t:string)=> <Tag type={t} key={t} />)}
               </Tokens>}
             </Left>
           </Row>
 
-          <div className="section-separator"></div>
+          <div className="section-separator" style={selected ? { opacity: 1} : { opacity: 0}} ></div>
           <div className="row info-section">
             <div className="col-4 col-sm-4 col-md-4 col-lg-4">
-              <div>Admin:</div>
+              <div className="uppercase">Admin:</div>
               <div className="lighter-color">AdminUsername</div>
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
-              <div>Members:</div>
+              <div className="uppercase">Members:</div>
               <div className="lighter-color">42</div>
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
-              <div>Created on:</div>
+              <div className="uppercase">Created on:</div>
               <div className="lighter-color">May 22</div>
             </div>
           </div>
@@ -90,6 +90,8 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
               </QRWrap>}
             </div>
           </div>
+
+          <div className="colapse-button"><img src="static/keyboard_arrow_up-black-18dp.svg" alt="" /></div>
         </Left>
       </Content>
     </EuiCheckableCard>

@@ -71,6 +71,9 @@ code {
   font-size: 10px;
   text-transform: uppercase;
 }
+#header .euiIcon--medium {
+  width: 11px;
+}
 #header .euiFieldSearch::placeholder {
   color: #3B4755;
 }
@@ -162,7 +165,38 @@ fieldset.container {
   margin-top: 25px;
   margin-bottom: 25px;
 }
-
+.uppercase {
+  text-transform: uppercase;
+}
+.colapse-button {
+  display: block;
+  width: 100px;
+  height: 40px;
+  margin: 0 auto;
+  background: #151E27;
+  margin-bottom: -24px;
+  margin-top: 20px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  position: relative;
+}
+.colapse-button img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.tags-wrapper.tags-wrapper {
+  display: initial;
+  height: 20px;
+  overflow: hidden;
+}
+.euiCheckableCard-isChecked .tags-wrapper.tags-wrapper{
+  overflow: visible;
+}
+.tag-wrapper.tag-wrapper {
+  display: inline-flex;
+}
 @media (max-width: 767px) {
   #header-right {
     margin-top: 10px;

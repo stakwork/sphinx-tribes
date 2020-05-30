@@ -7,7 +7,7 @@ export default function T(props:any){
   if(!tags[type]) return <></>
   const Icon = tags[type].icon
   const color = tags[type].color
-  return <Wrap>
+  return <Wrap className="tag-wrapper">
     <IconWrap style={{borderColor:color,background:color+'22'}}>
       <Icon height="8" width="8" />
     </IconWrap>
