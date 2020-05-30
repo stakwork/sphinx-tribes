@@ -26,10 +26,10 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
         height:selected?'auto':100
       }} selected={selected}>
         <Left >
-          <Row>
+          <Row className="item-cont">
             <div className="placeholder-img-tribe"></div>
             <Img src={img} />
-            <Left style={{padding:'22px 22px 20px',maxHeight:100,maxWidth:'calc(100% - 100px)'}}>
+            <Left style={{padding:'0 0 22px 20px', maxWidth:'calc(100% - 100px)'}}>
               <Row style={selected?{flexDirection:'column',alignItems:'flex-start'}:{}}>
                 <Title>
                   {name}
@@ -37,7 +37,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
               </Row>
 
               <EuiSpacer size="m" />
-              <Description oneLine={true} style={{minHeight:20}}>
+              <Description oneLine={selected?false:true} style={{minHeight:20}}>
                 {description}
               </Description>
 
@@ -47,15 +47,49 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
             </Left>
           </Row>
 
-          {selected && <QRWrap id="qr-wrap">
-            <QRCode
-              bgColor={selected?'#FFFFFF':'#666'}
-              fgColor="#000000"
-              level="Q"
-              style={{width:246}}
-              value={makeQR(uuid)}
-            />
-          </QRWrap>}
+          <div className="section-separator"></div>
+          <div className="row info-section">
+            <div className="col-4 col-sm-4 col-md-4 col-lg-4">
+              <div>Admin:</div>
+              <div className="lighter-color">AdminUsername</div>
+            </div>
+            <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
+              <div>Members:</div>
+              <div className="lighter-color">42</div>
+            </div>
+            <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
+              <div>Created on:</div>
+              <div className="lighter-color">May 22</div>
+            </div>
+          </div>
+          <div className="section-separator"></div>
+
+          <div className="row">
+            <div className="col-4 col-sm-6 col-md-6 col-lg-6 qr-left">
+              <div className="text-right"><img style={{width: 90}} src="static/scan_notification.svg" alt="" /></div>
+              <div className="text-right info">
+                <div>Price to join</div>
+                <div className="lighter-color">2500</div>
+              </div>
+              <div className="section-separator"></div>
+              <div className="text-right info disabled">
+                <div>Price per msg</div>
+                <div className="lighter-color">0</div>
+              </div>
+              <div className="section-separator"></div>
+            </div>
+            <div className="col-8 col-sm-6 col-md-6 col-lg-6">
+              {selected && <QRWrap id="qr-wrap" className="float-r">
+                <QRCode
+                  bgColor={selected?'#FFFFFF':'#666'}
+                  fgColor="#000000"
+                  level="Q"
+                  style={{width:209}}
+                  value={makeQR(uuid)}
+                />
+              </QRWrap>}
+            </div>
+          </div>
         </Left>
       </Content>
     </EuiCheckableCard>
@@ -71,7 +105,7 @@ const Content = styled.div<ContentProps>`
   justify-content:space-between;
   max-width:100%;
   & h3{
-    color:#ccc;
+    color:#fff;
   }
   &:hover h3{
     color:white;
@@ -119,8 +153,6 @@ interface DescriptionProps {
 const Description=styled.h5<DescriptionProps>`
   font-weight:normal;
   line-height:20px;
-  overflow: scroll;
-  max-height:142px;
   ${(p)=> p.oneLine&&`
     white-space: nowrap;
     text-overflow: ellipsis;
