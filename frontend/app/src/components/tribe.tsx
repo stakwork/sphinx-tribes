@@ -11,6 +11,9 @@ import Tag from './tag'
 function makeQR(uuid:string){
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${window.location.hostname}`
 }
+function copyString() {
+  return false;
+}
 
 export default function Tribe({uuid,name,img,tags,description,selected,select}:any){
   const showTags = tags&&tags.length&&tags.length>0?true:false
@@ -29,20 +32,19 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
           <Row className="item-cont">
             <div className="placeholder-img-tribe"></div>
             <Img src={img} />
-            <Left style={{padding:'0 0 22px 20px', maxWidth:'calc(100% - 100px)'}}>
+            <Left style={{padding:'0 0 0 20px', maxWidth:'calc(100% - 100px)'}}>
               <Row style={selected?{flexDirection:'column',alignItems:'flex-start'}:{}}>
-                <Title>
+                <Title className="tribe-title">
                   {name}
                 </Title>
               </Row>
-
-              <EuiSpacer size="m" />
               <Description oneLine={selected?false:true} style={{minHeight:20}}>
                 {description}
               </Description>
 
               {showTags && <Tokens className="tags-wrapper">
                 {tags.map((t:string)=> <Tag type={t} key={t} />)}
+                {tags.length > 3 && <span className="more-tags-available">more...</span>}
               </Tokens>}
             </Left>
           </Row>
@@ -66,7 +68,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
 
           <div className="row">
             <div className="col-4 col-sm-6 col-md-6 col-lg-6 qr-left">
-              <div className="text-right"><img style={{width: 90}} src="static/scan_notification.svg" alt="" /></div>
+              <div className="text-right"><img style={{width: 100}} src="static/scan_notification.svg" alt="" /></div>
               <div className="text-right info">
                 <div>Price to join</div>
                 <div className="lighter-color">2500</div>
@@ -79,7 +81,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
               <div className="section-separator"></div>
             </div>
             <div className="col-8 col-sm-6 col-md-6 col-lg-6">
-              {selected && <QRWrap id="qr-wrap" className="float-r">
+              {selected && <QRWrap className="qr-wrap float-r">
                 <QRCode
                   bgColor={selected?'#FFFFFF':'#666'}
                   fgColor="#000000"
@@ -88,6 +90,10 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
                   value={makeQR(uuid)}
                 />
               </QRWrap>}
+              <div className="below-qr">
+                <div className="qr-string">14unzosz69hGfghj6...</div>
+                <button className="copy-btn" onClick={copyString}>Copy</button>
+              </div>
             </div>
           </div>
 
