@@ -35,12 +35,15 @@ code {
 .euiCheckableCard__row:first-child{
   display: none;
 }
-
+.container {
+  max-width: 760px !important;
+}
+.euiPopover {
+  margin-top: -5px;
+}
 #header {
-  padding-top: 14px;
+  padding-top: 12px;
   padding-bottom: 16px;
-  /*justify-content: space-between;
-  align-items: center;*/
   display: block;
   max-height: 105px;
   height: auto;
@@ -51,14 +54,16 @@ code {
 
 #logo {
   width: 200px;
-  height: 30px;
+  height: 40px;
 }
 #search-input {
-  width: 270px;
+  width: 260px;
+  height: 35px;
   box-shadow: none;
   border-radius: 5px;
   color: #3B4755;
   background: #101821;
+  margin-right: 10px;
 }
 #header .euiButton{
   min-width: 80px;
@@ -80,6 +85,9 @@ code {
 #header .euiFieldSearch:focus {
   background-image: linear-gradient(to top, #5D8FDD, #5D8FDD 2px, transparent 2px, transparent 100%);
 }
+#header-right {
+  align-items: center;
+}
 .euiPanel.euiPanel {
   background-color: #161e29;
   border: 1px solid #161e29;
@@ -91,20 +99,24 @@ code {
   background-color: #101821;
 }
 /* main */
+.main-wrap.main-wrap {
+  max-width: none;
+}
 #main {
   background: #17212a;
-  padding-top: 6px;
+  padding-top: 8px;
 }
 #main .euiSpacer--m {
   height: 6px;
 }
 fieldset.container {
   padding: 0;
+  padding-bottom: 60px;
 }
 
 #main .euiCheckableCard {
   min-height: 137px;
-  padding: 24px;
+  padding: 20px;
   border: 0;
   background: #1a2430;
   position: relative;
@@ -112,12 +124,17 @@ fieldset.container {
 #main .euiCheckableCard h5 {
   color: #6B7A8D;
   font-size: 12px;
+  margin-bottom: 0;
 }
-
+.tribe-title.tribe-title {
+  margin-top: 10px;
+  margin-bottom: 3px;
+  font-size: 17px;
+}
 .placeholder-img-tribe {
   position: absolute;
-  left: 24px;
-  top: 28px;
+  left: 22px;
+  top: 22px;
   width: 90px;
   height: 90px;
   border-radius: 5px;
@@ -128,8 +145,9 @@ fieldset.container {
   background-color: #161e29;
 }
 
-#qr-wrap {
+.qr-wrap {
   width: 219px;
+  margin-bottom: 20px;
 }
 .qr-left {
   color: #6B7A8D;
@@ -150,20 +168,25 @@ fieldset.container {
   margin-top: 0;
   margin-bottom: 0;
 }
+.below-qr {
+  display: flex;
+}
+
 #main .item-cont {
   align-items: inherit;
 }
 .info-section {
   color: #556171;
-  font-size: 10px;
+  font-size: 9px;
 }
 .lighter-color {
   color: #68798b;
+  font-size: 12px;
 }
 .section-separator {
   border: 1px solid #151E27;
-  margin-top: 25px;
-  margin-bottom: 25px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 .uppercase {
   text-transform: uppercase;
@@ -190,17 +213,55 @@ fieldset.container {
   display: initial;
   height: 20px;
   overflow: hidden;
+  position: relative;
 }
 .euiCheckableCard-isChecked .tags-wrapper.tags-wrapper{
   overflow: visible;
+  height: auto;
 }
 .tag-wrapper.tag-wrapper {
   display: inline-flex;
+}
+.more-tags-available {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: -0px;
+  font-size: 10px;
+  color: #6B7A8D;
+}
+
+.euiCheckableCard-isChecked .more-tags-available {
+  display: none;
+}
+.qr-string {
+  color: #fff;
+  width: 134px;
+  height: 15px;
+  font-size: 15px;
+}
+.copy-btn {
+  background: #698cf7;
+  width: 62px;
+  height: 25px;
+  font-size: 10px;
+  border-radius: 5px;
+  color: #fff;
+  text-transform: uppercase;
+  margin-left: 20px;
+}
+@media (min-width: 768px) {
+  #logo {
+    width: 250px;
+    height: 60px;
+  }
+  #header .container {
+    padding: 0;
+  }
 }
 @media (max-width: 767px) {
   #header-right {
     margin-top: 10px;
     margin-bottom: 10px;
-    padding: 0;
   }
 }
