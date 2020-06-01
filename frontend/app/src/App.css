@@ -41,6 +41,11 @@ code {
 .euiPopover {
   margin-top: -5px;
 }
+.euiLoadingSpinner {
+  position: absolute;
+  top: 50%;
+}
+
 #header {
   padding-top: 12px;
   padding-bottom: 16px;
@@ -174,6 +179,7 @@ fieldset.container {
 
 #main .item-cont {
   align-items: inherit;
+  min-height: 100px;
 }
 .info-section {
   color: #556171;
@@ -223,12 +229,13 @@ fieldset.container {
   display: inline-flex;
 }
 .more-tags-available {
-  display: none;
   position: absolute;
-  top: 6px;
-  right: -0px;
+  top: -4px;
+  right: 0px;
   font-size: 10px;
   color: #6B7A8D;
+  background: #1a2430;
+  padding: 10px;
 }
 
 .euiCheckableCard-isChecked .more-tags-available {
@@ -240,6 +247,17 @@ fieldset.container {
   height: 15px;
   font-size: 15px;
 }
+textarea.qr-string {
+  height: 20px;
+  background: transparent;
+  border: 0;
+  position: relative;
+  width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  resize: none;
+}
 .copy-btn {
   background: #698cf7;
   width: 62px;
@@ -248,7 +266,6 @@ fieldset.container {
   border-radius: 5px;
   color: #fff;
   text-transform: uppercase;
-  margin-left: 20px;
 }
 @media (min-width: 768px) {
   #logo {
@@ -257,6 +274,16 @@ fieldset.container {
   }
   #header .container {
     padding: 0;
+  }
+  fieldset.container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-columns: 380px;
+    grid-gap: 5px;
+    place-items: stretch;
+  }
+  #main .euiSpacer--m {
+    display: none;
   }
 }
 @media (max-width: 767px) {
