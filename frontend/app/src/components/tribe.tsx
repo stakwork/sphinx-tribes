@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useRef, useState} from 'react'
 import { QRCode } from 'react-qr-svg';
 import styled from 'styled-components'
 import {
@@ -11,12 +11,16 @@ import Tag from './tag'
 function makeQR(uuid:string){
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${window.location.hostname}`
 }
-function copyString() {
-  return false;
+function copyString(e:any, textareaRef:any) {
+  e.stopPropagation();
+  textareaRef.current.select();
+  document.execCommand('copy');
+  return alert('String copied!' )
 }
 
 export default function Tribe({uuid,name,img,tags,description,selected,select}:any){
   const showTags = tags&&tags.length&&tags.length>0?true:false
+  const textareaRef = useRef(null);
   return <>
     <EuiCheckableCard
       id={uuid}
@@ -48,56 +52,57 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
               </Tokens>}
             </Left>
           </Row>
+          <div className="expand-part" style={selected ? { opacity: 1} : { opacity: 0}}>
+            <div className="section-separator"></div>
+            <div className="row info-section">
+              <div className="col-4 col-sm-4 col-md-4 col-lg-4">
+                <div className="uppercase">Admin:</div>
+                <div className="lighter-color">AdminUsername</div>
+              </div>
+              <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
+                <div className="uppercase">Members:</div>
+                <div className="lighter-color">42</div>
+              </div>
+              <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
+                <div className="uppercase">Created on:</div>
+                <div className="lighter-color">May 22</div>
+              </div>
+            </div>
+            <div className="section-separator"></div>
 
-          <div className="section-separator" style={selected ? { opacity: 1} : { opacity: 0}} ></div>
-          <div className="row info-section">
-            <div className="col-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="uppercase">Admin:</div>
-              <div className="lighter-color">AdminUsername</div>
+            <div className="row">
+              <div className="col-4 col-sm-4 col-md-4 col-lg-4 qr-left">
+                <div className="text-right"><img style={{width: 100}} src="static/scan_notification.svg" alt="" /></div>
+                <div className="text-right info">
+                  <div>Price to join</div>
+                  <div className="lighter-color">2500</div>
+                </div>
+                <div className="section-separator"></div>
+                <div className="text-right info disabled">
+                  <div>Price per msg</div>
+                  <div className="lighter-color">0</div>
+                </div>
+                <div className="section-separator"></div>
+              </div>
+              <div className="col-8 col-sm-8 col-md-8 col-lg-8">
+                {selected && <QRWrap className="qr-wrap float-r">
+                  <QRCode
+                    bgColor={selected?'#FFFFFF':'#666'}
+                    fgColor="#000000"
+                    level="Q"
+                    style={{width:209}}
+                    value={makeQR(uuid)}
+                  />
+                </QRWrap>}
+                <div className="below-qr">
+                  <textarea className="qr-string" ref={textareaRef} >14unzosz69hGfghj614unzosz69hGfghj614unzosz69hGfghj614unzosz69hGfghj614unzosz69hGfghj6</textarea>
+                  <button className="copy-btn" onClick={(e) => copyString(e, textareaRef)}>Copy</button>
+                </div>
+              </div>
             </div>
-            <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
-              <div className="uppercase">Members:</div>
-              <div className="lighter-color">42</div>
-            </div>
-            <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
-              <div className="uppercase">Created on:</div>
-              <div className="lighter-color">May 22</div>
-            </div>
+
+            <div className="colapse-button"><img src="static/keyboard_arrow_up-black-18dp.svg" alt="" /></div>
           </div>
-          <div className="section-separator"></div>
-
-          <div className="row">
-            <div className="col-4 col-sm-6 col-md-6 col-lg-6 qr-left">
-              <div className="text-right"><img style={{width: 100}} src="static/scan_notification.svg" alt="" /></div>
-              <div className="text-right info">
-                <div>Price to join</div>
-                <div className="lighter-color">2500</div>
-              </div>
-              <div className="section-separator"></div>
-              <div className="text-right info disabled">
-                <div>Price per msg</div>
-                <div className="lighter-color">0</div>
-              </div>
-              <div className="section-separator"></div>
-            </div>
-            <div className="col-8 col-sm-6 col-md-6 col-lg-6">
-              {selected && <QRWrap className="qr-wrap float-r">
-                <QRCode
-                  bgColor={selected?'#FFFFFF':'#666'}
-                  fgColor="#000000"
-                  level="Q"
-                  style={{width:209}}
-                  value={makeQR(uuid)}
-                />
-              </QRWrap>}
-              <div className="below-qr">
-                <div className="qr-string">14unzosz69hGfghj6...</div>
-                <button className="copy-btn" onClick={copyString}>Copy</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="colapse-button"><img src="static/keyboard_arrow_up-black-18dp.svg" alt="" /></div>
         </Left>
       </Content>
     </EuiCheckableCard>
