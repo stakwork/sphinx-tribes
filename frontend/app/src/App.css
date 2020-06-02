@@ -306,12 +306,15 @@ textarea.qr-string {
   fieldset.container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-columns: 380px;
+    grid-auto-columns: 375px;
     grid-gap: 5px;
-    place-items: stretch;
+    place-items: self-start;
   }
   #main .euiSpacer--m {
     display: none;
+  }
+  #main .euiCheckableCard {
+    max-width: 378px;
   }
 }
 @media (max-width: 767px) {
