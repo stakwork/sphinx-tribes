@@ -48,10 +48,12 @@ export default function BodyComponent() {
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
         {!loading && <EuiFormFieldset style={{width:'100%'}} className="container">
-          {theTribes.map(t=> <Tribe {...t} key={t.uuid}
-            selected={selected===t.uuid}
-            select={setSelected}
-          />)}
+          <div className="row">
+            {theTribes.map(t=> <Tribe {...t} key={t.uuid}
+              selected={selected===t.uuid}
+              select={setSelected}
+            />)}
+          </div>
         </EuiFormFieldset>}
       </Column>
     </Body>

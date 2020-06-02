@@ -22,7 +22,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
   const showTags = tags&&tags.length&&tags.length>0?true:false
   const textareaRef = useRef(null);
   return <>
-    <EuiCheckableCard
+    <EuiCheckableCard className="col-md-6 col-lg-6 ml-2 mb-2"
       id={uuid}
       label={name}
       name={name}
@@ -106,7 +106,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select}:a
         </Left>
       </Content>
     </EuiCheckableCard>
-    <EuiSpacer size="m" />
+
   </>
 }
 interface ContentProps {

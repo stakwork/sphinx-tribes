@@ -304,17 +304,21 @@ textarea.qr-string {
     padding: 0;
   }
   fieldset.container {
-    display: grid;
+    /*display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-columns: 375px;
     grid-gap: 5px;
-    place-items: self-start;
+    place-items: self-start;*/
   }
   #main .euiSpacer--m {
     display: none;
   }
   #main .euiCheckableCard {
     max-width: 378px;
+    height: 100px;
+  }
+  #main .euiCheckableCard-isChecked  {
+    height: auto;
   }
 }
 @media (max-width: 767px) {
