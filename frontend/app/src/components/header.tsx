@@ -59,7 +59,7 @@ export default function Header() {
               button={button}
               isOpen={tagsPop}
               closePopover={()=>setTagsPop(false)}>
-              <EuiSelectable
+              <EuiSelectable className="popover-tags" 
                 searchable
                 options={ui.tags}
                 renderOption={(option,searchValue)=><div style={{display:'flex',alignItems:'center'}}>
