@@ -69,6 +69,10 @@ code {
   color: #3B4755;
   background: #101821;
   margin-right: 10px;
+  background-image: url(/static/search-24px.svg) !important;
+  background-repeat: no-repeat;
+  background-position: 10px;
+  background-size: 20px 20px;
 }
 #header .euiButton{
   min-width: 80px;
@@ -86,6 +90,7 @@ code {
 }
 #header .euiFieldSearch::placeholder {
   color: #3B4755;
+  font-size: 13px;
 }
 #header .euiFieldSearch:focus {
   background-image: linear-gradient(to top, #5D8FDD, #5D8FDD 2px, transparent 2px, transparent 100%);
@@ -102,6 +107,26 @@ code {
 }
 .euiFieldSearch.euiFieldSearch {
   background-color: #101821;
+  font-size: 12px;
+}
+.euiFieldSearch.euiFieldSearch::placeholder {
+  color: #3B4755;
+}
+.euiFieldSearch.euiFieldSearch:focus {
+  background-color: #101821;
+}
+#header-right .euiFormControlLayoutIcons {
+  display: none;
+}
+.popover-tags .euiFieldSearch.euiFieldSearch {
+  background-image: url(/static/search-24px.svg) !important;
+  background-repeat: no-repeat;
+  background-position: 10px;
+  background-size: 20px 20px;
+}
+
+.popover-tags .euiFormControlLayoutIcons {
+  display: none;
 }
 /* main */
 .main-wrap.main-wrap {
@@ -135,6 +160,9 @@ fieldset.container {
   margin-top: 10px;
   margin-bottom: 3px;
   font-size: 17px;
+}
+.euiCheckableCard-isChecked .tribe-title {
+  white-space: normal;
 }
 .placeholder-img-tribe {
   position: absolute;
