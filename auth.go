@@ -27,7 +27,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 		}
 
 		pubkey, err := VerifyTribeUUID(token)
-		if err != nil {
+		if pubkey == "" || err != nil {
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}

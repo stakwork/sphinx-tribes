@@ -78,6 +78,14 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	return m, nil
 }
 
+func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
+	if uuid == "" {
+		return false
+	}
+	db.db.Model(&Tribe{UUID: uuid}).Updates(u)
+	return true
+}
+
 func (db database) getAllTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Find(&ms)
