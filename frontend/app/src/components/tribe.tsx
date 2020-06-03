@@ -9,7 +9,6 @@ function makeQR(uuid:string){
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${window.location.hostname}`
 }
 
-
 export default function Tribe({uuid,name,img,tags,description,selected,select,created,owner_alias,price_to_join,price_per_message}:any){
   const showTags = tags&&tags.length&&tags.length>0?true:false
   const textareaRef = useRef(null);
