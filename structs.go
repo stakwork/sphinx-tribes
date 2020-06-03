@@ -23,6 +23,7 @@ type Tribe struct {
 	PricePerMessage int64          `json:"price_per_message"`
 	Created         *time.Time     `json:"created"`
 	Updated         *time.Time     `json:"updated"`
+	MemberCount     uint64         `json:"member_count"`
 }
 
 // PropertyMap ...

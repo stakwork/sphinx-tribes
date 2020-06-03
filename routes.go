@@ -40,6 +40,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Use(PubKeyContext)
 		r.Put("/tribe", createOrEditTribe)
+		r.Put("/tribestats", putTribeStats)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -121,6 +122,49 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribe)
+}
+
+func putTribeStats(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	tribe := Tribe{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &tribe)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if tribe.UUID == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(tribe.UUID)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	now := time.Now()
+	tribe.Updated = &now
+	DB.updateTribe(tribe.UUID, map[string]interface{}{
+		"member_count": tribe.MemberCount,
+		"updated":      &now,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
 }
 
 type extractResponse struct {
