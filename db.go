@@ -82,7 +82,7 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
 	}
-	db.db.Model(&Tribe{UUID: uuid}).Updates(u)
+	db.db.Model(&Tribe{}).Where("uuid = ?", uuid).Updates(u)
 	return true
 }
 
