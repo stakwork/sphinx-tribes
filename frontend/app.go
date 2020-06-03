@@ -54,6 +54,9 @@ func StaticRoute(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(path, "/static/js") {
 		w.Header().Set("content-type", "application/javascript")
 	}
+	if strings.HasSuffix(path, ".svg") {
+		w.Header().Set("content-type", "image/svg+xml")
+	}
 	file, err := appBox.Find(path)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
