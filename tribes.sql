@@ -11,7 +11,8 @@ CREATE TABLE tribes (
   price_to_join BIGINT,
   price_per_message BIGINT,
   created timestamptz,
-  updated timestamptz
+  updated timestamptz,
+  member_count BIGINT
 );
 
 -- for searching 
