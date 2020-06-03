@@ -20,6 +20,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+button:focus{
+  outline:none !important;
+}
+
 .app {
   position:fixed;
   top:0;right:0;bottom:0;left:0;
@@ -66,7 +70,7 @@ code {
   height: 35px;
   box-shadow: none;
   border-radius: 5px;
-  color: #3B4755;
+  color: #587393;
   background: #101821;
   margin-right: 10px;
   background-image: url(/static/search-24px.svg) !important;
@@ -76,7 +80,7 @@ code {
 }
 #header .euiButton{
   min-width: 80px;
-  width: 80px;
+  width: 95px;
   height: 35px;
   border: 1px solid #5D8FDD;
   color: #5D8FDD;
@@ -270,7 +274,7 @@ fieldset.container {
   display: none;
 }
 .qr-string {
-  color: #fff;
+  color: #7b7b7b;
   width: 134px;
   height: 15px;
   font-size: 15px;
