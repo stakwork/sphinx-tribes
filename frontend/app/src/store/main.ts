@@ -22,6 +22,7 @@ export interface Tribe {
   img: string;
   tags: string[];
   description: string;
+  member_count: number;
   matchCount?: number; // for tag search
 }
 
