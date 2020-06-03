@@ -61,7 +61,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select,cr
               <div className="lighter-color">{owner_alias}</div>
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
-              {member_count && <>
+              {(member_count?true:false) && <>
                 <div className="uppercase">Members:</div>
                 <div className="lighter-color">{member_count}</div>
               </>}
