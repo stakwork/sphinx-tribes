@@ -9,7 +9,7 @@ function makeQR(uuid:string){
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${window.location.hostname}`
 }
 
-export default function Tribe({uuid,name,img,tags,description,selected,select,created,owner_alias,price_to_join,price_per_message}:any){
+export default function Tribe({uuid,name,img,tags,description,selected,select,created,owner_alias,price_to_join,price_per_message,member_count}:any){
   const showTags = tags&&tags.length&&tags.length>0?true:false
   const textareaRef = useRef(null);
   const qrString = makeQR(uuid)
@@ -61,8 +61,10 @@ export default function Tribe({uuid,name,img,tags,description,selected,select,cr
               <div className="lighter-color">{owner_alias}</div>
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
-              {/* <div className="uppercase">Members:</div>
-              <div className="lighter-color">42</div> */}
+              {member_count && <>
+                <div className="uppercase">Members:</div>
+                <div className="lighter-color">{member_count}</div>
+              </>}
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
               <div className="uppercase">Created on:</div>

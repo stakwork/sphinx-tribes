@@ -35,7 +35,6 @@ export default function BodyComponent() {
       if(tagsFilter.length===0) return true
       return t.matchCount&&t.matchCount>0
     })
-    tribes.sort((a,b)=>b.matchCount-a.matchCount)
 
     let theTribes = tribes
     if(ui.searchText){
@@ -43,6 +42,10 @@ export default function BodyComponent() {
       const res = fuse.search(ui.searchText)
       theTribes = res.map(r=>r.item)
     }
+
+    tribes.sort((a,b)=>{
+      return b.member_count-a.member_count
+    })
 
     return <Body id="main">
       <Column className="main-wrap">
