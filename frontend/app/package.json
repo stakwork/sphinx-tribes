@@ -9,6 +9,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@types/styled-components": "^5.1.0",
+    "bootstrap": "^4.5.0",
     "dateformat": "^3.0.3",
     "fuse.js": "^5.2.3",
     "lodash": "^4.17.15",
@@ -50,6 +51,7 @@
     "@types/node": "^12.12.27",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "bootstrap": "^4.5.0"
   }
 }

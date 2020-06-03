@@ -44,14 +44,16 @@ export default function BodyComponent() {
       theTribes = res.map(r=>r.item)
     }
 
-    return <Body>
-      <Column>
+    return <Body id="main">
+      <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
-        {!loading && <EuiFormFieldset style={{width:'100%'}}>    
-          {theTribes.map(t=> <Tribe {...t} key={t.uuid} 
-            selected={selected===t.uuid}
-            select={setSelected}
-          />)}
+        {!loading && <EuiFormFieldset style={{width:'100%'}} className="container">
+          <div className="row">
+            {theTribes.map(t=> <Tribe {...t} key={t.uuid}
+              selected={selected===t.uuid}
+              select={setSelected}
+            />)}
+          </div>
         </EuiFormFieldset>}
       </Column>
     </Body>
@@ -60,7 +62,6 @@ export default function BodyComponent() {
 
 const Body = styled.div`
   flex:1;
-  padding:50px;
   height:calc(100vh - 50px);
   width:100%;
   overflow:scroll;
@@ -76,4 +77,3 @@ const Column = styled.div`
   max-width:900px;
   width:100%;
 `
-
