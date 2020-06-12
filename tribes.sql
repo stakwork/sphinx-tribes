@@ -10,6 +10,8 @@ CREATE TABLE tribes (
   img TEXT,
   price_to_join BIGINT,
   price_per_message BIGINT,
+  escrow_amount BIGINT,
+  escrow_millis BIGINT,
   created timestamptz,
   updated timestamptz,
   member_count BIGINT
