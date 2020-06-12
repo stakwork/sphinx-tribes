@@ -21,6 +21,8 @@ type Tribe struct {
 	Img             string         `json:"img"`
 	PriceToJoin     int64          `json:"price_to_join"`
 	PricePerMessage int64          `json:"price_per_message"`
+	EscrowAmount    int64          `json:"escrow_amount"`
+	EscrowMillis    int64          `json:"escrow_millis"`
 	Created         *time.Time     `json:"created"`
 	Updated         *time.Time     `json:"updated"`
 	MemberCount     uint64         `json:"member_count"`
