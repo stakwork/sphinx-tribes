@@ -1,6 +1,6 @@
   
 {
-    "auth": "http://auth:9090/mqtt/auth",
-    "acl": "http://auth:9090/mqtt/acl",
-    "super": "http://auth:9090/mqtt/superuser"
+    "auth": "https://auth.sphinx.tribes/mqtt/auth",
+    "acl": "https://auth.sphinx.tribes/mqtt/acl",
+    "super": "https://auth.sphinx.tribes/mqtt/superuser"
 }
