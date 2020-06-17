@@ -1,6 +1,6 @@
   
 {
-    "auth": "https://auth.sphinx.tribes/mqtt/auth",
-    "acl": "https://auth.sphinx.tribes/mqtt/acl",
-    "super": "https://auth.sphinx.tribes/mqtt/superuser"
+    "auth": "https://auth.sphinx.chat/mqtt/auth",
+    "acl": "https://auth.sphinx.chat/mqtt/acl",
+    "super": "https://auth.sphinx.chat/mqtt/superuser"
 }
