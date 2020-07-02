@@ -74,6 +74,7 @@ export default function Tribe({uuid,name,img,tags,description,selected,select,cr
           <div className="section-separator"></div>
 
           <div className="row">
+
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 qr-left">
               <div className="text-right"><img style={{width: 100}} src="static/scan_notification.svg" alt="" /></div>
               <div className="text-right info">
@@ -86,6 +87,11 @@ export default function Tribe({uuid,name,img,tags,description,selected,select,cr
                 <div className="lighter-color">{price_per_message||0}</div>
               </div>
               <div className="section-separator"></div>
+              <a href={qrString} className="btn join-btn">
+                <img style={{width:13,height:13,marginRight:8}} src="static/launch-24px.svg" alt="" />
+                Join
+              </a>
+
             </div>
             <div className="col-8 col-sm-8 col-md-8 col-lg-8">
               {selected && <QRWrap className="qr-wrap float-r">

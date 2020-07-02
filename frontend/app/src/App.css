@@ -189,6 +189,7 @@ fieldset.container {
 .qr-left {
   color: #6B7A8D;
   font-size: 12px;
+  position: relative;
 }
 .qr-left .lighter-color {
   color: #fff;
@@ -277,7 +278,7 @@ fieldset.container {
   color: #7b7b7b;
   width: 134px;
   height: 15px;
-  font-size: 15px;
+  font-size: 13px;
 }
 textarea.qr-string {
   height: 20px;
@@ -298,6 +299,19 @@ textarea.qr-string {
   border-radius: 5px;
   color: #fff;
   text-transform: uppercase;
+}
+.join-btn {
+  background: #698cf7 !important;
+  width: 68px;
+  height: 25px;
+  font-size: 10px !important;
+  border-radius: 5px;
+  color: #fff !important;
+  text-transform: uppercase;
+  position: absolute;
+  right: 12px;
+  bottom: 0px;
+  padding: 4px 2px !important;
 }
 @media (min-width: 768px) {
   #logo {
