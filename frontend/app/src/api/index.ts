@@ -14,7 +14,7 @@ class API {
 
 function addMethod(m: string): Function {
   const host = window.location.hostname
-  const rootUrl = host.includes('localhost')?'https://tribes.sphinx.chat/':`https://${host}/`
+  const rootUrl = host.includes('localhost')?'http://localhost:5002/':`https://${host}/`
   const func = async function (url: string, data: any, fields: any) {
     try {
       const headers: {[key:string]:string} = {}
