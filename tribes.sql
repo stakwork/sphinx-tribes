@@ -14,7 +14,8 @@ CREATE TABLE tribes (
   escrow_millis BIGINT,
   created timestamptz,
   updated timestamptz,
-  member_count BIGINT
+  member_count BIGINT,
+  unlisted boolean
 );
 
 -- for searching 

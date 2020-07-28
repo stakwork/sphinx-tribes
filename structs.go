@@ -26,6 +26,7 @@ type Tribe struct {
 	Created         *time.Time     `json:"created"`
 	Updated         *time.Time     `json:"updated"`
 	MemberCount     uint64         `json:"member_count"`
+	Unlisted        bool           `json:"unlisted"`
 }
 
 // PropertyMap ...
