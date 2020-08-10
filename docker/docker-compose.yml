@@ -34,7 +34,7 @@ services:
       - reverse-proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth.rule=Host(`auth.sphinx.chat`)"
+      - "traefik.http.routers.auth.rule=Host(`my.auth.url`)"
       - "traefik.http.services.auth.loadbalancer.server.port=9090"
       - "traefik.http.routers.auth.tls=true"
       - "traefik.http.routers.auth.tls.certresolver=myresolver"
@@ -52,12 +52,12 @@ services:
       - reverse-proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tribes.rule=Host(`tribes.sphinx.chat`)"
+      - "traefik.http.routers.tribes.rule=Host(`my.tribes.url`)"
       - "traefik.http.services.tribes.loadbalancer.server.port=5002"
       - "traefik.http.routers.tribes.tls=true"
       - "traefik.http.routers.tribes.tls.certresolver=myresolver"
       - "traefik.http.routers.tribes.entrypoints=websecure"
-      - "traefik.tcp.routers.tribes.rule=HostSNI(`tribes.sphinx.chat`)"
+      - "traefik.tcp.routers.tribes.rule=HostSNI(`my.tribes.url`)"
       - "traefik.tcp.services.tribes.loadbalancer.server.port=1883"
       - "traefik.tcp.routers.tribes.tls=true"
       - "traefik.tcp.routers.tribes.tls.certresolver=myresolver"
