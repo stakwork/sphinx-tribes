@@ -28,6 +28,7 @@ type Tribe struct {
 	MemberCount     uint64         `json:"member_count"`
 	Unlisted        bool           `json:"unlisted"`
 	Private         bool           `json:"private"`
+	Deleted         bool           `json:"deleted"`
 }
 
 // PropertyMap ...
