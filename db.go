@@ -42,7 +42,8 @@ func initDB() {
 var updatables = []string{
 	"name", "description", "tags", "img",
 	"owner_alias", "price_to_join", "price_per_message",
-	"escrow_amount", "escrow_millis", "unlisted", "private",
+	"escrow_amount", "escrow_millis",
+	"unlisted", "private", "deleted",
 }
 
 // check that update owner_pub_key does in fact throw error
@@ -89,7 +90,7 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 
 func (db database) getListedTribes() []Tribe {
 	ms := []Tribe{}
-	db.db.Where("unlisted = 'f' OR unlisted is null").Find(&ms)
+	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
 
