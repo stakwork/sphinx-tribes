@@ -1,0 +1,68 @@
+version: '2'
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.2.1
+    # Enables the web UI and tells Traefik to listen to docker
+    # command: --configFile=/home/ec2-user/sphinx-deploy/traefik.yaml
+    ports:
+      # The HTTP port
+      - 80:80
+      # The Web UI (enabled by --api.insecure=true)
+      - 8080:8080
+      # entrypoints
+      - 443:443
+      - 8883:8883
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ec2-user/sphinx-deploy/traefik.yaml:/etc/traefik/traefik.yaml
+      - /home/ec2-user/letsencrypt:/letsencrypt
+    logging:
+      options:
+        max-size: 10m
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 1000000
+        hard: 1000000
+
+  auth:
+    image: sphinx-auth
+    depends_on:
+      - reverse-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`auth.sphinx.chat`)"
+      - "traefik.http.services.auth.loadbalancer.server.port=9090"
+      - "traefik.http.routers.auth.tls=true"
+      - "traefik.http.routers.auth.tls.certresolver=myresolver"
+      - "traefik.http.routers.auth.entrypoints=websecure"
+    restart: on-failure
+    environment: 
+      - JWT_KEY=$JWT_KEY
+      - CLIENT_KEYS=$CLIENT_KEYS
+      - OAUTH_TIMEOUT=$OAUTH_TIMEOUT
+
+  tribes:
+    image: sphinx-tribes
+    depends_on:
+      - auth
+      - reverse-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tribes.rule=Host(`tribes.sphinx.chat`)"
+      - "traefik.http.services.tribes.loadbalancer.server.port=5002"
+      - "traefik.http.routers.tribes.tls=true"
+      - "traefik.http.routers.tribes.tls.certresolver=myresolver"
+      - "traefik.http.routers.tribes.entrypoints=websecure"
+      - "traefik.tcp.routers.tribes.rule=HostSNI(`tribes.sphinx.chat`)"
+      - "traefik.tcp.services.tribes.loadbalancer.server.port=1883"
+      - "traefik.tcp.routers.tribes.tls=true"
+      - "traefik.tcp.routers.tribes.tls.certresolver=myresolver"
+      - "traefik.tcp.routers.tribes.entrypoints=mqttsecure"
+      - "traefik.tcp.routers.tribes.service=tribes"
+    restart: on-failure
+    environment: 
+      - DATABASE_URL=$DATABASE_URL

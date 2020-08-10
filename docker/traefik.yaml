@@ -1,0 +1,19 @@
+api:
+  insecure: true
+
+providers:
+  docker: {}
+
+entryPoints:
+  web:
+    address: ":80"
+
+  websecure:
+    address: ":443"
+
+  mqttsecure:
+    address: ":8883"
+
+certificatesResolvers:
+  myresolver:
+    {YOUR_CERTIFICATE_RESOLVER_HERE}
