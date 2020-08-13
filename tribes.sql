@@ -15,7 +15,10 @@ CREATE TABLE tribes (
   created timestamptz,
   updated timestamptz,
   member_count BIGINT,
-  unlisted boolean
+  unlisted boolean,
+  private boolean,
+  deleted boolean,
+  app_url TEXT
 );
 
 -- for searching 

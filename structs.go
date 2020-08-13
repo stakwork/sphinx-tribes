@@ -29,6 +29,7 @@ type Tribe struct {
 	Unlisted        bool           `json:"unlisted"`
 	Private         bool           `json:"private"`
 	Deleted         bool           `json:"deleted"`
+	AppURL          string         `json:"app_url"`
 }
 
 // PropertyMap ...
