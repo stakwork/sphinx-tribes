@@ -44,6 +44,7 @@ var updatables = []string{
 	"owner_alias", "price_to_join", "price_per_message",
 	"escrow_amount", "escrow_millis",
 	"unlisted", "private", "deleted",
+	"app_url",
 }
 
 // check that update owner_pub_key does in fact throw error
