@@ -43,10 +43,6 @@ export default function BodyComponent() {
       theTribes = res.map(r=>r.item)
     }
 
-    tribes.sort((a,b)=>{
-      return b.member_count-a.member_count
-    })
-
     return <Body id="main">
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
