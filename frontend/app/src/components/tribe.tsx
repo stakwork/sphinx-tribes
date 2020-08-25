@@ -9,11 +9,14 @@ function makeQR(uuid:string){
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${window.location.hostname}`
 }
 
-export default function Tribe({uuid,name,img,tags,description,selected,select,created,owner_alias,price_to_join,price_per_message,member_count}:any){
+export default function Tribe({uuid,name,img,tags,description,selected,select,created,owner_alias,price_to_join,price_per_message,member_count,last_active}:any){
   const showTags = tags&&tags.length&&tags.length>0?true:false
   const textareaRef = useRef(null);
   const qrString = makeQR(uuid)
   const [copied,setCopied] = useState(false)
+
+  const lastActiveM = last_active ? moment(last_active*1000) : moment().subtract(1, 'months')
+  const lastActive = lastActiveM.format('MMM D HH:mm')  
 
   function copyString(e:any, textareaRef:any) {
     e.stopPropagation();
@@ -57,8 +60,8 @@ export default function Tribe({uuid,name,img,tags,description,selected,select,cr
           <div className="section-separator"></div>
           <div className="row info-section">
             <div className="col-4 col-sm-4 col-md-4 col-lg-4">
-              <div className="uppercase">Admin:</div>
-              <div className="lighter-color">{owner_alias}</div>
+              <div className="uppercase">Last Activity:</div>
+              <div className="lighter-color">{lastActive}</div>
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-center">
               {(member_count?true:false) && <>
@@ -67,9 +70,13 @@ export default function Tribe({uuid,name,img,tags,description,selected,select,cr
               </>}
             </div>
             <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
+              <div className="uppercase">Admin:</div>
+              <div className="lighter-color">{owner_alias}</div>
+            </div>
+            {/* <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
               <div className="uppercase">Created on:</div>
               <div className="lighter-color">{moment(created).format('MMM D')}</div>
-            </div>
+            </div> */}
           </div>
           <div className="section-separator"></div>
 
