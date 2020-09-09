@@ -46,6 +46,11 @@ var updatables = []string{
 	"unlisted", "private", "deleted",
 	"app_url",
 }
+var botupdatables = []string{
+	"name", "description", "tags", "img",
+	"owner_alias", "price_per_use",
+	"unlisted", "deleted",
+}
 
 // check that update owner_pub_key does in fact throw error
 func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
@@ -81,6 +86,43 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	return m, nil
 }
 
+// check that update owner_pub_key does in fact throw error
+func (db database) createOrEditBot(b Bot) (Bot, error) {
+	if b.OwnerPubKey == "" {
+		return Bot{}, errors.New("no pub key")
+	}
+	if b.UniqueName == "" {
+		return Bot{}, errors.New("no unique name")
+	}
+	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
+	for i, u := range botupdatables {
+		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
+		if i < len(updatables)-1 {
+			onConflict = onConflict + ","
+		}
+	}
+	if b.Name == "" {
+		b.Name = "name"
+	}
+	if b.Description == "" {
+		b.Description = "description"
+	}
+	if b.Tags == nil {
+		b.Tags = []string{}
+	}
+	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
+		fmt.Println(err)
+		return Bot{}, err
+	}
+	// not working?
+	db.db.Exec(`UPDATE tribes SET tsv =
+  	setweight(to_tsvector(name), 'A') ||
+	setweight(to_tsvector(description), 'B') ||
+	setweight(array_to_tsvector(tags), 'C')
+	WHERE uuid = '` + b.UUID + "'")
+	return b, nil
+}
+
 func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
@@ -91,6 +133,12 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 
 func (db database) getListedTribes() []Tribe {
 	ms := []Tribe{}
+	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	return ms
+}
+
+func (db database) getListedBots() []Bot {
+	ms := []Bot{}
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
@@ -107,6 +155,18 @@ func (db database) getTribe(uuid string) Tribe {
 	return m
 }
 
+func (db database) getBot(uuid string) Bot {
+	m := Bot{}
+	db.db.Where("uuid = ?", uuid).Find(&m)
+	return m
+}
+
+func (db database) getBotByUniqueName(un string) Bot {
+	m := Bot{}
+	db.db.Where("unique_name = ?", un).Find(&m)
+	return m
+}
+
 func (db database) searchTribes(s string) []Tribe {
 	ms := []Tribe{}
 	if s == "" {
@@ -116,6 +176,20 @@ func (db database) searchTribes(s string) []Tribe {
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
 		FROM tribes, to_tsquery('` + s + `') q
+		WHERE tsv @@ q
+		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
+	return ms
+}
+
+func (db database) searchBots(s string) []Bot {
+	ms := []Bot{}
+	if s == "" {
+		return ms
+	}
+	// set limit
+	db.db.Raw(
+		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
+		FROM bots, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
 		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
 	return ms

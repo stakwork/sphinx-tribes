@@ -33,6 +33,24 @@ type Tribe struct {
 	LastActive      int64          `json:"last_active"`
 }
 
+// Bot struct
+type Bot struct {
+	UUID        string         `json:"uuid"`
+	OwnerPubKey string         `json:"owner_pubkey"`
+	OwnerAlias  string         `json:"owner_alias"`
+	Name        string         `json:"name"`
+	UniqueName  string         `json:"unique_name"`
+	Description string         `json:"description"`
+	Tags        pq.StringArray `json:"tags"`
+	Img         string         `json:"img"`
+	PricePerUse int64          `json:"price_per_use"`
+	Created     *time.Time     `json:"created"`
+	Updated     *time.Time     `json:"updated"`
+	Unlisted    bool           `json:"unlisted"`
+	Deleted     bool           `json:"deleted"`
+	MemberCount uint64         `json:"member_count"`
+}
+
 // PropertyMap ...
 type PropertyMap map[string]interface{}
 
