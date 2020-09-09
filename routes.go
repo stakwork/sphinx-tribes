@@ -35,6 +35,9 @@ func NewRouter() *http.Server {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
 		r.Post("/tribes", createOrEditTribe)
+		r.Post("/bots", createOrEditBot)
+		r.Get("/bots", getListedBots)
+		r.Get("/bots/{uuid}", getBot)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -42,6 +45,11 @@ func NewRouter() *http.Server {
 		r.Put("/tribe", createOrEditTribe)
 		r.Put("/tribestats", putTribeStats)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(PubKeyContext)
+		r.Put("/bot", createOrEditBot)
 	})
 
 	PORT := os.Getenv("PORT")
