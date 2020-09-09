@@ -18,7 +18,8 @@ CREATE TABLE tribes (
   unlisted boolean,
   private boolean,
   deleted boolean,
-  app_url TEXT
+  app_url TEXT,
+  last_active timestamptz
 );
 
 -- for searching 
@@ -49,3 +50,34 @@ LIMIT 12;
 -- plainto_tsquery is another way
 
 
+
+
+
+
+CREATE TABLE bots (
+  uuid TEXT NOT NULL PRIMARY KEY,
+  owner_pub_key TEXT NOT NULL,
+  owner_alias TEXT,
+  name TEXT,
+  unique_name TEXT,
+  description TEXT,
+  tags TEXT[] not null default '{}',
+  img TEXT,
+  price_per_use BIGINT,
+  created timestamptz,
+  updated timestamptz,
+  member_count BIGINT,
+  unlisted boolean,
+  deleted boolean
+);
+
+-- for searching 
+
+ALTER TABLE bots ADD COLUMN tsv tsvector;
+
+UPDATE bots SET tsv =
+  setweight(to_tsvector(name), 'A') ||
+	setweight(to_tsvector(description), 'B') ||
+	setweight(array_to_tsvector(tags), 'C');
+
+CREATE INDEX bots_tsv ON bots USING GIN(tsv);
