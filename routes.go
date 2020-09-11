@@ -38,6 +38,8 @@ func NewRouter() *http.Server {
 		r.Post("/bots", createOrEditBot)
 		r.Get("/bots", getListedBots)
 		r.Get("/bots/{uuid}", getBot)
+		r.Get("/bot/{name}", getBotByUniqueName)
+		r.Get("/search/bots/{query}", searchBots)
 	})
 
 	r.Group(func(r chi.Router) {
