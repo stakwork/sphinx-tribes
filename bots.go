@@ -79,6 +79,20 @@ func getBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
+func getBotByUniqueName(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "name")
+	bot := DB.getBotByUniqueName(name)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bot)
+}
+
+func searchBots(w http.ResponseWriter, r *http.Request) {
+	query := chi.URLParam(r, "query")
+	bots := DB.searchBots(query)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bots)
+}
+
 func botUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
