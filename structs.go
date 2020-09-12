@@ -51,6 +51,18 @@ type Bot struct {
 	MemberCount uint64         `json:"member_count"`
 }
 
+// Bot struct
+type BotRes struct {
+	UUID        string         `json:"uuid"`
+	OwnerPubKey string         `json:"owner_pubkey"`
+	Name        string         `json:"name"`
+	UniqueName  string         `json:"unique_name"`
+	Description string         `json:"description"`
+	Tags        pq.StringArray `json:"tags"`
+	Img         string         `json:"img"`
+	PricePerUse int64          `json:"price_per_use"`
+}
+
 // PropertyMap ...
 type PropertyMap map[string]interface{}
 
