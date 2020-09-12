@@ -88,7 +88,15 @@ func getBotByUniqueName(w http.ResponseWriter, r *http.Request) {
 
 func searchBots(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
-	bots := DB.searchBots(query)
+	limitString := r.URL.Query().Get("limit")
+	offsetString := r.URL.Query().Get("offset")
+
+	limit, _ := strconv.Atoi(limitString)
+	offset, _ := strconv.Atoi(offsetString)
+	if limit == 0 {
+		limit = 10
+	}
+	bots := DB.searchBots(query, limit, offset)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
