@@ -181,14 +181,14 @@ func (db database) searchTribes(s string) []Tribe {
 	return ms
 }
 
-func (db database) searchBots(s string) []Bot {
-	ms := []Bot{}
+func (db database) searchBots(s string) []BotRes {
+	ms := []BotRes{}
 	if s == "" {
 		return ms
 	}
 	// set limit
 	db.db.Raw(
-		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
+		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
 		FROM bots, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
 		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
