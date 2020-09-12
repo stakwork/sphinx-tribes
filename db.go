@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -181,16 +182,19 @@ func (db database) searchTribes(s string) []Tribe {
 	return ms
 }
 
-func (db database) searchBots(s string) []BotRes {
+func (db database) searchBots(s string, limit, offset int) []BotRes {
 	ms := []BotRes{}
 	if s == "" {
 		return ms
 	}
 	// set limit
+	limitStr := strconv.Itoa(limit)
+	offsetStr := strconv.Itoa(offset)
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
 		FROM bots, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
-		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
+		ORDER BY rank DESC 
+		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)
 	return ms
 }

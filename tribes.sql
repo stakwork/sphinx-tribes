@@ -81,3 +81,8 @@ UPDATE bots SET tsv =
 	setweight(array_to_tsvector(tags), 'C');
 
 CREATE INDEX bots_tsv ON bots USING GIN(tsv);
+
+SELECT uuid, unique_name, ts_rank(tsv, q) as rank
+  FROM bots, to_tsquery('btc') q
+  WHERE tsv @@ q
+  ORDER BY rank DESC LIMIT 2 OFFSET 0;
