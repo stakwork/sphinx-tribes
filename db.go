@@ -98,7 +98,7 @@ func (db database) createOrEditBot(b Bot) (Bot, error) {
 	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
 	for i, u := range botupdatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(updatables)-1 {
+		if i < len(botupdatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
