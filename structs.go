@@ -31,6 +31,7 @@ type Tribe struct {
 	Deleted         bool           `json:"deleted"`
 	AppURL          string         `json:"app_url"`
 	LastActive      int64          `json:"last_active"`
+	Bots            string         `json:"bots"`
 }
 
 // Bot struct
@@ -62,6 +63,44 @@ type BotRes struct {
 	Img         string         `json:"img"`
 	PricePerUse int64          `json:"price_per_use"`
 }
+
+// for bot pricing info
+type BotInfo struct {
+	Commands *[]BotCommand `json:"commands"`
+	Prefix   string        `json:"prefix"`
+	Price    int64         `json:"price"`
+}
+type BotCommand struct {
+	Command   string `json:"command"`
+	Price     int64  `json:"price"`
+	MinPrice  int64  `json:"min_price"`
+	MaxPrice  int64  `json:"max_price"`
+	WordIndex uint   `json:"word_index"`
+	AdminOnly bool   `json:"admin_only"`
+}
+
+/* loopbot:
+{
+	prefix:'/loopout',
+	price:0,
+	commands: [{
+		command: '*',
+		price: 0,
+		min_price: 250000,
+		max_price: 16777215,
+		price_index: 2,
+		admin_only: false
+	}]
+}
+*/
+
+/* btc bot:
+{
+	prefix:'/btc',
+	price:10,
+	commands: null
+}
+*/
 
 // PropertyMap ...
 type PropertyMap map[string]interface{}
