@@ -19,7 +19,8 @@ CREATE TABLE tribes (
   private boolean,
   deleted boolean,
   app_url TEXT,
-  last_active timestamptz
+  last_active timestamptz,
+  bots TEXT
 );
 
 -- for searching 
