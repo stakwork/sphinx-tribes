@@ -144,6 +144,14 @@ func (db database) getListedBots() []Bot {
 	return ms
 }
 
+func (db database) updateBot(uuid string, u map[string]interface{}) bool {
+	if uuid == "" {
+		return false
+	}
+	db.db.Model(&Bot{}).Where("uuid = ?", uuid).Updates(u)
+	return true
+}
+
 func (db database) getAllTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Find(&ms)

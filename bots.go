@@ -124,3 +124,35 @@ func botUniqueNameFromName(name string) (string, error) {
 	}
 	return path, nil
 }
+
+func deleteBot(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	uuid := chi.URLParam(r, "uuid")
+
+	if uuid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(uuid)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	DB.updateBot(uuid, map[string]interface{}{
+		"deleted": true,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
