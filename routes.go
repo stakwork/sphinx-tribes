@@ -212,6 +212,7 @@ func putTribeStats(w http.ResponseWriter, r *http.Request) {
 	DB.updateTribe(tribe.UUID, map[string]interface{}{
 		"member_count": tribe.MemberCount,
 		"updated":      &now,
+		"bots":         tribe.Bots,
 	})
 
 	w.WriteHeader(http.StatusOK)
