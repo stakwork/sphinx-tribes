@@ -46,7 +46,9 @@ func NewRouter() *http.Server {
 		r.Use(PubKeyContext)
 		r.Put("/tribe", createOrEditTribe)
 		r.Put("/tribestats", putTribeStats)
+		r.Delete("/tribe/{uuid}", deleteTribe)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
+		r.Delete("/bot/{uuid}", deleteBot)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -210,6 +212,38 @@ func putTribeStats(w http.ResponseWriter, r *http.Request) {
 	DB.updateTribe(tribe.UUID, map[string]interface{}{
 		"member_count": tribe.MemberCount,
 		"updated":      &now,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
+
+func deleteTribe(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	uuid := chi.URLParam(r, "uuid")
+
+	if uuid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(uuid)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	DB.updateTribe(uuid, map[string]interface{}{
+		"deleted": true,
 	})
 
 	w.WriteHeader(http.StatusOK)
