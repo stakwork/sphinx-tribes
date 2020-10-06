@@ -40,6 +40,7 @@ func NewRouter() *http.Server {
 		r.Get("/bots/{uuid}", getBot)
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
+		r.Get("/podcast", getPodcast)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -70,6 +71,17 @@ func NewRouter() *http.Server {
 	}()
 
 	return server
+}
+
+func getPodcast(w http.ResponseWriter, r *http.Request) {
+	url := r.URL.Query().Get("url")
+	latest, err := getLatestEpisode(url)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(latest)
 }
 
 func getAllTribes(w http.ResponseWriter, r *http.Request) {
