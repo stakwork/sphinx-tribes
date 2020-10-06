@@ -30,6 +30,7 @@ type Tribe struct {
 	Private         bool           `json:"private"`
 	Deleted         bool           `json:"deleted"`
 	AppURL          string         `json:"app_url"`
+	FeedURL         string         `json:"feed_url"`
 	LastActive      int64          `json:"last_active"`
 	Bots            string         `json:"bots"`
 }
