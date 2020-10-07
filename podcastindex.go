@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,7 +21,6 @@ func unix() string {
 
 func makeHeaders() map[string]string {
 	apiSecret := os.Getenv("PODCAST_INDEX_SECRET")
-	fmt.Println("SERCRET", apiSecret)
 	ts := unix()
 	s := apiKey + apiSecret + ts
 	h := sha1.New()
@@ -35,11 +33,10 @@ func makeHeaders() map[string]string {
 		"Authorization": fmt.Sprintf("%x", bs),
 	}
 }
-func getLatestEpisode(feedURL string) (*PodcastEpisode, error) {
 
+func getFeed(feedURL string) (*Podcast, error) {
 	client := &http.Client{}
-	url := baseURL + "episodes/byfeedurl?url=" + feedURL
-	fmt.Println("URL", url)
+	url := baseURL + "podcasts/byfeedurl?url=" + feedURL
 	req, err := http.NewRequest("GET", url, nil)
 
 	headers := makeHeaders()
@@ -62,15 +59,58 @@ func getLatestEpisode(feedURL string) (*PodcastEpisode, error) {
 		return nil, err
 	}
 
-	if r.Items != nil && len(r.Items) > 0 {
-		latest := r.Items[0]
-		fmt.Printf("%+v\n", latest)
-		return &latest, nil
+	return &r.Feed, nil
+}
+func getEpisodes(feedURL string) ([]Episode, error) {
+
+	client := &http.Client{}
+	url := baseURL + "episodes/byfeedurl?url=" + feedURL
+	req, err := http.NewRequest("GET", url, nil)
+
+	headers := makeHeaders()
+	for k, v := range headers {
+		req.Header.Add(k, v)
 	}
-	return nil, errors.New("no items")
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("GET error:", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var r EpisodeResponse
+	body, err := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &r)
+	if err != nil {
+		fmt.Println("json unmarshall error", err)
+		return nil, err
+	}
+
+	return r.Items, nil
 }
 
-type PodcastEpisode struct {
+type PodcastResponse struct {
+	Feed Podcast `json:"feed"`
+}
+type Podcast struct {
+	ID             uint      `json:"id"`
+	Title          string    `json:"title"`
+	URL            string    `json:"url"`
+	Description    string    `json:"description"`
+	Author         string    `json:"author"`
+	Image          string    `json:"image"`
+	Link           string    `json:"link"`
+	LastUpdateTime int32     `json:"lastUpdateTime"`
+	ContentType    string    `json:"contentType"`
+	Language       string    `json:"language"`
+	Episodes       []Episode `json:"episodes"`
+}
+type EpisodeResponse struct {
+	Items []Episode `json:"items"`
+	Count uint      `json:"count"`
+}
+type Episode struct {
 	ID              uint   `json:"id"`
 	Title           string `json:"title"`
 	Description     string `json:"description"`
@@ -80,8 +120,4 @@ type PodcastEpisode struct {
 	EnclosureLength int32  `json:"enclosureLength"`
 	Image           string `json:"image"`
 	Link            string `json:"link"`
-}
-type PodcastResponse struct {
-	Items []PodcastEpisode `json:"items"`
-	Count uint             `json:"count"`
 }
