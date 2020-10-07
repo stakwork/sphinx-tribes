@@ -75,13 +75,16 @@ func NewRouter() *http.Server {
 
 func getPodcast(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
-	latest, err := getLatestEpisode(url)
+	podcast, err := getFeed(url)
+	episodes, err := getEpisodes(url)
+	podcast.Episodes = episodes
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(latest)
+	json.NewEncoder(w).Encode(podcast)
 }
 
 func getAllTribes(w http.ResponseWriter, r *http.Request) {
