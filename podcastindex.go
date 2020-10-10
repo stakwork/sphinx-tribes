@@ -105,6 +105,7 @@ type Podcast struct {
 	ContentType    string    `json:"contentType"`
 	Language       string    `json:"language"`
 	Episodes       []Episode `json:"episodes"`
+	Value          *Value    `json:"value"`
 }
 type EpisodeResponse struct {
 	Items []Episode `json:"items"`
@@ -120,4 +121,17 @@ type Episode struct {
 	EnclosureLength int32  `json:"enclosureLength"`
 	Image           string `json:"image"`
 	Link            string `json:"link"`
+}
+type Value struct {
+	Model        Model         `json:"model"`
+	Destinations []Destination `json:"destinations"`
+}
+type Model struct {
+	Type      string `json:"type"`
+	Suggested string `json:"suggested"`
+}
+type Destination struct {
+	Address string `json:"address"`
+	Split   uint   `json:"split"`
+	Type    string `json:"type"`
 }
