@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,8 +12,6 @@ import (
 	"time"
 )
 
-const apiKey = "BVJTWLERYJXHWA7MYWXV"
-
 const baseURL = "https://api.podcastindex.org/api/1.0/"
 
 func unix() string {
@@ -20,6 +19,7 @@ func unix() string {
 }
 
 func makeHeaders() map[string]string {
+	apiKey := os.Getenv("PODCAST_INDEX_KEY")
 	apiSecret := os.Getenv("PODCAST_INDEX_SECRET")
 	ts := unix()
 	s := apiKey + apiSecret + ts
@@ -34,9 +34,19 @@ func makeHeaders() map[string]string {
 	}
 }
 
-func getFeed(feedURL string) (*Podcast, error) {
+func getFeed(feedURL string, feedID string) (*Podcast, error) {
 	client := &http.Client{}
-	url := baseURL + "podcasts/byfeedurl?url=" + feedURL
+
+	url := ""
+	if feedURL != "" {
+		url = baseURL + "podcasts/byfeedurl?url=" + feedURL
+	} else if feedID != "" {
+		url = baseURL + "podcasts/byfeedid?id=" + feedID
+	}
+	if url == "" {
+		return nil, errors.New("no url or id supplied")
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 
 	headers := makeHeaders()
@@ -61,10 +71,19 @@ func getFeed(feedURL string) (*Podcast, error) {
 
 	return &r.Feed, nil
 }
-func getEpisodes(feedURL string) ([]Episode, error) {
-
+func getEpisodes(feedURL string, feedID string) ([]Episode, error) {
 	client := &http.Client{}
-	url := baseURL + "episodes/byfeedurl?url=" + feedURL
+
+	url := ""
+	if feedURL != "" {
+		url = baseURL + "episodes/byfeedurl?url=" + feedURL
+	} else if feedID != "" {
+		url = baseURL + "episodes/byfeedid?id=" + feedID
+	}
+	if url == "" {
+		return nil, errors.New("no url or id supplied")
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 
 	headers := makeHeaders()
