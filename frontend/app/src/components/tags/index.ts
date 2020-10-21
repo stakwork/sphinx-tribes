@@ -5,6 +5,9 @@ import {ReactComponent as crypto} from './svg/crypto.svg'
 import {ReactComponent as music} from './svg/music.svg'
 import {ReactComponent as tech} from './svg/tech.svg'
 import {ReactComponent as altcoins} from './svg/altcoins.svg'
+import {ReactComponent as podcast} from './svg/podcast.svg'
+
+// 2d9be3145a5b9aa9fd4ad3c8c7c180946fbe3982
 
 const tags:{[k:string]:any} = {
     Bitcoin: {
@@ -18,6 +21,10 @@ const tags:{[k:string]:any} = {
     Sphinx: {
         icon: sphinx,
         color: '#6189ff',
+    },
+    Podcast: {
+        icon: podcast,
+        color: '#C41D73'
     },
     Crypto: {
         icon: crypto,

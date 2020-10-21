@@ -75,13 +75,15 @@ func NewRouter() *http.Server {
 
 func getPodcast(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
-	podcast, err := getFeed(url)
-	episodes, err := getEpisodes(url)
-	podcast.Episodes = episodes
+	feedid := r.URL.Query().Get("id")
+	podcast, err := getFeed(url, feedid)
+	episodes, err := getEpisodes(url, feedid)
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	podcast.Episodes = episodes
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(podcast)
