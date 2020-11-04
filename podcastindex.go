@@ -69,7 +69,27 @@ func getFeed(feedURL string, feedID string) (*Podcast, error) {
 		return nil, err
 	}
 
-	return &r.Feed, nil
+	feed := r.Feed
+	if feed.Value != nil && feed.URL != "" {
+		if feed.Value.Destinations != nil {
+			if len(feed.Value.Destinations) == 1 {
+				first := feed.Value.Destinations[0]
+				if first.Split == 1 {
+					// this is the auto
+					tribe := DB.getTribeByFeedURL(feed.URL)
+					if tribe.OwnerPubKey != "" && tribe.OwnerPubKey != first.Address {
+						feed.Value.Destinations = append(feed.Value.Destinations, Destination{
+							Address: tribe.OwnerPubKey,
+							Split:   99,
+							Type:    "node",
+						})
+					}
+				}
+			}
+		}
+	}
+
+	return &feed, nil
 }
 func getEpisodes(feedURL string, feedID string) ([]Episode, error) {
 	client := &http.Client{}
