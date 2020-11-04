@@ -164,6 +164,12 @@ func (db database) getTribe(uuid string) Tribe {
 	return m
 }
 
+func (db database) getTribeByFeedURL(feedURL string) Tribe {
+	m := Tribe{}
+	db.db.Where("feed_url = ?", feedURL).First(&m)
+	return m
+}
+
 func (db database) getBot(uuid string) Bot {
 	m := Bot{}
 	db.db.Where("uuid = ?", uuid).Find(&m)
