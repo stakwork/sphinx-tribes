@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
 import { orderBy } from 'lodash'
@@ -24,6 +24,16 @@ export default function Header() {
 
   const selectedTags = ui.tags.filter(t=>t.checked==='on')
   const showTagCount = selectedTags.length>0?true:false
+
+  useEffect(()=>{
+    if(window.location.host==='podcasts.sphinx.chat') {
+      ui.setTags(ui.tags.map(t=>{
+        if(t.label==='Podcast') return {...t,checked:'on'}
+        return t
+      }))
+    }
+  }, [])
+
   return useObserver(() => {
     const button = (<EuiButton
       iconType="arrowDown"
@@ -71,7 +81,10 @@ export default function Header() {
                   </EuiHighlight>
                 </div>}
                 listProps={{rowHeight: 30}} // showIcons:false
-                onChange={opts=> ui.setTags(opts)}>
+                onChange={opts=> {
+                  console.log(opts)
+                  ui.setTags(opts)
+                }}>
                 {(list, search) => <div style={{ width: 220 }}>
                   {search}
                   {list}
