@@ -116,7 +116,7 @@ func (db database) createOrEditBot(b Bot) (Bot, error) {
 		return Bot{}, err
 	}
 	// not working?
-	db.db.Exec(`UPDATE tribes SET tsv =
+	db.db.Exec(`UPDATE bots SET tsv =
   	setweight(to_tsvector(name), 'A') ||
 	setweight(to_tsvector(description), 'B') ||
 	setweight(array_to_tsvector(tags), 'C')
