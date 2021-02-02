@@ -19,6 +19,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/ec2-user/sphinx-deploy/traefik.yaml:/etc/traefik/traefik.yaml
       - /home/ec2-user/letsencrypt:/letsencrypt
+    environment: 
+      - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - AWS_REGION=$AWS_REGION
     logging:
       options:
         max-size: 10m
@@ -34,7 +38,7 @@ services:
       - reverse-proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth.rule=Host(`my.auth.url`)"
+      - "traefik.http.routers.auth.rule=Host(`auth.sphinx.chat`)"
       - "traefik.http.services.auth.loadbalancer.server.port=9090"
       - "traefik.http.routers.auth.tls=true"
       - "traefik.http.routers.auth.tls.certresolver=myresolver"
@@ -52,12 +56,12 @@ services:
       - reverse-proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tribes.rule=Host(`my.tribes.url`)"
+      - "traefik.http.routers.tribes.rule=Host(`tribes.sphinx.chat`)"
       - "traefik.http.services.tribes.loadbalancer.server.port=5002"
       - "traefik.http.routers.tribes.tls=true"
       - "traefik.http.routers.tribes.tls.certresolver=myresolver"
       - "traefik.http.routers.tribes.entrypoints=websecure"
-      - "traefik.tcp.routers.tribes.rule=HostSNI(`my.tribes.url`)"
+      - "traefik.tcp.routers.tribes.rule=HostSNI(`tribes.sphinx.chat`)"
       - "traefik.tcp.services.tribes.loadbalancer.server.port=1883"
       - "traefik.tcp.routers.tribes.tls=true"
       - "traefik.tcp.routers.tribes.tls.certresolver=myresolver"
@@ -66,3 +70,10 @@ services:
     restart: on-failure
     environment: 
       - DATABASE_URL=$DATABASE_URL
+      - PODCAST_INDEX_SECRET=$PODCAST_INDEX_SECRET
+      - PODCAST_INDEX_KEY=$PODCAST_INDEX_KEY
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 1000000
+        hard: 1000000
