@@ -20,7 +20,8 @@ CREATE TABLE tribes (
   deleted boolean,
   app_url TEXT,
   last_active timestamptz,
-  bots TEXT
+  bots TEXT,
+  owner_route_hint TEXT,
 );
 
 -- for searching 
