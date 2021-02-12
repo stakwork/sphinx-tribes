@@ -46,11 +46,13 @@ var updatables = []string{
 	"escrow_amount", "escrow_millis",
 	"unlisted", "private", "deleted",
 	"app_url", "bots", "feed_url",
+	"owner_route_hint"
 }
 var botupdatables = []string{
 	"name", "description", "tags", "img",
 	"owner_alias", "price_per_use",
 	"unlisted", "deleted",
+	"owner_route_hint"
 }
 
 // check that update owner_pub_key does in fact throw error
