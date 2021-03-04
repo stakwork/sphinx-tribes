@@ -86,7 +86,10 @@ func getPodcast(w http.ResponseWriter, r *http.Request) {
 	podcast.Episodes = episodes
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(podcast)
+	err = json.NewEncoder(w).Encode(podcast)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func getAllTribes(w http.ResponseWriter, r *http.Request) {
