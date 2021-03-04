@@ -123,14 +123,14 @@ func addToFeed(feed Podcast) Podcast {
 		if feed.Value.Destinations != nil {
 			if len(feed.Value.Destinations) == 1 {
 				first := feed.Value.Destinations[0]
-				firstSplit, _ := first.Split.Int64()
+				firstSplit, _ := first.Split.(json.Number).Int64()
 				if firstSplit == 1 {
 					// this is the auto
 					tribe := DB.getTribeByFeedURL(feed.URL)
 					if tribe.OwnerPubKey != first.Address {
 						feed.Value.Destinations = append(feed.Value.Destinations, Destination{
 							Address: tribe.OwnerPubKey,
-							Split:   json.Number(99),
+							Split:   99,
 							Type:    "node",
 						})
 					}
@@ -147,7 +147,7 @@ func addToFeed(feed Podcast) Podcast {
 				Destination{
 					Address: tribe.OwnerPubKey,
 					Type:    "node",
-					Split:   json.Number(100),
+					Split:   100,
 				},
 			},
 		}
@@ -197,6 +197,6 @@ type Model struct {
 }
 type Destination struct {
 	Address string      `json:"address"`
-	Split   json.Number `json:"split"`
+	Split   interface{} `json:"split"`
 	Type    string      `json:"type"`
 }
