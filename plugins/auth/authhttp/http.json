@@ -1,6 +1,5 @@
-
 {
-    "auth": "http://localhost:9090/mqtt/auth",
-    "acl": "http://localhost:9090/mqtt/acl",
-    "super": "http://localhost:9090/mqtt/superuser"
+    "auth": "https://auth.sphinx.chat/mqtt/auth",
+    "acl": "https://auth.sphinx.chat/mqtt/acl",
+    "super": "https://auth.sphinx.chat/mqtt/superuser"
 }
