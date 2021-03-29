@@ -12,6 +12,15 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
+var (
+	// signedMsgPrefix is a special prefix that we'll prepend to any
+	// messages we sign/verify. We do this to ensure that we don't
+	// accidentally sign a sighash, or other sensitive material. By
+	// prepending this fragment, we mind message signing to our particular
+	// context.
+	signedMsgPrefix = []byte("Lightning Signed Message:")
+)
+
 type contextKey string
 
 // ContextKey ...

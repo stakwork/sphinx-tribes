@@ -1,5 +1,0 @@
-{
-    "auth": "https://auth.sphinx.chat/mqtt/auth",
-    "acl": "https://auth.sphinx.chat/mqtt/acl",
-    "super": "https://auth.sphinx.chat/mqtt/superuser"
-}
