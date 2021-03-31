@@ -61,17 +61,31 @@ services:
       - "traefik.http.routers.tribes.tls=true"
       - "traefik.http.routers.tribes.tls.certresolver=myresolver"
       - "traefik.http.routers.tribes.entrypoints=websecure"
-      - "traefik.tcp.routers.tribes.rule=HostSNI(`tribes.sphinx.chat`)"
-      - "traefik.tcp.services.tribes.loadbalancer.server.port=1883"
-      - "traefik.tcp.routers.tribes.tls=true"
-      - "traefik.tcp.routers.tribes.tls.certresolver=myresolver"
-      - "traefik.tcp.routers.tribes.entrypoints=mqttsecure"
-      - "traefik.tcp.routers.tribes.service=tribes"
     restart: on-failure
     environment: 
       - DATABASE_URL=$DATABASE_URL
       - PODCAST_INDEX_SECRET=$PODCAST_INDEX_SECRET
       - PODCAST_INDEX_KEY=$PODCAST_INDEX_KEY
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 1000000
+        hard: 1000000
+
+  mqtt:
+    image: sphinx-mqtt
+    depends_on:
+      - auth
+      - reverse-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.tribes.rule=HostSNI(`tribes.sphinx.chat`)"
+      - "traefik.tcp.services.tribes.loadbalancer.server.port=1883"
+      - "traefik.tcp.routers.tribes.tls=true"
+      - "traefik.tcp.routers.tribes.tls.certresolver=myresolver"
+      - "traefik.tcp.routers.tribes.entrypoints=mqttsecure"
+      - "traefik.tcp.routers.tribes.service=mqtt"
+    restart: on-failure
     ulimits:
       nproc: 65535
       nofile:
