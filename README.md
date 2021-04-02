@@ -4,11 +4,11 @@
 
 Decentralized message broker for public groups in Sphinx. Anyone can run a **sphinx-tribes** server, to route group messages.
 
-**sphinx-tribes** clients can be anything from **sphinx-relay** nodes, to apps, websites, or IoT devices.
+**sphinx-tribes** clients can be **sphinx-relay** nodes, apps, websites, or IoT devices.
 
 ### How
 
-**sphinx-tribes** is an MQTT broker that any node can subscribe to. Message topics always have two parts: `{receiverPubKey}/{groupUUID}`. Only the owner of the group is allowed to publish to it: all messages from group members must be submitted to the owner as an LND keysend payment. the group `uuid` is timestamp signed by the owner.
+**sphinx-tribes** is an MQTT broker that any node can subscribe to. Message topics always have two parts: `{receiverPubKey}/{groupUUID}`. Only the owner of the group is allowed to publish to it: all messages from group members must be submitted to the owner as an Lightning keysend payment. The group `uuid` is a timestamp signed by the owner.
 
 ![Tribes](https://github.com/stakwork/sphinx-tribes/raw/master/img/tribes.jpg)
 
