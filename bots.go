@@ -101,30 +101,6 @@ func searchBots(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bots)
 }
 
-func botUniqueNameFromName(name string) (string, error) {
-	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
-	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
-	if err != nil {
-		return "", err
-	}
-	path := reg.ReplaceAllString(pathOne, "")
-	n := 0
-	for {
-		uniquepath := path
-		if n > 0 {
-			uniquepath = path + strconv.Itoa(n)
-		}
-		existing := DB.getBotByUniqueName(uniquepath)
-		if existing.UUID != "" {
-			n = n + 1
-		} else {
-			path = uniquepath
-			break
-		}
-	}
-	return path, nil
-}
-
 func deleteBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
@@ -155,4 +131,52 @@ func deleteBot(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func botUniqueNameFromName(name string) (string, error) {
+	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		return "", err
+	}
+	path := reg.ReplaceAllString(pathOne, "")
+	n := 0
+	for {
+		uniquepath := path
+		if n > 0 {
+			uniquepath = path + strconv.Itoa(n)
+		}
+		existing := DB.getBotByUniqueName(uniquepath)
+		if existing.UUID != "" {
+			n = n + 1
+		} else {
+			path = uniquepath
+			break
+		}
+	}
+	return path, nil
+}
+
+func tribeUniqueNameFromName(name string) (string, error) {
+	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		return "", err
+	}
+	path := reg.ReplaceAllString(pathOne, "")
+	n := 0
+	for {
+		uniquepath := path
+		if n > 0 {
+			uniquepath = path + strconv.Itoa(n)
+		}
+		existing := DB.getTribeByUniqueName(uniquepath)
+		if existing.UUID != "" {
+			n = n + 1
+		} else {
+			path = uniquepath
+			break
+		}
+	}
+	return path, nil
 }

@@ -16,6 +16,7 @@ type Tribe struct {
 	OwnerAlias      string         `json:"owner_alias"`
 	GroupKey        string         `json:"group_key"`
 	Name            string         `json:"name"`
+	UniqueName      string         `json:"unique_name"`
 	Description     string         `json:"description"`
 	Tags            pq.StringArray `json:"tags"`
 	Img             string         `json:"img"`
