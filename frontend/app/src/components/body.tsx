@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import styled from 'styled-components'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
@@ -24,6 +24,30 @@ const fuseOptions = {
 export default function BodyComponent() {
   const { main, ui } = useStores()
   const [selected, setSelected] = useState('')
+  const [n,setN] = useState(100)
+  const [loadingMore,setLoadingMore] = useState(false)
+
+  function selectTribe(uuid:string, unique_name:string) {
+    setSelected(uuid)
+    if(unique_name && window.history.pushState) {
+      window.history.pushState({}, 'Sphinx Tribes', '/t/'+unique_name);
+    }
+  }
+  async function loadTribes(){
+    let un = ''
+    if(window.location.pathname.startsWith('/t/')) {
+      un = window.location.pathname.substr(3)
+    }
+    const ts = await main.getTribes(un)
+    if(un) {
+      const initial = ts[0]
+      if(initial.unique_name===un) setSelected(initial.uuid)
+    }
+  }
+  useEffect(()=>{
+    loadTribes()
+  }, [])
+
   return useObserver(() => {
     const loading = main.tribes.length===0
 
@@ -43,17 +67,33 @@ export default function BodyComponent() {
       theTribes = res.map(r=>r.item)
     }
 
-    return <Body id="main">
+    const finalTribes = theTribes.slice(0,n)
+    function handleScroll(e:any) {
+      const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight;
+      if (bottom) { 
+        setLoadingMore(true)
+        setTimeout(()=>{
+          setN(n+100)
+        }, 500)
+        setTimeout(()=>{
+          setLoadingMore(false)
+        }, 3000)
+      }
+    }
+    return <Body id="main" onScroll={handleScroll}>
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
         {!loading && <EuiFormFieldset style={{width:'100%'}} className="container">
           <div className="row">
-            {theTribes.map(t=> <Tribe {...t} key={t.uuid}
+            {finalTribes.map(t=> <Tribe {...t} key={t.uuid}
               selected={selected===t.uuid}
-              select={setSelected}
+              select={selectTribe}
             />)}
           </div>
         </EuiFormFieldset>}
+        <LoadmoreWrap show={loadingMore}>
+          <EuiLoadingSpinner size="l" />
+        </LoadmoreWrap>
       </Column>
     </Body>
   }
@@ -61,10 +101,10 @@ export default function BodyComponent() {
 
 const Body = styled.div`
   flex:1;
-  height:calc(100vh - 50px);
+  height:calc(100vh - 90px);
   padding-bottom:80px;
   width:100%;
-  overflow:scroll;
+  overflow:auto;
   background:#272c4b;
   display:flex;
   flex-direction:column;
@@ -76,4 +116,12 @@ const Column = styled.div`
   align-items:center;
   max-width:900px;
   width:100%;
+`
+interface LoadmoreWrapProps {
+  show: boolean
+}
+const LoadmoreWrap = styled.div<LoadmoreWrapProps>`
+  position:relative;
+  text-align:center;
+  visibility:${p=> p.show?'visible':'hidden'};
 `

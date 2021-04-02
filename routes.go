@@ -30,6 +30,12 @@ func NewRouter() *http.Server {
 		r.Get("/manifest.json", frontend.ManifestRoute)
 		r.Get("/favicon.ico", frontend.FaviconRoute)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get("/t/static/*", frontend.StaticRoute)
+		r.Get("/t/manifest.json", frontend.ManifestRoute)
+		r.Get("/t/favicon.ico", frontend.FaviconRoute)
+		r.Get("/t/{unique_name}", frontend.IndexRoute)
+	})
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
@@ -156,6 +162,7 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	tribe.OwnerPubKey = extractedPubkey
 	tribe.Updated = &now
+	tribe.UniqueName, _ = tribeUniqueNameFromName(tribe.Name)
 
 	DB.createOrEditTribe(tribe)
 

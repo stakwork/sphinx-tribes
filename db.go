@@ -132,6 +132,14 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	return true
 }
 
+func (db database) updateTribeUniqueName(uuid string, u string) {
+	if uuid == "" {
+		return
+	}
+	// fmt.Println(u)
+	db.db.Model(&Tribe{}).Where("uuid = ?", uuid).Update("unique_name", u)
+}
+
 func (db database) getListedTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
@@ -173,6 +181,12 @@ func (db database) getTribeByFeedURL(feedURL string) Tribe {
 func (db database) getBot(uuid string) Bot {
 	m := Bot{}
 	db.db.Where("uuid = ?", uuid).Find(&m)
+	return m
+}
+
+func (db database) getTribeByUniqueName(un string) Tribe {
+	m := Tribe{}
+	db.db.Where("unique_name = ?", un).Find(&m)
 	return m
 }
 

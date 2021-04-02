@@ -48,6 +48,9 @@ func FaviconRoute(w http.ResponseWriter, r *http.Request) {
 // StaticRoute - css and js
 func StaticRoute(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.RequestURI()
+	// if strings.HasPrefix(path, "/t/") {
+	// 	path = path[2:]
+	// }
 	if strings.HasPrefix(path, "/static/css") {
 		w.Header().Set("content-type", "text/css")
 	}
