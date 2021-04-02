@@ -21,7 +21,7 @@ CREATE TABLE tribes (
   app_url TEXT,
   last_active timestamptz,
   bots TEXT,
-  owner_route_hint TEXT,
+  owner_route_hint TEXT
 );
 
 -- for searching 
@@ -43,7 +43,7 @@ WHERE tsv @@ q;
 
 -- rank
 
-SELECT name, id, description, ts_rank(tsv, q) as rank
+SELECT name, uuid, description, ts_rank(tsv, q) as rank
 FROM tribes, to_tsquery('anothe') q
 WHERE tsv @@ q
 ORDER BY rank DESC
