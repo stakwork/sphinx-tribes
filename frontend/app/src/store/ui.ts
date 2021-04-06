@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import tags from '../components/tags'
+import tags from '../tribes/tags'
 
 const tagLabels = Object.keys(tags)
 const initialTags = tagLabels.map(label=>{

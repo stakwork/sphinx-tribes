@@ -83,6 +83,30 @@ type BotCommand struct {
 	AdminOnly bool   `json:"admin_only"`
 }
 
+type Tabler interface {
+	TableName() string
+}
+
+func (Person) TableName() string {
+	return "people"
+}
+
+// Person struct
+type Person struct {
+	ID             uint           `json:"id"`
+	OwnerPubKey    string         `json:"owner_pubkey"`
+	OwnerAlias     string         `json:"owner_alias"`
+	UniqueName     string         `json:"unique_name"`
+	Description    string         `json:"description"`
+	Tags           pq.StringArray `json:"tags"`
+	Img            string         `json:"img"`
+	Created        *time.Time     `json:"created"`
+	Updated        *time.Time     `json:"updated"`
+	Private        bool           `json:"private"`
+	Deleted        bool           `json:"deleted"`
+	OwnerRouteHint string         `json:"owner_route_hint"`
+}
+
 /* loopbot:
 {
 	prefix:'/loopout',

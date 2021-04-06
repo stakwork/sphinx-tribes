@@ -24,6 +24,15 @@ export class MainStore {
     this.tribes = ts
     return ts
   }
+
+  @observable
+  people: Person[] = []
+
+  @action async getPeople(uniqueName?:string): Promise<Person[]> {
+    const ps = await api.get('people')
+    this.people = ps
+    return ps
+  }
 }
 
 export const mainStore = new MainStore()
@@ -43,3 +52,12 @@ export interface Tribe {
   matchCount?: number; // for tag search
 }
 
+export interface Person {
+  id: number;
+  unique_name: string;
+  owner_pub_key: string;
+  owner_alias: string;
+  description: string;
+  img: string;
+  tags: string[];
+}
