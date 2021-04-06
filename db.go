@@ -54,6 +54,12 @@ var botupdatables = []string{
 	"unlisted", "deleted",
 	"owner_route_hint",
 }
+var peopleupdatables = []string{
+	"description", "tags", "img",
+	"owner_alias",
+	"unlisted", "deleted",
+	"owner_route_hint",
+}
 
 // check that update owner_pub_key does in fact throw error
 func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
@@ -124,11 +130,52 @@ func (db database) createOrEditBot(b Bot) (Bot, error) {
 	return b, nil
 }
 
+// check that update owner_pub_key does in fact throw error
+func (db database) createOrEditPerson(m Person) (Person, error) {
+	if m.OwnerPubKey == "" {
+		return Person{}, errors.New("no pub key")
+	}
+	onConflict := "ON CONFLICT (id) DO UPDATE SET"
+	for i, u := range updatables {
+		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
+		if i < len(updatables)-1 {
+			onConflict = onConflict + ","
+		}
+	}
+	if m.OwnerAlias == "" {
+		m.OwnerAlias = "name"
+	}
+	if m.Description == "" {
+		m.Description = "description"
+	}
+	if m.Tags == nil {
+		m.Tags = []string{}
+	}
+	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
+		fmt.Println(err)
+		return Person{}, err
+	}
+	db.db.Exec(`UPDATE tribes SET tsv =
+  	setweight(to_tsvector(owner_alias), 'A') ||
+	setweight(to_tsvector(description), 'B') ||
+	setweight(array_to_tsvector(tags), 'C')
+	WHERE id = '` + strconv.Itoa(int(m.ID)) + "'")
+	return m, nil
+}
+
 func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
 	}
 	db.db.Model(&Tribe{}).Where("uuid = ?", uuid).Updates(u)
+	return true
+}
+
+func (db database) updatePerson(id uint, u map[string]interface{}) bool {
+	if id == 0 {
+		return false
+	}
+	db.db.Model(&Person{}).Where("id = ?", id).Updates(u)
 	return true
 }
 
@@ -148,6 +195,12 @@ func (db database) getListedTribes() []Tribe {
 
 func (db database) getListedBots() []Bot {
 	ms := []Bot{}
+	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	return ms
+}
+
+func (db database) getListedPeople() []Person {
+	ms := []Person{}
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
@@ -172,6 +225,12 @@ func (db database) getTribe(uuid string) Tribe {
 	return m
 }
 
+func (db database) getPerson(id uint) Person {
+	m := Person{}
+	db.db.Where("id = ?", id).Find(&m)
+	return m
+}
+
 func (db database) getTribeByFeedURL(feedURL string) Tribe {
 	m := Tribe{}
 	db.db.Where("feed_url = ?", feedURL).First(&m)
@@ -192,6 +251,12 @@ func (db database) getTribeByUniqueName(un string) Tribe {
 
 func (db database) getBotByUniqueName(un string) Bot {
 	m := Bot{}
+	db.db.Where("unique_name = ?", un).Find(&m)
+	return m
+}
+
+func (db database) getPersonByUniqueName(un string) Person {
+	m := Person{}
 	db.db.Where("unique_name = ?", un).Find(&m)
 	return m
 }
@@ -221,6 +286,23 @@ func (db database) searchBots(s string, limit, offset int) []BotRes {
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
 		FROM bots, to_tsquery('` + s + `') q
+		WHERE tsv @@ q
+		ORDER BY rank DESC 
+		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)
+	return ms
+}
+
+func (db database) searchPeople(s string, limit, offset int) []Person {
+	ms := []Person{}
+	if s == "" {
+		return ms
+	}
+	// set limit
+	limitStr := strconv.Itoa(limit)
+	offsetStr := strconv.Itoa(offset)
+	db.db.Raw(
+		`SELECT id, owner_pub_key, unique_name, img, description, tags, ts_rank(tsv, q) as rank
+		FROM people, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
 		ORDER BY rank DESC 
 		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)

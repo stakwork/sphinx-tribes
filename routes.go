@@ -47,6 +47,7 @@ func NewRouter() *http.Server {
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
+		r.Get("/people", getListedPeople)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -108,6 +109,12 @@ func getListedTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := DB.getListedTribes()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
+}
+
+func getListedPeople(w http.ResponseWriter, r *http.Request) {
+	people := DB.getListedPeople()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
 }
 
 func getTribe(w http.ResponseWriter, r *http.Request) {
