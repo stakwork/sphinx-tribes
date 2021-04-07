@@ -8,6 +8,7 @@ import {
 } from '@elastic/eui';
 import Fuse from 'fuse.js'
 import Person from './person'
+import EditMe from './editMe'
 
 export default function BodyComponent() {
   const { main, ui } = useStores()
@@ -41,6 +42,9 @@ export default function BodyComponent() {
           </div>
         </EuiFormFieldset>}
       </Column>
+
+      <EditMe />
+
     </Body>
   }
 )}

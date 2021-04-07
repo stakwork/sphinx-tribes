@@ -28,6 +28,11 @@ class UiStore {
   @action setSearchText(s:string){
     this.searchText = s
   }
+
+  @observable editMe: boolean = true
+  @action setEditMe(b:boolean){
+    this.editMe = b
+  }
 }
 
 export const uiStore = new UiStore()
