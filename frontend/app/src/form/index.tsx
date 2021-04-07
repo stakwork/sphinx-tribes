@@ -48,9 +48,11 @@ const Wrap = styled.div`
 `;
 
 export interface FormField {
-  name: string,
-  type: string,
-  label: string,
+  name: string
+  type: string
+  label: string
+  readOnly?: boolean
+  required?: boolean
   validator?: any
   style?: any
 }

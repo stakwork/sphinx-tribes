@@ -69,6 +69,12 @@ func ask(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type VerifyPayload struct {
+	MemeToken   string `json:"memeToken"`
+	TribesToken string `json:"tribesToken"`
+	Pubkey      string `json:"pubkey"`
+}
+
 func verify(w http.ResponseWriter, r *http.Request) {
 	challenge := chi.URLParam(r, "challenge")
 	_, err := store.GetChallenge(challenge)
@@ -77,23 +83,43 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := r.URL.Query().Get("token")
-	if token == "" {
+	payload := VerifyPayload{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &payload)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if payload.MemeToken == "" || payload.TribesToken == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	pubkey, err := VerifyTribeUUID(token)
+	pubkey, err := VerifyTribeUUID(payload.TribesToken)
 	if pubkey == "" || err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	store.SetChallenge(challenge, token)
+	payload.Pubkey = pubkey
+	marshalled, err := json.Marshal(payload)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	// set into the cache
+	store.SetChallenge(challenge, string(marshalled))
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{})
 }
 
+/*
+curl localhost:5002/ask
+curl localhost:5002/poll/SQEYkBpWfGFwAPDlRaDYsWvg_AMh9bjyvXNg5E8HlA0=
+*/
 func poll(w http.ResponseWriter, r *http.Request) {
 
 	challenge := chi.URLParam(r, "challenge")
@@ -103,7 +129,14 @@ func poll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(res) < 10 {
+	if len(res) <= 10 {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	pld := VerifyPayload{}
+	err = json.Unmarshal([]byte(res), &pld)
+	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -111,9 +144,7 @@ func poll(w http.ResponseWriter, r *http.Request) {
 	store.DeleteChallenge(challenge)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": res,
-	})
+	json.NewEncoder(w).Encode(pld)
 }
 
 func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
