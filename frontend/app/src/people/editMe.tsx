@@ -26,7 +26,7 @@ const meSchema: FormField[] = [
 
 export default function EditMe(props:any) {
   const { ui } = useStores();
-  const [me, setMe] = useState(null)
+  const [me, setMe] = useState({})
 
   function closeModal(){
     ui.setEditMe(false)
