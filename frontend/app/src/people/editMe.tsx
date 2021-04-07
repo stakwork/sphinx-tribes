@@ -13,6 +13,11 @@ import ConfirmMe from './confirmMe'
 
 const meSchema: FormField[] = [
   {
+    name:'img',
+    label:'Image',
+    type:'img'
+  },
+  {
     name:'owner_alias',
     label:'Name',
     type:'text'
