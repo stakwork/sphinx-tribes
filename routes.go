@@ -49,6 +49,8 @@ func NewRouter() *http.Server {
 		r.Get("/podcast", getPodcast)
 		r.Get("/people", getListedPeople)
 		r.Get("/ask", ask)
+		r.Post("/verify/{challenge}", verify)
+		r.Get("/poll/{challenge}", poll)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -60,7 +62,6 @@ func NewRouter() *http.Server {
 		r.Delete("/bot/{uuid}", deleteBot)
 		r.Put("/person", createOrEditPerson)
 		r.Put("/bot", createOrEditBot)
-		r.Get("/verify", verify)
 	})
 
 	PORT := os.Getenv("PORT")

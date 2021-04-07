@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
@@ -59,6 +61,15 @@ func VerifyTribeUUID(uuid string) (string, error) {
 	if err != nil || !valid || pubkey == "" {
 		return "", err
 	}
+
+	// 5 MINUTE MAX
+	ts := int64(binary.BigEndian.Uint32(timeBuf))
+	now := time.Now().Unix()
+	if ts < now-300 {
+		fmt.Println("TOO LATE!")
+		return "", errors.New("too late")
+	}
+
 	return pubkey, nil
 }
 
