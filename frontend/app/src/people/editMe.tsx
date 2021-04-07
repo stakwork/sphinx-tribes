@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { useStores } from "../store";
 import { useObserver } from "mobx-react-lite";
 import {
@@ -13,6 +13,12 @@ import ConfirmMe from './confirmMe'
 
 const meSchema: FormField[] = [
   {
+    name:'pubkey',
+    label:'Pubkey',
+    type:'text',
+    readOnly:true
+  },
+  {
     name:'img',
     label:'Image',
     type:'img'
@@ -20,7 +26,8 @@ const meSchema: FormField[] = [
   {
     name:'owner_alias',
     label:'Name',
-    type:'text'
+    type:'text',
+    required: true
   },
   {
     name:'description',
@@ -31,7 +38,6 @@ const meSchema: FormField[] = [
 
 export default function EditMe(props:any) {
   const { ui } = useStores();
-  const [me, setMe] = useState({})
 
   function closeModal(){
     ui.setEditMe(false)
@@ -44,9 +50,10 @@ export default function EditMe(props:any) {
           <EuiModalHeaderTitle>My Profile</EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
-          {!me && <ConfirmMe setMe={setMe} />}
-          {me && <Form 
+          {!ui.tokens && <ConfirmMe />}
+          {ui.tokens && <Form 
             schema={meSchema}
+            initialValues={{pubkey:ui.tokens.pubkey}}
           />}
         </EuiModalBody>
       </EuiModal>

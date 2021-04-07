@@ -37,7 +37,7 @@ function addMethod(m: string): Function {
       if (m === 'BLOB') opts.method = 'GET'
       const r = await fetch(rootUrl + url, opts);
       if (!r.ok) {
-        console.log(r)
+        // console.log(r)
         throw new Error('Not OK!');
       }
       let res

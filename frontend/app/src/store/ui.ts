@@ -33,6 +33,18 @@ class UiStore {
   @action setEditMe(b:boolean){
     this.editMe = b
   }
+
+  @observable tokens: TokensData = null
+  @action setTokens(t:Tokens){
+    this.tokens = t
+  }
+}
+
+export type TokensData = Tokens | null
+export interface Tokens {
+  pubkey: string
+  memeToken: string
+  tribesTokens: string
 }
 
 export const uiStore = new UiStore()
