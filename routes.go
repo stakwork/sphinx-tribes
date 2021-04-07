@@ -48,6 +48,7 @@ func NewRouter() *http.Server {
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
 		r.Get("/people", getListedPeople)
+		r.Get("/ask", ask)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -57,11 +58,9 @@ func NewRouter() *http.Server {
 		r.Delete("/tribe/{uuid}", deleteTribe)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
 		r.Delete("/bot/{uuid}", deleteBot)
-	})
-
-	r.Group(func(r chi.Router) {
-		r.Use(PubKeyContext)
+		r.Put("/person", createOrEditPerson)
 		r.Put("/bot", createOrEditBot)
+		r.Get("/verify", verify)
 	})
 
 	PORT := os.Getenv("PORT")

@@ -19,6 +19,7 @@ require (
 	github.com/karrick/godirwalk v1.16.1 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/lib/pq v1.5.2
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
