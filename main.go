@@ -21,6 +21,8 @@ func main() {
 
 	initDB()
 
+	initCache()
+
 	run()
 }
 
