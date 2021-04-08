@@ -73,6 +73,10 @@ type VerifyPayload struct {
 	MemeToken   string `json:"memeToken"`
 	TribesToken string `json:"tribesToken"`
 	Pubkey      string `json:"pubkey"`
+	ContactKey  string `json:"contactKey"`
+	Alias       string `json:"alias"`
+	PhotoURL    string `json:"photoUrl"`
+	RouteHint   string `json:"routeHint"`
 }
 
 func verify(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +122,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 
 /*
 curl localhost:5002/ask
-curl localhost:5002/poll/SQEYkBpWfGFwAPDlRaDYsWvg_AMh9bjyvXNg5E8HlA0=
+curl localhost:5002/poll/it8hiKlFDm5YLbuUarl5yl8c7L4NKOsEQT6iFSpofiQ=
 */
 func poll(w http.ResponseWriter, r *http.Request) {
 
