@@ -1,8 +1,14 @@
 import React, {useRef, useState} from 'react'
 import { QRCode } from 'react-qr-svg';
 import styled from 'styled-components'
-import {EuiCheckableCard} from '@elastic/eui';
 import moment from 'moment'
+import qrCode from '../utils/invoice-qr-code.svg'
+
+import {
+  EuiCheckableCard,
+  EuiButton
+} from '@elastic/eui';
+
 
 export default function Person({id,img,tags,description,selected,select,created,owner_alias,unique_name}:any){
   return <EuiCheckableCard className="col-md-6 col-lg-6 ml-2 mb-2"
@@ -17,8 +23,7 @@ export default function Person({id,img,tags,description,selected,select,created,
     }} selected={selected}>
       <Left>
         <Row className="item-cont">
-          <div className="placeholder-img-tribe"></div>
-          <Img src={img} />
+          {img ? <Img src={img} /> : <div className="placeholder-img-tribe"></div>}
           <Left style={{padding:'0 0 0 20px', maxWidth:'calc(100% - 100px)'}}>
             <Row style={selected?{flexDirection:'column',alignItems:'flex-start'}:{}}>
               <Title className="tribe-title">
@@ -28,7 +33,31 @@ export default function Person({id,img,tags,description,selected,select,created,
             <Description oneLine={selected?false:true} style={{minHeight:20}}>
               {description}
             </Description>
+            <TagsWrap>
+              <Tag>Bitcoin</Tag>
+              <Tag>React</Tag>
+              <Tag>Art</Tag>
+            </TagsWrap>
           </Left>
+        </Row>
+        <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
+
+            <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600}}>
+              FOLLOW
+            </EuiButton>
+            <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600}} iconType={qrCode} >
+              QR CODE
+            </EuiButton>
+
+        </Row>
+        <Intro>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        </Intro>
+        <Row style={{ color:"#6B7A8D", fontSize:12, fontWeight:"bold", padding:"10px 10px 0px 10px" }}>
+          INTERESTS
+        </Row>
+        <Row style={{color:"white", fontSize:14, margin:"0px 10px 10px 10px"}}>
+          Art, Painting, Photography, Lighting
         </Row>
         <div className="expand-part" style={selected ? { opacity: 1} : { opacity: 0}}>
 
@@ -92,9 +121,12 @@ const Title=styled.h3`
 interface DescriptionProps {
   oneLine: boolean;
 }
-const Description=styled.h5<DescriptionProps>`
+const Description=styled.div<DescriptionProps>`
   font-weight:normal;
   line-height:20px;
+  font-size:15px;
+  font-weight: 500;
+  color:#6B7A8D;
   ${(p)=> p.oneLine&&`
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -110,10 +142,25 @@ const Img = styled.div<ImageProps>`
   background-size:cover;
   height:90px;
   width:90px;
-  border-radius: 5px;
+  border-radius: 50%;
   position:relative;
 `
 const Tokens=styled.div`
   display:flex;
   align-items:center;
+`
+const TagsWrap=styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top:10px;
+`
+const Tag=styled.h5`
+  margin-right: 10px;
+`
+const Intro=styled.div`
+  color:white;
+  font-size:14px;
+  margin:10px
 `

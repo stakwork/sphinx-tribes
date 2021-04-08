@@ -17,7 +17,7 @@ export default function Header() {
       <div className="container">
         <div className="row">
           <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            <img id="logo" src="/static/tribes_logo.svg" alt="Logo"/>
+            <img id="logo" src="/static/people_logo.svg" alt="Logo"/>
             {/*<Title>Tribes</Title>*/}
           </EuiHeaderSection>
 
