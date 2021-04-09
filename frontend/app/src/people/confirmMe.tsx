@@ -6,16 +6,17 @@ import {
 import styled from 'styled-components'
 import api from '../api'
 import { useStores } from '../store';
-import type {Tokens} from '../store/ui'
+import type {MeInfo} from '../store/ui'
 
 const host = window.location.host==='localhost:3001'?'localhost:5002':window.location.host
-function makeQR(challenge:string) {
-  return `sphinx.chat://?action=tokens&host=${host}&challenge=${challenge}`
+function makeQR(challenge:string, ts:string) {
+  return `sphinx.chat://?action=tokens&host=${host}&challenge=${challenge}&ts=${ts}`
 }
 
 export default function ConfirmMe(){
   const {ui} = useStores()
   const [challenge, setChallenge] = useState('')
+  const [ts, setTS] = useState('')
 
   async function startPolling(challenge:string){
     let ok = true
@@ -23,10 +24,10 @@ export default function ConfirmMe(){
     while(ok) {
       await sleep(3000)
       try {
-        const ts:Tokens = await api.get(`poll/${challenge}`)
-        console.log(ts)
-        if(ts && ts.pubkey) {
-          ui.setTokens(ts)
+        const me:MeInfo = await api.get(`poll/${challenge}`)
+        console.log(me)
+        if(me && me.pubkey) {
+          ui.setMeInfo(me)
           ok = false
           break;
         }
@@ -41,18 +42,19 @@ export default function ConfirmMe(){
       setChallenge(res.challenge)
       startPolling(res.challenge)
     }
+    if(res.ts) {
+      setTS(res.ts)
+    }
   }
   useEffect(()=>{
     getChallenge()
   }, [])
-  // 1. get "challenge" 
-  // 2. display
-  // 3. poll for signed timestamp
-  // 4. when its gotten, go store in localstorage
-  const qrString = makeQR(challenge)
+
+  const qrString = makeQR(challenge, ts)
   return <ConfirmWrap>
     {!challenge && <EuiLoadingSpinner size="xl" style={{marginTop:60}} />}
     {challenge && <InnerWrap>
+      <P>Scan QR or click to open Sphinx</P>
       <QRCode
         bgColor="#FFFFFF"
         fgColor="#000000"
@@ -95,6 +97,7 @@ const LinkWrap = styled.div`
     margin-left:25px;
   }
 `
+const P = styled.p``
 
 async function sleep(ms:number) {
 	return new Promise(resolve => setTimeout(resolve, ms))
