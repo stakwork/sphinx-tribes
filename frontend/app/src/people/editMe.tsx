@@ -50,10 +50,10 @@ export default function EditMe(props:any) {
           <EuiModalHeaderTitle>My Profile</EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
-          {!ui.tokens && <ConfirmMe />}
-          {ui.tokens && <Form 
+          {!ui.meInfo && <ConfirmMe />}
+          {ui.meInfo && <Form 
             schema={meSchema}
-            initialValues={{pubkey:ui.tokens.pubkey}}
+            initialValues={{pubkey:ui.meInfo.pubkey}}
           />}
         </EuiModalBody>
       </EuiModal>

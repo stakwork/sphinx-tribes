@@ -34,17 +34,21 @@ class UiStore {
     this.editMe = b
   }
 
-  @observable tokens: TokensData = null
-  @action setTokens(t:Tokens){
-    this.tokens = t
+  @observable meInfo: MeData = null
+  @action setMeInfo(t:MeData){
+    this.meInfo = t
   }
 }
 
-export type TokensData = Tokens | null
-export interface Tokens {
+export type MeData = MeInfo | null
+export interface MeInfo {
   pubkey: string
   memeToken: string
-  tribesTokens: string
+  tribesToken: string
+  photoUrl: string
+  alias: string
+  routeHint: string
+  contactKey: string
 }
 
 export const uiStore = new UiStore()

@@ -66,6 +66,7 @@ func ask(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"challenge": challenge,
+		"ts":        ts,
 	})
 }
 
@@ -122,7 +123,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 
 /*
 curl localhost:5002/ask
-curl localhost:5002/poll/it8hiKlFDm5YLbuUarl5yl8c7L4NKOsEQT6iFSpofiQ=
+curl localhost:5002/poll/d5SYZNY5pQ7dXwHP-oXh2uSOPUEX0fUJOXI0_5-eOsg=
 */
 func poll(w http.ResponseWriter, r *http.Request) {
 
