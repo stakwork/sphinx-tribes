@@ -66,6 +66,7 @@ func ask(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"challenge": challenge,
+		"ts":        ts,
 	})
 }
 
@@ -73,6 +74,10 @@ type VerifyPayload struct {
 	MemeToken   string `json:"memeToken"`
 	TribesToken string `json:"tribesToken"`
 	Pubkey      string `json:"pubkey"`
+	ContactKey  string `json:"contactKey"`
+	Alias       string `json:"alias"`
+	PhotoURL    string `json:"photoUrl"`
+	RouteHint   string `json:"routeHint"`
 }
 
 func verify(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +123,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 
 /*
 curl localhost:5002/ask
-curl localhost:5002/poll/SQEYkBpWfGFwAPDlRaDYsWvg_AMh9bjyvXNg5E8HlA0=
+curl localhost:5002/poll/d5SYZNY5pQ7dXwHP-oXh2uSOPUEX0fUJOXI0_5-eOsg=
 */
 func poll(w http.ResponseWriter, r *http.Request) {
 
