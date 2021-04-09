@@ -12,7 +12,7 @@ export default function Form(props:any) {
       onSubmit={props.onSubmit}
       validationSchema={validator(props.schema)}
     >
-      {({setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid}) => {
+      {({setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues}) => {
         return (
           <Wrap>
             {props.schema && props.schema.map((item:FormField) => <Input
@@ -20,6 +20,7 @@ export default function Form(props:any) {
               key={item.name}
               value={values[item.name]}
               error={errors[item.name]}
+              initialValues={initialValues}
               handleChange={(e:any) => {
                 setFieldValue(item.name, e);
               }}
