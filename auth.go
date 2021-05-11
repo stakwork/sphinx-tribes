@@ -37,7 +37,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 			return
 		}
 
-		pubkey, err := VerifyTribeUUID(token)
+		pubkey, err := VerifyTribeUUID(token, true)
 		if pubkey == "" || err != nil {
 			http.Error(w, http.StatusText(401), 401)
 			return
@@ -49,7 +49,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 }
 
 // VerifyTribeUUID takes base64 uuid and returns hex pubkey
-func VerifyTribeUUID(uuid string) (string, error) {
+func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
 	sigByes, err := base64.URLEncoding.DecodeString(uuid)
 	if err != nil {
 		return "", err
@@ -62,12 +62,14 @@ func VerifyTribeUUID(uuid string) (string, error) {
 		return "", err
 	}
 
-	// 5 MINUTE MAX
-	ts := int64(binary.BigEndian.Uint32(timeBuf))
-	now := time.Now().Unix()
-	if ts < now-300 {
-		fmt.Println("TOO LATE!")
-		return "", errors.New("too late")
+	if checkTimestamp {
+		// 5 MINUTE MAX
+		ts := int64(binary.BigEndian.Uint32(timeBuf))
+		now := time.Now().Unix()
+		if ts < now-300 {
+			fmt.Println("TOO LATE!")
+			return "", errors.New("too late")
+		}
 	}
 
 	return pubkey, nil
