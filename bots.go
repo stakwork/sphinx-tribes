@@ -34,7 +34,7 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	extractedPubkey, err := VerifyTribeUUID(bot.UUID)
+	extractedPubkey, err := VerifyTribeUUID(bot.UUID, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -112,7 +112,7 @@ func deleteBot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := VerifyTribeUUID(uuid)
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
