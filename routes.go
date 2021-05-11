@@ -145,7 +145,7 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	extractedPubkey, err := VerifyTribeUUID(tribe.UUID)
+	extractedPubkey, err := VerifyTribeUUID(tribe.UUID, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -187,7 +187,7 @@ func putTribeActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := VerifyTribeUUID(uuid)
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -228,7 +228,7 @@ func putTribeStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := VerifyTribeUUID(tribe.UUID)
+	extractedPubkey, err := VerifyTribeUUID(tribe.UUID, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -264,7 +264,7 @@ func deleteTribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := VerifyTribeUUID(uuid)
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
