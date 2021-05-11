@@ -102,7 +102,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	pubkey, err := VerifyTribeUUID(payload.TribesToken)
+	pubkey, err := VerifyTribeUUID(payload.TribesToken, false)
 	if pubkey == "" || err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
