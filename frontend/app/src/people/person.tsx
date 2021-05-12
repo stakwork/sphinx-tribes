@@ -42,10 +42,10 @@ export default function Person({id,img,tags,description,selected,select,created,
           </Left>
         </Row>
         <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
-          <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600}}>
+          <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600, fontSize:12}}>
             FOLLOW
           </EuiButton>
-          <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600}} iconType={qrCode}>
+          <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600, fontSize:12}} iconType={qrCode}>
             QR CODE
           </EuiButton>
         </Row>
@@ -59,7 +59,6 @@ export default function Person({id,img,tags,description,selected,select,created,
           {tagsString}
         </Row>
         <div className="expand-part" style={selected ? { opacity: 1} : { opacity: 0}}>
-
           <div className="colapse-button"><img src="/static/keyboard_arrow_up-black-18dp.svg" alt="" /></div>
         </div>
       </Left>

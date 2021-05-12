@@ -29,12 +29,12 @@ class UiStore {
     this.searchText = s
   }
 
-  @observable editMe: boolean = false
+  @observable editMe: boolean = true
   @action setEditMe(b:boolean){
     this.editMe = b
   }
 
-  @observable meInfo: MeData = null
+  @observable meInfo: MeData = emptyMeData
   @action setMeInfo(t:MeData){
     this.meInfo = t
   }
@@ -50,5 +50,6 @@ export interface MeInfo {
   routeHint: string
   contactKey: string
 }
+const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',memeToken:'',tribesToken:'',routeHint:'',contactKey:'',photoUrl:''}
 
 export const uiStore = new UiStore()

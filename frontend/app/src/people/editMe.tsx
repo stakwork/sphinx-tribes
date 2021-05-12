@@ -51,12 +51,15 @@ export default function EditMe(props:any) {
         </EuiModalHeader>
         <EuiModalBody >
           <div>
-          {!ui.meInfo && <ConfirmMe />}
-          {ui.meInfo && <Form 
-            schema={meSchema}
-            initialValues={{pubkey:ui.meInfo.pubkey}}
-          />}
-
+            {!ui.meInfo && <ConfirmMe />}
+            {ui.meInfo && <Form 
+              schema={meSchema}
+              initialValues={{
+                pubkey: ui.meInfo.pubkey,
+                owner_alias: ui.meInfo.alias,
+                img: ui.meInfo.photoUrl
+              }}
+            />}
           </div>
         </EuiModalBody>
       </EuiModal>
