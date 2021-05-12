@@ -13,15 +13,15 @@ import ConfirmMe from './confirmMe'
 
 const meSchema: FormField[] = [
   {
+    name:'img',
+    label:'Image',
+    type:'img'
+  },
+  {
     name:'pubkey',
     label:'Pubkey',
     type:'text',
     readOnly:true
-  },
-  {
-    name:'img',
-    label:'Image',
-    type:'img'
   },
   {
     name:'owner_alias',
@@ -49,12 +49,15 @@ export default function EditMe(props:any) {
         <EuiModalHeader>
           <EuiModalHeaderTitle>My Profile</EuiModalHeaderTitle>
         </EuiModalHeader>
-        <EuiModalBody>
+        <EuiModalBody >
+          <div>
           {!ui.meInfo && <ConfirmMe />}
           {ui.meInfo && <Form 
             schema={meSchema}
             initialValues={{pubkey:ui.meInfo.pubkey}}
           />}
+
+          </div>
         </EuiModalBody>
       </EuiModal>
     </EuiOverlayMask>
