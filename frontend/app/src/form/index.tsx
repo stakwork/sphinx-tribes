@@ -30,6 +30,7 @@ export default function Form(props:any) {
             <EuiButton
               onClick={()=> handleSubmit()}
               disabled={!isValid || !dirty}
+              style={{fontSize:12, fontWeight:600}}
             >
               {props.buttonText || "Save Changes"}
             </EuiButton>
