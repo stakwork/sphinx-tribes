@@ -3,14 +3,17 @@ import { QRCode } from 'react-qr-svg';
 import styled from 'styled-components'
 import moment from 'moment'
 import qrCode from '../utils/invoice-qr-code.svg'
-
 import {
   EuiCheckableCard,
   EuiButton
 } from '@elastic/eui';
 
-
 export default function Person({id,img,tags,description,selected,select,created,owner_alias,unique_name}:any){
+  let tagsString = ''
+  tags.forEach((t:string,i:number)=> {
+    if(i!==0) tagsString+=','
+    tagsString+=t
+  })
   return <EuiCheckableCard className="col-md-6 col-lg-6 ml-2 mb-2"
     id={id+''}
     label={owner_alias}
@@ -34,30 +37,26 @@ export default function Person({id,img,tags,description,selected,select,created,
               {description}
             </Description>
             <TagsWrap>
-              <Tag>Bitcoin</Tag>
-              <Tag>React</Tag>
-              <Tag>Art</Tag>
+              {tags.map((t:string)=> <Tag>{t}</Tag>)}
             </TagsWrap>
           </Left>
         </Row>
         <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
-
-            <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600}}>
-              FOLLOW
-            </EuiButton>
-            <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600}} iconType={qrCode} >
-              QR CODE
-            </EuiButton>
-
+          <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600}}>
+            FOLLOW
+          </EuiButton>
+          <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600}} iconType={qrCode}>
+            QR CODE
+          </EuiButton>
         </Row>
         <Intro>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          {description}
         </Intro>
         <Row style={{ color:"#6B7A8D", fontSize:12, fontWeight:"bold", padding:"10px 10px 0px 10px" }}>
           INTERESTS
         </Row>
         <Row style={{color:"white", fontSize:14, margin:"0px 10px 10px 10px"}}>
-          Art, Painting, Photography, Lighting
+          {tagsString}
         </Row>
         <div className="expand-part" style={selected ? { opacity: 1} : { opacity: 0}}>
 
@@ -93,6 +92,9 @@ const Content = styled.div<ContentProps>`
       color:#bebebe;
     }
   `}
+  & button img {
+
+  }
 `
 const QRWrap = styled.div`
   background:white;

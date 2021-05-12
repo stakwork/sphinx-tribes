@@ -29,7 +29,7 @@ class UiStore {
     this.searchText = s
   }
 
-  @observable editMe: boolean = true
+  @observable editMe: boolean = false
   @action setEditMe(b:boolean){
     this.editMe = b
   }

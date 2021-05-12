@@ -55,13 +55,15 @@ export default function ConfirmMe(){
     {!challenge && <EuiLoadingSpinner size="xl" style={{marginTop:60}} />}
     {challenge && <InnerWrap>
       <P>Scan QR or click to open Sphinx</P>
-      <QRCode
-        bgColor="#FFFFFF"
-        fgColor="#000000"
-        level="Q"
-        style={{width:209}}
-        value={qrString}
-      />
+      <QrWrap>
+        <QRCode
+          bgColor="#FFFFFF"
+          fgColor="#000000"
+          level="Q"
+          style={{width:209}}
+          value={qrString}
+        />
+      </QrWrap>
       <LinkWrap>
         <a href={qrString} className="btn join-btn">
           <img style={{width:13,height:13,marginRight:8}} src="/static/launch-24px.svg" alt="" />
@@ -97,7 +99,16 @@ const LinkWrap = styled.div`
     margin-left:25px;
   }
 `
-const P = styled.p``
+const P = styled.p`
+  color:white;
+`
+const QrWrap = styled.div`
+  padding:8px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+`
 
 async function sleep(ms:number) {
 	return new Promise(resolve => setTimeout(resolve, ms))
