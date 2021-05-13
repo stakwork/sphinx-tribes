@@ -49,7 +49,6 @@ func NewRouter() *http.Server {
 		r.Get("/podcast", getPodcast)
 		r.Get("/people", getListedPeople)
 		r.Get("/ask", ask)
-		r.Post("/verify/{challenge}", verify)
 		r.Get("/poll/{challenge}", poll)
 	})
 
@@ -61,6 +60,7 @@ func NewRouter() *http.Server {
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
 		r.Delete("/bot/{uuid}", deleteBot)
 		r.Put("/person", createOrEditPerson)
+		r.Post("/verify/{challenge}", verify)
 		r.Put("/bot", createOrEditBot)
 	})
 

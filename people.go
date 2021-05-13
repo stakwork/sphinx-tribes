@@ -71,16 +71,18 @@ func ask(w http.ResponseWriter, r *http.Request) {
 }
 
 type VerifyPayload struct {
-	MemeToken   string `json:"memeToken"`
-	TribesToken string `json:"tribesToken"`
-	Pubkey      string `json:"pubkey"`
-	ContactKey  string `json:"contactKey"`
-	Alias       string `json:"alias"`
-	PhotoURL    string `json:"photoUrl"`
-	RouteHint   string `json:"routeHint"`
+	Pubkey     string `json:"pubkey"`
+	ContactKey string `json:"contactKey"`
+	Alias      string `json:"alias"`
+	PhotoURL   string `json:"photoUrl"`
+	RouteHint  string `json:"routeHint"`
+	JWT        string `json:"jwt"`
 }
 
 func verify(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
 	challenge := chi.URLParam(r, "challenge")
 	_, err := store.GetChallenge(challenge)
 	if err != nil {
@@ -98,17 +100,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if payload.MemeToken == "" || payload.TribesToken == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	pubkey, err := VerifyTribeUUID(payload.TribesToken, false)
-	if pubkey == "" || err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	payload.Pubkey = pubkey
+	payload.Pubkey = pubKeyFromAuth
 	marshalled, err := json.Marshal(payload)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -166,10 +158,11 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if person.ID == 0 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
+	// ?
+	// if person.ID == 0 {
+	// 	w.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
 
 	now := time.Now()
 
@@ -182,7 +175,7 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
-	person.UniqueName, _ = botUniqueNameFromName(person.OwnerAlias)
+	person.UniqueName, _ = personUniqueNameFromName(person.OwnerAlias)
 
 	p, err := DB.createOrEditPerson(person)
 	if err != nil {
