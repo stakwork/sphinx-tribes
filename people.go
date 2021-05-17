@@ -77,6 +77,7 @@ type VerifyPayload struct {
 	PhotoURL   string `json:"photoUrl"`
 	RouteHint  string `json:"routeHint"`
 	JWT        string `json:"jwt"`
+	URL        string `json:"url"`
 }
 
 func verify(w http.ResponseWriter, r *http.Request) {
