@@ -33,6 +33,11 @@ const meSchema: FormField[] = [
     name:'description',
     label:'Description',
     type:'text'
+  },
+  {
+    name:'price_to_meet',
+    label:'Price to Meet',
+    type:'number'
   }
 ]
 

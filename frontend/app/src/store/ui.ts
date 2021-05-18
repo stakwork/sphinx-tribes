@@ -34,7 +34,7 @@ class UiStore {
     this.editMe = b
   }
 
-  @observable meInfo: MeData = emptyMeData
+  @observable meInfo: MeData = null
   @action setMeInfo(t:MeData){
     this.meInfo = t
   }

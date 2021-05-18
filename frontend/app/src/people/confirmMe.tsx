@@ -10,7 +10,7 @@ import type {MeInfo} from '../store/ui'
 
 const host = window.location.host==='localhost:3001'?'localhost:5002':window.location.host
 function makeQR(challenge:string, ts:string) {
-  return `sphinx.chat://?action=tokens&host=${host}&challenge=${challenge}&ts=${ts}`
+  return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`
 }
 
 export default function ConfirmMe(){
