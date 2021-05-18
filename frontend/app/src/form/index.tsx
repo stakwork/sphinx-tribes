@@ -49,9 +49,10 @@ const Wrap = styled.div`
   height: 100%;
 `;
 
+type FormFieldType = 'text' | 'img' | 'number'
 export interface FormField {
   name: string
-  type: string
+  type: FormFieldType
   label: string
   readOnly?: boolean
   required?: boolean
