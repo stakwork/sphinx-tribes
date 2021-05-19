@@ -72,10 +72,10 @@ func ask(w http.ResponseWriter, r *http.Request) {
 
 type VerifyPayload struct {
 	Pubkey     string `json:"pubkey"`
-	ContactKey string `json:"contactKey"`
+	ContactKey string `json:"contact_key"`
 	Alias      string `json:"alias"`
-	PhotoURL   string `json:"photoUrl"`
-	RouteHint  string `json:"routeHint"`
+	PhotoURL   string `json:"photo_url"`
+	RouteHint  string `json:"route_hint"`
 	JWT        string `json:"jwt"`
 	URL        string `json:"url"`
 }
