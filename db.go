@@ -59,6 +59,7 @@ var peopleupdatables = []string{
 	"owner_alias",
 	"unlisted", "deleted",
 	"owner_route_hint",
+	"price_to_meet",
 }
 
 // check that update owner_pub_key does in fact throw error
@@ -228,6 +229,12 @@ func (db database) getTribe(uuid string) Tribe {
 func (db database) getPerson(id uint) Person {
 	m := Person{}
 	db.db.Where("id = ?", id).Find(&m)
+	return m
+}
+
+func (db database) getPersonByPubkey(pubkey string) Person {
+	m := Person{}
+	db.db.Where("owner_pubkey = ?", pubkey).Find(&m)
 	return m
 }
 

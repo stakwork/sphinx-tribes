@@ -112,7 +112,8 @@ CREATE TABLE people (
   updated timestamptz,
   unlisted boolean,
   deleted boolean,
-  unique_name TEXT
+  unique_name TEXT,
+  price_to_meet BIGINT
 );
 
 ALTER TABLE people ADD COLUMN tsv tsvector;
