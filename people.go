@@ -211,3 +211,10 @@ func personUniqueNameFromName(name string) (string, error) {
 	}
 	return path, nil
 }
+
+func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
+	pubkey := chi.URLParam(r, "pubkey")
+	person := DB.getPersonByPubkey(pubkey)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(person)
+}
