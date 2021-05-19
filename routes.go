@@ -60,7 +60,7 @@ func NewRouter() *http.Server {
 		r.Delete("/tribe/{uuid}", deleteTribe)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
 		r.Delete("/bot/{uuid}", deleteBot)
-		r.Put("/person", createOrEditPerson)
+		r.Post("/person", createOrEditPerson)
 		r.Post("/verify/{challenge}", verify)
 		r.Put("/bot", createOrEditBot)
 	})
