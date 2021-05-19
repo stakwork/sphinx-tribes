@@ -13,12 +13,24 @@ function makeQR(pubkey:string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`
 }
 
-export default function Person({id,img,tags,description,selected,select,created,owner_alias,unique_name}:any){
+export default function Person({id,img,tags,description,selected,select,created,owner_alias,owner_pubkey,unique_name}:any){
+  const [showQR, setShowQR] = useState(false)
+  const qrString = makeQR(owner_pubkey)
+
   let tagsString = ''
   tags.forEach((t:string,i:number)=> {
     if(i!==0) tagsString+=','
     tagsString+=t
   })
+
+  function add(e) {
+    e.stopPropagation()
+
+  }
+  function toggleQR(e) {
+    e.stopPropagation()
+    setShowQR(current=> !current)
+  }
   return <EuiCheckableCard className="col-md-6 col-lg-6 ml-2 mb-2"
     id={id+''}
     label={owner_alias}
@@ -41,28 +53,37 @@ export default function Person({id,img,tags,description,selected,select,created,
             <Description oneLine={selected?false:true} style={{minHeight:20}}>
               {description}
             </Description>
-            <TagsWrap>
+            {/* <TagsWrap>
               {tags.map((t:string)=> <Tag key={t}>{t}</Tag>)}
-            </TagsWrap>
+            </TagsWrap> */}
           </Left>
         </Row>
-        {/* <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
-          <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600, fontSize:12}}>
-            FOLLOW
-          </EuiButton>
-          <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600, fontSize:12}} iconType={qrCode}>
+        <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
+          <a href={qrString}><EuiButton onClick={add} fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600, fontSize:12}} aria-label="add">
+            ADD
+          </EuiButton></a>
+          <EuiButton onClick={toggleQR} style={{borderColor: "#6B7A8D", color:"white", fontWeight:600, fontSize:12}} iconType={qrCode} aria-label="qr-code">
             QR CODE
           </EuiButton>
-        </Row> */}
+        </Row>
+        {showQR && <QRWrapWrap><QRWrap className="qr-wrap float-r">
+          <QRCode
+            bgColor={'#FFFFFF'}
+            fgColor="#000000"
+            level="Q"
+            style={{width:209}}
+            value={qrString}
+          />
+        </QRWrap></QRWrapWrap>}
         <Intro>
           {description}
         </Intro>
-        <Row style={{ color:"#6B7A8D", fontSize:12, fontWeight:"bold", padding:"10px 10px 0px 10px" }}>
+        {/* <Row style={{ color:"#6B7A8D", fontSize:12, fontWeight:"bold", padding:"10px 10px 0px 10px" }}>
           INTERESTS
         </Row>
         <Row style={{color:"white", fontSize:14, margin:"0px 10px 10px 10px"}}>
           {tagsString}
-        </Row>
+        </Row> */}
         <div className="expand-part" style={selected ? { opacity: 1} : { opacity: 0}}>
           <div className="colapse-button"><img src="/static/keyboard_arrow_up-black-18dp.svg" alt="" /></div>
         </div>
@@ -99,6 +120,10 @@ const Content = styled.div<ContentProps>`
   & button img {
 
   }
+`
+const QRWrapWrap = styled.div`
+  display:flex;
+  justify-content:center;
 `
 const QRWrap = styled.div`
   background:white;

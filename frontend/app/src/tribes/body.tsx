@@ -7,25 +7,11 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import Tribe from './tribe'
-import Fuse from 'fuse.js'
-
-const fuseOptions = {
-  keys: ['name','description'],
-  shouldSort: true,
-  // matchAllTokens: true,
-  includeMatches: true,
-  threshold: 0.35,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-};
+import {useFuse, useScroll} from '../hooks'
 
 export default function BodyComponent() {
   const { main, ui } = useStores()
   const [selected, setSelected] = useState('')
-  const [n,setN] = useState(100)
-  const [loadingMore,setLoadingMore] = useState(false)
 
   function selectTribe(uuid:string, unique_name:string) {
     setSelected(uuid)
@@ -60,26 +46,10 @@ export default function BodyComponent() {
       return t.matchCount&&t.matchCount>0
     })
 
-    let theTribes = tribes
-    if(ui.searchText){
-      var fuse = new Fuse(tribes, fuseOptions)
-      const res = fuse.search(ui.searchText)
-      theTribes = res.map(r=>r.item)
-    }
-
+    let theTribes = useFuse(tribes, ["name", "description"])
+    const {n, loadingMore, handleScroll} = useScroll()
     const finalTribes = theTribes.slice(0,n)
-    function handleScroll(e:any) {
-      const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight;
-      if (bottom) { 
-        setLoadingMore(true)
-        setTimeout(()=>{
-          setN(n+100)
-        }, 500)
-        setTimeout(()=>{
-          setLoadingMore(false)
-        }, 3000)
-      }
-    }
+    
     return <Body id="main" onScroll={handleScroll}>
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
