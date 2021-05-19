@@ -5,6 +5,7 @@ import { useStores } from '../store'
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
+  EuiButtonIcon
 } from '@elastic/eui';
 import Fuse from 'fuse.js'
 import Person from './person'
@@ -41,6 +42,14 @@ export default function BodyComponent() {
             />)}
           </div>
         </EuiFormFieldset>}
+        <AddWrap>
+          {!loading && <EuiButtonIcon 
+            onClick={()=> ui.setEditMe(true)}
+            iconType="plusInCircleFilled"
+            iconSize="l"
+            size="m"
+          />}
+        </AddWrap>
       </Column>
 
       <EditMe />
@@ -66,4 +75,20 @@ const Column = styled.div`
   align-items:center;
   max-width:900px;
   width:100%;
+`
+const AddWrap = styled.div`
+  position:fixed;
+  bottom:40px;
+  right:40px;
+  & button {
+    height: 100px;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  & svg {
+    width:60px;
+    height:60px;
+  }
 `

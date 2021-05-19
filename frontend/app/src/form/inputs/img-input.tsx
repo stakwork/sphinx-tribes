@@ -10,7 +10,7 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 export default function ImageInput({label, value, handleChange, handleBlur, handleFocus}:Props) {
   // const {meme} = useStores();
   const [uploading, setUploading] = useState(false);
-  const [picsrc, setPicsrc] = useState("");
+  const [picsrc, setPicsrc] = useState(value||'');
   // return <EuiFilePicker value={props.initialValues.img} >
   //   </EuiFilePicker>
 

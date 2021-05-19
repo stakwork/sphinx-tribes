@@ -8,6 +8,11 @@ import {
   EuiButton
 } from '@elastic/eui';
 
+const host = window.location.host==='localhost:3001'?'localhost:5002':window.location.host
+function makeQR(pubkey:string) {
+  return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`
+}
+
 export default function Person({id,img,tags,description,selected,select,created,owner_alias,unique_name}:any){
   let tagsString = ''
   tags.forEach((t:string,i:number)=> {
@@ -37,18 +42,18 @@ export default function Person({id,img,tags,description,selected,select,created,
               {description}
             </Description>
             <TagsWrap>
-              {tags.map((t:string)=> <Tag>{t}</Tag>)}
+              {tags.map((t:string)=> <Tag key={t}>{t}</Tag>)}
             </TagsWrap>
           </Left>
         </Row>
-        <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
+        {/* <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
           <EuiButton fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600, fontSize:12}}>
             FOLLOW
           </EuiButton>
           <EuiButton style={{borderColor: "#6B7A8D", color:"white", fontWeight:600, fontSize:12}} iconType={qrCode}>
             QR CODE
           </EuiButton>
-        </Row>
+        </Row> */}
         <Intro>
           {description}
         </Intro>
