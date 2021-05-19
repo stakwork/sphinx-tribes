@@ -50,6 +50,7 @@ func NewRouter() *http.Server {
 		r.Get("/people", getListedPeople)
 		r.Get("/ask", ask)
 		r.Get("/poll/{challenge}", poll)
+		r.Get("/person/{pubkey}", getPersonByPubkey)
 	})
 
 	r.Group(func(r chi.Router) {

@@ -105,6 +105,7 @@ type Person struct {
 	Private        bool           `json:"private"`
 	Deleted        bool           `json:"deleted"`
 	OwnerRouteHint string         `json:"owner_route_hint"`
+	PriceToMeet    int64          `json:"price_to_meet"`
 }
 
 /* loopbot:
