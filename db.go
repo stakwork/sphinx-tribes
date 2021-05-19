@@ -156,7 +156,7 @@ func (db database) createOrEditPerson(m Person) (Person, error) {
 		fmt.Println(err)
 		return Person{}, err
 	}
-	db.db.Exec(`UPDATE tribes SET tsv =
+	db.db.Exec(`UPDATE people SET tsv =
   	setweight(to_tsvector(owner_alias), 'A') ||
 	setweight(to_tsvector(description), 'B') ||
 	setweight(array_to_tsvector(tags), 'C')
