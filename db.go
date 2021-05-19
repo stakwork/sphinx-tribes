@@ -137,9 +137,9 @@ func (db database) createOrEditPerson(m Person) (Person, error) {
 		return Person{}, errors.New("no pub key")
 	}
 	onConflict := "ON CONFLICT (id) DO UPDATE SET"
-	for i, u := range updatables {
+	for i, u := range peopleupdatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(updatables)-1 {
+		if i < len(peopleupdatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
