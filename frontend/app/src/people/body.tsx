@@ -7,9 +7,9 @@ import {
   EuiLoadingSpinner,
   EuiButtonIcon
 } from '@elastic/eui';
-import Fuse from 'fuse.js'
 import Person from './person'
 import EditMe from './editMe'
+import {useFuse, useScroll} from '../hooks'
 
 export default function BodyComponent() {
   const { main, ui } = useStores()
@@ -29,8 +29,13 @@ export default function BodyComponent() {
     loadPeople()
   }, [])
 
+  
+
   return useObserver(() => {
-    const people = main.people
+    const peeps = useFuse(main.people, ["owner_alias"])
+    const {handleScroll, n, loadingMore} = useScroll()
+    const people = peeps.slice(0,n)
+
     return <Body id="main">
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
@@ -48,6 +53,7 @@ export default function BodyComponent() {
             iconType="plusInCircleFilled"
             iconSize="l"
             size="m"
+            aria-label="edit-me"
           />}
         </AddWrap>
       </Column>
@@ -78,8 +84,8 @@ const Column = styled.div`
 `
 const AddWrap = styled.div`
   position:fixed;
-  bottom:40px;
-  right:40px;
+  bottom:2rem;
+  right:2rem;
   & button {
     height: 100px;
     width: 100px;
