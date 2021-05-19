@@ -102,7 +102,7 @@ type Person struct {
 	Img            string         `json:"img"`
 	Created        *time.Time     `json:"created"`
 	Updated        *time.Time     `json:"updated"`
-	Private        bool           `json:"private"`
+	Unlisted       bool           `json:"unlisted"`
 	Deleted        bool           `json:"deleted"`
 	OwnerRouteHint string         `json:"owner_route_hint"`
 	PriceToMeet    int64          `json:"price_to_meet"`
