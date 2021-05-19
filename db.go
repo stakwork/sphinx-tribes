@@ -234,7 +234,7 @@ func (db database) getPerson(id uint) Person {
 
 func (db database) getPersonByPubkey(pubkey string) Person {
 	m := Person{}
-	db.db.Where("owner_pubkey = ?", pubkey).Find(&m)
+	db.db.Where("owner_pub_key = ?", pubkey).Find(&m)
 	return m
 }
 
