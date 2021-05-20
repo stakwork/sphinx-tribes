@@ -162,15 +162,18 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// existing := DB.getTribe(tribe.UUID)
-	// if existing.UUID != "" {
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	return
-	// }
+	existing := DB.getTribe(tribe.UUID)
+	if existing.UUID == "" { // doesnt exist already, create unique name
+		tribe.UniqueName, _ = tribeUniqueNameFromName(tribe.Name)
+	} else { // already exists! make sure its owned
+		if tribe.OwnerPubKey != pubKeyFromAuth {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
 
-	tribe.OwnerPubKey = extractedPubkey
+	tribe.OwnerPubKey = pubKeyFromAuth
 	tribe.Updated = &now
-	tribe.UniqueName, _ = tribeUniqueNameFromName(tribe.Name)
 
 	DB.createOrEditTribe(tribe)
 
