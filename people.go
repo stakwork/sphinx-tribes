@@ -176,6 +176,10 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 
 	existing := DB.getPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 { // new!
+		if person.ID != 0 { // cant try to "edit" if not exists already
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		person.UniqueName, _ = personUniqueNameFromName(person.OwnerAlias)
 	} else { // editing! needs ID
 		if person.ID == 0 { // cant create that already exists
