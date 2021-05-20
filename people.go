@@ -243,21 +243,25 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 	idString := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idString)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	if id == 0 {
+		fmt.Println("id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	existing := DB.getPerson(uint(id))
 	if existing.ID == 0 {
+		fmt.Println("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	if existing.OwnerAlias != pubKeyFromAuth {
+		fmt.Println("keys dont match")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
