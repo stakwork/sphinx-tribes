@@ -216,55 +216,55 @@ func (db database) updateBot(uuid string, u map[string]interface{}) bool {
 
 func (db database) getAllTribes() []Tribe {
 	ms := []Tribe{}
-	db.db.Find(&ms)
+	db.db.Where("(deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
 
 func (db database) getTribe(uuid string) Tribe {
 	m := Tribe{}
-	db.db.Where("uuid = ?", uuid).Find(&m)
+	db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null)", uuid).Find(&m)
 	return m
 }
 
 func (db database) getPerson(id uint) Person {
 	m := Person{}
-	db.db.Where("id = ?", id).Find(&m)
+	db.db.Where("id = ? AND (deleted = 'f' OR deleted is null)", id).Find(&m)
 	return m
 }
 
 func (db database) getPersonByPubkey(pubkey string) Person {
 	m := Person{}
-	db.db.Where("owner_pub_key = ?", pubkey).Find(&m)
+	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
 	return m
 }
 
 func (db database) getTribeByFeedURL(feedURL string) Tribe {
 	m := Tribe{}
-	db.db.Where("feed_url = ?", feedURL).First(&m)
+	db.db.Where("feed_url = ? AND (deleted = 'f' OR deleted is null)", feedURL).First(&m)
 	return m
 }
 
 func (db database) getBot(uuid string) Bot {
 	m := Bot{}
-	db.db.Where("uuid = ?", uuid).Find(&m)
+	db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null)", uuid).Find(&m)
 	return m
 }
 
 func (db database) getTribeByUniqueName(un string) Tribe {
 	m := Tribe{}
-	db.db.Where("unique_name = ?", un).Find(&m)
+	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
 	return m
 }
 
 func (db database) getBotByUniqueName(un string) Bot {
 	m := Bot{}
-	db.db.Where("unique_name = ?", un).Find(&m)
+	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
 	return m
 }
 
 func (db database) getPersonByUniqueName(un string) Person {
 	m := Person{}
-	db.db.Where("unique_name = ?", un).Find(&m)
+	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
 	return m
 }
 
@@ -278,6 +278,7 @@ func (db database) searchTribes(s string) []Tribe {
 		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
 		FROM tribes, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
+		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
 	return ms
 }
@@ -294,6 +295,7 @@ func (db database) searchBots(s string, limit, offset int) []BotRes {
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
 		FROM bots, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
+		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC 
 		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)
 	return ms
@@ -311,6 +313,7 @@ func (db database) searchPeople(s string, limit, offset int) []Person {
 		`SELECT id, owner_pub_key, unique_name, img, description, tags, ts_rank(tsv, q) as rank
 		FROM people, to_tsquery('` + s + `') q
 		WHERE tsv @@ q
+		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC 
 		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)
 	return ms
