@@ -186,6 +186,10 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+		if person.ID != existing.ID { // cant edit someone else's
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
 
 	person.OwnerPubKey = pubKeyFromAuth
