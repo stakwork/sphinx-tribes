@@ -235,3 +235,37 @@ func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
+
+func deletePerson(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	idString := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if id == 0 {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := DB.getPerson(uint(id))
+	if existing.ID == 0 {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if existing.OwnerAlias != pubKeyFromAuth {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	DB.updatePerson(uint(id), map[string]interface{}{
+		"deleted": true,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
