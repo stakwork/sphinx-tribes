@@ -260,7 +260,7 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	if existing.OwnerAlias != pubKeyFromAuth {
+	if existing.OwnerPubKey != pubKeyFromAuth {
 		fmt.Println("keys dont match")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
