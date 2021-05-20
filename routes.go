@@ -63,6 +63,7 @@ func NewRouter() *http.Server {
 		r.Post("/person", createOrEditPerson)
 		r.Post("/verify/{challenge}", verify)
 		r.Put("/bot", createOrEditBot)
+		r.Delete("/person/{id}", deletePerson)
 	})
 
 	PORT := os.Getenv("PORT")
