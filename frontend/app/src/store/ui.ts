@@ -43,13 +43,13 @@ class UiStore {
 export type MeData = MeInfo | null
 export interface MeInfo {
   pubkey: string
-  memeToken: string
-  tribesToken: string
-  photoUrl: string
+  photo_url: string
   alias: string
-  routeHint: string
-  contactKey: string
+  route_hint: string
+  contact_key: string
+  jwt: string
+  url: string
 }
-const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',memeToken:'',tribesToken:'',routeHint:'',contactKey:'',photoUrl:''}
+const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',photo_url:'',url:'',jwt:''}
 
 export const uiStore = new UiStore()

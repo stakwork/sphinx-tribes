@@ -49,7 +49,7 @@ const Wrap = styled.div`
   height: 100%;
 `;
 
-type FormFieldType = 'text' | 'img' | 'number'
+type FormFieldType = 'text' | 'img' | 'number' | 'hidden'
 export interface FormField {
   name: string
   type: FormFieldType

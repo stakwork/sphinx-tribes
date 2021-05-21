@@ -47,6 +47,10 @@ export default function EditMe(props:any) {
   function closeModal(){
     ui.setEditMe(false)
   }
+
+  async function submitForm(v) {
+    console.log(v)
+  }
   return useObserver(() => {
     if(!ui.editMe) return <></>
     return <EuiOverlayMask>
@@ -58,11 +62,12 @@ export default function EditMe(props:any) {
           <div>
             {!ui.meInfo && <ConfirmMe />}
             {ui.meInfo && <Form 
+              onSubmit={submitForm}
               schema={meSchema}
               initialValues={{
                 pubkey: ui.meInfo.pubkey,
                 owner_alias: ui.meInfo.alias,
-                img: ui.meInfo.photoUrl
+                img: ui.meInfo.photo_url,
               }}
             />}
           </div>

@@ -11,6 +11,8 @@ export default function Input(props:any){
             return <ImageInput {...props}/>
         case 'number':
             return <NumberInput {...props}/>
+        case 'hidden':
+            return <></>
         default:
             return <></>
     }

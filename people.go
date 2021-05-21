@@ -168,25 +168,33 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
-	} else {
-		person.Created = &now
+	}
+	if pubKeyFromAuth != person.OwnerPubKey {
+		fmt.Println("mismatched pubkey")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
 	existing := DB.getPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 { // new!
 		if person.ID != 0 { // cant try to "edit" if not exists already
+			fmt.Println("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		person.UniqueName, _ = personUniqueNameFromName(person.OwnerAlias)
+		person.Created = &now
 	} else { // editing! needs ID
 		if person.ID == 0 { // cant create that already exists
+			fmt.Println("cant create existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		if person.ID != existing.ID { // cant edit someone else's
+			fmt.Println("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
