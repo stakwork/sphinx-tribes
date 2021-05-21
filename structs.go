@@ -24,8 +24,8 @@ type Tribe struct {
 	PricePerMessage int64          `json:"price_per_message"`
 	EscrowAmount    int64          `json:"escrow_amount"`
 	EscrowMillis    int64          `json:"escrow_millis"`
-	Created         *time.Time     `json:"created" gorm:"type:timestamp"`
-	Updated         *time.Time     `json:"updated" gorm:"type:timestamp"`
+	Created         *time.Time     `json:"created"`
+	Updated         *time.Time     `json:"updated"`
 	MemberCount     uint64         `json:"member_count"`
 	Unlisted        bool           `json:"unlisted"`
 	Private         bool           `json:"private"`
@@ -48,8 +48,8 @@ type Bot struct {
 	Tags           pq.StringArray `json:"tags"`
 	Img            string         `json:"img"`
 	PricePerUse    int64          `json:"price_per_use"`
-	Created        *time.Time     `json:"created" gorm:"type:timestamp"`
-	Updated        *time.Time     `json:"updated" gorm:"type:timestamp"`
+	Created        *time.Time     `json:"created"`
+	Updated        *time.Time     `json:"updated"`
 	Unlisted       bool           `json:"unlisted"`
 	Deleted        bool           `json:"deleted"`
 	MemberCount    uint64         `json:"member_count"`
@@ -100,8 +100,8 @@ type Person struct {
 	Description     string         `json:"description"`
 	Tags            pq.StringArray `json:"tags"`
 	Img             string         `json:"img"`
-	Created         *time.Time     `json:"created" gorm:"type:timestamp"`
-	Updated         *time.Time     `json:"updated" gorm:"type:timestamp"`
+	Created         *time.Time     `json:"created"`
+	Updated         *time.Time     `json:"updated"`
 	Unlisted        bool           `json:"unlisted"`
 	Deleted         bool           `json:"deleted"`
 	OwnerRouteHint  string         `json:"owner_route_hint"`
