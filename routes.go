@@ -175,6 +175,7 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	tribe.OwnerPubKey = pubKeyFromAuth
 	tribe.Updated = &now
+	tribe.LastActive = now.Unix()
 
 	DB.createOrEditTribe(tribe)
 
