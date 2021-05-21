@@ -71,6 +71,7 @@ func ask(w http.ResponseWriter, r *http.Request) {
 }
 
 type VerifyPayload struct {
+	ID         uint   `json:"id"`
 	Pubkey     string `json:"pubkey"`
 	ContactKey string `json:"contact_key"`
 	Alias      string `json:"alias"`
@@ -137,6 +138,16 @@ func poll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
+	}
+
+	if pld.Pubkey == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := DB.getPersonByPubkey(pld.Pubkey)
+	if existing.ID > 0 {
+		pld.ID = existing.ID // add ID on if exists
 	}
 
 	store.DeleteChallenge(challenge)

@@ -145,7 +145,7 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	now := time.Now()
+	now := time.Now() //.Format(time.RFC3339)
 
 	extractedPubkey, err := VerifyTribeUUID(tribe.UUID, false)
 	if err != nil {
