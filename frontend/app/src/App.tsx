@@ -26,7 +26,7 @@ enum Mode {
 const hosts:{[k:string]:Mode} = {
   'localhost:3000': Mode.TRIBES,
   'tribes.sphinx.chat': Mode.TRIBES,
-  'localhost:3001': Mode.PEOPLE,
+  'localhost:3007': Mode.PEOPLE,
   'people.sphinx.chat': Mode.PEOPLE,
 }
 

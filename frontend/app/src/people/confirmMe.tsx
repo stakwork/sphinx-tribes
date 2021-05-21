@@ -8,7 +8,7 @@ import api from '../api'
 import { useStores } from '../store';
 import type {MeInfo} from '../store/ui'
 
-const host = window.location.host==='localhost:3001'?'localhost:5002':window.location.host
+const host = window.location.host.includes('localhost')?'localhost:5002':window.location.host
 function makeQR(challenge:string, ts:string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`
 }

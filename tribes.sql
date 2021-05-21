@@ -21,6 +21,7 @@ CREATE TABLE tribes (
   private boolean,
   deleted boolean,
   app_url TEXT,
+  feed_url TEXT,
   last_active timestamptz,
   bots TEXT,
   owner_route_hint TEXT,
