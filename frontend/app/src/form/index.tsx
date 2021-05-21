@@ -28,6 +28,7 @@ export default function Form(props:any) {
               handleFocus={() => setFieldTouched(item.name, true)}
             />)}
             <EuiButton
+              isLoading={props.loading}
               onClick={()=> handleSubmit()}
               disabled={!isValid || !dirty}
               style={{fontSize:12, fontWeight:600}}

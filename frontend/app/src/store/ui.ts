@@ -42,6 +42,7 @@ class UiStore {
 
 export type MeData = MeInfo | null
 export interface MeInfo {
+  id?: number
   pubkey: string
   photo_url: string
   alias: string
