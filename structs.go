@@ -93,19 +93,20 @@ func (Person) TableName() string {
 
 // Person struct
 type Person struct {
-	ID             uint           `json:"id"`
-	OwnerPubKey    string         `json:"owner_pubkey"`
-	OwnerAlias     string         `json:"owner_alias"`
-	UniqueName     string         `json:"unique_name"`
-	Description    string         `json:"description"`
-	Tags           pq.StringArray `json:"tags"`
-	Img            string         `json:"img"`
-	Created        *time.Time     `json:"created"`
-	Updated        *time.Time     `json:"updated"`
-	Unlisted       bool           `json:"unlisted"`
-	Deleted        bool           `json:"deleted"`
-	OwnerRouteHint string         `json:"owner_route_hint"`
-	PriceToMeet    int64          `json:"price_to_meet"`
+	ID              uint           `json:"id"`
+	OwnerPubKey     string         `json:"owner_pubkey"`
+	OwnerAlias      string         `json:"owner_alias"`
+	UniqueName      string         `json:"unique_name"`
+	Description     string         `json:"description"`
+	Tags            pq.StringArray `json:"tags"`
+	Img             string         `json:"img"`
+	Created         *time.Time     `json:"created"`
+	Updated         *time.Time     `json:"updated"`
+	Unlisted        bool           `json:"unlisted"`
+	Deleted         bool           `json:"deleted"`
+	OwnerRouteHint  string         `json:"owner_route_hint"`
+	OwnerContactKey string         `json:"owner_contact_key"`
+	PriceToMeet     int64          `json:"price_to_meet"`
 }
 
 /* loopbot:

@@ -105,6 +105,7 @@ CREATE TABLE people (
   owner_pub_key TEXT NOT NULL,
   owner_alias TEXT,
   owner_route_hint TEXT,
+  owner_contact_key TEXT,
   description TEXT,
   tags TEXT[] not null default '{}',
   img TEXT,
