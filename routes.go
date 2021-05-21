@@ -167,13 +167,13 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	if existing.UUID == "" { // doesnt exist already, create unique name
 		tribe.UniqueName, _ = tribeUniqueNameFromName(tribe.Name)
 	} else { // already exists! make sure its owned
-		if tribe.OwnerPubKey != pubKeyFromAuth {
+		if tribe.OwnerPubKey != extractedPubkey {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 	}
 
-	tribe.OwnerPubKey = pubKeyFromAuth
+	tribe.OwnerPubKey = extractedPubkey
 	tribe.Updated = &now
 	tribe.LastActive = now.Unix()
 
