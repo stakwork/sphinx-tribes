@@ -28,6 +28,7 @@ export default function ConfirmMe(){
         console.log(me)
         if(me && me.pubkey) {
           ui.setMeInfo(me)
+          setChallenge('')
           ok = false
           break;
         }
