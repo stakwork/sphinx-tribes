@@ -48,9 +48,11 @@ export interface MeInfo {
   alias: string
   route_hint: string
   contact_key: string
+  price_to_meet: number
   jwt: string
   url: string
+  description: string
 }
-const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',photo_url:'',url:'',jwt:''}
+const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',price_to_meet:0,photo_url:'',url:'',jwt:'',description:''}
 
 export const uiStore = new UiStore()

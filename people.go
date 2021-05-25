@@ -71,14 +71,16 @@ func ask(w http.ResponseWriter, r *http.Request) {
 }
 
 type VerifyPayload struct {
-	ID         uint   `json:"id"`
-	Pubkey     string `json:"pubkey"`
-	ContactKey string `json:"contact_key"`
-	Alias      string `json:"alias"`
-	PhotoURL   string `json:"photo_url"`
-	RouteHint  string `json:"route_hint"`
-	JWT        string `json:"jwt"`
-	URL        string `json:"url"`
+	ID          uint   `json:"id"`
+	Pubkey      string `json:"pubkey"`
+	ContactKey  string `json:"contact_key"`
+	Alias       string `json:"alias"`
+	PhotoURL    string `json:"photo_url"`
+	RouteHint   string `json:"route_hint"`
+	PriceToMeet uint   `json:"price_to_meet"`
+	JWT         string `json:"jwt"`
+	URL         string `json:"url"`
+	Description string `json:"description"`
 }
 
 func verify(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +150,7 @@ func poll(w http.ResponseWriter, r *http.Request) {
 	existing := DB.getPersonByPubkey(pld.Pubkey)
 	if existing.ID > 0 {
 		pld.ID = existing.ID // add ID on if exists
+		pld.Description = existing.Description
 	}
 
 	store.DeleteChallenge(challenge)
