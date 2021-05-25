@@ -68,9 +68,13 @@ export default function EditMe(props: any) {
     const jwt = info.jwt;
     const r = await fetch(url + "/profile", {
       method: "POST",
-      body: JSON.stringify({ ...v, host }),
+      body: JSON.stringify({ 
+        ...v, host, 
+        price_to_meet: parseInt(v.price_to_meet) 
+      }),
       headers: {
         "x-jwt": jwt,
+        "Content-Type": "application/json"
       },
     });
     if (!r.ok) {
