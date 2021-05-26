@@ -107,6 +107,7 @@ type Person struct {
 	OwnerRouteHint  string         `json:"owner_route_hint"`
 	OwnerContactKey string         `json:"owner_contact_key"`
 	PriceToMeet     int64          `json:"price_to_meet"`
+	Twitter         string         `json:"twitter"`
 }
 
 /* loopbot:
