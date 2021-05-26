@@ -90,6 +90,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 	challenge := chi.URLParam(r, "challenge")
 	_, err := store.GetChallenge(challenge)
 	if err != nil {
+		fmt.Println("challenge not found", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -107,6 +108,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 	payload.Pubkey = pubKeyFromAuth
 	marshalled, err := json.Marshal(payload)
 	if err != nil {
+		fmt.Println("payload unparseable", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
