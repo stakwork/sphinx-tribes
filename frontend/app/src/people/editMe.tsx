@@ -63,9 +63,14 @@ export default function EditMe(props: any) {
   }
 
   async function testChallenge(chal: string) {
-    const me:MeInfo = await api.get(`poll/${chal}`)
-    if(me && me.pubkey) {
-      ui.setMeInfo(me)
+    try {
+      const me:MeInfo = await api.get(`poll/${chal}`)
+      console.log("GOT ME",me)
+      if(me && me.pubkey) {
+        ui.setMeInfo(me)
+      }
+    } catch(e) {
+      console.log(e)
     }
   }
 
@@ -74,6 +79,7 @@ export default function EditMe(props: any) {
       var urlObject = new URL(window.location.href);
       var params = urlObject.searchParams;
       const chal = params.get('challenge')
+      console.log("CHALLEGEN", chal)
       if(chal) {
         testChallenge(chal)
       }
