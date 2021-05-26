@@ -5,4 +5,5 @@ export interface Props {
     handleChange: any
     handleBlur: any
     handleFocus: any
+    readOnly: boolean
 }

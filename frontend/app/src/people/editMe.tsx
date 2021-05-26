@@ -57,6 +57,7 @@ export default function EditMe(props: any) {
 
   function closeModal() {
     ui.setEditMe(false);
+    ui.setMeInfo(null)
   }
 
   async function submitForm(v) {
@@ -64,16 +65,15 @@ export default function EditMe(props: any) {
     const info = ui.meInfo as any;
     if (!info) return console.log("no meInfo");
     setLoading(true);
-    const url = info.url;
-    const jwt = info.jwt;
-    const r = await fetch(url + "/profile", {
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
+    const r = await fetch(URL + "/profile", {
       method: "POST",
       body: JSON.stringify({ 
         ...v, host, 
         price_to_meet: parseInt(v.price_to_meet) 
       }),
       headers: {
-        "x-jwt": jwt,
+        "x-jwt": info.jwt,
         "Content-Type": "application/json"
       },
     });
