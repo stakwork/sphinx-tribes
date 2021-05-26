@@ -25,7 +25,7 @@ type Store struct {
 var store Store
 
 func initCache() {
-	authTimeout := 60
+	authTimeout := 120
 	store = Store{
 		cache: cache.New(
 			time.Duration(authTimeout)*time.Second,
