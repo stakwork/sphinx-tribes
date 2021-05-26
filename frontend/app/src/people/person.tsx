@@ -13,7 +13,7 @@ function makeQR(pubkey:string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`
 }
 
-export default function Person({id,img,tags,description,selected,select,created,owner_alias,owner_pubkey,unique_name}:any){
+export default function Person({id,img,tags,description,selected,select,created,owner_alias,owner_pubkey,unique_name,price_to_meet}:any){
   const [showQR, setShowQR] = useState(false)
   const qrString = makeQR(owner_pubkey)
 
@@ -58,14 +58,21 @@ export default function Person({id,img,tags,description,selected,select,created,
             </TagsWrap> */}
           </Left>
         </Row>
-        <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly"}}>
-          <a href={qrString}><EuiButton onClick={add} fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600, fontSize:12}} aria-label="add">
-            ADD
-          </EuiButton></a>
-          <EuiButton onClick={toggleQR} style={{borderColor: "#6B7A8D", color:"white", fontWeight:600, fontSize:12}} iconType={qrCode} aria-label="qr-code">
-            QR CODE
-          </EuiButton>
-        </Row>
+        {price_to_meet && <RowWrap>
+          <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly", color:'white', fontWeight:'bold'}}>
+            {`Price to Meet: ${price_to_meet} sats`}
+          </Row>
+        </RowWrap>}
+        <RowWrap>
+          <Row style={{marginBottom: 20, justifyContent:"space-evenly"}}>
+            <a href={qrString}><EuiButton onClick={add} fill={true} style={{backgroundColor:"#6089ff", borderColor:"#6089ff", color: "white", fontWeight:600, fontSize:12}} aria-label="add">
+              ADD
+            </EuiButton></a>
+            <EuiButton onClick={toggleQR} style={{borderColor: "#6B7A8D", color:"white", fontWeight:600, fontSize:12}} iconType={qrCode} aria-label="qr-code">
+              QR CODE
+            </EuiButton>
+          </Row>
+        </RowWrap>
         {showQR && <QRWrapWrap><QRWrap className="qr-wrap float-r">
           <QRCode
             bgColor={'#FFFFFF'}
@@ -140,6 +147,7 @@ const Row=styled.div`
   display:flex;
   align-items:center;
 `
+const RowWrap = styled.div``
 const Title=styled.h3`
   margin-right:12px;
   font-size:22px;
