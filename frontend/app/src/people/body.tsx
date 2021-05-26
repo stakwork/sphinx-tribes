@@ -29,8 +29,6 @@ export default function BodyComponent() {
     loadPeople()
   }, [])
 
-  
-
   return useObserver(() => {
     const peeps = useFuse(main.people, ["owner_alias"])
     const {handleScroll, n, loadingMore} = useScroll()

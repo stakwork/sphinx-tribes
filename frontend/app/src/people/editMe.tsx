@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStores } from "../store";
 import { useObserver } from "mobx-react-lite";
 import {
@@ -10,6 +10,8 @@ import {
 } from "@elastic/eui";
 import Form, { FormField } from "../form";
 import ConfirmMe from "./confirmMe";
+import type {MeInfo} from '../store/ui'
+import api from '../api'
 
 const meSchema: FormField[] = [
   {
@@ -59,6 +61,24 @@ export default function EditMe(props: any) {
     ui.setEditMe(false);
     ui.setMeInfo(null)
   }
+
+  async function testChallenge(chal: string) {
+    const me:MeInfo = await api.get(`poll/${chal}`)
+    if(me && me.pubkey) {
+      ui.setMeInfo(me)
+    }
+  }
+
+  useEffect(()=>{
+    try {
+      var urlObject = new URL(window.location.href);
+      var params = urlObject.searchParams;
+      const chal = params.get('challenge')
+      if(chal) {
+        testChallenge(chal)
+      }
+    } catch(e) {}
+  })
 
   async function submitForm(v) {
     console.log(v);
