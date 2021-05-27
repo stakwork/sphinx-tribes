@@ -116,7 +116,7 @@ CREATE TABLE people (
   deleted boolean,
   unique_name TEXT,
   price_to_meet BIGINT,
-  twitter TEXT
+  extras JSONB
 );
 
 ALTER TABLE people ADD COLUMN tsv tsvector;

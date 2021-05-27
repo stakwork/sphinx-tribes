@@ -60,6 +60,7 @@ var peopleupdatables = []string{
 	"unlisted", "deleted",
 	"owner_route_hint",
 	"price_to_meet", "updated",
+	"extras",
 }
 
 // check that update owner_pub_key does in fact throw error
