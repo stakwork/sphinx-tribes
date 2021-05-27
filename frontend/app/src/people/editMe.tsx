@@ -96,7 +96,7 @@ export default function EditMe(props: any) {
       body: JSON.stringify({ 
         ...v, host, 
         price_to_meet: parseInt(v.price_to_meet),
-        extras: {twitter:'hello'}
+        extras: {twitter:'hello!'}
       }),
       headers: {
         "x-jwt": info.jwt,
