@@ -155,7 +155,7 @@ func poll(w http.ResponseWriter, r *http.Request) {
 		pld.Description = existing.Description
 	}
 
-	store.DeleteChallenge(challenge)
+	// store.DeleteChallenge(challenge)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(pld)
