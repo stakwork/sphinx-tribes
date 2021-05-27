@@ -59,7 +59,7 @@ export default function EditMe(props: any) {
 
   function closeModal() {
     ui.setEditMe(false);
-    ui.setMeInfo(null)
+    ui.setMeInfo(null);
   }
 
   async function testChallenge(chal: string) {
@@ -83,7 +83,7 @@ export default function EditMe(props: any) {
         testChallenge(chal)
       }
     } catch(e) {}
-  })
+  }, [])
 
   async function submitForm(v) {
     console.log(v);
@@ -95,7 +95,8 @@ export default function EditMe(props: any) {
       method: "POST",
       body: JSON.stringify({ 
         ...v, host, 
-        price_to_meet: parseInt(v.price_to_meet) 
+        price_to_meet: parseInt(v.price_to_meet),
+        extras: {twitter:'hello'}
       }),
       headers: {
         "x-jwt": info.jwt,

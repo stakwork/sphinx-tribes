@@ -1,7 +1,6 @@
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
-import styled from 'styled-components'
 
 import {
   EuiHeader,
