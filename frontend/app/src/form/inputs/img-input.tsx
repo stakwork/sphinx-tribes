@@ -6,31 +6,52 @@ import Dropzone from "react-dropzone";
 import avatarIcon from "../../utils/profile_avatar.svg";
 import type {Props} from './propsType'
 import { EuiLoadingSpinner } from '@elastic/eui';
+import {useStores} from '../../store'
+import api from "../../api";
 
 export default function ImageInput({label, value, handleChange, handleBlur, handleFocus}:Props) {
-  // const {meme} = useStores();
+  const {ui} = useStores();
   const [uploading, setUploading] = useState(false);
   const [picsrc, setPicsrc] = useState(value||'');
   // return <EuiFilePicker value={props.initialValues.img} >
   //   </EuiFilePicker>
 
+  async function uploadBase64Pic(img_base64:string, img_type:string){
+    console.log('uploadBase64Pic', img_type, img_base64)
+    try {
+      const info = ui.meInfo as any;
+      if (!info) return console.log("no meInfo");
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
+      const r = await fetch(URL + "/profile", {
+        method: "POST",
+        body: JSON.stringify({ 
+          img_base64, img_type
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json"
+        },
+      });
+      const j = await r.json()
+      if(j.img) {
+        setPicsrc(j.img)
+        handleChange(j.img)
+      }
+    } catch(e) {
+      console.log('ERROR UPLOADING IMAGE', e)
+    }
+  }
+
   async function dropzoneUpload(files:File[]) {
     console.log(files)
-    // const file = files[0];
-    // const server = meme.getDefaultServer();
-    // setUploading(true);
-    // const r = await uploadFile(
-    //   file,
-    //   file.type,
-    //   server.host,
-    //   server.token,
-    //   "Image.jpg",
-    //   true
-    // );
-    // if (r && r.muid) {
-    //   // console.log(`https://${server.host}/public/${r.muid}`)
-    //   setPicsrc(`https://${server.host}/public/${r.muid}`);
-    // }
+    const file = files[0];
+    setUploading(true)
+    const reader = new FileReader();
+    reader.onload = async (event:any) => {
+      await uploadBase64Pic(event.target.result, file.type)
+      setUploading(false)
+    }
+    reader.readAsDataURL(file);
   }
 
   return (
