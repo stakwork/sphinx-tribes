@@ -189,6 +189,8 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if pubKeyFromAuth != person.OwnerPubKey {
+		fmt.Println(pubKeyFromAuth)
+		fmt.Println(person.OwnerPubKey)
 		fmt.Println("mismatched pubkey")
 		w.WriteHeader(http.StatusUnauthorized)
 		return

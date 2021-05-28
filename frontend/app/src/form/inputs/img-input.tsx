@@ -7,7 +7,6 @@ import avatarIcon from "../../utils/profile_avatar.svg";
 import type {Props} from './propsType'
 import { EuiLoadingSpinner } from '@elastic/eui';
 import {useStores} from '../../store'
-import api from "../../api";
 
 export default function ImageInput({label, value, handleChange, handleBlur, handleFocus}:Props) {
   const {ui} = useStores();
@@ -17,7 +16,7 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
   //   </EuiFilePicker>
 
   async function uploadBase64Pic(img_base64:string, img_type:string){
-    console.log('uploadBase64Pic', img_type, img_base64)
+    console.log('uploadBase64Pic', img_type)
     try {
       const info = ui.meInfo as any;
       if (!info) return console.log("no meInfo");
@@ -33,9 +32,10 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
         },
       });
       const j = await r.json()
-      if(j.img) {
-        setPicsrc(j.img)
-        handleChange(j.img)
+
+      if(j.success && j.response && j.response.img) {
+        setPicsrc(j.response.img)
+        handleChange(j.response.img)
       }
     } catch(e) {
       console.log('ERROR UPLOADING IMAGE', e)
@@ -54,9 +54,10 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
     reader.readAsDataURL(file);
   }
 
+  const MAX_SIZE = 4194304 // 4MB
   return (
     <ImageWrap>
-      <Dropzone multiple={false} onDrop={dropzoneUpload}>
+      <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_SIZE}>
         {({ getRootProps, getInputProps, isDragActive, open }) => (
           <DropzoneStuff>
             <DottedCircle {...getRootProps()} isDragActive={isDragActive}>
