@@ -22,7 +22,7 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
       const info = ui.meInfo as any;
       if (!info) return console.log("no meInfo");
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
-      const r = await fetch(URL + "/profile", {
+      const r = await fetch(URL + "/public_pic", {
         method: "POST",
         body: JSON.stringify({ 
           img_base64, img_type

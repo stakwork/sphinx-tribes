@@ -153,6 +153,9 @@ func (db database) createOrEditPerson(m Person) (Person, error) {
 	if m.Tags == nil {
 		m.Tags = []string{}
 	}
+	if m.Extras == nil {
+		m.Extras = map[string]interface{}{}
+	}
 	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
 		fmt.Println(err)
 		return Person{}, err
