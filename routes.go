@@ -169,9 +169,9 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	if existing.UUID == "" { // doesnt exist already, create unique name
 		tribe.UniqueName, _ = tribeUniqueNameFromName(tribe.Name)
 	} else { // already exists! make sure its owned
-		if tribe.OwnerPubKey != extractedPubkey {
+		if existing.OwnerPubKey != extractedPubkey {
 			fmt.Println("createOrEditTribe tribe.ownerPubKey not match")
-			fmt.Println(tribe.OwnerPubKey)
+			fmt.Println(existing.OwnerPubKey)
 			fmt.Println(extractedPubkey)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
