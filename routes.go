@@ -141,6 +141,7 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if tribe.UUID == "" {
+		fmt.Println("createOrEditTribe no uuid")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -158,6 +159,7 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 		tribe.Created = &now
 	} else { // IF PUBKEY IN CONTEXT, MUST AUTH!
 		if pubKeyFromAuth != extractedPubkey {
+			fmt.Println("createOrEditTribe pubkeys dont match")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -177,7 +179,10 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	tribe.Updated = &now
 	tribe.LastActive = now.Unix()
 
-	DB.createOrEditTribe(tribe)
+	_, err = DB.createOrEditTribe(tribe)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribe)
