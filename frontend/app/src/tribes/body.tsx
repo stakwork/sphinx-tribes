@@ -46,7 +46,11 @@ export default function BodyComponent() {
       return t.matchCount&&t.matchCount>0
     })
 
-    let theTribes = useFuse(tribes, ["name", "description"])
+    const nsfwChecked = tagsFilter.find(label=> label==='NSFW') ? true : false
+    const sfwTribes = nsfwChecked ? tribes :
+      tribes.filter(t=> !t.tags.includes('NSFW'))
+
+    let theTribes = useFuse(sfwTribes, ["name", "description"])
     const {n, loadingMore, handleScroll} = useScroll()
     const finalTribes = theTribes.slice(0,n)
     
