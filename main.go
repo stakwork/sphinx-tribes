@@ -23,6 +23,8 @@ func main() {
 
 	initCache()
 
+	go processTwitterConfirmationsLoop()
+
 	run()
 }
 
