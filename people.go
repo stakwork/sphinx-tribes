@@ -231,6 +231,23 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+func processTwitterConfirmationsLoop() {
+	peeps := DB.getUnconfirmedTwitter()
+	for _, p := range peeps {
+		username, _ := p.Extras["twitter"].(string)
+		if username != "" {
+			pubkey, err := ConfirmIdentityTweet(username)
+			if err == nil && pubkey != "" {
+				if p.OwnerPubKey == pubkey {
+					DB.updateTwitterConfirmed(p.ID, true)
+				}
+			}
+		}
+	}
+	time.Sleep(5 * time.Minute)
+	processTwitterConfirmationsLoop()
+}
+
 func personUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")

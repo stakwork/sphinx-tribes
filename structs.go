@@ -93,21 +93,22 @@ func (Person) TableName() string {
 
 // Person struct
 type Person struct {
-	ID              uint           `json:"id"`
-	OwnerPubKey     string         `json:"owner_pubkey"`
-	OwnerAlias      string         `json:"owner_alias"`
-	UniqueName      string         `json:"unique_name"`
-	Description     string         `json:"description"`
-	Tags            pq.StringArray `json:"tags"`
-	Img             string         `json:"img"`
-	Created         *time.Time     `json:"created"`
-	Updated         *time.Time     `json:"updated"`
-	Unlisted        bool           `json:"unlisted"`
-	Deleted         bool           `json:"deleted"`
-	OwnerRouteHint  string         `json:"owner_route_hint"`
-	OwnerContactKey string         `json:"owner_contact_key"`
-	PriceToMeet     int64          `json:"price_to_meet"`
-	Extras          PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
+	ID               uint           `json:"id"`
+	OwnerPubKey      string         `json:"owner_pubkey"`
+	OwnerAlias       string         `json:"owner_alias"`
+	UniqueName       string         `json:"unique_name"`
+	Description      string         `json:"description"`
+	Tags             pq.StringArray `json:"tags"`
+	Img              string         `json:"img"`
+	Created          *time.Time     `json:"created"`
+	Updated          *time.Time     `json:"updated"`
+	Unlisted         bool           `json:"unlisted"`
+	Deleted          bool           `json:"deleted"`
+	OwnerRouteHint   string         `json:"owner_route_hint"`
+	OwnerContactKey  string         `json:"owner_contact_key"`
+	PriceToMeet      int64          `json:"price_to_meet"`
+	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
+	TwitterConfirmed bool           `json:"twitter_confirmed"`
 }
 
 /* loopbot:
