@@ -4,19 +4,33 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
+	"strings"
 
 	"github.com/imroc/req"
 )
 
-func ConfirmIdentityTweet() (bool, error) {
-	id, err := LookupUserID("TwitterDev")
+func ConfirmIdentityTweet(username string) (string, error) {
+	id, err := LookupUserID(username)
 	if err != nil {
-		return false, err
+		return "", err
 	}
-	LookupUserTweet(id)
-	return false, nil
+	token, err := LookupUserTweet(id)
+	if err != nil {
+		return "", err
+	}
+
+	return VerifyTribeUUID(token, false)
+}
+
+type UserResponse struct {
+	Username    string `json:"username"`
+	Name        string `json:"name"`
+	ID          string `json:"id"`
+	Description string `json:"description"`
+}
+type LookupUserIDResponse struct {
+	Data []UserResponse `json:"data"`
 }
 
 func LookupUserID(username string) (string, error) {
@@ -35,20 +49,37 @@ func LookupUserID(username string) (string, error) {
 		"authorization": "Bearer " + twitterToken,
 	})
 
-	fmt.Println(err)
-	fmt.Printf("RES: %+v\n", re)
-
-	return "", nil
+	if err != nil {
+		return "", err
+	}
+	var res LookupUserIDResponse
+	re.ToJSON(&res)
+	if res.Data == nil {
+		return "", errors.New("no data")
+	}
+	if len(res.Data) == 0 {
+		return "", errors.New("no data")
+	}
+	if res.Data[0].ID == "" {
+		return "", errors.New("no ID")
+	}
+	return res.Data[0].ID, nil
 }
 
-func LookupUserTweet(userID string) error {
+type TweetResponse struct {
+	ID   string `json:"id"`
+	Text string `json:"text"`
+}
+type LookupUserTweetResponse struct {
+	Data []TweetResponse `json:"data"`
+}
+
+func LookupUserTweet(userID string) (string, error) {
 
 	twitterToken := os.Getenv("TWITTER_TOKEN")
 	if twitterToken == "" {
-		return errors.New("no twitter token")
+		return "", errors.New("no twitter token")
 	}
-
-	// userID := "2244994945"
 
 	url := "https://api.twitter.com/2/users/" + userID + "/tweets"
 	url += "?max_results=100"
@@ -60,8 +91,31 @@ func LookupUserTweet(userID string) error {
 		"authorization": "Bearer " + twitterToken,
 	})
 
-	fmt.Println(err)
-	fmt.Printf("RES: %+v\n", re)
+	if err != nil {
+		return "", err
+	}
+	var res LookupUserTweetResponse
+	re.ToJSON(&res)
+	if res.Data == nil {
+		return "", errors.New("no data")
+	}
+	if len(res.Data) == 0 {
+		return "", errors.New("no data")
+	}
 
-	return nil
+	prefixes := []string{
+		"Sphinx Verification: ",
+		"Sphinx verification: ",
+		"sphinx veriication: ",
+	}
+
+	for _, tweet := range res.Data {
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(tweet.Text, prefix) {
+				return strings.TrimPrefix(tweet.Text, prefix), nil
+			}
+		}
+	}
+
+	return "", errors.New("did not find the tweet")
 }

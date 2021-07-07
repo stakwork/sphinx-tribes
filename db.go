@@ -37,6 +37,7 @@ func initDB() {
 		panic(err)
 	}
 	DB.db = db
+
 	fmt.Println("db connected")
 }
 
@@ -166,6 +167,18 @@ func (db database) createOrEditPerson(m Person) (Person, error) {
 	setweight(array_to_tsvector(tags), 'C')
 	WHERE id = '` + strconv.Itoa(int(m.ID)) + "'")
 	return m, nil
+}
+
+func (db database) getUnconfirmedTwitter() []Person {
+	ms := []Person{}
+	db.db.Raw(`SELECT * FROM people where extras -> 'twitter' IS NOT NULL and twitter_confirmed = 'f';`).Find(&ms)
+	return ms
+}
+
+func (db database) updateTwitterConfirmed(id uint, confirmed bool) {
+	db.db.Model(&Person{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"twitter_confirmed": confirmed,
+	})
 }
 
 func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
