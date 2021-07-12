@@ -106,7 +106,7 @@ func LookupUserTweet(userID string) (string, error) {
 	prefixes := []string{
 		"Sphinx Verification: ",
 		"Sphinx verification: ",
-		"sphinx veriication: ",
+		"sphinx verification: ",
 	}
 
 	for _, tweet := range res.Data {

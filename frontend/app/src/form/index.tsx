@@ -26,6 +26,7 @@ export default function Form(props:any) {
               }}
               handleBlur={() => setFieldTouched(item.name, false)}
               handleFocus={() => setFieldTouched(item.name, true)}
+              extraText={props.extraText && props.extraText[item.name]}
             />)}
             <EuiButton
               isLoading={props.loading}
@@ -59,6 +60,7 @@ export interface FormField {
   required?: boolean
   validator?: any
   style?: any
+  prepend?: string
 }
 
 function validator(config: FormField[]) {

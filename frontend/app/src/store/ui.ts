@@ -52,7 +52,8 @@ export interface MeInfo {
   jwt: string
   url: string
   description: string
+  verification_signature: string
 }
-const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',price_to_meet:0,photo_url:'',url:'',jwt:'',description:''}
+const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',price_to_meet:0,photo_url:'',url:'',jwt:'',description:'',verification_signature:''}
 
 export const uiStore = new UiStore()
