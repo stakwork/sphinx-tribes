@@ -71,16 +71,17 @@ func ask(w http.ResponseWriter, r *http.Request) {
 }
 
 type VerifyPayload struct {
-	ID          uint   `json:"id"`
-	Pubkey      string `json:"pubkey"`
-	ContactKey  string `json:"contact_key"`
-	Alias       string `json:"alias"`
-	PhotoURL    string `json:"photo_url"`
-	RouteHint   string `json:"route_hint"`
-	PriceToMeet uint   `json:"price_to_meet"`
-	JWT         string `json:"jwt"`
-	URL         string `json:"url"`
-	Description string `json:"description"`
+	ID                    uint   `json:"id"`
+	Pubkey                string `json:"pubkey"`
+	ContactKey            string `json:"contact_key"`
+	Alias                 string `json:"alias"`
+	PhotoURL              string `json:"photo_url"`
+	RouteHint             string `json:"route_hint"`
+	PriceToMeet           uint   `json:"price_to_meet"`
+	JWT                   string `json:"jwt"`
+	URL                   string `json:"url"`
+	Description           string `json:"description"`
+	VerificationSignature string `json:"verification_signature"`
 }
 
 func verify(w http.ResponseWriter, r *http.Request) {
@@ -244,7 +245,7 @@ func processTwitterConfirmationsLoop() {
 			}
 		}
 	}
-	time.Sleep(5 * time.Minute)
+	time.Sleep(30 * time.Second)
 	processTwitterConfirmationsLoop()
 }
 

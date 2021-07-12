@@ -46,6 +46,12 @@ const meSchema: FormField[] = [
     label: "ID",
     type: "hidden",
   },
+  {
+    name:'twitter',
+    label:'Twitter Username',
+    type:'text',
+    prepend:'@'
+  }
 ];
 
 const host = window.location.host.includes("localhost")
@@ -88,15 +94,18 @@ export default function EditMe(props: any) {
   async function submitForm(v) {
     console.log(v);
     const info = ui.meInfo as any;
+    const body = v
+    body.extras = {
+      ...v.twitter && {twitter: v.twitter}
+    }
     if (!info) return console.log("no meInfo");
     setLoading(true);
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
     const r = await fetch(URL + "/profile", {
       method: "POST",
       body: JSON.stringify({ 
-        ...v, host, 
+        ...body, host, 
         price_to_meet: parseInt(v.price_to_meet),
-        extras: {twitter:'hello!'}
       }),
       headers: {
         "x-jwt": info.jwt,
@@ -127,6 +136,7 @@ export default function EditMe(props: any) {
         img: ui.meInfo.photo_url || "",
         price_to_meet: ui.meInfo.price_to_meet || 0,
         description: ui.meInfo.description || "",
+        verification_signature: ui.meInfo.verification_signature || ''
       };
     }
 
@@ -145,6 +155,9 @@ export default function EditMe(props: any) {
                   onSubmit={submitForm}
                   schema={meSchema}
                   initialValues={initialValues}
+                  extraText={
+                    ui.meInfo.verification_signature ? {twitter: `Post this to your twitter account to verify: "Sphinx Verification: ${ui.meInfo.verification_signature}"`} : {}
+                  }
                 />
               )}
             </div>
