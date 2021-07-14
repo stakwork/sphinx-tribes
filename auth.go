@@ -80,6 +80,19 @@ func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
 	return pubkey, nil
 }
 
+// VerifyArbitrary takes base64 sig and msg and returns hex pubkey
+func VerifyArbitrary(sig string, msg string) (string, error) {
+	sigByes, err := base64.URLEncoding.DecodeString(sig)
+	if err != nil {
+		return "", err
+	}
+	pubkey, valid, err := VerifyAndExtract([]byte(msg), sigByes)
+	if err != nil || !valid || pubkey == "" {
+		return "", err
+	}
+	return pubkey, nil
+}
+
 // VerifyAndExtract ... pubkey comes out hex encoded
 func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 

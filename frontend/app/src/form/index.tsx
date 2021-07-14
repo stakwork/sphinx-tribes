@@ -26,7 +26,7 @@ export default function Form(props:any) {
               }}
               handleBlur={() => setFieldTouched(item.name, false)}
               handleFocus={() => setFieldTouched(item.name, true)}
-              extraText={props.extraText && props.extraText[item.name]}
+              extraHTML={props.extraHTML && props.extraHTML[item.name]}
             />)}
             <EuiButton
               isLoading={props.loading}

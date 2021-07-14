@@ -19,8 +19,8 @@ func ConfirmIdentityTweet(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	return VerifyTribeUUID(token, false)
+	pubkey, err := VerifyArbitrary(token, "Sphinx Verification")
+	return pubkey, err
 }
 
 type UserResponse struct {

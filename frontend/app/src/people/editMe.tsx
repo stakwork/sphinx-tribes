@@ -103,8 +103,9 @@ export default function EditMe(props: any) {
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
     const r = await fetch(URL + "/profile", {
       method: "POST",
-      body: JSON.stringify({ 
-        ...body, host, 
+      body: JSON.stringify({
+        host, 
+        ...body, 
         price_to_meet: parseInt(v.price_to_meet),
       }),
       headers: {
@@ -136,7 +137,7 @@ export default function EditMe(props: any) {
         img: ui.meInfo.photo_url || "",
         price_to_meet: ui.meInfo.price_to_meet || 0,
         description: ui.meInfo.description || "",
-        verification_signature: ui.meInfo.verification_signature || ''
+        twitter: (ui.meInfo.extras && ui.meInfo.extras.twitter) || ''
       };
     }
 
@@ -155,8 +156,8 @@ export default function EditMe(props: any) {
                   onSubmit={submitForm}
                   schema={meSchema}
                   initialValues={initialValues}
-                  extraText={
-                    ui.meInfo.verification_signature ? {twitter: `Post this to your twitter account to verify: "Sphinx Verification: ${ui.meInfo.verification_signature}"`} : {}
+                  extraHTML={
+                    ui.meInfo.verification_signature ? {twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`} : {}
                   }
                 />
               )}

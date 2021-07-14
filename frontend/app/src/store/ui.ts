@@ -41,6 +41,9 @@ class UiStore {
 }
 
 export type MeData = MeInfo | null
+interface Extras {
+  twitter?: string
+}
 export interface MeInfo {
   id?: number
   pubkey: string
@@ -53,7 +56,8 @@ export interface MeInfo {
   url: string
   description: string
   verification_signature: string
+  extras: Extras
 }
-const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',price_to_meet:0,photo_url:'',url:'',jwt:'',description:'',verification_signature:''}
+const emptyMeData:MeData = {pubkey:'asdf',alias:'evan',route_hint:'',contact_key:'',price_to_meet:0,photo_url:'',url:'',jwt:'',description:'',verification_signature:'',extras:{}}
 
 export const uiStore = new UiStore()

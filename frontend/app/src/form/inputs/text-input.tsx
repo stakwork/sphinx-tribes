@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import {EuiFormRow, EuiFieldText} from '@elastic/eui'
 import type {Props} from './propsType'
 
-export default function TextInput({label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraText}:Props) {
+export default function TextInput({label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML}:Props) {
+  console.log("TEXT", label, extraHTML)
   return <>
     <EuiFormRow label={label}>
       <Text name="first" value={value||''} 
@@ -14,7 +15,10 @@ export default function TextInput({label, value, handleChange, handleBlur, handl
         prepend={prepend}
       />
     </EuiFormRow>
-    {extraText && value && <ExtraText>{extraText}</ExtraText>}
+    <ExtraText
+      style={{display:value&&extraHTML?'block':'none'}}
+      dangerouslySetInnerHTML={{__html:extraHTML||''}}
+    />
   </>
 }
 

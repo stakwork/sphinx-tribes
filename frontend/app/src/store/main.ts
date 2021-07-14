@@ -30,6 +30,14 @@ export class MainStore {
 
   @action async getPeople(uniqueName?:string): Promise<Person[]> {
     const ps = await api.get('people')
+    if(uniqueName) {
+      ps.forEach(function(t:Tribe,i:number){
+        if(t.unique_name === uniqueName){
+          ps.splice(i, 1);
+          ps.unshift(t);
+        }
+      })
+    }
     this.people = ps
     return ps
   }
