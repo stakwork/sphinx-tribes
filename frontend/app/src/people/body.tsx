@@ -18,11 +18,22 @@ export default function BodyComponent() {
 
   function selectPerson(id:number, unique_name:string){
     setSelectedPerson(id)
+    if(unique_name && window.history.pushState) {
+      window.history.pushState({}, 'Sphinx Tribes', '/p/'+unique_name);
+    }
   }
 
   async function loadPeople(){
     setLoading(true)
+    let un = ''
+    if(window.location.pathname.startsWith('/p/')) {
+      un = window.location.pathname.substr(3)
+    }
     const ps = await main.getPeople('')
+    if(un) {
+      const initial = ps[0]
+      if(initial.unique_name===un) setSelectedPerson(initial.id)
+    }
     setLoading(false)
   }
   useEffect(()=>{

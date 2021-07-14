@@ -13,9 +13,11 @@ function makeQR(pubkey:string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`
 }
 
-export default function Person({id,img,tags,description,selected,select,created,owner_alias,owner_pubkey,unique_name,price_to_meet}:any){
+export default function Person({id,img,tags,description,selected,select,created,owner_alias,owner_pubkey,unique_name,price_to_meet,extras,twitter_confirmed}:any){
   const [showQR, setShowQR] = useState(false)
   const qrString = makeQR(owner_pubkey)
+
+  const twitterUsername = (extras && extras.twitter) || null
 
   let tagsString = ''
   tags.forEach((t:string,i:number)=> {
@@ -61,6 +63,12 @@ export default function Person({id,img,tags,description,selected,select,created,
         {price_to_meet && <RowWrap>
           <Row style={{marginTop:20, marginBottom: 20, justifyContent:"space-evenly", color:'white', fontWeight:'bold'}}>
             {`Price to Meet: ${price_to_meet} sats`}
+          </Row>
+        </RowWrap>}
+        {twitter_confirmed && twitterUsername && <RowWrap>
+          <Row style={{marginTop:20, marginBottom: 20, color:'white', fontWeight:'bold', fontSize:14}}>
+            <img src="/static/twitter.png" style={{marginLeft:28}} height="32" width="32" alt="twitter" />
+            <span style={{marginLeft:12}}>{`@${twitterUsername}`}</span>
           </Row>
         </RowWrap>}
         <RowWrap>

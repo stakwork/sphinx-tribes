@@ -8,5 +8,5 @@ export interface Props {
     handleFocus: any
     readOnly: boolean
     prepend?: string
-    extraText?: string
+    extraHTML?: string
 }
