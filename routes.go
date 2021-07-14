@@ -36,6 +36,12 @@ func NewRouter() *http.Server {
 		r.Get("/t/favicon.ico", frontend.FaviconRoute)
 		r.Get("/t/{unique_name}", frontend.IndexRoute)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get("/p/static/*", frontend.StaticRoute)
+		r.Get("/p/manifest.json", frontend.ManifestRoute)
+		r.Get("/p/favicon.ico", frontend.FaviconRoute)
+		r.Get("/p/{unique_name}", frontend.IndexRoute)
+	})
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
