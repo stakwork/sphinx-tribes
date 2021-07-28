@@ -8,51 +8,12 @@ import {
   EuiModalHeaderTitle,
   EuiOverlayMask,
 } from "@elastic/eui";
-import Form, { FormField } from "../form";
+import Form from "../form";
 import ConfirmMe from "./confirmMe";
-import type {MeInfo} from '../store/ui'
+import type { MeInfo } from '../store/ui'
+import { meSchema } from '../form/schema'
 import api from '../api'
 
-const meSchema: FormField[] = [
-  {
-    name: "img",
-    label: "Image",
-    type: "img",
-  },
-  {
-    name: "pubkey",
-    label: "Pubkey",
-    type: "text",
-    readOnly: true,
-  },
-  {
-    name: "owner_alias",
-    label: "Name",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "description",
-    label: "Description",
-    type: "text",
-  },
-  {
-    name: "price_to_meet",
-    label: "Price to Meet",
-    type: "number",
-  },
-  {
-    name: "id",
-    label: "ID",
-    type: "hidden",
-  },
-  {
-    name:'twitter',
-    label:'Twitter Username',
-    type:'text',
-    prepend:'@'
-  }
-];
 
 const host = window.location.host.includes("localhost")
   ? "localhost:5002"
@@ -70,25 +31,25 @@ export default function EditMe(props: any) {
 
   async function testChallenge(chal: string) {
     try {
-      const me:MeInfo = await api.get(`poll/${chal}`)
-      if(me && me.pubkey) {
+      const me: MeInfo = await api.get(`poll/${chal}`)
+      if (me && me.pubkey) {
         ui.setMeInfo(me)
         ui.setEditMe(true)
       }
-    } catch(e) {
+    } catch (e) {
       console.log(e)
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     try {
       var urlObject = new URL(window.location.href);
       var params = urlObject.searchParams;
       const chal = params.get('challenge')
-      if(chal) {
+      if (chal) {
         testChallenge(chal)
       }
-    } catch(e) {}
+    } catch (e) { }
   }, [])
 
   async function submitForm(v) {
@@ -96,7 +57,7 @@ export default function EditMe(props: any) {
     const info = ui.meInfo as any;
     const body = v
     body.extras = {
-      ...v.twitter && {twitter: v.twitter}
+      ...v.twitter && { twitter: v.twitter }
     }
     if (!info) return console.log("no meInfo");
     setLoading(true);
@@ -104,8 +65,8 @@ export default function EditMe(props: any) {
     const r = await fetch(URL + "/profile", {
       method: "POST",
       body: JSON.stringify({
-        host, 
-        ...body, 
+        host,
+        ...body,
         price_to_meet: parseInt(v.price_to_meet),
       }),
       headers: {
@@ -137,7 +98,8 @@ export default function EditMe(props: any) {
         img: ui.meInfo.photo_url || "",
         price_to_meet: ui.meInfo.price_to_meet || 0,
         description: ui.meInfo.description || "",
-        twitter: (ui.meInfo.extras && ui.meInfo.extras.twitter) || ''
+        // twitter: (ui.meInfo.extras && ui.meInfo.extras.twitter) || '',
+        extras: ui.meInfo.extras || {}
       };
     }
 
@@ -152,12 +114,13 @@ export default function EditMe(props: any) {
               {!ui.meInfo && <ConfirmMe />}
               {ui.meInfo && (
                 <Form
+                  paged={true}
                   loading={loading}
                   onSubmit={submitForm}
                   schema={meSchema}
                   initialValues={initialValues}
                   extraHTML={
-                    ui.meInfo.verification_signature ? {twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`} : {}
+                    ui.meInfo.verification_signature ? { twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>` } : {}
                   }
                 />
               )}
