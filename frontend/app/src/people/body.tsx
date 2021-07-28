@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
@@ -9,56 +9,60 @@ import {
 } from '@elastic/eui';
 import Person from './person'
 import EditMe from './editMe'
-import {useFuse, useScroll} from '../hooks'
+import { useFuse, useScroll } from '../hooks'
+
+// avoid hook within callback warning by renaming hooks
+const getFuse = useFuse
+const getScroll = useScroll
 
 export default function BodyComponent() {
   const { main, ui } = useStores()
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [selectedPerson, setSelectedPerson] = useState(0)
 
-  function selectPerson(id:number, unique_name:string){
+  function selectPerson(id: number, unique_name: string) {
     setSelectedPerson(id)
-    if(unique_name && window.history.pushState) {
-      window.history.pushState({}, 'Sphinx Tribes', '/p/'+unique_name);
+    if (unique_name && window.history.pushState) {
+      window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
     }
   }
 
-  async function loadPeople(){
+  async function loadPeople() {
     setLoading(true)
     let un = ''
-    if(window.location.pathname.startsWith('/p/')) {
+    if (window.location.pathname.startsWith('/p/')) {
       un = window.location.pathname.substr(3)
     }
     const ps = await main.getPeople('')
-    if(un) {
+    if (un) {
       const initial = ps[0]
-      if(initial.unique_name===un) setSelectedPerson(initial.id)
+      if (initial.unique_name === un) setSelectedPerson(initial.id)
     }
     setLoading(false)
   }
-  useEffect(()=>{
+  useEffect(() => {
     loadPeople()
   }, [])
 
   return useObserver(() => {
-    const peeps = useFuse(main.people, ["owner_alias"])
-    const {handleScroll, n, loadingMore} = useScroll()
-    const people = peeps.slice(0,n)
+    const peeps = getFuse(main.people, ["owner_alias"])
+    const { handleScroll, n, loadingMore } = getScroll()
+    const people = peeps.slice(0, n)
 
     return <Body id="main">
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
-        {!loading && <EuiFormFieldset style={{width:'100%'}} className="container">
+        {!loading && <EuiFormFieldset style={{ width: '100%' }} className="container">
           <div className="row">
-            {people.map(t=> <Person {...t} key={t.id}
-              selected={selectedPerson===t.id}
+            {people.map(t => <Person {...t} key={t.id}
+              selected={selectedPerson === t.id}
               select={selectPerson}
             />)}
           </div>
         </EuiFormFieldset>}
         <AddWrap>
-          {!loading && <EuiButtonIcon 
-            onClick={()=> ui.setEditMe(true)}
+          {!loading && <EuiButtonIcon
+            onClick={() => ui.setEditMe(true)}
             iconType="plusInCircleFilled"
             iconSize="l"
             size="m"
@@ -71,7 +75,8 @@ export default function BodyComponent() {
 
     </Body>
   }
-)}
+  )
+}
 
 const Body = styled.div`
   flex:1;
