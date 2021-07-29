@@ -55,7 +55,7 @@ export default function FadeLeft(props) {
 
     if (!alwaysRender && !shouldRender) return <div style={{ position: 'absolute', left: 0, top: 0 }} />
     return (
-        <Fader style={{ ...style, transform: `translateX(${translation}px)`, opacity }}>
+        <Fader style={{ height: 'inherit', ...style, transform: `translateX(${translation}px)`, opacity }}>
             {children}
         </Fader>
     );

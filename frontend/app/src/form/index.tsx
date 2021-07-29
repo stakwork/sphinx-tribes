@@ -32,7 +32,8 @@ export default function Form(props: any) {
       initialValues={props.initialValues || {}}
       onSubmit={props.onSubmit}
       validationSchema={validator(props.schema)}
-      style={{ height: '100%' }}
+      style={{ height: 'inherit' }}
+      innerStyle={{ height: 'inherit' }}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
@@ -110,7 +111,7 @@ export default function Form(props: any) {
 
 const Wrap = styled.div`
   display: flex;
-  flex:1;
+  height:inherit;
   flex-direction: column;
   align-content: center;
   justify-content: space-between;
@@ -119,9 +120,10 @@ const Wrap = styled.div`
 const BWrap = styled.div`
   display: flex;
   justify-content: space-evenly;
-  align-items:flex-end;
+  align-items:center;
   width:100%;
-  flex:1;
+  height:42px;
+  min-height:42px;
   margin-top:20px;
 `;
 

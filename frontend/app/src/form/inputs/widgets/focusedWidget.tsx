@@ -182,6 +182,9 @@ const Nav = styled.div`
     align-content: center;
     justify-content: space-evenly;
     margin-bottom:20px;
+    margin-top:2px;
+    height:42px;
+    min-height:42px;
 `;
 
 export interface IconProps {

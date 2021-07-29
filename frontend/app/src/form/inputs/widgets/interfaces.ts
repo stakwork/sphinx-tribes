@@ -12,14 +12,51 @@ export interface FormState {
 
 export interface BlogPost {
     title: string,
-
+    markdown: string,
+    createdAt: number
 }
 
-export type Blog = BlogPost[]
+export interface Offer {
+    title: string,
+    price: number,
+    description: string,
+    img?: string,
+    url?: string,
+    createdAt: number
+}
+
+export interface Wanted {
+    title: string,
+    priceMin: number,
+    priceMax: number,
+    description: string,
+    url?: string,
+    createdAt: number
+}
+
+export interface Wanted {
+    title: string,
+    priceMin: number,
+    priceMax: number,
+    description: string,
+    url?: string,
+    createdAt: number
+}
+
+export interface Donation {
+    title: string,
+    description: string,
+    createdAt: number,
+    url?: string,
+    img?: string
+}
 
 export interface Extras {
     twitter?: string,
-
+    blog?: BlogPost[],
+    offers?: Offer[],
+    wanted?: Wanted[],
+    donation?: Donation,
 }
 
 function doJSONToFormState(json: MeInfo): FormState {

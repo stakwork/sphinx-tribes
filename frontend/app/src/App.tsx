@@ -1,13 +1,14 @@
 import React from 'react'
 import './App.css'
+import '@material/react-material-icon/dist/material-icon.css';
 import Header from './tribes/header'
 import Body from './tribes/body'
 import PeopleHeader from './people/header'
-import PeopleBody from './people/body' 
+import PeopleBody from './people/body'
 
 function App() {
   const mode = getMode()
-  if(mode===Mode.PEOPLE) {
+  if (mode === Mode.PEOPLE) {
     return <div className="app">
       <PeopleHeader />
       <PeopleBody />
@@ -23,7 +24,7 @@ enum Mode {
   TRIBES = 'tribes',
   PEOPLE = 'people',
 }
-const hosts:{[k:string]:Mode} = {
+const hosts: { [k: string]: Mode } = {
   'localhost:3000': Mode.TRIBES,
   'tribes.sphinx.chat': Mode.TRIBES,
   'tribes-test.sphinx.chat': Mode.TRIBES,
@@ -32,7 +33,7 @@ const hosts:{[k:string]:Mode} = {
   'people-test.sphinx.chat': Mode.PEOPLE
 }
 
-function getMode(): Mode{
+function getMode(): Mode {
   const host = window.location.host
   return hosts[host] || Mode.TRIBES
 }

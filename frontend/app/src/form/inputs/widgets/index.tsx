@@ -3,7 +3,6 @@ import Widget from './widget'
 import FocusedWidget from './focusedWidget'
 import FadeLeft from '../../../animated/fadeLeft'
 import styled from "styled-components";
-import { EuiButton } from '@elastic/eui'
 
 export default function Widgets(props: any) {
     const [selected, setSelected] = useState(null)
@@ -14,11 +13,17 @@ export default function Widgets(props: any) {
             isMounted={!selected}
             style={{ maxWidth: 500 }}
             dismountCallback={() => setShowFocused(true)}>
-            <InnerWrap>
-                {props.extras.map((e, i) => {
-                    return <Widget key={i} {...e} setSelected={setSelected} />
-                })}
-            </InnerWrap>
+            <Center>
+                <InnerWrap>
+                    {props.extras.map((e, i) => {
+                        return <Widget parentName={props.name}
+                            setFieldValue={props.setFieldValue}
+                            values={props.values}
+                            key={i} {...e}
+                            setSelected={setSelected} />
+                    })}
+                </InnerWrap>
+            </Center>
         </FadeLeft>
 
         <FadeLeft
@@ -35,10 +40,16 @@ export default function Widgets(props: any) {
 
 const Wrap = styled.div`
 `;
-
+const Center = styled.div`
+    display: flex;
+    flex:1;
+    align-content: center;
+    justify-content: center;
+`;
 const InnerWrap = styled.div`
     display: flex;
     align-content: center;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     flex-wrap:wrap;
+    max-width:310px;
 `;

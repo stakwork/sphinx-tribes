@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from "styled-components";
 import Blog from './listItems/blog'
+import Offer from './listItems/offer'
+import Wanted from './listItems/wanted'
 
 
 export default function WidgetList(props: any) {
@@ -21,14 +23,10 @@ export default function WidgetList(props: any) {
         switch (props.schema.class) {
             case 'blog':
                 return wrap(<Blog {...v} />)
-            case 'twitter':
-                return wrap(<Blog {...v} />)
-            case 'donations':
-                return wrap(<Blog {...v} />)
             case 'offer':
-                return wrap(<Blog {...v} />)
+                return wrap(<Offer {...v} />)
             case 'wanted':
-                return <></>
+                return wrap(<Wanted {...v} />)
             default:
                 return <></>
         }

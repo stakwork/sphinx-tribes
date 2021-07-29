@@ -13,6 +13,7 @@ import ConfirmMe from "./confirmMe";
 import type { MeInfo } from '../store/ui'
 import { meSchema } from '../form/schema'
 import api from '../api'
+import styled, { css } from "styled-components";
 
 
 const host = window.location.host.includes("localhost")
@@ -117,23 +118,64 @@ export default function EditMe(props: any) {
           <EuiModalHeader>
             <EuiModalHeaderTitle>{`${verb} My Profile`}</EuiModalHeaderTitle>
           </EuiModalHeader>
-          <EuiModalBody>
-            {!ui.meInfo && <ConfirmMe />}
-            {ui.meInfo && (
-              <Form
-                paged={true}
-                loading={loading}
-                onSubmit={submitForm}
-                schema={meSchema}
-                initialValues={initialValues}
-                extraHTML={
-                  ui.meInfo.verification_signature ? { twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>` } : {}
-                }
-              />
-            )}
+          <EuiModalBody style={{ padding: 0 }}>
+            <B>
+
+              {!ui.meInfo && <ConfirmMe />}
+              {ui.meInfo && (
+                <Form
+                  paged={true}
+                  loading={loading}
+                  onSubmit={submitForm}
+                  schema={meSchema}
+                  initialValues={initialValues}
+                  extraHTML={
+                    ui.meInfo.verification_signature ? { twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>` } : {}
+                  }
+                />
+              )}
+            </B>
           </EuiModalBody>
         </EuiModal>
       </EuiOverlayMask >
     );
   });
 }
+
+
+const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }) => css`
+  scrollbar-color: ${thumbColor} ${trackBackgroundColor}; // Firefox support
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 100%;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${thumbColor};
+    background-clip: content-box;
+    border-radius: 5px;
+      border: 1px solid ${trackBackgroundColor};
+  }
+
+  &::-webkit-scrollbar-corner,
+  &::-webkit-scrollbar-track {
+    background-color: ${trackBackgroundColor};
+  }
+}
+
+`
+
+const B = styled.div`
+  height:calc(100% - 4px);
+  width: calc(100% - 4px);
+  overflow-y:auto;
+  padding:0 20px;
+  box-sizing:border-box;
+  ${EnvWithScrollBar({
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)',
+})}
+`
+

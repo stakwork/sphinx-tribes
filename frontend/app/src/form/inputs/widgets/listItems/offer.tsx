@@ -1,14 +1,15 @@
 import React from 'react'
 import styled from "styled-components";
-import { BlogPost } from '../interfaces';
+import * as I from '../interfaces';
 
 
-export default function Blog(props: BlogPost) {
+export default function Offer(props: I.Offer) {
 
     return <Wrap>
+        <div>{props.price}</div>
+        <div>{props.description}</div>
+        <div>{props.img}</div>
         <div>{props.title}</div>
-        <div>{props.markdown}</div>
-        <div>{props.createdAt}</div>
     </Wrap>
 
 }
