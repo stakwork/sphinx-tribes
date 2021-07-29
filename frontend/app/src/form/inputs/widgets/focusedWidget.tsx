@@ -6,7 +6,8 @@ import FadeLeft from '../../../animated/fadeLeft';
 import WidgetList from './widgetList'
 
 export default function FocusedWidget(props: any) {
-    const { name, values, errors, initialValues, setFieldTouched, setFieldValue, item, setShowFocused, setDisableFormButtons } = props
+    const { name, values, errors, initialValues, setFieldTouched,
+        setFieldValue, item, setShowFocused, setDisableFormButtons } = props
     const { single } = item
     const [selectedIndex, setSelectedIndex] = useState(-1)
 
@@ -105,16 +106,7 @@ export default function FocusedWidget(props: any) {
         {/* single widgets will only show these fields */}
         {/* <FadeLeft isMounted={showInputs} dismountCallback={() =>}> */}
         {!showingList && <>
-            <Nav>
-                <EuiButton
-                    onClick={() => cancel()}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                >Cancel</EuiButton>
-                <EuiButton
-                    onClick={() => done()}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                >Save{item.itemLabel && ` ${item.itemLabel}`}</EuiButton>
-            </Nav>
+
             {item.fields.map((e, i) => {
                 return <Input
                     {...e}
@@ -135,6 +127,16 @@ export default function FocusedWidget(props: any) {
                         setFieldTouched(f, true)
                     }} />
             })}
+            <Nav style={{ marginTop: 20 }}>
+                <EuiButton
+                    onClick={() => cancel()}
+                    style={{ fontSize: 12, fontWeight: 600 }}
+                >Cancel</EuiButton>
+                <EuiButton
+                    onClick={() => done()}
+                    style={{ fontSize: 12, fontWeight: 600 }}
+                >Save{item.itemLabel && ` ${item.itemLabel}`}</EuiButton>
+            </Nav>
         </>}
         {/* </FadeLeft> */}
 
@@ -142,7 +144,7 @@ export default function FocusedWidget(props: any) {
         {/* <FadeLeft isMounted={showingList} dismountCallback={() =>}> */}
 
         {showingList && <>
-            <Nav>
+            <Nav >
                 <EuiButton
                     onClick={() => setShowFocused(false)}
                     style={{ fontSize: 12, fontWeight: 600 }}

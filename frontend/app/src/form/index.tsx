@@ -64,42 +64,44 @@ export default function Form(props: any) {
                 extraHTML={props.extraHTML && props.extraHTML[item.name]}
               />)}
 
-              <BWrap>
+              <FadeLeft isMounted={!disableFormButtons}>
+                <BWrap>
+                  {page > 1 &&
+                    <EuiButton
+                      disabled={disableFormButtons || props.loading}
+                      onClick={async () => {
+                        // this does form animation between pages
+                        setFormMounted(false)
+                        await sleep(200)
+                        //
+                        setPage(page - 1)
+                      }}
+                      style={{ fontSize: 12, fontWeight: 600 }}
+                    >
+                      Back
+                    </EuiButton>
+                  }
 
-                {page > 1 &&
                   <EuiButton
-                    disabled={disableFormButtons || props.loading}
+                    isLoading={props.loading}
                     onClick={async () => {
-                      // this does form animation between pages
-                      setFormMounted(false)
-                      await sleep(200)
-                      //
-                      setPage(page - 1)
+                      if (lastPage === page) handleSubmit()
+                      else {
+                        // this does form animation between pages
+                        setFormMounted(false)
+                        await sleep(200)
+                        //
+                        setPage(page + 1)
+                      }
                     }}
+                    disabled={disableFormButtons || !isValid}
                     style={{ fontSize: 12, fontWeight: 600 }}
                   >
-                    Back
+                    {buttonText}
                   </EuiButton>
-                }
+                </BWrap>
+              </FadeLeft>
 
-                <EuiButton
-                  isLoading={props.loading}
-                  onClick={async () => {
-                    if (lastPage === page) handleSubmit()
-                    else {
-                      // this does form animation between pages
-                      setFormMounted(false)
-                      await sleep(200)
-                      //
-                      setPage(page + 1)
-                    }
-                  }}
-                  disabled={disableFormButtons || !isValid}
-                  style={{ fontSize: 12, fontWeight: 600 }}
-                >
-                  {buttonText}
-                </EuiButton>
-              </BWrap>
             </Wrap >
 
           </FadeLeft >
