@@ -52,7 +52,7 @@ export const meSchema: FormField[] = [
                 type: "widget",
                 class: "twitter",
                 single: true,
-                icon: '',
+                icon: 'twitter',
                 fields: [
                     {
                         name: 'handle',
@@ -68,7 +68,6 @@ export const meSchema: FormField[] = [
                 type: "widget",
                 class: "donations",
                 single: true,
-                icon: '',
                 fields: [
                     {
                         name: 'img',
@@ -93,7 +92,6 @@ export const meSchema: FormField[] = [
                 itemLabel: "Offer",
                 type: "widget",
                 class: "offer",
-                icon: '',
                 fields: [
                     {
                         name: 'img',
@@ -118,7 +116,6 @@ export const meSchema: FormField[] = [
                 itemLabel: "Listing",
                 type: "widget",
                 class: "wanted",
-                icon: '',
                 fields: [
                     {
                         name: 'img',
@@ -143,7 +140,6 @@ export const meSchema: FormField[] = [
                 itemLabel: "Post",
                 type: "widget",
                 class: "blog",
-                icon: '',
                 fields: [
                     {
                         name: 'title',

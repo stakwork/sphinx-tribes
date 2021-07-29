@@ -1,46 +1,103 @@
 import React from 'react'
 import styled from "styled-components";
+import MaterialIcon from '@material/react-material-icon';
 
 export default function Widget(props: any) {
+    // highlight if state has any of these
+
+    const { values, name, parentName, setFieldValue } = props
+    const state = values.extras && values.extras[name]
+
+    function objectOrArrayHasLength(mystate) {
+        let v = 0
+        if (mystate) {
+            if (Array.isArray(mystate)) {
+                v = mystate.length
+            } else {
+                v = Object.keys(mystate).length
+            }
+        }
+        return v > 0
+    }
+
+    function deleteSingleWidget() {
+        setFieldValue(`${parentName}.${name}`, null);
+    }
+
+
+    let highlight = objectOrArrayHasLength(state)
 
     return <Wrap onClick={() => props.setSelected(props)}>
-        {/* {props.icon && <Icon source={props.icon} />} */}
-        <Content>{props.label}</Content>
+        <Icon source={`static/${props.icon || 'sphinx'}.png`} />
+
+        <Title>{props.label}</Title>
+
+        {highlight &&
+            <Dot>
+                <MaterialIcon icon={props.single ? "close" : "settings"}
+                    style={{
+                        fontSize: 20,
+                        color: "#1d1e24",
+                        cursor: props.single && 'pointer'
+                    }}
+                    onClick={(e) => {
+                        if (props.single) {
+                            e.stopPropagation()
+                            //delete state
+                            deleteSingleWidget()
+                        }
+                    }} />
+            </Dot>
+        }
+
     </Wrap>
 
 }
 
-const Content = styled.div`
+const Dot = styled.div`
+    color: #1d1e24;
+    position:absolute;
+    top:6px;
+    right:6px;
+    opacity:0.8;
+    
+`
+
+const Title = styled.div`
     width:100%;
     display:flex;
     align-content: center;
     justify-content: center;
+    margin-top:10px;
 `
 
 const Wrap = styled.div`
-    color: #fff;
-    height: 50px;
-    width: 100px;
-    border: 1px solid #fff;
-    border-radius:5px;
+    background:#ffffff;
+    width: 145px;
     margin:5px;
-
+    padding: 10px 5px;
     display: flex;
+    border-radius:5px;
     flex-direction: column;
     align-content: center;
+    align-items:center;
     justify-content: center;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+    position:relative;
 `;
 
 export interface IconProps {
     source: string;
 }
 
-const Icon = styled.img<IconProps>`
+const Icon = styled.div<IconProps>`
     background-image: ${p => `url(${p.source})`};
-    width:100px;
-    height:100px;
+    width:70px;
+    height:70px;
+    margin-top:10px;
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
     background-size: contain; /* Resize the background image to cover the entire container */
+    border:none;
 `;
 
