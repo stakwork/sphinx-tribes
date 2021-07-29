@@ -20,7 +20,10 @@ export default function Widgets(props: any) {
                             setFieldValue={props.setFieldValue}
                             values={props.values}
                             key={i} {...e}
-                            setSelected={setSelected} />
+                            setSelected={(e) => {
+                                props.setDisableFormButtons(true)
+                                setSelected(e)
+                            }} />
                     })}
                 </InnerWrap>
             </Center>
