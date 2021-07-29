@@ -98,36 +98,42 @@ export default function EditMe(props: any) {
         img: ui.meInfo.photo_url || "",
         price_to_meet: ui.meInfo.price_to_meet || 0,
         description: ui.meInfo.description || "",
-        // twitter: (ui.meInfo.extras && ui.meInfo.extras.twitter) || '',
         extras: ui.meInfo.extras || {}
       };
     }
 
     return (
       <EuiOverlayMask>
-        <EuiModal onClose={closeModal} initialFocus="[name=popswitch]">
+        <EuiModal onClose={closeModal}
+          style={{
+            minWidth: 300,
+            minHeight: 460,
+            maxWidth: 460,
+            maxHeight: 500,
+            height: '50vh',
+            width: '50vw',
+          }}
+          initialFocus="[name=popswitch]">
           <EuiModalHeader>
             <EuiModalHeaderTitle>{`${verb} My Profile`}</EuiModalHeaderTitle>
           </EuiModalHeader>
           <EuiModalBody>
-            <div>
-              {!ui.meInfo && <ConfirmMe />}
-              {ui.meInfo && (
-                <Form
-                  paged={true}
-                  loading={loading}
-                  onSubmit={submitForm}
-                  schema={meSchema}
-                  initialValues={initialValues}
-                  extraHTML={
-                    ui.meInfo.verification_signature ? { twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>` } : {}
-                  }
-                />
-              )}
-            </div>
+            {!ui.meInfo && <ConfirmMe />}
+            {ui.meInfo && (
+              <Form
+                paged={true}
+                loading={loading}
+                onSubmit={submitForm}
+                schema={meSchema}
+                initialValues={initialValues}
+                extraHTML={
+                  ui.meInfo.verification_signature ? { twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>` } : {}
+                }
+              />
+            )}
           </EuiModalBody>
         </EuiModal>
-      </EuiOverlayMask>
+      </EuiOverlayMask >
     );
   });
 }

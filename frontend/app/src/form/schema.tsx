@@ -50,30 +50,29 @@ export const meSchema: FormField[] = [
                 name: "twitter",
                 label: "Twitter",
                 type: "widget",
+                class: "twitter",
+                single: true,
                 icon: '',
                 fields: [
                     {
                         name: 'handle',
-                        label: "Handle",
+                        label: "Twitter Handle",
                         type: "text",
                         prepend: '@',
-                    },
-                    {
-                        name: 'bio',
-                        label: "Bio",
-                        type: "text",
-                    },
+                    }
                 ]
             },
             {
                 name: "donations",
                 label: "Donations",
                 type: "widget",
+                class: "donations",
+                single: true,
                 icon: '',
                 fields: [
                     {
                         name: 'img',
-                        label: "image",
+                        label: "Image",
                         type: "img",
                     },
                     {
@@ -91,7 +90,9 @@ export const meSchema: FormField[] = [
             {
                 name: "offer",
                 label: "Offer",
+                itemLabel: "Offer",
                 type: "widget",
+                class: "offer",
                 icon: '',
                 fields: [
                     {
@@ -114,7 +115,9 @@ export const meSchema: FormField[] = [
             {
                 name: "wanted",
                 label: "Wanted",
+                itemLabel: "Listing",
                 type: "widget",
+                class: "wanted",
                 icon: '',
                 fields: [
                     {
@@ -137,17 +140,22 @@ export const meSchema: FormField[] = [
             {
                 name: "blog",
                 label: "Blog",
+                itemLabel: "Post",
                 type: "widget",
+                class: "blog",
                 icon: '',
                 fields: [
                     {
-                        name: 'url',
+                        name: 'title',
                         label: "URL",
                         type: "text",
                     }
-                ]
+                ],
             },
         ],
         page: 2,
     }
 ];
+
+
+// extras.blog.existing

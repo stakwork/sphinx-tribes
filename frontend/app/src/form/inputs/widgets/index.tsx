@@ -25,13 +25,7 @@ export default function Widgets(props: any) {
             isMounted={showFocused}
             dismountCallback={() => setSelected(null)}>
             <>
-                <EuiButton
-                    onClick={() => setShowFocused(false)}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                >
-                    Back
-                </EuiButton>
-                <FocusedWidget {...props} item={selected} />
+                <FocusedWidget {...props} setShowFocused={setShowFocused} item={selected} />
             </>
         </FadeLeft>
 

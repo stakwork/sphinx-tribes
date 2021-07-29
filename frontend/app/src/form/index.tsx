@@ -4,10 +4,15 @@ import * as Yup from "yup";
 import styled from "styled-components";
 import Input from "./inputs";
 import { EuiButton } from '@elastic/eui'
+import FadeLeft from '../animated/fadeLeft';
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default function Form(props: any) {
 
   const [page, setPage] = useState(1)
+  const [formMounted, setFormMounted] = useState(true)
+  const [disableFormButtons, setDisableFormButtons] = useState(false)
 
   let lastPage = 1
 
@@ -27,83 +32,110 @@ export default function Form(props: any) {
       initialValues={props.initialValues || {}}
       onSubmit={props.onSubmit}
       validationSchema={validator(props.schema)}
+      style={{ height: '100%' }}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
         return (
-          <Wrap>
-            {schema && schema.map((item: FormField) => <Input
-              {...item}
-              key={item.name}
-              values={values}
-              errors={errors}
-              value={values[item.name]}
-              error={errors[item.name]}
-              initialValues={initialValues}
-              handleChange={(e: any) => {
-                setFieldValue(item.name, e);
-              }}
-              setFieldValue={setFieldValue}
-              setFieldTouched={setFieldTouched}
-              handleBlur={() => setFieldTouched(item.name, false)}
-              handleFocus={() => setFieldTouched(item.name, true)}
-              extraHTML={props.extraHTML && props.extraHTML[item.name]}
-            />)}
+          <FadeLeft
+            alwaysRender
+            noFadeOnInit
+            isMounted={formMounted}
+            dismountCallback={() => setFormMounted(true)}
+          >
+            <Wrap>
+              {schema && schema.map((item: FormField) => <Input
+                {...item}
+                key={item.name}
+                values={values}
+                errors={errors}
+                value={values[item.name]}
+                error={errors[item.name]}
+                initialValues={initialValues}
+                handleChange={(e: any) => {
+                  setFieldValue(item.name, e);
+                }}
+                setFieldValue={setFieldValue}
+                setFieldTouched={setFieldTouched}
+                handleBlur={() => setFieldTouched(item.name, false)}
+                handleFocus={() => setFieldTouched(item.name, true)}
+                setDisableFormButtons={setDisableFormButtons}
+                extraHTML={props.extraHTML && props.extraHTML[item.name]}
+              />)}
 
-            <BWrap>
+              <BWrap>
 
-              {page > 1 &&
+                {page > 1 &&
+                  <EuiButton
+                    disabled={disableFormButtons || props.loading}
+                    onClick={async () => {
+                      // this does form animation between pages
+                      setFormMounted(false)
+                      await sleep(200)
+                      //
+                      setPage(page - 1)
+                    }}
+                    style={{ fontSize: 12, fontWeight: 600 }}
+                  >
+                    Back
+                  </EuiButton>
+                }
+
                 <EuiButton
-                  disabled={props.loading}
-                  onClick={() => {
-                    setPage(page - 1)
+                  isLoading={props.loading}
+                  onClick={async () => {
+                    if (lastPage === page) handleSubmit()
+                    else {
+                      // this does form animation between pages
+                      setFormMounted(false)
+                      await sleep(200)
+                      //
+                      setPage(page + 1)
+                    }
                   }}
+                  disabled={disableFormButtons || !isValid}
                   style={{ fontSize: 12, fontWeight: 600 }}
                 >
-                  Back
+                  {buttonText}
                 </EuiButton>
-              }
+              </BWrap>
+            </Wrap >
 
-              <EuiButton
-                isLoading={props.loading}
-                onClick={() => {
-                  if (lastPage === page) handleSubmit()
-                  else setPage(page + 1)
-                }}
-                disabled={!isValid}
-                style={{ fontSize: 12, fontWeight: 600 }}
-              >
-                {buttonText}
-              </EuiButton>
-
-            </BWrap>
-          </Wrap>
+          </FadeLeft >
         );
       }}
-    </Formik>
+    </Formik >
   );
 }
 
 const Wrap = styled.div`
   display: flex;
+  flex:1;
   flex-direction: column;
   align-content: center;
-  justify-content: space-evenly;
-  height: 100%;
+  justify-content: space-between;
 `;
 
 const BWrap = styled.div`
   display: flex;
   justify-content: space-evenly;
-  margin-top:10px;
+  align-items:flex-end;
+  width:100%;
+  flex:1;
+  margin-top:20px;
 `;
 
 type FormFieldType = 'text' | 'img' | 'number' | 'hidden' | 'widgets' | 'widget'
 
+type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'donations'
+
 export interface FormField {
   name: string
   type: FormFieldType
+  class?: FormFieldClass
   label: string
+  itemLabel?: string
+  single?: boolean
   readOnly?: boolean
   required?: boolean
   validator?: any
