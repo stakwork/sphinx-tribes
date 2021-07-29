@@ -4,7 +4,7 @@ import styled from 'styled-components'
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default function FadeLeft(props) {
-    const { drift, isMounted, dismountCallback, style, children } = props
+    const { drift, isMounted, dismountCallback, style, children, alwaysRender, noFadeOnInit } = props
     const [translation, setTranslation] = useState(drift ? drift : -40)
     const [opacity, setOpacity] = useState(0)
     const [shouldRender, setShouldRender] = useState(false)
@@ -28,6 +28,13 @@ export default function FadeLeft(props) {
     }
 
     useEffect(() => {
+        if (noFadeOnInit) {
+            setOpacity(1)
+            setTranslation(0)
+        }
+    }, [])
+
+    useEffect(() => {
         (async () => {
             if (!isMounted) {
                 let speed = 200
@@ -46,7 +53,7 @@ export default function FadeLeft(props) {
         })()
     }, [isMounted])
 
-    if (!shouldRender) return <div style={{ position: 'absolute', left: 0, top: 0 }} />
+    if (!alwaysRender && !shouldRender) return <div style={{ position: 'absolute', left: 0, top: 0 }} />
     return (
         <Fader style={{ ...style, transform: `translateX(${translation}px)`, opacity }}>
             {children}
