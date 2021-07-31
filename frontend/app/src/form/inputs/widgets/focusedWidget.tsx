@@ -4,10 +4,11 @@ import Input from "../../../form/inputs/";
 import { EuiButton } from '@elastic/eui'
 import FadeLeft from '../../../animated/fadeLeft';
 import WidgetList from './widgetList'
+import MaterialIcon from '@material/react-material-icon';
 
 export default function FocusedWidget(props: any) {
     const { name, values, errors, initialValues, setFieldTouched,
-        setFieldValue, item, setShowFocused, setDisableFormButtons } = props
+        setFieldValue, item, setShowFocused, setDisableFormButtons, deleteErrors } = props
     const { single } = item
     const [selectedIndex, setSelectedIndex] = useState(-1)
 
@@ -29,25 +30,54 @@ export default function FocusedWidget(props: any) {
         }
     }, [])
 
-    function cancel() {
+    useEffect(() => {
+        // in order to 
+        if (single) {
+            let firstInput = item.fields[0]
+            let firstInputName = getFieldToUpdate(firstInput)
+            let vl = newState && newState[firstInput.name]
+            if (!vl) {
+                // get initial value by type
+                vl = getInitialValueByType(firstInput.type)
+            }
+            setFieldValue(firstInputName, vl)
+        }
+
+    }, [selectedIndex])
+
+    function cancel(dismount) {
         // new widget cancelled, revert form state
         setFieldValue(`${name}.${item.name}`, prevState);
-        if (single) setShowFocused(false)
+        // clear errors if there are any
+
+        if (single || dismount) setShowFocused(false)
         else setSelectedIndex(-1)
     }
 
     function done() {
         // new widget added, keep form state and reset selected index
         // if errors, prevent!
+        if (thereAreErrors()) {
+            console.log('errors!', newErrors)
+            alert('validation errors!')
+            return
+        }
         if (single) setShowFocused(false)
-        else setSelectedIndex(-1)
-
-
+        else {
+            setSelectedIndex(-1)
+            setPrevState(getFormState())
+        }
     }
 
+    function getFormState() {
+        return (values[name] && values[name][item.name]) || []
+    }
     function startCreate() {
-        let formState = (values[name] && values[name][item.name]) || []
-        setPrevState(formState)
+        let cloneformState = getFormState()
+        setPrevState(cloneformState)
+        let formState = [...cloneformState]
+
+        if (single) setFieldTouched(item.name, true)
 
         const obj = {}
         item.fields.forEach((o) => {
@@ -64,13 +94,15 @@ export default function FocusedWidget(props: any) {
 
     function startEdit(obj, i) {
         console.log('startEdit', obj)
-        let formState = (values[name] && values[name][item.name]) || []
+        let cloneformState = getFormState()
+        setPrevState(cloneformState)
+        let formState = [...cloneformState]
+
+
         let index = i
         if (obj.id) {
             index = formState && formState.findIndex(f => f.id === obj.id)
         }
-
-        setPrevState(formState)
         setSelectedIndex(index)
     }
 
@@ -86,6 +118,24 @@ export default function FocusedWidget(props: any) {
         setFieldValue(`${name}.${item.name}`, formState);
     }
 
+    function getInitialValueByType(type) {
+        let value: any = ''
+        if (type === 'number') value = 0
+        return value
+    }
+
+    function thereAreErrors() {
+        let result = false
+
+        if (newErrors && Array.isArray(newErrors) && newErrors.length) {
+            result = true
+        }
+        else if (newErrors && Object.keys(newErrors).length) {
+            result = true
+        }
+        return result
+    }
+
 
     function getFieldToUpdate(e) {
         let valueToUpdate = `${name}.${item.name}.${e.name}`
@@ -97,18 +147,36 @@ export default function FocusedWidget(props: any) {
 
     const showingList = single ? false : (selectedIndex > -1) ? false : true
 
+    const widgetHeader = <div style={{
+        display: 'flex', marginBottom: 20, justifyContent: 'space-between',
+        width: '100%', alignItems: 'center', cursor: 'pointer',
+        height: 45
+    }}
+    >
+        <div style={{ display: 'flex' }} onClick={() => cancel(true)}>
+            <MaterialIcon icon={'west'} />
+            <Icon source={`static/${item.icon || 'sphinx'}.png`} style={{ marginLeft: 5 }} />
+            <div style={{ marginLeft: 10 }}>{item.label}</div>
+        </div>
+        {
+            showingList ?
+                <EuiButton
+                    onClick={() => startCreate()}
+                    style={{ fontSize: 12, fontWeight: 600 }}
+                >Add New</EuiButton>
+                : <div />
+        }
+    </div >
+
     return <Wrap>
 
-
-
-        {props.icon && <Icon source={props.icon} />}
+        {widgetHeader}
 
         {/* single widgets will only show these fields */}
-        {/* <FadeLeft isMounted={showInputs} dismountCallback={() =>}> */}
         {!showingList && <>
-
             {item.fields.map((e, i) => {
                 return <Input
+                    // {...props}
                     {...e}
                     key={e.name}
                     value={newState && newState[e.name]}
@@ -125,46 +193,36 @@ export default function FocusedWidget(props: any) {
                     handleFocus={() => {
                         let f = getFieldToUpdate(e)
                         setFieldTouched(f, true)
+                        let vl = newState && newState[e.name]
+                        console.log('vl', vl)
+                        if (!vl) {
+                            vl = ''
+                        }
+                        setFieldValue(f, vl)
                     }} />
             })}
             <Nav style={{ marginTop: 20 }}>
                 <EuiButton
-                    onClick={() => cancel()}
+                    onClick={() => cancel(false)}
                     style={{ fontSize: 12, fontWeight: 600 }}
                 >Cancel</EuiButton>
                 <EuiButton
                     onClick={() => done()}
+                    disabled={thereAreErrors()}
                     style={{ fontSize: 12, fontWeight: 600 }}
                 >Save{item.itemLabel && ` ${item.itemLabel}`}</EuiButton>
             </Nav>
         </>}
-        {/* </FadeLeft> */}
 
         {/* only multi widgets will only show the list */}
-        {/* <FadeLeft isMounted={showingList} dismountCallback={() =>}> */}
 
-        {showingList && <>
-            <Nav >
-                <EuiButton
-                    onClick={() => setShowFocused(false)}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                >Back to Widgets
-                </EuiButton>
-
-                <EuiButton
-                    onClick={() => startCreate()}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                >New{item.itemLabel && ` ${item.itemLabel}`}</EuiButton>
-            </Nav>
-
+        {showingList &&
             <WidgetList schema={item}
                 values={values[name] && values[name][item.name]}
                 setSelected={startEdit}
                 deleteItem={deleteItem} />
+        }
 
-        </>}
-
-        {/* </FadeLeft> */}
 
     </Wrap >
 
@@ -193,12 +251,14 @@ export interface IconProps {
     source: string;
 }
 
-const Icon = styled.img<IconProps>`
+const Icon = styled.div<IconProps>`
     background-image: ${p => `url(${p.source})`};
-    width:100px;
-    height:100px;
+    width:30px;
+    height:30px;
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
     background-size: contain; /* Resize the background image to cover the entire container */
+    border-radius:5px;
+    overflow:hidden;
 `;
 

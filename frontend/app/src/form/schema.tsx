@@ -1,6 +1,8 @@
 import * as Yup from 'yup'
 import { FormField } from "../form";
 
+const strValidator = Yup.string().required('Required')
+
 export const meSchema: FormField[] = [
     {
         name: "img",
@@ -20,7 +22,7 @@ export const meSchema: FormField[] = [
         label: "Name",
         type: "text",
         required: true,
-        validator: Yup.string().required('Required'),
+        validator: strValidator,
         page: 1,
     },
     {
@@ -45,6 +47,29 @@ export const meSchema: FormField[] = [
         name: 'extras',
         label: 'Widgets',
         type: 'widgets',
+        validator: Yup.object().shape({
+            twitter: Yup.object({
+                handle: strValidator
+            }).default(undefined),
+            donations: Yup.object({
+                url: strValidator
+            }).default(undefined),
+            wanted: Yup.array().of(
+                Yup.object().shape({
+                    title: strValidator,
+                }).nullable()
+            ),
+            offer: Yup.array().of(
+                Yup.object().shape({
+                    title: strValidator,
+                })
+            ),
+            blog: Yup.array().of(
+                Yup.object().shape({
+                    title: strValidator,
+                })
+            ),
+        }),
         extras: [
             {
                 name: "twitter",
@@ -99,8 +124,8 @@ export const meSchema: FormField[] = [
                         type: "img",
                     },
                     {
-                        name: 'header',
-                        label: "Header",
+                        name: 'title',
+                        label: "Title",
                         type: "text",
                     },
                     {
@@ -123,8 +148,8 @@ export const meSchema: FormField[] = [
                         type: "img",
                     },
                     {
-                        name: 'header',
-                        label: "Header",
+                        name: 'title',
+                        label: "Title",
                         type: "text",
                     },
                     {
@@ -143,7 +168,12 @@ export const meSchema: FormField[] = [
                 fields: [
                     {
                         name: 'title',
-                        label: "URL",
+                        label: "Title",
+                        type: "text",
+                    },
+                    {
+                        name: 'markdown',
+                        label: "Markdown",
                         type: "text",
                     }
                 ],

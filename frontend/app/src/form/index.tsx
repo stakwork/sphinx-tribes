@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import styled from "styled-components";
@@ -13,13 +13,25 @@ export default function Form(props: any) {
   const [page, setPage] = useState(1)
   const [formMounted, setFormMounted] = useState(true)
   const [disableFormButtons, setDisableFormButtons] = useState(false)
+  const refBody: any = useRef(null)
 
   let lastPage = 1
+
+  const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody
+
+  useEffect(() => {
+    scrollToTop()
+  }, [page])
 
   if (props.paged) {
     props.schema.forEach((s) => {
       if (s.page > lastPage) lastPage = s.page
     })
+  }
+  function scrollToTop() {
+    if (scrollDiv && scrollDiv.current) {
+      scrollDiv.current.scrollTop = 0
+    }
   }
 
   const schema = props.paged ? props.schema.filter(f => f.page === page) : props.schema
@@ -37,6 +49,8 @@ export default function Form(props: any) {
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
+        console.log('errors', errors)
+        console.log('isValid', isValid)
         return (
           <FadeLeft
             alwaysRender
@@ -44,22 +58,34 @@ export default function Form(props: any) {
             isMounted={formMounted}
             dismountCallback={() => setFormMounted(true)}
           >
-            <Wrap>
+            <Wrap ref={refBody}>
               {schema && schema.map((item: FormField) => <Input
                 {...item}
                 key={item.name}
                 values={values}
                 errors={errors}
+                scrollToTop={scrollToTop}
                 value={values[item.name]}
                 error={errors[item.name]}
                 initialValues={initialValues}
+                deleteErrors={() => {
+                  if (errors[item.name]) delete errors[item.name]
+                }}
                 handleChange={(e: any) => {
                   setFieldValue(item.name, e);
                 }}
-                setFieldValue={setFieldValue}
+                setFieldValue={(e, f) => {
+                  setFieldValue(e, f)
+                }}
                 setFieldTouched={setFieldTouched}
                 handleBlur={() => setFieldTouched(item.name, false)}
-                handleFocus={() => setFieldTouched(item.name, true)}
+                handleFocus={() => {
+                  // set value to what it is on focus to get proper errors on init
+                  console.log('what is this value?')
+                  console.log(values[item.name])
+                  console.log('yep')
+                  setFieldTouched(item.name, true)
+                }}
                 setDisableFormButtons={setDisableFormButtons}
                 extraHTML={props.extraHTML && props.extraHTML[item.name]}
               />)}
