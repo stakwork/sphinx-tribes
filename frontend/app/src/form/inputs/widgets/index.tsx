@@ -3,11 +3,26 @@ import Widget from './widget'
 import FocusedWidget from './focusedWidget'
 import FadeLeft from '../../../animated/fadeLeft'
 import styled from "styled-components";
+import { useEffect } from 'react';
+
+async function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 export default function Widgets(props: any) {
     const [selected, setSelected] = useState(null)
     const [showFocused, setShowFocused] = useState(false)
 
+    useEffect(() => {
+        doDelayedScrollTop()
+
+    }, [selected, showFocused])
+
+    async function doDelayedScrollTop() {
+        // we do this so there is no jumping with the animation
+        await sleep(140)
+        if (props.scrollToTop) props.scrollToTop()
+    }
     return <Wrap>
         <FadeLeft
             isMounted={!selected}

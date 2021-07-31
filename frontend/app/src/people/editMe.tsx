@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useStores } from "../store";
 import { useObserver } from "mobx-react-lite";
 import {
@@ -24,6 +24,7 @@ export default function EditMe(props: any) {
   const { ui, main } = useStores();
 
   const [loading, setLoading] = useState(false);
+  const scrollDiv: any = useRef(null)
 
   function closeModal() {
     ui.setEditMe(false);
@@ -58,32 +59,40 @@ export default function EditMe(props: any) {
     const info = ui.meInfo as any;
     const body = v
     body.extras = {
-      ...v.twitter && { twitter: v.twitter }
+      ...v.extras
     }
-    if (!info) return console.log("no meInfo");
-    setLoading(true);
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
-    const r = await fetch(URL + "/profile", {
-      method: "POST",
-      body: JSON.stringify({
-        host,
-        ...body,
-        price_to_meet: parseInt(v.price_to_meet),
-      }),
-      headers: {
-        "x-jwt": info.jwt,
-        "Content-Type": "application/json"
-      },
-    });
-    if (!r.ok) {
-      setLoading(false);
-      return alert("Failed to create profile");
+
+    try {
+      if (!info) return console.log("no meInfo");
+      setLoading(true);
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
+      const r = await fetch(URL + "/profile", {
+        method: "POST",
+        body: JSON.stringify({
+          host,
+          ...body,
+          price_to_meet: parseInt(v.price_to_meet),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json"
+        },
+      });
+      if (!r.ok) {
+        setLoading(false);
+        return alert("Failed to create profile");
+      }
+      await main.getPeople();
+      ui.setEditMe(false);
+      ui.setMeInfo(null);
+    } catch (e) {
+      console.log('oops', e)
     }
-    await main.getPeople();
-    ui.setEditMe(false);
-    ui.setMeInfo(null);
     setLoading(false);
+
   }
+
+
   return useObserver(() => {
     if (!ui.editMe) return <></>;
 
@@ -119,7 +128,7 @@ export default function EditMe(props: any) {
             <EuiModalHeaderTitle>{`${verb} My Profile`}</EuiModalHeaderTitle>
           </EuiModalHeader>
           <EuiModalBody style={{ padding: 0 }}>
-            <B>
+            <B ref={scrollDiv}>
 
               {!ui.meInfo && <ConfirmMe />}
               {ui.meInfo && (
@@ -127,6 +136,7 @@ export default function EditMe(props: any) {
                   paged={true}
                   loading={loading}
                   onSubmit={submitForm}
+                  scrollDiv={scrollDiv}
                   schema={meSchema}
                   initialValues={initialValues}
                   extraHTML={

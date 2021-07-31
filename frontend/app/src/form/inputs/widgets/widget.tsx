@@ -21,7 +21,7 @@ export default function Widget(props: any) {
     }
 
     function deleteSingleWidget() {
-        setFieldValue(`${parentName}.${name}`, null);
+        setFieldValue(`${parentName}.${name}`, undefined);
     }
 
 
@@ -98,6 +98,7 @@ const Icon = styled.div<IconProps>`
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
     background-size: contain; /* Resize the background image to cover the entire container */
-    border:none;
+    border-radius:5px;
+    overflow:hidden;
 `;
 
