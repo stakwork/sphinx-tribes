@@ -49,8 +49,6 @@ export default function Form(props: any) {
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
-        console.log('errors', errors)
-        console.log('isValid', isValid)
         return (
           <FadeLeft
             alwaysRender
@@ -79,13 +77,7 @@ export default function Form(props: any) {
                 }}
                 setFieldTouched={setFieldTouched}
                 handleBlur={() => setFieldTouched(item.name, false)}
-                handleFocus={() => {
-                  // set value to what it is on focus to get proper errors on init
-                  console.log('what is this value?')
-                  console.log(values[item.name])
-                  console.log('yep')
-                  setFieldTouched(item.name, true)
-                }}
+                handleFocus={() => setFieldTouched(item.name, true)}
                 setDisableFormButtons={setDisableFormButtons}
                 extraHTML={props.extraHTML && props.extraHTML[item.name]}
               />)}
@@ -155,9 +147,9 @@ const BWrap = styled.div`
   margin-top:20px;
 `;
 
-type FormFieldType = 'text' | 'img' | 'number' | 'hidden' | 'widgets' | 'widget'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch'
 
-type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'donations'
+type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 
 export interface FormField {
   name: string

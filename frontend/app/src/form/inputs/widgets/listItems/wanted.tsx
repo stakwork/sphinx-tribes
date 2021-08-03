@@ -7,16 +7,22 @@ export default function Wanted(props: I.Wanted) {
 
     return <Wrap>
         <div>{props.title}</div>
-        <div>{props.description}</div>
-        <div>{props.priceMin}</div>
-        <div>{props.priceMax}</div>
-        <div>{props.url}</div>
+        <Row>
+            <div>{props.priceMin}</div>
+            <div> ~ </div>
+            <div>{props.priceMax}</div>
+        </Row>
     </Wrap>
 
 }
 
 const Wrap = styled.div`
 color: #fff;
-display: flex;
+`;
+
+const Row = styled.div`
+color: #f1f1f1;
+display:flex;
+font-size:12px;
 `;
 

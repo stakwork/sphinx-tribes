@@ -5,11 +5,13 @@ import { useStores } from '../store'
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiButton
 } from '@elastic/eui';
 import Person from './person'
 import EditMe from './editMe'
 import { useFuse, useScroll } from '../hooks'
+import MaterialIcon from '@material/react-material-icon';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
@@ -61,13 +63,13 @@ export default function BodyComponent() {
           </div>
         </EuiFormFieldset>}
         <AddWrap>
-          {!loading && <EuiButtonIcon
-            onClick={() => ui.setEditMe(true)}
-            iconType="plusInCircleFilled"
-            iconSize="l"
-            size="m"
-            aria-label="edit-me"
-          />}
+          {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
+            <div style={{ display: 'flex' }}>
+              <MaterialIcon
+                style={{ fontSize: 70 }}
+                icon="account_circle" aria-label="edit-me" />
+            </div>
+          </EuiButton>}
         </AddWrap>
       </Column>
 

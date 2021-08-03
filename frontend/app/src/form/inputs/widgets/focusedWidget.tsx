@@ -42,7 +42,6 @@ export default function FocusedWidget(props: any) {
             }
             setFieldValue(firstInputName, vl)
         }
-
     }, [selectedIndex])
 
     function cancel(dismount) {
@@ -121,6 +120,7 @@ export default function FocusedWidget(props: any) {
     function getInitialValueByType(type) {
         let value: any = ''
         if (type === 'number') value = 0
+        if (type === 'gallery') value = []
         return value
     }
 
@@ -194,9 +194,9 @@ export default function FocusedWidget(props: any) {
                         let f = getFieldToUpdate(e)
                         setFieldTouched(f, true)
                         let vl = newState && newState[e.name]
-                        console.log('vl', vl)
                         if (!vl) {
-                            vl = ''
+                            // give it its initial
+                            vl = getInitialValueByType(e.type)
                         }
                         setFieldValue(f, vl)
                     }} />
@@ -217,7 +217,8 @@ export default function FocusedWidget(props: any) {
         {/* only multi widgets will only show the list */}
 
         {showingList &&
-            <WidgetList schema={item}
+            <WidgetList
+                schema={item}
                 values={values[name] && values[name][item.name]}
                 setSelected={startEdit}
                 deleteItem={deleteItem} />

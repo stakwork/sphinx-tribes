@@ -7,7 +7,6 @@ export default function Blog(props: BlogPost) {
 
     return <Wrap>
         <div>{props.title}</div>
-        <div>{props.markdown}</div>
         <div>{props.createdAt}</div>
     </Wrap>
 
