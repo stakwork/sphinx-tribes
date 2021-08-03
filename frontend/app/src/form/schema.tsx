@@ -28,7 +28,7 @@ export const meSchema: FormField[] = [
     {
         name: "description",
         label: "Description",
-        type: "text",
+        type: "textarea",
         page: 1,
     },
     {
@@ -49,9 +49,9 @@ export const meSchema: FormField[] = [
         type: 'widgets',
         validator: Yup.object().shape({
             twitter: Yup.object({
-                handle: strValidator
+                handle: strValidator,
             }).default(undefined),
-            donations: Yup.object({
+            supportme: Yup.object({
                 url: strValidator
             }).default(undefined),
             wanted: Yup.array().of(
@@ -84,45 +84,49 @@ export const meSchema: FormField[] = [
                         label: "Twitter Handle",
                         type: "text",
                         prepend: '@',
-                    }
+                    },
+                    {
+                        name: 'show',
+                        label: "Show In Link",
+                        type: "switch",
+                    },
                 ]
             },
             {
-                name: "donations",
-                label: "Donations",
+                name: "supportme",
+                label: "Support Me",
                 type: "widget",
-                class: "donations",
+                class: "supportme",
                 single: true,
                 fields: [
                     {
-                        name: 'img',
-                        label: "Image",
-                        type: "img",
+                        name: 'gallery',
+                        label: "Gallery",
+                        type: "gallery",
                     },
                     {
                         name: 'bio',
                         label: "Bio",
-                        type: "text",
+                        type: "textarea",
                     },
                     {
                         name: 'url',
                         label: "URL",
                         type: "text",
-                    }
+                    },
+                    {
+                        name: 'show',
+                        label: "Show In Link",
+                        type: "switch",
+                    },
                 ]
             },
             {
                 name: "offer",
                 label: "Offer",
-                itemLabel: "Offer",
                 type: "widget",
                 class: "offer",
                 fields: [
-                    {
-                        name: 'img',
-                        label: "image",
-                        type: "img",
-                    },
                     {
                         name: 'title',
                         label: "Title",
@@ -132,37 +136,55 @@ export const meSchema: FormField[] = [
                         name: 'price',
                         label: "Price",
                         type: "number",
-                    }
+                    },
+                    {
+                        name: 'gallery',
+                        label: "Gallery",
+                        type: "gallery",
+                    },
+                    {
+                        name: 'show',
+                        label: "Show In Link",
+                        type: "switch",
+                    },
                 ]
             },
             {
                 name: "wanted",
                 label: "Wanted",
-                itemLabel: "Listing",
                 type: "widget",
                 class: "wanted",
                 fields: [
-                    {
-                        name: 'img',
-                        label: "image",
-                        type: "img",
-                    },
                     {
                         name: 'title',
                         label: "Title",
                         type: "text",
                     },
                     {
-                        name: 'price',
-                        label: "Price",
+                        name: 'priceMin',
+                        label: "Price Min",
                         type: "number",
-                    }
+                    },
+                    {
+                        name: 'priceMax',
+                        label: "Price Max",
+                        type: "number",
+                    },
+                    {
+                        name: 'description',
+                        label: "Description",
+                        type: "textarea",
+                    },
+                    {
+                        name: 'show',
+                        label: "Show In Link",
+                        type: "switch",
+                    },
                 ]
             },
             {
                 name: "blog",
                 label: "Blog",
-                itemLabel: "Post",
                 type: "widget",
                 class: "blog",
                 fields: [
@@ -174,8 +196,18 @@ export const meSchema: FormField[] = [
                     {
                         name: 'markdown',
                         label: "Markdown",
-                        type: "text",
-                    }
+                        type: "textarea",
+                    },
+                    {
+                        name: 'gallery',
+                        label: "Gallery",
+                        type: "gallery",
+                    },
+                    {
+                        name: 'show',
+                        label: "Show In Link",
+                        type: "switch",
+                    },
                 ],
             },
         ],

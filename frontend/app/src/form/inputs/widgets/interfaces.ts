@@ -20,16 +20,7 @@ export interface Offer {
     title: string,
     price: number,
     description: string,
-    img?: string,
-    url?: string,
-    createdAt: number
-}
-
-export interface Wanted {
-    title: string,
-    priceMin: number,
-    priceMax: number,
-    description: string,
+    gallery?: [string],
     url?: string,
     createdAt: number
 }
@@ -48,7 +39,7 @@ export interface Donation {
     description: string,
     createdAt: number,
     url?: string,
-    img?: string
+    gallery?: [string],
 }
 
 export interface Extras {
