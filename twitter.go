@@ -19,6 +19,7 @@ func ConfirmIdentityTweet(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// fmt.Println("tok", token)
 	pubkey, err := VerifyArbitrary(token, "Sphinx Verification")
 	return pubkey, err
 }
@@ -107,6 +108,8 @@ func LookupUserTweet(userID string) (string, error) {
 		"Sphinx Verification: ",
 		"Sphinx verification: ",
 		"sphinx verification: ",
+		"Sphinx verify: ",
+		"Sphinx Verify: ",
 	}
 
 	for _, tweet := range res.Data {
