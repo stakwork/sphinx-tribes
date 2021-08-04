@@ -14,11 +14,7 @@ import type { MeInfo } from '../store/ui'
 import { meSchema } from '../form/schema'
 import api from '../api'
 import styled, { css } from "styled-components";
-
-
-const host = window.location.host.includes("localhost")
-  ? "localhost:5002"
-  : window.location.host;
+import { getHostIncludingDockerHosts } from "../host";
 
 export default function EditMe(props: any) {
   const { ui, main } = useStores();
@@ -33,13 +29,13 @@ export default function EditMe(props: any) {
 
   async function testChallenge(chal: string) {
     try {
-      const me: MeInfo = await api.get(`poll/${chal}`)
+      const me: MeInfo = await api.get(`poll/${chal}`);
       if (me && me.pubkey) {
-        ui.setMeInfo(me)
-        ui.setEditMe(true)
+        ui.setMeInfo(me);
+        ui.setEditMe(true);
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   }
 
@@ -47,46 +43,39 @@ export default function EditMe(props: any) {
     try {
       var urlObject = new URL(window.location.href);
       var params = urlObject.searchParams;
-      const chal = params.get('challenge')
+      const chal = params.get("challenge");
       if (chal) {
-        testChallenge(chal)
+        testChallenge(chal);
       }
     } catch (e) { }
-  }, [])
+  }, []);
 
   async function submitForm(v) {
     console.log(v);
     const info = ui.meInfo as any;
-    const body = v
+    const body = v;
     body.extras = {
-      ...v.extras
-    }
-
-    try {
-      if (!info) return console.log("no meInfo");
-      setLoading(true);
-      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
-      const r = await fetch(URL + "/profile", {
-        method: "POST",
-        body: JSON.stringify({
-          host,
-          ...body,
-          price_to_meet: parseInt(v.price_to_meet),
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json"
-        },
-      });
-      if (!r.ok) {
-        setLoading(false);
-        return alert("Failed to create profile");
-      }
-      await main.getPeople();
-      ui.setEditMe(false);
-      ui.setMeInfo(null);
-    } catch (e) {
-      console.log('oops', e)
+      ...v.extras,
+    };
+    if (!info) return console.log("no meInfo");
+    setLoading(true);
+    const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+    const r = await fetch(URL + "/profile", {
+      method: "POST",
+      body: JSON.stringify({
+        // use docker host (tribes.sphinx), because relay will post to it
+        host: getHostIncludingDockerHosts(),
+        ...body,
+        price_to_meet: parseInt(v.price_to_meet),
+      }),
+      headers: {
+        "x-jwt": info.jwt,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!r.ok) {
+      setLoading(false);
+      return alert("Failed to create profile");
     }
     setLoading(false);
 
@@ -140,7 +129,11 @@ export default function EditMe(props: any) {
                   schema={meSchema}
                   initialValues={initialValues}
                   extraHTML={
-                    ui.meInfo.verification_signature ? { twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>` } : {}
+                    ui.meInfo.verification_signature
+                      ? {
+                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                      }
+                      : {}
                   }
                 />
               )}

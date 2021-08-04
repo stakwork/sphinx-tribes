@@ -350,3 +350,11 @@ textarea.qr-string {
   padding:24px 0 !important;
   
 }
+
+.euiFormRow {
+margin-bottom:10px;
+}
+
+.euiFormRow__labelWrapper{
+  margin-bottom:0px;
+}
