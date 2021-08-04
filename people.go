@@ -240,6 +240,7 @@ func processTwitterConfirmationsLoop() {
 		username, _ := p.Extras["twitter"].(string)
 		if username != "" {
 			pubkey, err := ConfirmIdentityTweet(username)
+			// fmt.Println("TWitter err", err)
 			if err == nil && pubkey != "" {
 				if p.OwnerPubKey == pubkey {
 					DB.updateTwitterConfirmed(p.ID, true)
