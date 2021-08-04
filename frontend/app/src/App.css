@@ -345,3 +345,16 @@ textarea.qr-string {
     margin-bottom: 10px;
   }
 }
+
+.euiModal__flex .euiModalBody .euiModalBody__overflow{
+  padding:24px 0 !important;
+  
+}
+
+.euiFormRow {
+margin-bottom:10px;
+}
+
+.euiFormRow__labelWrapper{
+  margin-bottom:0px;
+}

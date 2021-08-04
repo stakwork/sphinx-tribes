@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useStores } from "../store";
 import { useObserver } from "mobx-react-lite";
 import {
@@ -8,57 +8,19 @@ import {
   EuiModalHeaderTitle,
   EuiOverlayMask,
 } from "@elastic/eui";
-import Form, { FormField } from "../form";
+import Form from "../form";
 import ConfirmMe from "./confirmMe";
-import type { MeInfo } from "../store/ui";
-import api from "../api";
+import type { MeInfo } from '../store/ui'
+import { meSchema } from '../form/schema'
+import api from '../api'
+import styled, { css } from "styled-components";
 import { getHostIncludingDockerHosts } from "../host";
-
-const meSchema: FormField[] = [
-  {
-    name: "img",
-    label: "Image",
-    type: "img",
-  },
-  {
-    name: "pubkey",
-    label: "Pubkey",
-    type: "text",
-    readOnly: true,
-  },
-  {
-    name: "owner_alias",
-    label: "Name",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "description",
-    label: "Description",
-    type: "text",
-  },
-  {
-    name: "price_to_meet",
-    label: "Price to Meet",
-    type: "number",
-  },
-  {
-    name: "id",
-    label: "ID",
-    type: "hidden",
-  },
-  {
-    name: "twitter",
-    label: "Twitter Username",
-    type: "text",
-    prepend: "@",
-  },
-];
 
 export default function EditMe(props: any) {
   const { ui, main } = useStores();
 
   const [loading, setLoading] = useState(false);
+  const scrollDiv: any = useRef(null)
 
   function closeModal() {
     ui.setEditMe(false);
@@ -85,7 +47,7 @@ export default function EditMe(props: any) {
       if (chal) {
         testChallenge(chal);
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   async function submitForm(v) {
@@ -93,7 +55,7 @@ export default function EditMe(props: any) {
     const info = ui.meInfo as any;
     const body = v;
     body.extras = {
-      ...(v.twitter && { twitter: v.twitter }),
+      ...v.extras,
     };
     if (!info) return console.log("no meInfo");
     setLoading(true);
@@ -115,11 +77,11 @@ export default function EditMe(props: any) {
       setLoading(false);
       return alert("Failed to create profile");
     }
-    await main.getPeople();
-    ui.setEditMe(false);
-    ui.setMeInfo(null);
     setLoading(false);
+
   }
+
+
   return useObserver(() => {
     if (!ui.editMe) return <></>;
 
@@ -135,38 +97,88 @@ export default function EditMe(props: any) {
         img: ui.meInfo.photo_url || "",
         price_to_meet: ui.meInfo.price_to_meet || 0,
         description: ui.meInfo.description || "",
-        twitter: (ui.meInfo.extras && ui.meInfo.extras.twitter) || "",
+        extras: ui.meInfo.extras || {}
       };
     }
 
     return (
       <EuiOverlayMask>
-        <EuiModal onClose={closeModal} initialFocus="[name=popswitch]">
+        <EuiModal onClose={closeModal}
+          style={{
+            minWidth: 300,
+            minHeight: 460,
+            maxWidth: 460,
+            maxHeight: 500,
+            height: '50vh',
+            width: '50vw',
+          }}
+          initialFocus="[name=popswitch]">
           <EuiModalHeader>
             <EuiModalHeaderTitle>{`${verb} My Profile`}</EuiModalHeaderTitle>
           </EuiModalHeader>
-          <EuiModalBody>
-            <div>
+          <EuiModalBody style={{ padding: 0 }}>
+            <B ref={scrollDiv}>
+
               {!ui.meInfo && <ConfirmMe />}
               {ui.meInfo && (
                 <Form
+                  paged={true}
                   loading={loading}
                   onSubmit={submitForm}
+                  scrollDiv={scrollDiv}
                   schema={meSchema}
                   initialValues={initialValues}
                   extraHTML={
                     ui.meInfo.verification_signature
                       ? {
-                          twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
-                        }
+                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                      }
                       : {}
                   }
                 />
               )}
-            </div>
+            </B>
           </EuiModalBody>
         </EuiModal>
-      </EuiOverlayMask>
+      </EuiOverlayMask >
     );
   });
 }
+
+
+const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }) => css`
+  scrollbar-color: ${thumbColor} ${trackBackgroundColor}; // Firefox support
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 100%;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${thumbColor};
+    background-clip: content-box;
+    border-radius: 5px;
+      border: 1px solid ${trackBackgroundColor};
+  }
+
+  &::-webkit-scrollbar-corner,
+  &::-webkit-scrollbar-track {
+    background-color: ${trackBackgroundColor};
+  }
+}
+
+`
+
+const B = styled.div`
+  height:calc(100% - 4px);
+  width: calc(100% - 4px);
+  overflow-y:auto;
+  padding:0 20px;
+  box-sizing:border-box;
+  ${EnvWithScrollBar({
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)',
+})}
+`
+
