@@ -1,19 +1,18 @@
-import React from "react";
-import "./App.css";
-import Header from "./tribes/header";
-import Body from "./tribes/body";
-import PeopleHeader from "./people/header";
-import PeopleBody from "./people/body";
+import React from 'react'
+import './App.css'
+import '@material/react-material-icon/dist/material-icon.css';
+import Header from './tribes/header'
+import Body from './tribes/body'
+import PeopleHeader from './people/header'
+import PeopleBody from './people/body'
 
 function App() {
-  const mode = getMode();
+  const mode = getMode()
   if (mode === Mode.PEOPLE) {
-    return (
-      <div className="app">
-        <PeopleHeader />
-        <PeopleBody />
-      </div>
-    );
+    return <div className="app">
+      <PeopleHeader />
+      <PeopleBody />
+    </div>
   }
   return (
     <div className="app">

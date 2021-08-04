@@ -1,14 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
-import {EuiFormRow, EuiFieldText} from '@elastic/eui'
-import type {Props} from './propsType'
+import { EuiFormRow, EuiFieldText } from '@elastic/eui'
+import type { Props } from './propsType'
 
-export default function TextInput({label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML}:Props) {
-  console.log("TEXT", label, extraHTML)
+export default function TextInput({ label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+  console.log("TEXT", label, value)
   return <>
     <EuiFormRow label={label}>
-      <Text name="first" value={value||''} 
-        readOnly={readOnly||false}
+      <Text name="first" value={value || ''}
+        readOnly={readOnly || false}
         onChange={e => handleChange(e.target.value)}
         onBlur={handleBlur}
         onFocus={handleFocus}
@@ -16,8 +16,8 @@ export default function TextInput({label, value, handleChange, handleBlur, handl
       />
     </EuiFormRow>
     <ExtraText
-      style={{display:value&&extraHTML?'block':'none'}}
-      dangerouslySetInnerHTML={{__html:extraHTML||''}}
+      style={{ display: value && extraHTML ? 'block' : 'none' }}
+      dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
     />
   </>
 }
