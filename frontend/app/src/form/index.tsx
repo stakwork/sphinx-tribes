@@ -39,6 +39,8 @@ export default function Form(props: any) {
   let buttonText = props.buttonText || "Save Changes"
   if (lastPage !== page) buttonText = 'Next'
 
+  console.log('props.initialValues', props.initialValues)
+
   return (
     <Formik
       initialValues={props.initialValues || {}}
