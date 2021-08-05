@@ -10,21 +10,26 @@ function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-export default function Person({
-  id,
-  img,
-  tags,
-  description,
-  selected,
-  select,
-  created,
-  owner_alias,
-  owner_pubkey,
-  unique_name,
-  price_to_meet,
-  extras,
-  twitter_confirmed,
-}: any) {
+export default function Person(props: any) {
+
+  const {
+    id,
+    img,
+    tags,
+    description,
+    selected,
+    select,
+    created,
+    owner_alias,
+    owner_pubkey,
+    unique_name,
+    price_to_meet,
+    extras,
+    twitter_confirmed,
+  } = props
+
+  console.log('props', props)
+
   const [showQR, setShowQR] = useState(false);
   const qrString = makeQR(owner_pubkey);
 
@@ -43,6 +48,8 @@ export default function Person({
     e.stopPropagation();
     setShowQR((current) => !current);
   }
+
+  // return <div style={{ color: '#fff' }}>{owner_alias}</div>
   return (
     <EuiCheckableCard
       className="col-md-6 col-lg-6 ml-2 mb-2"
@@ -51,32 +58,22 @@ export default function Person({
       name={owner_alias}
       value={id + ""}
       checked={selected}
+      style={{ border: '1px solid #fff' }}
       onChange={() => select(id, unique_name)}
     >
       <Content
-        onClick={() => select(selected ? "" : id, unique_name)}
-        style={{
-          height: selected ? "auto" : 100,
-        }}
-        selected={selected}
+        onClick={() => select(id, unique_name)}
+        style={{ border: '1px solid #45b9f6', borderRadius: 5 }}
       >
         <Left>
-          <Row className="item-cont">
-            {img ? (
-              <Img src={img} />
-            ) : (
-              <div className="placeholder-img-tribe"></div>
-            )}
+          <Row className="item-cont" style={{ padding: 10 }}>
+
+            <Img src={img || '/static/sphinx.png'} />
+
             <Left
               style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
             >
-              <Row
-                style={
-                  selected
-                    ? { flexDirection: "column", alignItems: "flex-start" }
-                    : {}
-                }
-              >
+              <Row>
                 <Title className="tribe-title">{owner_alias}</Title>
               </Row>
               <Description
@@ -127,7 +124,7 @@ export default function Person({
               </Row>
             </RowWrap>
           )}
-          <RowWrap>
+          {/* <RowWrap>
             <Row style={{ marginBottom: 20, justifyContent: "space-evenly" }}>
               <a href={qrString}>
                 <EuiButton
@@ -159,7 +156,7 @@ export default function Person({
                 QR CODE
               </EuiButton>
             </Row>
-          </RowWrap>
+          </RowWrap> */}
           {showQR && (
             <QRWrapWrap>
               <QRWrap className="qr-wrap float-r">
@@ -196,32 +193,25 @@ export default function Person({
 interface ContentProps {
   selected: boolean;
 }
-const Content = styled.div<ContentProps>`
+const Content = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  max-width: 100%;
+  // max-width: 100%;
   & h3 {
     color: #fff;
   }
   &:hover h3 {
     color: white;
   }
-  ${(p) =>
-    p.selected
-      ? `
-    & h5{
-      color:#cacaca;
-    }
-  `
-      : `
+  
     & h5{
       color:#aaa;
     }
     &:hover h5{
       color:#bebebe;
     }
-  `}
+  }
   & button img {
   }
 `;
@@ -246,6 +236,7 @@ const Row = styled.div`
 `;
 const RowWrap = styled.div``;
 const Title = styled.h3`
+  color:#fff;
   margin-right: 12px;
   font-size: 22px;
   white-space: nowrap;
@@ -262,7 +253,7 @@ const Description = styled.div<DescriptionProps>`
   line-height: 20px;
   font-size: 15px;
   font-weight: 500;
-  color: #6b7a8d;
+  color: #fff;//#6b7a8d;
   ${(p) =>
     p.oneLine &&
     `
@@ -278,8 +269,8 @@ const Img = styled.div<ImageProps>`
   background-image: url("${(p) => p.src}");
   background-position: center;
   background-size: cover;
-  height: 90px;
-  width: 90px;
+  height: 70px;
+  width: 70px;
   border-radius: 50%;
   position: relative;
 `;

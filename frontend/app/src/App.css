@@ -15,6 +15,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color:#fff;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -169,7 +170,7 @@ fieldset.container {
   white-space: normal;
 }
 .placeholder-img-tribe {
-  position: absolute;
+  /* position: absolute; */
   left: 22px;
   top: 22px;
   width: 90px;
@@ -333,7 +334,8 @@ textarea.qr-string {
   }
   #main .euiCheckableCard {
     max-width: 378px;
-    height: 100px;
+    /* height: 100px; */
+    
   }
   #main .euiCheckableCard-isChecked  {
     height: auto;

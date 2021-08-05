@@ -9,6 +9,7 @@ import {
   EuiButton
 } from '@elastic/eui';
 import Person from './person'
+import PersonView from './personView'
 import EditMe from './editMe'
 import { useFuse, useScroll } from '../hooks'
 import MaterialIcon from '@material/react-material-icon';
@@ -18,6 +19,7 @@ const getFuse = useFuse
 const getScroll = useScroll
 
 export default function BodyComponent() {
+
   const { main, ui } = useStores()
   const [loading, setLoading] = useState(false)
   const [selectedPerson, setSelectedPerson] = useState(0)
@@ -35,13 +37,14 @@ export default function BodyComponent() {
     if (window.location.pathname.startsWith('/p/')) {
       un = window.location.pathname.substr(3)
     }
-    const ps = await main.getPeople('')
+    const ps = await main.getPeople(un)
     if (un) {
       const initial = ps[0]
-      if (initial.unique_name === un) setSelectedPerson(initial.id)
+      if (initial && initial.unique_name === un) setSelectedPerson(initial.id)
     }
     setLoading(false)
   }
+
   useEffect(() => {
     loadPeople()
   }, [])
@@ -50,6 +53,19 @@ export default function BodyComponent() {
     const peeps = getFuse(main.people, ["owner_alias"])
     const { handleScroll, n, loadingMore } = getScroll()
     const people = peeps.slice(0, n)
+
+    if (selectedPerson) {
+      return <Body id="main">
+        <Column className="main-wrap">
+          <PersonView goBack={() => {
+            setSelectedPerson(0)
+            window.history.pushState({}, 'Sphinx Tribes', '/');
+          }}
+            personId={selectedPerson}
+            loading={loading} />
+        </Column>
+      </Body>
+    }
 
     return <Body id="main">
       <Column className="main-wrap">

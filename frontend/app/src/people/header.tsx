@@ -16,7 +16,13 @@ export default function Header() {
       <div className="container">
         <div className="row">
           <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            <img id="logo" src="/static/people_logo.svg" alt="Logo"/>
+            <img id="logo" src="/static/people_logo.svg" alt="Logo"
+            // style={{ cursor: 'pointer' }}
+            // onClick={() => {
+            //   window.history.pushState({}, 'Sphinx Tribes', '/');
+            //   console.log('click!')
+            // }}
+            />
             {/*<Title>Tribes</Title>*/}
           </EuiHeaderSection>
 
@@ -26,7 +32,7 @@ export default function Header() {
               <EuiFieldSearch id="search-input"
                 placeholder="Search People"
                 value={ui.searchText}
-                onChange={e=> ui.setSearchText(e.target.value)}
+                onChange={e => ui.setSearchText(e.target.value)}
                 // isClearable={this.state.isClearable}
                 aria-label="search"
               />

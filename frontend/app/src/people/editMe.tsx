@@ -10,7 +10,8 @@ import {
 } from "@elastic/eui";
 import Form from "../form";
 import ConfirmMe from "./confirmMe";
-import type { MeInfo } from '../store/ui'
+import type { MeInfo, MeData } from '../store/ui'
+import { emptyMeInfo } from '../store/ui'
 import { meSchema } from '../form/schema'
 import api from '../api'
 import styled, { css } from "styled-components";
@@ -50,32 +51,34 @@ export default function EditMe(props: any) {
     } catch (e) { }
   }, []);
 
-  async function submitForm(v) {
-    console.log(v);
+  async function submitForm(body) {
+    console.log('SUBMIT FORM', body);
     const info = ui.meInfo as any;
-    const body = v;
-    body.extras = {
-      ...v.extras,
-    };
     if (!info) return console.log("no meInfo");
     setLoading(true);
-    const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
-    const r = await fetch(URL + "/profile", {
-      method: "POST",
-      body: JSON.stringify({
-        // use docker host (tribes.sphinx), because relay will post to it
-        host: getHostIncludingDockerHosts(),
-        ...body,
-        price_to_meet: parseInt(v.price_to_meet),
-      }),
-      headers: {
-        "x-jwt": info.jwt,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!r.ok) {
-      setLoading(false);
-      return alert("Failed to create profile");
+    try {
+      const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+      const r = await fetch(URL + "/profile", {
+        method: "POST",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...body,
+          price_to_meet: parseInt(body.price_to_meet),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!r.ok) {
+        setLoading(false);
+        return alert("Failed to create profile");
+      }
+
+      closeModal()
+    } catch (e) {
+      console.log('e', e)
     }
     setLoading(false);
 
@@ -88,17 +91,17 @@ export default function EditMe(props: any) {
     let verb = "Create";
     if (ui.meInfo && ui.meInfo.id) verb = "Edit";
 
-    let initialValues = {};
+    let initialValues: MeData = emptyMeInfo;
+
     if (ui.meInfo) {
-      initialValues = {
-        id: ui.meInfo.id || 0,
-        pubkey: ui.meInfo.pubkey,
-        owner_alias: ui.meInfo.alias || "",
-        img: ui.meInfo.photo_url || "",
-        price_to_meet: ui.meInfo.price_to_meet || 0,
-        description: ui.meInfo.description || "",
-        extras: ui.meInfo.extras || {}
-      };
+      initialValues.id = ui.meInfo.id || 0
+      initialValues.pubkey = ui.meInfo.pubkey
+      initialValues.owner_alias = ui.meInfo.alias || ""
+      initialValues.photo_url = ui.meInfo.photo_url || ""
+      initialValues.price_to_meet = ui.meInfo.price_to_meet || 0
+      initialValues.description = ui.meInfo.description || ""
+      initialValues.extras = ui.meInfo.extras || {}
+
     }
 
     return (
