@@ -72,7 +72,6 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
         <EuiFormRow label={label}>
             <Wrapper>
                 {picsrcArray && picsrcArray.map((v, i) => {
-                    console.log('image', v)
                     return <ImageWrap key={i}>
                         <Close onClick={() => deleteImg(i)}>
                             <MaterialIcon icon={'close'} style={{ color: '#000', fontSize: 12 }} />

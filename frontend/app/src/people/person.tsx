@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { getHost } from "../host";
 import qrCode from "../utils/invoice-qr-code.svg";
 import { EuiCheckableCard, EuiButton } from "@elastic/eui";
-
+import { formatPrice } from '../helpers';
 const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
@@ -27,8 +27,6 @@ export default function Person(props: any) {
     extras,
     twitter_confirmed,
   } = props
-
-  console.log('props', props)
 
   const [showQR, setShowQR] = useState(false);
   const qrString = makeQR(owner_pubkey);
@@ -79,7 +77,7 @@ export default function Person(props: any) {
               <Description
                 style={{ minHeight: 20 }}
               >
-                {`${price_to_meet} SATS`}
+                {formatPrice(price_to_meet)}
               </Description>
               {/* <TagsWrap>
               {tags.map((t:string)=> <Tag key={t}>{t}</Tag>)}

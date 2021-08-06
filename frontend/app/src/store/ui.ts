@@ -42,9 +42,7 @@ class UiStore {
 
   @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
-    console.log('setMeInfo', t)
     this.meInfo = t
-    console.log('this.meInfo', this.meInfo)
   }
 }
 
