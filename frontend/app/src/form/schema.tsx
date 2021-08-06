@@ -105,8 +105,8 @@ export const meSchema: FormField[] = [
                         type: "gallery",
                     },
                     {
-                        name: 'bio',
-                        label: "Bio",
+                        name: 'description',
+                        label: "Description",
                         type: "textarea",
                     },
                     {

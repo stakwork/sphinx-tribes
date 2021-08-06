@@ -12,19 +12,12 @@ export default function Offer(props: I.Offer) {
                 <div>{props.price}</div>
             </Sub>
         </div>
-
-        {(props.gallery && props.gallery.length) ? <Image style={{
-            backgroundImage: `url(${props.gallery[0] + '?thumb=true'})`
-        }}
-        /> : <div />}
-
     </Wrap>
 
 }
 
 const Wrap = styled.div`
 display:flex;
-justify-content:space-between;
 color: #fff;
 width:100%;
 `;

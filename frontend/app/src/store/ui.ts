@@ -15,6 +15,11 @@ export interface EuiSelectableOption {
 }
 
 class UiStore {
+
+  // constructor() {
+  //   this.meInfo = emptyMeData
+  // }
+
   @observable ready: boolean = false
   @action setReady(ready: boolean) {
     this.ready = ready
@@ -48,6 +53,7 @@ export interface MeInfo {
   pubkey: string
   photo_url: string
   alias: string
+  owner_alias?: string
   route_hint: string
   contact_key: string
   price_to_meet: number
@@ -57,6 +63,7 @@ export interface MeInfo {
   verification_signature: string
   extras: Extras
 }
-const emptyMeData: MeData = { pubkey: 'asdf', alias: 'evan', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
+export const emptyMeData: MeData = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
+export const emptyMeInfo: MeInfo = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
 
 export const uiStore = new UiStore()
