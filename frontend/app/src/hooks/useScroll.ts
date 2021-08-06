@@ -16,5 +16,5 @@ export function useScroll() {
       }, 3000);
     }
   }
-  return {handleScroll, n, loadingMore}
+  return { handleScroll, n, loadingMore }
 }
