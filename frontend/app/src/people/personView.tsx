@@ -103,62 +103,36 @@ export default function PersonView(props: any) {
             return <div />
         }
 
-        const p = fullSelectedWidget
         const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === selectedWidget) || {}
         const single = widgetSchema.single
-        const label = widgetSchema.label
-        const icon = widgetSchema.icon
         let fields = [...widgetSchema.fields]
         // remove show from display
         fields = fields.filter(f => f.name !== 'show')
 
-        if (single) {
-            return <WidgetItem>
-                {fields && fields.map((f, i) => {
-                    return <div style={{ marginBottom: 5 }} key={i}>
-                        <div>
-                            {f.label}
-                        </div>
-                        <div>
-                            {fullSelectedWidget[f.name]}
-                        </div>
-                    </div>
+        function wrapIt(child) {
+            if (single) {
+                return <WidgetItem>{child}</WidgetItem>
+            }
+            return <SelectedWidgetWrap>
+                {fullSelectedWidget.length && fullSelectedWidget.map((s, i) => {
+                    return <WidgetItem key={i}>
+                        {React.cloneElement(child, { ...s })}
+                    </WidgetItem>
                 })}
-            </WidgetItem>
+            </SelectedWidgetWrap>
         }
 
-        return <SelectedWidgetWrap>
-            {fullSelectedWidget.map((s, si) => {
-                return <WidgetItem key={si}>
-                    {fields && fields.map((f, i) => {
-                        return <div style={{ marginBottom: 5 }} key={i}>
-                            <div>
-                                {f.label}
-                            </div>
-                            <div>
-                                {s[f.name]}
-                            </div>
-                        </div>
-                    })}
-                </WidgetItem>
-            })}
-
-        </SelectedWidgetWrap>
-
-        // do this instead, build each widget its own view style
-        switch (widgetSchema.type) {
+        switch (widgetSchema.name) {
             case 'twitter':
-                return <TwitterView {...props} />
+                return wrapIt(<TwitterView {...fullSelectedWidget} />)
             case 'supportme':
-                return <SupportMeView {...props} />
-            case 'offers':
-                return <OfferView {...props} />
+                return wrapIt(<SupportMeView {...fullSelectedWidget} />)
+            case 'offer':
+                return wrapIt(<OfferView {...fullSelectedWidget} />)
             case 'wanted':
-                return <WantedView {...props} />
+                return wrapIt(<WantedView {...fullSelectedWidget} />)
             case 'blog':
-                return <BlogView {...props} />
-            case 'hidden':
-                return <></>
+                return wrapIt(<BlogView {...fullSelectedWidget} />)
             default:
                 return <></>
 
@@ -213,7 +187,7 @@ export default function PersonView(props: any) {
                 <Name>{owner_alias}</Name>
             </RowWrap>
             <RowWrap>
-                <Row style={{ padding: 20, maxWidth: 300, background: '#ffffff21', borderRadius: 5 }}>
+                <Row style={{ padding: 20, maxWidth: 400, background: '#ffffff21', borderRadius: 5 }}>
                     <Description>{description}</Description>
                 </Row>
             </RowWrap>
@@ -226,17 +200,14 @@ export default function PersonView(props: any) {
                         const label = widgetSchema.label
                         const icon = widgetSchema.icon
                         const selected = name === selectedWidget
-                        console.log('p', p)
 
-                        return < WidgetEnv key={i} selected={selected} onClick={() => setSelectedWidget(name)}>
-                            {
-                                widgetSchema.single ?
-                                    <Widget key={i}>
-                                        {label}
-                                    </Widget>
-
-                                    : <Widget key={i}>{label}</Widget>
-                            }
+                        return < WidgetEnv key={i} selected={selected} onClick={() => {
+                            if (selectedWidget === name) setSelectedWidget('')
+                            else setSelectedWidget(name)
+                        }}>
+                            <Widget key={i}>
+                                {label}
+                            </Widget>
                             <Icon source={`/static/${icon || 'sphinx'}.png`} />
                         </WidgetEnv>
                     })}
@@ -245,11 +216,7 @@ export default function PersonView(props: any) {
 
             <RowWrap>
                 <Row>
-                    {fullSelectedWidget &&
-                        <>
-                            {renderSelectedWidget()}
-                        </>
-                    }
+                    {renderSelectedWidget()}
                 </Row>
             </RowWrap>
 
@@ -311,11 +278,14 @@ const Widget = styled.div`
             `;
 
 const WidgetItem = styled.div`
-    width: 300px;
+    min-width: 300px;
+    max-width: 700px;
     padding: 20px;
-    border: 1px solid #fff;
+    border: 1px solid #ffffff21;
+    background:#ffffff07;
     border-radius: 5px;
     overflow:hidden;
+    margin-bottom:20px;
             `;
 
 
@@ -324,6 +294,7 @@ const SelectedWidgetWrap = styled.div`
             display:flex;
             width:100%;
             justify-content:space-around;
+            flex-wrap:wrap;
             `;
 interface WidgetEnvProps {
     selected: boolean;

@@ -14,6 +14,7 @@ export interface FormState {
 export interface BlogPost {
     title: string,
     markdown: string,
+    gallery?: [string],
     createdAt: number,
     show?: boolean
 }
