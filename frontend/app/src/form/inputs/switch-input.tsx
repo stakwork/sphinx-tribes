@@ -4,7 +4,6 @@ import { EuiFormRow, EuiSwitch } from '@elastic/eui'
 import type { Props } from './propsType'
 
 export default function SwitchInput({ label, value, name, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
-    console.log("SwitchInput", label, value)
 
     useEffect(() => {
         // if value not initiated, default value true

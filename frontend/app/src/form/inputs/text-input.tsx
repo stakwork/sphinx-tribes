@@ -4,7 +4,6 @@ import { EuiFormRow, EuiFieldText } from '@elastic/eui'
 import type { Props } from './propsType'
 
 export default function TextInput({ label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
-  console.log("TEXT", label, value)
   return <>
     <EuiFormRow label={label}>
       <Text name="first" value={value || ''}

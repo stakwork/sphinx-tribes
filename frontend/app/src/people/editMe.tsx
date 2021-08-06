@@ -76,6 +76,7 @@ export default function EditMe(props: any) {
         return alert("Failed to create profile");
       }
 
+      await main.getPeople('')
       closeModal()
     } catch (e) {
       console.log('e', e)

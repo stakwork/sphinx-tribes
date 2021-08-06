@@ -77,31 +77,16 @@ export default function Person(props: any) {
                 <Title className="tribe-title">{owner_alias}</Title>
               </Row>
               <Description
-                oneLine={selected ? false : true}
                 style={{ minHeight: 20 }}
               >
-                {description}
+                {`${price_to_meet} SATS`}
               </Description>
               {/* <TagsWrap>
               {tags.map((t:string)=> <Tag key={t}>{t}</Tag>)}
             </TagsWrap> */}
             </Left>
           </Row>
-          {price_to_meet && (
-            <RowWrap>
-              <Row
-                style={{
-                  marginTop: 20,
-                  marginBottom: 20,
-                  justifyContent: "space-evenly",
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-              >
-                {`Price to Meet: ${price_to_meet} sats`}
-              </Row>
-            </RowWrap>
-          )}
+
           {twitter_confirmed && twitterUsername && (
             <RowWrap>
               <Row
@@ -124,67 +109,7 @@ export default function Person(props: any) {
               </Row>
             </RowWrap>
           )}
-          {/* <RowWrap>
-            <Row style={{ marginBottom: 20, justifyContent: "space-evenly" }}>
-              <a href={qrString}>
-                <EuiButton
-                  onClick={add}
-                  fill={true}
-                  style={{
-                    backgroundColor: "#6089ff",
-                    borderColor: "#6089ff",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: 12,
-                  }}
-                  aria-label="add"
-                >
-                  ADD
-                </EuiButton>
-              </a>
-              <EuiButton
-                onClick={toggleQR}
-                style={{
-                  borderColor: "#6B7A8D",
-                  color: "white",
-                  fontWeight: 600,
-                  fontSize: 12,
-                }}
-                iconType={qrCode}
-                aria-label="qr-code"
-              >
-                QR CODE
-              </EuiButton>
-            </Row>
-          </RowWrap> */}
-          {showQR && (
-            <QRWrapWrap>
-              <QRWrap className="qr-wrap float-r">
-                <QRCode
-                  bgColor={"#FFFFFF"}
-                  fgColor="#000000"
-                  level="Q"
-                  style={{ width: 209 }}
-                  value={qrString}
-                />
-              </QRWrap>
-            </QRWrapWrap>
-          )}
           <Intro>{description}</Intro>
-          {/* <Row style={{ color:"#6B7A8D", fontSize:12, fontWeight:"bold", padding:"10px 10px 0px 10px" }}>
-          INTERESTS
-        </Row>
-        <Row style={{color:"white", fontSize:14, margin:"0px 10px 10px 10px"}}>
-          {tagsString}
-        </Row> */}
-          <div
-            className="expand-part"
-            style={selected ? { opacity: 1 } : { opacity: 0 }}
-          >
-            <div className="colapse-button">
-              <img src="/static/keyboard_arrow_up-black-18dp.svg" alt="" />
-            </div>
-          </div>
         </Left>
       </Content>
     </EuiCheckableCard>
@@ -245,22 +170,15 @@ const Title = styled.h3`
   max-width: 100%;
   min-height: 24px;
 `;
-interface DescriptionProps {
-  oneLine: boolean;
-}
-const Description = styled.div<DescriptionProps>`
-  font-weight: normal;
-  line-height: 20px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #fff;//#6b7a8d;
-  ${(p) =>
-    p.oneLine &&
-    `
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow:hidden;
-  `}
+const Description = styled.div`
+  
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7a8d;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  
 `;
 interface ImageProps {
   readonly src: string;
