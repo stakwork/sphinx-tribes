@@ -28,7 +28,7 @@ export default function Widget(props: any) {
     let highlight = objectOrArrayHasLength(state)
 
     return <Wrap onClick={() => props.setSelected(props)}>
-        <Icon source={`static/${props.icon || 'sphinx'}.png`} />
+        <Icon source={`/static/${props.icon || 'sphinx'}.png`} />
 
         <Title>{props.label}</Title>
 

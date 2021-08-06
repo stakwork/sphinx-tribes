@@ -4,27 +4,30 @@ import styled from "styled-components";
 import { getHost } from "../host";
 import qrCode from "../utils/invoice-qr-code.svg";
 import { EuiCheckableCard, EuiButton } from "@elastic/eui";
-
+import { formatPrice } from '../helpers';
 const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-export default function Person({
-  id,
-  img,
-  tags,
-  description,
-  selected,
-  select,
-  created,
-  owner_alias,
-  owner_pubkey,
-  unique_name,
-  price_to_meet,
-  extras,
-  twitter_confirmed,
-}: any) {
+export default function Person(props: any) {
+
+  const {
+    id,
+    img,
+    tags,
+    description,
+    selected,
+    select,
+    created,
+    owner_alias,
+    owner_pubkey,
+    unique_name,
+    price_to_meet,
+    extras,
+    twitter_confirmed,
+  } = props
+
   const [showQR, setShowQR] = useState(false);
   const qrString = makeQR(owner_pubkey);
 
@@ -43,6 +46,8 @@ export default function Person({
     e.stopPropagation();
     setShowQR((current) => !current);
   }
+
+  // return <div style={{ color: '#fff' }}>{owner_alias}</div>
   return (
     <EuiCheckableCard
       className="col-md-6 col-lg-6 ml-2 mb-2"
@@ -51,60 +56,35 @@ export default function Person({
       name={owner_alias}
       value={id + ""}
       checked={selected}
+      style={{ border: '1px solid #fff' }}
       onChange={() => select(id, unique_name)}
     >
       <Content
-        onClick={() => select(selected ? "" : id, unique_name)}
-        style={{
-          height: selected ? "auto" : 100,
-        }}
-        selected={selected}
+        onClick={() => select(id, unique_name)}
+        style={{ border: '1px solid #45b9f6', borderRadius: 5 }}
       >
         <Left>
-          <Row className="item-cont">
-            {img ? (
-              <Img src={img} />
-            ) : (
-              <div className="placeholder-img-tribe"></div>
-            )}
+          <Row className="item-cont" style={{ padding: 10 }}>
+
+            <Img src={img || '/static/sphinx.png'} />
+
             <Left
               style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
             >
-              <Row
-                style={
-                  selected
-                    ? { flexDirection: "column", alignItems: "flex-start" }
-                    : {}
-                }
-              >
+              <Row>
                 <Title className="tribe-title">{owner_alias}</Title>
               </Row>
               <Description
-                oneLine={selected ? false : true}
                 style={{ minHeight: 20 }}
               >
-                {description}
+                {formatPrice(price_to_meet)}
               </Description>
               {/* <TagsWrap>
               {tags.map((t:string)=> <Tag key={t}>{t}</Tag>)}
             </TagsWrap> */}
             </Left>
           </Row>
-          {price_to_meet && (
-            <RowWrap>
-              <Row
-                style={{
-                  marginTop: 20,
-                  marginBottom: 20,
-                  justifyContent: "space-evenly",
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-              >
-                {`Price to Meet: ${price_to_meet} sats`}
-              </Row>
-            </RowWrap>
-          )}
+
           {twitter_confirmed && twitterUsername && (
             <RowWrap>
               <Row
@@ -127,67 +107,7 @@ export default function Person({
               </Row>
             </RowWrap>
           )}
-          <RowWrap>
-            <Row style={{ marginBottom: 20, justifyContent: "space-evenly" }}>
-              <a href={qrString}>
-                <EuiButton
-                  onClick={add}
-                  fill={true}
-                  style={{
-                    backgroundColor: "#6089ff",
-                    borderColor: "#6089ff",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: 12,
-                  }}
-                  aria-label="add"
-                >
-                  ADD
-                </EuiButton>
-              </a>
-              <EuiButton
-                onClick={toggleQR}
-                style={{
-                  borderColor: "#6B7A8D",
-                  color: "white",
-                  fontWeight: 600,
-                  fontSize: 12,
-                }}
-                iconType={qrCode}
-                aria-label="qr-code"
-              >
-                QR CODE
-              </EuiButton>
-            </Row>
-          </RowWrap>
-          {showQR && (
-            <QRWrapWrap>
-              <QRWrap className="qr-wrap float-r">
-                <QRCode
-                  bgColor={"#FFFFFF"}
-                  fgColor="#000000"
-                  level="Q"
-                  style={{ width: 209 }}
-                  value={qrString}
-                />
-              </QRWrap>
-            </QRWrapWrap>
-          )}
           <Intro>{description}</Intro>
-          {/* <Row style={{ color:"#6B7A8D", fontSize:12, fontWeight:"bold", padding:"10px 10px 0px 10px" }}>
-          INTERESTS
-        </Row>
-        <Row style={{color:"white", fontSize:14, margin:"0px 10px 10px 10px"}}>
-          {tagsString}
-        </Row> */}
-          <div
-            className="expand-part"
-            style={selected ? { opacity: 1 } : { opacity: 0 }}
-          >
-            <div className="colapse-button">
-              <img src="/static/keyboard_arrow_up-black-18dp.svg" alt="" />
-            </div>
-          </div>
         </Left>
       </Content>
     </EuiCheckableCard>
@@ -196,32 +116,25 @@ export default function Person({
 interface ContentProps {
   selected: boolean;
 }
-const Content = styled.div<ContentProps>`
+const Content = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  max-width: 100%;
+  // max-width: 100%;
   & h3 {
     color: #fff;
   }
   &:hover h3 {
     color: white;
   }
-  ${(p) =>
-    p.selected
-      ? `
-    & h5{
-      color:#cacaca;
-    }
-  `
-      : `
+  
     & h5{
       color:#aaa;
     }
     &:hover h5{
       color:#bebebe;
     }
-  `}
+  }
   & button img {
   }
 `;
@@ -246,6 +159,7 @@ const Row = styled.div`
 `;
 const RowWrap = styled.div``;
 const Title = styled.h3`
+  color:#fff;
   margin-right: 12px;
   font-size: 22px;
   white-space: nowrap;
@@ -254,22 +168,15 @@ const Title = styled.h3`
   max-width: 100%;
   min-height: 24px;
 `;
-interface DescriptionProps {
-  oneLine: boolean;
-}
-const Description = styled.div<DescriptionProps>`
-  font-weight: normal;
-  line-height: 20px;
-  font-size: 15px;
-  font-weight: 500;
+const Description = styled.div`
+  
+  font-size: 12px;
+  font-weight: 400;
   color: #6b7a8d;
-  ${(p) =>
-    p.oneLine &&
-    `
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow:hidden;
-  `}
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  
 `;
 interface ImageProps {
   readonly src: string;
@@ -278,8 +185,8 @@ const Img = styled.div<ImageProps>`
   background-image: url("${(p) => p.src}");
   background-position: center;
   background-size: cover;
-  height: 90px;
-  width: 90px;
+  height: 70px;
+  width: 70px;
   border-radius: 50%;
   position: relative;
 `;
