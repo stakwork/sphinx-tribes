@@ -31,7 +31,7 @@ export default function Person(props: any) {
   const [showQR, setShowQR] = useState(false);
   const qrString = makeQR(owner_pubkey);
 
-  const twitterUsername = (extras && extras.twitter) || null;
+  const twitterUsername = (extras && extras.twitter && extras.twitter.handle) || (extras && extras.twitter) || null;
 
   let tagsString = "";
   tags.forEach((t: string, i: number) => {
@@ -57,7 +57,7 @@ export default function Person(props: any) {
       value={id + ""}
       checked={selected}
       style={{ border: '1px solid #fff' }}
-      onChange={() => select(id, unique_name)}
+      onChange={() => console.log('change')}
     >
       <Content
         onClick={() => select(id, unique_name)}

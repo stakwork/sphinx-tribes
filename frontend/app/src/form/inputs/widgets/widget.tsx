@@ -69,6 +69,7 @@ const Title = styled.div`
     align-content: center;
     justify-content: center;
     margin-top:10px;
+    color:#000;
 `
 
 const Wrap = styled.div`

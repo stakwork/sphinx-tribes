@@ -37,7 +37,7 @@ export default function PersonView(props: any) {
 
     const { main, ui } = useStores()
 
-    const person = main.people && main.people[0]
+    const person = (main.people && main.people.length && main.people.find(f => f.id === personId))
 
     const {
         id,
@@ -57,7 +57,7 @@ export default function PersonView(props: any) {
     const qrString = makeQR(owner_pubkey);
 
     let tagsString = "";
-    tags.forEach((t: string, i: number) => {
+    tags && tags.forEach((t: string, i: number) => {
         if (i !== 0) tagsString += ",";
         tagsString += t;
     });
@@ -87,14 +87,14 @@ export default function PersonView(props: any) {
         let emptyArrayKeys = ['']
 
         Object.keys(filteredExtras).forEach(name => {
-            const p = person.extras[name]
+            const p = person && person.extras[name]
             if (Array.isArray(p) && !p.length) {
                 emptyArrayKeys.push(name)
             }
         })
 
         emptyArrayKeys.forEach(e => {
-            if (e) delete filteredExtras[e]
+            if (filteredExtras && e) delete filteredExtras[e]
         })
     }
 
@@ -195,7 +195,6 @@ export default function PersonView(props: any) {
             <RowWrap>
                 <Row style={{ flexWrap: 'wrap' }}>
                     {filteredExtras && Object.keys(filteredExtras).map((name, i) => {
-                        const p = person.extras[name]
                         const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === name) || {}
                         const label = widgetSchema.label
                         const icon = widgetSchema.icon

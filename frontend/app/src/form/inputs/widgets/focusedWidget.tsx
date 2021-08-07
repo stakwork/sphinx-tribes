@@ -155,7 +155,7 @@ export default function FocusedWidget(props: any) {
     >
         <div style={{ display: 'flex' }} onClick={() => cancel(true)}>
             <MaterialIcon icon={'west'} />
-            <Icon source={`static/${item.icon || 'sphinx'}.png`} style={{ marginLeft: 5 }} />
+            <Icon source={`/static/${item.icon || 'sphinx'}.png`} style={{ marginLeft: 5 }} />
             <div style={{ marginLeft: 10 }}>{item.label}</div>
         </div>
         {
