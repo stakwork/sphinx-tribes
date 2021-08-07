@@ -25,6 +25,7 @@ export default function BodyComponent() {
   const [selectedPerson, setSelectedPerson] = useState(0)
 
   function selectPerson(id: number, unique_name: string) {
+    console.log('selectPerson', id, unique_name)
     setSelectedPerson(id)
     if (unique_name && window.history.pushState) {
       window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
