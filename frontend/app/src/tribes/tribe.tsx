@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { EuiCheckableCard } from "@elastic/eui";
 import Tag from "./tag";
 import moment from "moment";
-import { getHost } from "../host";
+import { getHostIncludingDockerHosts } from "../host";
 
 function makeQR(uuid: string) {
-  return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHost()}`;
+  return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`;
 }
 
 export default function Tribe({
