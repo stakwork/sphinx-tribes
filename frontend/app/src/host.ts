@@ -1,9 +1,5 @@
-const dockerHosts = [
-  "localhost:13007",
-  "localhost:13000",
-  "localhost:23007",
-  "localhost:23000",
-];
+const internalDockerHosts = ["localhost:13007", "localhost:13000"];
+const externalDockerHosts = ["localhost:23007", "localhost:23000"];
 
 export function getHost(): string {
   const host = window.location.host.includes("localhost")
@@ -13,8 +9,10 @@ export function getHost(): string {
 }
 
 export function getHostIncludingDockerHosts() {
-  if (dockerHosts.includes(window.location.host)) {
+  if (externalDockerHosts.includes(window.location.host)) {
     return "tribes.sphinx:5002";
+  } else if (internalDockerHosts.includes(window.location.host)) {
+    return window.location.host;
   } else {
     return getHost();
   }
