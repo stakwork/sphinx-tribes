@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -235,6 +236,10 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 }
 
 func processTwitterConfirmationsLoop() {
+	twitterToken := os.Getenv("TWITTER_TOKEN")
+	if twitterToken == "" {
+		return
+	}
 	peeps := DB.getUnconfirmedTwitter()
 	for _, p := range peeps {
 		username, _ := p.Extras["twitter"].(string)

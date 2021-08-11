@@ -1,4 +1,4 @@
-import { getHost } from "../host";
+import { getHostIncludingDockerHosts } from "../host";
 
 class API {
   constructor() {
@@ -14,10 +14,11 @@ class API {
 }
 
 function addMethod(m: string): Function {
-  const host = getHost();
-  const rootUrl = host.includes("localhost")
-    ? `http://${host}/`
-    : `https://${host}/`;
+  const host = getHostIncludingDockerHosts();
+  const rootUrl =
+    host.includes("localhost") || host.includes("internal")
+      ? `http://${host}/`
+      : `https://${host}/`;
   const func = async function (url: string, data: any, fields: any) {
     try {
       const headers: { [key: string]: string } = {};
