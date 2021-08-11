@@ -153,7 +153,7 @@ export default function PersonView(props: any) {
                 dismountCallback={endAnimation}>
                 <SelectedWidgetWrap>
                     {fullSelectedWidget.length && fullSelectedWidget.map((s, i) => {
-                        return <Card key={i}>
+                        return <Card key={i} style={{ width: '100%' }}>
                             {React.cloneElement(child, { ...s })}
                         </Card>
                     })}
@@ -252,28 +252,27 @@ export default function PersonView(props: any) {
                     <RowWrap>
                         <Name>{owner_alias}</Name>
                     </RowWrap>
+
                     {extras && extras.twitter &&
-                        <RowWrap style={{ alignItems: 'center' }}>
-                            <Icon source={'/static/twitter.png'} style={{ width: 16, height: 16, margin: '0 3px 0 0' }} />
-                            <div>{extras.twitter.handle}</div>
+                        <RowWrap style={{ alignItems: 'center', margin: 0 }}>
+                            <Icon source={'/static/twitter.png'} style={{ width: 14, height: 14, margin: '0 3px 0 0' }} />
+                            <div style={{ fontSize: 14, color: '#ffffffd3' }}>{extras.twitter.handle}</div>
                         </RowWrap>
                     }
+
                     <RowWrap>
                         <Row style={{
-                            padding: 10, maxWidth: 400, maxHeight: 400,
+                            padding: 10, maxWidth: 400, maxHeight: 400, margin: 10,
                             overflow: 'auto', background: '#ffffff21', borderRadius: 5
                         }}>
                             <Description>{description}</Description>
                         </Row>
                     </RowWrap>
                 </div>
-
-
-
             </Head>
 
             <RowWrap>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', margin: '0 20px', borderBottom: '1px solid #ffffff21' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', margin: '0 20px', borderBottom: '1px solid #ffffff21' }}>
                     <TabRow>
                         {filteredExtras && Object.keys(filteredExtras).map((name, i) => {
                             const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === name) || {}
@@ -288,6 +287,12 @@ export default function PersonView(props: any) {
                             </WidgetEnv>
                         })}
                     </TabRow>
+
+                    {/* <EuiButtonIcon
+                        iconType={'arrowRight'}
+                        aria-label="next"
+                        style={{ width: 50, height: 50, margin: 0 }}
+                    /> */}
                     <div />
                 </div>
             </RowWrap>
@@ -439,6 +444,7 @@ const TabRow = styled.div`
                 width:100%;
                 user-select:none;
                 // margin: 10px 0;
+                margin-top:10px;
                 `;
 const RowWrap = styled.div`
                 display:flex;

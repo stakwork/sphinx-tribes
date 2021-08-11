@@ -107,7 +107,7 @@ export default function Person(props: any) {
               </Row>
             </RowWrap>
           )}
-          <Intro>{description}</Intro>
+          {/* <Intro>{description}</Intro> */}
         </Left>
       </Content>
     </EuiCheckableCard>
