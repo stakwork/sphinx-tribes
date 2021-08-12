@@ -62,7 +62,13 @@ export default function PersonView(props: any) {
 
     useEffect(() => {
         if (extras && (Object.keys(extras).length > 0)) {
-            const name = Object.keys(extras)[0]
+            let name = ''
+            // pick the extra with one or more widgets
+            Object.keys(extras).forEach(e => {
+                if (name) return
+                if (extras[e].length > 0) name = e
+            })
+
             setSelectedWidget(name)
             setNewSelectedWidget(name)
         }
@@ -177,8 +183,6 @@ export default function PersonView(props: any) {
 
         }
     }
-
-
 
     return (
         <Content>
