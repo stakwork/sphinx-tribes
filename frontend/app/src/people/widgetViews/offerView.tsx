@@ -2,23 +2,20 @@ import React from 'react'
 import styled from "styled-components";
 import { Offer } from '../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../helpers';
+import GalleryViewer from '../utils/galleryViewer';
 
 export default function OfferView(props: Offer) {
     const { gallery, title, description, price, url } = props
 
     return <Wrap>
-        <P>{formatPrice(price)} </P>
+
         <T>{title || 'No title'}</T>
         <Body>
             <D>{description || 'No description'}</D>
             <U>{url || 'No link'}</U>
-
-            <Gallery>
-                {(gallery && gallery.length) && gallery.map((g, i) => {
-                    return <Img key={i} src={g} />
-                })}
-            </Gallery>
+            <GalleryViewer gallery={gallery} />
         </Body>
+        <P>{formatPrice(price)} </P>
 
     </Wrap>
 

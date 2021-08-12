@@ -48,8 +48,12 @@ export interface SupportMe {
     show?: boolean
 }
 
+export interface Twitter {
+    handle: string
+}
+
 export interface Extras {
-    twitter?: string,
+    twitter?: Twitter,
     blog?: BlogPost[],
     offers?: Offer[],
     wanted?: Wanted[],

@@ -7,13 +7,12 @@ export default function WantedView(props: Wanted) {
     const { title, description, priceMin, priceMax, url } = props
 
     return < Wrap >
-        <P>{formatPrice(priceMin)} ~ {formatPrice(priceMax)}</P>
         <T>{title || 'No title'}</T>
         <Body>
             <D>{description || 'No description'}</D>
             <U>{url || 'No link'}</U>
         </Body>
-
+        <P>{formatPrice(priceMin)} ~ {formatPrice(priceMax)}</P>
     </Wrap >
 
 }

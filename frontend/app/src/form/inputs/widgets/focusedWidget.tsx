@@ -107,7 +107,7 @@ export default function FocusedWidget(props: any) {
 
     function deleteItem(obj, i) {
         console.log('deleteItem', obj)
-        let formState = (values[name] && values[name][item.name]) || []
+        let formState = (values[name] && [...values[name][item.name]]) || []
         let index = i
         if (obj.id) {
             index = formState && formState.findIndex(f => f.id === obj.id)
@@ -121,6 +121,7 @@ export default function FocusedWidget(props: any) {
         let value: any = ''
         if (type === 'number') value = 0
         if (type === 'gallery') value = []
+        console.log('getInitialValueByType', value)
         return value
     }
 
@@ -176,7 +177,6 @@ export default function FocusedWidget(props: any) {
         {!showingList && <>
             {item.fields.map((e, i) => {
                 return <Input
-                    // {...props}
                     {...e}
                     key={e.name}
                     value={newState && newState[e.name]}
@@ -193,12 +193,6 @@ export default function FocusedWidget(props: any) {
                     handleFocus={() => {
                         let f = getFieldToUpdate(e)
                         setFieldTouched(f, true)
-                        let vl = newState && newState[e.name]
-                        if (!vl) {
-                            // give it its initial
-                            vl = getInitialValueByType(e.type)
-                        }
-                        setFieldValue(f, vl)
                     }} />
             })}
             <Nav style={{ marginTop: 20 }}>

@@ -12,14 +12,14 @@ export const meSchema: FormField[] = [
     },
     {
         name: "pubkey",
-        label: "Pubkey",
+        label: "Pubkey*",
         type: "text",
         readOnly: true,
         page: 1
     },
     {
         name: "owner_alias",
-        label: "Name",
+        label: "Name*",
         type: "text",
         required: true,
         validator: strValidator,
@@ -57,6 +57,8 @@ export const meSchema: FormField[] = [
             wanted: Yup.array().of(
                 Yup.object().shape({
                     title: strValidator,
+                    priceMin: Yup.number().when('priceMax', (pricemax) => Yup.number().max(pricemax, `Must be less than max`)
+                    )
                 }).nullable()
             ),
             offer: Yup.array().of(
@@ -67,6 +69,7 @@ export const meSchema: FormField[] = [
             blog: Yup.array().of(
                 Yup.object().shape({
                     title: strValidator,
+                    markdown: strValidator,
                 })
             ),
         }),
@@ -81,7 +84,7 @@ export const meSchema: FormField[] = [
                 fields: [
                     {
                         name: 'handle',
-                        label: "Twitter Handle",
+                        label: "Twitter*",
                         type: "text",
                         prepend: '@',
                     },
@@ -100,9 +103,9 @@ export const meSchema: FormField[] = [
                 single: true,
                 fields: [
                     {
-                        name: 'gallery',
-                        label: "Gallery",
-                        type: "gallery",
+                        name: 'url',
+                        label: "URL*",
+                        type: "text",
                     },
                     {
                         name: 'description',
@@ -110,9 +113,9 @@ export const meSchema: FormField[] = [
                         type: "textarea",
                     },
                     {
-                        name: 'url',
-                        label: "URL",
-                        type: "text",
+                        name: 'gallery',
+                        label: "Gallery",
+                        type: "gallery",
                     },
                     {
                         name: 'show',
@@ -129,7 +132,7 @@ export const meSchema: FormField[] = [
                 fields: [
                     {
                         name: 'title',
-                        label: "Title",
+                        label: "Title*",
                         type: "text",
                     },
                     {
@@ -157,7 +160,7 @@ export const meSchema: FormField[] = [
                 fields: [
                     {
                         name: 'title',
-                        label: "Title",
+                        label: "Title*",
                         type: "text",
                     },
                     {
@@ -190,12 +193,12 @@ export const meSchema: FormField[] = [
                 fields: [
                     {
                         name: 'title',
-                        label: "Title",
+                        label: "Title*",
                         type: "text",
                     },
                     {
                         name: 'markdown',
-                        label: "Markdown",
+                        label: "Markdown*",
                         type: "textarea",
                     },
                     {

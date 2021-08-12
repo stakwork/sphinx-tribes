@@ -56,12 +56,12 @@ export default function Person(props: any) {
       name={owner_alias}
       value={id + ""}
       checked={selected}
-      style={{ border: '1px solid #fff' }}
+      style={{ border: '1px solid #45b9f6' }}
       onChange={() => console.log('change')}
     >
       <Content
         onClick={() => select(id, unique_name)}
-        style={{ border: '1px solid #45b9f6', borderRadius: 5 }}
+        style={{ borderRadius: 5 }}
       >
         <Left>
           <Row className="item-cont" style={{ padding: 10 }}>
@@ -107,7 +107,7 @@ export default function Person(props: any) {
               </Row>
             </RowWrap>
           )}
-          <Intro>{description}</Intro>
+          {/* <Intro>{description}</Intro> */}
         </Left>
       </Content>
     </EuiCheckableCard>
@@ -207,5 +207,11 @@ const Tag = styled.h5`
 const Intro = styled.div`
   color: white;
   font-size: 14px;
-  margin: 10px;
+  margin: 5px;
+  padding: 10px;
+  max-width: 400px;
+  max-height:100px;
+  overflow:auto;
+  background: #ffffff21;
+  border-radius: 5px;
 `;
