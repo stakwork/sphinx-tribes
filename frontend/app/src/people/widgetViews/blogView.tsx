@@ -24,15 +24,14 @@ const Wrap = styled.div`
 color: #fff;
 display: flex;
 flex-direction:column;
+width:100%;
+min-width:100%;
 `;
 
 const T = styled.div`
-padding: 10px;
-background: #ffffff21;
 border-radius: 5px;
-text-align:center;
-margin-bottom:5px;
 font-weight:bold;
+font-size:25px;
 `;
 
 const M = styled.div`

@@ -43,12 +43,14 @@ export default function Form(props: any) {
     <Formik
       initialValues={props.initialValues || {}}
       onSubmit={props.onSubmit}
+      innerRef={props.formRef}
       validationSchema={validator(props.schema)}
       style={{ height: 'inherit' }}
       innerStyle={{ height: 'inherit' }}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
+        console.log('errors', errors)
         return (
           <FadeLeft
             alwaysRender
@@ -83,7 +85,7 @@ export default function Form(props: any) {
               />)}
 
               <FadeLeft isMounted={!disableFormButtons}>
-                <BWrap>
+                <BWrap floatingButtons={props.floatingButtons}>
                   {page > 1 &&
                     <EuiButton
                       disabled={disableFormButtons || props.loading}
@@ -137,7 +139,11 @@ const Wrap = styled.div`
   justify-content: space-between;
 `;
 
-const BWrap = styled.div`
+interface BWrapProps {
+  readonly floatingButtons: boolean;
+}
+
+const BWrap = styled.div<BWrapProps>`
   display: flex;
   justify-content: space-evenly;
   align-items:center;
@@ -145,6 +151,9 @@ const BWrap = styled.div`
   height:42px;
   min-height:42px;
   margin-top:20px;
+  position:${p => p.floatingButtons && 'absolute'};
+  bottom:${p => p.floatingButtons && '0px'};
+  left:${p => p.floatingButtons && '0px'};
 `;
 
 type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch'
