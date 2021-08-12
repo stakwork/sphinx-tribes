@@ -1,4 +1,4 @@
-import { getHostIncludingDockerHosts } from "../host";
+import { getHost } from "../host";
 
 class API {
   constructor() {
@@ -14,7 +14,7 @@ class API {
 }
 
 function addMethod(m: string): Function {
-  const host = getHostIncludingDockerHosts();
+  const host = getHost();
   const rootUrl =
     host.includes("localhost") || host.includes("internal")
       ? `http://${host}/`

@@ -61,7 +61,7 @@ export default function PersonView(props: any) {
     const qrString = makeQR(owner_pubkey);
 
     useEffect(() => {
-        if (extras && Object.keys(extras).length) {
+        if (extras && (Object.keys(extras).length > 0)) {
             const name = Object.keys(extras)[0]
             setSelectedWidget(name)
             setNewSelectedWidget(name)
@@ -152,7 +152,7 @@ export default function PersonView(props: any) {
                 drift={20}
                 dismountCallback={endAnimation}>
                 <SelectedWidgetWrap>
-                    {fullSelectedWidget.length && fullSelectedWidget.map((s, i) => {
+                    {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
                         return <Card key={i} style={{ width: '100%' }}>
                             {React.cloneElement(child, { ...s })}
                         </Card>
