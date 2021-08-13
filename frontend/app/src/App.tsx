@@ -1,21 +1,25 @@
 import React from 'react'
 import './App.css'
 import '@material/react-material-icon/dist/material-icon.css';
+import "@fontsource/roboto";
 import Header from './tribes/header'
 import Body from './tribes/body'
 import PeopleHeader from './people/header'
 import PeopleBody from './people/body'
+import { colors } from './colors'
 
 function App() {
   const mode = getMode()
+  const c = colors['light']
+
   if (mode === Mode.PEOPLE) {
-    return <div className="app">
+    return <div className="app" style={{ background: c.background }}>
       <PeopleHeader />
       <PeopleBody />
     </div>
   }
   return (
-    <div className="app">
+    <div className="app" style={{ background: c.background }}>
       <Header />
       <Body />
     </div>

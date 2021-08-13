@@ -346,7 +346,7 @@ const Content = styled.div`
             flex-direction:column;
             flex:1;
             width:100%;
-            max-width:800px;
+            // max-width:800px;
             align-items:center;
             color:#fff;
             padding-bottom:200px;
