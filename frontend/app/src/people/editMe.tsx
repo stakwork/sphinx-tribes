@@ -49,6 +49,7 @@ export default function EditMe(props: any) {
       console.log('foundChange', name, a, b)
       result = true
     }
+
     let widgetSchemas: any = meSchema.find(f => f.name === 'extras')
 
     if (no1 && no2) {
@@ -56,6 +57,9 @@ export default function EditMe(props: any) {
         if (result) return
         let current = no1[name]
         let previous = no2[name]
+
+        // if its a new multi widget, this will trigger
+        if (!previous) foundChange_(name, current, previous)
 
         // if extras, we're comparing objects
         if (name === 'extras') {
