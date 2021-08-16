@@ -112,33 +112,3 @@ const Tab = styled.div`
   font-size: 13px;
   cursor:pointer;
 `
-
-const SearchList = styled.div`
-  position:absolute;
-  top:40px;
-  left:0px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  max-width:260px;
-  width:100%;
-`
-
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url("${(p) => p.src}");
-  background-position: center;
-  background-size: cover;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  position: relative;
-  margin-right:5px;
-`;
-
-const Name = styled.div`
-  font-weight:bold;
-  color:#fff;
-`

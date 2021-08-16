@@ -9,11 +9,14 @@ import {
   EuiButton
 } from '@elastic/eui';
 import Person from './person'
+import Drawer from './drawer/index'
 import PersonView from './personView'
+import PersonViewSlim from './personViewSlim'
 import EditMe from './editMe'
 import { useFuse, useScroll } from '../hooks'
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from '../colors'
+import FadeLeft from '../animated/fadeLeft';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
@@ -23,11 +26,14 @@ export default function BodyComponent() {
   const { main, ui } = useStores()
   const [loading, setLoading] = useState(false)
   const [selectedPerson, setSelectedPerson] = useState(0)
+  const [selectingPerson, setSelectingPerson] = useState(0)
+  const [showProfile, setShowProfile] = useState(false)
   const c = colors['light']
 
   function selectPerson(id: number, unique_name: string) {
     console.log('selectPerson', id, unique_name)
     setSelectedPerson(id)
+    setSelectingPerson(id)
     if (unique_name && window.history.pushState) {
       window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
     }
@@ -54,10 +60,11 @@ export default function BodyComponent() {
   return useObserver(() => {
     const peeps = getFuse(main.people, ["owner_alias"])
     const { handleScroll, n, loadingMore } = getScroll()
-    const people = peeps.slice(0, n)
+    let people = peeps.slice(0, n)
+    people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
-    if (selectedPerson) {
-      return <Body id="main" className='container'>
+    if (selectedPerson && showProfile) {
+      return <Body>
         <Column className="main-wrap">
           <PersonView goBack={() => {
             setSelectedPerson(0)
@@ -69,14 +76,8 @@ export default function BodyComponent() {
       </Body>
     }
 
-    return <Body id="main" className='container'>
-      <Drawer>
-        <div>yooo</div>
-        <div>yooo</div>
-        <div>yooo</div>
-        <div>yooo</div>
-        <div>yooo</div>
-      </Drawer>
+    return <Body>
+      <Drawer />
 
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
@@ -98,9 +99,20 @@ export default function BodyComponent() {
           </EuiButton>}
         </AddWrap>
       </Column>
-
       <EditMe />
 
+      <FadeLeft
+        withOverlay
+        drift={40}
+        overlayClick={() => setSelectingPerson(0)}
+        style={{ position: 'absolute', top: 30, right: 0 }}
+        isMounted={(selectingPerson && !showProfile) ? true : false}
+        dismountCallback={() => setSelectedPerson(0)}
+      >
+        <PersonViewSlim goBack={() => setSelectingPerson(0)}
+          personId={selectedPerson}
+          loading={loading} />
+      </FadeLeft>
     </Body>
   }
   )
@@ -115,28 +127,18 @@ const Body = styled.div`
   overflow:auto;
   display:flex;
 `
-const Drawer = styled.div`
-  height:100%;
-  width:200px;
-  padding:10px;
-  overflow:auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  color:#000;
-  border-right:1px solid #000;
-`
 const Column = styled.div`
   display:flex;
   // flex-direction:column;
   // align-items:center;
-  // max-width:900px;
+  max-width:900px;
+  flex-wrap:wrap;
   width:100%;
 `
 
 const Row = styled.div`
   display:flex;
-  
+  flex-wrap:wrap;
   width:100%;
   
 `

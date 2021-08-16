@@ -6,7 +6,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 export default function FadeLeft(props) {
     const { drift, isMounted, dismountCallback,
         style, children, alwaysRender, noFadeOnInit,
-        direction } = props
+        direction, withOverlay, overlayClick } = props
     const [translation, setTranslation] = useState(drift ? drift : -40)
     const [opacity, setOpacity] = useState(0)
     const [shouldRender, setShouldRender] = useState(false)
@@ -56,8 +56,26 @@ export default function FadeLeft(props) {
     }, [isMounted])
 
     if (!alwaysRender && !shouldRender) return <div style={{ position: 'absolute', left: 0, top: 0 }} />
+
+    const transformValue = direction === 'up' ? `translateY(${translation}px)` : `translateX(${translation}px)`
+
+    if (withOverlay) {
+        return (
+            <Overlay style={{ ...style, background: '#00000044', opacity }}
+                onClick={() => {
+                    if (overlayClick) overlayClick()
+                }}>
+                <Fader
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ height: 'inherit', ...style, transform: transformValue }}>
+                    {children}
+                </Fader>
+            </Overlay>
+
+        );
+    }
     return (
-        <Fader style={{ height: 'inherit', ...style, transform: direction === 'up' ? `translateY(${translation}px)` : `translateX(${translation}px)`, opacity }}>
+        <Fader style={{ height: 'inherit', ...style, transform: transformValue, opacity }}>
             {children}
         </Fader>
     );
@@ -65,4 +83,9 @@ export default function FadeLeft(props) {
 
 const Fader = styled.div`
   transition:all 0.2s;
+`
+const Overlay = styled.div`
+  transition:all 0.2s;
+  width:100%;
+  height:100%;
 `

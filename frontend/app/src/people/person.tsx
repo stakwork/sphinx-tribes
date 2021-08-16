@@ -36,7 +36,7 @@ export default function Person(props: any) {
   const twitterUsername = (extras && extras.twitter && extras.twitter.handle) || (extras && extras.twitter) || null;
 
   let tagsString = "";
-  tags.forEach((t: string, i: number) => {
+  tags && tags.forEach((t: string, i: number) => {
     if (i !== 0) tagsString += ",";
     tagsString += t;
   });
