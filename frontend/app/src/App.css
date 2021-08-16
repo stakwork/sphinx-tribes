@@ -59,8 +59,8 @@ button:focus{
 }
 
 #header {
-  padding-top: 12px;
-  padding-bottom: 16px;
+  /* padding-top: 12px;
+  padding-bottom: 16px; */
   display: block;
   max-height: 105px;
   height: auto;
@@ -188,6 +188,11 @@ fieldset.container {
   background-size: 40px 33px;
   background-position: center center;
   background-color: #161e29;
+}
+
+input.input {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .qr-wrap {
@@ -321,6 +326,7 @@ textarea.qr-string {
   bottom: 0px;
   padding: 4px 2px !important;
 }
+
 @media (min-width: 768px) {
   #logo {
     width: 250px;
@@ -348,12 +354,12 @@ textarea.qr-string {
     height: auto;
   }
 }
-@media (max-width: 767px) {
-  #header-right {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
+
+#header-right {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
+
 
 .euiModal__flex .euiModalBody .euiModalBody__overflow{
   padding:24px 0 !important;

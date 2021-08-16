@@ -74,15 +74,6 @@ export default function PersonView(props: any) {
         }
     }, [extras])
 
-    function switchWidgets(name) {
-        // setting newSelectedWidget will dismount the FadeLeft, 
-        // and on dismount, endAnimation runs
-        if (!animating && selectedWidget !== name) {
-            setNewSelectedWidget(name)
-            setAnimating(true)
-        }
-    }
-
     function endAnimation() {
         setSelectedWidget(newSelectedWidget)
         setAnimating(false)
@@ -134,7 +125,7 @@ export default function PersonView(props: any) {
         })
     }
 
-    function renderSelectedWidget() {
+    function renderWidgets() {
         if (!selectedWidget || !fullSelectedWidget) {
             return <div style={{ height: 200 }} />
         }
@@ -150,21 +141,13 @@ export default function PersonView(props: any) {
                 return null
             }
 
-            return <FadeLeft
-                direction={'up'}
-                style={{ width: '100%' }}
-                isMounted={newSelectedWidget === widgetSchema.name}
-                speed={100}
-                drift={20}
-                dismountCallback={endAnimation}>
-                <SelectedWidgetWrap>
-                    {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
-                        return <Card key={i} style={{ width: '100%' }}>
-                            {React.cloneElement(child, { ...s })}
-                        </Card>
-                    })}
-                </SelectedWidgetWrap>
-            </FadeLeft>
+            return <SelectedWidgetWrap>
+                {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
+                    return <Card key={i} style={{ width: '100%' }}>
+                        {React.cloneElement(child, { ...s })}
+                    </Card>
+                })}
+            </SelectedWidgetWrap>
         }
 
         switch (widgetSchema.name) {
@@ -186,154 +169,112 @@ export default function PersonView(props: any) {
 
     return (
         <Content>
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 20px', marginBottom: 40 }}>
-                <EuiButton onClick={goBack}
-                    iconType="sortLeft" aria-label="goback"
-                />
-
-
-                <div style={{ display: 'flex', width: 'fit-content', margin: 0 }}>
-
-                    {extras && extras.supportme &&
-                        <EuiToolTip position="bottom"
-                            content={`Donate`}>
-                            <EuiButtonIcon
-                                style={{
-                                    border: "1px solid #6B7A8D",
-                                    color: "white",
-                                    padding: 10,
-                                    marginRight: 10
-                                }}
-                                iconType={'cheer'}
-                                aria-label="donate"
-                            />
-                        </EuiToolTip>
-                    }
-
-                    <EuiToolTip position="bottom"
-                        content={`Price to Meet: ${price_to_meet} sats`}>
-                        <div style={{ display: 'flex', width: 'fit-content', margin: 0 }}>
-                            <EuiButtonIcon
-                                onClick={toggleQR}
-                                style={{
-                                    border: "1px solid #6B7A8D",
-                                    color: "white",
-                                    padding: 10,
-                                    marginRight: 10
-                                }}
-                                iconType={qrCode}
-                                aria-label="qr-code"
-                            />
-
-                            <a href={qrString}>
-                                <EuiButton
-                                    onClick={add}
-                                    fill={true}
-                                    style={{
-                                        backgroundColor: "#6089ff",
-                                        borderColor: "#6089ff",
-                                        color: "white",
-                                        fontWeight: 600,
-                                        fontSize: 12,
-                                        width: 80,
-                                        maxWidth: 80,
-                                        minWidth: 80
-                                    }}
-                                    aria-label="add"
-                                >
-                                    ADD
-                                </EuiButton>
-                            </a>
-                        </div>
-                    </EuiToolTip>
-                </div>
-
-            </div>
-            {/* profile photo */}
-            <Head>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <Img src={img || '/static/sphinx.png'} />
-                    <RowWrap>
-                        <Name>{owner_alias}</Name>
-                    </RowWrap>
-
-                    {extras && extras.twitter &&
-                        <RowWrap style={{ alignItems: 'center', margin: 0 }}>
-                            <Icon source={'/static/twitter.png'} style={{ width: 14, height: 14, margin: '0 3px 0 0' }} />
-                            <div style={{ fontSize: 14, color: '#ffffffd3' }}>{extras.twitter.handle}</div>
-                        </RowWrap>
-                    }
-
-                    <RowWrap>
-                        <Row style={{
-                            padding: 10, maxWidth: 400, maxHeight: 400, margin: 10,
-                            overflow: 'auto', background: '#ffffff21', borderRadius: 5
-                        }}>
-                            <Description>{description}</Description>
-                        </Row>
-                    </RowWrap>
-                </div>
-            </Head>
-
-            <RowWrap>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', margin: '0 20px', borderBottom: '1px solid #ffffff21' }}>
-                    <TabRow>
-                        {filteredExtras && Object.keys(filteredExtras).map((name, i) => {
-                            const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === name) || {}
-                            const label = widgetSchema.label
-                            const icon = widgetSchema.icon
-                            const selected = name === newSelectedWidget
-
-                            return < WidgetEnv key={i} selected={selected} onClick={() => switchWidgets(name)}>
-                                <Widget key={i}>
-                                    {label}
-                                </Widget>
-                            </WidgetEnv>
-                        })}
-                    </TabRow>
-
-                    {/* <EuiButtonIcon
-                        iconType={'arrowRight'}
-                        aria-label="next"
-                        style={{ width: 50, height: 50, margin: 0 }}
-                    /> */}
+            <div style={{
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                width: 400,
+                overflow: 'auto', height: '100%', paddingTop: 20
+            }}>
+                <div style={{ color: '#000', display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 20px', marginBottom: 40 }}>
+                    <EuiButtonIcon onClick={goBack}
+                        iconType="cross" aria-label="goback"
+                        style={{ color: '#000' }}
+                    />
                     <div />
                 </div>
-            </RowWrap>
 
-            <RowWrap>
-                <Row>
-                    {renderSelectedWidget()}
-                </Row>
-            </RowWrap>
+                {/* profile photo */}
+                <Head>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <Img src={img || '/static/sphinx.png'} />
+                        <RowWrap>
+                            <Name>{owner_alias}</Name>
+                        </RowWrap>
 
-            {
-                showQR &&
-                <EuiOverlayMask onClick={() => setShowQR(false)}>
-                    <EuiModal onClose={() => setShowQR(false)}
-                        initialFocus="[name=popswitch]">
-                        <EuiModalHeader>
-                            <EuiModalHeaderTitle>{`Add ${owner_alias}`}</EuiModalHeaderTitle>
-                        </EuiModalHeader>
-                        <EuiModalBody style={{ padding: 0, color: '#fff' }}>
-                            <RowWrap style={{ marginTop: -20, marginBottom: 10 }}>
-                                {`Price to Meet: ${price_to_meet} sats`}
+                        {extras && extras.twitter &&
+                            <RowWrap style={{ alignItems: 'center', margin: 0 }}>
+                                <Icon source={'/static/twitter.png'} style={{ width: 14, height: 14, margin: '0 3px 0 0' }} />
+                                <div style={{ fontSize: 14, }}>{extras.twitter.handle}</div>
                             </RowWrap>
-                            <QRWrapWrap>
-                                <QRWrap className="qr-wrap float-r">
-                                    <QRCode
-                                        bgColor={"#FFFFFF"}
-                                        fgColor="#000000"
-                                        level="Q"
-                                        style={{ width: qrWidth }}
-                                        value={qrString}
-                                    />
-                                </QRWrap>
-                            </QRWrapWrap>
-                        </EuiModalBody>
-                    </EuiModal>
-                </EuiOverlayMask >
-            }
+                        }
+
+                        <RowWrap>
+                            <Row style={{
+                                padding: 10, maxWidth: 400, maxHeight: 400, margin: 10,
+                                overflow: 'auto', background: '#ffffff21', borderRadius: 5
+                            }}>
+                                <Description>{description}</Description>
+                            </Row>
+                        </RowWrap>
+                    </div>
+                </Head>
+
+                <RowWrap>
+                    <Row>
+                        {renderWidgets()}
+                    </Row>
+                </RowWrap>
+
+                {
+                    showQR &&
+                    <EuiOverlayMask onClick={() => setShowQR(false)}>
+                        <EuiModal onClose={() => setShowQR(false)}
+                            initialFocus="[name=popswitch]">
+                            <EuiModalHeader>
+                                <EuiModalHeaderTitle>{`Add ${owner_alias}`}</EuiModalHeaderTitle>
+                            </EuiModalHeader>
+                            <EuiModalBody style={{ padding: 0, }}>
+                                <RowWrap style={{ marginTop: -20, marginBottom: 10 }}>
+                                    {`Price to Meet: ${price_to_meet} sats`}
+                                </RowWrap>
+                                <QRWrapWrap>
+                                    <QRWrap className="qr-wrap float-r">
+                                        <QRCode
+                                            bgColor={"#FFFFFF"}
+                                            fgColor="#000000"
+                                            level="Q"
+                                            style={{ width: qrWidth }}
+                                            value={qrString}
+                                        />
+                                    </QRWrap>
+                                </QRWrapWrap>
+                            </EuiModalBody>
+                        </EuiModal>
+                    </EuiOverlayMask >
+                }
+            </div>
+
+            <Bottom>
+                <EuiButtonIcon
+                    onClick={toggleQR}
+                    style={{
+                        border: "1px solid #6B7A8D",
+                        padding: 10,
+                        marginRight: 10,
+
+                    }}
+                    iconType={qrCode}
+                    aria-label="qr-code"
+                />
+
+                <a href={qrString}>
+                    <EuiButton
+                        onClick={add}
+                        fill={true}
+                        style={{
+                            backgroundColor: "#6089ff",
+                            borderColor: "#6089ff",
+                            fontWeight: 600,
+                            fontSize: 12,
+                            width: 120,
+                            maxWidth: 120,
+                            minWidth: 120
+                        }}
+                        aria-label="join"
+                    >
+                        JOIN
+                    </EuiButton>
+                </a>
+            </Bottom>
         </Content >
 
     );
@@ -344,12 +285,13 @@ interface ContentProps {
 const Content = styled.div`
             display: flex;
             flex-direction:column;
-            flex:1;
-            width:400px;
+            // flex:1;
+            width:100%;
+            height: calc(100% - 60px);
             // max-width:800px;
             align-items:center;
+            color:#000000;
             background:#fff;
-            padding-bottom:200px;
             `;
 const QRWrapWrap = styled.div`
             display: flex;
@@ -363,6 +305,16 @@ const Widget = styled.div`
 
             `;
 
+const Bottom = styled.div`
+height:80px;
+width:100%;
+left:0px;
+display:flex;
+justify-content:space-around;
+align-items:center;
+background: #FFFFFF;
+box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+            `;
 const Head = styled.div`
             display:flex;
             flex-direction:column;
@@ -418,12 +370,10 @@ const WidgetEnv = styled.div<WidgetEnvProps>`
             }
                 `;
 const Name = styled.div`
-                color: white;
                 font-weight: 500;
                 margin-top:15px;
                 `;
 const Description = styled.div`
-                color: white;
                 font-weight: 340;
                 `;
 const Left = styled.div`
@@ -495,7 +445,6 @@ const Tag = styled.h5`
                     margin-right: 10px;
                     `;
 const Intro = styled.div`
-                    color: white;
                     font-size: 14px;
                     margin: 10px;
                     `;

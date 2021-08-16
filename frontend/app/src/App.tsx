@@ -15,7 +15,9 @@ function App() {
   if (mode === Mode.PEOPLE) {
     return <div className="app" style={{ background: c.background }}>
       <PeopleHeader />
-      <PeopleBody />
+      <div id="main" className='container'>
+        <PeopleBody />
+      </div>
     </div>
   }
   return (

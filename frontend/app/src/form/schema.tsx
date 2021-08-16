@@ -66,6 +66,11 @@ export const meSchema: FormField[] = [
                     title: strValidator,
                 })
             ),
+            tribes: Yup.array().of(
+                Yup.object().shape({
+                    address: strValidator,
+                })
+            ),
             blog: Yup.array().of(
                 Yup.object().shape({
                     title: strValidator,
@@ -177,6 +182,23 @@ export const meSchema: FormField[] = [
                         name: 'description',
                         label: "Description",
                         type: "textarea",
+                    },
+                    {
+                        name: 'show',
+                        label: "Show In Link",
+                        type: "switch",
+                    },
+                ]
+            },
+            {
+                name: "tribes",
+                label: "Tribes",
+                type: "widget",
+                fields: [
+                    {
+                        name: 'address',
+                        label: "Tribe address*",
+                        type: "text",
                     },
                     {
                         name: 'show',
