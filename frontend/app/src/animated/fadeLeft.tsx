@@ -61,7 +61,7 @@ export default function FadeLeft(props) {
 
     if (withOverlay) {
         return (
-            <Overlay style={{ ...style, background: '#00000044', opacity }}
+            <Overlay style={{ ...style, background: '#00000066', opacity }}
                 onClick={() => {
                     if (overlayClick) overlayClick()
                 }}>

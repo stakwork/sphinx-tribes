@@ -179,40 +179,48 @@ export default function PersonView(props: any) {
                         iconType="cross" aria-label="goback"
                         style={{ color: '#000' }}
                     />
-                    <div />
+                    <EuiButtonIcon onClick={toggleQR}
+                        iconType={qrCode} aria-label="qrcode"
+                        style={{ color: '#000' }}
+                    />
                 </div>
 
                 {/* profile photo */}
                 <Head>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Img src={img || '/static/sphinx.png'} />
-                        <RowWrap>
-                            <Name>{owner_alias}</Name>
-                        </RowWrap>
+                    <Img src={img || '/static/sphinx.png'} />
+                    <RowWrap style={{ marginBottom: 50, marginTop: 10 }}>
+                        <Name>{owner_alias}</Name>
+                    </RowWrap>
 
-                        {extras && extras.twitter &&
+                    <RowWrap style={{ justifyContent: 'space-around', width: '80%' }}>
+                        <Detail><B>300</B> members</Detail>
+                        <Detail><B>82</B> Posts</Detail>
+                    </RowWrap>
+                    {/* {extras && extras.twitter &&
                             <RowWrap style={{ alignItems: 'center', margin: 0 }}>
                                 <Icon source={'/static/twitter.png'} style={{ width: 14, height: 14, margin: '0 3px 0 0' }} />
                                 <div style={{ fontSize: 14, }}>{extras.twitter.handle}</div>
                             </RowWrap>
-                        }
+                        } */}
 
-                        <RowWrap>
-                            <Row style={{
-                                padding: 10, maxWidth: 400, maxHeight: 400, margin: 10,
-                                overflow: 'auto', background: '#ffffff21', borderRadius: 5
-                            }}>
-                                <Description>{description}</Description>
-                            </Row>
-                        </RowWrap>
-                    </div>
                 </Head>
 
-                <RowWrap>
-                    <Row>
-                        {renderWidgets()}
-                    </Row>
-                </RowWrap>
+                <Sleeve>
+                    <RowWrap>
+                        <Row style={{
+                            padding: 10, maxWidth: 400, maxHeight: 400, margin: 10,
+                            overflow: 'auto', background: '#ffffff21', borderRadius: 5
+                        }}>
+                            <Description>{description}</Description>
+                        </Row>
+                    </RowWrap>
+
+                    <RowWrap>
+                        <Row>
+                            {renderWidgets()}
+                        </Row>
+                    </RowWrap>
+                </Sleeve>
 
                 {
                     showQR &&
@@ -222,10 +230,7 @@ export default function PersonView(props: any) {
                             <EuiModalHeader>
                                 <EuiModalHeaderTitle>{`Add ${owner_alias}`}</EuiModalHeaderTitle>
                             </EuiModalHeader>
-                            <EuiModalBody style={{ padding: 0, }}>
-                                <RowWrap style={{ marginTop: -20, marginBottom: 10 }}>
-                                    {`Price to Meet: ${price_to_meet} sats`}
-                                </RowWrap>
+                            <EuiModalBody style={{ padding: 0 }}>
                                 <QRWrapWrap>
                                     <QRWrap className="qr-wrap float-r">
                                         <QRCode
@@ -244,18 +249,6 @@ export default function PersonView(props: any) {
             </div>
 
             <Bottom>
-                <EuiButtonIcon
-                    onClick={toggleQR}
-                    style={{
-                        border: "1px solid #6B7A8D",
-                        padding: 10,
-                        marginRight: 10,
-
-                    }}
-                    iconType={qrCode}
-                    aria-label="qr-code"
-                />
-
                 <a href={qrString}>
                     <EuiButton
                         onClick={add}
@@ -265,15 +258,35 @@ export default function PersonView(props: any) {
                             borderColor: "#6089ff",
                             fontWeight: 600,
                             fontSize: 12,
-                            width: 120,
-                            maxWidth: 120,
-                            minWidth: 120
+                            width: '40%',
+                            minWidth: 140,
+                            maxWidth: 140,
+                            color: '#fff'
                         }}
                         aria-label="join"
                     >
                         JOIN
                     </EuiButton>
                 </a>
+                <div style={{ width: 20 }} />
+                <EuiButton
+                    onClick={toggleQR}
+                    fill={true}
+                    style={{
+                        background: "#fff",
+                        borderColor: "#5F6368",
+                        color: '#5F6368',
+                        fontWeight: 600,
+                        fontSize: 12,
+                        width: '40%',
+                        minWidth: 140,
+                        maxWidth: 140
+                    }}
+                    // iconType={qrCode}
+                    aria-label="qr-code"
+                >
+                    QR
+                </EuiButton>
             </Bottom>
         </Content >
 
@@ -287,7 +300,7 @@ const Content = styled.div`
             flex-direction:column;
             // flex:1;
             width:100%;
-            height: calc(100% - 60px);
+            height: 100%;
             // max-width:800px;
             align-items:center;
             color:#000000;
@@ -308,9 +321,8 @@ const Widget = styled.div`
 const Bottom = styled.div`
 height:80px;
 width:100%;
-left:0px;
 display:flex;
-justify-content:space-around;
+justify-content:center;
 align-items:center;
 background: #FFFFFF;
 box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
@@ -321,6 +333,12 @@ const Head = styled.div`
             justify-content:center;
             align-items:center;
             width:100%;
+            `;
+
+const B = styled.span`
+            color:#000;
+            font-weight:bold;
+            margin-right:5px;
             `;
 
 const Card = styled.div`
@@ -370,11 +388,48 @@ const WidgetEnv = styled.div<WidgetEnvProps>`
             }
                 `;
 const Name = styled.div`
-                font-weight: 500;
-                margin-top:15px;
+font-style: normal;
+font-weight: 500;
+font-size: 26px;
+line-height: 19px;
+/* or 73% */
+
+text-align: center;
+
+/* Text 2 */
+
+color: #3C3F41;
                 `;
+
+const Detail = styled.div`
+display:flex;
+font-family: Roboto;
+font-style: normal;
+font-size: 18px;
+line-height: 18px;
+/* or 106% */
+
+/* Main bottom icons */
+
+color: #5F6368;
+                                `;
+
+const Sleeve = styled.div`
+padding:20px;
+                `;
+
 const Description = styled.div`
-                font-weight: 340;
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 13px;
+line-height: 19px;
+/* or 146% */
+
+
+/* Secondary Text 4 */
+
+color: #8E969C;
                 `;
 const Left = styled.div`
                 height: 100%;
@@ -425,8 +480,9 @@ const Img = styled.div<ImageProps>`
                     background-image: url("${(p) => p.src}");
                     background-position: center;
                     background-size: cover;
-                    height: 90px;
-                    width: 90px;
+                    margin-bottom:20px;
+                    width:150px;
+                    height:150px;
                     border-radius: 50%;
                     position: relative;
                     `;
@@ -454,8 +510,8 @@ interface IconProps {
 
 const Icon = styled.div<IconProps>`
                         background-image: ${p => `url(${p.source})`};
-                        width:40px;
-                        height:40px;
+                        width:150px;
+                        height:150px;
                         margin-top:10px;
                         background-position: center; /* Center the image */
                         background-repeat: no-repeat; /* Do not repeat the image */
