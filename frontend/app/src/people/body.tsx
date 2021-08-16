@@ -105,7 +105,7 @@ export default function BodyComponent() {
         withOverlay
         drift={40}
         overlayClick={() => setSelectingPerson(0)}
-        style={{ position: 'absolute', top: 30, right: 0 }}
+        style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000 }}
         isMounted={(selectingPerson && !showProfile) ? true : false}
         dismountCallback={() => setSelectedPerson(0)}
       >
