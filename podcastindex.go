@@ -196,7 +196,9 @@ type Model struct {
 	Suggested string `json:"suggested"`
 }
 type Destination struct {
-	Address string      `json:"address"`
-	Split   interface{} `json:"split"`
-	Type    string      `json:"type"`
+	Address     string      `json:"address"`
+	Split       interface{} `json:"split"`
+	Type        string      `json:"type"`
+	CustomKey   string      `json:"customKey"`
+	CustomValue string      `json:"customValue"`
 }
