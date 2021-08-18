@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui'
+import { EuiFormRow, EuiFieldText, EuiIcon, PropertySortType } from '@elastic/eui'
 import type { Props } from './propsType'
 
-export default function SearchTextInput({ error, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function SearchTextInput({ placeholder, error, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: any) {
 
     let labeltext = label
     if (error) labeltext = labeltext + ` (${error})`
@@ -15,7 +15,7 @@ export default function SearchTextInput({ error, label, value, handleChange, han
                 onChange={e => handleChange(e.target.value)}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
-                placeholder={'Search'}
+                placeholder={placeholder || 'Search'}
             />
             {error && <E>
                 <EuiIcon type="alert" size='m' style={{ width: 20, height: 20 }} />

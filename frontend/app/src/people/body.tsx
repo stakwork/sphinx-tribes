@@ -17,6 +17,14 @@ import { useFuse, useScroll } from '../hooks'
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from '../colors'
 import FadeLeft from '../animated/fadeLeft';
+import { useIsMobile } from '../hooks';
+import {
+  Switch,
+  Route,
+  Link,
+  useHistory,
+  useLocation
+} from "react-router-dom";
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
@@ -29,6 +37,12 @@ export default function BodyComponent() {
   const [selectingPerson, setSelectingPerson] = useState(0)
   const [showProfile, setShowProfile] = useState(false)
   const c = colors['light']
+  const isMobile = useIsMobile()
+  const history = useHistory()
+  const location = useLocation()
+
+  console.log('history', history)
+  console.log('location', location)
 
   function selectPerson(id: number, unique_name: string) {
     console.log('selectPerson', id, unique_name)
@@ -77,28 +91,29 @@ export default function BodyComponent() {
     }
 
     return <Body>
-      <Drawer />
-
-      <Column className="main-wrap">
-        {loading && <EuiLoadingSpinner size="xl" />}
-        {!loading && <EuiFormFieldset style={{ width: '100%' }} >
-          <Row>
-            {people.map(t => <Person {...t} key={t.id}
-              selected={selectedPerson === t.id}
-              select={selectPerson}
-            />)}
-          </Row>
-        </EuiFormFieldset>}
-        <AddWrap>
-          {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
-            <div style={{ display: 'flex' }}>
-              <MaterialIcon
-                style={{ fontSize: 70 }}
-                icon="account_circle" aria-label="edit-me" />
-            </div>
-          </EuiButton>}
-        </AddWrap>
-      </Column>
+      <>
+        <Drawer />
+        <Column className="main-wrap">
+          {loading && <EuiLoadingSpinner size="xl" />}
+          {!loading && <EuiFormFieldset style={{ width: '100%' }} >
+            <Row>
+              {people.map(t => <Person {...t} key={t.id}
+                selected={selectedPerson === t.id}
+                select={selectPerson}
+              />)}
+            </Row>
+          </EuiFormFieldset>}
+          <AddWrap>
+            {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
+              <div style={{ display: 'flex' }}>
+                <MaterialIcon
+                  style={{ fontSize: 70 }}
+                  icon="account_circle" aria-label="edit-me" />
+              </div>
+            </EuiButton>}
+          </AddWrap>
+        </Column>
+      </>
       <EditMe />
 
       <FadeLeft
@@ -121,7 +136,7 @@ export default function BodyComponent() {
 
 const Body = styled.div`
   flex:1;
-  height:calc(100vh - 90px);
+  height:calc(100vh - 60px);
   padding-bottom:80px;
   width:100%;
   overflow:auto;

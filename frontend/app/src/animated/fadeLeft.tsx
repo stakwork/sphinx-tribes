@@ -6,7 +6,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 export default function FadeLeft(props) {
     const { drift, isMounted, dismountCallback,
         style, children, alwaysRender, noFadeOnInit,
-        direction, withOverlay, overlayClick } = props
+        direction, withOverlay, overlayClick, noFade } = props
     const [translation, setTranslation] = useState(drift ? drift : -40)
     const [opacity, setOpacity] = useState(0)
     const [shouldRender, setShouldRender] = useState(false)
@@ -61,7 +61,7 @@ export default function FadeLeft(props) {
 
     if (withOverlay) {
         return (
-            <Overlay style={{ ...style, background: '#00000066', opacity }}
+            <Overlay style={{ ...style, background: '#00000066', opacity: noFade ? opacity : 1 }}
                 onClick={() => {
                     if (overlayClick) overlayClick()
                 }}>
@@ -75,7 +75,7 @@ export default function FadeLeft(props) {
         );
     }
     return (
-        <Fader style={{ height: 'inherit', ...style, transform: transformValue, opacity }}>
+        <Fader style={{ height: 'inherit', ...style, transform: transformValue, opacity: noFade ? opacity : 1 }}>
             {children}
         </Fader>
     );
