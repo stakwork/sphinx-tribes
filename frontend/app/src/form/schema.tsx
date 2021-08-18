@@ -240,5 +240,41 @@ export const meSchema: FormField[] = [
     }
 ];
 
+export const ftuxEditMeSchema: FormField[] = [
+    {
+        name: "img",
+        label: "Image",
+        type: "img",
+        page: 1
+    },
+    {
+        name: "pubkey",
+        label: "Pubkey*",
+        type: "text",
+        readOnly: true,
+        page: 1
+    },
+    {
+        name: "owner_alias",
+        label: "Name*",
+        type: "text",
+        required: true,
+        validator: strValidator,
+        page: 1,
+    },
+    {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        page: 1,
+    },
+    {
+        name: "price_to_meet",
+        label: "Price to Meet",
+        type: "number",
+        page: 1,
+    },
+];
+
 
 // extras.blog.existing
