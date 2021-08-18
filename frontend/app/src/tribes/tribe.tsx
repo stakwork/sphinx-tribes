@@ -63,8 +63,7 @@ export default function Tribe({
       >
         <Left>
           <Row className="item-cont">
-            <div className="placeholder-img-tribe"></div>
-            <Img src={img} />
+            {img ? <Img src={img} /> : <div className="placeholder-img-tribe"></div>}
             <Left
               style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
             >

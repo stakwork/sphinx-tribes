@@ -345,10 +345,10 @@ const Content = styled.div`
             display: flex;
             flex-direction:column;
             flex:1;
-            width:100%;
-            max-width:800px;
+            width:400px;
+            // max-width:800px;
             align-items:center;
-            color:#fff;
+            background:#fff;
             padding-bottom:200px;
             `;
 const QRWrapWrap = styled.div`
