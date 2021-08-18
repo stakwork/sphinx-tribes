@@ -6,13 +6,14 @@ import api from "../api";
 import { useStores } from "../store";
 import type { MeInfo } from "../store/ui";
 import { getHost } from "../host";
+import { PropertySortType } from "@elastic/eui/src/services/sort";
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
 }
 
-export default function ConfirmMe() {
+export default function ConfirmMe(props: any) {
   const { ui } = useStores();
   const [challenge, setChallenge] = useState("");
   const [ts, setTS] = useState("");
@@ -28,6 +29,7 @@ export default function ConfirmMe() {
         if (me && me.pubkey) {
           ui.setMeInfo(me);
           setChallenge("");
+          if (props.onSuccess) props.onSuccess()
           ok = false;
           break;
         }

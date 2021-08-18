@@ -105,6 +105,11 @@ export default function PersonView(props: any) {
         setShowQR((current) => !current);
     }
 
+    function logout() {
+        ui.setEditMe(false)
+        ui.setMeInfo(null)
+    }
+
     if (loading) return <div>Loading...</div>
 
     let widgetSchemas: any = meSchema.find(f => f.name === 'extras')
@@ -218,8 +223,10 @@ export default function PersonView(props: any) {
         },
     }
 
-    function renderButton() {
-        if (!selectedWidget) return <div />
+    const isEdit = true
+
+    function renderEditButton() {
+        if (!isEdit || !selectedWidget) return <div />
 
         const { action } = tabs[selectedWidget]
         return <div style={{ padding: 10, margin: '8px 0 5px' }}>
@@ -239,6 +246,8 @@ export default function PersonView(props: any) {
         </div>
     }
 
+
+
     return (
         <Content>
             <div style={{
@@ -257,7 +266,7 @@ export default function PersonView(props: any) {
                             icon='arrow_back'
                         />
                         <IconButton
-                            onClick={goBack}
+                            onClick={logout}
                             icon='logout'
                         />
                     </div>
@@ -269,35 +278,26 @@ export default function PersonView(props: any) {
                             <Name>{owner_alias}</Name>
                         </RowWrap>
 
-                        <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                            <a href={qrString}>
+                        {/* only see buttons on other people's profile */}
+                        {isEdit ? <div style={{ height: 40 }} /> :
+                            <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                                <a href={qrString}>
+                                    <Button
+                                        text='Connect'
+                                        onClick={add}
+                                        color='primary'
+                                        height={42}
+                                        width={120}
+                                    />
+                                </a>
+                                <div style={{ width: 15 }} />
                                 <Button
-                                    text='Connect'
-                                    onClick={add}
-                                    color='primary'
+                                    text='Support'
+                                    color='link'
                                     height={42}
-                                    width={120}
-                                />
-                            </a>
-                            <div style={{ width: 15 }} />
-                            <Button
-                                text='Support'
-                                color='link'
-                                height={42}
-                                width={120} />
-                        </RowWrap>
-
-                        {/* <RowWrap style={{ justifyContent: 'space-around', width: '80%' }}>
-                            <Detail><B>300</B> members</Detail>
-                            <Detail><B>82</B> Posts</Detail>
-                        </RowWrap> */}
-                        {/* {extras && extras.twitter &&
-                            <RowWrap style={{ alignItems: 'center', margin: 0 }}>
-                                <Icon source={'/static/twitter.png'} style={{ width: 14, height: 14, margin: '0 3px 0 0' }} />
-                                <div style={{ fontSize: 14, }}>{extras.twitter.handle}</div>
+                                    width={120} />
                             </RowWrap>
-                        } */}
-
+                        }
                     </Head>
 
                     <Tabs>
@@ -321,7 +321,7 @@ export default function PersonView(props: any) {
                 </Panel>
 
                 <Sleeve>
-                    {renderButton()}
+                    {renderEditButton()}
                     {renderWidgets()}
                 </Sleeve>
 
@@ -543,7 +543,7 @@ const WidgetEnv = styled.div<WidgetEnvProps>`
 const Name = styled.div`
                     font-style: normal;
                     font-weight: 500;
-                    font-size: 26px;
+                    font-size: 30px;
                     line-height: 19px;
                     /* or 73% */
 
@@ -554,18 +554,6 @@ const Name = styled.div`
                     color: #3C3F41;
                     `;
 
-const Detail = styled.div`
-                    display:flex;
-                    font-family: Roboto;
-                    font-style: normal;
-                    font-size: 18px;
-                    line-height: 18px;
-                    /* or 106% */
-
-                    /* Main bottom icons */
-
-                    color: #5F6368;
-                    `;
 
 const Sleeve = styled.div`
 
