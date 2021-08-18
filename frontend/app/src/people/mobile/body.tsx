@@ -9,8 +9,6 @@ import {
     EuiButton
 } from '@elastic/eui';
 import Person from '../person'
-import Drawer from '../drawer/index'
-import PersonView from '../personView'
 import PersonViewSlim from '../personViewSlim'
 import EditMe from '../editMe'
 import { useFuse, useScroll } from '../../hooks'
@@ -25,7 +23,7 @@ import {
     useHistory,
     useLocation
 } from "react-router-dom";
-
+import { Modal, Button, Divider } from '../../sphinxUI';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -77,10 +75,7 @@ export default function BodyComponent() {
         let people = peeps.slice(0, n)
         people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
-        console.log('hiii')
-
         return <Body>
-
             <div>
                 {loading && <EuiLoadingSpinner size="xl" />}
                 {!loading && <EuiFormFieldset style={{ width: '100%' }} >
@@ -116,7 +111,17 @@ export default function BodyComponent() {
                     personId={selectedPerson}
                     loading={loading} />
             </FadeLeft>
-        </Body>
+
+
+
+            {/* you logged in modal  */}
+            < Modal visible={false} >
+                <div>
+                    HIII
+                </div>
+
+            </Modal >
+        </Body >
     }
     )
 }
@@ -132,9 +137,11 @@ const Body = styled.div`
 `
 const Column = styled.div`
   width:100%;
-`
-
-const Row = styled.div`
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding: 25px;
   
 `
 const AddWrap = styled.div`
@@ -153,3 +160,41 @@ const AddWrap = styled.div`
     height:60px;
   }
 `
+
+const Name = styled.div`
+font-style: normal;
+font-weight: 500;
+font-size: 26px;
+line-height: 19px;
+/* or 73% */
+
+text-align: center;
+
+/* Text 2 */
+
+color: #292C33;
+`;
+const Description = styled.div`
+font-size: 17px;
+line-height: 20px;
+text-align: center;
+margin:20px 0;
+
+/* Main bottom icons */
+
+color: #5F6368;
+`
+
+interface ImageProps {
+    readonly src: string;
+}
+const Img = styled.div<ImageProps>`
+                        background-image: url("${(p) => p.src}");
+                        background-position: center;
+                        background-size: cover;
+                        margin-bottom:20px;
+                        width:90px;
+                        height:90px;
+                        border-radius: 50%;
+                        position: relative;
+                        `;

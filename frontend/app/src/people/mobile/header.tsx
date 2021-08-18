@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import styled from 'styled-components'
@@ -10,8 +10,9 @@ import {
 import { useFuse } from '../../hooks'
 import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Button } from '../../sphinxUI';
-
+import { Modal, Button, Divider } from '../../sphinxUI';
+import FadeLeft from '../../animated/fadeLeft';
+import EditInfo from '../edit/editInfo'
 export default function Header() {
     const { main, ui } = useStores()
 
@@ -38,26 +39,40 @@ export default function Header() {
         }
     ]
 
+    const [showSignIn, setShowSignIn] = useState(false)
+    const [showWelcome, setShowWelcome] = useState(true)
+    const [showEditSelf, setShowEditSelf] = useState(false)
+
     const pathname = location && location.pathname
-    console.log('pathname', pathname)
+
 
     return useObserver(() => {
-        return <EuiHeader id="header" style={{ color: '#fff' }}>
-            <div className="container">
-                <Row style={{ justifyContent: 'space-between' }}>
-                    <EuiHeaderSection grow={false}>
-                        <Img src="/static/people_logo.svg" />
-                    </EuiHeaderSection>
+        return <>
+            <EuiHeader id="header" style={{ color: '#fff' }}>
+                <div className="container">
+                    <Row style={{ justifyContent: 'space-between' }}>
+                        <EuiHeaderSection grow={false}>
+                            <Img src="/static/people_logo.svg" />
+                        </EuiHeaderSection>
 
-                    <Corner>
-                        <Button
-                            icon={'account_circle'}
-                            text={'Sign in'}
-                            color='primary'
-                        />
-                    </Corner>
+                        <Corner>
+                            {true ?
+                                <Button
+                                    icon={'account_circle'}
+                                    text={'Edit'}
+                                    color='primary'
+                                    onClick={() => setShowEditSelf(true)}
+                                /> :
+                                <Button
+                                    icon={'account_circle'}
+                                    text={'Sign in'}
+                                    color='primary'
+                                    onClick={() => setShowSignIn(true)}
+                                />
+                            }
+                        </Corner>
 
-                    {/* {tabs.map((t, i) => {
+                        {/* {tabs.map((t, i) => {
                         const selected = pathname.includes(t.path)
                         return <Tab
                             onClick={() => {
@@ -70,24 +85,115 @@ export default function Header() {
                     })} */}
 
 
-                </Row>
+                    </Row>
 
-                <EuiHeaderSection id="header-right" side="right" style={{
-                    background: '#000000',
-                    boxShadow: 'inset 0px 1px 2px rgba(0, 0, 0, 0.15)',
-                    borderRadius: 50, overflow: 'hidden'
+                    <EuiHeaderSection id="header-right" side="right" style={{
+                        background: '#000000',
+                        boxShadow: 'inset 0px 1px 2px rgba(0, 0, 0, 0.15)',
+                        borderRadius: 50, overflow: 'hidden'
+                    }}>
+                        <EuiFieldSearch id="search-input"
+                            placeholder="Search for People"
+                            value={ui.searchText}
+                            onChange={e => ui.setSearchText(e.target.value)}
+                            style={{ width: '100%', height: '100%' }}
+                            aria-label="search"
+
+                        />
+                    </EuiHeaderSection>
+                </div>
+
+
+            </EuiHeader >
+
+
+            {/* you wanna login modal  */}
+            <Modal
+                visible={showSignIn}
+                close={() => setShowSignIn(false)}
+                overlayClick={() => setShowSignIn(false)}
+            >
+                <div>
+                    <Column>
+                        <Imgg src={'/static/sphinx.png'} />
+
+                        <Name>Welcome</Name>
+
+                        <Description>
+                            Use Sphinx to login and create or edit your profile.
+                        </Description>
+
+
+                        <Button
+                            text={'Login with Sphinx'}
+                            height={60}
+                            width={'100%'}
+                            color={'primary'}
+                        />
+                    </Column>
+                    <Divider />
+                    <Column style={{ paddingTop: 0 }}>
+                        <Description>
+                            I don't have Sphinx!
+                        </Description>
+                        <Button
+                            text={'Get Sphinx'}
+                            height={60}
+                            width={'100%'}
+                            color={'widget'}
+                        />
+                    </Column>
+                </div>
+            </Modal >
+
+            {/* you logged in modal  */}
+            < Modal visible={showWelcome} >
+                <div>
+                    <Column>
+                        <Imgg
+                            style={{ height: 128, width: 128, marginBottom: 40 }}
+                            src={'/static/sphinx.png'} />
+
+                        <T>
+                            <div style={{ marginRight: 6 }}>Welcome</div>
+                            <Name>{'Jonathan'}</Name>
+                        </T>
+
+                        <Welcome>
+                            Your profile is now public.
+                            Connect with other people, join tribes and liste your favorite podcast!
+                        </Welcome>
+
+                        <Button
+                            text={'Continue'}
+                            height={48}
+                            width={'100%'}
+                            color={'primary'}
+                            onClick={() => setShowWelcome(false)}
+                        />
+                    </Column>
+                </div>
+            </Modal>
+
+            {/* ONLY FOR FIRST TIME USER edit your info modal  */}
+            < Modal visible={showEditSelf}
+                drift={40}
+                fill
+                close={() => setShowEditSelf(false)}
+            >
+                <div style={{
+                    background: '#fff',
+                    height: '100%',
+                    width: '100%',
+                    overflow: 'auto'
                 }}>
-                    <EuiFieldSearch id="search-input"
-                        placeholder="Search for People"
-                        value={ui.searchText}
-                        onChange={e => ui.setSearchText(e.target.value)}
-                        style={{ width: '100%', height: '100%' }}
-                        aria-label="search"
+                    <EditInfo
+                        style={{ padding: '50px 10px' }}
+                        ftux={true} />
+                </div>
+            </Modal>
 
-                    />
-                </EuiHeaderSection>
-            </div>
-        </EuiHeader >
+        </>
     })
 }
 
@@ -100,6 +206,12 @@ const Corner = styled.div`
   display:flex;
   align-items:center;
 `
+const T = styled.div`
+display:flex;
+font-size: 26px;
+line-height: 19px;
+`
+
 const Tab = styled.div`
   margin-left:10px;
   display:flex;
@@ -127,3 +239,61 @@ const Img = styled.div<ImageProps>`
     
     position: relative;
   `;
+
+
+const Name = styled.div`
+font-style: normal;
+font-weight: 500;
+font-size: 26px;
+line-height: 19px;
+/* or 73% */
+
+text-align: center;
+
+/* Text 2 */
+
+color: #292C33;
+`;
+
+const Description = styled.div`
+font-size: 17px;
+line-height: 20px;
+text-align: center;
+margin:20px 0;
+
+/* Main bottom icons */
+
+color: #5F6368;
+
+`
+const Welcome = styled.div`
+font-size: 15px;
+line-height: 24px;
+margin:20px 0 50px;
+text-align: center;
+
+/* Text 2 */
+
+color: #3C3F41;
+`
+
+
+const Column = styled.div`
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding: 25px;
+  
+`
+const Imgg = styled.div<ImageProps>`
+                        background-image: url("${(p) => p.src}");
+                        background-position: center;
+                        background-size: cover;
+                        margin-bottom:20px;
+                        width:90px;
+                        height:90px;
+                        border-radius: 50%;
+                        position: relative;
+                        `;

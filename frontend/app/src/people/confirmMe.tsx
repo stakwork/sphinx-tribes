@@ -33,7 +33,7 @@ export default function ConfirmMe() {
         }
         i++;
         if (i > 100) ok = false;
-      } catch (e) {}
+      } catch (e) { }
     }
   }
   async function getChallenge() {
