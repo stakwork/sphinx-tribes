@@ -61,7 +61,7 @@ export default function FadeLeft(props) {
 
     if (withOverlay) {
         return (
-            <Overlay style={{ ...style, background: '#00000066', opacity: noFade ? opacity : 1 }}
+            <Overlay style={{ ...style, background: '#00000066', opacity: !noFade ? opacity : 1 }}
                 onClick={() => {
                     if (overlayClick) overlayClick()
                 }}>
@@ -75,7 +75,7 @@ export default function FadeLeft(props) {
         );
     }
     return (
-        <Fader style={{ height: 'inherit', ...style, transform: transformValue, opacity: noFade ? opacity : 1 }}>
+        <Fader style={{ height: 'inherit', ...style, transform: transformValue, opacity: !noFade ? opacity : 1 }}>
             {children}
         </Fader>
     );

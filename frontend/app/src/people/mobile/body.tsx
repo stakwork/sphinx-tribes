@@ -106,7 +106,6 @@ export default function BodyComponent() {
 
             <FadeLeft
                 withOverlay
-                noFade
                 drift={40}
                 overlayClick={() => setSelectingPerson(0)}
                 style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000 }}
