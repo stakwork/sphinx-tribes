@@ -41,7 +41,7 @@ export default function Header() {
     ]
 
     const [showSignIn, setShowSignIn] = useState(false)
-    const [showWelcome, setShowWelcome] = useState(true)
+    const [showWelcome, setShowWelcome] = useState(false)
     const [showEditSelf, setShowEditSelf] = useState(false)
 
     const pathname = location && location.pathname
@@ -116,6 +116,7 @@ export default function Header() {
                 <SignIn
                     onSuccess={() => {
                         setShowSignIn(false)
+                        setShowWelcome(true)
                     }} />
             </Modal >
 
@@ -129,12 +130,12 @@ export default function Header() {
 
                         <T>
                             <div style={{ marginRight: 6 }}>Welcome</div>
-                            <Name>{'Jonathan'}</Name>
+                            <Name>{ui.meInfo?.alias}</Name>
                         </T>
 
                         <Welcome>
                             Your profile is now public.
-                            Connect with other people, join tribes and liste your favorite podcast!
+                            Connect with other people, join tribes and listen your favorite podcast!
                         </Welcome>
 
                         <Button
