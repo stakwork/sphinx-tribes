@@ -1,25 +1,44 @@
 import React from 'react'
 import './App.css'
 import '@material/react-material-icon/dist/material-icon.css';
+import "@fontsource/roboto";
 import Header from './tribes/header'
 import Body from './tribes/body'
 import PeopleHeader from './people/header'
+import MobilePeopleHeader from './people/mobile/header'
 import PeopleBody from './people/body'
+import MobilePeopleBody from './people/mobile/body'
+import { colors } from './colors'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import { useIsMobile } from './hooks';
 
 function App() {
   const mode = getMode()
-  if (mode === Mode.PEOPLE) {
-    return <div className="app">
-      <PeopleHeader />
-      <PeopleBody />
-    </div>
-  }
-  return (
-    <div className="app">
-      <Header />
-      <Body />
-    </div>
-  );
+  const c = colors['light']
+  const isMobile = useIsMobile()
+
+  return <Router>
+    {
+      // people
+      mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
+        {isMobile ? <MobilePeopleHeader /> : <PeopleHeader />}
+        {isMobile ? <MobilePeopleBody /> : <PeopleBody />}
+      </div>
+
+        // tribes
+        : <div className="app" style={{ background: c.background }}>
+          <Header />
+          <Body />
+        </div>
+    }
+  </Router>
+
+
 }
 
 enum Mode {

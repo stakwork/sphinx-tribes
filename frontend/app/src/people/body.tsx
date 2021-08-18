@@ -9,24 +9,45 @@ import {
   EuiButton
 } from '@elastic/eui';
 import Person from './person'
+import Drawer from './drawer/index'
 import PersonView from './personView'
+import PersonViewSlim from './personViewSlim'
 import EditMe from './editMe'
 import { useFuse, useScroll } from '../hooks'
 import MaterialIcon from '@material/react-material-icon';
+import { colors } from '../colors'
+import FadeLeft from '../animated/fadeLeft';
+import { useIsMobile } from '../hooks';
+import {
+  Switch,
+  Route,
+  Link,
+  useHistory,
+  useLocation
+} from "react-router-dom";
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
 
 export default function BodyComponent() {
-
   const { main, ui } = useStores()
   const [loading, setLoading] = useState(false)
   const [selectedPerson, setSelectedPerson] = useState(0)
+  const [selectingPerson, setSelectingPerson] = useState(0)
+  const [showProfile, setShowProfile] = useState(false)
+  const c = colors['light']
+  const isMobile = useIsMobile()
+  const history = useHistory()
+  const location = useLocation()
+
+  console.log('history', history)
+  console.log('location', location)
 
   function selectPerson(id: number, unique_name: string) {
     console.log('selectPerson', id, unique_name)
     setSelectedPerson(id)
+    setSelectingPerson(id)
     if (unique_name && window.history.pushState) {
       window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
     }
@@ -53,10 +74,11 @@ export default function BodyComponent() {
   return useObserver(() => {
     const peeps = getFuse(main.people, ["owner_alias"])
     const { handleScroll, n, loadingMore } = getScroll()
-    const people = peeps.slice(0, n)
+    let people = peeps.slice(0, n)
+    people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
-    if (selectedPerson) {
-      return <Body id="main">
+    if (selectedPerson && showProfile) {
+      return <Body>
         <Column className="main-wrap">
           <PersonView goBack={() => {
             setSelectedPerson(0)
@@ -68,52 +90,72 @@ export default function BodyComponent() {
       </Body>
     }
 
-    return <Body id="main">
-      <Column className="main-wrap">
-        {loading && <EuiLoadingSpinner size="xl" />}
-        {!loading && <EuiFormFieldset style={{ width: '100%' }} className="container">
-          <div className="row">
-            {people.map(t => <Person {...t} key={t.id}
-              selected={selectedPerson === t.id}
-              select={selectPerson}
-            />)}
-          </div>
-        </EuiFormFieldset>}
-        <AddWrap>
-          {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
-            <div style={{ display: 'flex' }}>
-              <MaterialIcon
-                style={{ fontSize: 70 }}
-                icon="account_circle" aria-label="edit-me" />
-            </div>
-          </EuiButton>}
-        </AddWrap>
-      </Column>
-
+    return <Body>
+      <>
+        <Drawer />
+        <Column className="main-wrap">
+          {loading && <EuiLoadingSpinner size="xl" />}
+          {!loading && <EuiFormFieldset style={{ width: '100%' }} >
+            <Row>
+              {people.map(t => <Person {...t} key={t.id}
+                selected={selectedPerson === t.id}
+                select={selectPerson}
+              />)}
+            </Row>
+          </EuiFormFieldset>}
+          <AddWrap>
+            {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
+              <div style={{ display: 'flex' }}>
+                <MaterialIcon
+                  style={{ fontSize: 70 }}
+                  icon="account_circle" aria-label="edit-me" />
+              </div>
+            </EuiButton>}
+          </AddWrap>
+        </Column>
+      </>
       <EditMe />
 
+      <FadeLeft
+        withOverlay
+        drift={40}
+        overlayClick={() => setSelectingPerson(0)}
+        style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000 }}
+        isMounted={(selectingPerson && !showProfile) ? true : false}
+        dismountCallback={() => setSelectedPerson(0)}
+      >
+        <PersonViewSlim goBack={() => setSelectingPerson(0)}
+          personId={selectedPerson}
+          loading={loading} />
+      </FadeLeft>
     </Body>
   }
   )
 }
 
+
 const Body = styled.div`
   flex:1;
-  height:calc(100vh - 90px);
+  height:calc(100vh - 60px);
   padding-bottom:80px;
   width:100%;
   overflow:auto;
-  background:#272c4b;
   display:flex;
-  flex-direction:column;
-  align-items:center;
 `
 const Column = styled.div`
   display:flex;
-  flex-direction:column;
-  align-items:center;
+  // flex-direction:column;
+  // align-items:center;
   max-width:900px;
+  flex-wrap:wrap;
   width:100%;
+`
+
+const Row = styled.div`
+  display:flex;
+  flex-wrap:wrap;
+  width:100%;
+  
 `
 const AddWrap = styled.div`
   position:fixed;

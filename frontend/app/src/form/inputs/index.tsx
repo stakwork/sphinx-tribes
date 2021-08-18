@@ -1,5 +1,6 @@
 import React from 'react'
 import TextInput from './text-input'
+import SearchTextInput from './search-text-input'
 import TextAreaInput from './text-area-input'
 import ImageInput from './img-input'
 import GalleryInput from './gallery-input'
@@ -13,6 +14,8 @@ export default function Input(props: any) {
             return <TextInput {...props} />
         case 'textarea':
             return <TextAreaInput {...props} />
+        case 'search':
+            return <SearchTextInput {...props} />
         case 'img':
             return <ImageInput {...props} />
         case 'gallery':

@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react'
 import styled from "styled-components";
 import Input from "../../../form/inputs/";
 import { EuiButton } from '@elastic/eui'
-import FadeLeft from '../../../animated/fadeLeft';
 import WidgetList from './widgetList'
 import MaterialIcon from '@material/react-material-icon';
 
 export default function FocusedWidget(props: any) {
     const { name, values, errors, initialValues, setFieldTouched,
-        setFieldValue, item, setShowFocused, setDisableFormButtons, deleteErrors } = props
+        setFieldValue, item, setShowFocused, setDisableFormButtons } = props
     const { single } = item
     const [selectedIndex, setSelectedIndex] = useState(-1)
 
@@ -46,11 +45,16 @@ export default function FocusedWidget(props: any) {
 
     function cancel(dismount) {
         // new widget cancelled, revert form state
-        setFieldValue(`${name}.${item.name}`, prevState);
-        // clear errors if there are any
+
+        let returnState = prevState
+        if (!single && selectedIndex < 0) {
+            returnState = getFormState()
+        }
+
+        setFieldValue(`${name}.${item.name}`, returnState);
 
         if (single || dismount) setShowFocused(false)
-        else setSelectedIndex(-1)
+        // else setSelectedIndex(-1)
     }
 
     function done() {
@@ -71,6 +75,7 @@ export default function FocusedWidget(props: any) {
     function getFormState() {
         return (values[name] && values[name][item.name]) || []
     }
+
     function startCreate() {
         let cloneformState = getFormState()
         setPrevState(cloneformState)

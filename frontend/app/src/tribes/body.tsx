@@ -81,7 +81,7 @@ export default function BodyComponent() {
 
 const Body = styled.div`
   flex:1;
-  height:calc(100vh - 90px);
+  height:calc(100vh - 60px);
   padding-bottom:80px;
   width:100%;
   overflow:auto;

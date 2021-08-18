@@ -1,21 +1,24 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,400i,700,700i');
 @import url('https://rsms.me/inter/inter-ui.css');
 html{
-  position: fixed;
+  /* position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 0; */
   overflow: hidden;
+  height:100%;
+  width:100%;
 }
 body {
   margin: 0;
-  font-family: "Inter UI", Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  height:100%;
+  width:100%;
+  font-family: Roboto,"Inter UI", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color:#fff;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -30,6 +33,13 @@ button:focus{
   top:0;right:0;bottom:0;left:0;
 }
 
+.euiCheckableCard {
+  background:none !important;
+  color:none !important;
+  box-shadow: none !important;
+  border-bottom:1px solid #EBEDEF !important;
+}
+
 .euiCheckableCard__children{
   width:100%;
   padding:0 !important;
@@ -41,7 +51,8 @@ button:focus{
   display: none;
 }
 .container {
-  max-width: 760px !important;
+  /* max-width: 760px !important; */
+  max-width:90% !important;
 }
 .euiPopover {
   margin-top: -5px;
@@ -52,20 +63,22 @@ button:focus{
 }
 
 #header {
-  padding-top: 12px;
-  padding-bottom: 16px;
+  /* padding-top: 12px;
+  padding-bottom: 16px; */
   display: block;
-  max-height: 105px;
+  /* max-height: 105px; */
   height: auto;
   min-height: auto;
-  background: #161e29;
+  background: #1E1F25;
   border: 0;
+  padding-bottom:10px;
 }
 
 #logo {
   width: 200px;
   height: 40px;
 }
+
 #search-input {
   width: 260px;
   height: 35px;
@@ -79,17 +92,7 @@ button:focus{
   background-position: 10px;
   background-size: 20px 20px;
 }
-#header .euiButton{
-  min-width: 80px;
-  width: 95px;
-  height: 35px;
-  border: 1px solid #5D8FDD;
-  color: #5D8FDD;
-}
-#header .euiButton__text {
-  font-size: 10px;
-  text-transform: uppercase;
-}
+/* 
 #header .euiIcon--medium {
   width: 11px;
 }
@@ -123,6 +126,10 @@ button:focus{
 #header-right .euiFormControlLayoutIcons {
   display: none;
 }
+.euiFormControlLayout{
+  max-width:none;
+  min-height:40px;
+} */
 .popover-tags .euiFieldSearch.euiFieldSearch {
   background-image: url(/static/search-24px.svg) !important;
   background-repeat: no-repeat;
@@ -138,7 +145,7 @@ button:focus{
   max-width: none;
 }
 #main {
-  background: #17212a;
+  /* background: #17212a; */
   padding-top: 8px;
 }
 #main .euiSpacer--m {
@@ -153,11 +160,11 @@ fieldset.container {
   min-height: 137px;
   padding: 20px;
   border: 0;
-  background: #1a2430;
+  /* background: #1a2430; */
   position: relative;
 }
 #main .euiCheckableCard h5 {
-  color: #6B7A8D;
+  /* color: #6B7A8D; */
   font-size: 12px;
   margin-bottom: 0;
 }
@@ -181,6 +188,11 @@ fieldset.container {
   background-size: 40px 33px;
   background-position: center center;
   background-color: #161e29;
+}
+
+input.input {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .qr-wrap {
@@ -314,7 +326,7 @@ textarea.qr-string {
   bottom: 0px;
   padding: 4px 2px !important;
 }
-@media (min-width: 768px) {
+
   #logo {
     width: 250px;
     height: 60px;
@@ -340,13 +352,13 @@ textarea.qr-string {
   #main .euiCheckableCard-isChecked  {
     height: auto;
   }
+
+
+#header-right {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
-@media (max-width: 767px) {
-  #header-right {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-}
+
 
 .euiModal__flex .euiModalBody .euiModalBody__overflow{
   padding:24px 0 !important;
@@ -359,4 +371,22 @@ margin-bottom:10px;
 
 .euiFormRow__labelWrapper{
   margin-bottom:0px;
+}
+
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #556171;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #556171;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #556171;
+}
+
+.sphinxButton{
+  box-shadow:none;
 }
