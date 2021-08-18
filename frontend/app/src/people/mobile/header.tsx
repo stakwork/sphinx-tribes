@@ -13,6 +13,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
 import FadeLeft from '../../animated/fadeLeft';
 import EditInfo from '../edit/editInfo'
+import SignIn from '../auth/signIn';
 export default function Header() {
     const { main, ui } = useStores()
 
@@ -44,7 +45,7 @@ export default function Header() {
     const [showEditSelf, setShowEditSelf] = useState(false)
 
     const pathname = location && location.pathname
-
+    console.log(ui.meInfo)
 
     return useObserver(() => {
         return <>
@@ -56,13 +57,12 @@ export default function Header() {
                         </EuiHeaderSection>
 
                         <Corner>
-                            {true ?
-                                <Button
-                                    icon={'account_circle'}
-                                    text={'Edit'}
-                                    color='primary'
-                                    onClick={() => setShowEditSelf(true)}
-                                /> :
+                            {ui.meInfo ?
+                                <Imgg
+                                    style={{ height: 30, width: 30, marginRight: 10 }}
+                                    src={ui.meInfo.photo_url || '/static/sphinx.png'}
+                                    onClick={() => setShowEditSelf(true)} />
+                                :
                                 <Button
                                     icon={'account_circle'}
                                     text={'Sign in'}
@@ -113,37 +113,10 @@ export default function Header() {
                 close={() => setShowSignIn(false)}
                 overlayClick={() => setShowSignIn(false)}
             >
-                <div>
-                    <Column>
-                        <Imgg src={'/static/sphinx.png'} />
-
-                        <Name>Welcome</Name>
-
-                        <Description>
-                            Use Sphinx to login and create or edit your profile.
-                        </Description>
-
-
-                        <Button
-                            text={'Login with Sphinx'}
-                            height={60}
-                            width={'100%'}
-                            color={'primary'}
-                        />
-                    </Column>
-                    <Divider />
-                    <Column style={{ paddingTop: 0 }}>
-                        <Description>
-                            I don't have Sphinx!
-                        </Description>
-                        <Button
-                            text={'Get Sphinx'}
-                            height={60}
-                            width={'100%'}
-                            color={'widget'}
-                        />
-                    </Column>
-                </div>
+                <SignIn
+                    onSuccess={() => {
+                        setShowSignIn(false)
+                    }} />
             </Modal >
 
             {/* you logged in modal  */}
@@ -189,7 +162,9 @@ export default function Header() {
                 }}>
                     <EditInfo
                         style={{ padding: '50px 10px' }}
-                        ftux={true} />
+                        ftux={true}
+                        done={() => setShowEditSelf(false)}
+                    />
                 </div>
             </Modal>
 
@@ -254,18 +229,6 @@ text-align: center;
 
 color: #292C33;
 `;
-
-const Description = styled.div`
-font-size: 17px;
-line-height: 20px;
-text-align: center;
-margin:20px 0;
-
-/* Main bottom icons */
-
-color: #5F6368;
-
-`
 const Welcome = styled.div`
 font-size: 15px;
 line-height: 24px;
@@ -291,9 +254,8 @@ const Imgg = styled.div<ImageProps>`
                         background-image: url("${(p) => p.src}");
                         background-position: center;
                         background-size: cover;
-                        margin-bottom:20px;
                         width:90px;
                         height:90px;
                         border-radius: 50%;
-                        position: relative;
                         `;
+

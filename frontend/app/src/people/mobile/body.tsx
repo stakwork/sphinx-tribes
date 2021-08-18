@@ -10,7 +10,7 @@ import {
 } from '@elastic/eui';
 import Person from '../person'
 import PersonViewSlim from '../personViewSlim'
-import EditMe from '../editMe'
+
 import { useFuse, useScroll } from '../../hooks'
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from '../../colors'
@@ -78,32 +78,19 @@ export default function BodyComponent() {
         return <Body>
             <div>
                 {loading && <EuiLoadingSpinner size="xl" />}
-                {!loading && <EuiFormFieldset style={{ width: '100%' }} >
-
+                {!loading && <div style={{ width: '100%' }} >
                     {people.map(t => <Person {...t} key={t.id}
                         selected={selectedPerson === t.id}
                         select={selectPerson}
                     />)}
-
-                </EuiFormFieldset>}
-                <AddWrap>
-                    {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
-                        <div style={{ display: 'flex' }}>
-                            <MaterialIcon
-                                style={{ fontSize: 70 }}
-                                icon="account_circle" aria-label="edit-me" />
-                        </div>
-                    </EuiButton>}
-                </AddWrap>
+                </div>}
             </div>
-
-            <EditMe />
 
             <FadeLeft
                 withOverlay
                 drift={40}
                 overlayClick={() => setSelectingPerson(0)}
-                style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000 }}
+                style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
                 isMounted={(selectingPerson && !showProfile) ? true : false}
                 dismountCallback={() => setSelectedPerson(0)}
             >
@@ -112,15 +99,6 @@ export default function BodyComponent() {
                     loading={loading} />
             </FadeLeft>
 
-
-
-            {/* you logged in modal  */}
-            < Modal visible={false} >
-                <div>
-                    HIII
-                </div>
-
-            </Modal >
         </Body >
     }
     )
@@ -134,15 +112,6 @@ const Body = styled.div`
   width:100%;
   overflow:auto;
   display:flex;
-`
-const Column = styled.div`
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding: 25px;
-  
 `
 const AddWrap = styled.div`
   position:fixed;
@@ -160,41 +129,3 @@ const AddWrap = styled.div`
     height:60px;
   }
 `
-
-const Name = styled.div`
-font-style: normal;
-font-weight: 500;
-font-size: 26px;
-line-height: 19px;
-/* or 73% */
-
-text-align: center;
-
-/* Text 2 */
-
-color: #292C33;
-`;
-const Description = styled.div`
-font-size: 17px;
-line-height: 20px;
-text-align: center;
-margin:20px 0;
-
-/* Main bottom icons */
-
-color: #5F6368;
-`
-
-interface ImageProps {
-    readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-                        background-image: url("${(p) => p.src}");
-                        background-position: center;
-                        background-size: cover;
-                        margin-bottom:20px;
-                        width:90px;
-                        height:90px;
-                        border-radius: 50%;
-                        position: relative;
-                        `;

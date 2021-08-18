@@ -11,7 +11,7 @@ import styled, { css } from "styled-components";
 import { getHostIncludingDockerHosts } from "../../host";
 import { Button } from "../../sphinxUI";
 
-export default function EditMe(props: any) {
+export default function EditInfo(props: any) {
     const { ui, main } = useStores();
 
     const [loading, setLoading] = useState(false);
@@ -31,7 +31,9 @@ export default function EditMe(props: any) {
 
         setWarnBeforeClose(false)
         ui.setEditMe(false);
-        ui.setMeInfo(null);
+        // ui.setMeInfo(null);
+
+        if (props.done) props.done()
     }
 
     function fullStateCompare(no1, no2, r) {
