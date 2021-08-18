@@ -3,7 +3,6 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
 import { orderBy } from 'lodash'
 import styled from 'styled-components'
-import { colors } from '../colors'
 
 import {
   EuiHeader,
@@ -25,8 +24,6 @@ export default function Header() {
 
   const selectedTags = ui.tags.filter(t => t.checked === 'on')
   const showTagCount = selectedTags.length > 0 ? true : false
-
-  const c = colors['light']
 
   useEffect(() => {
     if (window.location.host === 'podcasts.sphinx.chat') {
@@ -51,12 +48,12 @@ export default function Header() {
     return <EuiHeader id="header" >
       <div className="container">
         <div className="row">
-          <EuiHeaderSection grow={false} >
+          <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             <img id="logo" src="/static/tribes_logo.svg" alt="Logo" />
             {/*<Title>Tribes</Title>*/}
           </EuiHeaderSection>
 
-          <EuiHeaderSection id="header-right" side="right" >
+          <EuiHeaderSection id="header-right" side="right" className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             {/* <EuiHeaderSectionItem> */}
             <div>
               <EuiFieldSearch id="search-input"
