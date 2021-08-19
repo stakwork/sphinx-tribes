@@ -9,10 +9,8 @@ import {
     EuiButton
 } from '@elastic/eui';
 import Person from '../person'
-import Drawer from '../drawer/index'
-import PersonView from '../personView'
 import PersonViewSlim from '../personViewSlim'
-import EditMe from '../editMe'
+
 import { useFuse, useScroll } from '../../hooks'
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from '../../colors'
@@ -25,7 +23,7 @@ import {
     useHistory,
     useLocation
 } from "react-router-dom";
-
+import { Modal, Button, Divider } from '../../sphinxUI';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -77,38 +75,22 @@ export default function BodyComponent() {
         let people = peeps.slice(0, n)
         people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
-        console.log('hiii')
-
         return <Body>
 
-            <div>
-                {loading && <EuiLoadingSpinner size="xl" />}
-                {!loading && <EuiFormFieldset style={{ width: '100%' }} >
+            {loading && <EuiLoadingSpinner size="xl" />}
+            {!loading && <div style={{ width: '100%' }} >
+                {people.map(t => <Person {...t} key={t.id}
+                    selected={selectedPerson === t.id}
+                    select={selectPerson}
+                />)}
+            </div>}
 
-                    {people.map(t => <Person {...t} key={t.id}
-                        selected={selectedPerson === t.id}
-                        select={selectPerson}
-                    />)}
-
-                </EuiFormFieldset>}
-                <AddWrap>
-                    {!loading && <EuiButton onClick={() => ui.setEditMe(true)} style={{ border: 'none' }}>
-                        <div style={{ display: 'flex' }}>
-                            <MaterialIcon
-                                style={{ fontSize: 70 }}
-                                icon="account_circle" aria-label="edit-me" />
-                        </div>
-                    </EuiButton>}
-                </AddWrap>
-            </div>
-
-            <EditMe />
 
             <FadeLeft
                 withOverlay
                 drift={40}
                 overlayClick={() => setSelectingPerson(0)}
-                style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000 }}
+                style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
                 isMounted={(selectingPerson && !showProfile) ? true : false}
                 dismountCallback={() => setSelectedPerson(0)}
             >
@@ -116,7 +98,8 @@ export default function BodyComponent() {
                     personId={selectedPerson}
                     loading={loading} />
             </FadeLeft>
-        </Body>
+
+        </Body >
     }
     )
 }
@@ -124,18 +107,11 @@ export default function BodyComponent() {
 
 const Body = styled.div`
   flex:1;
-  height:calc(100vh - 60px);
+  height:100%;
   padding-bottom:80px;
   width:100%;
   overflow:auto;
   display:flex;
-`
-const Column = styled.div`
-  width:100%;
-`
-
-const Row = styled.div`
-  
 `
 const AddWrap = styled.div`
   position:fixed;

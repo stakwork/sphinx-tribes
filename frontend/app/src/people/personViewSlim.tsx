@@ -16,11 +16,13 @@ import {
 
 import { meSchema } from '../form/schema'
 
+import AboutView from "./widgetViews/aboutView";
 import BlogView from "./widgetViews/blogView";
 import OfferView from "./widgetViews/offerView";
 import TwitterView from "./widgetViews/twitterView";
 import SupportMeView from "./widgetViews/supportMeView";
 import WantedView from "./widgetViews/wantedView";
+
 import FadeLeft from "../animated/fadeLeft";
 import { useEffect } from "react";
 import { Button, IconButton } from "../sphinxUI";
@@ -40,6 +42,7 @@ export default function PersonView(props: any) {
     } = props
 
     const { main, ui } = useStores()
+    const { meInfo } = ui || {}
 
     const person = (main.people && main.people.length && main.people.find(f => f.id === personId))
 
@@ -54,27 +57,15 @@ export default function PersonView(props: any) {
         extras
     } = person || {}
 
+    const editMode = id === meInfo?.id
+
     const owner_pubkey = ''
 
-    const [selectedWidget, setSelectedWidget] = useState('');
-    const [newSelectedWidget, setNewSelectedWidget] = useState('');
+    const [selectedWidget, setSelectedWidget] = useState('posts');
+    const [newSelectedWidget, setNewSelectedWidget] = useState('posts');
     const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const qrString = makeQR(owner_pubkey);
-
-    useEffect(() => {
-        if (extras && (Object.keys(extras).length > 0)) {
-            let name = ''
-            // pick the extra with one or more widgets
-            Object.keys(extras).forEach(e => {
-                if (name) return
-                if (extras[e].length > 0) name = e
-            })
-
-            setSelectedWidget(name)
-            setNewSelectedWidget(name)
-        }
-    }, [extras])
 
     function switchWidgets(name) {
         // setting newSelectedWidget will dismount the FadeLeft, 
@@ -103,6 +94,12 @@ export default function PersonView(props: any) {
     function toggleQR(e) {
         e.stopPropagation();
         setShowQR((current) => !current);
+    }
+
+    function logout() {
+        ui.setEditMe(false)
+        ui.setMeInfo(null)
+        goBack()
     }
 
     if (loading) return <div>Loading...</div>
@@ -137,54 +134,12 @@ export default function PersonView(props: any) {
         })
     }
 
-    function renderWidgets() {
-        if (!selectedWidget || !fullSelectedWidget) {
-            return <div style={{ height: 200 }} />
-        }
-
-        const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === selectedWidget) || {}
-        const single = widgetSchema.single
-        let fields = [...widgetSchema.fields]
-        // remove show from display
-        fields = fields.filter(f => f.name !== 'show')
-
-        function wrapIt(child) {
-            if (single) {
-                return null
-            }
-
-            return <Panel>
-                {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
-                    return <Card key={i} style={{ width: '100%' }}>
-                        {React.cloneElement(child, { ...s })}
-                    </Card>
-                })}
-            </Panel>
-        }
-
-        switch (widgetSchema.name) {
-            case 'twitter':
-                return wrapIt(<TwitterView {...fullSelectedWidget} />)
-            case 'supportme':
-                return wrapIt(<SupportMeView {...fullSelectedWidget} />)
-            case 'offer':
-                return wrapIt(<OfferView {...fullSelectedWidget} />)
-            case 'wanted':
-                return wrapIt(<WantedView {...fullSelectedWidget} />)
-            case 'blog':
-                return wrapIt(<BlogView {...fullSelectedWidget} />)
-            default:
-                return <></>
-
-        }
-    }
-
-
 
     const tabs = {
         about: {
             label: 'About',
             name: 'about',
+            single: true,
             action: {
                 text: 'Edit Profile',
                 icon: 'edit'
@@ -218,8 +173,60 @@ export default function PersonView(props: any) {
         },
     }
 
-    function renderButton() {
-        if (!selectedWidget) return <div />
+    function renderWidgets() {
+        if (!selectedWidget) {
+            return <div style={{ height: 200 }} />
+        }
+
+        const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === selectedWidget) || {}
+        const single = widgetSchema.single
+        let fields = widgetSchema.fields && [...widgetSchema.fields]
+        // remove show from display
+        fields = fields && fields.filter(f => f.name !== 'show')
+
+        function wrapIt(child) {
+            if (single) {
+                return <Panel style={{ padding: 20 }}>
+                    {child}
+                </Panel>
+            }
+
+            if (!fullSelectedWidget) return <div></div>
+
+            return <Panel>
+                {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
+                    return <Card key={i} style={{ width: '100%' }}>
+                        {React.cloneElement(child, { ...s })}
+                    </Card>
+                })}
+            </Panel>
+        }
+
+        switch (selectedWidget) {
+            case 'about':
+                return <Panel style={{ padding: 20 }}>
+                    <AboutView {...person} />
+                </Panel>
+            case 'posts':
+                return wrapIt(<OfferView {...fullSelectedWidget} />)
+            case 'twitter':
+                return wrapIt(<TwitterView {...fullSelectedWidget} />)
+            case 'supportme':
+                return wrapIt(<SupportMeView {...fullSelectedWidget} />)
+            case 'offer':
+                return wrapIt(<OfferView {...fullSelectedWidget} />)
+            case 'wanted':
+                return wrapIt(<WantedView {...fullSelectedWidget} />)
+            case 'blog':
+                return wrapIt(<BlogView {...fullSelectedWidget} />)
+            default:
+                return wrapIt(<></>)
+
+        }
+    }
+
+    function renderEditButton() {
+        if (!editMode || !selectedWidget) return <div />
 
         const { action } = tabs[selectedWidget]
         return <div style={{ padding: 10, margin: '8px 0 5px' }}>
@@ -239,6 +246,8 @@ export default function PersonView(props: any) {
         </div>
     }
 
+
+
     return (
         <Content>
             <div style={{
@@ -256,10 +265,12 @@ export default function PersonView(props: any) {
                             onClick={goBack}
                             icon='arrow_back'
                         />
-                        <IconButton
-                            onClick={goBack}
-                            icon='logout'
-                        />
+                        {editMode ?
+                            <IconButton
+                                onClick={logout}
+                                icon='logout'
+                            /> : <div />
+                        }
                     </div>
 
                     {/* profile photo */}
@@ -269,35 +280,26 @@ export default function PersonView(props: any) {
                             <Name>{owner_alias}</Name>
                         </RowWrap>
 
-                        <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                            <a href={qrString}>
+                        {/* only see buttons on other people's profile */}
+                        {editMode ? <div style={{ height: 40 }} /> :
+                            <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                                <a href={qrString}>
+                                    <Button
+                                        text='Connect'
+                                        onClick={add}
+                                        color='primary'
+                                        height={42}
+                                        width={120}
+                                    />
+                                </a>
+                                <div style={{ width: 15 }} />
                                 <Button
-                                    text='Connect'
-                                    onClick={add}
-                                    color='primary'
+                                    text='Support'
+                                    color='link'
                                     height={42}
-                                    width={120}
-                                />
-                            </a>
-                            <div style={{ width: 15 }} />
-                            <Button
-                                text='Support'
-                                color='link'
-                                height={42}
-                                width={120} />
-                        </RowWrap>
-
-                        {/* <RowWrap style={{ justifyContent: 'space-around', width: '80%' }}>
-                            <Detail><B>300</B> members</Detail>
-                            <Detail><B>82</B> Posts</Detail>
-                        </RowWrap> */}
-                        {/* {extras && extras.twitter &&
-                            <RowWrap style={{ alignItems: 'center', margin: 0 }}>
-                                <Icon source={'/static/twitter.png'} style={{ width: 14, height: 14, margin: '0 3px 0 0' }} />
-                                <div style={{ fontSize: 14, }}>{extras.twitter.handle}</div>
+                                    width={120} />
                             </RowWrap>
-                        } */}
-
+                        }
                     </Head>
 
                     <Tabs>
@@ -321,7 +323,7 @@ export default function PersonView(props: any) {
                 </Panel>
 
                 <Sleeve>
-                    {renderButton()}
+                    {renderEditButton()}
                     {renderWidgets()}
                 </Sleeve>
 
@@ -543,7 +545,7 @@ const WidgetEnv = styled.div<WidgetEnvProps>`
 const Name = styled.div`
                     font-style: normal;
                     font-weight: 500;
-                    font-size: 26px;
+                    font-size: 30px;
                     line-height: 19px;
                     /* or 73% */
 
@@ -554,18 +556,6 @@ const Name = styled.div`
                     color: #3C3F41;
                     `;
 
-const Detail = styled.div`
-                    display:flex;
-                    font-family: Roboto;
-                    font-style: normal;
-                    font-size: 18px;
-                    line-height: 18px;
-                    /* or 106% */
-
-                    /* Main bottom icons */
-
-                    color: #5F6368;
-                    `;
 
 const Sleeve = styled.div`
 
