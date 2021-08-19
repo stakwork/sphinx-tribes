@@ -8,7 +8,7 @@ import { EuiCheckableCard, EuiButton } from "@elastic/eui";
 import { formatPrice } from '../helpers';
 import { colors } from "../colors";
 import { useIsMobile, useScreenWidth } from "../hooks";
-import { Button } from '../sphinxUI/index'
+import { Button, Divider } from '../sphinxUI/index'
 const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
@@ -78,6 +78,7 @@ export default function Person(props: any) {
 
             />
           </Row>
+          <Divider style={{ marginTop: 20 }} />
         </R>
       </Wrap>
     );
@@ -87,51 +88,57 @@ interface ContentProps {
   selected: boolean;
 }
 const Content = styled.div`
-// display:flex;
-`;
+        // display:flex;
+        `;
 const Wrap = styled.div`
-  cursor:pointer;
-  padding: 10px;
-  display:flex;
-`;
+        cursor:pointer;
+        padding: 25px;
+        padding-bottom:0px;
+        display:flex;
+        width:100%;
+        `;
 const R = styled.div`
-  margin-left:20px;
-`;
+        width:67%;
+        margin-left:20px;
+        `;
 
 
 const Row = styled.div`
-  display: flex;
-`;
+        display: flex;
+        width:100%;
+        `;
 
 const Title = styled.h3`
-font-style: normal;
-font-weight: 500;
-font-size: 20px;
-line-height: 19px;
-/* or 95% */
+        font-style: normal;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 19px;
+        /* or 95% */
 
 
-/* Text 2 */
+        /* Text 2 */
 
-color: #3C3F41;
-`;
+        color: #3C3F41;
+        `;
 const Description = styled.div`
-  font-size: 15px;
-  color: #5F6368;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow:hidden;
-`;
+        font-size: 15px;
+        color: #5F6368;
+        white-space: nowrap;
+        height:26px;
+        text-overflow: ellipsis;
+        overflow:hidden;
+        // width:280px;
+        `;
 interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url("${(p) => p.src}");
-  background-position: center;
-  background-size: cover;
-  height: 80px;
-  width: 80px;
-  min-width: 80px;
-  border-radius: 50%;
-  position: relative;
-`;
+          background-image: url("${(p) => p.src}");
+          background-position: center;
+          background-size: cover;
+          height: 96px;
+          width: 96px;
+          min-width: 96px;
+          border-radius: 50%;
+          position: relative;
+          `;

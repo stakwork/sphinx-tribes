@@ -58,7 +58,7 @@ export default function Button(props: any) {
 
 const B = styled(EuiButton)`
 position:relative;
-border-radius: 25px;
+border-radius: 100px;
 height:36px;
 font-weight:bold;
 border:none;
