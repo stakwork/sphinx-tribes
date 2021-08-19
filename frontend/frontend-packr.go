@@ -5,4 +5,4 @@
 // and any other packr generated files.
 package frontend
 
-import _ "Users/davidplell/code/sphinx-tribes/frontend/packrd"
+import _ "github.com/stakwork/sphinx-tribes/frontend/packrd"
