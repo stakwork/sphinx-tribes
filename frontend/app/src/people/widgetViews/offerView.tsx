@@ -32,7 +32,6 @@ const Img = styled.div<ImageProps>`
                 width: 80px;
                 border-radius: 5px;
                 position: relative;
-                border:1px solid #ffffff21;
                 `;
 
 const T = styled.div`
@@ -41,7 +40,6 @@ font-weight:bold;
 const P = styled.div`
 padding: 10px;
 max-width: 400;
-background: #ffffff21;
 border-radius: 5px;
 text-align:center;
 margin-bottom:5px;
@@ -52,7 +50,6 @@ const U = styled.div`
 color:#1BA9F5
 `;
 const Wrap = styled.div`
-color: #fff;
 display: flex;
 flex-direction:column;
 `;
@@ -60,14 +57,4 @@ flex-direction:column;
 const Body = styled.div`
 padding: 0 5px 5px 5px;
 font-size:14px;
-`;
-
-const Gallery = styled.div`
-display:flex;
-flex-wrap:wrap;
-margin-top:10px;
-`;
-
-const None = styled.div`
-color:#ffffff71;
 `;

@@ -14,6 +14,9 @@ import { Modal, Button, Divider } from '../../sphinxUI';
 import FadeLeft from '../../animated/fadeLeft';
 import EditInfo from '../edit/editInfo'
 import SignIn from '../auth/signIn';
+
+import PersonViewSlim from '../personViewSlim';
+
 export default function Header() {
     const { main, ui } = useStores()
 
@@ -42,6 +45,7 @@ export default function Header() {
 
     const [showSignIn, setShowSignIn] = useState(false)
     const [showWelcome, setShowWelcome] = useState(false)
+    const [showInitEditSelf, setShowInitEditSelf] = useState(false)
     const [showEditSelf, setShowEditSelf] = useState(false)
 
     const pathname = location && location.pathname
@@ -121,7 +125,8 @@ export default function Header() {
             </Modal >
 
             {/* you logged in modal  */}
-            < Modal visible={showWelcome} >
+            < Modal
+                visible={showWelcome}>
                 <div>
                     <Column>
                         <Imgg
@@ -143,17 +148,21 @@ export default function Header() {
                             height={48}
                             width={'100%'}
                             color={'primary'}
-                            onClick={() => setShowWelcome(false)}
+                            onClick={() => {
+                                // switch from welcome modal to edit modal
+                                setShowWelcome(false)
+                                setShowEditSelf(true)
+                            }}
                         />
                     </Column>
                 </div>
             </Modal>
 
             {/* ONLY FOR FIRST TIME USER edit your info modal  */}
-            < Modal visible={showEditSelf}
+            {/* < Modal visible={showInitEditSelf}
                 drift={40}
                 fill
-                close={() => setShowEditSelf(false)}
+                close={() => setShowInitEditSelf(false)}
             >
                 <div style={{
                     background: '#fff',
@@ -164,9 +173,20 @@ export default function Header() {
                     <EditInfo
                         style={{ padding: '50px 10px' }}
                         ftux={true}
-                        done={() => setShowEditSelf(false)}
+                        done={() => setShowInitEditSelf(false)}
                     />
                 </div>
+            </Modal> */}
+
+
+            < Modal visible={showEditSelf}
+                drift={40}
+                fill
+                close={() => setShowEditSelf(false)}
+            >
+                <PersonViewSlim goBack={() => setShowEditSelf(false)}
+                    personId={ui.meInfo?.id}
+                />
             </Modal>
 
         </>
