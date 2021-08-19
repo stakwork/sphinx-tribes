@@ -228,7 +228,8 @@ export default function PersonView(props: any) {
     function renderEditButton() {
         if (!editMode || !selectedWidget) return <div />
 
-        const { action } = tabs[selectedWidget]
+        let { action } = tabs[selectedWidget] || {}
+        action = action || {}
         return <div style={{ padding: 10, margin: '8px 0 5px' }}>
             {action.info &&
                 <ActionInfo>
