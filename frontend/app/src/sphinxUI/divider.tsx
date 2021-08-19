@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 export default function Divider(props: any) {
 
-    return <D />
+    return <D style={{ ...props.style }} />
 }
 
 const D = styled.div`

@@ -76,15 +76,15 @@ export default function BodyComponent() {
         people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
         return <Body>
-            <div>
-                {loading && <EuiLoadingSpinner size="xl" />}
-                {!loading && <div style={{ width: '100%' }} >
-                    {people.map(t => <Person {...t} key={t.id}
-                        selected={selectedPerson === t.id}
-                        select={selectPerson}
-                    />)}
-                </div>}
-            </div>
+
+            {loading && <EuiLoadingSpinner size="xl" />}
+            {!loading && <div style={{ width: '100%' }} >
+                {people.map(t => <Person {...t} key={t.id}
+                    selected={selectedPerson === t.id}
+                    select={selectPerson}
+                />)}
+            </div>}
+
 
             <FadeLeft
                 withOverlay
@@ -107,7 +107,7 @@ export default function BodyComponent() {
 
 const Body = styled.div`
   flex:1;
-  height:calc(100vh - 60px);
+  height:100%;
   padding-bottom:80px;
   width:100%;
   overflow:auto;

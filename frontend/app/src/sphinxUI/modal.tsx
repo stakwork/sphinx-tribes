@@ -6,7 +6,7 @@ import FadeLeft from '../animated/fadeLeft';
 import { IconButton } from '.';
 
 export default function Modal(props: any) {
-    const { visible, fill, overlayClick, drift, dismountCallback, children, close } = props
+    const { visible, fill, overlayClick, drift, dismountCallback, children, close, style } = props
 
     const fillStyle = fill ? {
         height: '100%',
@@ -24,6 +24,7 @@ export default function Modal(props: any) {
             position: 'absolute', top: 0, left: 0,
             zIndex: 10000, width: '100%', height: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            ...style
         }}>
         <Env style={{ ...fillStyle }}>
             {close && <X>
