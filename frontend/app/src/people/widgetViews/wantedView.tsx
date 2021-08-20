@@ -48,7 +48,6 @@ const U = styled.div`
 color:#1BA9F5
 `;
 const Wrap = styled.div`
-color: #fff;
 display: flex;
 flex-direction:column;
 `;

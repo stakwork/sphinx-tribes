@@ -1,16 +1,17 @@
 import React from 'react'
 import styled from 'styled-components'
-import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui'
+import { EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
+import { FieldEnv, FieldText } from './index'
 
 export default function NumberInput({ error, label, value, handleChange, handleBlur, handleFocus }: Props) {
 
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
 
-  return <EuiFormRow label={labeltext}>
+  return <FieldEnv label={labeltext}>
     <R>
-      <Text name="first" value={value} type="number"
+      <FieldText name="first" value={value} type="number"
         onChange={e => {
           // dont allow zero or negative numbers
           if (parseInt(e.target.value) < 1) return
@@ -33,13 +34,9 @@ export default function NumberInput({ error, label, value, handleChange, handleB
         <EuiIcon type="alert" size='m' style={{ width: 20, height: 20 }} />
       </E>}
     </R>
-  </EuiFormRow>
+  </FieldEnv>
 }
 
-
-const Text = styled(EuiFieldText)`
-
-`
 const E = styled.div`
   position:absolute;
   right:10px;

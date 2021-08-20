@@ -17,7 +17,6 @@ export default function Wanted(props: I.Wanted) {
 }
 
 const Wrap = styled.div`
-color: #fff;
 `;
 
 const Row = styled.div`

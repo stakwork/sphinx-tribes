@@ -21,7 +21,6 @@ export default function BlogView(props: BlogPost) {
 }
 
 const Wrap = styled.div`
-color: #fff;
 display: flex;
 flex-direction:column;
 width:100%;

@@ -3,8 +3,9 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import styled from "styled-components";
 import Input from "./inputs";
-import { EuiButton } from '@elastic/eui'
+
 import FadeLeft from '../animated/fadeLeft';
+import { Button, IconButton } from "../sphinxUI";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -16,6 +17,8 @@ export default function Form(props: any) {
   const refBody: any = useRef(null)
 
   let lastPage = 1
+
+  const readOnly = props.readOnly
 
   const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody
 
@@ -45,86 +48,77 @@ export default function Form(props: any) {
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
       validationSchema={validator(props.schema)}
-      style={{ height: 'inherit' }}
-      innerStyle={{ height: 'inherit' }}
+    // style={{ height: 'inherit' }}
+    // innerStyle={{ height: 'inherit' }}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
-        console.log('errors', errors)
         return (
-          <FadeLeft
-            alwaysRender
-            noFadeOnInit
-            isMounted={formMounted}
-            dismountCallback={() => setFormMounted(true)}
-          >
-            <Wrap ref={refBody}>
-              {schema && schema.map((item: FormField) => <Input
-                {...item}
-                key={item.name}
-                values={values}
-                errors={errors}
-                scrollToTop={scrollToTop}
-                value={values[item.name]}
-                error={errors[item.name]}
-                initialValues={initialValues}
-                deleteErrors={() => {
-                  if (errors[item.name]) delete errors[item.name]
+          <Wrap ref={refBody}>
+            {schema && schema.map((item: FormField) => <Input
+              {...item}
+              key={item.name}
+              values={values}
+              disabled={readOnly}
+              readOnly={readOnly}
+              errors={errors}
+              scrollToTop={scrollToTop}
+              value={values[item.name]}
+              error={errors[item.name]}
+              initialValues={initialValues}
+              deleteErrors={() => {
+                if (errors[item.name]) delete errors[item.name]
+              }}
+              handleChange={(e: any) => {
+                setFieldValue(item.name, e);
+              }}
+              setFieldValue={(e, f) => {
+                setFieldValue(e, f)
+              }}
+              setFieldTouched={setFieldTouched}
+              handleBlur={() => setFieldTouched(item.name, false)}
+              handleFocus={() => setFieldTouched(item.name, true)}
+              setDisableFormButtons={setDisableFormButtons}
+              extraHTML={props.extraHTML && props.extraHTML[item.name]}
+            />)}
+
+            <BWrap >
+
+              <IconButton
+                isLoading={props.loading}
+                icon='arrow_back'
+                onClick={() => {
+                  if (props.close) props.close()
                 }}
-                handleChange={(e: any) => {
-                  setFieldValue(item.name, e);
-                }}
-                setFieldValue={(e, f) => {
-                  setFieldValue(e, f)
-                }}
-                setFieldTouched={setFieldTouched}
-                handleBlur={() => setFieldTouched(item.name, false)}
-                handleFocus={() => setFieldTouched(item.name, true)}
-                setDisableFormButtons={setDisableFormButtons}
-                extraHTML={props.extraHTML && props.extraHTML[item.name]}
-              />)}
+                disabled={disableFormButtons || !isValid}
+                style={{ fontSize: 12, fontWeight: 600 }}
+              />
 
-              <FadeLeft isMounted={!disableFormButtons}>
-                <BWrap floatingButtons={props.floatingButtons}>
-                  {page > 1 &&
-                    <EuiButton
-                      disabled={disableFormButtons || props.loading}
-                      onClick={async () => {
-                        // this does form animation between pages
-                        setFormMounted(false)
-                        await sleep(200)
-                        //
-                        setPage(page - 1)
-                      }}
-                      style={{ fontSize: 12, fontWeight: 600 }}
-                    >
-                      Back
-                    </EuiButton>
-                  }
+              {readOnly ? <div /> :
+                <Button
+                  disabled={disableFormButtons || props.loading}
+                  onClick={() => {
+                    handleSubmit()
+                    // if (lastPage === page) handleSubmit()
+                    // else {
+                    //   // this does form animation between pages
+                    //   setFormMounted(false)
+                    //   await sleep(200)
+                    //   //
+                    //   setPage(page + 1)
+                    // }
+                  }}
+                  color={'primary'}
+                  text={props.submitText || 'Save'}
+                />
+              }
 
-                  <EuiButton
-                    isLoading={props.loading}
-                    onClick={async () => {
-                      if (lastPage === page) handleSubmit()
-                      else {
-                        // this does form animation between pages
-                        setFormMounted(false)
-                        await sleep(200)
-                        //
-                        setPage(page + 1)
-                      }
-                    }}
-                    disabled={disableFormButtons || !isValid}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                  >
-                    {buttonText}
-                  </EuiButton>
-                </BWrap>
-              </FadeLeft>
 
-            </Wrap >
 
-          </FadeLeft >
+            </BWrap>
+
+          </Wrap >
+
         );
       }}
     </Formik >
@@ -132,29 +126,33 @@ export default function Form(props: any) {
 }
 
 const Wrap = styled.div`
+  padding:10px;
+  padding-top:80px;
+  margin-bottom:100px;
   display: flex;
   height:inherit;
   flex-direction: column;
   align-content: center;
-  justify-content: space-between;
 `;
 
 interface BWrapProps {
   readonly floatingButtons: boolean;
 }
 
-const BWrap = styled.div<BWrapProps>`
+const BWrap = styled.div`
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items:center;
   width:100%;
-  height:42px;
+  padding:10px;
   min-height:42px;
-  margin-top:20px;
-  position:${p => p.floatingButtons && 'absolute'};
-  bottom:${p => p.floatingButtons && '0px'};
-  left:${p => p.floatingButtons && '0px'};
+  position: absolute;
+  top:0px;
+  left:0px;
+  background:#ffffff;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
 `;
+
 
 type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch'
 
