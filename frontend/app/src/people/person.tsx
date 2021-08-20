@@ -72,11 +72,15 @@ export default function Person(props: any) {
           </Description>
           <Row style={{ justifyContent: 'space-between' }}>
             <div>3h ago</div>
-            <Button
-              text='Connect'
-              color='white'
-
-            />
+            {owner_pubkey ?
+              <a href={qrString}>
+                <Button
+                  text='Connect'
+                  color='white'
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </a> : <div />
+            }
           </Row>
           <Divider style={{ marginTop: 20 }} />
         </R>

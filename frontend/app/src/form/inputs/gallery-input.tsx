@@ -7,6 +7,8 @@ import type { Props } from './propsType'
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
 import MaterialIcon from "@material/react-material-icon";
+import { FieldEnv, FieldTextArea } from './index'
+
 
 export default function GalleryInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
     const { ui } = useStores();
@@ -69,7 +71,7 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
     const MAX_SIZE = 4194304 // 4MB
 
     return (
-        <EuiFormRow label={label}>
+        <>
             <Wrapper>
                 {picsrcArray && picsrcArray.map((v, i) => {
                     return <ImageWrap key={i}>
@@ -105,7 +107,7 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
 
                 </ImageWrap>
             </Wrapper>
-        </EuiFormRow>
+        </>
     );
 }
 

@@ -2,7 +2,9 @@ import * as Yup from 'yup'
 import { FormField } from "../form";
 
 const strValidator = Yup.string().required('Required')
+const nomValidator = Yup.number().required('Required')
 
+// this is source of truth for widget items!
 export const meSchema: FormField[] = [
     {
         name: "img",
@@ -191,6 +193,23 @@ export const meSchema: FormField[] = [
                 ]
             },
             {
+                name: "post",
+                label: "Post",
+                type: "widget",
+                fields: [
+                    {
+                        name: "title",
+                        label: "Title",
+                        type: "text"
+                    },
+                    {
+                        name: "content",
+                        label: "Content",
+                        type: "textarea",
+                    }
+                ]
+            },
+            {
                 name: "tribes",
                 label: "Tribes",
                 type: "widget",
@@ -240,7 +259,7 @@ export const meSchema: FormField[] = [
     }
 ];
 
-export const ftuxEditMeSchema: FormField[] = [
+export const aboutSchema: FormField[] = [
     {
         name: "img",
         label: "Image",
@@ -275,6 +294,81 @@ export const ftuxEditMeSchema: FormField[] = [
         page: 1,
     },
 ];
+
+export const postSchema: FormField[] = [
+    {
+        name: "title",
+        label: "Title",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: "content",
+        label: "Content",
+        type: "textarea",
+        validator: strValidator,
+    }
+];
+
+export const offerSchema: FormField[] = [
+    {
+        name: "title",
+        label: "Title",
+        validator: strValidator,
+        type: "text"
+    },
+    {
+        name: "description",
+        label: "Description",
+        validator: strValidator,
+        type: "textarea",
+    },
+    {
+        name: "price",
+        label: "Price",
+        validator: nomValidator,
+        type: "number",
+    }
+];
+
+export const wantedSchema: FormField[] = [
+    {
+        name: 'title',
+        label: "Title*",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: 'description',
+        label: "Description",
+        type: "textarea",
+        validator: strValidator,
+    },
+    {
+        name: 'priceMin',
+        label: "Price Min",
+        validator: Yup.number().when('priceMax', (pricemax) => Yup.number().max(pricemax, `Must be less than max`)),
+        type: "number",
+    },
+    {
+        name: 'priceMax',
+        label: "Price Max",
+        validator: nomValidator,
+        type: "number",
+    },
+    {
+        name: 'gallery',
+        label: "Gallery",
+        type: "gallery",
+    },
+
+    {
+        name: 'show',
+        label: "Show In Link",
+        type: "switch",
+    },
+];
+
 
 
 // extras.blog.existing
