@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { EuiFormRow, EuiTextArea, EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
+import { FieldEnv, FieldTextArea } from './index'
 
 export default function TextAreaInput({ error, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
     // console.log("TEXTAREA", label, extraHTML)
@@ -10,9 +11,9 @@ export default function TextAreaInput({ error, label, value, handleChange, handl
     if (error) labeltext = labeltext + ` (${error})`
 
     return <>
-        <EuiFormRow label={labeltext}>
+        <FieldEnv label={labeltext}>
             <R>
-                <Text name="first" value={value || ''}
+                <FieldTextArea name="first" value={value || ''}
                     readOnly={readOnly || false}
                     onChange={e => handleChange(e.target.value)}
                     onBlur={handleBlur}
@@ -23,7 +24,7 @@ export default function TextAreaInput({ error, label, value, handleChange, handl
                     <EuiIcon type="alert" size='m' style={{ width: 20, height: 20 }} />
                 </E>}
             </R>
-        </EuiFormRow>
+        </FieldEnv>
         <ExtraText
             style={{ display: value && extraHTML ? 'block' : 'none' }}
             dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
@@ -31,9 +32,6 @@ export default function TextAreaInput({ error, label, value, handleChange, handl
     </>
 }
 
-const Text = styled(EuiTextArea)`
-
-`
 const ExtraText = styled.div`
   color:#ddd;
   padding:10px 10px 25px 10px;

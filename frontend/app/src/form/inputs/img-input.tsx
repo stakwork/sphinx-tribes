@@ -4,18 +4,18 @@ import { EuiButton } from "@elastic/eui";
 import Camera from "../../utils/camera-option-icon.svg";
 import Dropzone from "react-dropzone";
 import avatarIcon from "../../utils/profile_avatar.svg";
-import type {Props} from './propsType'
+import type { Props } from './propsType'
 import { EuiLoadingSpinner } from '@elastic/eui';
-import {useStores} from '../../store'
+import { useStores } from '../../store'
 
-export default function ImageInput({label, value, handleChange, handleBlur, handleFocus}:Props) {
-  const {ui} = useStores();
+export default function ImageInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
+  const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
-  const [picsrc, setPicsrc] = useState(value||'');
+  const [picsrc, setPicsrc] = useState(value || '');
   // return <EuiFilePicker value={props.initialValues.img} >
   //   </EuiFilePicker>
 
-  async function uploadBase64Pic(img_base64:string, img_type:string){
+  async function uploadBase64Pic(img_base64: string, img_type: string) {
     console.log('uploadBase64Pic', img_type)
     try {
       const info = ui.meInfo as any;
@@ -23,7 +23,7 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
       const r = await fetch(URL + "/public_pic", {
         method: "POST",
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           img_base64, img_type
         }),
         headers: {
@@ -33,21 +33,21 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
       });
       const j = await r.json()
 
-      if(j.success && j.response && j.response.img) {
+      if (j.success && j.response && j.response.img) {
         setPicsrc(j.response.img)
         handleChange(j.response.img)
       }
-    } catch(e) {
+    } catch (e) {
       console.log('ERROR UPLOADING IMAGE', e)
     }
   }
 
-  async function dropzoneUpload(files:File[]) {
+  async function dropzoneUpload(files: File[]) {
     console.log(files)
     const file = files[0];
     setUploading(true)
     const reader = new FileReader();
-    reader.onload = async (event:any) => {
+    reader.onload = async (event: any) => {
       await uploadBase64Pic(event.target.result, file.type)
       setUploading(false)
     }
@@ -64,14 +64,14 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
               <input {...getInputProps()} />
               <ImageCircle>
                 <Image style={{
-                  backgroundImage: `url(${
-                    picsrc ? picsrc + "?thumb=true" : (uploading ? '' : avatarIcon)
-                  })`}}
+                  backgroundImage: `url(${picsrc ? picsrc + "?thumb=true" : (uploading ? '' : avatarIcon)
+                    })`
+                }}
                 />
-                {uploading && <EuiLoadingSpinner size="xl" style={{marginTop:-14}} />}
+                {uploading && <EuiLoadingSpinner size="xl" style={{ marginTop: -14 }} />}
               </ImageCircle>
             </DottedCircle>
-            <div style={{ color: "#6B7A8D", marginTop: 5 }}>Drag and drop or</div>
+            {/* <div style={{ color: "#6B7A8D", marginTop: 5 }}>Drag and drop or</div>
             <EuiButton onClick={open}
               style={{
                 borderColor: "#6B7A8D",
@@ -85,7 +85,7 @@ export default function ImageInput({label, value, handleChange, handleBlur, hand
               iconSide="right"
             >
               Change Image
-            </EuiButton>
+            </EuiButton> */}
           </DropzoneStuff>
         )}
       </Dropzone>
@@ -113,6 +113,7 @@ const ImageWrap = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-bottom:20px;
 `;
 export interface DottedCircleProps {
   isDragActive: boolean;
@@ -125,7 +126,7 @@ const DottedCircle = styled.div<DottedCircleProps>`
   width: 120px;
   border-radius: 50%;
   border-style: dashed;
-  border-color: ${p=> p.isDragActive?'white':'#6b7a8d'};
+  border-color: ${p => p.isDragActive ? 'white' : '#6b7a8d'};
   border-width: thin;
 `;
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import styled from 'styled-components'
-import { useFuse } from '../../hooks'
+import { useFuse, useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
@@ -11,10 +11,8 @@ import ConfirmMe from '../confirmMe';
 
 
 export default function SignIn(props: any) {
-    const { main, ui } = useStores()
-
-    const people = useFuse(main.people, ["owner_alias"])
-    const location = useLocation()
+    // const { main, ui } = useStores()
+    // const location = useLocation()
 
     // function selectPerson(id: number, unique_name: string) {
     //   console.log('selectPerson', id, unique_name)
@@ -26,15 +24,12 @@ export default function SignIn(props: any) {
     const c = colors['light']
     const [showSignIn, setShowSignIn] = useState(false)
 
-    const pathname = location && location.pathname
-
     return useObserver(() => {
         return <div>
             {showSignIn ?
                 <Column>
                     <ConfirmMe
                         onSuccess={() => {
-                            console.log('success!')
                             if (props.onSuccess) props.onSuccess()
                         }} />
                 </Column>

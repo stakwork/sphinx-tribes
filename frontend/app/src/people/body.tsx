@@ -75,7 +75,6 @@ export default function BodyComponent() {
     const peeps = getFuse(main.people, ["owner_alias"])
     const { handleScroll, n, loadingMore } = getScroll()
     let people = peeps.slice(0, n)
-    people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
     if (selectedPerson && showProfile) {
       return <Body>

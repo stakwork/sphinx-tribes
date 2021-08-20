@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { EuiFormRow, EuiSwitch } from '@elastic/eui'
+import { EuiSwitch } from '@elastic/eui'
 import type { Props } from './propsType'
+import { FieldEnv } from './index'
 
 export default function SwitchInput({ label, value, name, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
@@ -11,7 +12,7 @@ export default function SwitchInput({ label, value, name, handleChange, handleBl
     }, [])
 
     return <>
-        <EuiFormRow label={label}>
+        <FieldEnv label={label}>
             <EuiSwitch
                 label=""
                 checked={value}
@@ -22,7 +23,7 @@ export default function SwitchInput({ label, value, name, handleChange, handleBl
                 onFocus={handleFocus}
                 compressed
             />
-        </EuiFormRow>
+        </FieldEnv>
         <ExtraText
             style={{ display: value && extraHTML ? 'block' : 'none' }}
             dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

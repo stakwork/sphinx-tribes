@@ -22,7 +22,6 @@ export default function SupportMeView(props: SupportMe) {
 }
 
 const Wrap = styled.div`
-color: #fff;
 display: flex;
 flex-direction:column;
 `;

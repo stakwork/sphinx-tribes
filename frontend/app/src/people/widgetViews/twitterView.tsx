@@ -12,7 +12,6 @@ export default function TwitterView(props) {
 }
 
 const Wrap = styled.div`
-color: #fff;
 display: flex;
 align-items:center;
 `;

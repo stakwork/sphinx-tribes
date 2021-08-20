@@ -13,7 +13,6 @@ export default function Blog(props: BlogPost) {
 }
 
 const Wrap = styled.div`
-color: #fff;
 display: flex;
 `;
 
