@@ -85,12 +85,10 @@ export default function Form(props: any) {
             <BWrap >
 
               <IconButton
-                isLoading={props.loading}
                 icon='arrow_back'
                 onClick={() => {
                   if (props.close) props.close()
                 }}
-                disabled={disableFormButtons || !isValid}
                 style={{ fontSize: 12, fontWeight: 600 }}
               />
 
