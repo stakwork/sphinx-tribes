@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { QRCode } from "react-qr-svg";
 import styled from "styled-components";
 import { getHost } from "../host";
@@ -14,19 +14,19 @@ import {
     EuiOverlayMask,
 } from "@elastic/eui";
 
-import { meSchema } from '../form/schema'
-
 import AboutView from "./widgetViews/aboutView";
 import BlogView from "./widgetViews/blogView";
 import OfferView from "./widgetViews/offerView";
 import TwitterView from "./widgetViews/twitterView";
 import SupportMeView from "./widgetViews/supportMeView";
 import WantedView from "./widgetViews/wantedView";
+import PostView from "./widgetViews/postView";
 
 import FadeLeft from "../animated/fadeLeft";
-import { useEffect } from "react";
-import { Button, IconButton } from "../sphinxUI";
+import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
+import FocusedView from './mobile/focusView'
+import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../form/schema";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -61,10 +61,12 @@ export default function PersonView(props: any) {
 
     const owner_pubkey = ''
 
-    const [selectedWidget, setSelectedWidget] = useState('posts');
-    const [newSelectedWidget, setNewSelectedWidget] = useState('posts');
+    const [selectedWidget, setSelectedWidget] = useState(editMode ? 'post' : 'about');
+    const [focusIndex, setFocusIndex] = useState(-1);
+    const [newSelectedWidget, setNewSelectedWidget] = useState(editMode ? 'post' : 'about');
     const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
+    const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey);
 
     function switchWidgets(name) {
@@ -140,14 +142,18 @@ export default function PersonView(props: any) {
             label: 'About',
             name: 'about',
             single: true,
+            submitText: 'Save',
+            schema: aboutSchema,
             action: {
                 text: 'Edit Profile',
                 icon: 'edit'
             }
         },
-        posts: {
+        post: {
             label: 'Posts',
-            name: 'posts',
+            name: 'post',
+            submitText: 'Post',
+            schema: postSchema,
             action: {
                 text: 'Create a Post',
                 icon: 'add',
@@ -158,14 +164,18 @@ export default function PersonView(props: any) {
         offer: {
             label: 'Offer',
             name: 'offer',
+            submitText: 'Post',
+            schema: offerSchema,
             action: {
                 text: 'Sell Something',
                 icon: 'local_offer'
             }
         },
-        wishlist: {
+        wanted: {
             label: 'Wishlist',
-            name: 'wishlist',
+            name: 'wanted',
+            submitText: 'Save',
+            schema: wantedSchema,
             action: {
                 text: 'Add to Wishlist',
                 icon: 'star'
@@ -191,11 +201,16 @@ export default function PersonView(props: any) {
                 </Panel>
             }
 
-            if (!fullSelectedWidget) return <div></div>
+            if (!fullSelectedWidget) return <div />
 
             return <Panel>
                 {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
-                    return <Card key={i} style={{ width: '100%' }}>
+                    return <Card key={i}
+                        onClick={() => {
+                            setShowFocusView(true)
+                            setFocusIndex(i)
+                        }}
+                        style={{ width: '100%' }}>
                         {React.cloneElement(child, { ...s })}
                     </Card>
                 })}
@@ -207,8 +222,8 @@ export default function PersonView(props: any) {
                 return <Panel style={{ padding: 20 }}>
                     <AboutView {...person} />
                 </Panel>
-            case 'posts':
-                return wrapIt(<OfferView {...fullSelectedWidget} />)
+            case 'post':
+                return wrapIt(<PostView {...fullSelectedWidget} />)
             case 'twitter':
                 return wrapIt(<TwitterView {...fullSelectedWidget} />)
             case 'supportme':
@@ -231,7 +246,7 @@ export default function PersonView(props: any) {
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
         return <div style={{ padding: 10, margin: '8px 0 5px' }}>
-            {action.info &&
+            {!fullSelectedWidget && action.info &&
                 <ActionInfo>
                     <MaterialIcon icon={action.infoIcon} style={{ fontSize: 80 }} />
                     <>{action.info}</>
@@ -243,6 +258,9 @@ export default function PersonView(props: any) {
                 leadingIcon={action.icon}
                 width='100%'
                 height={48}
+                onClick={() => {
+                    setShowFocusView(true)
+                }}
             />
         </div>
     }
@@ -306,7 +324,6 @@ export default function PersonView(props: any) {
                     <Tabs>
                         {tabs && Object.keys(tabs).map((name, i) => {
                             const t = tabs[name]
-                            const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === name) || {}
                             const label = t.label
                             const selected = name === newSelectedWidget
 
@@ -353,6 +370,26 @@ export default function PersonView(props: any) {
                     </EuiOverlayMask >
                 }
             </div>
+
+            <Modal
+                fill
+                visible={showFocusView}>
+                <FocusedView
+                    person={person}
+                    editMode={editMode}
+                    selectedIndex={focusIndex}
+                    config={tabs[selectedWidget] && tabs[selectedWidget]}
+                    onSuccess={() => {
+                        console.log('success')
+                        setFocusIndex(-1)
+                    }}
+                    goBack={() => {
+                        setShowFocusView(false)
+                        setFocusIndex(-1)
+                    }}
+                />
+            </Modal>
+
 
             {/* <Bottom>
                 <a href={qrString}>
@@ -405,6 +442,7 @@ interface ContentProps {
 const Panel = styled.div`
             position:relative;
             background:#ffffff;
+            color:#000000;
             margin-bottom:10px;
             padding:10px;
             box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
@@ -426,9 +464,6 @@ const QRWrapWrap = styled.div`
 const QRWrap = styled.div`
             background: white;
             padding: 5px;
-            `;
-const Widget = styled.div`
-
             `;
 
 const ActionInfo = styled.div`
@@ -454,6 +489,10 @@ const ActionInfo = styled.div`
 const Tabs = styled.div`
             display:flex;
             width:100%;
+            overflow-x:auto;
+            ::-webkit-scrollbar {
+                display: none;
+            }
             `;
 
 interface TagProps {
@@ -498,14 +537,7 @@ const B = styled.span`
                 `;
 
 const Card = styled.div`
-                // min-width: 300px;
-                // max-width: 700px;
-                // padding: 20px;
-                // border: 1px solid #ffffff21;
-                // background:#ffffff07;
-                // border-radius: 5px;
-                // overflow:hidden;
-                // margin-bottom:20px;
+                
                 `;
 
 const SupportMe = styled.div`

@@ -39,9 +39,6 @@ export default function BodyComponent() {
     const history = useHistory()
     const location = useLocation()
 
-    console.log('history', history)
-    console.log('location', location)
-
     function selectPerson(id: number, unique_name: string) {
         console.log('selectPerson', id, unique_name)
         setSelectedPerson(id)
@@ -73,7 +70,6 @@ export default function BodyComponent() {
         const peeps = getFuse(main.people, ["owner_alias"])
         const { handleScroll, n, loadingMore } = getScroll()
         let people = peeps.slice(0, n)
-        people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
         return <Body>
 

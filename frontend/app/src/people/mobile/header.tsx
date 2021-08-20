@@ -12,7 +12,7 @@ import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
 import FadeLeft from '../../animated/fadeLeft';
-import EditInfo from '../edit/editInfo'
+// import EditInfo from '../edit/editInfo'
 import SignIn from '../auth/signIn';
 
 import PersonViewSlim from '../personViewSlim';
@@ -170,11 +170,7 @@ export default function Header() {
                     width: '100%',
                     overflow: 'auto'
                 }}>
-                    <EditInfo
-                        style={{ padding: '50px 10px' }}
-                        ftux={true}
-                        done={() => setShowInitEditSelf(false)}
-                    />
+                    
                 </div>
             </Modal> */}
 

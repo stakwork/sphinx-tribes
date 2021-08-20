@@ -7,6 +7,7 @@ import { useStores } from "../store";
 import type { MeInfo } from "../store/ui";
 import { getHost } from "../host";
 import { PropertySortType } from "@elastic/eui/src/services/sort";
+import { useIsMobile } from "../hooks";
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
@@ -17,6 +18,22 @@ export default function ConfirmMe(props: any) {
   const { ui } = useStores();
   const [challenge, setChallenge] = useState("");
   const [ts, setTS] = useState("");
+
+  const isMobile = useIsMobile()
+
+  const qrString = makeQR(challenge, ts);
+
+  useEffect(() => {
+    getChallenge();
+  }, []);
+
+  useEffect(() => {
+    if (isMobile && challenge && ts) {
+      let el = document.createElement('a')
+      el.href = qrString
+      el.click();
+    }
+  }, [isMobile, challenge, ts])
 
   async function startPolling(challenge: string) {
     let ok = true;
@@ -48,11 +65,17 @@ export default function ConfirmMe(props: any) {
       setTS(res.ts);
     }
   }
-  useEffect(() => {
-    getChallenge();
-  }, []);
 
-  const qrString = makeQR(challenge, ts);
+  // if mobile, automatically kick to sphinx app, dont show qr
+  if (isMobile) return (
+    <ConfirmWrap>
+      <InnerWrap>
+        <div style={{ marginBottom: 50 }}>Opening Sphinx...</div>
+        <EuiLoadingSpinner size="xl" />
+      </InnerWrap>
+    </ConfirmWrap>
+  )
+
   return (
     <ConfirmWrap>
       {!challenge && <EuiLoadingSpinner size="xl" style={{ marginTop: 60 }} />}

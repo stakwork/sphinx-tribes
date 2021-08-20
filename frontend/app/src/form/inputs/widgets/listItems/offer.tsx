@@ -18,7 +18,6 @@ export default function Offer(props: I.Offer) {
 
 const Wrap = styled.div`
 display:flex;
-color: #fff;
 width:100%;
 `;
 

@@ -19,6 +19,13 @@ export interface BlogPost {
     show?: boolean
 }
 
+export interface Post {
+    title: string,
+    content: string,
+    createdAt: number,
+    show?: boolean
+}
+
 export interface Offer {
     title: string,
     price: number,
