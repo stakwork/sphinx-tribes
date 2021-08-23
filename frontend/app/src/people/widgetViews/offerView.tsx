@@ -5,56 +5,58 @@ import { formatPrice } from '../../helpers';
 import GalleryViewer from '../utils/galleryViewer';
 
 export default function OfferView(props: Offer) {
-    const { gallery, title, description, price, url } = props
+    const { gallery, title, description, price } = props
 
     return <Wrap>
 
-        <T>{title || 'No title'}</T>
+        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} />
+
         <Body>
+            <T>{title || 'No title'}</T>
             <D>{description || 'No description'}</D>
-            <U>{url || 'No link'}</U>
-            <GalleryViewer gallery={gallery} />
+            <P>{formatPrice(price)} <B>sat</B></P>
         </Body>
-        <P>{formatPrice(price)} </P>
 
     </Wrap>
 
 }
+const Wrap = styled.div`
+display: flex;
+justify-content:flex-start;
 
-interface ImageProps {
-    readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-                background-image: url("${(p) => p.src}");
-                background-position: center;
-                background-size: cover;
-                height: 80px;
-                width: 80px;
-                border-radius: 5px;
-                position: relative;
-                `;
-
+`;
 const T = styled.div`
 font-weight:bold;
 `;
+const B = styled.span`
+font-weight:300;
+`;
 const P = styled.div`
-padding: 10px;
-max-width: 400;
-border-radius: 5px;
-text-align:center;
-margin-bottom:5px;
+font-weight:500;
 `;
 const D = styled.div`
-`;
-const U = styled.div`
-color:#1BA9F5
-`;
-const Wrap = styled.div`
-display: flex;
-flex-direction:column;
+color:#5F6368;
+white-space: nowrap;
+height:26px;
+text-overflow: ellipsis;
+overflow:hidden;
 `;
 
+
 const Body = styled.div`
-padding: 0 5px 5px 5px;
 font-size:14px;
+margin-left:10px;
+font-size: 15px;
+line-height: 20px;
+/* or 133% */
+
+display: flex;
+flex-direction:column;
+justify-content: space-around;
+
+/* Primary Text 1 */
+
+color: #292C33;
+overflow:hidden;
 `;
+

@@ -27,7 +27,7 @@ export default function Button(props: any) {
     }
 
     return <B
-        style={{ ...colors[props.color], padding: props.icon && '0 0 0 15px', height: props.height, width: props.width }}
+        style={{ ...colors[props.color], padding: props.icon && '0 0 0 15px', height: props.height, width: props.width, ...props.style }}
         disabled={props.disabled}
         onClick={props.onClick}
     >

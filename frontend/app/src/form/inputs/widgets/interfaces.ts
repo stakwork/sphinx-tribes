@@ -15,14 +15,15 @@ export interface BlogPost {
     title: string,
     markdown: string,
     gallery?: [string],
-    createdAt: number,
+    created: number,
     show?: boolean
 }
 
 export interface Post {
     title: string,
     content: string,
-    createdAt: number,
+    created: number,
+    gallery?: [string],
     show?: boolean
 }
 
@@ -32,7 +33,7 @@ export interface Offer {
     description: string,
     gallery?: [string],
     url?: string,
-    createdAt: number,
+    created: number,
     show?: boolean
 }
 
@@ -40,16 +41,17 @@ export interface Wanted {
     title: string,
     priceMin: number,
     priceMax: number,
+    gallery?: [string],
     description: string,
     url?: string,
-    createdAt: number,
+    created: number,
     show?: boolean
 }
 
 export interface SupportMe {
     title: string,
     description: string,
-    createdAt: number,
+    created: number,
     url?: string,
     gallery?: [string],
     show?: boolean
