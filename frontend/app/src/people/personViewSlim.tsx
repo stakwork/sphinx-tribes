@@ -3,7 +3,6 @@ import { QRCode } from "react-qr-svg";
 import styled from "styled-components";
 import { getHost } from "../host";
 import qrCode from "../utils/invoice-qr-code.svg";
-import { EuiCheckableCard, EuiButton, EuiButtonIcon, EuiToolTip } from "@elastic/eui";
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
 import {
@@ -57,13 +56,13 @@ export default function PersonView(props: any) {
         extras
     } = person || {}
 
-    const editMode = id === meInfo?.id
+    const canEdit = id === meInfo?.id
 
     const owner_pubkey = ''
 
-    const [selectedWidget, setSelectedWidget] = useState(editMode ? 'post' : 'about');
+    const [selectedWidget, setSelectedWidget] = useState(canEdit ? 'post' : 'about');
     const [focusIndex, setFocusIndex] = useState(-1);
-    const [newSelectedWidget, setNewSelectedWidget] = useState(editMode ? 'post' : 'about');
+    const [newSelectedWidget, setNewSelectedWidget] = useState(canEdit ? 'post' : 'about');
     const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const [showFocusView, setShowFocusView] = useState(false);
@@ -113,7 +112,7 @@ export default function PersonView(props: any) {
 
     const qrWidth = 209
 
-    let fullSelectedWidget = (extras && selectedWidget) ? extras[selectedWidget] : {}
+    let fullSelectedWidget: any = (extras && selectedWidget) ? extras[selectedWidget] : null
 
     // we do this because sometimes the widgets are empty arrays
     let filteredExtras = extras && { ...extras }
@@ -142,6 +141,7 @@ export default function PersonView(props: any) {
             label: 'About',
             name: 'about',
             single: true,
+            skipEditLayer: true,
             submitText: 'Save',
             schema: aboutSchema,
             action: {
@@ -196,30 +196,34 @@ export default function PersonView(props: any) {
 
         function wrapIt(child) {
             if (single) {
-                return <Panel style={{ padding: 20 }}>
+                return <Panel>
                     {child}
                 </Panel>
             }
 
             if (!fullSelectedWidget) return <div />
 
-            return <Panel>
-                {(fullSelectedWidget.length > 0) && fullSelectedWidget.map((s, i) => {
-                    return <Card key={i}
-                        onClick={() => {
-                            setShowFocusView(true)
-                            setFocusIndex(i)
-                        }}
-                        style={{ width: '100%' }}>
-                        {React.cloneElement(child, { ...s })}
-                    </Card>
-                })}
-            </Panel>
+            const elementArray: any = []
+
+            fullSelectedWidget && fullSelectedWidget.map((s, i) => {
+
+                elementArray.push(<Panel key={i}
+                    onClick={() => {
+                        setShowFocusView(true)
+                        setFocusIndex(i)
+                    }}
+                    style={{ width: '100%' }}>
+                    {React.cloneElement(child, { ...s })}
+                </Panel>)
+            })
+
+            // </Panel>
+            return elementArray
         }
 
         switch (selectedWidget) {
             case 'about':
-                return <Panel style={{ padding: 20 }}>
+                return <Panel>
                     <AboutView {...person} />
                 </Panel>
             case 'post':
@@ -241,7 +245,7 @@ export default function PersonView(props: any) {
     }
 
     function renderEditButton() {
-        if (!editMode || !selectedWidget) return <div />
+        if (!canEdit || !selectedWidget) return <div />
 
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
@@ -284,7 +288,7 @@ export default function PersonView(props: any) {
                             onClick={goBack}
                             icon='arrow_back'
                         />
-                        {editMode ?
+                        {canEdit ?
                             <IconButton
                                 onClick={logout}
                                 icon='logout'
@@ -300,7 +304,7 @@ export default function PersonView(props: any) {
                         </RowWrap>
 
                         {/* only see buttons on other people's profile */}
-                        {editMode ? <div style={{ height: 40 }} /> :
+                        {canEdit ? <div style={{ height: 40 }} /> :
                             <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
                                 <a href={qrString}>
                                     <Button
@@ -376,7 +380,7 @@ export default function PersonView(props: any) {
                 visible={showFocusView}>
                 <FocusedView
                     person={person}
-                    editMode={editMode}
+                    canEdit={canEdit}
                     selectedIndex={focusIndex}
                     config={tabs[selectedWidget] && tabs[selectedWidget]}
                     onSuccess={() => {
@@ -444,7 +448,7 @@ const Panel = styled.div`
             background:#ffffff;
             color:#000000;
             margin-bottom:10px;
-            padding:10px;
+            padding:20px;
             box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
             `;
 const Content = styled.div`
@@ -537,7 +541,7 @@ const B = styled.span`
                 `;
 
 const Card = styled.div`
-                
+                margin-bottom:10px;
                 `;
 
 const SupportMe = styled.div`
