@@ -9,15 +9,19 @@ import { meSchema } from '../../form/schema'
 import api from '../../api'
 import styled, { css } from "styled-components";
 import { getHostIncludingDockerHosts } from "../../host";
-import { Button } from "../../sphinxUI";
+import { Button, IconButton } from "../../sphinxUI";
 import moment from 'moment'
+import SummaryViewer from '../widgetViews/summaryViewer'
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
-    const { onSuccess, goBack, config, selectedIndex, editMode, person } = props
+    const { onSuccess, goBack, config, selectedIndex, canEdit, person } = props
     const { ui, main } = useStores();
 
+    const skipEditLayer = ((selectedIndex < 0) || config.skipEditLayer) ? true : false
+
     const [loading, setLoading] = useState(false);
+    const [editMode, setEditMode] = useState(skipEditLayer);
     const scrollDiv: any = useRef(null)
     const formRef: any = useRef(null)
 
@@ -69,7 +73,7 @@ export default function FocusedView(props: any) {
                 if (!v.created) v.created = moment().unix()
                 // if editing widget
                 if (selectedIndex > -1) {
-                    // mutate it?
+                    // mutate it
                     fullMeData.extras[config.name][selectedIndex] = v
                 } else {
                     // if creating new widget
@@ -129,7 +133,7 @@ export default function FocusedView(props: any) {
         // let initialValues: MeData = emptyMeInfo;
         let initialValues: any = {};
 
-        let personInfo = editMode ? ui.meInfo : person
+        let personInfo = canEdit ? ui.meInfo : person
 
         // set initials here
         if (personInfo) {
@@ -145,6 +149,8 @@ export default function FocusedView(props: any) {
                 if (selectedIndex > -1) {
                     const extras = { ...personInfo.extras }
                     let sel = extras[config.name][selectedIndex]
+
+                    console.log('sel', sel)
                     config.schema.forEach(s => {
                         initialValues[s.name] = sel[s.name]
                     })
@@ -156,34 +162,87 @@ export default function FocusedView(props: any) {
             <div style={{ ...props.style, width: '100%', height: '100%' }}>
                 {/* {renderWarnBeforeClose()} */}
 
-                <B ref={scrollDiv} hide={false}>
-                    {!ui.meInfo && <ConfirmMe />}
-                    {ui.meInfo && (
-                        <Form
-                            readOnly={!editMode}
-                            formRef={formRef}
-                            submitText={config && config.submitText}
-                            loading={loading}
-                            close={goBack}
-                            onSubmit={submitForm}
-                            scrollDiv={scrollDiv}
-                            schema={config && config.schema}
-                            initialValues={initialValues}
-                            extraHTML={
-                                ui.meInfo.verification_signature
-                                    ? {
-                                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
-                                    }
-                                    : {}
-                            }
+                {editMode ?
+                    <B ref={scrollDiv} hide={false}>
+                        {!ui.meInfo && <ConfirmMe />}
+                        {ui.meInfo && (
+                            <Form
+                                readOnly={!canEdit}
+                                formRef={formRef}
+                                submitText={config && config.submitText}
+                                loading={loading}
+                                close={() => {
+                                    if (skipEditLayer) goBack()
+                                    else setEditMode(false)
+                                }}
+                                onSubmit={submitForm}
+                                scrollDiv={scrollDiv}
+                                schema={config && config.schema}
+                                initialValues={initialValues}
+                                extraHTML={
+                                    ui.meInfo.verification_signature
+                                        ? {
+                                            twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                                        }
+                                        : {}
+                                }
+                            />
+                        )}
+                    </B>
+                    : <>
+                        <BWrap >
+                            <IconButton
+                                icon='arrow_back'
+                                onClick={() => {
+                                    if (goBack) goBack()
+                                }}
+                                style={{ fontSize: 12, fontWeight: 600 }}
+                            />
+                            {canEdit ?
+                                <Button
+                                    onClick={() => setEditMode(true)}
+                                    color={'widget'}
+                                    leadingIcon={'edit'}
+                                    iconSize={18}
+                                    width={100}
+                                    text={props.submitText || 'Edit'}
+                                /> : <div />}
+                        </BWrap>
+                        <div style={{ height: 60 }} />
+
+                        {/* display item */}
+                        <SummaryViewer
+                            person={person}
+                            item={person.extras && person.extras[config.name][selectedIndex]}
+                            config={config}
                         />
-                    )}
-                </B>
+
+                    </>}
+
+
             </div>
         );
 
     });
 }
+const Summary = styled.div`
+padding-top:80px;
+`
+
+
+const BWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items:center;
+  width:100%;
+  padding:10px;
+  min-height:42px;
+  position: absolute;
+  top:0px;
+  left:0px;
+  background:#ffffff;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+`;
 
 
 const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }) => css`

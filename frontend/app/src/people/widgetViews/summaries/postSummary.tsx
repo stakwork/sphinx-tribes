@@ -1,11 +1,13 @@
 import moment from 'moment';
 import React from 'react'
 import styled from "styled-components";
-import { Post } from '../../form/inputs/widgets/interfaces';
+import { Post } from '../../../form/inputs/widgets/interfaces';
+import GalleryViewer from '../../utils/galleryViewer';
 
-
-export default function PostView(props: Post) {
+export default function PostSummary(props: Post) {
     const { title, content, created, gallery } = props
+
+    console.log('props', props)
 
     return <Wrap>
         <T>{title || 'No title'} </T>
@@ -14,11 +16,7 @@ export default function PostView(props: Post) {
 
         {/* readmore */}
 
-        {<Gallery>
-            {gallery && gallery.map((g, i) => {
-                return <Img key={i} src={g} />
-            })}
-        </Gallery>}
+        <GalleryViewer gallery={gallery} wrap={false} selectable={false} big={true} />
     </Wrap>
 
 }
@@ -27,6 +25,7 @@ const Wrap = styled.div`
 display: flex;
 flex-direction:column;
 width:100%;
+padding:20px;
 min-width:100%;
 font-style: normal;
 font-weight: 500;

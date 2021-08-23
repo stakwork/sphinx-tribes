@@ -206,7 +206,12 @@ export const meSchema: FormField[] = [
                         name: "content",
                         label: "Content",
                         type: "textarea",
-                    }
+                    },
+                    {
+                        name: 'gallery',
+                        label: "Gallery",
+                        type: "gallery",
+                    },
                 ]
             },
             {
@@ -307,7 +312,12 @@ export const postSchema: FormField[] = [
         label: "Content",
         type: "textarea",
         validator: strValidator,
-    }
+    },
+    {
+        name: 'gallery',
+        label: "Gallery",
+        type: "gallery",
+    },
 ];
 
 export const offerSchema: FormField[] = [
@@ -328,7 +338,12 @@ export const offerSchema: FormField[] = [
         label: "Price",
         validator: nomValidator,
         type: "number",
-    }
+    },
+    {
+        name: 'gallery',
+        label: "Gallery",
+        type: "gallery",
+    },
 ];
 
 export const wantedSchema: FormField[] = [
@@ -362,11 +377,11 @@ export const wantedSchema: FormField[] = [
         type: "gallery",
     },
 
-    {
-        name: 'show',
-        label: "Show In Link",
-        type: "switch",
-    },
+    // {
+    //     name: 'show',
+    //     label: "Show In Link",
+    //     type: "switch",
+    // },
 ];
 
 

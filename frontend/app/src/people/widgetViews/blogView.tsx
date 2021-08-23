@@ -1,14 +1,16 @@
 import React from 'react'
 import styled from "styled-components";
 import { BlogPost } from '../../form/inputs/widgets/interfaces';
+import moment from 'moment';
 
 
 export default function BlogView(props: BlogPost) {
-    const { title, markdown, gallery } = props
+    const { title, markdown, gallery, created } = props
 
     const showImages = gallery && gallery.length
     return <Wrap>
         <T>{title || 'No title'} </T>
+        <Time>{moment(created).format('l') || 'No title'} </Time>
         <M>{markdown || 'No markdown'} </M>
 
         {showImages && <Gallery>
@@ -25,6 +27,13 @@ display: flex;
 flex-direction:column;
 width:100%;
 min-width:100%;
+font-weight: 500;
+font-size: 24px;
+line-height: 20px;
+
+
+color: #3C3F41;
+
 `;
 
 const T = styled.div`
@@ -33,6 +42,11 @@ font-weight:bold;
 font-size:25px;
 `;
 
+const Time = styled.div`
+border-radius: 5px;
+font-weight:bold;
+font-size:25px;
+`;
 const M = styled.div`
 border-radius: 5px;
 margin:15px 0 10px 0;

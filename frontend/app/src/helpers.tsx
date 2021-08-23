@@ -1,4 +1,4 @@
 
 export function formatPrice(amount) {
-    return amount + ' SATS'
+    return amount
 }
