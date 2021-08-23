@@ -2,68 +2,61 @@ import React from 'react'
 import styled from "styled-components";
 import { Wanted } from '../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../helpers';
+import GalleryViewer from '../utils/galleryViewer';
 
 export default function WantedView(props: Wanted) {
-    const { title, description, priceMin, priceMax, url } = props
+    const { title, description, priceMin, priceMax, url, gallery } = props
 
-    return < Wrap >
-        <T>{title || 'No title'}</T>
+    return <Wrap>
+
+        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} />
+
         <Body>
+            <T>{title || 'No title'}</T>
             <D>{description || 'No description'}</D>
-            <U>{url || 'No link'}</U>
+            <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
         </Body>
-        <P>{formatPrice(priceMin)} ~ {formatPrice(priceMax)}</P>
-    </Wrap >
+
+    </Wrap>
 
 }
+const Wrap = styled.div`
+display: flex;
+justify-content:flex-start;
 
-interface ImageProps {
-    readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-                background-image: url("${(p) => p.src}");
-                background-position: center;
-                background-size: cover;
-                height: 80px;
-                width: 80px;
-                border-radius: 5px;
-                position: relative;
-                border:1px solid #ffffff21;
-                `;
-
+`;
 const T = styled.div`
 font-weight:bold;
 `;
+const B = styled.span`
+font-weight:300;
+`;
 const P = styled.div`
-padding: 10px;
-max-width: 400;
-background: #ffffff21;
-border-radius: 5px;
-text-align:center;
-margin-bottom:5px;
+font-weight:500;
 `;
 const D = styled.div`
+color:#5F6368;
+white-space: nowrap;
+height:26px;
+text-overflow: ellipsis;
+overflow:hidden;
 `;
-const U = styled.div`
-color:#1BA9F5
-`;
-const Wrap = styled.div`
-display: flex;
-flex-direction:column;
-`;
+
 
 const Body = styled.div`
-padding: 0 5px 5px 5px;
 font-size:14px;
-`;
+margin-left:10px;
+font-size: 15px;
+line-height: 20px;
+/* or 133% */
 
-const Gallery = styled.div`
-display:flex;
-flex-wrap:wrap;
-margin-top:10px;
-`;
+display: flex;
+flex-direction:column;
+justify-content: space-around;
 
-const None = styled.div`
-color:#ffffff71;
+/* Primary Text 1 */
+
+color: #292C33;
+overflow:hidden;
 `;
 

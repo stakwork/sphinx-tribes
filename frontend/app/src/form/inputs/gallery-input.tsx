@@ -8,6 +8,7 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
 import MaterialIcon from "@material/react-material-icon";
 import { FieldEnv, FieldTextArea } from './index'
+import { Button } from "../../sphinxUI";
 
 
 export default function GalleryInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
@@ -88,25 +89,34 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
                         </Sq>
                     </ImageWrap>
                 })}
-
-                <ImageWrap>
-                    <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_SIZE}>
-                        {({ getRootProps, getInputProps, isDragActive, open }) => (
-                            <DropzoneStuff>
-                                <DottedSq {...getRootProps()} isDragActive={isDragActive}>
-                                    <input {...getInputProps()} />
-                                    <ImageCircle>
-
-                                        <MaterialIcon icon={'add'} />
-                                        {uploading && <EuiLoadingSpinner size="xl" style={{ marginTop: -14 }} />}
-                                    </ImageCircle>
-                                </DottedSq>
-                            </DropzoneStuff>
-                        )}
-                    </Dropzone>
-
-                </ImageWrap>
             </Wrapper>
+
+            <div style={{ marginTop: 5 }}>
+                <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_SIZE}>
+                    {({ getRootProps, getInputProps, isDragActive, open }) => (
+                        <DropzoneStuff>
+                            <div>
+                                <input {...getInputProps()} />
+                                <Button
+                                    {...getRootProps()}
+                                    leadingIcon={'add'}
+                                    style={{
+                                        width: 154,
+                                        paddingRight: 20,
+                                    }}
+                                    // iconSize={18}
+                                    // width={150}
+                                    height={48}
+                                    text={'Add Media'}
+                                    color='widget'
+                                    loading={uploading}
+                                />
+                            </div>
+                        </DropzoneStuff>
+                    )}
+                </Dropzone>
+
+            </div>
         </>
     );
 }
@@ -114,28 +124,26 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap:wrap;
 `
 
 const DropzoneStuff = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction:column;
+  
 `
 const Image = styled.div`
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height:55px;
-  width: 80px;
+  height:105px;
+  width: 105px;
 `;
 const Close = styled.div`
   display:flex;
   align-items:center;
   justify-content:center;
   position:absolute;
-  top:0px;
-  right:0px;
+  top:2px;
+  right:2px;
   height:20px;
   width:20px;
   background:white;
@@ -148,27 +156,10 @@ const ImageWrap = styled.div`
   margin:2px;
   position:relative;
 `;
-export interface DottedCircleProps {
-    isDragActive?: boolean;
-}
-const DottedSq = styled.div<DottedCircleProps>`
+const Sq = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  width: 90px;
-  border-style: dashed;
-  border-color: ${p => p.isDragActive ? 'white' : '#6b7a8d'};
-  border-width: thin;
-  cursor:pointer;
-`;
-const Sq = styled.div<DottedCircleProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 60px;
-  width: 90px;
-  border-color: ${p => p.isDragActive ? 'white' : '#6b7a8d'};
   border-width: thin;
 `;
 
@@ -176,7 +167,5 @@ const ImageCircle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 80px;
-  width: 80px;
   position:relative;
 `;
