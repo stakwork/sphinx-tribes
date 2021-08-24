@@ -16,6 +16,8 @@ import FadeLeft from '../../animated/fadeLeft';
 import SignIn from '../auth/signIn';
 
 import PersonViewSlim from '../personViewSlim';
+import { MeInfo } from '../../store/ui';
+import api from '../../api';
 
 export default function Header() {
     const { main, ui } = useStores()
@@ -47,6 +49,32 @@ export default function Header() {
     const [showWelcome, setShowWelcome] = useState(false)
     const [showInitEditSelf, setShowInitEditSelf] = useState(false)
     const [showEditSelf, setShowEditSelf] = useState(false)
+
+    async function testChallenge(chal: string) {
+        try {
+            const me: MeInfo = await api.get(`poll/${chal}`)
+            if (me && me.pubkey) {
+                ui.setMeInfo(me)
+                setShowSignIn(false)
+                setShowWelcome(true)
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    useEffect(() => {
+        try {
+            var urlObject = new URL(window.location.href);
+            var params = urlObject.searchParams;
+            const chal = params.get('challenge')
+            if (chal) {
+                testChallenge(chal)
+            }
+        } catch (e) { }
+    }, [])
+
+
 
     const pathname = location && location.pathname
     console.log(ui.meInfo)
