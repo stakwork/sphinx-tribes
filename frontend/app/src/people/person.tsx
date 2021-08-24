@@ -33,7 +33,7 @@ export default function Person(props: any) {
   } = props
 
   const [showQR, setShowQR] = useState(false);
-  const qrString = makeQR(owner_pubkey);
+
   const c = colors['light']
 
   const isMobile = useIsMobile()
@@ -57,7 +57,7 @@ export default function Person(props: any) {
 
   return useObserver(() => {
 
-
+    const qrString = makeQR(owner_pubkey);
     // return <div style={{ color: '#fff' }}>{owner_alias}</div>
     return (
       <Wrap onClick={() => select(id, unique_name)}>
@@ -70,13 +70,15 @@ export default function Person(props: any) {
           <Description>
             {description}
           </Description>
-          <Row style={{ justifyContent: 'space-between' }}>
+          <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
             <div>3h ago</div>
             {owner_pubkey ?
               <a href={qrString}>
                 <Button
                   text='Connect'
                   color='white'
+                  leadingIcon={'open_in_new'}
+                  iconSize={16}
                   onClick={(e) => e.stopPropagation()}
                 />
               </a> : <div />
@@ -102,7 +104,7 @@ const Wrap = styled.div`
         width:100%;
         `;
 const R = styled.div`
-        width:67%;
+        width:calc(100% - 110px);
         margin-left:20px;
         `;
 
@@ -131,7 +133,7 @@ const Description = styled.div`
         height:26px;
         text-overflow: ellipsis;
         overflow:hidden;
-        // width:280px;
+        margin-bottom:10px;
         `;
 interface ImageProps {
   readonly src: string;
