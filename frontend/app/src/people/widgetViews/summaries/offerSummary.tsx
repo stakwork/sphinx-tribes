@@ -16,7 +16,6 @@ export default function OfferSummary(props: Offer) {
                                 <div>Price</div>
                                 <P>{formatPrice(price)} <B>sat</B></P>
                         </Y>
-                        HIII
                         <Divider style={{
                                 marginBottom: 10
                         }} />
