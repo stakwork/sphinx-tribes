@@ -16,39 +16,11 @@ import {
   Link
 } from "react-router-dom";
 import { useIsMobile } from './hooks';
-import { MeInfo } from './store/ui';
-import api from './api';
-import { useStores } from './store';
 
 function App() {
   const mode = getMode()
   const c = colors['light']
   const isMobile = useIsMobile()
-  const { main, ui } = useStores()
-
-  async function testChallenge(chal: string) {
-    try {
-
-      const me: MeInfo = await api.get(`poll/${chal}`)
-      if (me && me.pubkey) {
-        ui.setMeInfo(me)
-        ui.setEditMe(true)
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  useEffect(() => {
-    try {
-      var urlObject = new URL(window.location.href);
-      var params = urlObject.searchParams;
-      const chal = params.get('challenge')
-      if (chal) {
-        testChallenge(chal)
-      }
-    } catch (e) { }
-  }, [])
 
   return <Router>
     {
