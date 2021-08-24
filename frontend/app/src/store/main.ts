@@ -64,7 +64,7 @@ export interface Tribe {
 export interface Person {
   id: number;
   unique_name: string;
-  owner_pub_key: string;
+  owner_pubkey: string;
   owner_alias: string;
   description: string;
   img: string;
