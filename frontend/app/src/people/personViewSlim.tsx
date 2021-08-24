@@ -53,12 +53,13 @@ export default function PersonView(props: any) {
         owner_alias,
         unique_name,
         price_to_meet,
-        extras
+        extras,
+        owner_pubkey
     } = person || {}
+
 
     const canEdit = id === meInfo?.id
 
-    const owner_pubkey = ''
 
     const [selectedWidget, setSelectedWidget] = useState(canEdit ? 'post' : 'about');
     const [focusIndex, setFocusIndex] = useState(-1);
@@ -66,7 +67,7 @@ export default function PersonView(props: any) {
     const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const [showFocusView, setShowFocusView] = useState(false);
-    const qrString = makeQR(owner_pubkey);
+    const qrString = makeQR(owner_pubkey || '');
 
     function switchWidgets(name) {
         // setting newSelectedWidget will dismount the FadeLeft, 

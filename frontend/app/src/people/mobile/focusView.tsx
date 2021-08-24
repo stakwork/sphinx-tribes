@@ -242,6 +242,7 @@ const BWrap = styled.div`
   left:0px;
   background:#ffffff;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+  z-index:100;
 `;
 
 
