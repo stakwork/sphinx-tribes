@@ -6,39 +6,38 @@ import { Divider } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 
 export default function WantedSummary(props: Wanted) {
-    const { title, description, priceMin, priceMax, url, gallery } = props
+        const { title, description, priceMin, priceMax, url, gallery } = props
 
-    return <Wrap>
+        return <>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={true} />
-        <Pad>
-            <Y>
-                <div>Price</div>
-                <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
-            </Y>
-            <Divider style={{
-                marginBottom: 10
-            }} />
+                <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={true} />
+                <Divider />
+                <Pad>
+                        <Y>
+                                <div>Price</div>
+                                <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                        </Y>
+                        <Divider style={{
+                                marginBottom: 10
+                        }} />
 
 
-            <T>{title || 'No title'}</T>
-            <D>{description || 'No description'}</D>
-        </Pad>
+                        <T>{title || 'No title'}</T>
+                        <D>{description || 'No description'}</D>
+                </Pad>
 
-    </Wrap>
+        </>
 
 }
 const Pad = styled.div`
-        padding:20px;
-        `;
-const Wrap = styled.div`
-        display: flex;
-        flex-direction:column;
+        padding: 0 20px;
         `;
 const Y = styled.div`
         display: flex;
         justify-content:space-between;
         width:100%;
+        height:50px;
+        align-items:center;
         `;
 const T = styled.div`
         font-weight:bold;

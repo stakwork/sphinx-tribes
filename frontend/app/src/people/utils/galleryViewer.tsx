@@ -1,33 +1,130 @@
 import React, { useState } from 'react'
 import styled from "styled-components";
 import FadeLeft from '../../animated/fadeLeft';
+import { IconButton } from '../../sphinxUI';
 
 export default function GalleryViewer({ gallery, wrap, selectable, big }) {
-    const [selectedImage, setSelectedImage] = useState('')
+    const [selectedImage, setSelectedImage] = useState(0)
 
     let g = gallery
 
     if (!g || !g.length) return <Square big={big} />
 
-    return <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', minHeight: big && 370 }}>
-        {g && g.length && g.map((ga, i) => {
-            return <Img big={big} key={i} src={ga} onClick={() => {
-                if (selectable) setSelectedImage(ga)
-            }} />
-        })}
+    const showNav = (g.length > 1) && big
 
-        <FadeLeft isMounted={selectedImage}>
-            <BigEnv onClick={() => setSelectedImage('')}>
-                <BigImg src={selectedImage} />
-            </BigEnv>
-        </FadeLeft>
+    function next(e) {
+        e.stopPropagation()
+        let nextindex = selectedImage + 1
+        if (g[nextindex]) setSelectedImage(nextindex)
+        else setSelectedImage(0)
+    }
 
-    </Gallery>
+    function prev(e) {
+        e.stopPropagation()
+        let previndex = selectedImage - 1
+        if (g[previndex]) setSelectedImage(previndex)
+        else setSelectedImage(g.length - 1)
+    }
+
+    return <>
+        <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', minHeight: big && 370 }}>
+
+            <Img big={big} src={g[selectedImage]} />
+            {showNav &&
+                <L>
+                    <Circ>
+                        <IconButton
+                            iconStyle={{ color: '#000' }}
+                            icon={'chevron_left'}
+                            onClick={next}
+                        />
+                    </Circ>
+                </L>
+            }
+
+            {showNav &&
+                <R>
+                    <Circ>
+                        <IconButton
+                            icon={'chevron_right'}
+                            iconStyle={{ color: '#000' }}
+                            onClick={prev}
+                        />
+                    </Circ>
+                </R>
+            }
+
+            <Label>
+                {selectedImage + 1} / {g.length}
+            </Label>
+
+
+            {/* <FadeLeft isMounted={selectedImage}>
+                <BigEnv onClick={() => setSelectedImage('')}>
+                    <BigImg src={selectedImage} />
+                </BigEnv>
+            </FadeLeft> */}
+
+        </Gallery>
+    </>
 }
 
 const Gallery = styled.div`
 display:flex;
 flex-wrap:wrap;
+position:relative;
+`;
+
+const Label = styled.div`
+display:flex;
+align-items:center;
+justify-content:center;
+color:#fff;
+border-radius:20px;
+position:absolute;
+right:5px;
+bottom:10px;
+background: rgba(0, 0, 0, 0.25);
+border-radius: 21px;
+font-size: 12px;
+line-height: 18px;
+/* or 152% */
+padding:4px 10px;
+display: flex;
+align-items: center;
+text-align: center;
+letter-spacing: 1px;
+`;
+
+const Circ = styled.div`
+display:flex;
+align-items:center;
+justify-content:center;
+width:30px;
+height:30px;
+background:#ffffff99;
+border-radius:20px;
+cursor:pointer;
+`
+
+const R = styled.div`
+position:absolute;
+right:5px;
+top:0px;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+`;
+
+const L = styled.div`
+position:absolute;
+left:5px;
+top:0px;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
 `;
 
 const Square = styled.div<ImageProps>`
@@ -59,7 +156,6 @@ const Img = styled.div<ImageProps>`
                 background-size: cover;
                 height: ${(p) => p.big ? '372px' : '132px'};
                 width: ${(p) => p.big ? '100%' : '132px'};
-                // border-radius: 5px;
                 position: relative;
                 border:1px solid #ffffff21;
                 `;

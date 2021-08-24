@@ -173,13 +173,13 @@ export default function PersonView(props: any) {
             }
         },
         wanted: {
-            label: 'Wishlist',
+            label: 'Wanted',
             name: 'wanted',
             submitText: 'Save',
             schema: wantedSchema,
             action: {
-                text: 'Add to Wishlist',
-                icon: 'star'
+                text: 'Add to Wanted',
+                icon: 'favorite_outline'
             }
         },
     }
