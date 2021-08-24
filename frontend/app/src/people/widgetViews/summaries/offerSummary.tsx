@@ -6,27 +6,26 @@ import { Divider } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 
 export default function OfferSummary(props: Offer) {
-    const { gallery, title, description, price } = props
+        const { gallery, title, description, price } = props
 
-    return <Wrap>
+        return <Wrap>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={true} />
-        <Pad>
-            <Y>
-                <div>Price</div>
-                <P>{formatPrice(price)} <B>sat</B></P>
-            </Y>
+                <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={true} />
+                <Pad>
+                        <Y>
+                                <div>Price</div>
+                                <P>{formatPrice(price)} <B>sat</B></P>
+                        </Y>
+                        <Divider style={{
+                                marginBottom: 10
+                        }} />
 
-            <Divider style={{
-                marginBottom: 10
-            }} />
 
+                        <T>{title || 'No title'}</T>
+                        <D>{description || 'No description'}</D>
+                </Pad>
 
-            <T>{title || 'No title'}</T>
-            <D>{description || 'No description'}</D>
-        </Pad>
-
-    </Wrap>
+        </Wrap>
 
 }
 const Pad = styled.div`

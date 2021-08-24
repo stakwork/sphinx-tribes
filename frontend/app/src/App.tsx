@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './App.css'
 import '@material/react-material-icon/dist/material-icon.css';
 import "@fontsource/roboto";
@@ -26,8 +26,12 @@ function App() {
     {
       // people
       mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
-        {isMobile ? <MobilePeopleHeader /> : <PeopleHeader />}
-        {isMobile ? <MobilePeopleBody /> : <PeopleBody />}
+        {/* {isMobile ? */}
+        <MobilePeopleHeader />
+        {/* : <PeopleHeader />} */}
+        {/* {isMobile ? */}
+        <MobilePeopleBody />
+        {/* : <PeopleBody />} */}
       </div>
 
         // tribes
