@@ -70,6 +70,7 @@ export default function Header() {
     function forceLogout() {
         ui.setMeInfo(null)
         ui.setChallenge('')
+        setShowSignIn(true)
         alert('Session timeout')
     }
 
