@@ -126,7 +126,7 @@ export default function PersonView(props: any) {
                 emptyArrayKeys.push(name)
             }
             const thisSchema = widgetSchemas && widgetSchemas.find(e => e.name === name)
-            if (filteredExtras && thisSchema.single) {
+            if (filteredExtras && thisSchema && thisSchema.single) {
                 delete filteredExtras[name]
             }
         })

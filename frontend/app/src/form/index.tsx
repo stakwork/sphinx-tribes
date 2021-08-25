@@ -59,8 +59,8 @@ export default function Form(props: any) {
               {...item}
               key={item.name}
               values={values}
-              disabled={readOnly}
-              readOnly={readOnly}
+              // disabled={readOnly}
+              // readOnly={readOnly}
               errors={errors}
               scrollToTop={scrollToTop}
               value={values[item.name]}
@@ -168,6 +168,7 @@ export interface FormField {
   validator?: any
   style?: any
   prepend?: string
+  widget?: boolean
   page?: number
   extras?: FormField[]
   fields?: FormField[]

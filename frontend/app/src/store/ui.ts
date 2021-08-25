@@ -42,6 +42,10 @@ class UiStore {
 
   @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
+    if (t) {
+      t.img = t.photo_url
+      if (!t.owner_alias) t.owner_alias = t.alias
+    }
     this.meInfo = t
   }
 }
@@ -53,6 +57,7 @@ export interface MeInfo {
   pubkey: string
   photo_url: string
   alias: string
+  img?: string
   owner_alias?: string
   route_hint: string
   contact_key: string

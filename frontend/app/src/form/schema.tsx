@@ -298,6 +298,21 @@ export const aboutSchema: FormField[] = [
         type: "number",
         page: 1,
     },
+    {
+        name: "twitter",
+        label: "Twitter",
+        widget: true,
+        type: "text",
+        prepend: '@',
+        page: 1,
+    },
+    // {
+    //     name: "facebook",
+    //     label: "Facebook",
+    //     widget: true,
+    //     type: "text",
+    //     page: 1,
+    // },
 ];
 
 export const postSchema: FormField[] = [

@@ -16,8 +16,6 @@ export default function PostView(props: Post) {
         <Time>{created && moment.unix(created).format('LLL')} </Time>
         <M style={{ maxHeight: !expand ? 120 : '' }}>{content || 'No content'} </M>
 
-
-
         {isLong &&
             <Link onClick={(e) => {
                 e.stopPropagation()
