@@ -45,7 +45,6 @@ export default function ConfirmMe(props: any) {
         console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
-          ui.setChallenge(challenge)
           setChallenge("");
           if (props.onSuccess) props.onSuccess()
           ok = false;

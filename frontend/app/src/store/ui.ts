@@ -50,13 +50,6 @@ class UiStore {
     this.meInfo = t
   }
 
-  @persist('object') @observable challenge: Challenge = { challenge: '' }
-  @action setChallenge(t: string) {
-    let c = {
-      challenge: t
-    }
-    this.challenge = c
-  }
 }
 
 export type MeData = MeInfo | null
@@ -78,8 +71,7 @@ export interface MeInfo {
   url: string
   description: string
   verification_signature: string
-  extras: Extras,
-  challenge?: string
+  extras: Extras
 }
 export const emptyMeData: MeData = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
 export const emptyMeInfo: MeInfo = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
