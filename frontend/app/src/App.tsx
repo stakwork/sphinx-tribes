@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
 import '@material/react-material-icon/dist/material-icon.css';
 import "@fontsource/roboto";
@@ -16,9 +16,12 @@ import {
   Link
 } from "react-router-dom";
 import { useIsMobile } from './hooks';
+import { useStores } from './store';
+import ConfirmMe from './people/confirmMe';
 
 function App() {
   const mode = getMode()
+  const { ui } = useStores()
   const c = colors['light']
   const isMobile = useIsMobile()
 
@@ -26,6 +29,8 @@ function App() {
     {
       // people
       mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
+
+        {/* <ConfirmMe /> */}
         {/* {isMobile ? */}
         <MobilePeopleHeader />
         {/* : <PeopleHeader />} */}

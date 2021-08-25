@@ -297,6 +297,7 @@ export const aboutSchema: FormField[] = [
         label: "Price to Meet",
         type: "number",
         page: 1,
+        extraHTML: '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>'
     },
     {
         name: "twitter",

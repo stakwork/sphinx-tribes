@@ -4,12 +4,14 @@ import { EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
 import { FieldEnv, FieldText } from './index'
 
-export default function NumberInput({ error, label, value, handleChange, handleBlur, handleFocus }: Props) {
+export default function NumberInput({ error, label, value, extraHTML, handleChange, handleBlur, handleFocus }: Props) {
 
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
 
-  return <FieldEnv label={labeltext}>
+  console.log('extraHTML', extraHTML)
+
+  return <><FieldEnv label={labeltext}>
     <R>
       <FieldText name="first" value={value} type="number"
         onChange={e => {
@@ -35,8 +37,19 @@ export default function NumberInput({ error, label, value, handleChange, handleB
       </E>}
     </R>
   </FieldEnv>
-}
+    <ExtraText
+      style={{ display: value && extraHTML ? 'block' : 'none' }}
+      dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
+    />
+  </>
 
+}
+const ExtraText = styled.div`
+  padding:2px 10px 5px;
+  max-width:calc(100% - 20px);
+  word-break: break;
+  font-size:14px;
+`
 const E = styled.div`
   position:absolute;
   right:10px;

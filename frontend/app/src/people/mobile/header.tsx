@@ -18,6 +18,9 @@ import SignIn from '../auth/signIn';
 import PersonViewSlim from '../personViewSlim';
 import { MeInfo } from '../../store/ui';
 import api from '../../api';
+import ConfirmMe from '../confirmMe';
+
+let heartbeat
 
 export default function Header() {
     const { main, ui } = useStores()
@@ -55,6 +58,7 @@ export default function Header() {
             const me: any = await api.get(`poll/${chal}`)
             if (me && me.pubkey) {
                 ui.setMeInfo(me)
+                ui.setChallenge(chal)
                 setShowSignIn(false)
                 setShowWelcome(true)
             }
@@ -62,6 +66,43 @@ export default function Header() {
             console.log(e)
         }
     }
+
+    function forceLogout() {
+        ui.setMeInfo(null)
+        ui.setChallenge('')
+        setShowSignIn(true)
+        alert('Session timeout')
+    }
+
+    async function ping() {
+        let chal = ui.challenge?.challenge
+        if (!chal) {
+            console.log('no challenge')
+            return
+        }
+
+        try {
+            const me: any = await api.get(`poll/${chal}`)
+            if (me && me.pubkey) {
+            } else {
+                // sign out
+                forceLogout()
+            }
+        } catch (e) {
+            console.log(e)
+            forceLogout()
+        }
+    }
+
+    useEffect(() => {
+        heartbeat = setInterval(() => {
+            ping()
+        }, 60000)
+
+        return function cleanup() {
+            if (heartbeat) clearInterval(heartbeat)
+        }
+    }, [])
 
     useEffect(() => {
         try {
@@ -75,12 +116,9 @@ export default function Header() {
     }, [])
 
 
-
-    const pathname = location && location.pathname
-    console.log(ui.meInfo)
-
     return useObserver(() => {
         return <>
+
             <EuiHeader id="header" style={{ color: '#fff' }}>
                 <div className="container">
                     <Row style={{ justifyContent: 'space-between' }}>
@@ -154,7 +192,7 @@ export default function Header() {
 
             {/* you logged in modal  */}
             < Modal
-                visible={showWelcome}>
+                visible={(ui.meInfo && showWelcome) ? true : false}>
                 <div>
                     <Column>
                         <Imgg
@@ -203,7 +241,7 @@ export default function Header() {
             </Modal> */}
 
 
-            < Modal visible={showEditSelf}
+            < Modal visible={(ui.meInfo && showEditSelf) ? true : false}
                 drift={40}
                 fill
                 close={() => setShowEditSelf(false)}
@@ -212,7 +250,6 @@ export default function Header() {
                     personId={ui.meInfo?.id}
                 />
             </Modal>
-
         </>
     })
 }

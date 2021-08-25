@@ -8,7 +8,7 @@ import { EuiCheckableCard, EuiButton } from "@elastic/eui";
 import { formatPrice } from '../helpers';
 import { colors } from "../colors";
 import { useIsMobile, useScreenWidth } from "../hooks";
-import { Button, Divider } from '../sphinxUI/index'
+import { Button, Divider, Modal } from '../sphinxUI/index'
 const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
@@ -71,25 +71,62 @@ export default function Person(props: any) {
             {description}
           </Description>
           <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>3h ago</div>
+            <div></div>
             {owner_pubkey ?
-              <a href={qrString}>
-                <Button
-                  text='Connect'
-                  color='white'
-                  leadingIcon={'open_in_new'}
-                  iconSize={16}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </a> : <div />
+              <>
+                {isMobile ?
+                  <a href={qrString}>
+                    <Button
+                      text='Connect'
+                      color='white'
+                      leadingIcon={'open_in_new'}
+                      iconSize={16}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </a> :
+                  <Button
+                    text='Connect'
+                    color='white'
+                    leadingIcon={'open_in_new'}
+                    iconSize={16}
+                    onClick={(e) => {
+                      setShowQR(true)
+                      e.stopPropagation()
+                    }}
+                  />
+                }
+              </> : <div />
             }
           </Row>
           <Divider style={{ marginTop: 20 }} />
         </R>
+        <Modal
+          visible={showQR}
+          close={() => setShowQR(false)}
+        >
+          <InnerWrap>
+            <QRCode
+              bgColor={"#FFFFFF"}
+              fgColor="#000000"
+              // level="Q"
+              style={{ width: 200, height: 200 }}
+              value={qrString}
+            />
+            <div style={{ marginTop: 10 }}>Scan with your Sphinx Mobile App</div>
+          </InnerWrap>
+        </Modal>
       </Wrap>
     );
   })
 }
+const InnerWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  padding:50px 0 30px;
+`;
 interface ContentProps {
   selected: boolean;
 }
