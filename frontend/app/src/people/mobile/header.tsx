@@ -52,7 +52,7 @@ export default function Header() {
 
     async function testChallenge(chal: string) {
         try {
-            const me: MeInfo = await api.get(`poll/${chal}`)
+            const me: any = await api.get(`poll/${chal}`)
             if (me && me.pubkey) {
                 ui.setMeInfo(me)
                 setShowSignIn(false)
@@ -92,7 +92,7 @@ export default function Header() {
                             {ui.meInfo ?
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10 }}
-                                    src={ui.meInfo.photo_url || '/static/sphinx.png'}
+                                    src={ui.meInfo.img || '/static/sphinx.png'}
                                     onClick={() => setShowEditSelf(true)} />
                                 :
                                 <Button
@@ -159,11 +159,11 @@ export default function Header() {
                     <Column>
                         <Imgg
                             style={{ height: 128, width: 128, marginBottom: 40 }}
-                            src={'/static/sphinx.png'} />
+                            src={ui.meInfo?.img || '/static/sphinx.png'} />
 
                         <T>
                             <div style={{ marginRight: 6 }}>Welcome</div>
-                            <Name>{ui.meInfo?.alias}</Name>
+                            <Name>{ui.meInfo?.owner_alias}</Name>
                         </T>
 
                         <Welcome>

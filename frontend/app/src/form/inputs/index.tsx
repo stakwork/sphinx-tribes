@@ -69,8 +69,28 @@ box-shadow:none !important;
 export const FieldText = styled(EuiFieldText)`
 background-color:#fff !important;
 background:#fff !important;
-color:#000 !important;
+color:${p => p.readOnly ? '#888' : '#000'} !important;
 box-shadow:none !important;
+
+.euiFormRow__labelWrapper .euiFormControlLayout--group{
+    background-color:#fff !important;
+    background:#fff !important;
+    box-shadow:none !important;
+}
+
+.euiFormRow__fieldWrapper .euiFormControlLayout {
+    background-color:#fff !important;
+    background:#fff !important;
+    box-shadow:none !important;
+}
+
+.euiFormLabel euiFormControlLayout__prepend{
+    background-color:#fff !important;
+    background:#fff !important;
+    box-shadow:none !important;
+    color:#000;
+    display:none !important;
+}
 `
 export const FieldTextArea = styled(EuiTextArea)`
 background-color:#fff !important;

@@ -188,7 +188,7 @@ export default function EditMe(props: any) {
       initialValues.id = ui.meInfo.id || 0
       initialValues.pubkey = ui.meInfo.pubkey
       initialValues.owner_alias = ui.meInfo.alias || ""
-      initialValues.photo_url = ui.meInfo.photo_url || ""
+      initialValues.img = ui.meInfo.img || ""
       initialValues.price_to_meet = ui.meInfo.price_to_meet || 0
       initialValues.description = ui.meInfo.description || ""
       initialValues.extras = { ...ui.meInfo.extras } || {}
@@ -210,7 +210,7 @@ export default function EditMe(props: any) {
       initialValues.id = ui.meInfo.id || 0
       initialValues.pubkey = ui.meInfo.pubkey
       initialValues.owner_alias = ui.meInfo.alias || ""
-      initialValues.photo_url = ui.meInfo.photo_url || ""
+      initialValues.img = ui.meInfo.img || ""
       initialValues.price_to_meet = ui.meInfo.price_to_meet || 0
       initialValues.description = ui.meInfo.description || ""
       initialValues.extras = ui.meInfo.extras || {}
