@@ -79,7 +79,7 @@ export default function Form(props: any) {
               handleBlur={() => setFieldTouched(item.name, false)}
               handleFocus={() => setFieldTouched(item.name, true)}
               setDisableFormButtons={setDisableFormButtons}
-              extraHTML={props.extraHTML && props.extraHTML[item.name]}
+              extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
             />)}
 
             <BWrap >
@@ -173,6 +173,7 @@ export interface FormField {
   extras?: FormField[]
   fields?: FormField[]
   icon?: string
+  extraHTML?: string
 }
 
 function validator(config: FormField[]) {

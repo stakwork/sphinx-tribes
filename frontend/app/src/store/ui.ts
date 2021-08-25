@@ -1,4 +1,5 @@
 import { observable, action } from 'mobx'
+import { persist } from 'mobx-persist'
 import tags from '../tribes/tags'
 import { Extras } from '../form/inputs/widgets/interfaces'
 
@@ -40,7 +41,7 @@ class UiStore {
     this.editMe = b
   }
 
-  @observable meInfo: MeData = null
+  @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
       t.img = t.photo_url
@@ -48,10 +49,21 @@ class UiStore {
     }
     this.meInfo = t
   }
+
+  @persist('object') @observable challenge: Challenge = { challenge: '' }
+  @action setChallenge(t: string) {
+    let c = {
+      challenge: t
+    }
+    this.challenge = c
+  }
 }
 
 export type MeData = MeInfo | null
 
+export interface Challenge {
+  challenge: string
+}
 export interface MeInfo {
   id?: number
   pubkey: string
@@ -66,7 +78,8 @@ export interface MeInfo {
   url: string
   description: string
   verification_signature: string
-  extras: Extras
+  extras: Extras,
+  challenge?: string
 }
 export const emptyMeData: MeData = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
 export const emptyMeInfo: MeInfo = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }

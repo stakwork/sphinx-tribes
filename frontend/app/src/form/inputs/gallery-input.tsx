@@ -54,6 +54,7 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
             await uploadBase64Pic(event.target.result, file.type)
             setUploading(false)
         }
+        console.log('file', file)
         reader.readAsDataURL(file);
     }
 

@@ -19,7 +19,6 @@ export default function SummaryViewer(props: any) {
         </Wrap>
     }
 
-    console.log('config.name', config.name)
     switch (config.name) {
         case 'post':
             return wrapIt(<PostSummary {...item} />)
