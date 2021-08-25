@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { persist } from 'mobx-persist'
+import { create as createPersist, persist } from 'mobx-persist'
 import tags from '../tribes/tags'
 import { Extras } from '../form/inputs/widgets/interfaces'
 
@@ -85,3 +85,6 @@ export const emptyMeData: MeData = { pubkey: '', alias: '', route_hint: '', cont
 export const emptyMeInfo: MeInfo = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
 
 export const uiStore = new UiStore()
+
+const hydrate = createPersist()
+hydrate('some', uiStore).then(() => {})
