@@ -30,7 +30,7 @@ export default function IconButton(props: any) {
         <div style={{ display: 'flex', height: '100%', alignItems: 'center' }}>
             <MaterialIcon
                 icon={props.icon}
-                style={{ fontSize: props.size ? props.size : 30, color: '#B0B7BC' }} />
+                style={{ fontSize: props.size ? props.size : 30, color: '#B0B7BC', ...props.iconStyle }} />
         </div>
 
     </B>

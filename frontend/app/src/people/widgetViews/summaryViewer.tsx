@@ -13,15 +13,30 @@ export default function SummaryViewer(props: any) {
     const { item, config, person } = props
     const { ui, main } = useStores();
 
+    function wrapIt(child) {
+        return <Wrap>
+            {child}
+        </Wrap>
+    }
+
     console.log('config.name', config.name)
     switch (config.name) {
         case 'post':
-            return <PostSummary {...item} />
+            return wrapIt(<PostSummary {...item} />)
         case 'offer':
-            return <OfferSummary {...item} />
+            return wrapIt(<OfferSummary {...item} />)
         case 'wanted':
-            return <WantedSummary {...item} />
+            return wrapIt(<WantedSummary {...item} />)
         default:
-            return <div>none</div>
+            return wrapIt(<div>none</div>)
     }
 }
+
+const Wrap = styled.div`
+height: calc(100% - 60px);
+overflow: auto;
+display: flex;
+flex-direction:column;
+width:100%;
+min-width:100%;
+`;

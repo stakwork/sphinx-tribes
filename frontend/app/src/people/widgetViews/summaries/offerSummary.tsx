@@ -8,9 +8,10 @@ import GalleryViewer from '../../utils/galleryViewer';
 export default function OfferSummary(props: Offer) {
         const { gallery, title, description, price } = props
 
-        return <Wrap>
+        return <>
 
                 <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={true} />
+                <Divider />
                 <Pad>
                         <Y>
                                 <div>Price</div>
@@ -25,20 +26,18 @@ export default function OfferSummary(props: Offer) {
                         <D>{description || 'No description'}</D>
                 </Pad>
 
-        </Wrap>
+        </>
 
 }
 const Pad = styled.div`
-        padding:20px;
-        `;
-const Wrap = styled.div`
-    display: flex;
-    flex-direction:column;
+        padding:0 20px;
         `;
 const Y = styled.div`
         display: flex;
         justify-content:space-between;
         width:100%;
+        height:50px;
+        align-items:center;
         `;
 const T = styled.div`
         font-weight:bold;

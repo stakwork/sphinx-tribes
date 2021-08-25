@@ -57,14 +57,20 @@ export default function FocusedView(props: any) {
     function mergeFormWithMeData(v) {
         let fullMeData: any = null
 
-
         if (ui.meInfo) {
             fullMeData = { ...ui.meInfo }
 
             // if about
             if (config.name === 'about') {
                 config.schema.forEach((s => {
-                    fullMeData[s.name] = v[s.name]
+                    if (s.widget) {
+                        // this allows the link widgets to be edited as a part of about me,
+                        // when really they are stored as extras 
+                        fullMeData.extras[s.name] = [{ value: v[s.name] }]
+                    } else {
+                        fullMeData[s.name] = v[s.name]
+                    }
+
                 }))
             }
             // if extras
@@ -121,6 +127,9 @@ export default function FocusedView(props: any) {
             }
 
             await main.getPeople('')
+            // massage data
+
+            ui.setMeInfo(body)
             closeModal(true)
         } catch (e) {
             console.log('e', e)
@@ -135,22 +144,25 @@ export default function FocusedView(props: any) {
 
         let personInfo = canEdit ? ui.meInfo : person
 
+        console.log('personInfo', personInfo)
+
         // set initials here
         if (personInfo) {
             if (config && config.name === 'about') {
                 initialValues.id = personInfo.id || 0
                 initialValues.pubkey = personInfo.pubkey
-                initialValues.owner_alias = personInfo.alias || ""
-                initialValues.photo_url = personInfo.photo_url || ""
+                initialValues.owner_alias = personInfo.owner_alias || ""
+                initialValues.img = personInfo.img || ""
                 initialValues.price_to_meet = personInfo.price_to_meet || 0
                 initialValues.description = personInfo.description || ""
+                initialValues.twitter = personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value || ""
+                initialValues.facebook = personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value || ""
             } else {
                 // if there is a selected index, fill in values
                 if (selectedIndex > -1) {
                     const extras = { ...personInfo.extras }
                     let sel = extras[config.name][selectedIndex]
 
-                    console.log('sel', sel)
                     config.schema.forEach(s => {
                         initialValues[s.name] = sel[s.name]
                     })
