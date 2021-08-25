@@ -3,14 +3,14 @@ import styled from "styled-components";
 import { Divider } from '../../sphinxUI';
 
 export default function AboutView(props: any) {
-    const { price_to_meet, description, extras } = props
+    const { price_to_meet, description, extras, twitter_confirmed } = props
 
     const { twitter } = extras || {}
     let tag = ''
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
     return <Wrap>
         <Row>
-            <div>Price to Join:</div>
+            <div>Price to Connect:</div>
             <div>{price_to_meet}</div>
         </Row>
 
@@ -23,6 +23,7 @@ export default function AboutView(props: any) {
             <I>
                 <Icon source={`/static/twitter.png`} />
                 <div>@{tag}</div>
+                <Gray>({twitter_confirmed ? 'Verified' : 'Pending verification'})</Gray>
             </I>
         </>}
         {/* <I>Facebook</I> */}
@@ -35,7 +36,11 @@ export default function AboutView(props: any) {
 }
 
 
-
+const Gray = styled.div`
+margin-left:5px;
+font-weight:300;
+opacity:0.6;
+`;
 const Wrap = styled.div`
 display: flex;
 flex-direction:column;
