@@ -157,6 +157,14 @@ func poll(w http.ResponseWriter, r *http.Request) {
 		pld.ID = existing.ID // add ID on if exists
 		pld.Description = existing.Description
 		pld.Extras = existing.Extras
+		// standardize language for frontend, retrun photo_url for img
+		if existing.Img != "" {
+			pld.PhotoURL = existing.Img
+		}
+		// standardize language for frontend, return alias for img
+		if existing.OwnerAlias != "" {
+			pld.Alias = existing.OwnerAlias
+		}
 	}
 
 	// store.DeleteChallenge(challenge)
