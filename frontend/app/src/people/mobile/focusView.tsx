@@ -21,6 +21,7 @@ export default function FocusedView(props: any) {
     const skipEditLayer = ((selectedIndex < 0) || config.skipEditLayer) ? true : false
 
     const [loading, setLoading] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [editMode, setEditMode] = useState(skipEditLayer);
     const scrollDiv: any = useRef(null)
     const formRef: any = useRef(null)
@@ -97,6 +98,47 @@ export default function FocusedView(props: any) {
         return fullMeData
     }
 
+    async function deleteIt() {
+        let body: any = null
+        body = { ...ui.meInfo }
+
+        // mutates
+        body.extras[config.name].splice(selectedIndex, 1)
+
+        const info = ui.meInfo as any;
+        if (!info) return console.log("no meInfo");
+        setDeleting(true);
+        try {
+            const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+            const r = await fetch(URL + "/profile", {
+                method: "POST",
+                body: JSON.stringify({
+                    // use docker host (tribes.sphinx), because relay will post to it
+                    host: getHostIncludingDockerHosts(),
+                    ...body,
+                    price_to_meet: parseInt(body.price_to_meet),
+                }),
+                headers: {
+                    "x-jwt": info.jwt,
+                    "Content-Type": "application/json",
+                },
+            });
+            if (!r.ok) {
+                setLoading(false);
+                return alert("Failed to create profile");
+            }
+
+            await main.getPeople('')
+            // massage data
+
+            ui.setMeInfo(body)
+            closeModal(true)
+        } catch (e) {
+            console.log('e', e)
+        }
+        setDeleting(false);
+    }
+
     async function submitForm(body) {
         console.log('SUBMIT FORM', body);
         body = mergeFormWithMeData(body)
@@ -144,8 +186,6 @@ export default function FocusedView(props: any) {
 
         let personInfo = canEdit ? ui.meInfo : person
 
-        console.log('personInfo', personInfo)
-
         // set initials here
         if (personInfo) {
             if (config && config.name === 'about') {
@@ -163,9 +203,11 @@ export default function FocusedView(props: any) {
                     const extras = { ...personInfo.extras }
                     let sel = extras[config.name][selectedIndex]
 
-                    config.schema.forEach(s => {
-                        initialValues[s.name] = sel[s.name]
-                    })
+                    if (sel) {
+                        config.schema.forEach(s => {
+                            initialValues[s.name] = sel[s.name]
+                        })
+                    }
                 }
             }
         }
@@ -211,14 +253,25 @@ export default function FocusedView(props: any) {
                                 style={{ fontSize: 12, fontWeight: 600 }}
                             />
                             {canEdit ?
-                                <Button
-                                    onClick={() => setEditMode(true)}
-                                    color={'widget'}
-                                    leadingIcon={'edit'}
-                                    iconSize={18}
-                                    width={100}
-                                    text={props.submitText || 'Edit'}
-                                /> : <div />}
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Button
+                                        onClick={() => setEditMode(true)}
+                                        color={'widget'}
+                                        leadingIcon={'edit'}
+                                        iconSize={18}
+                                        width={100}
+                                        text={props.submitText || 'Edit'}
+                                    />
+                                    <IconButton
+                                        onClick={() => deleteIt()}
+                                        color={'widget'}
+                                        loading={deleting}
+                                        icon={'delete'}
+                                    // iconSize={18}
+                                    />
+                                </div>
+                                : <div />}
+
                         </BWrap>
                         <div style={{ height: 60 }} />
 

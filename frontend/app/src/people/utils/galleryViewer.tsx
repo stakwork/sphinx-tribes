@@ -8,7 +8,8 @@ export default function GalleryViewer({ gallery, wrap, selectable, big }) {
 
     let g = gallery
 
-    if (!g || !g.length) return <Square big={big} />
+    if (!g || !g.length) return <div />
+    //<Square big={big} />
 
     const showNav = (g.length > 1) && big
 
@@ -36,7 +37,7 @@ export default function GalleryViewer({ gallery, wrap, selectable, big }) {
                         <IconButton
                             iconStyle={{ color: '#000' }}
                             icon={'chevron_left'}
-                            onClick={next}
+                            onClick={prev}
                         />
                     </Circ>
                 </L>
@@ -48,7 +49,7 @@ export default function GalleryViewer({ gallery, wrap, selectable, big }) {
                         <IconButton
                             icon={'chevron_right'}
                             iconStyle={{ color: '#000' }}
-                            onClick={prev}
+                            onClick={next}
                         />
                     </Circ>
                 </R>

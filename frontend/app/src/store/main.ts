@@ -1,9 +1,10 @@
 import { observable, action } from 'mobx'
+import { persist } from 'mobx-persist'
 import api from '../api'
 import { Extras } from '../form/inputs/widgets/interfaces'
 
 export class MainStore {
-  @observable
+  @persist('list') @observable
   tribes: Tribe[] = []
 
   @action async getTribes(uniqueName?: string): Promise<Tribe[]> {
@@ -26,7 +27,7 @@ export class MainStore {
     return ts
   }
 
-  @observable
+  @persist('list') @observable
   people: Person[] = []
 
   @action async getPeople(uniqueName?: string): Promise<Person[]> {

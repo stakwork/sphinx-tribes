@@ -3,27 +3,19 @@ import styled from 'styled-components'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {
-    EuiFormFieldset,
     EuiLoadingSpinner,
-    EuiButtonIcon,
-    EuiButton
 } from '@elastic/eui';
 import Person from '../person'
 import PersonViewSlim from '../personViewSlim'
 
 import { useFuse, useScroll } from '../../hooks'
-import MaterialIcon from '@material/react-material-icon';
 import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
 import { useIsMobile } from '../../hooks';
 import {
-    Switch,
-    Route,
-    Link,
     useHistory,
     useLocation
 } from "react-router-dom";
-import { Modal, Button, Divider } from '../../sphinxUI';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -34,10 +26,12 @@ export default function BodyComponent() {
     const [selectedPerson, setSelectedPerson] = useState(0)
     const [selectingPerson, setSelectingPerson] = useState(0)
     const [showProfile, setShowProfile] = useState(false)
+
     const c = colors['light']
     const isMobile = useIsMobile()
     const history = useHistory()
     const location = useLocation()
+
 
     function selectPerson(id: number, unique_name: string) {
         console.log('selectPerson', id, unique_name)
@@ -80,7 +74,6 @@ export default function BodyComponent() {
                     select={selectPerson}
                 />)}
             </div>}
-
 
             <FadeLeft
                 withOverlay

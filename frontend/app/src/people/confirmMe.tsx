@@ -45,6 +45,7 @@ export default function ConfirmMe(props: any) {
         console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
+          ui.setChallenge(challenge)
           setChallenge("");
           if (props.onSuccess) props.onSuccess()
           ok = false;
@@ -81,7 +82,7 @@ export default function ConfirmMe(props: any) {
       {!challenge && <EuiLoadingSpinner size="xl" style={{ marginTop: 60 }} />}
       {challenge && (
         <InnerWrap>
-          <P>Scan QR or click to open Sphinx</P>
+          <P>Scan with your Sphinx Mobile App</P>
           <QrWrap>
             <QRCode
               bgColor="#FFFFFF"
@@ -133,7 +134,7 @@ const LinkWrap = styled.div`
   }
 `;
 const P = styled.p`
-  color: white;
+margin-top:10px;
 `;
 const QrWrap = styled.div`
   padding: 8px;

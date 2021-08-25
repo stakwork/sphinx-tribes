@@ -26,6 +26,7 @@ import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
 import FocusedView from './mobile/focusView'
 import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../form/schema";
+import { useIsMobile } from "../hooks";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -69,6 +70,8 @@ export default function PersonView(props: any) {
     const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey || '');
 
+    const isMobile = useIsMobile()
+
     function switchWidgets(name) {
         // setting newSelectedWidget will dismount the FadeLeft, 
         // and on dismount, endAnimation runs
@@ -100,6 +103,7 @@ export default function PersonView(props: any) {
 
     function logout() {
         ui.setEditMe(false)
+        ui.setChallenge('')
         ui.setMeInfo(null)
         goBack()
     }
@@ -307,15 +311,25 @@ export default function PersonView(props: any) {
                         {/* only see buttons on other people's profile */}
                         {canEdit ? <div style={{ height: 40 }} /> :
                             <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                                <a href={qrString}>
+                                {isMobile ?
+                                    <a href={qrString}>
+                                        <Button
+                                            text='Connect'
+                                            onClick={add}
+                                            color='primary'
+                                            height={42}
+                                            width={120}
+                                        />
+                                    </a>
+                                    :
                                     <Button
                                         text='Connect'
-                                        onClick={add}
+                                        onClick={() => setShowQR(true)}
                                         color='primary'
                                         height={42}
                                         width={120}
                                     />
-                                </a>
+                                }
                                 <div style={{ width: 15 }} />
                                 <Button
                                     text='Support'
@@ -356,9 +370,9 @@ export default function PersonView(props: any) {
                         <EuiModal onClose={() => setShowQR(false)}
                             initialFocus="[name=popswitch]">
                             <EuiModalHeader>
-                                <EuiModalHeaderTitle>{`Add ${owner_alias}`}</EuiModalHeaderTitle>
+                                <EuiModalHeaderTitle>{`Connect with ${owner_alias}`}</EuiModalHeaderTitle>
                             </EuiModalHeader>
-                            <EuiModalBody style={{ padding: 0 }}>
+                            <EuiModalBody style={{ padding: 0, textAlign: 'center' }}>
                                 <QRWrapWrap>
                                     <QRWrap className="qr-wrap float-r">
                                         <QRCode
@@ -370,6 +384,7 @@ export default function PersonView(props: any) {
                                         />
                                     </QRWrap>
                                 </QRWrapWrap>
+                                <div style={{ marginTop: 10, color: '#fff' }}>Scan with your Sphinx Mobile App</div>
                             </EuiModalBody>
                         </EuiModal>
                     </EuiOverlayMask >
