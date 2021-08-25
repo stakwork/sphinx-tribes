@@ -18,9 +18,7 @@ import SignIn from '../auth/signIn';
 import PersonViewSlim from '../personViewSlim';
 import { MeInfo } from '../../store/ui';
 import api from '../../api';
-import ConfirmMe from '../confirmMe';
 
-let heartbeat
 
 export default function Header() {
     const { main, ui } = useStores()
@@ -58,7 +56,6 @@ export default function Header() {
             const me: any = await api.get(`poll/${chal}`)
             if (me && me.pubkey) {
                 ui.setMeInfo(me)
-                ui.setChallenge(chal)
                 setShowSignIn(false)
                 setShowWelcome(true)
             }
@@ -67,42 +64,15 @@ export default function Header() {
         }
     }
 
-    function forceLogout() {
-        ui.setMeInfo(null)
-        ui.setChallenge('')
-        setShowSignIn(true)
-        alert('Session timeout')
-    }
+    // useEffect(() => {
+    //     heartbeat = setInterval(() => {
+    //         ping()
+    //     }, 60000)
 
-    async function ping() {
-        let chal = ui.challenge?.challenge
-        if (!chal) {
-            console.log('no challenge')
-            return
-        }
-
-        try {
-            const me: any = await api.get(`poll/${chal}`)
-            if (me && me.pubkey) {
-            } else {
-                // sign out
-                forceLogout()
-            }
-        } catch (e) {
-            console.log(e)
-            forceLogout()
-        }
-    }
-
-    useEffect(() => {
-        heartbeat = setInterval(() => {
-            ping()
-        }, 60000)
-
-        return function cleanup() {
-            if (heartbeat) clearInterval(heartbeat)
-        }
-    }, [])
+    //     return function cleanup() {
+    //         if (heartbeat) clearInterval(heartbeat)
+    //     }
+    // }, [])
 
     useEffect(() => {
         try {

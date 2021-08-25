@@ -103,7 +103,6 @@ export default function PersonView(props: any) {
 
     function logout() {
         ui.setEditMe(false)
-        ui.setChallenge('')
         ui.setMeInfo(null)
         goBack()
     }
