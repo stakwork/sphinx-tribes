@@ -7,9 +7,7 @@ import GalleryViewer from '../../utils/galleryViewer';
 export default function PostSummary(props: Post) {
     const { title, content, created, gallery } = props
 
-    console.log('props', props)
-
-    return <Wrap>
+    return <Pad>
         <T>{title || 'No title'} </T>
         <Time>{created && moment.unix(created).format('LLL')} </Time>
         <M>{content || 'No content'} </M>
@@ -17,27 +15,13 @@ export default function PostSummary(props: Post) {
         {/* readmore */}
 
         <GalleryViewer gallery={gallery} wrap={false} selectable={false} big={true} />
-    </Wrap>
+    </Pad>
 
 }
 
-const Wrap = styled.div`
-display: flex;
-flex-direction:column;
+const Pad = styled.div`
 width:100%;
 padding:20px;
-min-width:100%;
-font-style: normal;
-font-weight: 500;
-font-size: 24px;
-line-height: 20px;
-/* or 83% */
-
-
-/* Text 2 */
-
-color: #3C3F41;
-
 `;
 
 const Time = styled.div`
@@ -72,23 +56,6 @@ line-height: 25px;
 /* Main bottom icons */
 
 color: #5F6368;
+margin-bottom:20px;
 `;
 
-const Gallery = styled.div`
-display:flex;
-margin-top:10px;
-`;
-
-interface ImageProps {
-    readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-                background-image: url("${(p) => p.src}");
-                background-position: center;
-                background-size: cover;
-                min-height:200px;
-                width: 100%;
-                border-radius: 5px;
-                position: relative;
-                border:1px solid #ffffff21;
-                `;

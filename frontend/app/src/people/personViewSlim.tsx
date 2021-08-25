@@ -126,7 +126,7 @@ export default function PersonView(props: any) {
                 emptyArrayKeys.push(name)
             }
             const thisSchema = widgetSchemas && widgetSchemas.find(e => e.name === name)
-            if (filteredExtras && thisSchema.single) {
+            if (filteredExtras && thisSchema && thisSchema.single) {
                 delete filteredExtras[name]
             }
         })
@@ -173,13 +173,13 @@ export default function PersonView(props: any) {
             }
         },
         wanted: {
-            label: 'Wishlist',
+            label: 'Wanted',
             name: 'wanted',
             submitText: 'Save',
             schema: wantedSchema,
             action: {
-                text: 'Add to Wishlist',
-                icon: 'star'
+                text: 'Add to Wanted',
+                icon: 'favorite_outline'
             }
         },
     }

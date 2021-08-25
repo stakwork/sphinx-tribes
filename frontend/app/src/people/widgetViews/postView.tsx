@@ -1,24 +1,37 @@
 import moment from 'moment';
-import React from 'react'
+import React, { useState } from 'react'
 import styled from "styled-components";
 import { Post } from '../../form/inputs/widgets/interfaces';
+import GalleryViewer from '../utils/galleryViewer';
 
 
 export default function PostView(props: Post) {
     const { title, content, created, gallery } = props
+    const isLong = content && (content.length > 200)
+    const [expand, setExpand] = useState(false)
+
 
     return <Wrap>
         <T>{title || 'No title'} </T>
         <Time>{created && moment.unix(created).format('LLL')} </Time>
-        <M>{content || 'No content'} </M>
+        <M style={{ maxHeight: !expand ? 120 : '' }}>{content || 'No content'} </M>
 
-        {/* readmore */}
+        {isLong &&
+            <Link onClick={(e) => {
+                e.stopPropagation()
+                setExpand(!expand)
+            }}>
+                {!expand ? 'Read more' : 'Show less'}
+            </Link>
+        }
 
-        {<Gallery>
-            {gallery && gallery.map((g, i) => {
-                return <Img key={i} src={g} />
-            })}
-        </Gallery>}
+
+        <GalleryViewer
+            big={true}
+            wrap={false}
+            selectable={true}
+            gallery={gallery} />
+
     </Wrap>
 
 }
@@ -64,32 +77,28 @@ margin-bottom:10px;
 color: #5F6368;
 `;
 
-const M = styled.div`
+const Link = styled.div`
 font-size: 15px;
-line-height: 25px;
+line-height: 20px;
+
+
+/* Primary blue */
+
+color: #618AFF;
+margin-bottom:10px;
+`;
+
+
+const M = styled.div`
+font-size: 16px;
+line-height: 20px;
 /* or 167% */
 
 
 /* Main bottom icons */
 
 color: #5F6368;
+margin-bottom:10px;
+overflow:hidden;
 `;
 
-const Gallery = styled.div`
-display:flex;
-margin-top:10px;
-`;
-
-interface ImageProps {
-    readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-                background-image: url("${(p) => p.src}");
-                background-position: center;
-                background-size: cover;
-                min-height:200px;
-                width: 100%;
-                border-radius: 5px;
-                position: relative;
-                border:1px solid #ffffff21;
-                `;
