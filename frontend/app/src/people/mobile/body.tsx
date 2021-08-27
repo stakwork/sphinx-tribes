@@ -16,6 +16,8 @@ import {
     useHistory,
     useLocation
 } from "react-router-dom";
+import Drawer from '../drawer/index'
+import { calculateContrast } from '@elastic/eui/src/services/color/luminance_and_contrast';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -65,30 +67,77 @@ export default function BodyComponent() {
         const { handleScroll, n, loadingMore } = getScroll()
         let people = peeps.slice(0, n)
 
-        return <Body>
+        if (loading) {
+            return <Body>
+                <EuiLoadingSpinner size="xl" />
+            </Body>
+        }
 
-            {loading && <EuiLoadingSpinner size="xl" />}
-            {!loading && <div style={{ width: '100%' }} >
-                {people.map(t => <Person {...t} key={t.id}
-                    selected={selectedPerson === t.id}
-                    select={selectPerson}
-                />)}
-            </div>}
+        if (isMobile) {
+            return <Body>
+                <div style={{ width: '100%' }} >
+                    {people.map(t => <Person {...t} key={t.id}
+                        selected={selectedPerson === t.id}
+                        small={isMobile}
+                        select={selectPerson}
+                    />)}
+                </div>
+                <FadeLeft
+                    withOverlay
+                    drift={40}
+                    overlayClick={() => setSelectingPerson(0)}
+                    style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
+                    isMounted={(selectingPerson && !showProfile) ? true : false}
+                    dismountCallback={() => setSelectedPerson(0)}
+                >
+                    <PersonViewSlim goBack={() => setSelectingPerson(0)}
+                        personId={selectedPerson}
+                        selectPerson={selectPerson}
+                        loading={loading} />
+                </FadeLeft>
+            </Body >
+        }
 
+        // desktop mode
+        return <Body style={{
+            background: '#f0f1f3',
+            height: 'calc(100% - 65px)'
+
+        }}>
+
+            <>
+                <Drawer />
+                <div style={{
+                    width: '100%', padding: 16, paddingLeft: 0, display: 'flex', flexWrap: 'wrap',
+                    justifyContent: 'space-around', alignItems: 'flex-start'
+                }} >
+                    {people.map(t => <Person {...t} key={t.id}
+                        small={false}
+                        selected={selectedPerson === t.id}
+                        select={selectPerson}
+                    />)}
+                </div>
+            </>
+
+
+
+            {/* selected view */}
             <FadeLeft
-                withOverlay
+                withOverlay={isMobile}
                 drift={40}
                 overlayClick={() => setSelectingPerson(0)}
-                style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
+                style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
                 isMounted={(selectingPerson && !showProfile) ? true : false}
                 dismountCallback={() => setSelectedPerson(0)}
             >
                 <PersonViewSlim goBack={() => setSelectingPerson(0)}
                     personId={selectedPerson}
-                    loading={loading} />
+                    loading={loading}
+                    selectPerson={selectPerson} />
             </FadeLeft>
-
         </Body >
+
+
     }
     )
 }

@@ -24,37 +24,39 @@ export default function DrawerComponent() {
         people = [...people, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
         const tags = [
-            {
-                checked: true,
-                text: 'hi',
-                number: 234
-            },
-            {
-                checked: true,
-                text: 'hi',
-                number: 234
-            },
-            {
-                checked: true,
-                text: 'hi',
-                number: 234
-            },
-            {
-                checked: true,
-                text: 'hi',
-                number: 234
-            },
-            {
-                checked: true,
-                text: 'hi',
-                number: 234
-            },
-            {
-                checked: true,
-                text: 'hi',
-                number: 234
-            },
+            // {
+            //     checked: true,
+            //     text: 'hi',
+            //     number: 234
+            // },
+            // {
+            //     checked: true,
+            //     text: 'hi',
+            //     number: 234
+            // },
+            // {
+            //     checked: true,
+            //     text: 'hi',
+            //     number: 234
+            // },
+            // {
+            //     checked: true,
+            //     text: 'hi',
+            //     number: 234
+            // },
+            // {
+            //     checked: true,
+            //     text: 'hi',
+            //     number: 234
+            // },
+            // {
+            //     checked: true,
+            //     text: 'hi',
+            //     number: 234
+            // },
         ]
+
+        const width = 150
 
         return <Drawer>
             <Spacer />
@@ -63,6 +65,7 @@ export default function DrawerComponent() {
                 type='search'
                 placeholder='Search'
                 value={ui.searchText}
+                style={{ width }}
                 onChange={e => {
                     console.log('handleChange', e)
                     ui.setSearchText(e)
@@ -71,9 +74,9 @@ export default function DrawerComponent() {
             />
 
             <Spacer />
-            <Label>Tags</Label>
 
-            <Tags>
+            <Tags style={{ width }}>
+                <Label>Tags</Label>
                 <Spacer />
                 {tags.map((t, i) => {
                     return <Tag {...t}
@@ -89,14 +92,13 @@ export default function DrawerComponent() {
 }
 const Drawer = styled.div`
   height:100%;
-  width:260px;
+  width:230px;
   padding-top:10px;
   overflow:auto;
   display:flex;
   flex-direction:column;
+  align-items:center;
   color:#000;
-  margin-right:50px;
-//   border-right:1px solid #000;
 `
 
 const Tags = styled.div`
@@ -112,7 +114,7 @@ const Spacer = styled.div`
 
 const Label = styled.div`
     font-style: normal;
-    font-weight: bold;
+    font-weight: 500;
     font-size: 16px;
     line-height: 31px;
     width:100%;

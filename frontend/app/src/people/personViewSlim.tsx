@@ -27,6 +27,8 @@ import MaterialIcon from "@material/react-material-icon";
 import FocusedView from './mobile/focusView'
 import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../form/schema";
 import { useIsMobile } from "../hooks";
+import Person from "./person";
+import { relative } from "path";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -38,6 +40,7 @@ export default function PersonView(props: any) {
     const {
         personId,
         loading,
+        selectPerson,
         goBack
     } = props
 
@@ -45,7 +48,7 @@ export default function PersonView(props: any) {
     const { meInfo } = ui || {}
 
     const person = (main.people && main.people.length && main.people.find(f => f.id === personId))
-
+    const people = main.people
     const {
         id,
         img,
@@ -60,17 +63,20 @@ export default function PersonView(props: any) {
 
 
     const canEdit = id === meInfo?.id
+    const isMobile = useIsMobile()
 
+    const initialWidget = (!isMobile || canEdit) ? 'post' : 'about'
 
-    const [selectedWidget, setSelectedWidget] = useState(canEdit ? 'post' : 'about');
+    const [selectedWidget, setSelectedWidget] = useState(initialWidget);
+    const [newSelectedWidget, setNewSelectedWidget] = useState(initialWidget);
     const [focusIndex, setFocusIndex] = useState(-1);
-    const [newSelectedWidget, setNewSelectedWidget] = useState(canEdit ? 'post' : 'about');
+
     const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey || '');
 
-    const isMobile = useIsMobile()
+
 
     function switchWidgets(name) {
         // setting newSelectedWidget will dismount the FadeLeft, 
@@ -78,14 +84,17 @@ export default function PersonView(props: any) {
         // if (!animating && selectedWidget !== name) {
         setNewSelectedWidget(name)
         setSelectedWidget(name)
+        setShowFocusView(false)
+        setFocusIndex(-1)
         setAnimating(true)
         // }
     }
 
-    function endAnimation() {
-        setSelectedWidget(newSelectedWidget)
-        setAnimating(false)
+    function selectPersonWithinFocusView(id, unique_name) {
+        switchWidgets('post')
+        selectPerson(id, unique_name)
     }
+
 
     let tagsString = "";
     tags && tags.forEach((t: string, i: number) => {
@@ -95,10 +104,6 @@ export default function PersonView(props: any) {
 
     function add(e) {
         e.stopPropagation();
-    }
-    function toggleQR(e) {
-        e.stopPropagation();
-        setShowQR((current) => !current);
     }
 
     function logout() {
@@ -187,7 +192,27 @@ export default function PersonView(props: any) {
         },
     }
 
-    function renderWidgets() {
+    function renderWidgets(name: string) {
+        if (name) {
+            switch (name) {
+                case 'about':
+                    return <AboutView {...person} />
+                case 'post':
+                    return wrapIt(<PostView {...fullSelectedWidget} />)
+                case 'twitter':
+                    return wrapIt(<TwitterView {...fullSelectedWidget} />)
+                case 'supportme':
+                    return wrapIt(<SupportMeView {...fullSelectedWidget} />)
+                case 'offer':
+                    return wrapIt(<OfferView {...fullSelectedWidget} />)
+                case 'wanted':
+                    return wrapIt(<WantedView {...fullSelectedWidget} />)
+                case 'blog':
+                    return wrapIt(<BlogView {...fullSelectedWidget} />)
+                default:
+                    return wrapIt(<></>)
+            }
+        }
         if (!selectedWidget) {
             return <div style={{ height: 200 }} />
         }
@@ -244,7 +269,6 @@ export default function PersonView(props: any) {
                 return wrapIt(<BlogView {...fullSelectedWidget} />)
             default:
                 return wrapIt(<></>)
-
         }
     }
 
@@ -253,7 +277,7 @@ export default function PersonView(props: any) {
 
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
-        return <div style={{ padding: 10, margin: '8px 0 5px' }}>
+        return <div style={{ padding: 10, margin: '6px 0 5px' }}>
             {!fullSelectedWidget && action.info &&
                 <ActionInfo>
                     <MaterialIcon icon={action.infoIcon} style={{ fontSize: 80 }} />
@@ -262,7 +286,7 @@ export default function PersonView(props: any) {
             }
             <Button
                 text={action.text}
-                color='widget'
+                color={isMobile ? 'widget' : 'desktopWidget'}
                 leadingIcon={action.icon}
                 width='100%'
                 height={48}
@@ -274,121 +298,92 @@ export default function PersonView(props: any) {
     }
 
 
-
-    return (
-        <Content>
-            <div style={{
-                display: 'flex', flexDirection: 'column',
-                width: '100%', overflow: 'auto', height: '100%'
-            }}>
-                <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: 20, left: 0,
-                        display: 'flex',
-                        justifyContent: 'space-between', width: '100%',
-                    }}>
+    function renderMobileView() {
+        return <div style={{
+            display: 'flex', flexDirection: 'column',
+            width: '100%', overflow: 'auto', height: '100%'
+        }}>
+            <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
+                <div style={{
+                    position: 'absolute',
+                    top: 20, left: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between', width: '100%',
+                }}>
+                    <IconButton
+                        onClick={goBack}
+                        icon='arrow_back'
+                    />
+                    {canEdit ?
                         <IconButton
-                            onClick={goBack}
-                            icon='arrow_back'
-                        />
-                        {canEdit ?
-                            <IconButton
-                                onClick={logout}
-                                icon='logout'
-                            /> : <div />
-                        }
-                    </div>
+                            onClick={logout}
+                            icon='logout'
+                        /> : <div />
+                    }
+                </div>
 
-                    {/* profile photo */}
-                    <Head>
-                        <Img src={img || '/static/sphinx.png'} />
-                        <RowWrap>
-                            <Name>{owner_alias}</Name>
-                        </RowWrap>
+                {/* profile photo */}
+                <Head>
+                    <Img src={img || '/static/sphinx.png'} />
+                    <RowWrap>
+                        <Name>{owner_alias}</Name>
+                    </RowWrap>
 
-                        {/* only see buttons on other people's profile */}
-                        {canEdit ? <div style={{ height: 40 }} /> :
-                            <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                                {isMobile ?
-                                    <a href={qrString}>
-                                        <Button
-                                            text='Connect'
-                                            onClick={add}
-                                            color='primary'
-                                            height={42}
-                                            width={120}
-                                        />
-                                    </a>
-                                    :
+                    {/* only see buttons on other people's profile */}
+                    {canEdit ? <div style={{ height: 40 }} /> :
+                        <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                            {isMobile ?
+                                <a href={qrString}>
                                     <Button
                                         text='Connect'
-                                        onClick={() => setShowQR(true)}
+                                        onClick={add}
                                         color='primary'
                                         height={42}
                                         width={120}
                                     />
-                                }
-                                <div style={{ width: 15 }} />
+                                </a>
+                                :
                                 <Button
-                                    text='Support'
-                                    color='link'
+                                    text='Connect'
+                                    onClick={() => setShowQR(true)}
+                                    color='primary'
                                     height={42}
-                                    width={120} />
-                            </RowWrap>
-                        }
-                    </Head>
+                                    width={120}
+                                />
+                            }
+                            <div style={{ width: 15 }} />
+                            <Button
+                                text='Support'
+                                color='link'
+                                height={42}
+                                width={120} />
+                        </RowWrap>
+                    }
+                </Head>
 
-                    <Tabs>
-                        {tabs && Object.keys(tabs).map((name, i) => {
-                            const t = tabs[name]
-                            const label = t.label
-                            const selected = name === newSelectedWidget
+                <Tabs>
+                    {tabs && Object.keys(tabs).map((name, i) => {
+                        const t = tabs[name]
+                        const label = t.label
+                        const selected = name === newSelectedWidget
 
-                            return <Tab key={i}
-                                selected={selected}
-                                onClick={() => {
-                                    switchWidgets(name)
-                                }}>
-                                {label}
-                            </Tab>
-                        })}
+                        return <Tab key={i}
+                            selected={selected}
+                            onClick={() => {
+                                switchWidgets(name)
+                            }}>
+                            {label}
+                        </Tab>
+                    })}
 
-                    </Tabs>
+                </Tabs>
 
-                </Panel>
+            </Panel>
 
-                <Sleeve>
-                    {renderEditButton()}
-                    {renderWidgets()}
-                </Sleeve>
-
-                {
-                    showQR &&
-                    <EuiOverlayMask onClick={() => setShowQR(false)}>
-                        <EuiModal onClose={() => setShowQR(false)}
-                            initialFocus="[name=popswitch]">
-                            <EuiModalHeader>
-                                <EuiModalHeaderTitle>{`Connect with ${owner_alias}`}</EuiModalHeaderTitle>
-                            </EuiModalHeader>
-                            <EuiModalBody style={{ padding: 0, textAlign: 'center' }}>
-                                <QRWrapWrap>
-                                    <QRWrap className="qr-wrap float-r">
-                                        <QRCode
-                                            bgColor={"#FFFFFF"}
-                                            fgColor="#000000"
-                                            level="Q"
-                                            style={{ width: qrWidth }}
-                                            value={qrString}
-                                        />
-                                    </QRWrap>
-                                </QRWrapWrap>
-                                <div style={{ marginTop: 10, color: '#fff' }}>Scan with your Sphinx Mobile App</div>
-                            </EuiModalBody>
-                        </EuiModal>
-                    </EuiOverlayMask >
-                }
-            </div>
+            <Sleeve>
+                {renderEditButton()}
+                {renderWidgets('')}
+            </Sleeve>
 
             <Modal
                 fill
@@ -408,48 +403,192 @@ export default function PersonView(props: any) {
                     }}
                 />
             </Modal>
+        </div>
+    }
+
+    function renderDesktopView() {
+        return <div style={{
+            display: 'flex',
+            width: '100%', height: '100%'
+        }}>
+
+            {!canEdit &&
+                <PeopleList>
+                    <DBack >
+                        <Button
+                            color='clear'
+                            leadingIcon='arrow_back'
+                            text='Back'
+                            onClick={goBack}
+                        />
+                    </DBack>
+
+                    <div style={{ width: '100%' }} >
+                        {people.map(t => <Person {...t} key={t.id}
+                            selected={personId === t.id}
+                            hideActions={true}
+                            small={true}
+                            select={selectPersonWithinFocusView}
+                        />)}
+                    </div>
+
+                </PeopleList>
+            }
+
+            <Panel style={{ paddingBottom: 0, paddingTop: 80, width: 322, minWidth: 322 }}>
+                <div style={{
+                    position: 'absolute',
+                    top: 20, left: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between', width: '100%',
+                }}>
+                    {canEdit ? <Button
+                        color='clear'
+                        leadingIcon='arrow_back'
+                        text='Back'
+                        onClick={goBack}
+                    /> : <div />}
+
+                    {!canEdit ? <IconButton
+                        onClick={() => setShowQR(true)}
+                        icon='qr_code_2'
+                    /> : <div />}
+
+                </div>
+
+                {/* profile photo */}
+                <Head>
+                    <Img src={img || '/static/sphinx.png'} />
+                    <RowWrap>
+                        <Name>{owner_alias}</Name>
+                    </RowWrap>
+
+                    {/* only see buttons on other people's profile */}
+                    {canEdit ? <div style={{ height: 40 }} /> :
+                        <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                            {isMobile ?
+                                <a href={qrString}>
+                                    <Button
+                                        text='Connect'
+                                        onClick={add}
+                                        color='primary'
+                                        height={42}
+                                        width={120}
+                                    />
+                                </a>
+                                :
+                                <Button
+                                    text='Connect'
+                                    onClick={() => setShowQR(true)}
+                                    color='primary'
+                                    height={42}
+                                    width={120}
+                                />
+                            }
+                            <div style={{ width: 15 }} />
+                            <Button
+                                text='Support'
+                                color='link'
+                                height={42}
+                                width={120} />
+                        </RowWrap>
+                    }
+                </Head>
+
+                {renderWidgets('about')}
+
+            </Panel>
+
+            <div style={{
+                width: canEdit ? 'calc(100% - 323px)' : 'calc(100% - 685px)',
+                minWidth: 250,
+            }}>
+                <Tabs style={{ background: '#fff', padding: '0 20px' }}>
+                    {tabs && Object.keys(tabs).map((name, i) => {
+                        if (name === 'about') return <div key={i} />
+                        const t = tabs[name]
+                        const label = t.label
+                        const selected = name === newSelectedWidget
+
+                        return <Tab key={i}
+                            style={{ height: 64, alignItems: 'center' }}
+                            selected={selected}
+                            onClick={() => {
+                                switchWidgets(name)
+                            }}>
+                            {label}
+                        </Tab>
+                    })}
+
+                </Tabs>
+
+                {showFocusView ?
+                    <div style={{
+                        display: 'flex', flexDirection: 'column', flex: 1,
+                        background: '#fff', padding: 20, position: 'relative', height: 'calc(100% - 63px)',
+                        overflowY: 'auto', borderLeft: '1px solid #F2F3F5'
+                    }}>
+                        <FocusedView
+                            person={person}
+                            canEdit={canEdit}
+                            selectedIndex={focusIndex}
+                            config={tabs[selectedWidget] && tabs[selectedWidget]}
+                            onSuccess={() => {
+                                console.log('success')
+                                setFocusIndex(-1)
+                            }}
+                            goBack={() => {
+                                setShowFocusView(false)
+                                setFocusIndex(-1)
+                            }}
+                        /></div> :
+                    <Sleeve style={{
+                        display: 'flex', flexDirection: 'column', flex: 1,
+                        background: '#F2F3F5', padding: 20, position: 'relative', height: 'calc(100% - 63px)',
+                        overflowY: 'auto'
+                    }}>
+                        {renderEditButton()}
+                        {renderWidgets('')}
+
+                    </Sleeve>
+                }
+            </div>
+        </div >
+    }
 
 
-            {/* <Bottom>
-                <a href={qrString}>
-                    <EuiButton
-                        onClick={add}
-                        fill={true}
-                        style={{
-                            backgroundColor: "#6089ff",
-                            borderColor: "#6089ff",
-                            fontWeight: 600,
-                            fontSize: 12,
-                            width: '40%',
-                            minWidth: 140,
-                            maxWidth: 140,
-                            color: '#fff'
-                        }}
-                        aria-label="join"
-                    >
-                        JOIN
-                    </EuiButton>
-                </a>
-                <div style={{ width: 20 }} />
-                <EuiButton
-                    onClick={toggleQR}
-                    fill={true}
-                    style={{
-                        background: "#fff",
-                        borderColor: "#5F6368",
-                        color: '#5F6368',
-                        fontWeight: 600,
-                        fontSize: 12,
-                        width: '40%',
-                        minWidth: 140,
-                        maxWidth: 140
-                    }}
-                    // iconType={qrCode}
-                    aria-label="qr-code"
-                >
-                    QR
-                </EuiButton>
-            </Bottom> */}
+    return (
+        <Content>
+            {isMobile ? renderMobileView() : renderDesktopView()}
+
+            {
+                showQR &&
+                <EuiOverlayMask onClick={() => setShowQR(false)}>
+                    <EuiModal onClose={() => setShowQR(false)}
+                        initialFocus="[name=popswitch]">
+                        <EuiModalHeader>
+                            <EuiModalHeaderTitle>{`Connect with ${owner_alias}`}</EuiModalHeaderTitle>
+                        </EuiModalHeader>
+                        <EuiModalBody style={{ padding: 0, textAlign: 'center' }}>
+                            <QRWrapWrap>
+                                <QRWrap className="qr-wrap float-r">
+                                    <QRCode
+                                        bgColor={"#FFFFFF"}
+                                        fgColor="#000000"
+                                        level="Q"
+                                        style={{ width: qrWidth }}
+                                        value={qrString}
+                                    />
+                                </QRWrap>
+                            </QRWrapWrap>
+                            <div style={{ marginTop: 10, color: '#fff' }}>Scan with your Sphinx Mobile App</div>
+                        </EuiModalBody>
+                    </EuiModal>
+                </EuiOverlayMask >
+            }
+
+
+
         </Content >
 
     );
@@ -457,6 +596,22 @@ export default function PersonView(props: any) {
 interface ContentProps {
     selected: boolean;
 }
+
+const PeopleList = styled.div`
+            display:flex;
+            flex-direction:column;
+            background:#ffffff;
+            width: 362px;
+            min-width: 362px;
+            `;
+
+const DBack = styled.div`
+            height:64px;
+            display:flex;
+            align-items:center;
+            background: #FFFFFF;
+            box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+`
 
 const Panel = styled.div`
             position:relative;
@@ -508,6 +663,7 @@ const ActionInfo = styled.div`
 const Tabs = styled.div`
             display:flex;
             width:100%;
+            align-items:center;
             overflow-x:auto;
             ::-webkit-scrollbar {
                 display: none;
