@@ -44,6 +44,16 @@ export default function Header() {
         },
     ]
 
+    useEffect(() => {
+        // if route not supported, redirect
+        let pass = false
+        let path = location.pathname
+        tabs.forEach((t => {
+            if (path.includes(t.path)) pass = true
+        }))
+        if (!pass) history.push('/p/')
+    }, [])
+
     const [showSignIn, setShowSignIn] = useState(false)
     const [showWelcome, setShowWelcome] = useState(false)
 

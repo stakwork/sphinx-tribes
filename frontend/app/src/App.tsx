@@ -19,18 +19,6 @@ function App() {
   const mode = getMode()
   const c = colors['light']
 
-  useEffect(() => {
-    const routes = ['/p/', '/t/', '/b/']
-    // if route not supported, redirect
-    let pass = false
-    let path = window.location.pathname
-    routes.forEach((r => {
-      if (path.includes(r)) pass = true
-    }))
-
-    if (!pass) window.location.pathname = '/p/'
-  }, [])
-
   return <Router>
     {
       // people
