@@ -110,11 +110,7 @@ export default function Header() {
 
                     </Row>
 
-                    <EuiHeaderSection id="header-right" side="right" style={{
-                        background: '#000000',
-                        boxShadow: 'inset 0px 1px 2px rgba(0, 0, 0, 0.15)',
-                        borderRadius: 50, overflow: 'hidden'
-                    }}>
+                    <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden' }} >
                         <EuiFieldSearch id="search-input"
                             placeholder="Search for People"
                             value={ui.searchText}
@@ -151,6 +147,17 @@ export default function Header() {
                         })}
 
                     </Tabs>
+
+                    <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden', width: 295 }} >
+                        <EuiFieldSearch id="search-input"
+                            placeholder="Search for People"
+                            value={ui.searchText}
+                            onChange={e => ui.setSearchText(e.target.value)}
+                            style={{ width: 295, height: '100%' }}
+                            aria-label="search"
+
+                        />
+                    </EuiHeaderSection>
                 </Row>
 
                 <Corner>

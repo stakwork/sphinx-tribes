@@ -17,7 +17,6 @@ import {
     useLocation
 } from "react-router-dom";
 import Drawer from '../drawer/index'
-import { calculateContrast } from '@elastic/eui/src/services/color/luminance_and_contrast';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -25,7 +24,9 @@ const getScroll = useScroll
 export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
-    const [selectedPerson, setSelectedPerson] = useState(0)
+
+    let { setSelectedPerson, selectedPerson } = ui || {}
+
     const [selectingPerson, setSelectingPerson] = useState(0)
     const [showProfile, setShowProfile] = useState(false)
 
