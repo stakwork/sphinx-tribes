@@ -454,6 +454,10 @@ margin-bottom:10px;
 #header-right .euiFormControlLayoutIcons {
   display: none;
 }
+
+#hide-icons .euiFormControlLayoutIcons {
+  display: none;
+}
 .popover-tags .euiFieldSearch.euiFieldSearch {
   background-image: url(/static/search-24px.svg) !important;
   background-repeat: no-repeat;

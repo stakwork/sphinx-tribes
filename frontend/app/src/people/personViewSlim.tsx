@@ -48,7 +48,7 @@ export default function PersonView(props: any) {
     const { meInfo } = ui || {}
 
     const person = (main.people && main.people.length && main.people.find(f => f.id === personId))
-    const people = main.people
+    const people = (main.people && main.people.filter(f => !f.hide)) || []
     const {
         id,
         img,
@@ -110,6 +110,7 @@ export default function PersonView(props: any) {
     function logout() {
         ui.setEditMe(false)
         ui.setMeInfo(null)
+        main.getPeople()
         goBack()
     }
 
@@ -460,42 +461,47 @@ export default function PersonView(props: any) {
                         onClick={goBack}
                     /> : <div />}
 
-                    {!canEdit ? <IconButton
+                    {canEdit ? <IconButton
+                        onClick={logout}
+                        icon='logout'
+                    /> : <IconButton
                         onClick={() => setShowQR(true)}
                         icon='qr_code_2'
-                    /> : <div />}
+                    />}
 
                 </div>
 
                 {/* profile photo */}
                 <Head>
+                    <div style={{ height: 80 }} />
                     <Img src={img || '/static/sphinx.png'} />
                     <RowWrap>
                         <Name>{owner_alias}</Name>
                     </RowWrap>
 
                     {/* only see buttons on other people's profile */}
-                    {canEdit ? <div style={{ height: 40 }} /> :
+                    {canEdit ? <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                        <Button
+                            text='Edit Profile'
+                            onClick={() => {
+                                switchWidgets('about')
+                                setShowFocusView(true)
+                            }}
+                            color='widget'
+                            height={42}
+                            width={120}
+                        /> </RowWrap>
+                        :
                         <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                            {isMobile ?
-                                <a href={qrString}>
-                                    <Button
-                                        text='Connect'
-                                        onClick={add}
-                                        color='primary'
-                                        height={42}
-                                        width={120}
-                                    />
-                                </a>
-                                :
-                                <Button
-                                    text='Connect'
-                                    onClick={() => setShowQR(true)}
-                                    color='primary'
-                                    height={42}
-                                    width={120}
-                                />
-                            }
+
+                            <Button
+                                text='Connect'
+                                onClick={() => setShowQR(true)}
+                                color='primary'
+                                height={42}
+                                width={120}
+                            />
+
                             <div style={{ width: 15 }} />
                             <Button
                                 text='Support'
@@ -547,10 +553,12 @@ export default function PersonView(props: any) {
                             onSuccess={() => {
                                 console.log('success')
                                 setFocusIndex(-1)
+                                if (selectedWidget === 'about') switchWidgets('post')
                             }}
                             goBack={() => {
                                 setShowFocusView(false)
                                 setFocusIndex(-1)
+                                if (selectedWidget === 'about') switchWidgets('post')
                             }}
                         /></div> :
                     <Sleeve style={{
@@ -622,7 +630,7 @@ const DBack = styled.div`
             align-items:center;
             background: #FFFFFF;
             box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
-`
+            `
 
 const Panel = styled.div`
             position:relative;
