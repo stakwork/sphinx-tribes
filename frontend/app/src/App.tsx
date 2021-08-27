@@ -4,10 +4,8 @@ import '@material/react-material-icon/dist/material-icon.css';
 import "@fontsource/roboto";
 import Header from './tribes/header'
 import Body from './tribes/body'
-import PeopleHeader from './people/header'
-import MobilePeopleHeader from './people/mobile/header'
-import PeopleBody from './people/body'
-import MobilePeopleBody from './people/mobile/body'
+import PeopleHeader from './people/mobile/header'
+import PeopleBody from './people/mobile/body'
 import { colors } from './colors'
 import {
   BrowserRouter as Router,
@@ -29,14 +27,8 @@ function App() {
     {
       // people
       mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
-
-        {/* <ConfirmMe /> */}
-        {/* {isMobile ? */}
-        <MobilePeopleHeader />
-        {/* : <PeopleHeader />} */}
-        {/* {isMobile ? */}
-        <MobilePeopleBody />
-        {/* : <PeopleBody />} */}
+        <PeopleHeader />
+        <PeopleBody />
       </div>
 
         // tribes

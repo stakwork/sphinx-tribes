@@ -15,6 +15,11 @@ export default function Button(props: any) {
             color: '#5F6368',
             border: '1px solid #DDE1E5'
         },
+        clear: {
+            background: '#fff',
+            color: '#5F6368',
+            border: '1px solid #fff'
+        },
         link: {
             background: '#fff',
             color: '#618AFF',
@@ -24,6 +29,13 @@ export default function Button(props: any) {
             background: '#DDE1E5',
             color: '#3C3F41',
         },
+        desktopWidget: {
+            background: 'rgba(0,0,0,0)',
+            color: '#3C3F41',
+            border: '1px dashed #B0B7BC',
+            boxWizing: 'border-box',
+            borderRadius: 4
+        },
     }
 
     return <B
@@ -31,28 +43,37 @@ export default function Button(props: any) {
         disabled={props.disabled}
         onClick={props.onClick}
     >
-        <>
-            {props.icon &&
-                <div style={{
-                    display: 'flex', alignItems: 'center',
-                    position: 'absolute', top: 0, left: 3, height: '100%'
-                }}>
-                    <MaterialIcon
-                        icon={props.icon}
-                        style={{ fontSize: props.iconSize ? props.iconSize : 30 }} />
-                </div>
-            }
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                {props.leadingIcon && <MaterialIcon
-                    icon={props.leadingIcon}
-                    style={{
-                        fontSize: props.iconSize ? props.iconSize : 20,
-                        marginRight: 10
-                    }} />
+        {props.children ? props.children :
+            <>
+                {props.icon &&
+                    <div style={{
+                        display: 'flex', alignItems: 'center',
+                        position: 'absolute', top: 0, left: 3, height: '100%'
+                    }}>
+                        <MaterialIcon
+                            icon={props.icon}
+                            style={{ fontSize: props.iconSize ? props.iconSize : 30 }} />
+                    </div>
                 }
-                <>{props.text}</>
-            </div>
-        </>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {props.leadingIcon && <MaterialIcon
+                        icon={props.leadingIcon}
+                        style={{
+                            fontSize: props.iconSize ? props.iconSize : 20,
+                            marginRight: 10
+                        }} />
+                    }
+                    <>{props.text}</>
+                    {props.endingIcon && <MaterialIcon
+                        icon={props.endingIcon}
+                        style={{
+                            fontSize: props.iconSize ? props.iconSize : 20,
+                            marginLeft: 10
+                        }} />
+                    }
+                </div>
+            </>
+        }
     </B>
 }
 
