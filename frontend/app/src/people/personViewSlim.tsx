@@ -91,7 +91,8 @@ export default function PersonView(props: any) {
     }
 
     function selectPersonWithinFocusView(id, unique_name) {
-        switchWidgets('post')
+        setShowFocusView(false)
+        setFocusIndex(-1)
         selectPerson(id, unique_name)
     }
 
@@ -423,7 +424,7 @@ export default function PersonView(props: any) {
                         />
                     </DBack>
 
-                    <div style={{ width: '100%' }} >
+                    <div style={{ width: '100%', overflowY: 'auto' }} >
                         {people.map(t => <Person {...t} key={t.id}
                             selected={personId === t.id}
                             hideActions={true}
@@ -435,7 +436,17 @@ export default function PersonView(props: any) {
                 </PeopleList>
             }
 
-            <Panel style={{ paddingBottom: 0, paddingTop: 80, width: 322, minWidth: 322 }}>
+            <div style={{
+                paddingBottom: 0, paddingTop: 80, width: 322,
+                minWidth: 322, overflowY: 'auto',
+                position: 'relative',
+                background: '#ffffff',
+                color: '#000000',
+                padding: 20,
+                height: '100%',
+                borderLeft: '1px solid #F2F3F5',
+                borderRight: '1px solid #F2F3F5'
+            }}>
                 <div style={{
                     position: 'absolute',
                     top: 20, left: 0,
@@ -497,7 +508,7 @@ export default function PersonView(props: any) {
 
                 {renderWidgets('about')}
 
-            </Panel>
+            </div>
 
             <div style={{
                 width: canEdit ? 'calc(100% - 323px)' : 'calc(100% - 685px)',
@@ -526,7 +537,7 @@ export default function PersonView(props: any) {
                     <div style={{
                         display: 'flex', flexDirection: 'column', flex: 1,
                         background: '#fff', padding: 20, position: 'relative', height: 'calc(100% - 63px)',
-                        overflowY: 'auto', borderLeft: '1px solid #F2F3F5'
+                        overflowY: 'auto',
                     }}>
                         <FocusedView
                             person={person}
