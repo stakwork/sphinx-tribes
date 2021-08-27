@@ -41,6 +41,11 @@ class UiStore {
     this.editMe = b
   }
 
+  @observable selectedPerson: number = 0
+  @action setSelectedPerson(n: number) {
+    this.selectedPerson = n
+  }
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
@@ -54,9 +59,6 @@ class UiStore {
 
 export type MeData = MeInfo | null
 
-export interface Challenge {
-  challenge: string
-}
 export interface MeInfo {
   id?: number
   pubkey: string
