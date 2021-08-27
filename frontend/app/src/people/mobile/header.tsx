@@ -11,29 +11,19 @@ import { useFuse, useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
-import FadeLeft from '../../animated/fadeLeft';
+
 // import EditInfo from '../edit/editInfo'
 import SignIn from '../auth/signIn';
 
-import PersonViewSlim from '../personViewSlim';
-import { MeInfo } from '../../store/ui';
 import api from '../../api';
 
 
 export default function Header() {
     const { main, ui } = useStores()
-    const people = useFuse(main.people, ["owner_alias"])
     const location = useLocation()
     const history = useHistory()
     const isMobile = useIsMobile()
 
-    // function selectPerson(id: number, unique_name: string) {
-    //   console.log('selectPerson', id, unique_name)
-    //   setSelectedPerson(id)
-    //   if (unique_name && window.history.pushState) {
-    //     window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
-    //   }
-    // }
     const c = colors['light']
 
     const tabs = [
@@ -56,8 +46,6 @@ export default function Header() {
 
     const [showSignIn, setShowSignIn] = useState(false)
     const [showWelcome, setShowWelcome] = useState(false)
-    const [showInitEditSelf, setShowInitEditSelf] = useState(false)
-    const [showEditSelf, setShowEditSelf] = useState(false)
 
     async function testChallenge(chal: string) {
         try {
