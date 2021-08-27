@@ -22,9 +22,9 @@ import api from '../../api';
 
 export default function Header() {
     const { main, ui } = useStores()
-
     const people = useFuse(main.people, ["owner_alias"])
     const location = useLocation()
+    const history = useHistory()
     const isMobile = useIsMobile()
 
     // function selectPerson(id: number, unique_name: string) {
@@ -83,6 +83,13 @@ export default function Header() {
         } catch (e) { }
     }, [])
 
+    function goToEditSelf() {
+        if (ui.meInfo?.id) {
+            ui.setSelectedPerson(ui.meInfo.id)
+            ui.setSelectingPerson(ui.meInfo.id)
+        }
+    }
+
     function renderHeader() {
         if (isMobile) {
             return <EuiHeader id="header" style={{ color: '#fff' }}>
@@ -97,7 +104,9 @@ export default function Header() {
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10 }}
                                     src={(ui.meInfo.img && ui.meInfo.img + '?thumb=true') || '/static/sphinx.png'}
-                                    onClick={() => setShowEditSelf(true)} />
+                                    onClick={() => {
+                                        goToEditSelf()
+                                    }} />
                                 :
                                 <Button
                                     icon={'account_circle'}
@@ -135,12 +144,12 @@ export default function Header() {
                     <Tabs>
                         {tabs && tabs.map((t, i) => {
                             const label = t.label
-                            const selected = t.name === 'people'
+                            const selected = location.pathname.includes(t.path)
 
                             return <Tab key={i}
                                 selected={selected}
                                 onClick={() => {
-
+                                    history.push(t.path)
                                 }}>
                                 {label}
                             </Tab>
@@ -162,12 +171,13 @@ export default function Header() {
 
                 <Corner>
                     {ui.meInfo ?
-                        <Button>
-                            <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setShowEditSelf(true)}>
+                        <Button onClick={() => {
+                            goToEditSelf()
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10 }}
-                                    src={(ui.meInfo.img && ui.meInfo.img + '?thumb=true') || '/static/sphinx.png'}
-                                    onClick={() => setShowEditSelf(true)} />
+                                    src={(ui.meInfo.img && ui.meInfo.img + '?thumb=true') || '/static/sphinx.png'} />
                                 <div style={{ color: '#fff' }}>
                                     {ui.meInfo?.owner_alias}
                                 </div>
@@ -234,7 +244,7 @@ export default function Header() {
                             onClick={() => {
                                 // switch from welcome modal to edit modal
                                 setShowWelcome(false)
-                                setShowEditSelf(true)
+                                goToEditSelf()
                             }}
                         />
                     </Column>
@@ -256,17 +266,6 @@ export default function Header() {
                     
                 </div>
             </Modal> */}
-
-            {/* personSelect should just be kept in state */}
-            < Modal visible={(ui.meInfo && showEditSelf) ? true : false}
-                drift={40}
-                fill
-                close={() => setShowEditSelf(false)}
-            >
-                <PersonViewSlim goBack={() => setShowEditSelf(false)}
-                    personId={ui.meInfo?.id}
-                />
-            </Modal>
         </>
     })
 }

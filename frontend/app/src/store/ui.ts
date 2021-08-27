@@ -16,11 +16,6 @@ export interface EuiSelectableOption {
 }
 
 class UiStore {
-
-  // constructor() {
-  //   this.meInfo = emptyMeData
-  // }
-
   @observable ready: boolean = false
   @action setReady(ready: boolean) {
     this.ready = ready
@@ -44,6 +39,13 @@ class UiStore {
   @observable selectedPerson: number = 0
   @action setSelectedPerson(n: number) {
     this.selectedPerson = n
+  }
+
+  // this is for animations, if you deselect as a component is fading out, 
+  // it empties and looks broke for a second
+  @observable selectingPerson: number = 0
+  @action setSelectingPerson(n: number) {
+    this.selectingPerson = n
   }
 
   @persist('object') @observable meInfo: MeData = null
@@ -80,5 +82,5 @@ export const emptyMeInfo: MeInfo = { pubkey: '', alias: '', route_hint: '', cont
 
 export const uiStore = new UiStore()
 
-const hydrate = createPersist()
-hydrate('some', uiStore).then(() => {})
+// const hydrate = createPersist()
+// hydrate('some', uiStore).then(() => { })
