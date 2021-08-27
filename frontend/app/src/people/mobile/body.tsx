@@ -25,9 +25,6 @@ export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
 
-    let { setSelectedPerson, selectedPerson } = ui || {}
-
-    const [selectingPerson, setSelectingPerson] = useState(0)
     const [showProfile, setShowProfile] = useState(false)
 
     const c = colors['light']
@@ -38,8 +35,8 @@ export default function BodyComponent() {
 
     function selectPerson(id: number, unique_name: string) {
         console.log('selectPerson', id, unique_name)
-        setSelectedPerson(id)
-        setSelectingPerson(id)
+        ui.setSelectedPerson(id)
+        ui.setSelectingPerson(id)
         if (unique_name && window.history.pushState) {
             window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
         }
@@ -54,7 +51,7 @@ export default function BodyComponent() {
         const ps = await main.getPeople(un)
         if (un) {
             const initial = ps[0]
-            if (initial && initial.unique_name === un) setSelectedPerson(initial.id)
+            if (initial && initial.unique_name === un) ui.setSelectedPerson(initial.id)
         }
         setLoading(false)
     }
@@ -68,8 +65,10 @@ export default function BodyComponent() {
         const { handleScroll, n, loadingMore } = getScroll()
         let people = peeps.slice(0, n)
 
+        people = (people && people.filter(f => !f.hide)) || []
+
         if (loading) {
-            return <Body>
+            return <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <EuiLoadingSpinner size="xl" />
             </Body>
         }
@@ -78,7 +77,7 @@ export default function BodyComponent() {
             return <Body>
                 <div style={{ width: '100%' }} >
                     {people.map(t => <Person {...t} key={t.id}
-                        selected={selectedPerson === t.id}
+                        selected={ui.selectedPerson === t.id}
                         small={isMobile}
                         select={selectPerson}
                     />)}
@@ -86,13 +85,13 @@ export default function BodyComponent() {
                 <FadeLeft
                     withOverlay
                     drift={40}
-                    overlayClick={() => setSelectingPerson(0)}
+                    overlayClick={() => ui.setSelectingPerson(0)}
                     style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
-                    isMounted={(selectingPerson && !showProfile) ? true : false}
-                    dismountCallback={() => setSelectedPerson(0)}
+                    isMounted={(ui.selectingPerson && !showProfile) ? true : false}
+                    dismountCallback={() => ui.setSelectedPerson(0)}
                 >
-                    <PersonViewSlim goBack={() => setSelectingPerson(0)}
-                        personId={selectedPerson}
+                    <PersonViewSlim goBack={() => ui.setSelectingPerson(0)}
+                        personId={ui.selectedPerson}
                         selectPerson={selectPerson}
                         loading={loading} />
                 </FadeLeft>
@@ -114,25 +113,24 @@ export default function BodyComponent() {
                 }} >
                     {people.map(t => <Person {...t} key={t.id}
                         small={false}
-                        selected={selectedPerson === t.id}
+                        selected={ui.selectedPerson === t.id}
                         select={selectPerson}
                     />)}
                 </div>
             </>
 
 
-
             {/* selected view */}
             <FadeLeft
                 withOverlay={isMobile}
                 drift={40}
-                overlayClick={() => setSelectingPerson(0)}
+                overlayClick={() => ui.setSelectingPerson(0)}
                 style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
-                isMounted={(selectingPerson && !showProfile) ? true : false}
-                dismountCallback={() => setSelectedPerson(0)}
+                isMounted={(ui.selectingPerson && !showProfile) ? true : false}
+                dismountCallback={() => ui.setSelectedPerson(0)}
             >
-                <PersonViewSlim goBack={() => setSelectingPerson(0)}
-                    personId={selectedPerson}
+                <PersonViewSlim goBack={() => ui.setSelectingPerson(0)}
+                    personId={ui.selectedPerson}
                     loading={loading}
                     selectPerson={selectPerson} />
             </FadeLeft>

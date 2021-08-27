@@ -2,6 +2,7 @@ import { observable, action } from 'mobx'
 import { persist } from 'mobx-persist'
 import api from '../api'
 import { Extras } from '../form/inputs/widgets/interfaces'
+import { uiStore } from './ui'
 
 export class MainStore {
   @persist('list') @observable
@@ -32,6 +33,11 @@ export class MainStore {
 
   @action async getPeople(uniqueName?: string): Promise<Person[]> {
     const ps = await api.get('people')
+    if (uiStore.meInfo) {
+      // add 'hide' property to me in people list
+      const index = ps.findIndex(f => f.id === uiStore.meInfo?.id)
+      if (index > -1) ps[index].hide = true
+    }
     if (uniqueName) {
       ps.forEach(function (t: Tribe, i: number) {
         if (t.unique_name === uniqueName) {
@@ -79,4 +85,5 @@ export interface Person {
   url: string
   verification_signature: string
   extras: Extras
+  hide?: boolean
 }
