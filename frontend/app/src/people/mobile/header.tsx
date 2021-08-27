@@ -7,7 +7,7 @@ import {
     EuiHeaderSection,
     EuiFieldSearch,
 } from '@elastic/eui';
-import { useFuse } from '../../hooks'
+import { useFuse, useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
@@ -25,6 +25,7 @@ export default function Header() {
 
     const people = useFuse(main.people, ["owner_alias"])
     const location = useLocation()
+    const isMobile = useIsMobile()
 
     // function selectPerson(id: number, unique_name: string) {
     //   console.log('selectPerson', id, unique_name)
@@ -37,13 +38,20 @@ export default function Header() {
 
     const tabs = [
         {
-            text: 'Tribes',
+            label: 'Tribes',
+            name: 'tribes',
             path: '/t/'
         },
         {
-            text: 'People',
+            label: 'People',
+            name: 'people',
             path: '/p/'
-        }
+        },
+        {
+            label: 'Bots',
+            name: 'bots',
+            path: '/b/'
+        },
     ]
 
     const [showSignIn, setShowSignIn] = useState(false)
@@ -64,16 +72,6 @@ export default function Header() {
         }
     }
 
-    // useEffect(() => {
-    //     heartbeat = setInterval(() => {
-    //         ping()
-    //     }, 60000)
-
-    //     return function cleanup() {
-    //         if (heartbeat) clearInterval(heartbeat)
-    //     }
-    // }, [])
-
     useEffect(() => {
         try {
             var urlObject = new URL(window.location.href);
@@ -85,11 +83,9 @@ export default function Header() {
         } catch (e) { }
     }, [])
 
-
-    return useObserver(() => {
-        return <>
-
-            <EuiHeader id="header" style={{ color: '#fff' }}>
+    function renderHeader() {
+        if (isMobile) {
+            return <EuiHeader id="header" style={{ color: '#fff' }}>
                 <div className="container">
                     <Row style={{ justifyContent: 'space-between' }}>
                         <EuiHeaderSection grow={false}>
@@ -100,7 +96,7 @@ export default function Header() {
                             {ui.meInfo ?
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10 }}
-                                    src={ui.meInfo.img || '/static/sphinx.png'}
+                                    src={(ui.meInfo.img && ui.meInfo.img + '?thumb=true') || '/static/sphinx.png'}
                                     onClick={() => setShowEditSelf(true)} />
                                 :
                                 <Button
@@ -111,19 +107,6 @@ export default function Header() {
                                 />
                             }
                         </Corner>
-
-                        {/* {tabs.map((t, i) => {
-                        const selected = pathname.includes(t.path)
-                        return <Tab
-                            onClick={() => {
-                                if (window.history.pushState) window.history.pushState({}, 'Sphinx Tribes', t.path)
-                                console.log('hi')
-                            }}
-                            key={i} style={{ background: selected && c.blue1 }}>
-                            {t.text}
-                        </Tab>
-                    })} */}
-
 
                     </Row>
 
@@ -142,9 +125,66 @@ export default function Header() {
                         />
                     </EuiHeaderSection>
                 </div>
-
-
             </EuiHeader >
+        }
+
+        // desktop version
+        return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <Row>
+                    <EuiHeaderSection grow={false}>
+                        <Img src="/static/people_logo.svg" />
+                    </EuiHeaderSection>
+
+                    <Tabs>
+                        {tabs && tabs.map((t, i) => {
+                            const label = t.label
+                            const selected = t.name === 'people'
+
+                            return <Tab key={i}
+                                selected={selected}
+                                onClick={() => {
+
+                                }}>
+                                {label}
+                            </Tab>
+                        })}
+
+                    </Tabs>
+                </Row>
+
+                <Corner>
+                    {ui.meInfo ?
+                        <Button>
+                            <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setShowEditSelf(true)}>
+                                <Imgg
+                                    style={{ height: 30, width: 30, marginRight: 10 }}
+                                    src={(ui.meInfo.img && ui.meInfo.img + '?thumb=true') || '/static/sphinx.png'}
+                                    onClick={() => setShowEditSelf(true)} />
+                                <div style={{ color: '#fff' }}>
+                                    {ui.meInfo?.owner_alias}
+                                </div>
+                            </div>
+                        </Button>
+
+                        :
+                        <Button
+                            icon={'account_circle'}
+                            text={'Sign in'}
+                            color='primary'
+                            onClick={() => setShowSignIn(true)}
+                        />
+                    }
+                </Corner>
+            </div>
+        </EuiHeader >
+    }
+
+
+    return useObserver(() => {
+        return <>
+
+            {renderHeader()}
 
 
             {/* you wanna login modal  */}
@@ -210,7 +250,7 @@ export default function Header() {
                 </div>
             </Modal> */}
 
-
+            {/* personSelect should just be kept in state */}
             < Modal visible={(ui.meInfo && showEditSelf) ? true : false}
                 drift={40}
                 fill
@@ -225,89 +265,93 @@ export default function Header() {
 }
 
 const Row = styled.div`
-  display:flex;
-  align-items:center;
-  width:100%;
-`
+            display:flex;
+            align-items:center;
+            width:100%;
+            `
 const Corner = styled.div`
-  display:flex;
-  align-items:center;
-`
+            display:flex;
+            align-items:center;
+            `
 const T = styled.div`
-display:flex;
-font-size: 26px;
-line-height: 19px;
-`
-
-const Tab = styled.div`
-  margin-left:10px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  width:150px;
-  padding:10px;
-  height:32px;
-  width:92px;
-  border-radius: 5px;
-  font-weight: 500;
-  font-size: 13px;
-  cursor:pointer;
-`
+            display:flex;
+            font-size: 26px;
+            line-height: 19px;
+            `
 
 interface ImageProps {
     readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-    background-image: url("${(p) => p.src}");
-    background-position: center;
-    background-size: cover;
-    height:37px;
-    width:232px;
-    
-    position: relative;
-  `;
+                background-image: url("${(p) => p.src}");
+                background-position: center;
+                background-size: cover;
+                height:37px;
+                width:232px;
+
+                position: relative;
+                `;
 
 
 const Name = styled.div`
-font-style: normal;
-font-weight: 500;
-font-size: 26px;
-line-height: 19px;
-/* or 73% */
+                font-style: normal;
+                font-weight: 500;
+                font-size: 26px;
+                line-height: 19px;
+                /* or 73% */
 
-text-align: center;
+                text-align: center;
 
-/* Text 2 */
+                /* Text 2 */
 
-color: #292C33;
-`;
+                color: #292C33;
+                `;
 const Welcome = styled.div`
-font-size: 15px;
-line-height: 24px;
-margin:20px 0 50px;
-text-align: center;
+                font-size: 15px;
+                line-height: 24px;
+                margin:20px 0 50px;
+                text-align: center;
 
-/* Text 2 */
+                /* Text 2 */
 
-color: #3C3F41;
-`
+                color: #3C3F41;
+                `
 
 
 const Column = styled.div`
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding: 25px;
-  
-`
-const Imgg = styled.div<ImageProps>`
-                        background-image: url("${(p) => p.src}");
-                        background-position: center;
-                        background-size: cover;
-                        width:90px;
-                        height:90px;
-                        border-radius: 50%;
-                        `;
+                width:100%;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+                align-items:center;
+                padding: 25px;
 
+                `
+const Imgg = styled.div<ImageProps>`
+                    background-image: url("${(p) => p.src}");
+                    background-position: center;
+                    background-size: cover;
+                    width:90px;
+                    height:90px;
+                    border-radius: 50%;
+                    `;
+
+const Tabs = styled.div`
+                    display:flex;
+                    margin-left:20px;
+                    `;
+
+interface TagProps {
+    selected: boolean;
+}
+const Tab = styled.div<TagProps>`
+                        display:flex;
+                        padding:10px;
+                        margin-right:25px;
+                        color:${p => p.selected ? '#fff' : '#8E969C'};
+                        border-bottom: ${p => p.selected && '4px solid #618AFF'};                        
+                        cursor:pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        line-height: 19px;
+                        `;

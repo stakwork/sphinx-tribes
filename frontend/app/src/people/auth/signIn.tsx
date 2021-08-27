@@ -4,7 +4,7 @@ import { useStores } from '../../store'
 import styled from 'styled-components'
 import { useFuse, useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
-import { useHistory, useLocation } from 'react-router-dom'
+import { Redirect, useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
 import FadeLeft from '../../animated/fadeLeft';
 import ConfirmMe from '../confirmMe';
@@ -23,6 +23,13 @@ export default function SignIn(props: any) {
     // }
     const c = colors['light']
     const [showSignIn, setShowSignIn] = useState(false)
+
+    function redirect() {
+        let el = document.createElement('a')
+        el.target = '_blank'
+        el.href = 'https://sphinx.chat/'
+        el.click();
+    }
 
     return useObserver(() => {
         return <div>
@@ -59,6 +66,7 @@ export default function SignIn(props: any) {
                         </Description>
                         <Button
                             text={'Get Sphinx'}
+                            onClick={() => redirect()}
                             height={60}
                             width={'100%'}
                             color={'widget'}

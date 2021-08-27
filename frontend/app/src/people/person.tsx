@@ -3,11 +3,7 @@ import { QRCode } from "react-qr-svg";
 import styled from "styled-components";
 import { getHost } from "../host";
 import { useObserver } from 'mobx-react-lite'
-import qrCode from "../utils/invoice-qr-code.svg";
-import { EuiCheckableCard, EuiButton } from "@elastic/eui";
-import { formatPrice } from '../helpers';
 import { colors } from "../colors";
-import { useIsMobile, useScreenWidth } from "../hooks";
 import { Button, Divider, Modal } from '../sphinxUI/index'
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -17,6 +13,8 @@ function makeQR(pubkey: string) {
 export default function Person(props: any) {
 
   const {
+    hideActions,
+    small,
     id,
     img,
     tags,
@@ -36,45 +34,33 @@ export default function Person(props: any) {
 
   const c = colors['light']
 
-  const isMobile = useIsMobile()
-  const screenWidth = useScreenWidth()
-
-  const twitterUsername = (extras && extras.twitter && extras.twitter.handle) || (extras && extras.twitter) || null;
-
   let tagsString = "";
   tags && tags.forEach((t: string, i: number) => {
     if (i !== 0) tagsString += ",";
     tagsString += t;
   });
 
-  function add(e) {
-    e.stopPropagation();
-  }
-  function toggleQR(e) {
-    e.stopPropagation();
-    setShowQR((current) => !current);
-  }
 
   return useObserver(() => {
 
-    const qrString = makeQR(owner_pubkey);
-    // return <div style={{ color: '#fff' }}>{owner_alias}</div>
-    return (
-      <Wrap onClick={() => select(id, unique_name)}>
-        <div>
-          <Img src={img || '/static/sphinx.png'} />
-        </div>
 
-        <R>
-          <Title>{owner_alias}</Title>
-          <Description>
-            {description}
-          </Description>
-          <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <div></div>
-            {owner_pubkey ?
-              <>
-                {isMobile ?
+    const qrString = makeQR(owner_pubkey);
+
+    function renderPersonCard() {
+      if (small) {
+        return <Wrap onClick={() => select(id, unique_name)} style={{ background: selected ? '#F2F3F5' : '#fff' }}>
+          <div>
+            <Img src={img || '/static/sphinx.png'} />
+          </div>
+          <R>
+            <Title>{owner_alias}</Title>
+            <Description>
+              {description}
+            </Description>
+            <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+              <div></div>
+              {(!hideActions && owner_pubkey) ?
+                <>
                   <a href={qrString}>
                     <Button
                       text='Connect'
@@ -83,23 +69,52 @@ export default function Person(props: any) {
                       iconSize={16}
                       onClick={(e) => e.stopPropagation()}
                     />
-                  </a> :
-                  <Button
-                    text='Connect'
-                    color='white'
-                    leadingIcon={'open_in_new'}
-                    iconSize={16}
-                    onClick={(e) => {
-                      setShowQR(true)
-                      e.stopPropagation()
-                    }}
-                  />
-                }
+                  </a>
+                </> : <div style={{ height: 30 }} />
+              }
+            </Row>
+            <Divider style={{ marginTop: 20 }} />
+          </R>
+        </Wrap>
+      }
+      // desktop mode
+      return <DWrap onClick={() => select(id, unique_name)}>
+        <div>
+          <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={img || '/static/sphinx.png'} />
+          <div style={{ padding: 10 }}>
+            <DTitle>{owner_alias}</DTitle>
+            <DDescription>
+              {description}
+            </DDescription>
+          </div>
+        </div>
+        <div>
+          <Divider />
+          <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
+            <div />
+            {owner_pubkey ?
+              <>
+                <Button
+                  text='Connect'
+                  color='clear'
+                  endingIcon={'open_in_new'}
+                  iconSize={16}
+                  onClick={(e) => {
+                    setShowQR(true)
+                    e.stopPropagation()
+                  }}
+                />
               </> : <div />
             }
           </Row>
-          <Divider style={{ marginTop: 20 }} />
-        </R>
+        </div>
+      </DWrap>
+    }
+
+    return (
+      <>
+        {renderPersonCard()}
+
         <Modal
           visible={showQR}
           close={() => setShowQR(false)}
@@ -115,7 +130,7 @@ export default function Person(props: any) {
             <div style={{ marginTop: 10 }}>Scan with your Sphinx Mobile App</div>
           </InnerWrap>
         </Modal>
-      </Wrap>
+      </>
     );
   })
 }
@@ -140,6 +155,19 @@ const Wrap = styled.div`
         display:flex;
         width:100%;
         `;
+const DWrap = styled.div`
+        cursor:pointer;
+        height:350px;
+        width:210px;
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        background:#fff;
+        margin-bottom:20px;
+        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        `;
+
 const R = styled.div`
         width:calc(100% - 110px);
         margin-left:20px;
@@ -152,7 +180,6 @@ const Row = styled.div`
         `;
 
 const Title = styled.h3`
-        font-style: normal;
         font-weight: 500;
         font-size: 20px;
         line-height: 19px;
@@ -163,11 +190,30 @@ const Title = styled.h3`
 
         color: #3C3F41;
         `;
+
+const DTitle = styled.h3`
+font-weight: 500;
+font-size: 17px;
+line-height: 19px;
+
+        color: #3C3F41;
+        `;
 const Description = styled.div`
         font-size: 15px;
         color: #5F6368;
         white-space: nowrap;
         height:26px;
+        text-overflow: ellipsis;
+        overflow:hidden;
+        margin-bottom:10px;
+        `;
+
+const DDescription = styled.div`
+        font-size: 12px;
+        line-height: 18px;
+        color: #5F6368;
+        white-space: nowrap;
+        // height:26px;
         text-overflow: ellipsis;
         overflow:hidden;
         margin-bottom:10px;
