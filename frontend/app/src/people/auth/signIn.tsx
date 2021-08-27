@@ -11,7 +11,7 @@ import ConfirmMe from '../confirmMe';
 
 
 export default function SignIn(props: any) {
-    // const { main, ui } = useStores()
+    const { main, ui } = useStores()
     // const location = useLocation()
 
     // function selectPerson(id: number, unique_name: string) {
@@ -38,6 +38,7 @@ export default function SignIn(props: any) {
                     <ConfirmMe
                         onSuccess={() => {
                             if (props.onSuccess) props.onSuccess()
+                            main.getPeople()
                         }} />
                 </Column>
                 :

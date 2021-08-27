@@ -15,7 +15,6 @@ import {
 } from "react-router-dom";
 import { useIsMobile } from './hooks';
 import { useStores } from './store';
-import ConfirmMe from './people/confirmMe';
 
 function App() {
   const mode = getMode()
@@ -27,8 +26,16 @@ function App() {
     {
       // people
       mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
+        {/*  */}
         <PeopleHeader />
-        <PeopleBody />
+        <Switch>
+          <Route path="/p/">
+            <PeopleBody />
+          </Route>
+          <Route path="/t/">
+            <Body />
+          </Route>
+        </Switch>
       </div>
 
         // tribes
@@ -60,7 +67,9 @@ const hosts: { [k: string]: Mode } = {
 };
 
 function getMode(): Mode {
+
   const host = window.location.host;
+
   return hosts[host] || Mode.TRIBES;
 }
 
