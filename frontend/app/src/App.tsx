@@ -11,22 +11,30 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from "react-router-dom";
-import { useIsMobile } from './hooks';
-import { useStores } from './store';
+// import { useIsMobile } from './hooks';
+// import { useStores } from './store';
 
 function App() {
   const mode = getMode()
-  const { ui } = useStores()
   const c = colors['light']
-  const isMobile = useIsMobile()
+
+  useEffect(() => {
+    const routes = ['/p/', '/t/', '/b/']
+    // if route not supported, redirect
+    let pass = false
+    let path = window.location.pathname
+    routes.forEach((r => {
+      if (path.includes(r)) pass = true
+    }))
+
+    if (!pass) window.location.pathname = '/p/'
+  }, [])
 
   return <Router>
     {
       // people
       mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
-        {/*  */}
         <PeopleHeader />
         <Switch>
           <Route path="/p/">
