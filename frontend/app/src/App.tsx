@@ -33,7 +33,6 @@ function App() {
           </Route>
         </Switch>
       </div>
-
         // tribes
         : <div className="app" style={{ background: c.background }}>
           <Header />
