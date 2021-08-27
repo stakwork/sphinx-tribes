@@ -6,7 +6,7 @@ import FadeLeft from '../animated/fadeLeft';
 import { IconButton } from '.';
 
 export default function Modal(props: any) {
-    const { visible, fill, overlayClick, drift, dismountCallback, children, close, style } = props
+    const { visible, fill, overlayClick, drift, dismountCallback, children, close, style, hideOverlay } = props
 
     const fillStyle = fill ? {
         height: '100%',
@@ -14,7 +14,7 @@ export default function Modal(props: any) {
         borderRadius: 0
     } : {}
     return <FadeLeft
-        withOverlay
+        withOverlay={!hideOverlay}
         drift={100}
         direction='up'
         overlayClick={overlayClick}
@@ -22,7 +22,7 @@ export default function Modal(props: any) {
         isMounted={visible ? true : false}
         style={{
             position: 'absolute', top: 0, left: 0,
-            zIndex: 10000, width: '100%', height: '100%',
+            zIndex: 1000000, width: '100%', height: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             ...style
         }}>

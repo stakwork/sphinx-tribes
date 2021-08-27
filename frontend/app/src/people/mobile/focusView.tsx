@@ -3,15 +3,14 @@ import { useStores } from "../../store";
 import { useObserver } from "mobx-react-lite";
 import Form from "../../form";
 import ConfirmMe from "../confirmMe";
-import type { MeInfo, MeData } from '../../store/ui'
-import { emptyMeInfo } from '../../store/ui'
-import { meSchema } from '../../form/schema'
+import type { MeInfo } from '../../store/ui'
 import api from '../../api'
 import styled, { css } from "styled-components";
 import { getHostIncludingDockerHosts } from "../../host";
 import { Button, IconButton } from "../../sphinxUI";
 import moment from 'moment'
 import SummaryViewer from '../widgetViews/summaryViewer'
+import { useIsMobile } from "../../hooks";
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -25,6 +24,8 @@ export default function FocusedView(props: any) {
     const [editMode, setEditMode] = useState(skipEditLayer);
     const scrollDiv: any = useRef(null)
     const formRef: any = useRef(null)
+
+    const isMobile = useIsMobile()
 
     function closeModal(override) {
         ui.setEditMe(false);
@@ -212,6 +213,8 @@ export default function FocusedView(props: any) {
             }
         }
 
+        const noShadow = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {}
+
         return (
             <div style={{ ...props.style, width: '100%', height: '100%' }}>
                 {/* {renderWarnBeforeClose()} */}
@@ -244,7 +247,7 @@ export default function FocusedView(props: any) {
                         )}
                     </B>
                     : <>
-                        <BWrap >
+                        <BWrap style={{ ...noShadow }}>
                             <IconButton
                                 icon='arrow_back'
                                 onClick={() => {
