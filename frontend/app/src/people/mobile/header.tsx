@@ -44,16 +44,6 @@ export default function Header() {
         },
     ]
 
-    useEffect(() => {
-        // if route not supported, redirect
-        let pass = false
-        let path = location.pathname
-        tabs.forEach((t => {
-            if (path.includes(t.path)) pass = true
-        }))
-        if (!pass) history.push('/p/')
-    }, [])
-
     const [showSignIn, setShowSignIn] = useState(false)
     const [showWelcome, setShowWelcome] = useState(false)
 
@@ -70,15 +60,29 @@ export default function Header() {
         }
     }
 
+    function urlRedirect() {
+        // if route not supported, redirect
+        let pass = false
+        let path = location.pathname
+        tabs.forEach((t => {
+            if (path.includes(t.path)) pass = true
+        }))
+        if (!pass) history.push('/p/')
+    }
+
     useEffect(() => {
-        try {
-            var urlObject = new URL(window.location.href);
-            var params = urlObject.searchParams;
-            const chal = params.get('challenge')
-            if (chal) {
-                testChallenge(chal)
-            }
-        } catch (e) { }
+        (async () => {
+            try {
+                var urlObject = new URL(window.location.href);
+                var params = urlObject.searchParams;
+                const chal = params.get('challenge')
+                if (chal) {
+                    await testChallenge(chal)
+                }
+                urlRedirect()
+            } catch (e) { }
+        })()
+
     }, [])
 
     function goToEditSelf() {
