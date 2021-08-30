@@ -49,6 +49,16 @@ export class MainStore {
     this.people = ps
     return ps
   }
+
+  @action async refreshJwt() {
+    try {
+      const res = await api.get('refresh_jwt')
+      return res.jwt
+    } catch (e) {
+      // could not refresh jwt, logout!
+      return false
+    }
+  }
 }
 
 export const mainStore = new MainStore()
@@ -86,4 +96,8 @@ export interface Person {
   verification_signature: string
   extras: Extras
   hide?: boolean
+}
+
+export interface Jwt {
+  jwt: string;
 }

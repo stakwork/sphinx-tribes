@@ -14,7 +14,7 @@ export default function PostSummary(props: Post) {
 
         {/* readmore */}
 
-        <GalleryViewer gallery={gallery} wrap={false} selectable={false} big={true} />
+        <GalleryViewer gallery={gallery} showAll={true} wrap={false} selectable={false} big={true} />
     </Pad>
 
 }

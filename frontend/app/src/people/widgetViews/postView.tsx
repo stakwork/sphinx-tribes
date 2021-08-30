@@ -12,25 +12,28 @@ export default function PostView(props: Post) {
 
 
     return <Wrap>
-        <T>{title || 'No title'} </T>
-        <Time>{created && moment.unix(created).format('LLL')} </Time>
-        <M style={{ maxHeight: !expand ? 120 : '' }}>{content || 'No content'} </M>
+        <Pad>
+            <T>{title || 'No title'} </T>
+            <Time>{created && moment.unix(created).format('LLL')} </Time>
+            <M style={{ maxHeight: !expand ? 120 : '' }}>{content || 'No content'} </M>
 
-        {isLong &&
-            <Link onClick={(e) => {
-                e.stopPropagation()
-                setExpand(!expand)
-            }}>
-                {!expand ? 'Read more' : 'Show less'}
-            </Link>
-        }
+            {isLong &&
+                <Link onClick={(e) => {
+                    e.stopPropagation()
+                    setExpand(!expand)
+                }}>
+                    {!expand ? 'Read more' : 'Show less'}
+                </Link>
+            }
 
-
+        </Pad>
         <GalleryViewer
+            showAll={false}
             big={true}
             wrap={false}
             selectable={true}
-            gallery={gallery} />
+            gallery={gallery}
+            style={{ maxHeight: 208, overflow: 'hidden' }} />
 
     </Wrap>
 
@@ -101,4 +104,11 @@ color: #5F6368;
 margin-bottom:10px;
 overflow:hidden;
 `;
+
+const Pad = styled.div`
+display:flex;
+flex-direction:column;
+padding:10px;
+`;
+
 
