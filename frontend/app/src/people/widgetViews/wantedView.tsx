@@ -9,7 +9,7 @@ export default function WantedView(props: Wanted) {
 
     return <Wrap>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} />
+        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
 
         <Body>
             <T>{title || 'No title'}</T>

@@ -9,7 +9,7 @@ export default function OfferView(props: Offer) {
 
     return <Wrap>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} />
+        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
 
         <Body>
             <T>{title || 'No title'}</T>

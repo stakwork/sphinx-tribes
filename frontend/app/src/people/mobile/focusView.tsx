@@ -248,13 +248,13 @@ export default function FocusedView(props: any) {
                     </B>
                     : <>
                         <BWrap style={{ ...noShadow }}>
-                            <IconButton
+                            {goBack ? <IconButton
                                 icon='arrow_back'
                                 onClick={() => {
                                     if (goBack) goBack()
                                 }}
                                 style={{ fontSize: 12, fontWeight: 600 }}
-                            />
+                            /> : <div />}
                             {canEdit ?
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <Button
@@ -293,10 +293,6 @@ export default function FocusedView(props: any) {
 
     });
 }
-const Summary = styled.div`
-padding-top:80px;
-`
-
 
 const BWrap = styled.div`
   display: flex;
