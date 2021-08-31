@@ -34,7 +34,7 @@ export default function PostView(props: Post) {
             wrap={false}
             selectable={true}
             gallery={gallery}
-            style={{ maxHeight: 208, overflow: 'hidden' }} />
+            style={{ maxHeight: 291, overflow: 'hidden' }} />
 
     </Wrap>
 

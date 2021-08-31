@@ -51,7 +51,7 @@ class UiStore {
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
-      t.img = t.photo_url
+      if (t.photo_url) t.img = t.photo_url
       if (!t.owner_alias) t.owner_alias = t.alias
     }
     this.meInfo = t
