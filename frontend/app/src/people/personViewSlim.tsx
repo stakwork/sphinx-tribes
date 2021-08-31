@@ -595,11 +595,11 @@ export default function PersonView(props: any) {
                             setFocusIndex(-1)
                             if (selectedWidget === 'about') switchWidgets('post')
                         }}
-                    // goBack={() => {
-                    //     setShowFocusView(false)
-                    //     setFocusIndex(-1)
-                    //     if (selectedWidget === 'about') switchWidgets('post')
-                    // }}
+                        goBack={() => {
+                            setShowFocusView(false)
+                            setFocusIndex(-1)
+                            if (selectedWidget === 'about') switchWidgets('post')
+                        }}
                     />
                 </Modal>
 
