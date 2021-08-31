@@ -236,6 +236,13 @@ export default function PersonView(props: any) {
 
             const elementArray: any = []
 
+
+            const panelStyles = isMobile ? {
+                minHeight: 132
+            } : {
+                maxWidth: 291, minWidth: 291, minHeight: 429
+            }
+
             fullSelectedWidget && fullSelectedWidget.map((s, i) => {
 
                 elementArray.push(<Panel key={i}
@@ -244,7 +251,7 @@ export default function PersonView(props: any) {
                         setFocusIndex(i)
                     }}
                     style={{
-                        maxWidth: 291, minWidth: 291,
+                        ...panelStyles,
                         padding: 0, overflow: 'hidden'
                     }}
                 >

@@ -2,17 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { Button, Modal } from '../../sphinxUI'
 import { useStores } from '../../store'
 
+let timeout
+
 export default function TokenRefresh() {
     const { main, ui } = useStores()
     const [show, setShow] = useState(false)
 
     useEffect(() => {
-        (async () => {
-            console.log('token refresh!')
+
+        timeout = setTimeout(async () => {
+            console.log('run token refresh!')
             if (ui.meInfo) {
                 const res = await main.refreshJwt()
                 if (res && res.jwt) {
-                    console.log('token refresh!')
+                    console.log('token refreshed!')
                     ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt })
                 }
                 else {
@@ -21,9 +24,16 @@ export default function TokenRefresh() {
                     ui.setSelectedPerson(0)
                     ui.setSelectingPerson(0)
                     setShow(true)
+                    // run this to reset state
+                    main.getPeople('')
                 }
             }
-        })()
+        }, 2000)
+
+        return function cleanup() {
+            clearTimeout(timeout)
+        }
+
     }, [])
 
     return <>

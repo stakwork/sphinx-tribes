@@ -10,7 +10,7 @@ import { Button, IconButton } from "../sphinxUI";
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default function Form(props: any) {
-
+  const { buttonsOnBottom } = props
   const [page, setPage] = useState(1)
   const [formMounted, setFormMounted] = useState(true)
   const [disableFormButtons, setDisableFormButtons] = useState(false)
@@ -41,7 +41,10 @@ export default function Form(props: any) {
 
   let buttonText = props.buttonText || "Save Changes"
   if (lastPage !== page) buttonText = 'Next'
+  let buttonAlignment = buttonsOnBottom ? { bottom: 0, height: 108, justifyContent: 'center' } : { top: 0 }
+  let formPad = buttonsOnBottom ? { paddingTop: 30 } : {}
 
+  let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {}
   return (
     <Formik
       initialValues={props.initialValues || {}}
@@ -54,7 +57,7 @@ export default function Form(props: any) {
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
         return (
-          <Wrap ref={refBody}>
+          <Wrap ref={refBody} style={formPad}>
             {schema && schema.map((item: FormField) => <Input
               {...item}
               key={item.name}
@@ -82,15 +85,15 @@ export default function Form(props: any) {
               extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
             />)}
 
-            <BWrap >
+            <BWrap style={buttonAlignment}>
 
-              <IconButton
+              {!buttonsOnBottom && <IconButton
                 icon='arrow_back'
                 onClick={() => {
                   if (props.close) props.close()
                 }}
                 style={{ fontSize: 12, fontWeight: 600 }}
-              />
+              />}
 
               {readOnly ? <div /> :
                 <Button
@@ -106,6 +109,7 @@ export default function Form(props: any) {
                     //   setPage(page + 1)
                     // }
                   }}
+                  style={buttonStyle}
                   color={'primary'}
                   text={props.submitText || 'Save'}
                 />
@@ -146,7 +150,6 @@ const BWrap = styled.div`
   padding:10px;
   min-height:42px;
   position: absolute;
-  top:0px;
   left:0px;
   background:#ffffff;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);

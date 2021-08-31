@@ -14,7 +14,7 @@ import { useIsMobile } from "../../hooks";
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
-    const { onSuccess, goBack, config, selectedIndex, canEdit, person } = props
+    const { onSuccess, goBack, config, selectedIndex, canEdit, person, buttonsOnBottom, formHeader } = props
     const { ui, main } = useStores();
 
     const skipEditLayer = ((selectedIndex < 0) || config.skipEditLayer) ? true : false
@@ -65,14 +65,13 @@ export default function FocusedView(props: any) {
             // if about
             if (config.name === 'about') {
                 config.schema.forEach((s => {
-                    if (s.widget) {
+                    if (s.widget && fullMeData.extras) {
                         // this allows the link widgets to be edited as a part of about me,
                         // when really they are stored as extras 
                         fullMeData.extras[s.name] = [{ value: v[s.name] }]
                     } else {
                         fullMeData[s.name] = v[s.name]
                     }
-
                 }))
             }
             // if extras
@@ -163,10 +162,19 @@ export default function FocusedView(props: any) {
                     "x-jwt": info.jwt,
                     "Content-Type": "application/json",
                 },
-            });
+            })
+
+
             if (!r.ok) {
                 setLoading(false);
                 return alert("Failed to create profile");
+            }
+
+            // if user has no id, update local id from response
+            if (!body.id) {
+                const j = await r.json()
+                if (j.response?.id)
+                    body.id = j.response?.id
             }
 
             await main.getPeople('')
@@ -222,14 +230,16 @@ export default function FocusedView(props: any) {
                 {editMode ?
                     <B ref={scrollDiv} hide={false}>
                         {!ui.meInfo && <ConfirmMe />}
+                        {formHeader && formHeader}
                         {ui.meInfo && (
                             <Form
+                                buttonsOnBottom={buttonsOnBottom}
                                 readOnly={!canEdit}
                                 formRef={formRef}
                                 submitText={config && config.submitText}
                                 loading={loading}
                                 close={() => {
-                                    if (skipEditLayer) goBack()
+                                    if (skipEditLayer && goBack) goBack()
                                     else setEditMode(false)
                                 }}
                                 onSubmit={submitForm}
@@ -303,7 +313,6 @@ const BWrap = styled.div`
   padding:10px;
   min-height:42px;
   position: absolute;
-  top:0px;
   left:0px;
   background:#ffffff;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
