@@ -9,14 +9,14 @@ export default function OfferView(props: Offer) {
 
     return <Wrap>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} />
-
-        <Body>
-            <T>{title || 'No title'}</T>
-            <D>{description || 'No description'}</D>
-            <P>{formatPrice(price)} <B>sat</B></P>
-        </Body>
-
+        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
+        <Pad>
+            <Body>
+                <T>{title || 'No title'}</T>
+                <D>{description || 'No description'}</D>
+                <P>{formatPrice(price)} <B>sat</B></P>
+            </Body>
+        </Pad>
     </Wrap>
 
 }
@@ -45,11 +45,10 @@ overflow:hidden;
 
 const Body = styled.div`
 font-size:14px;
-margin-left:10px;
 font-size: 15px;
 line-height: 20px;
 /* or 133% */
-
+padding:10px;
 display: flex;
 flex-direction:column;
 justify-content: space-around;
@@ -60,3 +59,8 @@ color: #292C33;
 overflow:hidden;
 `;
 
+const Pad = styled.div`
+display:flex;
+flex-direction:column;
+
+`;

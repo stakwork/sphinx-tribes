@@ -105,19 +105,16 @@ export default function BodyComponent() {
 
         }}>
 
-            <>
-                <Drawer />
-                <div style={{
-                    width: '100%', padding: 16, paddingLeft: 0, display: 'flex', flexWrap: 'wrap',
-                    justifyContent: 'space-around', alignItems: 'flex-start'
-                }} >
-                    {people.map(t => <Person {...t} key={t.id}
-                        small={false}
-                        selected={ui.selectedPerson === t.id}
-                        select={selectPerson}
-                    />)}
-                </div>
-            </>
+            <div style={{
+                width: '100%', padding: 16, paddingLeft: 0, display: 'flex', flexWrap: 'wrap',
+                justifyContent: 'space-around', alignItems: 'flex-start'
+            }} >
+                {people.map(t => <Person {...t} key={t.id}
+                    small={false}
+                    selected={ui.selectedPerson === t.id}
+                    select={selectPerson}
+                />)}
+            </div>
 
 
             {/* selected view */}

@@ -169,6 +169,10 @@ export default function Header() {
 
                         />
                     </EuiHeaderSection>
+
+                    <Button
+                        text='Tabs'
+                    />
                 </Row>
 
                 <Corner>
@@ -354,12 +358,14 @@ interface TagProps {
 }
 const Tab = styled.div<TagProps>`
                         display:flex;
-                        padding:10px;
-                        margin-right:25px;
+                        padding:10px 25px;
+                        margin-right:10px;
                         color:${p => p.selected ? '#fff' : '#8E969C'};
-                        border-bottom: ${p => p.selected && '4px solid #618AFF'};                        
+                        // border-bottom: ${p => p.selected && '4px solid #618AFF'};                        
                         cursor:pointer;
                         font-weight: 500;
-                        font-size: 13px;
+                        font-size: 15px;
                         line-height: 19px;
+                        background:${p => p.selected ? '#3C3F41' : '#3C3F4100'};
+                        border-radius:25px;
                         `;

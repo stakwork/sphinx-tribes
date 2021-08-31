@@ -9,7 +9,7 @@ export default function WantedView(props: Wanted) {
 
     return <Wrap>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} />
+        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
 
         <Body>
             <T>{title || 'No title'}</T>
@@ -44,12 +44,10 @@ overflow:hidden;
 
 
 const Body = styled.div`
-font-size:14px;
-margin-left:10px;
 font-size: 15px;
 line-height: 20px;
 /* or 133% */
-
+padding:10px;
 display: flex;
 flex-direction:column;
 justify-content: space-around;
@@ -60,3 +58,8 @@ color: #292C33;
 overflow:hidden;
 `;
 
+const Pad = styled.div`
+display:flex;
+flex-direction:column;
+padding:10px;
+`;

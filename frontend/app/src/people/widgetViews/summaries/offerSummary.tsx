@@ -10,8 +10,7 @@ export default function OfferSummary(props: Offer) {
 
         return <>
 
-                <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={true} />
-                <Divider />
+
                 <Pad>
                         <Y>
                                 <div>Price</div>
@@ -25,6 +24,9 @@ export default function OfferSummary(props: Offer) {
                         <T>{title || 'No title'}</T>
                         <D>{description || 'No description'}</D>
                 </Pad>
+                <Divider />
+                <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
+
 
         </>
 
@@ -54,21 +56,3 @@ const D = styled.div`
         color:#5F6368;
         margin: 10px 0;
         `;
-
-const Body = styled.div`
-        font-size:14px;
-        margin-left:10px;
-        font-size: 15px;
-        line-height: 20px;
-        /* or 133% */
-
-        display: flex;
-        flex-direction:column;
-        justify-content: space-around;
-
-        /* Primary Text 1 */
-
-        color: #292C33;
-        overflow:hidden;
-        `;
-
