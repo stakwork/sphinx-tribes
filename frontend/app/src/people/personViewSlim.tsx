@@ -568,7 +568,8 @@ export default function PersonView(props: any) {
                     visible={showFocusView}
                     style={{ top: -64, height: 'calc(100% + 64px)' }}
                     envStyle={{
-                        marginTop: 64, borderRadius: 0, background: '#fff', height: 'calc(100% - 64px)', width: '60%',
+                        marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
+                        height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
                         minWidth: 500, maxWidth: 800, //minHeight: 300,
                     }}
                     nextArrow={nextIndex}

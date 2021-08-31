@@ -10,8 +10,7 @@ export default function WantedSummary(props: Wanted) {
 
         return <>
 
-                <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
-                <Divider />
+
                 <Pad>
                         <Y>
                                 <div>Price</div>
@@ -25,6 +24,9 @@ export default function WantedSummary(props: Wanted) {
                         <T>{title || 'No title'}</T>
                         <D>{description || 'No description'}</D>
                 </Pad>
+
+                <Divider />
+                <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
 
         </>
 
