@@ -11,7 +11,7 @@ export default function GalleryViewer(props) {
     if (!g || !g.length) return <div />
     //<Square big={big} />
 
-    const showNav = (g.length > 1) && big
+    const showNav = (g.length > 1)
 
     function next(e) {
         e.stopPropagation()

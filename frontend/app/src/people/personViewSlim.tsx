@@ -245,7 +245,7 @@ export default function PersonView(props: any) {
                     }}
                     style={{
                         maxWidth: 291, minWidth: 291,
-                        padding: 0
+                        padding: 0, overflow: 'hidden'
                     }}
                 >
                     {React.cloneElement(child, { ...s })}
