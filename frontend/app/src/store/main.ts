@@ -2,7 +2,9 @@ import { observable, action } from 'mobx'
 import { persist } from 'mobx-persist'
 import api from '../api'
 import { Extras } from '../form/inputs/widgets/interfaces'
+import { getHostIncludingDockerHosts } from '../host'
 import { uiStore } from './ui'
+
 
 export class MainStore {
   @persist('list') @observable
@@ -52,11 +54,22 @@ export class MainStore {
 
   @action async refreshJwt() {
     try {
-      const res = await api.get('refresh_jwt')
+      if (!uiStore.meInfo) return null
+      const info = uiStore.meInfo
+      const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+      const res: any = await fetch(URL + "/refresh_jwt", {
+        method: "GET",
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+
       return res.jwt
     } catch (e) {
+      console.log('e', e)
       // could not refresh jwt, logout!
-      return false
+      return null
     }
   }
 }
