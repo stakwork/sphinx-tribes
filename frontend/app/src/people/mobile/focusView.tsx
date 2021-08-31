@@ -213,7 +213,7 @@ export default function FocusedView(props: any) {
             }
         }
 
-        const noShadow = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {}
+        const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {}
 
         return (
             <div style={{ ...props.style, width: '100%', height: '100%' }}>
@@ -247,7 +247,7 @@ export default function FocusedView(props: any) {
                         )}
                     </B>
                     : <>
-                        <BWrap style={{ ...noShadow }}>
+                        {(isMobile || canEdit) && <BWrap style={{ ...noShadow }}>
                             {goBack ? <IconButton
                                 icon='arrow_back'
                                 onClick={() => {
@@ -275,8 +275,9 @@ export default function FocusedView(props: any) {
                                 </div>
                                 : <div />}
 
-                        </BWrap>
-                        <div style={{ height: 60 }} />
+                        </BWrap>}
+
+                        {(isMobile || canEdit) && <div style={{ height: 60 }} />}
 
                         {/* display item */}
                         <SummaryViewer

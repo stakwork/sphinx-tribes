@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import styled from "styled-components";
 import { Post } from '../../form/inputs/widgets/interfaces';
 import GalleryViewer from '../utils/galleryViewer';
-
+import ReactMarkdown from 'react-markdown'
 
 export default function PostView(props: Post) {
     const { title, content, created, gallery } = props
@@ -15,7 +15,8 @@ export default function PostView(props: Post) {
         <Pad>
             <T>{title || 'No title'} </T>
             <Time>{created && moment.unix(created).format('LLL')} </Time>
-            <M style={{ maxHeight: !expand ? 120 : '' }}>{content || 'No content'} </M>
+            <M style={{ maxHeight: !expand ? 120 : '' }}>
+                <ReactMarkdown>{content}</ReactMarkdown> </M>
 
             {isLong &&
                 <Link onClick={(e) => {
@@ -108,7 +109,7 @@ overflow:hidden;
 const Pad = styled.div`
 display:flex;
 flex-direction:column;
-padding:10px;
+padding:20px;
 `;
 
 
