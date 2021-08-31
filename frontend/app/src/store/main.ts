@@ -35,10 +35,20 @@ export class MainStore {
 
   @action async getPeople(uniqueName?: string): Promise<Person[]> {
     const ps = await api.get('people')
+
     if (uiStore.meInfo) {
-      // add 'hide' property to me in people list
-      const index = ps.findIndex(f => f.id === uiStore.meInfo?.id)
-      if (index > -1) ps[index].hide = true
+      const index = ps.findIndex(f => f.id == uiStore.meInfo?.id)
+
+      if (index > -1) {
+        // add 'hide' property to me in people list
+        ps[index].hide = true
+
+        if (!uiStore.meInfo.img && ps[index].img) {
+          // if meInfo has no img but people list does, copy that image to meInfo
+          console.log('set me info')
+          uiStore.setMeInfo({ ...uiStore.meInfo, img: ps[index].img })
+        }
+      }
     }
     if (uniqueName) {
       ps.forEach(function (t: Tribe, i: number) {
@@ -64,8 +74,9 @@ export class MainStore {
           "Content-Type": "application/json",
         },
       });
+      const j = await res.json()
 
-      return res.jwt
+      return j.response
     } catch (e) {
       console.log('e', e)
       // could not refresh jwt, logout!
