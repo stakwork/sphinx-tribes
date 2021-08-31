@@ -11,12 +11,14 @@ import PersonViewSlim from '../personViewSlim'
 import { useFuse, useScroll } from '../../hooks'
 import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
+import FirstTimeScreen from './firstTimeScreen';
 import { useIsMobile } from '../../hooks';
+import { aboutSchema } from '../../form/schema';
 import {
     useHistory,
     useLocation
 } from "react-router-dom";
-import Drawer from '../drawer/index'
+import Form from '../../form';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -71,6 +73,12 @@ export default function BodyComponent() {
             return <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <EuiLoadingSpinner size="xl" />
             </Body>
+        }
+
+        const showFirstTime = ui.meInfo && ui.meInfo.id === 0
+
+        if (showFirstTime) {
+            return <FirstTimeScreen />
         }
 
         if (isMobile) {
