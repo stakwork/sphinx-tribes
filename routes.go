@@ -25,7 +25,7 @@ func NewRouter() *http.Server {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Get("/*", frontend.IndexRoute)
+		r.Get("/", frontend.IndexRoute)
 		r.Get("/static/*", frontend.StaticRoute)
 		r.Get("/manifest.json", frontend.ManifestRoute)
 		r.Get("/favicon.ico", frontend.FaviconRoute)
