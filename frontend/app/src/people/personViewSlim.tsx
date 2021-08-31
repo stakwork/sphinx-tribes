@@ -243,7 +243,11 @@ export default function PersonView(props: any) {
                         setShowFocusView(true)
                         setFocusIndex(i)
                     }}
-                    style={{ width: '100%' }}>
+                    style={{
+                        maxWidth: 291, minWidth: 291,
+                        padding: 0, overflow: 'hidden'
+                    }}
+                >
                     {React.cloneElement(child, { ...s })}
                 </Panel>)
             })
@@ -274,12 +278,30 @@ export default function PersonView(props: any) {
         }
     }
 
+    function nextIndex() {
+        if (person && person.extras) {
+            let g = person.extras[tabs[selectedWidget].name]
+            let nextindex = focusIndex + 1
+            if (g[nextindex]) setFocusIndex(nextindex)
+            else setFocusIndex(0)
+        }
+    }
+
+    function prevIndex() {
+        if (person && person.extras) {
+            let g = person?.extras[tabs[selectedWidget].name]
+            let previndex = focusIndex - 1
+            if (g[previndex]) setFocusIndex(previndex)
+            else setFocusIndex(g.length - 1)
+        }
+    }
+
     function renderEditButton() {
         if (!canEdit || !selectedWidget) return <div />
 
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
-        return <div style={{ padding: 10, margin: '6px 0 5px' }}>
+        return <div style={{ padding: isMobile ? 10 : '10 0', margin: isMobile ? '6px 0 5px' : '10px 0' }}>
             {!fullSelectedWidget && action.info &&
                 <ActionInfo>
                     <MaterialIcon icon={action.infoIcon} style={{ fontSize: 80 }} />
@@ -290,13 +312,14 @@ export default function PersonView(props: any) {
                 text={action.text}
                 color={isMobile ? 'widget' : 'desktopWidget'}
                 leadingIcon={action.icon}
-                width='100%'
+                // width={isMobile ? '100%' : 291}
+                width={'100%'}
                 height={48}
                 onClick={() => {
                     setShowFocusView(true)
                 }}
             />
-        </div>
+        </div >
     }
 
 
@@ -318,6 +341,7 @@ export default function PersonView(props: any) {
                     />
                     {canEdit ?
                         <IconButton
+                            iconStyle={{ transform: 'rotate(270deg)' }}
                             onClick={logout}
                             icon='logout'
                         /> : <div />
@@ -463,6 +487,7 @@ export default function PersonView(props: any) {
 
                     {canEdit ? <IconButton
                         onClick={logout}
+                        iconStyle={{ transform: 'rotate(270deg)' }}
                         icon='logout'
                     /> : <IconButton
                         onClick={() => setShowQR(true)}
@@ -517,7 +542,7 @@ export default function PersonView(props: any) {
             </div>
 
             <div style={{
-                width: canEdit ? 'calc(100% - 323px)' : 'calc(100% - 685px)',
+                width: canEdit ? 'calc(100% - 323px)' : 'calc(100% - 586px)',
                 minWidth: 250,
             }}>
                 <Tabs style={{ background: '#fff', padding: '0 20px' }}>
@@ -539,38 +564,64 @@ export default function PersonView(props: any) {
 
                 </Tabs>
 
-                {showFocusView ?
-                    <div style={{
-                        display: 'flex', flexDirection: 'column', flex: 1,
-                        background: '#fff', padding: 20, position: 'relative', height: 'calc(100% - 63px)',
-                        overflowY: 'auto',
-                    }}>
-                        <FocusedView
-                            person={person}
-                            canEdit={canEdit}
-                            selectedIndex={focusIndex}
-                            config={tabs[selectedWidget] && tabs[selectedWidget]}
-                            onSuccess={() => {
-                                console.log('success')
-                                setFocusIndex(-1)
-                                if (selectedWidget === 'about') switchWidgets('post')
-                            }}
-                            goBack={() => {
-                                setShowFocusView(false)
-                                setFocusIndex(-1)
-                                if (selectedWidget === 'about') switchWidgets('post')
-                            }}
-                        /></div> :
-                    <Sleeve style={{
-                        display: 'flex', flexDirection: 'column', flex: 1,
-                        background: '#F2F3F5', padding: 20, position: 'relative', height: 'calc(100% - 63px)',
-                        overflowY: 'auto'
-                    }}>
-                        {renderEditButton()}
-                        {renderWidgets('')}
+                <Modal
+                    visible={showFocusView}
+                    style={{ top: -64, height: 'calc(100% + 64px)' }}
+                    envStyle={{
+                        marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
+                        height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
+                        minWidth: 500, maxWidth: 800, //minHeight: 300,
+                    }}
+                    nextArrow={nextIndex}
+                    prevArrow={prevIndex}
+                    overlayClick={() => {
+                        setShowFocusView(false)
+                        setFocusIndex(-1)
+                        if (selectedWidget === 'about') switchWidgets('post')
+                    }}
+                    bigClose={() => {
+                        setShowFocusView(false)
+                        setFocusIndex(-1)
+                        if (selectedWidget === 'about') switchWidgets('post')
+                    }}
+                >
+                    <FocusedView
+                        person={person}
+                        canEdit={canEdit}
+                        selectedIndex={focusIndex}
+                        config={tabs[selectedWidget] && tabs[selectedWidget]}
+                        onSuccess={() => {
+                            console.log('success')
+                            setFocusIndex(-1)
+                            if (selectedWidget === 'about') switchWidgets('post')
+                        }}
+                    // goBack={() => {
+                    //     setShowFocusView(false)
+                    //     setFocusIndex(-1)
+                    //     if (selectedWidget === 'about') switchWidgets('post')
+                    // }}
+                    />
+                </Modal>
 
+                <div style={{
+                    padding: 20, height: 'calc(100% - 63px)', background: '#F2F3F5',
+                    overflowY: 'auto',
+                    position: 'relative',
+                }}>
+                    {renderEditButton()}
+                    <div style={{ height: 15 }} />
+                    <Sleeve style={{
+                        display: 'flex',
+                        justifyContent: 'space-around',
+                        flexWrap: 'wrap'
+                    }}>
+
+                        {renderWidgets('')}
                     </Sleeve>
-                }
+                </div>
+
+
+
             </div>
         </div >
     }
@@ -606,8 +657,6 @@ export default function PersonView(props: any) {
                 </EuiOverlayMask >
             }
 
-
-
         </Content >
 
     );
@@ -620,8 +669,7 @@ const PeopleList = styled.div`
             display:flex;
             flex-direction:column;
             background:#ffffff;
-            width: 362px;
-            min-width: 362px;
+            width: 265px;
             `;
 
 const DBack = styled.div`

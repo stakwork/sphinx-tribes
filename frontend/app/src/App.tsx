@@ -12,8 +12,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-// import { useIsMobile } from './hooks';
-// import { useStores } from './store';
+import TokenRefresh from './people/utils/tokenRefresh';
 
 function App() {
   const mode = getMode()
@@ -26,10 +25,16 @@ function App() {
         <PeopleHeader />
         <Switch>
           <Route path="/p/">
-            <PeopleBody />
+            <>
+              <TokenRefresh />
+              <PeopleBody />
+            </>
           </Route>
           <Route path="/t/">
             <Body />
+          </Route>
+          <Route path="/b/">
+            <div>Coming soon</div>
           </Route>
         </Switch>
       </div>

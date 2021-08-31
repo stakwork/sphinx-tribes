@@ -21,9 +21,13 @@ export default function AboutView(props: any) {
         {tag && <>
             <T>Follow Me</T>
             <I>
-                <Icon source={`/static/twitter.png`} />
+                <Icon source={`/static/twitter2.png`} />
                 <div>@{tag}</div>
-                <Gray>({twitter_confirmed ? 'Verified' : 'Pending verification'})</Gray>
+                {twitter_confirmed ?
+                    <Badge>VERIFIED</Badge> :
+                    <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
+                }
+
             </I>
         </>}
         {/* <I>Facebook</I> */}
@@ -34,13 +38,23 @@ export default function AboutView(props: any) {
     </Wrap>
 
 }
-
-
-const Gray = styled.div`
-margin-left:5px;
-font-weight:300;
-opacity:0.6;
+const Badge = styled.div`
+display:flex;
+justify-content:center;
+align-items:center;
+margin-left:10px;
+height:20px;
+color:#ffffff;
+background: #1DA1F2;
+border-radius: 32px;
+font-weight: bold;
+font-size: 8px;
+line-height: 9px;
+padding 0 10px;
 `;
+
+
+
 const Wrap = styled.div`
 display: flex;
 flex-direction:column;
@@ -75,7 +89,7 @@ const Icon = styled.div<IconProps>`
                     background-image: ${p => `url(${p.source})`};
                     width:20px;
                     height:20px;
-                    margin-right:5px;
+                    margin-right:10px;
                     background-position: center; /* Center the image */
                     background-repeat: no-repeat; /* Do not repeat the image */
                     background-size: contain; /* Resize the background image to cover the entire container */

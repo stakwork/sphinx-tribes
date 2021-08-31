@@ -3,15 +3,15 @@ import styled from "styled-components";
 import FadeLeft from '../../animated/fadeLeft';
 import { IconButton } from '../../sphinxUI';
 
-export default function GalleryViewer({ gallery, wrap, selectable, big }) {
+export default function GalleryViewer(props) {
+    const { gallery, wrap, selectable, big, showAll, style } = props
     const [selectedImage, setSelectedImage] = useState(0)
-
     let g = gallery
 
     if (!g || !g.length) return <div />
     //<Square big={big} />
 
-    const showNav = (g.length > 1) && big
+    const showNav = (g.length > 1)
 
     function next(e) {
         e.stopPropagation()
@@ -28,36 +28,46 @@ export default function GalleryViewer({ gallery, wrap, selectable, big }) {
     }
 
     return <>
-        <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', minHeight: big && 370 }}>
+        <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', ...style }}>
 
-            <Img big={big} src={g[selectedImage]} />
-            {showNav &&
-                <L>
-                    <Circ>
-                        <IconButton
-                            iconStyle={{ color: '#000' }}
-                            icon={'chevron_left'}
-                            onClick={prev}
-                        />
-                    </Circ>
-                </L>
+            {showAll ?
+                <div>
+                    {g.map((ga, i) => {
+                        return <BigImg big={big} src={ga} key={i} />
+                    })}
+                </div>
+                :
+                <>
+                    <Img big={big} src={g[selectedImage]} />
+                    {showNav &&
+                        <L>
+                            <Circ>
+                                <IconButton
+                                    iconStyle={{ color: '#000' }}
+                                    icon={'chevron_left'}
+                                    onClick={prev}
+                                />
+                            </Circ>
+                        </L>
+                    }
+
+                    {showNav &&
+                        <R>
+                            <Circ>
+                                <IconButton
+                                    icon={'chevron_right'}
+                                    iconStyle={{ color: '#000' }}
+                                    onClick={next}
+                                />
+                            </Circ>
+                        </R>
+                    }
+
+                    <Label>
+                        {selectedImage + 1} / {g.length}
+                    </Label>
+                </>
             }
-
-            {showNav &&
-                <R>
-                    <Circ>
-                        <IconButton
-                            icon={'chevron_right'}
-                            iconStyle={{ color: '#000' }}
-                            onClick={next}
-                        />
-                    </Circ>
-                </R>
-            }
-
-            <Label>
-                {selectedImage + 1} / {g.length}
-            </Label>
 
 
             {/* <FadeLeft isMounted={selectedImage}>
@@ -103,7 +113,7 @@ align-items:center;
 justify-content:center;
 width:30px;
 height:30px;
-background:#ffffff99;
+background:#ffffff66;
 border-radius:20px;
 cursor:pointer;
 `
@@ -161,17 +171,11 @@ const Img = styled.div<ImageProps>`
                 border:1px solid #ffffff21;
                 `;
 
-const BigImg = styled.div<ImageProps>`
+const BigImg = styled.img<ImageProps>`
                 background-image: url("${(p) => p.src}");
-                background-position: center;
-                background-size: cover;
-                height: 60vh;
-                min-height:200px;
-                max-height:800px;
-                width: 60vw;
-                min-width:200px;
-                max-width:800px;
-                // border-radius: 5px;
-                position: relative;
-                border:1px solid #ffffff21;
+                // background-size: contain;
+                // background-position: center;
+                max-width:100%;
+                height:auto;
+                margin-bottom:5px;
                 `;

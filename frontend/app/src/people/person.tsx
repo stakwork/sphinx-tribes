@@ -48,31 +48,36 @@ export default function Person(props: any) {
 
     function renderPersonCard() {
       if (small) {
-        return <Wrap onClick={() => select(id, unique_name)} style={{ background: selected ? '#F2F3F5' : '#fff' }}>
+        return <Wrap onClick={() => select(id, unique_name)} style={{
+          background: selected ? '#F2F3F5' : '#fff',
+
+        }}>
           <div>
-            <Img src={img || '/static/sphinx.png'} />
+            <Img src={img || '/static/sphinx.png'} style={hideActions && { width: 56, height: 56 }} />
           </div>
           <R>
-            <Title>{owner_alias}</Title>
+            <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
             <Description>
               {description}
             </Description>
-            <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-              <div></div>
-              {(!hideActions && owner_pubkey) ?
-                <>
-                  <a href={qrString}>
-                    <Button
-                      text='Connect'
-                      color='white'
-                      leadingIcon={'open_in_new'}
-                      iconSize={16}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </a>
-                </> : <div style={{ height: 30 }} />
-              }
-            </Row>
+            {!hideActions &&
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <div></div>
+                {(!hideActions && owner_pubkey) ?
+                  <>
+                    <a href={qrString}>
+                      <Button
+                        text='Connect'
+                        color='white'
+                        leadingIcon={'open_in_new'}
+                        iconSize={16}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </a>
+                  </> : <div style={{ height: 30 }} />
+                }
+              </Row>
+            }
             <Divider style={{ marginTop: 20 }} />
           </R>
         </Wrap>
@@ -169,7 +174,7 @@ const DWrap = styled.div`
         `;
 
 const R = styled.div`
-        width:calc(100% - 110px);
+        width:calc(100% - 80px);
         margin-left:20px;
         `;
 
@@ -227,7 +232,6 @@ const Img = styled.div<ImageProps>`
           background-size: cover;
           height: 96px;
           width: 96px;
-          min-width: 96px;
           border-radius: 50%;
           position: relative;
           `;

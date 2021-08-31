@@ -3,6 +3,7 @@ import React from 'react'
 import styled from "styled-components";
 import { Post } from '../../../form/inputs/widgets/interfaces';
 import GalleryViewer from '../../utils/galleryViewer';
+import ReactMarkdown from 'react-markdown'
 
 export default function PostSummary(props: Post) {
     const { title, content, created, gallery } = props
@@ -10,11 +11,11 @@ export default function PostSummary(props: Post) {
     return <Pad>
         <T>{title || 'No title'} </T>
         <Time>{created && moment.unix(created).format('LLL')} </Time>
-        <M>{content || 'No content'} </M>
+        <M><ReactMarkdown>{content}</ReactMarkdown></M>
 
         {/* readmore */}
 
-        <GalleryViewer gallery={gallery} wrap={false} selectable={false} big={true} />
+        <GalleryViewer gallery={gallery} showAll={true} wrap={false} selectable={false} big={true} />
     </Pad>
 
 }
