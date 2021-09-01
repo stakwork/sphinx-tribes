@@ -4,25 +4,32 @@ import styled from "styled-components";
 import { Post } from '../../form/inputs/widgets/interfaces';
 import GalleryViewer from '../utils/galleryViewer';
 import ReactMarkdown from 'react-markdown'
+import { Title, Paragraph, Date, Link } from '../../sphinxUI';
 
 export default function PostView(props: Post) {
     const { title, content, created, gallery } = props
-    const isLong = content && (content.length > 200)
+    const isLong = content && (content.length > 100)
     const [expand, setExpand] = useState(false)
 
+    const noGallery = !gallery || !gallery.length
 
-    return <Wrap>
+    return <Wrap style={{ maxHeight: expand ? '' : 472 }}>
         <Pad>
-            <T>{title || 'No title'} </T>
-            <Time>{created && moment.unix(created).format('LLL')} </Time>
-            <M style={{ maxHeight: !expand ? 120 : '' }}>
-                <ReactMarkdown>{content}</ReactMarkdown> </M>
+            <Title>{title} </Title>
+            <Date>{created && moment.unix(created).format('LLL')} </Date>
+            <Paragraph style={{
+                maxHeight: (noGallery && !expand) ? 340 : !expand ? 80 : '',
+                minHeight: noGallery ? 80 : '', overflow: 'hidden'
+            }}>
+                <ReactMarkdown>{content}</ReactMarkdown> </Paragraph>
 
             {isLong &&
-                <Link onClick={(e) => {
-                    e.stopPropagation()
-                    setExpand(!expand)
-                }}>
+                <Link
+                    style={{ textAlign: 'right', width: '100%' }}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        setExpand(!expand)
+                    }}>
                     {!expand ? 'Read more' : 'Show less'}
                 </Link>
             }
@@ -44,17 +51,14 @@ const Wrap = styled.div`
 display: flex;
 flex-direction:column;
 width:100%;
+min-height:472px;
 min-width:100%;
 font-style: normal;
 font-weight: 500;
 font-size: 24px;
 line-height: 20px;
-/* or 83% */
-
-
-/* Text 2 */
-
 color: #3C3F41;
+justify-content:space-between;
 
 `;
 
@@ -81,16 +85,15 @@ margin-bottom:10px;
 color: #5F6368;
 `;
 
-const Link = styled.div`
-font-size: 15px;
-line-height: 20px;
-
-
-/* Primary blue */
-
-color: #618AFF;
-margin-bottom:10px;
-`;
+// const Link = styled.div`
+// font-size: 15px;
+// line-height: 20px;
+// width:100%;
+// text-align:right;
+// /* Primary blue */
+// color: #618AFF;
+// cursor:pointer;
+// `;
 
 
 const M = styled.div`
@@ -100,7 +103,8 @@ line-height: 20px;
 
 
 /* Main bottom icons */
-
+text-overflow: ellipsis;
+// white-space: nowrap;
 color: #5F6368;
 margin-bottom:10px;
 overflow:hidden;

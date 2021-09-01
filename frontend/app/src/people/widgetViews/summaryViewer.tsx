@@ -38,4 +38,5 @@ display: flex;
 flex-direction:column;
 width:100%;
 min-width:100%;
+padding:20px;
 `;

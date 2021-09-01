@@ -47,7 +47,7 @@ export default function Modal(props: any) {
             {prevArrow && <L>
                 <Circ>
                     <IconButton
-                        iconStyle={{ color: '#000' }}
+                        iconStyle={{ color: '#fff' }}
                         icon={'chevron_left'}
                         onClick={(e) => {
                             e.stopPropagation()
@@ -60,7 +60,7 @@ export default function Modal(props: any) {
                 <Circ>
                     <IconButton
                         icon={'chevron_right'}
-                        iconStyle={{ color: '#000' }}
+                        iconStyle={{ color: '#fff' }}
                         onClick={(e) => {
                             e.stopPropagation()
                             nextArrow()
@@ -98,9 +98,9 @@ const Circ = styled.div`
 display:flex;
 align-items:center;
 justify-content:center;
-width:70px;
-height:70px;
-background:#ffffffdd;
+width:65px;
+height:65px;
+background:#ffffff44;
 border-radius:50px;
 cursor:pointer;
 `
