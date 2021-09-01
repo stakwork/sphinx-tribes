@@ -112,17 +112,21 @@ export default function BodyComponent() {
             height: 'calc(100% - 65px)'
 
         }}>
+            <>
+                <div style={{
+                    width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
+                    justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20
+                }}>
+                    {people.map(t => <Person {...t} key={t.id}
+                        small={false}
+                        selected={ui.selectedPerson === t.id}
+                        select={selectPerson}
+                    />)}
+                </div>
+                <div style={{ height: 100 }} />
+            </>
 
-            <div style={{
-                width: '100%', padding: 16, paddingLeft: 0, display: 'flex', flexWrap: 'wrap',
-                justifyContent: 'space-around', alignItems: 'flex-start'
-            }} >
-                {people.map(t => <Person {...t} key={t.id}
-                    small={false}
-                    selected={ui.selectedPerson === t.id}
-                    select={selectPerson}
-                />)}
-            </div>
+
 
 
             {/* selected view */}
@@ -148,26 +152,10 @@ export default function BodyComponent() {
 
 
 const Body = styled.div`
-  flex:1;
-  height:calc(100% - 105px);
-  padding-bottom:80px;
-  width:100%;
-  overflow:auto;
-  display:flex;
-`
-const AddWrap = styled.div`
-  position:fixed;
-  bottom:2rem;
-  right:2rem;
-  & button {
-    height: 100px;
-    width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  & svg {
-    width:60px;
-    height:60px;
-  }
-`
+            flex:1;
+            height:calc(100% - 105px);
+            padding-bottom:80px;
+            width:100%;
+            overflow:auto;
+            display:flex;
+            `

@@ -23,12 +23,10 @@ function App() {
       // people
       mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
         <PeopleHeader />
+        <TokenRefresh />
         <Switch>
           <Route path="/p/">
-            <>
-              <TokenRefresh />
-              <PeopleBody />
-            </>
+            <PeopleBody />
           </Route>
           <Route path="/t/">
             <Body />

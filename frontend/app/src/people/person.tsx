@@ -169,6 +169,7 @@ const DWrap = styled.div`
         justify-content:space-between;
         background:#fff;
         margin-bottom:20px;
+        margin-right:20px;
         box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
         border-radius: 4px;
         `;
