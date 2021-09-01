@@ -55,7 +55,7 @@ export default function Person(props: any) {
           <div>
             <Img src={img || '/static/sphinx.png'} style={hideActions && { width: 56, height: 56 }} />
           </div>
-          <R>
+          <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
             <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
             <Description>
               {description}
@@ -175,7 +175,6 @@ const DWrap = styled.div`
         `;
 
 const R = styled.div`
-        width:calc(100% - 80px);
         margin-left:20px;
         `;
 

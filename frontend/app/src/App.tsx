@@ -13,6 +13,7 @@ import {
   Route,
 } from "react-router-dom";
 import TokenRefresh from './people/utils/tokenRefresh';
+import BotsBody from './bots/body';
 
 function App() {
   const mode = getMode()
@@ -32,7 +33,7 @@ function App() {
             <Body />
           </Route>
           <Route path="/b/">
-            <div>Coming soon</div>
+            <BotsBody />
           </Route>
         </Switch>
       </div>

@@ -224,7 +224,9 @@ export default function FocusedView(props: any) {
         const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {}
 
         return (
-            <div style={{ ...props.style, width: '100%', height: '100%' }}>
+            <div style={{
+                ...props.style, width: '100%', height: '100%'
+            }}>
                 {/* {renderWarnBeforeClose()} */}
 
                 {editMode ?

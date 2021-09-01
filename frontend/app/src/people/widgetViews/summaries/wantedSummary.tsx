@@ -2,35 +2,69 @@ import React from 'react'
 import styled from "styled-components";
 import { Wanted } from '../../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../../helpers';
-import { Divider } from '../../../sphinxUI';
+import { useIsMobile } from '../../../hooks';
+import { Divider, Title, Paragraph } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 
 export default function WantedSummary(props: Wanted) {
         const { title, description, priceMin, priceMax, url, gallery } = props
 
-        return <>
+        const isMobile = useIsMobile()
+        if (isMobile) {
+                return <>
+                        <Pad>
+                                <Y>
+                                        <div>Price</div>
+                                        <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                                </Y>
+                                <Divider style={{
+                                        marginBottom: 10
+                                }} />
 
 
-                <Pad>
-                        <Y>
-                                <div>Price</div>
-                                <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
-                        </Y>
-                        <Divider style={{
-                                marginBottom: 10
-                        }} />
+                                <T>{title || 'No title'}</T>
+                                <D>{description || 'No description'}</D>
+                        </Pad>
 
+                        <Divider />
+                        <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
+                </>
+        }
 
-                        <T>{title || 'No title'}</T>
-                        <D>{description || 'No description'}</D>
-                </Pad>
+        return <Wrap>
+                <GalleryViewer
+                        style={{ width: 507 }}
+                        gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
+                <div style={{ width: 316, height: '100%', padding: 20, paddingTop: 30 }}>
+                        <Pad>
+                                <Title>{title}</Title>
+                                <Divider style={{ marginTop: 10 }} />
+                                <Y>
+                                        <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                                </Y>
+                                <Divider style={{ marginBottom: 10 }} />
 
-                <Divider />
-                <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
+                                <Paragraph>{description}</Paragraph>
+                        </Pad>
+                </div>
 
-        </>
+        </Wrap>
 
 }
+
+const Wrap = styled.div`
+display: flex;
+width:100%;
+height:100%;
+min-width:800px;
+font-style: normal;
+font-weight: 500;
+font-size: 24px;
+line-height: 20px;
+color: #3C3F41;
+justify-content:space-between;
+
+`;
 const Pad = styled.div`
         padding: 0 20px;
         `;

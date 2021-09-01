@@ -7,10 +7,13 @@ import avatarIcon from "../../utils/profile_avatar.svg";
 import type { Props } from './propsType'
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
+import { Button, Modal } from "../../sphinxUI";
+import { MAX_UPLOAD_SIZE } from "../../people/utils/constants";
 
 export default function ImageInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
+  const [showError, setShowError] = useState('');
   const [picsrc, setPicsrc] = useState(value || '');
   // return <EuiFilePicker value={props.initialValues.img} >
   //   </EuiFilePicker>
@@ -42,7 +45,24 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
     }
   }
 
-  async function dropzoneUpload(files: File[]) {
+  async function dropzoneUpload(files: File[], fileRejections) {
+
+    console.log('fileRejections', fileRejections)
+    if (fileRejections.length) {
+      fileRejections.forEach((file) => {
+        file.errors.forEach((err) => {
+          if (err.code === "file-too-large") {
+            setShowError(`Error: ${err.message}`);
+          }
+          if (err.code === "file-invalid-type") {
+            setShowError(`Error: ${err.message}`);
+          }
+        });
+      });
+      console.log('upload error')
+      return
+    }
+
     console.log(files)
     const file = files[0];
     setUploading(true)
@@ -54,10 +74,9 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
     reader.readAsDataURL(file);
   }
 
-  const MAX_SIZE = 4194304 // 4MB
   return (
     <ImageWrap>
-      <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_SIZE}>
+      <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
         {({ getRootProps, getInputProps, isDragActive, open }) => (
           <DropzoneStuff>
             <DottedCircle {...getRootProps()} isDragActive={isDragActive}>
@@ -89,6 +108,24 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
           </DropzoneStuff>
         )}
       </Dropzone>
+
+      <Modal
+        visible={showError ? true : false}>
+        <div style={{
+          display: 'flex', flexDirection: 'column',
+          justifyContent: 'center', alignItems: 'center', padding: 20
+        }}>
+          <div style={{ marginBottom: 20 }}>
+            {showError}
+          </div>
+          <Button
+            onClick={() => setShowError('')}
+            text={'Okay'}
+            color={'primary'}
+          />
+        </div>
+      </Modal>
+
     </ImageWrap>
   );
 }
