@@ -30,17 +30,17 @@ export default function Header() {
         {
             label: 'Tribes',
             name: 'tribes',
-            path: '/t/'
+            path: '/t'
         },
         {
             label: 'People',
             name: 'people',
-            path: '/p/'
+            path: '/p'
         },
         {
             label: 'Bots',
             name: 'bots',
-            path: '/b/'
+            path: '/b'
         },
     ]
 
@@ -62,12 +62,12 @@ export default function Header() {
 
     function urlRedirect() {
         // if route not supported, redirect
-        // let pass = false
-        // let path = location.pathname
-        // tabs.forEach((t => {
-        //     if (path.includes(t.path)) pass = true
-        // }))
-        // if (!pass) history.push('/p/')
+        let pass = false
+        let path = location.pathname
+        tabs.forEach((t => {
+            if (path.includes(t.path)) pass = true
+        }))
+        if (!pass) history.push('/p')
     }
 
     useEffect(() => {
