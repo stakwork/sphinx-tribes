@@ -62,12 +62,12 @@ export default function Header() {
 
     function urlRedirect() {
         // if route not supported, redirect
-        let pass = false
-        let path = location.pathname
-        tabs.forEach((t => {
-            if (path.includes(t.path)) pass = true
-        }))
-        if (!pass) history.push('/p/')
+        // let pass = false
+        // let path = location.pathname
+        // tabs.forEach((t => {
+        //     if (path.includes(t.path)) pass = true
+        // }))
+        // if (!pass) history.push('/p/')
     }
 
     useEffect(() => {
@@ -94,8 +94,10 @@ export default function Header() {
 
     function renderHeader() {
         if (isMobile) {
-            return <EuiHeader id="header" style={{ color: '#fff' }}>
-                <div className="container">
+            return <EuiHeader id="header" style={{
+                color: '#fff', background: '#292C33'
+            }}>
+                < div className="container" >
                     <Row style={{ justifyContent: 'space-between' }}>
                         <EuiHeaderSection grow={false}>
                             <Img src="/static/people_logo.svg" />
@@ -132,11 +134,11 @@ export default function Header() {
                         />
                     </EuiHeaderSection>
                 </div>
-            </EuiHeader >
+            </ EuiHeader >
         }
 
         // desktop version
-        return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px' }}>
+        return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px', background: '#292C33' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <Row>
                     <EuiHeaderSection grow={false}>
@@ -170,9 +172,9 @@ export default function Header() {
                         />
                     </EuiHeaderSection>
 
-                    <Button
-                        text='Tabs'
-                    />
+                    {/* <Button
+                        text='Tags'
+                    /> */}
                 </Row>
 
                 <Corner>
@@ -277,95 +279,95 @@ export default function Header() {
 }
 
 const Row = styled.div`
-            display:flex;
-            align-items:center;
-            width:100%;
-            `
+                display:flex;
+                align-items:center;
+                width:100%;
+                `
 const Corner = styled.div`
-            display:flex;
-            align-items:center;
-            `
+                display:flex;
+                align-items:center;
+                `
 const T = styled.div`
-            display:flex;
-            font-size: 26px;
-            line-height: 19px;
-            `
+                display:flex;
+                font-size: 26px;
+                line-height: 19px;
+                `
 
 interface ImageProps {
     readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-                background-image: url("${(p) => p.src}");
-                background-position: center;
-                background-size: cover;
-                height:37px;
-                width:232px;
-
-                position: relative;
-                `;
-
-
-const Name = styled.div`
-                font-style: normal;
-                font-weight: 500;
-                font-size: 26px;
-                line-height: 19px;
-                /* or 73% */
-
-                text-align: center;
-
-                /* Text 2 */
-
-                color: #292C33;
-                `;
-const Welcome = styled.div`
-                font-size: 15px;
-                line-height: 24px;
-                margin:20px 0 50px;
-                text-align: center;
-
-                /* Text 2 */
-
-                color: #3C3F41;
-                `
-
-
-const Column = styled.div`
-                width:100%;
-                display:flex;
-                flex-direction:column;
-                justify-content:center;
-                align-items:center;
-                padding: 25px;
-
-                `
-const Imgg = styled.div<ImageProps>`
                     background-image: url("${(p) => p.src}");
                     background-position: center;
                     background-size: cover;
-                    width:90px;
-                    height:90px;
-                    border-radius: 50%;
+                    height:37px;
+                    width:232px;
+
+                    position: relative;
                     `;
 
-const Tabs = styled.div`
-                    display:flex;
-                    margin-left:20px;
+
+const Name = styled.div`
+                    font-style: normal;
+                    font-weight: 500;
+                    font-size: 26px;
+                    line-height: 19px;
+                    /* or 73% */
+
+                    text-align: center;
+
+                    /* Text 2 */
+
+                    color: #292C33;
                     `;
+const Welcome = styled.div`
+                    font-size: 15px;
+                    line-height: 24px;
+                    margin:20px 0 50px;
+                    text-align: center;
+
+                    /* Text 2 */
+
+                    color: #3C3F41;
+                    `
+
+
+const Column = styled.div`
+                    width:100%;
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:center;
+                    align-items:center;
+                    padding: 25px;
+
+                    `
+const Imgg = styled.div<ImageProps>`
+                        background-image: url("${(p) => p.src}");
+                        background-position: center;
+                        background-size: cover;
+                        width:90px;
+                        height:90px;
+                        border-radius: 50%;
+                        `;
+
+const Tabs = styled.div`
+                        display:flex;
+                        margin-left:20px;
+                        `;
 
 interface TagProps {
     selected: boolean;
 }
 const Tab = styled.div<TagProps>`
-                        display:flex;
-                        padding:10px 25px;
-                        margin-right:10px;
-                        color:${p => p.selected ? '#fff' : '#8E969C'};
-                        // border-bottom: ${p => p.selected && '4px solid #618AFF'};                        
-                        cursor:pointer;
-                        font-weight: 500;
-                        font-size: 15px;
-                        line-height: 19px;
-                        background:${p => p.selected ? '#3C3F41' : '#3C3F4100'};
-                        border-radius:25px;
-                        `;
+                            display:flex;
+                            padding:10px 25px;
+                            margin-right:10px;
+                            color:${p => p.selected ? '#fff' : '#8E969C'};
+                        // border-bottom: ${p => p.selected && '4px solid #618AFF'};
+                            cursor:pointer;
+                            font-weight: 500;
+                            font-size: 15px;
+                            line-height: 19px;
+                            background:${p => p.selected ? '#3C3F41' : '#3C3F4100'};
+                            border-radius:25px;
+                            `;
