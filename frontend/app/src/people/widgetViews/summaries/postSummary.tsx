@@ -22,6 +22,7 @@ export default function PostSummary(props: Post) {
 
 const Pad = styled.div`
 width:100%;
+max-width:602px;
 padding:20px;
 `;
 
