@@ -8,12 +8,13 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
 import MaterialIcon from "@material/react-material-icon";
 import { FieldEnv, FieldTextArea } from './index'
-import { Button } from "../../sphinxUI";
-
+import { Button, Modal } from "../../sphinxUI";
+import { MAX_UPLOAD_SIZE } from "../../people/utils/constants";
 
 export default function GalleryInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
     const { ui } = useStores();
     const [uploading, setUploading] = useState(false);
+    const [showError, setShowError] = useState('');
     // return <EuiFilePicker value={props.initialValues.img} >
     //   </EuiFilePicker>
 
@@ -45,7 +46,24 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
         }
     }
 
-    async function dropzoneUpload(files: File[]) {
+    async function dropzoneUpload(files: File[], fileRejections) {
+        console.log('fileRejections', fileRejections)
+        if (fileRejections.length) {
+            fileRejections.forEach((file) => {
+                file.errors.forEach((err) => {
+                    if (err.code === "file-too-large") {
+                        setShowError(`Error: ${err.message}`);
+                    }
+                    if (err.code === "file-invalid-type") {
+                        setShowError(`Error: ${err.message}`);
+                    }
+                });
+            });
+            console.log('upload error')
+            return
+        }
+
+
         console.log(files)
         const file = files[0];
         setUploading(true)
@@ -70,8 +88,6 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
         handleChange(picsClone)
     }
 
-    const MAX_SIZE = 4194304 // 4MB
-
     return (
         <>
             <Wrapper>
@@ -93,7 +109,7 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
             </Wrapper>
 
             <div style={{ marginTop: 5 }}>
-                <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_SIZE}>
+                <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
                     {({ getRootProps, getInputProps, isDragActive, open }) => (
                         <DropzoneStuff>
                             <div>
@@ -118,6 +134,23 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
                 </Dropzone>
 
             </div>
+
+            <Modal
+                visible={showError ? true : false}>
+                <div style={{
+                    display: 'flex', flexDirection: 'column',
+                    justifyContent: 'center', alignItems: 'center', padding: 20
+                }}>
+                    <div style={{ marginBottom: 20 }}>
+                        {showError}
+                    </div>
+                    <Button
+                        onClick={() => setShowError('')}
+                        text={'Okay'}
+                        color={'primary'}
+                    />
+                </div>
+            </Modal>
         </>
     );
 }

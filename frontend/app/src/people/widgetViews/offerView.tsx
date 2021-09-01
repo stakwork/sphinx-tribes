@@ -2,29 +2,91 @@ import React from 'react'
 import styled from "styled-components";
 import { Offer } from '../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../helpers';
+import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
+import { Divider } from '../../sphinxUI';
 
 export default function OfferView(props: Offer) {
     const { gallery, title, description, price } = props
+    const isMobile = useIsMobile()
 
-    return <Wrap>
+    if (isMobile) {
+        return <Wrap>
 
-        <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
-        <Pad>
-            <Body>
-                <T>{title || 'No title'}</T>
-                <D>{description || 'No description'}</D>
-                <P>{formatPrice(price)} <B>sat</B></P>
-            </Body>
-        </Pad>
-    </Wrap>
+            <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
+            <Pad>
+                <Body>
+                    <T>{title || 'No title'}</T>
+                    <D>{description || 'No description'}</D>
+                    <P>{formatPrice(price)} <B>sat</B></P>
+                </Body>
+            </Pad>
+        </Wrap>
+    }
+
+    return <DWrap>
+        <GalleryViewer
+            showAll={false}
+            big={true}
+            wrap={false}
+            selectable={true}
+            gallery={gallery}
+            style={{ maxHeight: 291, overflow: 'hidden' }} />
+        <div>
+            <Pad style={{ padding: 20 }}>
+                <DT>{title || 'No title'}</DT>
+                <DD>{description || 'No description'}</DD>
+            </Pad>
+            <Divider style={{ margin: 0 }} />
+
+            <Pad style={{ padding: 20, }}>
+                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>sat</B></P>
+            </Pad>
+        </div>
+    </DWrap>
 
 }
 const Wrap = styled.div`
 display: flex;
-justify-content:flex-start;
+justify-content:flex-start;`
 
+
+const DWrap = styled.div`
+display: flex;
+flex-direction:column;
+width:100%;
+min-width:100%;
+font-style: normal;
+font-weight: 500;
+font-size: 24px;
+line-height: 20px;
+color: #3C3F41;
+justify-content:space-between;
 `;
+
+const DD = styled.div`
+font-style: normal;
+font-weight: normal;
+font-size: 12px;
+line-height: 25px;
+margin-bottom:10px;
+
+
+/* Main bottom icons */
+
+color: #8E969C;
+`;
+const DT = styled.div`
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 25px;
+color:#292C33 !important;
+margin-bottom:10px;
+
+color: #5F6368;
+`;
+
 const T = styled.div`
 font-weight:bold;
 `;
@@ -64,3 +126,6 @@ display:flex;
 flex-direction:column;
 
 `;
+
+
+

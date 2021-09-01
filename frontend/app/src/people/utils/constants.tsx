@@ -1,0 +1,3 @@
+const MAX_UPLOAD_SIZE = 10194304 //10MB
+
+export { MAX_UPLOAD_SIZE }

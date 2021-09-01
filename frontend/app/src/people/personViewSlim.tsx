@@ -28,7 +28,6 @@ import FocusedView from './mobile/focusView'
 import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../form/schema";
 import { useIsMobile } from "../hooks";
 import Person from "./person";
-import { relative } from "path";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -176,6 +175,12 @@ export default function PersonView(props: any) {
             label: 'Offer',
             name: 'offer',
             submitText: 'Post',
+            modalStyle: {
+                width: 'auto',
+                maxWidth: 'auto',
+                minWidth: '400px',
+                height: 'auto'
+            },
             schema: offerSchema,
             action: {
                 text: 'Sell Something',
@@ -186,6 +191,12 @@ export default function PersonView(props: any) {
             label: 'Wanted',
             name: 'wanted',
             submitText: 'Save',
+            modalStyle: {
+                width: 'auto',
+                maxWidth: 'auto',
+                minWidth: '400px',
+                height: 'auto'
+            },
             schema: wantedSchema,
             action: {
                 text: 'Add to Wanted',
@@ -240,7 +251,8 @@ export default function PersonView(props: any) {
             const panelStyles = isMobile ? {
                 minHeight: 132
             } : {
-                maxWidth: 291, minWidth: 291, minHeight: 429
+                maxWidth: 291, minWidth: 291,
+                marginRight: 20, marginBottom: 20, minHeight: 472
             }
 
             fullSelectedWidget && fullSelectedWidget.map((s, i) => {
@@ -252,6 +264,7 @@ export default function PersonView(props: any) {
                     }}
                     style={{
                         ...panelStyles,
+                        cursor: 'pointer',
                         padding: 0, overflow: 'hidden'
                     }}
                 >
@@ -286,6 +299,10 @@ export default function PersonView(props: any) {
     }
 
     function nextIndex() {
+        if (focusIndex < 0) {
+            console.log('nope!')
+            return
+        }
         if (person && person.extras) {
             let g = person.extras[tabs[selectedWidget].name]
             let nextindex = focusIndex + 1
@@ -295,6 +312,10 @@ export default function PersonView(props: any) {
     }
 
     function prevIndex() {
+        if (focusIndex < 0) {
+            console.log('nope!')
+            return
+        }
         if (person && person.extras) {
             let g = person?.extras[tabs[selectedWidget].name]
             let previndex = focusIndex - 1
@@ -303,12 +324,12 @@ export default function PersonView(props: any) {
         }
     }
 
-    function renderEditButton() {
+    function renderEditButton(style: any) {
         if (!canEdit || !selectedWidget) return <div />
 
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
-        return <div style={{ padding: isMobile ? 10 : '10 0', margin: isMobile ? '6px 0 5px' : '10px 0' }}>
+        return <div style={{ padding: isMobile ? 10 : '10 0', margin: isMobile ? '6px 0 5px' : '10px 0', ...style }}>
             {!fullSelectedWidget && action.info &&
                 <ActionInfo>
                     <MaterialIcon icon={action.infoIcon} style={{ fontSize: 80 }} />
@@ -414,7 +435,7 @@ export default function PersonView(props: any) {
             </Panel>
 
             <Sleeve>
-                {renderEditButton()}
+                {renderEditButton({})}
                 {renderWidgets('')}
             </Sleeve>
 
@@ -439,7 +460,14 @@ export default function PersonView(props: any) {
         </div>
     }
 
+
     function renderDesktopView() {
+
+
+        const focusedDesktopModalStyles = newSelectedWidget ? {
+            ...tabs[newSelectedWidget].modalStyle
+        } : {}
+
         return <div style={{
             display: 'flex',
             width: '100%', height: '100%'
@@ -477,13 +505,17 @@ export default function PersonView(props: any) {
                 padding: 20,
                 height: '100%',
                 borderLeft: '1px solid #F2F3F5',
-                borderRight: '1px solid #F2F3F5'
+                borderRight: '1px solid #F2F3F5',
+                boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
             }}>
                 <div style={{
                     position: 'absolute',
-                    top: 20, left: 0,
+                    top: 0, left: 0,
                     display: 'flex',
                     justifyContent: 'space-between', width: '100%',
+                    alignItems: 'center',
+                    boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.07)',
+                    height: 64
                 }}>
                     {canEdit ? <Button
                         color='clear'
@@ -550,9 +582,12 @@ export default function PersonView(props: any) {
 
             <div style={{
                 width: canEdit ? 'calc(100% - 323px)' : 'calc(100% - 586px)',
-                minWidth: 250,
+                minWidth: 250
             }}>
-                <Tabs style={{ background: '#fff', padding: '0 20px' }}>
+                <Tabs style={{
+                    background: '#fff', padding: '0 20px', boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.07)'
+
+                }}>
                     {tabs && Object.keys(tabs).map((name, i) => {
                         if (name === 'about') return <div key={i} />
                         const t = tabs[name]
@@ -573,11 +608,15 @@ export default function PersonView(props: any) {
 
                 <Modal
                     visible={showFocusView}
-                    style={{ top: -64, height: 'calc(100% + 64px)' }}
+                    style={{
+                        top: -64,
+                        height: 'calc(100% + 64px)'
+                    }}
                     envStyle={{
                         marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
                         height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
-                        minWidth: 500, maxWidth: 800, //minHeight: 300,
+                        minWidth: 500, maxWidth: 602, //minHeight: 300,
+                        ...focusedDesktopModalStyles
                     }}
                     nextArrow={nextIndex}
                     prevArrow={prevIndex}
@@ -615,11 +654,12 @@ export default function PersonView(props: any) {
                     overflowY: 'auto',
                     position: 'relative',
                 }}>
-                    {renderEditButton()}
-                    <div style={{ height: 15 }} />
+                    {renderEditButton({ marginBottom: 15 })}
+                    {/* <div style={{ height: 15 }} /> */}
                     <Sleeve style={{
                         display: 'flex',
-                        justifyContent: 'space-around',
+                        alignItems: 'flex-start',
+                        justifyContent: 'flex-start',
                         flexWrap: 'wrap'
                     }}>
 
@@ -667,6 +707,7 @@ export default function PersonView(props: any) {
         </Content >
 
     );
+
 }
 interface ContentProps {
     selected: boolean;
