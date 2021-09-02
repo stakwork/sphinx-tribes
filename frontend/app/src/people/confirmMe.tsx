@@ -6,20 +6,21 @@ import api from "../api";
 import { useStores } from "../store";
 import type { MeInfo } from "../store/ui";
 import { getHost } from "../host";
-import { PropertySortType } from "@elastic/eui/src/services/sort";
-import { useIsMobile } from "../hooks";
+// import { useIsMobile } from "../hooks";
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
 }
 
+let interval
+
 export default function ConfirmMe(props: any) {
   const { ui } = useStores();
   const [challenge, setChallenge] = useState("");
   const [ts, setTS] = useState("");
 
-  const isMobile = useIsMobile()
+  // const isMobile = useIsMobile()
 
   const qrString = makeQR(challenge, ts);
 
@@ -28,18 +29,16 @@ export default function ConfirmMe(props: any) {
   }, []);
 
   useEffect(() => {
-    if (isMobile && challenge && ts) {
+    if (challenge && ts) {
       let el = document.createElement('a')
       el.href = qrString
       el.click();
     }
-  }, [isMobile, challenge, ts])
+  }, [challenge, ts])
 
   async function startPolling(challenge: string) {
-    let ok = true;
     let i = 0;
-    while (ok) {
-      await sleep(3000);
+    interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
         console.log(me);
@@ -47,14 +46,16 @@ export default function ConfirmMe(props: any) {
           ui.setMeInfo(me);
           setChallenge("");
           if (props.onSuccess) props.onSuccess()
-          ok = false;
-          break;
+          if (interval) clearInterval(interval)
         }
         i++;
-        if (i > 100) ok = false;
+        if (i > 100) {
+          if (interval) clearInterval(interval)
+        }
       } catch (e) { }
-    }
+    }, 3000)
   }
+
   async function getChallenge() {
     const res = await api.get("ask");
     if (res.challenge) {
@@ -67,7 +68,8 @@ export default function ConfirmMe(props: any) {
   }
 
   // if mobile, automatically kick to sphinx app, dont show qr
-  if (isMobile) return (
+  // if (isMobile)
+  return (
     <ConfirmWrap>
       <InnerWrap>
         <div style={{ marginBottom: 50 }}>Opening Sphinx...</div>
@@ -76,35 +78,35 @@ export default function ConfirmMe(props: any) {
     </ConfirmWrap>
   )
 
-  return (
-    <ConfirmWrap>
-      {!challenge && <EuiLoadingSpinner size="xl" style={{ marginTop: 60 }} />}
-      {challenge && (
-        <InnerWrap>
-          <P>Scan with your Sphinx Mobile App</P>
-          <QrWrap>
-            <QRCode
-              bgColor="#FFFFFF"
-              fgColor="#000000"
-              level="Q"
-              style={{ width: 209 }}
-              value={qrString}
-            />
-          </QrWrap>
-          <LinkWrap>
-            <a href={qrString} className="btn join-btn">
-              <img
-                style={{ width: 13, height: 13, marginRight: 8 }}
-                src="/static/launch-24px.svg"
-                alt=""
-              />
-              Open Sphinx
-            </a>
-          </LinkWrap>
-        </InnerWrap>
-      )}
-    </ConfirmWrap>
-  );
+  // return (
+  //   <ConfirmWrap>
+  //     {!challenge && <EuiLoadingSpinner size="xl" style={{ marginTop: 60 }} />}
+  //     {challenge && (
+  //       <InnerWrap>
+  //         <P>Scan with your Sphinx Mobile App</P>
+  //         <QrWrap>
+  //           <QRCode
+  //             bgColor="#FFFFFF"
+  //             fgColor="#000000"
+  //             level="Q"
+  //             style={{ width: 209 }}
+  //             value={qrString}
+  //           />
+  //         </QrWrap>
+  //         <LinkWrap>
+  //           <a href={qrString} className="btn join-btn">
+  //             <img
+  //               style={{ width: 13, height: 13, marginRight: 8 }}
+  //               src="/static/launch-24px.svg"
+  //               alt=""
+  //             />
+  //             Open Sphinx
+  //           </a>
+  //         </LinkWrap>
+  //       </InnerWrap>
+  //     )}
+  //   </ConfirmWrap>
+  // );
 }
 
 const ConfirmWrap = styled.div`
