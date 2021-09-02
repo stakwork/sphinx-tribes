@@ -19,6 +19,8 @@ import {
     useLocation
 } from "react-router-dom";
 import Form from '../../form';
+import NoneSpace from '../utils/noneSpace';
+import { Divider } from '../../sphinxUI';
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -112,6 +114,31 @@ export default function BodyComponent() {
             height: 'calc(100% - 65px)'
 
         }}>
+
+            {!ui.meInfo &&
+                <div>
+                    <NoneSpace
+                        banner
+                        buttonText={'Get Started'}
+                        buttonIcon={'arrow_forward'}
+                        action={() => ui.setShowSignIn(true)}
+                        img={'explore.png'}
+                        text={'Discover people on Sphinx'}
+                        style={{ height: 320 }}
+                    />
+                    <Divider />
+                </div>
+            }
+
+            <div style={{
+                width: '100%', display: 'flex',
+                justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20,
+                height: 62
+            }}>
+                <Label>
+                    Explore
+                </Label>
+            </div>
             <>
                 <div style={{
                     width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
@@ -158,4 +185,19 @@ const Body = styled.div`
             width:100%;
             overflow:auto;
             display:flex;
+            flex-direction:column;
             `
+const Label = styled.div`
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 26px;
+            line-height: 40px;
+            /* or 154% */
+            
+            display: flex;
+            align-items: center;
+            
+            /* Text 2 */
+            
+            color: #3C3F41;`

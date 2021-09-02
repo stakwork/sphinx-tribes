@@ -83,7 +83,41 @@ export class MainStore {
       return null
     }
   }
+
+  @action async deleteProfile() {
+    try {
+      if (!uiStore.meInfo) return null
+      const info = uiStore.meInfo
+      const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+      const res: any = await fetch(URL + "/profile", {
+        method: "DELETE",
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...info
+        }),
+      });
+
+      uiStore.setMeInfo(null)
+      uiStore.setSelectingPerson(0)
+      uiStore.setSelectedPerson(0)
+
+      const j = await res.json()
+      return j
+    } catch (e) {
+      console.log('e', e)
+      // could not delete profile!
+      return null
+    }
+  }
 }
+
+
+
 
 export const mainStore = new MainStore()
 

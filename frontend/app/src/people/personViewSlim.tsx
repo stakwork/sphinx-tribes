@@ -28,6 +28,7 @@ import FocusedView from './mobile/focusView'
 import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../form/schema";
 import { useIsMobile } from "../hooks";
 import Person from "./person";
+import NoneSpace from "./utils/noneSpace";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -157,7 +158,7 @@ export default function PersonView(props: any) {
             action: {
                 text: 'Edit Profile',
                 icon: 'edit'
-            }
+            },
         },
         post: {
             label: 'Posts',
@@ -169,6 +170,19 @@ export default function PersonView(props: any) {
                 icon: 'add',
                 info: "What's on your mind?",
                 infoIcon: 'chat_bubble_outline'
+            },
+            noneSpace: {
+                me: {
+                    img: 'no_posts.png',
+                    text: 'What’s on your mind?',
+                    buttonText: 'Create a post',
+                    buttonIcon: 'add'
+                },
+                otherUser: {
+                    img: 'no_posts2.png',
+                    text: 'No Posts Yet',
+                    sub: 'Looks like this person hasn’t posted anything yet.'
+                }
             }
         },
         offer: {
@@ -185,6 +199,19 @@ export default function PersonView(props: any) {
             action: {
                 text: 'Sell Something',
                 icon: 'local_offer'
+            },
+            noneSpace: {
+                me: {
+                    img: 'no_offers.png',
+                    text: 'Use lightning network to sell your digital goods!',
+                    buttonText: 'Sell something',
+                    buttonIcon: 'local_offer'
+                },
+                otherUser: {
+                    img: 'no_offers2.png',
+                    text: 'No Offers Yet',
+                    sub: 'Looks like this person is not selling anything yet.'
+                }
             }
         },
         wanted: {
@@ -201,6 +228,19 @@ export default function PersonView(props: any) {
             action: {
                 text: 'Add to Wanted',
                 icon: 'favorite_outline'
+            },
+            noneSpace: {
+                me: {
+                    img: 'no_wanted.png',
+                    text: 'Make a list of items and services you need.',
+                    buttonText: 'Add to wanted',
+                    buttonIcon: 'favorite_outline'
+                },
+                otherUser: {
+                    img: 'no_wanted2.png',
+                    text: 'No Wanteds Yet',
+                    sub: 'Looks like this person doesn’t need anything yet.'
+                }
             }
         },
     }
@@ -209,7 +249,7 @@ export default function PersonView(props: any) {
         if (name) {
             switch (name) {
                 case 'about':
-                    return <AboutView {...person} />
+                    return <AboutView canEdit={canEdit} {...person} />
                 case 'post':
                     return wrapIt(<PostView {...fullSelectedWidget} />)
                 case 'twitter':
@@ -243,10 +283,7 @@ export default function PersonView(props: any) {
                 </Panel>
             }
 
-            if (!fullSelectedWidget) return <div />
-
             const elementArray: any = []
-
 
             const panelStyles = isMobile ? {
                 minHeight: 132
@@ -255,7 +292,7 @@ export default function PersonView(props: any) {
                 marginRight: 20, marginBottom: 20, minHeight: 472
             }
 
-            fullSelectedWidget && fullSelectedWidget.map((s, i) => {
+            fullSelectedWidget && fullSelectedWidget.forEach((s, i) => {
 
                 elementArray.push(<Panel key={i}
                     onClick={() => {
@@ -272,7 +309,15 @@ export default function PersonView(props: any) {
                 </Panel>)
             })
 
-            // </Panel>
+            // if empty
+            if (!elementArray.length) {
+                const noneKey = canEdit ? 'me' : 'otherUser'
+                return <NoneSpace
+                    action={() => setShowFocusView(true)}
+                    {...tabs[selectedWidget].noneSpace[noneKey]}
+                />
+            }
+
             return elementArray
         }
 
@@ -325,7 +370,9 @@ export default function PersonView(props: any) {
     }
 
     function renderEditButton(style: any) {
-        if (!canEdit || !selectedWidget) return <div />
+        if (!canEdit || !selectedWidget || !fullSelectedWidget) return <div />
+        // don't return button if there are no items in list, the button is returned elsewhere
+        if (fullSelectedWidget && fullSelectedWidget.length < 1) return <div />
 
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
@@ -434,7 +481,7 @@ export default function PersonView(props: any) {
 
             </Panel>
 
-            <Sleeve>
+            <Sleeve style={{ paddingTop: (fullSelectedWidget && fullSelectedWidget.length > 0) ? 0 : 20 }}>
                 {renderEditButton({})}
                 {renderWidgets('')}
             </Sleeve>
@@ -659,10 +706,10 @@ export default function PersonView(props: any) {
                     <Sleeve style={{
                         display: 'flex',
                         alignItems: 'flex-start',
-                        justifyContent: 'flex-start',
-                        flexWrap: 'wrap'
+                        justifyContent: (fullSelectedWidget && fullSelectedWidget.length > 0) ? 'flex-start' : 'center',
+                        flexWrap: 'wrap',
+                        height: '100%'
                     }}>
-
                         {renderWidgets('')}
                     </Sleeve>
                 </div>
@@ -869,7 +916,7 @@ const Name = styled.div`
                     font-style: normal;
                     font-weight: 500;
                     font-size: 30px;
-                    line-height: 19px;
+                    line-height: 28px;
                     /* or 73% */
 
                     text-align: center;
