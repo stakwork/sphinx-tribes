@@ -78,6 +78,8 @@ export default function FocusedView(props: any) {
             else {
                 // add timestamp if not there
                 if (!v.created) v.created = moment().unix()
+
+                if (!fullMeData.extras) fullMeData.extras = {}
                 // if editing widget
                 if (selectedIndex > -1) {
                     // mutate it
@@ -172,15 +174,18 @@ export default function FocusedView(props: any) {
 
             // if user has no id, update local id from response
             if (!body.id) {
+                // TEMPORARY sign out! bug patch here because the id returned by POST /profile for a brand new user is always 1
                 const j = await r.json()
-                if (j.response?.id)
-                    body.id = j.response?.id
+                console.log('json', j)
+                body.id = j.response.id
             }
 
-            await main.getPeople('')
-            // massage data
+            console.log('body', body)
 
             ui.setMeInfo(body)
+
+            await main.getPeople('')
+
             closeModal(true)
         } catch (e) {
             console.log('e', e)

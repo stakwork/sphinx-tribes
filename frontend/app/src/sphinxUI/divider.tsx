@@ -8,7 +8,6 @@ export default function Divider(props: any) {
 
 const D = styled.div`
 height:1px;
-background:#EBEDEF;
+background:#DDE1E5;//#EBEDEF;
 width:100%;
 `
-

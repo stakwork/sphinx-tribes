@@ -8,7 +8,7 @@ import { Redirect, useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button, Divider } from '../../sphinxUI';
 import FadeLeft from '../../animated/fadeLeft';
 import ConfirmMe from '../confirmMe';
-
+import AuthQR from './authQR'
 
 export default function SignIn(props: any) {
     const { main, ui } = useStores()
@@ -31,6 +31,8 @@ export default function SignIn(props: any) {
         el.click();
     }
 
+    const isMobile = useIsMobile()
+
     return useObserver(() => {
         return <div>
             {showSignIn ?
@@ -44,13 +46,16 @@ export default function SignIn(props: any) {
                 :
                 <>
                     <Column>
-                        <Imgg src={'/static/sphinx.png'} />
+                        {isMobile && <Imgg src={'/static/sphinx.png'} />}
 
                         <Name>Welcome</Name>
 
                         <Description>
                             Use Sphinx to login and create or edit your profile.
                         </Description>
+
+                        {!isMobile && <AuthQR
+                            style={{ marginBottom: 20 }} />}
 
                         <Button
                             text={'Login with Sphinx'}
@@ -59,6 +64,8 @@ export default function SignIn(props: any) {
                             color={'primary'}
                             onClick={() => setShowSignIn(true)}
                         />
+
+
                     </Column>
                     <Divider />
                     <Column style={{ paddingTop: 0 }}>
