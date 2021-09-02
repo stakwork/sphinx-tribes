@@ -55,6 +55,10 @@ export default function SignIn(props: any) {
                         </Description>
 
                         {!isMobile && <AuthQR
+                            onSuccess={() => {
+                                if (props.onSuccess) props.onSuccess()
+                                main.getPeople()
+                            }}
                             style={{ marginBottom: 20 }} />}
 
                         <Button
