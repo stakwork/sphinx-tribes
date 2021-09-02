@@ -29,6 +29,10 @@ export default function Button(props: any) {
             background: '#DDE1E5',
             color: '#3C3F41',
         },
+        danger: {
+            background: 'red',
+            color: '#ffffff',
+        },
         desktopWidget: {
             background: 'rgba(0,0,0,0)',
             color: '#3C3F41',
@@ -39,7 +43,11 @@ export default function Button(props: any) {
     }
 
     return <B
-        style={{ ...colors[props.color], padding: props.icon && '0 0 0 15px', height: props.height, width: props.width, ...props.style }}
+        style={{
+            ...colors[props.color], padding: props.icon && '0 0 0 15px',
+            height: props.height, width: props.width, paddingRight: props.leadingIcon && 10,
+            ...props.style
+        }}
         disabled={props.disabled}
         onClick={props.onClick}
     >

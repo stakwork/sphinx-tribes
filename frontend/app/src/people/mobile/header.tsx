@@ -44,7 +44,6 @@ export default function Header() {
         },
     ]
 
-    const [showSignIn, setShowSignIn] = useState(false)
     const [showWelcome, setShowWelcome] = useState(false)
 
     async function testChallenge(chal: string) {
@@ -52,7 +51,7 @@ export default function Header() {
             const me: any = await api.get(`poll/${chal}`)
             if (me && me.pubkey) {
                 ui.setMeInfo(me)
-                setShowSignIn(false)
+                ui.setShowSignIn(false)
                 setShowWelcome(true)
             }
         } catch (e) {
@@ -116,7 +115,7 @@ export default function Header() {
                                     icon={'account_circle'}
                                     text={'Sign in'}
                                     color='primary'
-                                    onClick={() => setShowSignIn(true)}
+                                    onClick={() => ui.setShowSignIn(true)}
                                 />
                             }
                         </Corner>
@@ -197,7 +196,7 @@ export default function Header() {
                             icon={'account_circle'}
                             text={'Sign in'}
                             color='primary'
-                            onClick={() => setShowSignIn(true)}
+                            onClick={() => ui.setShowSignIn(true)}
                         />
                     }
                 </Corner>
@@ -214,13 +213,13 @@ export default function Header() {
 
             {/* you wanna login modal  */}
             <Modal
-                visible={showSignIn}
-                close={() => setShowSignIn(false)}
-                overlayClick={() => setShowSignIn(false)}
+                visible={ui.showSignIn}
+                close={() => ui.setShowSignIn(false)}
+                overlayClick={() => ui.setShowSignIn(false)}
             >
                 <SignIn
                     onSuccess={() => {
-                        setShowSignIn(false)
+                        ui.setShowSignIn(false)
                         setShowWelcome(true)
                     }} />
             </Modal >
@@ -235,8 +234,8 @@ export default function Header() {
                             src={ui.meInfo?.img || '/static/sphinx.png'} />
 
                         <T>
-                            <div style={{ marginRight: 6 }}>Welcome</div>
-                            <Name>{ui.meInfo?.owner_alias}</Name>
+                            <div style={{ lineHeight: '26px' }}>Welcome <Name>{ui.meInfo?.owner_alias}</Name></div>
+
                         </T>
 
                         <Welcome>
@@ -258,22 +257,6 @@ export default function Header() {
                     </Column>
                 </div>
             </Modal>
-
-            {/* ONLY FOR FIRST TIME USER edit your info modal  */}
-            {/* < Modal visible={showInitEditSelf}
-                drift={40}
-                fill
-                close={() => setShowInitEditSelf(false)}
-            >
-                <div style={{
-                    background: '#fff',
-                    height: '100%',
-                    width: '100%',
-                    overflow: 'auto'
-                }}>
-                    
-                </div>
-            </Modal> */}
         </>
     })
 }
@@ -307,14 +290,12 @@ const Img = styled.div<ImageProps>`
                     `;
 
 
-const Name = styled.div`
+const Name = styled.span`
                     font-style: normal;
                     font-weight: 500;
                     font-size: 26px;
                     line-height: 19px;
                     /* or 73% */
-
-                    text-align: center;
 
                     /* Text 2 */
 

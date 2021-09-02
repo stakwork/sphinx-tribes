@@ -57,6 +57,11 @@ class UiStore {
     this.meInfo = t
   }
 
+  @observable showSignIn: boolean = false
+  @action setShowSignIn(b: boolean) {
+    this.showSignIn = b
+  }
+
 }
 
 export type MeData = MeInfo | null
