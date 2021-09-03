@@ -3,18 +3,21 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import styled from "styled-components";
 import Input from "./inputs";
-
-import FadeLeft from '../animated/fadeLeft';
-import { Button, IconButton } from "../sphinxUI";
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+import { Button, IconButton, Modal } from "../sphinxUI";
+import { useStores } from "../store";
 
 export default function Form(props: any) {
   const { buttonsOnBottom } = props
   const [page, setPage] = useState(1)
   const [formMounted, setFormMounted] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showDeleteWarn, setShowDeleteWarn] = useState(false)
   const [disableFormButtons, setDisableFormButtons] = useState(false)
   const refBody: any = useRef(null)
+  const { main, ui } = useStores()
+
+
+  console.log('form props', props)
 
   let lastPage = 1
 
@@ -39,12 +42,15 @@ export default function Form(props: any) {
 
   const schema = props.paged ? props.schema.filter(f => f.page === page) : props.schema
 
-  let buttonText = props.buttonText || "Save Changes"
-  if (lastPage !== page) buttonText = 'Next'
+  // let buttonText = props.buttonText || "Save Changes"
+  // if (lastPage !== page) buttonText = 'Next'
   let buttonAlignment = buttonsOnBottom ? { bottom: 0, height: 108, justifyContent: 'center' } : { top: 0 }
   let formPad = buttonsOnBottom ? { paddingTop: 30 } : {}
 
   let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {}
+
+  const isAboutMeForm = props.schema.find(f => f.name === 'owner_alias') ? true : false
+
   return (
     <Formik
       initialValues={props.initialValues || {}}
@@ -109,6 +115,7 @@ export default function Form(props: any) {
                     //   setPage(page + 1)
                     // }
                   }}
+                  loading={props.loading}
                   style={buttonStyle}
                   color={'primary'}
                   text={props.submitText || 'Save'}
@@ -118,6 +125,52 @@ export default function Form(props: any) {
 
 
             </BWrap>
+
+            {/*  if schema is AboutMe */}
+            {isAboutMeForm && (ui.meInfo?.id != 0) && <>
+              <div style={{ cursor: 'pointer', marginTop: 20, fontSize: 12, marginBottom: 20 }}
+                onClick={() => setShowSettings(!showSettings)}>Advanced Settings {showSettings ? '-' : '+'}</div>
+
+              {showSettings &&
+                <Button
+                  text={'Delete my account'}
+                  color={'link2'}
+                  width='fit-content'
+                  onClick={() => setShowDeleteWarn(true)}
+                />
+              }
+
+              <Modal
+                visible={showDeleteWarn}>
+                <div style={{ padding: 40, textAlign: 'center' }}>
+                  <div style={{ fontSize: 30, marginBottom: 10 }}>Danger zone</div>
+                  <p>Are you sure? Doing so will delete your profile and <b>all of your posts.</b></p>
+
+                  <div style={{
+                    width: '100%', display: 'flex', flexDirection: 'column',
+                    justifyContent: 'center', alignItems: 'center', marginTop: 20
+                  }}>
+                    <Button
+                      text={'Nevermind'}
+                      color={'white'}
+                      onClick={() => {
+                        setShowSettings(false)
+                        setShowDeleteWarn(false)
+                      }}
+                    />
+                    <div style={{ height: 20 }} />
+                    <Button
+                      text={'Delete everything'}
+                      color={'danger'}
+                      onClick={() => main.deleteProfile()}
+                    />
+                  </div>
+                </div>
+
+              </Modal>
+
+            </>
+            }
 
           </Wrap >
 

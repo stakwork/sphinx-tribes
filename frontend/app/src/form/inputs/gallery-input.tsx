@@ -10,15 +10,18 @@ import MaterialIcon from "@material/react-material-icon";
 import { FieldEnv, FieldTextArea } from './index'
 import { Button, Modal } from "../../sphinxUI";
 import { MAX_UPLOAD_SIZE } from "../../people/utils/constants";
+import { useEffect } from "hoist-non-react-statics/node_modules/@types/react";
 
 export default function GalleryInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
     const { ui } = useStores();
     const [uploading, setUploading] = useState(false);
     const [showError, setShowError] = useState('');
-    // return <EuiFilePicker value={props.initialValues.img} >
-    //   </EuiFilePicker>
+    // const [initPicArray, setInitPicArray] = useState(value || []);
+    // const [newPicsArray, setNewPicsArray]: any = useState([]);
 
-    const picsrcArray = value || []
+    let picsrcArray = value || []
+
+    console.log('value', value)
 
     async function uploadBase64Pic(img_base64: string, img_type: string) {
         console.log('uploadBase64Pic', img_type)
@@ -39,6 +42,7 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
             const j = await r.json()
 
             if (j.success && j.response && j.response.img) {
+                // addNewImg(img_base64)
                 addImg(j.response.img)
             }
         } catch (e) {
@@ -82,11 +86,21 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
         handleChange(picsClone)
     }
 
+    // async function addNewImg(base64Img) {
+    //     setNewPicsArray([...newPicsArray, base64Img])
+    // }
+
     async function deleteImg(index) {
         let picsClone = [...picsrcArray]
         picsClone.splice(index, 1)
         handleChange(picsClone)
     }
+
+    // async function deleteNewImg(index) {
+    //     let newPicsClone = [...newPicsArray]
+    //     newPicsClone.splice(index, 1)
+    //     setNewPicsArray(newPicsClone)
+    // }
 
     return (
         <>
@@ -106,6 +120,22 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
                         </Sq>
                     </ImageWrap>
                 })}
+
+                {/* {newPicsArray && newPicsArray.map((v, i) => {
+                    return <ImageWrap key={i}>
+                        <Close onClick={() => deleteNewImg(i)}>
+                            <MaterialIcon icon={'close'} style={{ color: '#000', fontSize: 12 }} />
+                        </Close>
+                        <Sq>
+                            <ImageCircle>
+                                <Image style={{
+                                    backgroundImage: `url(${v})`
+                                }}
+                                />
+                            </ImageCircle>
+                        </Sq>
+                    </ImageWrap>
+                })} */}
             </Wrapper>
 
             <div style={{ marginTop: 5 }}>

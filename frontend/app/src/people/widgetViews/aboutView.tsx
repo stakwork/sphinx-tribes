@@ -1,27 +1,13 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from "styled-components";
-import { Button, Divider } from '../../sphinxUI';
-import MaterialIcon from '@material/react-material-icon';
-import { useStores } from '../../store';
+import { Divider } from '../../sphinxUI';
+import QrBar from '../utils/QrBar'
 
 export default function AboutView(props: any) {
-    const { price_to_meet, description, extras, twitter_confirmed, owner_contact_key, canEdit } = props
+    const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
     const { twitter } = extras || {}
     let tag = ''
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
-
-    const { main } = useStores()
-
-    const [showSettings, setShowSettings] = useState(false)
-
-    function copyToClipboard(str) {
-        const el = document.createElement('textarea');
-        el.value = str;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-    };
 
     return <Wrap>
         <Row>
@@ -31,34 +17,7 @@ export default function AboutView(props: any) {
 
         <Divider />
 
-        <Row>
-            <QRWrap style={{
-                display: 'flex', alignItems: 'center', width: '70%',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-            }}>
-                <MaterialIcon
-                    icon={'qr_code_2'}
-                    style={{ fontSize: 20, color: '#B0B7BC', marginRight: 10 }} />
-                <div style={{
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis'
-                }}>
-                    {owner_contact_key}
-                </div>
-            </QRWrap>
-
-            <Button
-                text='Copy'
-                color='widget'
-                width={72}
-                height={32}
-                style={{ minWidth: 72 }}
-                onClick={() => copyToClipboard(owner_contact_key)}
-            />
-        </Row>
+        <QrBar value={owner_pubkey} />
 
         <Divider />
 
@@ -82,15 +41,7 @@ export default function AboutView(props: any) {
 
         {/* show twitter etc. here */}
 
-        {canEdit && <div style={{ cursor: 'pointer', marginTop: 60, fontSize: 12, marginBottom: 20 }} onClick={() => setShowSettings(!showSettings)}>Show Settings</div>}
 
-        {showSettings &&
-            <Button
-                text={'Delete my account'}
-                color={'danger'}
-                onClick={() => main.deleteProfile()}
-            />
-        }
     </Wrap>
 
 }

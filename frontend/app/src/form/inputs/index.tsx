@@ -91,6 +91,13 @@ box-shadow:none !important;
     color:#000;
     display:none !important;
 }
+
+.euiFormControlLayout--group {
+    background-color: #ffffff00 !important;
+    transition: none !important;
+    display: none !important;
+    
+}
 `
 export const FieldTextArea = styled(EuiTextArea)`
 background-color:#fff !important;
