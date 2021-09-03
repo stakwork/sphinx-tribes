@@ -31,7 +31,7 @@ export default function GalleryViewer(props) {
         <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', ...style }}>
 
             {showAll ?
-                <div>
+                <div style={{ textAlign: 'center' }}>
                     {g.map((ga, i) => {
                         return <BigImg big={big} src={ga} key={i} />
                     })}

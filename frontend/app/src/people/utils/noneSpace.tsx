@@ -11,7 +11,7 @@ export default function NoneSpace(props) {
             height: '100%', background: '#f0f1f3',
             padding: 40, width: '100%', ...props.style
         }}>
-            <Icon src={`static/${props.img}`} style={{ width: 180, height: 180 }} />
+            <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} />
 
             <div style={{ marginLeft: 20, padding: 20 }}>
                 <H style={{ paddingLeft: 0 }}>{props.text}</H>
@@ -37,7 +37,7 @@ export default function NoneSpace(props) {
         justifyContent: 'center', alignItems: 'center',
         height: '100%', background: '#f0f1f3',
     }}>
-        <Icon src={`static/${props.img}`} />
+        <Icon src={`/static/${props.img}`} />
 
         <>
             <H>{props.text}</H>

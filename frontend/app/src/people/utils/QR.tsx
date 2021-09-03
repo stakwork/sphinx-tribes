@@ -12,6 +12,8 @@ export default function QR(props) {
         // ecLevel={'Q'}
         level={'Q'}
         // size={203}
+        width={props.size}
+        height={props.size}
         // logoImage={'static/sphinx.png'}
         // logoWidth={40}
         // logoHeight={40}

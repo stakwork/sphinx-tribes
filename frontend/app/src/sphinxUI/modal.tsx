@@ -41,9 +41,6 @@ export default function Modal(props: any) {
                 />
             </BigX>}
 
-
-
-
             {prevArrow && <L>
                 <Circ>
                     <IconButton
@@ -107,7 +104,7 @@ cursor:pointer;
 const X = styled.div`
 position:absolute;
 top:5px;
-right:0px;
+right:12px;
 cursor:pointer;
 `
 
