@@ -23,7 +23,9 @@ export default function IconButton(props: any) {
     }
 
     return <B
-        style={{ ...colors[props.color] }}
+        background={props.style && props.style.background}
+        width={props.style && props.style.width}
+        style={{ ...colors[props.color], ...props.style }}
         disabled={props.disabled}
         onClick={props.onClick}
     >
@@ -36,13 +38,17 @@ export default function IconButton(props: any) {
     </B>
 }
 
-const B = styled(EuiButton)`
-background:#ffffff00 !important;
+interface BProps {
+    background: string;
+    width: string;
+}
+const B = styled(EuiButton) <BProps>`
+background:${p => p.background ? p.background : '#ffffff00'} !important;
 position:relative;
 width:fit-content !important;
-min-width:fit-content;
-max-width:fit-content;
-width:30px;
+min-width:${p => p.width ? p.width : 'fit-content'};
+max-width:${p => p.width ? p.width : 'fit-content'};
+width:${p => p.width ? p.width : '30px'};
 font-weight:bold;
 border:none;
 display: flex;
@@ -50,5 +56,15 @@ align-items: center;
 justify-content:center;
 box-shadow:none !important;
 text-transform:none !important;
+
+.euiButton__content {
+    height: 100%;
+    width: 100%;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
 `
 

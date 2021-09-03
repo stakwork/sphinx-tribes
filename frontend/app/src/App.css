@@ -57,10 +57,10 @@ button:focus{
 .euiPopover {
   margin-top: -5px;
 }
-.euiLoadingSpinner {
+/* .euiLoadingSpinner {
   position: absolute;
   top: 50%;
-}
+} */
 
 #header {
   padding-top: 12px;
@@ -725,4 +725,25 @@ margin-bottom:10px;
   flex-basis: 100%;
   width: 0;
   order: 2;
+}
+
+.euiFormRow__fieldWrapper .euiFormControlLayout--group {
+  background-color: #ffffff00;
+  
+  box-shadow: none;
+  transition: none;
+  display: flex;
+  
+  padding: 1px;
+  
+}
+
+.euiFormRow__fieldWrapper .euiFormControlLayout--group label{
+    color:#000000;
+    padding-right:0px;
+    background-color: #ffffff00 !important;
+}
+
+.euiFormRow__fieldWrapper .euiFormControlLayout--group .euiFormLabel .euiFormControlLayout__prepend {
+  background-color: #ffffff00 !important;
 }

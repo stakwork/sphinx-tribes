@@ -29,6 +29,7 @@ import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "..
 import { useIsMobile } from "../hooks";
 import Person from "./person";
 import NoneSpace from "./utils/noneSpace";
+import ConnectCard from "./utils/connectCard";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -409,6 +410,7 @@ export default function PersonView(props: any) {
                     top: 20, left: 0,
                     display: 'flex',
                     justifyContent: 'space-between', width: '100%',
+                    padding: '0 20px'
                 }}>
                     <IconButton
                         onClick={goBack}
@@ -429,6 +431,8 @@ export default function PersonView(props: any) {
                     <RowWrap>
                         <Name>{owner_alias}</Name>
                     </RowWrap>
+
+
 
                     {/* only see buttons on other people's profile */}
                     {canEdit ? <div style={{ height: 40 }} /> :
@@ -509,8 +513,6 @@ export default function PersonView(props: any) {
 
 
     function renderDesktopView() {
-
-
         const focusedDesktopModalStyles = newSelectedWidget ? {
             ...tabs[newSelectedWidget].modalStyle
         } : {}
@@ -544,54 +546,63 @@ export default function PersonView(props: any) {
             }
 
             <div style={{
-                paddingBottom: 0, paddingTop: 80, width: 322,
+                width: 322,
                 minWidth: 322, overflowY: 'auto',
                 position: 'relative',
                 background: '#ffffff',
                 color: '#000000',
-                padding: 20,
+                padding: 30,
                 height: '100%',
                 borderLeft: '1px solid #F2F3F5',
                 borderRight: '1px solid #F2F3F5',
                 boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
             }}>
-                <div style={{
+
+                {canEdit && <div style={{
                     position: 'absolute',
                     top: 0, left: 0,
                     display: 'flex',
                     justifyContent: 'space-between', width: '100%',
                     alignItems: 'center',
                     boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.07)',
+                    paddingRight: 10,
                     height: 64
                 }}>
-                    {canEdit ? <Button
+                    <Button
                         color='clear'
                         leadingIcon='arrow_back'
                         text='Back'
                         onClick={goBack}
-                    /> : <div />}
-
-                    {canEdit ? <IconButton
-                        onClick={logout}
-                        iconStyle={{ transform: 'rotate(270deg)' }}
-                        icon='logout'
-                    /> : <IconButton
-                        onClick={() => setShowQR(true)}
-                        icon='qr_code_2'
-                    />}
-
+                    />
+                    <div />
                 </div>
+                }
 
                 {/* profile photo */}
                 <Head>
-                    <div style={{ height: 80 }} />
-                    <Img src={img || '/static/sphinx.png'} />
+                    <div style={{ height: canEdit ? 80 : 65 }} />
+
+                    <Img src={img || '/static/sphinx.png'} >
+                        <IconButton
+                            iconStyle={{ color: '#5F6368' }}
+                            style={{
+                                zIndex: 2, width: '40px',
+                                height: '40px', padding: 0,
+                                background: '#ffffff', border: '1px solid #D0D5D8',
+                                boxSizing: 'borderBox', borderRadius: 4
+                            }}
+                            icon={'qr_code_2'}
+                            onClick={() => setShowQR(true)}
+                        />
+                    </Img>
+
+
                     <RowWrap>
                         <Name>{owner_alias}</Name>
                     </RowWrap>
 
                     {/* only see buttons on other people's profile */}
-                    {canEdit ? <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                    {canEdit ? <RowWrap style={{ marginBottom: 30, marginTop: 25, justifyContent: 'space-between' }}>
                         <Button
                             text='Edit Profile'
                             onClick={() => {
@@ -600,10 +611,24 @@ export default function PersonView(props: any) {
                             }}
                             color='widget'
                             height={42}
-                            width={120}
-                        /> </RowWrap>
+                            style={{ fontSize: 13 }}
+
+                            leadingIcon={'edit'}
+                            iconSize={15}
+                        />
+                        <Button
+                            text='Sign out'
+                            onClick={logout}
+                            height={42}
+                            style={{ fontSize: 13 }}
+                            iconSize={15}
+                            color='white'
+                            leadingIcon='logout'
+                        />
+
+                    </RowWrap>
                         :
-                        <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+                        <RowWrap style={{ marginBottom: 30, marginTop: 25, justifyContent: 'space-between' }}>
 
                             <Button
                                 text='Connect'
@@ -613,7 +638,6 @@ export default function PersonView(props: any) {
                                 width={120}
                             />
 
-                            <div style={{ width: 15 }} />
                             <Button
                                 text='Support'
                                 color='link'
@@ -717,6 +741,11 @@ export default function PersonView(props: any) {
 
 
             </div>
+
+            <ConnectCard
+                dismiss={() => setShowQR(false)}
+                modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+                person={person} visible={showQR} />
         </div >
     }
 
@@ -724,33 +753,6 @@ export default function PersonView(props: any) {
     return (
         <Content>
             {isMobile ? renderMobileView() : renderDesktopView()}
-
-            {
-                showQR &&
-                <EuiOverlayMask onClick={() => setShowQR(false)}>
-                    <EuiModal onClose={() => setShowQR(false)}
-                        initialFocus="[name=popswitch]">
-                        <EuiModalHeader>
-                            <EuiModalHeaderTitle>{`Connect with ${owner_alias}`}</EuiModalHeaderTitle>
-                        </EuiModalHeader>
-                        <EuiModalBody style={{ padding: 0, textAlign: 'center' }}>
-                            <QRWrapWrap>
-                                <QRWrap className="qr-wrap float-r">
-                                    <QRCode
-                                        bgColor={"#FFFFFF"}
-                                        fgColor="#000000"
-                                        level="Q"
-                                        style={{ width: qrWidth }}
-                                        value={qrString}
-                                    />
-                                </QRWrap>
-                            </QRWrapWrap>
-                            <div style={{ marginTop: 10, color: '#fff' }}>Scan with your Sphinx Mobile App</div>
-                        </EuiModalBody>
-                    </EuiModal>
-                </EuiOverlayMask >
-            }
-
         </Content >
 
     );
@@ -998,6 +1000,9 @@ const Img = styled.div<ImageProps>`
                         height:150px;
                         border-radius: 50%;
                         position: relative;
+                        display:flex;
+                        align-items:flex-end;
+                        justify-content:flex-end;
                         `;
 const Tokens = styled.div`
                         display: flex;
