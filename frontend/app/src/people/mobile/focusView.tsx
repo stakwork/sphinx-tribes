@@ -2,9 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { useStores } from "../../store";
 import { useObserver } from "mobx-react-lite";
 import Form from "../../form";
-import ConfirmMe from "../confirmMe";
-import type { MeInfo } from '../../store/ui'
-import api from '../../api'
 import styled, { css } from "styled-components";
 import { getHostIncludingDockerHosts } from "../../host";
 import { Button, IconButton } from "../../sphinxUI";
@@ -31,30 +28,6 @@ export default function FocusedView(props: any) {
         ui.setEditMe(false);
         if (props.goBack) props.goBack()
     }
-
-    // in case you arent logged in
-    async function testChallenge(chal: string) {
-        try {
-            const me: MeInfo = await api.get(`poll/${chal}`);
-            if (me && me.pubkey) {
-                ui.setMeInfo(me);
-                ui.setEditMe(true);
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    useEffect(() => {
-        try {
-            var urlObject = new URL(window.location.href);
-            var params = urlObject.searchParams;
-            const chal = params.get("challenge");
-            if (chal) {
-                testChallenge(chal);
-            }
-        } catch (e) { }
-    }, []);
 
     function mergeFormWithMeData(v) {
         let fullMeData: any = null
@@ -232,11 +205,9 @@ export default function FocusedView(props: any) {
             <div style={{
                 ...props.style, width: '100%', height: '100%'
             }}>
-                {/* {renderWarnBeforeClose()} */}
 
                 {editMode ?
                     <B ref={scrollDiv} hide={false}>
-                        {!ui.meInfo && <ConfirmMe />}
                         {formHeader && formHeader}
                         {ui.meInfo && (
                             <Form

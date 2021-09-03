@@ -5,6 +5,7 @@ import { getHost } from "../host";
 import { useObserver } from 'mobx-react-lite'
 import { colors } from "../colors";
 import { Button, Divider, Modal } from '../sphinxUI/index'
+import ConnectCard from "./utils/connectCard";
 const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
@@ -120,39 +121,15 @@ export default function Person(props: any) {
       <>
         {renderPersonCard()}
 
-        <Modal
-          visible={showQR}
-          close={() => setShowQR(false)}
-        >
-          <InnerWrap>
-            <QRCode
-              bgColor={"#FFFFFF"}
-              fgColor="#000000"
-              // level="Q"
-              style={{ width: 200, height: 200 }}
-              value={qrString}
-            />
-            <div style={{ marginTop: 10 }}>Scan with your Sphinx Mobile App</div>
-          </InnerWrap>
-        </Modal>
+        <ConnectCard
+          dismiss={() => setShowQR(false)}
+          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+          person={props} visible={showQR} />
       </>
     );
   })
 }
-const InnerWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  padding:50px 0 30px;
-`;
-interface ContentProps {
-  selected: boolean;
-}
-const Content = styled.div`
-        // display:flex;
-        `;
+
 const Wrap = styled.div`
         cursor:pointer;
         padding: 25px;

@@ -45,7 +45,6 @@ export class MainStore {
 
         if (!uiStore.meInfo.img && ps[index].img) {
           // if meInfo has no img but people list does, copy that image to meInfo
-          console.log('set me info')
           uiStore.setMeInfo({ ...uiStore.meInfo, img: ps[index].img })
         }
       }

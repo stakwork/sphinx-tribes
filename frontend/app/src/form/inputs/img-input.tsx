@@ -14,9 +14,7 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
-  const [picsrc, setPicsrc] = useState(value || '');
-  // return <EuiFilePicker value={props.initialValues.img} >
-  //   </EuiFilePicker>
+  const [picsrc, setPicsrc] = useState('');
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
     console.log('uploadBase64Pic', img_type)
@@ -37,7 +35,7 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
       const j = await r.json()
 
       if (j.success && j.response && j.response.img) {
-        setPicsrc(j.response.img)
+        setPicsrc(img_base64)
         handleChange(j.response.img)
       }
     } catch (e) {
@@ -82,12 +80,14 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
             <DottedCircle {...getRootProps()} isDragActive={isDragActive}>
               <input {...getInputProps()} />
               <ImageCircle>
-                <Image style={{
-                  backgroundImage: `url(${picsrc ? picsrc + "?thumb=true" : (uploading ? '' : avatarIcon)
-                    })`
-                }}
-                />
-                {uploading && <EuiLoadingSpinner size="xl" style={{ marginTop: -14 }} />}
+                {!uploading ?
+                  <Image style={{
+                    backgroundImage: `url(${picsrc ? picsrc : value ? value + "?thumb=true" : (uploading ? '' : avatarIcon)
+                      })`
+                  }}
+                  /> :
+                  <EuiLoadingSpinner size="xl" />
+                }
               </ImageCircle>
             </DottedCircle>
             {/* <div style={{ color: "#6B7A8D", marginTop: 5 }}>Drag and drop or</div>
