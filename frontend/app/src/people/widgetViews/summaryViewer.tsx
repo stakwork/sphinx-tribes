@@ -14,7 +14,7 @@ export default function SummaryViewer(props: any) {
     const { ui, main } = useStores();
 
     function wrapIt(child) {
-        return <Wrap>
+        return <Wrap style={{ maxHeight: config.name === 'post' ? '' : '80vh' }}>
             {child}
         </Wrap>
     }
@@ -39,4 +39,5 @@ flex-direction:column;
 width:100%;
 min-width:100%;
 padding:20px;
+
 `;

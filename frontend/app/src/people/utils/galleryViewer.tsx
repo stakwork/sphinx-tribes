@@ -28,7 +28,7 @@ export default function GalleryViewer(props) {
     }
 
     return <>
-        <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', ...style }}>
+        <Gallery style={{ width: (big || wrap) ? '100%' : 'fit-content', ...style }} ref={props.innerRef}>
 
             {showAll ?
                 <div style={{ textAlign: 'center' }}>

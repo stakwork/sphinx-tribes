@@ -31,11 +31,11 @@ export default function WantedView(props: Wanted) {
             wrap={false}
             selectable={true}
             gallery={gallery}
-            style={{ maxHeight: 291, overflow: 'hidden' }} />
+            style={{ maxHeight: 276, overflow: 'hidden' }} />
 
         <Pad style={{ padding: 20 }}>
             <DT>{title || 'No title'}</DT>
-            <DD>{description || 'No description'}</DD>
+            <DD style={{ height: gallery ? 50 : '' }}>{description || 'No description'}</DD>
         </Pad>
         <Divider style={{ margin: 0 }} />
         <Pad style={{ padding: 20, }}>
@@ -112,8 +112,7 @@ font-weight: normal;
 font-size: 12px;
 line-height: 25px;
 margin-bottom:10px;
-
-
+overflow:hidden;
 /* Main bottom icons */
 
 color: #8E969C;
