@@ -31,11 +31,11 @@ export default function OfferView(props: Offer) {
             wrap={false}
             selectable={true}
             gallery={gallery}
-            style={{ maxHeight: 291, overflow: 'hidden' }} />
+            style={{ maxHeight: 276, overflow: 'hidden' }} />
         <div>
-            <Pad style={{ padding: 20 }}>
+            <Pad style={{ padding: 20, height: gallery ? '' : 411 }}>
                 <DT>{title || 'No title'}</DT>
-                <DD>{description || 'No description'}</DD>
+                <DD style={{ height: gallery ? 50 : '' }}>{description || 'No description'}</DD>
             </Pad>
             <Divider style={{ margin: 0 }} />
 
@@ -43,7 +43,7 @@ export default function OfferView(props: Offer) {
                 <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>sat</B></P>
             </Pad>
         </div>
-    </DWrap>
+    </DWrap >
 
 }
 const Wrap = styled.div`
@@ -70,7 +70,7 @@ font-weight: normal;
 font-size: 12px;
 line-height: 25px;
 margin-bottom:10px;
-
+overflow:hidden;
 
 /* Main bottom icons */
 

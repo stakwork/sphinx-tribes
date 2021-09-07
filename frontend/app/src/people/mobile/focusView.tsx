@@ -35,6 +35,9 @@ export default function FocusedView(props: any) {
         if (ui.meInfo) {
             fullMeData = { ...ui.meInfo }
 
+            // add extras if doesnt exist, for brand new users
+            if (!fullMeData.extras) fullMeData.extras = {}
+
             // if about
             if (config.name === 'about') {
                 config.schema.forEach((s => {

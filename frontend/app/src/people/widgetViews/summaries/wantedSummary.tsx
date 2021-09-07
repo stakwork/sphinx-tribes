@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
 import { Wanted } from '../../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../../helpers';
@@ -8,6 +8,16 @@ import GalleryViewer from '../../utils/galleryViewer';
 
 export default function WantedSummary(props: Wanted) {
         const { title, description, priceMin, priceMax, url, gallery } = props
+        const [envHeight, setEnvHeight] = useState('100%')
+        const imgRef: any = useRef(null)
+
+        useLayoutEffect(() => {
+                if (imgRef && imgRef.current) {
+                        if (imgRef.current?.offsetHeight > 100) {
+                                setEnvHeight(imgRef.current?.offsetHeight)
+                        }
+                }
+        }, [imgRef])
 
         const isMobile = useIsMobile()
         if (isMobile) {
@@ -33,9 +43,10 @@ export default function WantedSummary(props: Wanted) {
 
         return <Wrap>
                 <GalleryViewer
-                        style={{ width: 507 }}
+                        innerRef={imgRef}
+                        style={{ width: 507, height: 'fit-content' }}
                         gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
-                <div style={{ width: 316, height: '100%', padding: 20, paddingTop: 30 }}>
+                <div style={{ width: 316, padding: 20, paddingTop: 30, overflowY: 'auto', height: envHeight }}>
                         <Pad>
                                 <Title>{title}</Title>
                                 <Divider style={{ marginTop: 10 }} />
