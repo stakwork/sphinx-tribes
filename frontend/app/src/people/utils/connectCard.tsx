@@ -25,7 +25,7 @@ export default function ConnectCard(props) {
                 <N>{person?.owner_alias}</N>
                 <D><B>{person?.price_to_meet} sats</B> is required to connect.</D>
 
-                <QR value={qrString} />
+                <QR value={qrString} size={210} />
 
                 <QrBar value={person?.owner_pubkey}
                     simple style={{ marginTop: 11 }} />

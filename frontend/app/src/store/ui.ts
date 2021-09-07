@@ -53,6 +53,7 @@ class UiStore {
     if (t) {
       if (t.photo_url) t.img = t.photo_url
       if (!t.owner_alias) t.owner_alias = t.alias
+      if (!t.owner_pubkey) t.owner_pubkey = t.pubkey
     }
     this.meInfo = t
   }
@@ -69,6 +70,7 @@ export type MeData = MeInfo | null
 export interface MeInfo {
   id?: number
   pubkey: string
+  owner_pubkey?: string
   photo_url: string
   alias: string
   img?: string

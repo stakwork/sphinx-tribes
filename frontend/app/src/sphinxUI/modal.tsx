@@ -104,7 +104,7 @@ cursor:pointer;
 const X = styled.div`
 position:absolute;
 top:5px;
-right:12px;
+right:8px;
 cursor:pointer;
 `
 

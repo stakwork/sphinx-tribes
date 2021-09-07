@@ -1,17 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
-import { QRCode } from "react-qr-svg";
 import styled from "styled-components";
 import { getHost } from "../host";
-import qrCode from "../utils/invoice-qr-code.svg";
-import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../store'
-import {
-    EuiModal,
-    EuiModalBody,
-    EuiModalHeader,
-    EuiModalHeaderTitle,
-    EuiOverlayMask,
-} from "@elastic/eui";
+
 
 import AboutView from "./widgetViews/aboutView";
 import BlogView from "./widgetViews/blogView";
@@ -21,7 +12,6 @@ import SupportMeView from "./widgetViews/supportMeView";
 import WantedView from "./widgetViews/wantedView";
 import PostView from "./widgetViews/postView";
 
-import FadeLeft from "../animated/fadeLeft";
 import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
 import FocusedView from './mobile/focusView'
@@ -48,7 +38,13 @@ export default function PersonView(props: any) {
     const { main, ui } = useStores()
     const { meInfo } = ui || {}
 
-    const person = (main.people && main.people.length && main.people.find(f => f.id === personId))
+    let person: any = (main.people && main.people.length && main.people.find(f => f.id === personId))
+
+    // if i select myself, fill person with meInfo
+    if (personId === ui.meInfo?.id) {
+        person = ui.meInfo
+    }
+
     const people = (main.people && main.people.filter(f => !f.hide)) || []
     const {
         id,
@@ -371,9 +367,12 @@ export default function PersonView(props: any) {
     }
 
     function renderEditButton(style: any) {
-        if (!canEdit || !selectedWidget || !fullSelectedWidget) return <div />
+        if (!canEdit || !selectedWidget) return <div />
         // don't return button if there are no items in list, the button is returned elsewhere
-        if (fullSelectedWidget && fullSelectedWidget.length < 1) return <div />
+
+        if (selectedWidget !== 'about') {
+            if (!fullSelectedWidget || (fullSelectedWidget && fullSelectedWidget.length < 1)) return <div />
+        }
 
         let { action } = tabs[selectedWidget] || {}
         action = action || {}
@@ -437,25 +436,16 @@ export default function PersonView(props: any) {
                     {/* only see buttons on other people's profile */}
                     {canEdit ? <div style={{ height: 40 }} /> :
                         <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                            {isMobile ?
-                                <a href={qrString}>
-                                    <Button
-                                        text='Connect'
-                                        onClick={add}
-                                        color='primary'
-                                        height={42}
-                                        width={120}
-                                    />
-                                </a>
-                                :
+                            <a href={qrString}>
                                 <Button
                                     text='Connect'
-                                    onClick={() => setShowQR(true)}
+                                    onClick={add}
                                     color='primary'
                                     height={42}
                                     width={120}
                                 />
-                            }
+                            </a>
+
                             <div style={{ width: 15 }} />
                             <Button
                                 text='Support'
@@ -471,6 +461,7 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
+                        let count = extras[name] && extras[name].length
 
                         return <Tab key={i}
                             selected={selected}
@@ -478,6 +469,9 @@ export default function PersonView(props: any) {
                                 switchWidgets(name)
                             }}>
                             {label}
+                            <Counter>
+                                {count}
+                            </Counter>
                         </Tab>
                     })}
 
@@ -485,10 +479,12 @@ export default function PersonView(props: any) {
 
             </Panel>
 
-            <Sleeve style={{ paddingTop: (fullSelectedWidget && fullSelectedWidget.length > 0) ? 0 : 20 }}>
+            <Sleeve>
                 {renderEditButton({})}
                 {renderWidgets('')}
+                <div style={{ height: 60 }} />
             </Sleeve>
+
 
             <Modal
                 fill
@@ -580,7 +576,7 @@ export default function PersonView(props: any) {
 
                 {/* profile photo */}
                 <Head>
-                    <div style={{ height: canEdit ? 80 : 65 }} />
+                    <div style={{ height: canEdit ? 80 : 35 }} />
 
                     <Img src={img || '/static/sphinx.png'} >
                         <IconButton
@@ -664,7 +660,7 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-
+                        let count = extras[name] && extras[name].length
                         return <Tab key={i}
                             style={{ height: 64, alignItems: 'center' }}
                             selected={selected}
@@ -672,6 +668,9 @@ export default function PersonView(props: any) {
                                 switchWidgets(name)
                             }}>
                             {label}
+                            <Counter>
+                                {count}
+                            </Counter>
                         </Tab>
                     })}
 
@@ -731,11 +730,11 @@ export default function PersonView(props: any) {
                         display: 'flex',
                         alignItems: 'flex-start',
                         justifyContent: (fullSelectedWidget && fullSelectedWidget.length > 0) ? 'flex-start' : 'center',
-                        flexWrap: 'wrap',
-                        height: '100%'
+                        flexWrap: 'wrap'
                     }}>
                         {renderWidgets('')}
                     </Sleeve>
+                    <div style={{ height: 60 }} />
                 </div>
 
 
@@ -795,13 +794,23 @@ const Content = styled.div`
             color:#000000;
             background:#f0f1f3;
             `;
-const QRWrapWrap = styled.div`
-            display: flex;
-            justify-content: center;
-            `;
-const QRWrap = styled.div`
-            background: white;
-            padding: 5px;
+
+const Counter = styled.div`
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 11px;
+line-height: 19px;
+margin-bottom:-3px;
+/* or 173% */
+margin-left:8px;
+
+display: flex;
+align-items: center;
+
+/* Placeholder Text */
+
+color: #B0B7BC;
             `;
 
 const ActionInfo = styled.div`
@@ -828,6 +837,7 @@ const Tabs = styled.div`
             display:flex;
             width:100%;
             align-items:center;
+            // justify-content:center;
             overflow-x:auto;
             ::-webkit-scrollbar {
                 display: none;
@@ -845,7 +855,7 @@ const Tab = styled.div<TagProps>`
                 border-bottom: ${p => p.selected && '4px solid #618AFF'};
                 cursor:hover;
                 font-weight: 500;
-                font-size: 16px;
+                font-size: 15px;
                 line-height: 19px;
                 cursor:pointer;
                 `;
@@ -869,34 +879,6 @@ const Head = styled.div`
                 width:100%;
                 `;
 
-const B = styled.span`
-                color:#000;
-                font-weight:bold;
-                margin-right:5px;
-                `;
-
-const Card = styled.div`
-                margin-bottom:10px;
-                `;
-
-const SupportMe = styled.div`
-                min-width: 300px;
-                max-width: 700px;
-                padding: 20px;
-                border: 1px solid #ffffff21;
-                background:#ffffff07;
-                border-radius: 5px;
-                overflow:hidden;
-                margin-bottom:20px;
-                `;
-
-
-const SelectedWidgetWrap = styled.div`
-                display:flex;
-                width:100%;
-                justify-content:space-around;
-                flex-wrap:wrap;
-                `;
 interface WidgetEnvProps {
     selected: boolean;
 }
@@ -933,60 +915,12 @@ const Sleeve = styled.div`
 
                     `;
 
-const Description = styled.div`
-                    font-family: Roboto;
-                    font-style: normal;
-                    font-weight: normal;
-                    font-size: 13px;
-                    line-height: 19px;
-                    /* or 146% */
-
-
-                    /* Secondary Text 4 */
-
-                    color: #8E969C;
-                    `;
-const Left = styled.div`
-                    height: 100%;
-                    max-width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    flex: 1;
-                    `;
-const Row = styled.div`
-                    display: flex;
-                    align-items: center;
-                    width:100%;
-                    margin: 20px 0;
-                    justify-content: space-evenly;
-                    `;
-
-const TabRow = styled.div`
-                    display: flex;
-                    flex-wrap:flex;
-                    align-items: center;
-                    width:100%;
-                    user-select:none;
-                    // margin: 10px 0;
-                    margin-top:10px;
-                    `;
 const RowWrap = styled.div`
                     display:flex;
                     justify-content:center;
 
                     width:100%`;
-const Title = styled.h3`
-                    margin-right: 12px;
-                    font-size: 22px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    max-width: 100%;
-                    min-height: 24px;
-                    `;
-interface DescriptionProps {
-    oneLine: boolean;
-}
+
 
 interface ImageProps {
     readonly src: string;
@@ -1004,36 +938,3 @@ const Img = styled.div<ImageProps>`
                         align-items:flex-end;
                         justify-content:flex-end;
                         `;
-const Tokens = styled.div`
-                        display: flex;
-                        align-items: center;
-                        `;
-const TagsWrap = styled.div`
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: flex-start;
-                        align-items: center;
-                        margin-top: 10px;
-                        `;
-const Tag = styled.h5`
-                        margin-right: 10px;
-                        `;
-const Intro = styled.div`
-                        font-size: 14px;
-                        margin: 10px;
-                        `;
-interface IconProps {
-    source: string;
-}
-
-const Icon = styled.div<IconProps>`
-                            background-image: ${p => `url(${p.source})`};
-                            width:150px;
-                            height:150px;
-                            margin-top:10px;
-                            background-position: center; /* Center the image */
-                            background-repeat: no-repeat; /* Do not repeat the image */
-                            background-size: contain; /* Resize the background image to cover the entire container */
-                            border-radius:5px;
-                            overflow:hidden;
-                            `;
