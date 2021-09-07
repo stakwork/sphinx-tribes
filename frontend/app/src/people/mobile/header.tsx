@@ -105,7 +105,7 @@ export default function Header() {
                         <Corner>
                             {ui.meInfo ?
                                 <Imgg
-                                    style={{ height: 30, width: 30, marginRight: 10 }}
+                                    style={{ height: 30, width: 30, marginRight: 10, border: '1px solid #ffffff55' }}
                                     src={(ui.meInfo.img && ui.meInfo.img + '?thumb=true') || '/static/sphinx.png'}
                                     onClick={() => {
                                         goToEditSelf()
@@ -209,7 +209,6 @@ export default function Header() {
         return <>
 
             {renderHeader()}
-
 
             {/* you wanna login modal  */}
             <Modal

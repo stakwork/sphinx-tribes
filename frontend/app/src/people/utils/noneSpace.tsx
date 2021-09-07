@@ -35,7 +35,7 @@ export default function NoneSpace(props) {
     return <div style={{
         display: 'flex', flexDirection: 'column',
         justifyContent: 'center', alignItems: 'center',
-        height: '100%', background: '#f0f1f3',
+        height: '100%', background: '#f0f1f3', ...props.style
     }}>
         <Icon src={`/static/${props.img}`} />
 
