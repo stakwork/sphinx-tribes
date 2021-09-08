@@ -16,13 +16,12 @@ const getScroll = useScroll
 
 export default function WidgetSwitchViewer(props) {
 
-    let { selectedWidget, onPanelClick } = props
-
     const { main, ui } = useStores()
     const isMobile = useIsMobile()
 
     return useObserver(() => {
 
+        let { selectedWidget, onPanelClick } = props
         const peeps = [...main.people]
         const { handleScroll, n, loadingMore } = getScroll()
         let people = peeps.slice(0, n)
@@ -38,20 +37,20 @@ export default function WidgetSwitchViewer(props) {
         }
 
         const renderView = {
-            post: (p, i) => <PostView showName key={i + p.unique_name} person={p} />,
-            offer: (p, i) => <OfferView showName key={i + p.unique_name} person={p} />,
-            wanted: (p, i) => <WantedView showName key={i + p.unique_name} person={p} />,
+            post: (p, i) => <PostView showName key={i + p.owner_pubkey + 'view'} person={p} />,
+            offer: (p, i) => <OfferView showName key={i + p.owner_pubkey + 'view'} person={p} />,
+            wanted: (p, i) => <WantedView showName key={i + p.owner_pubkey + 'view'} person={p} />,
         }
 
         let allElements: any = []
 
         const searchKeys = widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget].schema?.map(s => s.name) || []
 
-        people && people.map((p, i) => {
+        people && people.forEach((p, i) => {
             // if this person has entries for this widget
-            if (p.extras && p.extras[selectedWidget] && p.extras[selectedWidget].length) {
-
-                const theseExtras = getFuse(p.extras[selectedWidget], searchKeys)
+            const thisWidget = p.extras && p.extras[selectedWidget]
+            if (thisWidget && thisWidget.length) {
+                const theseExtras = getFuse(thisWidget, searchKeys)
                 if (renderView[selectedWidget]) {
                     allElements = [...allElements, ...wrapIt(renderView[selectedWidget](p, i), theseExtras, p)]
                 }
@@ -69,7 +68,7 @@ export default function WidgetSwitchViewer(props) {
             }
 
             fullSelectedWidget && fullSelectedWidget.forEach((s, i) => {
-                elementArray.push(<Panel key={i}
+                elementArray.push(<Panel key={i + person.owner_pubkey}
                     onClick={() => {
                         if (onPanelClick) onPanelClick(person, s, i)
                     }}
