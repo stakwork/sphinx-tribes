@@ -30,6 +30,29 @@ export class MainStore {
     return ts
   }
 
+  bots: Bot[] = []
+
+  @action async getBots(uniqueName?: string): Promise<Bot[]> {
+    const b = await api.get('bots')
+    console.log('b', b)
+    if (uniqueName) {
+      b.forEach(function (t: Bot, i: number) {
+        if (t.unique_name === uniqueName) {
+          b.splice(i, 1);
+          b.unshift(t);
+        }
+      })
+    }
+    this.bots = b
+    return b
+  }
+
+  @action async makeBot(uniqueName?: string): Promise<Bot> {
+    const b = await api.post('bots', { uuid: '2178812fr891fg9716fd7612fd' })
+    console.log('made bot', b)
+    return b
+  }
+
   @persist('list') @observable
   people: Person[] = []
 
@@ -115,9 +138,6 @@ export class MainStore {
   }
 }
 
-
-
-
 export const mainStore = new MainStore()
 
 export interface Tribe {
@@ -133,6 +153,27 @@ export interface Tribe {
   member_count: number;
   last_active: number;
   matchCount?: number; // for tag search
+}
+
+export interface Bot {
+  id?: number;
+  uuid: string;
+  name: string;
+  owner_pubkey: string;
+  unique_name: string;
+  price_per_use: number;
+  created: string;
+  updated: string;
+  unlisted: boolean;
+  deleted: boolean;
+  owner_route_hint: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
 }
 
 export interface Person {

@@ -48,6 +48,18 @@ class UiStore {
     this.selectingPerson = n
   }
 
+  @observable selectedBot: number = 0
+  @action setSelectedBot(n: number) {
+    this.selectedBot = n
+  }
+
+  // this is for animations, if you deselect as a component is fading out, 
+  // it empties and looks broke for a second
+  @observable selectingBot: number = 0
+  @action setSelectingBot(n: number) {
+    this.selectingBot = n
+  }
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
