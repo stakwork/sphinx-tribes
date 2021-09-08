@@ -160,7 +160,7 @@ export default function Header() {
 
                     </Tabs>
 
-                    <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden', width: 295 }} >
+                    {/* <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden', width: 295 }} >
                         <EuiFieldSearch id="search-input"
                             placeholder="Search for People"
                             value={ui.searchText}
@@ -169,7 +169,7 @@ export default function Header() {
                             aria-label="search"
 
                         />
-                    </EuiHeaderSection>
+                    </EuiHeaderSection> */}
 
                     {/* <Button
                         text='Tags'

@@ -6,7 +6,7 @@ import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
 import { Divider } from '../../sphinxUI';
 
-export default function OfferView(props: Offer) {
+export default function OfferView(props: any) {
     const { gallery, title, description, price } = props
     const isMobile = useIsMobile()
 

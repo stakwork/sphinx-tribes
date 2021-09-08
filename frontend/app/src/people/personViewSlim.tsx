@@ -20,6 +20,7 @@ import { useIsMobile } from "../hooks";
 import Person from "./person";
 import NoneSpace from "./utils/noneSpace";
 import ConnectCard from "./utils/connectCard";
+import { widgetConfigs } from "./utils/constants";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -143,104 +144,7 @@ export default function PersonView(props: any) {
         })
     }
 
-
-    const tabs = {
-        about: {
-            label: 'About',
-            name: 'about',
-            single: true,
-            skipEditLayer: true,
-            submitText: 'Save',
-            schema: aboutSchema,
-            action: {
-                text: 'Edit Profile',
-                icon: 'edit'
-            },
-        },
-        post: {
-            label: 'Posts',
-            name: 'post',
-            submitText: 'Post',
-            schema: postSchema,
-            action: {
-                text: 'Create a Post',
-                icon: 'add',
-                info: "What's on your mind?",
-                infoIcon: 'chat_bubble_outline'
-            },
-            noneSpace: {
-                me: {
-                    img: 'no_posts.png',
-                    text: 'What’s on your mind?',
-                    buttonText: 'Create a post',
-                    buttonIcon: 'add'
-                },
-                otherUser: {
-                    img: 'no_posts2.png',
-                    text: 'No Posts Yet',
-                    sub: 'Looks like this person hasn’t posted anything yet.'
-                }
-            }
-        },
-        offer: {
-            label: 'Offer',
-            name: 'offer',
-            submitText: 'Post',
-            modalStyle: {
-                width: 'auto',
-                maxWidth: 'auto',
-                minWidth: '400px',
-                height: 'auto'
-            },
-            schema: offerSchema,
-            action: {
-                text: 'Sell Something',
-                icon: 'local_offer'
-            },
-            noneSpace: {
-                me: {
-                    img: 'no_offers.png',
-                    text: 'Use lightning network to sell your digital goods!',
-                    buttonText: 'Sell something',
-                    buttonIcon: 'local_offer'
-                },
-                otherUser: {
-                    img: 'no_offers2.png',
-                    text: 'No Offers Yet',
-                    sub: 'Looks like this person is not selling anything yet.'
-                }
-            }
-        },
-        wanted: {
-            label: 'Wanted',
-            name: 'wanted',
-            submitText: 'Save',
-            modalStyle: {
-                width: 'auto',
-                maxWidth: 'auto',
-                minWidth: '400px',
-                height: 'auto'
-            },
-            schema: wantedSchema,
-            action: {
-                text: 'Add to Wanted',
-                icon: 'favorite_outline'
-            },
-            noneSpace: {
-                me: {
-                    img: 'no_wanted.png',
-                    text: 'Make a list of items and services you need.',
-                    buttonText: 'Add to wanted',
-                    buttonIcon: 'favorite_outline'
-                },
-                otherUser: {
-                    img: 'no_wanted2.png',
-                    text: 'No Wanteds Yet',
-                    sub: 'Looks like this person doesn’t need anything yet.'
-                }
-            }
-        },
-    }
+    const tabs = widgetConfigs
 
     function renderWidgets(name: string) {
         if (name) {
@@ -461,7 +365,7 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = extras[name] && extras[name].length
+                        let count = (extras[name] && extras[name].length > 0) ? extras[name].length : null
 
                         return <Tab key={i}
                             selected={selected}
@@ -469,9 +373,9 @@ export default function PersonView(props: any) {
                                 switchWidgets(name)
                             }}>
                             {label}
-                            <Counter>
+                            {count && <Counter>
                                 {count}
-                            </Counter>
+                            </Counter>}
                         </Tab>
                     })}
 
@@ -660,7 +564,7 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = extras[name] && extras[name].length
+                        let count = (extras[name] && extras[name].length > 0) ? extras[name].length : null
                         return <Tab key={i}
                             style={{ height: 64, alignItems: 'center' }}
                             selected={selected}
@@ -668,9 +572,9 @@ export default function PersonView(props: any) {
                                 switchWidgets(name)
                             }}>
                             {label}
-                            <Counter>
+                            {count && <Counter>
                                 {count}
-                            </Counter>
+                            </Counter>}
                         </Tab>
                     })}
 
