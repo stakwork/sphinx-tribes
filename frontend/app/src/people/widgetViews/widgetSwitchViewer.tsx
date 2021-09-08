@@ -1,0 +1,103 @@
+import React from 'react'
+import BlogView from "../widgetViews/blogView";
+import OfferView from "../widgetViews/offerView";
+import TwitterView from "../widgetViews/twitterView";
+import SupportMeView from "../widgetViews/supportMeView";
+import WantedView from "../widgetViews/wantedView";
+import PostView from "../widgetViews/postView";
+import styled from 'styled-components';
+import { useIsMobile } from '../../hooks';
+import { useStores } from '../../store';
+import { useObserver } from 'mobx-react-lite';
+import { useFuse, useScroll } from '../../hooks';
+import { widgetConfigs } from '../utils/constants';
+const getFuse = useFuse
+const getScroll = useScroll
+
+export default function WidgetSwitchViewer(props) {
+
+    let { selectedWidget, onPanelClick } = props
+
+    const { main, ui } = useStores()
+    const isMobile = useIsMobile()
+
+    return useObserver(() => {
+
+        const peeps = [...main.people]
+        const { handleScroll, n, loadingMore } = getScroll()
+        let people = peeps.slice(0, n)
+        people = (people && people.filter(f => !f.hide)) || []
+
+        if (props.people) {
+            // props.people overrides ui
+            people = props.people
+        }
+
+        if (!selectedWidget) {
+            return <div style={{ height: 200 }} />
+        }
+
+        const renderView = {
+            post: (p, i) => <PostView showName key={i + p.unique_name} person={p} />,
+            offer: (p, i) => <OfferView showName key={i + p.unique_name} person={p} />,
+            wanted: (p, i) => <WantedView showName key={i + p.unique_name} person={p} />,
+        }
+
+        let allElements: any = []
+
+        const searchKeys = widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget].schema?.map(s => s.name) || []
+
+        people && people.map((p, i) => {
+            // if this person has entries for this widget
+            if (p.extras && p.extras[selectedWidget] && p.extras[selectedWidget].length) {
+
+                const theseExtras = getFuse(p.extras[selectedWidget], searchKeys)
+                if (renderView[selectedWidget]) {
+                    allElements = [...allElements, ...wrapIt(renderView[selectedWidget](p, i), theseExtras, p)]
+                }
+            }
+        })
+
+        function wrapIt(child, fullSelectedWidget, person) {
+            const elementArray: any = []
+
+            const panelStyles = isMobile ? {
+                minHeight: 132
+            } : {
+                maxWidth: 291, minWidth: 291,
+                marginRight: 20, marginBottom: 20, minHeight: 472
+            }
+
+            fullSelectedWidget && fullSelectedWidget.forEach((s, i) => {
+                elementArray.push(<Panel key={i}
+                    onClick={() => {
+                        if (onPanelClick) onPanelClick(person, s, i)
+                    }}
+                    style={{
+                        ...panelStyles,
+                        cursor: 'pointer',
+                        padding: 0, overflow: 'hidden'
+                    }}
+                >
+                    {React.cloneElement(child, { ...s })}
+                </Panel>)
+            })
+
+            return elementArray
+
+        }
+
+        return allElements
+    })
+}
+
+
+const Panel = styled.div`
+            position:relative;
+            background:#ffffff;
+            color:#000000;
+            margin-bottom:10px;
+            padding:20px;
+            box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
+            `;
+

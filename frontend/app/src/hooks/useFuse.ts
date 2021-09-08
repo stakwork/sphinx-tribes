@@ -23,3 +23,13 @@ export function useFuse(array, keys: string[] = []) {
   }
   return theArray;
 }
+
+export function useLocalFuse(searchText, array, keys: string[] = []) {
+  let theArray = array;
+  if (searchText) {
+    var fuse = new Fuse(array, { ...fuseOptions, keys });
+    const res = fuse.search(searchText);
+    theArray = res.map((r) => r.item);
+  }
+  return theArray;
+}
