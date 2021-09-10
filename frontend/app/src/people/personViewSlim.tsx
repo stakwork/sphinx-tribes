@@ -146,6 +146,14 @@ export default function PersonView(props: any) {
 
     const tabs = widgetConfigs
 
+    function hasWidgets() {
+        let has = false
+        if (fullSelectedWidget && fullSelectedWidget.length) {
+            has = true
+        }
+        return has
+    }
+
     function renderWidgets(name: string) {
         if (name) {
             switch (name) {
@@ -446,12 +454,12 @@ export default function PersonView(props: any) {
             }
 
             <div style={{
-                width: 322,
-                minWidth: 322, overflowY: 'auto',
+                width: canEdit ? 364 : 322,
+                minWidth: canEdit ? 364 : 322, overflowY: 'auto',
                 position: 'relative',
                 background: '#ffffff',
                 color: '#000000',
-                padding: 30,
+                padding: canEdit ? 40 : 30,
                 height: '100%',
                 borderLeft: '1px solid #F2F3F5',
                 borderRight: '1px solid #F2F3F5',
@@ -502,7 +510,7 @@ export default function PersonView(props: any) {
                     </RowWrap>
 
                     {/* only see buttons on other people's profile */}
-                    {canEdit ? <RowWrap style={{ marginBottom: 30, marginTop: 25, justifyContent: 'space-between' }}>
+                    {canEdit ? <RowWrap style={{ marginBottom: 30, marginTop: 25, justifyContent: 'space-around' }}>
                         <Button
                             text='Edit Profile'
                             onClick={() => {
@@ -552,7 +560,7 @@ export default function PersonView(props: any) {
             </div>
 
             <div style={{
-                width: canEdit ? 'calc(100% - 323px)' : 'calc(100% - 586px)',
+                width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 586px)',
                 minWidth: 250
             }}>
                 <Tabs style={{
@@ -634,7 +642,9 @@ export default function PersonView(props: any) {
                         display: 'flex',
                         alignItems: 'flex-start',
                         justifyContent: (fullSelectedWidget && fullSelectedWidget.length > 0) ? 'flex-start' : 'center',
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        height: !hasWidgets() ? 'inherit' : '',
+                        paddingTop: !hasWidgets() ? 30 : 0
                     }}>
                         {renderWidgets('')}
                     </Sleeve>

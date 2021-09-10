@@ -91,10 +91,12 @@ export default function Header() {
         }
     }
 
+    const headerBackground = '#1A242E'
+
     function renderHeader() {
         if (isMobile) {
             return <EuiHeader id="header" style={{
-                color: '#fff', background: '#292C33'
+                color: '#fff', background: headerBackground
             }}>
                 < div className="container" >
                     <Row style={{ justifyContent: 'space-between' }}>
@@ -137,7 +139,7 @@ export default function Header() {
         }
 
         // desktop version
-        return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px', background: '#292C33' }}>
+        return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px', background: headerBackground }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <Row>
                     <EuiHeaderSection grow={false}>
@@ -342,12 +344,11 @@ const Tab = styled.div<TagProps>`
                             display:flex;
                             padding:10px 25px;
                             margin-right:10px;
-                            color:${p => p.selected ? '#fff' : '#8E969C'};
-                        // border-bottom: ${p => p.selected && '4px solid #618AFF'};
+                            color:${p => p.selected ? '#fff' : '#6B7A8D'};
                             cursor:pointer;
                             font-weight: 500;
                             font-size: 15px;
                             line-height: 19px;
-                            background:${p => p.selected ? '#3C3F41' : '#3C3F4100'};
+                            background:${p => p.selected ? 'rgba(255,255,255,0.07)' : '#3C3F4100'};
                             border-radius:25px;
                             `;
