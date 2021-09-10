@@ -99,6 +99,11 @@ const H = styled.div`
 
             color: #292C33;
             padding:0 10px;
+            max-width:350px;
+
+            font-weight: 900;
+            letter-spacing:0px;
+            color: rgb(60, 63, 65);
             `;
 
 const C = styled.div`
@@ -123,5 +128,8 @@ const C = styled.div`
 
             color: #5F6368;
             padding:0 10px;
+
+            max-width:350px;
+            padding: 0 65px;
 
             `;

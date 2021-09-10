@@ -35,7 +35,7 @@ export default function WantedView(props: any) {
 
         <Pad style={{ padding: 20 }}>
             <DT>{title || 'No title'}</DT>
-            <DD style={{ height: gallery ? 50 : '' }}>{description || 'No description'}</DD>
+            <DD style={{ maxHeight: gallery ? 40 : '' }}>{description || 'No description'}</DD>
         </Pad>
         <Divider style={{ margin: 0 }} />
         <Pad style={{ padding: 20, }}>
@@ -106,24 +106,35 @@ padding:10px;
 `;
 
 
+
 const DD = styled.div`
-font-style: normal;
-font-weight: normal;
-font-size: 12px;
-line-height: 25px;
 margin-bottom:10px;
 overflow:hidden;
-/* Main bottom icons */
 
-color: #8E969C;
-`;
-const DT = styled.div`
+font-family: Roboto;
 font-style: normal;
 font-weight: normal;
-font-size: 24px;
-line-height: 25px;
-color:#292C33 !important;
-margin-bottom:10px;
+font-size: 13px;
+line-height: 20px;
+/* or 154% */
+
+/* Main bottom icons */
 
 color: #5F6368;
+
+`;
+const DT = styled.div`
+margin-bottom:9px;
+font-family: Roboto;
+font-style: normal;
+font-weight: 500;
+font-size: 15px;
+line-height: 20px;
+/* or 133% */
+max-height:40px;
+overflow:hidden;
+
+/* Primary Text 1 */
+
+color: #292C33;
 `;
