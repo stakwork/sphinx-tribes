@@ -68,6 +68,7 @@ export default function PersonView(props: any) {
     const [selectedWidget, setSelectedWidget] = useState(initialWidget);
     const [newSelectedWidget, setNewSelectedWidget] = useState(initialWidget);
     const [focusIndex, setFocusIndex] = useState(-1);
+    const [showSupport, setShowSupport] = useState(false);
 
     const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
@@ -359,11 +360,13 @@ export default function PersonView(props: any) {
                             </a>
 
                             <div style={{ width: 15 }} />
+
                             <Button
-                                text='Support'
+                                text='Send Tip'
                                 color='link'
                                 height={42}
-                                width={120} />
+                                width={120}
+                                onClick={() => setShowSupport(true)} />
                         </RowWrap>
                     }
                 </Head>
@@ -547,10 +550,11 @@ export default function PersonView(props: any) {
                             />
 
                             <Button
-                                text='Support'
+                                text='Send Tip'
                                 color='link'
                                 height={42}
-                                width={120} />
+                                width={120}
+                                onClick={() => setShowSupport(true)} />
                         </RowWrap>
                     }
                 </Head>
@@ -666,6 +670,29 @@ export default function PersonView(props: any) {
     return (
         <Content>
             {isMobile ? renderMobileView() : renderDesktopView()}
+
+            <Modal
+                visible={showSupport}
+                close={() => setShowSupport(false)}
+                style={{
+                    top: -64,
+                    height: 'calc(100% + 64px)'
+                }}
+                envStyle={{
+                    marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0
+                }}
+            >
+                <div dangerouslySetInnerHTML={{
+                    __html: `<sphinx-widget
+                                pubkey=${owner_pubkey}
+                                amount="500"
+                                title="Support Me"
+                                subtitle="Because I'm awesome"
+                                buttonlabel="Donate"
+                                defaultinterval="weekly"
+                                imgurl="${img || 'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'}"
+                            ></sphinx-widget>` }} />
+            </Modal>
         </Content >
 
     );

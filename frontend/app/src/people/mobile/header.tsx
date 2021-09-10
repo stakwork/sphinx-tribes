@@ -70,6 +70,14 @@ export default function Header() {
     }
 
     useEffect(() => {
+        let path = location.pathname
+        if (!path.includes('/p') && (ui.selectedPerson || ui.selectingPerson)) {
+            ui.setSelectedPerson(0)
+            ui.setSelectingPerson(0)
+        }
+    }, [location.pathname])
+
+    useEffect(() => {
         (async () => {
             try {
                 var urlObject = new URL(window.location.href);
@@ -88,6 +96,11 @@ export default function Header() {
         if (ui.meInfo?.id) {
             ui.setSelectedPerson(ui.meInfo.id)
             ui.setSelectingPerson(ui.meInfo.id)
+
+            let path = location.pathname
+            if (!path.includes('/p')) {
+                history.push('/p')
+            }
         }
     }
 
