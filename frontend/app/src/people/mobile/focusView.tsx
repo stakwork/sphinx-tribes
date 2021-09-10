@@ -261,6 +261,7 @@ export default function FocusedView(props: any) {
                                         color={'widget'}
                                         loading={deleting}
                                         icon={'delete'}
+                                        style={{ marginLeft: 10 }}
                                     // iconSize={18}
                                     />
                                 </div>

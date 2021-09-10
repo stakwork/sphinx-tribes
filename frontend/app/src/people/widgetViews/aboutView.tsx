@@ -24,10 +24,10 @@ export default function AboutView(props: any) {
         <D>{description || 'No description'} </D>
 
         {tag && <>
-            <T>Follow Me</T>
+            <T>For Normies</T>
             <I>
                 <Icon source={`/static/twitter2.png`} />
-                <div>@{tag}</div>
+                <Tag>@{tag}</Tag>
                 {twitter_confirmed ?
                     <Badge>VERIFIED</Badge> :
                     <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
@@ -81,6 +81,23 @@ display:flex;
 align-items:center;
 
 `;
+
+const Tag = styled.div`
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 15px;
+line-height: 26px;
+/* or 173% */
+
+display: flex;
+align-items: center;
+
+/* Main bottom icons */
+
+color: #5F6368;
+`
+
 const Row = styled.div`
 display:flex;
 justify-content:space-between;
@@ -102,7 +119,19 @@ color: #8E969C;
 
 `;
 const T = styled.div`
-font-weight:bold;
+font-family: Roboto;
+font-style: normal;
+font-weight: bold;
+font-size: 10px;
+line-height: 26px;
+/* or 260% */
+
+letter-spacing: 0.3px;
+text-transform: uppercase;
+
+/* Text 2 */
+
+color: #3C3F41;
 margin-top:5px;
 margin-bottom:5px;
 `;
@@ -130,9 +159,9 @@ interface IconProps {
 
 const Icon = styled.div<IconProps>`
                     background-image: ${p => `url(${p.source})`};
-                    width:20px;
-                    height:20px;
-                    margin-right:10px;
+                    width:16px;
+                    height:13px;
+                    margin-right:8px;
                     background-position: center; /* Center the image */
                     background-repeat: no-repeat; /* Do not repeat the image */
                     background-size: contain; /* Resize the background image to cover the entire container */
