@@ -33,7 +33,7 @@ export default function QrBar(props: any) {
         addToast()
     };
 
-    return <Row style={props.style}>
+    return <Row style={props.style} onClick={() => copyToClipboard(value)}>
         <QRWrap style={{
             display: 'flex', alignItems: 'center', width: '70%',
             overflow: 'hidden',
@@ -53,14 +53,15 @@ export default function QrBar(props: any) {
             </div>
         </QRWrap>
 
-        <Button
-            text='Copy'
-            color={'link2'}
-            // width={72}
-            // height={32}
-            // style={{ minWidth: 72 }}
-            onClick={() => copyToClipboard(value)}
-        />
+        <Copy
+            style={{
+                display: 'flex', fontSize: 11, alignItems: 'center', color: '#618AFF', cursor: 'pointer',
+                letterSpacing: '0.3px'
+            }}
+        // onClick={() => copyToClipboard(value)}
+        >
+            COPY
+        </Copy>
 
         <EuiGlobalToastList
             toasts={toasts}
@@ -100,5 +101,23 @@ align-items: center;
 /* Secondary Text 4 */
 
 color: #8E969C;
+cursor:pointer;
 
 `;
+
+const Copy = styled.div`
+
+font-family: Roboto;
+font-style: normal;
+font-weight: 500;
+font-size: 11px;
+line-height: 13px;
+display: flex;
+align-items: center;
+text-align: right;
+letter-spacing: 0.04em;
+text-transform: uppercase;
+
+/* Primary blue */
+
+color: #618AFF;`
