@@ -47,8 +47,8 @@ export class MainStore {
     return b
   }
 
-  @action async makeBot(uniqueName?: string): Promise<Bot> {
-    const b = await api.post('bots', { uuid: '2178812fr891fg9716fd7612fd' })
+  @action async makeBot(payload: any): Promise<Bot> {
+    const b = await api.post('bots', payload)
     console.log('made bot', b)
     return b
   }

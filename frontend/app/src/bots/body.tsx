@@ -76,20 +76,20 @@ export default function BotBody() {
             </Body>
         }
 
-        if (!bots.length) {
-            return (<>
-                {/* <Button
-                    text={'Make bot'}
-                    color={'primary'}
-                    onClick={() => main.makeBot()}
-                /> */}
-                <NoneSpace
-                    img={'coming_soon.png'}
-                    text={'COMING SOON'}
-                    sub={'Stay tuned for something amazing!'}
-                />
-            </>)
-        }
+        // if (!bots.length) {
+        //     return (<>
+        //         {/* <Button
+        //             text={'Make bot'}
+        //             color={'primary'}
+        //             onClick={() => main.makeBot()}
+        //         /> */}
+        //         <NoneSpace
+        //             img={'coming_soon.png'}
+        //             text={'COMING SOON'}
+        //             sub={'Stay tuned for something amazing!'}
+        //         />
+        //     </>)
+        // }
 
         if (isMobile) {
             return <Body>
