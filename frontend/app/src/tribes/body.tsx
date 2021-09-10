@@ -5,10 +5,20 @@ import { useStores } from '../store'
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
+  EuiHeader,
+  EuiPopover,
+  EuiSelectable,
+  EuiHeaderSection,
+  EuiButton,
+  EuiFieldSearch,
+  EuiHighlight,
 } from '@elastic/eui';
 import Tribe from './tribe'
 import { useFuse, useScroll } from '../hooks'
-
+import { Divider, SearchTextInput } from '../sphinxUI';
+import { orderBy } from 'lodash'
+import Tag from './tag'
+import tags from './tags'
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
 const getScroll = useScroll
@@ -16,6 +26,10 @@ const getScroll = useScroll
 export default function BodyComponent() {
   const { main, ui } = useStores()
   const [selected, setSelected] = useState('')
+  const [tagsPop, setTagsPop] = useState(false)
+
+  const selectedTags = ui.tags.filter(t => t.checked === 'on')
+  const showTagCount = selectedTags.length > 0 ? true : false
 
   function selectTribe(uuid: string, unique_name: string) {
     setSelected(uuid)
@@ -59,7 +73,70 @@ export default function BodyComponent() {
     const { n, loadingMore, handleScroll } = getScroll()
     const finalTribes = theTribes.slice(0, n)
 
-    return <Body id="main" onScroll={handleScroll}>
+
+    const button = (<EuiButton
+      iconType="arrowDown"
+      iconSide="right"
+      size="s"
+      onClick={() => {
+        ui.setTags(orderBy(ui.tags, ['checked'], ['asc']))
+        setTagsPop(!tagsPop)
+      }}>
+      {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
+    </EuiButton>)
+
+    return <Body id="main" onScroll={handleScroll} style={{ paddingTop: 0 }}>
+      <div style={{
+        width: '100%', display: 'flex',
+        justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
+        height: 62
+      }}>
+        <Label>
+          Tribes
+        </Label>
+
+        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <EuiPopover
+            panelPaddingSize="none"
+            button={button}
+            isOpen={tagsPop}
+            closePopover={() => setTagsPop(false)}>
+            <EuiSelectable
+              searchable
+              options={ui.tags}
+              renderOption={(option, searchValue) => <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Tag type={option.label} iconOnly />
+                <EuiHighlight search={searchValue} style={{
+                  fontSize: 11, marginLeft: 5, color: tags[option.label].color
+                }}>
+                  {option.label}
+                </EuiHighlight>
+              </div>}
+              listProps={{ rowHeight: 30 }} // showIcons:false
+              onChange={opts => {
+                console.log(opts)
+                ui.setTags(opts)
+              }}>
+              {(list, search) => <div style={{ width: 220 }}>
+                {search}
+                {list}
+              </div>}
+            </EuiSelectable>
+          </EuiPopover>
+
+          <SearchTextInput
+            name='search'
+            type='search'
+            placeholder='Search'
+            value={ui.searchText}
+            style={{ width: 204, height: 40, background: '#111', color: '#fff', border: 'none', marginLeft: 20 }}
+            onChange={e => {
+              console.log('handleChange', e)
+              ui.setSearchText(e)
+            }}
+          />
+        </div>
+      </div>
       <Column className="main-wrap">
         {loading && <EuiLoadingSpinner size="xl" />}
         {!loading && <EuiFormFieldset style={{ width: '100%' }} className="container">
@@ -74,7 +151,7 @@ export default function BodyComponent() {
           <EuiLoadingSpinner size="l" />
         </LoadmoreWrap>
       </Column>
-    </Body>
+    </Body >
   }
   )
 }
@@ -105,3 +182,17 @@ const LoadmoreWrap = styled.div<LoadmoreWrapProps>`
   text-align:center;
   visibility:${p => p.show ? 'visible' : 'hidden'};
 `
+const Label = styled.div`
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 26px;
+            line-height: 40px;
+            /* or 154% */
+            
+            display: flex;
+            align-items: center;
+            
+            /* Text 2 */
+            
+            color: #ffffff;`
