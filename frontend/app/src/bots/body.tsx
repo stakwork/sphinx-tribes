@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import NoneSpace from '../people/utils/noneSpace';
-import { Button } from '../sphinxUI';
+import { Button, Modal, SearchTextInput } from '../sphinxUI';
 import { useStores } from '../store';
 import { useObserver } from 'mobx-react-lite'
 import { EuiLoadingSpinner } from '@elastic/eui';
@@ -10,6 +10,8 @@ import { colors } from '../colors'
 import FadeLeft from '../animated/fadeLeft';
 import { useIsMobile } from '../hooks';
 import Bot from './bot'
+import Form from '../form';
+import { botSchema } from '../form/schema';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
@@ -18,6 +20,7 @@ const getScroll = useScroll
 export default function BotBody() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
+    const [showBotCreator, setShowBotCreator] = useState(false)
 
     const c = colors['light']
     const isMobile = useIsMobile()
@@ -29,6 +32,16 @@ export default function BotBody() {
         if (unique_name && window.history.pushState) {
             window.history.pushState({}, 'Sphinx Tribes', '/b/' + unique_name);
         }
+    }
+
+    async function createBot(v: any) {
+        console.log('createBot!')
+        try {
+            await main.makeBot(v)
+        } catch (e) {
+            console.log('e', e)
+        }
+        setShowBotCreator(false)
     }
 
     async function loadBots() {
@@ -50,11 +63,12 @@ export default function BotBody() {
     }, [])
 
     return useObserver(() => {
-        const bs = getFuse(main.bots, ["owner_alias"])
+        const bs = getFuse(main.bots, ["name", "description"])
         const { handleScroll, n, loadingMore } = getScroll()
         let bots = bs.slice(0, n)
 
         bots = (bots && bots.filter(f => !f.hide)) || []
+
 
         if (loading) {
             return <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -110,6 +124,39 @@ export default function BotBody() {
             background: '#f0f1f3',
             height: 'calc(100% - 65px)'
         }}>
+
+            <div style={{
+                width: '100%', display: 'flex',
+                justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
+                height: 62
+            }}>
+                <Label>
+                    Bots
+                </Label>
+
+                <div style={{ display: 'flex', alignItems: 'baseline' }}>
+
+                    <Button
+                        text={'Make a Bot'}
+                        // color='primary'
+                        onClick={() => setShowBotCreator(true)}
+                    />
+
+                    <SearchTextInput
+                        name='search'
+                        type='search'
+                        placeholder='Search'
+                        value={ui.searchText}
+                        style={{ width: 204, height: 40, background: '#DDE1E5', marginLeft: 20 }}
+                        onChange={e => {
+                            console.log('handleChange', e)
+                            ui.setSearchText(e)
+                        }}
+
+                    />
+                </div>
+            </div>
+
             <>
                 <div style={{
                     width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
@@ -143,6 +190,19 @@ export default function BotBody() {
                 // selectPerson={selectPerson}
                 />
             </FadeLeft>
+
+            <Modal
+                close={() => setShowBotCreator(false)}
+                visible={showBotCreator}>
+                <Form
+                    loading={loading}
+                    close={() => setShowBotCreator(false)}
+                    onSubmit={createBot}
+                    schema={botSchema}
+                    initialValues={{}}
+                />
+            </Modal>
+
         </Body >
     }
     )

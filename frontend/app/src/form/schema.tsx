@@ -336,6 +336,27 @@ export const postSchema: FormField[] = [
     },
 ];
 
+
+export const botSchema: FormField[] = [
+    {
+        name: "img",
+        label: "Logo",
+        type: "img",
+    },
+    {
+        name: "name",
+        label: "Name",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        validator: strValidator,
+    },
+];
+
 export const offerSchema: FormField[] = [
     {
         name: "title",
