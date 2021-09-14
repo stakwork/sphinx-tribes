@@ -148,7 +148,7 @@ const DTitle = styled.h3`
 font-weight: 500;
 font-size: 17px;
 line-height: 19px;
-text-transform:uppercase;
+// text-transform:uppercase;
         color: #3C3F41;
         `;
 const Description = styled.div`
@@ -165,11 +165,11 @@ const DDescription = styled.div`
         font-size: 12px;
         line-height: 18px;
         color: #5F6368;
-        white-space: nowrap;
-        // height:26px;
-        text-overflow: ellipsis;
+        // white-space: nowrap;
+        height:36px;
+        // text-overflow: ellipsis;
         overflow:hidden;
-        margin-bottom:10px;
+        // margin-bottom:10px;
         `;
 interface ImageProps {
     readonly src: string;

@@ -126,7 +126,6 @@ export default function FocusedView(props: any) {
 
 
         const info = ui.meInfo as any;
-        console.log('before img', info.img)
         if (!info) return console.log("no meInfo");
         setLoading(true);
         try {
@@ -160,9 +159,6 @@ export default function FocusedView(props: any) {
             }
 
             console.log('body', body)
-
-            console.log('after img', body.img)
-
 
             ui.setMeInfo(body)
 
