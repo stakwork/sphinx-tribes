@@ -49,7 +49,7 @@ export class MainStore {
       if (bb.unique_name === 'btc') {
         bb.img = '/static/bots_bitcoin.png'
       }
-      if (bb.unique_name === 'bets') {
+      if (bb.unique_name === 'bet') {
         bb.img = '/static/bots_betting.png'
       }
       if (bb.unique_name === 'hello' || bb.unique_name === 'welcome') {
