@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { EuiButton, EuiFormRow } from "@elastic/eui";
-import Camera from "../../utils/camera-option-icon.svg";
 import Dropzone from "react-dropzone";
 import type { Props } from './propsType'
-import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
 import MaterialIcon from "@material/react-material-icon";
-import { FieldEnv, FieldTextArea } from './index'
+
 import { Button, Modal } from "../../sphinxUI";
 import { MAX_UPLOAD_SIZE } from "../../people/utils/constants";
-import { useEffect } from "hoist-non-react-statics/node_modules/@types/react";
 
 export default function GalleryInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
     const { ui } = useStores();
