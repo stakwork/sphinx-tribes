@@ -69,22 +69,6 @@ export default function Bot(props: any) {
                         </DDescription>
                     </div>
                 </div>
-                <div>
-                    <Divider />
-                    <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
-                        <div />
-                        <Button
-                            text='Invite'
-                            color='clear'
-                            endingIcon={'open_in_new'}
-                            iconSize={16}
-                            onClick={(e) => {
-                                setShowQR(true)
-                                e.stopPropagation()
-                            }}
-                        />
-                    </Row>
-                </div>
             </DWrap>
         }
 
@@ -110,7 +94,7 @@ const Wrap = styled.div`
         `;
 const DWrap = styled.div`
         cursor:pointer;
-        height:350px;
+        height:320px;
         width:210px;
         display:flex;
         flex-direction:column;
