@@ -225,9 +225,10 @@ export default function BodyComponent() {
                 <PersonViewSlim goBack={() => ui.setSelectingPerson(0)}
                     personId={ui.selectedPerson}
                     loading={loading}
+                    peopleView={true}
                     selectPerson={selectPerson} />
             </FadeLeft>
-        </Body >
+        </Body>
     }
     )
 }

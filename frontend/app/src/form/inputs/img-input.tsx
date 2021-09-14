@@ -16,13 +16,14 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
   const [showError, setShowError] = useState('');
   const [picsrc, setPicsrc] = useState('');
 
-  console.log('value', value)
-
   async function uploadBase64Pic(img_base64: string, img_type: string) {
     console.log('uploadBase64Pic', img_type)
     try {
       const info = ui.meInfo as any;
-      if (!info) return console.log("no meInfo");
+      if (!info) {
+        alert('You are not logged in.')
+        return console.log("no meInfo");
+      }
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`
       const r = await fetch(URL + "/public_pic", {
         method: "POST",
