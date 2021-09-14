@@ -12,12 +12,7 @@ export default function GalleryInput({ label, value, handleChange, handleBlur, h
     const { ui } = useStores();
     const [uploading, setUploading] = useState(false);
     const [showError, setShowError] = useState('');
-    // const [initPicArray, setInitPicArray] = useState(value || []);
-    // const [newPicsArray, setNewPicsArray]: any = useState([]);
-
     let picsrcArray = value || []
-
-    console.log('value', value)
 
     async function uploadBase64Pic(img_base64: string, img_type: string) {
         console.log('uploadBase64Pic', img_type)
