@@ -16,6 +16,8 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
   const [showError, setShowError] = useState('');
   const [picsrc, setPicsrc] = useState('');
 
+  console.log('value', value)
+
   async function uploadBase64Pic(img_base64: string, img_type: string) {
     console.log('uploadBase64Pic', img_type)
     try {
@@ -82,7 +84,7 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
               <ImageCircle>
                 {!uploading ?
                   <Image style={{
-                    backgroundImage: `url(${picsrc ? picsrc : value ? value + "?thumb=true" : (uploading ? '' : avatarIcon)
+                    backgroundImage: `url(${picsrc ? picsrc : value ? value : (uploading ? '' : avatarIcon)
                       })`
                   }}
                   /> :

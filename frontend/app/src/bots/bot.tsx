@@ -73,7 +73,16 @@ export default function Bot(props: any) {
                     <Divider />
                     <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
                         <div />
-                        <div />
+                        <Button
+                            text='Invite'
+                            color='clear'
+                            endingIcon={'open_in_new'}
+                            iconSize={16}
+                            onClick={(e) => {
+                                setShowQR(true)
+                                e.stopPropagation()
+                            }}
+                        />
                     </Row>
                 </div>
             </DWrap>
@@ -139,7 +148,7 @@ const DTitle = styled.h3`
 font-weight: 500;
 font-size: 17px;
 line-height: 19px;
-
+text-transform:uppercase;
         color: #3C3F41;
         `;
 const Description = styled.div`
