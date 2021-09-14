@@ -109,7 +109,7 @@ export default function Header() {
     function renderHeader() {
         if (isMobile) {
             return <EuiHeader id="header" style={{
-                color: '#fff', background: headerBackground
+                color: '#fff', background: headerBackground, maxHeight: 159
             }}>
                 < div className="container" >
                     <Row style={{ justifyContent: 'space-between' }}>
@@ -134,12 +134,11 @@ export default function Header() {
                                 />
                             }
                         </Corner>
-
                     </Row>
 
                     <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden' }} >
                         <EuiFieldSearch id="search-input"
-                            placeholder="Search for People"
+                            placeholder="Search"
                             value={ui.searchText}
                             onChange={e => ui.setSearchText(e.target.value)}
                             style={{ width: '100%', height: '100%' }}
@@ -147,6 +146,22 @@ export default function Header() {
 
                         />
                     </EuiHeaderSection>
+
+                    <Tabs>
+                        {tabs && tabs.map((t, i) => {
+                            const label = t.label
+                            const selected = location.pathname.includes(t.path)
+
+                            return <Tab key={i}
+                                selected={selected}
+                                onClick={() => {
+                                    history.push(t.path)
+                                }}>
+                                {label}
+                            </Tab>
+                        })}
+
+                    </Tabs>
                 </div>
             </ EuiHeader >
         }

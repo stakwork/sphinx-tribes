@@ -158,8 +158,6 @@ export default function FocusedView(props: any) {
                 body.id = j.response.id
             }
 
-            console.log('body', body)
-
             ui.setMeInfo(body)
 
             await main.getPeople('')

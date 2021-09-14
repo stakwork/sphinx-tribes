@@ -73,7 +73,6 @@ export default function BodyComponent() {
     const { n, loadingMore, handleScroll } = getScroll()
     const finalTribes = theTribes.slice(0, n)
 
-
     const button = (<EuiButton
       iconType="arrowDown"
       iconSide="right"
@@ -92,7 +91,6 @@ export default function BodyComponent() {
         height: 62
       }}>
         <Label>
-          Tribes
         </Label>
 
         <div style={{ display: 'flex', alignItems: 'baseline' }}>
@@ -138,7 +136,7 @@ export default function BodyComponent() {
         </div>
       </div>
       <Column className="main-wrap">
-        {loading && <EuiLoadingSpinner size="xl" />}
+        {loading && <EuiLoadingSpinner size="xl" style={{ marginTop: 20 }} />}
         {!loading && <EuiFormFieldset style={{ width: '100%' }} className="container">
           <div className="row">
             {finalTribes.map(t => <Tribe {...t} key={t.uuid}

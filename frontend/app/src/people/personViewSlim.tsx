@@ -1,8 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { getHost } from "../host";
 import { useStores } from '../store'
-
 
 import AboutView from "./widgetViews/aboutView";
 import BlogView from "./widgetViews/blogView";
@@ -15,7 +14,7 @@ import PostView from "./widgetViews/postView";
 import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
 import FocusedView from './mobile/focusView'
-import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../form/schema";
+import { meSchema } from "../form/schema";
 import { useIsMobile } from "../hooks";
 import Person from "./person";
 import NoneSpace from "./utils/noneSpace";
@@ -33,12 +32,13 @@ export default function PersonView(props: any) {
         personId,
         loading,
         selectPerson,
-        goBack
+        goBack,
     } = props
 
     const { main, ui } = useStores()
     const { meInfo } = ui || {}
 
+    // FOR PEOPLE VIEW
     let person: any = (main.people && main.people.length && main.people.find(f => f.id === personId))
 
     // if i select myself, fill person with meInfo
@@ -59,7 +59,6 @@ export default function PersonView(props: any) {
         owner_pubkey
     } = person || {}
 
-
     const canEdit = id === meInfo?.id
     const isMobile = useIsMobile()
 
@@ -70,7 +69,6 @@ export default function PersonView(props: any) {
     const [focusIndex, setFocusIndex] = useState(-1);
     const [showSupport, setShowSupport] = useState(false);
 
-    const [animating, setAnimating] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey || '');
@@ -78,15 +76,10 @@ export default function PersonView(props: any) {
 
 
     function switchWidgets(name) {
-        // setting newSelectedWidget will dismount the FadeLeft, 
-        // and on dismount, endAnimation runs
-        // if (!animating && selectedWidget !== name) {
         setNewSelectedWidget(name)
         setSelectedWidget(name)
         setShowFocusView(false)
         setFocusIndex(-1)
-        setAnimating(true)
-        // }
     }
 
     function selectPersonWithinFocusView(id, unique_name) {
@@ -119,8 +112,6 @@ export default function PersonView(props: any) {
     if (widgetSchemas && widgetSchemas.extras) {
         widgetSchemas = widgetSchemas && widgetSchemas.extras
     }
-
-    const qrWidth = 209
 
     let fullSelectedWidget: any = (extras && selectedWidget) ? extras[selectedWidget] : null
 
@@ -344,8 +335,6 @@ export default function PersonView(props: any) {
                         <Name>{owner_alias}</Name>
                     </RowWrap>
 
-
-
                     {/* only see buttons on other people's profile */}
                     {canEdit ? <div style={{ height: 40 }} /> :
                         <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
@@ -422,7 +411,6 @@ export default function PersonView(props: any) {
         </div>
     }
 
-
     function renderDesktopView() {
         const focusedDesktopModalStyles = newSelectedWidget ? {
             ...tabs[newSelectedWidget].modalStyle
@@ -457,12 +445,12 @@ export default function PersonView(props: any) {
             }
 
             <div style={{
-                width: canEdit ? 364 : 322,
-                minWidth: canEdit ? 364 : 322, overflowY: 'auto',
+                width: 364,
+                minWidth: 364, overflowY: 'auto',
                 position: 'relative',
                 background: '#ffffff',
                 color: '#000000',
-                padding: canEdit ? 40 : 30,
+                padding: 40,
                 height: '100%',
                 borderLeft: '1px solid #F2F3F5',
                 borderRight: '1px solid #F2F3F5',
@@ -564,7 +552,7 @@ export default function PersonView(props: any) {
             </div>
 
             <div style={{
-                width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 586px)',
+                width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 628px)',
                 minWidth: 250
             }}>
                 <Tabs style={{
@@ -654,8 +642,6 @@ export default function PersonView(props: any) {
                     </Sleeve>
                     <div style={{ height: 60 }} />
                 </div>
-
-
 
             </div>
 
