@@ -33,8 +33,8 @@ export class MainStore {
   bots: Bot[] = []
 
   @action async getBots(uniqueName?: string): Promise<Bot[]> {
-    const b = await api.get('bots')
-    console.log('b', b)
+    let b = await api.get('bots')
+
     if (uniqueName) {
       b.forEach(function (t: Bot, i: number) {
         if (t.unique_name === uniqueName) {
@@ -43,6 +43,25 @@ export class MainStore {
         }
       })
     }
+
+    // hide test bots and set images
+    b && b.forEach((bb) => {
+      if (bb.unique_name === 'btc') {
+        bb.img = '/static/bots_bitcoin.png'
+      }
+      if (bb.unique_name === 'bets') {
+        bb.img = '/static/bots_betting.png'
+      }
+      if (bb.unique_name === 'hello' || bb.unique_name === 'welcome') {
+        bb.img = '/static/bots_welcome.png'
+      }
+      if (bb.unique_name.includes('test')) {
+        // hide all test bots
+        bb.hide = true
+      }
+    })
+
+
     this.bots = b
     return b
   }

@@ -23,6 +23,16 @@ export default function QR(props) {
         }}>
             <Img src={'/static/sphinx.png'} />
         </div>
+
+        <div style={{
+            position: 'absolute', zIndex: 8,
+            height: props.size,
+            width: props.size,
+            top: 0, left: 0,
+            display: 'flex', justifyContent: 'center', alignItems: 'center'
+        }}>
+            <div style={{ background: '#fff', height: 63, width: 63, borderRadius: '50%' }} />
+        </div>
     </div>
 
 }
