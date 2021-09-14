@@ -44,18 +44,41 @@ export class MainStore {
       })
     }
 
+    // b = [{
+    //   name: 'welcome',
+    //   unique_name: 'welcome',
+    //   label: 'Welcome',
+    //   description: 'my first bot bot'
+    // }, {
+    //   name: 'btc',
+    //   unique_name: 'btc',
+    //   label: 'BTC',
+    //   description: 'my first bot bot'
+    // }, {
+    //   name: 'bet',
+    //   unique_name: 'bet',
+    //   label: 'Bet',
+    //   description: 'my first bot botmy first bot botmy first bot botmy first bot bot'
+    // },]
+
     // hide test bots and set images
-    b && b.forEach((bb) => {
+    b && b.forEach((bb, i) => {
       if (bb.unique_name === 'btc') {
         bb.img = '/static/bots_bitcoin.png'
+        b.splice(i, 1);
+        b.unshift(bb);
       }
       if (bb.unique_name === 'bet') {
         bb.img = '/static/bots_betting.png'
+        b.splice(i, 1);
+        b.unshift(bb);
       }
       if (bb.unique_name === 'hello' || bb.unique_name === 'welcome') {
         bb.img = '/static/bots_welcome.png'
+        b.splice(i, 1);
+        b.unshift(bb);
       }
-      if (bb.unique_name.includes('test')) {
+      if (bb.unique_name && bb.unique_name.includes('test')) {
         // hide all test bots
         bb.hide = true
       }
@@ -193,6 +216,7 @@ export interface Bot {
   tags: string[];
   description: string;
   member_count: number;
+  hide?: boolean;
 }
 
 export interface Person {

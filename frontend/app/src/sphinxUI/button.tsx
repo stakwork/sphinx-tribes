@@ -55,8 +55,9 @@ export default function Button(props: any) {
     return <B
         style={{
             ...colors[props.color], padding: props.icon && '0 0 0 15px', position: 'relative',
+            opacity: props.disabled ? 0.7 : 1,
             height: props.height, width: props.width, paddingRight: props.leadingIcon && 10,
-            ...props.style
+            ...props.style,
         }}
         disabled={props.disabled}
         onClick={props.onClick}
