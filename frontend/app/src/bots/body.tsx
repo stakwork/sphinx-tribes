@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import NoneSpace from '../people/utils/noneSpace';
-import { Button, Modal, SearchTextInput } from '../sphinxUI';
+import { Button, Modal, SearchTextInput, Divider } from '../sphinxUI';
 import { useStores } from '../store';
 import { useObserver } from 'mobx-react-lite'
 import { EuiLoadingSpinner } from '@elastic/eui';
@@ -12,7 +12,7 @@ import { useIsMobile } from '../hooks';
 import Bot from './bot'
 import Form from '../form';
 import { botSchema } from '../form/schema';
-
+import MaterialIcon from '@material/react-material-icon';
 import BotView from './botView'
 
 // avoid hook within callback warning by renaming hooks
@@ -25,6 +25,7 @@ export default function BotBody() {
     const [showBotCreator, setShowBotCreator] = useState(false)
     const [showCreate, setShowCreate] = useState(false)
     const [selectedWidget, setSelectedWidget] = useState('top')
+    const [showDropdown, setShowDropdown] = useState(false)
 
     const c = colors['light']
     const isMobile = useIsMobile()
@@ -98,8 +99,73 @@ export default function BotBody() {
             </Body>
         }
 
+        const widgetLabel = selectedWidget && tabs.find(f => f.name === selectedWidget)
+
         if (isMobile) {
             return <Body>
+                {!ui.meInfo &&
+                    <div style={{ marginTop: 50 }}>
+                        <NoneSpace
+                            buttonText={'Get Started'}
+                            buttonIcon={'arrow_forward'}
+                            action={() => ui.setShowSignIn(true)}
+                            img={'bots_nonespace.png'}
+                            text={'Discover Bots on Sphinx'}
+                            sub={'Spice up your Sphinx experience with our diverse range of Sphinx bots'}
+                            style={{ background: '#fff', height: 400 }}
+                        />
+                        <Divider />
+                    </div>
+                }
+                <div style={{
+                    width: '100%', display: 'flex',
+                    justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
+                    height: 62, marginBottom: 20
+                }}>
+                    <Label style={{ fontSize: 20 }}>
+                        Explore
+                        <Link
+                            onClick={() => setShowDropdown(true)}>
+                            <div>{widgetLabel && widgetLabel.label}</div>
+                            <MaterialIcon icon={'expand_more'} style={{ fontSize: 18, marginLeft: 5 }} />
+
+                            {showDropdown && <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, background: '#fff' }}>
+                                {tabs && tabs.map((t, i) => {
+                                    const label = t.label
+                                    const selected = selectedWidget === t.name
+
+                                    return <Tab key={i}
+                                        style={{ borderRadius: 0, margin: 0 }}
+                                        selected={selected}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setShowDropdown(false)
+                                            setSelectedWidget(t.name)
+                                        }}>
+                                        {label}
+                                    </Tab>
+                                })}
+                            </div>}
+                        </Link>
+                    </Label>
+
+
+
+                    <SearchTextInput
+                        small
+                        name='search'
+                        type='search'
+                        placeholder='Search'
+                        value={ui.searchText}
+                        style={{ width: 164, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
+                        onChange={e => {
+                            console.log('handleChange', e)
+                            ui.setSearchText(e)
+                        }}
+
+                    />
+
+                </div>
                 <div style={{ width: '100%' }} >
                     {bots.map(t => <Bot
                         {...t} key={t.id}
@@ -131,36 +197,55 @@ export default function BotBody() {
             height: 'calc(100% - 65px)'
         }}>
 
+            {!ui.meInfo &&
+                <div style={{ marginTop: 50 }}>
+                    <NoneSpace
+                        buttonText={'Get Started'}
+                        buttonIcon={'arrow_forward'}
+                        action={() => ui.setShowSignIn(true)}
+                        img={'bots_nonespace.png'}
+                        text={'Discover Bots on Sphinx'}
+                        sub={'Spice up your Sphinx experience with our diverse range of Sphinx bots'}
+                        style={{ height: 400 }}
+                    />
+                    <Divider />
+                </div>
+            }
+
             <div style={{
                 width: '100%', display: 'flex',
                 justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
                 height: 62
             }}>
-                <Label style={{ width: 366 }}>
-                    Explore
-                </Label>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Label style={{ marginRight: 46 }}>
+                        Explore
+                    </Label>
 
-                <Tabs>
-                    {tabs && tabs.map((t, i) => {
-                        const label = t.label
-                        const selected = selectedWidget === t.name
+                    <Tabs>
+                        {tabs && tabs.map((t, i) => {
+                            const label = t.label
+                            const selected = selectedWidget === t.name
 
-                        return <Tab key={i}
-                            selected={selected}
-                            onClick={() => {
-                                setSelectedWidget(t.name)
-                            }}>
-                            {label}
-                        </Tab>
-                    })}
+                            return <Tab key={i}
+                                selected={selected}
+                                onClick={() => {
+                                    setSelectedWidget(t.name)
+                                }}>
+                                {label}
+                            </Tab>
+                        })}
 
-                </Tabs>
+                    </Tabs>
+                </div>
 
-                <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
 
                     <Button
                         text={'Add a Bot'}
-                        // color='primary'
+                        leadingIcon={'add'}
+                        height={40}
+                        color='primary'
                         onClick={() => setShowBotCreator(true)}
                     />
 
@@ -294,4 +379,16 @@ font-size: 15px;
 line-height: 19px;
 background:${p => p.selected ? '#DCEDFE' : '#3C3F4100'};
 border-radius:25px;
+min-width:89px;
+justify-content:center;
+align-items:center;
 `;
+const Link = styled.div`
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            margin-left:6px;
+            color:#618AFF;
+            cursor:pointer;
+            position:relative;
+            `;

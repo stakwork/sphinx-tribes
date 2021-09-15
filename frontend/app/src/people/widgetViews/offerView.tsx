@@ -14,13 +14,13 @@ export default function OfferView(props: any) {
         return <Wrap>
 
             <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
-            <Pad>
-                <Body>
-                    <T>{title || 'No title'}</T>
-                    <D>{description || 'No description'}</D>
-                    <P>{formatPrice(price)} <B>sat</B></P>
-                </Body>
-            </Pad>
+
+            <Body>
+                <T>{title || 'No title'}</T>
+                <D>{description || 'No description'}</D>
+                <P>{formatPrice(price)} <B>sat</B></P>
+            </Body>
+
         </Wrap>
     }
 
@@ -48,8 +48,9 @@ export default function OfferView(props: any) {
 }
 const Wrap = styled.div`
 display: flex;
-justify-content:flex-start;`
+justify-content:flex-start;
 
+`;
 
 const DWrap = styled.div`
 display: flex;
@@ -115,7 +116,6 @@ overflow:hidden;
 
 
 const Body = styled.div`
-font-size:14px;
 font-size: 15px;
 line-height: 20px;
 /* or 133% */

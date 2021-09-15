@@ -1,23 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import { useStores } from "../../store";
-import { useObserver } from "mobx-react-lite";
-import Form from "../../form";
-import ConfirmMe from "../confirmMe";
-import type { MeInfo } from '../../store/ui'
-import api from '../../api'
-import styled, { css } from "styled-components";
-import { getHostIncludingDockerHosts } from "../../host";
-import { Button, IconButton, Modal } from "../../sphinxUI";
-import moment from 'moment'
-import SummaryViewer from '../widgetViews/summaryViewer'
-import { useIsMobile } from "../../hooks";
+import styled from "styled-components";
+import { Modal } from "../../sphinxUI";
 import FocusedView from "./focusView";
 import { aboutSchema } from "../../form/schema";
-import FadeLeft from "../../animated/fadeLeft";
 
 // this is where we see others posts (etc) and edit our own
 export default function FirstTimeScreen() {
-    const { ui } = useStores();
+    const { ui, main } = useStores();
 
     const formHeader = <div style={{ marginTop: 60 }}>
         <Title>
@@ -39,6 +29,10 @@ export default function FirstTimeScreen() {
                 buttonsOnBottom={true}
                 person={ui.meInfo}
                 canEdit={true}
+                goBack={() => {
+                    ui.setMeInfo(null)
+                    main.getPeople()
+                }}
                 selectedIndex={-1}
                 config={{
                     label: 'About',
@@ -51,9 +45,9 @@ export default function FirstTimeScreen() {
                 onSuccess={() => {
                     console.log('success')
                 }}
-
             />
         </div>
+
     </Modal>
 }
 

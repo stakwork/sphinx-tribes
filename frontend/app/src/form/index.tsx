@@ -92,14 +92,24 @@ export default function Form(props: any) {
             />)}
 
             <BWrap style={buttonAlignment}>
-
-              {!buttonsOnBottom && <IconButton
-                icon='arrow_back'
-                onClick={() => {
-                  if (props.close) props.close()
-                }}
-                style={{ fontSize: 12, fontWeight: 600 }}
-              />}
+              {(props.close && buttonsOnBottom) ?
+                <Button
+                  disabled={disableFormButtons || props.loading}
+                  onClick={() => {
+                    if (props.close) props.close()
+                  }}
+                  loading={props.loading}
+                  style={{ ...buttonStyle, marginRight: 10 }}
+                  color={'white'}
+                  text={'Cancel'}
+                />
+                : <IconButton
+                  icon='arrow_back'
+                  onClick={() => {
+                    if (props.close) props.close()
+                  }}
+                  style={{ fontSize: 12, fontWeight: 600 }}
+                />}
 
               {readOnly ? <div /> :
                 <Button

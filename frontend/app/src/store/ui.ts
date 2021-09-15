@@ -60,6 +60,12 @@ class UiStore {
     this.selectingBot = n
   }
 
+  @observable toasts: any = []
+  @action setToasts(n: any) {
+    console.log('set toasts', n)
+    this.toasts = n
+  }
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {

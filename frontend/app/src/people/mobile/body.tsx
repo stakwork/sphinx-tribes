@@ -4,6 +4,7 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {
     EuiFieldSearch,
+    EuiGlobalToastList,
     EuiLoadingSpinner,
 } from '@elastic/eui';
 import Person from '../person'
@@ -16,15 +17,18 @@ import { useIsMobile } from '../../hooks';
 import NoneSpace from '../utils/noneSpace';
 import { Divider, SearchTextInput } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
-
+import MaterialIcon from '@material/react-material-icon';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
+
 const getFuse = useFuse
 const getScroll = useScroll
 
 export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
+    const [showDropdown, setShowDropdown] = useState(false)
+
     const [selectedWidget, setSelectedWidget] = useState('people')
 
     const c = colors['light']
@@ -92,7 +96,7 @@ export default function BodyComponent() {
 
         function renderPeople() {
             const p = people && people.map(t => <Person {...t} key={t.id}
-                small={false}
+                small={isMobile}
                 selected={ui.selectedPerson === t.id}
                 select={selectPerson}
             />)
@@ -111,15 +115,92 @@ export default function BodyComponent() {
             return <FirstTimeScreen />
         }
 
+        const widgetLabel = selectedWidget && tabs.find(f => f.name === selectedWidget)
+
+        const toastsEl = <EuiGlobalToastList
+            toasts={ui.toasts}
+            dismissToast={() => ui.setToasts([])}
+            toastLifeTimeMs={3000}
+        />
+
         if (isMobile) {
             return <Body>
-                <div style={{ width: '100%' }} >
-                    {people.map(t => <Person {...t} key={t.id}
-                        selected={ui.selectedPerson === t.id}
-                        small={isMobile}
-                        select={selectPerson}
-                    />)}
+
+                {!ui.meInfo &&
+                    <div style={{ marginTop: 60 }}>
+                        <NoneSpace
+                            buttonText={'Get Started'}
+                            buttonIcon={'arrow_forward'}
+                            action={() => ui.setShowSignIn(true)}
+                            img={'explore.png'}
+                            text={'Discover people on Sphinx'}
+                            style={{ height: 320, background: '#fff' }}
+                        />
+                        <Divider />
+                    </div>
+                }
+
+                <div style={{
+                    width: '100%', display: 'flex',
+                    justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
+                    height: 62, marginBottom: 20
+                }}>
+                    <Label style={{ fontSize: 20 }}>
+                        Explore
+                        <Link
+                            onClick={() => setShowDropdown(true)}>
+                            <div>{widgetLabel && widgetLabel.label}</div>
+                            <MaterialIcon icon={'expand_more'} style={{ fontSize: 18, marginLeft: 5 }} />
+
+                            {showDropdown && <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, background: '#fff' }}>
+                                {tabs && tabs.map((t, i) => {
+                                    const label = t.label
+                                    const selected = selectedWidget === t.name
+
+                                    return <Tab key={i}
+                                        style={{ borderRadius: 0, margin: 0 }}
+                                        selected={selected}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setShowDropdown(false)
+                                            setSelectedWidget(t.name)
+                                        }}>
+                                        {label}
+                                    </Tab>
+                                })}
+                            </div>}
+                        </Link>
+                    </Label>
+
+
+
+                    <SearchTextInput
+                        small
+                        name='search'
+                        type='search'
+                        placeholder='Search'
+                        value={ui.searchText}
+                        style={{ width: 164, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
+                        onChange={e => {
+                            console.log('handleChange', e)
+                            ui.setSearchText(e)
+                        }}
+
+                    />
+
                 </div>
+
+                <div style={{ width: '100%' }} >
+                    {selectedWidget === 'people' ?
+                        renderPeople()
+                        : <WidgetSwitchViewer
+                            onPanelClick={(person, widget, i) => {
+                                selectPerson(person.id, person.unique_name)
+                            }}
+                            selectedWidget={selectedWidget} />
+                    }
+                </div>
+
                 <FadeLeft
                     withOverlay
                     drift={40}
@@ -133,6 +214,8 @@ export default function BodyComponent() {
                         selectPerson={selectPerson}
                         loading={loading} />
                 </FadeLeft>
+
+                {toastsEl}
             </Body >
         }
 
@@ -228,6 +311,8 @@ export default function BodyComponent() {
                     peopleView={true}
                     selectPerson={selectPerson} />
             </FadeLeft>
+
+            {toastsEl}
         </Body>
     }
     )
@@ -278,4 +363,14 @@ const Tab = styled.div<TagProps>`
             line-height: 19px;
             background:${p => p.selected ? '#DCEDFE' : '#3C3F4100'};
             border-radius:25px;
+            `;
+
+const Link = styled.div`
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            margin-left:6px;
+            color:#618AFF;
+            cursor:pointer;
+            position:relative;
             `;

@@ -93,14 +93,13 @@ export default function Header() {
     }, [])
 
     function goToEditSelf() {
+        // if page is not /p, go to /p (people)
+        let path = location.pathname
+        if (!path.includes('/p')) history.push('/p')
+
         if (ui.meInfo?.id) {
             ui.setSelectedPerson(ui.meInfo.id)
             ui.setSelectingPerson(ui.meInfo.id)
-
-            let path = location.pathname
-            if (!path.includes('/p')) {
-                history.push('/p')
-            }
         }
     }
 
@@ -109,7 +108,7 @@ export default function Header() {
     function renderHeader() {
         if (isMobile) {
             return <EuiHeader id="header" style={{
-                color: '#fff', background: headerBackground, maxHeight: 159
+                color: '#fff', background: headerBackground, paddingBottom: 0,
             }}>
                 < div className="container" >
                     <Row style={{ justifyContent: 'space-between' }}>
@@ -136,7 +135,7 @@ export default function Header() {
                         </Corner>
                     </Row>
 
-                    <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden' }} >
+                    {/* <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden' }} >
                         <EuiFieldSearch id="search-input"
                             placeholder="Search"
                             value={ui.searchText}
@@ -145,23 +144,23 @@ export default function Header() {
                             aria-label="search"
 
                         />
-                    </EuiHeaderSection>
+                    </EuiHeaderSection> */}
 
-                    <Tabs>
+                    <MTabs>
                         {tabs && tabs.map((t, i) => {
                             const label = t.label
                             const selected = location.pathname.includes(t.path)
 
-                            return <Tab key={i}
+                            return <MTab key={i}
                                 selected={selected}
                                 onClick={() => {
                                     history.push(t.path)
                                 }}>
                                 {label}
-                            </Tab>
+                            </MTab>
                         })}
 
-                    </Tabs>
+                    </MTabs>
                 </div>
             </ EuiHeader >
         }
@@ -250,6 +249,10 @@ export default function Header() {
                     onSuccess={() => {
                         ui.setShowSignIn(false)
                         setShowWelcome(true)
+
+                        // if page is not /p, go to /p (people)
+                        let path = location.pathname
+                        if (!path.includes('/p')) history.push('/p')
                     }} />
             </Modal >
 
@@ -365,6 +368,11 @@ const Tabs = styled.div`
                         margin-left:20px;
                         `;
 
+const MTabs = styled.div`
+                        display:flex;
+                        margin:0 20px;
+                        justify-content:space-around;
+                        `;
 interface TagProps {
     selected: boolean;
 }
@@ -379,4 +387,18 @@ const Tab = styled.div<TagProps>`
                             line-height: 19px;
                             background:${p => p.selected ? 'rgba(255,255,255,0.07)' : '#3C3F4100'};
                             border-radius:25px;
+                            `;
+
+const MTab = styled.div<TagProps>`
+                            display:flex;
+                            margin:25px 5px 0;
+                            color:${p => p.selected ? '#fff' : '#ffffff99'};
+                            cursor:pointer;
+                            height:30px;
+                            min-width:65px;
+                            font-weight: 500;
+                            font-size: 15px;
+                            line-height: 19px;
+                            justify-content:center;
+                            border-bottom:${p => p.selected ? '3px solid #618AFF' : 'none'};
                             `;

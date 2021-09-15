@@ -564,7 +564,7 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = (extras[name] && extras[name].length > 0) ? extras[name].length : null
+                        let count = (extras && extras[name] && extras[name].length > 0) ? extras[name].length : null
                         return <Tab key={i}
                             style={{ height: 64, alignItems: 'center' }}
                             selected={selected}
