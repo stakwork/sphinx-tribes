@@ -44,7 +44,6 @@ export default function Person(props: any) {
 
   return useObserver(() => {
 
-
     const qrString = makeQR(owner_pubkey);
 
     function renderPersonCard() {

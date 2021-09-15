@@ -156,6 +156,10 @@ export default function FocusedView(props: any) {
                 const j = await r.json()
                 console.log('json', j)
                 body.id = j.response.id
+                ui.setToasts([{
+                    id: '1',
+                    title: 'Profile created! Now you can sign in.'
+                }]);
             }
 
             ui.setMeInfo(body)

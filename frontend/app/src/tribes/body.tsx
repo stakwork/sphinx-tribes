@@ -14,7 +14,7 @@ import {
   EuiHighlight,
 } from '@elastic/eui';
 import Tribe from './tribe'
-import { useFuse, useScroll } from '../hooks'
+import { useFuse, useIsMobile, useScroll } from '../hooks'
 import { Divider, SearchTextInput } from '../sphinxUI';
 import { orderBy } from 'lodash'
 import Tag from './tag'
@@ -27,6 +27,8 @@ export default function BodyComponent() {
   const { main, ui } = useStores()
   const [selected, setSelected] = useState('')
   const [tagsPop, setTagsPop] = useState(false)
+
+  const isMobile = useIsMobile()
 
   const selectedTags = ui.tags.filter(t => t.checked === 'on')
   const showTagCount = selectedTags.length > 0 ? true : false
@@ -102,7 +104,7 @@ export default function BodyComponent() {
             <EuiSelectable
               searchable
               options={ui.tags}
-              renderOption={(option, searchValue) => <div style={{ display: 'flex', alignItems: 'center' }}>
+              renderOption={(option, searchValue) => <div style={{ display: 'flex', alignItems: 'center', }}>
                 <Tag type={option.label} iconOnly />
                 <EuiHighlight search={searchValue} style={{
                   fontSize: 11, marginLeft: 5, color: tags[option.label].color
@@ -122,12 +124,15 @@ export default function BodyComponent() {
             </EuiSelectable>
           </EuiPopover>
 
+          <div style={{ width: 20 }} />
+
           <SearchTextInput
             name='search'
             type='search'
+            small={isMobile}
             placeholder='Search'
             value={ui.searchText}
-            style={{ width: 204, height: 40, background: '#111', color: '#fff', border: 'none', marginLeft: 20 }}
+            style={{ width: 204, height: 40, background: '#111', color: '#fff', border: 'none' }}
             onChange={e => {
               console.log('handleChange', e)
               ui.setSearchText(e)
