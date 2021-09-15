@@ -36,6 +36,9 @@ function App() {
             <BotsBody />
           </Route>
         </Switch>
+
+        {/* for global toasts */}
+
       </div>
         // tribes
         : <div className="app" style={{ background: c.background }}>
