@@ -174,7 +174,8 @@ const Column = styled.div`
   display:flex;
   flex-direction:column;
   align-items:center;
-  max-width:900px;
+  margin-top:10px;
+  // max-width:900px;
   width:100%;
 `
 interface LoadmoreWrapProps {
