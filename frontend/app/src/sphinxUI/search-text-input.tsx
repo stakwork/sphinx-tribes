@@ -8,7 +8,7 @@ export default function SearchTextInput(props: any) {
     const [expand, setExpand] = useState(ui.searchText ? true : false)
 
     const collapseStyles = (props.small && !expand) ? {
-        width: 40, maxWidth: 40,
+        // width: 40, maxWidth: 40,
     } : {}
 
     return <div style={{ position: 'relative' }}><Text
@@ -21,10 +21,12 @@ export default function SearchTextInput(props: any) {
         placeholder={'Search'}
         style={{ ...props.style, ...collapseStyles }}
     />
-        {(props.small && !expand) && <MaterialIcon icon='search' style={{
-            position: 'absolute', color: '#B0B7BC',
-            top: 9, left: 9, fontSize: 22, userSelect: 'none', pointerEvents: 'none'
-        }} />}
+        {!ui.searchText &&
+            <MaterialIcon icon='search' style={{
+                position: 'absolute', color: '#B0B7BC',
+                top: 9, right: 9, fontSize: 22, userSelect: 'none', pointerEvents: 'none'
+            }} />
+        }
     </div>
 }
 
