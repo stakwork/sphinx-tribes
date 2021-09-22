@@ -2,21 +2,38 @@
 import React from 'react'
 import styled from 'styled-components';
 import moment from 'moment'
-export default function NameTag(props) {
-    const { owner_alias, img, created, style } = props
+import { useStores } from '../../store';
 
-    let diffHours = 1
-    if (created) {
-        let a = moment()
-        let b = moment.unix(created)
-        diffHours = a.diff(b, 'hours')
+export default function NameTag(props) {
+    const { owner_alias, img, created, unique_name, id, style, widget } = props
+    const { ui } = useStores()
+
+    const isSelected = (ui.selectedPerson == id) ? true : false
+
+    function selectPerson(e) {
+        // don't select if already selected
+        if (isSelected) return
+        e.stopPropagation()
+        console.log('selectPerson', id, unique_name)
+        ui.setPersonViewOpenTab(widget || '')
+        ui.setSelectedPerson(id)
+        ui.setSelectingPerson(id)
+        if (unique_name && window.history.pushState) {
+            window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
+        }
     }
 
+    let lastSeen = created ? moment.unix(created).fromNow() : ''
 
-    return <div style={{
-        display: 'flex', alignItems: 'center',
-        width: 'fit-content', marginBottom: 10, ...style
-    }}>
+    // shorten lastSeen string
+    if (lastSeen === 'a few seconds ago') lastSeen = 'just now'
+
+    return <Wrap
+        isSelected={isSelected}
+        onClick={(e) => {
+            selectPerson(e)
+        }}
+        style={style}>
         <Img
             src={img || `/static/sphinx`}
         />
@@ -24,12 +41,12 @@ export default function NameTag(props) {
             {owner_alias}
         </Name>
 
-        <div style={{ height: 4, width: 4, borderRadius: '50%', margin: '0 5px' }} />
+        <div style={{ height: 3, width: 3, borderRadius: '50%', margin: '0 6px', background: '#8E969C' }} />
 
         <Date>
-            {!diffHours ? 'just now' : `${diffHours} h`}
+            {lastSeen}
         </Date>
-    </div>
+    </Wrap>
 
 }
 
@@ -60,7 +77,7 @@ align-items: center;
 
 /* Secondary Text 4 */
 
-color: #8E969C;
+
 
             `;
 
@@ -71,13 +88,24 @@ font-weight: normal;
 font-size: 12px;
 line-height: 19px;
 /* or 158% */
-margin-left:5px;
 
 display: flex;
 align-items: center;
 
-/* Secondary Text 4 */
+            `;
+interface WrapProps {
+    readonly isSelected: boolean;
+}
 
+const Wrap = styled.div<WrapProps>`
+display: flex;
+align-items: center;
+cursor: ${p => !p.isSelected && 'pointer'};
+width: fit-content;
+margin-bottom: 10px;
 color: #8E969C;
+&:hover{
+    color:${p => !p.isSelected && '#618AFF'};
 
+}
             `;

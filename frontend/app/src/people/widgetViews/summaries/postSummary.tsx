@@ -4,13 +4,23 @@ import styled from "styled-components";
 import { Post } from '../../../form/inputs/widgets/interfaces';
 import GalleryViewer from '../../utils/galleryViewer';
 import ReactMarkdown from 'react-markdown'
+import NameTag from '../../utils/nameTag';
+import MaterialIcon from '@material/react-material-icon';
+import FavoriteButton from '../../utils/favoriteButton';
 
-export default function PostSummary(props: Post) {
-    const { title, content, created, gallery } = props
+export default function PostSummary(props: any) {
+    const { title, content, created, gallery, person } = props
+
+    const heart = <FavoriteButton />
 
     return <Pad>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+            <NameTag {...person} created={created} widget={'post'} />
+            {heart}
+        </div>
+
         <T>{title || 'No title'} </T>
-        <Time>{created && moment.unix(created).format('LLL')} </Time>
+        {/* <Time>{created && moment.unix(created).format('LLL')} </Time> */}
         <M><ReactMarkdown>{content}</ReactMarkdown></M>
 
         {/* readmore */}

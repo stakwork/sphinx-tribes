@@ -1,9 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React from "react";
 import { useStores } from "../../store";
-import { useObserver } from "mobx-react-lite";
-import styled, { css } from "styled-components";
-import { Button, IconButton } from "../../sphinxUI";
-import moment from 'moment'
+import styled from "styled-components";
 import PostSummary from './summaries/postSummary'
 import WantedSummary from './summaries/wantedSummary'
 import OfferSummary from './summaries/offerSummary'
@@ -11,28 +8,32 @@ import OfferSummary from './summaries/offerSummary'
 // this is where we see others posts (etc) and edit our own
 export default function SummaryViewer(props: any) {
     const { item, config, person } = props
-    const { ui, main } = useStores();
+    const { ui } = useStores();
+
+    const isSelectedView = ui.selectedPerson ? true : false
 
     function wrapIt(child) {
-        return <Wrap style={{ maxHeight: config.name === 'post' ? '' : '80vh' }}>
+        return <Wrap style={{
+            maxHeight: config.name === 'post' ? '' : '80vh',
+            height: isSelectedView ? 'calc(100% - 60px)' : '100%'
+        }}>
             {child}
         </Wrap>
     }
 
     switch (config.name) {
         case 'post':
-            return wrapIt(<PostSummary {...item} />)
+            return wrapIt(<PostSummary {...item} person={person} />)
         case 'offer':
-            return wrapIt(<OfferSummary {...item} />)
+            return wrapIt(<OfferSummary {...item} person={person} />)
         case 'wanted':
-            return wrapIt(<WantedSummary {...item} />)
+            return wrapIt(<WantedSummary {...item} person={person} />)
         default:
             return wrapIt(<div>none</div>)
     }
 }
 
 const Wrap = styled.div`
-height: calc(100% - 60px);
 overflow: auto;
 display: flex;
 flex-direction:column;
