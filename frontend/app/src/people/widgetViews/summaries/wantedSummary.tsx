@@ -1,3 +1,4 @@
+import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
 import { Wanted } from '../../../form/inputs/widgets/interfaces';
@@ -5,9 +6,11 @@ import { formatPrice } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
 import { Divider, Title, Paragraph } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
+import NameTag from '../../utils/nameTag';
+import FavoriteButton from '../../utils/favoriteButton'
 
-export default function WantedSummary(props: Wanted) {
-        const { title, description, priceMin, priceMax, url, gallery } = props
+export default function WantedSummary(props: any) {
+        const { title, description, priceMin, priceMax, url, gallery, person, created } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
 
@@ -19,25 +22,29 @@ export default function WantedSummary(props: Wanted) {
                 }
         }, [imgRef])
 
+        const heart = <FavoriteButton />
+
         const isMobile = useIsMobile()
         if (isMobile) {
                 return <>
                         <Pad>
-                                <Y>
-                                        <div>Price</div>
-                                        <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
-                                </Y>
-                                <Divider style={{
-                                        marginBottom: 10
-                                }} />
-
+                                <NameTag {...person}
+                                        created={created}
+                                        widget={'wanted'} />
 
                                 <T>{title || 'No title'}</T>
+                                <Divider style={{
+                                        marginTop: 22
+                                }} />
+                                <Y>
+                                        <P>{formatPrice(priceMin)} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
+                                        {heart}
+                                </Y>
+                                <Divider style={{ marginBottom: 22 }} />
                                 <D>{description || 'No description'}</D>
-                        </Pad>
 
-                        <Divider />
-                        <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
+                                <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
+                        </Pad>
                 </>
         }
 
@@ -46,14 +53,22 @@ export default function WantedSummary(props: Wanted) {
                         innerRef={imgRef}
                         style={{ width: 507, height: 'fit-content' }}
                         gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
-                <div style={{ width: 316, padding: 20, paddingTop: 30, overflowY: 'auto', height: envHeight }}>
+                <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
                         <Pad>
+                                <NameTag
+                                        style={{ marginBottom: 14 }}
+                                        {...person}
+                                        created={created}
+                                        widget={'wanted'} />
+
                                 <Title>{title}</Title>
-                                <Divider style={{ marginTop: 10 }} />
+
+                                <Divider style={{ marginTop: 22 }} />
                                 <Y>
-                                        <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                                        <P>{formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax) || '0'} <B>SAT</B></P>
+                                        {heart}
                                 </Y>
-                                <Divider style={{ marginBottom: 10 }} />
+                                <Divider style={{ marginBottom: 22 }} />
 
                                 <Paragraph>{description}</Paragraph>
                         </Pad>
@@ -99,6 +114,6 @@ const P = styled.div`
         `;
 const D = styled.div`
         color:#5F6368;
-        margin: 10px 0;
+        margin: 10px 0 30px;
         `;
 

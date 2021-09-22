@@ -6,6 +6,7 @@ import { useObserver } from 'mobx-react-lite'
 import { colors } from "../colors";
 import { Button, Divider, Modal } from '../sphinxUI/index'
 import ConnectCard from "./utils/connectCard";
+import moment from "moment";
 const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
@@ -27,6 +28,7 @@ export default function Person(props: any) {
     owner_pubkey,
     unique_name,
     price_to_meet,
+    updated,
     extras,
     twitter_confirmed
   } = props
@@ -41,6 +43,15 @@ export default function Person(props: any) {
     tagsString += t;
   });
 
+  // no suffix
+  let lastSeen = moment(updated).fromNow(true)
+
+  // shorten lastSeen string
+  if (lastSeen === 'a few seconds') lastSeen = 'just now'
+  if (lastSeen === 'an hour') lastSeen = '1 hour'
+  if (lastSeen === 'a minute') lastSeen = '1 minute'
+  if (lastSeen === 'a day') lastSeen = '1 day'
+  if (lastSeen === 'a month') lastSeen = '1 month'
 
   return useObserver(() => {
 
@@ -50,7 +61,6 @@ export default function Person(props: any) {
       if (small) {
         return <Wrap onClick={() => select(id, unique_name)} style={{
           background: selected ? '#F2F3F5' : '#fff',
-
         }}>
           <div>
             <Img src={img || '/static/sphinx.png'} style={hideActions && { width: 56, height: 56 }} />
@@ -62,7 +72,7 @@ export default function Person(props: any) {
             </Description>
             {!hideActions &&
               <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <div></div>
+                <Updated>{lastSeen}</Updated>
                 {(!hideActions && owner_pubkey) ?
                   <>
                     <a href={qrString}>
@@ -96,7 +106,7 @@ export default function Person(props: any) {
         <div>
           <Divider />
           <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
-            <div />
+            <Updated style={{ marginLeft: 10 }}>{lastSeen}</Updated>
             {owner_pubkey ?
               <>
                 <Button
@@ -152,6 +162,21 @@ const DWrap = styled.div`
 
 const R = styled.div`
         margin-left:20px;
+        `;
+
+const Updated = styled.div`
+font-style: normal;
+font-weight: normal;
+font-size: 13px;
+line-height: 22px;
+/* or 169% */
+
+display: flex;
+align-items: center;
+
+/* Secondary Text 4 */
+
+color: #8E969C;
         `;
 
 
