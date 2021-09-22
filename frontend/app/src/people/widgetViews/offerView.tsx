@@ -85,7 +85,7 @@ color: #5F6368;
 `;
 const DT = styled(Title)`
 margin-bottom:9px;
-max-height:40px;
+max-height:52px;
 overflow:hidden;
 
 /* Text 2 */
