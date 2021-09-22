@@ -4,10 +4,11 @@ import { Offer } from '../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
-import { Divider } from '../../sphinxUI';
+import { Divider, Title } from '../../sphinxUI';
+import NameTag from '../utils/nameTag';
 
 export default function OfferView(props: any) {
-    const { gallery, title, description, price } = props
+    const { gallery, title, description, price, person, created } = props
     const isMobile = useIsMobile()
 
     if (isMobile) {
@@ -34,6 +35,7 @@ export default function OfferView(props: any) {
             style={{ maxHeight: 276, overflow: 'hidden' }} />
         <div>
             <Pad style={{ padding: 20, height: gallery ? '' : 411 }}>
+                <NameTag {...person} created={created} widget={'offer'} />
                 <DT>{title}</DT>
                 <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
             </Pad>
@@ -81,20 +83,14 @@ line-height: 20px;
 color: #5F6368;
 
 `;
-const DT = styled.div`
+const DT = styled(Title)`
 margin-bottom:9px;
-font-family: Roboto;
-font-style: normal;
-font-weight: 500;
-font-size: 15px;
-line-height: 20px;
-/* or 133% */
 max-height:40px;
 overflow:hidden;
 
-/* Primary Text 1 */
+/* Text 2 */
 
-color: #292C33;
+color: #3C3F41;
 `;
 
 const T = styled.div`

@@ -5,7 +5,6 @@ import { Extras } from '../form/inputs/widgets/interfaces'
 import { getHostIncludingDockerHosts } from '../host'
 import { uiStore } from './ui'
 
-
 export class MainStore {
   @persist('list') @observable
   tribes: Tribe[] = []
@@ -176,6 +175,86 @@ export class MainStore {
       console.log('e', e)
       // could not delete profile!
       return null
+    }
+  }
+
+  @action async addFavorite() {
+    let body: any = {}
+    console.log('SUBMIT FORM', body);
+
+    // console.log('mergeFormWithMeData', body);
+    if (!body) return // avoid saving bad state
+
+    const info = uiStore.meInfo as any;
+    if (!info) return console.log("no meInfo");
+    try {
+      const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+      const r = await fetch(URL + "/profile", {
+        method: "POST",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...body,
+          price_to_meet: parseInt(body.price_to_meet),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      })
+
+
+      if (!r.ok) {
+        return alert("Failed to create profile");
+      }
+
+      uiStore.setToasts([{
+        id: '1',
+        title: 'Added to favorites.'
+      }]);
+
+    } catch (e) {
+      console.log('e', e)
+    }
+  }
+
+  @action async deleteFavorite() {
+    let body: any = {}
+    console.log('SUBMIT FORM', body);
+
+    // console.log('mergeFormWithMeData', body);
+    if (!body) return // avoid saving bad state
+
+    const info = uiStore.meInfo as any;
+    if (!info) return console.log("no meInfo");
+    try {
+      const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
+      const r = await fetch(URL + "/profile", {
+        method: "POST",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...body,
+          price_to_meet: parseInt(body.price_to_meet),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      })
+
+
+      if (!r.ok) {
+        return alert("Failed to create profile");
+      }
+
+      uiStore.setToasts([{
+        id: '1',
+        title: 'Added to favorites.'
+      }]);
+
+    } catch (e) {
+      console.log('e', e)
     }
   }
 }

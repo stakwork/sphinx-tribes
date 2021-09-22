@@ -26,12 +26,11 @@ function Link(props: any) {
 
 const T = styled.div`
 color:#3C3F41;
-font-family: Roboto;
 font-size: 20px;
 font-style: normal;
-font-weight: 600;
+font-weight: 500;
 line-height: 26px;
-letter-spacing: 1px;
+letter-spacing: 0.7px;
 text-align: left;
 margin-bottom:10px;
 

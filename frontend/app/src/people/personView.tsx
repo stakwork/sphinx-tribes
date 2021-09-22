@@ -169,15 +169,15 @@ export default function PersonView(props: any) {
 
         switch (widgetSchema.name) {
             case 'twitter':
-                return wrapIt(<TwitterView {...fullSelectedWidget} />)
+                return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />)
             case 'supportme':
-                return wrapIt(<SupportMeView {...fullSelectedWidget} />)
+                return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />)
             case 'offer':
-                return wrapIt(<OfferView {...fullSelectedWidget} />)
+                return wrapIt(<OfferView {...fullSelectedWidget} person={person} />)
             case 'wanted':
-                return wrapIt(<WantedView {...fullSelectedWidget} />)
+                return wrapIt(<WantedView {...fullSelectedWidget} person={person} />)
             case 'blog':
-                return wrapIt(<BlogView {...fullSelectedWidget} />)
+                return wrapIt(<BlogView {...fullSelectedWidget} person={person} />)
             default:
                 return <></>
 

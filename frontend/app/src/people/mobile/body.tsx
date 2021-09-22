@@ -3,21 +3,24 @@ import styled from 'styled-components'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {
-    EuiFieldSearch,
     EuiGlobalToastList,
     EuiLoadingSpinner,
 } from '@elastic/eui';
 import Person from '../person'
 import PersonViewSlim from '../personViewSlim'
-import { useFuse, useScroll } from '../../hooks'
+import { useFuse, useScroll, useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
-import { useIsMobile } from '../../hooks';
+
 import NoneSpace from '../utils/noneSpace';
-import { Divider, SearchTextInput } from '../../sphinxUI';
+import { Divider, SearchTextInput, Modal } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
 import MaterialIcon from '@material/react-material-icon';
+import FocusedView from './focusView';
+
+import { widgetConfigs } from '../utils/constants'
+
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -28,6 +31,9 @@ export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
     const [showDropdown, setShowDropdown] = useState(false)
+
+    const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
+    const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
@@ -57,10 +63,20 @@ export default function BodyComponent() {
     ]
     const isMobile = useIsMobile()
 
+    useEffect(() => {
+        // clear public focus is selected person
+        if (ui.selectedPerson) {
+            setPublicFocusPerson(null)
+            setPublicFocusIndex(-1)
+        }
+    }, [ui.selectedPerson])
+
     function selectPerson(id: number, unique_name: string) {
         console.log('selectPerson', id, unique_name)
         ui.setSelectedPerson(id)
         ui.setSelectingPerson(id)
+        // setPublicFocusPerson(null)
+        // setPublicFocusIndex(-1)
         if (unique_name && window.history.pushState) {
             window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
         }
@@ -84,8 +100,10 @@ export default function BodyComponent() {
         loadPeople()
     }, [])
 
-
-
+    function publicPanelClick(person, widget, i) {
+        setPublicFocusPerson(person)
+        setPublicFocusIndex(i)
+    }
 
     return useObserver(() => {
         const peeps = getFuse(main.people, ["owner_alias"])
@@ -195,7 +213,8 @@ export default function BodyComponent() {
                         renderPeople()
                         : <WidgetSwitchViewer
                             onPanelClick={(person, widget, i) => {
-                                selectPerson(person.id, person.unique_name)
+                                publicPanelClick(person, widget, i)
+                                // selectPerson(person.id, person.unique_name)
                             }}
                             selectedWidget={selectedWidget} />
                     }
@@ -215,9 +234,34 @@ export default function BodyComponent() {
                         loading={loading} />
                 </FadeLeft>
 
+                <Modal
+                    visible={publicFocusPerson ? true : false}
+                    fill={true}
+                >
+                    <FocusedView
+                        person={publicFocusPerson}
+                        canEdit={false}
+                        selectedIndex={publicFocusIndex}
+                        config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
+                        onSuccess={() => {
+                            console.log('success')
+                            setPublicFocusPerson(null)
+                            setPublicFocusIndex(-1)
+                        }}
+                        goBack={() => {
+                            setPublicFocusPerson(null)
+                            setPublicFocusIndex(-1)
+                        }}
+                    />
+                </Modal>
+
                 {toastsEl}
             </Body >
         }
+
+        const focusedDesktopModalStyles = (selectedWidget && widgetConfigs[selectedWidget]) ? {
+            ...widgetConfigs[selectedWidget].modalStyle
+        } : {}
 
         // desktop mode
         return <Body style={{
@@ -287,7 +331,8 @@ export default function BodyComponent() {
                         renderPeople()
                         : <WidgetSwitchViewer
                             onPanelClick={(person, widget, i) => {
-                                selectPerson(person.id, person.unique_name)
+                                publicPanelClick(person, widget, i)
+                                // selectPerson(person.id, person.unique_name)
                             }}
                             selectedWidget={selectedWidget} />
                     }
@@ -311,6 +356,37 @@ export default function BodyComponent() {
                     peopleView={true}
                     selectPerson={selectPerson} />
             </FadeLeft>
+
+
+            <Modal
+                visible={publicFocusPerson ? true : false}
+                envStyle={{
+                    borderRadius: 0, background: '#fff',
+                    height: '100%', width: '60%',
+                    minWidth: 500, maxWidth: 602,
+                    ...focusedDesktopModalStyles
+                }}
+                bigClose={() => {
+                    setPublicFocusPerson(null)
+                    setPublicFocusIndex(-1)
+                }}
+            >
+                <FocusedView
+                    person={publicFocusPerson}
+                    canEdit={false}
+                    selectedIndex={publicFocusIndex}
+                    config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
+                    onSuccess={() => {
+                        console.log('success')
+                        setPublicFocusPerson(null)
+                        setPublicFocusIndex(-1)
+                    }}
+                    goBack={() => {
+                        setPublicFocusPerson(null)
+                        setPublicFocusIndex(-1)
+                    }}
+                />
+            </Modal>
 
             {toastsEl}
         </Body>

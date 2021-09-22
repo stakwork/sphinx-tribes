@@ -1,13 +1,13 @@
 import React from 'react'
 import styled from "styled-components";
-import { Wanted } from '../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
-import { Divider } from '../../sphinxUI';
+import { Divider, Title } from '../../sphinxUI';
+import NameTag from '../utils/nameTag';
 
 export default function WantedView(props: any) {
-    const { title, description, priceMin, priceMax, url, gallery } = props
+    const { title, description, priceMin, priceMax, url, gallery, person, created } = props
     const isMobile = useIsMobile()
 
     if (isMobile) {
@@ -16,8 +16,8 @@ export default function WantedView(props: any) {
             <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
 
             <Body>
-                <T>{title || 'No title'}</T>
-                <D>{description || 'No description'}</D>
+                <T>{title}</T>
+                <D>{description}</D>
                 <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
             </Body>
 
@@ -34,8 +34,9 @@ export default function WantedView(props: any) {
             style={{ maxHeight: 276, overflow: 'hidden' }} />
 
         <Pad style={{ padding: 20 }}>
-            <DT>{title || 'No title'}</DT>
-            <DD style={{ maxHeight: gallery ? 40 : '' }}>{description || 'No description'}</DD>
+            <NameTag {...person} created={created} widget={'wanted'} />
+            <DT>{title}</DT>
+            <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
         </Pad>
         <Divider style={{ margin: 0 }} />
         <Pad style={{ padding: 20, }}>
@@ -123,14 +124,8 @@ line-height: 20px;
 color: #5F6368;
 
 `;
-const DT = styled.div`
+const DT = styled(Title)`
 margin-bottom:9px;
-font-family: Roboto;
-font-style: normal;
-font-weight: 500;
-font-size: 15px;
-line-height: 20px;
-/* or 133% */
 max-height:40px;
 overflow:hidden;
 

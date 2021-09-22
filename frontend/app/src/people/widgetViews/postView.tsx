@@ -17,8 +17,8 @@ export default function PostView(props: any) {
     return <Wrap style={{ maxHeight: expand ? '' : 472 }}>
         <Pad>
             <Title>{title} </Title>
-            {(showName && person) ? <NameTag {...person} created={created} />
-                : <Date>{created && moment.unix(created).format('LLL')} </Date>}
+            <NameTag {...person} created={created} widget={'post'} />
+            {/* // : <Date>{created && moment.unix(created).format('LLL')} </Date>} */}
             <Paragraph style={{
                 maxHeight: (noGallery && !expand) ? 340 : !expand ? 80 : '',
                 minHeight: noGallery ? 80 : '', overflow: 'hidden'
