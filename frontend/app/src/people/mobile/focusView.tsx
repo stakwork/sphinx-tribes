@@ -258,15 +258,15 @@ export default function FocusedView(props: any) {
                                         leadingIcon={'edit'}
                                         iconSize={18}
                                         width={100}
-                                        text={props.submitText || 'Edit'}
+                                        text={'Edit'}
                                     />
-                                    <IconButton
+                                    <Button
                                         onClick={() => deleteIt()}
-                                        color={'widget'}
+                                        color={'white'}
                                         loading={deleting}
-                                        icon={'delete'}
-                                        style={{ marginLeft: 10 }}
-                                    // iconSize={18}
+                                        leadingIcon={'delete_outline'}
+                                        text={'Delete'}
+                                        style={{ marginLeft: 20 }}
                                     />
                                 </div>
                                 : <div />}
@@ -278,7 +278,7 @@ export default function FocusedView(props: any) {
                         {/* display item */}
                         <SummaryViewer
                             person={person}
-                            item={person.extras && person.extras[config.name][selectedIndex]}
+                            item={person?.extras && person.extras[config.name][selectedIndex]}
                             config={config}
                         />
 

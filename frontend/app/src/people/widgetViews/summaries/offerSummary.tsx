@@ -1,14 +1,17 @@
 
+import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
-import { Offer } from '../../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
 import { Divider, Title, Paragraph } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
+import NameTag from '../../utils/nameTag';
+import FavoriteButton from '../../utils/favoriteButton'
 
-export default function OfferSummary(props: Offer) {
-        const { gallery, title, description, price } = props
+export default function OfferSummary(props: any) {
+        let { gallery, title, description, price, person, created } = props
+
         const isMobile = useIsMobile()
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
@@ -21,23 +24,29 @@ export default function OfferSummary(props: Offer) {
                 }
         }, [imgRef])
 
+        const heart = <FavoriteButton />
+
         if (isMobile) {
                 return <>
                         <Pad>
-                                <Y>
-                                        <div>Price</div>
-                                        <P>{formatPrice(price)} <B>sat</B></P>
-                                </Y>
-                                <Divider style={{
-                                        marginBottom: 10
-                                }} />
-
+                                <NameTag {...person}
+                                        style={{ marginBottom: 14 }}
+                                        created={created} widget={'offer'} />
 
                                 <T>{title || 'No title'}</T>
+
+                                <Divider style={{ marginTop: 22 }} />
+                                <Y>
+                                        <P>{formatPrice(price)} <B>SAT</B></P>
+
+                                        {heart}
+                                </Y>
+                                <Divider style={{ marginBottom: 22 }} />
+
                                 <D>{description || 'No description'}</D>
+
+                                <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
                         </Pad>
-                        <Divider />
-                        <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
                 </>
         }
 
@@ -46,14 +55,19 @@ export default function OfferSummary(props: Offer) {
                         innerRef={imgRef}
                         style={{ width: 507, height: 'fit-content' }}
                         gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
-                <div style={{ width: 316, padding: 20, paddingTop: 30, overflowY: 'auto', height: envHeight }}>
+                <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
                         <Pad>
+                                <NameTag {...person}
+                                        style={{ marginBottom: 14 }}
+                                        created={created} widget={'offer'} />
                                 <Title>{title}</Title>
-                                <Divider style={{ marginTop: 10 }} />
+
+                                <Divider style={{ marginTop: 22 }} />
                                 <Y>
-                                        <P>{formatPrice(price)} <B>sat</B></P>
+                                        <P>{formatPrice(price)} <B>SAT</B></P>
+                                        {heart}
                                 </Y>
-                                <Divider style={{ marginBottom: 10 }} />
+                                <Divider style={{ marginBottom: 22 }} />
 
                                 <Paragraph>{description}</Paragraph>
                         </Pad>
@@ -98,5 +112,5 @@ const P = styled.div`
         `;
 const D = styled.div`
         color:#5F6368;
-        margin: 10px 0;
+        margin: 10px 0 30px;
         `;

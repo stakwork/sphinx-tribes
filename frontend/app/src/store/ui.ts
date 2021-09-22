@@ -66,6 +66,12 @@ class UiStore {
     this.toasts = n
   }
 
+  @observable personViewOpenTab: string = ''
+  @action setPersonViewOpenTab(s: string) {
+    console.log('set setPersonViewOpenTab', s)
+    this.personViewOpenTab = s
+  }
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {

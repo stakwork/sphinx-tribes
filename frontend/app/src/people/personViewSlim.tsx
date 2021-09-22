@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { getHost } from "../host";
 import { useStores } from '../store'
@@ -88,6 +88,13 @@ export default function PersonView(props: any) {
         selectPerson(id, unique_name)
     }
 
+    useEffect(() => {
+        if (ui.personViewOpenTab) {
+            switchWidgets(ui.personViewOpenTab)
+            ui.setPersonViewOpenTab('')
+        }
+    }, [ui.personViewOpenTab])
+
 
     let tagsString = "";
     tags && tags.forEach((t: string, i: number) => {
@@ -152,17 +159,17 @@ export default function PersonView(props: any) {
                 case 'about':
                     return <AboutView canEdit={canEdit} {...person} />
                 case 'post':
-                    return wrapIt(<PostView {...fullSelectedWidget} />)
+                    return wrapIt(<PostView {...fullSelectedWidget} person={person} />)
                 case 'twitter':
-                    return wrapIt(<TwitterView {...fullSelectedWidget} />)
+                    return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />)
                 case 'supportme':
-                    return wrapIt(<SupportMeView {...fullSelectedWidget} />)
+                    return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />)
                 case 'offer':
-                    return wrapIt(<OfferView {...fullSelectedWidget} />)
+                    return wrapIt(<OfferView {...fullSelectedWidget} person={person} />)
                 case 'wanted':
-                    return wrapIt(<WantedView {...fullSelectedWidget} />)
+                    return wrapIt(<WantedView {...fullSelectedWidget} person={person} />)
                 case 'blog':
-                    return wrapIt(<BlogView {...fullSelectedWidget} />)
+                    return wrapIt(<BlogView {...fullSelectedWidget} person={person} />)
                 default:
                     return wrapIt(<></>)
             }
@@ -228,17 +235,17 @@ export default function PersonView(props: any) {
                     <AboutView {...person} />
                 </Panel>
             case 'post':
-                return wrapIt(<PostView {...fullSelectedWidget} />)
+                return wrapIt(<PostView {...fullSelectedWidget} person={person} />)
             case 'twitter':
-                return wrapIt(<TwitterView {...fullSelectedWidget} />)
+                return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />)
             case 'supportme':
-                return wrapIt(<SupportMeView {...fullSelectedWidget} />)
+                return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />)
             case 'offer':
-                return wrapIt(<OfferView {...fullSelectedWidget} />)
+                return wrapIt(<OfferView {...fullSelectedWidget} person={person} />)
             case 'wanted':
-                return wrapIt(<WantedView {...fullSelectedWidget} />)
+                return wrapIt(<WantedView {...fullSelectedWidget} person={person} />)
             case 'blog':
-                return wrapIt(<BlogView {...fullSelectedWidget} />)
+                return wrapIt(<BlogView {...fullSelectedWidget} person={person} />)
             default:
                 return wrapIt(<></>)
         }
