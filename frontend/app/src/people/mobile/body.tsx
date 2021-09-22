@@ -12,7 +12,7 @@ import { useFuse, useScroll, useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
-
+import moment from 'moment';
 import NoneSpace from '../utils/noneSpace';
 import { Divider, SearchTextInput, Modal } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
@@ -113,7 +113,11 @@ export default function BodyComponent() {
         people = (people && people.filter(f => !f.hide)) || []
 
         function renderPeople() {
-            const p = people && people.map(t => <Person {...t} key={t.id}
+            // clone, sort, reverse, return
+            const peopleClone = [...people]
+            const p = peopleClone && peopleClone.sort((a: any, b: any) => {
+                return moment(a.updated).valueOf() - moment(b.updated).valueOf()
+            }).reverse().map(t => <Person {...t} key={t.id}
                 small={isMobile}
                 selected={ui.selectedPerson === t.id}
                 select={selectPerson}
