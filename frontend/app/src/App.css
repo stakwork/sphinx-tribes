@@ -747,3 +747,7 @@ margin-bottom:10px;
 .euiFormRow__fieldWrapper .euiFormControlLayout--group .euiFormLabel .euiFormControlLayout__prepend {
   background-color: #ffffff00 !important;
 }
+
+.euiFormControlLayout {
+  max-width: 900px !important;
+}
