@@ -7,7 +7,7 @@ export default function QR(props) {
     const { type } = props
 
     const centerIcon = type === 'connect' ? (<Icon>
-        <MaterialIcon icon={'person_add'} style={{ fontSize: 36, marginLeft: 6 }} />
+        <MaterialIcon icon={'person_add'} style={{ fontSize: 36, marginLeft: 7 }} />
     </Icon>) : <Img src={'/static/sphinx.png'} />
 
     return <div style={{ position: 'relative' }}>

@@ -198,7 +198,7 @@ const Wrap = styled.div`
   height:inherit;
   flex-direction: column;
   align-content: center;
-  max-width:400px;
+  // max-width:400px;
   min-width:320px;
 `;
 

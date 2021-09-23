@@ -11,7 +11,7 @@ import { useIsMobile } from "../../hooks";
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
-    const { onSuccess, goBack, config, selectedIndex, canEdit, person, buttonsOnBottom, formHeader } = props
+    const { onSuccess, goBack, config, selectedIndex, canEdit, person, buttonsOnBottom, formHeader, manualGoBackOnly } = props
     const { ui, main } = useStores();
 
     const skipEditLayer = ((selectedIndex < 0) || config.skipEditLayer) ? true : false
@@ -25,8 +25,11 @@ export default function FocusedView(props: any) {
     const isMobile = useIsMobile()
 
     function closeModal(override) {
-        ui.setEditMe(false);
-        if (props.goBack) props.goBack()
+        if (!manualGoBackOnly) {
+            console.log('close modal')
+            ui.setEditMe(false);
+            if (props.goBack) props.goBack()
+        }
     }
 
     function mergeFormWithMeData(v) {
@@ -109,6 +112,7 @@ export default function FocusedView(props: any) {
             await main.getPeople('')
             // massage data
 
+
             ui.setMeInfo(body)
             closeModal(true)
         } catch (e) {
@@ -122,8 +126,6 @@ export default function FocusedView(props: any) {
         body = mergeFormWithMeData(body)
         // console.log('mergeFormWithMeData', body);
         if (!body) return // avoid saving bad state
-
-
 
         const info = ui.meInfo as any;
         if (!info) return console.log("no meInfo");
@@ -152,20 +154,15 @@ export default function FocusedView(props: any) {
 
             // if user has no id, update local id from response
             if (!body.id) {
-                // TEMPORARY sign out! bug patch here because the id returned by POST /profile for a brand new user is always 1
                 const j = await r.json()
                 console.log('json', j)
                 body.id = j.response.id
-                ui.setToasts([{
-                    id: '1',
-                    title: 'Profile created! Now you can sign in.'
-                }]);
             }
 
+            console.log('body', body)
             ui.setMeInfo(body)
 
             await main.getPeople('')
-
             closeModal(true)
         } catch (e) {
             console.log('e', e)

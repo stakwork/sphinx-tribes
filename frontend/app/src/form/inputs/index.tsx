@@ -53,6 +53,7 @@ border: 1px solid #DDE1E5;
 box-sizing: border-box;
 border-radius: 4px;
 box-shadow:none !important;
+max-width:900px;
 
 .euiFormRow__labelWrapper{
     margin-bottom:0px;
@@ -68,6 +69,7 @@ box-shadow:none !important;
 `
 export const FieldText = styled(EuiFieldText)`
 background-color:#fff !important;
+max-width:900px;
 background:#fff !important;
 color:${p => p.readOnly ? '#888' : '#000'} !important;
 box-shadow:none !important;
@@ -96,12 +98,14 @@ box-shadow:none !important;
     background-color: #ffffff00 !important;
     transition: none !important;
     display: none !important;
+    max-width:900px;
     
 }
 `
 export const FieldTextArea = styled(EuiTextArea)`
 background-color:#fff !important;
 background:#fff !important;
+max-width:900px;
 color:#000 !important;
 box-shadow:none !important;
 `
