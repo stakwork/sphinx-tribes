@@ -1,8 +1,14 @@
 import React from 'react'
 import styled from 'styled-components';
 import { QRCode } from "react-qr-svg";
+import MaterialIcon from '@material/react-material-icon';
 
 export default function QR(props) {
+    const { type } = props
+
+    const centerIcon = type === 'connect' ? (<Icon>
+        <MaterialIcon icon={'person_add'} style={{ fontSize: 36, marginLeft: 6 }} />
+    </Icon>) : <Img src={'/static/sphinx.png'} />
 
     return <div style={{ position: 'relative' }}>
         <QRCode
@@ -21,7 +27,7 @@ export default function QR(props) {
             top: 0, left: 0,
             display: 'flex', justifyContent: 'center', alignItems: 'center'
         }}>
-            <Img src={'/static/sphinx.png'} />
+            {centerIcon}
         </div>
 
         <div style={{
@@ -47,4 +53,12 @@ const Img = styled.div<ImageProps>`
             height: 55px;
             width: 55px;
             border-radius: 50%;
+            `;
+
+const Icon = styled.div`
+            height: 55px;
+            width: 55px;
+            border-radius: 50%;
+            display:flex;
+            align-items:center;
             `;

@@ -34,14 +34,18 @@ export default function NameTag(props) {
             selectPerson(e)
         }}
         style={style}>
-        <Img
-            src={img || `/static/sphinx`}
-        />
-        <Name>
-            {owner_alias}
-        </Name>
 
-        <div style={{ height: 3, width: 3, borderRadius: '50%', margin: '0 6px', background: '#8E969C' }} />
+        {!isSelected && <>
+            <Img
+                src={img || `/static/sphinx`}
+            />
+            <Name>
+                {owner_alias}
+            </Name>
+
+            <div style={{ height: 3, width: 3, borderRadius: '50%', margin: '0 6px', background: '#8E969C' }} />
+        </>
+        }
 
         <Date>
             {lastSeen}
@@ -76,9 +80,6 @@ display: flex;
 align-items: center;
 
 /* Secondary Text 4 */
-
-
-
             `;
 
 const Date = styled.div`
