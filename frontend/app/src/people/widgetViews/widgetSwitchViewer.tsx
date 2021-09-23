@@ -11,6 +11,7 @@ import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
 import { useFuse, useScroll } from '../../hooks';
 import { widgetConfigs } from '../utils/constants';
+import moment from 'moment';
 const getFuse = useFuse
 const getScroll = useScroll
 
@@ -46,7 +47,10 @@ export default function WidgetSwitchViewer(props) {
 
         const searchKeys = widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget].schema?.map(s => s.name) || []
 
-        people && people.forEach((p, i) => {
+        let peopleClone = [...people]
+        peopleClone && peopleClone.sort((a: any, b: any) => {
+            return moment(a.updated).valueOf() - moment(b.updated).valueOf()
+        }).reverse().forEach((p, i) => {
             // if this person has entries for this widget
             const thisWidget = p.extras && p.extras[selectedWidget]
             if (thisWidget && thisWidget.length) {
@@ -83,7 +87,6 @@ export default function WidgetSwitchViewer(props) {
             })
 
             return elementArray
-
         }
 
         return allElements

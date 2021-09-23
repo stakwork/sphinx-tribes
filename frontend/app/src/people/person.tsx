@@ -29,6 +29,7 @@ export default function Person(props: any) {
     unique_name,
     price_to_meet,
     updated,
+    squeeze,
     extras,
     twitter_confirmed
   } = props
@@ -93,7 +94,7 @@ export default function Person(props: any) {
         </Wrap>
       }
       // desktop mode
-      return <DWrap onClick={() => select(id, unique_name)}>
+      return <DWrap squeeze={squeeze} onClick={() => select(id, unique_name)}>
         <div>
           <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={img || '/static/sphinx.png'} />
           <div style={{ padding: 10 }}>
@@ -146,10 +147,14 @@ const Wrap = styled.div`
         display:flex;
         width:100%;
         `;
-const DWrap = styled.div`
+
+interface DWarpProps {
+  squeeze: boolean;
+}
+const DWrap = styled.div<DWarpProps>`
         cursor:pointer;
         height:350px;
-        width:210px;
+        width:${p => p.squeeze ? '200px' : '210px'};
         display:flex;
         flex-direction:column;
         justify-content:space-between;
@@ -218,11 +223,17 @@ const DDescription = styled.div`
         font-size: 12px;
         line-height: 18px;
         color: #5F6368;
-        white-space: nowrap;
+        // white-space: nowrap;
         // height:26px;
-        text-overflow: ellipsis;
-        overflow:hidden;
-        margin-bottom:10px;
+        // text-overflow: ellipsis;
+        // overflow:hidden;
+        // margin-bottom:10px;
+
+        overflow: hidden;
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
         `;
 interface ImageProps {
   readonly src: string;
