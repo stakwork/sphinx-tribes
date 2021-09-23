@@ -29,7 +29,9 @@ export default function FirstTimeScreen() {
                 buttonsOnBottom={true}
                 person={ui.meInfo}
                 canEdit={true}
+                manualGoBackOnly={true}
                 goBack={() => {
+                    console.log('goBack')
                     ui.setMeInfo(null)
                     main.getPeople()
                 }}
