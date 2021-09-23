@@ -8,7 +8,7 @@ import {
 } from '@elastic/eui';
 import Person from '../person'
 import PersonViewSlim from '../personViewSlim'
-import { useFuse, useScroll, useIsMobile } from '../../hooks'
+import { useFuse, useScroll, useIsMobile, useScreenWidth } from '../../hooks'
 import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
@@ -31,7 +31,7 @@ export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
     const [showDropdown, setShowDropdown] = useState(false)
-
+    const screenWidth = useScreenWidth()
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
 
@@ -119,6 +119,7 @@ export default function BodyComponent() {
                 return moment(a.updated).valueOf() - moment(b.updated).valueOf()
             }).reverse().map(t => <Person {...t} key={t.id}
                 small={isMobile}
+                squeeze={screenWidth < 1420}
                 selected={ui.selectedPerson === t.id}
                 select={selectPerson}
             />)
