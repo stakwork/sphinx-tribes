@@ -21,8 +21,8 @@ function App() {
 
   return <Router>
     {
-      // people
-      mode === Mode.PEOPLE ? <div className="app" style={{ background: c.background }}>
+      // people/community
+      mode === Mode.COMMUNITY ? <div className="app" style={{ background: c.background }}>
         <PeopleHeader />
         <TokenRefresh />
         <Switch>
@@ -55,18 +55,22 @@ function App() {
 enum Mode {
   TRIBES = "tribes",
   PEOPLE = "people",
+  COMMUNITY = "community",
 }
+
 const hosts: { [k: string]: Mode } = {
   "localhost:3000": Mode.TRIBES,
   "localhost:13000": Mode.TRIBES,
   "localhost:23000": Mode.TRIBES,
   "tribes.sphinx.chat": Mode.TRIBES,
   "tribes-test.sphinx.chat": Mode.TRIBES,
-  "localhost:13007": Mode.PEOPLE,
-  "localhost:23007": Mode.PEOPLE,
-  "localhost:3007": Mode.PEOPLE,
-  "people.sphinx.chat": Mode.PEOPLE,
-  "people-test.sphinx.chat": Mode.PEOPLE,
+  "localhost:13007": Mode.COMMUNITY,
+  "localhost:23007": Mode.COMMUNITY,
+  "localhost:3007": Mode.COMMUNITY,
+  "people.sphinx.chat": Mode.COMMUNITY,
+  "people-test.sphinx.chat": Mode.COMMUNITY,
+  "community-test.sphinx.chat": Mode.COMMUNITY,
+  "community.sphinx.chat": Mode.COMMUNITY,
 };
 
 function getMode(): Mode {
