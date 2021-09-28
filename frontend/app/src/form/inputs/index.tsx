@@ -9,6 +9,7 @@ import NumberInput from './number-input'
 import Widgets from './widgets/index'
 import SwitchInput from './switch-input'
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui'
+import SelectInput from './select-input'
 
 export default function Input(props: any) {
 
@@ -28,6 +29,8 @@ export default function Input(props: any) {
                 return <NumberInput {...props} />
             case 'switch':
                 return <SwitchInput {...props} />
+            case 'select':
+                return <SelectInput {...props} />
             case 'widgets':
                 return <Widgets {...props} />
             case 'hidden':
