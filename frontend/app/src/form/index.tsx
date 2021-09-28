@@ -5,10 +5,15 @@ import styled from "styled-components";
 import Input from "./inputs";
 import { Button, IconButton, Modal } from "../sphinxUI";
 import { useStores } from "../store";
+import { wantedItemSchema, wantedCodingTaskSchema } from "./schema";
+import Select from "../sphinxUI/select";
+import { formDrowdownOptions } from '../people/utils/constants'
 
 export default function Form(props: any) {
   const { buttonsOnBottom } = props
   const [page, setPage] = useState(1)
+  const [dynamicSchema, setDynamicSchema]: any = useState(null)
+  const [dynamicSchemaName, setDynamicSchemaName] = useState('')
   const [formMounted, setFormMounted] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [showDeleteWarn, setShowDeleteWarn] = useState(false)
@@ -16,54 +21,79 @@ export default function Form(props: any) {
   const refBody: any = useRef(null)
   const { main, ui } = useStores()
 
-
   console.log('form props', props)
 
   let lastPage = 1
-
   const readOnly = props.readOnly
-
   const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody
+
+  useEffect(() => {
+    const dSchema = schema.find(f => f.defaultSchema)
+    if (dSchema) {
+      setDynamicSchema(dSchema.defaultSchema)
+      setDynamicSchemaName(dSchema.defaultSchemaName)
+    }
+  }, [])
 
   useEffect(() => {
     scrollToTop()
   }, [page])
 
-  if (props.paged) {
-    props.schema.forEach((s) => {
-      if (s.page > lastPage) lastPage = s.page
-    })
-  }
   function scrollToTop() {
     if (scrollDiv && scrollDiv.current) {
       scrollDiv.current.scrollTop = 0
     }
   }
 
-  const schema = props.paged ? props.schema.filter(f => f.page === page) : props.schema
+  if (props.paged) {
+    props.schema.forEach((s) => {
+      if (s.page > lastPage) lastPage = s.page
+    })
+  }
 
-  // let buttonText = props.buttonText || "Save Changes"
-  // if (lastPage !== page) buttonText = 'Next'
+  let schema = props.paged ? props.schema.filter(f => f.page === page) : props.schema
+
+  // replace schema with dynamic schema if there is one
+  schema = dynamicSchema || schema
+
   let buttonAlignment = buttonsOnBottom ? { bottom: 0, height: 108, justifyContent: 'center' } : { top: 0 }
   let formPad = buttonsOnBottom ? { paddingTop: 30 } : {}
 
   let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {}
 
-  const isAboutMeForm = props.schema.find(f => f.name === 'owner_alias') ? true : false
+  const isAboutMeForm = schema.find(f => f.name === 'owner_alias') ? true : false
+
+  const dynamicFormOptions = formDrowdownOptions['wanted']
 
   return (
     <Formik
       initialValues={props.initialValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(props.schema)}
-    // style={{ height: 'inherit' }}
-    // innerStyle={{ height: 'inherit' }}
+      validationSchema={validator(schema)}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
         return (
           <Wrap ref={refBody} style={formPad}>
+
+            {/* schema flipping dropdown */}
+            {dynamicSchema &&
+              <Select
+                style={{ marginBottom: 14 }}
+                onChange={(v) => {
+                  console.log('v', v)
+                  const selectedOption = dynamicFormOptions.find(f => f.value === v)
+                  if (selectedOption) {
+                    setDynamicSchemaName(v)
+                    setDynamicSchema(selectedOption.schema)
+                  }
+                }}
+                options={dynamicFormOptions}
+                value={dynamicSchemaName}
+              />
+            }
+
             {schema && schema.map((item: FormField) => <Input
               {...item}
               key={item.name}
@@ -191,36 +221,36 @@ export default function Form(props: any) {
 }
 
 const Wrap = styled.div`
-  padding:10px;
-  padding-top:80px;
-  margin-bottom:100px;
-  display: flex;
-  height:inherit;
-  flex-direction: column;
-  align-content: center;
-  // max-width:400px;
-  min-width:320px;
-`;
+      padding:10px;
+      padding-top:80px;
+      margin-bottom:100px;
+      display: flex;
+      height:inherit;
+      flex-direction: column;
+      align-content: center;
+      // max-width:400px;
+      min-width:320px;
+      `;
 
 interface BWrapProps {
   readonly floatingButtons: boolean;
 }
 
 const BWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items:center;
-  width:100%;
-  padding:10px;
-  min-height:42px;
-  position: absolute;
-  left:0px;
-  background:#ffffff;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
-`;
+      display: flex;
+      justify-content: space-between;
+      align-items:center;
+      width:100%;
+      padding:10px;
+      min-height:42px;
+      position: absolute;
+      left:0px;
+      background:#ffffff;
+      box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+      `;
 
 
-type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select'
 
 type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 
@@ -242,6 +272,9 @@ export interface FormField {
   fields?: FormField[]
   icon?: string
   extraHTML?: string
+  options?: any[]
+  defaultSchema?: FormField[]
+  defaultSchemaName?: string
 }
 
 function validator(config: FormField[]) {

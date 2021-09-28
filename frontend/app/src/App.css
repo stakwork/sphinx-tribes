@@ -751,3 +751,19 @@ margin-bottom:10px;
 .euiFormControlLayout {
   max-width: 900px !important;
 }
+
+.euiSuperSelectControl.euiSuperSelect--isOpen__button{
+  background:#ffffff !important;
+  background-color:#ffffff !important;
+}
+
+.euiSuperSelectControl.euiSuperSelect--isClosed__button{
+  background:#ffffff !important;
+  background-color:#ffffff !important;
+}
+
+.euiSuperSelectControl:focus {
+  background:#ffffff !important;
+  background-color:#ffffff !important;
+  box-shadow:none !important;
+}

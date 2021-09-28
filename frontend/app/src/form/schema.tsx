@@ -383,7 +383,9 @@ export const offerSchema: FormField[] = [
     },
 ];
 
-export const wantedSchema: FormField[] = [
+
+
+export const wantedItemSchema: FormField[] = [
     {
         name: 'title',
         label: "Title*",
@@ -421,6 +423,58 @@ export const wantedSchema: FormField[] = [
     // },
 ];
 
+export const wantedCodingTaskSchema: FormField[] = [
+    {
+        name: 'tribe',
+        label: "Tribe",
+        type: "select",
+        options: [{
+            value: 'this',
+            label: 'this',
+        }, {
+            value: 'that',
+            label: 'that',
+        }],
+        validator: strValidator,
+    },
+    {
+        name: 'repo',
+        label: "Github Repository URL",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: 'payment',
+        label: "Payment",
+        validator: Yup.number(),
+        type: "number",
+    },
+    {
+        name: 'title',
+        label: "Title*",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: 'description',
+        label: "Description",
+        type: "textarea",
+        validator: strValidator,
+    },
 
+    // {
+    //     name: 'show',
+    //     label: "Show In Link",
+    //     type: "switch",
+    // },
+];
 
-// extras.blog.existing
+export const wantedSchema: FormField[] = [
+    {
+        name: 'dynamicSchema',
+        label: 'none',
+        type: 'text',
+        defaultSchema: wantedCodingTaskSchema,
+        defaultSchemaName: 'coding_task',
+    }
+];

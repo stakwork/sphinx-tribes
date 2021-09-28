@@ -9,6 +9,7 @@ export interface Props {
     readOnly: boolean
     prepend?: string
     extraHTML?: string
+    options?: any[]
     name: string,
     error: string
 }
