@@ -15,6 +15,7 @@ require (
 	github.com/gobuffalo/packr v1.30.1 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/gohornet/hornet v0.3.0
+	github.com/google/go-github/v39 v39.1.1-0.20210928160219-eefa00252998
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imroc/req v0.3.0
 	github.com/iotaledger/hive.go v0.0.0-20200107205115-986a54f82a30
@@ -28,7 +29,7 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/cobra v1.2.1 // indirect
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210820121016-41cdb8703e55 // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
