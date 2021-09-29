@@ -168,7 +168,7 @@ export default function EditMe(props: any) {
       });
       if (!r.ok) {
         setLoading(false);
-        return alert("Failed to create profile");
+        return alert("Failed to save data");
       }
 
       await main.getPeople('')

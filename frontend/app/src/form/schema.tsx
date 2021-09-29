@@ -415,6 +415,11 @@ export const wantedOtherSchema: FormField[] = [
         label: "Gallery",
         type: "gallery",
     },
+    {
+        name: 'type',
+        label: "Type",
+        type: "hide",
+    },
 
     // {
     //     name: 'show',
@@ -424,6 +429,12 @@ export const wantedOtherSchema: FormField[] = [
 ];
 
 export const wantedCodingTaskSchema: FormField[] = [
+    {
+        name: 'title',
+        label: "Title",
+        type: "text",
+        validator: strValidator,
+    },
     {
         name: 'tribe',
         label: "Tribe",
@@ -456,24 +467,18 @@ export const wantedCodingTaskSchema: FormField[] = [
         validator: nomValidator,
         type: "number",
     },
-    {
-        name: 'title',
-        label: "Title",
-        type: "text",
-        validator: strValidator,
-    },
+
     {
         name: 'description',
         label: "Description",
         type: "textarea",
         validator: strValidator,
     },
-
-    // {
-    //     name: 'show',
-    //     label: "Show In Link",
-    //     type: "switch",
-    // },
+    {
+        name: 'type',
+        label: "Type",
+        type: "hide",
+    },
 ];
 
 export const wantedSchema: FormField[] = [

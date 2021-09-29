@@ -17,7 +17,7 @@ export default function WantedView(props: any) {
             <Body>
                 <T>{title}</T>
                 <D>{description}</D>
-                <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                <P>{formatPrice(priceMin)} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
             </Body>
         </Wrap>
     }
@@ -33,7 +33,7 @@ export default function WantedView(props: any) {
                     </div>
                     <DT>{title}</DT>
                     <DD>{description}</DD>
-                    <DD>{repo + '/' + issue}</DD>
+                    <Link>github.com/{repo + '/' + issue}</Link>
                 </Pad>
                 <Divider style={{ margin: 0 }} />
                 <Pad style={{ padding: 20, }}>
@@ -58,7 +58,7 @@ export default function WantedView(props: any) {
             </Pad>
             <Divider style={{ margin: 0 }} />
             <Pad style={{ padding: 20, }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                <P style={{ fontSize: 17 }}>{formatPrice(priceMin)} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
             </Pad>
         </DWrap>
     }
@@ -91,6 +91,13 @@ display: flex;
 justify-content:flex-start;
 
 `;
+
+const Link = styled.div`
+color:blue;
+overflow-wrap:break-word;
+font-size:15px;
+`;
+
 const T = styled.div`
 font-weight:bold;
 `;

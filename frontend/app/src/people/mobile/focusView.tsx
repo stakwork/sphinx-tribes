@@ -107,7 +107,7 @@ export default function FocusedView(props: any) {
             });
             if (!r.ok) {
                 setLoading(false);
-                return alert("Failed to create profile");
+                return alert("Failed to save data");
             }
 
             await main.getPeople('')
@@ -122,9 +122,11 @@ export default function FocusedView(props: any) {
         setDeleting(false);
     }
 
-    function trimBodyToSchema(body) {
+    function trimBodyToSchema(b) {
         // trim to schema to remove data that doesnt below 
         // (in case of switching between dynamic schemas)
+        const body = { ...b }
+
         let dynamicSchema = config.schema.find(f => f.defaultSchema)
 
         if (dynamicSchema) {
@@ -138,8 +140,9 @@ export default function FocusedView(props: any) {
             } else {
                 trueSchema = dynamicSchema.defaultSchema
             }
-            Object.keys(body).map(k => {
-                if (!trueSchema[k]) delete body[k]
+            Object.keys(body).forEach(k => {
+                const foundIt = trueSchema.find(f => f.name === k)
+                if (!foundIt) delete body[k]
             })
         }
 
@@ -148,7 +151,10 @@ export default function FocusedView(props: any) {
 
     async function submitForm(body) {
         console.log('SUBMIT FORM', body);
-        // body = trimBodyToSchema(body)
+
+        // let dynamicSchema = config.schema.find(f => f.defaultSchema)
+        // if (dynamicSchema) body = trimBodyToSchema(body)
+
         body = mergeFormWithMeData(body)
         if (!body) return // avoid saving bad state
 
@@ -171,10 +177,9 @@ export default function FocusedView(props: any) {
                 },
             })
 
-
             if (!r.ok) {
                 setLoading(false);
-                return alert("Failed to create profile");
+                return alert("Failed to save data");
             }
 
             // if user has no id, update local id from response
@@ -304,7 +309,7 @@ export default function FocusedView(props: any) {
                                         loading={deleting}
                                         leadingIcon={'delete_outline'}
                                         text={'Delete'}
-                                        style={{ marginLeft: 20 }}
+                                        style={{ marginLeft: 10 }}
                                     />
                                 </div>
                                 : <div />}

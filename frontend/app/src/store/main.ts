@@ -212,7 +212,7 @@ export class MainStore {
 
 
       if (!r.ok) {
-        return alert("Failed to create profile");
+        return alert("Failed to save data");
       }
 
       uiStore.setToasts([{
@@ -252,7 +252,7 @@ export class MainStore {
 
 
       if (!r.ok) {
-        return alert("Failed to create profile");
+        return alert("Failed to save data");
       }
 
       uiStore.setToasts([{
