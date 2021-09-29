@@ -1,4 +1,4 @@
-import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema } from "../../form/schema";
+import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema, wantedCodingTaskSchema, wantedOtherSchema } from "../../form/schema";
 
 const MAX_UPLOAD_SIZE = 10194304 //10MB
 
@@ -100,5 +100,23 @@ const widgetConfigs = {
     },
 }
 
+const formDropdownOptions = {
+    wanted: [
+        {
+            value: 'coding_task',
+            label: 'Coding Task',
+            schema: wantedCodingTaskSchema,
+            description: 'Post a coding task referencing your github repo.'
+        },
+        {
+            value: 'other',
+            label: 'Other',
+            schema: wantedOtherSchema,
+            description: 'Could be anything.'
+        },
+    ],
+}
 
-export { MAX_UPLOAD_SIZE, widgetConfigs }
+
+
+export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions }

@@ -2,9 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
-import { FieldEnv, FieldText } from './index'
+import { FieldEnv, FieldText, Note } from './index'
 
-export default function TextInput({ error, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function TextInput({ error, note, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
@@ -12,6 +12,7 @@ export default function TextInput({ error, label, value, handleChange, handleBlu
   return <>
     <FieldEnv label={labeltext}>
       <R>
+
         <FieldText name="first" value={value || ''}
           readOnly={readOnly || false}
           onChange={e => handleChange(e.target.value)}
@@ -24,6 +25,7 @@ export default function TextInput({ error, label, value, handleChange, handleBlu
         </E>}
       </R>
     </FieldEnv>
+    {note && <Note>*{note}</Note>}
     <ExtraText
       style={{ display: value && extraHTML ? 'block' : 'none' }}
       dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

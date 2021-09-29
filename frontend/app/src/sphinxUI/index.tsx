@@ -4,5 +4,6 @@ import IconButton from "./iconButton";
 import Modal from "./modal";
 import Divider from "./divider";
 import { Title, Date, Paragraph, Link } from './elements'
+import Select from './select'
 
-export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link }
+export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select }
