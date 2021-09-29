@@ -5,45 +5,69 @@ import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
 import { Divider, Title } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
+import MaterialIcon from '@material/react-material-icon';
 
 export default function WantedView(props: any) {
-    const { title, description, priceMin, priceMax, url, gallery, person, created } = props
+    const { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type } = props
     const isMobile = useIsMobile()
 
-    if (isMobile) {
+    function getMobileView() {
         return <Wrap>
-
             <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
-
             <Body>
                 <T>{title}</T>
                 <D>{description}</D>
-                <P>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
+                <P>{formatPrice(priceMin)} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
             </Body>
-
         </Wrap>
     }
 
-    return <DWrap>
-        <GalleryViewer
-            showAll={false}
-            big={true}
-            wrap={false}
-            selectable={true}
-            gallery={gallery}
-            style={{ maxHeight: 276, overflow: 'hidden' }} />
+    function getDesktopView() {
+        if (type === 'coding_task') {
+            // this is a code task
+            return <DWrap>
+                <Pad style={{ padding: 20, height: 410 }}>
+                    <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                        <NameTag {...person} created={created} widget={'wanted'} />
+                        <MaterialIcon icon={'code'} />
+                    </div>
+                    <DT>{title}</DT>
+                    <DD>{description}</DD>
+                    <Link>github.com/{repo + '/' + issue}</Link>
+                </Pad>
+                <Divider style={{ margin: 0 }} />
+                <Pad style={{ padding: 20, }}>
+                    <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT</B></P>
+                </Pad>
+            </DWrap>
+        }
 
-        <Pad style={{ padding: 20 }}>
-            <NameTag {...person} created={created} widget={'wanted'} />
-            <DT>{title}</DT>
-            <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
-        </Pad>
-        <Divider style={{ margin: 0 }} />
-        <Pad style={{ padding: 20, }}>
-            <P style={{ fontSize: 17 }}>{formatPrice(priceMin)} <B>sat</B> - {formatPrice(priceMax)} <B>sat</B></P>
-        </Pad>
-    </DWrap>
+        return <DWrap>
+            <GalleryViewer
+                showAll={false}
+                big={true}
+                wrap={false}
+                selectable={true}
+                gallery={gallery}
+                style={{ maxHeight: 276, overflow: 'hidden' }} />
 
+            <Pad style={{ padding: 20 }}>
+                <NameTag {...person} created={created} widget={'wanted'} />
+                <DT>{title}</DT>
+                <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
+            </Pad>
+            <Divider style={{ margin: 0 }} />
+            <Pad style={{ padding: 20, }}>
+                <P style={{ fontSize: 17 }}>{formatPrice(priceMin)} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
+            </Pad>
+        </DWrap>
+    }
+
+    if (isMobile) {
+        return getMobileView()
+    }
+
+    return getDesktopView()
 }
 
 const DWrap = styled.div`
@@ -67,6 +91,13 @@ display: flex;
 justify-content:flex-start;
 
 `;
+
+const Link = styled.div`
+color:blue;
+overflow-wrap:break-word;
+font-size:15px;
+`;
+
 const T = styled.div`
 font-weight:bold;
 `;

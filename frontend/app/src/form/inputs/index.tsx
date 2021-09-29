@@ -9,9 +9,9 @@ import NumberInput from './number-input'
 import Widgets from './widgets/index'
 import SwitchInput from './switch-input'
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui'
+import SelectInput from './select-input'
 
 export default function Input(props: any) {
-
     function getInput() {
         switch (props.type) {
             case 'text':
@@ -28,6 +28,8 @@ export default function Input(props: any) {
                 return <NumberInput {...props} />
             case 'switch':
                 return <SwitchInput {...props} />
+            case 'select':
+                return <SelectInput {...props} />
             case 'widgets':
                 return <Widgets {...props} />
             case 'hidden':
@@ -48,6 +50,19 @@ background-color:#fff !important;
 background:#fff !important;
 `
 
+
+export const Note = styled.div`
+display: flex;
+padding-left: 10px;
+flex-wrap: wrap;
+font-size: 12px;
+color: #888;
+margin-bottom: 16px;
+margin-top: -6px;
+max-width: 400px;
+font-style:italic;
+`
+
 export const FieldEnv = styled(EuiFormRow)`
 border: 1px solid #DDE1E5;
 box-sizing: border-box;
@@ -63,6 +78,7 @@ max-width:900px;
     label {
         color: #B0B7BC !important;
         background:#ffffff;
+        z-index:10;
     }
 }
 

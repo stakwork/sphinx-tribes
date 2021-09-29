@@ -9,8 +9,9 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
 import { Button, Modal } from "../../sphinxUI";
 import { MAX_UPLOAD_SIZE } from "../../people/utils/constants";
+import { Note } from './index'
 
-export default function ImageInput({ label, value, handleChange, handleBlur, handleFocus }: Props) {
+export default function ImageInput({ label, note, value, handleChange, handleBlur, handleFocus }: Props) {
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
@@ -128,6 +129,8 @@ export default function ImageInput({ label, value, handleChange, handleBlur, han
           />
         </div>
       </Modal>
+
+      {note && <Note>*{note}</Note>}
 
     </ImageWrap>
   );

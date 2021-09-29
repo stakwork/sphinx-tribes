@@ -19,7 +19,7 @@ export default function OfferView(props: any) {
             <Body>
                 <T>{title || 'No title'}</T>
                 <D>{description || 'No description'}</D>
-                <P>{formatPrice(price)} <B>sat</B></P>
+                <P>{formatPrice(price)} <B>SAT</B></P>
             </Body>
 
         </Wrap>
@@ -42,7 +42,7 @@ export default function OfferView(props: any) {
             <Divider style={{ margin: 0 }} />
 
             <Pad style={{ padding: 20, }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>sat</B></P>
+                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT</B></P>
             </Pad>
         </div>
     </DWrap >
