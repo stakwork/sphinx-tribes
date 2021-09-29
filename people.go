@@ -268,9 +268,41 @@ func processTwitterConfirmationsLoop() {
 func processGithubIssuesLoop() {
 	peeps := DB.getListedPeople()
 	for _, p := range peeps {
-		wanteds, ok := p.Extras["wanted"].(map[string]interface{})
-		if ok {
-			fmt.Println(wanteds)
+		wanteds, ok := p.Extras["wanted"].([]interface{})
+		if !ok {
+			continue // next person
+		}
+		for _, wanted := range wanteds {
+			w, ok2 := wanted.(map[string]interface{})
+			if !ok2 {
+				continue // next wanted
+			}
+			repo, ok3 := w["repo"].(string)
+			issnum, ok4 := w["issue"].(string)
+			if !ok3 || !ok4 {
+				continue
+			}
+			if !strings.Contains(repo, "/") {
+				continue
+			}
+			arr := strings.Split(repo, "/")
+			owner := arr[0]
+			reponame := arr[1]
+			issint, err := strconv.Atoi(issnum)
+			if issint < 1 || err != nil {
+				continue
+			}
+			issue, issueErr := GetIssue(owner, reponame, issint)
+			if issueErr != nil {
+				continue
+			}
+			fullissuename := owner + "/" + reponame + "/" + issnum
+			DB.updateGithubIssues(p.ID, map[string]interface{}{
+				fullissuename: map[string]string{
+					"assignee": issue.Assignee,
+					"status":   issue.Status,
+				},
+			})
 		}
 	}
 	time.Sleep(5 * time.Minute)
