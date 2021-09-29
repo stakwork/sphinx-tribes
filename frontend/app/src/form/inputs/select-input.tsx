@@ -2,10 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 import { EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
-import { FieldEnv } from './index'
+import { FieldEnv, Note } from './index'
 import { Select } from '../../sphinxUI'
 
-export default function SelectInput({ error, label, options, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function SelectInput({ error, note, label, options, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
     let labeltext = label
     if (error) labeltext = labeltext + ` (${error})`
@@ -14,6 +14,7 @@ export default function SelectInput({ error, label, options, value, handleChange
         <FieldEnv label={labeltext}>
             <R>
                 <Select
+                    selectStyle={{ border: 'none' }}
                     options={options}
                     value={value}
                     onChange={(e) => {
@@ -25,6 +26,7 @@ export default function SelectInput({ error, label, options, value, handleChange
                 </E>}
             </R>
         </FieldEnv>
+        {note && <Note>*{note}</Note>}
         <ExtraText
             style={{ display: value && extraHTML ? 'block' : 'none' }}
             dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

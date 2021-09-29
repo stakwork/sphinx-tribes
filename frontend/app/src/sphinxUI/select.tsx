@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { EuiSuperSelect, EuiText } from '@elastic/eui'
 
 export default function Select(props: any) {
-    const { options, onChange, value, style } = props
+    const { options, onChange, value, style, selectStyle } = props
 
     const opts = options.map((o) => {
         return {
@@ -25,6 +25,7 @@ export default function Select(props: any) {
 
     return <div style={{ position: 'relative', ...style }}>
         <S
+            style={selectStyle}
             options={opts}
             valueOfSelected={value}
             onChange={(value) => onChange(value)}
