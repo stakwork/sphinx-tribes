@@ -24,6 +24,7 @@ func main() {
 	initCache()
 
 	go processTwitterConfirmationsLoop()
+	go processGithubIssuesLoop()
 
 	run()
 }

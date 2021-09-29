@@ -265,6 +265,18 @@ func processTwitterConfirmationsLoop() {
 	processTwitterConfirmationsLoop()
 }
 
+func processGithubIssuesLoop() {
+	peeps := DB.getListedPeople()
+	for _, p := range peeps {
+		wanteds, ok := p.Extras["wanted"].(map[string]interface{})
+		if ok {
+			fmt.Println(wanteds)
+		}
+	}
+	time.Sleep(5 * time.Minute)
+	processGithubIssuesLoop()
+}
+
 func personUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
