@@ -2,9 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import { EuiFormRow, EuiTextArea, EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
-import { FieldEnv, FieldTextArea } from './index'
+import { FieldEnv, FieldTextArea, Note } from './index'
 
-export default function TextAreaInput({ error, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function TextAreaInput({ error, note, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
     // console.log("TEXTAREA", label, extraHTML)
 
     let labeltext = label
@@ -25,6 +25,7 @@ export default function TextAreaInput({ error, label, value, handleChange, handl
                 </E>}
             </R>
         </FieldEnv>
+        {note && <Note>*{note}</Note>}
         <ExtraText
             style={{ display: value && extraHTML ? 'block' : 'none' }}
             dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

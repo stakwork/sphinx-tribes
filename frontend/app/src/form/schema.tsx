@@ -385,7 +385,7 @@ export const offerSchema: FormField[] = [
 
 
 
-export const wantedItemSchema: FormField[] = [
+export const wantedOtherSchema: FormField[] = [
     {
         name: 'title',
         label: "Title*",
@@ -439,19 +439,26 @@ export const wantedCodingTaskSchema: FormField[] = [
     },
     {
         name: 'repo',
-        label: "Github Repository URL",
+        label: "Github Repository",
         type: "text",
-        validator: strValidator,
+        note: 'Enter in this format: githubName/repositoryName, (e.g. stakwork/sphinx-tribes)',
+        validator: strValidator, // look for 1 slash
     },
     {
-        name: 'payment',
-        label: "Payment",
-        validator: Yup.number(),
+        name: 'issue',
+        label: "Issue #",
+        type: "number",
+        validator: nomValidator,
+    },
+    {
+        name: 'price',
+        label: "Price",
+        validator: nomValidator,
         type: "number",
     },
     {
         name: 'title',
-        label: "Title*",
+        label: "Title",
         type: "text",
         validator: strValidator,
     },
@@ -476,5 +483,12 @@ export const wantedSchema: FormField[] = [
         type: 'text',
         defaultSchema: wantedCodingTaskSchema,
         defaultSchemaName: 'coding_task',
+        dropdownOptions: 'wanted'
     }
 ];
+
+// this object is used to switch between schemas in form when dynamic
+export const dynamicSchemasByType = {
+    coding_task: wantedCodingTaskSchema,
+    other: wantedOtherSchema
+}

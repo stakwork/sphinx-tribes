@@ -5,34 +5,39 @@ import styled from "styled-components";
 import Input from "./inputs";
 import { Button, IconButton, Modal } from "../sphinxUI";
 import { useStores } from "../store";
-import { wantedItemSchema, wantedCodingTaskSchema } from "./schema";
 import Select from "../sphinxUI/select";
-import { formDrowdownOptions } from '../people/utils/constants'
+import { dynamicSchemasByType } from './schema'
+import { formDropdownOptions, } from '../people/utils/constants'
 
 export default function Form(props: any) {
   const { buttonsOnBottom } = props
   const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true)
   const [dynamicSchema, setDynamicSchema]: any = useState(null)
   const [dynamicSchemaName, setDynamicSchemaName] = useState('')
-  const [formMounted, setFormMounted] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [showDeleteWarn, setShowDeleteWarn] = useState(false)
   const [disableFormButtons, setDisableFormButtons] = useState(false)
   const refBody: any = useRef(null)
   const { main, ui } = useStores()
 
-  console.log('form props', props)
-
   let lastPage = 1
   const readOnly = props.readOnly
   const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody
 
   useEffect(() => {
-    const dSchema = schema.find(f => f.defaultSchema)
-    if (dSchema) {
+    const dSchema = props.schema.find(f => f.defaultSchema)
+    const type = props.initialValues?.type
+    if (dSchema && type) {
+      let editSchema = dynamicSchemasByType[type]
+      setDynamicSchema(editSchema)
+      setDynamicSchemaName(type)
+    } else if (dSchema) {
       setDynamicSchema(dSchema.defaultSchema)
       setDynamicSchemaName(dSchema.defaultSchemaName)
     }
+
+    setLoading(false)
   }, [])
 
   useEffect(() => {
@@ -63,7 +68,20 @@ export default function Form(props: any) {
 
   const isAboutMeForm = schema.find(f => f.name === 'owner_alias') ? true : false
 
-  const dynamicFormOptions = formDrowdownOptions['wanted']
+  const dynamicFormOptions = formDropdownOptions[props.schema.dropdownOptions || 'wanted']
+
+  // inject owner tribes
+  const tribesSelectorIndex = schema.findIndex(f => f.name === 'tribe')
+  if (tribesSelectorIndex > -1) {
+    schema[tribesSelectorIndex].options = (main.ownerTribes?.length && main.ownerTribes.map(ot => {
+      return {
+        value: ot.unique_name,
+        label: ot.unique_name
+      }
+    })) || [{ value: 'none', label: 'None' }]
+  }
+
+  if (loading) return <div />
 
   return (
     <Formik
@@ -145,6 +163,10 @@ export default function Form(props: any) {
                 <Button
                   disabled={disableFormButtons || props.loading}
                   onClick={() => {
+                    if (dynamicSchemaName) {
+                      // inject type in body
+                      setFieldValue('type', dynamicSchemaName)
+                    }
                     handleSubmit()
                     // if (lastPage === page) handleSubmit()
                     // else {
@@ -271,10 +293,12 @@ export interface FormField {
   extras?: FormField[]
   fields?: FormField[]
   icon?: string
+  note?: string
   extraHTML?: string
   options?: any[]
   defaultSchema?: FormField[]
   defaultSchemaName?: string
+  dropdownOptions?: string
 }
 
 function validator(config: FormField[]) {
