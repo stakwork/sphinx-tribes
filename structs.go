@@ -111,6 +111,14 @@ type Person struct {
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 }
 
+/*
+GithubIssues
+stakwork/sphinx-relay/229: {
+	status: open
+	assignee: Evanfeenstra
+}
+*/
+
 /* loopbot:
 {
 	prefix:'/loopout',
