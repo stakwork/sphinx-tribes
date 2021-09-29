@@ -39,6 +39,14 @@ func initDB() {
 	DB.db = db
 
 	fmt.Println("db connected")
+
+	// data := map[string]string{
+	// 	"assignee": "Evanfeenstra",
+	// 	"status":   "open",
+	// }
+	// DB.updateGithubIssues(1, map[string]interface{}{
+	// 	"stakwork/sphinx-relay/229": data,
+	// })
 }
 
 var updatables = []string{
@@ -181,6 +189,12 @@ func (db database) updateTwitterConfirmed(id uint, confirmed bool) {
 	})
 }
 
+func (db database) updateGithubIssues(id uint, issues map[string]interface{}) {
+	db.db.Model(&Person{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"github_issues": issues,
+	})
+}
+
 func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
@@ -208,6 +222,12 @@ func (db database) updateTribeUniqueName(uuid string, u string) {
 func (db database) getListedTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	return ms
+}
+
+func (db database) getTribesByOwner(pubkey string) []Tribe {
+	ms := []Tribe{}
+	db.db.Where("owner_pub_key = ? AND (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)", pubkey).Find(&ms)
 	return ms
 }
 
