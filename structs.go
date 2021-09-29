@@ -109,6 +109,7 @@ type Person struct {
 	PriceToMeet      int64          `json:"price_to_meet"`
 	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
+	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 }
 
 /*
