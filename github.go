@@ -2,14 +2,32 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/google/go-github/v39/github"
 )
 
 type GithubIssue struct {
-	Title    string `json:"title"`
-	Status   string `json:"status"`
-	Assignee string `json:"assignee"`
+	Title       string `json:"title"`
+	Status      string `json:"status"`
+	Assignee    string `json:"assignee"`
+	Description string `json:"description"`
+}
+
+func getGithubIssue(w http.ResponseWriter, r *http.Request) {
+	owner := chi.URLParam(r, "owner")
+	repo := chi.URLParam(r, "repo")
+	issueString := chi.URLParam(r, "issue")
+	issueNum, err := strconv.Atoi(issueString)
+	if err != nil || issueNum < 1 {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+	issue, err := GetIssue(owner, repo, issueNum)
+	json.NewEncoder(w).Encode(issue)
 }
 
 func GetRepoIssues(owner string, repo string) ([]GithubIssue, error) {
@@ -42,9 +60,10 @@ func GetIssue(owner string, repo string, id int) (GithubIssue, error) {
 			assignee = *iss.Assignee.Login
 		}
 		issue = GithubIssue{
-			Title:    *iss.Title,
-			Status:   *iss.State,
-			Assignee: assignee,
+			Title:       *iss.Title,
+			Status:      *iss.State,
+			Assignee:    assignee,
+			Description: *iss.Body,
 		}
 	}
 	return issue, err
