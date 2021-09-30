@@ -100,6 +100,14 @@ export default function BodyComponent() {
         loadPeople()
     }, [])
 
+    useEffect(() => {
+        if (ui.meInfo) {
+            main.getTribesByOwner(ui.meInfo.owner_pubkey || '')
+        }
+    }, [ui.meInfo])
+
+
+
     function publicPanelClick(person, widget, i) {
         setPublicFocusPerson(person)
         setPublicFocusIndex(i)

@@ -8,6 +8,7 @@ import { uiStore } from './ui'
 export class MainStore {
   @persist('list') @observable
   tribes: Tribe[] = []
+  ownerTribes: Tribe[] = []
 
   @action async getTribes(uniqueName?: string): Promise<Tribe[]> {
     const ts = await api.get('tribes')
@@ -86,6 +87,12 @@ export class MainStore {
 
     this.bots = b
     return b
+  }
+
+  @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
+    const ts = await api.get(`tribes_by_owner/${pubkey}`)
+    this.ownerTribes = ts
+    return ts
   }
 
   @action async makeBot(payload: any): Promise<Bot> {
@@ -205,7 +212,7 @@ export class MainStore {
 
 
       if (!r.ok) {
-        return alert("Failed to create profile");
+        return alert("Failed to save data");
       }
 
       uiStore.setToasts([{
@@ -245,7 +252,7 @@ export class MainStore {
 
 
       if (!r.ok) {
-        return alert("Failed to create profile");
+        return alert("Failed to save data");
       }
 
       uiStore.setToasts([{

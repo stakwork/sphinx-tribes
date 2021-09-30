@@ -2,9 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import { EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
-import { FieldEnv, FieldText } from './index'
+import { FieldEnv, FieldText, Note } from './index'
 
-export default function NumberInput({ error, label, value, extraHTML, handleChange, handleBlur, handleFocus }: Props) {
+export default function NumberInput({ error, note, label, value, extraHTML, handleChange, handleBlur, handleFocus }: Props) {
 
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
@@ -37,6 +37,7 @@ export default function NumberInput({ error, label, value, extraHTML, handleChan
       </E>}
     </R>
   </FieldEnv>
+    {note && <Note>*{note}</Note>}
     <ExtraText
       style={{ display: value && extraHTML ? 'block' : 'none' }}
       dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

@@ -1,7 +1,9 @@
 import * as Yup from 'yup'
 import { FormField } from "../form";
 
-const strValidator = Yup.string().required('Required')
+const strValidator = Yup.string().trim().required('Required')
+const repoStrValidator = Yup.string().trim()
+    .matches(/^[^\/]+\/[^\/]+$/, 'Incorrect format').required('Required')
 const nomValidator = Yup.number().required('Required')
 
 // this is source of truth for widget items!
@@ -383,7 +385,9 @@ export const offerSchema: FormField[] = [
     },
 ];
 
-export const wantedSchema: FormField[] = [
+
+
+export const wantedOtherSchema: FormField[] = [
     {
         name: 'title',
         label: "Title*",
@@ -413,6 +417,11 @@ export const wantedSchema: FormField[] = [
         label: "Gallery",
         type: "gallery",
     },
+    {
+        name: 'type',
+        label: "Type",
+        type: "hide",
+    },
 
     // {
     //     name: 'show',
@@ -421,6 +430,72 @@ export const wantedSchema: FormField[] = [
     // },
 ];
 
+export const wantedCodingTaskSchema: FormField[] = [
+    {
+        name: 'title',
+        label: "Title",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: 'tribe',
+        label: "Tribe",
+        type: "select",
+        options: [{
+            value: 'this',
+            label: 'this',
+        }, {
+            value: 'that',
+            label: 'that',
+        }],
+        validator: strValidator,
+    },
+    {
+        name: 'repo',
+        label: "Github Repository",
+        type: "text",
+        note: 'Enter in this format: githubName/repoName, (e.g. stakwork/sphinx-tribes)',
+        validator: repoStrValidator, // look for 1 slash
+    },
+    {
+        name: 'issue',
+        label: "Issue #",
+        type: "number",
+        validator: nomValidator,
+    },
+    {
+        name: 'price',
+        label: "Price",
+        validator: nomValidator,
+        type: "number",
+    },
 
+    {
+        name: 'description',
+        label: "Description",
+        type: "textarea",
+        validator: strValidator,
+    },
+    {
+        name: 'type',
+        label: "Type",
+        type: "hide",
+    },
+];
 
-// extras.blog.existing
+export const wantedSchema: FormField[] = [
+    {
+        name: 'dynamicSchema',
+        label: 'none',
+        type: 'text',
+        defaultSchema: wantedCodingTaskSchema,
+        defaultSchemaName: 'coding_task',
+        dropdownOptions: 'wanted'
+    }
+];
+
+// this object is used to switch between schemas in form when dynamic
+export const dynamicSchemasByType = {
+    coding_task: wantedCodingTaskSchema,
+    other: wantedOtherSchema
+}

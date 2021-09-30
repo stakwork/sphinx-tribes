@@ -8,11 +8,20 @@ import { Divider, Title, Paragraph } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton'
+import { extractGithubIssue } from '../../../helpers';
+import ReactMarkdown from 'react-markdown'
+
+export function renderMarkdown(str) {
+        return <ReactMarkdown>{str}</ReactMarkdown>
+}
 
 export default function WantedSummary(props: any) {
-        const { title, description, priceMin, priceMax, url, gallery, person, created } = props
+        const { title, description, priceMin, priceMax, url, gallery, person, created, repo, issue, price, type, tribe } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
+
+        const heart = <FavoriteButton />
+        const isMobile = useIsMobile()
 
         useLayoutEffect(() => {
                 if (imgRef && imgRef.current) {
@@ -22,9 +31,78 @@ export default function WantedSummary(props: any) {
                 }
         }, [imgRef])
 
-        const heart = <FavoriteButton />
+        function renderCodingTask() {
+                const { assignee, status } = extractGithubIssue(person, repo, issue)
 
-        const isMobile = useIsMobile()
+                if (isMobile) {
+                        return <Pad>
+                                <NameTag {...person}
+                                        created={created}
+                                        widget={'wanted'} />
+
+                                <T>{title || 'No title'}</T>
+                                <div style={{ marginTop: 5 }}>
+                                        <Status>{status || 'Open'} - {assignee ? 'Assigned' : 'Unassigned'}</Status>
+                                </div>
+                                <Link >github.com/{repo + '/' + issue}</Link>
+                                <Status style={{ marginTop: 22 }}>Tribe:&nbsp;{tribe}</Status>
+                                <Divider style={{
+                                        marginTop: 22
+                                }} />
+                                <Y>
+                                        <P>{formatPrice(price)} <B>SAT</B></P>
+                                        {heart}
+                                </Y>
+                                <Divider style={{ marginBottom: 22 }} />
+                                <D>{renderMarkdown(description)}</D>
+
+                        </Pad>
+                }
+
+                return <Wrap>
+                        <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
+                                <Paragraph>{renderMarkdown(description)}</Paragraph>
+                        </div>
+                        <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
+                                <Pad>
+                                        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                                <NameTag
+                                                        style={{ marginBottom: 14 }}
+                                                        {...person}
+                                                        created={created}
+                                                        widget={'wanted'} />
+                                                <MaterialIcon icon={'code'} />
+                                        </div>
+
+
+                                        <Title>{title}</Title>
+
+                                        <div style={{ display: 'flex', marginBottom: 0 }}>
+                                                <Status>{status || 'Open'} -</Status>
+                                                <Assignee>{assignee ? 'Assigned' : 'Unassigned'}</Assignee>
+                                        </div>
+                                        <Link >github.com/{repo + '/' + issue}</Link>
+                                        <Status style={{ marginTop: 22 }}>Tribe:&nbsp;{tribe}</Status>
+
+                                        <Divider style={{ marginTop: 22 }} />
+                                        <Y>
+                                                <P>{formatPrice(price) || '0'} <B>SAT</B></P>
+                                                {heart}
+                                        </Y>
+
+
+                                </Pad>
+                        </div>
+
+                </Wrap>
+        }
+
+
+
+        if (type === 'coding_task') {
+                return renderCodingTask()
+        }
+
         if (isMobile) {
                 return <>
                         <Pad>
@@ -37,11 +115,12 @@ export default function WantedSummary(props: any) {
                                         marginTop: 22
                                 }} />
                                 <Y>
-                                        <P>{formatPrice(priceMin)} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
+                                        <P>{formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
                                         {heart}
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
-                                <D>{description || 'No description'}</D>
+
+                                <D>{renderMarkdown(description)}</D>
 
                                 <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
                         </Pad>
@@ -70,7 +149,7 @@ export default function WantedSummary(props: any) {
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
 
-                                <Paragraph>{description}</Paragraph>
+                                <Paragraph>{renderMarkdown(description)}</Paragraph>
                         </Pad>
                 </div>
 
@@ -117,3 +196,23 @@ const D = styled.div`
         margin: 10px 0 30px;
         `;
 
+
+const Assignee = styled.div`
+        display: flex;
+        font-size:12px;
+        font-weight:300;
+        `;
+
+const Status = styled.div`
+        display: flex;
+        font-size:12px;
+        margin-right:4px;
+        font-weight:300;
+        `;
+
+const Link = styled.div`
+        color:blue;
+        overflow-wrap:break-word;
+        font-size:15px;
+        font-weight:300;
+        `;

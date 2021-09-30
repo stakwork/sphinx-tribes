@@ -1,11 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
-import { EuiFormRow, EuiTextArea, EuiIcon } from '@elastic/eui'
+import { EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
-import { FieldEnv, FieldTextArea, Note } from './index'
+import { FieldEnv, Note } from './index'
+import { Select } from '../../sphinxUI'
 
-export default function TextAreaInput({ error, note, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
-    // console.log("TEXTAREA", label, extraHTML)
+export default function SelectInput({ error, note, label, options, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
     let labeltext = label
     if (error) labeltext = labeltext + ` (${error})`
@@ -13,12 +13,13 @@ export default function TextAreaInput({ error, note, label, value, handleChange,
     return <>
         <FieldEnv label={labeltext}>
             <R>
-                <FieldTextArea name="first" value={value || ''}
-                    readOnly={readOnly || false}
-                    onChange={e => handleChange(e.target.value)}
-                    onBlur={handleBlur}
-                    onFocus={handleFocus}
-                // prepend={prepend}
+                <Select
+                    selectStyle={{ border: 'none' }}
+                    options={options}
+                    value={value}
+                    onChange={(e) => {
+                        handleChange(e)
+                    }}
                 />
                 {error && <E>
                     <EuiIcon type="alert" size='m' style={{ width: 20, height: 20 }} />
@@ -34,8 +35,7 @@ export default function TextAreaInput({ error, note, label, value, handleChange,
 }
 
 const ExtraText = styled.div`
-  color:#ddd;
-  padding:10px 10px 25px 10px;
+  padding:2px 10px 25px 10px;
   max-width:calc(100% - 20px);
   word-break: break-all;
   font-size:14px;
@@ -44,8 +44,9 @@ const ExtraText = styled.div`
 const E = styled.div`
   position:absolute;
   right:10px;
-  top:10px;
+  top:0px;
   display:flex;
+  height:100%;
   justify-content:center;
   align-items:center;
   color:#45b9f6;
@@ -55,3 +56,4 @@ const E = styled.div`
 const R = styled.div`
   position:relative
 `
+
