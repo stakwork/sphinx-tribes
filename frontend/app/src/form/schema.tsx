@@ -1,7 +1,9 @@
 import * as Yup from 'yup'
 import { FormField } from "../form";
 
-const strValidator = Yup.string().required('Required')
+const strValidator = Yup.string().trim().required('Required')
+const repoStrValidator = Yup.string().trim()
+    .matches(/^[^\/]+\/[^\/]+$/, 'Incorrect format').required('Required')
 const nomValidator = Yup.number().required('Required')
 
 // this is source of truth for widget items!
@@ -452,8 +454,8 @@ export const wantedCodingTaskSchema: FormField[] = [
         name: 'repo',
         label: "Github Repository",
         type: "text",
-        note: 'Enter in this format: githubName/repositoryName, (e.g. stakwork/sphinx-tribes)',
-        validator: strValidator, // look for 1 slash
+        note: 'Enter in this format: githubName/repoName, (e.g. stakwork/sphinx-tribes)',
+        validator: repoStrValidator, // look for 1 slash
     },
     {
         name: 'issue',

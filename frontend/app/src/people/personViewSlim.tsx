@@ -47,6 +47,7 @@ export default function PersonView(props: any) {
     }
 
     const people = (main.people && main.people.filter(f => !f.hide)) || []
+
     const {
         id,
         img,
@@ -472,7 +473,8 @@ export default function PersonView(props: any) {
                     alignItems: 'center',
                     boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.07)',
                     paddingRight: 10,
-                    height: 64
+                    height: 64,
+                    zIndex: 0
                 }}>
                     <Button
                         color='clear'
@@ -708,6 +710,7 @@ const DBack = styled.div`
             align-items:center;
             background: #FFFFFF;
             box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+            z-index:0;
             `
 
 const Panel = styled.div`
