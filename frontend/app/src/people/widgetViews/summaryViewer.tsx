@@ -4,17 +4,19 @@ import styled from "styled-components";
 import PostSummary from './summaries/postSummary'
 import WantedSummary from './summaries/wantedSummary'
 import OfferSummary from './summaries/offerSummary'
+import { useIsMobile } from "../../hooks";
 
 // this is where we see others posts (etc) and edit our own
 export default function SummaryViewer(props: any) {
     const { item, config, person } = props
     const { ui } = useStores();
+    const isMobile = useIsMobile()
 
     const isSelectedView = ui.selectedPerson ? true : false
 
     function wrapIt(child) {
         return <Wrap style={{
-            maxHeight: config.name === 'post' ? '' : '80vh',
+            maxHeight: (config.name === 'post' || isMobile) ? '' : '80vh',
             height: isSelectedView ? 'calc(100% - 60px)' : '100%'
         }}>
             {child}

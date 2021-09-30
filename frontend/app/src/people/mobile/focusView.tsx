@@ -8,6 +8,7 @@ import { Button, IconButton } from "../../sphinxUI";
 import moment from 'moment'
 import SummaryViewer from '../widgetViews/summaryViewer'
 import { useIsMobile } from "../../hooks";
+import { dynamicSchemasByType } from "../../form/schema";
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -106,7 +107,7 @@ export default function FocusedView(props: any) {
             });
             if (!r.ok) {
                 setLoading(false);
-                return alert("Failed to create profile");
+                return alert("Failed to save data");
             }
 
             await main.getPeople('')
@@ -121,10 +122,40 @@ export default function FocusedView(props: any) {
         setDeleting(false);
     }
 
+    function trimBodyToSchema(b) {
+        // trim to schema to remove data that doesnt below 
+        // (in case of switching between dynamic schemas)
+        const body = { ...b }
+
+        let dynamicSchema = config.schema.find(f => f.defaultSchema)
+
+        if (dynamicSchema) {
+            let trueSchema = config.schema
+            let personInfo = canEdit ? ui.meInfo : person
+            const extras = { ...personInfo.extras }
+            let sel = extras[config.name][selectedIndex]
+            if (sel?.type) {
+                let thisDynamicSchema = dynamicSchemasByType[sel.type]
+                trueSchema = thisDynamicSchema
+            } else {
+                trueSchema = dynamicSchema.defaultSchema
+            }
+            Object.keys(body).forEach(k => {
+                const foundIt = trueSchema.find(f => f.name === k)
+                if (!foundIt) delete body[k]
+            })
+        }
+
+        return body
+    }
+
     async function submitForm(body) {
         console.log('SUBMIT FORM', body);
+
+        // let dynamicSchema = config.schema.find(f => f.defaultSchema)
+        // if (dynamicSchema) body = trimBodyToSchema(body)
+
         body = mergeFormWithMeData(body)
-        // console.log('mergeFormWithMeData', body);
         if (!body) return // avoid saving bad state
 
         const info = ui.meInfo as any;
@@ -146,10 +177,9 @@ export default function FocusedView(props: any) {
                 },
             })
 
-
             if (!r.ok) {
                 setLoading(false);
-                return alert("Failed to create profile");
+                return alert("Failed to save data");
             }
 
             // if user has no id, update local id from response
@@ -195,9 +225,25 @@ export default function FocusedView(props: any) {
                     let sel = extras[config.name][selectedIndex]
 
                     if (sel) {
-                        config.schema.forEach(s => {
-                            initialValues[s.name] = sel[s.name]
-                        })
+                        // if dynamic, find right schema
+                        let dynamicSchema = config.schema.find(f => f.defaultSchema)
+                        if (dynamicSchema) {
+                            if (sel.type) {
+                                let thisDynamicSchema = dynamicSchemasByType[sel.type]
+                                thisDynamicSchema.forEach(s => {
+                                    initialValues[s.name] = sel[s.name]
+                                })
+                            } else {
+                                // use default schema
+                                dynamicSchema.defaultSchema.forEach(s => {
+                                    initialValues[s.name] = sel[s.name]
+                                })
+                            }
+                        } else {
+                            config.schema.forEach(s => {
+                                initialValues[s.name] = sel[s.name]
+                            })
+                        }
                     }
                 }
             }
@@ -263,7 +309,7 @@ export default function FocusedView(props: any) {
                                         loading={deleting}
                                         leadingIcon={'delete_outline'}
                                         text={'Delete'}
-                                        style={{ marginLeft: 20 }}
+                                        style={{ marginLeft: 10 }}
                                     />
                                 </div>
                                 : <div />}

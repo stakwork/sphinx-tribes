@@ -23,7 +23,7 @@ export default function ConnectCard(props) {
             </ImgWrap>
             <div style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}>
                 <N>{person?.owner_alias}</N>
-                <D><B>{person?.price_to_meet} sats</B> is required to connect.</D>
+                <D><B>{person?.price_to_meet} SAT</B> is required to connect.</D>
 
                 <QR value={qrString} size={210} type={'connect'} />
 

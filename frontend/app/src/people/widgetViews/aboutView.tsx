@@ -2,6 +2,11 @@ import React from 'react'
 import styled from "styled-components";
 import { Divider } from '../../sphinxUI';
 import QrBar from '../utils/QrBar'
+import ReactMarkdown from 'react-markdown'
+
+export function renderMarkdown(str) {
+    return <ReactMarkdown>{str}</ReactMarkdown>
+}
 
 export default function AboutView(props: any) {
     const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
@@ -21,7 +26,7 @@ export default function AboutView(props: any) {
 
         <Divider />
 
-        <D>{description || 'No description'} </D>
+        <D>{renderMarkdown(description)}</D>
 
         {tag && <>
             <T>For Normies</T>

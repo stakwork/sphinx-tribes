@@ -8,6 +8,11 @@ import { Divider, Title, Paragraph } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton'
+import ReactMarkdown from 'react-markdown'
+
+export function renderMarkdown(str) {
+        return <ReactMarkdown>{str}</ReactMarkdown>
+}
 
 export default function OfferSummary(props: any) {
         let { gallery, title, description, price, person, created } = props
@@ -42,9 +47,7 @@ export default function OfferSummary(props: any) {
                                         {heart}
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
-
-                                <D>{description || 'No description'}</D>
-
+                                <D>{renderMarkdown(description)}</D>
                                 <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
                         </Pad>
                 </>
@@ -69,7 +72,7 @@ export default function OfferSummary(props: any) {
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
 
-                                <Paragraph>{description}</Paragraph>
+                                <Paragraph>{renderMarkdown(description)}</Paragraph>
                         </Pad>
                 </div>
 

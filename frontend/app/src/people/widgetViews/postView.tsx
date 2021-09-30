@@ -1,7 +1,5 @@
-import moment from 'moment';
 import React, { useState } from 'react'
 import styled from "styled-components";
-import { Post } from '../../form/inputs/widgets/interfaces';
 import GalleryViewer from '../utils/galleryViewer';
 import ReactMarkdown from 'react-markdown'
 import NameTag from '../utils/nameTag';

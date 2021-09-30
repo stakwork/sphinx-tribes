@@ -19,7 +19,7 @@ export default function OfferView(props: any) {
             <Body>
                 <T>{title || 'No title'}</T>
                 <D>{description || 'No description'}</D>
-                <P>{formatPrice(price)} <B>sat</B></P>
+                <P>{formatPrice(price)} <B>SAT</B></P>
             </Body>
 
         </Wrap>
@@ -42,7 +42,7 @@ export default function OfferView(props: any) {
             <Divider style={{ margin: 0 }} />
 
             <Pad style={{ padding: 20, }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>sat</B></P>
+                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT</B></P>
             </Pad>
         </div>
     </DWrap >
@@ -95,6 +95,12 @@ color: #3C3F41;
 
 const T = styled.div`
 font-weight:bold;
+overflow:hidden;
+line-height: 20px;
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
 `;
 const B = styled.span`
 font-weight:300;
@@ -104,10 +110,12 @@ font-weight:500;
 `;
 const D = styled.div`
 color:#5F6368;
-white-space: nowrap;
-height:26px;
-text-overflow: ellipsis;
 overflow:hidden;
+line-height:18px;
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
 `;
 
 
@@ -124,6 +132,7 @@ justify-content: space-around;
 
 color: #292C33;
 overflow:hidden;
+height:132px;
 `;
 
 const Pad = styled.div`

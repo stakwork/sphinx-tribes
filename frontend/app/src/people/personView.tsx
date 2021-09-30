@@ -211,7 +211,7 @@ export default function PersonView(props: any) {
                     }
 
                     <EuiToolTip position="bottom"
-                        content={`Price to Meet: ${price_to_meet} sats`}>
+                        content={`Price to Meet: ${price_to_meet} SAT`}>
                         <div style={{ display: 'flex', width: 'fit-content', margin: 0 }}>
                             <EuiButtonIcon
                                 onClick={toggleQR}
@@ -317,7 +317,7 @@ export default function PersonView(props: any) {
                         </EuiModalHeader>
                         <EuiModalBody style={{ padding: 0, color: '#fff' }}>
                             <RowWrap style={{ marginTop: -20, marginBottom: 10 }}>
-                                {`Price to Meet: ${price_to_meet} sats`}
+                                {`Price to Meet: ${price_to_meet} SAT`}
                             </RowWrap>
                             <QRWrapWrap>
                                 <QRWrap className="qr-wrap float-r">

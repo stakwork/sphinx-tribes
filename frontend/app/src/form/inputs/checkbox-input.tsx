@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { EuiFormRow, EuiCheckbox } from '@elastic/eui'
+import { EuiCheckbox } from '@elastic/eui'
 import type { Props } from './propsType'
+import { Note } from './index'
 
-export default function CheckBox({ label, value, name, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function CheckBox({ label, note, value, name, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
     useEffect(() => {
         // if value not initiated, default value true
@@ -22,6 +23,7 @@ export default function CheckBox({ label, value, name, handleChange, handleBlur,
             onFocus={handleFocus}
             compressed
         />
+        {note && <Note>*{note}</Note>}
     </>
 }
 
