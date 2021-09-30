@@ -8,6 +8,10 @@ import NameTag from '../../utils/nameTag';
 import MaterialIcon from '@material/react-material-icon';
 import FavoriteButton from '../../utils/favoriteButton';
 
+export function renderMarkdown(str) {
+    return <ReactMarkdown>{str}</ReactMarkdown>
+}
+
 export default function PostSummary(props: any) {
     const { title, content, created, gallery, person } = props
 
@@ -21,7 +25,7 @@ export default function PostSummary(props: any) {
 
         <T>{title || 'No title'} </T>
         {/* <Time>{created && moment.unix(created).format('LLL')} </Time> */}
-        <M><ReactMarkdown>{content}</ReactMarkdown></M>
+        <M>{renderMarkdown(content)}</M>
 
         {/* readmore */}
 

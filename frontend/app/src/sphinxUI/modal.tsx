@@ -111,7 +111,7 @@ cursor:pointer;
 const BigX = styled.div`
 position:absolute;
 top:20px;
-right:-70px;
+right:-68px;
 cursor:pointer;
 z-index:10;
 `
