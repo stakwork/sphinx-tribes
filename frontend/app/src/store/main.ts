@@ -95,6 +95,17 @@ export class MainStore {
     return ts
   }
 
+  @action async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
+    const data = await api.get(`github_issue/${owner}/${repo}/${issue}`)
+    const { title } = data && data
+
+    console.log('data', data)
+
+    // if no title, the github issue isnt real
+    if (!title) return null
+    return data
+  }
+
   @action async makeBot(payload: any): Promise<Bot> {
     const b = await api.post('bots', payload)
     console.log('made bot', b)
@@ -114,12 +125,20 @@ export class MainStore {
         // add 'hide' property to me in people list
         ps[index].hide = true
 
-        if (!uiStore.meInfo.img && ps[index].img) {
-          // if meInfo has no img but people list does, copy that image to meInfo
-          uiStore.setMeInfo({ ...uiStore.meInfo, img: ps[index].img })
-        }
+        let meInfoUpdates: any = {}
+
+        // if meInfo has no img but people list does, copy that
+        if (!uiStore.meInfo.img && ps[index].img) meInfoUpdates.img = ps[index].img
+        // if meInfo has no github_issues but people list does, copy that
+        if (!uiStore.meInfo.github_issues && ps[index].github_issues) meInfoUpdates.github_issues = ps[index].github_issues
+        // if meInfo has no verification_signature but people list does, copy that
+        if (!uiStore.meInfo.verification_signature && ps[index].verification_signature) meInfoUpdates.verification_signature = ps[index].verification_signature
+
+        uiStore.setMeInfo({ ...uiStore.meInfo, ...meInfoUpdates })
       }
+
     }
+
     if (uniqueName) {
       ps.forEach(function (t: Tribe, i: number) {
         if (t.unique_name === uniqueName) {
