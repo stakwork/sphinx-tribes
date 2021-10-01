@@ -95,6 +95,11 @@ export class MainStore {
     return ts
   }
 
+  @action async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
+    const data = await api.get(`/github_issue/${owner}/${repo}/${issue}`)
+    return data
+  }
+
   @action async makeBot(payload: any): Promise<Bot> {
     const b = await api.post('bots', payload)
     console.log('made bot', b)

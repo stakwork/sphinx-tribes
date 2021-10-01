@@ -72,6 +72,14 @@ class UiStore {
     this.personViewOpenTab = s
   }
 
+  @observable lastGithubRepo: string = ''
+  @action setLastGithubRepo(s: string) {
+    console.log('set setLastGithubRepo', s)
+    this.lastGithubRepo = s
+  }
+
+
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
