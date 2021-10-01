@@ -113,7 +113,7 @@ export default function Form(props: any) {
         value: ot.unique_name,
         label: ot.unique_name
       }
-    })) || [{ value: 'none', label: 'N/A' }]
+    })) || [{ value: 'none', label: 'None' }]
   }
 
   if (loading) return <div />

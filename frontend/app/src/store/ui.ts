@@ -107,6 +107,7 @@ export interface MeInfo {
   alias: string
   img?: string
   owner_alias?: string
+  github_issues?: any[]
   route_hint: string
   contact_key: string
   price_to_meet: number

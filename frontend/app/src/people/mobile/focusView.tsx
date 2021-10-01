@@ -150,7 +150,6 @@ export default function FocusedView(props: any) {
     }
 
     async function preSubmitFunctions(body) {
-
         // if github repo
         try {
             if (body.type === 'coding_task') {
@@ -159,7 +158,7 @@ export default function FocusedView(props: any) {
                 let repo = splitString[1]
                 let res = await main.getGithubIssueData(owner, repo, body.issue)
                 if (!res) {
-                    throw new Error('no response')
+                    throw "Couldn't locate this Github issue."
                 }
                 const { description, title } = res
                 body.description = description
@@ -169,7 +168,7 @@ export default function FocusedView(props: any) {
                 ui.setLastGithubRepo(body.repo)
             }
         } catch (e) {
-            throw new Error('failed')
+            throw "Couldn't locate this Github issue."
         }
 
         return body
@@ -185,7 +184,7 @@ export default function FocusedView(props: any) {
             body = await preSubmitFunctions(body)
         } catch (e) {
             console.log('e', e)
-            alert('Could not save.')
+            alert(e)
             return
         }
 

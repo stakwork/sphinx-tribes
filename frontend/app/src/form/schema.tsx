@@ -449,13 +449,14 @@ export const wantedCodingTaskSchema: FormField[] = [
         name: 'repo',
         label: "Github Repository",
         type: "text",
-        note: 'Enter in this format: githubName/repoName, (e.g. stakwork/sphinx-tribes)',
+        note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
         validator: repoStrValidator, // look for 1 slash
     },
     {
         name: 'issue',
         label: "Issue #",
         type: "number",
+        note: 'Add the "stakwork" user to your github repo for issue status updates.',
         validator: nomValidator,
     },
     {
