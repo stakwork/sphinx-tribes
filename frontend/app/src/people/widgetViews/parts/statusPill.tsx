@@ -11,7 +11,7 @@ export default function GithubStatusPill(props: any) {
 
     return <div style={{ display: 'flex' }}>
         <Pill isOpen={isOpen}>
-            <MaterialIcon icon={isOpen ? "arrow_circle_up" : "check_circle_outline"} />
+            <MaterialIcon style={{ marginRight: 5, fontSize: 18 }} icon={isOpen ? "arrow_circle_up" : "check_circle_outline"} />
             <div>
                 {status}
             </div>
