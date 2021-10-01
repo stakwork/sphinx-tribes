@@ -3,13 +3,13 @@ import styled from "styled-components";
 import MaterialIcon from '@material/react-material-icon';
 
 export default function GithubStatusPill(props: any) {
-    const { status, assignee } = props
+    const { status, assignee, style } = props
 
     const isOpen = status === 'open'
 
     if (!status) return <div />
 
-    return <div style={{ display: 'flex' }}>
+    return <div style={{ display: 'flex', ...style }}>
         <Pill isOpen={isOpen}>
             <MaterialIcon style={{ marginRight: 5, fontSize: 18 }} icon={isOpen ? "arrow_circle_up" : "check_circle_outline"} />
             <div>
@@ -17,7 +17,7 @@ export default function GithubStatusPill(props: any) {
             </div>
         </Pill>
         <Assignee>
-            {assignee || 'Not assigned'}
+            {(assignee && `Assigned: ${assignee}`) || 'Not assigned'}
         </Assignee>
     </div>
 

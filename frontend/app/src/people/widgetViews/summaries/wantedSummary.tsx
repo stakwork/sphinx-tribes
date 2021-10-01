@@ -89,10 +89,9 @@ export default function WantedSummary(props: any) {
 
                                         <Title>{title}</Title>
 
-
-
+                                        <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
                                         {githubLink}
-                                        <GithubStatusPill status={status} assignee={assignee} />
+
                                         <Status style={{ marginTop: 22 }}>{addTribe}</Status>
 
                                         <Divider style={{ marginTop: 22 }} />
