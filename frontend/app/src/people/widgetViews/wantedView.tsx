@@ -40,10 +40,10 @@ export default function WantedView(props: any) {
                 </div>
 
                 <DT style={{ marginBottom: 4 }}>{title}</DT>
-                <GithubStatusPill status={status} assignee={assignee} />
                 <Link >github.com/{repo + '/issues/' + issue}</Link>
+                <GithubStatusPill status={status} assignee={assignee} />
                 <div style={{ height: 15 }} />
-                <DescriptionCodeTask style={{ maxHeight: 200 }}>{description}</DescriptionCodeTask>
+                <DescriptionCodeTask style={{ maxHeight: 180 }}>{description}</DescriptionCodeTask>
 
             </Pad>
             <Divider style={{ margin: 0 }} />
