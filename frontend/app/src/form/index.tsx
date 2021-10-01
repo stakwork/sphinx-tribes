@@ -6,13 +6,14 @@ import Input from "./inputs";
 import { Button, IconButton, Modal } from "../sphinxUI";
 import { useStores } from "../store";
 import Select from "../sphinxUI/select";
-import { dynamicSchemasByType } from './schema'
+import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema'
 import { formDropdownOptions, } from '../people/utils/constants'
 
 export default function Form(props: any) {
   const { buttonsOnBottom } = props
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null)
   const [dynamicSchema, setDynamicSchema]: any = useState(null)
   const [dynamicSchemaName, setDynamicSchemaName] = useState('')
   const [showSettings, setShowSettings] = useState(false)
@@ -24,6 +25,8 @@ export default function Form(props: any) {
   let lastPage = 1
   const readOnly = props.readOnly
   const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody
+
+  let initValues = dynamicInitialValues || props.initialValues
 
   useEffect(() => {
     const dSchema = props.schema.find(f => f.defaultSchema)
@@ -40,9 +43,41 @@ export default function Form(props: any) {
     setLoading(false)
   }, [])
 
+  // this useEffect triggers when the dynamic schema name is updated
+  // checks if there are autofill fields that we can pull from local storage
+
+  useEffect(() => {
+    const formRef = props.formRef?.current
+    const vals = formRef && formRef.values
+    if (vals) {
+      if (dynamicSchemaAutofillFieldsByType[dynamicSchemaName]) {
+        Object.keys(dynamicSchemaAutofillFieldsByType[dynamicSchemaName]).forEach((k) => {
+          const localStorageKey = dynamicSchemaAutofillFieldsByType[dynamicSchemaName][k]
+          const valueToAssign = ui[localStorageKey]
+          // if no value exists already
+          if (!vals[k] || vals[k] == undefined) {
+            if (valueToAssign) {
+              setDynamicInitialValues({ ...initValues, [k]: valueToAssign })
+              // re-render 
+              reloadForm()
+            }
+          }
+        })
+      }
+    }
+
+  }, [dynamicSchemaName])
+
   useEffect(() => {
     scrollToTop()
   }, [page])
+
+  function reloadForm() {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+    }, 20)
+  }
 
   function scrollToTop() {
     if (scrollDiv && scrollDiv.current) {
@@ -78,14 +113,14 @@ export default function Form(props: any) {
         value: ot.unique_name,
         label: ot.unique_name
       }
-    })) || [{ value: 'none', label: 'None' }]
+    })) || [{ value: 'none', label: 'N/A' }]
   }
 
   if (loading) return <div />
 
   return (
     <Formik
-      initialValues={props.initialValues || {}}
+      initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
       validationSchema={validator(schema)}

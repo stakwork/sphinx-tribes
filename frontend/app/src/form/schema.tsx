@@ -1,5 +1,6 @@
 import * as Yup from 'yup'
 import { FormField } from "../form";
+import { uiStore } from '../store/ui';
 
 const strValidator = Yup.string().trim().required('Required')
 const repoStrValidator = Yup.string().trim()
@@ -434,20 +435,14 @@ export const wantedCodingTaskSchema: FormField[] = [
     {
         name: 'title',
         label: "Title",
-        type: "text",
-        validator: strValidator,
+        type: "hide",
+        // validator: strValidator,
     },
     {
         name: 'tribe',
         label: "Tribe",
         type: "select",
-        options: [{
-            value: 'this',
-            label: 'this',
-        }, {
-            value: 'that',
-            label: 'that',
-        }],
+        options: [],
         validator: strValidator,
     },
     {
@@ -473,8 +468,8 @@ export const wantedCodingTaskSchema: FormField[] = [
     {
         name: 'description',
         label: "Description",
-        type: "textarea",
-        validator: strValidator,
+        type: "hide",
+        // validator: strValidator,
     },
     {
         name: 'type',
@@ -498,4 +493,11 @@ export const wantedSchema: FormField[] = [
 export const dynamicSchemasByType = {
     coding_task: wantedCodingTaskSchema,
     other: wantedOtherSchema
+}
+
+// this object is used to autofill form fields if info is available in local storage
+export const dynamicSchemaAutofillFieldsByType = {
+    coding_task: {
+        repo: 'lastGithubRepo'
+    }
 }
