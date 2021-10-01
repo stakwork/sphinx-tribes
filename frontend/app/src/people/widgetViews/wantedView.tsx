@@ -39,9 +39,10 @@ export default function WantedView(props: any) {
                     <MaterialIcon icon={'code'} />
                 </div>
 
-                <DT style={{ marginBottom: 4 }}>{title}</DT>
+                <DT>{title}</DT>
+                <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
                 <Link >github.com/{repo + '/issues/' + issue}</Link>
-                <GithubStatusPill status={status} assignee={assignee} />
+
                 <div style={{ height: 15 }} />
                 <DescriptionCodeTask style={{ maxHeight: 180 }}>{description}</DescriptionCodeTask>
 
