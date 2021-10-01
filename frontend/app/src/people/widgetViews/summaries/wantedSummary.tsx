@@ -51,9 +51,9 @@ export default function WantedSummary(props: any) {
 
                                 <T>{title || 'No title'}</T>
                                 <div style={{ marginTop: 5 }}>
-                                        <GithubStatusPill status={status} assignee={assignee} />
+                                        {githubLink}
                                 </div>
-                                {githubLink}
+                                <GithubStatusPill status={status} assignee={assignee} />
 
                                 <Status style={{ marginTop: 22 }}>{addTribe}</Status>
                                 <Divider style={{
@@ -89,9 +89,9 @@ export default function WantedSummary(props: any) {
 
                                         <Title>{title}</Title>
 
-                                        <GithubStatusPill status={status} assignee={assignee} />
-
+                                        <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
                                         {githubLink}
+
                                         <Status style={{ marginTop: 22 }}>{addTribe}</Status>
 
                                         <Divider style={{ marginTop: 22 }} />
