@@ -72,6 +72,14 @@ class UiStore {
     this.personViewOpenTab = s
   }
 
+  @observable lastGithubRepo: string = ''
+  @action setLastGithubRepo(s: string) {
+    console.log('set setLastGithubRepo', s)
+    this.lastGithubRepo = s
+  }
+
+
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
@@ -99,6 +107,7 @@ export interface MeInfo {
   alias: string
   img?: string
   owner_alias?: string
+  github_issues?: any[]
   route_hint: string
   contact_key: string
   price_to_meet: number

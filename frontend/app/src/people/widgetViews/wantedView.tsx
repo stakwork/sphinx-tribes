@@ -7,6 +7,7 @@ import { Divider, Title } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
 import MaterialIcon from '@material/react-material-icon';
 import { extractGithubIssue } from '../../helpers';
+import GithubStatusPill from './parts/statusPill';
 
 export default function WantedView(props: any) {
     const { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type } = props
@@ -24,10 +25,7 @@ export default function WantedView(props: any) {
                     </div>
                     <T style={{ marginBottom: 5 }}>{title}</T>
                     <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', marginBottom: 0 }}>
-                            <Status>{status || 'Open'} -</Status>
-                            <Assignee>{assignee ? 'Assigned' : 'Unassigned'}</Assignee>
-                        </div>
+                        <GithubStatusPill status={status} assignee={assignee} />
                         <P>{formatPrice(price)} <B>SAT</B></P>
                     </div>
                 </Body>
@@ -41,14 +39,12 @@ export default function WantedView(props: any) {
                     <MaterialIcon icon={'code'} />
                 </div>
 
-                <DT style={{ marginBottom: 4 }}>{title}</DT>
-                <div style={{ display: 'flex', marginBottom: 0 }}>
-                    <Status>{status || 'Open'} -</Status>
-                    <Assignee>{assignee ? 'Assigned' : 'Unassigned'}</Assignee>
-                </div>
-                <Link >github.com/{repo + '/' + issue}</Link>
+                <DT>{title}</DT>
+                <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
+                <Link >github.com/{repo + '/issues/' + issue}</Link>
+
                 <div style={{ height: 15 }} />
-                <DescriptionCodeTask style={{ height: 240 }}>{description}</DescriptionCodeTask>
+                <DescriptionCodeTask style={{ maxHeight: 180 }}>{description}</DescriptionCodeTask>
 
             </Pad>
             <Divider style={{ margin: 0 }} />
@@ -134,8 +130,29 @@ font-weight:300;
 const Status = styled.div`
 display: flex;
 font-size:12px;
-margin-right:4px;
 font-weight:300;
+`;
+
+const Pill = styled.div`
+display: flex;
+justify-content:center;
+align-items:center;
+height:20px;
+font-size:12px;
+font-weight:300;
+background:green;
+border-radius:30px;
+
+border: 1px solid transparent;
+
+padding: 5px 12px;
+font-size: 14px;
+font-weight: 500;
+line-height: 20px;
+white-space: nowrap;
+border-radius: 2em;
+height:32px;
+width:81px;
 `;
 
 const Link = styled.div`
@@ -230,7 +247,7 @@ color: #5F6368;
 overflow: hidden;
 text-overflow: ellipsis;
 display: -webkit-box;
--webkit-line-clamp: 12;
+-webkit-line-clamp: 10;
 -webkit-box-orient: vertical;
 height: 240px;
 `

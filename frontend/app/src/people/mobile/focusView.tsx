@@ -149,11 +149,45 @@ export default function FocusedView(props: any) {
         return body
     }
 
+    async function preSubmitFunctions(body) {
+        // if github repo
+        try {
+            if (body.type === 'coding_task') {
+                let splitString = body.repo.split('/')
+                let owner = splitString[0]
+                let repo = splitString[1]
+                let res = await main.getGithubIssueData(owner, repo, body.issue)
+                if (!res) {
+                    throw "Couldn't locate this Github issue."
+                }
+                const { description, title } = res
+                body.description = description
+                body.title = title
+
+                // save repo to cookies for autofill in form
+                ui.setLastGithubRepo(body.repo)
+            }
+        } catch (e) {
+            throw "Couldn't locate this Github issue."
+        }
+
+        return body
+    }
+
+
     async function submitForm(body) {
         console.log('SUBMIT FORM', body);
 
         // let dynamicSchema = config.schema.find(f => f.defaultSchema)
         // if (dynamicSchema) body = trimBodyToSchema(body)
+        try {
+            body = await preSubmitFunctions(body)
+        } catch (e) {
+            console.log('e', e)
+            alert(e)
+            return
+        }
+
 
         body = mergeFormWithMeData(body)
         if (!body) return // avoid saving bad state

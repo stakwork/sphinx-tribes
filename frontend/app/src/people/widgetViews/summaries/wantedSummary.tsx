@@ -1,15 +1,16 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
-import { Wanted } from '../../../form/inputs/widgets/interfaces';
 import { formatPrice } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Divider, Title, Paragraph } from '../../../sphinxUI';
+import { Divider, Title, Paragraph, Button } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton'
 import { extractGithubIssue } from '../../../helpers';
 import ReactMarkdown from 'react-markdown'
+import GithubStatusPill from '../parts/statusPill';
+import { useHistory } from 'react-router';
 
 export function renderMarkdown(str) {
         return <ReactMarkdown>{str}</ReactMarkdown>
@@ -19,7 +20,7 @@ export default function WantedSummary(props: any) {
         const { title, description, priceMin, priceMax, url, gallery, person, created, repo, issue, price, type, tribe } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
-
+        const history = useHistory()
         const heart = <FavoriteButton />
         const isMobile = useIsMobile()
 
@@ -30,6 +31,14 @@ export default function WantedSummary(props: any) {
                         }
                 }
         }, [imgRef])
+
+        const repoUrl = `github.com/${repo}/issues/${issue}`
+        const githubLink = <a href={'https://' + repoUrl} target='_blank'><Link >{repoUrl}</Link></a>
+        const addTribe = <Button
+                text={'View Tribe'}
+                color={'primary'}
+                onClick={() => history.push(`/t/${tribe}`)}
+        />
 
         function renderCodingTask() {
                 const { assignee, status } = extractGithubIssue(person, repo, issue)
@@ -42,10 +51,11 @@ export default function WantedSummary(props: any) {
 
                                 <T>{title || 'No title'}</T>
                                 <div style={{ marginTop: 5 }}>
-                                        <Status>{status || 'Open'} - {assignee ? 'Assigned' : 'Unassigned'}</Status>
+                                        {githubLink}
                                 </div>
-                                <Link >github.com/{repo + '/' + issue}</Link>
-                                <Status style={{ marginTop: 22 }}>Tribe:&nbsp;{tribe}</Status>
+                                <GithubStatusPill status={status} assignee={assignee} />
+
+                                <Status style={{ marginTop: 22 }}>{addTribe}</Status>
                                 <Divider style={{
                                         marginTop: 22
                                 }} />
@@ -54,6 +64,7 @@ export default function WantedSummary(props: any) {
                                         {heart}
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
+                                {/* <Img src={'/static/github_logo.png'} /> */}
                                 <D>{renderMarkdown(description)}</D>
 
                         </Pad>
@@ -61,6 +72,7 @@ export default function WantedSummary(props: any) {
 
                 return <Wrap>
                         <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
+                                <Img src={'/static/github_logo.png'} />
                                 <Paragraph>{renderMarkdown(description)}</Paragraph>
                         </div>
                         <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
@@ -77,12 +89,10 @@ export default function WantedSummary(props: any) {
 
                                         <Title>{title}</Title>
 
-                                        <div style={{ display: 'flex', marginBottom: 0 }}>
-                                                <Status>{status || 'Open'} -</Status>
-                                                <Assignee>{assignee ? 'Assigned' : 'Unassigned'}</Assignee>
-                                        </div>
-                                        <Link >github.com/{repo + '/' + issue}</Link>
-                                        <Status style={{ marginTop: 22 }}>Tribe:&nbsp;{tribe}</Status>
+                                        <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
+                                        {githubLink}
+
+                                        <Status style={{ marginTop: 22 }}>{addTribe}</Status>
 
                                         <Divider style={{ marginTop: 22 }} />
                                         <Y>
@@ -216,3 +226,17 @@ const Link = styled.div`
         font-size:15px;
         font-weight:300;
         `;
+
+
+interface ImageProps {
+        readonly src?: string;
+}
+const Img = styled.div<ImageProps>`
+                            background-image: url("${(p) => p.src}");
+                            background-position: center;
+                            background-size: cover;
+                            position: relative;
+                            width:30px;
+                            height:30px;
+                            margin-bottom:20px;
+                            `;
