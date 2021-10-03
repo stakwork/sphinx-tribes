@@ -49,8 +49,8 @@ export default function WantedSummary(props: any) {
                                         created={created}
                                         widget={'wanted'} />
 
-                                <T>{title || 'No title'}</T>
-                                <div style={{ marginTop: 5 }}>
+                                <T>{title}</T>
+                                <div style={{ margin: '5px 0 10px' }}>
                                         {githubLink}
                                 </div>
                                 <GithubStatusPill status={status} assignee={assignee} />
@@ -72,7 +72,7 @@ export default function WantedSummary(props: any) {
 
                 return <Wrap>
                         <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
-                                <Img src={'/static/github_logo.png'} />
+                                <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
                                 <Paragraph>{renderMarkdown(description)}</Paragraph>
                         </div>
                         <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
@@ -83,14 +83,14 @@ export default function WantedSummary(props: any) {
                                                         {...person}
                                                         created={created}
                                                         widget={'wanted'} />
-                                                <MaterialIcon icon={'code'} />
+                                                <Img src={'/static/github_logo.png'} />
                                         </div>
 
 
                                         <Title>{title}</Title>
-
-                                        <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
                                         {githubLink}
+                                        <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+
 
                                         <Status style={{ marginTop: 22 }}>{addTribe}</Status>
 
@@ -236,7 +236,6 @@ const Img = styled.div<ImageProps>`
                             background-position: center;
                             background-size: cover;
                             position: relative;
-                            width:30px;
-                            height:30px;
-                            margin-bottom:20px;
+                            width:22px;
+                            height:22px;
                             `;
