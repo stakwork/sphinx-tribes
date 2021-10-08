@@ -8,15 +8,9 @@ jobs:
     name: Webhook Job
     runs-on:
       - ubuntu-latest
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
       - name: Check out from Git
         uses: actions/checkout@v2
-      - name: Git tag
-        run: echo "::set-env name=COMMIT_MSG::$(git log -1 --pretty=format:%B)"
-      - name: Commit Author
-        run: echo "::set-env name=COMMIT_AUTHOR::$(git log -1 --pretty=format:'%an')"
       - name: Webhook
         uses: joelwmale/webhook-action@749e2dcbc6735ce0c36e1dbbb660618cd7b5f91c
         env:
