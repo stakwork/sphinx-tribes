@@ -21,7 +21,8 @@ export default function WantedView(props: any) {
                 <Body style={{ width: '100%' }}>
                     <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                         <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
-                        <MaterialIcon icon={'code'} />
+                        <Img src={'/static/github_logo.png'} />
+                        {/* <MaterialIcon icon={'code'} /> */}
                     </div>
                     <T style={{ marginBottom: 5 }}>{title}</T>
                     <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
@@ -36,15 +37,17 @@ export default function WantedView(props: any) {
             <Pad style={{ padding: 20, height: 410 }}>
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                     <NameTag {...person} created={created} widget={'wanted'} />
-                    <MaterialIcon icon={'code'} />
+                    {/* <MaterialIcon icon={'code'} /> */}
+                    <Img src={'/static/github_logo.png'} />
                 </div>
 
                 <DT>{title}</DT>
-                <GithubStatusPill status={status} assignee={assignee} style={{ margin: '5px 0' }} />
+
                 <Link >github.com/{repo + '/issues/' + issue}</Link>
+                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
 
                 <div style={{ height: 15 }} />
-                <DescriptionCodeTask style={{ maxHeight: 180 }}>{description}</DescriptionCodeTask>
+                <DescriptionCodeTask>{description}</DescriptionCodeTask>
 
             </Pad>
             <Divider style={{ margin: 0 }} />
@@ -247,9 +250,9 @@ color: #5F6368;
 overflow: hidden;
 text-overflow: ellipsis;
 display: -webkit-box;
--webkit-line-clamp: 10;
+-webkit-line-clamp: 8;
 -webkit-box-orient: vertical;
-height: 240px;
+height: 160px;
 `
 const DT = styled(Title)`
 margin-bottom:9px;
@@ -260,3 +263,15 @@ overflow:hidden;
 
 color: #292C33;
 `;
+
+interface ImageProps {
+    readonly src?: string;
+}
+const Img = styled.div<ImageProps>`
+                        background-image: url("${(p) => p.src}");
+                        background-position: center;
+                        background-size: cover;
+                        position: relative;
+                        width:22px;
+                        height:22px;
+                        `;
