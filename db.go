@@ -231,6 +231,12 @@ func (db database) getTribesByOwner(pubkey string) []Tribe {
 	return ms
 }
 
+func (db database) getAllTribesByOwner(pubkey string) []Tribe {
+	ms := []Tribe{}
+	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&ms)
+	return ms
+}
+
 func (db database) getListedBots() []Bot {
 	ms := []Bot{}
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)

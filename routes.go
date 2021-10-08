@@ -125,9 +125,14 @@ func getListedTribes(w http.ResponseWriter, r *http.Request) {
 }
 
 func getTribesByOwner(w http.ResponseWriter, r *http.Request) {
+	all := r.URL.Query().Get("all")
+	tribes := []Tribe{}
 	pubkey := chi.URLParam(r, "pubkey")
-	fmt.Println("PBKEY", pubkey)
-	tribes := DB.getTribesByOwner(pubkey)
+	if all == "true" {
+		tribes = DB.getAllTribesByOwner(pubkey)
+	} else {
+		tribes = DB.getTribesByOwner(pubkey)
+	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
