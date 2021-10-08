@@ -1,9 +1,8 @@
-name: Push
+name: Issue Opened
 on:
   issues:
     types: 
       - opened
-      - closed
 
 jobs:
   webhook:
