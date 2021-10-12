@@ -49,7 +49,10 @@ export default function NumberInput({ name, error, note, label, value, extraHTML
 
 }
 const ExtraText = styled.div`
-  padding:2px 10px 5px;
+  padding:0px 10px 5px;
+  margin:-5px 0 10px;
+  color:#b75858;
+  font-style:italic;
   max-width:calc(100% - 20px);
   word-break: break;
   font-size:14px;

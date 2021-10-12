@@ -47,7 +47,7 @@ export default function BodyComponent() {
     const ts = await main.getTribes(un)
     if (un) {
       const initial = ts[0]
-      if (initial.unique_name === un) setSelected(initial.uuid)
+      if (initial && initial.unique_name === un) setSelected(initial.uuid)
     }
   }
   useEffect(() => {

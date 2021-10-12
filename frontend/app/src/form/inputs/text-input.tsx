@@ -35,7 +35,10 @@ export default function TextInput({ name, error, note, label, value, handleChang
 }
 
 const ExtraText = styled.div`
-  padding:2px 10px 25px 10px;
+  padding:0px 10px 5px;
+  margin:-5px 0 10px;
+  color:#b75858;
+  font-style:italic;
   max-width:calc(100% - 20px);
   word-break: break-all;
   font-size:14px;
