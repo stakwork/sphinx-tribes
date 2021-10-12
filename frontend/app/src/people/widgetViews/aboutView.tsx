@@ -11,9 +11,7 @@ export function renderMarkdown(str) {
 }
 
 export default function AboutView(props: any) {
-    const { ui, main } = useStores()
     const history = useHistory()
-    let { ownerTribes } = main
     const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
     const { twitter, github, coding_languages, tribes } = extras || {}
     let tag = ''
@@ -26,23 +24,6 @@ export default function AboutView(props: any) {
     if (tribes && tribes[0] && tribes[0].value) {
         myTribes = tribes[0].value
     }
-
-    // for testing
-    // let ownerTribes: any = [{
-    //     unique_name: 'none',
-    //     name: 'None',
-    //     img: '/static/twitter2.png'
-    // },
-    // {
-    //     unique_name: 'this',
-    //     name: 'This',
-    //     img: '/static/twitter2.png'
-    // },
-    // {
-    //     unique_name: 'that',
-    //     name: 'That',
-    //     img: '/static/twitter2.png'
-    // }]
 
     return <Wrap>
         <Row>
@@ -89,17 +70,15 @@ export default function AboutView(props: any) {
             </Row>
         </>}
 
-        {myTribes &&
+        {myTribes && (myTribes.length > 0) &&
             <>
                 <Divider />
                 <T style={{ height: 20 }}>My Tribes</T>
                 <Grow >
-                    {myTribes.map((t, i) => {
-                        const thisTribe = ownerTribes && ownerTribes.find(f => f.unique_name === t.value)
-                        if (!thisTribe) return <div key={i} />
+                    {myTribes.map((thisTribe, i) => {
                         return (<TribeRow key={i + 'mytribe'}
                             onClick={() => history.push(`/t/${thisTribe?.unique_name}`)}>
-                            <Img src={thisTribe?.img} />
+                            <Img src={thisTribe?.img || '/static/sphinx.png'} />
                             <div>{thisTribe?.name}</div>
                         </TribeRow>)
                     })}
@@ -134,6 +113,7 @@ const TribeRow = styled.div`
 display: flex;
 align-items: center;
 cursor: pointer;
+margin-bottom:5px;
 &:hover{
     color:#000;
 }
