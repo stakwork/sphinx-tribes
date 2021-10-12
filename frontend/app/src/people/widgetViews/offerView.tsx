@@ -1,15 +1,18 @@
 import React from 'react'
 import styled from "styled-components";
 import { Offer } from '../../form/inputs/widgets/interfaces';
-import { formatPrice } from '../../helpers';
+import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
 import { Divider, Title } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
 
 export default function OfferView(props: any) {
-    const { gallery, title, description, price, person, created } = props
+    const { gallery, title, description, price, person, created, type } = props
     const isMobile = useIsMobile()
+
+    const showPrice = !(type === 'offer_skill' || type === 'offer_other')
+
 
     if (isMobile) {
         return <Wrap>
@@ -19,7 +22,7 @@ export default function OfferView(props: any) {
             <Body>
                 <T>{title || 'No title'}</T>
                 <D>{description || 'No description'}</D>
-                <P>{formatPrice(price)} <B>SAT</B></P>
+                {showPrice && <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>}
             </Body>
 
         </Wrap>
@@ -39,11 +42,14 @@ export default function OfferView(props: any) {
                 <DT>{title}</DT>
                 <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
             </Pad>
-            <Divider style={{ margin: 0 }} />
 
-            <Pad style={{ padding: 20, }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT</B></P>
-            </Pad>
+            {showPrice && <>
+                <Divider style={{ margin: 0 }} />
+
+                <Pad style={{ padding: 20, }}>
+                    <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
+                </Pad>
+            </>}
         </div>
     </DWrap >
 

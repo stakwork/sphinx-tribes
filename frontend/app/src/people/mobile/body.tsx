@@ -45,21 +45,9 @@ export default function BodyComponent() {
             name: 'people',
 
         },
-        {
-            label: 'Posts',
-            name: 'post',
-
-        },
-        {
-            label: 'Offers',
-            name: 'offer',
-
-        },
-        {
-            label: 'Wanted',
-            name: 'wanted',
-
-        },
+        widgetConfigs['post'],
+        widgetConfigs['offer'],
+        widgetConfigs['wanted'],
     ]
     const isMobile = useIsMobile()
 

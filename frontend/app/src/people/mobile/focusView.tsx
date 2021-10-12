@@ -151,14 +151,16 @@ export default function FocusedView(props: any) {
 
     async function preSubmitFunctions(body) {
         // if github repo
+
+        let githubError = "Couldn't locate this Github issue. For private repos: add the 'stakwork' user to your repo and try again."
         try {
-            if (body.type === 'coding_task') {
+            if (body.type === 'wanted_coding_task' || body.type === 'coding_task') {
                 let splitString = body.repo.split('/')
                 let owner = splitString[0]
                 let repo = splitString[1]
                 let res = await main.getGithubIssueData(owner, repo, body.issue)
                 if (!res) {
-                    throw "Couldn't locate this Github issue."
+                    throw githubError
                 }
                 const { description, title } = res
                 body.description = description
@@ -168,7 +170,7 @@ export default function FocusedView(props: any) {
                 ui.setLastGithubRepo(body.repo)
             }
         } catch (e) {
-            throw "Couldn't locate this Github issue."
+            throw githubError
         }
 
         return body
@@ -251,7 +253,9 @@ export default function FocusedView(props: any) {
                 initialValues.price_to_meet = personInfo.price_to_meet || 0
                 initialValues.description = personInfo.description || ""
                 initialValues.twitter = personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value || ""
+                initialValues.github = personInfo.extras?.github && personInfo.extras?.github[0]?.value || ""
                 initialValues.facebook = personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value || ""
+                initialValues.coding_languages = personInfo.extras?.coding_languages && personInfo.extras?.coding_languages[0]?.value || ""
             } else {
                 // if there is a selected index, fill in values
                 if (selectedIndex > -1) {

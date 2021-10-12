@@ -4,21 +4,22 @@ import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
 import { FieldEnv, FieldText, Note } from './index'
 
-export default function TextInput({ error, note, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function TextInput({ name, error, note, label, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
 
+  const padStyle = prepend ? { paddingLeft: 0 } : {}
   return <>
     <FieldEnv label={labeltext}>
       <R>
-
         <FieldText name="first" value={value || ''}
           readOnly={readOnly || false}
           onChange={e => handleChange(e.target.value)}
           onBlur={handleBlur}
           onFocus={handleFocus}
           prepend={prepend}
+          style={padStyle}
         />
         {error && <E>
           <EuiIcon type="alert" size='m' style={{ width: 20, height: 20 }} />
