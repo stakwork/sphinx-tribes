@@ -112,8 +112,9 @@ export default function Form(props: any) {
   if (tribesSelectorIndex > -1) {
     schema[tribesSelectorIndex].options = (main.ownerTribes?.length && main.ownerTribes.map(ot => {
       return {
+        ...ot,
         value: ot.unique_name,
-        label: ot.unique_name
+        label: ot.name,
       }
     })) || defaultOptions
   }
