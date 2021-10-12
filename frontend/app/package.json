@@ -29,6 +29,7 @@
     "react-qrcode-logo": "^2.5.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.0",
+    "react-select": "^5.1.0",
     "styled-components": "^5.1.0",
     "yup": "^0.32.9"
   },

@@ -771,3 +771,8 @@ margin-bottom:10px;
 .euiFormControlLayout__prepend{
   color:#B0B7BC !important;
 }
+
+.multi-select-input div {
+  border-width:0px !important;
+  border: none !important;
+}

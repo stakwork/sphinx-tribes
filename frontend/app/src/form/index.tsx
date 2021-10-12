@@ -105,15 +105,17 @@ export default function Form(props: any) {
 
   const dynamicFormOptions = (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || []
 
+  const defaultOptions = schema.find(f => f.name === 'tribe') ? [{ value: 'none', label: 'None' }] : [{ value: 'none', label: 'None' }, { value: 'that', label: 'That' }, { value: 'this', label: 'This' }]
+
   // inject owner tribes
-  const tribesSelectorIndex = schema.findIndex(f => f.name === 'tribe')
+  const tribesSelectorIndex = schema.findIndex(f => f.name === 'tribe' || f.name === 'tribes')
   if (tribesSelectorIndex > -1) {
     schema[tribesSelectorIndex].options = (main.ownerTribes?.length && main.ownerTribes.map(ot => {
       return {
         value: ot.unique_name,
         label: ot.unique_name
       }
-    })) || [{ value: 'none', label: 'None' }]
+    })) || defaultOptions
   }
 
   if (loading) return <div />
@@ -225,16 +227,18 @@ export default function Form(props: any) {
 
             {/*  if schema is AboutMe */}
             {isAboutMeForm && (ui.meInfo?.id != 0) && <>
-              <div style={{ cursor: 'pointer', marginTop: 20, fontSize: 12, marginBottom: 20 }}
+              <div style={{ cursor: 'pointer', marginTop: 20, fontSize: 12, minHeight: 30, height: 30 }}
                 onClick={() => setShowSettings(!showSettings)}>Advanced Settings {showSettings ? '-' : '+'}</div>
 
               {showSettings &&
-                <Button
-                  text={'Delete my account'}
-                  color={'link2'}
-                  width='fit-content'
-                  onClick={() => setShowDeleteWarn(true)}
-                />
+                <div style={{ minHeight: 50, height: 50 }}>
+                  <Button
+                    text={'Delete my account'}
+                    color={'link2'}
+                    width='fit-content'
+                    onClick={() => setShowDeleteWarn(true)}
+                  />
+                </div>
               }
 
               <Modal
@@ -307,7 +311,7 @@ const BWrap = styled.div`
       `;
 
 
-type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'hide'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'hide'
 
 type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 
