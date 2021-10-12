@@ -250,20 +250,24 @@ func processTwitterConfirmationsLoop() {
 	}
 	peeps := DB.getUnconfirmedTwitter()
 	for _, p := range peeps {
-		twit, ok := p.Extras["twitter"].(map[string]string)
+		twitArray, ok := p.Extras["twitter"].([]interface{})
 		if ok {
-			username := twit["value"]
-			if username != "" {
-				pubkey, err := ConfirmIdentityTweet(username)
-				// fmt.Println("TWitter err", err)
-				if err == nil && pubkey != "" {
-					if p.OwnerPubKey == pubkey {
-						DB.updateTwitterConfirmed(p.ID, true)
+			if len(twitArray) > 0 {
+				twitValue, ok2 := twitArray[0].(map[string]interface{})
+				if ok2 {
+					username, _ := twitValue["value"].(string)
+					if username != "" {
+						pubkey, err := ConfirmIdentityTweet(username)
+						// fmt.Println("TWitter err", err)
+						if err == nil && pubkey != "" {
+							if p.OwnerPubKey == pubkey {
+								DB.updateTwitterConfirmed(p.ID, true)
+							}
+						}
 					}
 				}
 			}
 		}
-
 	}
 	time.Sleep(30 * time.Second)
 	processTwitterConfirmationsLoop()
