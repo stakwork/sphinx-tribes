@@ -105,7 +105,7 @@ export default function Form(props: any) {
 
   const dynamicFormOptions = (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || []
 
-  const defaultOptions = schema.find(f => f.name === 'tribe') ? [{ value: 'none', label: 'None' }] : [{ value: 'none', label: 'None' }, { value: 'that', label: 'That' }, { value: 'this', label: 'This' }]
+  const defaultOptions = schema.find(f => f.name === 'tribe') ? [{ value: 'none', label: 'None' }] : []
 
   // inject owner tribes
   const tribesSelectorIndex = schema.findIndex(f => f.name === 'tribe' || f.name === 'tribes')
