@@ -13,7 +13,7 @@ import PostView from "./widgetViews/postView";
 
 import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
-import FocusedView from './mobile/focusView'
+import FocusedView from './main/focusView'
 import { meSchema } from "../form/schema";
 import { useIsMobile } from "../hooks";
 import Person from "./person";

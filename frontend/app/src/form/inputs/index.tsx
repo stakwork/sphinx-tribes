@@ -10,6 +10,7 @@ import Widgets from './widgets/index'
 import SwitchInput from './switch-input'
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui'
 import SelectInput from './select-input'
+import MultiSelectInput from './multi-select-input'
 
 export default function Input(props: any) {
     function getInput() {
@@ -30,6 +31,8 @@ export default function Input(props: any) {
                 return <SwitchInput {...props} />
             case 'select':
                 return <SelectInput {...props} />
+            case 'multiselect':
+                return <MultiSelectInput {...props} />
             case 'widgets':
                 return <Widgets {...props} />
             case 'hidden':

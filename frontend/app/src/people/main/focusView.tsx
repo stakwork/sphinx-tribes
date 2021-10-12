@@ -178,7 +178,7 @@ export default function FocusedView(props: any) {
 
 
     async function submitForm(body) {
-        console.log('SUBMIT FORM', body);
+        console.log('START SUBMIT FORM', body);
 
         // let dynamicSchema = config.schema.find(f => f.defaultSchema)
         // if (dynamicSchema) body = trimBodyToSchema(body)
@@ -192,6 +192,8 @@ export default function FocusedView(props: any) {
 
 
         body = mergeFormWithMeData(body)
+
+        console.log('SUBMIT MERGED FORM', body);
         if (!body) return // avoid saving bad state
 
         const info = ui.meInfo as any;
@@ -256,6 +258,7 @@ export default function FocusedView(props: any) {
                 initialValues.github = personInfo.extras?.github && personInfo.extras?.github[0]?.value || ""
                 initialValues.facebook = personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value || ""
                 initialValues.coding_languages = personInfo.extras?.coding_languages && personInfo.extras?.coding_languages[0]?.value || ""
+                initialValues.tribes = personInfo.extras?.tribes && personInfo.extras?.tribes[0]?.value || ""
             } else {
                 // if there is a selected index, fill in values
                 if (selectedIndex > -1) {

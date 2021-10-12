@@ -290,6 +290,20 @@ export const aboutSchema: FormField[] = [
         page: 1,
     },
     {
+        name: "price_to_meet",
+        label: "Price to Meet",
+        type: "number",
+        page: 1,
+        extraHTML: '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>'
+    },
+    {
+        name: 'tribes',
+        label: 'Tribes',
+        type: 'multiselect',
+        options: [],
+        widget: true,
+    },
+    {
         name: "coding_languages",
         label: "Coding Languages",
         widget: true,
@@ -305,24 +319,17 @@ export const aboutSchema: FormField[] = [
         page: 1,
     },
     {
-        name: "description",
-        label: "Description",
-        type: "textarea",
-        page: 1,
-    },
-    {
-        name: "price_to_meet",
-        label: "Price to Meet",
-        type: "number",
-        page: 1,
-        extraHTML: '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>'
-    },
-    {
         name: "twitter",
         label: "Twitter",
         widget: true,
         type: "text",
         prepend: '@',
+        page: 1,
+    },
+    {
+        name: "description",
+        label: "Description",
+        type: "textarea",
         page: 1,
     },
     // {
