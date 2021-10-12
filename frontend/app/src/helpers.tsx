@@ -1,8 +1,14 @@
 
 import { getHost } from "./host";
+import { uiStore } from "./store/ui";
 
 export function formatPrice(amount) {
     return amount
+}
+
+export function satToUsd(amount) {
+    if (!amount) amount = 0
+    return (amount / (uiStore.usdToSatsExchangeRate || 0)).toFixed(2) + ' USD'
 }
 
 const host = getHost();

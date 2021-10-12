@@ -290,6 +290,21 @@ export const aboutSchema: FormField[] = [
         page: 1,
     },
     {
+        name: "coding_languages",
+        label: "Coding Languages",
+        widget: true,
+        type: "text",
+        page: 1,
+    },
+    {
+        name: "github",
+        label: "Github",
+        widget: true,
+        type: "text",
+        prepend: 'https://github.com/',
+        page: 1,
+    },
+    {
         name: "description",
         label: "Description",
         type: "textarea",
@@ -360,7 +375,29 @@ export const botSchema: FormField[] = [
     },
 ];
 
-export const offerSchema: FormField[] = [
+
+
+export const offerSkillSchema: FormField[] = [
+    {
+        name: "title",
+        label: "Title",
+        validator: strValidator,
+        type: "text"
+    },
+    {
+        name: "description",
+        label: "Description",
+        validator: strValidator,
+        type: "textarea",
+    },
+    {
+        name: 'gallery',
+        label: "Gallery",
+        type: "gallery",
+    },
+];
+
+export const offerOtherSchema: FormField[] = [
     {
         name: "title",
         label: "Title",
@@ -386,7 +423,16 @@ export const offerSchema: FormField[] = [
     },
 ];
 
-
+export const offerSchema: FormField[] = [
+    {
+        name: 'dynamicSchema',
+        label: 'none',
+        type: 'text',
+        defaultSchema: offerSkillSchema,
+        defaultSchemaName: 'offer_skill',
+        dropdownOptions: 'offer'
+    }
+];
 
 export const wantedOtherSchema: FormField[] = [
     {
@@ -485,7 +531,7 @@ export const wantedSchema: FormField[] = [
         label: 'none',
         type: 'text',
         defaultSchema: wantedCodingTaskSchema,
-        defaultSchemaName: 'coding_task',
+        defaultSchemaName: 'wanted_coding_task',
         dropdownOptions: 'wanted'
     }
 ];
@@ -493,12 +539,17 @@ export const wantedSchema: FormField[] = [
 // this object is used to switch between schemas in form when dynamic
 export const dynamicSchemasByType = {
     coding_task: wantedCodingTaskSchema,
-    other: wantedOtherSchema
+    other: wantedOtherSchema,
+    // 
+    wanted_coding_task: wantedCodingTaskSchema,
+    wanted_other: wantedOtherSchema,
+    offer_skill: offerSkillSchema,
+    offer_other: offerOtherSchema,
 }
 
 // this object is used to autofill form fields if info is available in local storage
 export const dynamicSchemaAutofillFieldsByType = {
-    coding_task: {
+    wanted_coding_task: {
         repo: 'lastGithubRepo'
-    }
+    },
 }

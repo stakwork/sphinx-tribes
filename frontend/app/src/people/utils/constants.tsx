@@ -1,4 +1,4 @@
-import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema, wantedCodingTaskSchema, wantedOtherSchema } from "../../form/schema";
+import { aboutSchema, postSchema, wantedSchema, meSchema, offerSchema, offerSkillSchema, offerOtherSchema, wantedCodingTaskSchema, wantedOtherSchema } from "../../form/schema";
 
 const MAX_UPLOAD_SIZE = 10194304 //10MB
 
@@ -16,7 +16,7 @@ const widgetConfigs = {
         },
     },
     post: {
-        label: 'Posts',
+        label: 'Blog',
         name: 'post',
         submitText: 'Post',
         schema: postSchema,
@@ -41,9 +41,9 @@ const widgetConfigs = {
         }
     },
     offer: {
-        label: 'Offer',
+        label: 'Portfolio',
         name: 'offer',
-        submitText: 'Post',
+        submitText: 'Save',
         modalStyle: {
             width: 'auto',
             maxWidth: 'auto',
@@ -52,20 +52,25 @@ const widgetConfigs = {
         },
         schema: offerSchema,
         action: {
-            text: 'Sell Something',
+            text: 'Add to Portfolio',
+            // text: 'Sell Something',
             icon: 'local_offer'
         },
         noneSpace: {
             me: {
                 img: 'no_offers.png',
-                text: 'Use lightning network to sell your digital goods!',
-                buttonText: 'Sell something',
+                text: 'Use lightning network to market your skills!',
+                // text: 'Use lightning network to sell your digital goods!',
+                buttonText: 'Add to Portfolio',
+                // buttonText: 'Sell something',
                 buttonIcon: 'local_offer'
             },
             otherUser: {
                 img: 'no_offers2.png',
-                text: 'No Offers Yet',
-                sub: 'Looks like this person is not selling anything yet.'
+                text: 'Portfolio is Empty',
+                // text: 'No Offers Yet',
+                sub: "Looks like this person hasn't shared their porfolio."
+                // sub: 'Looks like this person is not selling anything yet.'
             }
         }
     },
@@ -101,15 +106,29 @@ const widgetConfigs = {
 }
 
 const formDropdownOptions = {
-    wanted: [
+    'wanted': [
         {
-            value: 'coding_task',
+            value: 'wanted_coding_task',
             label: 'Coding Task',
             schema: wantedCodingTaskSchema,
             description: 'Post a coding task referencing your github repo.'
         },
         {
-            value: 'other',
+            value: 'wanted_other',
+            label: 'Other',
+            schema: wantedOtherSchema,
+            description: 'Could be anything.'
+        },
+    ],
+    'offer': [
+        {
+            value: 'offer_skill',
+            label: 'Skill',
+            schema: offerSkillSchema,
+            description: 'Build your portfolio.'
+        },
+        {
+            value: 'offer_other',
             label: 'Other',
             schema: wantedOtherSchema,
             description: 'Could be anything.'
