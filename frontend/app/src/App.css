@@ -767,3 +767,7 @@ margin-bottom:10px;
   background-color:#ffffff !important;
   box-shadow:none !important;
 }
+
+.euiFormControlLayout__prepend{
+  color:#B0B7BC !important;
+}

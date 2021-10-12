@@ -173,6 +173,28 @@ export class MainStore {
     }
   }
 
+  @action async getUsdToSatsExchangeRate() {
+    try {
+      // get rate for 1 USD
+      const res: any = await fetch("https://blockchain.info/tobtc?currency=USD&value=1", {
+        method: "GET",
+      });
+      const j = await res.json()
+      // 1 bitcoin is 1 million satoshis
+      let satoshisInABitcoin = .00000001
+      const exchangeRate = j / satoshisInABitcoin
+
+      console.log('update exchange rate', exchangeRate)
+      uiStore.setUsdToSatsExchangeRate(exchangeRate)
+
+      return exchangeRate
+    } catch (e) {
+      console.log('e', e)
+      // could not refresh jwt, logout!
+      return null
+    }
+  }
+
   @action async deleteProfile() {
     try {
       if (!uiStore.meInfo) return null
