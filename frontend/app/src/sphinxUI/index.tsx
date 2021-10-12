@@ -5,5 +5,6 @@ import Modal from "./modal";
 import Divider from "./divider";
 import { Title, Date, Paragraph, Link } from './elements'
 import Select from './select'
+import MultiSelect from './multiSelect'
 
-export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select }
+export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect }

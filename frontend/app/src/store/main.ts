@@ -90,7 +90,7 @@ export class MainStore {
   }
 
   @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
-    const ts = await api.get(`tribes_by_owner/${pubkey}`)
+    const ts = await api.get(`tribes_by_owner/${pubkey}?all=true`)
     this.ownerTribes = ts
     return ts
   }

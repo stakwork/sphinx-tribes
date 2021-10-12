@@ -3,20 +3,46 @@ import styled from "styled-components";
 import { Divider } from '../../sphinxUI';
 import QrBar from '../utils/QrBar'
 import ReactMarkdown from 'react-markdown'
+import { useStores } from '../../store';
+import { useHistory, useLocation } from 'react-router-dom'
 
 export function renderMarkdown(str) {
     return <ReactMarkdown>{str}</ReactMarkdown>
 }
 
 export default function AboutView(props: any) {
+    const { ui, main } = useStores()
+    const history = useHistory()
+    let { ownerTribes } = main
     const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
-    const { twitter, github, coding_languages } = extras || {}
+    const { twitter, github, coding_languages, tribes } = extras || {}
     let tag = ''
     let githubTag = ''
     let codingLanguages = ''
+    let myTribes: any = null
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
     if (github && github[0] && github[0].value) githubTag = github[0].value
     if (coding_languages && coding_languages[0] && coding_languages[0].value) codingLanguages = coding_languages[0].value
+    if (tribes && tribes[0] && tribes[0].value) {
+        myTribes = tribes[0].value
+    }
+
+    // for testing
+    // let ownerTribes: any = [{
+    //     unique_name: 'none',
+    //     name: 'None',
+    //     img: '/static/twitter2.png'
+    // },
+    // {
+    //     unique_name: 'this',
+    //     name: 'This',
+    //     img: '/static/twitter2.png'
+    // },
+    // {
+    //     unique_name: 'that',
+    //     name: 'That',
+    //     img: '/static/twitter2.png'
+    // }]
 
     return <Wrap>
         <Row>
@@ -63,19 +89,29 @@ export default function AboutView(props: any) {
             </Row>
         </>}
 
+        {myTribes &&
+            <>
+                <Divider />
+                <T style={{ height: 20 }}>My Tribes</T>
+                <Grow >
+                    {myTribes.map((t, i) => {
+                        const thisTribe = ownerTribes && ownerTribes.find(f => f.unique_name === t.value)
+                        if (!thisTribe) return <div key={i} />
+                        return (<TribeRow key={i + 'mytribe'}
+                            onClick={() => history.push(`/t/${thisTribe?.unique_name}`)}>
+                            <Img src={thisTribe?.img} />
+                            <div>{thisTribe?.name}</div>
+                        </TribeRow>)
+                    })}
+                </Grow>
+            </>
+        }
+
         <Divider />
 
 
 
         <D>{renderMarkdown(description)}</D>
-
-
-        {/* <I>Facebook</I> */}
-        {/* <div></div>
-        {handle && <div>@{handle}</div>} */}
-
-        {/* show twitter etc. here */}
-
 
     </Wrap>
 
@@ -94,17 +130,13 @@ font-size: 8px;
 line-height: 9px;
 padding 0 10px;
 `;
-const QRWrap = styled.div`
-font-family: Roboto;
-font-style: normal;
-font-weight: normal;
-font-size: 13px;
-line-height: 15px;
-letter-spacing: 0.02em;
-
-/* Main bottom icons */
-
-color: #5F6368;
+const TribeRow = styled.div`
+display: flex;
+align-items: center;
+cursor: pointer;
+&:hover{
+    color:#000;
+}
 `;
 const Wrap = styled.div`
 display: flex;
@@ -150,6 +182,21 @@ align-items: center;
 
 /* Secondary Text 4 */
 
+color: #8E969C;
+
+`;
+
+const Grow = styled.div`
+display:flex;
+justify-content:flex-start;
+flex-direction:column;
+min-height:28px;
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 14px;
+line-height: 28px;
+margin-bottom:8px;
 color: #8E969C;
 
 `;
@@ -216,4 +263,5 @@ const Img = styled.div<ImageProps>`
                                         height:18px;
                                         margin-left:2px;
                                         margin-right: 10px;
+                                        border-radius:5px;
                                         `;
