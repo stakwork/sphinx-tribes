@@ -7,7 +7,7 @@ import { Button, IconButton, Modal } from "../sphinxUI";
 import { useStores } from "../store";
 import Select from "../sphinxUI/select";
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema'
-import { formDropdownOptions, } from '../people/utils/constants'
+import { formDropdownOptions } from '../people/utils/constants'
 
 export default function Form(props: any) {
   const { buttonsOnBottom } = props
@@ -103,7 +103,7 @@ export default function Form(props: any) {
 
   const isAboutMeForm = schema.find(f => f.name === 'owner_alias') ? true : false
 
-  const dynamicFormOptions = formDropdownOptions[props.schema.dropdownOptions || 'wanted']
+  const dynamicFormOptions = (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || []
 
   // inject owner tribes
   const tribesSelectorIndex = schema.findIndex(f => f.name === 'tribe')

@@ -31,6 +31,11 @@ class UiStore {
     this.searchText = s
   }
 
+  @observable usdToSatsExchangeRate: number = 0
+  @action setUsdToSatsExchangeRate(n: number) {
+    this.usdToSatsExchangeRate = n
+  }
+
   @observable editMe: boolean = false
   @action setEditMe(b: boolean) {
     this.editMe = b
@@ -62,22 +67,18 @@ class UiStore {
 
   @observable toasts: any = []
   @action setToasts(n: any) {
-    console.log('set toasts', n)
     this.toasts = n
   }
 
   @observable personViewOpenTab: string = ''
   @action setPersonViewOpenTab(s: string) {
-    console.log('set setPersonViewOpenTab', s)
     this.personViewOpenTab = s
   }
 
   @observable lastGithubRepo: string = ''
   @action setLastGithubRepo(s: string) {
-    console.log('set setLastGithubRepo', s)
     this.lastGithubRepo = s
   }
-
 
 
   @persist('object') @observable meInfo: MeData = null

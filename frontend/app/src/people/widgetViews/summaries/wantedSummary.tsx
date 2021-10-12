@@ -1,7 +1,7 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
-import { formatPrice } from '../../../helpers';
+import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
 import { Divider, Title, Paragraph, Button } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
@@ -60,7 +60,7 @@ export default function WantedSummary(props: any) {
                                         marginTop: 22
                                 }} />
                                 <Y>
-                                        <P>{formatPrice(price)} <B>SAT</B></P>
+                                        <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
                                         {heart}
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
@@ -96,7 +96,7 @@ export default function WantedSummary(props: any) {
 
                                         <Divider style={{ marginTop: 22 }} />
                                         <Y>
-                                                <P>{formatPrice(price) || '0'} <B>SAT</B></P>
+                                                <P>{formatPrice(price) || '0'} <B>SAT ({satToUsd(price)})</B> </P>
                                                 {heart}
                                         </Y>
 
@@ -109,7 +109,7 @@ export default function WantedSummary(props: any) {
 
 
 
-        if (type === 'coding_task') {
+        if (type === 'coding_task' || type === 'wanted_coding_task') {
                 return renderCodingTask()
         }
 

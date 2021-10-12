@@ -10,9 +10,13 @@ export function renderMarkdown(str) {
 
 export default function AboutView(props: any) {
     const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
-    const { twitter } = extras || {}
+    const { twitter, github, coding_languages } = extras || {}
     let tag = ''
+    let githubTag = ''
+    let codingLanguages = ''
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
+    if (github && github[0] && github[0].value) githubTag = github[0].value
+    if (coding_languages && coding_languages[0] && coding_languages[0].value) codingLanguages = coding_languages[0].value
 
     return <Wrap>
         <Row>
@@ -24,22 +28,48 @@ export default function AboutView(props: any) {
 
         <QrBar value={owner_pubkey} />
 
+        {githubTag &&
+            <>
+                <Divider />
+
+                <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
+                    <Img src={'/static/github_logo.png'} />
+                    <a href={`https://github.com/${githubTag}`} target='_blank'>https://github.com/{githubTag}</a>
+                </Row>
+            </>
+        }
+
+        {tag && <>
+            <Divider />
+            <Row>
+                {/* <T>For Normies</T> */}
+                <I>
+                    <div style={{ width: 4 }} />
+                    <Icon source={`/static/twitter2.png`} />
+                    <Tag>@{tag}</Tag>
+                    {twitter_confirmed ?
+                        <Badge>VERIFIED</Badge> :
+                        <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
+                    }
+
+                </I>
+            </Row>
+        </>}
+
+        {codingLanguages && <>
+            <Divider />
+            <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
+                {codingLanguages}
+            </Row>
+        </>}
+
         <Divider />
+
+
 
         <D>{renderMarkdown(description)}</D>
 
-        {tag && <>
-            <T>For Normies</T>
-            <I>
-                <Icon source={`/static/twitter2.png`} />
-                <Tag>@{tag}</Tag>
-                {twitter_confirmed ?
-                    <Badge>VERIFIED</Badge> :
-                    <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
-                }
 
-            </I>
-        </>}
         {/* <I>Facebook</I> */}
         {/* <div></div>
         {handle && <div>@{handle}</div>} */}
@@ -91,7 +121,7 @@ const Tag = styled.div`
 font-family: Roboto;
 font-style: normal;
 font-weight: normal;
-font-size: 15px;
+font-size: 14px;
 line-height: 26px;
 /* or 173% */
 
@@ -143,7 +173,7 @@ margin-bottom:5px;
 
 const D = styled.div`
 
-margin:15px 0 10px 0;
+margin:35px 0 10px 0;
 font-family: Roboto;
 font-style: normal;
 font-weight: normal;
@@ -173,3 +203,17 @@ const Icon = styled.div<IconProps>`
                     border-radius:5px;
                     overflow:hidden;
                 `;
+
+interface ImageProps {
+    readonly src?: string;
+}
+const Img = styled.div<ImageProps>`
+                                        background-image: url("${(p) => p.src}");
+                                        background-position: center;
+                                        background-size: cover;
+                                        position: relative;
+                                        width:18px;
+                                        height:18px;
+                                        margin-left:2px;
+                                        margin-right: 10px;
+                                        `;

@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from "styled-components";
-import { formatPrice } from '../../helpers';
+import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
 import { Divider, Title } from '../../sphinxUI';
@@ -27,7 +27,7 @@ export default function WantedView(props: any) {
                     <T style={{ marginBottom: 5 }}>{title}</T>
                     <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                         <GithubStatusPill status={status} assignee={assignee} />
-                        <P>{formatPrice(price)} <B>SAT</B></P>
+                        <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
                     </div>
                 </Body>
             </Wrap>
@@ -52,7 +52,7 @@ export default function WantedView(props: any) {
             </Pad>
             <Divider style={{ margin: 0 }} />
             <Pad style={{ padding: 20, }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT</B></P>
+                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
             </Pad>
         </DWrap>
     }
@@ -91,7 +91,7 @@ export default function WantedView(props: any) {
         </DWrap>
     }
 
-    if (type === 'coding_task') {
+    if (type === 'coding_task' || type === 'wanted_coding_task') {
         return renderCodingTask()
     }
 
