@@ -14,10 +14,26 @@ import {
 } from "react-router-dom";
 import TokenRefresh from './people/utils/tokenRefresh';
 import BotsBody from './bots/body';
+import { mainStore } from './store/main';
+
+let exchangeRateInterval: any = null
 
 function App() {
   const mode = getMode()
   const c = colors['light']
+
+  // get usd/sat exchange rate every 100 seconds
+  useEffect(() => {
+    mainStore.getUsdToSatsExchangeRate()
+
+    exchangeRateInterval = setInterval(() => {
+      mainStore.getUsdToSatsExchangeRate()
+    }, 100000)
+
+    return function cleanup() {
+      clearInterval(exchangeRateInterval)
+    }
+  }, [])
 
   return <Router>
     {

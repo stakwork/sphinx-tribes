@@ -106,7 +106,7 @@ box-shadow:none !important;
     background-color:#fff !important;
     background:#fff !important;
     box-shadow:none !important;
-    color:#000;
+    color:#999 !important;s
     display:none !important;
 }
 
@@ -117,6 +117,8 @@ box-shadow:none !important;
     max-width:900px;
     
 }
+
+
 `
 export const FieldTextArea = styled(EuiTextArea)`
 background-color:#fff !important;
