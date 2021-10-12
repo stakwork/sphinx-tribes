@@ -3,8 +3,9 @@ import styled from 'styled-components'
 import { EuiIcon } from '@elastic/eui'
 import type { Props } from './propsType'
 import { FieldEnv, FieldText, Note } from './index'
+import { satToUsd } from '../../helpers'
 
-export default function NumberInput({ error, note, label, value, extraHTML, handleChange, handleBlur, handleFocus }: Props) {
+export default function NumberInput({ name, error, note, label, value, extraHTML, handleChange, handleBlur, handleFocus }: Props) {
 
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
@@ -38,10 +39,12 @@ export default function NumberInput({ error, note, label, value, extraHTML, hand
     </R>
   </FieldEnv>
     {note && <Note>*{note}</Note>}
+    {name.includes('price') && <Note>({satToUsd(value)})</Note>}
     <ExtraText
       style={{ display: value && extraHTML ? 'block' : 'none' }}
       dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
     />
+
   </>
 
 }

@@ -2,7 +2,7 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
-import { formatPrice } from '../../../helpers';
+import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
 import { Divider, Title, Paragraph } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
@@ -15,7 +15,9 @@ export function renderMarkdown(str) {
 }
 
 export default function OfferSummary(props: any) {
-        let { gallery, title, description, price, person, created } = props
+        let { gallery, title, description, price, person, created, type } = props
+
+        const showPrice = !(type === 'offer_skill' || type === 'offer_other')
 
         const isMobile = useIsMobile()
         const [envHeight, setEnvHeight] = useState('100%')
@@ -42,7 +44,7 @@ export default function OfferSummary(props: any) {
 
                                 <Divider style={{ marginTop: 22 }} />
                                 <Y>
-                                        <P>{formatPrice(price)} <B>SAT</B></P>
+                                        {showPrice ? <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P> : <div />}
 
                                         {heart}
                                 </Y>
@@ -67,7 +69,7 @@ export default function OfferSummary(props: any) {
 
                                 <Divider style={{ marginTop: 22 }} />
                                 <Y>
-                                        <P>{formatPrice(price)} <B>SAT</B></P>
+                                        {showPrice ? <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B></P> : <div />}
                                         {heart}
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
