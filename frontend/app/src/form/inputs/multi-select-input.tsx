@@ -10,6 +10,8 @@ export default function MultiSelectInput({ error, note, label, options, value, h
     let labeltext = label
     if (error) labeltext = labeltext + ` (${error})`
 
+    console.log('options', options)
+
     return <>
         <FieldEnv label={labeltext}>
             <R>
@@ -18,6 +20,7 @@ export default function MultiSelectInput({ error, note, label, options, value, h
                     options={options}
                     value={value}
                     onChange={(e) => {
+                        console.log('onChange', e)
                         handleChange(e)
                     }}
                 />

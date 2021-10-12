@@ -14,6 +14,7 @@ import { dynamicSchemasByType } from "../../form/schema";
 export default function FocusedView(props: any) {
     const { onSuccess, goBack, config, selectedIndex, canEdit, person, buttonsOnBottom, formHeader, manualGoBackOnly } = props
     const { ui, main } = useStores();
+    const { ownerTribes } = main
 
     const skipEditLayer = ((selectedIndex < 0) || config.skipEditLayer) ? true : false
 
@@ -48,7 +49,19 @@ export default function FocusedView(props: any) {
                     if (s.widget && fullMeData.extras) {
                         // this allows the link widgets to be edited as a part of about me,
                         // when really they are stored as extras 
-                        fullMeData.extras[s.name] = [{ value: v[s.name] }]
+
+                        // include full tribe info from ownerTribes data
+                        if (s.name === 'tribes') {
+                            let submitTribes: any = []
+
+                            v[s.name].forEach(t => {
+                                let fullTribeInfo = ownerTribes && ownerTribes.find(f => f.unique_name === t.value)
+                                if (fullTribeInfo) submitTribes.push({ ...fullTribeInfo, ...t })
+                            })
+                            fullMeData.extras[s.name] = [{ value: submitTribes }]
+                        } else {
+                            fullMeData.extras[s.name] = [{ value: v[s.name] }]
+                        }
                     } else {
                         fullMeData[s.name] = v[s.name]
                     }
