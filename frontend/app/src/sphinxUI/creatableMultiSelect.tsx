@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
@@ -26,7 +26,7 @@ export default function Sel(props: any) {
     </div>
 }
 
-const S = styled(Select)`
+const S = styled(CreatableSelect)`
 background:#ffffff00;
 border: 1px solid #E0E0E0;
 color:#000;

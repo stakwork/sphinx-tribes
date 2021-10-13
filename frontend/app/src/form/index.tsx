@@ -39,7 +39,6 @@ export default function Form(props: any) {
       setDynamicSchema(dSchema.defaultSchema)
       setDynamicSchemaName(dSchema.defaultSchemaName)
     }
-
     setLoading(false)
   }, [])
 
@@ -65,7 +64,6 @@ export default function Form(props: any) {
         })
       }
     }
-
   }, [dynamicSchemaName])
 
   useEffect(() => {
@@ -312,7 +310,7 @@ const BWrap = styled.div`
       `;
 
 
-type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'hide'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'hide'
 
 type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 
