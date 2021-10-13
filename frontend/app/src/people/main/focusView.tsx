@@ -56,9 +56,19 @@ export default function FocusedView(props: any) {
 
                             v[s.name].forEach(t => {
                                 let fullTribeInfo = ownerTribes && ownerTribes.find(f => f.unique_name === t.value)
-                                if (fullTribeInfo) submitTribes.push({ ...fullTribeInfo, ...t })
+                                // disclude sensitive details
+                                if (fullTribeInfo) submitTribes.push({
+                                    name: fullTribeInfo.name,
+                                    unique_name: fullTribeInfo.unique_name,
+                                    img: fullTribeInfo.img,
+                                    description: fullTribeInfo.description,
+                                    ...t
+                                })
                             })
-                            fullMeData.extras[s.name] = [{ value: submitTribes }]
+                            fullMeData.extras[s.name] = submitTribes
+                        } else if (s.name === 'repos' || s.name === 'coding_languages') {
+                            // multiples, so we don't need a wrapper
+                            fullMeData.extras[s.name] = v[s.name]
                         } else {
                             fullMeData.extras[s.name] = [{ value: v[s.name] }]
                         }
@@ -270,8 +280,9 @@ export default function FocusedView(props: any) {
                 initialValues.twitter = personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value || ""
                 initialValues.github = personInfo.extras?.github && personInfo.extras?.github[0]?.value || ""
                 initialValues.facebook = personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value || ""
-                initialValues.coding_languages = personInfo.extras?.coding_languages && personInfo.extras?.coding_languages[0]?.value || ""
-                initialValues.tribes = personInfo.extras?.tribes && personInfo.extras?.tribes[0]?.value || ""
+                initialValues.coding_languages = personInfo.extras?.coding_languages || ""
+                initialValues.tribes = personInfo.extras?.tribes || ""
+                initialValues.repos = personInfo.extras?.repos || ""
             } else {
                 // if there is a selected index, fill in values
                 if (selectedIndex > -1) {
