@@ -6,5 +6,6 @@ import Divider from "./divider";
 import { Title, Date, Paragraph, Link } from './elements'
 import Select from './select'
 import MultiSelect from './multiSelect'
+import CreatableMultiSelect from './creatableMultiSelect'
 
-export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect }
+export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect, CreatableMultiSelect }

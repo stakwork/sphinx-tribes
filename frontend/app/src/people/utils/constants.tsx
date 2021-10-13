@@ -130,7 +130,7 @@ const formDropdownOptions = {
         {
             value: 'offer_other',
             label: 'Other',
-            schema: wantedOtherSchema,
+            schema: offerOtherSchema,
             description: 'Could be anything.'
         },
     ],

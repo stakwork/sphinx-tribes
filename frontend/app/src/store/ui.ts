@@ -116,6 +116,7 @@ export interface MeInfo {
   url: string
   description: string
   verification_signature: string
+  twitter_confirmed?: boolean
   extras: Extras
 }
 export const emptyMeData: MeData = { pubkey: '', alias: '', route_hint: '', contact_key: '', price_to_meet: 0, photo_url: '', url: '', jwt: '', description: '', verification_signature: '', extras: {} }
