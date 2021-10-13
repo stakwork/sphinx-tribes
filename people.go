@@ -317,6 +317,31 @@ func processGithubIssuesLoop() {
 	processGithubIssuesLoop()
 }
 
+func processGithubConfirmationsLoop() {
+	peeps := DB.getUnconfirmedGithub()
+	for _, p := range peeps {
+		gitArray, ok := p.Extras["twitter"].([]interface{})
+		if ok {
+			if len(gitArray) > 0 {
+				gitValue, ok2 := gitArray[0].(map[string]interface{})
+				if ok2 {
+					username, _ := gitValue["value"].(string)
+					if username != "" {
+						pubkey, err := PubkeyForGithubUser(username)
+						if err == nil && pubkey != "" {
+							if p.OwnerPubKey == pubkey {
+								DB.updateGithubConfirmed(p.ID, true)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	time.Sleep(30 * time.Second)
+	processGithubConfirmationsLoop()
+}
+
 func personUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
