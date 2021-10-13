@@ -184,8 +184,26 @@ func (db database) getUnconfirmedTwitter() []Person {
 }
 
 func (db database) updateTwitterConfirmed(id uint, confirmed bool) {
+	if id == 0 {
+		return
+	}
 	db.db.Model(&Person{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"twitter_confirmed": confirmed,
+	})
+}
+
+func (db database) getUnconfirmedGithub() []Person {
+	ms := []Person{}
+	db.db.Raw(`SELECT * FROM people where extras -> 'github' IS NOT NULL and github_confirmed = 'f';`).Find(&ms)
+	return ms
+}
+
+func (db database) updateGithubConfirmed(id uint, confirmed bool) {
+	if id == 0 {
+		return
+	}
+	db.db.Model(&Person{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"github_confirmed": confirmed,
 	})
 }
 
