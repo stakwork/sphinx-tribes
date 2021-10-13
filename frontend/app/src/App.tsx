@@ -4,8 +4,8 @@ import '@material/react-material-icon/dist/material-icon.css';
 import "@fontsource/roboto";
 import Header from './tribes/header'
 import Body from './tribes/body'
-import PeopleHeader from './people/mobile/header'
-import PeopleBody from './people/mobile/body'
+import PeopleHeader from './people/main/header'
+import PeopleBody from './people/main/body'
 import { colors } from './colors'
 import {
   BrowserRouter as Router,

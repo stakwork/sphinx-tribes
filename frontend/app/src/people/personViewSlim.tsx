@@ -13,7 +13,7 @@ import PostView from "./widgetViews/postView";
 
 import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
-import FocusedView from './mobile/focusView'
+import FocusedView from './main/focusView'
 import { meSchema } from "../form/schema";
 import { useIsMobile } from "../hooks";
 import Person from "./person";
@@ -43,7 +43,10 @@ export default function PersonView(props: any) {
 
     // if i select myself, fill person with meInfo
     if (personId === ui.meInfo?.id) {
-        person = ui.meInfo
+        console.log('before', person.twitter_confirmed)
+        console.log('after', ui.meInfo?.twitter_confirmed)
+        person = { twitter_confirmed: person.twitter_confirmed, ...ui.meInfo }
+
     }
 
     const people = (main.people && main.people.filter(f => !f.hide)) || []
