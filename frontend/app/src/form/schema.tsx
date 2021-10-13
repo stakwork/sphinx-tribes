@@ -1,11 +1,26 @@
 import * as Yup from 'yup'
 import { FormField } from "../form";
-import { uiStore } from '../store/ui';
+// import { uiStore } from '../store/ui';
 
 const strValidator = Yup.string().trim().required('Required')
 const repoStrValidator = Yup.string().trim()
     .matches(/^[^\/]+\/[^\/]+$/, 'Incorrect format').required('Required')
+const repoArrayStrValidator = Yup.array().of(
+    Yup.object().shape({
+        value: repoStrValidator
+    })
+)
+
 const nomValidator = Yup.number().required('Required')
+
+const languages = ['Lightning', 'Javascript', 'Typescript', 'Node', 'Golang', 'Swift', 'Kotlin', 'MySQL', 'PHP', 'R', 'C#', 'C++', 'Java',]
+
+const codingLanguages = languages.map(l => {
+    return {
+        value: l,
+        label: l
+    }
+})
 
 // this is source of truth for widget items!
 export const meSchema: FormField[] = [
@@ -297,6 +312,12 @@ export const aboutSchema: FormField[] = [
         extraHTML: '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>'
     },
     {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        page: 1,
+    },
+    {
         name: 'tribes',
         label: 'Tribes',
         type: 'multiselect',
@@ -307,7 +328,8 @@ export const aboutSchema: FormField[] = [
         name: "coding_languages",
         label: "Coding Languages",
         widget: true,
-        type: "text",
+        type: "creatablemultiselect",
+        options: codingLanguages,
         page: 1,
     },
     {
@@ -319,6 +341,17 @@ export const aboutSchema: FormField[] = [
         page: 1,
     },
     {
+        name: "repos",
+        label: "Github Repository Links",
+        widget: true,
+        type: "creatablemultiselect",
+        options: [],
+        note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
+        validator: repoArrayStrValidator, // look for 1 slash
+        page: 1,
+    },
+
+    {
         name: "twitter",
         label: "Twitter",
         widget: true,
@@ -326,12 +359,7 @@ export const aboutSchema: FormField[] = [
         prepend: '@',
         page: 1,
     },
-    {
-        name: "description",
-        label: "Description",
-        type: "textarea",
-        page: 1,
-    },
+
     // {
     //     name: "facebook",
     //     label: "Facebook",
@@ -416,12 +444,6 @@ export const offerOtherSchema: FormField[] = [
         label: "Description",
         validator: strValidator,
         type: "textarea",
-    },
-    {
-        name: "price",
-        label: "Price",
-        validator: nomValidator,
-        type: "number",
     },
     {
         name: 'gallery',
@@ -560,3 +582,4 @@ export const dynamicSchemaAutofillFieldsByType = {
         repo: 'lastGithubRepo'
     },
 }
+

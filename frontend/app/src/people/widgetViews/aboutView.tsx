@@ -13,17 +13,12 @@ export function renderMarkdown(str) {
 export default function AboutView(props: any) {
     const history = useHistory()
     const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
-    const { twitter, github, coding_languages, tribes } = extras || {}
+    const { twitter, github, coding_languages, tribes, repos } = extras || {}
     let tag = ''
     let githubTag = ''
-    let codingLanguages = ''
-    let myTribes: any = null
+
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
     if (github && github[0] && github[0].value) githubTag = github[0].value
-    if (coding_languages && coding_languages[0] && coding_languages[0].value) codingLanguages = coding_languages[0].value
-    if (tribes && tribes[0] && tribes[0].value) {
-        myTribes = tribes[0].value
-    }
 
     return <Wrap>
         <Row>
@@ -34,17 +29,6 @@ export default function AboutView(props: any) {
         <Divider />
 
         <QrBar value={owner_pubkey} />
-
-        {githubTag &&
-            <>
-                <Divider />
-
-                <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
-                    <Img src={'/static/github_logo.png'} />
-                    <a href={`https://github.com/${githubTag}`} target='_blank'>https://github.com/{githubTag}</a>
-                </Row>
-            </>
-        }
 
         {tag && <>
             <Divider />
@@ -63,32 +47,58 @@ export default function AboutView(props: any) {
             </Row>
         </>}
 
-        {codingLanguages && <>
+        {githubTag &&
+            <>
+                <Divider />
+
+                <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
+                    <Img src={'/static/github_logo.png'} />
+                    <a href={`https://github.com/${githubTag}`} target='_blank'>https://github.com/{githubTag}</a>
+                </Row>
+            </>
+        }
+
+        {coding_languages && (coding_languages.length > 0) && <>
             <Divider />
-            <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
-                {codingLanguages}
-            </Row>
+            <GrowRow style={{ paddingBottom: 0 }}>
+                {coding_languages.map((c, i) => {
+                    return <CodeBadge key={i}>{c.label}</CodeBadge>
+                })}
+            </GrowRow>
         </>}
 
-        {myTribes && (myTribes.length > 0) &&
+        {repos && (repos.length > 0) &&
+            <>
+                <Divider />
+                <T style={{ height: 20 }}>My Repos</T>
+                <Grow >
+                    {repos.map((r, i) => {
+                        return (<ItemRow key={i + 'myrepo'} style={{ width: 'fit-content' }}>
+                            <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
+                            <a href={`https://github.com/${r?.label}`} target='_blank'>{r?.label}</a>
+                        </ItemRow>)
+                    })}
+                </Grow>
+            </>
+        }
+
+        {tribes && (tribes.length > 0) &&
             <>
                 <Divider />
                 <T style={{ height: 20 }}>My Tribes</T>
                 <Grow >
-                    {myTribes.map((thisTribe, i) => {
-                        return (<TribeRow key={i + 'mytribe'}
-                            onClick={() => history.push(`/t/${thisTribe?.unique_name}`)}>
-                            <Img src={thisTribe?.img || '/static/sphinx.png'} />
-                            <div>{thisTribe?.name}</div>
-                        </TribeRow>)
+                    {tribes.map((t, i) => {
+                        return (<ItemRow key={i + 'mytribe'}
+                            onClick={() => history.push(`/t/${t?.unique_name}`)}>
+                            <Img src={t?.img || '/static/sphinx.png'} />
+                            <div>{t?.name}</div>
+                        </ItemRow>)
                     })}
                 </Grow>
             </>
         }
 
         <Divider />
-
-
 
         <D>{renderMarkdown(description)}</D>
 
@@ -109,7 +119,22 @@ font-size: 8px;
 line-height: 9px;
 padding 0 10px;
 `;
-const TribeRow = styled.div`
+const CodeBadge = styled.div`
+display:flex;
+justify-content:center;
+align-items:center;
+margin-right:10px;
+height:26px;
+color:#5078F2;
+background: #DCEDFE;
+border-radius: 32px;
+font-weight: bold;
+font-size: 12px;
+line-height: 13px;
+padding 0 10px;
+margin-bottom:10px;
+`;
+const ItemRow = styled.div`
 display: flex;
 align-items: center;
 cursor: pointer;
@@ -122,6 +147,7 @@ const Wrap = styled.div`
 display: flex;
 flex-direction:column;
 width:100%;
+overflow-x:hidden;
 `;
 const I = styled.div`
 display:flex;
@@ -149,6 +175,29 @@ const Row = styled.div`
 display:flex;
 justify-content:space-between;
 height:48px;
+align-items:center;
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 15px;
+line-height: 48px;
+/* identical to box height, or 320% */
+
+display: flex;
+align-items: center;
+
+/* Secondary Text 4 */
+
+color: #8E969C;
+
+`;
+
+const GrowRow = styled.div`
+display:flex;
+justify-content:flex-start;
+flex-wrap:wrap;
+min-height:48px;
+padding:10px 0;
 align-items:center;
 font-family: Roboto;
 font-style: normal;
