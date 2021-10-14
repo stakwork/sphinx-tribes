@@ -276,12 +276,14 @@ export default function FocusedView(props: any) {
                 initialValues.img = personInfo.img || ""
                 initialValues.price_to_meet = personInfo.price_to_meet || 0
                 initialValues.description = personInfo.description || ""
+                // below are extras, 
                 initialValues.twitter = personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value || ""
                 initialValues.github = personInfo.extras?.github && personInfo.extras?.github[0]?.value || ""
                 initialValues.facebook = personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value || ""
-                initialValues.coding_languages = personInfo.extras?.coding_languages || ""
-                initialValues.tribes = personInfo.extras?.tribes || ""
-                initialValues.repos = personInfo.extras?.repos || ""
+                // extras with multiple items
+                initialValues.coding_languages = personInfo.extras?.coding_languages || []
+                initialValues.tribes = personInfo.extras?.tribes || []
+                initialValues.repos = personInfo.extras?.repos || []
             } else {
                 // if there is a selected index, fill in values
                 if (selectedIndex > -1) {

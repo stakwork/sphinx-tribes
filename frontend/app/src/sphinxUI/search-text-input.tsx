@@ -26,7 +26,7 @@ export default function SearchTextInput(props: any) {
         onChange={e => {
             setSearchValue(e.target.value)
             debounceValue = e.target.value
-            debounce(doDelayedValueUpdate, 200)
+            debounce(doDelayedValueUpdate, 300)
         }}
         placeholder={'Search'}
         style={{ ...props.style, ...collapseStyles }}
