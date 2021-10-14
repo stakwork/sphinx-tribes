@@ -54,7 +54,7 @@ export default function FocusedView(props: any) {
                         if (s.name === 'tribes') {
                             let submitTribes: any = []
 
-                            v[s.name].forEach(t => {
+                            v[s.name] && v[s.name].forEach(t => {
                                 let fullTribeInfo = ownerTribes && ownerTribes.find(f => f.unique_name === t.value)
                                 // disclude sensitive details
                                 if (fullTribeInfo) submitTribes.push({
@@ -212,7 +212,6 @@ export default function FocusedView(props: any) {
             alert(e)
             return
         }
-
 
         body = mergeFormWithMeData(body)
 
