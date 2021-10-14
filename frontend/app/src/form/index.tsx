@@ -175,6 +175,7 @@ export default function Form(props: any) {
               extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
             />)}
 
+
             <BWrap style={buttonAlignment}>
               {(props.close && buttonsOnBottom) ?
                 <Button
@@ -239,6 +240,10 @@ export default function Form(props: any) {
                   />
                 </div>
               }
+
+
+              {/* make space at bottom for first sign up */}
+              {buttonsOnBottom && <div style={{ height: 400 }} />}
 
               <Modal
                 visible={showDeleteWarn}>
