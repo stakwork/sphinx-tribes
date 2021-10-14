@@ -16,11 +16,13 @@ const fuseOptions = {
 export function useFuse(array, keys: string[] = []) {
   const { ui } = useStores();
   let theArray = array;
+
   if (ui.searchText) {
     var fuse = new Fuse(array, { ...fuseOptions, keys });
     const res = fuse.search(ui.searchText);
     theArray = res.map((r) => r.item);
   }
+
   return theArray;
 }
 
@@ -33,3 +35,4 @@ export function useLocalFuse(searchText, array, keys: string[] = []) {
   }
   return theArray;
 }
+

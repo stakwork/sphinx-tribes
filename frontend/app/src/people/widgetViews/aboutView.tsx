@@ -53,7 +53,7 @@ export default function AboutView(props: any) {
 
                 <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
                     <Img src={'/static/github_logo.png'} />
-                    <a href={`https://github.com/${githubTag}`} target='_blank'>https://github.com/{githubTag}</a>
+                    <a href={`https://github.com/${githubTag}`} target='_blank'>{githubTag}</a>
                 </Row>
             </>
         }
