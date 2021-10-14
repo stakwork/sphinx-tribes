@@ -393,8 +393,8 @@ export default function BodyComponent() {
         </Body>
     }
     )
-}
 
+}
 
 const Body = styled.div`
             flex:1;
