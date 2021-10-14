@@ -5,11 +5,16 @@ import { useStores } from '../store'
 
 export default function SearchTextInput(props: any) {
     const { ui } = useStores()
+    const [searchValue, setSearchValue] = useState(ui.searchText || '')
     const [expand, setExpand] = useState(ui.searchText ? true : false)
 
     const collapseStyles = (props.small && !expand) ? {
         // width: 40, maxWidth: 40,
     } : {}
+
+    function doDelayedValueUpdate() {
+        props.onChange(debounceValue)
+    }
 
     return <div style={{ position: 'relative' }}><Text
         {...props}
@@ -17,7 +22,12 @@ export default function SearchTextInput(props: any) {
         onBlur={() => {
             if (!ui.searchText) setExpand(false)
         }}
-        onChange={e => props.onChange(e.target.value)}
+        value={searchValue}
+        onChange={e => {
+            setSearchValue(e.target.value)
+            debounceValue = e.target.value
+            debounce(doDelayedValueUpdate, 200)
+        }}
         placeholder={'Search'}
         style={{ ...props.style, ...collapseStyles }}
     />
@@ -29,6 +39,16 @@ export default function SearchTextInput(props: any) {
         }
     </div>
 }
+
+let debounceValue = ''
+let inDebounce
+function debounce(func, delay) {
+    clearTimeout(inDebounce)
+    inDebounce = setTimeout(() => {
+        func()
+    }, delay)
+}
+
 
 const Text = styled.input`
 background:#F2F3F580;

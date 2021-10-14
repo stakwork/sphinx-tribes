@@ -43,10 +43,9 @@ export default function PersonView(props: any) {
 
     // if i select myself, fill person with meInfo
     if (personId === ui.meInfo?.id) {
-        console.log('before', person.twitter_confirmed)
+        console.log('before', person?.twitter_confirmed)
         console.log('after', ui.meInfo?.twitter_confirmed)
-        person = { twitter_confirmed: person.twitter_confirmed, ...ui.meInfo }
-
+        person = { twitter_confirmed: person?.twitter_confirmed, ...ui.meInfo }
     }
 
     const people = (main.people && main.people.filter(f => !f.hide)) || []
