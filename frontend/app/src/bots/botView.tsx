@@ -6,6 +6,7 @@ import { Button, Divider, IconButton } from "../sphinxUI";
 import { useIsMobile } from "../hooks";
 import Bot from "./bot";
 import BotBar from "./utils/botBar";
+import QrBar from "../people/utils/QrBar";
 
 export default function BotView(props: any) {
 
@@ -18,21 +19,29 @@ export default function BotView(props: any) {
 
     const { main } = useStores()
 
-    const bot: any = (main.bots && main.bots.length && main.bots.find(f => f.unique_name === botUniqueName))
+    let bot: any = (main.bots && main.bots.length && main.bots.find(f => f.unique_name === botUniqueName))
 
     const {
         name,
         unique_name,
         description,
-        img
+        img,
+        owner_pubkey,
+        owner_alias
     } = bot || {}
 
     // FOR BOT VIEW
-    const bots: any = (main.bots && main.bots.length && main.bots.filter(f => !f.hide))
+    let bots: any = (main.bots && main.bots.length && main.bots.filter(f => !f.hide))
 
     const isMobile = useIsMobile()
 
     if (loading) return <div>Loading...</div>
+
+    const connectWithCreator = owner_pubkey && (<><Divider style={{ margin: '10px 0' }} />
+        <RowWrap style={{ flexDirection: 'column' }}>
+            <div style={{ fontSize: 12, marginTop: 5, marginBottom: -10, color: '#5F6368', cursor: 'default' }}>Connect with {owner_alias || 'the creator'}</div>
+            <QrBar value={owner_pubkey} />
+        </RowWrap></>)
 
     function renderMobileView() {
         return <div style={{
@@ -63,6 +72,8 @@ export default function BotView(props: any) {
                     <RowWrap>
                         <BotBar value={unique_name} />
                     </RowWrap>
+                    {connectWithCreator}
+
                 </Head>
             </Panel>
 
@@ -127,7 +138,7 @@ export default function BotView(props: any) {
                         <BotBar value={unique_name} />
                     </RowWrap>
 
-                    {/* only see buttons on other people's profile */}
+                    {connectWithCreator}
 
                 </Head>
 
