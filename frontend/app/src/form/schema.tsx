@@ -459,7 +459,9 @@ export const offerSchema: FormField[] = [
         type: 'text',
         defaultSchema: offerSkillSchema,
         defaultSchemaName: 'offer_skill',
-        dropdownOptions: 'offer'
+        dropdownOptions: 'offer',
+        // these are included to allow searching by fields for all possible schema types
+        dynamicSchemas: [offerSkillSchema, offerOtherSchema]
     }
 ];
 
@@ -561,7 +563,9 @@ export const wantedSchema: FormField[] = [
         type: 'text',
         defaultSchema: wantedCodingTaskSchema,
         defaultSchemaName: 'wanted_coding_task',
-        dropdownOptions: 'wanted'
+        dropdownOptions: 'wanted',
+        // these are included to allow searching by fields for all possible schema types
+        dynamicSchemas: [wantedCodingTaskSchema, wantedOtherSchema]
     }
 ];
 
