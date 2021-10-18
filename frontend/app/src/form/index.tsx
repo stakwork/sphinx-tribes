@@ -94,7 +94,7 @@ export default function Form(props: any) {
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema
 
-  let buttonAlignment = buttonsOnBottom ? { bottom: 0, height: 108, justifyContent: 'center' } : { top: 0 }
+  let buttonAlignment = buttonsOnBottom ? { zIndex: 20, bottom: 0, height: 108, justifyContent: 'center' } : { top: 0 }
   let formPad = buttonsOnBottom ? { paddingTop: 30 } : {}
 
   let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {}
@@ -176,6 +176,10 @@ export default function Form(props: any) {
             />)}
 
 
+            {/* make space at bottom for first sign up */}
+            {buttonsOnBottom && <div style={{ height: 600, minHeight: 600 }} />}
+
+
             <BWrap style={buttonAlignment}>
               {(props.close && buttonsOnBottom) ?
                 <Button
@@ -242,8 +246,6 @@ export default function Form(props: any) {
               }
 
 
-              {/* make space at bottom for first sign up */}
-              {buttonsOnBottom && <div style={{ height: 400 }} />}
 
               <Modal
                 visible={showDeleteWarn}>
@@ -342,6 +344,8 @@ export interface FormField {
   defaultSchema?: FormField[]
   defaultSchemaName?: string
   dropdownOptions?: string
+  dynamicSchemas?: any[]
+
 }
 
 function validator(config: FormField[]) {

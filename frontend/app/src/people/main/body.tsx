@@ -204,7 +204,6 @@ export default function BodyComponent() {
                             console.log('handleChange', e)
                             ui.setSearchText(e)
                         }}
-
                     />
 
                 </div>
