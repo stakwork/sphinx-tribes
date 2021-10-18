@@ -15,4 +15,4 @@ jobs:
         uses: joelwmale/webhook-action@749e2dcbc6735ce0c36e1dbbb660618cd7b5f91c
         env:
           WEBHOOK_URL: https://sssv0edjyjuz9eb.stakwork.sphinx.chat/action
-          data: "{'bot_name': 'GithubBot', 'content': 'New push in sphinx-tribes by ${{ github.event.pusher.name }}: ${{ github.event.head_commit.message }}', 'action': 'broadcast', 'bot_id': '9EB12CB2A3D6499E', 'bot_secret': '${{ secrets.GITHUB_BOT_SECRET }}', 'chat_uuid': 'YQ6fHSAXPmT7NgX77byaMTYvep72g6ZFS-X8XqIQ0-Ot-1F3CzRM6m0wVLHQd0O0SV69nw72nLb9_nRVw50YTxe_svub'}"
+          data: "{'bot_name': 'GithubBot', 'content': 'New push in sphinx-tribes by ${{ github.event.pusher.name }}: ${{ github.event.head_commit.message }}', 'action': 'broadcast', 'bot_id': '9EB12CB2A3D6499E', 'bot_secret': '${{ secrets.TRIBES_BOT_SECRET }}', 'chat_uuid': 'YQ6fHSAXPmT7NgX77byaMTYvep72g6ZFS-X8XqIQ0-Ot-1F3CzRM6m0wVLHQd0O0SV69nw72nLb9_nRVw50YTxe_svub'}"
