@@ -45,7 +45,18 @@ export default function WidgetSwitchViewer(props) {
 
         let allElements: any = []
 
-        const searchKeys = widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget].schema?.map(s => s.name) || []
+        let searchKeys: any = widgetConfigs[selectedWidget]?.schema?.map(s => s.name) || []
+        let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(f => f.dynamicSchemas)
+        // if dynamic schema, get all those fields
+        if (foundDynamicSchema) {
+            let dynamicFields: any = []
+            foundDynamicSchema.dynamicSchemas?.forEach(ds => {
+                ds.forEach(f => {
+                    if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name)
+                })
+            })
+            searchKeys = dynamicFields
+        }
 
         let peopleClone = [...people]
         peopleClone && peopleClone.sort((a: any, b: any) => {
