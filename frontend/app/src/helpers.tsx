@@ -22,3 +22,8 @@ export function extractGithubIssue(person, repo, issue) {
     return (github_issues && github_issues[keyname]) || {}
 }
 
+export const randomString = (l: number): string => {
+    return Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte) => {
+        return ("0" + (byte & 0xff).toString(16)).slice(-2);
+    }).join("");
+};

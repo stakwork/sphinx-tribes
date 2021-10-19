@@ -37,6 +37,8 @@ export default function BodyComponent() {
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
+    const { torFormBodyQR } = ui
+
     const c = colors['light']
 
     const tabs = [

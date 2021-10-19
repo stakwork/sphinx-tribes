@@ -15,7 +15,7 @@ export default function FirstTimeScreen() {
             <div>thank you for joining.</div>
         </Title>
         <SubTitle>
-            Please, enter few basic info about yourself and create a public profile.
+            Please enter some basic info about yourself and create a public profile.
         </SubTitle>
     </div>
 
