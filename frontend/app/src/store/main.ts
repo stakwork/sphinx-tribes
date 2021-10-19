@@ -3,7 +3,7 @@ import { persist } from "mobx-persist";
 import api from "../api";
 import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
-import { uiStore } from "./ui";
+import { MeInfo, uiStore } from "./ui";
 
 export class MainStore {
   @persist("list")
@@ -139,18 +139,22 @@ export class MainStore {
         let meInfoUpdates: any = {};
 
         // if meInfo has no img but people list does, copy that
-        if (!uiStore.meInfo.img && ps[index].img)
+        if (!uiStore.meInfo.img && ps[index].img) {
           meInfoUpdates.img = ps[index].img;
+        }
+
         // if meInfo has no github_issues but people list does, copy that
-        if (!uiStore.meInfo.github_issues && ps[index].github_issues)
+        if (!uiStore.meInfo.github_issues && ps[index].github_issues) {
           meInfoUpdates.github_issues = ps[index].github_issues;
+        }
+
         // if meInfo has no verification_signature but people list does, copy that
         if (
           !uiStore.meInfo.verification_signature &&
           ps[index].verification_signature
-        )
-          meInfoUpdates.verification_signature =
-            ps[index].verification_signature;
+        ) {
+          meInfoUpdates.verification_signature = ps[index].verification_signature;
+        }
 
         uiStore.setMeInfo({ ...uiStore.meInfo, ...meInfoUpdates });
       }
@@ -167,6 +171,21 @@ export class MainStore {
     this.people = ps;
     return ps;
   }
+
+  @action async getSelf() {
+    const ps = await api.get("people");
+
+    if (uiStore.meInfo) {
+      // fixme, this wont work with hundreds of users
+      // need route to get self
+      // for now find self in people, update
+      const index = ps.findIndex((f) => f.id == uiStore.meInfo?.id);
+      if (index > -1) {
+        uiStore.setMeInfo({ ...uiStore.meInfo, ...ps[index] })
+      }
+    }
+  }
+
 
   @action async refreshJwt() {
     try {

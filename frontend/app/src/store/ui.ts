@@ -80,6 +80,10 @@ class UiStore {
     this.lastGithubRepo = s
   }
 
+  @observable torFormBodyQR: string = ''
+  @action setTorFormBodyQR(s: string) {
+    this.torFormBodyQR = s
+  }
 
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
