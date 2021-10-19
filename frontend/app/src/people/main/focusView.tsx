@@ -54,6 +54,9 @@ export default function FocusedView(props: any) {
     }
 
     async function submitFormViaApp(body) {
+
+        setLoading(true);
+
         const key = randomString(15);
         const gotHost = getHostIncludingDockerHosts()
         const data = JSON.stringify({
@@ -63,12 +66,19 @@ export default function FocusedView(props: any) {
         });
         const path = "profile";
         const method = "POST";
-        await main.postToCache({
-            key,
-            body: data,
-            path,
-            method,
-        });
+
+        try {
+            await main.postToCache({
+                key,
+                body: data,
+                path,
+                method,
+            });
+        } catch (e) {
+            console.log('e', e)
+        }
+
+        setLoading(false);
         // show QR for app to link / scan
         setTorBodyURL(makeTorSaveURL(gotHost, key))
     }
@@ -335,7 +345,7 @@ export default function FocusedView(props: any) {
         const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {}
 
         const torWarningStyle = !buttonsOnBottom ? { marginTop: 80, marginBottom: -40 } : { marginTop: 20, }
-        const torWarning = !torSave && (<div style={{
+        const torWarning = torSave && (<div style={{
             ...torWarningStyle, color: '#5078F2', display: 'flex',
             justifyContent: 'center', alignItems: 'center'
         }}>
