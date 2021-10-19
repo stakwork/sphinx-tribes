@@ -30,6 +30,8 @@ export default function FocusedView(props: any) {
 
     const isMobile = useIsMobile()
 
+    const torSave = canEdit && ui?.meInfo?.url?.endsWith('.onion')
+
     function closeModal(override) {
         if (!manualGoBackOnly) {
             console.log('close modal')
@@ -41,8 +43,7 @@ export default function FocusedView(props: any) {
     // get self on unmount if tor user
     useEffect(() => {
         return function cleanup() {
-            const info = ui.meInfo as any;
-            if (canEdit && info && info.url.endsWith('.onion')) {
+            if (torSave) {
                 main.getSelf()
             }
         }
@@ -232,7 +233,7 @@ export default function FocusedView(props: any) {
         if (!info) return console.log("no meInfo");
 
         // fork between tor and non-tor users
-        if (info.url.endsWith('.onion')) {
+        if (torSave) {
             return submitFormViaApp(body)
         }
 
@@ -333,6 +334,17 @@ export default function FocusedView(props: any) {
 
         const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {}
 
+        const torWarningStyle = !buttonsOnBottom ? { marginTop: 80, marginBottom: -40 } : { marginTop: 20, }
+        const torWarning = !torSave && (<div style={{
+            ...torWarningStyle, color: '#5078F2', display: 'flex',
+            justifyContent: 'center', alignItems: 'center'
+        }}>
+            <div style={{ borderRadius: 5, background: '#DCEDFE', padding: 10 }}>
+                <b>Tor</b> support coming soon.
+            </div>
+
+        </div>)
+
         return (
             <div style={{
                 ...props.style, width: '100%', height: '100%'
@@ -340,6 +352,7 @@ export default function FocusedView(props: any) {
                 {editMode ?
                     <B ref={scrollDiv} hide={false}>
                         {formHeader && formHeader}
+                        {torWarning}
                         {ui.meInfo && (
                             <Form
                                 buttonsOnBottom={buttonsOnBottom}
