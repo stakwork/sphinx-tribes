@@ -171,9 +171,10 @@ func poll(w http.ResponseWriter, r *http.Request) {
 }
 
 type Save struct {
-	Key  string `json:"key"`
-	Body string `json:"body"`
-	Path string `json:"path"`
+	Key    string `json:"key"`
+	Body   string `json:"body"`
+	Path   string `json:"path"`
+	Method string `json:"method"`
 }
 
 func postSave(w http.ResponseWriter, r *http.Request) {
