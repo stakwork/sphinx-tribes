@@ -80,6 +80,9 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("people id")
+	fmt.Println(p.ID)
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
 }
