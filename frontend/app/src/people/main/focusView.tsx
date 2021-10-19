@@ -74,13 +74,14 @@ export default function FocusedView(props: any) {
                 path,
                 method,
             });
+
+            // show QR for app to link / scan
+            setTorBodyURL(makeTorSaveURL(gotHost, key))
         } catch (e) {
             console.log('e', e)
         }
 
         setLoading(false);
-        // show QR for app to link / scan
-        setTorBodyURL(makeTorSaveURL(gotHost, key))
     }
 
     function mergeFormWithMeData(v) {
