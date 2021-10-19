@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/google/go-github/v39/github"
@@ -67,4 +69,28 @@ func GetIssue(owner string, repo string, id int) (GithubIssue, error) {
 		}
 	}
 	return issue, err
+}
+
+func PubkeyForGithubUser(owner string) (string, error) {
+	client := github.NewClient(nil)
+	gs, _, err := client.Gists.List(context.Background(), owner, nil)
+	if err == nil && gs != nil {
+		for _, g := range gs {
+			if g.Files != nil {
+				for k := range g.Files {
+					if strings.Contains(string(k), "Sphinx Verification") {
+						// get the actual gist
+						gist, _, err := client.Gists.Get(context.Background(), *g.ID)
+						gistFile := gist.Files[k]
+						pubkey, err := VerifyArbitrary(*gistFile.Content, "Sphinx Verification")
+						if err != nil {
+							return "", err
+						}
+						return pubkey, nil
+					}
+				}
+			}
+		}
+	}
+	return "", errors.New("nope")
 }

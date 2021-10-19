@@ -13,7 +13,7 @@ function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
 }
 
-let interval
+let interval;
 
 export default function ConfirmMe(props: any) {
   const { ui } = useStores();
@@ -30,11 +30,11 @@ export default function ConfirmMe(props: any) {
 
   useEffect(() => {
     if (challenge && ts) {
-      let el = document.createElement('a')
-      el.href = qrString
+      let el = document.createElement("a");
+      el.href = qrString;
       el.click();
     }
-  }, [challenge, ts])
+  }, [challenge, ts]);
 
   async function startPolling(challenge: string) {
     let i = 0;
@@ -45,15 +45,15 @@ export default function ConfirmMe(props: any) {
         if (me && me.pubkey) {
           ui.setMeInfo(me);
           setChallenge("");
-          if (props.onSuccess) props.onSuccess()
-          if (interval) clearInterval(interval)
+          if (props.onSuccess) props.onSuccess();
+          if (interval) clearInterval(interval);
         }
         i++;
         if (i > 100) {
-          if (interval) clearInterval(interval)
+          if (interval) clearInterval(interval);
         }
-      } catch (e) { }
-    }, 3000)
+      } catch (e) {}
+    }, 3000);
   }
 
   async function getChallenge() {
@@ -76,7 +76,7 @@ export default function ConfirmMe(props: any) {
         <EuiLoadingSpinner size="xl" />
       </InnerWrap>
     </ConfirmWrap>
-  )
+  );
 
   // return (
   //   <ConfirmWrap>
@@ -135,7 +135,7 @@ const LinkWrap = styled.div`
   }
 `;
 const P = styled.p`
-margin-top:10px;
+  margin-top: 10px;
 `;
 const QrWrap = styled.div`
   padding: 8px;
