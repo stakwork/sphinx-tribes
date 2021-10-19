@@ -4,11 +4,13 @@ import { useObserver } from "mobx-react-lite";
 import Form from "../../form";
 import styled, { css } from "styled-components";
 import { getHostIncludingDockerHosts } from "../../host";
-import { Button, IconButton } from "../../sphinxUI";
+import { Button, IconButton, Modal } from "../../sphinxUI";
 import moment from 'moment'
 import SummaryViewer from '../widgetViews/summaryViewer'
 import { useIsMobile } from "../../hooks";
 import { dynamicSchemasByType } from "../../form/schema";
+import { randomString } from "../../helpers";
+import QR from "../utils/QR";
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -21,6 +23,8 @@ export default function FocusedView(props: any) {
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [editMode, setEditMode] = useState(skipEditLayer);
+    const [torBodyURL, setTorBodyURL] = useState('');
+
     const scrollDiv: any = useRef(null)
     const formRef: any = useRef(null)
 
@@ -32,6 +36,40 @@ export default function FocusedView(props: any) {
             ui.setEditMe(false);
             if (props.goBack) props.goBack()
         }
+    }
+
+    // get self on unmount if tor user
+    useEffect(() => {
+        return function cleanup() {
+            const info = ui.meInfo as any;
+            if (canEdit && info && info.url.endsWith('.onion')) {
+                main.getSelf()
+            }
+        }
+    }, [])
+
+    function makeTorSaveURL(host: string, key: string) {
+        return `sphinx.chat://?action=save&host=${host}&key=${key}`;
+    }
+
+    async function submitFormViaApp(body) {
+        const key = randomString(15);
+        const gotHost = getHostIncludingDockerHosts()
+        const data = JSON.stringify({
+            host: gotHost,
+            ...body,
+            price_to_meet: parseInt(body.price_to_meet),
+        });
+        const path = "profile";
+        const method = "POST";
+        await main.postToCache({
+            key,
+            body: data,
+            path,
+            method,
+        });
+        // show QR for app to link / scan
+        setTorBodyURL(makeTorSaveURL(gotHost, key))
     }
 
     function mergeFormWithMeData(v) {
@@ -145,33 +183,6 @@ export default function FocusedView(props: any) {
         setDeleting(false);
     }
 
-    function trimBodyToSchema(b) {
-        // trim to schema to remove data that doesnt below 
-        // (in case of switching between dynamic schemas)
-        const body = { ...b }
-
-        let dynamicSchema = config.schema.find(f => f.defaultSchema)
-
-        if (dynamicSchema) {
-            let trueSchema = config.schema
-            let personInfo = canEdit ? ui.meInfo : person
-            const extras = { ...personInfo.extras }
-            let sel = extras[config.name][selectedIndex]
-            if (sel?.type) {
-                let thisDynamicSchema = dynamicSchemasByType[sel.type]
-                trueSchema = thisDynamicSchema
-            } else {
-                trueSchema = dynamicSchema.defaultSchema
-            }
-            Object.keys(body).forEach(k => {
-                const foundIt = trueSchema.find(f => f.name === k)
-                if (!foundIt) delete body[k]
-            })
-        }
-
-        return body
-    }
-
     async function preSubmitFunctions(body) {
         // if github repo
 
@@ -217,9 +228,14 @@ export default function FocusedView(props: any) {
 
         console.log('SUBMIT MERGED FORM', body);
         if (!body) return // avoid saving bad state
-
         const info = ui.meInfo as any;
         if (!info) return console.log("no meInfo");
+
+        // fork between tor and non-tor users
+        if (info.url.endsWith('.onion')) {
+            return submitFormViaApp(body)
+        }
+
         setLoading(true);
         try {
             const URL = info.url.startsWith("http") ? info.url : `https://${info.url}`;
@@ -321,7 +337,6 @@ export default function FocusedView(props: any) {
             <div style={{
                 ...props.style, width: '100%', height: '100%'
             }}>
-
                 {editMode ?
                     <B ref={scrollDiv} hide={false}>
                         {formHeader && formHeader}
@@ -393,8 +408,54 @@ export default function FocusedView(props: any) {
 
                     </>}
 
+                <Modal
+                    visible={torBodyURL}
+                    close={() => {
+                        goBack()
+                        // setTorBodyURL('')
+                        // main.getSelf()
+                    }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center', alignItems: 'center',
+                        padding: '10px 20px', width: '100%'
+                    }}>
+                        <div style={{ height: 40 }} />
 
-            </div>
+                        <QR
+                            size={220}
+                            value={torBodyURL}
+                        />
+
+                        <Button
+                            text={'Save on Sphinx'}
+                            height={60}
+                            style={{ marginTop: 30 }}
+                            width={'100%'}
+                            color={'primary'}
+                            onClick={() => {
+                                let el = document.createElement("a");
+                                el.href = torBodyURL;
+                                el.click();
+                            }}
+                        />
+
+                        <Button
+                            text={'Dismiss'}
+                            height={60}
+                            style={{ marginTop: 20 }}
+                            width={'100%'}
+                            color={'action'}
+                            onClick={() => {
+                                goBack()
+                            }}
+                        />
+                    </div>
+                </Modal >
+
+
+            </div >
         );
 
     });
