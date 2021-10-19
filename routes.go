@@ -62,6 +62,8 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", poll)
 		r.Get("/person/{pubkey}", getPersonByPubkey)
 		r.Get("/github_issue/{owner}/{repo}/{issue}", getGithubIssue)
+		r.Post("/save", postSave)
+		r.Get("/save/{key}", pollSave)
 	})
 
 	r.Group(func(r chi.Router) {
