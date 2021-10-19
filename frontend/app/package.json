@@ -2,6 +2,17 @@
   "name": "catcher",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "start:tribes:docker": "PORT=23000 react-scripts start",
+    "start:tribes:cluster": "PORT=13000 react-scripts start",
+    "start:people": "PORT=3007 react-scripts start",
+    "start:people:docker": "PORT=23007 react-scripts start",
+    "start:people:cluster": "PORT=13007 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "@elastic/datemath": "^5.0.2",
     "@elastic/eui": "^19.0.0",
@@ -32,17 +43,6 @@
     "react-select": "^5.1.0",
     "styled-components": "^5.1.0",
     "yup": "^0.32.9"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "start:tribes:docker": "PORT=23000 react-scripts start",
-    "start:tribes:cluster": "PORT=13000 react-scripts start",
-    "start:people": "PORT=3007 react-scripts start",
-    "start:people:docker": "PORT=23007 react-scripts start",
-    "start:people:cluster": "PORT=13007 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app",
