@@ -54,7 +54,7 @@ var updatables = []string{
 	"owner_alias", "price_to_join", "price_per_message",
 	"escrow_amount", "escrow_millis",
 	"unlisted", "private", "deleted",
-	"app_url", "bots", "feed_url",
+	"app_url", "bots", "feed_url", "feed_type",
 	"owner_route_hint", "updated",
 }
 var botupdatables = []string{
