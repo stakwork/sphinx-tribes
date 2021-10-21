@@ -85,6 +85,12 @@ class UiStore {
     this.torFormBodyQR = s
   }
 
+  @observable openIssueCount: number = 0
+  @action setOpenIssueCount(n: number) {
+    this.openIssueCount = n
+  }
+
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {
