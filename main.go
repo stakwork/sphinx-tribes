@@ -20,7 +20,6 @@ func main() {
 	}
 
 	initDB()
-
 	initCache()
 
 	go processTwitterConfirmationsLoop()

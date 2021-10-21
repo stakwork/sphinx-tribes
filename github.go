@@ -12,13 +12,6 @@ import (
 	"github.com/google/go-github/v39/github"
 )
 
-type GithubIssue struct {
-	Title       string `json:"title"`
-	Status      string `json:"status"`
-	Assignee    string `json:"assignee"`
-	Description string `json:"description"`
-}
-
 func getGithubIssue(w http.ResponseWriter, r *http.Request) {
 	owner := chi.URLParam(r, "owner")
 	repo := chi.URLParam(r, "repo")
