@@ -112,6 +112,18 @@ type Person struct {
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 }
 
+// Github struct
+type GithubIssue struct {
+	// ID          uint `json:"id"`
+	// PersonID    uint `json:"person_id"`
+	// Person      Person
+	// URL         string `json:"url"` // this will function as id
+	Title       string `json:"title"`
+	Status      string `json:"status"`
+	Assignee    string `json:"assignee"`
+	Description string `json:"description"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {
