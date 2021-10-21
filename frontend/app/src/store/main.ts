@@ -104,11 +104,19 @@ export class MainStore {
     const data = await api.get(`github_issue/${owner}/${repo}/${issue}`);
     const { title } = data && data;
 
-    console.log("data", data);
-
     // if no title, the github issue isnt real
     if (!title) return null;
     return data;
+  }
+
+  @action async getOpenGithubIssues(): Promise<any> {
+    try {
+      const openIssues = await api.get(`github_issue/status/open`);
+      return openIssues;
+    } catch (e) {
+      console.log('e', e)
+    }
+
   }
 
   @action async makeBot(payload: any): Promise<Bot> {
