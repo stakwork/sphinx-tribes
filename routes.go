@@ -58,6 +58,7 @@ func NewRouter() *http.Server {
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
 		r.Get("/people", getListedPeople)
+
 		r.Get("/ask", ask)
 		r.Get("/poll/{challenge}", poll)
 		r.Get("/person/{pubkey}", getPersonByPubkey)

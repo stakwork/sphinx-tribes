@@ -36,6 +36,7 @@ func initDB() {
 	if err != nil {
 		panic(err)
 	}
+
 	DB.db = db
 
 	fmt.Println("db connected")
@@ -164,6 +165,9 @@ func (db database) createOrEditPerson(m Person) (Person, error) {
 	}
 	if m.Extras == nil {
 		m.Extras = map[string]interface{}{}
+	}
+	if m.GithubIssues == nil {
+		m.GithubIssues = map[string]interface{}{}
 	}
 	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
 		fmt.Println(err)
