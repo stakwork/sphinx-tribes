@@ -22,6 +22,7 @@ CREATE TABLE tribes (
   deleted boolean,
   app_url TEXT,
   feed_url TEXT,
+  feed_type INT,
   last_active BIGINT,
   bots TEXT,
   owner_route_hint TEXT,
@@ -116,7 +117,9 @@ CREATE TABLE people (
   deleted boolean,
   unique_name TEXT,
   price_to_meet BIGINT,
-  extras JSONB
+  extras JSONB,
+  twitter_confirmed BOOLEAN,
+  github_issues JSONB
 );
 
 ALTER TABLE people ADD COLUMN tsv tsvector;
