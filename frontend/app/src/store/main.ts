@@ -126,7 +126,9 @@ export class MainStore {
   }
 
   @action async postToCache(payload: any): Promise<void> {
-    await api.post("save", payload);
+    await api.post("save", payload, {
+      "Content-Type": "application/json",
+    });
     return;
   }
 
@@ -161,7 +163,8 @@ export class MainStore {
           !uiStore.meInfo.verification_signature &&
           ps[index].verification_signature
         ) {
-          meInfoUpdates.verification_signature = ps[index].verification_signature;
+          meInfoUpdates.verification_signature =
+            ps[index].verification_signature;
         }
 
         uiStore.setMeInfo({ ...uiStore.meInfo, ...meInfoUpdates });
@@ -189,11 +192,10 @@ export class MainStore {
       // for now find self in people, update
       const index = ps.findIndex((f) => f.id == uiStore.meInfo?.id);
       if (index > -1) {
-        uiStore.setMeInfo({ ...uiStore.meInfo, ...ps[index] })
+        uiStore.setMeInfo({ ...uiStore.meInfo, ...ps[index] });
       }
     }
   }
-
 
   @action async refreshJwt() {
     try {

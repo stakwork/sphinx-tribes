@@ -19,14 +19,24 @@ function addMethod(m: string): Function {
     host.includes("localhost") || host.includes("internal")
       ? `http://${host}/`
       : `https://${host}/`;
-  const func = async function (url: string, data: any, fields: any) {
+  const func = async function (url: string, data: any, incomingHeaders: any) {
     try {
       const headers: { [key: string]: string } = {};
       const opts: { [key: string]: any } = { mode: "cors" };
       if (m === "POST" || m === "PUT") {
-        headers["Content-Type"] =
-          "application/x-www-form-urlencoded; charset=UTF-8";
-        opts.body = new URLSearchParams(data);
+        if (!incomingHeaders) {
+          headers["Content-Type"] =
+            "application/x-www-form-urlencoded; charset=UTF-8";
+          opts.body = new URLSearchParams(data);
+        } else {
+          if (
+            incomingHeaders &&
+            incomingHeaders["Content-Type"] &&
+            incomingHeaders["Content-Type"] === "application/json"
+          ) {
+            opts.body = JSON.stringify(data);
+          }
+        }
       }
       if (m === "UPLOAD") {
         const file = data;
