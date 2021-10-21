@@ -20,6 +20,7 @@ import Person from "./person";
 import NoneSpace from "./utils/noneSpace";
 import ConnectCard from "./utils/connectCard";
 import { widgetConfigs } from "./utils/constants";
+import { extractGithubIssue } from "../helpers";
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -43,8 +44,6 @@ export default function PersonView(props: any) {
 
     // if i select myself, fill person with meInfo
     if (personId === ui.meInfo?.id) {
-        console.log('before', person?.twitter_confirmed)
-        console.log('after', ui.meInfo?.twitter_confirmed)
         person = { twitter_confirmed: person?.twitter_confirmed, ...ui.meInfo }
     }
 
@@ -575,7 +574,17 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = (extras && extras[name] && extras[name].length > 0) ? extras[name].length : null
+                        const hasExtras = (extras && extras[name] && (extras[name].length > 0))
+                        let count = hasExtras ? extras[name].length : null
+                        // count only open ones
+                        if (hasExtras && name === 'wanted') {
+                            count = 0
+                            extras[name].forEach((w => {
+                                const { repo, issue } = w
+                                const { status } = extractGithubIssue(person, repo, issue)
+                                if (!status || status === 'open') count++
+                            }))
+                        }
                         return <Tab key={i}
                             style={{ height: 64, alignItems: 'center' }}
                             selected={selected}

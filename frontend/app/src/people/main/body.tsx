@@ -37,7 +37,7 @@ export default function BodyComponent() {
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
-    const { torFormBodyQR } = ui
+    const { openIssueCount } = ui
 
     const c = colors['light']
 
@@ -88,6 +88,7 @@ export default function BodyComponent() {
 
     useEffect(() => {
         loadPeople()
+        main.getOpenGithubIssues()
     }, [])
 
     useEffect(() => {
@@ -299,13 +300,14 @@ export default function BodyComponent() {
                     {tabs && tabs.map((t, i) => {
                         const label = t.label
                         const selected = selectedWidget === t.name
+                        const isWanted = 'wanted' === t.name
 
                         return <Tab key={i}
                             selected={selected}
                             onClick={() => {
                                 setSelectedWidget(t.name)
                             }}>
-                            {label}
+                            {label} {isWanted && openIssueCount && `(${openIssueCount})`}
                         </Tab>
                     })}
 
