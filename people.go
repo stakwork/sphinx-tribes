@@ -76,12 +76,9 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 
 	p, err := DB.createOrEditPerson(person)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	fmt.Println("people id")
-	fmt.Println(p.ID)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
