@@ -63,7 +63,7 @@ export default function Tribe({
       >
         <Left>
           <Row className="item-cont">
-            {img ? <Img src={img} /> : <div className="placeholder-img-tribe"></div>}
+            <Img src={img || '/static/placeholder.svg'} />
             <Left
               style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
             >
@@ -269,6 +269,8 @@ const Img = styled.div<ImageProps>`
   border-radius: 5px;
   position: relative;
 `;
+
+
 const Tokens = styled.div`
   display: flex;
   align-items: center;
