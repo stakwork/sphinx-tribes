@@ -307,7 +307,8 @@ export default function BodyComponent() {
                             onClick={() => {
                                 setSelectedWidget(t.name)
                             }}>
-                            {label} {isWanted && openIssueCount && `(${openIssueCount})`}
+                            {label}
+                            {/* {isWanted && openIssueCount && `(${openIssueCount})`} */}
                         </Tab>
                     })}
 
