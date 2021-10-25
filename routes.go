@@ -211,7 +211,9 @@ func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	_, err = DB.createOrEditTribe(tribe)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("=> ERR createOrEditTribe", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
