@@ -60,7 +60,12 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 	bot.Updated = &now
 	bot.UniqueName, _ = botUniqueNameFromName(bot.Name)
 
-	DB.createOrEditBot(bot)
+	_, err = DB.createOrEditBot(bot)
+	if err != nil {
+		fmt.Println("=> ERR createOrEditBot", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bot)
