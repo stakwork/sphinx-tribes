@@ -293,12 +293,22 @@ export default function PersonView(props: any) {
             })
 
             const noneKey = canEdit ? 'me' : 'otherUser'
-            let panels: any = elementArray.length ? elementArray : (<NoneSpace
+            const panels: any = elementArray.length ? elementArray : (<NoneSpace
                 action={() => setShowFocusView(true)}
                 {...tabs[selectedWidget]?.noneSpace[noneKey]}
             />)
 
-            return loadingPerson ? <EuiLoadingSpinner size="xl" /> : panels
+            const loader = <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: 0.8,
+                width: '100%'
+            }}>
+                <EuiLoadingSpinner size="xl" />
+            </div>
+
+            return loadingPerson ? loader : panels
         }
 
         switch (selectedWidget) {
