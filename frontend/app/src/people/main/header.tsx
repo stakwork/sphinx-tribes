@@ -24,8 +24,6 @@ export default function Header() {
     const history = useHistory()
     const isMobile = useIsMobile()
 
-    console.log('location.searcj', location.search)
-
     const c = colors['light']
 
     const tabs = [
@@ -69,7 +67,6 @@ export default function Header() {
             if (path.includes(t.path)) pass = true
         }))
         if (!pass) {
-            console.log('urlRedirect')
             history.push('/p')
         }
     }

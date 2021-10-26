@@ -116,8 +116,6 @@ export default function PersonView(props: any) {
                 // deeplink for widgets
                 let widgetName: any = new URLSearchParams(search).get("widget")
                 let widgetTimestamp: any = new URLSearchParams(search).get("timestamp")
-                console.log('widgetName', widgetName)
-                console.log('widgetTimestamp', widgetTimestamp)
 
                 if (widgetName) {
                     setNewSelectedWidget(widgetName)
@@ -125,7 +123,6 @@ export default function PersonView(props: any) {
                     if (widgetTimestamp) {
                         const thisExtra = p?.extras && p?.extras[widgetName]
                         const thisItemIndex = thisExtra && thisExtra.length && thisExtra.findIndex(f => f.created === parseInt(widgetTimestamp))
-                        console.log('thisItemIndex', thisItemIndex)
                         if (thisItemIndex > -1) {
                             // select it!
                             setFocusIndex(thisItemIndex)

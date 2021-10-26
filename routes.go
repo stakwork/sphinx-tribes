@@ -41,7 +41,7 @@ func NewRouter() *http.Server {
 		r.Get("/p/static/*", frontend.StaticRoute)
 		r.Get("/p/manifest.json", frontend.ManifestRoute)
 		r.Get("/p/favicon.ico", frontend.FaviconRoute)
-		r.Get("/p/{unique_name}", frontend.IndexRoute)
+		r.Get("/p/{pubkey}", frontend.IndexRoute)
 		r.Get("/p", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
 	})
