@@ -50,6 +50,12 @@ export default function Button(props: any) {
             boxWizing: 'border-box',
             borderRadius: 4
         },
+        transparent: {
+            background: '#ffffff12',
+            color: '#fff',
+            border: 'none'
+        }
+
     }
 
     return <B

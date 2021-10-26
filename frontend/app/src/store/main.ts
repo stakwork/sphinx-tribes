@@ -183,6 +183,13 @@ export class MainStore {
     return ps;
   }
 
+  @action async getPersonByPubkey(pubkey: string): Promise<Person> {
+    const p = await api.get(`person/${pubkey}`);
+    console.log('p', p)
+    return p
+  }
+
+
   @action async getSelf() {
     const ps = await api.get("people");
 
