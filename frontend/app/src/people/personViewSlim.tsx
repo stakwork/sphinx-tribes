@@ -22,6 +22,7 @@ import ConnectCard from "./utils/connectCard";
 import { widgetConfigs } from "./utils/constants";
 import { extractGithubIssue } from "../helpers";
 import { useHistory, useLocation } from "react-router";
+import { EuiLoadingSpinner } from '@elastic/eui';
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -92,9 +93,14 @@ export default function PersonView(props: any) {
 
     // deeplink load person
     useEffect(() => {
-        deeplinkTimeout = setTimeout(() => {
+
+        if (loadedPerson) {
             doDeeplink()
-        }, 500)
+        } else {
+            deeplinkTimeout = setTimeout(() => {
+                doDeeplink()
+            }, 200)
+        }
 
         return function cleanup() {
             clearTimeout(deeplinkTimeout)
@@ -286,16 +292,13 @@ export default function PersonView(props: any) {
                 </Panel>)
             })
 
-            // if empty
-            if (!elementArray.length) {
-                const noneKey = canEdit ? 'me' : 'otherUser'
-                return <NoneSpace
-                    action={() => setShowFocusView(true)}
-                    {...tabs[selectedWidget]?.noneSpace[noneKey]}
-                />
-            }
+            const noneKey = canEdit ? 'me' : 'otherUser'
+            let panels: any = elementArray.length ? elementArray : (<NoneSpace
+                action={() => setShowFocusView(true)}
+                {...tabs[selectedWidget]?.noneSpace[noneKey]}
+            />)
 
-            return elementArray
+            return loadingPerson ? <EuiLoadingSpinner size="xl" /> : panels
         }
 
         switch (selectedWidget) {
