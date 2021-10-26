@@ -28,6 +28,8 @@ import { useHistory, useLocation } from 'react-router';
 const getFuse = useFuse
 const getScroll = useScroll
 
+let deeplinkTimeout
+
 export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
@@ -59,18 +61,26 @@ export default function BodyComponent() {
 
     // deeplink page navigation
     useEffect(() => {
-        (async () => {
-            if (pathname) {
-                let splitPathname = pathname?.split('/')
-                let personPubkey: string = splitPathname[2]
-                if (personPubkey) {
-                    let p = await main.getPersonByPubkey(personPubkey)
-                    ui.setSelectedPerson(p.id)
-                    ui.setSelectingPerson(p.id)
-                }
-            }
-        })()
+        deeplinkTimeout = setTimeout(() => {
+            doDeeplink()
+        }, 500)
+
+        return function cleanup() {
+            clearTimeout(deeplinkTimeout)
+        }
     }, [])
+
+    async function doDeeplink() {
+        if (pathname) {
+            let splitPathname = pathname?.split('/')
+            let personPubkey: string = splitPathname[2]
+            if (personPubkey) {
+                let p = await main.getPersonByPubkey(personPubkey)
+                ui.setSelectedPerson(p?.id)
+                ui.setSelectingPerson(p?.id)
+            }
+        }
+    }
 
     useEffect(() => {
         // clear public focus is selected person
