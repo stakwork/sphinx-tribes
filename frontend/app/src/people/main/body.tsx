@@ -20,6 +20,7 @@ import MaterialIcon from '@material/react-material-icon';
 import FocusedView from './focusView';
 
 import { widgetConfigs } from '../utils/constants'
+import { useHistory, useLocation } from 'react-router';
 
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
@@ -37,6 +38,8 @@ export default function BodyComponent() {
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
+    const history = useHistory()
+
     const { openIssueCount } = ui
 
     const c = colors['light']
@@ -52,6 +55,22 @@ export default function BodyComponent() {
         widgetConfigs['wanted'],
     ]
     const isMobile = useIsMobile()
+    const pathname = history?.location?.pathname
+
+    // deeplink page navigation
+    useEffect(() => {
+        (async () => {
+            if (pathname) {
+                let splitPathname = pathname?.split('/')
+                let personPubkey: string = splitPathname[2]
+                if (personPubkey) {
+                    let p = await main.getPersonByPubkey(personPubkey)
+                    ui.setSelectedPerson(p.id)
+                    ui.setSelectingPerson(p.id)
+                }
+            }
+        })()
+    }, [])
 
     useEffect(() => {
         // clear public focus is selected person
@@ -61,15 +80,14 @@ export default function BodyComponent() {
         }
     }, [ui.selectedPerson])
 
-    function selectPerson(id: number, unique_name: string) {
-        console.log('selectPerson', id, unique_name)
+    function selectPerson(id: number, unique_name: string, pubkey: string) {
+        console.log('selectPerson', id, unique_name, pubkey)
         ui.setSelectedPerson(id)
         ui.setSelectingPerson(id)
+
+        history.push(`/p/${pubkey}`)
         // setPublicFocusPerson(null)
         // setPublicFocusIndex(-1)
-        if (unique_name && window.history.pushState) {
-            window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
-        }
     }
 
     async function loadPeople() {
@@ -102,6 +120,11 @@ export default function BodyComponent() {
     function publicPanelClick(person, widget, i) {
         setPublicFocusPerson(person)
         setPublicFocusIndex(i)
+    }
+
+    function goBack() {
+        ui.setSelectingPerson(0)
+        history.push('/p')
     }
 
     return useObserver(() => {
@@ -217,7 +240,6 @@ export default function BodyComponent() {
                         : <WidgetSwitchViewer
                             onPanelClick={(person, widget, i) => {
                                 publicPanelClick(person, widget, i)
-                                // selectPerson(person.id, person.unique_name)
                             }}
                             selectedWidget={selectedWidget} />
                     }
@@ -226,12 +248,12 @@ export default function BodyComponent() {
                 <FadeLeft
                     withOverlay
                     drift={40}
-                    overlayClick={() => ui.setSelectingPerson(0)}
+                    overlayClick={() => goBack()}
                     style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
                     isMounted={ui.selectingPerson ? true : false}
                     dismountCallback={() => ui.setSelectedPerson(0)}
                 >
-                    <PersonViewSlim goBack={() => ui.setSelectingPerson(0)}
+                    <PersonViewSlim goBack={goBack}
                         personId={ui.selectedPerson}
                         selectPerson={selectPerson}
                         loading={loading} />
@@ -337,7 +359,6 @@ export default function BodyComponent() {
                         : <WidgetSwitchViewer
                             onPanelClick={(person, widget, i) => {
                                 publicPanelClick(person, widget, i)
-                                // selectPerson(person.id, person.unique_name)
                             }}
                             selectedWidget={selectedWidget} />
                     }
@@ -350,12 +371,12 @@ export default function BodyComponent() {
             <FadeLeft
                 withOverlay={isMobile}
                 drift={40}
-                overlayClick={() => ui.setSelectingPerson(0)}
+                overlayClick={() => goBack()}
                 style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
                 isMounted={ui.selectingPerson ? true : false}
                 dismountCallback={() => ui.setSelectedPerson(0)}
             >
-                <PersonViewSlim goBack={() => ui.setSelectingPerson(0)}
+                <PersonViewSlim goBack={goBack}
                     personId={ui.selectedPerson}
                     loading={loading}
                     peopleView={true}

@@ -1,10 +1,9 @@
-import React, { useRef, useState } from "react";
-import { QRCode } from "react-qr-svg";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { getHost } from "../host";
 import { useObserver } from 'mobx-react-lite'
 import { colors } from "../colors";
-import { Button, Divider, Modal } from '../sphinxUI/index'
+import { Button, Divider } from '../sphinxUI/index'
 import ConnectCard from "./utils/connectCard";
 import moment from "moment";
 const host = getHost();
@@ -60,7 +59,7 @@ export default function Person(props: any) {
 
     function renderPersonCard() {
       if (small) {
-        return <Wrap onClick={() => select(id, unique_name)} style={{
+        return <Wrap onClick={() => select(id, unique_name, owner_pubkey)} style={{
           background: selected ? '#F2F3F5' : '#fff',
         }}>
           <div>
@@ -94,7 +93,7 @@ export default function Person(props: any) {
         </Wrap>
       }
       // desktop mode
-      return <DWrap squeeze={squeeze} onClick={() => select(id, unique_name)}>
+      return <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
         <div>
           <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={img || '/static/sphinx.png'} />
           <div style={{ padding: 10 }}>
