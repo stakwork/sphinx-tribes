@@ -95,11 +95,8 @@ export default function Header() {
     }, [])
 
     function goToEditSelf() {
-        // if page is not /p, go to /p (people)
-        let path = location.pathname
-        if (!path.includes('/p')) history.push('/p')
-
         if (ui.meInfo?.id) {
+            history.push(`/p/${ui.meInfo.owner_pubkey}`)
             ui.setSelectedPerson(ui.meInfo.id)
             ui.setSelectingPerson(ui.meInfo.id)
         }
