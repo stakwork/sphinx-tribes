@@ -3,10 +3,13 @@ import React from 'react'
 import styled from 'styled-components';
 import moment from 'moment'
 import { useStores } from '../../store';
+import { useHistory } from 'react-router';
 
 export default function NameTag(props) {
-    const { owner_alias, img, created, unique_name, id, style, widget } = props
+    const { owner_alias, owner_pubkey, img, created, unique_name, id, style, widget } = props
     const { ui } = useStores()
+
+    const history = useHistory()
 
     const isSelected = (ui.selectedPerson == id) ? true : false
 
@@ -18,8 +21,9 @@ export default function NameTag(props) {
         ui.setPersonViewOpenTab(widget || '')
         ui.setSelectedPerson(id)
         ui.setSelectingPerson(id)
-        if (unique_name && window.history.pushState) {
-            window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
+        if (owner_pubkey) {
+            history.push(`/p/${owner_pubkey}`)
+            // window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
         }
     }
 
