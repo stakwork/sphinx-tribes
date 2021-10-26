@@ -53,14 +53,14 @@ export default function PersonView(props: any) {
     // FOR PEOPLE VIEW
     let person: any = (main.people && main.people.length && main.people.find(f => f.id === personId))
 
-    // if i select myself, fill person with meInfo
-    if (personId === ui.meInfo?.id) {
-        person = { twitter_confirmed: person?.twitter_confirmed, ...ui.meInfo }
-    }
-
     // migrating to loading person on person view load
     if (loadedPerson) {
         person = loadedPerson
+    }
+
+    // if i select myself, fill person with meInfo
+    if (personId === ui.meInfo?.id) {
+        person = { twitter_confirmed: person?.twitter_confirmed, ...ui.meInfo }
     }
 
     const people = (main.people && main.people.filter(f => !f.hide)) || []
