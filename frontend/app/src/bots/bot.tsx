@@ -164,6 +164,6 @@ const Img = styled.div<ImageProps>`
           background-size: cover;
           height: 96px;
           width: 96px;
-          border-radius: 50%;
           position: relative;
+          border-radius: 8px;
           `;

@@ -317,7 +317,7 @@ const BWrap = styled.div`
       `;
 
 
-type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'hide'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'imgcanvas' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'hide'
 
 type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 

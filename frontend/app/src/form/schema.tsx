@@ -350,7 +350,20 @@ export const aboutSchema: FormField[] = [
         validator: repoArrayStrValidator, // look for 1 slash
         page: 1,
     },
-
+    {
+        name: "lightning",
+        label: "Lightning address",
+        widget: true,
+        type: "text",
+        page: 1,
+    },
+    {
+        name: "amboss",
+        label: "Amboss address",
+        widget: true,
+        type: "text",
+        page: 1,
+    },
     {
         name: "twitter",
         label: "Twitter",
@@ -389,25 +402,60 @@ export const postSchema: FormField[] = [
     },
 ];
 
+//name, webhook, price_per_use, img, description, tags 
 
 export const botSchema: FormField[] = [
     {
         name: "img",
         label: "Logo",
-        type: "img",
+        type: "imgcanvas",
     },
     {
         name: "name",
-        label: "Name",
+        label: "Bot Name",
+        type: "text",
+        validator: strValidator,
+    },
+    {
+        name: "webhook",
+        label: "Webhook",
         type: "text",
         validator: strValidator,
     },
     {
         name: "description",
-        label: "Description",
+        label: "How to use",
         type: "textarea",
         validator: strValidator,
     },
+    {
+        name: "price_per_use",
+        label: "Price Per Use",
+        type: "number",
+        validator: nomValidator,
+    },
+    {
+        name: "tags",
+        label: "Tags",
+        type: "creatablemultiselect",
+        options: [{
+            value: 'Utility',
+            label: 'Utility'
+        },
+        {
+            value: 'Social',
+            label: 'Social'
+        },
+        {
+            value: 'Fun',
+            label: 'Fun'
+        },
+        {
+            value: 'Betting',
+            label: 'Betting'
+        },]
+    },
+
 ];
 
 
