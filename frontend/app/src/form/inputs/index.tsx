@@ -24,6 +24,8 @@ export default function Input(props: any) {
                 return <SearchTextInput {...props} />
             case 'img':
                 return <ImageInput {...props} />
+            case 'imgcanvas':
+                return <ImageInput notProfilePic={true} {...props} />
             case 'gallery':
                 return <GalleryInput {...props} />
             case 'number':

@@ -33,7 +33,8 @@ export class MainStore {
 
   bots: Bot[] = [];
 
-  @action async getBots(uniqueName?: string): Promise<Bot[]> {
+  @action async getBots(uniqueName?: string): Promise<any> {
+    console.log("get bots");
     let b = await api.get("bots");
 
     if (uniqueName) {
@@ -88,7 +89,41 @@ export class MainStore {
 
     this.bots = b;
     return b;
+
   }
+
+  @action async getMyBots(): Promise<any> {
+    if (!uiStore.meInfo) return null;
+
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      let relayB: any = await fetch(URL + "/bots", {
+        method: "GET",
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+
+      relayB = await relayB.json()
+      console.log("got bots from relay", relayB);
+
+      if (relayB?.response?.bots) {
+        let concattedBots = [...this.bots, ...relayB?.response?.bots]
+        this.bots = concattedBots
+      }
+
+      return relayB?.response?.bots
+    } catch (e) {
+      console.log('ok')
+    }
+  }
+
+
+
 
   @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
     const ts = await api.get(`tribes_by_owner/${pubkey}?all=true`);
@@ -119,10 +154,34 @@ export class MainStore {
 
   }
 
-  @action async makeBot(payload: any): Promise<Bot> {
-    const b = await api.post("bots", payload);
-    console.log("made bot", b);
-    return b;
+  @action async makeBot(payload: any): Promise<any> {
+    // const b = await api.post("bot", payload);
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      const b = await fetch(URL + "/bot", {
+        method: "POST",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...payload
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("made bot", b);
+
+      return b;
+    } catch (e) {
+      console.log('ok')
+    }
+
   }
 
   @action async postToCache(payload: any): Promise<void> {
