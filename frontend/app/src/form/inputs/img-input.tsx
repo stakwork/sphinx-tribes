@@ -4,6 +4,8 @@ import { EuiButton } from "@elastic/eui";
 import Camera from "../../utils/camera-option-icon.svg";
 import Dropzone from "react-dropzone";
 import avatarIcon from "../../utils/profile_avatar.svg";
+import backgroundIcon from "../../utils/background_icon.svg";
+
 import type { Props } from './propsType'
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../store'
@@ -11,7 +13,7 @@ import { Button, Modal } from "../../sphinxUI";
 import { MAX_UPLOAD_SIZE } from "../../people/utils/constants";
 import { Note } from './index'
 
-export default function ImageInput({ label, note, value, handleChange, handleBlur, handleFocus }: Props) {
+export default function ImageInput({ label, note, value, handleChange, handleBlur, handleFocus, notProfilePic }: Props) {
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
@@ -76,23 +78,30 @@ export default function ImageInput({ label, note, value, handleChange, handleBlu
     reader.readAsDataURL(file);
   }
 
+  const addedStyle = notProfilePic ? {
+    borderRadius: 0,
+  } : {}
+
+  const defaultIcon = notProfilePic ? backgroundIcon : avatarIcon
+
   return (
     <ImageWrap>
       <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
         {({ getRootProps, getInputProps, isDragActive, open }) => (
           <DropzoneStuff>
-            <DottedCircle {...getRootProps()} isDragActive={isDragActive}>
+            <DottedCircle {...getRootProps()} isDragActive={isDragActive} style={addedStyle}>
               <input {...getInputProps()} />
-              <ImageCircle>
+              <ImageCircle style={addedStyle}>
                 {!uploading ?
                   <Image style={{
-                    backgroundImage: `url(${picsrc ? picsrc : value ? value : (uploading ? '' : avatarIcon)
-                      })`
+                    backgroundImage: `url(${picsrc ? picsrc : value ? value : (uploading ? '' : defaultIcon)
+                      })`, ...addedStyle
                   }}
                   /> :
                   <EuiLoadingSpinner size="xl" />
                 }
               </ImageCircle>
+
             </DottedCircle>
             {/* <div style={{ color: "#6B7A8D", marginTop: 5 }}>Drag and drop or</div>
             <EuiButton onClick={open}
@@ -151,6 +160,14 @@ const Image = styled.div`
   border-radius: 50%;
 `;
 
+const ImageSq = styled.div`
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100px;
+  width: 100px;
+`;
+
 const ImageWrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -171,6 +188,7 @@ const DottedCircle = styled.div<DottedCircleProps>`
   border-style: dashed;
   border-color: ${p => p.isDragActive ? 'white' : '#6b7a8d'};
   border-width: thin;
+  cursor:pointer;
 `;
 
 const ImageCircle = styled.div`
@@ -180,5 +198,14 @@ const ImageCircle = styled.div`
   height: 100px;
   width: 100px;
   border-radius: 50%;
+  position:relative;
+`;
+
+const ImageSquare = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100px;
   position:relative;
 `;

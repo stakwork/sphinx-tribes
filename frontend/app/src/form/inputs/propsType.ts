@@ -12,6 +12,8 @@ export interface Props {
     extraHTML?: string
     note?: string
     options?: any[]
-    name: string,
+    name: string
     error: string
+
+    notProfilePic?: boolean
 }
