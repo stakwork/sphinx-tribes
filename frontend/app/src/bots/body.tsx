@@ -38,11 +38,16 @@ export default function BotBody() {
 
     async function createBot(v: any) {
         console.log('createBot!')
+
+        v.tags = v.tags && v.tags.map(t => t.value)
+        v.price_per_use = parseInt(v.price_per_use)
+
         try {
             await main.makeBot(v)
         } catch (e) {
             console.log('e', e)
         }
+        loadBots()
         setShowBotCreator(false)
         setShowCreate(false)
     }
@@ -54,6 +59,7 @@ export default function BotBody() {
             un = window.location.pathname.substr(3)
         }
         const ps = await main.getBots(un)
+        console.log('ps', ps)
         // if (un) {
         //     const initial = ps[0]
         //     if (initial && initial.unique_name === un) ui.setSelectedBot(initial.id || 0)
@@ -85,6 +91,7 @@ export default function BotBody() {
         el.click();
     }
 
+
     return useObserver(() => {
         const bs = getFuse(main.bots, ["name", "description"])
         const { handleScroll, n, loadingMore } = getScroll()
@@ -101,7 +108,116 @@ export default function BotBody() {
 
         const widgetLabel = selectedWidget && tabs.find(f => f.name === selectedWidget)
 
-        if (isMobile) {
+        function renderDesktop() {
+            return <Body style={{
+                background: '#f0f1f3',
+                height: 'calc(100% - 65px)'
+            }}>
+
+                {!ui.meInfo &&
+                    <div style={{ marginTop: 50 }}>
+                        <NoneSpace
+                            buttonText={'Get Started'}
+                            buttonIcon={'arrow_forward'}
+                            action={() => ui.setShowSignIn(true)}
+                            img={'bots_nonespace.png'}
+                            text={'Discover Bots on Sphinx'}
+                            sub={'Spice up your Sphinx experience with our diverse range of Sphinx bots'}
+                            style={{ height: 400 }}
+                        />
+                        <Divider />
+                    </div>
+                }
+
+                <div style={{
+                    width: '100%', display: 'flex',
+                    justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
+                    height: 62
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Label style={{ marginRight: 46 }}>
+                            Explore
+                        </Label>
+
+                        <Tabs>
+                            {tabs && tabs.map((t, i) => {
+                                const label = t.label
+                                const selected = selectedWidget === t.name
+
+                                return <Tab key={i}
+                                    selected={selected}
+                                    onClick={() => {
+                                        setSelectedWidget(t.name)
+                                    }}>
+                                    {label}
+                                </Tab>
+                            })}
+
+                        </Tabs>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+
+                        <Button
+                            text={'Add a Bot'}
+                            leadingIcon={'add'}
+                            height={40}
+                            color='primary'
+                            onClick={() => setShowBotCreator(true)}
+                        />
+
+                        <SearchTextInput
+                            name='search'
+                            type='search'
+                            placeholder='Search'
+                            value={ui.searchText}
+                            style={{ width: 204, height: 40, background: '#DDE1E5', marginLeft: 20 }}
+                            onChange={e => {
+                                console.log('handleChange', e)
+                                ui.setSearchText(e)
+                            }}
+
+                        />
+                    </div>
+                </div>
+
+                <>
+                    <div style={{
+                        width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
+                        justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20
+                    }}>
+                        {bots.map(t => <Bot
+                            {...t} key={t.id}
+                            small={false}
+                            selected={ui.selectedBot === t.id}
+                            select={() => selectBot(t.unique_name)}
+                        />
+                        )}
+                    </div>
+                    <div style={{ height: 100 }} />
+                </>
+
+
+                {/* selected view */}
+                <FadeLeft
+                    withOverlay={isMobile}
+                    drift={40}
+                    overlayClick={() => ui.setSelectingBot('')}
+                    style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
+                    isMounted={ui.selectingBot ? true : false}
+                    dismountCallback={() => ui.setSelectedBot('')}
+                >
+                    <BotView goBack={() => ui.setSelectingBot('')}
+                        botUniqueName={ui.selectedBot}
+                        loading={loading}
+                        selectBot={selectBot}
+                        botView={true} />
+                </FadeLeft>
+
+            </Body >
+        }
+
+        function renderMobile() {
             return <Body>
                 {!ui.meInfo &&
                     <div style={{ marginTop: 50 }}>
@@ -166,6 +282,14 @@ export default function BotBody() {
                     />
 
                 </div>
+
+                <Button
+                    text={'Add a Bot'}
+                    leadingIcon={'add'}
+                    style={{ height: 48, minHeight: 48, margin: 20, marginTop: 0 }}
+                    color='primary'
+                    onClick={() => setShowBotCreator(true)}
+                />
                 <div style={{ width: '100%' }} >
                     {bots.map(t => <Bot
                         {...t} key={t.id}
@@ -191,147 +315,58 @@ export default function BotBody() {
             </Body >
         }
 
-        // desktop mode
-        return <Body style={{
-            background: '#f0f1f3',
-            height: 'calc(100% - 65px)'
-        }}>
 
-            {!ui.meInfo &&
-                <div style={{ marginTop: 50 }}>
-                    <NoneSpace
-                        buttonText={'Get Started'}
-                        buttonIcon={'arrow_forward'}
-                        action={() => ui.setShowSignIn(true)}
-                        img={'bots_nonespace.png'}
-                        text={'Discover Bots on Sphinx'}
-                        sub={'Spice up your Sphinx experience with our diverse range of Sphinx bots'}
-                        style={{ height: 400 }}
-                    />
-                    <Divider />
-                </div>
-            }
 
-            <div style={{
-                width: '100%', display: 'flex',
-                justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
-                height: 62
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Label style={{ marginRight: 46 }}>
-                        Explore
-                    </Label>
 
-                    <Tabs>
-                        {tabs && tabs.map((t, i) => {
-                            const label = t.label
-                            const selected = selectedWidget === t.name
 
-                            return <Tab key={i}
-                                selected={selected}
-                                onClick={() => {
-                                    setSelectedWidget(t.name)
-                                }}>
-                                {label}
-                            </Tab>
-                        })}
 
-                    </Tabs>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center' }}>
 
-                    <Button
-                        text={'Add a Bot'}
-                        leadingIcon={'add'}
-                        height={40}
-                        color='primary'
-                        onClick={() => setShowBotCreator(true)}
-                    />
+        let renderContent = isMobile ? renderMobile() : renderDesktop()
 
-                    <SearchTextInput
-                        name='search'
-                        type='search'
-                        placeholder='Search'
-                        value={ui.searchText}
-                        style={{ width: 204, height: 40, background: '#DDE1E5', marginLeft: 20 }}
-                        onChange={e => {
-                            console.log('handleChange', e)
-                            ui.setSearchText(e)
-                        }}
+        return <>
+            {renderContent}
 
-                    />
-                </div>
+            <div style={{ overflowY: 'auto', }}>
+                <Modal
+                    style={{ overflowY: 'auto', height: '100%' }}
+                    close={() => {
+                        setShowBotCreator(false)
+                        setShowCreate(false)
+                    }}
+                    visible={showBotCreator}>
+                    {showCreate ? <Form
+                        loading={loading}
+                        close={() => setShowCreate(false)}
+                        onSubmit={createBot}
+                        schema={botSchema}
+                        initialValues={{}}
+                    /> :
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <Icon src={'/static/bots_new.png'} />
+                            <Button
+                                text={'Add Your Own Bot'}
+                                color={'primary'}
+                                leadingIcon={'add'}
+                                height={50}
+                                width={200}
+                                onClick={() => setShowCreate(true)} />
+                            <div style={{ height: 20 }} />
+                            <Button
+                                text={'Learn About Bots'}
+                                leadingIcon={'open_in_new'}
+                                style={{ marginBottom: 20 }}
+                                height={50}
+                                width={200}
+                                onClick={() => redirect()} />
+                        </div>
+                    }
+
+                </Modal>
             </div>
-
-            <>
-                <div style={{
-                    width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
-                    justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20
-                }}>
-                    {bots.map(t => <Bot
-                        {...t} key={t.id}
-                        small={false}
-                        selected={ui.selectedBot === t.id}
-                        select={() => selectBot(t.unique_name)}
-                    />
-                    )}
-                </div>
-                <div style={{ height: 100 }} />
-            </>
-
-
-            {/* selected view */}
-            <FadeLeft
-                withOverlay={isMobile}
-                drift={40}
-                overlayClick={() => ui.setSelectingBot('')}
-                style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
-                isMounted={ui.selectingBot ? true : false}
-                dismountCallback={() => ui.setSelectedBot('')}
-            >
-                <BotView goBack={() => ui.setSelectingBot('')}
-                    botUniqueName={ui.selectedBot}
-                    loading={loading}
-                    selectBot={selectBot}
-                    botView={true} />
-            </FadeLeft>
-
-            <Modal
-                close={() => {
-                    setShowBotCreator(false)
-                    setShowCreate(false)
-                }}
-                visible={showBotCreator}>
-                {showCreate ? <Form
-                    loading={loading}
-                    close={() => setShowCreate(false)}
-                    onSubmit={createBot}
-                    schema={botSchema}
-                    initialValues={{}}
-                /> :
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Button
-                            text={'Build your own bot'}
-                            leadingIcon={'open_in_new'}
-                            height={50}
-                            width={200}
-                            onClick={() => redirect()} />
-                        <div style={{ height: 20 }} />
-                        <Button
-                            text={'Add a bot listing'}
-                            color={'primary'}
-                            disabled={true}
-                            height={50}
-                            width={200}
-                            onClick={() => setShowCreate(true)} />
-                    </div>
-                }
-
-            </Modal>
-
-        </Body >
+        </>
     }
+
     )
 }
 
@@ -391,4 +426,21 @@ const Link = styled.div`
             color:#618AFF;
             cursor:pointer;
             position:relative;
+            `;
+
+
+interface IconProps {
+    src: string;
+}
+
+const Icon = styled.div<IconProps>`
+            background-image: ${p => `url(${p.src})`};
+            width:160px;
+            height:160px;
+            margin:30px;
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-size: contain; /* Resize the background image to cover the entire container */
+            // border-radius:5px;
+            overflow:hidden;
             `;
