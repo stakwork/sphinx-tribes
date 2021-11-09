@@ -91,6 +91,13 @@ func getBotByUniqueName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
+func getBotsByOwner(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "pubkey")
+	bots := DB.getBotsByOwner(name)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bots)
+}
+
 func searchBots(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 	limitString := r.URL.Query().Get("limit")
