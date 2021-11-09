@@ -10,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/stakwork/sphinx-tribes/feeds"
 )
 
 const baseURL = "https://api.podcastindex.org/api/1.0/"
@@ -128,7 +130,7 @@ func addToFeed(feed Podcast) Podcast {
 					// this is the auto
 					tribe := DB.getTribeByFeedURL(feed.URL)
 					if tribe.OwnerPubKey != first.Address {
-						feed.Value.Destinations = append(feed.Value.Destinations, Destination{
+						feed.Value.Destinations = append(feed.Value.Destinations, feeds.Destination{
 							Address: tribe.OwnerPubKey,
 							Split:   99,
 							Type:    "node",
@@ -138,13 +140,13 @@ func addToFeed(feed Podcast) Podcast {
 			}
 		}
 	} else {
-		feed.Value = &Value{
-			Model: Model{
+		feed.Value = &feeds.Value{
+			Model: feeds.Model{
 				Type:      "lightning",
 				Suggested: "0.00000015000",
 			},
-			Destinations: []Destination{
-				Destination{
+			Destinations: []feeds.Destination{
+				{
 					Address: tribe.OwnerPubKey,
 					Type:    "node",
 					Split:   100,
@@ -159,18 +161,18 @@ type PodcastResponse struct {
 	Feed Podcast `json:"feed"`
 }
 type Podcast struct {
-	ID             uint      `json:"id"`
-	Title          string    `json:"title"`
-	URL            string    `json:"url"`
-	Description    string    `json:"description"`
-	Author         string    `json:"author"`
-	Image          string    `json:"image"`
-	Link           string    `json:"link"`
-	LastUpdateTime int32     `json:"lastUpdateTime"`
-	ContentType    string    `json:"contentType"`
-	Language       string    `json:"language"`
-	Episodes       []Episode `json:"episodes"`
-	Value          *Value    `json:"value"`
+	ID             uint         `json:"id"`
+	Title          string       `json:"title"`
+	URL            string       `json:"url"`
+	Description    string       `json:"description"`
+	Author         string       `json:"author"`
+	Image          string       `json:"image"`
+	Link           string       `json:"link"`
+	LastUpdateTime int32        `json:"lastUpdateTime"`
+	ContentType    string       `json:"contentType"`
+	Language       string       `json:"language"`
+	Episodes       []Episode    `json:"episodes"`
+	Value          *feeds.Value `json:"value"`
 }
 type EpisodeResponse struct {
 	Items []Episode `json:"items"`
@@ -186,19 +188,4 @@ type Episode struct {
 	EnclosureLength int32  `json:"enclosureLength"`
 	Image           string `json:"image"`
 	Link            string `json:"link"`
-}
-type Value struct {
-	Model        Model         `json:"model"`
-	Destinations []Destination `json:"destinations"`
-}
-type Model struct {
-	Type      string `json:"type"`
-	Suggested string `json:"suggested"`
-}
-type Destination struct {
-	Address     string      `json:"address"`
-	Split       interface{} `json:"split"`
-	Type        string      `json:"type"`
-	CustomKey   string      `json:"customKey"`
-	CustomValue string      `json:"customValue"`
 }
