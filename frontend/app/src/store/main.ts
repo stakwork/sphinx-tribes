@@ -32,10 +32,13 @@ export class MainStore {
   }
 
   bots: Bot[] = [];
+  myBots: Bot[] = [];
 
   @action async getBots(uniqueName?: string): Promise<any> {
     console.log("get bots");
     let b = await api.get("bots");
+
+    const info = uiStore.meInfo;
 
     if (uniqueName) {
       b.forEach(function (t: Bot, i: number) {
@@ -85,6 +88,11 @@ export class MainStore {
           // hide all test bots
           bb.hide = true;
         }
+
+        if (bb.owner_pubkey === info?.owner_pubkey) {
+          // hide my own bots
+          bb.hide = true;
+        }
       });
 
     this.bots = b;
@@ -110,13 +118,24 @@ export class MainStore {
 
       relayB = await relayB.json()
       console.log("got bots from relay", relayB);
+      let relayMyBots = relayB?.response?.bots || []
 
-      if (relayB?.response?.bots) {
-        let concattedBots = [...this.bots, ...relayB?.response?.bots]
-        this.bots = concattedBots
-      }
+      // merge tribe server stuff
+      console.log("get bots");
+      let tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
-      return relayB?.response?.bots
+      // merge data from tribe server, it has more than relay
+      let mergedBots = relayMyBots.map(b => {
+        const thisBot = tribeServerBots.find(f => f.uuid === b.uuid)
+        return {
+          ...b,
+          ...thisBot
+        }
+      })
+
+      this.myBots = mergedBots
+
+      return mergedBots
     } catch (e) {
       console.log('ok')
     }
@@ -155,7 +174,6 @@ export class MainStore {
   }
 
   @action async makeBot(payload: any): Promise<any> {
-    // const b = await api.post("bot", payload);
 
     if (!uiStore.meInfo) return null;
     const info = uiStore.meInfo;
@@ -163,7 +181,7 @@ export class MainStore {
       const URL = info.url.startsWith("http")
         ? info.url
         : `https://${info.url}`;
-      const b = await fetch(URL + "/bot", {
+      let b: any = await fetch(URL + "/bot", {
         method: "POST",
         body: JSON.stringify({
           // use docker host (tribes.sphinx), because relay will post to it
@@ -175,7 +193,67 @@ export class MainStore {
           "Content-Type": "application/json",
         },
       });
+
+
+      b = await b.json()
       console.log("made bot", b);
+
+      return b?.response;
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
+  @action async updateBot(payload: any): Promise<any> {
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      const b = await fetch(URL + "/bot", {
+        method: "PUT",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...payload
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("updated bot", b);
+
+      return b;
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
+  @action async deleteBot(id: string): Promise<any> {
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      const b = await fetch(URL + `/bot/${id}`, {
+        method: "DELETE",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("deleted bot", b);
 
       return b;
     } catch (e) {
