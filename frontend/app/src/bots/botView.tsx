@@ -122,7 +122,7 @@ export default function BotView(props: any) {
                 </DBack>
 
                 <div style={{ width: '100%', overflowY: 'auto' }} >
-                    {bots.map(t => <Bot {...t} key={t.id}
+                    {bots.map(t => <Bot {...t} key={t.uuid}
                         selected={botUniqueName === t.unique_name}
                         hideActions={true}
                         small={true}

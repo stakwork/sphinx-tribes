@@ -14,6 +14,10 @@ import Form from '../form';
 import { botSchema } from '../form/schema';
 import MaterialIcon from '@material/react-material-icon';
 import BotView from './botView'
+import BotSecret from './utils/botSecret'
+import {
+    EuiGlobalToastList,
+} from '@elastic/eui';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse
@@ -25,27 +29,37 @@ export default function BotBody() {
     const [showBotCreator, setShowBotCreator] = useState(false)
     const [showCreate, setShowCreate] = useState(false)
     const [editThisBot, setEditThisBot]: any = useState(null)
+    const [showSecret, setShowSecret] = useState('')
     const [selectedWidget, setSelectedWidget] = useState('top')
     const [showDropdown, setShowDropdown] = useState(false)
     const isMyBots = selectedWidget === 'mybots'
 
+    const [toasts, setToasts]: any = useState([]);
+
+    function addToast(name: string) {
+        setToasts([{
+            id: '1',
+            title: `Deleted ${name}`
+        }]);
+    };
+
+    function removeToast() {
+        setToasts([]);
+    };
+
     const c = colors['light']
     const isMobile = useIsMobile()
 
-    const botSource = isMyBots ? main.myBots : main.bots
     const botSelectionAttribute = isMyBots ? 'id' : 'unique_name'
 
-    const bs = getFuse(botSource, ["name", "description"])
-    const { handleScroll, n, loadingMore } = getScroll()
-    let bots = bs.slice(0, n)
-    bots = (bots && bots.filter(f => !f.hide)) || []
-
-
     function selectBot(attr: string) {
+        console.log('attr', attr)
 
         // is mybot
         if (isMyBots) {
-            const thisBot = bots.find(f => f[botSelectionAttribute] === attr)
+            const botSource = isMyBots ? main.myBots : main.bots
+            const thisBot = botSource.find(f => f[botSelectionAttribute] === attr)
+            console.log('thisBot', thisBot)
             setEditThisBot(thisBot)
             setShowCreate(true)
         } else {
@@ -54,7 +68,6 @@ export default function BotBody() {
             ui.setSelectedBot(attr)
             ui.setSelectingBot(attr)
         }
-
     }
 
     async function createOrSaveBot(v: any) {
@@ -63,14 +76,49 @@ export default function BotBody() {
         v.tags = v.tags && v.tags.map(t => t.value)
         v.price_per_use = parseInt(v.price_per_use)
 
-        try {
-            await main.makeBot(v)
-        } catch (e) {
-            console.log('e', e)
+        const isEdit = v.id ? true : false
+
+        let b: any = null
+
+        if (isEdit) {
+            // edit
+            alert('Bot content cannot be updated right now. Coming soon.')
+            return
+            // try {
+            //     await main.updateBot(v)
+            // } catch (e) {
+            //     console.log('e', e)
+            // }
+        } else {
+            // create
+            try {
+                b = await main.makeBot(v)
+
+                setShowSecret(b.secret)
+                setEditThisBot(b)
+            } catch (e) {
+                console.log('e', e)
+            }
         }
         loadBots()
         setShowCreate(false)
     }
+
+    async function deleteBot() {
+        console.log('deleteBot!')
+
+        try {
+            await main.deleteBot(editThisBot.id)
+            addToast(editThisBot.name)
+        } catch (e) {
+            console.log('e', e)
+        }
+
+        setEditThisBot(null)
+        setShowCreate(false)
+        loadBots()
+    }
+
 
     async function loadBots() {
         setLoading(true)
@@ -78,14 +126,16 @@ export default function BotBody() {
         if (window.location.pathname.startsWith('/b/')) {
             un = window.location.pathname.substr(3)
         }
-        main.getMyBots()
+
         const ps = await main.getBots(un)
-        console.log('ps', ps)
+        await main.getMyBots()
+
         // if (un) {
         //     const initial = ps[0]
         //     if (initial && initial.unique_name === un) ui.setSelectedBot(initial.id || 0)
         // }
         setLoading(false)
+
     }
 
     useEffect(() => {
@@ -104,11 +154,16 @@ export default function BotBody() {
         //     disabled: true
 
         // },
-        {
+
+    ]
+
+    if (ui.meInfo) {
+        tabs.push({
             label: 'My Bots',
             name: 'mybots',
-        }
-    ]
+        })
+    }
+
     function redirect() {
         let el = document.createElement('a')
         el.target = '_blank'
@@ -118,6 +173,17 @@ export default function BotBody() {
 
 
     return useObserver(() => {
+
+        const botSource = isMyBots ? main.myBots : main.bots
+
+        const bs = getFuse(botSource, ["name", "description"])
+        const { handleScroll, n, loadingMore } = getScroll()
+        let bots = bs.slice(0, n)
+
+        if (!isMyBots) {
+            // hide bots if not looking at your own
+            bots = (bots && bots.filter(f => !f.hide)) || []
+        }
 
 
         if (loading) {
@@ -207,9 +273,9 @@ export default function BotBody() {
                         justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20
                     }}>
                         {bots.map(t => <Bot
-                            {...t} key={t.id}
+                            {...t} key={t.uuid}
                             small={false}
-                            selected={ui.selectedBot === t.id}
+                            selected={ui.selectedBot === t.uuid}
                             select={() => {
                                 console.log('t', t)
                                 selectBot(t[botSelectionAttribute])
@@ -233,7 +299,7 @@ export default function BotBody() {
                     <BotView goBack={() => ui.setSelectingBot('')}
                         botUniqueName={ui.selectedBot}
                         loading={loading}
-                        selectBot={selectBot}
+                        selectBot={(b) => selectBot(b[botSelectionAttribute])}
                         botView={true} />
                 </FadeLeft>
 
@@ -339,13 +405,29 @@ export default function BotBody() {
         }
 
 
-
-
-
-
-
-
         let renderContent = isMobile ? renderMobile() : renderDesktop()
+
+        let initialValues: any = {};
+
+        // set initials here
+        if (editThisBot) {
+            initialValues = { ...editThisBot }
+
+            initialValues.tags = initialValues.tags && initialValues.tags.map(o => {
+                return {
+                    value: o.value || o,
+                    label: o.value || o
+                }
+            })
+        }
+
+        const botEditHeader = editThisBot?.secret && <div style={{ marginBottom: -50 }}>
+            <BotSecret {...editThisBot} />
+        </div>
+
+        const botEditHeaderFull = editThisBot?.secret && <div>
+            <BotSecret {...editThisBot} full />
+        </div>
 
         return <>
             {renderContent}
@@ -358,7 +440,7 @@ export default function BotBody() {
                     }}
                     visible={showBotCreator}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Icon src={'/static/bots_new.png'} />
+                        <Icon src={'/static/bots_create.svg'} />
                         <Button
                             text={'Add Your Own Bot'}
                             color={'primary'}
@@ -387,23 +469,42 @@ export default function BotBody() {
                         setEditThisBot(null)
                     }}
                     style={{ height: '100%' }}
-                    envStyle={{ height: '100%', borderRadius: 0, width: '100%', maxWidth: 375 }}>
-                    <div style={{ height: '100%', padding: 20, paddingTop: 0 }}>
+                    envStyle={{ height: '100%', borderRadius: 0, width: '100%', maxWidth: 375, paddingTop: editThisBot?.secret && 60 }}>
+                    <div style={{ height: '100%', overflowY: 'auto', padding: 20 }}>
+                        {botEditHeader}
                         <Form
                             loading={loading}
                             close={() => {
                                 setShowCreate(false)
                                 setEditThisBot(null)
                             }}
+                            delete={editThisBot && deleteBot}
                             onSubmit={createOrSaveBot}
                             schema={botSchema}
-                            initialValues={editThisBot || {}}
+                            initialValues={initialValues}
                         />
+                    </div>
+                </Modal>
+
+                <Modal
+                    visible={(!showCreate && showSecret) ? true : false}
+                    close={() => {
+                        setShowSecret('')
+                        setEditThisBot(null)
+                    }}>
+                    <div >
+                        {botEditHeaderFull}
                     </div>
                 </Modal>
 
 
             </div>
+
+            <EuiGlobalToastList
+                toasts={toasts}
+                dismissToast={removeToast}
+                toastLifeTimeMs={1000}
+            />
         </>
     }
 
@@ -475,8 +576,8 @@ interface IconProps {
 
 const Icon = styled.div<IconProps>`
             background-image: ${p => `url(${p.src})`};
-            width:160px;
-            height:160px;
+            width:220px;
+            height:220px;
             margin:30px;
             background-position: center; /* Center the image */
             background-repeat: no-repeat; /* Do not repeat the image */
