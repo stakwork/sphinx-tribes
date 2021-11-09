@@ -53,7 +53,9 @@ func NewRouter() *http.Server {
 		r.Post("/tribes", createOrEditTribe)
 		r.Post("/bots", createOrEditBot)
 		r.Get("/bots", getListedBots)
+		r.Get("/bots/owner/{pubkey}", getBotsByOwner)
 		r.Get("/bots/{uuid}", getBot)
+
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
