@@ -24,20 +24,41 @@ export default function BotBody() {
     const [loading, setLoading] = useState(false)
     const [showBotCreator, setShowBotCreator] = useState(false)
     const [showCreate, setShowCreate] = useState(false)
+    const [editThisBot, setEditThisBot]: any = useState(null)
     const [selectedWidget, setSelectedWidget] = useState('top')
     const [showDropdown, setShowDropdown] = useState(false)
+    const isMyBots = selectedWidget === 'mybots'
 
     const c = colors['light']
     const isMobile = useIsMobile()
 
-    function selectBot(unique_name: string) {
-        console.log('selectBot', unique_name)
-        ui.setSelectedBot(unique_name)
-        ui.setSelectingBot(unique_name)
+    const botSource = isMyBots ? main.myBots : main.bots
+    const botSelectionAttribute = isMyBots ? 'id' : 'unique_name'
+
+    const bs = getFuse(botSource, ["name", "description"])
+    const { handleScroll, n, loadingMore } = getScroll()
+    let bots = bs.slice(0, n)
+    bots = (bots && bots.filter(f => !f.hide)) || []
+
+
+    function selectBot(attr: string) {
+
+        // is mybot
+        if (isMyBots) {
+            const thisBot = bots.find(f => f[botSelectionAttribute] === attr)
+            setEditThisBot(thisBot)
+            setShowCreate(true)
+        } else {
+            // is other bot
+            console.log('selectBot', attr)
+            ui.setSelectedBot(attr)
+            ui.setSelectingBot(attr)
+        }
+
     }
 
-    async function createBot(v: any) {
-        console.log('createBot!')
+    async function createOrSaveBot(v: any) {
+        console.log('createOrSaveBot!')
 
         v.tags = v.tags && v.tags.map(t => t.value)
         v.price_per_use = parseInt(v.price_per_use)
@@ -48,7 +69,6 @@ export default function BotBody() {
             console.log('e', e)
         }
         loadBots()
-        setShowBotCreator(false)
         setShowCreate(false)
     }
 
@@ -58,6 +78,7 @@ export default function BotBody() {
         if (window.location.pathname.startsWith('/b/')) {
             un = window.location.pathname.substr(3)
         }
+        main.getMyBots()
         const ps = await main.getBots(un)
         console.log('ps', ps)
         // if (un) {
@@ -77,11 +98,15 @@ export default function BotBody() {
             name: 'top',
 
         },
-        {
-            label: 'Music',
-            name: 'music',
-            disabled: true
+        // {
+        //     label: 'Music',
+        //     name: 'music',
+        //     disabled: true
 
+        // },
+        {
+            label: 'My Bots',
+            name: 'mybots',
         }
     ]
     function redirect() {
@@ -93,11 +118,6 @@ export default function BotBody() {
 
 
     return useObserver(() => {
-        const bs = getFuse(main.bots, ["name", "description"])
-        const { handleScroll, n, loadingMore } = getScroll()
-        let bots = bs.slice(0, n)
-
-        bots = (bots && bots.filter(f => !f.hide)) || []
 
 
         if (loading) {
@@ -190,7 +210,10 @@ export default function BotBody() {
                             {...t} key={t.id}
                             small={false}
                             selected={ui.selectedBot === t.id}
-                            select={() => selectBot(t.unique_name)}
+                            select={() => {
+                                console.log('t', t)
+                                selectBot(t[botSelectionAttribute])
+                            }}
                         />
                         )}
                     </div>
@@ -295,7 +318,7 @@ export default function BotBody() {
                         {...t} key={t.id}
                         selected={ui.selectedBot === t.id}
                         small={isMobile}
-                        select={() => selectBot(t.unique_name)}
+                        select={() => selectBot(t[botSelectionAttribute])}
                     />)}
                 </div>
                 <FadeLeft
@@ -309,7 +332,7 @@ export default function BotBody() {
                     <BotView goBack={() => ui.setSelectingBot('')}
                         botUniqueName={ui.selectedBot}
                         loading={loading}
-                        selectBot={selectBot}
+                        selectBot={(b) => selectBot(b[botSelectionAttribute])}
                         botView={true} />
                 </FadeLeft>
             </Body >
@@ -332,37 +355,54 @@ export default function BotBody() {
                     style={{ overflowY: 'auto', height: '100%' }}
                     close={() => {
                         setShowBotCreator(false)
-                        setShowCreate(false)
                     }}
                     visible={showBotCreator}>
-                    {showCreate ? <Form
-                        loading={loading}
-                        close={() => setShowCreate(false)}
-                        onSubmit={createBot}
-                        schema={botSchema}
-                        initialValues={{}}
-                    /> :
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <Icon src={'/static/bots_new.png'} />
-                            <Button
-                                text={'Add Your Own Bot'}
-                                color={'primary'}
-                                leadingIcon={'add'}
-                                height={50}
-                                width={200}
-                                onClick={() => setShowCreate(true)} />
-                            <div style={{ height: 20 }} />
-                            <Button
-                                text={'Learn About Bots'}
-                                leadingIcon={'open_in_new'}
-                                style={{ marginBottom: 20 }}
-                                height={50}
-                                width={200}
-                                onClick={() => redirect()} />
-                        </div>
-                    }
-
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon src={'/static/bots_new.png'} />
+                        <Button
+                            text={'Add Your Own Bot'}
+                            color={'primary'}
+                            leadingIcon={'add'}
+                            height={50}
+                            width={200}
+                            onClick={() => {
+                                setShowCreate(true)
+                                setShowBotCreator(false)
+                            }} />
+                        <div style={{ height: 20 }} />
+                        <Button
+                            text={'Learn About Bots'}
+                            leadingIcon={'open_in_new'}
+                            style={{ marginBottom: 20 }}
+                            height={50}
+                            width={200}
+                            onClick={() => redirect()} />
+                    </div>
                 </Modal>
+
+                <Modal
+                    visible={showCreate}
+                    close={() => {
+                        setShowCreate(false)
+                        setEditThisBot(null)
+                    }}
+                    style={{ height: '100%' }}
+                    envStyle={{ height: '100%', borderRadius: 0, width: '100%', maxWidth: 375 }}>
+                    <div style={{ height: '100%', padding: 20, paddingTop: 0 }}>
+                        <Form
+                            loading={loading}
+                            close={() => {
+                                setShowCreate(false)
+                                setEditThisBot(null)
+                            }}
+                            onSubmit={createOrSaveBot}
+                            schema={botSchema}
+                            initialValues={editThisBot || {}}
+                        />
+                    </div>
+                </Modal>
+
+
             </div>
         </>
     }

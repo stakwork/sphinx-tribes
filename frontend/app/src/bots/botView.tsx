@@ -126,7 +126,7 @@ export default function BotView(props: any) {
                         selected={botUniqueName === t.unique_name}
                         hideActions={true}
                         small={true}
-                        select={() => selectBot(t.unique_name)}
+                        select={() => selectBot(t)}
                     />)}
                 </div>
 

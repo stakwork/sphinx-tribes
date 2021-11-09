@@ -32,6 +32,7 @@ export class MainStore {
   }
 
   bots: Bot[] = [];
+  myBots: Bot[] = [];
 
   @action async getBots(uniqueName?: string): Promise<any> {
     console.log("get bots");
@@ -110,11 +111,7 @@ export class MainStore {
 
       relayB = await relayB.json()
       console.log("got bots from relay", relayB);
-
-      if (relayB?.response?.bots) {
-        let concattedBots = [...this.bots, ...relayB?.response?.bots]
-        this.bots = concattedBots
-      }
+      this.myBots = relayB?.response?.bots
 
       return relayB?.response?.bots
     } catch (e) {
