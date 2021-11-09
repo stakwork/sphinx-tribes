@@ -9,13 +9,9 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/stakwork/sphinx-tribes/feeds"
 )
 
 func main() {
-
-	feeds.ParseMediumFeed("https://medium.com/feed/@jjpryor")
-	return
 
 	var err error
 

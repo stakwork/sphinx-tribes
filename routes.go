@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 
+	"github.com/stakwork/sphinx-tribes/feeds"
 	"github.com/stakwork/sphinx-tribes/frontend"
 )
 
@@ -57,6 +58,7 @@ func NewRouter() *http.Server {
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
+		r.Get("/feed", getGenericFeed)
 		r.Get("/people", getListedPeople)
 
 		r.Get("/ask", ask)
@@ -94,6 +96,24 @@ func NewRouter() *http.Server {
 	}()
 
 	return server
+}
+
+func getGenericFeed(w http.ResponseWriter, r *http.Request) {
+	url := r.URL.Query().Get("url")
+	feed, err := feeds.ParseFeed(url)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if feed.Value == nil {
+		tribe := DB.getTribeByFeedURL(url)
+		if tribe.OwnerPubKey != "" {
+			feed.Value = feeds.AddedValue(tribe.OwnerPubKey)
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(feed)
 }
 
 func getPodcast(w http.ResponseWriter, r *http.Request) {
