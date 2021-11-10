@@ -42,7 +42,7 @@ func NewRouter() *http.Server {
 		r.Get("/p/static/*", frontend.StaticRoute)
 		r.Get("/p/manifest.json", frontend.ManifestRoute)
 		r.Get("/p/favicon.ico", frontend.FaviconRoute)
-		r.Get("/p/{unique_name}", frontend.IndexRoute)
+		r.Get("/p/{pubkey}", frontend.IndexRoute)
 		r.Get("/p", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
 	})
@@ -54,7 +54,9 @@ func NewRouter() *http.Server {
 		r.Post("/tribes", createOrEditTribe)
 		r.Post("/bots", createOrEditBot)
 		r.Get("/bots", getListedBots)
+		r.Get("/bots/owner/{pubkey}", getBotsByOwner)
 		r.Get("/bots/{uuid}", getBot)
+
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
