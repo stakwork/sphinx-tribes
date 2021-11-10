@@ -144,9 +144,8 @@ export default function EditMe(props: any) {
       if (chal) {
         testChallenge(chal);
       }
-    } catch (e) { }
+    } catch (e) {}
   }, []);
-
 
   async function submitFormViaApp(body) {
     const key = randomString(15);
@@ -172,7 +171,7 @@ export default function EditMe(props: any) {
     const info = ui.meInfo as any;
     if (!info) return console.log("no meInfo");
     setLoading(true);
-    const isTor = info.url.endsWith(".onion");
+    const isTor = info.url.includes(".onion");
     if (isTor) {
       return submitFormViaApp(body);
     }
@@ -312,8 +311,8 @@ export default function EditMe(props: any) {
                     extraHTML={
                       ui.meInfo.verification_signature
                         ? {
-                          twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
-                        }
+                            twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                          }
                         : {}
                     }
                   />
@@ -359,9 +358,9 @@ const B = styled.div<BProps>`
   padding: 0 20px;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: "#5a606c",
-  trackBackgroundColor: "rgba(0,0,0,0)",
-})}
+    thumbColor: "#5a606c",
+    trackBackgroundColor: "rgba(0,0,0,0)",
+  })}
 `;
 
 const BWrap = styled.div`
