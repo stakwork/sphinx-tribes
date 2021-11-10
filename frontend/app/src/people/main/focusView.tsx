@@ -41,7 +41,7 @@ export default function FocusedView(props: any) {
 
   const isMobile = useIsMobile();
 
-  const torSave = canEdit && ui?.meInfo?.url?.endsWith(".onion");
+  const torSave = canEdit && ui?.meInfo?.url?.includes(".onion");
   console.log("TOR SAVE", torSave);
 
   function closeModal(override) {
