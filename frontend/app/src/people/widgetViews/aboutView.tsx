@@ -13,12 +13,16 @@ export function renderMarkdown(str) {
 export default function AboutView(props: any) {
     const history = useHistory()
     const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
-    const { twitter, github, coding_languages, tribes, repos } = extras || {}
+    const { twitter, github, coding_languages, tribes, repos, lightning, amboss } = extras || {}
     let tag = ''
     let githubTag = ''
+    let lightningAddress = ''
+    let ambossAddress = ''
 
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
     if (github && github[0] && github[0].value) githubTag = github[0].value
+    if (lightning && lightning[0] && lightning[0].value) lightningAddress = lightning[0].value
+    if (amboss && amboss[0] && amboss[0].value) ambossAddress = amboss[0].value
 
     return <Wrap>
         <Row>
@@ -94,6 +98,30 @@ export default function AboutView(props: any) {
                             <div>{t?.name}</div>
                         </ItemRow>)
                     })}
+                </Grow>
+            </>
+        }
+
+        {lightningAddress &&
+            <>
+                <Divider />
+                <T style={{ height: 20 }}>Lightning Address</T>
+                <Grow >
+                    <ItemRow style={{ width: 'fit-content' }}>
+                        {lightningAddress}
+                    </ItemRow>
+                </Grow>
+            </>
+        }
+
+        {ambossAddress &&
+            <>
+                <Divider />
+                <T style={{ height: 20 }}>Amboss Address</T>
+                <Grow >
+                    <ItemRow style={{ width: 'fit-content' }}>
+                        {ambossAddress}
+                    </ItemRow>
                 </Grow>
             </>
         }

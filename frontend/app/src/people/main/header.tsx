@@ -66,7 +66,9 @@ export default function Header() {
         tabs.forEach((t => {
             if (path.includes(t.path)) pass = true
         }))
-        if (!pass) history.push('/p')
+        if (!pass) {
+            history.push('/p')
+        }
     }
 
     useEffect(() => {
@@ -93,11 +95,8 @@ export default function Header() {
     }, [])
 
     function goToEditSelf() {
-        // if page is not /p, go to /p (people)
-        let path = location.pathname
-        if (!path.includes('/p')) history.push('/p')
-
         if (ui.meInfo?.id) {
+            history.push(`/p/${ui.meInfo.owner_pubkey}`)
             ui.setSelectedPerson(ui.meInfo.id)
             ui.setSelectingPerson(ui.meInfo.id)
         }
@@ -112,11 +111,19 @@ export default function Header() {
             }}>
                 < div className="container" >
                     <Row style={{ justifyContent: 'space-between' }}>
-                        <EuiHeaderSection grow={false}>
-                            <Img src="/static/people_logo.svg" />
+                        <EuiHeaderSection grow={false} >
+                            <Img src="/static/people_logo.svg" style={{ width: 190 }} />
                         </EuiHeaderSection>
 
                         <Corner>
+                            <a href={'https://sphinx.chat/'} target="_blank">
+                                <Button
+                                    text={'Get Sphinx'}
+                                    color='transparent'
+                                    style={{ marginRight: 14, width: 85 }}
+                                />
+                            </a>
+
                             {ui.meInfo ?
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10, border: '1px solid #ffffff55' }}
@@ -127,24 +134,14 @@ export default function Header() {
                                 :
                                 <Button
                                     icon={'account_circle'}
-                                    text={'Sign in'}
+                                    // text={'Sign in'}
+                                    style={{ minWidth: 38, width: 38, marginRight: 10, height: 37 }}
                                     color='primary'
                                     onClick={() => ui.setShowSignIn(true)}
                                 />
                             }
                         </Corner>
                     </Row>
-
-                    {/* <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden' }} >
-                        <EuiFieldSearch id="search-input"
-                            placeholder="Search"
-                            value={ui.searchText}
-                            onChange={e => ui.setSearchText(e.target.value)}
-                            style={{ width: '100%', height: '100%' }}
-                            aria-label="search"
-
-                        />
-                    </EuiHeaderSection> */}
 
                     <MTabs>
                         {tabs && tabs.map((t, i) => {
@@ -206,6 +203,13 @@ export default function Header() {
                 </Row>
 
                 <Corner>
+                    <a href={'https://sphinx.chat/'} target="_blank">
+                        <Button
+                            text={'Get Sphinx'}
+                            color='transparent'
+                            style={{ marginRight: 20 }}
+                        />
+                    </a>
                     {ui.meInfo ?
                         <Button onClick={() => {
                             goToEditSelf()

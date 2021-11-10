@@ -321,6 +321,12 @@ func (db database) getTribeByUniqueName(un string) Tribe {
 	return m
 }
 
+func (db database) getBotsByOwner(pubkey string) []Bot {
+	bs := []Bot{}
+	db.db.Where("owner_pub_key = ?", pubkey).Find(&bs)
+	return bs
+}
+
 func (db database) getBotByUniqueName(un string) Bot {
 	m := Bot{}
 	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)

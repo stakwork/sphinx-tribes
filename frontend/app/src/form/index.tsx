@@ -201,28 +201,44 @@ export default function Form(props: any) {
                 />}
 
               {readOnly ? <div /> :
-                <Button
-                  disabled={disableFormButtons || props.loading}
-                  onClick={() => {
-                    if (dynamicSchemaName) {
-                      // inject type in body
-                      setFieldValue('type', dynamicSchemaName)
-                    }
-                    handleSubmit()
-                    // if (lastPage === page) handleSubmit()
-                    // else {
-                    //   // this does form animation between pages
-                    //   setFormMounted(false)
-                    //   await sleep(200)
-                    //   //
-                    //   setPage(page + 1)
-                    // }
-                  }}
-                  loading={props.loading}
-                  style={buttonStyle}
-                  color={'primary'}
-                  text={props.submitText || 'Save'}
-                />
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+
+                  <Button
+                    disabled={disableFormButtons || props.loading}
+                    onClick={() => {
+                      if (dynamicSchemaName) {
+                        // inject type in body
+                        setFieldValue('type', dynamicSchemaName)
+                      }
+                      handleSubmit()
+                      // if (lastPage === page) handleSubmit()
+                      // else {
+                      //   // this does form animation between pages
+                      //   setFormMounted(false)
+                      //   await sleep(200)
+                      //   //
+                      //   setPage(page + 1)
+                      // }
+                    }}
+                    loading={props.loading}
+                    style={buttonStyle}
+                    color={'primary'}
+                    text={props.submitText || 'Save'}
+                  />
+
+                  {props.delete &&
+                    <IconButton
+                      disabled={disableFormButtons || props.loading}
+                      onClick={() => {
+                        props.delete()
+                      }}
+                      icon={'delete'}
+                      loading={props.loading}
+                      style={{ marginLeft: 10 }}
+                      color={'clear'}
+                    />
+                  }
+                </div>
               }
 
 
@@ -317,7 +333,7 @@ const BWrap = styled.div`
       `;
 
 
-type FormFieldType = 'text' | 'textarea' | 'img' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'hide'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'imgcanvas' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'hide'
 
 type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 

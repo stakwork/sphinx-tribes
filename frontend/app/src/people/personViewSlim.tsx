@@ -21,11 +21,15 @@ import NoneSpace from "./utils/noneSpace";
 import ConnectCard from "./utils/connectCard";
 import { widgetConfigs } from "./utils/constants";
 import { extractGithubIssue } from "../helpers";
+import { useHistory, useLocation } from "react-router";
+import { EuiLoadingSpinner } from '@elastic/eui';
 
 const host = getHost();
 function makeQR(pubkey: string) {
     return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
+
+let deeplinkTimeout
 
 export default function PersonView(props: any) {
 
@@ -39,8 +43,20 @@ export default function PersonView(props: any) {
     const { main, ui } = useStores()
     const { meInfo } = ui || {}
 
+    const [loadingPerson, setLoadingPerson]: any = useState(false)
+    const [loadedPerson, setLoadedPerson]: any = useState(null)
+
+    const history = useHistory()
+    const location = useLocation()
+    const pathname = history?.location?.pathname
+
     // FOR PEOPLE VIEW
     let person: any = (main.people && main.people.length && main.people.find(f => f.id === personId))
+
+    // migrating to loading person on person view load
+    if (loadedPerson) {
+        person = loadedPerson
+    }
 
     // if i select myself, fill person with meInfo
     if (personId === ui.meInfo?.id) {
@@ -75,19 +91,75 @@ export default function PersonView(props: any) {
     const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey || '');
 
+    // deeplink load person
+    useEffect(() => {
 
+        if (loadedPerson) {
+            doDeeplink()
+        } else {
+            deeplinkTimeout = setTimeout(() => {
+                doDeeplink()
+            }, 200)
+        }
+
+        return function cleanup() {
+            clearTimeout(deeplinkTimeout)
+        }
+    }, [personId])
+
+    async function doDeeplink() {
+        if (pathname) {
+            let splitPathname = pathname?.split('/')
+            let personPubkey: string = splitPathname[2]
+            if (personPubkey) {
+                setLoadingPerson(true)
+                let p = await main.getPersonByPubkey(personPubkey)
+                setLoadedPerson(p)
+                setLoadingPerson(false)
+
+                const search = location?.search
+
+                // deeplink for widgets
+                let widgetName: any = new URLSearchParams(search).get("widget")
+                let widgetTimestamp: any = new URLSearchParams(search).get("timestamp")
+
+                if (widgetName) {
+                    setNewSelectedWidget(widgetName)
+                    setSelectedWidget(widgetName)
+                    if (widgetTimestamp) {
+                        const thisExtra = p?.extras && p?.extras[widgetName]
+                        const thisItemIndex = thisExtra && thisExtra.length && thisExtra.findIndex(f => f.created === parseInt(widgetTimestamp))
+                        if (thisItemIndex > -1) {
+                            // select it!
+                            setFocusIndex(thisItemIndex)
+                            setShowFocusView(true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function updatePath(name) {
+        history.push(location.pathname + `?widget=${name}`)
+    }
+
+    function updatePathIndex(timestamp) {
+        history.push(location.pathname + `?widget=${selectedWidget}&timestamp=${timestamp}`)
+    }
 
     function switchWidgets(name) {
         setNewSelectedWidget(name)
         setSelectedWidget(name)
+        updatePath(name)
         setShowFocusView(false)
         setFocusIndex(-1)
     }
 
-    function selectPersonWithinFocusView(id, unique_name) {
+    function selectPersonWithinFocusView(id, unique_name, pubkey) {
         setShowFocusView(false)
         setFocusIndex(-1)
-        selectPerson(id, unique_name)
+        selectPerson(id, unique_name, pubkey)
     }
 
     useEffect(() => {
@@ -208,6 +280,7 @@ export default function PersonView(props: any) {
                     onClick={() => {
                         setShowFocusView(true)
                         setFocusIndex(i)
+                        if (s.created) updatePathIndex(s.created)
                     }}
                     style={{
                         ...panelStyles,
@@ -219,16 +292,23 @@ export default function PersonView(props: any) {
                 </Panel>)
             })
 
-            // if empty
-            if (!elementArray.length) {
-                const noneKey = canEdit ? 'me' : 'otherUser'
-                return <NoneSpace
-                    action={() => setShowFocusView(true)}
-                    {...tabs[selectedWidget].noneSpace[noneKey]}
-                />
-            }
+            const noneKey = canEdit ? 'me' : 'otherUser'
+            const panels: any = elementArray.length ? elementArray : (<NoneSpace
+                action={() => setShowFocusView(true)}
+                {...tabs[selectedWidget]?.noneSpace[noneKey]}
+            />)
 
-            return elementArray
+            const loader = <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: 0.8,
+                width: '100%'
+            }}>
+                <EuiLoadingSpinner size="xl" />
+            </div>
+
+            return loadingPerson ? loader : panels
         }
 
         switch (selectedWidget) {
@@ -259,7 +339,7 @@ export default function PersonView(props: any) {
             return
         }
         if (person && person.extras) {
-            let g = person.extras[tabs[selectedWidget].name]
+            let g = person.extras[tabs[selectedWidget]?.name]
             let nextindex = focusIndex + 1
             if (g[nextindex]) setFocusIndex(nextindex)
             else setFocusIndex(0)
@@ -272,7 +352,7 @@ export default function PersonView(props: any) {
             return
         }
         if (person && person.extras) {
-            let g = person?.extras[tabs[selectedWidget].name]
+            let g = person?.extras[tabs[selectedWidget]?.name]
             let previndex = focusIndex - 1
             if (g[previndex]) setFocusIndex(previndex)
             else setFocusIndex(g.length - 1)
@@ -422,7 +502,7 @@ export default function PersonView(props: any) {
 
     function renderDesktopView() {
         const focusedDesktopModalStyles = newSelectedWidget ? {
-            ...tabs[newSelectedWidget].modalStyle
+            ...tabs[newSelectedWidget]?.modalStyle
         } : {}
 
         return <div style={{
@@ -716,6 +796,7 @@ const PeopleList = styled.div`
             `;
 
 const DBack = styled.div`
+            min-height:64px;
             height:64px;
             display:flex;
             align-items:center;

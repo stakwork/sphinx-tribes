@@ -6,7 +6,7 @@ import { Button, Divider, IconButton } from "../sphinxUI";
 import { useIsMobile } from "../hooks";
 import Bot from "./bot";
 import BotBar from "./utils/botBar";
-import QrBar from "../people/utils/QrBar";
+import { useHistory } from "react-router";
 
 export default function BotView(props: any) {
 
@@ -19,6 +19,8 @@ export default function BotView(props: any) {
 
     const { main } = useStores()
 
+    const history = useHistory()
+
     let bot: any = (main.bots && main.bots.length && main.bots.find(f => f.unique_name === botUniqueName))
 
     const {
@@ -27,7 +29,9 @@ export default function BotView(props: any) {
         description,
         img,
         owner_pubkey,
-        owner_alias
+        owner_alias,
+        tags,
+        price_per_use
     } = bot || {}
 
     // FOR BOT VIEW
@@ -37,11 +41,37 @@ export default function BotView(props: any) {
 
     if (loading) return <div>Loading...</div>
 
-    const connectWithCreator = owner_pubkey && (<><Divider style={{ margin: '10px 0' }} />
-        <RowWrap style={{ flexDirection: 'column' }}>
-            <div style={{ fontSize: 12, marginTop: 5, marginBottom: -10, color: '#5F6368', cursor: 'default' }}>Connect with {owner_alias || 'the creator'}</div>
-            <QrBar value={owner_pubkey} />
-        </RowWrap></>)
+    const head = <Head>
+        {!isMobile && <div style={{ height: 35 }} />}
+        <Img src={img || '/static/sphinx.png'} />
+        <RowWrap>
+            <Name>{name}</Name>
+        </RowWrap>
+        <RowWrap style={{ marginBottom: 40 }}>
+            <BotBar value={unique_name} />
+        </RowWrap>
+
+        <RowWrap>
+            <div>Price per use</div>
+            <Value>{price_per_use}</Value>
+        </RowWrap>
+        <Divider />
+        <RowWrap>
+            <div>Creator</div>
+            <Value style={{ cursor: 'pointer' }} onClick={() => history.push(`/p/${owner_pubkey}`)}>{owner_alias || ""}</Value>
+        </RowWrap>
+
+        {tags && (tags.length > 0) && <div style={{ width: '100%' }}>
+            <Divider style={{ marginBottom: 6 }} />
+            <GrowRow style={{ paddingBottom: 0 }}>
+                {tags.map((c, i) => {
+                    return <CodeBadge key={i}>{c}</CodeBadge>
+                })}
+            </GrowRow>
+        </div>}
+
+
+    </Head >
 
     function renderMobileView() {
         return <div style={{
@@ -64,17 +94,7 @@ export default function BotView(props: any) {
                 </div>
 
                 {/* profile photo */}
-                <Head>
-                    <Img src={img || '/static/sphinx.png'} />
-                    <RowWrap>
-                        <Name>{name}</Name>
-                    </RowWrap>
-                    <RowWrap>
-                        <BotBar value={unique_name} />
-                    </RowWrap>
-                    {connectWithCreator}
-
-                </Head>
+                {head}
             </Panel>
 
             <Sleeve style={{ padding: 20 }}>
@@ -91,7 +111,7 @@ export default function BotView(props: any) {
             width: '100%', height: '100%'
         }}>
 
-            <PeopleList>
+            <BotList>
                 <DBack >
                     <Button
                         color='clear'
@@ -102,15 +122,15 @@ export default function BotView(props: any) {
                 </DBack>
 
                 <div style={{ width: '100%', overflowY: 'auto' }} >
-                    {bots.map(t => <Bot {...t} key={t.id}
+                    {bots.map(t => <Bot {...t} key={t.uuid}
                         selected={botUniqueName === t.unique_name}
                         hideActions={true}
                         small={true}
-                        select={() => selectBot(t.unique_name)}
+                        select={() => selectBot(t)}
                     />)}
                 </div>
 
-            </PeopleList>
+            </BotList>
 
             <div style={{
                 width: 364,
@@ -126,22 +146,7 @@ export default function BotView(props: any) {
             }}>
 
                 {/* profile photo */}
-                <Head>
-                    <div style={{ height: 35 }} />
-
-                    <Img src={img || '/static/sphinx.png'} />
-
-                    <RowWrap>
-                        <Name>{name}</Name>
-                    </RowWrap>
-                    <RowWrap>
-                        <BotBar value={unique_name} />
-                    </RowWrap>
-
-                    {connectWithCreator}
-
-                </Head>
-
+                {head}
                 {/* Here's where the details go */}
 
             </div>
@@ -180,40 +185,46 @@ export default function BotView(props: any) {
 
 }
 
-const PeopleList = styled.div`
-            display:flex;
-            flex-direction:column;
-            background:#ffffff;
-            width: 265px;
-            `;
+const BotList = styled.div`
+        display:flex;
+                flex-direction:column;
+                background:#ffffff;
+                width: 265px;
+                `;
+
+const Link = styled.div`
+                color:#5078F2;
+                cursor:pointer;
+                `;
 
 const DBack = styled.div`
-            height:64px;
-            display:flex;
-            align-items:center;
-            background: #FFFFFF;
-            box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.07);
-            z-index:2;
-            `
+                height:64px;
+                min-height:64px;
+                display:flex;
+                align-items:center;
+                background: #FFFFFF;
+                box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.07);
+                z-index:2;
+                `
 
 const Panel = styled.div`
-            position:relative;
-            background:#ffffff;
-            color:#000000;
-            margin-bottom:10px;
-            padding:20px;
-            box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
-            `;
+                position:relative;
+                background:#ffffff;
+                color:#000000;
+                margin-bottom:10px;
+                padding:20px;
+                box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
+                `;
 const Content = styled.div`
-            display: flex;
-            flex-direction:column;
+                display: flex;
+                flex-direction:column;
 
-            width:100%;
-            height: 100%;
-            align-items:center;
-            color:#000000;
-            background:#fff;
-            `;
+                width:100%;
+                height: 100%;
+                align-items:center;
+                color:#000000;
+                background:#fff;
+                `;
 
 const Head = styled.div`
                 display:flex;
@@ -224,45 +235,101 @@ const Head = styled.div`
                 `;
 
 const Name = styled.div`
-                    font-style: normal;
-                    font-weight: 500;
-                    font-size: 30px;
-                    line-height: 28px;
-                    /* or 73% */
+                width:100%;
+                font-style: normal;
+                font-weight: 500;
+                /* or 73% */
 
-                    text-align: center;
+                text-align: center;
 
-                    /* Text 2 */
+                /* Text 2 */
 
-                    color: #3C3F41;
-                    margin-bottom:20px;
-                    `;
+                color: #3C3F41;
+                margin:30px 0;
+
+                font-size: 24px;
+                line-height: 19px;
+                `;
 
 
 const Sleeve = styled.div`
 
-                    `;
+                `;
+
+const Value = styled.div`
+font-weight:bold;
+color:#3C3F41;
+`;
 
 const RowWrap = styled.div`
-                    display:flex;
-                    justify-content:center;
-
-                    width:100%`;
+                display:flex;
+                justify-content:space-between;
+                min-height:48px;
+                align-items:center;
+                font-family: Roboto;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 15px;
+                line-height: 48px;
+                width:100%;
+                color: #8E969C;
+                
+                `;
 
 
 interface ImageProps {
     readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-                        background-image: url("${(p) => p.src}");
-                        background-position: center;
-                        background-size: cover;
-                        margin-bottom:20px;
-                        width:150px;
-                        height:150px;
-                        border-radius: 50%;
-                        position: relative;
-                        display:flex;
-                        align-items:flex-end;
-                        justify-content:flex-end;
-                        `;
+                    background-image: url("${(p) => p.src}");
+                    background-position: center;
+                    background-size: cover;
+                    width:150px;
+                    height:150px;
+                    border-radius: 16px;
+                    position: relative;
+                    display:flex;
+                    align-items:flex-end;
+                    justify-content:flex-end;
+                    `;
+
+
+const GrowRow = styled.div`
+display:flex;
+justify-content:flex-start;
+flex-wrap:wrap;
+min-height:48px;
+padding:10px 0;
+align-items:center;
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 15px;
+line-height: 48px;
+/* identical to box height, or 320% */
+
+display: flex;
+align-items: center;
+
+/* Secondary Text 4 */
+
+color: #8E969C;
+
+`;
+
+
+const CodeBadge = styled.div`
+display:flex;
+justify-content:center;
+align-items:center;
+margin-right:10px;
+height:26px;
+color:#5078F2;
+background: #DCEDFE;
+border-radius: 32px;
+font-weight: bold;
+font-size: 12px;
+line-height: 13px;
+padding 0 10px;
+margin-bottom:10px;
+`;

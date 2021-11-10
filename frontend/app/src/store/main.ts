@@ -32,9 +32,13 @@ export class MainStore {
   }
 
   bots: Bot[] = [];
+  myBots: Bot[] = [];
 
-  @action async getBots(uniqueName?: string): Promise<Bot[]> {
+  @action async getBots(uniqueName?: string): Promise<any> {
+    console.log("get bots");
     let b = await api.get("bots");
+
+    const info = uiStore.meInfo;
 
     if (uniqueName) {
       b.forEach(function (t: Bot, i: number) {
@@ -84,11 +88,61 @@ export class MainStore {
           // hide all test bots
           bb.hide = true;
         }
+
+        if (bb.owner_pubkey === info?.owner_pubkey) {
+          // hide my own bots
+          bb.hide = true;
+        }
       });
 
     this.bots = b;
     return b;
+
   }
+
+  @action async getMyBots(): Promise<any> {
+    if (!uiStore.meInfo) return null;
+
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      let relayB: any = await fetch(URL + "/bots", {
+        method: "GET",
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+
+      relayB = await relayB.json()
+      console.log("got bots from relay", relayB);
+      let relayMyBots = relayB?.response?.bots || []
+
+      // merge tribe server stuff
+      console.log("get bots");
+      let tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
+
+      // merge data from tribe server, it has more than relay
+      let mergedBots = relayMyBots.map(b => {
+        const thisBot = tribeServerBots.find(f => f.uuid === b.uuid)
+        return {
+          ...b,
+          ...thisBot
+        }
+      })
+
+      this.myBots = mergedBots
+
+      return mergedBots
+    } catch (e) {
+      console.log('ok')
+    }
+  }
+
+
+
 
   @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
     const ts = await api.get(`tribes_by_owner/${pubkey}?all=true`);
@@ -119,10 +173,93 @@ export class MainStore {
 
   }
 
-  @action async makeBot(payload: any): Promise<Bot> {
-    const b = await api.post("bots", payload);
-    console.log("made bot", b);
-    return b;
+  @action async makeBot(payload: any): Promise<any> {
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      let b: any = await fetch(URL + "/bot", {
+        method: "POST",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...payload
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+
+
+      b = await b.json()
+      console.log("made bot", b);
+
+      return b?.response;
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
+  @action async updateBot(payload: any): Promise<any> {
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      const b = await fetch(URL + "/bot", {
+        method: "PUT",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...payload
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("updated bot", b);
+
+      return b;
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
+  @action async deleteBot(id: string): Promise<any> {
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      const b = await fetch(URL + `/bot/${id}`, {
+        method: "DELETE",
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("deleted bot", b);
+
+      return b;
+    } catch (e) {
+      console.log('ok')
+    }
+
   }
 
   @action async postToCache(payload: any): Promise<void> {
@@ -182,6 +319,13 @@ export class MainStore {
     this.people = ps;
     return ps;
   }
+
+  @action async getPersonByPubkey(pubkey: string): Promise<Person> {
+    const p = await api.get(`person/${pubkey}`);
+    console.log('p', p)
+    return p
+  }
+
 
   @action async getSelf() {
     const ps = await api.get("people");
