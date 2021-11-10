@@ -50,6 +50,12 @@ export default function Button(props: any) {
             boxWizing: 'border-box',
             borderRadius: 4
         },
+        transparent: {
+            background: '#ffffff12',
+            color: '#fff',
+            border: 'none'
+        }
+
     }
 
     return <B
@@ -63,65 +69,92 @@ export default function Button(props: any) {
         onClick={props.onClick}
     >
         {props.children ? props.children :
-            <>
+            props.wideButton ? <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', minWidth: '100%' }}>
+                {props.text &&
+                    <div style={{
+                        display: 'flex', alignItems: 'center',
+                        position: 'absolute', left: 18, top: 0, height: props.height,
+                        maxWidth: '80%'
+                    }}>
+                        <div style={{
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                        }}>
+                            {props.text}
+                        </div>
+                    </div>
+                }
                 {props.icon &&
                     <div style={{
                         display: 'flex', alignItems: 'center',
-                        position: 'absolute', top: 0, left: 3, height: '100%'
+                        position: 'absolute', right: 13, top: 0, height: props.height
                     }}>
                         <MaterialIcon
                             icon={props.icon}
                             style={{ fontSize: props.iconSize ? props.iconSize : 30 }} />
                     </div>
                 }
-                {props.img &&
-                    <div style={{
-                        display: 'flex', alignItems: 'center',
-                        position: 'absolute', top: 0, left: 10, height: '100%'
-                    }}>
-                        <Img src={`/static/${props.img}`}
-                            style={{ width: props.imgSize ? props.imgSize : 30, height: props.imgSize ? props.imgSize : 30 }} />
+            </div> :
+                <>
+                    {props.icon &&
+                        <div style={{
+                            display: 'flex', alignItems: 'center',
+                            position: 'absolute', top: 0, left: 3, height: '100%'
+                        }}>
+                            <MaterialIcon
+                                icon={props.icon}
+                                style={{ fontSize: props.iconSize ? props.iconSize : 30 }} />
+                        </div>
+                    }
+                    {props.img &&
+                        <div style={{
+                            display: 'flex', alignItems: 'center',
+                            position: 'absolute', top: 0, left: 10, height: '100%'
+                        }}>
+                            <Img src={`/static/${props.img}`}
+                                style={{ width: props.imgSize ? props.imgSize : 30, height: props.imgSize ? props.imgSize : 30 }} />
+                        </div>
+                    }
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {props.leadingIcon && <MaterialIcon
+                            icon={props.leadingIcon}
+                            style={{
+                                fontSize: props.iconSize ? props.iconSize : 20,
+                                marginRight: 10
+                            }} />
+                        }
+
+
+                        {(props.loading || props.submitting) ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
+                        {props.endingIcon && <MaterialIcon
+                            icon={props.endingIcon}
+                            style={{
+                                fontSize: props.iconSize ? props.iconSize : 20,
+                                marginLeft: 10
+                            }} />
+                        }
                     </div>
-                }
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {props.leadingIcon && <MaterialIcon
-                        icon={props.leadingIcon}
-                        style={{
-                            fontSize: props.iconSize ? props.iconSize : 20,
-                            marginRight: 10
-                        }} />
-                    }
-
-
-                    {(props.loading || props.submitting) ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
-                    {props.endingIcon && <MaterialIcon
-                        icon={props.endingIcon}
-                        style={{
-                            fontSize: props.iconSize ? props.iconSize : 20,
-                            marginLeft: 10
-                        }} />
-                    }
-                </div>
-            </>
+                </>
         }
     </B>
 }
 
 const B = styled(EuiButton)`
-position:relative;
-border-radius: 100px;
-height:36px;
-font-weight:bold;
-border:none;
-font-weight: 500;
-font-size: 15px;
-line-height: 18px;
-display: flex;
-align-items: center;
-text-align: center;
-box-shadow:none !important;
-text-transform:none !important;
-`
+        position:relative;
+        border-radius: 100px;
+        height:36px;
+        font-weight:bold;
+        border:none;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 18px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        box-shadow:none !important;
+        text-transform:none !important;
+        `
 
 interface IconProps {
     src: string;

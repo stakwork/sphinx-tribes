@@ -4,6 +4,7 @@ import {
     EuiGlobalToastList,
 } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
+import { Button } from '../../sphinxUI';
 export default function BotBar(props: any) {
     const { value, simple } = props
     const [toasts, setToasts]: any = useState([]);
@@ -30,39 +31,32 @@ export default function BotBar(props: any) {
         addToast()
     };
 
-    return <Row style={props.style} onClick={() => copyToClipboard('/bot install ' + value)}>
-        <QRWrap style={{
-            display: 'flex', alignItems: 'center', width: '70%',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-        }}>
-            <MaterialIcon icon={'chevron_right'} style={{ fontSize: 14, marginRight: 4 }} />
-            <div style={{
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis'
-            }}>
-                /bot install {value}
-            </div>
-        </QRWrap>
+    return <>
 
-        <Copy
-            style={{
-                display: 'flex', fontSize: 11, alignItems: 'center', color: '#618AFF', cursor: 'pointer',
-                letterSpacing: '0.3px'
-            }}>
-            COPY
-        </Copy>
+        <Button
+            text={`/bot install ${value}`}
+            wideButton={true}
+            icon={'content_copy'}
+            iconStyle={{ color: '#fff', fontSize: 20 }}
+            iconSize={20}
+            color={'primary'}
+            width={'100%'}
+            height={50}
+            style={{ width: '100%', padding: '0 5px' }}
+            onClick={() => copyToClipboard('/bot install ' + value)}
+        />
 
         <EuiGlobalToastList
             toasts={toasts}
             dismissToast={removeToast}
             toastLifeTimeMs={1000}
         />
-    </Row>
+    </>
+
 
 }
+
+
 const QRWrap = styled.div`
 font-family: Roboto;
 font-style: normal;

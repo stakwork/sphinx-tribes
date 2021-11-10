@@ -337,6 +337,14 @@ export default function FocusedView(props: any) {
           personInfo.extras?.coding_languages || [];
         initialValues.tribes = personInfo.extras?.tribes || [];
         initialValues.repos = personInfo.extras?.repos || [];
+        initialValues.lightning =
+          (personInfo.extras?.lightning &&
+            personInfo.extras?.lightning[0]?.value) ||
+          "";
+        initialValues.amboss =
+          (personInfo.extras?.amboss &&
+            personInfo.extras?.amboss[0]?.value) ||
+          "";
       } else {
         // if there is a selected index, fill in values
         if (selectedIndex > -1) {
@@ -421,8 +429,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
-                      }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                    }
                     : {}
                 }
               />
@@ -584,7 +592,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: "#5a606c",
-    trackBackgroundColor: "rgba(0,0,0,0)",
-  })}
+  thumbColor: "#5a606c",
+  trackBackgroundColor: "rgba(0,0,0,0)",
+})}
 `;
