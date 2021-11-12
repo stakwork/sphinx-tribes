@@ -108,12 +108,9 @@ func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if feed.Value == nil {
-		tribe := DB.getTribeByFeedURL(url)
-		if tribe.OwnerPubKey != "" {
-			feed.Value = feeds.AddedValue(tribe.OwnerPubKey)
-		}
-	}
+	tribe := DB.getFirstTribeByFeedURL(url)
+	feed.Value = feeds.AddedValue(feed.Value, tribe.OwnerPubKey)
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(feed)
 }
