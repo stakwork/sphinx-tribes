@@ -2,7 +2,6 @@ package feeds
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -29,8 +28,25 @@ func ParseFeed(url string) (*Feed, error) {
 		}
 		return f, nil
 	}
-	fmt.Println("PARSE A PODCAST")
+	if strings.Contains(url, "youtube.com/feeds/videos.xml") {
+		f, err := ParseYoutubeFeed(url)
+		if err != nil {
+			return nil, err
+		}
+		return f, nil
+	}
+	if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
+		f, err := ParseBitcoinTVFeed(url)
+		if err != nil {
+			return nil, err
+		}
+		return f, nil
+	}
 	f, err := ParsePodcastFeed(url)
+	if err != nil {
+		return nil, err
+	}
+	f, err = ParseSubstackFeed(url) // this one is quite generic
 	if err != nil {
 		return nil, err
 	}
