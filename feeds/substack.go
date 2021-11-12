@@ -2,10 +2,9 @@ package feeds
 
 import (
 	"encoding/xml"
-	"time"
-)
 
-const SubstackTimeFormat = time.RFC1123
+	"github.com/araddon/dateparse"
+)
 
 type SubstackPost struct {
 	Title   string `xml:"title"`
@@ -55,7 +54,7 @@ func SubstackFeedToGeneric(url string, mf SubstackFeed) (Feed, error) {
 	c := mf.Channel
 	items := []Item{}
 	for _, post := range c.Items {
-		t, _ := time.Parse(SubstackTimeFormat, post.PubDate)
+		t, _ := dateparse.ParseAny(post.PubDate)
 		items = append(items, Item{
 			Id:            post.Guid,
 			Title:         post.Title,
