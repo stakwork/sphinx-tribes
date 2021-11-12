@@ -23,8 +23,8 @@ func main() {
 	initDB()
 	initCache()
 
-	go processTwitterConfirmationsLoop()
-	go processGithubIssuesLoop()
+	// go processTwitterConfirmationsLoop()
+	// go processGithubIssuesLoop()
 
 	run()
 }
