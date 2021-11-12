@@ -1,7 +1,8 @@
 package feeds
 
 import (
-	"errors"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -28,23 +29,51 @@ func ParseFeed(url string) (*Feed, error) {
 		}
 		return f, nil
 	}
-	return nil, errors.New("no matching feed")
+	fmt.Println("PARSE A PODCAST")
+	f, err := ParsePodcastFeed(url)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
-func AddedValue(tribeOwnerPubkey string) *Value {
-	return &Value{
-		Model: Model{
-			Type:      "lightning",
-			Suggested: "0.00000015000",
-		},
-		Destinations: []Destination{
-			{
-				Address: tribeOwnerPubkey,
-				Type:    "node",
-				Split:   100,
-			},
-		},
+func AddedValue(value *Value, tribeOwnerPubkey string) *Value {
+	if tribeOwnerPubkey == "" {
+		return value
 	}
+	if value != nil {
+		if value.Destinations != nil {
+			if len(value.Destinations) == 1 {
+				first := value.Destinations[0]
+				firstSplit, _ := first.Split.(json.Number).Int64()
+				if firstSplit == 1 {
+					// this is the auto
+					if tribeOwnerPubkey != first.Address {
+						value.Destinations = append(value.Destinations, Destination{
+							Address: tribeOwnerPubkey,
+							Split:   99,
+							Type:    "node",
+						})
+					}
+				}
+			}
+		}
+	} else {
+		value = &Value{
+			Model: Model{
+				Type:      "lightning",
+				Suggested: "0.00000015000",
+			},
+			Destinations: []Destination{
+				{
+					Address: tribeOwnerPubkey,
+					Type:    "node",
+					Split:   100,
+				},
+			},
+		}
+	}
+	return value
 }
 
 type Feed struct {
@@ -58,8 +87,8 @@ type Feed struct {
 	ImageUrl      string `json:"imageUrl"`
 	OwnerUrl      string `json:"ownerUrl"`
 	Link          string `json:"link"`
-	DatePublished string `json:"datePublished"`
-	DateUpdated   string `json:"dateUpdated"`
+	DatePublished int32  `json:"datePublished"`
+	DateUpdated   int32  `json:"dateUpdated"`
 	ContentType   string `json:"contentType"`
 	Language      string `json:"language"`
 	Items         []Item `json:"items"`

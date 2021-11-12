@@ -303,7 +303,7 @@ func (db database) getPersonByPubkey(pubkey string) Person {
 	return m
 }
 
-func (db database) getTribeByFeedURL(feedURL string) Tribe {
+func (db database) getFirstTribeByFeedURL(feedURL string) Tribe {
 	m := Tribe{}
 	db.db.Where("feed_url = ? AND (deleted = 'f' OR deleted is null)", feedURL).First(&m)
 	return m
