@@ -20,7 +20,7 @@ func unix() string {
 
 func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 	items := []Item{}
-	fmt.Println("P EPISODES", len(p.Episodes))
+	fmt.Println("P EPISODES", len(p.Episodes), p)
 	for _, ep := range p.Episodes {
 		items = append(items, Item{
 			Id:              strconv.Itoa(int(ep.ID)),
@@ -70,6 +70,7 @@ func PodcastIndexHeaders() map[string]string {
 
 func ParsePodcastFeed(url string) (*Feed, error) {
 	pod, err := PodcastFeed(url)
+	fmt.Println("GOT A POD!", pod)
 	if err != nil || pod == nil {
 		return nil, err
 	}
