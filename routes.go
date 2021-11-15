@@ -115,10 +115,6 @@ func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tribe = DB.getFirstTribeByFeedURL(url)
 	}
-	if tribe.OwnerPubKey == "" {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	feed.Value = feeds.AddedValue(feed.Value, tribe.OwnerPubKey)
 
