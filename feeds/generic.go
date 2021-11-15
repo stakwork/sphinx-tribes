@@ -44,11 +44,10 @@ func ParseFeed(url string) (*Feed, error) {
 	}
 	f, err := ParsePodcastFeed(url)
 	if err != nil {
-		return nil, err
-	}
-	f, err = ParseSubstackFeed(url) // this one is quite generic
-	if err != nil {
-		return nil, err
+		f, err = ParseSubstackFeed(url) // this one is quite generic
+		if err != nil {
+			return nil, err
+		}
 	}
 	return f, nil
 }
