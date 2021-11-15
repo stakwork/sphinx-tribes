@@ -97,6 +97,6 @@ func BitcoinTVToGeneric(url string, mf BitcoinTVFeed) (Feed, error) {
 		Items:       items,
 		ImageUrl:    c.Image.Url,
 		Generator:   c.Generator,
-		DateUpdated: int32(tu.Unix()),
+		DateUpdated: tu.Unix(),
 	}, nil
 }

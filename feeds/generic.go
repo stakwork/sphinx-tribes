@@ -102,8 +102,8 @@ type Feed struct {
 	ImageUrl      string `json:"imageUrl"`
 	OwnerUrl      string `json:"ownerUrl"`
 	Link          string `json:"link"`
-	DatePublished int32  `json:"datePublished"`
-	DateUpdated   int32  `json:"dateUpdated"`
+	DatePublished int64  `json:"datePublished"`
+	DateUpdated   int64  `json:"dateUpdated"`
 	ContentType   string `json:"contentType"`
 	Language      string `json:"language"`
 	Items         []Item `json:"items"`
