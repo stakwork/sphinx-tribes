@@ -72,7 +72,12 @@ func YoutubeFeedToGeneric(url string, f YoutubeFeed) (Feed, error) {
 	for _, item := range f.Items {
 		tp, _ := dateparse.ParseAny(item.Published)
 		tu, _ := dateparse.ParseAny(item.Updated)
+		id := item.ID
+		if id == "" {
+			id = item.Link.Href
+		}
 		items = append(items, Item{
+			Id:            id,
 			Title:         item.Title,
 			Link:          item.Link.Href,
 			EnclosureURL:  item.MediaGroup.Content.Url,
@@ -85,13 +90,19 @@ func YoutubeFeedToGeneric(url string, f YoutubeFeed) (Feed, error) {
 			DateUpdated:   tu.Unix(),
 		})
 	}
+	id := f.ID
+	if id == "" {
+		id = url
+	}
+	pd, _ := dateparse.ParseAny(f.Published)
 	return Feed{
-		ID:       f.ID,
-		FeedType: FeedTypeVideo,
-		Title:    f.Title,
-		Url:      url,
-		Link:     f.Link.Href,
-		Items:    items,
-		Author:   f.Author.Name,
+		ID:            id,
+		FeedType:      FeedTypeVideo,
+		Title:         f.Title,
+		Url:           url,
+		Link:          f.Link.Href,
+		Items:         items,
+		Author:        f.Author.Name,
+		DatePublished: pd.Unix(),
 	}, nil
 }
