@@ -45,7 +45,7 @@ func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 		Items:       items,
 		ImageUrl:    p.Image,
 		Link:        p.Link,
-		DateUpdated: p.LastUpdateTime,
+		DateUpdated: int64(p.LastUpdateTime),
 		ContentType: p.ContentType,
 		Language:    p.Language,
 		Value:       p.Value,
