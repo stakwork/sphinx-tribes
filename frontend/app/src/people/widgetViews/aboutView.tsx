@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from "styled-components";
 import { Divider } from '../../sphinxUI';
 import QrBar from '../utils/QrBar'
@@ -19,12 +19,28 @@ export default function AboutView(props: any) {
     let lightningAddress = ''
     let ambossAddress = ''
 
+    const [expand, setExpand] = useState(false)
+
     if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value
     if (github && github[0] && github[0].value) githubTag = github[0].value
     if (lightning && lightning[0] && lightning[0].value) lightningAddress = lightning[0].value
     if (amboss && amboss[0] && amboss[0].value) ambossAddress = amboss[0].value
 
+    const descriptionIsLong = description && description.length && description.length > 120
+
     return <Wrap>
+
+        <D>
+            {expand ?
+                <DExpand>{renderMarkdown(description)}</DExpand> :
+                <DCollapsed>{renderMarkdown(description)}</DCollapsed>
+            }
+            {descriptionIsLong &&
+                <SM onClick={() => setExpand(!expand)}>SHOW {expand ? 'LESS' : 'MORE'}</SM>
+            }
+        </D>
+
+        <Divider />
         <Row>
             <div>Price to Connect:</div>
             <div style={{ fontWeight: 'bold', color: '#000' }}>{price_to_meet}</div>
@@ -126,9 +142,6 @@ export default function AboutView(props: any) {
             </>
         }
 
-        <Divider />
-
-        <D>{renderMarkdown(description)}</D>
 
     </Wrap>
 
@@ -277,20 +290,45 @@ margin-bottom:5px;
 
 const D = styled.div`
 
-margin:35px 0 10px 0;
+margin:5px 0 15px 0;
 font-family: Roboto;
 font-style: normal;
 font-weight: normal;
 font-size: 15px;
 line-height: 20px;
 /* or 133% */
-
-
 /* Main bottom icons */
 
 color: #5F6368;
-
 `;
+
+const SM = styled.div`
+display:flex;
+justify-content:flex-end;
+cursor:pointer;
+color: #618AFF;
+font-size: 11px;
+letter-spacing: 0.3px;
+margin:10px 0 4px;
+`;
+
+
+const DCollapsed = styled.div`
+color:#5F6368;
+overflow:hidden;
+line-height: 20px;
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+`;
+
+const DExpand = styled.div`
+color:#5F6368;
+line-height: 20px;
+`;
+
+
 
 interface IconProps {
     source: string;
