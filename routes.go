@@ -61,6 +61,7 @@ func NewRouter() *http.Server {
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
 		r.Get("/feed", getGenericFeed)
+		r.Get("/search_podcasts", searchPodcasts)
 		r.Get("/people", getListedPeople)
 
 		r.Get("/ask", ask)
@@ -139,6 +140,17 @@ func getPodcast(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func searchPodcasts(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("q")
+	podcasts, err := searchPodcastIndex(q)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(podcasts)
 }
 
 func getAllTribes(w http.ResponseWriter, r *http.Request) {
