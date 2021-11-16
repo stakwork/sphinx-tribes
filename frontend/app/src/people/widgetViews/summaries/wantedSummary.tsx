@@ -73,7 +73,10 @@ export default function WantedSummary(props: any) {
                 return <Wrap>
                         <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
                                 <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
-                                <Paragraph>{renderMarkdown(description)}</Paragraph>
+                                <Paragraph style={{
+                                        overflow: 'hidden',
+                                        wordBreak: 'normal'
+                                }}>{renderMarkdown(description)}</Paragraph>
                         </div>
                         <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
                                 <Pad>
