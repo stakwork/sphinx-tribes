@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 
+	"github.com/stakwork/sphinx-tribes/feeds"
 	"github.com/stakwork/sphinx-tribes/frontend"
 )
 
@@ -59,6 +60,8 @@ func NewRouter() *http.Server {
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
+		r.Get("/feed", getGenericFeed)
+		r.Get("/search_podcasts", searchPodcasts)
 		r.Get("/people", getListedPeople)
 
 		r.Get("/ask", ask)
@@ -98,6 +101,28 @@ func NewRouter() *http.Server {
 	return server
 }
 
+func getGenericFeed(w http.ResponseWriter, r *http.Request) {
+	url := r.URL.Query().Get("url")
+	feed, err := feeds.ParseFeed(url)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	tribeUUID := r.URL.Query().Get("uuid")
+	tribe := Tribe{}
+	if tribeUUID != "" {
+		tribe = DB.getTribe(tribeUUID)
+	} else {
+		tribe = DB.getFirstTribeByFeedURL(url)
+	}
+
+	feed.Value = feeds.AddedValue(feed.Value, tribe.OwnerPubKey)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(feed)
+}
+
 func getPodcast(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	feedid := r.URL.Query().Get("id")
@@ -115,6 +140,17 @@ func getPodcast(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func searchPodcasts(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("q")
+	podcasts, err := searchPodcastIndex(q)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(podcasts)
 }
 
 func getAllTribes(w http.ResponseWriter, r *http.Request) {
