@@ -241,6 +241,12 @@ func (db database) updateTribeUniqueName(uuid string, u string) {
 	db.db.Model(&Tribe{}).Where("uuid = ?", uuid).Update("unique_name", u)
 }
 
+// func (db database) getOpenGithubIssues(id uint, issues map[string]interface{}) int {
+// 	ms := []GithubIssue{}
+// 	db.db.Model(&Person{}).Where("id = ?", id).Find(&ms)
+// 	return len(ms)
+// }
+
 func (db database) getListedTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
