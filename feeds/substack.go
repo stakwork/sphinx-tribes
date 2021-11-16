@@ -29,6 +29,7 @@ type SubstackChannel struct {
 	LastBuildDate string         `xml:"lastBuildDate"`
 	Copyright     string         `xml:"copyright"`
 	Language      string         `xml:"language"`
+	Creator       string         `xml:"creator"`
 	Items         []SubstackPost `xml:"item"`
 }
 
@@ -81,5 +82,6 @@ func SubstackFeedToGeneric(url string, mf SubstackFeed) (Feed, error) {
 		ImageUrl:    c.Image.Url,
 		DateUpdated: lbd.Unix(),
 		Generator:   c.Generator,
+		Author:      c.Creator,
 	}, nil
 }

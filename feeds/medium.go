@@ -31,6 +31,7 @@ type MediumChannel struct {
 	Image         MediumImage  `xml:"image"`
 	Generator     string       `xml:"generator"`
 	LastBuildDate string       `xml:"lastBuildDate"`
+	Creator       string       `xml:"creator"`
 	Items         []MediumPost `xml:"item"`
 }
 
@@ -82,6 +83,7 @@ func MediumFeedToGeneric(url string, mf MediumFeed) (Feed, error) {
 		Items:       items,
 		ImageUrl:    c.Image.Url,
 		Generator:   c.Generator,
+		Author:      c.Creator,
 		DateUpdated: lbd.Unix(),
 	}, nil
 }
