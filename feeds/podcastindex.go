@@ -152,6 +152,9 @@ func PodcastEpisodes(url string) ([]Episode, error) {
 	return r.Items, nil
 }
 
+type PodcastSearchResponse struct {
+	Feeds []Podcast `json:"feeds"`
+}
 type PodcastResponse struct {
 	Feed Podcast `json:"feed"`
 }
