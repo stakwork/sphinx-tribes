@@ -441,8 +441,12 @@ export default function BotBody() {
                     visible={showBotCreator}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <Icon src={'/static/bots_create.svg'} />
+
+                        <BotText>
+                            Share your awesome bot with other Sphinx chat users!
+                        </BotText>
                         <Button
-                            text={'Add Your Own Bot'}
+                            text={'Add a Bot'}
                             color={'primary'}
                             leadingIcon={'add'}
                             height={50}
@@ -453,7 +457,7 @@ export default function BotBody() {
                             }} />
                         <div style={{ height: 20 }} />
                         <Button
-                            text={'Learn About Bots'}
+                            text={'Learn about Bots'}
                             leadingIcon={'open_in_new'}
                             style={{ marginBottom: 20 }}
                             height={50}
@@ -480,6 +484,7 @@ export default function BotBody() {
                             }}
                             delete={editThisBot && deleteBot}
                             onSubmit={createOrSaveBot}
+                            submitText={editThisBot ? 'Save' : 'Submit'}
                             schema={botSchema}
                             initialValues={initialValues}
                         />
@@ -510,6 +515,22 @@ export default function BotBody() {
 
     )
 }
+
+const BotText = styled.div`
+width: 259px;
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 15px;
+line-height: 24px;
+/* or 160% */
+
+text-align: center;
+
+color: #3C3F41;
+
+margin-bottom:30px;
+`
 
 const Body = styled.div`
             flex:1;
@@ -579,6 +600,7 @@ const Icon = styled.div<IconProps>`
             width:220px;
             height:220px;
             margin:30px;
+            margin-bottom:0px;
             background-position: center; /* Center the image */
             background-repeat: no-repeat; /* Do not repeat the image */
             background-size: contain; /* Resize the background image to cover the entire container */
