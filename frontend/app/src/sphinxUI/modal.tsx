@@ -15,6 +15,7 @@ export default function Modal(props: any) {
         withOverlay={!hideOverlay}
         drift={100}
         direction='up'
+        close={close || bigClose}
         overlayClick={overlayClick}
         dismountCallback={dismountCallback}
         isMounted={visible ? true : false}
