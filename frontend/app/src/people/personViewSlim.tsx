@@ -536,13 +536,16 @@ export default function PersonView(props: any) {
             <div style={{
                 width: 364,
                 minWidth: 364, overflowY: 'auto',
-                position: 'relative',
+                // position: 'relative',
                 background: '#ffffff',
                 color: '#000000',
                 padding: 40,
-                height: '100%',
+                zIndex: 5,
+                // height: '100%',
+                marginTop: canEdit ? 64 : 0,
+                height: canEdit ? 'calc(100% - 64px)' : '100%',
                 borderLeft: '1px solid #F2F3F5',
-                borderRight: '1px solid #F2F3F5',
+                borderRight: canEdit ? '1px solid #F2F3F5' : '',
                 boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
             }}>
 
@@ -550,9 +553,12 @@ export default function PersonView(props: any) {
                     position: 'absolute',
                     top: 0, left: 0,
                     display: 'flex',
-                    justifyContent: 'space-between', width: '100%',
+                    background: '#ffffff',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.07)',
+                    width: 364,
+                    minWidth: 364,
+                    boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.07)',
                     paddingRight: 10,
                     height: 64,
                     zIndex: 0
@@ -569,7 +575,7 @@ export default function PersonView(props: any) {
 
                 {/* profile photo */}
                 <Head>
-                    <div style={{ height: canEdit ? 80 : 35 }} />
+                    <div style={{ height: 35 }} />
 
                     <Img src={img || '/static/sphinx.png'} >
                         <IconButton
@@ -643,10 +649,11 @@ export default function PersonView(props: any) {
 
             <div style={{
                 width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 628px)',
-                minWidth: 250
+                minWidth: 250, zIndex: canEdit ? 6 : 4,
             }}>
                 <Tabs style={{
-                    background: '#fff', padding: '0 20px', boxShadow: '0px 1px 6px rgba(0, 0, 0, 0.07)'
+                    background: '#fff', padding: '0 20px',
+                    boxShadow: canEdit ? '0px 1px 0px rgba(0, 0, 0, 0.07)' : '0px 1px 6px rgba(0, 0, 0, 0.07)'
 
                 }}>
                     {tabs && Object.keys(tabs).map((name, i) => {
@@ -680,48 +687,6 @@ export default function PersonView(props: any) {
 
                 </Tabs>
 
-                <Modal
-                    visible={showFocusView}
-                    style={{
-                        top: -64,
-                        height: 'calc(100% + 64px)'
-                    }}
-                    envStyle={{
-                        marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
-                        height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
-                        minWidth: 500, maxWidth: 602, //minHeight: 300,
-                        ...focusedDesktopModalStyles
-                    }}
-                    nextArrow={nextIndex}
-                    prevArrow={prevIndex}
-                    overlayClick={() => {
-                        setShowFocusView(false)
-                        setFocusIndex(-1)
-                        if (selectedWidget === 'about') switchWidgets('post')
-                    }}
-                    bigClose={() => {
-                        setShowFocusView(false)
-                        setFocusIndex(-1)
-                        if (selectedWidget === 'about') switchWidgets('post')
-                    }}
-                >
-                    <FocusedView
-                        person={person}
-                        canEdit={canEdit}
-                        selectedIndex={focusIndex}
-                        config={tabs[selectedWidget] && tabs[selectedWidget]}
-                        onSuccess={() => {
-                            console.log('success')
-                            setFocusIndex(-1)
-                            if (selectedWidget === 'about') switchWidgets('post')
-                        }}
-                        goBack={() => {
-                            setShowFocusView(false)
-                            setFocusIndex(-1)
-                            if (selectedWidget === 'about') switchWidgets('post')
-                        }}
-                    />
-                </Modal>
 
                 <div style={{
                     padding: 20, height: 'calc(100% - 63px)', background: '#F2F3F5',
@@ -749,6 +714,50 @@ export default function PersonView(props: any) {
                 dismiss={() => setShowQR(false)}
                 modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
                 person={person} visible={showQR} />
+
+
+            <Modal
+                visible={showFocusView}
+                style={{
+                    top: -64,
+                    height: 'calc(100% + 64px)'
+                }}
+                envStyle={{
+                    marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
+                    height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
+                    minWidth: 500, maxWidth: 602, zIndex: 20,//minHeight: 300, 
+                    ...focusedDesktopModalStyles
+                }}
+                nextArrow={nextIndex}
+                prevArrow={prevIndex}
+                overlayClick={() => {
+                    setShowFocusView(false)
+                    setFocusIndex(-1)
+                    if (selectedWidget === 'about') switchWidgets('post')
+                }}
+                bigClose={() => {
+                    setShowFocusView(false)
+                    setFocusIndex(-1)
+                    if (selectedWidget === 'about') switchWidgets('post')
+                }}
+            >
+                <FocusedView
+                    person={person}
+                    canEdit={canEdit}
+                    selectedIndex={focusIndex}
+                    config={tabs[selectedWidget] && tabs[selectedWidget]}
+                    onSuccess={() => {
+                        console.log('success')
+                        setFocusIndex(-1)
+                        if (selectedWidget === 'about') switchWidgets('post')
+                    }}
+                    goBack={() => {
+                        setShowFocusView(false)
+                        setFocusIndex(-1)
+                        if (selectedWidget === 'about') switchWidgets('post')
+                    }}
+                />
+            </Modal>
         </div >
     }
 
