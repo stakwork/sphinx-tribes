@@ -1,0 +1,13 @@
+name: PRCheck 
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  eslint:
+    name: ESLint Job
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - run: npm run lint
+      
