@@ -13,5 +13,5 @@ jobs:
       - name: Install modules
         run: yarn
       - name: Eslint
-        run: yarn run lint:ci
+        run: yarn --cwd ./frontend/app run lint
       
