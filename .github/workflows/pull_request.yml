@@ -9,5 +9,5 @@ jobs:
     runs-on:
       - ubuntu-latest
     steps:
-      - run: npm run lint
+      - run: npm run lint --prefix ./frontend/app
       
