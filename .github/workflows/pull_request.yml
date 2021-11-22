@@ -13,5 +13,5 @@ jobs:
       - name: Install modules
         run: yarn
       - name: Eslint
-        run: npm run lint --prefix ./frontend/app
+        run: yarn run lint --prefix ./frontend/app
       
