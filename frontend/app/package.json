@@ -13,8 +13,7 @@
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"lint": "eslint src --max-warnings 22 --ext .ts",
-		"lint:fix": "npm run lint -- --fix",
-		"lint:ci": "eslint src --max-warning 22 --ext .ts --prefix ./frontend/app"
+		"lint:fix": "npm run lint -- --fix"
 	},
 	"dependencies": {
 		"@elastic/datemath": "^5.0.2",
