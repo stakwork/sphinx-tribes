@@ -1,13 +1,13 @@
-import React, { useRef, useState } from "react";
-import { QRCode } from "react-qr-svg";
-import styled from "styled-components";
-import { EuiCheckableCard } from "@elastic/eui";
-import Tag from "./tag";
-import moment from "moment";
-import { getHostIncludingDockerHosts } from "../host";
+import React, { useRef, useState } from 'react'
+import { QRCode } from 'react-qr-svg'
+import styled from 'styled-components'
+import { EuiCheckableCard } from '@elastic/eui'
+import Tag from './tag'
+import moment from 'moment'
+import { getHostIncludingDockerHosts } from '../host'
 
 function makeQR(uuid: string) {
-  return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`;
+  return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`
 }
 
 export default function Tribe({
@@ -26,22 +26,22 @@ export default function Tribe({
   last_active,
   unique_name,
 }: any) {
-  const showTags = tags && tags.length && tags.length > 0 ? true : false;
-  const textareaRef = useRef(null);
-  const qrString = makeQR(uuid);
-  const [copied, setCopied] = useState(false);
+  const showTags = tags && tags.length && tags.length > 0 ? true : false
+  const textareaRef = useRef(null)
+  const qrString = makeQR(uuid)
+  const [copied, setCopied] = useState(false)
 
   const lastActiveM = last_active
     ? moment(last_active * 1000)
-    : moment().subtract(1, "months");
-  const lastActive = lastActiveM.format("MMM D HH:mm");
+    : moment().subtract(1, 'months')
+  const lastActive = lastActiveM.format('MMM D HH:mm')
 
   function copyString(e: any, textareaRef: any) {
-    e.stopPropagation();
-    textareaRef.current.select();
-    document.execCommand("copy");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2700);
+    e.stopPropagation()
+    textareaRef.current.select()
+    document.execCommand('copy')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2700)
   }
 
   return (
@@ -55,9 +55,9 @@ export default function Tribe({
       onChange={() => select(uuid, unique_name)}
     >
       <Content
-        onClick={() => select(selected ? "" : uuid, unique_name)}
+        onClick={() => select(selected ? '' : uuid, unique_name)}
         style={{
-          height: selected ? "auto" : 100,
+          height: selected ? 'auto' : 100,
         }}
         selected={selected}
       >
@@ -65,12 +65,12 @@ export default function Tribe({
           <Row className="item-cont">
             <Img src={img || '/static/placeholder.svg'} />
             <Left
-              style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
+              style={{ padding: '0 0 0 20px', maxWidth: 'calc(100% - 100px)' }}
             >
               <Row
                 style={
                   selected
-                    ? { flexDirection: "column", alignItems: "flex-start" }
+                    ? { flexDirection: 'column', alignItems: 'flex-start' }
                     : {}
                 }
               >
@@ -156,7 +156,7 @@ export default function Tribe({
                 {selected && (
                   <QRWrap className="qr-wrap float-r">
                     <QRCode
-                      bgColor={selected ? "#FFFFFF" : "#666"}
+                      bgColor={selected ? '#FFFFFF' : '#666'}
                       fgColor="#000000"
                       level="Q"
                       style={{ width: 209 }}
@@ -174,7 +174,7 @@ export default function Tribe({
                     className="copy-btn"
                     onClick={(e) => copyString(e, textareaRef)}
                   >
-                    {copied ? "Copied!" : "Copy"}
+                    {copied ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -187,10 +187,10 @@ export default function Tribe({
         </Left>
       </Content>
     </EuiCheckableCard>
-  );
+  )
 }
 interface ContentProps {
-  selected: boolean;
+  selected: boolean
 }
 const Content = styled.div<ContentProps>`
   cursor: pointer;
@@ -218,22 +218,22 @@ const Content = styled.div<ContentProps>`
       color:#bebebe;
     }
   `}
-`;
+`
 const QRWrap = styled.div`
   background: white;
   padding: 5px;
-`;
+`
 const Left = styled.div`
   height: 100%;
   max-width: 100%;
   display: flex;
   flex-direction: column;
   flex: 1;
-`;
+`
 const Row = styled.div`
   display: flex;
   align-items: center;
-`;
+`
 const Title = styled.h3`
   margin-right: 12px;
   font-size: 22px;
@@ -242,9 +242,9 @@ const Title = styled.h3`
   text-overflow: ellipsis;
   max-width: 100%;
   min-height: 24px;
-`;
+`
 interface DescriptionProps {
-  oneLine: boolean;
+  oneLine: boolean
 }
 const Description = styled.h5<DescriptionProps>`
   font-weight: normal;
@@ -256,22 +256,21 @@ const Description = styled.h5<DescriptionProps>`
     text-overflow: ellipsis;
     overflow:hidden;
   `}
-`;
+`
 interface ImageProps {
-  readonly src: string;
+  readonly src: string
 }
 const Img = styled.div<ImageProps>`
-  background-image: url("${(p) => p.src}");
+  background-image: url('${(p) => p.src}');
   background-position: center;
   background-size: cover;
   height: 90px;
   width: 90px;
   border-radius: 5px;
   position: relative;
-`;
-
+`
 
 const Tokens = styled.div`
   display: flex;
   align-items: center;
-`;
+`
