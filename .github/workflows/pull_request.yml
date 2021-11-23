@@ -5,7 +5,7 @@ on:
       - master
 jobs:
   eslint:
-    name: ESLint Job
+    name: ESLint check
     runs-on:
       - ubuntu-latest
     steps:
@@ -14,6 +14,14 @@ jobs:
         run: yarn --cwd ./frontend/app install
       - name: Eslint
         run: yarn --cwd ./frontend/app run lint
+  prettier:
+    name: Prettier check      
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn --cwd ./frontend/app install
       - name: Prettier
         run: yarn --cwd ./frontend/app run prettier-check
-      
+ 
