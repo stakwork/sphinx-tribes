@@ -4,28 +4,16 @@ on:
     branches:
       - master
 jobs:
-  setup:
-    name: Setup
+  eslint:
+    name: ESLint Job
     runs-on:
-      - ubuntu-latest  
+      - ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install modules
         run: yarn --cwd ./frontend/app install
-  eslint:
-    name: ESLint check
-    needs: setup
-    runs-on:
-      - ubuntu-latest
-    steps:
       - name: Eslint
         run: yarn --cwd ./frontend/app run lint
-  prettier:
-    name: Prettier check      
-    needs: setup
-    runs-on:
-      - ubuntu-latest
-    steps:
       - name: Prettier
         run: yarn --cwd ./frontend/app run prettier-check
- 
+      
