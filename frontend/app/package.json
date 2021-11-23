@@ -15,7 +15,7 @@
 		"lint": "eslint src --max-warnings 22 --ext .ts",
 		"lint:fix": "npm run lint -- --fix",
 		"prettier-fix": "npx prettier --write .",
-		"prepare": "cd ../.. && husky install ./frontend/app/.husky"
+		"prepare": "cd ../../ && husky install ./frontend/app/.husky"
 	},
 	"dependencies": {
 		"@elastic/datemath": "^5.0.2",
