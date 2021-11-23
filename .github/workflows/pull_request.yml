@@ -14,4 +14,6 @@ jobs:
         run: yarn --cwd ./frontend/app install
       - name: Eslint
         run: yarn --cwd ./frontend/app run lint
+      - name: Prettier
+        run: yarn --cwd ./frontend/app run prettier
       

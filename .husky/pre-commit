@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged --prefix ./frontend/app
+yarn --cwd ./frontend/app run prettier-fix

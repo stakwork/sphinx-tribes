@@ -1,79 +1,83 @@
 {
-	"name": "catcher",
-	"version": "0.1.0",
-	"private": true,
-	"scripts": {
-		"start": "react-scripts start",
-		"start:tribes:docker": "PORT=23000 react-scripts start",
-		"start:tribes:cluster": "PORT=13000 react-scripts start",
-		"start:people": "PORT=3007 react-scripts start",
-		"start:people:docker": "PORT=23007 react-scripts start",
-		"start:people:cluster": "PORT=13007 react-scripts start",
-		"build": "react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject",
-		"lint": "eslint src --max-warnings 22 --ext .ts",
-		"lint:fix": "npm run lint -- --fix",
-		"prettier-fix": "npx prettier --write .",
-		"prepare": "husky install"
-	},
-	"dependencies": {
-		"@elastic/datemath": "^5.0.2",
-		"@elastic/eui": "^19.0.0",
-		"@fontsource/roboto": "^4.5.0",
-		"@material/react-material-icon": "^0.15.0",
-		"@testing-library/jest-dom": "^4.2.4",
-		"@testing-library/react": "^9.3.2",
-		"@testing-library/user-event": "^7.1.2",
-		"@types/react-router-dom": "^5.1.8",
-		"@types/styled-components": "^5.1.0",
-		"bootstrap": "^4.5.0",
-		"dateformat": "^3.0.3",
-		"formik": "^2.2.6",
-		"fuse.js": "^5.2.3",
-		"lodash": "^4.17.15",
-		"mobx": "^5.15.4",
-		"mobx-persist": "^0.4.1",
-		"mobx-react-lite": "^1.5.2",
-		"moment": "^2.24.0",
-		"react": "^16.12.0",
-		"react-dom": "^16.12.0",
-		"react-dropzone": "^11.3.2",
-		"react-markdown": "^4.3.1",
-		"react-qr-svg": "^2.2.2",
-		"react-qrcode-logo": "^2.5.0",
-		"react-router-dom": "^5.2.0",
-		"react-scripts": "3.4.0",
-		"react-select": "^5.1.0",
-		"styled-components": "^5.1.0",
-		"yup": "^0.32.9"
-	},
-	"eslintConfig": {
-		"extends": "react-app",
-		"rules": {
-			"react-hooks/rules-of-hooks": "warn",
-			"react-hooks/exhaustive-deps": "warn",
-			"react/prop-types": "off"
-		}
-	},
-	"browserslist": {
-		"production": [">0.2%", "not dead", "not op_mini all"],
-		"development": [
-			"last 1 chrome version",
-			"last 1 firefox version",
-			"last 1 safari version"
-		]
-	},
-	"devDependencies": {
-		"@types/dateformat": "^3.0.1",
-		"@types/jest": "^24.9.1",
-		"@types/node": "^12.12.27",
-		"@types/react": "^16.9.19",
-		"@types/react-dom": "^16.9.5",
-		"bootstrap": "^4.5.0",
-		"husky": "^7.0.4",
-		"lint-staged": "^12.1.2",
-		"prettier": "2.4.1",
-		"typescript": "^3.7.5"
-	}
+  "name": "catcher",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "start:tribes:docker": "PORT=23000 react-scripts start",
+    "start:tribes:cluster": "PORT=13000 react-scripts start",
+    "start:people": "PORT=3007 react-scripts start",
+    "start:people:docker": "PORT=23007 react-scripts start",
+    "start:people:cluster": "PORT=13007 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src --max-warnings 22 --ext .ts",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier-fix": "npx prettier --write .",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@elastic/datemath": "^5.0.2",
+    "@elastic/eui": "^19.0.0",
+    "@fontsource/roboto": "^4.5.0",
+    "@material/react-material-icon": "^0.15.0",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/react-router-dom": "^5.1.8",
+    "@types/styled-components": "^5.1.0",
+    "bootstrap": "^4.5.0",
+    "dateformat": "^3.0.3",
+    "formik": "^2.2.6",
+    "fuse.js": "^5.2.3",
+    "lodash": "^4.17.15",
+    "mobx": "^5.15.4",
+    "mobx-persist": "^0.4.1",
+    "mobx-react-lite": "^1.5.2",
+    "moment": "^2.24.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-dropzone": "^11.3.2",
+    "react-markdown": "^4.3.1",
+    "react-qr-svg": "^2.2.2",
+    "react-qrcode-logo": "^2.5.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.0",
+    "react-select": "^5.1.0",
+    "styled-components": "^5.1.0",
+    "yup": "^0.32.9"
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "rules": {
+      "react-hooks/rules-of-hooks": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react/prop-types": "off"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/dateformat": "^3.0.1",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.12.27",
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "bootstrap": "^4.5.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.2",
+    "prettier": "2.4.1",
+    "typescript": "^3.7.5"
+  }
 }
