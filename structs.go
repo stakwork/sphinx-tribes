@@ -125,6 +125,12 @@ type GithubIssue struct {
 	Description string `json:"description"`
 }
 
+type Pagination struct {
+	Limit int    `json:"limit"`
+	Page  int    `json:"page"`
+	Sort  string `json:"sort"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {
