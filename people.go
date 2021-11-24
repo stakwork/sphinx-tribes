@@ -115,7 +115,7 @@ func processTwitterConfirmationsLoop() {
 }
 
 func processGithubIssuesLoop() {
-	peeps := DB.getListedPeople()
+	peeps := DB.getListedPeople(nil)
 	for _, p := range peeps {
 		wanteds, ok := p.Extras["wanted"].([]interface{})
 		if !ok {

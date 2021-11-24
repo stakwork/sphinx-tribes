@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 
@@ -265,15 +266,20 @@ func (db database) getAllTribesByOwner(pubkey string) []Tribe {
 	return ms
 }
 
-func (db database) getListedBots() []Bot {
+func (db database) getListedBots(r *http.Request) []Bot {
 	ms := []Bot{}
-	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	offset, limit, sortBy, direction := getPaginationParams(r)
+	// db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+
 	return ms
 }
 
-func (db database) getListedPeople() []Person {
+func (db database) getListedPeople(r *http.Request) []Person {
 	ms := []Person{}
-	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	offset, limit, sortBy, direction := getPaginationParams(r)
+	// db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
 

@@ -5,6 +5,8 @@ import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
 import { MeInfo, uiStore } from "./ui";
 
+export const queryLimit = 100
+
 export class MainStore {
   @persist("list")
   @observable
@@ -34,9 +36,11 @@ export class MainStore {
   bots: Bot[] = [];
   myBots: Bot[] = [];
 
-  @action async getBots(uniqueName?: string): Promise<any> {
+  @action async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
     console.log("get bots");
-    let b = await api.get("bots");
+
+    let query = this.appendQueryParams("bots", queryParams)
+    let b = await api.get(query);
 
     const info = uiStore.meInfo;
 
@@ -269,13 +273,35 @@ export class MainStore {
     return;
   }
 
+  @action appendQueryParams(path: string, queryParams?: QueryParams): string {
+    let query = path
+    if (queryParams) {
+      queryParams.limit = queryLimit
+      query += '?'
+      const length = Object.keys(queryParams).length
+      Object.keys(queryParams).forEach((k, i) => {
+        query += `${k}=${queryParams[k]}`
+
+        // add & if not last param
+        if (i !== length - 1) {
+          query += '&'
+        }
+      })
+    }
+
+    return query
+  }
+
   @persist("list")
   @observable
   people: Person[] = [];
 
-  @action async getPeople(uniqueName?: string): Promise<Person[]> {
-    const ps = await api.get("people");
+  @action async getPeople(uniqueName?: string, queryParams?: any): Promise<Person[]> {
 
+    let query = this.appendQueryParams("people", queryParams)
+    let ps = await api.get(query);
+
+    // fixme, this is old, dont need to do this if getSelf is updating properly
     if (uiStore.meInfo) {
       const index = ps.findIndex((f) => f.id == uiStore.meInfo?.id);
 
@@ -316,6 +342,7 @@ export class MainStore {
         }
       });
     }
+
     this.people = ps;
     return ps;
   }
@@ -327,17 +354,16 @@ export class MainStore {
   }
 
 
-  @action async getSelf() {
-    const ps = await api.get("people");
+  // this method merges the relay self data with the db self data, they each hold different data
+  @action async getSelf(me: any) {
+    console.log('getSelf')
+    let self = me || uiStore.meInfo
+    if (self) {
+      const p = await api.get(`person/${self.owner_pubkey}`);
 
-    if (uiStore.meInfo) {
-      // fixme, this wont work with hundreds of users
-      // need route to get self
-      // for now find self in people, update
-      const index = ps.findIndex((f) => f.id == uiStore.meInfo?.id);
-      if (index > -1) {
-        uiStore.setMeInfo({ ...uiStore.meInfo, ...ps[index] });
-      }
+      let updateSelf = { ...self, ...p }
+      console.log('updateSelf', updateSelf)
+      uiStore.setMeInfo(updateSelf);
     }
   }
 
@@ -569,4 +595,11 @@ export interface Person {
 
 export interface Jwt {
   jwt: string;
+}
+
+export interface QueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  direction?: string;
 }

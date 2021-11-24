@@ -59,14 +59,15 @@ export default function Header() {
         }
     }
 
-    function urlRedirect() {
+    function urlRedirect(directPathname) {
         // if route not supported, redirect
         let pass = false
-        let path = location.pathname
+        let path = directPathname || location.pathname
         tabs.forEach((t => {
             if (path.includes(t.path)) pass = true
         }))
         if (!pass) {
+            console.log('force fix')
             history.push('/p')
         }
     }
@@ -80,17 +81,32 @@ export default function Header() {
     }, [location.pathname])
 
     useEffect(() => {
+
         (async () => {
             try {
                 var urlObject = new URL(window.location.href);
+                let path = location.pathname
                 var params = urlObject.searchParams;
                 const chal = params.get('challenge')
+
+                console.log('here!')
                 if (chal) {
+                    // fix url path if "/p" is not included, add challenge to proper url path 
+                    if (!path.includes('/p')) {
+                        console.log('fix path!')
+                        path = `/p/?challenge=${chal}`
+                        history.push(path)
+                    }
                     await testChallenge(chal)
                 }
-                urlRedirect()
+                urlRedirect(path)
+            } catch (e) { }
+            try {
+                // update self on reload
+                await main.getSelf(null);
             } catch (e) { }
         })()
+
 
     }, [])
 

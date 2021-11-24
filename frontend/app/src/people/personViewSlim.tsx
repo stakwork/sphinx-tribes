@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { getHost } from "../host";
 import { useStores } from '../store'
@@ -23,10 +23,20 @@ import { widgetConfigs } from "./utils/constants";
 import { extractGithubIssue } from "../helpers";
 import { useHistory, useLocation } from "react-router";
 import { EuiLoadingSpinner } from '@elastic/eui';
+import { queryLimit } from '../store/main'
+
 
 const host = getHost();
 function makeQR(pubkey: string) {
     return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
+}
+
+let inDebounce
+function debounce(func, delay) {
+    clearTimeout(inDebounce)
+    inDebounce = setTimeout(() => {
+        func()
+    }, delay)
 }
 
 let deeplinkTimeout
@@ -43,8 +53,14 @@ export default function PersonView(props: any) {
     const { main, ui } = useStores()
     const { meInfo } = ui || {}
 
+    const peopleListRef: any = useRef(null)
+
     const [loadingPerson, setLoadingPerson]: any = useState(false)
     const [loadedPerson, setLoadedPerson]: any = useState(null)
+    const [loadingMore, setLoadingMore]: any = useState(false)
+    const [loadingLess, setLoadingLess]: any = useState(false)
+
+    const [listPage, setListPage]: any = useState(1)
 
     const history = useHistory()
     const location = useLocation()
@@ -60,10 +76,12 @@ export default function PersonView(props: any) {
 
     // if i select myself, fill person with meInfo
     if (personId === ui.meInfo?.id) {
-        person = { twitter_confirmed: person?.twitter_confirmed, ...ui.meInfo }
+        person = {
+            ...ui.meInfo
+        }
     }
 
-    const people = (main.people && main.people.filter(f => !f.hide)) || []
+    let people: any = (main.people && main.people.filter(f => !f.hide)) || []
 
     const {
         id,
@@ -90,6 +108,40 @@ export default function PersonView(props: any) {
     const [showQR, setShowQR] = useState(false);
     const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey || '');
+
+    async function loadMorePeople() {
+        let scrollTop = peopleListRef?.current?.scrollTop
+        let scrollHeight = peopleListRef?.current?.scrollHeight
+        let offsetHeight = peopleListRef?.current?.offsetHeight
+        // console.log('scrollTop', scrollTop)
+        // console.log('scrollHeight', scrollHeight)
+        // console.log('offsetHeight', offsetHeight)
+
+        if (listPage > 1 && scrollTop === 0) {
+
+            if (loadingLess) return
+            setLoadingLess(true)
+            // back it up off the edge
+            peopleListRef.current.scrollTop = peopleListRef.current.scrollTop + 20
+            const newPage = listPage - 1
+            await main.getPeople('', { page: newPage })
+            setListPage(newPage)
+            setLoadingLess(false)
+        }
+        else if ((offsetHeight + scrollTop) === scrollHeight) {
+            // dont load more, this is the last page
+            if (people && people.length < queryLimit) return
+            if (loadingMore) return
+            setLoadingMore(true)
+            // back it up off the top
+            peopleListRef.current.scrollTop = peopleListRef.current.scrollTop - 20
+            const newPage = listPage + 1
+            console.log(`LOAD MORE `, newPage)
+            await main.getPeople('', { page: newPage })
+            setLoadingMore(false)
+            setListPage(newPage)
+        }
+    }
 
     // deeplink load person
     useEffect(() => {
@@ -454,7 +506,7 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = (extras[name] && extras[name].length > 0) ? extras[name].length : null
+                        let count = (extras && extras[name] && extras[name].length > 0) ? extras[name].length : null
 
                         return <Tab key={i}
                             selected={selected}
@@ -500,6 +552,13 @@ export default function PersonView(props: any) {
         </div>
     }
 
+    const loaderTop = <Loader style={{ top: 60 }}>
+        <EuiLoadingSpinner />
+    </Loader>
+    const loaderBottom = <Loader style={{ bottom: 10 }}>
+        <EuiLoadingSpinner />
+    </Loader>
+
     function renderDesktopView() {
         const focusedDesktopModalStyles = newSelectedWidget ? {
             ...tabs[newSelectedWidget]?.modalStyle
@@ -511,7 +570,8 @@ export default function PersonView(props: any) {
         }}>
 
             {!canEdit &&
-                <PeopleList>
+                <PeopleList >
+
                     <DBack >
                         <Button
                             color='clear'
@@ -521,14 +581,28 @@ export default function PersonView(props: any) {
                         />
                     </DBack>
 
-                    <div style={{ width: '100%', overflowY: 'auto' }} >
+                    {loadingLess && loaderTop}
+
+                    <div style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={() => {
+                        debounce(() =>
+                            loadMorePeople()
+                            , 100)
+                    }} ref={peopleListRef}>
                         {people.map(t => <Person {...t} key={t.id}
                             selected={personId === t.id}
                             hideActions={true}
                             small={true}
                             select={selectPersonWithinFocusView}
                         />)}
+
+                        {/* make sure you can always scroll ever with too few people */}
+                        {people?.length < queryLimit &&
+                            <div style={{ height: 400 }} />
+                        }
                     </div>
+
+                    {loadingMore && loaderBottom}
+
 
                 </PeopleList>
             }
@@ -798,6 +872,7 @@ interface ContentProps {
 }
 
 const PeopleList = styled.div`
+            position:relative;
             display:flex;
             flex-direction:column;
             background:#ffffff;
@@ -952,6 +1027,16 @@ const Name = styled.div`
 const Sleeve = styled.div`
 
                     `;
+
+const Loader = styled.div`
+            position:absolute;
+            width:100%;
+            display:flex;
+            justify-content:center;
+            padding:10px;
+            left:0px;
+            z-index:20;
+`;
 
 const RowWrap = styled.div`
                     display:flex;
