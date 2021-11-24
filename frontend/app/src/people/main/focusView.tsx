@@ -42,6 +42,8 @@ export default function FocusedView(props: any) {
   const isMobile = useIsMobile();
 
   const torSave = canEdit && ui?.meInfo?.url?.includes(".onion");
+  console.log("canEdit", canEdit);
+  console.log("ui", ui, ui?.meInfo, ui?.meInfo?.url);
   console.log("TOR SAVE", torSave);
 
   function closeModal(override) {
@@ -341,8 +343,7 @@ export default function FocusedView(props: any) {
             personInfo.extras?.lightning[0]?.value) ||
           "";
         initialValues.amboss =
-          (personInfo.extras?.amboss &&
-            personInfo.extras?.amboss[0]?.value) ||
+          (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) ||
           "";
       } else {
         // if there is a selected index, fill in values
@@ -428,8 +429,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
-                    }
+                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                      }
                     : {}
                 }
               />
@@ -591,7 +592,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: "#5a606c",
-  trackBackgroundColor: "rgba(0,0,0,0)",
-})}
+    thumbColor: "#5a606c",
+    trackBackgroundColor: "rgba(0,0,0,0)",
+  })}
 `;

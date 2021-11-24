@@ -20,7 +20,7 @@ func unix() string {
 
 func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 	items := []Item{}
-	fmt.Println("P EPISODES", len(p.Episodes), p)
+	// fmt.Println("P EPISODES", len(p.Episodes), p)
 	for _, ep := range p.Episodes {
 		items = append(items, Item{
 			Id:              strconv.Itoa(int(ep.ID)),
@@ -28,7 +28,7 @@ func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 			Description:     ep.Description,
 			Title:           ep.Title,
 			ImageUrl:        ep.Image,
-			EnclosureURL:    ep.Link,
+			EnclosureURL:    ep.EnclosureURL,
 			EnclosureType:   ep.EnclosureType,
 			EnclosureLength: ep.EnclosureLength,
 			DatePublished:   int64(ep.DatePublished),
