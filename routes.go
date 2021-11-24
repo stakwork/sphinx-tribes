@@ -149,8 +149,17 @@ func searchPodcasts(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
+	fs := []feeds.Feed{}
+	for _, pod := range podcasts {
+		feed, err1 := feeds.PodcastToGeneric(pod.URL, &pod)
+		if err1 == nil {
+			fs = append(fs, feed)
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(podcasts)
+	err = json.NewEncoder(w).Encode(fs)
 }
 
 func getAllTribes(w http.ResponseWriter, r *http.Request) {
