@@ -127,7 +127,7 @@ export default function BotBody() {
             un = window.location.pathname.substr(3)
         }
 
-        const ps = await main.getBots(un)
+        const ps = await main.getBots(un, null)
         await main.getMyBots()
 
         // if (un) {
@@ -244,13 +244,15 @@ export default function BotBody() {
 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
 
-                        <Button
-                            text={'Add a Bot'}
-                            leadingIcon={'add'}
-                            height={40}
-                            color='primary'
-                            onClick={() => setShowBotCreator(true)}
-                        />
+                        {ui.meInfo &&
+                            <Button
+                                text={'Add a Bot'}
+                                leadingIcon={'add'}
+                                height={40}
+                                color='primary'
+                                onClick={() => setShowBotCreator(true)}
+                            />
+                        }
 
                         <SearchTextInput
                             name='search'
@@ -566,7 +568,7 @@ interface TagProps {
 }
 const Tab = styled.div<TagProps>`
 display:flex;
-padding:10px 25px;
+padding:10px; // 25px;
 margin-right:35px;
 color:${p => p.selected ? '#5078F2' : '#5F6368'};
 // border-bottom: ${p => p.selected && '4px solid #618AFF'};

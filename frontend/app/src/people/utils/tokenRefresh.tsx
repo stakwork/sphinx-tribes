@@ -9,7 +9,6 @@ export default function TokenRefresh() {
     const [show, setShow] = useState(false)
 
     useEffect(() => {
-
         timeout = setTimeout(async () => {
             console.log('run token refresh!')
             if (ui.meInfo) {
@@ -28,7 +27,7 @@ export default function TokenRefresh() {
                     main.getPeople('')
                 }
             }
-        }, 2000)
+        }, 6000)
 
         return function cleanup() {
             clearTimeout(timeout)

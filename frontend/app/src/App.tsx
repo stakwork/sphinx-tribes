@@ -42,14 +42,14 @@ function App() {
         <PeopleHeader />
         <TokenRefresh />
         <Switch>
-          <Route path="/p/">
-            <PeopleBody />
-          </Route>
           <Route path="/t/">
             <Body />
           </Route>
           <Route path="/b/">
             <BotsBody />
+          </Route>
+          <Route path="/p/">
+            <PeopleBody />
           </Route>
         </Switch>
 

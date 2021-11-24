@@ -10,8 +10,6 @@ export default function NumberInput({ name, error, note, label, value, extraHTML
   let labeltext = label
   if (error) labeltext = labeltext + ` (${error})`
 
-  console.log('extraHTML', extraHTML)
-
   return <><FieldEnv label={labeltext}>
     <R>
       <FieldText name="first" value={value} type="number"
