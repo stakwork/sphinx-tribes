@@ -188,7 +188,7 @@ func getTribesByOwner(w http.ResponseWriter, r *http.Request) {
 }
 
 func getListedPeople(w http.ResponseWriter, r *http.Request) {
-	people := DB.getListedPeople()
+	people := DB.getListedPeople(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
 }
