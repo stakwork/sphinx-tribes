@@ -16,7 +16,7 @@ function makeQR(challenge: string, ts: string) {
 let interval;
 
 export default function ConfirmMe(props: any) {
-  const { ui } = useStores();
+  const { ui, main } = useStores();
   const [challenge, setChallenge] = useState("");
   const [ts, setTS] = useState("");
 
@@ -44,6 +44,7 @@ export default function ConfirmMe(props: any) {
         // console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
+          await main.getSelf(me);
           setChallenge("");
           if (props.onSuccess) props.onSuccess();
           if (interval) clearInterval(interval);
@@ -52,7 +53,7 @@ export default function ConfirmMe(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
 

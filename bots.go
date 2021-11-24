@@ -72,7 +72,7 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 }
 
 func getListedBots(w http.ResponseWriter, r *http.Request) {
-	bots := DB.getListedBots()
+	bots := DB.getListedBots(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
