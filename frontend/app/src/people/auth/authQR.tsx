@@ -15,7 +15,7 @@ function makeQR(challenge: string, ts: string) {
 let interval
 
 export default function AuthQR(props: any) {
-    const { ui } = useStores();
+    const { ui, main } = useStores();
     const [challenge, setChallenge] = useState("");
     const [ts, setTS] = useState("");
 
@@ -23,7 +23,6 @@ export default function AuthQR(props: any) {
 
     useEffect(() => {
         getChallenge();
-
         return function cleanup() {
             if (interval) clearInterval(interval)
         }
@@ -37,6 +36,7 @@ export default function AuthQR(props: any) {
                 console.log(me);
                 if (me && me.pubkey) {
                     ui.setMeInfo(me);
+                    await main.getSelf(me);
                     setChallenge("");
                     if (props.onSuccess) props.onSuccess()
                     if (interval) clearInterval(interval)

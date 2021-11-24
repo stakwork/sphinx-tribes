@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
@@ -14,14 +14,14 @@ import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
 import moment from 'moment';
 import NoneSpace from '../utils/noneSpace';
-import { Divider, SearchTextInput, Modal } from '../../sphinxUI';
+import { Divider, SearchTextInput, Modal, Button } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
 import MaterialIcon from '@material/react-material-icon';
 import FocusedView from './focusView';
 
 import { widgetConfigs } from '../utils/constants'
 import { useHistory, useLocation } from 'react-router';
-
+import { queryLimit } from '../../store/main';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -30,6 +30,14 @@ const getScroll = useScroll
 
 let deeplinkTimeout
 
+let inDebounce
+function debounce(func, delay) {
+    clearTimeout(inDebounce)
+    inDebounce = setTimeout(() => {
+        func()
+    }, delay)
+}
+
 export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(false)
@@ -37,6 +45,12 @@ export default function BodyComponent() {
     const screenWidth = useScreenWidth()
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
+
+    const peopleListRef: any = useRef(null)
+    const peopleListRefMobile: any = useRef(null)
+    const [loadingMore, setLoadingMore]: any = useState(false)
+    const [loadingLess, setLoadingLess]: any = useState(false)
+    const [listPage, setListPage]: any = useState(1)
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
@@ -114,6 +128,69 @@ export default function BodyComponent() {
         setLoading(false)
     }
 
+    // when list page changes, load people
+    useEffect(() => {
+        (async () => {
+            let people = [...main.people]
+            if (listPage > 1) {
+                if (loadingLess) return
+                setLoadingLess(true)
+                const newPage = listPage - 1
+                await main.getPeople('', { page: newPage })
+                setListPage(newPage)
+                setLoadingLess(false)
+            }
+            else {
+                // dont load more, this is the last page
+                if (people && people.length < queryLimit) return
+                if (loadingMore) return
+                setLoadingMore(true)
+                const newPage = listPage + 1
+                console.log(`LOAD MORE `, newPage)
+                await main.getPeople('', { page: newPage })
+                setLoadingMore(false)
+                setListPage(newPage)
+            }
+        })()
+    }, [listPage])
+
+    async function loadMorePeople() {
+        // these divs are shared with widget display, make sure we're looking at people
+        if (selectedWidget !== 'people') return
+        let scrollTop = peopleListRef?.current?.scrollTop
+        let scrollHeight = peopleListRef?.current?.scrollHeight
+        let offsetHeight = peopleListRef?.current?.offsetHeight
+        // console.log('scrollTop', scrollTop)
+        // console.log('scrollHeight', scrollHeight)
+        // console.log('offsetHeight', offsetHeight)
+        let people = [...main.people]
+
+        if (listPage > 1 && scrollTop === 0) {
+
+            if (loadingLess) return
+            setLoadingLess(true)
+            // back it up off the edge
+            peopleListRef.current.scrollTop = peopleListRef.current.scrollTop + 20
+            const newPage = listPage - 1
+            await main.getPeople('', { page: newPage })
+            setListPage(newPage)
+            setLoadingLess(false)
+        }
+        else if ((offsetHeight + scrollTop) === scrollHeight) {
+            // dont load more, this is the last page
+            if (people && people.length < queryLimit) return
+            if (loadingMore) return
+            setLoadingMore(true)
+            // back it up off the top
+            peopleListRef.current.scrollTop = peopleListRef.current.scrollTop - 20
+            const newPage = listPage + 1
+            console.log(`LOAD MORE `, newPage)
+            await main.getPeople('', { page: newPage })
+            setLoadingMore(false)
+            setListPage(newPage)
+        }
+    }
+
     useEffect(() => {
         loadPeople()
         main.getOpenGithubIssues()
@@ -137,12 +214,33 @@ export default function BodyComponent() {
         history.push('/p')
     }
 
+
     return useObserver(() => {
         const peeps = getFuse(main.people, ["owner_alias"])
         const { handleScroll, n, loadingMore } = getScroll()
         let people = peeps.slice(0, n)
 
         people = (people && people.filter(f => !f.hide)) || []
+
+        const isFullPage = people?.length === queryLimit
+
+        const peopleLoadButtons = !isFullPage && listPage === 1 ? null : <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 40 }}>
+            <Button
+                disabled={listPage < 2}
+                onClick={() => setListPage(listPage + 1)}
+                loading={loadingLess}
+                color='widget'>
+                <MaterialIcon icon='west' />
+            </Button>
+            <Button
+                disabled={!isFullPage}
+                onClick={() => setListPage(listPage - 1)}
+                loading={loadingMore}
+                color='widget'
+                style={{ marginLeft: 20 }}>
+                <MaterialIcon icon='east' />
+            </Button>
+        </div>
 
         function renderPeople() {
             // clone, sort, reverse, return
@@ -244,9 +342,12 @@ export default function BodyComponent() {
 
                 </div>
 
-                <div style={{ width: '100%' }} >
+                <div style={{ width: '100%' }}>
                     {selectedWidget === 'people' ?
-                        renderPeople()
+                        <>
+                            {renderPeople()}
+                            {peopleLoadButtons}
+                        </>
                         : <WidgetSwitchViewer
                             onPanelClick={(person, widget, i) => {
                                 publicPanelClick(person, widget, i)
@@ -373,6 +474,8 @@ export default function BodyComponent() {
                             selectedWidget={selectedWidget} />
                     }
                 </div>
+
+                {selectedWidget === 'people' && peopleLoadButtons}
                 <div style={{ height: 100 }} />
             </>
 
@@ -382,7 +485,7 @@ export default function BodyComponent() {
                 withOverlay={isMobile}
                 drift={40}
                 overlayClick={() => goBack()}
-                style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
+                style={{ position: 'absolute', top: isMobile ? 0 : 64, right: 0, zIndex: 10000, width: '100%' }}
                 isMounted={ui.selectingPerson ? true : false}
                 dismountCallback={() => ui.setSelectedPerson(0)}
             >
@@ -434,7 +537,7 @@ export default function BodyComponent() {
 const Body = styled.div`
             flex:1;
             height:calc(100% - 105px);
-            padding-bottom:80px;
+            // padding-bottom:80px;
             width:100%;
             overflow:auto;
             display:flex;

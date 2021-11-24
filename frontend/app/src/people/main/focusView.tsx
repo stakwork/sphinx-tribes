@@ -58,7 +58,7 @@ export default function FocusedView(props: any) {
   useEffect(() => {
     return function cleanup() {
       if (torSave) {
-        main.getSelf();
+        main.getSelf(null);
       }
     };
   }, []);
@@ -298,8 +298,7 @@ export default function FocusedView(props: any) {
 
       console.log("body", body);
       ui.setMeInfo(body);
-
-      await main.getPeople("");
+      await main.getSelf(body);
       closeModal(true);
     } catch (e) {
       console.log("e", e);
@@ -499,7 +498,7 @@ export default function FocusedView(props: any) {
           close={() => {
             goBack();
             // setTorBodyURL('')
-            // main.getSelf()
+            // main.getSelf(null)
           }}
         >
           <div
