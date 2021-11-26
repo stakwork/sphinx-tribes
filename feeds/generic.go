@@ -110,18 +110,18 @@ type Feed struct {
 	Value         *Value `json:"value"`
 }
 type Item struct {
-	Id              string `json:"id"`
-	Title           string `json:"title"`
-	Description     string `json:"description"`
-	DatePublished   int64  `json:"datePublished"`
-	DateUpdated     int64  `json:"dateUpdated"`
-	Author          string `json:"author"`
-	EnclosureURL    string `json:"enclosureUrl"`
-	EnclosureType   string `json:"enclosureType"`
-	EnclosureLength int32  `json:"enclosureLength"`
-	ImageUrl        string `json:"imageUrl"`
-	ThumbnailUrl    string `json:"thumbnailUrl"`
-	Link            string `json:"link"`
+	Id            string `json:"id"`
+	Title         string `json:"title"`
+	Description   string `json:"description"`
+	DatePublished int64  `json:"datePublished"`
+	DateUpdated   int64  `json:"dateUpdated"`
+	Author        string `json:"author"`
+	EnclosureURL  string `json:"enclosureUrl"`
+	EnclosureType string `json:"enclosureType"`
+	Duration      int32  `json:"duration"`
+	ImageUrl      string `json:"imageUrl"`
+	ThumbnailUrl  string `json:"thumbnailUrl"`
+	Link          string `json:"link"`
 }
 type Value struct {
 	Model        Model         `json:"model"`
