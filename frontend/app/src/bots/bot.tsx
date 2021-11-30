@@ -41,7 +41,7 @@ export default function Bot(props: any) {
 
                 }}>
                     <div>
-                        <Img src={img || '/static/sphinx.png'} style={hideActions && { width: 56, height: 56 }} />
+                        <Img src={img || '/static/bot.svg'} style={hideActions && { width: 56, height: 56 }} />
                     </div>
                     <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
                         <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
@@ -61,7 +61,7 @@ export default function Bot(props: any) {
             // desktop mode
             return <DWrap onClick={() => select(id, unique_name)}>
                 <div>
-                    <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={img || '/static/sphinx.png'} />
+                    <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={img || '/static/bot.svg'} />
                     <div style={{ padding: 10 }}>
                         <DTitle>{name}</DTitle>
                         <DDescription>
