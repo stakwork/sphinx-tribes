@@ -364,16 +364,28 @@ export class MainStore {
     if (direction === 0) {
       mergePeople = ps
     }
+    // paging forward
     else if (direction > 0) {
       keepGroup = keepGroup.slice(0, queryLimit - 1)
       mergePeople = [...keepGroup, ...ps];
     }
+    // paging backward
     else {
       keepGroup = keepGroup.slice(queryLimit, queryLimit + queryLimit - 1)
       mergePeople = [...ps, ...keepGroup];
     }
 
     console.log('mergePeople', mergePeople)
+
+    // remove duplicates if any
+    let ids: any = []
+    mergePeople.forEach((p: any, i: number) => {
+      if (!ids.includes(p.id)) ids.push(p.id)
+      else {
+        console.log('found duplicates!', p.id)
+        mergePeople[i].hide = true
+      }
+    })
 
     this.people = mergePeople
 

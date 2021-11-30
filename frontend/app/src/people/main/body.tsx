@@ -160,11 +160,7 @@ export default function BodyComponent() {
         }
 
         function renderPeople() {
-            // clone, sort, reverse, return
-            const peopleClone = [...people]
-            const p = peopleClone && peopleClone.sort((a: any, b: any) => {
-                return moment(a.updated).valueOf() - moment(b.updated).valueOf()
-            }).reverse().map(t => <Person {...t} key={t.id}
+            const p = people?.map(t => <Person {...t} key={t.id}
                 small={isMobile}
                 squeeze={screenWidth < 1420}
                 selected={ui.selectedPerson === t.id}
