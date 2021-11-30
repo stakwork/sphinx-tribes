@@ -32,7 +32,7 @@ export function usePageScroll(goForward, goBackwards) {
     try {
       if (bottom || top) {
         setTimeout(async () => {
-          if (top) {
+          if (bottom) {
             setLoadingBottom(true)
             await goForward()
             setLoadingBottom(false)
