@@ -96,9 +96,6 @@ export default function PersonView(props: any) {
     const qrString = makeQR(owner_pubkey || '');
 
     async function loadMorePeople(direction) {
-        // can't load more, there are no more
-        if (direction > 0 && people?.length < queryLimit) return
-
         let newPage = peoplePageNumber + direction
         if (newPage < 1) newPage = 1
 
