@@ -52,6 +52,8 @@ export default function BodyComponent() {
     const [loadingLess, setLoadingLess]: any = useState(false)
     const [listPage, setListPage]: any = useState(1)
 
+    const { peoplePageNumber, setPeoplePageNumber } = ui
+
     const [selectedWidget, setSelectedWidget] = useState('people')
 
     const history = useHistory()
@@ -132,12 +134,11 @@ export default function BodyComponent() {
     useEffect(() => {
         (async () => {
             let people = [...main.people]
-            if (listPage > 1) {
+            if (peoplePageNumber > 1) {
                 if (loadingLess) return
                 setLoadingLess(true)
-                const newPage = listPage - 1
+                const newPage = peoplePageNumber - 1
                 await main.getPeople('', { page: newPage })
-                setListPage(newPage)
                 setLoadingLess(false)
             }
             else {
@@ -145,18 +146,15 @@ export default function BodyComponent() {
                 if (people && people.length < queryLimit) return
                 if (loadingMore) return
                 setLoadingMore(true)
-                const newPage = listPage + 1
+                const newPage = peoplePageNumber + 1
                 console.log(`LOAD MORE `, newPage)
                 await main.getPeople('', { page: newPage })
                 setLoadingMore(false)
-                setListPage(newPage)
             }
         })()
     }, [listPage])
 
     async function loadMorePeople() {
-        // these divs are shared with widget display, make sure we're looking at people
-        if (selectedWidget !== 'people') return
         let scrollTop = peopleListRef?.current?.scrollTop
         let scrollHeight = peopleListRef?.current?.scrollHeight
         let offsetHeight = peopleListRef?.current?.offsetHeight
@@ -165,15 +163,13 @@ export default function BodyComponent() {
         // console.log('offsetHeight', offsetHeight)
         let people = [...main.people]
 
-        if (listPage > 1 && scrollTop === 0) {
-
+        if (peoplePageNumber > 1 && scrollTop === 0) {
             if (loadingLess) return
             setLoadingLess(true)
             // back it up off the edge
             peopleListRef.current.scrollTop = peopleListRef.current.scrollTop + 20
-            const newPage = listPage - 1
+            const newPage = peoplePageNumber - 1
             await main.getPeople('', { page: newPage })
-            setListPage(newPage)
             setLoadingLess(false)
         }
         else if ((offsetHeight + scrollTop) === scrollHeight) {
@@ -183,11 +179,10 @@ export default function BodyComponent() {
             setLoadingMore(true)
             // back it up off the top
             peopleListRef.current.scrollTop = peopleListRef.current.scrollTop - 20
-            const newPage = listPage + 1
+            const newPage = peoplePageNumber + 1
             console.log(`LOAD MORE `, newPage)
             await main.getPeople('', { page: newPage })
             setLoadingMore(false)
-            setListPage(newPage)
         }
     }
 
@@ -222,26 +217,6 @@ export default function BodyComponent() {
 
         people = (people && people.filter(f => !f.hide)) || []
 
-        const isFullPage = people?.length === queryLimit
-
-        const peopleLoadButtons = !isFullPage && listPage === 1 ? null : <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 40 }}>
-            <Button
-                disabled={listPage < 2}
-                onClick={() => setListPage(listPage + 1)}
-                loading={loadingLess}
-                color='widget'>
-                <MaterialIcon icon='west' />
-            </Button>
-            <Button
-                disabled={!isFullPage}
-                onClick={() => setListPage(listPage - 1)}
-                loading={loadingMore}
-                color='widget'
-                style={{ marginLeft: 20 }}>
-                <MaterialIcon icon='east' />
-            </Button>
-        </div>
-
         function renderPeople() {
             // clone, sort, reverse, return
             const peopleClone = [...people]
@@ -255,6 +230,20 @@ export default function BodyComponent() {
             />)
             return p
         }
+
+        const peopleList = <div style={{ height: '100%', width: '100%' }} onScroll={() => {
+            debounce(() =>
+                loadMorePeople()
+                , 100)
+        }} ref={peopleListRef}>
+            {renderPeople()}
+        </div>
+
+        const listContent = selectedWidget === 'people' ? peopleList : <WidgetSwitchViewer
+            onPanelClick={(person, widget, i) => {
+                publicPanelClick(person, widget, i)
+            }}
+            selectedWidget={selectedWidget} />
 
         if (loading) {
             return <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -343,17 +332,7 @@ export default function BodyComponent() {
                 </div>
 
                 <div style={{ width: '100%' }}>
-                    {selectedWidget === 'people' ?
-                        <>
-                            {renderPeople()}
-                            {peopleLoadButtons}
-                        </>
-                        : <WidgetSwitchViewer
-                            onPanelClick={(person, widget, i) => {
-                                publicPanelClick(person, widget, i)
-                            }}
-                            selectedWidget={selectedWidget} />
-                    }
+                    {listContent}
                 </div>
 
                 <FadeLeft
@@ -465,17 +444,8 @@ export default function BodyComponent() {
                     width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
                     justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20
                 }}>
-                    {selectedWidget === 'people' ?
-                        renderPeople()
-                        : <WidgetSwitchViewer
-                            onPanelClick={(person, widget, i) => {
-                                publicPanelClick(person, widget, i)
-                            }}
-                            selectedWidget={selectedWidget} />
-                    }
+                    {listContent}
                 </div>
-
-                {selectedWidget === 'people' && peopleLoadButtons}
                 <div style={{ height: 100 }} />
             </>
 
