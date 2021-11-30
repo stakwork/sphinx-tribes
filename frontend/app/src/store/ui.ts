@@ -41,6 +41,11 @@ class UiStore {
     this.editMe = b
   }
 
+  @observable peoplePageNumber: number = 1
+  @action setPeoplePageNumber(n: number) {
+    this.peoplePageNumber = n
+  }
+
   @observable selectedPerson: number = 0
   @action setSelectedPerson(n: number) {
     this.selectedPerson = n
