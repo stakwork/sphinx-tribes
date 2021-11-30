@@ -297,10 +297,14 @@ export class MainStore {
   people: Person[] = [];
 
   @action async getPeople(uniqueName?: string, queryParams?: any): Promise<Person[]> {
-    let query = this.appendQueryParams("people", queryParams)
+    console.log('queryParams', queryParams)
+    let query = this.appendQueryParams("people", { ...queryParams, sortBy: 'updated' })
     let ps = await api.get(query);
 
-    console.log('getPeople', ps)
+    if (!ps || !ps.length) {
+      console.log('got no people, do not change page')
+      return []
+    }
 
     let direction = 0
 
