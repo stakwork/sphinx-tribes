@@ -5,9 +5,14 @@ function getIsMobile() {
 }
 
 const screenWidthOffset = 36
+const screenHeightOffset = 36
 
 function getScreenWidth() {
     return window.innerWidth - screenWidthOffset
+}
+
+function getScreenHeight() {
+    return window.innerHeight - screenHeightOffset
 }
 
 function useIsMobile() {
@@ -40,4 +45,19 @@ function useScreenWidth() {
     return width;
 }
 
-export { useIsMobile, useScreenWidth, getScreenWidth, getIsMobile, screenWidthOffset }
+function useScreenHeight() {
+    const [h, setH] = useState(getScreenHeight());
+
+    useEffect(() => {
+        function handleResize3() {
+            setH(getScreenHeight());
+        }
+
+        window.addEventListener('resize', handleResize3);
+        return () => window.removeEventListener('resize', handleResize3);
+    }, []);
+
+    return h;
+}
+
+export { useIsMobile, useScreenWidth, getScreenWidth, useScreenHeight, getIsMobile, screenWidthOffset }
