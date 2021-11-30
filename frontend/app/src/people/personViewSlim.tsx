@@ -51,7 +51,7 @@ export default function PersonView(props: any) {
     } = props
 
     const { main, ui } = useStores()
-    const { meInfo } = ui || {}
+    const { meInfo, peoplePageNumber, setPeoplePageNumber } = ui || {}
 
     const peopleListRef: any = useRef(null)
 
@@ -59,8 +59,6 @@ export default function PersonView(props: any) {
     const [loadedPerson, setLoadedPerson]: any = useState(null)
     const [loadingMore, setLoadingMore]: any = useState(false)
     const [loadingLess, setLoadingLess]: any = useState(false)
-
-    const [listPage, setListPage]: any = useState(1)
 
     const history = useHistory()
     const location = useLocation()
@@ -117,15 +115,13 @@ export default function PersonView(props: any) {
         // console.log('scrollHeight', scrollHeight)
         // console.log('offsetHeight', offsetHeight)
 
-        if (listPage > 1 && scrollTop === 0) {
-
+        if (peoplePageNumber > 1 && scrollTop === 0) {
             if (loadingLess) return
             setLoadingLess(true)
             // back it up off the edge
             peopleListRef.current.scrollTop = peopleListRef.current.scrollTop + 20
-            const newPage = listPage - 1
+            const newPage = peoplePageNumber - 1
             await main.getPeople('', { page: newPage })
-            setListPage(newPage)
             setLoadingLess(false)
         }
         else if ((offsetHeight + scrollTop) === scrollHeight) {
@@ -135,17 +131,15 @@ export default function PersonView(props: any) {
             setLoadingMore(true)
             // back it up off the top
             peopleListRef.current.scrollTop = peopleListRef.current.scrollTop - 20
-            const newPage = listPage + 1
+            const newPage = peoplePageNumber + 1
             console.log(`LOAD MORE `, newPage)
             await main.getPeople('', { page: newPage })
             setLoadingMore(false)
-            setListPage(newPage)
         }
     }
 
     // deeplink load person
     useEffect(() => {
-
         if (loadedPerson) {
             doDeeplink()
         } else {
