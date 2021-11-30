@@ -5,7 +5,7 @@ import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
 import { MeInfo, uiStore } from "./ui";
 
-export const queryLimit = 5
+export const queryLimit = 4
 
 export class MainStore {
   @persist("list")
