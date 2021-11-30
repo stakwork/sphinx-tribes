@@ -5,7 +5,7 @@ import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
 import { MeInfo, uiStore } from "./ui";
 
-export const queryLimit = 100
+export const queryLimit = 5
 
 export class MainStore {
   @persist("list")
@@ -297,9 +297,21 @@ export class MainStore {
   people: Person[] = [];
 
   @action async getPeople(uniqueName?: string, queryParams?: any): Promise<Person[]> {
-
     let query = this.appendQueryParams("people", queryParams)
     let ps = await api.get(query);
+
+    console.log('getPeople', ps)
+
+    let direction = 0
+
+    if (queryParams?.page) {
+      // this tells us whether we're loading earlier data, or later data so we can merge the array in the right order
+      if (uiStore.peoplePageNumber < queryParams.page) direction = 1 // paging forward
+      else direction = -1 // paging backward
+
+      // update people page in ui
+      uiStore.setPeoplePageNumber(queryParams.page)
+    }
 
     // fixme, this is old, dont need to do this if getSelf is updating properly
     if (uiStore.meInfo) {
@@ -343,7 +355,24 @@ export class MainStore {
       });
     }
 
-    this.people = ps;
+    let keepGroup = [...this.people]
+    let mergePeople
+    if (direction === 0) {
+      mergePeople = ps
+    }
+    else if (direction > 0) {
+      keepGroup = keepGroup.slice(0, queryLimit - 1)
+      mergePeople = [...keepGroup, ...ps];
+    }
+    else {
+      keepGroup = keepGroup.slice(queryLimit, queryLimit + queryLimit - 1)
+      mergePeople = [...ps, ...keepGroup];
+    }
+
+    console.log('mergePeople', mergePeople)
+
+    this.people = mergePeople
+
     return ps;
   }
 
