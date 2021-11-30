@@ -15,7 +15,7 @@ import { Button, IconButton, Modal } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
 import FocusedView from './main/focusView'
 import { meSchema } from "../form/schema";
-import { useIsMobile } from "../hooks";
+import { useIsMobile, usePageScroll } from "../hooks";
 import Person from "./person";
 import NoneSpace from "./utils/noneSpace";
 import ConnectCard from "./utils/connectCard";
@@ -31,14 +31,6 @@ function makeQR(pubkey: string) {
     return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-let inDebounce
-function debounce(func, delay) {
-    clearTimeout(inDebounce)
-    inDebounce = setTimeout(() => {
-        func()
-    }, delay)
-}
-
 let deeplinkTimeout
 
 export default function PersonView(props: any) {
@@ -51,14 +43,10 @@ export default function PersonView(props: any) {
     } = props
 
     const { main, ui } = useStores()
-    const { meInfo, peoplePageNumber, setPeoplePageNumber } = ui || {}
-
-    const peopleListRef: any = useRef(null)
+    const { meInfo, peoplePageNumber } = ui || {}
 
     const [loadingPerson, setLoadingPerson]: any = useState(false)
     const [loadedPerson, setLoadedPerson]: any = useState(null)
-    const [loadingMore, setLoadingMore]: any = useState(false)
-    const [loadingLess, setLoadingLess]: any = useState(false)
 
     const history = useHistory()
     const location = useLocation()
@@ -107,35 +95,14 @@ export default function PersonView(props: any) {
     const [showFocusView, setShowFocusView] = useState(false);
     const qrString = makeQR(owner_pubkey || '');
 
-    async function loadMorePeople() {
-        let scrollTop = peopleListRef?.current?.scrollTop
-        let scrollHeight = peopleListRef?.current?.scrollHeight
-        let offsetHeight = peopleListRef?.current?.offsetHeight
-        // console.log('scrollTop', scrollTop)
-        // console.log('scrollHeight', scrollHeight)
-        // console.log('offsetHeight', offsetHeight)
+    async function loadMorePeople(direction) {
+        // can't load more, there are no more
+        if (direction > 0 && people?.length < queryLimit) return
 
-        if (peoplePageNumber > 1 && scrollTop === 0) {
-            if (loadingLess) return
-            setLoadingLess(true)
-            // back it up off the edge
-            peopleListRef.current.scrollTop = peopleListRef.current.scrollTop + 20
-            const newPage = peoplePageNumber - 1
-            await main.getPeople('', { page: newPage })
-            setLoadingLess(false)
-        }
-        else if ((offsetHeight + scrollTop) === scrollHeight) {
-            // dont load more, this is the last page
-            if (people && people.length < queryLimit) return
-            if (loadingMore) return
-            setLoadingMore(true)
-            // back it up off the top
-            peopleListRef.current.scrollTop = peopleListRef.current.scrollTop - 20
-            const newPage = peoplePageNumber + 1
-            console.log(`LOAD MORE `, newPage)
-            await main.getPeople('', { page: newPage })
-            setLoadingMore(false)
-        }
+        let newPage = peoplePageNumber + direction
+        if (newPage < 1) newPage = 1
+
+        await main.getPeople('', { page: newPage })
     }
 
     // deeplink load person
@@ -232,6 +199,8 @@ export default function PersonView(props: any) {
         main.getPeople()
         goBack()
     }
+
+    const { loadingTop, loadingBottom, handleScroll } = usePageScroll(() => loadMorePeople(1), () => loadMorePeople(-1))
 
     if (loading) return <div>Loading...</div>
 
@@ -553,6 +522,8 @@ export default function PersonView(props: any) {
         <EuiLoadingSpinner />
     </Loader>
 
+
+
     function renderDesktopView() {
         const focusedDesktopModalStyles = newSelectedWidget ? {
             ...tabs[newSelectedWidget]?.modalStyle
@@ -575,13 +546,9 @@ export default function PersonView(props: any) {
                         />
                     </DBack>
 
-                    {loadingLess && loaderTop}
+                    {loadingTop && loaderTop}
 
-                    <div style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={() => {
-                        debounce(() =>
-                            loadMorePeople()
-                            , 100)
-                    }} ref={peopleListRef}>
+                    <div style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={handleScroll}>
                         {people.map(t => <Person {...t} key={t.id}
                             selected={personId === t.id}
                             hideActions={true}
@@ -595,7 +562,7 @@ export default function PersonView(props: any) {
                         }
                     </div>
 
-                    {loadingMore && loaderBottom}
+                    {loadingBottom && loaderBottom}
 
 
                 </PeopleList>
