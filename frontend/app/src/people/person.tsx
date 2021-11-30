@@ -65,7 +65,7 @@ export default function Person(props: any) {
           background: selected ? '#F2F3F5' : '#fff',
         }}>
           <div>
-            <Img src={(img && img + picSizeQuery) || '/static/sphinx.png'} style={hideActions && { width: 56, height: 56 }} />
+            <Img src={(img && img + picSizeQuery) || '/static/person.svg'} style={hideActions && { width: 56, height: 56 }} />
           </div>
           <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
             <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
@@ -97,7 +97,7 @@ export default function Person(props: any) {
       // desktop mode
       return <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
         <div>
-          <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={(img && img + picSizeQuery) || '/static/sphinx.png'} />
+          <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={(img && img + picSizeQuery) || '/static/person.svg'} />
           <div style={{ padding: 10 }}>
             <DTitle>{owner_alias}</DTitle>
             <DDescription>

@@ -32,7 +32,7 @@ func getPaginationParams(r *http.Request) (int, int, string, string) {
 		sortBy = "created"
 	}
 	if direction == "" {
-		direction = "asc"
+		direction = "desc"
 	}
 
 	// offset for page, start index
