@@ -53,7 +53,10 @@ export default function Person(props: any) {
   if (lastSeen === 'a day') lastSeen = '1 day'
   if (lastSeen === 'a month') lastSeen = '1 month'
 
-  const picSizeQuery = '?medium=true'
+  const defaultPic = '/static/person_empty.png'
+  const mediumPic = img && img + '?medium=true'
+
+  const addedStyles = hideActions ? { width: 56, height: 56 } : {}
 
   return useObserver(() => {
 
@@ -64,8 +67,8 @@ export default function Person(props: any) {
         return <Wrap onClick={() => select(id, unique_name, owner_pubkey)} style={{
           background: selected ? '#F2F3F5' : '#fff',
         }}>
-          <div>
-            <Img src={(img && img + picSizeQuery) || '/static/person.svg'} style={hideActions && { width: 56, height: 56 }} />
+          <div >
+            <Img style={addedStyles} src={mediumPic || defaultPic} />
           </div>
           <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
             <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
@@ -97,7 +100,9 @@ export default function Person(props: any) {
       // desktop mode
       return <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
         <div>
-          <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={(img && img + picSizeQuery) || '/static/person.svg'} />
+          <div style={{ height: 210, padding: mediumPic ? 0 : 40 }}>
+            <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={mediumPic || defaultPic} />
+          </div>
           <div style={{ padding: 10 }}>
             <DTitle>{owner_alias}</DTitle>
             <DDescription>

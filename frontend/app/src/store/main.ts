@@ -5,7 +5,7 @@ import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
 import { MeInfo, uiStore } from "./ui";
 
-export const queryLimit = 4
+export const queryLimit = 100
 
 export class MainStore {
   @persist("list")
@@ -366,12 +366,12 @@ export class MainStore {
     }
     // paging forward
     else if (direction > 0) {
-      keepGroup = keepGroup.slice(0, queryLimit - 1)
+      keepGroup = keepGroup.slice(0, queryLimit)
       mergePeople = [...keepGroup, ...ps];
     }
     // paging backward
     else {
-      keepGroup = keepGroup.slice(queryLimit, queryLimit + queryLimit - 1)
+      keepGroup = keepGroup.slice(queryLimit, queryLimit + queryLimit)
       mergePeople = [...ps, ...keepGroup];
     }
 
