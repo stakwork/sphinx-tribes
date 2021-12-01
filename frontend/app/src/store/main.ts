@@ -74,17 +74,17 @@ export class MainStore {
     b &&
       b.forEach((bb, i) => {
         if (bb.unique_name === "btc") {
-          bb.img = "/static/bots_bitcoin.png";
+          // bb.img = "/static/bots_bitcoin.png";
           b.splice(i, 1);
           b.unshift(bb);
         }
         if (bb.unique_name === "bet") {
-          bb.img = "/static/bots_betting.png";
+          // bb.img = "/static/bots_betting.png";
           b.splice(i, 1);
           b.unshift(bb);
         }
         if (bb.unique_name === "hello" || bb.unique_name === "welcome") {
-          bb.img = "/static/bots_welcome.png";
+          // bb.img = "/static/bots_welcome.png";
           b.splice(i, 1);
           b.unshift(bb);
         }
