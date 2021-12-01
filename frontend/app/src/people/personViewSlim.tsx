@@ -405,7 +405,7 @@ export default function PersonView(props: any) {
     }
 
     const defaultPic = '/static/person_empty.png'
-    const mediumPic = img && img + '/?medium=true'
+    const mediumPic = img && img + '?medium=true'
 
     function renderMobileView() {
         return <div style={{
