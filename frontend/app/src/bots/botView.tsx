@@ -43,7 +43,7 @@ export default function BotView(props: any) {
 
     const head = <Head>
         {!isMobile && <div style={{ height: 35 }} />}
-        <Img src={img || '/static/sphinx.png'} />
+        <Img src={img || '/static/bot_empty.png'} />
         <RowWrap>
             <Name>{name}</Name>
         </RowWrap>

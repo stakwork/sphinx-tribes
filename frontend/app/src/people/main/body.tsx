@@ -145,8 +145,8 @@ export default function BodyComponent() {
     return useObserver(() => {
         let people = getFuse(main.people, ["owner_alias"])
 
-        const loadForwardFunc = selectedWidget === 'people' ? () => loadMorePeople(1) : () => console.log('scroll top')
-        const loadBackwardFunc = selectedWidget === 'people' ? () => loadMorePeople(-1) : () => console.log('scroll bottom')
+        const loadForwardFunc = selectedWidget === 'people' ? () => loadMorePeople(1) : () => console.log('scroll bottom')
+        const loadBackwardFunc = selectedWidget === 'people' ? () => loadMorePeople(-1) : () => console.log('scroll top')
 
         const { loadingTop, loadingBottom, handleScroll } = getPageScroll(loadForwardFunc, loadBackwardFunc)
 
@@ -168,10 +168,6 @@ export default function BodyComponent() {
             />)
             return p
         }
-
-        // const peopleList = <div style={{ height: '100%', width: '100%', display: isMobile ? '' : 'flex' }} >
-        //     {renderPeople()}
-        // </div>
 
         const listContent = selectedWidget === 'people' ? renderPeople() : <WidgetSwitchViewer
             onPanelClick={(person, widget, i) => {
