@@ -81,6 +81,8 @@ export default function PersonView(props: any) {
         owner_pubkey
     } = person || {}
 
+
+
     const canEdit = id === meInfo?.id
     const isMobile = useIsMobile()
 
@@ -402,6 +404,8 @@ export default function PersonView(props: any) {
         </div >
     }
 
+    const defaultPic = '/static/person_empty.png'
+    const mediumPic = img && img + '/?medium=true'
 
     function renderMobileView() {
         return <div style={{
@@ -431,7 +435,7 @@ export default function PersonView(props: any) {
 
                 {/* profile photo */}
                 <Head>
-                    <Img src={img || '/static/sphinx.png'} />
+                    <Img src={mediumPic || defaultPic} />
                     <RowWrap>
                         <Name>{owner_alias}</Name>
                     </RowWrap>
@@ -609,7 +613,7 @@ export default function PersonView(props: any) {
                 <Head>
                     <div style={{ height: 35 }} />
 
-                    <Img src={img || '/static/sphinx.png'} >
+                    <Img src={mediumPic || defaultPic} >
                         <IconButton
                             iconStyle={{ color: '#5F6368' }}
                             style={{
@@ -817,7 +821,7 @@ export default function PersonView(props: any) {
                                 subtitle="Because I'm awesome"
                                 buttonlabel="Donate"
                                 defaultinterval="weekly"
-                                imgurl="${img || 'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'}"
+                                imgurl="${mediumPic || 'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'}"
                             ></sphinx-widget>` }} />
             </Modal>
         </Content >
