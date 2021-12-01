@@ -32,6 +32,10 @@ export default function Bot(props: any) {
 
     const [showQR, setShowQR] = useState(false);
 
+    const defaultPic = '/static/bot_empty.png'
+    const mediumPic = img && img + '?medium=true'
+
+
     return useObserver(() => {
 
         function renderBotCard() {
@@ -41,7 +45,7 @@ export default function Bot(props: any) {
 
                 }}>
                     <div>
-                        <Img src={img || '/static/bot.svg'} style={hideActions && { width: 56, height: 56 }} />
+                        <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
                     </div>
                     <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
                         <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
@@ -61,7 +65,7 @@ export default function Bot(props: any) {
             // desktop mode
             return <DWrap onClick={() => select(id, unique_name)}>
                 <div>
-                    <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={img || '/static/bot.svg'} />
+                    <Img style={{ height: 210, width: '100%', borderRadius: 0 }} src={mediumPic || defaultPic} />
                     <div style={{ padding: 10 }}>
                         <DTitle>{name}</DTitle>
                         <DDescription>
