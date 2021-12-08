@@ -252,7 +252,7 @@ export default function PersonView(props: any) {
             {/* profile photo */}
             <Head>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <Img src={img || '/static/sphinx.png'} />
+                    <Img src={img || '/static/person_placeholder.png'} />
                     <RowWrap>
                         <Name>{owner_alias}</Name>
                     </RowWrap>

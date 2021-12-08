@@ -6,6 +6,8 @@ import MaterialIcon from '@material/react-material-icon';
 
 export default function Button(props: any) {
 
+    const { iconStyle } = props
+
     const colors = {
         primary: {
             background: '#618AFF',
@@ -19,7 +21,7 @@ export default function Button(props: any) {
         clear: {
             background: '#fff',
             color: '#5F6368',
-            border: '1px solid #fff'
+            border: '1px solid #fff',
         },
         link: {
             background: '#fff',
@@ -92,7 +94,7 @@ export default function Button(props: any) {
                     }}>
                         <MaterialIcon
                             icon={props.icon}
-                            style={{ fontSize: props.iconSize ? props.iconSize : 30 }} />
+                            style={{ fontSize: props.iconSize ? props.iconSize : 30, ...iconStyle }} />
                     </div>
                 }
             </div> :
@@ -104,7 +106,7 @@ export default function Button(props: any) {
                         }}>
                             <MaterialIcon
                                 icon={props.icon}
-                                style={{ fontSize: props.iconSize ? props.iconSize : 30 }} />
+                                style={{ fontSize: props.iconSize ? props.iconSize : 30, ...iconStyle }} />
                         </div>
                     }
                     {props.img &&
@@ -121,7 +123,7 @@ export default function Button(props: any) {
                             icon={props.leadingIcon}
                             style={{
                                 fontSize: props.iconSize ? props.iconSize : 20,
-                                marginRight: 10
+                                marginRight: 10, ...iconStyle
                             }} />
                         }
 
@@ -131,7 +133,7 @@ export default function Button(props: any) {
                             icon={props.endingIcon}
                             style={{
                                 fontSize: props.iconSize ? props.iconSize : 20,
-                                marginLeft: 10
+                                marginLeft: 10, ...iconStyle
                             }} />
                         }
                     </div>

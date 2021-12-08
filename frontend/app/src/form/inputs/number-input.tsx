@@ -15,13 +15,14 @@ export default function NumberInput({ name, error, note, label, value, extraHTML
       <FieldText name="first" value={value} type="number"
         onChange={e => {
           // dont allow zero or negative numbers
-          if (parseInt(e.target.value) < 1) return
+          if (parseInt(e.target.value) < 0) return
           handleChange(e.target.value)
         }}
         onBlur={(e) => {
           // enter 0 on blur if no value
           console.log('onBlur', value)
           if (value === '') handleChange(0)
+          if (value === '0') handleChange(0)
           handleBlur(e)
         }}
         onFocus={(e) => {
