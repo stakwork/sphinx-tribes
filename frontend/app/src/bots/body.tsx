@@ -108,7 +108,7 @@ export default function BotBody() {
         console.log('deleteBot!')
 
         try {
-            await main.deleteBot(editThisBot.id, editThisBot.uuid)
+            await main.deleteBot(editThisBot.id)
             addToast(editThisBot.name)
         } catch (e) {
             console.log('e', e)

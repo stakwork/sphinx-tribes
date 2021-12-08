@@ -246,7 +246,7 @@ export class MainStore {
 
   }
 
-  @action async deleteBot(id: string, uuid: string): Promise<any> {
+  @action async deleteBot(id: string): Promise<any> {
 
     if (!uiStore.meInfo) return null;
     const info = uiStore.meInfo;
@@ -268,11 +268,7 @@ export class MainStore {
         },
       });
 
-      console.log("deleted from relay");
-
-      // delete from db
-      const db_bot = await api.del(`bot/${uuid}`);
-      console.log("deleted bot", b, db_bot);
+      console.log("deleted from relay", b);
 
       return b;
     } catch (e) {
