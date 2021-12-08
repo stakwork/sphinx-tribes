@@ -68,6 +68,7 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", poll)
 		r.Get("/person/{pubkey}", getPersonByPubkey)
 		r.Get("/github_issue/{owner}/{repo}/{issue}", getGithubIssue)
+		r.Get("/github_issue/status/open", getOpenGithubIssues)
 		r.Post("/save", postSave)
 		r.Get("/save/{key}", pollSave)
 	})
