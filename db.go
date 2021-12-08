@@ -242,11 +242,27 @@ func (db database) updateTribeUniqueName(uuid string, u string) {
 	db.db.Model(&Tribe{}).Where("uuid = ?", uuid).Update("unique_name", u)
 }
 
-// func (db database) getOpenGithubIssues(id uint, issues map[string]interface{}) int {
-// 	ms := []GithubIssue{}
-// 	db.db.Model(&Person{}).Where("id = ?", id).Find(&ms)
-// 	return len(ms)
-// }
+type GithubOpenIssue struct {
+	Status   string `json:"status"`
+	Assignee string `json:"assignee"`
+}
+
+func (db database) getOpenGithubIssues(r *http.Request) ([]GithubOpenIssue, error) {
+	ms := []GithubOpenIssue{}
+	// set limit
+	result := db.db.Raw(
+		`SELECT value
+		FROM (
+			SELECT * 
+			FROM people 
+			WHERE github_issues IS NOT NULL 
+			AND github_issues != 'null'
+			) p,
+		jsonb_each(github_issues) t2 
+		WHERE value @> '{"status": "open"}' OR value @> '{"status": ""}';`).Find(&ms)
+
+	return ms, result.Error
+}
 
 func (db database) getListedTribes() []Tribe {
 	ms := []Tribe{}

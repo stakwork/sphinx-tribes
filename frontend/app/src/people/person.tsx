@@ -53,7 +53,7 @@ export default function Person(props: any) {
   if (lastSeen === 'a day') lastSeen = '1 day'
   if (lastSeen === 'a month') lastSeen = '1 month'
 
-  const defaultPic = '/static/person_empty.png'
+  const defaultPic = '/static/person_placeholder.png'
   const mediumPic = img && img + '?medium=true'
 
   const addedStyles = hideActions ? { width: 56, height: 56 } : {}
@@ -64,46 +64,46 @@ export default function Person(props: any) {
 
     function renderPersonCard() {
       if (small) {
-        return <Wrap onClick={() => select(id, unique_name, owner_pubkey)} style={{
-          background: selected ? '#F2F3F5' : '#fff',
-        }}>
-          <div >
-            <Img style={addedStyles} src={mediumPic || defaultPic} />
-          </div>
-          <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
-            <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
-            <Description>
-              {description}
-            </Description>
-            {!hideActions &&
-              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Updated>{lastSeen}</Updated>
-                {(!hideActions && owner_pubkey) ?
-                  <>
-                    <a href={qrString}>
-                      <Button
-                        text='Connect'
-                        color='white'
-                        leadingIcon={'open_in_new'}
-                        iconSize={16}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </a>
-                  </> : <div style={{ height: 30 }} />
-                }
-              </Row>
-            }
-            <Divider style={{ marginTop: 20 }} />
-          </R>
-        </Wrap>
+        return <div style={{ background: selected ? '#F2F3F5' : '#fff', cursor: 'pointer' }} onClick={() => select(id, unique_name, owner_pubkey)}>
+          <Wrap>
+            <div>
+              <Img style={addedStyles} src={mediumPic || defaultPic} />
+            </div>
+            <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
+              <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
+              <Description>
+                {description}
+              </Description>
+              {!hideActions &&
+                <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Updated>{lastSeen}</Updated>
+                  {(!hideActions && owner_pubkey) ?
+                    <>
+                      <a href={qrString}>
+                        <Button
+                          text='Connect'
+                          color='white'
+                          leadingIcon={'open_in_new'}
+                          iconSize={16}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </a>
+                    </> : <div style={{ height: 30 }} />
+                  }
+                </Row>
+              }
+            </R>
+          </Wrap>
+          <Divider style={{ marginTop: 16 }} />
+        </div>
       }
       // desktop mode
       return <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
         <div>
-          <div style={{ height: 210, padding: mediumPic ? 0 : 40 }}>
+          <div style={{ height: 210 }}>
             <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={mediumPic || defaultPic} />
           </div>
-          <div style={{ padding: 10 }}>
+          <div style={{ padding: 16 }}>
             <DTitle>{owner_alias}</DTitle>
             <DDescription>
               {description}
@@ -119,7 +119,9 @@ export default function Person(props: any) {
                 <Button
                   text='Connect'
                   color='clear'
+                  iconStyle={{ color: '#B0B7BC' }}
                   endingIcon={'open_in_new'}
+                  style={{ fontSize: 13, fontWeight: 600 }}
                   iconSize={16}
                   onClick={(e) => {
                     setShowQR(true)
@@ -152,6 +154,7 @@ const Wrap = styled.div`
         padding-bottom:0px;
         display:flex;
         width:100%;
+        overflow:hidden;
         `;
 
 interface DWarpProps {
@@ -169,6 +172,7 @@ const DWrap = styled.div<DWarpProps>`
         margin-right:20px;
         box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
         border-radius: 4px;
+        overflow:hidden;
         `;
 
 const R = styled.div`
@@ -197,26 +201,29 @@ const Row = styled.div`
         `;
 
 const Title = styled.h3`
-        font-weight: 500;
-        font-size: 20px;
-        line-height: 19px;
-        /* or 95% */
-
-
+        font-weight: 600;
+        font-size:17px;
         /* Text 2 */
 
         color: #3C3F41;
         `;
 
 const DTitle = styled.h3`
-font-weight: 500;
-font-size: 17px;
-line-height: 19px;
+
+        font-weight: 600;
+        font-size: 17px;
+        line-height: 19px;
 
         color: #3C3F41;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+
         `;
 const Description = styled.div`
-        font-size: 15px;
+        font-size: 12px;
         color: #5F6368;
         white-space: nowrap;
         height:26px;

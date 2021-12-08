@@ -143,7 +143,7 @@ export default function Header() {
                             {ui.meInfo ?
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10, border: '1px solid #ffffff55' }}
-                                    src={ui.meInfo?.img || '/static/sphinx.png'}
+                                    src={ui.meInfo?.img || '/static/person_placeholder.png'}
                                     onClick={() => {
                                         goToEditSelf()
                                     }} />
@@ -233,7 +233,7 @@ export default function Header() {
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Imgg
                                     style={{ height: 30, width: 30, marginRight: 10 }}
-                                    src={ui.meInfo?.img || '/static/sphinx.png'} />
+                                    src={ui.meInfo?.img || '/static/person_placeholder.png'} />
                                 <div style={{ color: '#fff' }}>
                                     {ui.meInfo?.owner_alias}
                                 </div>
@@ -283,7 +283,7 @@ export default function Header() {
                     <Column>
                         <Imgg
                             style={{ height: 128, width: 128, marginBottom: 40 }}
-                            src={ui.meInfo?.img || '/static/sphinx.png'} />
+                            src={ui.meInfo?.img || '/static/person_placeholder.png'} />
 
                         <T>
                             <div style={{ lineHeight: '26px' }}>Welcome <Name>{ui.meInfo?.owner_alias}</Name></div>
