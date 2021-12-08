@@ -38,7 +38,7 @@ export default function BodyComponent() {
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
 
-    const { peoplePageNumber, openIssueCount } = ui
+    const { peoplePageNumber, openGithubIssues } = ui
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
@@ -351,7 +351,7 @@ export default function BodyComponent() {
                                 setSelectedWidget(t.name)
                             }}>
                             {label}
-                            {/* {isWanted && openIssueCount && `(${openIssueCount})`} */}
+                            {isWanted && openGithubIssues && (openGithubIssues.length > 0) && ` (${openGithubIssues.length})`}
                         </Tab>
                     })}
 

@@ -43,7 +43,7 @@ export default function BotView(props: any) {
 
     const head = <Head>
         {!isMobile && <div style={{ height: 35 }} />}
-        <Img src={img || '/static/bot_empty.png'} />
+        <Img src={img || '/static/bot_placeholder.png'} />
         <RowWrap>
             <Name>{name}</Name>
         </RowWrap>
@@ -58,7 +58,7 @@ export default function BotView(props: any) {
         <Divider />
         <RowWrap>
             <div>Creator</div>
-            <Value style={{ cursor: 'pointer' }} onClick={() => history.push(`/p/${owner_pubkey}`)}>{owner_alias || ""}</Value>
+            <Value style={{ cursor: 'pointer', color: '#5078F2' }} onClick={() => history.push(`/p/${owner_pubkey}`)}>{owner_alias || ""}</Value>
         </RowWrap>
 
         {tags && (tags.length > 0) && <div style={{ width: '100%' }}>
@@ -236,19 +236,18 @@ const Head = styled.div`
 
 const Name = styled.div`
                 width:100%;
-                font-style: normal;
-                font-weight: 500;
-                /* or 73% */
+                
 
                 text-align: center;
 
-                /* Text 2 */
-
                 color: #3C3F41;
                 margin:30px 0;
-
+                font-style: normal;
+                font-weight: 600;
                 font-size: 24px;
-                line-height: 19px;
+                line-height: 28px;
+                text-align: center;
+                color: #3C3F41;
                 `;
 
 
