@@ -1,13 +1,7 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import { getHost } from "../host";
 import { useObserver } from 'mobx-react-lite'
-import { colors } from "../colors";
 import { Button, Divider, Modal } from '../sphinxUI/index'
-const host = getHost();
-function makeQR(pubkey: string) {
-    return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
-}
 
 export default function Bot(props: any) {
 
@@ -30,11 +24,8 @@ export default function Bot(props: any) {
         twitter_confirmed
     } = props
 
-    const [showQR, setShowQR] = useState(false);
-
-    const defaultPic = '/static/bot_empty.png'
+    const defaultPic = '/static/bot_placeholder.png'
     const mediumPic = img && img + '?medium=true'
-
 
     return useObserver(() => {
 
@@ -95,6 +86,7 @@ const Wrap = styled.div`
         padding-bottom:0px;
         display:flex;
         width:100%;
+        overflow:hidden;
         `;
 const DWrap = styled.div`
         cursor:pointer;
@@ -108,6 +100,7 @@ const DWrap = styled.div`
         margin-right:20px;
         box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
         border-radius: 4px;
+        overflow:hidden;
         `;
 
 const R = styled.div`
@@ -121,11 +114,17 @@ const Row = styled.div`
         `;
 
 const Title = styled.h3`
-        font-weight: 500;
-        font-size: 20px;
-        line-height: 19px;
-        /* or 95% */
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 19px;
 
+    color: #3C3F41;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
 
         /* Text 2 */
 
@@ -133,10 +132,15 @@ const Title = styled.h3`
         `;
 
 const DTitle = styled.h3`
-font-weight: 500;
-font-size: 17px;
-line-height: 19px;
-// text-transform:uppercase;
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 19px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
         color: #3C3F41;
         `;
 const Description = styled.div`

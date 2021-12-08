@@ -70,6 +70,8 @@ export class MainStore {
     //   description: 'my first bot botmy first bot botmy first bot botmy first bot bot'
     // },]
 
+    const hideBots = ['please provide documentation', 'Example']
+
     // hide test bots and set images
     b &&
       b.forEach((bb, i) => {
@@ -88,7 +90,7 @@ export class MainStore {
           b.splice(i, 1);
           b.unshift(bb);
         }
-        if (bb.unique_name && bb.unique_name.includes("test")) {
+        if (bb.unique_name && (bb.unique_name.includes("test") || hideBots.includes(bb.unique_name))) {
           // hide all test bots
           bb.hide = true;
         }
@@ -160,21 +162,24 @@ export class MainStore {
     issue: string
   ): Promise<any> {
     const data = await api.get(`github_issue/${owner}/${repo}/${issue}`);
-    const { title } = data && data;
+    const { title, description, assignee, status } = data && data;
+
+    console.log('got github issue', data)
 
     // if no title, the github issue isnt real
-    if (!title) return null;
+    if (!title && !status && !description && !assignee) return null;
     return data;
   }
 
   @action async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
+      console.log('got openIssues', openIssues)
+      if (openIssues) uiStore.setOpenGithubIssues(openIssues)
       return openIssues;
     } catch (e) {
       console.log('e', e)
     }
-
   }
 
   @action async makeBot(payload: any): Promise<any> {
@@ -202,9 +207,12 @@ export class MainStore {
       b = await b.json()
       console.log("made bot", b);
 
+      const mybots = await this.getMyBots()
+      console.log("got my bots", mybots);
+
       return b?.response;
     } catch (e) {
-      console.log('ok')
+      console.log('failed', e)
     }
 
   }
@@ -242,6 +250,8 @@ export class MainStore {
 
     if (!uiStore.meInfo) return null;
     const info = uiStore.meInfo;
+
+    // delete from relay
     try {
       const URL = info.url.startsWith("http")
         ? info.url
@@ -257,11 +267,12 @@ export class MainStore {
           "Content-Type": "application/json",
         },
       });
-      console.log("deleted bot", b);
+
+      console.log("deleted from relay", b);
 
       return b;
     } catch (e) {
-      console.log('ok')
+      console.log('failed!')
     }
 
   }

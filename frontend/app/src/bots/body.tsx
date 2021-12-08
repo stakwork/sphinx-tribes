@@ -93,15 +93,15 @@ export default function BotBody() {
             // create
             try {
                 b = await main.makeBot(v)
-
                 setShowSecret(b.secret)
                 setEditThisBot(b)
+                setShowCreate(false)
             } catch (e) {
                 console.log('e', e)
+                alert('Bot could not be created.')
             }
         }
         loadBots()
-        setShowCreate(false)
     }
 
     async function deleteBot() {
@@ -294,7 +294,7 @@ export default function BotBody() {
                     withOverlay={isMobile}
                     drift={40}
                     overlayClick={() => ui.setSelectingBot('')}
-                    style={{ position: 'absolute', top: isMobile ? 0 : 65, right: 0, zIndex: 10000, width: '100%' }}
+                    style={{ position: 'absolute', top: isMobile ? 0 : 64, right: 0, zIndex: 10000, width: '100%' }}
                     isMounted={ui.selectingBot ? true : false}
                     dismountCallback={() => ui.setSelectedBot('')}
                 >

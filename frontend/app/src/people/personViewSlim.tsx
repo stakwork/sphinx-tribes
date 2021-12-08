@@ -404,7 +404,7 @@ export default function PersonView(props: any) {
         </div >
     }
 
-    const defaultPic = '/static/person_empty.png'
+    const defaultPic = '/static/person_placeholder.png'
     const mediumPic = img && img + '?medium=true'
 
     function renderMobileView() {
@@ -580,9 +580,9 @@ export default function PersonView(props: any) {
                 // height: '100%',
                 marginTop: canEdit ? 64 : 0,
                 height: canEdit ? 'calc(100% - 64px)' : '100%',
-                borderLeft: '1px solid #F2F3F5',
-                borderRight: canEdit ? '1px solid #F2F3F5' : '',
-                boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
+                borderLeft: '1px solid #ebedef',
+                borderRight: '1px solid #ebedef',
+                boxShadow: '1px 2px 6px -2px rgba(0, 0, 0, 0.07)'
             }}>
 
                 {canEdit && <div style={{
@@ -594,7 +594,8 @@ export default function PersonView(props: any) {
                     alignItems: 'center',
                     width: 364,
                     minWidth: 364,
-                    boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.07)',
+                    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.07)',
+                    borderBottom: 'solid 1px #ebedef',
                     paddingRight: 10,
                     height: 64,
                     zIndex: 0
@@ -642,8 +643,7 @@ export default function PersonView(props: any) {
                             }}
                             color='widget'
                             height={42}
-                            style={{ fontSize: 13 }}
-
+                            style={{ fontSize: 13, background: '#f2f3f5' }}
                             leadingIcon={'edit'}
                             iconSize={15}
                         />
@@ -651,7 +651,8 @@ export default function PersonView(props: any) {
                             text='Sign out'
                             onClick={logout}
                             height={42}
-                            style={{ fontSize: 13 }}
+                            style={{ fontSize: 13, color: '#3c3f41', }}
+                            iconStyle={{ color: '#8e969c' }}
                             iconSize={15}
                             color='white'
                             leadingIcon='logout'
@@ -689,7 +690,8 @@ export default function PersonView(props: any) {
             }}>
                 <Tabs style={{
                     background: '#fff', padding: '0 20px',
-                    boxShadow: canEdit ? '0px 1px 0px rgba(0, 0, 0, 0.07)' : '0px 1px 6px rgba(0, 0, 0, 0.07)'
+                    borderBottom: 'solid 1px #ebedef',
+                    boxShadow: canEdit ? '0px 2px 0px rgba(0, 0, 0, 0.07)' : '0px 2px 6px rgba(0, 0, 0, 0.07)'
 
                 }}>
                     {tabs && Object.keys(tabs).map((name, i) => {
@@ -954,27 +956,10 @@ const Head = styled.div`
                 width:100%;
                 `;
 
-interface WidgetEnvProps {
-    selected: boolean;
-}
-const WidgetEnv = styled.div<WidgetEnvProps>`
-                    display:flex;
-                    flex-direction:column;
-                    align-items:center;
-                    justify-content:center;
-                    padding:10px;
-                    min-width:80px;
-                    border-radius:5px;
-                    cursor:pointer;
-                    background:${p => p.selected && '#ffffff31'};
-                    &:hover{
-                        background: ${p => !p.selected && '#ffffff21'};
-            }
-                    `;
 const Name = styled.div`
                     font-style: normal;
-                    font-weight: 500;
-                    font-size: 30px;
+                    font-weight: 600;
+                    font-size: 24px;
                     line-height: 28px;
                     /* or 73% */
 

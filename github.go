@@ -25,6 +25,15 @@ func getGithubIssue(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(issue)
 }
 
+func getOpenGithubIssues(w http.ResponseWriter, r *http.Request) {
+	issue_count, err := DB.getOpenGithubIssues(r)
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+	json.NewEncoder(w).Encode(issue_count)
+}
+
 func GetRepoIssues(owner string, repo string) ([]GithubIssue, error) {
 	client := github.NewClient(nil)
 	issues, _, err := client.Issues.ListByRepo(context.Background(), owner, repo, nil)
