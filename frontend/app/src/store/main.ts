@@ -70,7 +70,7 @@ export class MainStore {
     //   description: 'my first bot botmy first bot botmy first bot botmy first bot bot'
     // },]
 
-    const hideBots = ['please provide documentation', 'Example']
+    const hideBots = ['pleaseprovidedocumentation', 'example']
 
     // hide test bots and set images
     b &&
@@ -386,7 +386,7 @@ export class MainStore {
       mergePeople = [...ps, ...keepGroup];
     }
 
-    console.log('mergePeople', mergePeople)
+    // console.log('mergePeople', mergePeople)
 
     // remove duplicates if any
     let ids: any = []
@@ -405,7 +405,7 @@ export class MainStore {
 
   @action async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
-    console.log('p', p)
+    // console.log('p', p)
     return p
   }
 
