@@ -312,7 +312,7 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
 		`SELECT 
-		json_build_object('owner_pub_key', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'post', extras->'post') #>> '{}' as person,
+		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'post', extras->'post') #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'post'::text)) #>> '{}' as body 
 		FROM people
 		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)
@@ -330,7 +330,7 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	offset, limit, sortBy, direction := getPaginationParams(r)
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
 		`SELECT 
-		json_build_object('owner_pub_key', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted') #>> '{}' as person,
+		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted') #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'wanted'::text)) #>> '{}' as body 
 		FROM people
 		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)
@@ -348,7 +348,7 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	offset, limit, sortBy, direction := getPaginationParams(r)
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
 		`SELECT 
-		json_build_object('owner_pub_key', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'offer', extras->'offer') #>> '{}' as person,
+		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'offer', extras->'offer') #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'offer'::text)) #>> '{}' as body 
 		FROM people
 		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)
