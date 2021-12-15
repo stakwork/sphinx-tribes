@@ -1,8 +1,5 @@
 import React from 'react'
-import BlogView from "../widgetViews/blogView";
 import OfferView from "../widgetViews/offerView";
-import TwitterView from "../widgetViews/twitterView";
-import SupportMeView from "../widgetViews/supportMeView";
 import WantedView from "../widgetViews/wantedView";
 import PostView from "../widgetViews/postView";
 import styled from 'styled-components';
@@ -12,30 +9,32 @@ import { useObserver } from 'mobx-react-lite';
 import { useFuse, useScroll } from '../../hooks';
 import { widgetConfigs } from '../utils/constants';
 import moment from 'moment';
-const getFuse = useFuse
-const getScroll = useScroll
+import { Spacer } from '../main/body';
+
+// const getFuse = useFuse
+// const getScroll = useScroll
 
 export default function WidgetSwitchViewer(props) {
 
-    const { main, ui } = useStores()
+    const { main } = useStores()
     const isMobile = useIsMobile()
 
     return useObserver(() => {
+        const { peoplePosts, peopleWanteds, peopleOffers } = main
+
+        const listSource = {
+            'post': peoplePosts,
+            'wanted': peopleWanteds,
+            'offer': peopleOffers
+        }
 
         let { selectedWidget, onPanelClick } = props
-        const peeps = [...main.people]
-        const { handleScroll, n, loadingMore } = getScroll()
-        let people = peeps.slice(0, n)
-        people = (people && people.filter(f => !f.hide)) || []
-
-        if (props.people) {
-            // props.people overrides ui
-            people = props.people
-        }
 
         if (!selectedWidget) {
             return <div style={{ height: 200 }} />
         }
+
+        const activeList = listSource[selectedWidget]
 
         const renderView = {
             post: (p, i) => <PostView showName key={i + p.owner_pubkey + 'view'} person={p} />,
@@ -58,23 +57,18 @@ export default function WidgetSwitchViewer(props) {
             searchKeys = dynamicFields
         }
 
-        let peopleClone = [...people]
-        peopleClone && peopleClone.sort((a: any, b: any) => {
-            return moment(a.updated).valueOf() - moment(b.updated).valueOf()
-        }).reverse().forEach((p, i) => {
+
+        activeList && activeList.forEach((item, i) => {
             // if this person has entries for this widget
-            const thisWidget = p.extras && p.extras[selectedWidget]
-            if (thisWidget && thisWidget.length) {
-                const theseExtras = getFuse(thisWidget, searchKeys)
+            if (item) {
                 if (renderView[selectedWidget]) {
-                    allElements = [...allElements, ...wrapIt(renderView[selectedWidget](p, i), theseExtras, p)]
+                    allElements.push(wrapIt(renderView[selectedWidget](item.person, i), item, i))
                 }
             }
         })
 
-        function wrapIt(child, fullSelectedWidget, person) {
-            const elementArray: any = []
-
+        function wrapIt(child, item, i) {
+            const { person, body } = item
             const panelStyles = isMobile ? {
                 minHeight: 132
             } : {
@@ -82,23 +76,21 @@ export default function WidgetSwitchViewer(props) {
                 marginRight: 20, marginBottom: 20, minHeight: 472
             }
 
-            fullSelectedWidget && fullSelectedWidget.forEach((s, i) => {
-                elementArray.push(<Panel key={i + person.owner_pubkey}
-                    onClick={() => {
-                        if (onPanelClick) onPanelClick(person, s, i)
-                    }}
-                    style={{
-                        ...panelStyles,
-                        cursor: 'pointer',
-                        padding: 0, overflow: 'hidden'
-                    }}
-                >
-                    {React.cloneElement(child, { ...s })}
-                </Panel>)
-            })
-
-            return elementArray
+            return <Panel key={person?.owner_pubkey + i}
+                onClick={() => {
+                    if (onPanelClick) onPanelClick(person, body)
+                }}
+                style={{
+                    ...panelStyles,
+                    cursor: 'pointer',
+                    padding: 0, overflow: 'hidden'
+                }}
+            >
+                {React.cloneElement(child, { ...body })}
+            </Panel>
         }
+
+        allElements = [...allElements, <Spacer key={'spacer'} />]
 
         return allElements
     })

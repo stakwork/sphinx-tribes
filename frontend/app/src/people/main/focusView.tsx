@@ -350,7 +350,7 @@ export default function FocusedView(props: any) {
         // if there is a selected index, fill in values
         if (selectedIndex > -1) {
           const extras = { ...personInfo.extras };
-          let sel = extras[config.name][selectedIndex];
+          let sel = extras[config.name] && extras[config.name].length > (selectedIndex - 1) && extras[config.name][selectedIndex];
 
           if (sel) {
             // if dynamic, find right schema

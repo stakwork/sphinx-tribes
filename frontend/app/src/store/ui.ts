@@ -46,6 +46,21 @@ class UiStore {
     this.peoplePageNumber = n
   }
 
+  @observable peoplePostsPageNumber: number = 1
+  @action setPeoplePostsPageNumber(n: number) {
+    this.peoplePostsPageNumber = n
+  }
+
+  @observable peopleWantedsPageNumber: number = 1
+  @action setPeopleWantedsPageNumber(n: number) {
+    this.peopleWantedsPageNumber = n
+  }
+
+  @observable peopleOffersPageNumber: number = 1
+  @action setPeopleOffersPageNumber(n: number) {
+    this.peopleOffersPageNumber = n
+  }
+
   @observable selectedPerson: number = 0
   @action setSelectedPerson(n: number) {
     this.selectedPerson = n
