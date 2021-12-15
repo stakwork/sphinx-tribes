@@ -185,12 +185,16 @@ export default function BodyComponent() {
             switch (selectedWidget) {
                 case 'people':
                     currentPage = peoplePageNumber
+                    break
                 case 'wanted':
                     currentPage = peopleWantedsPageNumber
+                    break
                 case 'offer':
                     currentPage = peopleOffersPageNumber
+                    break
                 case 'post':
                     currentPage = peoplePostsPageNumber
+                    break
                 default:
                     console.log('scroll', direction);
             }
@@ -202,12 +206,16 @@ export default function BodyComponent() {
                 switch (selectedWidget) {
                     case 'people':
                         await main.getPeople('', { page: newPage })
+                        break
                     case 'wanted':
                         await main.getPeopleWanteds({ page: newPage })
+                        break
                     case 'offer':
                         await main.getPeopleOffers({ page: newPage })
+                        break
                     case 'post':
                         await main.getPeoplePosts({ page: newPage })
+                        break
                     default:
                         console.log('scroll', direction);
                 }
