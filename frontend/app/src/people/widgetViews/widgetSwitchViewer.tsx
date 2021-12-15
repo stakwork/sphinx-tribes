@@ -53,7 +53,7 @@ export default function WidgetSwitchViewer(props) {
         }
 
         console.log('selectedWidget', selectedWidget)
-        console.log('activeList', activeList)
+        // console.log('activeList', activeList)
 
         const listItems = activeList && activeList.map((item, i) => {
             const { person, body } = item
@@ -75,7 +75,7 @@ export default function WidgetSwitchViewer(props) {
             </Panel>
         })
 
-        // allElements.push(<Spacer key={'spacer'} />)
+        listItems.push(<Spacer key={'spacer'} />)
 
         return listItems
     })
