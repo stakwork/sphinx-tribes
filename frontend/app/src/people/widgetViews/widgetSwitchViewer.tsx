@@ -11,15 +11,15 @@ import { widgetConfigs } from '../utils/constants';
 import moment from 'moment';
 import { Spacer } from '../main/body';
 
-// const getFuse = useFuse
+const getStores = useStores
 // const getScroll = useScroll
 
 export default function WidgetSwitchViewer(props) {
-
-    const { main } = useStores()
     const isMobile = useIsMobile()
-
     return useObserver(() => {
+
+        const { main } = getStores()
+
         const { peoplePosts, peopleWanteds, peopleOffers } = main
 
         const listSource = {
