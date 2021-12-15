@@ -77,12 +77,12 @@ export default function BodyComponent() {
     }, [])
 
     // reset list render, this avoids a bug with piling items
-    useEffect(() => {
-        setResetRender(true)
-        setTimeout(() => {
-            setResetRender(false)
-        }, 50)
-    }, [selectedWidget])
+    // useEffect(() => {
+    //     setResetRender(true)
+    //     setTimeout(() => {
+    //         setResetRender(false)
+    //     }, 50)
+    // }, [selectedWidget])
 
     async function doDeeplink() {
         if (pathname) {
