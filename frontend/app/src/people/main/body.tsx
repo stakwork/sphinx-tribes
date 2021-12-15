@@ -38,8 +38,6 @@ export default function BodyComponent() {
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
 
-    const [resetRender, setResetRender] = useState(false)
-
     const { peoplePageNumber,
         peopleWantedsPageNumber,
         peoplePostsPageNumber,
@@ -75,14 +73,6 @@ export default function BodyComponent() {
             clearTimeout(deeplinkTimeout)
         }
     }, [])
-
-    // reset list render, this avoids a bug with piling items
-    // useEffect(() => {
-    //     setResetRender(true)
-    //     setTimeout(() => {
-    //         setResetRender(false)
-    //     }, 50)
-    // }, [selectedWidget])
 
     async function doDeeplink() {
         if (pathname) {
@@ -249,7 +239,7 @@ export default function BodyComponent() {
             return p
         }
 
-        const listContent = resetRender ? <div style={{ height: 1800 }} /> : selectedWidget === 'people' ? renderPeople() : <WidgetSwitchViewer
+        const listContent = selectedWidget === 'people' ? renderPeople() : <WidgetSwitchViewer
             onPanelClick={(person, item) => {
                 publicPanelClick(person, item)
             }}
