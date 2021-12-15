@@ -75,9 +75,10 @@ export default function WidgetSwitchViewer(props) {
             </Panel>
         })
 
-        listItems.push(<Spacer key={'spacer'} />)
-
-        return listItems
+        return <>
+            {listItems}
+            <Spacer key={'spacer'} />
+        </>
     })
 }
 
