@@ -13,14 +13,7 @@ import { Spacer } from '../main/body';
 
 export default function WidgetSwitchViewer(props) {
     const { main } = useStores()
-    const { peoplePosts, peopleWanteds, peopleOffers } = main
     const isMobile = useIsMobile()
-
-    const listSource = {
-        'post': peoplePosts,
-        'wanted': peopleWanteds,
-        'offer': peopleOffers
-    }
 
     const panelStyles = isMobile ? {
         minHeight: 132
@@ -29,13 +22,21 @@ export default function WidgetSwitchViewer(props) {
         marginRight: 20, marginBottom: 20, minHeight: 472
     }
 
-    let { onPanelClick } = props
-
     return useObserver(() => {
-        let { selectedWidget } = props
+        const { peoplePosts, peopleWanteds, peopleOffers } = main
+
+        let { selectedWidget, onPanelClick } = props
+
         if (!selectedWidget) {
             return <div style={{ height: 200 }} />
         }
+
+        const listSource = {
+            'post': peoplePosts,
+            'wanted': peopleWanteds,
+            'offer': peopleOffers
+        }
+
         const activeList = listSource[selectedWidget]
 
         let searchKeys: any = widgetConfigs[selectedWidget]?.schema?.map(s => s.name) || []
@@ -51,11 +52,13 @@ export default function WidgetSwitchViewer(props) {
             searchKeys = dynamicFields
         }
 
+        console.log('selectedWidget', selectedWidget)
+        console.log('activeList', activeList)
 
-        const allElements = activeList && activeList.map((item, i) => {
+        const listItems = activeList && activeList.map((item, i) => {
             const { person, body } = item
             // if this person has entries for this widget
-            return <Panel key={person?.owner_pubkey + i}
+            return <Panel key={person?.owner_pubkey + i + body.created}
                 onClick={() => {
                     if (onPanelClick) onPanelClick(person, body)
                 }}
@@ -72,9 +75,9 @@ export default function WidgetSwitchViewer(props) {
             </Panel>
         })
 
-        allElements.push(<Spacer key={'spacer'} />)
+        // allElements.push(<Spacer key={'spacer'} />)
 
-        return allElements
+        return listItems
     })
 }
 
