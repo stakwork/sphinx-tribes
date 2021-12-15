@@ -40,8 +40,6 @@ export default function BodyComponent() {
 
     const [resetRender, setResetRender] = useState(false)
 
-
-
     const { peoplePageNumber,
         peopleWantedsPageNumber,
         peoplePostsPageNumber,
@@ -83,7 +81,7 @@ export default function BodyComponent() {
         setResetRender(true)
         setTimeout(() => {
             setResetRender(false)
-        }, 10)
+        }, 50)
     }, [selectedWidget])
 
     async function doDeeplink() {
@@ -106,7 +104,7 @@ export default function BodyComponent() {
         }
     }, [ui.selectedPerson])
 
-    const peopleLoader = <Loader style={{ bottom: 200 }}>
+    const peopleLoader = <Loader style={{ bottom: 80 }}>
         <EuiLoadingSpinner />
     </Loader>
 
