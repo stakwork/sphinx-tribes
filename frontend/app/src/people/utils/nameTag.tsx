@@ -41,7 +41,7 @@ export default function NameTag(props) {
 
         {!isSelected && <>
             <Img
-                src={img || `/static/sphinx`}
+                src={img || `static/person_placeholder.png`}
             />
             <Name>
                 {owner_alias}

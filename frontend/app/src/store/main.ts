@@ -6,6 +6,7 @@ import { getHostIncludingDockerHosts } from "../host";
 import { MeInfo, uiStore } from "./ui";
 
 export const queryLimit = 100
+export const smallQueryLimit = 40
 
 export class MainStore {
   @persist("list")
@@ -175,8 +176,15 @@ export class MainStore {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
       console.log('got openIssues', openIssues)
-      if (openIssues) uiStore.setOpenGithubIssues(openIssues)
-      return openIssues;
+      // remove my own!
+
+      let oIssues = [...openIssues]
+      if (openIssues) {
+        // remove my issues from count
+        // if (uiStore.meInfo?.owner_pubkey) oIssues.filter(f => f.owner_pubkey != uiStore.meInfo?.owner_pubkey)
+        uiStore.setOpenGithubIssues(oIssues)
+      }
+      return oIssues;
     } catch (e) {
       console.log('e', e)
     }
@@ -284,10 +292,10 @@ export class MainStore {
     return;
   }
 
-  @action appendQueryParams(path: string, queryParams?: QueryParams): string {
+  @action appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
     let query = path
     if (queryParams) {
-      queryParams.limit = queryLimit
+      queryParams.limit = limit
       query += '?'
       const length = Object.keys(queryParams).length
       Object.keys(queryParams).forEach((k, i) => {
@@ -309,60 +317,20 @@ export class MainStore {
 
   @action async getPeople(uniqueName?: string, queryParams?: any): Promise<Person[]> {
     console.log('queryParams', queryParams)
-    let query = this.appendQueryParams("people", { ...queryParams, sortBy: 'updated' })
+    let query = this.appendQueryParams("people", queryLimit, { ...queryParams, sortBy: 'updated' })
     let ps = await api.get(query);
 
-    if (!ps || !ps.length) {
-      console.log('got no people, do not change page')
-      return []
-    }
-
-    let direction = 0
-
-    if (queryParams?.page) {
-      // this tells us whether we're loading earlier data, or later data so we can merge the array in the right order
-      if (uiStore.peoplePageNumber < queryParams.page) direction = 1 // paging forward
-      else direction = -1 // paging backward
-
-      // update people page in ui
-      uiStore.setPeoplePageNumber(queryParams.page)
-    }
-
-    // fixme, this is old, dont need to do this if getSelf is updating properly
     if (uiStore.meInfo) {
       const index = ps.findIndex((f) => f.id == uiStore.meInfo?.id);
-
       if (index > -1) {
         // add 'hide' property to me in people list
         ps[index].hide = true;
-
-        let meInfoUpdates: any = {};
-
-        // if meInfo has no img but people list does, copy that
-        if (!uiStore.meInfo.img && ps[index].img) {
-          meInfoUpdates.img = ps[index].img;
-        }
-
-        // if meInfo has no github_issues but people list does, copy that
-        if (!uiStore.meInfo.github_issues && ps[index].github_issues) {
-          meInfoUpdates.github_issues = ps[index].github_issues;
-        }
-
-        // if meInfo has no verification_signature but people list does, copy that
-        if (
-          !uiStore.meInfo.verification_signature &&
-          ps[index].verification_signature
-        ) {
-          meInfoUpdates.verification_signature =
-            ps[index].verification_signature;
-        }
-
-        uiStore.setMeInfo({ ...uiStore.meInfo, ...meInfoUpdates });
       }
     }
 
+    // this is for ordering, fix me, search is its own query
     if (uniqueName) {
-      ps.forEach(function (t: Tribe, i: number) {
+      ps?.forEach(function (t: Tribe, i: number) {
         if (t.unique_name === uniqueName) {
           ps.splice(i, 1);
           ps.unshift(t);
@@ -370,37 +338,149 @@ export class MainStore {
       });
     }
 
-    let keepGroup = [...this.people]
-    let mergePeople
+    this.people = this.doPageListMerger(
+      this.people,
+      ps,
+      uiStore.peoplePageNumber,
+      (n) => uiStore.setPeoplePageNumber(n),
+      queryLimit,
+      queryParams
+    )
+
+    return ps;
+  }
+
+  @action decodeListJSON(li: any): Promise<any[]> {
+    if (li?.length) {
+      li.forEach((o, i) => {
+        li[i].body = JSON.parse(o.body)
+        li[i].person = JSON.parse(o.person)
+      })
+    }
+    return li
+  }
+
+  @persist("list")
+  @observable
+  peoplePosts: PersonPost[] = [];
+
+  @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
+    // console.log('queryParams', queryParams)
+    let query = this.appendQueryParams("people/posts", smallQueryLimit, { ...queryParams, sortBy: 'created' })
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps)
+      this.peoplePosts = this.doPageListMerger(
+        this.peoplePosts,
+        ps,
+        uiStore.peoplePostsPageNumber,
+        (n) => uiStore.setPeoplePostsPageNumber(n),
+        smallQueryLimit,
+        queryParams)
+      return ps;
+    } catch (e) {
+      console.log('fetch failed', e)
+      return [];
+    }
+  }
+
+  @persist("list")
+  @observable
+  peopleWanteds: PersonWanted[] = [];
+
+  @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
+    // console.log('queryParams', queryParams)
+    let query = this.appendQueryParams("people/wanteds", smallQueryLimit, { ...queryParams, sortBy: 'created' })
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps)
+
+      this.peopleWanteds = this.doPageListMerger(
+        this.peopleWanteds,
+        ps,
+        uiStore.peopleWantedsPageNumber,
+        (n) => uiStore.setPeopleWantedsPageNumber(n),
+        smallQueryLimit,
+        queryParams)
+      return ps;
+    } catch (e) {
+      console.log('fetch failed', e)
+      return [];
+    }
+  }
+
+  @persist("list")
+  @observable
+  peopleOffers: PersonOffer[] = [];
+
+  @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
+    // console.log('queryParams', queryParams)
+    let query = this.appendQueryParams("people/offers", smallQueryLimit, { ...queryParams, sortBy: 'created' })
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps)
+      this.peopleOffers = this.doPageListMerger(
+        this.peopleOffers,
+        ps,
+        uiStore.peopleOffersPageNumber,
+        (n) => uiStore.setPeopleOffersPageNumber(n),
+        smallQueryLimit,
+        queryParams)
+      return ps;
+    } catch (e) {
+      console.log('fetch failed', e)
+      return [];
+    }
+
+  }
+
+
+  @action doPageListMerger(currentList: any[], newList: any[], pageNumber: number, setPage: Function, limit: number, queryParams?: any) {
+    if (!newList || !newList.length) {
+      console.log('got no new items, do not change page')
+      return currentList
+    }
+
+    console.log('newList', newList)
+
+    let direction = 0
+
+    if (queryParams?.page) {
+      // this tells us whether we're loading earlier data, or later data so we can merge the array in the right order
+      if (pageNumber < queryParams.page) direction = 1 // paging forward
+      else direction = -1 // paging backward
+
+      // update page number in ui
+      setPage(queryParams.page)
+    }
+
+    let keepGroup = [...currentList]
+    let merger
+    // no page movement, all incoming are the new list
     if (direction === 0) {
-      mergePeople = ps
+      merger = newList
     }
     // paging forward
     else if (direction > 0) {
-      keepGroup = keepGroup.slice(0, queryLimit)
-      mergePeople = [...keepGroup, ...ps];
+      keepGroup = keepGroup.slice(0, limit)
+      merger = [...keepGroup, ...newList];
     }
     // paging backward
     else {
-      keepGroup = keepGroup.slice(queryLimit, queryLimit + queryLimit)
-      mergePeople = [...ps, ...keepGroup];
+      keepGroup = keepGroup.slice(limit, limit + limit)
+      merger = [...newList, ...keepGroup];
     }
 
-    // console.log('mergePeople', mergePeople)
+    // let ids: any = []
+    // merger.forEach((p: any, i: number) => {
+    //   if (!ids.includes(p.created)) ids.push(p.created)
+    //   else {
+    //     console.log('found duplicates!', p.created)
+    //     merger[i].hide = true
+    //   }
+    // })
 
-    // remove duplicates if any
-    let ids: any = []
-    mergePeople.forEach((p: any, i: number) => {
-      if (!ids.includes(p.id)) ids.push(p.id)
-      else {
-        console.log('found duplicates!', p.id)
-        mergePeople[i].hide = true
-      }
-    })
-
-    this.people = mergePeople
-
-    return ps;
+    return merger
   }
 
   @action async getPersonByPubkey(pubkey: string): Promise<Person> {
@@ -647,6 +727,47 @@ export interface Person {
   verification_signature: string;
   extras: Extras;
   hide?: boolean;
+}
+
+export interface PersonFlex {
+  id?: number;
+  unique_name?: string;
+  owner_pubkey?: string;
+  owner_alias?: string;
+  description?: string;
+  img?: string;
+  tags?: string[];
+  pubkey?: string;
+  photo_url?: string;
+  alias?: string;
+  route_hint?: string;
+  contact_key?: string;
+  price_to_meet?: number;
+  url?: string;
+  verification_signature?: string;
+  extras?: Extras;
+  hide?: boolean;
+}
+
+export interface PersonPost {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created: number;
+}
+
+export interface PersonWanted {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created: number;
+}
+
+export interface PersonOffer {
+  person: PersonFlex;
+  title: string;
+  description: string;
+  created: number;
 }
 
 export interface Jwt {
