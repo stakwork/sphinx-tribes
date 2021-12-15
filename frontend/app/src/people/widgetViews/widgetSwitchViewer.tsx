@@ -15,25 +15,46 @@ const getStores = useStores
 // const getScroll = useScroll
 
 export default function WidgetSwitchViewer(props) {
+    const { main } = useStores()
+    const { peoplePosts, peopleWanteds, peopleOffers } = main
     const isMobile = useIsMobile()
-    return useObserver(() => {
 
-        const { main } = getStores()
+    const listSource = {
+        'post': peoplePosts,
+        'wanted': peopleWanteds,
+        'offer': peopleOffers
+    }
 
-        const { peoplePosts, peopleWanteds, peopleOffers } = main
+    let { onPanelClick } = props
 
-        const listSource = {
-            'post': peoplePosts,
-            'wanted': peopleWanteds,
-            'offer': peopleOffers
+    function wrapIt(child, item, i) {
+        const { person, body } = item
+        const panelStyles = isMobile ? {
+            minHeight: 132
+        } : {
+            maxWidth: 291, minWidth: 291,
+            marginRight: 20, marginBottom: 20, minHeight: 472
         }
 
-        let { selectedWidget, onPanelClick } = props
+        return <Panel key={person?.owner_pubkey + i}
+            onClick={() => {
+                if (onPanelClick) onPanelClick(person, body)
+            }}
+            style={{
+                ...panelStyles,
+                cursor: 'pointer',
+                padding: 0, overflow: 'hidden'
+            }}
+        >
+            {React.cloneElement(child, { ...body })}
+        </Panel>
+    }
 
+    return useObserver(() => {
+        let { selectedWidget } = props
         if (!selectedWidget) {
             return <div style={{ height: 200 }} />
         }
-
         const activeList = listSource[selectedWidget]
 
         const renderView = {
@@ -41,8 +62,6 @@ export default function WidgetSwitchViewer(props) {
             offer: (p, i) => <OfferView showName key={i + p.owner_pubkey + 'view'} person={p} />,
             wanted: (p, i) => <WantedView showName key={i + p.owner_pubkey + 'view'} person={p} />,
         }
-
-        let allElements: any = []
 
         let searchKeys: any = widgetConfigs[selectedWidget]?.schema?.map(s => s.name) || []
         let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(f => f.dynamicSchemas)
@@ -57,40 +76,12 @@ export default function WidgetSwitchViewer(props) {
             searchKeys = dynamicFields
         }
 
-
-        activeList && activeList.forEach((item, i) => {
+        let allElements = activeList && activeList.map((item, i) => {
             // if this person has entries for this widget
-            if (item) {
-                if (renderView[selectedWidget]) {
-                    allElements.push(wrapIt(renderView[selectedWidget](item.person, i), item, i))
-                }
-            }
+            return wrapIt(renderView[selectedWidget](item.person, i), item, i)
         })
 
-        function wrapIt(child, item, i) {
-            const { person, body } = item
-            const panelStyles = isMobile ? {
-                minHeight: 132
-            } : {
-                maxWidth: 291, minWidth: 291,
-                marginRight: 20, marginBottom: 20, minHeight: 472
-            }
-
-            return <Panel key={person?.owner_pubkey + i}
-                onClick={() => {
-                    if (onPanelClick) onPanelClick(person, body)
-                }}
-                style={{
-                    ...panelStyles,
-                    cursor: 'pointer',
-                    padding: 0, overflow: 'hidden'
-                }}
-            >
-                {React.cloneElement(child, { ...body })}
-            </Panel>
-        }
-
-        allElements = [...allElements, <Spacer key={'spacer'} />]
+        allElements.push(<Spacer key={'spacer'} />)
 
         return allElements
     })
