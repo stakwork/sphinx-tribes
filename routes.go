@@ -63,6 +63,9 @@ func NewRouter() *http.Server {
 		r.Get("/feed", getGenericFeed)
 		r.Get("/search_podcasts", searchPodcasts)
 		r.Get("/people", getListedPeople)
+		r.Get("/people/posts", getListedPosts)
+		r.Get("/people/wanteds", getListedWanteds)
+		r.Get("/people/offers", getListedOffers)
 
 		r.Get("/ask", ask)
 		r.Get("/poll/{challenge}", poll)
@@ -192,6 +195,33 @@ func getListedPeople(w http.ResponseWriter, r *http.Request) {
 	people := DB.getListedPeople(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
+}
+func getListedPosts(w http.ResponseWriter, r *http.Request) {
+	people, err := DB.getListedPosts(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
+}
+func getListedWanteds(w http.ResponseWriter, r *http.Request) {
+	people, err := DB.getListedWanteds(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
+}
+func getListedOffers(w http.ResponseWriter, r *http.Request) {
+	people, err := DB.getListedOffers(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
 }
 
 func getTribe(w http.ResponseWriter, r *http.Request) {

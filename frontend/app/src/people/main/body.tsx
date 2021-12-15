@@ -38,7 +38,11 @@ export default function BodyComponent() {
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
 
-    const { peoplePageNumber, openGithubIssues } = ui
+    const { peoplePageNumber,
+        peopleWantedsPageNumber,
+        peoplePostsPageNumber,
+        peopleOffersPageNumber,
+        openGithubIssues } = ui
 
     const [selectedWidget, setSelectedWidget] = useState('people')
 
@@ -118,8 +122,16 @@ export default function BodyComponent() {
         setLoading(false)
     }
 
+    async function loadPeopleExtras() {
+        console.log("load extras")
+        main.getPeopleWanteds()
+        main.getPeopleOffers()
+        main.getPeoplePosts()
+    }
+
     useEffect(() => {
         loadPeople()
+        loadPeopleExtras()
         main.getOpenGithubIssues()
     }, [])
 
@@ -131,9 +143,22 @@ export default function BodyComponent() {
 
 
 
-    function publicPanelClick(person, widget, i) {
-        setPublicFocusPerson(person)
-        setPublicFocusIndex(i)
+    async function publicPanelClick(person, item) {
+        // migrating to load widgets separate from person
+        const itemIndex = person[selectedWidget]?.findIndex(f => f.created === item.created)
+        if (itemIndex > -1) {
+            // make person into proper structure (derived from widget) 
+            let p = {
+                ...person,
+                extras: {
+                    [selectedWidget]: person[selectedWidget]
+                }
+
+            }
+            setPublicFocusPerson(p)
+            setPublicFocusIndex(itemIndex)
+        }
+
     }
 
     function goBack() {
@@ -142,36 +167,73 @@ export default function BodyComponent() {
     }
 
 
+
     return useObserver(() => {
         let people = getFuse(main.people, ["owner_alias"])
 
-        const loadForwardFunc = selectedWidget === 'people' ? () => loadMorePeople(1) : () => console.log('scroll bottom')
-        const loadBackwardFunc = selectedWidget === 'people' ? () => loadMorePeople(-1) : () => console.log('scroll top')
-
+        const loadForwardFunc = () => loadMore(1)
+        const loadBackwardFunc = () => loadMore(-1)
         const { loadingTop, loadingBottom, handleScroll } = getPageScroll(loadForwardFunc, loadBackwardFunc)
 
         people = (people && people.filter(f => !f.hide)) || []
 
-        async function loadMorePeople(direction) {
-            let newPage = peoplePageNumber + direction
+        async function loadMore(direction) {
+            let currentPage = 1
+
+            console.log('selectedWidget', selectedWidget)
+
+            switch (selectedWidget) {
+                case 'people':
+                    currentPage = peoplePageNumber
+                case 'wanted':
+                    currentPage = peopleWantedsPageNumber
+                case 'offer':
+                    currentPage = peopleOffersPageNumber
+                case 'post':
+                    currentPage = peoplePostsPageNumber
+                default:
+                    console.log('scroll', direction);
+            }
+
+            let newPage = currentPage + direction
             if (newPage < 1) newPage = 1
 
-            await main.getPeople('', { page: newPage })
+            try {
+                switch (selectedWidget) {
+                    case 'people':
+                        await main.getPeople('', { page: newPage })
+                    case 'wanted':
+                        await main.getPeopleWanteds({ page: newPage })
+                    case 'offer':
+                        await main.getPeopleOffers({ page: newPage })
+                    case 'post':
+                        await main.getPeoplePosts({ page: newPage })
+                    default:
+                        console.log('scroll', direction);
+                }
+            } catch (e) {
+                console.log('load failed', e)
+            }
+
         }
 
         function renderPeople() {
-            const p = people?.map(t => <Person {...t} key={t.id}
+            let p = people?.map(t => <Person {...t} key={t.id}
                 small={isMobile}
                 squeeze={screenWidth < 1420}
                 selected={ui.selectedPerson === t.id}
                 select={selectPerson}
             />)
+
+            // add space at bottom
+            p = [...p, <Spacer key={'spacer'} />]
+
             return p
         }
 
         const listContent = selectedWidget === 'people' ? renderPeople() : <WidgetSwitchViewer
-            onPanelClick={(person, widget, i) => {
-                publicPanelClick(person, widget, i)
+            onPanelClick={(person, item) => {
+                publicPanelClick(person, item)
             }}
             selectedWidget={selectedWidget} />
 
@@ -243,8 +305,6 @@ export default function BodyComponent() {
                             </div>}
                         </Link>
                     </Label>
-
-
 
                     <SearchTextInput
                         small
@@ -377,8 +437,8 @@ export default function BodyComponent() {
                 }}>
                     {(loadingTop || loadingBottom) && peopleLoader}
                     {listContent}
+
                 </div>
-                <div style={{ height: 100 }} />
             </>
 
 
@@ -472,6 +532,7 @@ const Tab = styled.div<TagProps>`
             display:flex;
             padding:10px 25px;
             margin-right:35px;
+            height:40px;
             color:${p => p.selected ? '#5078F2' : '#5F6368'};
         // border-bottom: ${p => p.selected && '4px solid #618AFF'};
             cursor:pointer;
@@ -500,4 +561,12 @@ const Loader = styled.div`
             padding:10px;
             left:0px;
             z-index:20;
+`;
+
+export const Spacer = styled.div`
+            display:flex;
+            min-height:10px;
+            min-width:100%;
+            height:10px;
+            width:100%;
 `;
