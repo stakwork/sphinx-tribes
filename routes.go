@@ -63,6 +63,7 @@ func NewRouter() *http.Server {
 		r.Get("/feed", getGenericFeed)
 		r.Get("/search_podcasts", searchPodcasts)
 		r.Get("/search_youtube", searchYoutube)
+		r.Get("/youtube_videos", youtubeVideosForChannel)
 		r.Get("/people", getListedPeople)
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
@@ -170,6 +171,18 @@ func searchPodcasts(w http.ResponseWriter, r *http.Request) {
 func searchYoutube(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	fs, err := feeds.YoutubeSearch(q)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(fs)
+}
+
+func youtubeVideosForChannel(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("channelId")
+	fs, err := feeds.YoutubeVideosForChannel(q)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
