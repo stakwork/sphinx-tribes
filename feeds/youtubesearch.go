@@ -47,3 +47,47 @@ func YoutubeSearch(term string) ([]Feed, error) {
 
 	return fs, err
 }
+
+func YoutubeVideosForChannel(channelId string) ([]Item, error) {
+	apiKey := os.Getenv("YOUTUBE_KEY")
+	ctx := context.Background()
+	tube, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
+	if err != nil {
+		return nil, err
+	}
+	call := tube.Search.List([]string{"snippet"})
+	call.ChannelId(channelId)
+	call.Type("video")
+	response, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
+
+	fs := []Item{}
+	for _, r := range response.Items {
+		tp, _ := dateparse.ParseAny(r.Snippet.PublishedAt)
+		thumb := ""
+		if r.Snippet.Thumbnails != nil {
+			thumb = r.Snippet.Thumbnails.Default.Url
+		}
+		if r.Id == nil {
+			continue
+		}
+		id := r.Id.VideoId
+		link := "https://www.youtube.com/watch?v=" + r.Id.VideoId
+		f := Item{
+			Id:            id,
+			Title:         r.Snippet.Title,
+			Description:   r.Snippet.Description,
+			DatePublished: tp.Unix(),
+			ImageUrl:      thumb,
+			EnclosureURL:  link,
+			Link:          link,
+		}
+		fs = append(fs, f)
+	}
+
+	fmt.Printf("%+v\n", fs)
+
+	return fs, err
+}
