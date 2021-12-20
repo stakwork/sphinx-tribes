@@ -32,9 +32,11 @@ func YoutubeSearch(term string) ([]Feed, error) {
 		if r.Snippet.Thumbnails != nil {
 			thumb = r.Snippet.Thumbnails.Default.Url
 		}
+		url := "https://www.youtube.com/feeds/videos.xml?channel_id=" + r.Snippet.ChannelId
 		f := Feed{
 			ID:            r.Snippet.ChannelId,
 			FeedType:      FeedTypeVideo,
+			Url:           url,
 			Title:         r.Snippet.Title,
 			Description:   r.Snippet.Description,
 			DatePublished: tp.Unix(),
