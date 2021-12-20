@@ -19,6 +19,7 @@ func YoutubeSearch(term string) ([]Feed, error) {
 	}
 	call := tube.Search.List([]string{"snippet"})
 	call.Q(term)
+	call.MaxResults(50)
 	call.Type("channel", "playlist")
 	response, err := call.Do()
 	if err != nil {
