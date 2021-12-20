@@ -23,8 +23,11 @@ func main() {
 	initDB()
 	initCache()
 
-	go processTwitterConfirmationsLoop()
-	go processGithubIssuesLoop()
+	skipLoops := os.Getenv("SKIP_LOOPS")
+	if skipLoops != "true" {
+		go processTwitterConfirmationsLoop()
+		go processGithubIssuesLoop()
+	}
 
 	run()
 }
