@@ -45,8 +45,6 @@ func YoutubeSearch(term string) ([]Feed, error) {
 		fs = append(fs, f)
 	}
 
-	fmt.Printf("%+v\n", fs)
-
 	return fs, err
 }
 
