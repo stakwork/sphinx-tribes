@@ -32,7 +32,12 @@ func YoutubeSearch(term string) ([]Feed, error) {
 		if r.Snippet.Thumbnails != nil {
 			thumb = r.Snippet.Thumbnails.Default.Url
 		}
-		url := "https://www.youtube.com/feeds/videos.xml?channel_id=" + r.Snippet.ChannelId
+		url := "https://www.youtube.com/feeds/videos.xml?"
+		if r.Id.PlaylistId != "" && r.Id.ChannelId == "" {
+			url = url + "playlist_id=" + r.Id.PlaylistId
+		} else {
+			url = url + "channel_id=" + r.Snippet.ChannelId
+		}
 		f := Feed{
 			ID:            r.Snippet.ChannelId,
 			FeedType:      FeedTypeVideo,
