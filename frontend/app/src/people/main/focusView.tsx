@@ -201,7 +201,7 @@ export default function FocusedView(props: any) {
         return alert("Failed to save data");
       }
 
-      await main.getPeople("");
+      await main.getPeople();
       // massage data
 
       ui.setMeInfo(body);

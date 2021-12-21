@@ -776,3 +776,8 @@ margin-bottom:10px;
   border-width:0px !important;
   border: none !important;
 }
+
+/* the erase button for inputs */
+input::-webkit-search-cancel-button{
+  -webkit-appearance: none;
+}

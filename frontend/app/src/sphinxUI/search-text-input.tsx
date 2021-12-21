@@ -16,6 +16,11 @@ export default function SearchTextInput(props: any) {
         props.onChange(debounceValue)
     }
 
+    function erase() {
+        setSearchValue('')
+        props.onChange('')
+    }
+
     return <div style={{ position: 'relative' }}><Text
         {...props}
         onFocus={() => setExpand(true)}
@@ -31,7 +36,11 @@ export default function SearchTextInput(props: any) {
         placeholder={'Search'}
         style={{ ...props.style, ...collapseStyles }}
     />
-        {!ui.searchText &&
+        {searchValue ?
+            <MaterialIcon icon='close' onClick={() => erase()} style={{
+                position: 'absolute', color: '#757778', cursor: 'pointer',
+                top: 9, right: 9, fontSize: 22, userSelect: 'none',
+            }} /> :
             <MaterialIcon icon='search' style={{
                 position: 'absolute', color: '#B0B7BC',
                 top: 9, right: 9, fontSize: 22, userSelect: 'none', pointerEvents: 'none'

@@ -315,8 +315,10 @@ export class MainStore {
   @observable
   people: Person[] = [];
 
-  @action async getPeople(uniqueName?: string, queryParams?: any): Promise<Person[]> {
-    console.log('queryParams', queryParams)
+  @action async getPeople(queryParams?: any): Promise<Person[]> {
+
+    queryParams = { ...queryParams, search: uiStore.searchText }
+
     let query = this.appendQueryParams("people", queryLimit, { ...queryParams, sortBy: 'updated' })
     let ps = await api.get(query);
 
@@ -329,23 +331,32 @@ export class MainStore {
     }
 
     // this is for ordering, fix me, search is its own query
-    if (uniqueName) {
-      ps?.forEach(function (t: Tribe, i: number) {
-        if (t.unique_name === uniqueName) {
-          ps.splice(i, 1);
-          ps.unshift(t);
-        }
-      });
-    }
+    // if (uniqueName) {
+    //   ps?.forEach(function (t: Tribe, i: number) {
+    //     if (t.unique_name === uniqueName) {
+    //       ps.splice(i, 1);
+    //       ps.unshift(t);
+    //     }
+    //   });
+    // }
 
-    this.people = this.doPageListMerger(
-      this.people,
-      ps,
-      uiStore.peoplePageNumber,
-      (n) => uiStore.setPeoplePageNumber(n),
-      queryLimit,
-      queryParams
-    )
+    console.log('ps', ps)
+
+    // for search always reset page
+    if (queryParams && queryParams.resetPage) {
+      this.people = ps
+      uiStore.setPeoplePageNumber(1)
+    } else {
+      // all other cases, merge
+      this.people = this.doPageListMerger(
+        this.people,
+        ps,
+        uiStore.peoplePageNumber,
+        (n) => uiStore.setPeoplePageNumber(n),
+        queryLimit,
+        queryParams
+      )
+    }
 
     return ps;
   }
@@ -366,17 +377,28 @@ export class MainStore {
 
   @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     // console.log('queryParams', queryParams)
+    queryParams = { ...queryParams, search: uiStore.searchText }
     let query = this.appendQueryParams("people/posts", smallQueryLimit, { ...queryParams, sortBy: 'created' })
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
-      this.peoplePosts = this.doPageListMerger(
-        this.peoplePosts,
-        ps,
-        uiStore.peoplePostsPageNumber,
-        (n) => uiStore.setPeoplePostsPageNumber(n),
-        smallQueryLimit,
-        queryParams)
+
+      console.log('ps', ps)
+
+      // for search always reset page
+      if (queryParams && queryParams.resetPage) {
+        this.peoplePosts = ps
+        uiStore.setPeoplePostsPageNumber(1)
+      } else {
+        // all other cases, merge
+        this.peoplePosts = this.doPageListMerger(
+          this.peoplePosts,
+          ps,
+          uiStore.peoplePostsPageNumber,
+          (n) => uiStore.setPeoplePostsPageNumber(n),
+          smallQueryLimit,
+          queryParams)
+      }
       return ps;
     } catch (e) {
       console.log('fetch failed', e)
@@ -390,18 +412,28 @@ export class MainStore {
 
   @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     // console.log('queryParams', queryParams)
+    queryParams = { ...queryParams, search: uiStore.searchText }
     let query = this.appendQueryParams("people/wanteds", smallQueryLimit, { ...queryParams, sortBy: 'created' })
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
 
-      this.peopleWanteds = this.doPageListMerger(
-        this.peopleWanteds,
-        ps,
-        uiStore.peopleWantedsPageNumber,
-        (n) => uiStore.setPeopleWantedsPageNumber(n),
-        smallQueryLimit,
-        queryParams)
+      console.log('ps', ps)
+
+      // for search always reset page
+      if (queryParams && queryParams.resetPage) {
+        this.peopleWanteds = ps
+        uiStore.setPeopleWantedsPageNumber(1)
+      } else {
+        // all other cases, merge
+        this.peopleWanteds = this.doPageListMerger(
+          this.peopleWanteds,
+          ps,
+          uiStore.peopleWantedsPageNumber,
+          (n) => uiStore.setPeopleWantedsPageNumber(n),
+          smallQueryLimit,
+          queryParams)
+      }
       return ps;
     } catch (e) {
       console.log('fetch failed', e)
@@ -415,17 +447,29 @@ export class MainStore {
 
   @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
     // console.log('queryParams', queryParams)
+    queryParams = { ...queryParams, search: uiStore.searchText }
     let query = this.appendQueryParams("people/offers", smallQueryLimit, { ...queryParams, sortBy: 'created' })
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
-      this.peopleOffers = this.doPageListMerger(
-        this.peopleOffers,
-        ps,
-        uiStore.peopleOffersPageNumber,
-        (n) => uiStore.setPeopleOffersPageNumber(n),
-        smallQueryLimit,
-        queryParams)
+
+      console.log('ps', ps)
+
+      // for search always reset page
+      if (queryParams && queryParams.resetPage) {
+        this.peopleOffers = ps
+        uiStore.setPeopleOffersPageNumber(1)
+      } else {
+        // all other cases, merge
+        this.peopleOffers = this.doPageListMerger(
+          this.peopleOffers,
+          ps,
+          uiStore.peopleOffersPageNumber,
+          (n) => uiStore.setPeopleOffersPageNumber(n),
+          smallQueryLimit,
+          queryParams)
+      }
+
       return ps;
     } catch (e) {
       console.log('fetch failed', e)

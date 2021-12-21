@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Divider } from '../../sphinxUI';
 import QrBar from '../utils/QrBar'
 import ReactMarkdown from 'react-markdown'
-import { useStores } from '../../store';
 import { useHistory, useLocation } from 'react-router-dom'
 
 export function renderMarkdown(str) {
@@ -12,12 +11,17 @@ export function renderMarkdown(str) {
 
 export default function AboutView(props: any) {
     const history = useHistory()
-    const { price_to_meet, description, extras, twitter_confirmed, owner_pubkey } = props
+    const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props
     const { twitter, github, coding_languages, tribes, repos, lightning, amboss } = extras || {}
     let tag = ''
     let githubTag = ''
     let lightningAddress = ''
     let ambossAddress = ''
+
+    let { description } = props
+
+    // backend is adding 'description' to empty descriptions, short term fix
+    if (description === 'description') description = ''
 
     const [expand, setExpand] = useState(false)
 
