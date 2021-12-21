@@ -5,11 +5,11 @@ import (
 	"strconv"
 )
 
-func getPaginationParams(r *http.Request) (int, int, string, string) {
+func getPaginationParams(r *http.Request) (int, int, string, string, string) {
 
 	// there are cases when the request is not passed in
 	if r == nil {
-		return 0, -1, "updated", "asc"
+		return 0, -1, "updated", "asc", ""
 	}
 
 	keys := r.URL.Query()
@@ -17,6 +17,7 @@ func getPaginationParams(r *http.Request) (int, int, string, string) {
 	limit := keys.Get("limit")
 	sortBy := keys.Get("sortBy")
 	direction := keys.Get("direction")
+	search := keys.Get("search")
 
 	// convert string to int
 	intPage, _ := strconv.Atoi(page)
@@ -41,5 +42,11 @@ func getPaginationParams(r *http.Request) (int, int, string, string) {
 		offset = (intPage - 1) * intLimit
 	}
 
-	return offset, intLimit, sortBy, direction
+	return offset, intLimit, sortBy, direction, search
+}
+
+func buildSearchQuery(key string, term string) (string, string) {
+	arg1 := key + " LIKE ?"
+	arg2 := "%" + term + "%"
+	return arg1, arg2
 }
