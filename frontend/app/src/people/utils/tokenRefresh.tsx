@@ -24,7 +24,7 @@ export default function TokenRefresh() {
                     ui.setSelectingPerson(0)
                     setShow(true)
                     // run this to reset state
-                    main.getPeople('')
+                    main.getPeople()
                 }
             }
         }, 6000)

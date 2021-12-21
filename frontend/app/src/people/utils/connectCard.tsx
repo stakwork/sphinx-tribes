@@ -18,7 +18,7 @@ export default function ConnectCard(props) {
         <div style={{ textAlign: 'center', paddingTop: 59, width: 310, }}>
             <ImgWrap>
                 <W>
-                    <Icon src={person?.img} />
+                    <Icon src={person?.img || '/static/person_placeholder.png'} />
                 </W>
             </ImgWrap>
             <div style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}>
