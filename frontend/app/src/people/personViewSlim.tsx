@@ -11,7 +11,7 @@ import SupportMeView from "./widgetViews/supportMeView";
 import WantedView from "./widgetViews/wantedView";
 import PostView from "./widgetViews/postView";
 
-import { Button, IconButton, Modal } from "../sphinxUI";
+import { Button, IconButton, Modal, SearchTextInput } from "../sphinxUI";
 import MaterialIcon from "@material/react-material-icon";
 import FocusedView from './main/focusView'
 import { meSchema } from "../form/schema";
@@ -73,13 +73,17 @@ export default function PersonView(props: any) {
         id,
         img,
         tags,
-        description,
         owner_alias,
         unique_name,
         price_to_meet,
         extras,
         owner_pubkey
     } = person || {}
+
+    let { description } = person || {}
+
+    // backend is adding 'description' to empty descriptions, short term fix
+    if (description === 'description') description = ''
 
 
 
@@ -101,7 +105,7 @@ export default function PersonView(props: any) {
         let newPage = peoplePageNumber + direction
         if (newPage < 1) newPage = 1
 
-        await main.getPeople('', { page: newPage })
+        await main.getPeople({ page: newPage })
     }
 
     // deeplink load person
@@ -545,6 +549,19 @@ export default function PersonView(props: any) {
                             text='Back'
                             onClick={goBack}
                         />
+
+                        <SearchTextInput
+                            small
+                            name='search'
+                            type='search'
+                            placeholder='Search'
+                            value={ui.searchText}
+                            style={{ width: 120, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
+                            onChange={e => {
+                                console.log('handleChange', e)
+                                ui.setSearchText(e)
+                            }}
+                        />
                     </DBack>
 
                     {loadingTop && loaderTop}
@@ -847,7 +864,9 @@ const DBack = styled.div`
             min-height:64px;
             height:64px;
             display:flex;
+            padding-right:10px;
             align-items:center;
+            justify-content:space-between;
             background: #FFFFFF;
             box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
             z-index:0;
