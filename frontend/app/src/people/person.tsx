@@ -13,7 +13,7 @@ function makeQR(pubkey: string) {
 
 export default function Person(props: any) {
 
-  const {
+  let {
     hideActions,
     small,
     id,
@@ -32,6 +32,9 @@ export default function Person(props: any) {
     extras,
     twitter_confirmed
   } = props
+
+  // backend is adding 'description' to empty descriptions, short term fix
+  if (description === 'description') description = ''
 
   const [showQR, setShowQR] = useState(false);
 

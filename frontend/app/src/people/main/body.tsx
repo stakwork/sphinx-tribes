@@ -38,6 +38,8 @@ export default function BodyComponent() {
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
 
+    const [pageInitDone, setPageInitDone] = useState(false)
+
     const { peoplePageNumber,
         peopleWantedsPageNumber,
         peoplePostsPageNumber,
@@ -54,14 +56,21 @@ export default function BodyComponent() {
         {
             label: 'People',
             name: 'people',
-
         },
         widgetConfigs['post'],
         widgetConfigs['offer'],
         widgetConfigs['wanted'],
     ]
+
     const isMobile = useIsMobile()
     const pathname = history?.location?.pathname
+
+    const loadMethods = {
+        people: (a) => main.getPeople(a),
+        post: (a) => main.getPeoplePosts(a),
+        offer: (a) => main.getPeopleOffers(a),
+        wanted: (a) => main.getPeopleWanteds(a)
+    }
 
     // deeplink page navigation
     useEffect(() => {
@@ -73,6 +82,54 @@ export default function BodyComponent() {
             clearTimeout(deeplinkTimeout)
         }
     }, [])
+
+
+    useEffect(() => {
+        // clear public focus is selected person
+        if (ui.selectedPerson) {
+            setPublicFocusPerson(null)
+            setPublicFocusIndex(-1)
+        }
+    }, [ui.selectedPerson])
+
+
+    useEffect(() => {
+        loadPeople()
+        loadPeopleExtras()
+        main.getOpenGithubIssues()
+    }, [])
+
+    useEffect(() => {
+        if (ui.meInfo) {
+            main.getTribesByOwner(ui.meInfo.owner_pubkey || '')
+        }
+    }, [ui.meInfo])
+
+    // do search update
+    useEffect(() => {
+        (async () => {
+            // selectedWidget
+            // get assets page 1, by widget
+
+            if (pageInitDone) {
+                console.log('refresh list for search')
+                const loadMethod = loadMethods[selectedWidget]
+                // reset page will replace all results, this is good for a new search!
+                await loadMethod({ page: 1, resetPage: true })
+            } else {
+                setPageInitDone(true)
+            }
+        })()
+
+    }, [ui.searchText, selectedWidget])
+
+    async function loadPeopleExtras() {
+        console.log("load extras")
+        main.getPeopleWanteds()
+        main.getPeopleOffers()
+        main.getPeoplePosts()
+    }
+
 
     async function doDeeplink() {
         if (pathname) {
@@ -86,13 +143,6 @@ export default function BodyComponent() {
         }
     }
 
-    useEffect(() => {
-        // clear public focus is selected person
-        if (ui.selectedPerson) {
-            setPublicFocusPerson(null)
-            setPublicFocusIndex(-1)
-        }
-    }, [ui.selectedPerson])
 
     const peopleLoader = <Loader style={{ bottom: 80 }}>
         <EuiLoadingSpinner />
@@ -110,36 +160,20 @@ export default function BodyComponent() {
 
     async function loadPeople() {
         setLoading(true)
-        let un = ''
-        if (window.location.pathname.startsWith('/p/')) {
-            un = window.location.pathname.substr(3)
-        }
-        const ps = await main.getPeople(un, { page: peoplePageNumber })
-        if (un) {
-            const initial = ps[0]
-            if (initial && initial.unique_name === un) ui.setSelectedPerson(initial.id)
-        }
+        // let un = ''
+        // if (window.location.pathname.startsWith('/p/')) {
+        //     un = window.location.pathname.substr(3)
+        // }
+        const ps = await main.getPeople({ page: peoplePageNumber })
+        // if (un) {
+        //     const initial = ps[0]
+        //     if (initial && initial.unique_name === un) ui.setSelectedPerson(initial.id)
+        // }
         setLoading(false)
     }
 
-    async function loadPeopleExtras() {
-        console.log("load extras")
-        main.getPeopleWanteds()
-        main.getPeopleOffers()
-        main.getPeoplePosts()
-    }
 
-    useEffect(() => {
-        loadPeople()
-        loadPeopleExtras()
-        main.getOpenGithubIssues()
-    }, [])
 
-    useEffect(() => {
-        if (ui.meInfo) {
-            main.getTribesByOwner(ui.meInfo.owner_pubkey || '')
-        }
-    }, [ui.meInfo])
 
 
 
@@ -205,7 +239,7 @@ export default function BodyComponent() {
             try {
                 switch (selectedWidget) {
                     case 'people':
-                        await main.getPeople('', { page: newPage })
+                        await main.getPeople({ page: newPage })
                         break
                     case 'wanted':
                         await main.getPeopleWanteds({ page: newPage })
