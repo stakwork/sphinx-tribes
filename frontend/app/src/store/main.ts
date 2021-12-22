@@ -6,7 +6,7 @@ import { getHostIncludingDockerHosts } from "../host";
 import { MeInfo, uiStore } from "./ui";
 
 export const queryLimit = 100
-export const smallQueryLimit = 40
+export const smallQueryLimit = 100
 
 export class MainStore {
   @persist("list")
@@ -311,7 +311,7 @@ export class MainStore {
     return query
   }
 
-  @persist("list")
+  // @persist("list")
   @observable
   people: Person[] = [];
 
@@ -340,7 +340,7 @@ export class MainStore {
     //   });
     // }
 
-    console.log('ps', ps)
+    // console.log('ps', ps)
 
     // for search always reset page
     if (queryParams && queryParams.resetPage) {
@@ -371,7 +371,7 @@ export class MainStore {
     return li
   }
 
-  @persist("list")
+  // @persist("list")
   @observable
   peoplePosts: PersonPost[] = [];
 
@@ -383,7 +383,7 @@ export class MainStore {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
 
-      console.log('ps', ps)
+      // console.log('ps', ps)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -406,7 +406,7 @@ export class MainStore {
     }
   }
 
-  @persist("list")
+  // @persist("list")
   @observable
   peopleWanteds: PersonWanted[] = [];
 
@@ -418,7 +418,7 @@ export class MainStore {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
 
-      console.log('ps', ps)
+      // console.log('ps', ps)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -441,7 +441,7 @@ export class MainStore {
     }
   }
 
-  @persist("list")
+  // @persist("list")
   @observable
   peopleOffers: PersonOffer[] = [];
 
@@ -453,7 +453,7 @@ export class MainStore {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
 
-      console.log('ps', ps)
+      // console.log('ps', ps)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -485,7 +485,15 @@ export class MainStore {
       return currentList
     }
 
-    console.log('newList', newList)
+    // FIX ME, make me an infinite loader
+
+    // console.log('newList', newList)
+
+    // let whileIndex = 0
+    // while (newList.length < limit) {
+    //   newList.push({ created: (163463 * whileIndex + 1), hide: true, lastPage: true })
+    //   whileIndex++
+    // }
 
     let direction = 0
 
@@ -501,26 +509,40 @@ export class MainStore {
     let keepGroup = [...currentList]
     let merger
     // no page movement, all incoming are the new list
-    if (direction === 0) {
-      merger = newList
-    }
-    // paging forward
-    else if (direction > 0) {
-      keepGroup = keepGroup.slice(0, limit)
-      merger = [...keepGroup, ...newList];
-    }
-    // paging backward
-    else {
-      keepGroup = keepGroup.slice(limit, limit + limit)
-      merger = [...newList, ...keepGroup];
-    }
+    // if (direction === 0) {
+    //   merger = newList
+    // }
+    // // paging forward
+    // else if (direction > 0) {
+    //   if (keepGroup.length === limit * 2) {
+    //     keepGroup = keepGroup.slice(limit, limit + limit)
+    //   }
+    //   merger = [...keepGroup, ...newList];
+    // }
+    // // paging backward
+    // else {
+
+    //   // check if last page
+    //   // if (keepGroup.includes(f => f.lastPage)) {
+    //   //   merger = [...newList];
+    //   // } else {
+    //   // keepGroup = keepGroup.slice(0, limit)
+    //   merger = newList//[...newList, ...keepGroup];
+    //   // }
+    //   console.log('merger', merger)
+    // }
+
+    merger = newList
+
+    // if (merger.length > limit * 2) {
+    //   merger = merger.slice(0, limit * 2)
+    // }
 
     // let ids: any = []
     // merger.forEach((p: any, i: number) => {
     //   if (!ids.includes(p.created)) ids.push(p.created)
     //   else {
-    //     console.log('found duplicates!', p.created)
-    //     merger[i].hide = true
+    //     merger.splice(1, i)
     //   }
     // })
 
