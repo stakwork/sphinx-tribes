@@ -767,7 +767,7 @@ export default function PersonView(props: any) {
 
             <ConnectCard
                 dismiss={() => setShowQR(false)}
-                modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+                modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
                 person={person} visible={showQR} />
 
 

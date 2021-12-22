@@ -28,7 +28,7 @@ class UiStore {
 
   @observable searchText: string = ''
   @action setSearchText(s: string) {
-    this.searchText = s
+    this.searchText = s.toLowerCase()
   }
 
   @observable usdToSatsExchangeRate: number = 0
