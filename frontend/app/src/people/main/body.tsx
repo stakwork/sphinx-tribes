@@ -12,7 +12,6 @@ import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks
 import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
-import moment from 'moment';
 import NoneSpace from '../utils/noneSpace';
 import { Divider, SearchTextInput, Modal, Button } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
@@ -113,9 +112,16 @@ export default function BodyComponent() {
 
             if (pageInitDone) {
                 console.log('refresh list for search')
-                const loadMethod = loadMethods[selectedWidget]
+                let loadMethod = loadMethods[selectedWidget]
+
+                // if person is selected, always searching people
+                if (ui.selectingPerson) {
+                    loadMethod = loadMethods['people']
+                }
+
                 // reset page will replace all results, this is good for a new search!
                 await loadMethod({ page: 1, resetPage: true })
+
             } else {
                 setPageInitDone(true)
             }

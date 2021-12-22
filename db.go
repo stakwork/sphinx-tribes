@@ -287,7 +287,7 @@ func (db database) getListedBots(r *http.Request) []Bot {
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
 	// db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("name LIKE ?", "%"+search+"%").Find(&ms)
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(name) LIKE ?", "%"+search+"%").Find(&ms)
 
 	return ms
 }
@@ -297,7 +297,7 @@ func (db database) getListedPeople(r *http.Request) []Person {
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
 	// if search is empty, returns all
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("owner_alias LIKE ?", "%"+search+"%").Find(&ms)
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Find(&ms)
 	return ms
 }
 
@@ -322,9 +322,9 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 		AND extras != '{}'::jsonb
 		AND extras->'post' IS NOT NULL
 		AND extras->'post' != '[]'::jsonb
-		AND	jsonb_path_exists(
-			extras, 
-			'$.post.* ? (@ like_regex "` + search + `" flag "i")')`).Find(&ms)
+		AND EXISTS (SELECT *
+			FROM jsonb_array_elements_Text(extras -> 'post') as x(title)
+			WHERE LOWER(x.title) LIKE '%` + search + `%')`).Find(&ms)
 
 	return ms, result.Error
 }
@@ -344,9 +344,9 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 		AND extras != '{}'::jsonb
 		AND extras->'wanted' IS NOT NULL
 		AND extras->'wanted' != '[]'::jsonb
-		AND	jsonb_path_exists(
-			extras, 
-			'$.wanted.* ? (@ like_regex "` + search + `" flag "i")')`).Find(&ms)
+		AND EXISTS (SELECT *
+			FROM jsonb_array_elements_Text(extras -> 'wanted') as x(title)
+			WHERE LOWER(x.title) LIKE '%` + search + `%')`).Find(&ms)
 
 	return ms, result.Error
 }
@@ -366,9 +366,9 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 		AND extras != '{}'::jsonb
 		AND extras->'offer' IS NOT NULL
 		AND extras->'offer' != '[]'::jsonb
-		AND	jsonb_path_exists(
-			extras, 
-			'$.offer.* ? (@ like_regex "` + search + `" flag "i")')`).Find(&ms)
+		AND EXISTS (SELECT *
+			FROM jsonb_array_elements_Text(extras -> 'offer') as x(title)
+			WHERE LOWER(x.title) LIKE '%` + search + `%')`).Find(&ms)
 
 	return ms, result.Error
 }
