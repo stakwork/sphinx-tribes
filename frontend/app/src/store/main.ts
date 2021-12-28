@@ -3,10 +3,9 @@ import { persist } from "mobx-persist";
 import api from "../api";
 import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
-import { MeInfo, uiStore } from "./ui";
+import { uiStore } from "./ui";
 
 export const queryLimit = 100
-export const smallQueryLimit = 100
 
 export class MainStore {
   @persist("list")
@@ -14,23 +13,18 @@ export class MainStore {
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
 
-  @action async getTribes(uniqueName?: string): Promise<Tribe[]> {
-    const ts = await api.get("tribes");
-    ts.sort((a: Tribe, b: Tribe) => {
-      if (b.last_active === a.last_active) {
-        return b.member_count - a.member_count;
-      }
-      return b.last_active - a.last_active;
-    });
-    if (uniqueName) {
-      ts.forEach(function (t: Tribe, i: number) {
-        if (t.unique_name === uniqueName) {
-          ts.splice(i, 1);
-          ts.unshift(t);
-        }
-      });
-    }
-    this.tribes = ts;
+  @action async getTribes(queryParams?: any): Promise<Tribe[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText }
+
+    let query = this.appendQueryParams("tribes", queryLimit, { ...queryParams, sortBy: 'last_active' })
+    const ts = await api.get(query);
+
+    this.tribes = this.doPageListMerger(
+      this.tribes,
+      ts,
+      (n) => uiStore.setTribesPageNumber(n),
+      queryParams)
+
     return ts;
   }
 
@@ -316,10 +310,10 @@ export class MainStore {
   people: Person[] = [];
 
   @action async getPeople(queryParams?: any): Promise<Person[]> {
-
     queryParams = { ...queryParams, search: uiStore.searchText }
 
     let query = this.appendQueryParams("people", queryLimit, { ...queryParams, sortBy: 'updated' })
+
     let ps = await api.get(query);
 
     if (uiStore.meInfo) {
@@ -330,18 +324,6 @@ export class MainStore {
       }
     }
 
-    // this is for ordering, fix me, search is its own query
-    // if (uniqueName) {
-    //   ps?.forEach(function (t: Tribe, i: number) {
-    //     if (t.unique_name === uniqueName) {
-    //       ps.splice(i, 1);
-    //       ps.unshift(t);
-    //     }
-    //   });
-    // }
-
-    // console.log('ps', ps)
-
     // for search always reset page
     if (queryParams && queryParams.resetPage) {
       this.people = ps
@@ -351,9 +333,7 @@ export class MainStore {
       this.people = this.doPageListMerger(
         this.people,
         ps,
-        uiStore.peoplePageNumber,
         (n) => uiStore.setPeoplePageNumber(n),
-        queryLimit,
         queryParams
       )
     }
@@ -378,12 +358,11 @@ export class MainStore {
   @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText }
-    let query = this.appendQueryParams("people/posts", smallQueryLimit, { ...queryParams, sortBy: 'created' })
+
+    let query = this.appendQueryParams("people/posts", queryLimit, { ...queryParams, sortBy: 'created' })
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
-
-      // console.log('ps', ps)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -394,9 +373,7 @@ export class MainStore {
         this.peoplePosts = this.doPageListMerger(
           this.peoplePosts,
           ps,
-          uiStore.peoplePostsPageNumber,
           (n) => uiStore.setPeoplePostsPageNumber(n),
-          smallQueryLimit,
           queryParams)
       }
       return ps;
@@ -413,7 +390,8 @@ export class MainStore {
   @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText }
-    let query = this.appendQueryParams("people/wanteds", smallQueryLimit, { ...queryParams, sortBy: 'created' })
+
+    let query = this.appendQueryParams("people/wanteds", queryLimit, { ...queryParams, sortBy: 'created' })
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
@@ -429,9 +407,7 @@ export class MainStore {
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps,
-          uiStore.peopleWantedsPageNumber,
           (n) => uiStore.setPeopleWantedsPageNumber(n),
-          smallQueryLimit,
           queryParams)
       }
       return ps;
@@ -448,12 +424,12 @@ export class MainStore {
   @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
     // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText }
-    let query = this.appendQueryParams("people/offers", smallQueryLimit, { ...queryParams, sortBy: 'created' })
+
+    let query = this.appendQueryParams("people/offers", queryLimit, { ...queryParams, sortBy: 'created' })
     try {
+
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
-
-      // console.log('ps', ps)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -464,9 +440,7 @@ export class MainStore {
         this.peopleOffers = this.doPageListMerger(
           this.peopleOffers,
           ps,
-          uiStore.peopleOffersPageNumber,
           (n) => uiStore.setPeopleOffersPageNumber(n),
-          smallQueryLimit,
           queryParams)
       }
 
@@ -478,75 +452,17 @@ export class MainStore {
 
   }
 
-
-  @action doPageListMerger(currentList: any[], newList: any[], pageNumber: number, setPage: Function, limit: number, queryParams?: any) {
+  @action doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
     if (!newList || !newList.length) {
       console.log('got no new items, do not change page')
       return currentList
     }
 
-    // FIX ME, make me an infinite loader
+    if (queryParams?.page) setPage(queryParams.page)
 
-    // console.log('newList', newList)
+    console.log('list', newList)
 
-    // let whileIndex = 0
-    // while (newList.length < limit) {
-    //   newList.push({ created: (163463 * whileIndex + 1), hide: true, lastPage: true })
-    //   whileIndex++
-    // }
-
-    let direction = 0
-
-    if (queryParams?.page) {
-      // this tells us whether we're loading earlier data, or later data so we can merge the array in the right order
-      if (pageNumber < queryParams.page) direction = 1 // paging forward
-      else direction = -1 // paging backward
-
-      // update page number in ui
-      setPage(queryParams.page)
-    }
-
-    let keepGroup = [...currentList]
-    let merger
-    // no page movement, all incoming are the new list
-    // if (direction === 0) {
-    //   merger = newList
-    // }
-    // // paging forward
-    // else if (direction > 0) {
-    //   if (keepGroup.length === limit * 2) {
-    //     keepGroup = keepGroup.slice(limit, limit + limit)
-    //   }
-    //   merger = [...keepGroup, ...newList];
-    // }
-    // // paging backward
-    // else {
-
-    //   // check if last page
-    //   // if (keepGroup.includes(f => f.lastPage)) {
-    //   //   merger = [...newList];
-    //   // } else {
-    //   // keepGroup = keepGroup.slice(0, limit)
-    //   merger = newList//[...newList, ...keepGroup];
-    //   // }
-    //   console.log('merger', merger)
-    // }
-
-    merger = newList
-
-    // if (merger.length > limit * 2) {
-    //   merger = merger.slice(0, limit * 2)
-    // }
-
-    // let ids: any = []
-    // merger.forEach((p: any, i: number) => {
-    //   if (!ids.includes(p.created)) ids.push(p.created)
-    //   else {
-    //     merger.splice(1, i)
-    //   }
-    // })
-
-    return merger
+    return newList
   }
 
   @action async getPersonByPubkey(pubkey: string): Promise<Person> {

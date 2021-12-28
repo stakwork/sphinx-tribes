@@ -14,19 +14,24 @@ import {
   EuiHighlight,
 } from '@elastic/eui';
 import Tribe from './tribe'
-import { useFuse, useIsMobile, useScroll } from '../hooks'
+import { useFuse, useIsMobile, useScroll, usePageScroll } from '../hooks'
 import { Divider, SearchTextInput } from '../sphinxUI';
 import { orderBy } from 'lodash'
 import Tag from './tag'
 import tags from './tags'
 // avoid hook within callback warning by renaming hooks
-const getFuse = useFuse
-const getScroll = useScroll
+// const getFuse = useFuse
+// const getScroll = useScroll
+
+const getPageScroll = usePageScroll
 
 export default function BodyComponent() {
   const { main, ui } = useStores()
   const [selected, setSelected] = useState('')
   const [tagsPop, setTagsPop] = useState(false)
+  const [pageInitDone, setPageInitDone] = useState(false)
+
+  const { tribesPageNumber } = ui
 
   const isMobile = useIsMobile()
 
@@ -44,7 +49,7 @@ export default function BodyComponent() {
     if (window.location.pathname.startsWith('/t/')) {
       un = window.location.pathname.substr(3)
     }
-    const ts = await main.getTribes(un)
+    const ts = await main.getTribes()
     if (un) {
       const initial = ts[0]
       if (initial && initial.unique_name === un) setSelected(initial.uuid)
@@ -53,6 +58,33 @@ export default function BodyComponent() {
   useEffect(() => {
     loadTribes()
   }, [])
+
+  async function loadMore(direction) {
+    let currentPage = tribesPageNumber
+    let newPage = currentPage + direction
+    if (newPage < 1) newPage = 1
+
+    await main.getTribes({ page: newPage })
+
+  }
+
+  // do search update
+  useEffect(() => {
+    (async () => {
+      // selectedWidget
+      // get assets page 1, by widget
+
+      if (pageInitDone) {
+        console.log('refresh list for search')
+        // reset page will replace all results, this is good for a new search!
+        await main.getTribes({ page: 1, resetPage: true })
+
+      } else {
+        setPageInitDone(true)
+      }
+    })()
+
+  }, [ui.searchText])
 
   return useObserver(() => {
 
@@ -67,13 +99,17 @@ export default function BodyComponent() {
       return t.matchCount && t.matchCount > 0
     })
 
-    const nsfwChecked = tagsFilter.find(label => label === 'NSFW') ? true : false
-    const sfwTribes = nsfwChecked ? tribes :
-      tribes.filter(t => !t.tags.includes('NSFW'))
+    // const nsfwChecked = tagsFilter.find(label => label === 'NSFW') ? true : false
+    // const sfwTribes = nsfwChecked ? tribes :
+    //   tribes.filter(t => !t.tags.includes('NSFW'))
 
-    let theTribes = getFuse(sfwTribes, ["name", "description"])
-    const { n, loadingMore, handleScroll } = getScroll()
-    const finalTribes = theTribes.slice(0, n)
+    // let theTribes = getFuse(sfwTribes, ["name", "description"])
+    // const { n, loadingMore, handleScroll } = getScroll()
+    const loadForwardFunc = () => loadMore(1)
+    const loadBackwardFunc = () => loadMore(-1)
+    const { loadingTop, loadingBottom, handleScroll } = getPageScroll(loadForwardFunc, loadBackwardFunc)
+    let loadingMore = loadingTop || loadingBottom
+    // const finalTribes = theTribes.slice(0, n)
 
     const button = (<EuiButton
       iconType="arrowDown"
@@ -144,7 +180,7 @@ export default function BodyComponent() {
         {loading && <EuiLoadingSpinner size="xl" style={{ marginTop: 20 }} />}
         {!loading && <EuiFormFieldset style={{ width: '100%' }} className="container">
           <div className="row">
-            {finalTribes.map(t => <Tribe {...t} key={t.uuid}
+            {tribes.map(t => <Tribe {...t} key={t.uuid}
               selected={selected === t.uuid}
               select={selectTribe}
             />)}
