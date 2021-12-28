@@ -61,6 +61,11 @@ class UiStore {
     this.peopleOffersPageNumber = n
   }
 
+  @observable tribesPageNumber: number = 1
+  @action setTribesPageNumber(n: number) {
+    this.tribesPageNumber = n
+  }
+
   @observable selectedPerson: number = 0
   @action setSelectedPerson(n: number) {
     this.selectedPerson = n
