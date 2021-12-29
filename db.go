@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -264,9 +265,23 @@ func (db database) getOpenGithubIssues(r *http.Request) ([]GithubOpenIssue, erro
 	return ms, result.Error
 }
 
-func (db database) getListedTribes() []Tribe {
+func (db database) getListedTribes(r *http.Request) []Tribe {
 	ms := []Tribe{}
-	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
+	keys := r.URL.Query()
+	tags := keys.Get("tags") // this is a string of tags separated by commas
+	offset, limit, sortBy, direction, search := getPaginationParams(r)
+
+	thequery := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(name) LIKE ?", "%"+search+"%")
+
+	if tags != "" {
+		// pull out the tags and add them in here
+		t := strings.Split(tags, ",")
+		for _, s := range t {
+			thequery = thequery.Where("'" + s + "'" + " = any (tags)")
+		}
+	}
+
+	thequery.Find(&ms)
 	return ms
 }
 
