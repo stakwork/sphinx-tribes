@@ -8,8 +8,8 @@ import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
 import { useFuse, useScroll } from '../../hooks';
 import { widgetConfigs } from '../utils/constants';
-import moment from 'moment';
 import { Spacer } from '../main/body';
+import NoResults from '../utils/noResults';
 
 export default function WidgetSwitchViewer(props) {
     const { main } = useStores()
@@ -52,10 +52,7 @@ export default function WidgetSwitchViewer(props) {
             searchKeys = dynamicFields
         }
 
-        console.log('selectedWidget', selectedWidget)
-        // console.log('activeList', activeList)
-
-        const listItems = activeList && activeList.map((item, i) => {
+        const listItems = (activeList && activeList.length) ? activeList.map((item, i) => {
             const { person, body } = item
             // if this person has entries for this widget
             return <Panel key={person?.owner_pubkey + i + body.created}
@@ -73,7 +70,7 @@ export default function WidgetSwitchViewer(props) {
                         : selectedWidget === 'wanted' ? <WantedView showName key={i + person.owner_pubkey + 'wview'} person={person} {...body} />
                             : null}
             </Panel>
-        })
+        }) : <NoResults />
 
         return <>
             {listItems}
