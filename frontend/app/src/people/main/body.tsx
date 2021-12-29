@@ -9,7 +9,6 @@ import {
 import Person from '../person'
 import PersonViewSlim from '../personViewSlim'
 import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks'
-import { colors } from '../../colors'
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
 import NoneSpace from '../utils/noneSpace';
@@ -20,7 +19,8 @@ import FocusedView from './focusView';
 
 import { widgetConfigs } from '../utils/constants'
 import { useHistory, useLocation } from 'react-router';
-import { queryLimit } from '../../store/main';
+import NoResults from '../utils/noResults'
+import PageLoadSpinner from '../utils/pageLoadSpinner';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -31,13 +31,11 @@ let deeplinkTimeout
 
 export default function BodyComponent() {
     const { main, ui } = useStores()
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [showDropdown, setShowDropdown] = useState(false)
     const screenWidth = useScreenWidth()
     const [publicFocusPerson, setPublicFocusPerson]: any = useState(null)
     const [publicFocusIndex, setPublicFocusIndex] = useState(-1)
-
-    const [pageInitDone, setPageInitDone] = useState(false)
 
     const { peoplePageNumber,
         peopleWantedsPageNumber,
@@ -48,8 +46,6 @@ export default function BodyComponent() {
     const [selectedWidget, setSelectedWidget] = useState('people')
 
     const history = useHistory()
-
-    const c = colors['light']
 
     const tabs = [
         {
@@ -93,8 +89,8 @@ export default function BodyComponent() {
 
 
     useEffect(() => {
-        loadPeople()
-        loadPeopleExtras()
+        // loadPeople()
+        // loadPeopleExtras()
         main.getOpenGithubIssues()
     }, [])
 
@@ -109,32 +105,22 @@ export default function BodyComponent() {
         (async () => {
             // selectedWidget
             // get assets page 1, by widget
+            console.log('refresh list for search')
+            let loadMethod = loadMethods[selectedWidget]
 
-            if (pageInitDone) {
-                console.log('refresh list for search')
-                let loadMethod = loadMethods[selectedWidget]
-
-                // if person is selected, always searching people
-                if (ui.selectingPerson) {
-                    loadMethod = loadMethods['people']
-                }
-
-                // reset page will replace all results, this is good for a new search!
-                await loadMethod({ page: 1, resetPage: true })
-
-            } else {
-                setPageInitDone(true)
+            // if person is selected, always searching people
+            if (ui.selectingPerson) {
+                loadMethod = loadMethods['people']
             }
+
+            // reset page will replace all results, this is good for a new search!
+            await loadMethod({ page: 1, resetPage: true })
+
+            setLoading(false)
         })()
 
     }, [ui.searchText, selectedWidget])
 
-    async function loadPeopleExtras() {
-        console.log("load extras")
-        main.getPeopleWanteds()
-        main.getPeopleOffers()
-        main.getPeoplePosts()
-    }
 
 
     async function doDeeplink() {
@@ -149,13 +135,6 @@ export default function BodyComponent() {
         }
     }
 
-
-    const peopleLoader = <Loader style={{ bottom: 80 }}>
-        <EuiLoadingSpinner />
-    </Loader>
-
-
-
     function selectPerson(id: number, unique_name: string, pubkey: string) {
         console.log('selectPerson', id, unique_name, pubkey)
         ui.setSelectedPerson(id)
@@ -163,25 +142,6 @@ export default function BodyComponent() {
 
         history.push(`/p/${pubkey}`)
     }
-
-    async function loadPeople() {
-        setLoading(true)
-        // let un = ''
-        // if (window.location.pathname.startsWith('/p/')) {
-        //     un = window.location.pathname.substr(3)
-        // }
-        const ps = await main.getPeople({ page: peoplePageNumber })
-        // if (un) {
-        //     const initial = ps[0]
-        //     if (initial && initial.unique_name === un) ui.setSelectedPerson(initial.id)
-        // }
-        setLoading(false)
-    }
-
-
-
-
-
 
     async function publicPanelClick(person, item) {
         // migrating to load widgets separate from person
@@ -206,8 +166,6 @@ export default function BodyComponent() {
         history.push('/p')
     }
 
-
-
     return useObserver(() => {
         let people = getFuse(main.people, ["owner_alias"])
 
@@ -219,8 +177,6 @@ export default function BodyComponent() {
 
         async function loadMore(direction) {
             let currentPage = 1
-
-            console.log('selectedWidget', selectedWidget)
 
             switch (selectedWidget) {
                 case 'people':
@@ -266,15 +222,20 @@ export default function BodyComponent() {
         }
 
         function renderPeople() {
-            let p = people?.map(t => <Person {...t} key={t.id}
-                small={isMobile}
-                squeeze={screenWidth < 1420}
-                selected={ui.selectedPerson === t.id}
-                select={selectPerson}
-            />)
+            let p
+            if (people.length) {
+                p = people?.map(t => <Person {...t} key={t.id}
+                    small={isMobile}
+                    squeeze={screenWidth < 1420}
+                    selected={ui.selectedPerson === t.id}
+                    select={selectPerson}
+                />)
 
-            // add space at bottom
-            p = [...p, <Spacer key={'spacer'} />]
+                // add space at bottom
+                p = [...p, <Spacer key={'spacer'} />]
+            } else {
+                p = <NoResults />
+            }
 
             return p
         }
@@ -370,8 +331,9 @@ export default function BodyComponent() {
                 </div>
 
                 <div style={{ width: '100%' }}>
-                    {(loadingTop || loadingBottom) && peopleLoader}
+                    <PageLoadSpinner show={loadingTop} />
                     {listContent}
+                    <PageLoadSpinner noAnimate show={loadingBottom} />
                 </div>
 
                 <FadeLeft
@@ -479,14 +441,16 @@ export default function BodyComponent() {
                 />
             </div>
             <>
+
                 <div style={{
                     width: '100%', display: 'flex', flexWrap: 'wrap', height: '100%',
                     justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20
                 }}>
-                    {(loadingTop || loadingBottom) && peopleLoader}
+                    <PageLoadSpinner show={loadingTop} />
                     {listContent}
-
+                    <PageLoadSpinner noAnimate show={loadingBottom} />
                 </div>
+
             </>
 
 
