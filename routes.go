@@ -50,6 +50,8 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
+		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
+
 		r.Get("/tribes_by_owner/{pubkey}", getTribesByOwner)
 		r.Post("/tribes", createOrEditTribe)
 		r.Post("/bots", createOrEditBot)
@@ -199,7 +201,7 @@ func getAllTribes(w http.ResponseWriter, r *http.Request) {
 }
 
 func getListedTribes(w http.ResponseWriter, r *http.Request) {
-	tribes := DB.getListedTribes()
+	tribes := DB.getListedTribes(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
@@ -253,6 +255,13 @@ func getListedOffers(w http.ResponseWriter, r *http.Request) {
 func getTribe(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	tribe := DB.getTribe(uuid)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribe)
+}
+
+func getTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "un")
+	tribe := DB.getTribeByUniqueName(uuid)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribe)
 }
