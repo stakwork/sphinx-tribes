@@ -16,7 +16,6 @@ import {
 import Tribe from './tribe'
 import { useFuse, useIsMobile, useScroll, usePageScroll } from '../hooks'
 import { Divider, SearchTextInput } from '../sphinxUI';
-import { orderBy } from 'lodash'
 import Tag from './tag'
 import tags from './tags'
 import NoResults from '../people/utils/noResults'
@@ -26,7 +25,6 @@ import PageLoadSpinner from '../people/utils/pageLoadSpinner';
 // const getScroll = useScroll
 
 const getPageScroll = usePageScroll
-let debounceValue: any = []
 
 export default function BodyComponent() {
   const { main, ui } = useStores()
@@ -34,6 +32,7 @@ export default function BodyComponent() {
   const [tagsPop, setTagsPop] = useState(false)
   const [tagOptions, setTagOptions] = useState(ui.tags)
   const [loading, setLoading] = useState(true)
+  const [loadingList, setLoadingList] = useState(true)
 
   const { tribesPageNumber } = ui
 
@@ -64,29 +63,26 @@ export default function BodyComponent() {
 
   // do search update
   useEffect(() => {
-    (async () => {
-
-      console.log('refresh list')
-      // reset page will replace all results, this is good for a new search!
-      await main.getTribes({ page: 1, resetPage: true })
-
-      // do deeplink
-      let deeplinkUn = ''
-      if (window.location.pathname.startsWith('/t/')) {
-        deeplinkUn = window.location.pathname.substr(3)
-      }
-      if (deeplinkUn) {
-        let t = await main.getTribeByUn(deeplinkUn)
-        setSelected(t.uuid)
-        window.history.pushState({}, 'Sphinx Tribes', '/t');
-      }
-
-      setLoading(false)
-    })()
+    refreshList()
   }, [ui.searchText, ui.tags])
 
-  function doDelayedValueUpdate() {
-    ui.setTags(debounceValue)
+  async function refreshList() {
+    setLoadingList(true)
+    // reset page will replace all results, this is good for a new search!
+    await main.getTribes({ page: 1, resetPage: true })
+
+    // do deeplink
+    let deeplinkUn = ''
+    if (window.location.pathname.startsWith('/t/')) {
+      deeplinkUn = window.location.pathname.substr(3)
+    }
+    if (deeplinkUn) {
+      let t = await main.getTribeByUn(deeplinkUn)
+      setSelected(t.uuid)
+      window.history.pushState({}, 'Sphinx Tribes', '/t');
+    }
+    setLoadingList(false)
+    setLoading(false)
   }
 
   return useObserver(() => {
@@ -113,7 +109,7 @@ export default function BodyComponent() {
       {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
     </EuiButton>)
 
-    return <Body id="main" onScroll={tagsPop ? () => console.log('scroll') : handleScroll} style={{ paddingTop: 0 }}>
+    return <Body id="main" onScroll={handleScroll} style={{ paddingTop: 0 }}>
       <div style={{
         width: '100%', display: 'flex',
         justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
@@ -131,21 +127,23 @@ export default function BodyComponent() {
             <EuiSelectable
               searchable
               options={tagOptions}
-              renderOption={(option, searchValue) => <div style={{ display: 'flex', alignItems: 'center', }}>
+              renderOption={(option, searchValue) => <div style={{
+                display: 'flex', alignItems: 'center',
+                opacity: loadingList ? 0.5 : 1
+              }}>
                 <Tag type={option.label} iconOnly />
                 <EuiHighlight search={searchValue} style={{
-                  fontSize: 11, marginLeft: 5, ///color: ui.tags[option.label].color
+                  fontSize: 11, marginLeft: 5, color: tags[option.label].color
                 }}>
                   {option.label}
                 </EuiHighlight>
               </div>}
               listProps={{ rowHeight: 30 }} // showIcons:false
               onChange={opts => {
-                console.log(opts)
-                setTagOptions(opts)
-                debounceValue = opts
-                debounce(doDelayedValueUpdate, 800)
-
+                if (!loadingList) {
+                  setTagOptions(opts)
+                  ui.setTags(opts)
+                }
               }}>
               {(list, search) => <div style={{ width: 220 }}>
                 {search}
@@ -185,15 +183,6 @@ export default function BodyComponent() {
     </Body >
   }
   )
-}
-
-
-let inDebounce
-function debounce(func, delay) {
-  clearTimeout(inDebounce)
-  inDebounce = setTimeout(() => {
-    func()
-  }, delay)
 }
 
 const Body = styled.div`
