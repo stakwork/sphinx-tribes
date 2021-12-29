@@ -25,25 +25,24 @@ export function usePageScroll(goForward, goBackwards) {
   const [loadingBottom, setLoadingBottom] = useState(false);
   const [loadingTop, setLoadingTop] = useState(false);
 
-  function handleScroll(e: any) {
+  async function handleScroll(e: any) {
     const bottom = e.target.scrollHeight - e.target.scrollTop == e.target.clientHeight;
     const top = e.target.scrollTop == 0;
 
     try {
       if (bottom || top) {
-        setTimeout(async () => {
-          if (bottom) {
-            setLoadingBottom(true)
-            await goForward()
-            setLoadingBottom(false)
-          }
-          else {
-            setLoadingTop(true)
-            goBackwards()
-            setLoadingTop(false)
-
-          }
-        }, 500);
+        // setTimeout(async () => {
+        if (bottom) {
+          setLoadingBottom(true)
+          await goForward()
+          setLoadingBottom(false)
+        }
+        else {
+          setLoadingTop(true)
+          await goBackwards()
+          setLoadingTop(false)
+        }
+        // }, 200);
       }
     } catch (e) {
       console.log('oops!', e)

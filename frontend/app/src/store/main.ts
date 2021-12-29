@@ -14,7 +14,19 @@ export class MainStore {
   ownerTribes: Tribe[] = [];
 
   @action async getTribes(queryParams?: any): Promise<Tribe[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText }
+    let ta = [...uiStore.tags]
+    //make tags string for querys
+    ta = ta.filter(f => f.checked)
+    let tags = ''
+    if (ta && ta.length) {
+      ta.forEach((o, i) => {
+        tags += o.label
+        if (ta.length - 1 !== i) {
+          tags += ','
+        }
+      })
+    }
+    queryParams = { ...queryParams, search: uiStore.searchText, tags }
 
     let query = this.appendQueryParams("tribes", queryLimit, { ...queryParams, sortBy: 'last_active' })
     const ts = await api.get(query);
@@ -150,6 +162,21 @@ export class MainStore {
     this.ownerTribes = ts;
     return ts;
   }
+
+  @action async getTribeByUn(un: string): Promise<Tribe> {
+    const t = await api.get(`tribe_by_un/${un}`);
+    // put got on top
+    // if already exists, delete
+    const tribesClone = [...this.tribes]
+    const dupIndex = tribesClone.findIndex(f => f.uuid === t.uuid)
+    if (dupIndex > -1) {
+      tribesClone.splice(dupIndex, 1)
+    }
+
+    this.tribes = [t, ...tribesClone]
+    return t;
+  }
+
 
   @action async getGithubIssueData(
     owner: string,
@@ -454,13 +481,17 @@ export class MainStore {
 
   @action doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
     if (!newList || !newList.length) {
-      console.log('got no new items, do not change page')
-      return currentList
+      if (queryParams.search) {
+        // if search and no results, return nothing
+        return []
+      } else {
+        return currentList
+      }
     }
 
     if (queryParams?.page) setPage(queryParams.page)
 
-    console.log('list', newList)
+    // console.log('list', newList)
 
     return newList
   }

@@ -59,7 +59,7 @@ export default function WantedView(props: any) {
 
     function getMobileView() {
         return <Wrap>
-            <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
+            <GalleryViewer cover gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
             <Body>
                 <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
                 <T>{title}</T>
@@ -72,6 +72,7 @@ export default function WantedView(props: any) {
     function getDesktopView() {
         return <DWrap>
             <GalleryViewer
+                cover
                 showAll={false}
                 big={true}
                 wrap={false}

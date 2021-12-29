@@ -36,6 +36,7 @@ export default function PostView(props: any) {
 
         </Pad>
         <GalleryViewer
+            cover
             showAll={false}
             big={true}
             wrap={false}
