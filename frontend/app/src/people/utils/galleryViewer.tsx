@@ -4,7 +4,7 @@ import FadeLeft from '../../animated/fadeLeft';
 import { IconButton } from '../../sphinxUI';
 
 export default function GalleryViewer(props) {
-    const { gallery, wrap, selectable, big, showAll, style } = props
+    const { gallery, wrap, selectable, big, showAll, style, cover } = props
     const [selectedImage, setSelectedImage] = useState(0)
     let g = gallery
 
@@ -33,12 +33,12 @@ export default function GalleryViewer(props) {
             {showAll ?
                 <div style={{ textAlign: 'center' }}>
                     {g.map((ga, i) => {
-                        return <BigImg big={big} src={ga} key={i} />
+                        return <BigImg big={big} src={ga} cover={cover} key={i} />
                     })}
                 </div>
                 :
                 <>
-                    <Img big={big} src={g[selectedImage]} />
+                    <Img big={big} src={g[selectedImage]} cover={cover} />
                     {showNav &&
                         <L>
                             <Circ>
@@ -138,33 +138,17 @@ align-items:center;
 justify-content:center;
 `;
 
-const Square = styled.div<ImageProps>`
-    background-position: center;
-    background-size: cover;
-    height: ${(p) => p.big ? '372px' : '132px'};
-    width: ${(p) => p.big ? '100%' : '132px'};
-    position: relative;
-    background:#5F636822;
-`;
-
-const BigEnv = styled.div`
-position:absolute;
-top:0px;
-left:0px;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:20;
-`;
 
 interface ImageProps {
     readonly src?: string;
     big?: boolean;
+    cover?: boolean;
 }
 const Img = styled.div<ImageProps>`
                 background-image: url("${(p) => p.src}");
                 background-position: center;
-                background-size: cover;
+                background-repeat: no-repeat;
+                background-size: ${(p) => p.cover ? 'cover' : 'contain'};
                 height: ${(p) => p.big ? '372px' : '132px'};
                 width: ${(p) => p.big ? '100%' : '132px'};
                 position: relative;
@@ -174,7 +158,9 @@ const Img = styled.div<ImageProps>`
 const BigImg = styled.img<ImageProps>`
                 background-image: url("${(p) => p.src}");
                 // background-size: contain;
-                // background-position: center;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: ${(p) => p.cover ? 'cover' : 'contain'};
                 max-width:100%;
                 height:auto;
                 margin-bottom:5px;

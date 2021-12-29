@@ -17,7 +17,7 @@ export default function OfferView(props: any) {
     if (isMobile) {
         return <Wrap>
 
-            <GalleryViewer gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
+            <GalleryViewer cover gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
 
             <Body>
                 <T>{title || 'No title'}</T>
@@ -30,6 +30,7 @@ export default function OfferView(props: any) {
 
     return <DWrap>
         <GalleryViewer
+            cover
             showAll={false}
             big={true}
             wrap={false}

@@ -25,7 +25,7 @@ const getScroll = useScroll
 
 export default function BotBody() {
     const { main, ui } = useStores()
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [showBotCreator, setShowBotCreator] = useState(false)
     const [showCreate, setShowCreate] = useState(false)
     const [editThisBot, setEditThisBot]: any = useState(null)

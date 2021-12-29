@@ -24,6 +24,8 @@ import { extractGithubIssue } from "../helpers";
 import { useHistory, useLocation } from "react-router";
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { queryLimit } from '../store/main'
+import NoResults from "./utils/noResults";
+import PageLoadSpinner from "./utils/pageLoadSpinner";
 
 
 const host = getHost();
@@ -520,14 +522,8 @@ export default function PersonView(props: any) {
         </div>
     }
 
-    const loaderTop = <Loader style={{ top: 60 }}>
-        <EuiLoadingSpinner />
-    </Loader>
-    const loaderBottom = <Loader style={{ bottom: 10 }}>
-        <EuiLoadingSpinner />
-    </Loader>
-
-
+    const loaderTop = <PageLoadSpinner show={loadingTop} style={{ paddingTop: 10 }} />
+    const loaderBottom = <PageLoadSpinner noAnimate show={loadingBottom} style={{ position: 'absolute', bottom: 0, left: 0 }} />
 
     function renderDesktopView() {
         const focusedDesktopModalStyles = newSelectedWidget ? {
@@ -564,15 +560,15 @@ export default function PersonView(props: any) {
                         />
                     </DBack>
 
-                    {loadingTop && loaderTop}
+                    {loaderTop}
 
                     <div style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={handleScroll}>
-                        {people.map(t => <Person {...t} key={t.id}
+                        {people?.length ? people.map(t => <Person {...t} key={t.id}
                             selected={personId === t.id}
                             hideActions={true}
                             small={true}
                             select={selectPersonWithinFocusView}
-                        />)}
+                        />) : <NoResults />}
 
                         {/* make sure you can always scroll ever with too few people */}
                         {people?.length < queryLimit &&
@@ -580,7 +576,7 @@ export default function PersonView(props: any) {
                         }
                     </div>
 
-                    {loadingBottom && loaderBottom}
+                    {loaderBottom}
 
 
                 </PeopleList>
