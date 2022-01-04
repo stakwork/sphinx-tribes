@@ -560,9 +560,10 @@ export default function PersonView(props: any) {
                         />
                     </DBack>
 
-                    {loaderTop}
+
 
                     <div style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={handleScroll}>
+                        {loaderTop}
                         {people?.length ? people.map(t => <Person {...t} key={t.id}
                             selected={personId === t.id}
                             hideActions={true}
