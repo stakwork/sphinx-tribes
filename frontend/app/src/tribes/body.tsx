@@ -44,15 +44,21 @@ export default function BodyComponent() {
 
   function selectTribe(uuid: string, unique_name: string) {
     setSelected(uuid)
-    if (unique_name && window.history.pushState) {
+    if (!uuid) {
+      window.history.pushState({}, 'Sphinx Tribes', '/t');
+    } else if (unique_name && window.history.pushState) {
       window.history.pushState({}, 'Sphinx Tribes', '/t/' + unique_name);
     }
   }
 
   async function loadMore(direction) {
+    if (tagsPop) return
+
     let currentPage = tribesPageNumber
     let newPage = currentPage + direction
     if (newPage < 1) newPage = 1
+
+    console.log('loadmore')
 
     try {
       await main.getTribes({ page: newPage })
@@ -68,6 +74,7 @@ export default function BodyComponent() {
 
   async function refreshList() {
     setLoadingList(true)
+    console.log('refreshList')
     // reset page will replace all results, this is good for a new search!
     await main.getTribes({ page: 1, resetPage: true })
 
@@ -87,7 +94,7 @@ export default function BodyComponent() {
 
   return useObserver(() => {
 
-    const tribes = main.tribes
+    let tribes = main.tribes
 
     const loadForwardFunc = () => loadMore(1)
     const loadBackwardFunc = () => loadMore(-1)
@@ -99,11 +106,18 @@ export default function BodyComponent() {
       </Body>
     }
 
+    // if NSFW not selected, filter out NSFW
+    if (!selectedTags.find(f => f.label === 'NSFW')) {
+      tribes = tribes.filter(f => !f.tags.includes('NSFW'))
+    }
+
+
     const button = (<EuiButton
       iconType="arrowDown"
       iconSide="right"
       size="s"
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation()
         setTagsPop(!tagsPop)
       }}>
       {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
