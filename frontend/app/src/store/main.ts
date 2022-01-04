@@ -15,6 +15,8 @@ export class MainStore {
 
   @action async getTribes(queryParams?: any): Promise<Tribe[]> {
     let ta = [...uiStore.tags]
+
+    console.log('getTribes')
     //make tags string for querys
     ta = ta.filter(f => f.checked)
     let tags = ''

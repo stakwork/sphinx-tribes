@@ -178,7 +178,7 @@ min-width:800px;
 font-style: normal;
 font-weight: 500;
 font-size: 24px;
-line-height: 20px;
+
 color: #3C3F41;
 justify-content:space-between;
 
@@ -203,6 +203,7 @@ const B = styled.span`
         `;
 const P = styled.div`
         font-weight:500;
+        line-height: 24px;
         `;
 const D = styled.div`
         color:#5F6368;
