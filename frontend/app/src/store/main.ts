@@ -8,7 +8,7 @@ import { uiStore } from "./ui";
 export const queryLimit = 100
 
 export class MainStore {
-  @persist("list")
+  // @persist("list")
   @observable
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
@@ -491,11 +491,15 @@ export class MainStore {
       }
     }
 
+    if (queryParams && queryParams.resetPage) {
+      setPage(1)
+      return newList
+    }
+
     if (queryParams?.page) setPage(queryParams.page)
+    let l = [...currentList, ...newList]
 
-    // console.log('list', newList)
-
-    return newList
+    return l
   }
 
   @action async getPersonByPubkey(pubkey: string): Promise<Person> {

@@ -30,20 +30,18 @@ export function usePageScroll(goForward, goBackwards) {
     const top = e.target.scrollTop == 0;
 
     try {
-      if (bottom || top) {
-        // setTimeout(async () => {
-        if (bottom) {
-          setLoadingBottom(true)
-          await goForward()
-          setLoadingBottom(false)
-        }
-        else {
-          setLoadingTop(true)
-          await goBackwards()
-          setLoadingTop(false)
-        }
-        // }, 200);
+
+
+      if (bottom) {
+        setLoadingBottom(true)
+        await goForward()
+        setLoadingBottom(false)
       }
+      // else if (top) {
+      //   setLoadingTop(true)
+      //   await goBackwards()
+      //   setLoadingTop(false)
+      // }
     } catch (e) {
       console.log('oops!', e)
     }
