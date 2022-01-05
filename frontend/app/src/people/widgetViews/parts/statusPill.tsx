@@ -7,17 +7,18 @@ export default function GithubStatusPill(props: any) {
 
     const isOpen = status === 'open'
 
-    if (!status) return <div />
-
     return <div style={{ display: 'flex', ...style }}>
         <Pill isOpen={isOpen}>
-            <MaterialIcon style={{ marginRight: 2, fontSize: 14 }} icon={isOpen ? "arrow_circle_up" : "check_circle_outline"} />
-            <div>
-                {status}
-            </div>
+            <MaterialIcon style={{
+                // marginRight: 2,
+                fontSize: 14
+            }} icon={isOpen ? "arrow_circle_up" : "check_circle_outline"} />
+            {/* <div>
+                {status || 'Open'}
+            </div> */}
         </Pill>
         <Assignee>
-            {(assignee && `Assigned (${assignee})`) || 'Not Assigned'}
+            {(assignee && `Assigned to ${assignee}`) || 'Not Assigned'}
         </Assignee>
     </div>
 
@@ -31,11 +32,12 @@ justify-content:center;
 align-items:center;
 font-size:12px;
 font-weight:300;
-background:${p => p.isOpen ? '#006d32' : '#c93c37'}; //#26a641
+background:${p => p.isOpen ? '#347d39' : '#8256d0'}; //#26a641
 border-radius:30px;
 border: 1px solid transparent;
 text-transform: capitalize;
-padding: 12px 8px;
+padding: 12px 5px;
+// padding:8px;
 font-size: 12px;
 font-weight: 500;
 line-height: 20px;

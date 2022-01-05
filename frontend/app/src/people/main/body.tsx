@@ -52,8 +52,11 @@ export default function BodyComponent() {
             label: 'People',
             name: 'people',
         },
-        widgetConfigs['post'],
-        widgetConfigs['offer'],
+        // widgetConfigs['post'],
+        {
+            ...widgetConfigs['offer'],
+            label: 'Portfolios'
+        },
         widgetConfigs['wanted'],
     ]
 
