@@ -351,7 +351,7 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
 		`SELECT 
-		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted') #>> '{}' as person,
+		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'wanted'::text)) #>> '{}' as body 
 		FROM people
 		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)

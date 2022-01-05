@@ -41,7 +41,7 @@ func getPaginationParams(r *http.Request) (int, int, string, string, string) {
 	if intLimit > 0 && intPage > 0 {
 		// this will give us an offset that includes part of the next/previous page,
 		// so that all results arent replaced, a "page shifting" effect
-		offset = (intPage - 1) * (intLimit / 2)
+		offset = (intPage - 1) * intLimit
 	}
 
 	return offset, intLimit, sortBy, direction, search
