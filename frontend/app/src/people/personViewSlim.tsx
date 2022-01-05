@@ -27,6 +27,8 @@ import { queryLimit } from '../store/main'
 import NoResults from "./utils/noResults";
 import PageLoadSpinner from "./utils/pageLoadSpinner";
 
+import Badges from './utils/badges'
+
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -92,7 +94,7 @@ export default function PersonView(props: any) {
     const canEdit = id === meInfo?.id
     const isMobile = useIsMobile()
 
-    const initialWidget = (!isMobile || canEdit) ? 'post' : 'about'
+    const initialWidget = (!isMobile || canEdit) ? 'badges' : 'about'
 
     const [selectedWidget, setSelectedWidget] = useState(initialWidget);
     const [newSelectedWidget, setNewSelectedWidget] = useState(initialWidget);
@@ -244,6 +246,9 @@ export default function PersonView(props: any) {
         if (fullSelectedWidget && fullSelectedWidget.length) {
             has = true
         }
+        if (selectedWidget === 'badges') {
+            has = true
+        }
         return has
     }
 
@@ -270,6 +275,10 @@ export default function PersonView(props: any) {
         }
         if (!selectedWidget) {
             return <div style={{ height: 200 }} />
+        }
+
+        if (selectedWidget === 'badges') {
+            return <Badges person={person} />
         }
 
         const widgetSchema: any = widgetSchemas && widgetSchemas.find(f => f.name === selectedWidget) || {}
@@ -381,8 +390,10 @@ export default function PersonView(props: any) {
 
     function renderEditButton(style: any) {
         if (!canEdit || !selectedWidget) return <div />
-        // don't return button if there are no items in list, the button is returned elsewhere
 
+        if (selectedWidget === 'badges') return <div />
+
+        // don't return button if there are no items in list, the button is returned elsewhere
         if (selectedWidget !== 'about') {
             if (!fullSelectedWidget || (fullSelectedWidget && fullSelectedWidget.length < 1)) return <div />
         }
