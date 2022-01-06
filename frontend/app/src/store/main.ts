@@ -30,7 +30,7 @@ export class MainStore {
     }
     queryParams = { ...queryParams, search: uiStore.searchText, tags }
 
-    let query = this.appendQueryParams("tribes", queryLimit, { ...queryParams, sortBy: 'last_active' })
+    let query = this.appendQueryParams("tribes", queryLimit, { ...queryParams, sortBy: 'last_active=0, last_active', direction: 'desc' })
     const ts = await api.get(query);
 
     this.tribes = this.doPageListMerger(
