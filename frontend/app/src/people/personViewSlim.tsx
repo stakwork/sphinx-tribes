@@ -796,12 +796,12 @@ export default function PersonView(props: any) {
                 overlayClick={() => {
                     setShowFocusView(false)
                     setFocusIndex(-1)
-                    if (selectedWidget === 'about') switchWidgets('post')
+                    if (selectedWidget === 'about') switchWidgets('badges')
                 }}
                 bigClose={() => {
                     setShowFocusView(false)
                     setFocusIndex(-1)
-                    if (selectedWidget === 'about') switchWidgets('post')
+                    if (selectedWidget === 'about') switchWidgets('badges')
                 }}
             >
                 <FocusedView
@@ -812,12 +812,12 @@ export default function PersonView(props: any) {
                     onSuccess={() => {
                         console.log('success')
                         setFocusIndex(-1)
-                        if (selectedWidget === 'about') switchWidgets('post')
+                        if (selectedWidget === 'about') switchWidgets('badges')
                     }}
                     goBack={() => {
                         setShowFocusView(false)
                         setFocusIndex(-1)
-                        if (selectedWidget === 'about') switchWidgets('post')
+                        if (selectedWidget === 'about') switchWidgets('badges')
                     }}
                 />
             </Modal>
