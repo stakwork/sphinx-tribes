@@ -198,7 +198,7 @@ export class MainStore {
   @action async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
-      console.log('got openIssues', openIssues)
+      // console.log('got openIssues', openIssues)
       // remove my own!
 
       let oIssues = [...openIssues]
