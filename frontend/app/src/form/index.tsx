@@ -29,7 +29,7 @@ export default function Form(props: any) {
   let initValues = dynamicInitialValues || props.initialValues
 
   useEffect(() => {
-    const dSchema = props.schema.find(f => f.defaultSchema)
+    const dSchema = props.schema?.find(f => f.defaultSchema)
     const type = props.initialValues?.type
     if (dSchema && type) {
       let editSchema = dynamicSchemasByType[type]
@@ -84,29 +84,32 @@ export default function Form(props: any) {
   }
 
   if (props.paged) {
-    props.schema.forEach((s) => {
+    props.schema?.forEach((s) => {
       if (s.page > lastPage) lastPage = s.page
     })
   }
 
-  let schema = props.paged ? props.schema.filter(f => f.page === page) : props.schema
+  let schema = props.paged ? props.schema?.filter(f => f.page === page) : props.schema
 
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema
+
+  // if no schema, return empty div
+  if (loading || !schema) return <div />
 
   let buttonAlignment = buttonsOnBottom ? { zIndex: 20, bottom: 0, height: 108, justifyContent: 'center' } : { top: 0 }
   let formPad = buttonsOnBottom ? { paddingTop: 30 } : {}
 
   let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {}
 
-  const isAboutMeForm = schema.find(f => f.name === 'owner_alias') ? true : false
+  const isAboutMeForm = schema?.find(f => f.name === 'owner_alias') ? true : false
 
   const dynamicFormOptions = (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || []
 
-  const defaultOptions = schema.find(f => f.name === 'tribe') ? [{ value: 'none', label: 'None' }] : []
+  const defaultOptions = schema?.find(f => f.name === 'tribe') ? [{ value: 'none', label: 'None' }] : []
 
   // inject owner tribes
-  const tribesSelectorIndex = schema.findIndex(f => f.name === 'tribe' || f.name === 'tribes')
+  const tribesSelectorIndex = schema?.findIndex(f => f.name === 'tribe' || f.name === 'tribes')
   if (tribesSelectorIndex > -1) {
     schema[tribesSelectorIndex].options = (main.ownerTribes?.length && main.ownerTribes.map(ot => {
       return {
@@ -116,8 +119,6 @@ export default function Form(props: any) {
       }
     })) || defaultOptions
   }
-
-  if (loading) return <div />
 
   return (
     <Formik
@@ -137,7 +138,7 @@ export default function Form(props: any) {
                 style={{ marginBottom: 14 }}
                 onChange={(v) => {
                   console.log('v', v)
-                  const selectedOption = dynamicFormOptions.find(f => f.value === v)
+                  const selectedOption = dynamicFormOptions?.find(f => f.value === v)
                   if (selectedOption) {
                     setDynamicSchemaName(v)
                     setDynamicSchema(selectedOption.schema)

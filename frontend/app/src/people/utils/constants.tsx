@@ -120,7 +120,7 @@ const widgetConfigs = {
         noneSpace: {
             me: {
                 img: 'no_wanted.png',
-                text: 'Make a list of github tickets and you need help on.',
+                text: 'Make a list of github tickets you want help on.',
                 buttonText: 'Add New Ticket',
                 buttonIcon: 'favorite_outline'
             },
