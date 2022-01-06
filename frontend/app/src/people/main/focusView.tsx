@@ -42,8 +42,8 @@ export default function FocusedView(props: any) {
   const isMobile = useIsMobile();
 
   const torSave = canEdit && ui?.meInfo?.url?.includes(".onion");
-  console.log("canEdit", canEdit);
-  console.log("ui", ui, ui?.meInfo, ui?.meInfo?.url);
+  // console.log("canEdit", canEdit);
+  // console.log("ui", ui, ui?.meInfo, ui?.meInfo?.url);
   console.log("TOR SAVE", torSave);
 
   function closeModal(override) {
@@ -108,7 +108,7 @@ export default function FocusedView(props: any) {
 
       // if about
       if (config.name === "about") {
-        config.schema.forEach((s) => {
+        config?.schema?.forEach((s) => {
           if (s.widget && fullMeData.extras) {
             // this allows the link widgets to be edited as a part of about me,
             // when really they are stored as extras
@@ -121,7 +121,7 @@ export default function FocusedView(props: any) {
                 v[s.name].forEach((t) => {
                   let fullTribeInfo =
                     ownerTribes &&
-                    ownerTribes.find((f) => f.unique_name === t.value);
+                    ownerTribes?.find((f) => f.unique_name === t.value);
                   // disclude sensitive details
                   if (fullTribeInfo)
                     submitTribes.push({
@@ -354,7 +354,7 @@ export default function FocusedView(props: any) {
 
           if (sel) {
             // if dynamic, find right schema
-            let dynamicSchema = config.schema.find((f) => f.defaultSchema);
+            let dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
             if (dynamicSchema) {
               if (sel.type) {
                 let thisDynamicSchema = dynamicSchemasByType[sel.type];
@@ -368,7 +368,7 @@ export default function FocusedView(props: any) {
                 });
               }
             } else {
-              config.schema.forEach((s) => {
+              config?.schema?.forEach((s) => {
                 initialValues[s.name] = sel[s.name];
               });
             }
@@ -488,7 +488,7 @@ export default function FocusedView(props: any) {
             {/* display item */}
             <SummaryViewer
               person={person}
-              item={person?.extras && person.extras[config.name][selectedIndex]}
+              item={person?.extras && person.extras[config?.name][selectedIndex]}
               config={config}
             />
           </>
