@@ -115,6 +115,11 @@ class UiStore {
     this.openGithubIssues = a
   }
 
+  @observable badgeList: any = []
+  @action setBadgeList(a: any) {
+    this.badgeList = a
+  }
+
 
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
