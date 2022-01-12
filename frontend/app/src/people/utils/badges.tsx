@@ -35,7 +35,7 @@ export default function Badges(props) {
 
     const topLevelBadges = balancesTxns?.balances?.map((b, i) => {
 
-        const badgeDetails = badgeList.find(f => f.id === b.asset_id)
+        const badgeDetails = badgeList?.find(f => f.id === b.asset_id)
         // if early adopter badge
         let counter = ''
         if (b.asset_id === 8) {
@@ -46,9 +46,9 @@ export default function Badges(props) {
         // console.log('b', b)
 
         return <BWrap key={i + 'badges'} isMobile={isMobile}>
-            <Img src={`${badgeDetails.icon}`} />
+            <Img src={`${badgeDetails?.icon}`} />
             <div style={{ width: '100%', minWidth: 160, paddingRight: 30 }}>
-                <T isMobile={isMobile}>{badgeDetails.name} {b.balance > 1 && `(${b.balance})`}</T>
+                <T isMobile={isMobile}>{badgeDetails?.name} {b.balance > 1 && `(${b.balance})`}</T>
                 {counter && <D><Counter>{counter}</Counter></D>}
             </div>
 
