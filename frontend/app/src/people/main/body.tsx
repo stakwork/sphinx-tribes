@@ -95,6 +95,7 @@ export default function BodyComponent() {
         // loadPeople()
         // loadPeopleExtras()
         main.getOpenGithubIssues()
+        main.getBadgeList()
     }, [])
 
     useEffect(() => {
@@ -279,7 +280,7 @@ export default function BodyComponent() {
                             buttonIcon={'arrow_forward'}
                             action={() => ui.setShowSignIn(true)}
                             img={'explore.png'}
-                            text={'Discover people on Sphinx'}
+                            text={'Add your profile'}
                             style={{ height: 320, background: '#fff' }}
                         />
                         <Divider />
@@ -396,7 +397,7 @@ export default function BodyComponent() {
                         buttonIcon={'arrow_forward'}
                         action={() => ui.setShowSignIn(true)}
                         img={'explore.png'}
-                        text={'Discover people on Sphinx'}
+                        text={'Add your profile'}
                         style={{ height: 320 }}
                     />
                     <Divider />
