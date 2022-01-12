@@ -89,8 +89,6 @@ export default function PersonView(props: any) {
     // backend is adding 'description' to empty descriptions, short term fix
     if (description === 'description') description = ''
 
-
-
     const canEdit = id === meInfo?.id
     const isMobile = useIsMobile()
 
@@ -327,17 +325,10 @@ export default function PersonView(props: any) {
                 {...tabs[selectedWidget]?.noneSpace[noneKey]}
             />)
 
-            const loader = <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                opacity: 0.8,
-                width: '100%'
-            }}>
-                <EuiLoadingSpinner size="xl" />
-            </div>
-
-            return loadingPerson ? loader : panels
+            return <>
+                <PageLoadSpinner show={loadingPerson} />
+                {panels}
+            </>
         }
 
         switch (selectedWidget) {
