@@ -308,6 +308,43 @@ export class MainStore {
 
   }
 
+  @action async getBadgeList(): Promise<any> {
+
+    try {
+      const URL = 'https://liquid.sphinx.chat'
+
+      const l = await fetch(URL + `/list`, {
+        method: "GET",
+      });
+
+      const badgelist = await l.json();
+
+      uiStore.setBadgeList(badgelist)
+      return badgelist;
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
+  @action async getBalances(pubkey: any): Promise<any> {
+
+    try {
+      const URL = 'https://liquid.sphinx.chat'
+
+      const b = await fetch(URL + `/balances?pubkey=${pubkey}`, {
+        method: "GET",
+      });
+
+      const balances = await b.json();
+
+      return balances;
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
   @action async postToCache(payload: any): Promise<void> {
     await api.post("save", payload, {
       "Content-Type": "application/json",
@@ -445,6 +482,9 @@ export class MainStore {
       return [];
     }
   }
+
+
+
 
   // @persist("list")
   @observable
