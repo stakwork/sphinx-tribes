@@ -229,7 +229,7 @@ const D = styled.div`
 
 const Status = styled.div`
                         margin: 15px 20px 25px;
-                        width:100%;
+                        // width:100%;
                         font-size:12px;
                         display:flex;
                         justify-content:center;
