@@ -280,7 +280,7 @@ export default function BodyComponent() {
                             buttonIcon={'arrow_forward'}
                             action={() => ui.setShowSignIn(true)}
                             img={'explore.png'}
-                            text={'Add your profile'}
+                            text={'Start your own profile'}
                             style={{ height: 320, background: '#fff' }}
                         />
                         <Divider />
@@ -397,7 +397,7 @@ export default function BodyComponent() {
                         buttonIcon={'arrow_forward'}
                         action={() => ui.setShowSignIn(true)}
                         img={'explore.png'}
-                        text={'Add your profile'}
+                        text={'Start your own profile'}
                         style={{ height: 320 }}
                     />
                     <Divider />
