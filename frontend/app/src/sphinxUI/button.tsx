@@ -23,6 +23,10 @@ export default function Button(props: any) {
             color: '#5F6368',
             border: '1px solid #fff',
         },
+        noColor: {
+            background: '#ffffff00',
+            color: '#5F6368',
+        },
         link: {
             background: '#fff',
             color: '#618AFF',
