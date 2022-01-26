@@ -53,6 +53,7 @@ export default function Badges(props) {
     }
 
 
+    // console.log('balancesTxns', balancesTxns)
     // metadata should be json to support badge details
 
     const topLevelBadges = balancesTxns?.balances?.map((b, i) => {
@@ -66,11 +67,14 @@ export default function Badges(props) {
         }
 
         const packedBadge = {
+            ...b,
             ...badgeDetails,
             counter,
             metadata,
             deck: balancesTxns?.txs?.filter(f => f.asset_id === b.asset_id) || []
         }
+
+        // console.log('packedBadge', packedBadge)
 
         return <BWrap key={i + 'badges'} isMobile={isMobile} onClick={() => {
             // setSelectedBadge(packedBadge)
@@ -192,7 +196,7 @@ export default function Badges(props) {
                         try {
                             setClaiming(true)
                             let body: ClaimOnLiquid = {
-                                amount: badgeToPush.amount,
+                                amount: badgeToPush.balance,
                                 to: liquidAddress,
                                 asset: badgeToPush.id,
                                 memo: memo,
