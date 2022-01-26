@@ -152,7 +152,6 @@ const Img = styled.div<ImageProps>`
                 height: ${(p) => p.big ? '372px' : '132px'};
                 width: ${(p) => p.big ? '100%' : '132px'};
                 position: relative;
-                border:1px solid #ffffff21;
                 `;
 
 const BigImg = styled.img<ImageProps>`

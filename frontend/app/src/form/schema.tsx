@@ -282,6 +282,14 @@ export const meSchema: FormField[] = [
     }
 ];
 
+export const liquidSchema: FormField[] = [
+    {
+        name: "address",
+        label: "Liquid Address",
+        type: "text",
+    },
+]
+
 export const aboutSchema: FormField[] = [
     {
         name: "img",
