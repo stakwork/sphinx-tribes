@@ -61,7 +61,9 @@ export default function Badges(props) {
         const badgeDetails = badgeList?.find(f => f.id === b.asset_id)
         // if early adopter badge
         let counter = ''
-        let metadata = balancesTxns?.txs?.find(f => f.asset_id === b.asset_id)?.metadata
+        let theseTxType = balancesTxns?.txs?.find(f => f.asset_id === b.asset_id)
+        let metadata = theseTxType?.metadata
+        let liquidTxId = balancesTxns?.txs?.find(f => f.asset_id === b.asset_id && f.txid)?.txid || ''
         if (b.asset_id === 8) {
             counter = metadata
         }
@@ -69,6 +71,7 @@ export default function Badges(props) {
         const packedBadge = {
             ...b,
             ...badgeDetails,
+            txid: liquidTxId,
             counter,
             metadata,
             deck: balancesTxns?.txs?.filter(f => f.asset_id === b.asset_id) || []
@@ -104,12 +107,12 @@ export default function Badges(props) {
             </D>
 
             <Status onClick={() => {
-                if (thisIsMe && !packedBadge.onchain) {
+                if (thisIsMe && !packedBadge.txid) {
                     //user on own badge, off-chain
                     setBadgeToPush(packedBadge)
-                } else if (packedBadge.txId) {
+                } else if (packedBadge.txid) {
                     //on-chain, click to see on blockstream
-                    redirectToBlockstream(packedBadge.txId)
+                    redirectToBlockstream(packedBadge.txid)
                 }
             }}>
                 <BadgeStatus {...packedBadge} />
@@ -221,11 +224,11 @@ export default function Badges(props) {
 
 function BadgeStatus(props: any) {
 
-    let { onchain } = props
+    let { txid } = props
 
     return <div>
         <StatusText>
-            {onchain ?
+            {txid ?
                 <>
                     <MaterialIcon icon='link' style={{ fontSize: 13 }} />
                     <div style={{ marginLeft: 5, fontWeight: 500 }}>ON-CHAIN</div>
