@@ -4,7 +4,10 @@ import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
-import { Modal, Button, Divider } from '../../sphinxUI';
+import { Modal, Button, Divider, TextInput } from '../../sphinxUI';
+import { ClaimOnLiquid } from '../../store/main';
+import MaterialIcon from '@material/react-material-icon';
+
 // import { badges } from './constants';
 
 export default function Badges(props) {
@@ -17,28 +20,37 @@ export default function Badges(props) {
     const [selectedBadge, setSelectedBadge]: any = useState(null)
     const [badgeToPush, setBadgeToPush]: any = useState(null)
 
+    const [liquidAddress, setLiquidAddress]: any = useState('')
+    const [memo, setMemo]: any = useState('')
+    const [claiming, setClaiming]: any = useState(false)
+
     const isMobile = useIsMobile()
     const { person } = props
-
-    // console.log('badgeList', badgeList)
-    // console.log('balancesTxns', balancesTxns)
 
     const thisIsMe = meInfo?.owner_pubkey === person?.owner_pubkey
 
     useEffect(() => {
-
-        (async () => {
-            setLoading(true)
-            setSelectedBadge(null)
-            setBadgeToPush(null)
-            if (person?.owner_pubkey) {
-                const b = await main.getBalances(person?.owner_pubkey)
-                setBalancesTxns(b)
-            }
-            setLoading(false)
-        })()
-
+        getBadges()
     }, [person?.owner_pubkey])
+
+    async function getBadges() {
+        setLoading(true)
+        setSelectedBadge(null)
+        setBadgeToPush(null)
+        if (person?.owner_pubkey) {
+            const b = await main.getBalances(person?.owner_pubkey)
+            setBalancesTxns(b)
+        }
+        setLoading(false)
+    }
+
+
+    function redirectToBlockstream(txId) {
+        let el = document.createElement('a')
+        el.target = '_blank'
+        el.href = `https://blockstream.info/liquid/tx/${txId}`
+        el.click();
+    }
 
 
     // metadata should be json to support badge details
@@ -53,10 +65,6 @@ export default function Badges(props) {
             counter = metadata
         }
 
-        // let status = 'Pending'
-        // console.log('b', b)
-
-
         const packedBadge = {
             ...badgeDetails,
             counter,
@@ -65,18 +73,45 @@ export default function Badges(props) {
         }
 
         return <BWrap key={i + 'badges'} isMobile={isMobile} onClick={() => {
-            setSelectedBadge(packedBadge)
+            // setSelectedBadge(packedBadge)
         }}>
-            <Img src={`${badgeDetails?.icon}`} isMobile={isMobile} />
+
+            <Img src={`${badgeDetails?.icon}`} isMobile={isMobile} >
+                <div style={{ position: 'absolute', background: '#fff', bottom: -6, left: 12 }}>
+                    <Flag />
+
+                    <div style={{
+                        fontSize: 10, height: '90%',
+                        position: 'absolute', top: 0, left: 0, display: 'flex', justifyContent: 'center', width: '100%',
+                        alignItems: 'center',
+                        color: '#fff'
+                    }}>{counter}</div>
+                </div>
+            </Img>
+
             <div style={{ width: '100%', minWidth: 160 }}>
                 <T isMobile={isMobile}>{badgeDetails?.name} {b.balance > 1 && `(${b.balance})`}</T>
                 {badgeDetails?.description && <S isMobile={isMobile}>{badgeDetails?.description}</S>}
-                {counter && <D><Counter>{counter} / {badgeDetails?.amount}</Counter></D>}
             </div>
 
-            <Status>
-                <StatusText>{'Off-chain'}</StatusText>
+            <D>
+                {counter}
+                {badgeDetails?.amount && <div style={{ color: '#8E969C' }}>&nbsp;/&nbsp;{badgeDetails?.amount}</div>}
+            </D>
+
+            <Status onClick={() => {
+                if (thisIsMe && !packedBadge.onchain) {
+                    //user on own badge, off-chain
+                    setBadgeToPush(packedBadge)
+                } else if (packedBadge.txId) {
+                    //on-chain, click to see on blockstream
+                    redirectToBlockstream(packedBadge.txId)
+                }
+            }}>
+                <BadgeStatus {...packedBadge} />
             </Status>
+
+
 
         </BWrap>
     })
@@ -102,7 +137,6 @@ export default function Badges(props) {
                         }}>
                             <T isMobile={isMobile}>{selectedBadge?.name} {selectedBadge?.balance > 1 && `(${selectedBadge?.balance})`}</T>
                             {selectedBadge?.counter && <D><Counter>{selectedBadge?.counter} / {selectedBadge?.amount}</Counter></D>}
-
 
                             <div style={{ marginTop: 20, width: '100%' }}>
                                 {thisIsMe ?
@@ -133,14 +167,46 @@ export default function Badges(props) {
             visible={badgeToPush ? true : false}
             close={() => setBadgeToPush(null)}
         >
-            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <CodeText>
-                    {JSON.stringify(badgeToPush)}
-                </CodeText>
+            <div style={{ padding: 20, height: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+
+                <TextInput
+                    style={{ width: 240 }}
+                    label={'Liquid Address'}
+                    value={liquidAddress}
+                    onChange={(e) => setLiquidAddress(e)}
+                />
+
+                <TextInput
+                    style={{ width: 240 }}
+                    label={'Memo (optional)'}
+                    value={memo}
+                    onChange={(e) => setMemo(e)}
+                />
+
                 <Button
                     color='primary'
                     text='Claim on Liquid'
-                    disabled={true}
+                    loading={claiming}
+                    disabled={!liquidAddress || claiming}
+                    onClick={async () => {
+                        try {
+                            setClaiming(true)
+                            let body: ClaimOnLiquid = {
+                                amount: badgeToPush.amount,
+                                to: liquidAddress,
+                                asset: badgeToPush.id,
+                                memo: memo,
+                            }
+                            const token = await main.claimBadgeOnLiquid(body)
+                            console.log('token', token)
+                            // refresh badges
+                            getBadges()
+                        } catch (e) {
+                            console.log('e', e)
+                        }
+
+                        setClaiming(false)
+                    }}
                 />
             </div>
         </Modal>
@@ -149,9 +215,54 @@ export default function Badges(props) {
 }
 
 
+function BadgeStatus(props: any) {
+
+    let { onchain } = props
+
+    return <div>
+        <StatusText>
+            {onchain ?
+                <>
+                    <MaterialIcon icon='link' style={{ fontSize: 13 }} />
+                    <div style={{ marginLeft: 5, fontWeight: 500 }}>ON-CHAIN</div>
+                </> :
+
+                <div style={{
+                    display: 'flex', fontSize: 11, alignItems: 'center', color: '#618AFF', cursor: 'pointer',
+                    letterSpacing: '0.3px'
+                }}>
+                    OFF-CHAIN
+                </div>}
+        </StatusText>
+    </div>
+}
+
+
 interface BProps {
     readonly isMobile?: boolean;
 }
+
+
+function Flag() {
+    return <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#filter0_d_3736_56289)">
+            <path d="M4 27V3H26V27L15 24.3333L4 27Z" fill="#43C392" />
+        </g>
+        <defs>
+            <filter id="filter0_d_3736_56289" x="0" y="0" width="30" height="32" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                <feOffset dy="1" />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0.286275 0 0 0 0 0.788235 0 0 0 0 0.596078 0 0 0 0.5 0" />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3736_56289" />
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_3736_56289" result="shape" />
+            </filter>
+        </defs>
+    </svg>
+}
+
 
 const Wrap = styled.div<BProps>`
             display: flex;
@@ -163,7 +274,7 @@ const Wrap = styled.div<BProps>`
 
 const BWrap = styled.div<BProps>`
                 display: flex;
-                cursor:pointer;
+                // cursor:pointer;
                 flex-direction:${p => p.isMobile ? 'row' : 'column'};
                 position:relative;
                 width: ${p => p.isMobile ? '100%' : '192px'};
@@ -218,13 +329,22 @@ const S = styled.div<BProps>`
                         color: #5F6368;
                         `;
 const D = styled.div`
-                        position:absolute;
-                        top:0;
-                        left:0;
                         width:100%;
                         font-size:12px;
                         display:flex;
-                        justify-content:flex-end;
+                        justify-content:center;
+                        align-items:center;
+
+                        line-height: 30px;
+                        /* or 400% */
+
+                        display: flex;
+                        align-items: center;
+                        text-align: center;
+
+                        /* Text 2 */
+
+                        color: #3C3F41;
                         `;
 
 const Status = styled.div`
@@ -238,31 +358,21 @@ const StatusText = styled.div`
                         display:flex;
                         justify-content:center;
                         align-items:center;
-                        height:26px;
-                        color:#5078F2;
-                        background: #DCEDFE;
-                        border-radius: 32px;
-                        font-weight: bold;
-                        font-size: 12px;
-                        line-height: 13px;
+                        // height:26px;
+                        color:#B0B7BC;
+                        font-size: 10px;
                         padding 0 10px;
                         `;
 const Counter = styled.div`
-                        padding:3px 8px;
-                        background:#D4AF3799;
-                        border-bottom-left-radius:4px;
+                    
                         `;
-const CodeText = styled.div`
-    padding:20px;
-    background:#A3C1FF55;
-    word-break:break-word;
-    margin:20px;
-`;
+
 interface ImageProps {
     readonly src?: string;
     readonly isMobile?: boolean;
 }
 const Img = styled.div<ImageProps>`
+                            position:relative;
                             background-image: url("${(p) => p.src}");
                             background-position: center;
                             background-size: cover;
@@ -271,7 +381,7 @@ const Img = styled.div<ImageProps>`
                             width:${p => p.isMobile ? '108px' : '132px'};
                             min-height:${p => p.isMobile ? '108px' : '132px'};
                             height:${p => p.isMobile ? '108px' : '132px'};
-                            margin:${p => p.isMobile ? '24px' : '20px 30px'};
+                            margin:${p => p.isMobile ? '24px' : '0px 20px 20px'};
                             `;
 const SmallImg = styled.div<ImageProps>`
                             background-image: url("${(p) => p.src}");
@@ -282,5 +392,5 @@ const SmallImg = styled.div<ImageProps>`
                             width:90px;
                             min-height:90px;
                             height:90px;
-                            margin:20px 30px;
+                            margin:10px 30px;
                             `;

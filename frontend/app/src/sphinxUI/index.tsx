@@ -7,5 +7,6 @@ import { Title, Date, Paragraph, Link } from './elements'
 import Select from './select'
 import MultiSelect from './multiSelect'
 import CreatableMultiSelect from './creatableMultiSelect'
+import TextInput from './text-input'
 
-export { SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect, CreatableMultiSelect }
+export { TextInput, SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect, CreatableMultiSelect }

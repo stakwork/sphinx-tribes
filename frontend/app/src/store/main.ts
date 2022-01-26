@@ -454,15 +454,12 @@ export class MainStore {
   peopleWanteds: PersonWanted[] = [];
 
   @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
-    // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText }
 
     let query = this.appendQueryParams("people/wanteds", queryLimit, { ...queryParams, sortBy: 'created' })
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps)
-
-      // console.log('ps', ps)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -561,6 +558,39 @@ export class MainStore {
       uiStore.setMeInfo(updateSelf);
     }
   }
+
+
+
+  @action async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+
+    try {
+      const URL = info.url.startsWith("http")
+        ? info.url
+        : `https://${info.url}`;
+      const b = await fetch(URL + `/claim_on_liquid`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...body,
+          host: getHostIncludingDockerHosts(),
+        }),
+        headers: {
+          "x-jwt": info.jwt,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("code from relay", b);
+
+      return b;
+    } catch (e) {
+      console.log('failed!', e)
+    }
+  }
+
+
 
   @action async refreshJwt() {
     try {
@@ -838,4 +868,12 @@ export interface QueryParams {
   limit?: number;
   sortBy?: string;
   direction?: string;
+}
+
+
+export interface ClaimOnLiquid {
+  asset: number
+  to: string
+  amount?: number
+  memo: string
 }

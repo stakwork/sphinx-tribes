@@ -58,6 +58,5 @@ const Img = styled.div<ImageProps>`
                 width: 80px;
                 border-radius: 5px;
                 position: relative;
-                border:1px solid #ffffff21;
                 `;
 
