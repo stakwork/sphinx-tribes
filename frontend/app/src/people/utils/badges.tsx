@@ -322,8 +322,8 @@ function Flag(props) {
             <path d="M4 27V3H26V27L15 24.3333L4 27Z" fill={props.color} />
         </g>
         <defs>
-            <filter id="filter0_d_3736_56289" x="0" y="0" width="30" height="32" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <filter id="filter0_d_3736_56289" x="0" y="0" width="30" height="32" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                <feFlood floodOpacity="0" result="BackgroundImageFix" />
                 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
                 <feOffset dy="1" />
                 <feGaussianBlur stdDeviation="2" />
