@@ -716,14 +716,14 @@ export default function PersonView(props: any) {
                         const label = t.label
                         const selected = name === newSelectedWidget
                         const hasExtras = (extras && extras[name] && (extras[name].length > 0))
-                        let count = hasExtras ? extras[name].length : null
+                        let count: any = hasExtras ? extras[name].length : null
                         // count only open ones
                         if (hasExtras && name === 'wanted') {
                             count = 0
                             extras[name].forEach((w => {
                                 const { repo, issue } = w
                                 const { status } = extractGithubIssue(person, repo, issue)
-                                if (!status || status === 'open') count++
+                                if (status === '' || status === 'open') count++
                             }))
                         }
                         return <Tab key={i}
@@ -733,7 +733,7 @@ export default function PersonView(props: any) {
                                 switchWidgets(name)
                             }}>
                             {label}
-                            {count && <Counter>
+                            {(count > 0) && <Counter>
                                 {count}
                             </Counter>}
                         </Tab>
