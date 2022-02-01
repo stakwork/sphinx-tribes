@@ -331,7 +331,6 @@ export default function BodyComponent() {
                             ui.setSearchText(e)
                         }}
                     />
-
                 </div>
 
                 <div style={{ width: '100%' }}>

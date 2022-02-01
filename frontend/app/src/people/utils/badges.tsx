@@ -64,9 +64,24 @@ export default function Badges(props) {
         let theseTxType = balancesTxns?.txs?.find(f => f.asset_id === b.asset_id)
         let metadata = theseTxType?.metadata
         let liquidTxId = balancesTxns?.txs?.find(f => f.asset_id === b.asset_id && f.txid)?.txid || ''
-        if (b.asset_id === 8) {
+        let flagColor = '#41c292'
+
+
+        if (metadata && !isNaN(parseInt(metadata))) {
             counter = metadata
+
+            // flag colors
+            // 1 - 100 #41c292
+            // 100 - 500 #35c3cc
+            // 500 - 1000 #628afd
+            // > 1000 no show
+            let intCount = parseInt(counter)
+            if (intCount < 100) flagColor = '#41c292'
+            else if (intCount < 500) flagColor = '#35c3cc'
+            else if (intCount < 1001) flagColor = '#628afd'
         }
+
+        let showFlag = (counter && (parseInt(counter) < 1001)) ? true : false
 
         const packedBadge = {
             ...b,
@@ -79,21 +94,70 @@ export default function Badges(props) {
 
         // console.log('packedBadge', packedBadge)
 
+        if (isMobile) {
+            return <BWrap key={i + 'badges'} isMobile={isMobile} onClick={() => {
+                // setSelectedBadge(packedBadge)
+            }}>
+
+                <Img src={`${badgeDetails?.icon}`} isMobile={isMobile} >
+
+                    {showFlag && counter &&
+                        <div style={{ position: 'absolute', background: '#fff', bottom: -6, left: 12 }}>
+                            <Flag color={flagColor} />
+
+                            <div style={{
+                                fontSize: 10, height: '90%',
+                                position: 'absolute', top: 0, left: 0, display: 'flex', justifyContent: 'center', width: '100%',
+                                alignItems: 'center',
+                                color: '#fff'
+                            }}>{counter}</div>
+                        </div>
+                    }
+                </Img>
+
+                <div style={{
+                    display: 'flex', flexDirection: 'column',
+                    justifyContent: 'center', width: '100%', paddingRight: 20
+                }}>
+                    <div style={{ width: 'auto' }}>
+                        <T >{badgeDetails?.name} {b.balance > 1 && `(${b.balance})`}</T>
+                        {badgeDetails?.description && <S isMobile={isMobile}>{badgeDetails?.description}</S>}
+                    </div>
+
+                    <Status style={{ pointerEvents: (!thisIsMe && !packedBadge.txid) ? 'none' : 'auto', margin: 0, marginTop: 10 }} onClick={() => {
+                        if (thisIsMe && !packedBadge.txid) {
+                            //user on own badge, off-chain
+                            setBadgeToPush(packedBadge)
+                        } else if (packedBadge.txid) {
+                            //on-chain, click to see on blockstream
+                            redirectToBlockstream(packedBadge.txid)
+                        }
+                    }}>
+                        <BadgeStatus {...packedBadge} />
+                    </Status>
+                </div>
+            </BWrap>
+        }
+
+        // is desktop
         return <BWrap key={i + 'badges'} isMobile={isMobile} onClick={() => {
             // setSelectedBadge(packedBadge)
         }}>
 
             <Img src={`${badgeDetails?.icon}`} isMobile={isMobile} >
-                <div style={{ position: 'absolute', background: '#fff', bottom: -6, left: 12 }}>
-                    <Flag />
 
-                    <div style={{
-                        fontSize: 10, height: '90%',
-                        position: 'absolute', top: 0, left: 0, display: 'flex', justifyContent: 'center', width: '100%',
-                        alignItems: 'center',
-                        color: '#fff'
-                    }}>{counter}</div>
-                </div>
+                {showFlag && counter &&
+                    <div style={{ position: 'absolute', background: '#fff', bottom: -6, left: 12 }}>
+                        <Flag color={flagColor} />
+
+                        <div style={{
+                            fontSize: 10, height: '90%',
+                            position: 'absolute', top: 0, left: 0, display: 'flex', justifyContent: 'center', width: '100%',
+                            alignItems: 'center',
+                            color: '#fff'
+                        }}>{counter}</div>
+                    </div>
+                }
             </Img>
 
             <div style={{ width: '100%', minWidth: 160 }}>
@@ -102,11 +166,15 @@ export default function Badges(props) {
             </div>
 
             <D>
-                {counter}
-                {badgeDetails?.amount && <div style={{ color: '#8E969C' }}>&nbsp;/&nbsp;{badgeDetails?.amount}</div>}
+                {counter &&
+                    <>
+                        {counter}
+                        {badgeDetails?.amount && <div style={{ color: '#8E969C' }}>&nbsp;/&nbsp;{badgeDetails?.amount}</div>}
+                    </>
+                }
             </D>
 
-            <Status onClick={() => {
+            <Status style={{ pointerEvents: (!thisIsMe && !packedBadge.txid) ? 'none' : 'auto' }} onClick={() => {
                 if (thisIsMe && !packedBadge.txid) {
                     //user on own badge, off-chain
                     setBadgeToPush(packedBadge)
@@ -117,8 +185,6 @@ export default function Badges(props) {
             }}>
                 <BadgeStatus {...packedBadge} />
             </Status>
-
-
 
         </BWrap>
     })
@@ -235,7 +301,7 @@ function BadgeStatus(props: any) {
                 </> :
 
                 <div style={{
-                    display: 'flex', fontSize: 11, alignItems: 'center', color: '#618AFF', cursor: 'pointer',
+                    display: 'flex', fontSize: 11, alignItems: 'center', color: '#618AFF',
                     letterSpacing: '0.3px'
                 }}>
                     OFF-CHAIN
@@ -250,14 +316,14 @@ interface BProps {
 }
 
 
-function Flag() {
+function Flag(props) {
     return <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g filter="url(#filter0_d_3736_56289)">
-            <path d="M4 27V3H26V27L15 24.3333L4 27Z" fill="#43C392" />
+            <path d="M4 27V3H26V27L15 24.3333L4 27Z" fill={props.color} />
         </g>
         <defs>
-            <filter id="filter0_d_3736_56289" x="0" y="0" width="30" height="32" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <filter id="filter0_d_3736_56289" x="0" y="0" width="30" height="32" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                <feFlood floodOpacity="0" result="BackgroundImageFix" />
                 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
                 <feOffset dy="1" />
                 <feGaussianBlur stdDeviation="2" />
@@ -344,7 +410,7 @@ const D = styled.div`
 
                         line-height: 30px;
                         /* or 400% */
-
+                        min-height:30px;
                         display: flex;
                         align-items: center;
                         text-align: center;
@@ -369,6 +435,11 @@ const StatusText = styled.div`
                         color:#B0B7BC;
                         font-size: 10px;
                         padding 0 10px;
+                        cursor: pointer;
+                        
+                        &:hover{
+                            color:#618AFF99;
+                        }
                         `;
 const Counter = styled.div`
                     
