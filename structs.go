@@ -36,6 +36,7 @@ type Tribe struct {
 	LastActive      int64          `json:"last_active"`
 	Bots            string         `json:"bots"`
 	OwnerRouteHint  string         `json:"owner_route_hint"`
+	Pin             string         `json:"pin"`
 }
 
 // Bot struct
