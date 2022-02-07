@@ -58,7 +58,7 @@ var updatables = []string{
 	"escrow_amount", "escrow_millis",
 	"unlisted", "private", "deleted",
 	"app_url", "bots", "feed_url", "feed_type",
-	"owner_route_hint", "updated",
+	"owner_route_hint", "updated", "pin",
 }
 var botupdatables = []string{
 	"name", "description", "tags", "img",
