@@ -105,6 +105,7 @@ type Person struct {
 	Updated          *time.Time     `json:"updated"`
 	Unlisted         bool           `json:"unlisted"`
 	Deleted          bool           `json:"deleted"`
+	LastLogin        int64          `json:"last_login"`
 	OwnerRouteHint   string         `json:"owner_route_hint"`
 	OwnerContactKey  string         `json:"owner_contact_key"`
 	PriceToMeet      int64          `json:"price_to_meet"`
