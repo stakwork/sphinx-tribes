@@ -26,7 +26,8 @@ CREATE TABLE tribes (
   last_active BIGINT,
   bots TEXT,
   owner_route_hint TEXT,
-  unique_name TEXT
+  unique_name TEXT,
+  pin TEXT
 );
 
 -- for searching 
