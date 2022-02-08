@@ -4,8 +4,12 @@ import api from "../api";
 import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
 import { uiStore } from "./ui";
-
+import { randomString } from "../helpers";
 export const queryLimit = 100
+
+function makeTorSaveURL(host: string, key: string) {
+  return `sphinx.chat://?action=save&host=${host}&key=${key}`;
+}
 
 export class MainStore {
   // @persist("list")
@@ -352,6 +356,37 @@ export class MainStore {
     return;
   }
 
+  @action async getTorSaveURL(method: string, path: string, body: any): Promise<string> {
+    const key = randomString(15);
+    const gotHost = getHostIncludingDockerHosts();
+
+    // make price to meet an integer
+    if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet)
+
+    const data = JSON.stringify({
+      host: gotHost,
+      ...body
+    });
+
+    let torSaveURL = ''
+
+    try {
+      await this.postToCache({
+        key,
+        body: data,
+        path,
+        method,
+      });
+      torSaveURL = makeTorSaveURL(gotHost, key);
+    } catch (e) {
+      console.log('e', e)
+    }
+
+    return torSaveURL
+  }
+
+
+
   @action appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
     let query = path
     if (queryParams) {
@@ -378,7 +413,7 @@ export class MainStore {
   @action async getPeople(queryParams?: any): Promise<Person[]> {
     queryParams = { ...queryParams, search: uiStore.searchText }
 
-    let query = this.appendQueryParams("people", queryLimit, { ...queryParams, sortBy: 'updated' })
+    let query = this.appendQueryParams("people", queryLimit, { ...queryParams, sortBy: 'last_login' })
 
     let ps = await api.get(query);
 
