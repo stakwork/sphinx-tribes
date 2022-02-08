@@ -10,7 +10,7 @@ import SummaryViewer from "../widgetViews/summaryViewer";
 import { useIsMobile } from "../../hooks";
 import { dynamicSchemasByType } from "../../form/schema";
 import { randomString } from "../../helpers";
-import QR from "../utils/QR";
+import TorSaveQR from "../utils/torSaveQR";
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -63,37 +63,14 @@ export default function FocusedView(props: any) {
     };
   }, []);
 
-  function makeTorSaveURL(host: string, key: string) {
-    return `sphinx.chat://?action=save&host=${host}&key=${key}`;
-  }
-
   async function submitFormViaApp(body) {
     setLoading(true);
-
-    const key = randomString(15);
-    const gotHost = getHostIncludingDockerHosts();
-    const data = JSON.stringify({
-      host: gotHost,
-      ...body,
-      price_to_meet: parseInt(body.price_to_meet),
-    });
-    const path = "profile";
-    const method = "POST";
-
     try {
-      await main.postToCache({
-        key,
-        body: data,
-        path,
-        method,
-      });
-
-      // show QR for app to link / scan
-      setTorBodyURL(makeTorSaveURL(gotHost, key));
+      const torSaveURL = await main.getTorSaveURL("POST", "profile", body)
+      setTorBodyURL(torSaveURL);
     } catch (e) {
       console.log("e", e);
     }
-
     setLoading(false);
   }
 
@@ -502,44 +479,7 @@ export default function FocusedView(props: any) {
             // main.getSelf(null)
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "10px 20px",
-              width: "100%",
-            }}
-          >
-            <div style={{ height: 40 }} />
-
-            <QR size={220} value={torBodyURL} />
-
-            <Button
-              text={"Save on Sphinx"}
-              height={60}
-              style={{ marginTop: 30 }}
-              width={"100%"}
-              color={"primary"}
-              onClick={() => {
-                let el = document.createElement("a");
-                el.href = torBodyURL;
-                el.click();
-              }}
-            />
-
-            <Button
-              text={"Dismiss"}
-              height={60}
-              style={{ marginTop: 20 }}
-              width={"100%"}
-              color={"action"}
-              onClick={() => {
-                goBack();
-              }}
-            />
-          </div>
+          <TorSaveQR url={torBodyURL} goBack={goBack} />
         </Modal>
       </div>
     );
