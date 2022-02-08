@@ -43,6 +43,9 @@ func initDB() {
 
 	fmt.Println("db connected")
 
+	// migrate table changes
+	db.AutoMigrate(&Person{})
+
 	// data := map[string]string{
 	// 	"assignee": "Evanfeenstra",
 	// 	"status":   "open",
