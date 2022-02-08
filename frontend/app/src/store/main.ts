@@ -847,6 +847,7 @@ export interface Person {
   route_hint: string;
   contact_key: string;
   price_to_meet: number;
+  last_login?: number;
   url: string;
   verification_signature: string;
   extras: Extras;
@@ -866,6 +867,7 @@ export interface PersonFlex {
   alias?: string;
   route_hint?: string;
   contact_key?: string;
+  last_login?: number;
   price_to_meet?: number;
   url?: string;
   verification_signature?: string;
