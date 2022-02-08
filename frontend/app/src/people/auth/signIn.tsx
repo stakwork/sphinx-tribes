@@ -40,7 +40,7 @@ export default function SignIn(props: any) {
                     <ConfirmMe
                         onSuccess={() => {
                             if (props.onSuccess) props.onSuccess()
-                            main.getPeople()
+                            main.getPeople({ resetPage: true })
                         }} />
                 </Column>
                 :
@@ -57,7 +57,7 @@ export default function SignIn(props: any) {
                         {!isMobile && <AuthQR
                             onSuccess={() => {
                                 if (props.onSuccess) props.onSuccess()
-                                main.getPeople()
+                                main.getPeople({ resetPage: true })
                             }}
                             style={{ marginBottom: 20 }} />}
 
