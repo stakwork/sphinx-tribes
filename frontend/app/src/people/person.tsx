@@ -28,6 +28,7 @@ export default function Person(props: any) {
     unique_name,
     price_to_meet,
     updated,
+    last_login,
     squeeze,
     extras,
     twitter_confirmed
@@ -48,6 +49,13 @@ export default function Person(props: any) {
 
   // no suffix
   let lastSeen = moment(updated).fromNow(true)
+
+  //which is more recent, login, or update?
+  if (last_login) {
+    if (moment.unix(last_login).valueOf() > moment(updated).valueOf()) {
+      lastSeen = moment.unix(last_login).fromNow(true)
+    }
+  }
 
   // shorten lastSeen string
   if (lastSeen === 'a few seconds') lastSeen = 'just now'
