@@ -50,8 +50,8 @@ export default function Badges(props) {
     const torSave = thisIsMe && ui?.meInfo?.url?.includes(".onion");
 
     async function claimBadge() {
+        setClaiming(true)
         try {
-            setClaiming(true)
             let body: ClaimOnLiquid = {
                 amount: badgeToPush.balance,
                 to: liquidAddress,
@@ -71,11 +71,11 @@ export default function Badges(props) {
                 // refresh badges
                 getBadges()
             }
-
         } catch (e) {
             console.log('e', e)
         }
 
+        setClaiming(false)
     }
 
     function redirectToBlockstream(txId) {
