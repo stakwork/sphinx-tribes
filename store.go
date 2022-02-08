@@ -166,7 +166,7 @@ func poll(w http.ResponseWriter, r *http.Request) {
 
 	// update LastLogin for user
 	DB.updatePerson(pld.ID, map[string]interface{}{
-		"lastLogin": time.Now().Unix(),
+		"last_login": time.Now().Unix(),
 	})
 
 	// store.DeleteChallenge(challenge)
