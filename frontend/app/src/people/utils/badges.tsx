@@ -7,6 +7,7 @@ import PageLoadSpinner from './pageLoadSpinner';
 import { Modal, Button, Divider, TextInput } from '../../sphinxUI';
 import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
+import TorSaveQR from '../utils/torSaveQR'
 
 // import { badges } from './constants';
 
@@ -23,6 +24,7 @@ export default function Badges(props) {
     const [liquidAddress, setLiquidAddress]: any = useState('')
     const [memo, setMemo]: any = useState('')
     const [claiming, setClaiming]: any = useState(false)
+    const [torBodyURL, setTorBodyURL] = useState("");
 
     const isMobile = useIsMobile()
     const { person } = props
@@ -37,6 +39,7 @@ export default function Badges(props) {
         setLoading(true)
         setSelectedBadge(null)
         setBadgeToPush(null)
+        setTorBodyURL('')
         if (person?.owner_pubkey) {
             const b = await main.getBalances(person?.owner_pubkey)
             setBalancesTxns(b)
@@ -44,6 +47,36 @@ export default function Badges(props) {
         setLoading(false)
     }
 
+    const torSave = thisIsMe && ui?.meInfo?.url?.includes(".onion");
+
+    async function claimBadge() {
+        setClaiming(true)
+        try {
+            let body: ClaimOnLiquid = {
+                amount: badgeToPush.balance,
+                to: liquidAddress,
+                asset: badgeToPush.id,
+                memo: memo,
+            }
+
+            console.log("TOR SAVE", torSave);
+
+            if (torSave) {
+                // for tor users
+                const torSaveURL = await main.getTorSaveURL("POST", "claim_on_liquid", body)
+                setTorBodyURL(torSaveURL);
+            } else {
+                const token = await main.claimBadgeOnLiquid(body)
+                console.log('token', token)
+                // refresh badges
+                getBadges()
+            }
+        } catch (e) {
+            console.log('e', e)
+        }
+
+        setClaiming(false)
+    }
 
     function redirectToBlockstream(txId) {
         let el = document.createElement('a')
@@ -237,50 +270,43 @@ export default function Badges(props) {
             : topLevelBadges}
 
         <Modal
-            visible={badgeToPush ? true : false}
-            close={() => setBadgeToPush(null)}
+            visible={(badgeToPush || torBodyURL) ? true : false}
+            close={() => {
+                setBadgeToPush(null)
+                setTorBodyURL('')
+            }}
         >
             <div style={{ padding: 20, height: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                {torBodyURL ?
+                    <TorSaveQR url={torBodyURL} goBack={() => {
+                        setBadgeToPush(null)
+                        setTorBodyURL('')
+                    }} /> :
+                    <>
+                        <TextInput
+                            style={{ width: 240 }}
+                            label={'Liquid Address'}
+                            value={liquidAddress}
+                            onChange={(e) => setLiquidAddress(e)}
+                        />
 
-                <TextInput
-                    style={{ width: 240 }}
-                    label={'Liquid Address'}
-                    value={liquidAddress}
-                    onChange={(e) => setLiquidAddress(e)}
-                />
+                        <TextInput
+                            style={{ width: 240 }}
+                            label={'Memo (optional)'}
+                            value={memo}
+                            onChange={(e) => setMemo(e)}
+                        />
 
-                <TextInput
-                    style={{ width: 240 }}
-                    label={'Memo (optional)'}
-                    value={memo}
-                    onChange={(e) => setMemo(e)}
-                />
+                        <Button
+                            color='primary'
+                            text='Claim on Liquid'
+                            loading={claiming}
+                            disabled={!liquidAddress || claiming}
+                            onClick={() => claimBadge()}
+                        />
+                    </>
+                }
 
-                <Button
-                    color='primary'
-                    text='Claim on Liquid'
-                    loading={claiming}
-                    disabled={!liquidAddress || claiming}
-                    onClick={async () => {
-                        try {
-                            setClaiming(true)
-                            let body: ClaimOnLiquid = {
-                                amount: badgeToPush.balance,
-                                to: liquidAddress,
-                                asset: badgeToPush.id,
-                                memo: memo,
-                            }
-                            const token = await main.claimBadgeOnLiquid(body)
-                            console.log('token', token)
-                            // refresh badges
-                            getBadges()
-                        } catch (e) {
-                            console.log('e', e)
-                        }
-
-                        setClaiming(false)
-                    }}
-                />
             </div>
         </Modal>
     </Wrap >)
