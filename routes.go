@@ -59,6 +59,8 @@ func NewRouter() *http.Server {
 		r.Get("/bots/owner/{pubkey}", getBotsByOwner)
 		r.Get("/bots/{uuid}", getBot)
 
+		r.Get("/channel_by_uuid/{tribe_uuid}", getChannelsByTribe)
+
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
@@ -439,6 +441,19 @@ func deleteTribe(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func getChannelsByTribe(w http.ResponseWriter, r *http.Request) {
+	all := r.URL.Query().Get("all")
+	channels := []Channel{}
+	tribeUUID := chi.URLParam(r, "tribeUUID")
+	if all == "true" {
+		channels = DB.getAllChannelsByTribe(tribeUUID)
+	} else {
+		channels = DB.getChannelsByTribe(tribeUUID)
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(channels)
 }
 
 type extractResponse struct {
