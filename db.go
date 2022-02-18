@@ -254,6 +254,14 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	return true
 }
 
+func (db database) updateChannel(id uint, u map[string]interface{}) bool {
+	if id == 0 {
+		return false
+	}
+	db.db.Model(&Channel{}).Where("id= ?", id).Updates(u)
+	return true
+}
+
 func (db database) updatePerson(id uint, u map[string]interface{}) bool {
 	if id == 0 {
 		return false
@@ -326,13 +334,19 @@ func (db database) getAllTribesByOwner(pubkey string) []Tribe {
 
 func (db database) getAllChannelsByTribe(tribe_uuid string) []Channel {
 	ms := []Channel{}
-	db.db.Where("tribe_uuid = ?", tribe_uuid).Find(&ms)
+	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
 	return ms
 }
 
 func (db database) getChannelsByTribe(tribe_uuid string) []Channel {
 	ms := []Channel{}
-	db.db.Where("tribe_uuid = ?", tribe_uuid).Find(&ms)
+	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
+	return ms
+}
+
+func (db database) getChannel(id uint) Channel {
+	ms := Channel{}
+	db.db.Where("id = ?  AND (deleted = 'f' OR deleted is null)", id).Find(&ms)
 	return ms
 }
 
