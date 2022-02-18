@@ -111,28 +111,9 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	return m, nil
 }
 
-func (db database) createOrEditChannel(m Channel) (Channel, error) {
-	if m.TribeUUID == "" {
-		return Channel{}, errors.New("no tribe uuid")
-	}
-	onConflict := "ON CONFLICT (id) DO UPDATE SET"
-	for i, u := range updatables {
-		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(updatables)-1 {
-			onConflict = onConflict + ","
-		}
-	}
-	if m.Name == "" {
-		m.Name = "name"
-	}
-	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
-		fmt.Println(err)
-		return Channel{}, err
-	}
-	db.db.Exec(fmt.Sprintf(`UPDATE channel SET tsv =
-  	setweight(to_tsvector(name), 'A') 
-	WHERE id = %d`, m.ID))
-	return m, nil
+func (db database) createChannel(c Channel) Channel {
+	db.db.Create(&c)
+	return c
 }
 
 // check that update owner_pub_key does in fact throw error
