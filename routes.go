@@ -61,7 +61,7 @@ func NewRouter() *http.Server {
 		r.Get("/bots/{uuid}", getBot)
 
 		r.Get("/channel_by_uuid/{tribe_uuid}", getChannelsByTribe)
-		r.Post("/channel", createOrEditChannel)
+		r.Post("/channel", createChannel)
 
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
@@ -497,7 +497,8 @@ func getChannelsByTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(channels)
 }
 
-func createOrEditChannel(w http.ResponseWriter, r *http.Request) {
+// this is the simple way to do it
+func createChannel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
 
@@ -511,59 +512,19 @@ func createOrEditChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if channel.TribeUUID == "" {
-		fmt.Println("createOrEditChannel no tribe uuid")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	now := time.Now() //.Format(time.RFC3339)
-
-	extractedPubkey, err := VerifyTribeUUID(channel.TribeUUID, false)
-	if err != nil {
+	//check that the tribe has the same pubKeyFromAuth
+	tribe := DB.getTribe(channel.TribeUUID)
+	if tribe.OwnerPubKey != pubKeyFromAuth {
 		fmt.Println(err)
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
-	if pubKeyFromAuth == "" {
-		channel.Created = &now
-	} else { // IF PUBKEY IN CONTEXT, MUST AUTH!
-		if pubKeyFromAuth != extractedPubkey {
-			fmt.Println("createOrEditChannel pubkeys dont match")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	}
-
-	/*
-			existing := DB.getTribe(channel.TribeUUID)
-			if existing.UUID == "" { // doesnt exist already, create unique name
-				tribe.UniqueName, _ = tribeUniqueNameFromName(tribe.Name)
-			} else { // already exists! make sure its owned
-				if existing.OwnerPubKey != extractedPubkey {
-					fmt.Println("createOrEditTribe tribe.ownerPubKey not match")
-					fmt.Println(existing.OwnerPubKey)
-					fmt.Println(extractedPubkey)
-					w.WriteHeader(http.StatusUnauthorized)
-					return
-				}
-			}
-
-		tribe.OwnerPubKey = extractedPubkey
-		tribe.Updated = &now
-		tribe.LastActive = now.Unix()
-	*/
-
-	_, err = DB.createOrEditChannel(channel)
-	if err != nil {
-		fmt.Println("=> ERR createOrEditChannel", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	DB.createChannel(channel)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(channel)
+	return
 }
 
 type extractResponse struct {
