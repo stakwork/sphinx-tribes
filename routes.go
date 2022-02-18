@@ -465,12 +465,13 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	existing := DB.getChannel(uint(id))
+	existingTribe := DB.getTribe(existing.TribeUUID)
 	if existing.ID == 0 {
 		fmt.Println("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	if existing.OwnerPubKey != pubKeyFromAuth {
+	if existingTribe.OwnerPubKey != pubKeyFromAuth {
 		fmt.Println("keys dont match")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
