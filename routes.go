@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -60,7 +61,7 @@ func NewRouter() *http.Server {
 		r.Get("/bots/{uuid}", getBot)
 
 		r.Get("/channel_by_uuid/{tribe_uuid}", getChannelsByTribe)
-		r.Post("/channels", createOrEditChannel)
+		r.Post("/channel", createOrEditChannel)
 
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
@@ -94,6 +95,7 @@ func NewRouter() *http.Server {
 		r.Post("/verify/{challenge}", verify)
 		r.Put("/bot", createOrEditBot)
 		r.Delete("/person/{id}", deletePerson)
+		r.Delete("/channel/{id}", deleteChannel)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -437,6 +439,44 @@ func deleteTribe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	DB.updateTribe(uuid, map[string]interface{}{
+		"deleted": true,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
+
+func deleteChannel(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	idString := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if id == 0 {
+		fmt.Println("id is 0")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := DB.getChannel(uint(id))
+	if existing.ID == 0 {
+		fmt.Println("existing id is 0")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if existing.OwnerPubKey != pubKeyFromAuth {
+		fmt.Println("keys dont match")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	DB.updateChannel(uint(id), map[string]interface{}{
 		"deleted": true,
 	})
 
