@@ -313,12 +313,6 @@ func (db database) getAllTribesByOwner(pubkey string) []Tribe {
 	return ms
 }
 
-func (db database) getAllChannelsByTribe(tribe_uuid string) []Channel {
-	ms := []Channel{}
-	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
-	return ms
-}
-
 func (db database) getChannelsByTribe(tribe_uuid string) []Channel {
 	ms := []Channel{}
 	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
