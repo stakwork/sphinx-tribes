@@ -486,14 +486,9 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getChannelsByTribe(w http.ResponseWriter, r *http.Request) {
-	all := r.URL.Query().Get("all")
 	channels := []Channel{}
 	tribeUUID := chi.URLParam(r, "tribeUUID")
-	if all == "true" {
-		channels = DB.getAllChannelsByTribe(tribeUUID)
-	} else {
-		channels = DB.getChannelsByTribe(tribeUUID)
-	}
+	channels = DB.getChannelsByTribe(tribeUUID)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(channels)
 }
