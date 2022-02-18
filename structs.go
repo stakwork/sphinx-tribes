@@ -134,10 +134,12 @@ type Pagination struct {
 }
 
 type Channel struct {
-	ID        uint       `json:"id"`
-	TribeUUID string     `json:"tribe_uuid"`
-	Name      string     `json:"name"`
-	Created   *time.Time `json:"created"`
+	ID          uint       `json:"id"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	TribeUUID   string     `json:"tribe_uuid"`
+	Name        string     `json:"name"`
+	Created     *time.Time `json:"created"`
+	Deleted     bool       `json:"deleted"`
 }
 
 /*
