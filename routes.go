@@ -60,7 +60,6 @@ func NewRouter() *http.Server {
 		r.Get("/bots/owner/{pubkey}", getBotsByOwner)
 		r.Get("/bots/{uuid}", getBot)
 
-		r.Get("/channel_by_uuid/{tribe_uuid}", getChannelsByTribe)
 		r.Post("/channel", createChannel)
 
 		r.Get("/bot/{name}", getBotByUniqueName)
