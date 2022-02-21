@@ -260,8 +260,15 @@ func getListedOffers(w http.ResponseWriter, r *http.Request) {
 func getTribe(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	tribe := DB.getTribe(uuid)
+
+	var theTribe map[string]interface{}
+	j, _ := json.Marshal(tribe)
+	json.Unmarshal(j, &theTribe)
+
+	theTribe["channels"] = DB.getChannelsByTribe(uuid)
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tribe)
+	json.NewEncoder(w).Encode(theTribe)
 }
 
 func getTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
