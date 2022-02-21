@@ -274,8 +274,15 @@ func getTribe(w http.ResponseWriter, r *http.Request) {
 func getTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "un")
 	tribe := DB.getTribeByUniqueName(uuid)
+
+	var theTribe map[string]interface{}
+	j, _ := json.Marshal(tribe)
+	json.Unmarshal(j, &theTribe)
+
+	theTribe["channels"] = DB.getChannelsByTribe(tribe.UUID)
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tribe)
+	json.NewEncoder(w).Encode(theTribe)
 }
 
 func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
