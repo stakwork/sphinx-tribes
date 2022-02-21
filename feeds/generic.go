@@ -14,29 +14,35 @@ const (
 )
 
 func ParseFeed(url string) (*Feed, error) {
-	if strings.Contains(url, "https://medium.com/") {
-		f, err := ParseMediumFeed(url)
+
+	gen, bod, err := FindGenerator(url)
+	if err != nil {
+		return nil, err
+	}
+
+	if strings.Contains(url, "https://medium.com/") || gen == GeneratorWordpress {
+		f, err := ParseMediumFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
 	}
 	if strings.Contains(url, ".substack.com/feed") {
-		f, err := ParseSubstackFeed(url)
+		f, err := ParseSubstackFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
 	}
 	if strings.Contains(url, "youtube.com/feeds/videos.xml") {
-		f, err := ParseYoutubeFeed(url)
+		f, err := ParseYoutubeFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
 	}
 	if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
-		f, err := ParseBitcoinTVFeed(url)
+		f, err := ParseBitcoinTVFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +50,7 @@ func ParseFeed(url string) (*Feed, error) {
 	}
 	f, err := ParsePodcastFeed(url)
 	if err != nil {
-		f, err = ParseSubstackFeed(url) // this one is quite generic
+		f, err = ParseSubstackFeed(url, bod) // this one is quite generic
 		if err != nil {
 			return nil, err
 		}
