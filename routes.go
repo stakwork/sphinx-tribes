@@ -521,6 +521,16 @@ func createChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tribeChannels := DB.getChannelsByTribe(channel.TribeUUID)
+	for _, tribeChannel := range tribeChannels {
+		if tribeChannel.Name == channel.Name {
+			fmt.Println("Channel name already in use")
+			w.WriteHeader(http.StatusNotAcceptable)
+			return
+
+		}
+	}
+
 	DB.createChannel(channel)
 
 	w.WriteHeader(http.StatusOK)
