@@ -60,8 +60,6 @@ func NewRouter() *http.Server {
 		r.Get("/bots/owner/{pubkey}", getBotsByOwner)
 		r.Get("/bots/{uuid}", getBot)
 
-		r.Post("/channel", createChannel)
-
 		r.Get("/bot/{name}", getBotByUniqueName)
 		r.Get("/search/bots/{query}", searchBots)
 		r.Get("/podcast", getPodcast)
@@ -85,6 +83,7 @@ func NewRouter() *http.Server {
 
 	r.Group(func(r chi.Router) {
 		r.Use(PubKeyContext)
+		r.Post("/channel", createChannel)
 		r.Put("/tribe", createOrEditTribe)
 		r.Put("/tribestats", putTribeStats)
 		r.Delete("/tribe/{uuid}", deleteTribe)
@@ -535,7 +534,6 @@ func createChannel(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(channel)
-	return
 }
 
 type extractResponse struct {

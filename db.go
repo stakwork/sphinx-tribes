@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -44,7 +45,7 @@ func initDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
-	db.AutoMigrate(&Person{})
+	db.AutoMigrate(&Person{}, &Channel{})
 
 	// data := map[string]string{
 	// 	"assignee": "Evanfeenstra",
@@ -77,6 +78,8 @@ var peopleupdatables = []string{
 	"price_to_meet", "updated",
 	"extras",
 }
+var channelupdatables = []string{
+	"name", "deleted"}
 
 // check that update owner_pub_key does in fact throw error
 func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
@@ -111,9 +114,30 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	return m, nil
 }
 
-func (db database) createChannel(c Channel) Channel {
+func (db database) createChannel(c Channel) (Channel, error) {
+
+	/*onConflict := "ON CONFLICT (id) DO UPDATE SET"
+		for i, u := range channelupdatables {
+			onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
+			if i < len(updatables)-1 {
+				onConflict = onConflict + ","
+			}
+		}
+		if err := db.db.Set("gorm:insert_option", onConflict).Create(&c).Error; err != nil {
+			fmt.Println(err)
+			return Channel{}, err
+		}
+		db.db.Exec(`UPDATE channels SET tsv =
+	  	setweight(to_tsvector(name), 'A')
+		WHERE uuid = '` + strconv.Itoa(int(c.ID)) + "'")*/
+	if c.Created == nil {
+		now := time.Now()
+		c.Created = &now
+
+	}
 	db.db.Create(&c)
-	return c
+	return c, nil
+
 }
 
 // check that update owner_pub_key does in fact throw error
