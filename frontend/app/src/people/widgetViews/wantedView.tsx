@@ -5,7 +5,6 @@ import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
 import { Divider, Title } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
-import MaterialIcon from '@material/react-material-icon';
 import { extractGithubIssue } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 
@@ -16,8 +15,10 @@ export default function WantedView(props: any) {
     function renderCodingTask() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
 
+        const isClosed = status === 'closed'
+
         if (isMobile) {
-            return <Wrap>
+            return <Wrap isClosed={isClosed}>
                 <Body style={{ width: '100%' }}>
                     <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                         <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
@@ -33,7 +34,7 @@ export default function WantedView(props: any) {
             </Wrap>
         }
 
-        return <DWrap>
+        return <DWrap isClosed={isClosed}>
             <Pad style={{ padding: 20, height: 410 }}>
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                     <NameTag {...person} created={created} widget={'wanted'} />
@@ -103,7 +104,11 @@ export default function WantedView(props: any) {
     return getDesktopView()
 }
 
-const DWrap = styled.div`
+interface WrapProps {
+    isClosed?: boolean;
+}
+
+const DWrap = styled.div<WrapProps>`
 display: flex;
 flex:1;
 height:100%;
@@ -111,52 +116,20 @@ min-height:100%;
 flex-direction:column;
 width:100%;
 min-width:100%;
+max-height:471px;
 font-style: normal;
 font-weight: 500;
 font-size: 24px;
 line-height: 20px;
 color: #3C3F41;
 justify-content:space-between;
+
 `;
 
-const Wrap = styled.div`
+const Wrap = styled.div<WrapProps>`
 display: flex;
 justify-content:flex-start;
 
-`;
-
-const Assignee = styled.div`
-display: flex;
-font-size:12px;
-font-weight:300;
-`;
-
-const Status = styled.div`
-display: flex;
-font-size:12px;
-font-weight:300;
-`;
-
-const Pill = styled.div`
-display: flex;
-justify-content:center;
-align-items:center;
-height:20px;
-font-size:12px;
-font-weight:300;
-background:green;
-border-radius:30px;
-
-border: 1px solid transparent;
-
-padding: 5px 12px;
-font-size: 14px;
-font-weight: 500;
-line-height: 20px;
-white-space: nowrap;
-border-radius: 2em;
-height:32px;
-width:81px;
 `;
 
 const Link = styled.div`

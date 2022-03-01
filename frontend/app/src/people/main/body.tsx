@@ -43,7 +43,7 @@ export default function BodyComponent() {
         peopleOffersPageNumber,
         openGithubIssues } = ui
 
-    const [selectedWidget, setSelectedWidget] = useState('people')
+    const [selectedWidget, setSelectedWidget] = useState('wanted')
 
     const history = useHistory()
 
