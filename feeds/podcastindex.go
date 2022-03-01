@@ -23,15 +23,15 @@ func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 	// fmt.Println("P EPISODES", len(p.Episodes), p)
 	for _, ep := range p.Episodes {
 		items = append(items, Item{
-			Id:              strconv.Itoa(int(ep.ID)),
-			Link:            ep.Link,
-			Description:     ep.Description,
-			Title:           ep.Title,
-			ImageUrl:        ep.Image,
-			EnclosureURL:    ep.EnclosureURL,
-			EnclosureType:   ep.EnclosureType,
-			EnclosureLength: ep.EnclosureLength,
-			DatePublished:   int64(ep.DatePublished),
+			Id:            strconv.Itoa(int(ep.ID)),
+			Link:          ep.Link,
+			Description:   ep.Description,
+			Title:         ep.Title,
+			ImageUrl:      ep.Image,
+			EnclosureURL:  ep.EnclosureURL,
+			EnclosureType: ep.EnclosureType,
+			Duration:      ep.EnclosureLength,
+			DatePublished: int64(ep.DatePublished),
 		})
 	}
 	return Feed{
