@@ -69,6 +69,10 @@ export default function Person(props: any) {
 
   const addedStyles = hideActions ? { width: 56, height: 56 } : {}
 
+
+  // mute lastseen
+  lastSeen = ''
+
   return useObserver(() => {
 
     const qrString = makeQR(owner_pubkey);
