@@ -342,7 +342,7 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 		AND extras->'post' != '[]'::jsonb
 		AND EXISTS (SELECT *
 			FROM jsonb_array_elements_Text(extras -> 'post') as x(title)
-			WHERE LOWER(x.title) LIKE '%?%')`, search).Find(&ms)
+			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -364,7 +364,7 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 		AND extras->'wanted' != '[]'::jsonb
 		AND EXISTS (SELECT *
 			FROM jsonb_array_elements_Text(extras -> 'wanted') as x(title)
-			WHERE LOWER(x.title) LIKE '%?%')`, search).Find(&ms)
+			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -386,9 +386,7 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 		AND extras->'offer' != '[]'::jsonb
 		AND EXISTS (SELECT *
 			FROM jsonb_array_elements_Text(extras -> 'offer') as x(title)
-			WHERE LOWER(x.title) LIKE '%?%')`, search).Find(&ms)
-
-	// filter out unrelated posts from people who have offers that match
+			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -469,7 +467,7 @@ func (db database) searchTribes(s string) []Tribe {
 	// set limit
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
-		FROM tribes, to_tsquery('?') q
+		FROM tribes, to_tsquery(?) q
 		WHERE tsv @@ q
 		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC LIMIT 100;`, s).Find(&ms)
@@ -486,7 +484,7 @@ func (db database) searchBots(s string, limit, offset int) []BotRes {
 	offsetStr := strconv.Itoa(offset)
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
-		FROM bots, to_tsquery('?') q
+		FROM bots, to_tsquery(?) q
 		WHERE tsv @@ q
 		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC 
@@ -504,7 +502,7 @@ func (db database) searchPeople(s string, limit, offset int) []Person {
 	offsetStr := strconv.Itoa(offset)
 	db.db.Raw(
 		`SELECT id, owner_pub_key, unique_name, img, description, tags, ts_rank(tsv, q) as rank
-		FROM people, to_tsquery('?') q
+		FROM people, to_tsquery(?) q
 		WHERE tsv @@ q
 		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC 
