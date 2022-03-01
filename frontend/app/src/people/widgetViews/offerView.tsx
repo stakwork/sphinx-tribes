@@ -66,6 +66,7 @@ display: flex;
 flex-direction:column;
 width:100%;
 min-width:100%;
+max-height:471px;
 font-style: normal;
 font-weight: 500;
 font-size: 24px;
