@@ -14,23 +14,29 @@ type BitcoinTVEnclosure struct {
 	Length  string   `xml:"length,attr"`
 }
 
-type BitcoinTVMediaGroupThumbnail struct {
+type BitcoinTVMediaThumbnail struct {
 	XMLName xml.Name
 	Url     string `xml:"url,attr"`
 }
+type BitcoinTVMediaGroupContent struct {
+	Url      string `xml:"url,attr"`
+	Duration string `xml:"duration,attr"`
+	Type     string `xml:"type,attr"`
+}
 type BitcoinTVMediaGroup struct {
-	XMLName   xml.Name
-	Thumbnail BitcoinTVMediaGroupThumbnail `xml:"thumbnail"`
+	XMLName xml.Name
+	Content []BitcoinTVMediaGroupContent `xml:"content"`
 }
 
 type BitcoinTVVideo struct {
-	Title      string              `xml:"title"`
-	Desc       string              `xml:"description"`
-	Link       string              `xml:"link"`
-	Guid       string              `xml:"guid"`
-	PubDate    string              `xml:"pubDate"`
-	Enclosure  BitcoinTVEnclosure  `xml:"enclosure"`
-	MediaGroup BitcoinTVMediaGroup `xml:"group"`
+	Title      string                  `xml:"title"`
+	Desc       string                  `xml:"description"`
+	Link       string                  `xml:"link"`
+	Guid       string                  `xml:"guid"`
+	PubDate    string                  `xml:"pubDate"`
+	Enclosure  BitcoinTVEnclosure      `xml:"enclosure"`
+	MediaGroup BitcoinTVMediaGroup     `xml:"group"`
+	Thumbnail  BitcoinTVMediaThumbnail `xml:"thumbnail"`
 }
 
 type BitcoinTVImage struct {
@@ -52,11 +58,7 @@ type BitcoinTVFeed struct {
 	Channel BitcoinTVChannel `xml:"channel"`
 }
 
-func ParseBitcoinTVFeed(url string) (*Feed, error) {
-	bod, err := httpget(url)
-	if err != nil {
-		return nil, err
-	}
+func ParseBitcoinTVFeed(url string, bod []byte) (*Feed, error) {
 	var f BitcoinTVFeed
 	if err := xml.Unmarshal(bod, &f); err != nil {
 		return nil, err
@@ -73,19 +75,22 @@ func BitcoinTVToGeneric(url string, mf BitcoinTVFeed) (Feed, error) {
 	items := []Item{}
 	for _, post := range c.Items {
 		t, _ := dateparse.ParseAny(post.PubDate)
-		l, _ := strconv.Atoi(post.Enclosure.Length)
-		items = append(items, Item{
-			Id:              post.Guid,
-			Title:           post.Title,
-			Link:            post.Link,
-			EnclosureURL:    post.Enclosure.Url,
-			EnclosureType:   post.Enclosure.Type,
-			EnclosureLength: int32(l),
-			Description:     post.Desc,
-			DatePublished:   t.Unix(),
-			ImageUrl:        post.MediaGroup.Thumbnail.Url,
-			ThumbnailUrl:    post.MediaGroup.Thumbnail.Url,
-		})
+		if len(post.MediaGroup.Content) > 0 {
+			content := post.MediaGroup.Content[0]
+			dur, _ := strconv.Atoi(content.Duration)
+			items = append(items, Item{
+				Id:            post.Guid,
+				Title:         post.Title,
+				Link:          post.Link,
+				EnclosureURL:  content.Url,
+				EnclosureType: content.Type,
+				Duration:      int32(dur),
+				Description:   post.Desc,
+				DatePublished: t.Unix(),
+				ImageUrl:      post.Thumbnail.Url,
+				ThumbnailUrl:  post.Thumbnail.Url,
+			})
+		}
 	}
 	tu, _ := dateparse.ParseAny(c.LastBuildDate)
 	return Feed{
