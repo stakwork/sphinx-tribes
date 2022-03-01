@@ -330,7 +330,7 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
-	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
+	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
 		`SELECT 
 		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'post', extras->'post') #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'post'::text)) #>> '{}' as body 
@@ -342,7 +342,7 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 		AND extras->'post' != '[]'::jsonb
 		AND EXISTS (SELECT *
 			FROM jsonb_array_elements_Text(extras -> 'post') as x(title)
-			WHERE LOWER(x.title) LIKE '%` + search + `%')`).Find(&ms)
+			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -352,7 +352,7 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	// set limit
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
-	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
+	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
 		`SELECT 
 		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'wanted'::text)) #>> '{}' as body 
@@ -364,7 +364,7 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 		AND extras->'wanted' != '[]'::jsonb
 		AND EXISTS (SELECT *
 			FROM jsonb_array_elements_Text(extras -> 'wanted') as x(title)
-			WHERE LOWER(x.title) LIKE '%` + search + `%')`).Find(&ms)
+			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -374,7 +374,7 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	// set limit
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
-	result := db.db.Offset(offset).Limit(limit).Order(sortBy + " " + direction).Raw(
+	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
 		`SELECT 
 		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'offer', extras->'offer') #>> '{}' as person,
 		to_json(jsonb_array_elements(extras->'offer'::text)) #>> '{}' as body 
@@ -386,7 +386,7 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 		AND extras->'offer' != '[]'::jsonb
 		AND EXISTS (SELECT *
 			FROM jsonb_array_elements_Text(extras -> 'offer') as x(title)
-			WHERE LOWER(x.title) LIKE '%` + search + `%')`).Find(&ms)
+			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -467,10 +467,10 @@ func (db database) searchTribes(s string) []Tribe {
 	// set limit
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
-		FROM tribes, to_tsquery('` + s + `') q
+		FROM tribes, to_tsquery(?) q
 		WHERE tsv @@ q
 		AND (deleted = 'f' OR deleted is null)
-		ORDER BY rank DESC LIMIT 100;`).Find(&ms)
+		ORDER BY rank DESC LIMIT 100;`, s).Find(&ms)
 	return ms
 }
 
@@ -484,11 +484,11 @@ func (db database) searchBots(s string, limit, offset int) []BotRes {
 	offsetStr := strconv.Itoa(offset)
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
-		FROM bots, to_tsquery('` + s + `') q
+		FROM bots, to_tsquery(?) q
 		WHERE tsv @@ q
 		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC 
-		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)
+		LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
 	return ms
 }
 
@@ -502,10 +502,10 @@ func (db database) searchPeople(s string, limit, offset int) []Person {
 	offsetStr := strconv.Itoa(offset)
 	db.db.Raw(
 		`SELECT id, owner_pub_key, unique_name, img, description, tags, ts_rank(tsv, q) as rank
-		FROM people, to_tsquery('` + s + `') q
+		FROM people, to_tsquery(?) q
 		WHERE tsv @@ q
 		AND (deleted = 'f' OR deleted is null)
 		ORDER BY rank DESC 
-		LIMIT ` + limitStr + ` OFFSET ` + offsetStr + `;`).Find(&ms)
+		LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
 	return ms
 }
