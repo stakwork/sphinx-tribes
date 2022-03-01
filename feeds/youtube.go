@@ -51,11 +51,7 @@ type YoutubeFeed struct {
 	Items     []YoutubeEntry `xml:"entry"`
 }
 
-func ParseYoutubeFeed(url string) (*Feed, error) {
-	bod, err := httpget(url)
-	if err != nil {
-		return nil, err
-	}
+func ParseYoutubeFeed(url string, bod []byte) (*Feed, error) {
 	var f YoutubeFeed
 	if err := xml.Unmarshal(bod, &f); err != nil {
 		return nil, err
