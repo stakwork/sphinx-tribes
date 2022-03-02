@@ -1,16 +1,56 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import GalleryViewer from '../utils/galleryViewer';
-import { Divider, Title } from '../../sphinxUI';
+import { Divider, Title, Button } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
 import { extractGithubIssue } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
+import { useStores } from '../../store';
 
 export default function WantedView(props: any) {
-    const { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type } = props
+    const { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type, show } = props
     const isMobile = useIsMobile()
+    const { ui, main } = useStores()
+    const [saving, setSaving] = useState(false)
+
+    const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey
+
+    async function setWantedAsHidden() {
+        const { peopleWanteds } = main
+
+        if (peopleWanteds && ui.meInfo) {
+            let clonedMeInfo = { ...ui.meInfo }
+            let clonedExtras = clonedMeInfo?.extras
+            let clonedWanted = clonedExtras?.wanted
+            const wantedIndex = clonedWanted?.findIndex(f => f.created === created)
+
+            // set wanted show value to !show
+            if (clonedWanted && wantedIndex && (wantedIndex > -1)) {
+                setSaving(true)
+                try {
+                    clonedWanted[wantedIndex].show = !show
+                    clonedMeInfo.extras.wanted = clonedWanted
+                    await main.saveProfile(clonedMeInfo)
+
+                    // saved? ok update in wanted list
+                    const peopleWantedsClone = [...peopleWanteds]
+                    const indexToUpdate = peopleWantedsClone.findIndex(f => (f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && f.created === created)
+                    // if we found it, update it
+                    if (indexToUpdate > -1) {
+                        peopleWantedsClone[indexToUpdate].show = !show
+                        main.setPeopleWanteds(peopleWantedsClone)
+                    }
+
+                } catch (e) {
+                    console.log('e', e)
+                }
+                setSaving(false)
+            }
+        }
+    }
+
 
     function renderCodingTask() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
@@ -52,8 +92,33 @@ export default function WantedView(props: any) {
 
             </Pad>
             <Divider style={{ margin: 0 }} />
-            <Pad style={{ padding: 20, }}>
+            <Pad style={{ padding: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
                 <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
+
+
+                <div>
+                    {
+                        //  if my own, show this option to show/hide
+                        isMine &&
+                        <Button
+                            icon={show ? 'visibility' : 'visibility_off'}
+                            disable={saving}
+                            submitting={saving}
+                            iconStyle={{ color: '#555', fontSize: 20 }}
+                            style={{
+                                minWidth: 24, width: 24, minHeight: 20,
+                                height: 20, padding: 0, background: '#fff',
+                            }}
+                            onClick={(e) => {
+
+                                e.stopPropagation()
+                                setWantedAsHidden()
+
+                            }}
+                        />
+                    }
+
+                </div>
             </Pad>
         </DWrap>
     }

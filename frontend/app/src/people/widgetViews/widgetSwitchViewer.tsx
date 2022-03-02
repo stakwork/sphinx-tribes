@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
-import { useFuse, useScroll } from '../../hooks';
 import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';

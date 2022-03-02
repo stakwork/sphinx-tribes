@@ -488,6 +488,10 @@ export class MainStore {
   @observable
   peopleWanteds: PersonWanted[] = [];
 
+  @action setPeopleWanteds(wanteds: PersonWanted[]) {
+    this.peopleWanteds = wanteds
+  }
+
   @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText }
 
@@ -709,11 +713,9 @@ export class MainStore {
     }
   }
 
-  @action async addFavorite() {
-    let body: any = {};
+  @action async saveProfile(body) {
     console.log("SUBMIT FORM", body);
 
-    // console.log('mergeFormWithMeData', body);
     if (!body) return; // avoid saving bad state
 
     const info = uiStore.meInfo as any;
@@ -728,7 +730,6 @@ export class MainStore {
           // use docker host (tribes.sphinx), because relay will post to it
           host: getHostIncludingDockerHosts(),
           ...body,
-          price_to_meet: parseInt(body.price_to_meet),
         }),
         headers: {
           "x-jwt": info.jwt,
@@ -743,9 +744,11 @@ export class MainStore {
       uiStore.setToasts([
         {
           id: "1",
-          title: "Added to favorites.",
+          title: "Saved.",
         },
       ]);
+
+      // await this.getSelf(body);
     } catch (e) {
       console.log("e", e);
     }
@@ -887,6 +890,7 @@ export interface PersonWanted {
   title?: string;
   description?: string;
   created: number;
+  show: boolean;
 }
 
 export interface PersonOffer {

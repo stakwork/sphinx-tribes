@@ -250,6 +250,8 @@ export default function PersonView(props: any) {
         return has
     }
 
+
+
     function renderWidgets(name: string) {
         if (name) {
             switch (name) {
@@ -286,6 +288,8 @@ export default function PersonView(props: any) {
         fields = fields && fields.filter(f => f.name !== 'show')
 
         function wrapIt(child) {
+
+
             if (single) {
                 return <Panel>
                     {child}
@@ -301,7 +305,15 @@ export default function PersonView(props: any) {
                 marginRight: 20, marginBottom: 20, minHeight: 472
             }
 
+
             fullSelectedWidget && fullSelectedWidget.forEach((s, i) => {
+
+                if (!canEdit &&
+                    s.show !== undefined &&
+                    s.show === false) {
+                    // skip hidden items
+                    return
+                }
 
                 elementArray.push(<Panel key={i}
                     onClick={() => {
