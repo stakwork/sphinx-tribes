@@ -13,16 +13,18 @@ export default function SwitchInput({ label, note, value, name, handleChange, ha
 
     return <>
         <FieldEnv label={label}>
-            <EuiSwitch
-                label=""
-                checked={value}
-                onChange={e => {
-                    handleChange(e.target.checked)
-                }}
-                onBlur={handleBlur}
-                onFocus={handleFocus}
-                compressed
-            />
+            <div style={{ padding: 10 }}>
+                <EuiSwitch
+                    label=""
+                    checked={value}
+                    onChange={e => {
+                        handleChange(e.target.checked)
+                    }}
+                    onBlur={handleBlur}
+                    onFocus={handleFocus}
+                    compressed
+                />
+            </div>
         </FieldEnv>
         {note && <Note>*{note}</Note>}
         <ExtraText

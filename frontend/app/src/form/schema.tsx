@@ -547,10 +547,17 @@ export const wantedOtherSchema: FormField[] = [
         type: "number",
     },
     {
+        name: 'show',
+        label: "Show to public",
+        type: "switch",
+    },
+    {
         name: 'gallery',
         label: "Gallery",
         type: "gallery",
     },
+
+
     {
         name: 'type',
         label: "Type",
@@ -598,6 +605,12 @@ export const wantedCodingTaskSchema: FormField[] = [
         validator: nomValidator,
         type: "number",
     },
+    {
+        name: 'show',
+        label: "Show to public",
+        type: "switch",
+    },
+
 
     {
         name: 'description',

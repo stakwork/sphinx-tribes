@@ -9,7 +9,6 @@ import moment from "moment";
 import SummaryViewer from "../widgetViews/summaryViewer";
 import { useIsMobile } from "../../hooks";
 import { dynamicSchemasByType } from "../../form/schema";
-import { randomString } from "../../helpers";
 import TorSaveQR from "../utils/torSaveQR";
 
 // this is where we see others posts (etc) and edit our own

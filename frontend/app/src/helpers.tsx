@@ -8,7 +8,14 @@ export function formatPrice(amount) {
 
 export function satToUsd(amount) {
     if (!amount) amount = 0
-    return (amount / (uiStore.usdToSatsExchangeRate || 0)).toFixed(2) + ' USD'
+    let satExchange = uiStore.usdToSatsExchangeRate ? uiStore.usdToSatsExchangeRate : 0
+    let returnValue = (amount / satExchange).toFixed(2)
+
+    if (returnValue === 'Infinity' || isNaN(parseFloat(returnValue))) {
+        return '. . .'
+    }
+
+    return returnValue + ' USD'
 }
 
 const host = getHost();
