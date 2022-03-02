@@ -530,7 +530,12 @@ func createChannel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	DB.createChannel(channel)
+	channel, err = DB.createChannel(channel)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(channel)
