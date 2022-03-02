@@ -748,7 +748,7 @@ export class MainStore {
         },
       ]);
 
-      // await this.getSelf(body);
+      await this.getSelf(body);
     } catch (e) {
       console.log("e", e);
     }
@@ -890,7 +890,8 @@ export interface PersonWanted {
   title?: string;
   description?: string;
   created: number;
-  show: boolean;
+  show?: boolean;
+  body: PersonWanted;
 }
 
 export interface PersonOffer {
