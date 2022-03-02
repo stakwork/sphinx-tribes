@@ -12,7 +12,9 @@ export default function SummaryViewer(props: any) {
     const { ui } = useStores();
     const isMobile = useIsMobile()
 
-    const isSelectedView = ui.selectedPerson ? true : false
+    const isSelectedView = ui?.selectedPerson ? true : false
+
+
 
     function wrapIt(child) {
         return <Wrap style={{
