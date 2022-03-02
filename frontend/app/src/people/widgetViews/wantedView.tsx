@@ -101,7 +101,7 @@ export default function WantedView(props: any) {
                         //  if my own, show this option to show/hide
                         isMine &&
                         <Button
-                            icon={saving ? 'visibility_off' : 'visibility'}
+                            icon={show ? 'visibility' : 'visibility_off'}
                             disable={saving}
                             submitting={saving}
                             iconStyle={{ color: '#555', fontSize: 20 }}
