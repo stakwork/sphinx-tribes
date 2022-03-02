@@ -333,7 +333,7 @@ func makeExtrasListQuery(columnName string) string {
 	arr(item_object, position)
 	WHERE people.deleted != true
 	AND people.unlisted != true 
-	AND arr.item_object->>'title' LIKE ?
+	AND LOWER(arr.item_object->>'title') LIKE ?
 	AND CASE
 			WHEN arr.item_object->>'show' = 'false' THEN false
 			ELSE true

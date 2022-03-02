@@ -309,7 +309,7 @@ export default function PersonView(props: any) {
             fullSelectedWidget && fullSelectedWidget.forEach((s, i) => {
 
                 if (!canEdit &&
-                    s.show !== undefined &&
+                    'show' in s &&
                     s.show === false) {
                     // skip hidden items
                     return

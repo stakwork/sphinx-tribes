@@ -10,12 +10,19 @@ import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 
 export default function WantedView(props: any) {
-    const { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type, show } = props
+    let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type, show } = props
     const isMobile = useIsMobile()
     const { ui, main } = useStores()
     const [saving, setSaving] = useState(false)
 
     const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey
+
+    if ('show' in props) {
+        // show has a value
+    } else {
+        // if no value default to true
+        show = true
+    }
 
     async function setWantedAsHidden() {
         const { peopleWanteds } = main
