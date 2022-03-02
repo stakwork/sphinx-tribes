@@ -324,25 +324,32 @@ type PeopleExtra struct {
 	Person string `json:"person"`
 }
 
+func makeExtrasListQuery(columnName string) string {
+	return `SELECT 		
+	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
+	arr.item_object as body
+	FROM people,
+	jsonb_array_elements(extras->'` + columnName + `') with ordinality 
+	arr(item_object, position)
+	WHERE people.deleted != true
+	AND people.unlisted != true 
+	AND arr.item_object->>'title' LIKE ?
+	AND CASE
+			WHEN arr.item_object->>'show' = 'false' THEN false
+			ELSE true
+		END`
+}
+
 func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
 
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
+	rawQuery := makeExtrasListQuery("post")
+
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
-		`SELECT 
-		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'post', extras->'post') #>> '{}' as person,
-		to_json(jsonb_array_elements(extras->'post'::text)) #>> '{}' as body 
-		FROM people
-		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)
-		AND extras IS NOT NULL
-		AND extras != '{}'::jsonb
-		AND extras->'post' IS NOT NULL
-		AND extras->'post' != '[]'::jsonb
-		AND EXISTS (SELECT *
-			FROM jsonb_array_elements_Text(extras -> 'post') as x(title)
-			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
+		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -352,19 +359,10 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	// set limit
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
+	rawQuery := makeExtrasListQuery("wanted")
+
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
-		`SELECT 
-		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
-		to_json(jsonb_array_elements(extras->'wanted'::text)) #>> '{}' as body 
-		FROM people
-		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)
-		AND extras IS NOT NULL
-		AND extras != '{}'::jsonb
-		AND extras->'wanted' IS NOT NULL
-		AND extras->'wanted' != '[]'::jsonb
-		AND EXISTS (SELECT *
-			FROM jsonb_array_elements_Text(extras -> 'wanted') as x(title)
-			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
+		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -374,19 +372,10 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	// set limit
 	offset, limit, sortBy, direction, search := getPaginationParams(r)
 
+	rawQuery := makeExtrasListQuery("offer")
+
 	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
-		`SELECT 
-		json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'offer', extras->'offer') #>> '{}' as person,
-		to_json(jsonb_array_elements(extras->'offer'::text)) #>> '{}' as body 
-		FROM people
-		WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)
-		AND extras IS NOT NULL
-		AND extras != '{}'::jsonb
-		AND extras->'offer' IS NOT NULL
-		AND extras->'offer' != '[]'::jsonb
-		AND EXISTS (SELECT *
-			FROM jsonb_array_elements_Text(extras -> 'offer') as x(title)
-			WHERE LOWER(x.title) LIKE ?)`, "%"+search+"%").Find(&ms)
+		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
 }
@@ -420,6 +409,7 @@ func (db database) getPerson(id uint) Person {
 func (db database) getPersonByPubkey(pubkey string) Person {
 	m := Person{}
 	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
+
 	return m
 }
 
