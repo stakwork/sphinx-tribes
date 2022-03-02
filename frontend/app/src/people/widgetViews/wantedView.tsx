@@ -14,6 +14,7 @@ export default function WantedView(props: any) {
     const isMobile = useIsMobile()
     const { ui, main } = useStores()
     const [saving, setSaving] = useState(false)
+    const { peopleWanteds } = main
 
     const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey
 
@@ -25,8 +26,6 @@ export default function WantedView(props: any) {
     }
 
     async function setWantedAsHidden() {
-        const { peopleWanteds } = main
-
         if (peopleWanteds && ui.meInfo) {
             let clonedMeInfo = { ...ui.meInfo }
             let clonedExtras = clonedMeInfo?.extras
@@ -34,7 +33,7 @@ export default function WantedView(props: any) {
             const wantedIndex = clonedWanted?.findIndex(f => f.created === created)
 
             // set wanted show value to !show
-            if (clonedWanted && wantedIndex && (wantedIndex > -1)) {
+            if (clonedWanted && (wantedIndex || wantedIndex === 0) && (wantedIndex > -1)) {
                 setSaving(true)
                 try {
                     clonedWanted[wantedIndex].show = !show
@@ -43,13 +42,18 @@ export default function WantedView(props: any) {
 
                     // saved? ok update in wanted list
                     const peopleWantedsClone = [...peopleWanteds]
-                    const indexToUpdate = peopleWantedsClone.findIndex(f => (f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && f.created === created)
-                    // if we found it, update it
-                    if (indexToUpdate > -1) {
-                        peopleWantedsClone[indexToUpdate].show = !show
-                        main.setPeopleWanteds(peopleWantedsClone)
-                    }
+                    const indexToRemoveFromPeopleWanted = peopleWantedsClone.findIndex(f => {
+                        let val = f.body || {}
+                        return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
+                    })
 
+                    // if we found it, and it should be hidden now, remove it from the list
+                    if (indexToRemoveFromPeopleWanted > -1) {
+                        if (!show === false) {
+                            peopleWantedsClone.splice(indexToRemoveFromPeopleWanted, 1)
+                            main.setPeopleWanteds(peopleWantedsClone)
+                        }
+                    }
                 } catch (e) {
                     console.log('e', e)
                 }

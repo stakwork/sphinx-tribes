@@ -87,6 +87,11 @@ export default function BodyComponent() {
         if (ui.selectedPerson) {
             setPublicFocusPerson(null)
             setPublicFocusIndex(-1)
+        } else {
+            //pull list again, we came back from focus view
+            console.log('pull list')
+            let loadMethod = loadMethods[selectedWidget]
+            loadMethod({ page: 1, resetPage: true })
         }
     }, [ui.selectedPerson])
 
