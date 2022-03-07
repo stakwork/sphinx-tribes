@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,6 +23,11 @@ func getGithubIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	issue, err := GetIssue(owner, repo, issueNum)
+	if err != nil {
+		fmt.Println("Github error: ", err.Error())
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	json.NewEncoder(w).Encode(issue)
 }
 
