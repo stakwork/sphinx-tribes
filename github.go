@@ -6,11 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/google/go-github/v39/github"
+	"golang.org/x/oauth2"
 )
 
 func getGithubIssue(w http.ResponseWriter, r *http.Request) {
@@ -40,8 +42,19 @@ func getOpenGithubIssues(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(issue_count)
 }
 
+func githubClient() *github.Client {
+	gh_token := os.Getenv("GITHUB_TOKEN")
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: gh_token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	gc := github.NewClient(tc)
+	return gc
+}
+
 func GetRepoIssues(owner string, repo string) ([]GithubIssue, error) {
-	client := github.NewClient(nil)
+	client := githubClient()
 	issues, _, err := client.Issues.ListByRepo(context.Background(), owner, repo, nil)
 	ret := []GithubIssue{}
 	if err == nil {
@@ -61,7 +74,7 @@ func GetRepoIssues(owner string, repo string) ([]GithubIssue, error) {
 }
 
 func GetIssue(owner string, repo string, id int) (GithubIssue, error) {
-	client := github.NewClient(nil)
+	client := githubClient()
 	iss, _, err := client.Issues.Get(context.Background(), owner, repo, id)
 	issue := GithubIssue{}
 	if err == nil && iss != nil {
@@ -80,7 +93,7 @@ func GetIssue(owner string, repo string, id int) (GithubIssue, error) {
 }
 
 func PubkeyForGithubUser(owner string) (string, error) {
-	client := github.NewClient(nil)
+	client := githubClient()
 	gs, _, err := client.Gists.List(context.Background(), owner, nil)
 	if err == nil && gs != nil {
 		for _, g := range gs {
