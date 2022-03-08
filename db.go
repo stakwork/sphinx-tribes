@@ -116,20 +116,6 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 
 func (db database) createChannel(c Channel) (Channel, error) {
 
-	/*onConflict := "ON CONFLICT (id) DO UPDATE SET"
-		for i, u := range channelupdatables {
-			onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-			if i < len(updatables)-1 {
-				onConflict = onConflict + ","
-			}
-		}
-		if err := db.db.Set("gorm:insert_option", onConflict).Create(&c).Error; err != nil {
-			fmt.Println(err)
-			return Channel{}, err
-		}
-		db.db.Exec(`UPDATE channels SET tsv =
-	  	setweight(to_tsvector(name), 'A')
-		WHERE uuid = '` + strconv.Itoa(int(c.ID)) + "'")*/
 	if c.Created == nil {
 		now := time.Now()
 		c.Created = &now

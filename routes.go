@@ -497,7 +497,6 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-// this is the simple way to do it
 func createChannel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
