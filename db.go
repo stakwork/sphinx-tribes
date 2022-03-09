@@ -348,6 +348,10 @@ func addNewerThanXDaysToExtrasRawQuery(query string, days int) string {
 	return query + ` AND CAST(arr.item_object->>'created' AS INT) > (extract(epoch from now()) - ` + t + `) `
 }
 
+func addNotMineToExtrasRawQuery(query string, pubkey string) string {
+	return query + ` AND people.owner_pub_key != ` + pubkey + ` `
+}
+
 func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
@@ -355,6 +359,13 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("post")
+
+	// if logged in, dont get mine
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	if pubKeyFromAuth != "" {
+		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
+	}
 
 	// sort by newest
 	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
@@ -364,12 +375,20 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 }
 
 func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
+
 	ms := []PeopleExtra{}
 	// set limit
 	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("wanted")
 	rawQuery = addNewerThanXDaysToExtrasRawQuery(rawQuery, 14)
+
+	// if logged in, dont get mine
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	if pubKeyFromAuth != "" {
+		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
+	}
 
 	// sort by newest
 	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
@@ -384,6 +403,13 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("offer")
+
+	// if logged in, dont get mine
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	if pubKeyFromAuth != "" {
+		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
+	}
 
 	// sort by newest
 	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
@@ -436,8 +462,8 @@ func (db database) getPersonByGithubName(github_name string) Person {
 	WHERE people.deleted != true
 	AND people.unlisted != true
 	AND CASE
-			WHEN arr.item_object->>'value' = ? THEN false
-			ELSE true
+			WHEN arr.item_object->>'value' = ? THEN true
+			ELSE false
 		END`, github_name).First(&m)
 
 	return m
