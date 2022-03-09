@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -84,6 +85,7 @@ func NewRouter() *http.Server {
 
 	r.Group(func(r chi.Router) {
 		r.Use(PubKeyContext)
+		r.Post("/channel", createChannel)
 		r.Put("/tribe", createOrEditTribe)
 		r.Put("/tribestats", putTribeStats)
 		r.Delete("/tribe/{uuid}", deleteTribe)
@@ -93,6 +95,7 @@ func NewRouter() *http.Server {
 		r.Post("/verify/{challenge}", verify)
 		r.Put("/bot", createOrEditBot)
 		r.Delete("/person/{id}", deletePerson)
+		r.Delete("/channel/{id}", deleteChannel)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -257,15 +260,29 @@ func getListedOffers(w http.ResponseWriter, r *http.Request) {
 func getTribe(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	tribe := DB.getTribe(uuid)
+
+	var theTribe map[string]interface{}
+	j, _ := json.Marshal(tribe)
+	json.Unmarshal(j, &theTribe)
+
+	theTribe["channels"] = DB.getChannelsByTribe(uuid)
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tribe)
+	json.NewEncoder(w).Encode(theTribe)
 }
 
 func getTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "un")
 	tribe := DB.getTribeByUniqueName(uuid)
+
+	var theTribe map[string]interface{}
+	j, _ := json.Marshal(tribe)
+	json.Unmarshal(j, &theTribe)
+
+	theTribe["channels"] = DB.getChannelsByTribe(tribe.UUID)
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tribe)
+	json.NewEncoder(w).Encode(theTribe)
 }
 
 func createOrEditTribe(w http.ResponseWriter, r *http.Request) {
@@ -441,6 +458,88 @@ func deleteTribe(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func deleteChannel(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	idString := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if id == 0 {
+		fmt.Println("id is 0")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := DB.getChannel(uint(id))
+	existingTribe := DB.getTribe(existing.TribeUUID)
+	if existing.ID == 0 {
+		fmt.Println("existing id is 0")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if existingTribe.OwnerPubKey != pubKeyFromAuth {
+		fmt.Println("keys dont match")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	DB.updateChannel(uint(id), map[string]interface{}{
+		"deleted": true,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
+
+func createChannel(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	channel := Channel{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &channel)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	//check that the tribe has the same pubKeyFromAuth
+	tribe := DB.getTribe(channel.TribeUUID)
+	if tribe.OwnerPubKey != pubKeyFromAuth {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	tribeChannels := DB.getChannelsByTribe(channel.TribeUUID)
+	for _, tribeChannel := range tribeChannels {
+		if tribeChannel.Name == channel.Name {
+			fmt.Println("Channel name already in use")
+			w.WriteHeader(http.StatusNotAcceptable)
+			return
+
+		}
+	}
+
+	channel, err = DB.createChannel(channel)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(channel)
 }
 
 type extractResponse struct {
