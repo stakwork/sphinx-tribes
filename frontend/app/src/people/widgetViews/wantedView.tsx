@@ -49,7 +49,7 @@ export default function WantedView(props: any) {
                     await main.saveProfile(clonedMeInfo)
 
                     // saved? ok update in wanted list if found
-                    const peopleWantedsClone = [...peopleWanteds]
+                    const peopleWantedsClone: any = [...peopleWanteds]
                     const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
                         let val = f.body || {}
                         return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
@@ -61,7 +61,10 @@ export default function WantedView(props: any) {
                         if ('show' in clonedWanted[wantedIndex] && clonedWanted[wantedIndex].show === false) {
                             peopleWantedsClone.splice(indexFromPeopleWanted, 1)
                         } else {
-                            peopleWantedsClone[indexFromPeopleWanted] = clonedWanted[wantedIndex]
+                            peopleWantedsClone[indexFromPeopleWanted] = {
+                                person: person,
+                                body: clonedWanted[wantedIndex]
+                            }
                         }
                         main.setPeopleWanteds(peopleWantedsClone)
                     }
