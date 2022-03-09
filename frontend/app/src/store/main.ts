@@ -202,17 +202,11 @@ export class MainStore {
   @action async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
-      // console.log('got openIssues', openIssues)
-      // remove my own!
-
-      let oIssues = [...openIssues]
+      console.log('got openIssues', openIssues)
       if (openIssues) {
-        // remove my issues from count
-        // if (uiStore.meInfo?.owner_pubkey) oIssues.filter(f => f.owner_pubkey != uiStore.meInfo?.owner_pubkey)
-        console.log('got github issues', oIssues)
-        uiStore.setOpenGithubIssues(oIssues)
+        uiStore.setOpenGithubIssues(openIssues)
       }
-      return oIssues;
+      return openIssues;
     } catch (e) {
       console.log('e', e)
     }
