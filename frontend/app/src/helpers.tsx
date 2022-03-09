@@ -15,7 +15,7 @@ export function satToUsd(amount) {
         return '. . .'
     }
 
-    return returnValue + ' USD'
+    return returnValue
 }
 
 const host = getHost();
