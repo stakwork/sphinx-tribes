@@ -215,8 +215,8 @@ func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPersonByGithubName(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "github")
-	person := DB.getPersonByGithubName(pubkey)
+	github := chi.URLParam(r, "github")
+	person := DB.getPersonByGithubName(github)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
