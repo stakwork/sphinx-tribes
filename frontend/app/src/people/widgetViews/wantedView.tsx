@@ -36,7 +36,7 @@ export default function WantedView(props: any) {
         if (peopleWanteds && ui.meInfo) {
             let clonedMeInfo = { ...ui.meInfo }
             let clonedExtras = clonedMeInfo?.extras
-            let clonedWanted = clonedExtras?.wanted
+            let clonedWanted: any = clonedExtras?.wanted
             const wantedIndex = clonedWanted?.findIndex(f => f.created === created)
 
             // set wanted show value to !show
@@ -60,6 +60,8 @@ export default function WantedView(props: any) {
                         // if it should be hidden now, remove it from the list
                         if ('show' in clonedWanted[wantedIndex] && clonedWanted[wantedIndex].show === false) {
                             peopleWantedsClone.splice(indexFromPeopleWanted, 1)
+                        } else {
+                            peopleWantedsClone[indexFromPeopleWanted] = clonedWanted[wantedIndex]
                         }
                         main.setPeopleWanteds(peopleWantedsClone)
                     }
@@ -83,7 +85,7 @@ export default function WantedView(props: any) {
                     position: 'absolute', top: -1,
                     right: 0, width: 64, height: 72
                 }} />}
-                <Wrap isClosed={(isClosed && !isMine)}>
+                <Wrap isClosed={isClosed}>
                     <Body style={{ width: '100%' }}>
                         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                             <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
@@ -104,7 +106,7 @@ export default function WantedView(props: any) {
                 right: 0, width: 64, height: 72
             }} />}
 
-            <DWrap isClosed={(isClosed && !isMine)}>
+            <DWrap isClosed={isClosed}>
                 <Pad style={{ padding: 20, height: 410 }}>
                     <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                         <NameTag {...person} created={created} widget={'wanted'} />
@@ -119,7 +121,7 @@ export default function WantedView(props: any) {
                                 height: 30,
                             }}
                             color={'primary'}
-                            text={paid ? 'Mark Paid' : 'Mark Unpaid'}
+                            text={paid ? 'Mark Unpaid' : 'Mark Paid'}
                             onClick={e => {
                                 e.stopPropagation()
                                 setWantedPropertyAndSave('paid', false)
