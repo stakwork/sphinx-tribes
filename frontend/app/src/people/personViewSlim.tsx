@@ -110,6 +110,11 @@ export default function PersonView(props: any) {
         await main.getPeople({ page: newPage })
     }
 
+    // if no people, load people on mount
+    useEffect(() => {
+        if (!people.length) main.getPeople({ page: 1, resetPage: true });
+    }, [])
+
     // deeplink load person
     useEffect(() => {
         if (loadedPerson) {
