@@ -429,7 +429,14 @@ export default function BodyComponent() {
                                 setSelectedWidget(t.name)
                             }}>
                             {label}
-                            {isWanted && openGithubIssues && (openGithubIssues.length > 0) && ` (${openGithubIssues.length})`}
+                            {/* {isWanted && openGithubIssues && (openGithubIssues.length > 0) &&
+                                <div style={{
+                                    marginLeft: 5, height: '100%', fontSize: 10, fontWeight: 600,
+                                    display: 'flex', alignItems: 'flex-end'
+                                }}>
+                                    {openGithubIssues.length}
+                                </div>
+                            } */}
                         </Tab>
                     })}
 
@@ -552,8 +559,9 @@ const Tab = styled.div<TagProps>`
             display:flex;
             padding:10px 25px;
             margin-right:35px;
-            height:40px;
+            height:42px;
             color:${p => p.selected ? '#5078F2' : '#5F6368'};
+            border:${p => p.selected ? '1px solid #CDE0FF' : '1px solid #5F636800'};
         // border-bottom: ${p => p.selected && '4px solid #618AFF'};
             cursor:pointer;
             font-weight: 500;

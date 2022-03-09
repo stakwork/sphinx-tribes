@@ -209,6 +209,7 @@ export class MainStore {
       if (openIssues) {
         // remove my issues from count
         // if (uiStore.meInfo?.owner_pubkey) oIssues.filter(f => f.owner_pubkey != uiStore.meInfo?.owner_pubkey)
+        console.log('got github issues', oIssues)
         uiStore.setOpenGithubIssues(oIssues)
       }
       return oIssues;
@@ -584,6 +585,11 @@ export class MainStore {
     return p
   }
 
+  @action async getPersonByGithubName(github: string): Promise<Person> {
+    const p = await api.get(`person/githubname/${github}`);
+    console.log('getPersonByGithubName', p)
+    return p
+  }
 
   // this method merges the relay self data with the db self data, they each hold different data
   @action async getSelf(me: any) {

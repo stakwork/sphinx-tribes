@@ -251,11 +251,12 @@ type GithubOpenIssue struct {
 	Assignee string `json:"assignee"`
 }
 
-func (db database) getOpenGithubIssues(r *http.Request) ([]GithubOpenIssue, error) {
+func (db database) getOpenGithubIssues(r *http.Request) (int64, error) {
 	ms := []GithubOpenIssue{}
+
 	// set limit
 	result := db.db.Raw(
-		`SELECT value
+		`SELECT COUNT(value)
 		FROM (
 			SELECT * 
 			FROM people 
@@ -265,7 +266,7 @@ func (db database) getOpenGithubIssues(r *http.Request) ([]GithubOpenIssue, erro
 		jsonb_each(github_issues) t2 
 		WHERE value @> '{"status": "open"}' OR value @> '{"status": ""}'`).Find(&ms)
 
-	return ms, result.Error
+	return result.RowsAffected, result.Error
 }
 
 func (db database) getListedTribes(r *http.Request) []Tribe {
@@ -340,15 +341,23 @@ func makeExtrasListQuery(columnName string) string {
 		END`
 }
 
+func addNewerThanXDaysToExtrasRawQuery(query string, days int) string {
+	secondsInDay := 86400
+	newerThan := secondsInDay * days
+	t := strconv.Itoa(newerThan)
+	return query + ` AND CAST(arr.item_object->>'created' AS INT) > (extract(epoch from now()) - ` + t + `) `
+}
+
 func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
 
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("post")
 
-	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
+	// sort by newest
+	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
 		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
@@ -357,11 +366,13 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("wanted")
+	rawQuery = addNewerThanXDaysToExtrasRawQuery(rawQuery, 14)
 
-	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
+	// sort by newest
+	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
 		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
@@ -370,11 +381,12 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("offer")
 
-	result := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Raw(
+	// sort by newest
+	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
 		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
@@ -409,6 +421,24 @@ func (db database) getPerson(id uint) Person {
 func (db database) getPersonByPubkey(pubkey string) Person {
 	m := Person{}
 	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
+
+	return m
+}
+
+func (db database) getPersonByGithubName(github_name string) Person {
+	m := Person{}
+
+	db.db.Raw(`SELECT 		
+	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
+	FROM people,
+	jsonb_array_elements(extras->'github') with ordinality 
+	arr(item_object, position)
+	WHERE people.deleted != true
+	AND people.unlisted != true
+	AND CASE
+			WHEN arr.item_object->>'value' = ? THEN false
+			ELSE true
+		END`, github_name).First(&m)
 
 	return m
 }
