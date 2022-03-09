@@ -6,15 +6,29 @@ import { useStores } from '../../../store';
 export default function GithubStatusPill(props: any) {
     const { status, assignee, style } = props
     const { main } = useStores()
-    const history = useHistory()
 
     async function findUserByGithubHandle() {
         // look in database for first user with this github handle
-        const p = await main.getPersonByGithubName(assignee)
-        if (p) {
-            history.push(`/p/${p.owner_pubkey}`)
+        try {
+            const p = await main.getPersonByGithubName(assignee)
+            if (p) {
+                let url = ""
+                if (p.owner_pubkey) url = `https://community.sphinx.chat/p/${p.owner_pubkey}`
+                else url = `https://github.com/${assignee}`
+                sendToRedirect(url)
+            }
+        } catch (e) {
+            console.log('e', e)
         }
     }
+
+    function sendToRedirect(url) {
+        let el = document.createElement("a");
+        el.href = url;
+        el.target = '_blank';
+        el.click();
+    }
+
 
     const isOpen = status === 'open' || !status
 

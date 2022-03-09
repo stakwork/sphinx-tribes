@@ -25,7 +25,14 @@ export default function WantedView(props: any) {
         show = true
     }
 
-    async function setWantedAsHidden() {
+    if ('paid' in props) {
+        // show has no value
+    } else {
+        // if no value default to false
+        paid = false
+    }
+
+    async function setWantedPropertyAndSave(propertyName: string, removeIt: boolean) {
         if (peopleWanteds && ui.meInfo) {
             let clonedMeInfo = { ...ui.meInfo }
             let clonedExtras = clonedMeInfo?.extras
@@ -35,25 +42,28 @@ export default function WantedView(props: any) {
             // set wanted show value to !show
             if (clonedWanted && (wantedIndex || wantedIndex === 0) && (wantedIndex > -1)) {
                 setSaving(true)
+                const targetProperty = props[propertyName]
                 try {
-                    clonedWanted[wantedIndex].show = !show
+                    clonedWanted[wantedIndex][propertyName] = !targetProperty
                     clonedMeInfo.extras.wanted = clonedWanted
                     await main.saveProfile(clonedMeInfo)
 
-                    // saved? ok update in wanted list
+                    // saved? ok update in wanted list if found
                     const peopleWantedsClone = [...peopleWanteds]
-                    const indexToRemoveFromPeopleWanted = peopleWantedsClone.findIndex(f => {
+                    const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
                         let val = f.body || {}
                         return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
                     })
 
-                    // if we found it, and it should be hidden now, remove it from the list
-                    if (indexToRemoveFromPeopleWanted > -1) {
-                        if (!show === false) {
-                            peopleWantedsClone.splice(indexToRemoveFromPeopleWanted, 1)
-                            main.setPeopleWanteds(peopleWantedsClone)
+                    // if we found it in the wanted list, update in people wanted list
+                    if (indexFromPeopleWanted > -1) {
+                        // if it should be hidden now, remove it from the list
+                        if ('show' in clonedWanted[wantedIndex] && clonedWanted[wantedIndex].show === false) {
+                            peopleWantedsClone.splice(indexFromPeopleWanted, 1)
                         }
+                        main.setPeopleWanteds(peopleWantedsClone)
                     }
+
                 } catch (e) {
                     console.log('e', e)
                 }
@@ -61,7 +71,6 @@ export default function WantedView(props: any) {
             }
         }
     }
-
 
     function renderCodingTask() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
@@ -74,7 +83,7 @@ export default function WantedView(props: any) {
                     position: 'absolute', top: -1,
                     right: 0, width: 64, height: 72
                 }} />}
-                <Wrap isClosed={isClosed}>
+                <Wrap isClosed={(isClosed && !isMine)}>
                     <Body style={{ width: '100%' }}>
                         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                             <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
@@ -94,7 +103,8 @@ export default function WantedView(props: any) {
                 position: 'absolute', top: -1,
                 right: 0, width: 64, height: 72
             }} />}
-            <DWrap isClosed={isClosed}>
+
+            <DWrap isClosed={(isClosed && !isMine)}>
                 <Pad style={{ padding: 20, height: 410 }}>
                     <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                         <NameTag {...person} created={created} widget={'wanted'} />
@@ -102,7 +112,21 @@ export default function WantedView(props: any) {
 
                     <Divider style={{ margin: '10px 0' }} />
 
-                    <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                        {isMine && <Button
+                            style={{
+                                height: 30,
+                            }}
+                            color={'primary'}
+                            text={paid ? 'Mark Paid' : 'Mark Unpaid'}
+                            onClick={e => {
+                                e.stopPropagation()
+                                setWantedPropertyAndSave('paid', false)
+                            }} />
+                        }
+                    </div>
+
 
                     <DT>{title}</DT>
 
@@ -133,10 +157,8 @@ export default function WantedView(props: any) {
                                     height: 20, padding: 0, background: '#fff',
                                 }}
                                 onClick={(e) => {
-
                                     e.stopPropagation()
-                                    setWantedAsHidden()
-
+                                    setWantedPropertyAndSave('show', true)
                                 }}
                             />
                         }
