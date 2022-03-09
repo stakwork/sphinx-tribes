@@ -133,6 +133,14 @@ type Pagination struct {
 	Sort  string `json:"sort"`
 }
 
+type Channel struct {
+	ID        uint       `json:"id"`
+	TribeUUID string     `json:"tribe_uuid"`
+	Name      string     `json:"name"`
+	Created   *time.Time `json:"created"`
+	Deleted   bool       `json:"deleted"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {

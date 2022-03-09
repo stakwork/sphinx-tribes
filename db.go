@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -44,7 +45,7 @@ func initDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
-	db.AutoMigrate(&Person{})
+	db.AutoMigrate(&Person{}, &Channel{})
 
 	// data := map[string]string{
 	// 	"assignee": "Evanfeenstra",
@@ -77,6 +78,8 @@ var peopleupdatables = []string{
 	"price_to_meet", "updated",
 	"extras",
 }
+var channelupdatables = []string{
+	"name", "deleted"}
 
 // check that update owner_pub_key does in fact throw error
 func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
@@ -109,6 +112,18 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	setweight(array_to_tsvector(tags), 'C')
 	WHERE uuid = '` + m.UUID + "'")
 	return m, nil
+}
+
+func (db database) createChannel(c Channel) (Channel, error) {
+
+	if c.Created == nil {
+		now := time.Now()
+		c.Created = &now
+
+	}
+	db.db.Create(&c)
+	return c, nil
+
 }
 
 // check that update owner_pub_key does in fact throw error
@@ -230,6 +245,14 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	return true
 }
 
+func (db database) updateChannel(id uint, u map[string]interface{}) bool {
+	if id == 0 {
+		return false
+	}
+	db.db.Model(&Channel{}).Where("id= ?", id).Updates(u)
+	return true
+}
+
 func (db database) updatePerson(id uint, u map[string]interface{}) bool {
 	if id == 0 {
 		return false
@@ -298,6 +321,18 @@ func (db database) getTribesByOwner(pubkey string) []Tribe {
 func (db database) getAllTribesByOwner(pubkey string) []Tribe {
 	ms := []Tribe{}
 	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&ms)
+	return ms
+}
+
+func (db database) getChannelsByTribe(tribe_uuid string) []Channel {
+	ms := []Channel{}
+	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
+	return ms
+}
+
+func (db database) getChannel(id uint) Channel {
+	ms := Channel{}
+	db.db.Where("id = ?  AND (deleted = 'f' OR deleted is null)", id).Find(&ms)
 	return ms
 }
 
