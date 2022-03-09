@@ -54,7 +54,7 @@ export default function WidgetSwitchViewer(props) {
         const listItems = (activeList && activeList.length) ? activeList.map((item, i) => {
             const { person, body } = item
             // if this person has entries for this widget
-            return <Panel key={person?.owner_pubkey + i + body.created}
+            return <Panel key={person?.owner_pubkey + i + body?.created}
                 onClick={() => {
                     if (onPanelClick) onPanelClick(person, body)
                 }}
