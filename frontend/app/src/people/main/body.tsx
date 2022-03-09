@@ -140,6 +140,9 @@ export default function BodyComponent() {
                 let p = await main.getPersonByPubkey(personPubkey)
                 ui.setSelectedPerson(p?.id)
                 ui.setSelectingPerson(p?.id)
+                // make sure to load people in a person deeplink
+                const loadMethod = loadMethods["people"];
+                await loadMethod({ page: 1, resetPage: true });
             }
         }
     }
