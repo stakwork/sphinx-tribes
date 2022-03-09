@@ -183,6 +183,11 @@ export class MainStore {
     return t;
   }
 
+  @action async getSingleTribeByUn(un: string): Promise<Tribe> {
+    const t = await api.get(`tribe_by_un/${un}`);
+    return t;
+  }
+
 
   @action async getGithubIssueData(
     owner: string,
