@@ -183,6 +183,11 @@ export class MainStore {
     return t;
   }
 
+  @action async getSingleTribeByUn(un: string): Promise<Tribe> {
+    const t = await api.get(`tribe_by_un/${un}`);
+    return t;
+  }
+
 
   @action async getGithubIssueData(
     owner: string,
@@ -202,16 +207,11 @@ export class MainStore {
   @action async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
-      // console.log('got openIssues', openIssues)
-      // remove my own!
-
-      let oIssues = [...openIssues]
+      console.log('got openIssues', openIssues)
       if (openIssues) {
-        // remove my issues from count
-        // if (uiStore.meInfo?.owner_pubkey) oIssues.filter(f => f.owner_pubkey != uiStore.meInfo?.owner_pubkey)
-        uiStore.setOpenGithubIssues(oIssues)
+        uiStore.setOpenGithubIssues(openIssues)
       }
-      return oIssues;
+      return openIssues;
     } catch (e) {
       console.log('e', e)
     }
@@ -584,6 +584,11 @@ export class MainStore {
     return p
   }
 
+  @action async getPersonByGithubName(github: string): Promise<Person> {
+    const p = await api.get(`person/githubname/${github}`);
+    console.log('getPersonByGithubName', p)
+    return p
+  }
 
   // this method merges the relay self data with the db self data, they each hold different data
   @action async getSelf(me: any) {

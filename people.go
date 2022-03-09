@@ -214,6 +214,13 @@ func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
+func getPersonByGithubName(w http.ResponseWriter, r *http.Request) {
+	github := chi.URLParam(r, "github")
+	person := DB.getPersonByGithubName(github)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(person)
+}
+
 func deletePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)

@@ -10,7 +10,7 @@ import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 
 export default function WantedView(props: any) {
-    let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type, show } = props
+    let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type, show, paid } = props
     const isMobile = useIsMobile()
     const { ui, main } = useStores()
     const [saving, setSaving] = useState(false)
@@ -25,7 +25,14 @@ export default function WantedView(props: any) {
         show = true
     }
 
-    async function setWantedAsHidden() {
+    if ('paid' in props) {
+        // show has no value
+    } else {
+        // if no value default to false
+        paid = false
+    }
+
+    async function setWantedPropertyAndSave(propertyName: string, removeIt: boolean) {
         if (peopleWanteds && ui.meInfo) {
             let clonedMeInfo = { ...ui.meInfo }
             let clonedExtras = clonedMeInfo?.extras
@@ -35,25 +42,28 @@ export default function WantedView(props: any) {
             // set wanted show value to !show
             if (clonedWanted && (wantedIndex || wantedIndex === 0) && (wantedIndex > -1)) {
                 setSaving(true)
+                const targetProperty = props[propertyName]
                 try {
-                    clonedWanted[wantedIndex].show = !show
+                    clonedWanted[wantedIndex][propertyName] = !targetProperty
                     clonedMeInfo.extras.wanted = clonedWanted
                     await main.saveProfile(clonedMeInfo)
 
-                    // saved? ok update in wanted list
+                    // saved? ok update in wanted list if found
                     const peopleWantedsClone = [...peopleWanteds]
-                    const indexToRemoveFromPeopleWanted = peopleWantedsClone.findIndex(f => {
+                    const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
                         let val = f.body || {}
                         return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
                     })
 
-                    // if we found it, and it should be hidden now, remove it from the list
-                    if (indexToRemoveFromPeopleWanted > -1) {
-                        if (!show === false) {
-                            peopleWantedsClone.splice(indexToRemoveFromPeopleWanted, 1)
-                            main.setPeopleWanteds(peopleWantedsClone)
+                    // if we found it in the wanted list, update in people wanted list
+                    if (indexFromPeopleWanted > -1) {
+                        // if it should be hidden now, remove it from the list
+                        if ('show' in clonedWanted[wantedIndex] && clonedWanted[wantedIndex].show === false) {
+                            peopleWantedsClone.splice(indexFromPeopleWanted, 1)
                         }
+                        main.setPeopleWanteds(peopleWantedsClone)
                     }
+
                 } catch (e) {
                     console.log('e', e)
                 }
@@ -62,76 +72,101 @@ export default function WantedView(props: any) {
         }
     }
 
-
     function renderCodingTask() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
 
         const isClosed = status === 'closed'
 
         if (isMobile) {
-            return <Wrap isClosed={isClosed}>
-                <Body style={{ width: '100%' }}>
-                    <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                        <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
-                        <Img src={'/static/github_logo.png'} />
-                        {/* <MaterialIcon icon={'code'} /> */}
-                    </div>
-                    <T style={{ marginBottom: 5 }}>{title}</T>
-                    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-                        <GithubStatusPill status={status} assignee={assignee} />
-                        <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
-                    </div>
-                </Body>
-            </Wrap>
+            return <>
+                {paid && <Img src={'/static/paid_ribbon.svg'} style={{
+                    position: 'absolute', top: -1,
+                    right: 0, width: 64, height: 72
+                }} />}
+                <Wrap isClosed={(isClosed && !isMine)}>
+                    <Body style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                            <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
+                        </div>
+                        <T style={{ marginBottom: 5 }}>{title}</T>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                            <GithubStatusPill status={status} assignee={assignee} />
+                            <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                        </div>
+                    </Body>
+                </Wrap>
+            </>
         }
 
-        return <DWrap isClosed={isClosed}>
-            <Pad style={{ padding: 20, height: 410 }}>
-                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                    <NameTag {...person} created={created} widget={'wanted'} />
-                    {/* <MaterialIcon icon={'code'} /> */}
-                    <Img src={'/static/github_logo.png'} />
-                </div>
+        return <>
+            {paid && <Img src={'/static/paid_ribbon.svg'} style={{
+                position: 'absolute', top: -1,
+                right: 0, width: 64, height: 72
+            }} />}
 
-                <DT>{title}</DT>
+            <DWrap isClosed={(isClosed && !isMine)}>
+                <Pad style={{ padding: 20, height: 410 }}>
+                    <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                        <NameTag {...person} created={created} widget={'wanted'} />
+                    </div>
 
-                <Link >github.com/{repo + '/issues/' + issue}</Link>
-                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                    <Divider style={{ margin: '10px 0' }} />
 
-                <div style={{ height: 15 }} />
-                <DescriptionCodeTask>{description}</DescriptionCodeTask>
-
-            </Pad>
-            <Divider style={{ margin: 0 }} />
-            <Pad style={{ padding: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
-
-
-                <div>
-                    {
-                        //  if my own, show this option to show/hide
-                        isMine &&
-                        <Button
-                            icon={show ? 'visibility' : 'visibility_off'}
-                            disable={saving}
-                            submitting={saving}
-                            iconStyle={{ color: '#555', fontSize: 20 }}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                        {isMine && <Button
                             style={{
-                                minWidth: 24, width: 24, minHeight: 20,
-                                height: 20, padding: 0, background: '#fff',
+                                height: 30,
                             }}
-                            onClick={(e) => {
-
+                            color={'primary'}
+                            text={paid ? 'Mark Paid' : 'Mark Unpaid'}
+                            onClick={e => {
                                 e.stopPropagation()
-                                setWantedAsHidden()
+                                setWantedPropertyAndSave('paid', false)
+                            }} />
+                        }
+                    </div>
 
-                            }}
-                        />
-                    }
 
-                </div>
-            </Pad>
-        </DWrap>
+                    <DT>{title}</DT>
+
+                    {/* <Link >github.com/{repo + '/issues/' + issue}</Link> */}
+                    <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+
+                    <Divider style={{ margin: '22px 0' }} />
+
+                    <DescriptionCodeTask>{description}</DescriptionCodeTask>
+
+                </Pad>
+                <Divider style={{ margin: 0 }} />
+                <Pad style={{ padding: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+
+
+                    <div>
+                        {
+                            //  if my own, show this option to show/hide
+                            isMine &&
+                            <Button
+                                icon={show ? 'visibility' : 'visibility_off'}
+                                disable={saving}
+                                submitting={saving}
+                                iconStyle={{ color: '#555', fontSize: 20 }}
+                                style={{
+                                    minWidth: 24, width: 24, minHeight: 20,
+                                    height: 20, padding: 0, background: '#fff',
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    setWantedPropertyAndSave('show', true)
+                                }}
+                            />
+                        }
+
+                    </div>
+                </Pad>
+            </DWrap>
+        </>
     }
 
     function getMobileView() {
@@ -141,7 +176,7 @@ export default function WantedView(props: any) {
                 <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
                 <T>{title}</T>
                 <D>{description}</D>
-                <P>{formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
+                <P><B>{formatPrice(priceMin) || '0'} - {formatPrice(priceMax)}</B> SAT</P>
             </Body>
         </Wrap>
     }
@@ -164,7 +199,7 @@ export default function WantedView(props: any) {
             </Pad>
             <Divider style={{ margin: 0 }} />
             <Pad style={{ padding: 20, }}>
-                <P style={{ fontSize: 17 }}>{formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B></P>
+                <P><B>{formatPrice(priceMin) || '0'} - {formatPrice(priceMax)}</B> SAT</P>
             </Pad>
         </DWrap>
     }
@@ -195,10 +230,14 @@ min-width:100%;
 max-height:471px;
 font-style: normal;
 font-weight: 500;
-font-size: 24px;
-line-height: 20px;
-color: #3C3F41;
+font-size: 17px;
+line-height: 23px;
+color: #3C3F41 !important;
+letter-spacing:0px;
 justify-content:space-between;
+opacity:${p => p.isClosed ? '0.5' : '1'};
+filter: ${p => p.isClosed ? 'grayscale(1)' : 'grayscale(0)'};
+
 
 `;
 
@@ -225,10 +264,14 @@ display: -webkit-box;
 -webkit-box-orient: vertical;
 `;
 const B = styled.span`
-font-weight:300;
+font-size:15px;
+font-weight:bold;
+color:#3c3f41;
 `;
 const P = styled.div`
-font-weight:500;
+font-weight:regular;
+font-size:15px;
+color:#8e969c;
 `;
 const D = styled.div`
 color:#5F6368;
@@ -300,15 +343,18 @@ color: #5F6368;
 overflow: hidden;
 text-overflow: ellipsis;
 display: -webkit-box;
--webkit-line-clamp: 8;
+-webkit-line-clamp: 6;
 -webkit-box-orient: vertical;
-height: 160px;
+height: 120px;
 `
 const DT = styled(Title)`
 margin-bottom:9px;
 max-height:52px;
 overflow:hidden;
-
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
 /* Primary Text 1 */
 
 color: #292C33;
