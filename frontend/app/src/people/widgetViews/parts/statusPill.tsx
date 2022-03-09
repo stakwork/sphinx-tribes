@@ -40,12 +40,15 @@ export default function GithubStatusPill(props: any) {
                 {isOpen ? 'Open' : 'Closed'}
             </div>
         </Pill>
-        <Assignee>
-            {assignedText} <Link onClick={(e) => {
-                e.stopPropagation()
-                findUserByGithubHandle()
-            }}>{assignee}</Link>
-        </Assignee>
+        <W>
+            <Assignee>
+
+                {assignedText} <Link onClick={(e) => {
+                    e.stopPropagation()
+                    findUserByGithubHandle()
+                }}>{assignee}</Link>
+            </Assignee>
+        </W>
     </div>
 
 }
@@ -98,6 +101,11 @@ display: -webkit-box;
 overflow:hidden;
 
 
+`
+
+const W = styled.div`
+display: flex;
+align-items:center;
 `
 
 const Link = styled.span`

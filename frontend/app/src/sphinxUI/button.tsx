@@ -64,6 +64,8 @@ export default function Button(props: any) {
 
     }
 
+    console.log('...props.textStyle', props.textStyle)
+
     return <B
         style={{
             ...colors[props.color], padding: props.icon && '0 0 0 15px', position: 'relative',
@@ -80,7 +82,7 @@ export default function Button(props: any) {
                     <div style={{
                         display: 'flex', alignItems: 'center',
                         position: 'absolute', left: 18, top: 0, height: props.height,
-                        maxWidth: '80%'
+                        maxWidth: '80%',
                     }}>
                         <div style={{
                             overflow: 'hidden',
@@ -119,7 +121,10 @@ export default function Button(props: any) {
                             position: 'absolute', top: 0, left: 10, height: '100%'
                         }}>
                             <Img src={`/static/${props.img}`}
-                                style={{ width: props.imgSize ? props.imgSize : 30, height: props.imgSize ? props.imgSize : 30 }} />
+                                style={{
+                                    width: props.imgSize ? props.imgSize : 30, height: props.imgSize ? props.imgSize : 30,
+                                    ...props.imgStyle
+                                }} />
                         </div>
                     }
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -128,6 +133,14 @@ export default function Button(props: any) {
                             style={{
                                 fontSize: props.iconSize ? props.iconSize : 20,
                                 marginRight: 10, ...iconStyle
+                            }} />
+                        }
+
+                        {props.leadingImgUrl && <Img
+                            src={props.leadingImgUrl}
+                            style={{
+                                width: props.imgSize ? props.imgSize : 28, height: props.imgSize ? props.imgSize : 28,
+                                ...props.imgStyle
                             }} />
                         }
 

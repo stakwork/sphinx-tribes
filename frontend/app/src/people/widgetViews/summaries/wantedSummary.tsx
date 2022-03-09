@@ -1,5 +1,5 @@
 import MaterialIcon from '@material/react-material-icon';
-import React, { useRef, useState, useLayoutEffect } from 'react'
+import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
@@ -11,18 +11,22 @@ import { extractGithubIssue } from '../../../helpers';
 import ReactMarkdown from 'react-markdown'
 import GithubStatusPill from '../parts/statusPill';
 import { useHistory } from 'react-router';
+import { useStores } from '../../../store';
 
 export function renderMarkdown(str) {
         return <ReactMarkdown>{str}</ReactMarkdown>
 }
 
 export default function WantedSummary(props: any) {
-        const { title, description, priceMin, priceMax, url, gallery, person, created, repo, issue, price, type, tribe } = props
+        const { title, description, priceMin, priceMax, url, gallery, person, created, repo, issue, price, type, tribe, paid } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
         const history = useHistory()
         const heart = <FavoriteButton />
         const isMobile = useIsMobile()
+        const { main } = useStores()
+
+        const [tribeInfo, setTribeInfo]: any = useState(null)
 
         useLayoutEffect(() => {
                 if (imgRef && imgRef.current) {
@@ -32,13 +36,53 @@ export default function WantedSummary(props: any) {
                 }
         }, [imgRef])
 
-        const repoUrl = `github.com/${repo}/issues/${issue}`
-        const githubLink = <a href={'https://' + repoUrl} target='_blank'><Link >{repoUrl}</Link></a>
-        const addTribe = <Button
-                text={'View Tribe'}
-                color={'primary'}
-                onClick={() => history.push(`/t/${tribe}`)}
+        useEffect(() => {
+                (async () => {
+                        if (tribe) {
+                                try {
+                                        const t = await main.getSingleTribeByUn(tribe)
+                                        setTribeInfo(t)
+                                } catch (e) {
+                                        console.log('e', e)
+                                }
+
+                        }
+                })()
+        }, [])
+
+        const viewGithub = <Button
+                text={'Original Ticket'}
+                color={'white'}
+                endingIcon={'launch'}
+                iconSize={14}
+                style={{ fontSize: 14, height: 48 }}
+                onClick={() => {
+                        const repoUrl = `https://github.com/${repo}/issues/${issue}`
+                        sendToRedirect(repoUrl)
+                }}
         />
+
+        const viewTribe = <Button
+                text={'View Tribe'}
+                color={'white'}
+                leadingImgUrl={tribeInfo?.img || ' '}
+                endingIcon={'launch'}
+                iconSize={14}
+                imgStyle={{ marginRight: 10 }}
+                style={{ fontSize: 14, height: 48 }}
+                onClick={() => {
+                        const profileUrl = `https://community.sphinx.chat/t/${tribe}`
+                        sendToRedirect(profileUrl)
+                }}
+        />
+
+        function sendToRedirect(url) {
+                let el = document.createElement("a");
+                el.href = url;
+                el.target = '_blank';
+                el.click();
+        }
+
 
         function renderCodingTask() {
                 const { assignee, status } = extractGithubIssue(person, repo, issue)
@@ -50,17 +94,18 @@ export default function WantedSummary(props: any) {
                                         widget={'wanted'} />
 
                                 <T>{title}</T>
-                                <div style={{ margin: '5px 0 10px' }}>
-                                        {githubLink}
-                                </div>
+
                                 <GithubStatusPill status={status} assignee={assignee} />
 
-                                <Status style={{ marginTop: 22 }}>{addTribe}</Status>
+                                <ButtonRow style={{ marginTop: 22 }}>
+                                        {viewGithub}
+                                        {viewTribe}
+                                </ButtonRow>
                                 <Divider style={{
                                         marginTop: 22
                                 }} />
                                 <Y>
-                                        <P>{formatPrice(price)} <B>SAT ({satToUsd(price)})</B> </P>
+                                        <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
                                         {heart}
                                 </Y>
                                 <Divider style={{ marginBottom: 22 }} />
@@ -70,44 +115,51 @@ export default function WantedSummary(props: any) {
                         </Pad>
                 }
 
-                return <Wrap>
-                        <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
-                                <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
-                                <Paragraph style={{
-                                        overflow: 'hidden',
-                                        wordBreak: 'normal'
-                                }}>{renderMarkdown(description)}</Paragraph>
-                        </div>
-                        <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
-                                <Pad>
-                                        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                                                <NameTag
-                                                        style={{ marginBottom: 14 }}
-                                                        {...person}
-                                                        created={created}
-                                                        widget={'wanted'} />
-                                                <Img src={'/static/github_logo.png'} />
-                                        </div>
+                return <>
+                        {paid && <Img src={'/static/paid_ribbon.svg'} style={{
+                                position: 'absolute', top: -1,
+                                right: 0, width: 64, height: 72
+                        }} />}<Wrap>
+                                <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
+                                        <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
+                                        <Paragraph style={{
+                                                overflow: 'hidden',
+                                                wordBreak: 'normal'
+                                        }}>{renderMarkdown(description)}</Paragraph>
+                                </div>
 
+                                <div style={{ width: 410, padding: 20, overflowY: 'auto', height: envHeight }}>
+                                        <Pad>
+                                                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                                        <NameTag
+                                                                style={{ marginBottom: 14 }}
+                                                                {...person}
+                                                                created={created}
+                                                                widget={'wanted'} />
+                                                </div>
+                                                <Divider style={{ margin: '14px 0 20px' }} />
 
-                                        <Title>{title}</Title>
-                                        {githubLink}
-                                        <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                                                <Title>{title}</Title>
+                                                <div style={{ height: 10 }} />
+                                                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                                                <div style={{ height: 30 }} />
+                                                <ButtonRow>
+                                                        {viewGithub}
+                                                        {viewTribe}
+                                                </ButtonRow>
 
+                                                <Divider style={{ margin: '20px 0 0' }} />
+                                                <Y>
+                                                        <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                                                        {heart}
+                                                </Y>
+                                                <Divider />
 
-                                        <Status style={{ marginTop: 22 }}>{addTribe}</Status>
+                                        </Pad>
+                                </div>
 
-                                        <Divider style={{ marginTop: 22 }} />
-                                        <Y>
-                                                <P>{formatPrice(price) || '0'} <B>SAT ({satToUsd(price)})</B> </P>
-                                                {heart}
-                                        </Y>
-
-
-                                </Pad>
-                        </div>
-
-                </Wrap>
+                        </Wrap>
+                </>
         }
 
 
@@ -190,7 +242,7 @@ const Y = styled.div`
         display: flex;
         justify-content:space-between;
         width:100%;
-        height:50px;
+        padding: 20px 0;
         align-items:center;
         `;
 const T = styled.div`
@@ -199,11 +251,14 @@ const T = styled.div`
         margin: 10px 0;
         `;
 const B = styled.span`
-        font-weight:300;
+        font-size:15px;
+        font-weight:bold;
+        color:#3c3f41;
         `;
 const P = styled.div`
-        font-weight:500;
-        line-height: 24px;
+        font-weight:regular;
+        font-size:15px;
+        color:#8e969c;
         `;
 const D = styled.div`
         color:#5F6368;
@@ -217,11 +272,9 @@ const Assignee = styled.div`
         font-weight:300;
         `;
 
-const Status = styled.div`
+const ButtonRow = styled.div`
         display: flex;
-        font-size:12px;
-        margin-right:4px;
-        font-weight:300;
+        justify-content:space-around;
         `;
 
 const Link = styled.div`
