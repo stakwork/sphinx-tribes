@@ -64,8 +64,6 @@ export default function Button(props: any) {
 
     }
 
-    console.log('...props.textStyle', props.textStyle)
-
     return <B
         style={{
             ...colors[props.color], padding: props.icon && '0 0 0 15px', position: 'relative',
