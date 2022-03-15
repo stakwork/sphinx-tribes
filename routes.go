@@ -98,6 +98,10 @@ func NewRouter() *http.Server {
 		r.Delete("/channel/{id}", deleteChannel)
 	})
 
+	r.Group(func(r chi.Router) {
+		r.Post("/tribe/messageBundle", HandelTribeMessageBundleFromRelay)
+	})
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "5002"

@@ -141,6 +141,17 @@ type Channel struct {
 	Deleted   bool       `json:"deleted"`
 }
 
+type TribeBatch struct {
+	ChatUUID        string      `json:"chatUUID"`
+	SenderPublicKey string      `json:"senderPublicKey"`
+	BatchContents   []BatchItem `json:"batchContents"`
+}
+
+type BatchItem struct {
+	MQTTTopic string `json:"mqttTopic"`
+	Data      string `json:"data"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {

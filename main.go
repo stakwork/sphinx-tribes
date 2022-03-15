@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/stakwork/sphinx-tribes/mqtt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,11 +18,20 @@ func main() {
 
 	err = godotenv.Load()
 	if err != nil {
-		fmt.Println("no .env file")
+		fmt.Println("no .env file here")
 	}
 
+	fmt.Println("Init DB...")
 	initDB()
+	fmt.Println("Done.")
+
+	fmt.Println("Init Cache...")
 	initCache()
+	fmt.Println("Done")
+
+	fmt.Println("Init MQTT Client...")
+	mqtt.Init()
+	fmt.Println("Done")
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {
