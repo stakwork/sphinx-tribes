@@ -32,50 +32,45 @@ export default function WantedView(props: any) {
         paid = false
     }
 
-    async function setWantedPropertyAndSave(propertyName: string, removeIt: boolean) {
-        if (peopleWanteds && ui.meInfo) {
-            let clonedMeInfo = { ...ui.meInfo }
-            let clonedExtras = clonedMeInfo?.extras
-            let clonedWanted: any = clonedExtras?.wanted
-            const wantedIndex = clonedWanted?.findIndex(f => f.created === created)
-
-            // set wanted show value to !show
-            if (clonedWanted && (wantedIndex || wantedIndex === 0) && (wantedIndex > -1)) {
-                setSaving(true)
+    async function setExtrasPropertyAndSave(propertyName: string) {
+        if (peopleWanteds) {
+            setSaving(true)
+            try {
                 const targetProperty = props[propertyName]
-                try {
-                    clonedWanted[wantedIndex][propertyName] = !targetProperty
-                    clonedMeInfo.extras.wanted = clonedWanted
-                    await main.saveProfile(clonedMeInfo)
+                const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
+                    'wanted',
+                    propertyName,
+                    created,
+                    !targetProperty)
 
-                    // saved? ok update in wanted list if found
-                    const peopleWantedsClone: any = [...peopleWanteds]
-                    const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
-                        let val = f.body || {}
-                        return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
-                    })
+                // saved? ok update in wanted list if found
+                const peopleWantedsClone: any = [...peopleWanteds]
+                const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
+                    let val = f.body || {}
+                    return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
+                })
 
-                    // if we found it in the wanted list, update in people wanted list
-                    if (indexFromPeopleWanted > -1) {
-                        // if it should be hidden now, remove it from the list
-                        if ('show' in clonedWanted[wantedIndex] && clonedWanted[wantedIndex].show === false) {
-                            peopleWantedsClone.splice(indexFromPeopleWanted, 1)
-                        } else {
-                            peopleWantedsClone[indexFromPeopleWanted] = {
-                                person: person,
-                                body: clonedWanted[wantedIndex]
-                            }
+                // if we found it in the wanted list, update in people wanted list
+                if (indexFromPeopleWanted > -1) {
+                    // if it should be hidden now, remove it from the list
+                    if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
+                        peopleWantedsClone.splice(indexFromPeopleWanted, 1)
+                    } else {
+                        peopleWantedsClone[indexFromPeopleWanted] = {
+                            person: person,
+                            body: clonedEx[targetIndex]
                         }
-                        main.setPeopleWanteds(peopleWantedsClone)
                     }
-
-                } catch (e) {
-                    console.log('e', e)
+                    main.setPeopleWanteds(peopleWantedsClone)
                 }
-                setSaving(false)
+            } catch (e) {
+                console.log('e', e)
             }
+
+            setSaving(false)
         }
     }
+
 
     function renderCodingTask() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
@@ -127,7 +122,7 @@ export default function WantedView(props: any) {
                             text={paid ? 'Mark Unpaid' : 'Mark Paid'}
                             onClick={e => {
                                 e.stopPropagation()
-                                setWantedPropertyAndSave('paid', false)
+                                setExtrasPropertyAndSave('paid')
                             }} />
                         }
                     </div>
@@ -163,7 +158,7 @@ export default function WantedView(props: any) {
                                 }}
                                 onClick={(e) => {
                                     e.stopPropagation()
-                                    setWantedPropertyAndSave('show', true)
+                                    setExtrasPropertyAndSave('show')
                                 }}
                             />
                         }

@@ -5,17 +5,16 @@ import styled from 'styled-components'
 import {
     EuiHeader,
     EuiHeaderSection,
-    EuiFieldSearch,
 } from '@elastic/eui';
-import { useFuse, useIsMobile } from '../../hooks'
+import { useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Modal, Button, Divider } from '../../sphinxUI';
+import { Modal, Button } from '../../sphinxUI';
 
-// import EditInfo from '../edit/editInfo'
 import SignIn from '../auth/signIn';
 
 import api from '../../api';
+import TorSaveQR from '../utils/torSaveQR';
 
 
 export default function Header() {
@@ -308,6 +307,17 @@ export default function Header() {
                         />
                     </Column>
                 </div>
+            </Modal>
+
+            <Modal
+                visible={ui?.torFormBodyQR}
+                close={() => {
+                    ui.setTorFormBodyQR('')
+                }}
+            >
+                <TorSaveQR url={ui?.torFormBodyQR} goBack={() => {
+                    ui.setTorFormBodyQR('')
+                }} />
             </Modal>
         </>
     })
