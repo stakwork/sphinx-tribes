@@ -9,6 +9,7 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
+	"math/big"
 	"os"
 	"time"
 
@@ -41,7 +42,7 @@ func Init() {
 	mqttScheme := os.Getenv("MQTT_SCHEME")
 	mqttPort := os.Getenv("MQTT_PORT")
 	mqttHost := os.Getenv("MQTT_HOSTNAME")
-	mqttClientID := os.Getenv("MQTT_CLIENT_ID")
+	mqttClientID, _ := randomClientName()
 
 	password, mqttPublicKey, err := signTimestamp()
 	if err != nil {
@@ -148,4 +149,18 @@ func Publish(c mqtt.Client, topic string, payload string, wait bool) {
 
 func Disconnect(c mqtt.Client) {
 	c.Disconnect(250)
+}
+
+func randomClientName() (string, error) {
+	const available = "0123456789abcdefghijklmnopqrstuvwxyz-"
+	r := make([]byte, 6)
+	for i := 0; i < 6; i++ {
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(available))))
+		if err != nil {
+			return "", err
+		}
+		r[i] = available[n.Int64()]
+	}
+
+	return "sphinx-tribes-" + string(r), nil
 }
