@@ -10,10 +10,8 @@ import (
 )
 
 func HandelTribeMessageBundleFromRelay(w http.ResponseWriter, r *http.Request) {
-
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
-
 	tribeBatch := TribeBatch{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -29,21 +27,19 @@ func HandelTribeMessageBundleFromRelay(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
-
 	if tribeBatch.ChatUUID == "" {
 		log.Println("supplied 'chat_uuid' is empty")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
-
-	tribe := DB.getChannelsByTribe(tribeBatch.ChatUUID)
-	if len(tribe) != 1 {
+	tribe := DB.getTribe(tribeBatch.ChatUUID)
+	if tribe.UUID == "" {
 		log.Println("problem finding a tribe with the supplied 'chat_uuid'")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
-	if tribe[0].TribeUUID == pubKeyFromAuth {
+	if tribe.UUID == pubKeyFromAuth {
 		c := mqtt.Client()
 		defer mqtt.Disconnect(c)
 
