@@ -33,10 +33,10 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func Init() {
-	mqtt.DEBUG = log.New(os.Stdout, "[mqtt:debug]", 0)
+	//mqtt.DEBUG = log.New(os.Stdout, "[mqtt:debug]", 0)
 	mqtt.ERROR = log.New(os.Stdout, "[mqtt:error]", 0)
 	mqtt.CRITICAL = log.New(os.Stdout, "[mqtt:CRITICAL]", 0)
-	mqtt.WARN = log.New(os.Stdout, "[mqtt:warn]", 0)
+	//mqtt.WARN = log.New(os.Stdout, "[mqtt:warn]", 0)
 
 	mqttScheme := os.Getenv("MQTT_SCHEME")
 	mqttPort := os.Getenv("MQTT_PORT")
