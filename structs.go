@@ -142,13 +142,12 @@ type Channel struct {
 }
 
 type TribeBatch struct {
-	ChatUUID        string      `json:"chatUUID"`
-	SenderPublicKey string      `json:"senderPublicKey"`
-	BatchContents   []BatchItem `json:"batchContents"`
+	ChatUUID      string      `json:"chat_uuid"`
+	BatchContents []BatchItem `json:"batch_contents"`
 }
 
 type BatchItem struct {
-	MQTTTopic string `json:"mqttTopic"`
+	MQTTTopic string `json:"mqtt_topic"`
 	Data      string `json:"data"`
 }
 

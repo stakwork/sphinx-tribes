@@ -30,7 +30,20 @@ func HandelTribeMessageBundleFromRelay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if tribeBatch.SenderPublicKey == pubKeyFromAuth {
+	if tribeBatch.ChatUUID == "" {
+		log.Println("supplied 'chat_uuid' is empty")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	tribe := DB.getChannelsByTribe(tribeBatch.ChatUUID)
+	if len(tribe) != 1 {
+		log.Println("problem finding a tribe with the supplied 'chat_uuid'")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if tribe[0].TribeUUID == pubKeyFromAuth {
 		c := mqtt.Client()
 		defer mqtt.Disconnect(c)
 
