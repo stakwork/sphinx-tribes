@@ -232,35 +232,27 @@ export class MainStore {
 
   @action async makeBot(payload: any): Promise<any> {
 
-    try {
-      const [r, error] = await this.doCallToRelay('POST', `bot`, payload)
-      if (error) throw error;
-      if (!r) return // tor user will return here
+    const [r, error] = await this.doCallToRelay('POST', `bot`, payload)
+    if (error) throw error;
+    if (!r) return // tor user will return here
 
-      const b = await r.json()
-      console.log("made bot", b);
+    const b = await r.json()
+    console.log("made bot", b);
 
-      const mybots = await this.getMyBots()
-      console.log("got my bots", mybots);
+    const mybots = await this.getMyBots()
+    console.log("got my bots", mybots);
 
-      return b?.response;
-    } catch (e) {
-      console.log('failed', e)
-    }
+    return b?.response;
 
   }
 
   @action async updateBot(payload: any): Promise<any> {
-    try {
-      const [r, error] = await this.doCallToRelay('PUT', `bot`, payload)
-      if (error) throw error;
-      if (!r) return // tor user will return here
-      console.log("updated bot", r);
-      return r;
-    } catch (e) {
-      console.log('ok')
-    }
 
+    const [r, error] = await this.doCallToRelay('PUT', `bot`, payload)
+    if (error) throw error;
+    if (!r) return // tor user will return here
+    console.log("updated bot", r);
+    return r;
   }
 
   @action async deleteBot(id: string): Promise<any> {
@@ -269,9 +261,7 @@ export class MainStore {
       const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null)
       if (error) throw error;
       if (!r) return // tor user will return here
-
       console.log("deleted from relay", r);
-
       return r;
     } catch (e) {
       console.log('failed!')
@@ -690,8 +680,7 @@ export class MainStore {
     }
 
     // fork between tor users and not
-    const torSave = uiStore?.meInfo?.url?.includes(".onion");
-    if (torSave) {
+    if (this.isTorSave()) {
       this.submitFormViaApp(method, path, body)
       return [null, null]
     }
@@ -721,7 +710,7 @@ export class MainStore {
     return [response, error]
   }
 
-  @action async submitFormViaApp(body: any, method: string, path: string) {
+  @action async submitFormViaApp(method: string, path: string, body: any) {
     try {
       const torSaveURL = await this.getTorSaveURL(method, path, body)
       uiStore.setTorFormBodyQR(torSaveURL);
