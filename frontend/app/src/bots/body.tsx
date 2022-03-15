@@ -93,12 +93,14 @@ export default function BotBody() {
             // create
             try {
                 b = await main.makeBot(v)
-                setShowSecret(b.secret)
-                setEditThisBot(b)
+                if (b) {
+                    setShowSecret(b.secret)
+                    setEditThisBot(b)
+                }
                 setShowCreate(false)
             } catch (e) {
                 console.log('e', e)
-                alert('Bot could not be created.')
+                alert('Bot could not be saved.')
             }
         }
         loadBots()
@@ -108,8 +110,10 @@ export default function BotBody() {
         console.log('deleteBot!')
 
         try {
-            await main.deleteBot(editThisBot.id)
-            addToast(editThisBot.name)
+            const r = await main.deleteBot(editThisBot.id)
+            if (r) {
+                addToast(editThisBot.name)
+            }
         } catch (e) {
             console.log('e', e)
         }
