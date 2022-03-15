@@ -24,11 +24,13 @@ export default function TorSaveQR(props: TorSaveQRProps) {
         }}
     >
         <div style={{ height: 40 }} />
-
+        <div style={{ textAlign: 'center', margin: '0 0 20px' }}>
+            Scan to complete this request.
+        </div>
         <QR size={220} value={url} />
 
         <Button
-            text={"Save on Sphinx"}
+            text={"Open Sphinx App"}
             height={60}
             style={{ marginTop: 30 }}
             width={"100%"}
@@ -41,7 +43,7 @@ export default function TorSaveQR(props: TorSaveQRProps) {
         />
 
         <Button
-            text={"Dismiss"}
+            text={"Cancel"}
             height={60}
             style={{ marginTop: 20 }}
             width={"100%"}

@@ -3,13 +3,12 @@ import { useStores } from "../../store";
 import { useObserver } from "mobx-react-lite";
 import Form from "../../form";
 import styled, { css } from "styled-components";
-import { getHostIncludingDockerHosts } from "../../host";
-import { Button, IconButton, Modal } from "../../sphinxUI";
+import { Button, IconButton } from "../../sphinxUI";
 import moment from "moment";
 import SummaryViewer from "../widgetViews/summaryViewer";
 import { useIsMobile } from "../../hooks";
 import { dynamicSchemasByType } from "../../form/schema";
-import TorSaveQR from "../utils/torSaveQR";
+
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -33,7 +32,6 @@ export default function FocusedView(props: any) {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
-  const [torBodyURL, setTorBodyURL] = useState("");
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
@@ -41,9 +39,6 @@ export default function FocusedView(props: any) {
   const isMobile = useIsMobile();
 
   const torSave = canEdit && ui?.meInfo?.url?.includes(".onion");
-  // console.log("canEdit", canEdit);
-  // console.log("ui", ui, ui?.meInfo, ui?.meInfo?.url);
-  console.log("TOR SAVE", torSave);
 
   function closeModal(override) {
     if (!manualGoBackOnly) {
@@ -61,17 +56,6 @@ export default function FocusedView(props: any) {
       }
     };
   }, []);
-
-  async function submitFormViaApp(body) {
-    setLoading(true);
-    try {
-      const torSaveURL = await main.getTorSaveURL("POST", "profile", body)
-      setTorBodyURL(torSaveURL);
-    } catch (e) {
-      console.log("e", e);
-    }
-    setLoading(false);
-  }
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -154,33 +138,11 @@ export default function FocusedView(props: any) {
 
     const info = ui.meInfo as any;
     if (!info) return console.log("no meInfo");
+
     setDeleting(true);
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const r = await fetch(URL + "/profile", {
-        method: "POST",
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-          ...body,
-          price_to_meet: parseInt(body.price_to_meet),
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!r.ok) {
-        setLoading(false);
-        return alert("Failed to save data");
-      }
-
+      await main.saveProfile(body)
       await main.getPeople();
-      // massage data
-
-      ui.setMeInfo(body);
       closeModal(true);
     } catch (e) {
       console.log("e", e);
@@ -220,8 +182,6 @@ export default function FocusedView(props: any) {
   async function submitForm(body) {
     console.log("START SUBMIT FORM", body);
 
-    // let dynamicSchema = config.schema.find(f => f.defaultSchema)
-    // if (dynamicSchema) body = trimBodyToSchema(body)
     try {
       body = await preSubmitFunctions(body);
     } catch (e) {
@@ -237,45 +197,9 @@ export default function FocusedView(props: any) {
     const info = ui.meInfo as any;
     if (!info) return console.log("no meInfo");
 
-    // fork between tor and non-tor users
-    if (torSave) {
-      return submitFormViaApp(body);
-    }
-
     setLoading(true);
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const r = await fetch(URL + "/profile", {
-        method: "POST",
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-          ...body,
-          price_to_meet: parseInt(body.price_to_meet),
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!r.ok) {
-        setLoading(false);
-        return alert("Failed to save data");
-      }
-
-      // if user has no id, update local id from response
-      if (!body.id) {
-        const j = await r.json();
-        console.log("json", j);
-        body.id = j.response.id;
-      }
-
-      console.log("body", body);
-      ui.setMeInfo(body);
-      await main.getSelf(body);
+      await main.saveProfile(body)
       closeModal(true);
     } catch (e) {
       console.log("e", e);
@@ -357,25 +281,6 @@ export default function FocusedView(props: any) {
       ? { boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }
       : {};
 
-    const torWarningStyle = !buttonsOnBottom
-      ? { marginTop: 80, marginBottom: -40 }
-      : { marginTop: 20 };
-    const torWarning = torSave && (
-      <div
-        style={{
-          ...torWarningStyle,
-          color: "#5078F2",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ borderRadius: 5, background: "#DCEDFE", padding: 10 }}>
-          <b>Tor</b> support coming soon.
-        </div>
-      </div>
-    );
-
     return (
       <div
         style={{
@@ -387,7 +292,6 @@ export default function FocusedView(props: any) {
         {editMode ? (
           <B ref={scrollDiv} hide={false}>
             {formHeader && formHeader}
-            {torWarning}
             {ui.meInfo && (
               <Form
                 buttonsOnBottom={buttonsOnBottom}
@@ -469,17 +373,6 @@ export default function FocusedView(props: any) {
             />
           </>
         )}
-
-        <Modal
-          visible={torBodyURL}
-          close={() => {
-            goBack();
-            // setTorBodyURL('')
-            // main.getSelf(null)
-          }}
-        >
-          <TorSaveQR url={torBodyURL} goBack={goBack} />
-        </Modal>
       </div>
     );
   });
