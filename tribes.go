@@ -52,7 +52,9 @@ func HandelTribeMessageBundleFromRelay(w http.ResponseWriter, r *http.Request) {
 			"last_active": now,
 		})
 	} else {
-		log.Println("ERR?")
+		log.Println("keys dont match - unauthorised")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)
