@@ -702,11 +702,6 @@ export class MainStore {
       },
     });
 
-    if (!response.ok) {
-      alert("Failed to save data")
-      error = new Error('Failed to save data')
-    }
-
     return [response, error]
   }
 
