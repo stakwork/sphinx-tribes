@@ -39,9 +39,9 @@ func Init() {
 	mqtt.CRITICAL = log.New(os.Stdout, "[mqtt:CRITICAL]", 0)
 	//mqtt.WARN = log.New(os.Stdout, "[mqtt:warn]", 0)
 
-	mqttScheme := os.Getenv("MQTT_SCHEME")
-	mqttPort := os.Getenv("MQTT_PORT")
-	mqttHost := os.Getenv("MQTT_HOSTNAME")
+	mqttScheme := getEnv("MQTT_SCHEME", "tcp")
+	mqttPort := getEnv("MQTT_PORT", "1883")
+	mqttHost := getEnv("MQTT_HOSTNAME", "host.docker.internal")
 	mqttClientID, _ := randomClientName()
 
 	password, mqttPublicKey, err := signTimestamp()
@@ -163,4 +163,12 @@ func randomClientName() (string, error) {
 	}
 
 	return "sphinx-tribes-" + string(r), nil
+}
+
+func getEnv(key, fallback string) string {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		value = fallback
+	}
+	return value
 }
