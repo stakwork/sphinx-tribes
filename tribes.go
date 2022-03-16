@@ -39,7 +39,7 @@ func HandelTribeMessageBundleFromRelay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if tribe.UUID == pubKeyFromAuth {
+	if tribe.OwnerPubKey == pubKeyFromAuth {
 		c := mqtt.Client()
 		defer mqtt.Disconnect(c)
 
