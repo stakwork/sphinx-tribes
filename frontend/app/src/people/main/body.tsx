@@ -133,6 +133,7 @@ export default function BodyComponent() {
 
 
     async function doDeeplink() {
+        console.log('body: doDeeplink', pathname)
         if (pathname) {
             let splitPathname = pathname?.split('/')
             let personPubkey: string = splitPathname[2]
