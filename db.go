@@ -355,6 +355,17 @@ func (db database) getListedPeople(r *http.Request) []Person {
 	return ms
 }
 
+func (db database) getPeopleBySearch(r *http.Request) []Person {
+	ms := []Person{}
+	offset, limit, sortBy, direction, search := getPaginationParams(r)
+
+	// if search is empty, returns all
+
+	// return if like owner_alias, unique_name, or equals pubkey
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Or("LOWER(unique_name) LIKE ?", "%"+search+"%").Or("LOWER(owner_pub_key) = ?", search).Find(&ms)
+	return ms
+}
+
 type PeopleExtra struct {
 	Body   string `json:"body"`
 	Person string `json:"person"`
