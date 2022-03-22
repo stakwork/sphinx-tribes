@@ -1,5 +1,4 @@
-import MaterialIcon from '@material/react-material-icon'
-import React, { useState, Fragment } from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
 import { EuiSuperSelect, EuiText } from '@elastic/eui'
 

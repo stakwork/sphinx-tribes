@@ -360,6 +360,13 @@ export class MainStore {
     return query
   }
 
+  @action async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
+    let query = this.appendQueryParams("people", queryLimit, { search: alias, sortBy: 'owner_alias' })
+    let ps = await api.get(query);
+    console.log(ps)
+    return ps;
+  }
+
   // @persist("list")
   @observable
   people: Person[] = [];
@@ -893,6 +900,7 @@ export interface QueryParams {
   limit?: number;
   sortBy?: string;
   direction?: string;
+  search?: string;
 }
 
 

@@ -75,7 +75,7 @@ export default function WantedView(props: any) {
     function renderCodingTask() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
 
-        const isClosed = status === 'closed'
+        const isClosed = ((status === 'closed') || paid) ? true : false
 
         if (isMobile) {
             return <>

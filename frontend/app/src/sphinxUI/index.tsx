@@ -9,4 +9,6 @@ import MultiSelect from './multiSelect'
 import CreatableMultiSelect from './creatableMultiSelect'
 import TextInput from './text-input'
 
-export { TextInput, SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect, CreatableMultiSelect }
+import SearchableSelect from './searchableSelect'
+
+export { SearchableSelect, TextInput, SearchTextInput, Button, IconButton, Modal, Divider, Title, Date, Paragraph, Link, Select, MultiSelect, CreatableMultiSelect }
