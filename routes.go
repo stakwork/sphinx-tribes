@@ -68,6 +68,7 @@ func NewRouter() *http.Server {
 		r.Get("/search_youtube", searchYoutube)
 		r.Get("/youtube_videos", youtubeVideosForChannel)
 		r.Get("/people", getListedPeople)
+		r.Get("/people/search", getPeopleBySearch)
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
 		r.Get("/people/offers", getListedOffers)
@@ -223,7 +224,11 @@ func getTribesByOwner(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
-
+func getPeopleBySearch(w http.ResponseWriter, r *http.Request) {
+	people := DB.getPeopleBySearch(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
 func getListedPeople(w http.ResponseWriter, r *http.Request) {
 	people := DB.getListedPeople(r)
 	w.WriteHeader(http.StatusOK)
