@@ -106,18 +106,19 @@ export default function Form(props: any) {
 
   const dynamicFormOptions = (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || []
 
-  const defaultOptions = schema?.find(f => f.name === 'tribe') ? [{ value: 'none', label: 'None' }] : []
-
   // inject owner tribes
   const tribesSelectorIndex = schema?.findIndex(f => f.name === 'tribe' || f.name === 'tribes')
   if (tribesSelectorIndex > -1) {
-    schema[tribesSelectorIndex].options = (main.ownerTribes?.length && main.ownerTribes.map(ot => {
-      return {
+    // give "none" option
+    schema[tribesSelectorIndex].options = [{ value: 'none', label: 'None' }]
+    // add tribes
+    main.ownerTribes?.length && main.ownerTribes.forEach(ot => {
+      schema[tribesSelectorIndex].options.push({
         ...ot,
         value: ot.unique_name,
         label: ot.name,
-      }
-    })) || defaultOptions
+      })
+    })
   }
 
   return (
@@ -335,7 +336,7 @@ const BWrap = styled.div`
       `;
 
 
-type FormFieldType = 'text' | 'textarea' | 'img' | 'imgcanvas' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'hide'
+type FormFieldType = 'text' | 'textarea' | 'img' | 'imgcanvas' | 'gallery' | 'number' | 'hidden' | 'widgets' | 'widget' | 'switch' | 'select' | 'multiselect' | 'creatablemultiselect' | 'searchableselect' | 'space' | 'hide'
 
 type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme'
 
