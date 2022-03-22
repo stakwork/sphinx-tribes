@@ -5,7 +5,7 @@ import type { Props } from './propsType'
 import { FieldEnv, Note } from './index'
 import { Select } from '../../sphinxUI'
 
-export default function SelectInput({ error, note, label, options, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
+export default function SelectInput({ error, note, label, options, name, value, handleChange, handleBlur, handleFocus, readOnly, prepend, extraHTML }: Props) {
 
     let labeltext = label
     if (error) labeltext = labeltext + ` (${error})`
