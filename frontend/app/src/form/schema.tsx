@@ -3,6 +3,7 @@ import { FormField } from "../form";
 // import { uiStore } from '../store/ui';
 
 const strValidator = Yup.string().trim().required('Required')
+const strValidatorNotRequired = Yup.string().trim()
 const repoStrValidator = Yup.string().trim()
     .matches(/^[^\/]+\/[^\/]+$/, 'Incorrect format').required('Required')
 const repoArrayStrValidator = Yup.array().of(
@@ -579,13 +580,6 @@ export const wantedCodingTaskSchema: FormField[] = [
         // validator: strValidator,
     },
     {
-        name: 'tribe',
-        label: "Tribe",
-        type: "select",
-        options: [],
-        validator: strValidator,
-    },
-    {
         name: 'repo',
         label: "Github Repository",
         type: "text",
@@ -606,11 +600,28 @@ export const wantedCodingTaskSchema: FormField[] = [
         type: "number",
     },
     {
+        name: 'space',
+        label: 'space',
+        type: 'space'
+    },
+    {
+        name: 'tribe',
+        label: "Tribe",
+        type: "select",
+        options: [],
+        validator: strValidatorNotRequired,
+    },
+    {
+        name: 'assignee',
+        label: "Assignee",
+        type: "searchableselect",
+        options: [],
+    },
+    {
         name: 'show',
         label: "Show to public",
         type: "switch",
     },
-
 
     {
         name: 'description',

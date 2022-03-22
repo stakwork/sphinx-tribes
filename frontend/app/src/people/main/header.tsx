@@ -12,7 +12,6 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button } from '../../sphinxUI';
 
 import SignIn from '../auth/signIn';
-
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 
@@ -274,7 +273,6 @@ export default function Header() {
                     onSuccess={() => {
                         ui.setShowSignIn(false)
                         setShowWelcome(true)
-
                         // if page is not /p, go to /p (people)
                         let path = location.pathname
                         if (!path.includes('/p')) history.push('/p')

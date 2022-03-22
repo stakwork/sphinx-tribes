@@ -10,12 +10,15 @@ import Widgets from './widgets/index'
 import SwitchInput from './switch-input'
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui'
 import SelectInput from './select-input'
+import SearchableSelectInput from './searchable-select-input'
 import MultiSelectInput from './multi-select-input'
 import CreatableMultiSelectInput from './creatable-multi-select-input'
 
 export default function Input(props: any) {
     function getInput() {
         switch (props.type) {
+            case 'space':
+                return <div style={{ height: 10 }} />
             case 'text':
                 return <TextInput {...props} />
             case 'textarea':
@@ -34,6 +37,8 @@ export default function Input(props: any) {
                 return <SwitchInput {...props} />
             case 'select':
                 return <SelectInput {...props} />
+            case 'searchableselect':
+                return <SearchableSelectInput {...props} />
             case 'multiselect':
                 return <MultiSelectInput {...props} />
             case 'creatablemultiselect':
