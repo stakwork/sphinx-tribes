@@ -130,7 +130,9 @@ export default function PersonView(props: any) {
         }
     }, [personId])
 
+    // fill state from url
     async function doDeeplink() {
+        console.log('personviewslim: doDeeplink', pathname)
         if (pathname) {
             let splitPathname = pathname?.split('/')
             let personPubkey: string = splitPathname[2]
