@@ -16,7 +16,7 @@ import TokenRefresh from './people/utils/tokenRefresh';
 import BotsBody from './bots/body';
 import { mainStore } from './store/main';
 
-let exchangeRateInterval: any = null
+let exchangeRateInterval: any = null;
 
 function App() {
   const mode = getMode()
