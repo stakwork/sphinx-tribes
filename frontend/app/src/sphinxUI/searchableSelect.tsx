@@ -7,6 +7,7 @@ export default function SearchableSelect(props: any) {
 
     const opts = options.map((o) => {
         return {
+            ...o,
             value: o.value,
             label: o.label
         }
