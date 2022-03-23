@@ -41,7 +41,7 @@ export default function WantedSummary(props: any) {
                 (async () => {
                         if (props.assignee) {
                                 try {
-                                        const p = await main.getPersonByPubkey(props.assignee)
+                                        const p = await main.getPersonByPubkey(props.assignee.owner_pubkey)
                                         setAssigneeInfo(p)
                                 } catch (e) {
                                         console.log('e', e)

@@ -25,7 +25,9 @@ export default function SearchableSelectInput({ error, note, name, type, label, 
                     if (p && p.length) {
                         let newOpts = p.map(ot => {
                             return {
-                                ...ot,
+                                owner_alias: ot.owner_alias,
+                                owner_pubkey: ot.owner_pubkey,
+                                img: ot.img,
                                 value: ot.owner_pubkey,
                                 label: ot.owner_alias + ` (${ot.unique_name})`,
                             }
