@@ -11,6 +11,7 @@ export default function Modal(props: any) {
         width: '100%',
         borderRadius: 0
     } : {}
+
     return <FadeLeft
         withOverlay={!hideOverlay}
         drift={100}
@@ -23,6 +24,7 @@ export default function Modal(props: any) {
             position: 'absolute', top: 0, left: 0,
             zIndex: 1000000, width: '100%', height: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'auto',
             ...style
         }}>
         <Env style={{ ...fillStyle, ...envStyle }}>

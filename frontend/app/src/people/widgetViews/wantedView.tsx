@@ -356,8 +356,6 @@ display: -webkit-box;
 -webkit-line-clamp: 2;
 -webkit-box-orient: vertical;
 /* Primary Text 1 */
-
-color: #292C33;
 `;
 
 interface ImageProps {
