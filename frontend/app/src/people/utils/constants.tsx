@@ -76,7 +76,8 @@ const widgetConfigs = {
             width: 'auto',
             maxWidth: 'auto',
             minWidth: '400px',
-            height: 'auto'
+            minHeight: '40%',
+            maxHeight: '70%'
         },
         schema: offerSchema,
         action: {
@@ -110,7 +111,8 @@ const widgetConfigs = {
             width: 'auto',
             maxWidth: 'auto',
             minWidth: '400px',
-            height: 'auto'
+            minHeight: '40%',
+            maxHeight: '70%'
         },
         schema: wantedSchema,
         action: {

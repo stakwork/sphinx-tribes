@@ -22,7 +22,6 @@ import ConnectCard from "./utils/connectCard";
 import { widgetConfigs } from "./utils/constants";
 import { extractGithubIssue } from "../helpers";
 import { useHistory, useLocation } from "react-router";
-import { EuiLoadingSpinner } from '@elastic/eui';
 import { queryLimit } from '../store/main'
 import NoResults from "./utils/noResults";
 import PageLoadSpinner from "./utils/pageLoadSpinner";
@@ -35,8 +34,6 @@ function makeQR(pubkey: string) {
     return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-let deeplinkTimeout
-
 export default function PersonView(props: any) {
 
     const {
@@ -45,6 +42,8 @@ export default function PersonView(props: any) {
         selectPerson,
         goBack,
     } = props
+
+    // on this screen, there will always be a pubkey in the url, no need for personId
 
     const { main, ui } = useStores()
     const { meInfo, peoplePageNumber } = ui || {}
@@ -117,18 +116,8 @@ export default function PersonView(props: any) {
 
     // deeplink load person
     useEffect(() => {
-        if (loadedPerson) {
-            doDeeplink()
-        } else {
-            deeplinkTimeout = setTimeout(() => {
-                doDeeplink()
-            }, 200)
-        }
-
-        return function cleanup() {
-            clearTimeout(deeplinkTimeout)
-        }
-    }, [personId])
+        doDeeplink()
+    }, [pathname])
 
     // fill state from url
     async function doDeeplink() {
@@ -193,17 +182,6 @@ export default function PersonView(props: any) {
             ui.setPersonViewOpenTab('')
         }
     }, [ui.personViewOpenTab])
-
-
-    let tagsString = "";
-    tags && tags.forEach((t: string, i: number) => {
-        if (i !== 0) tagsString += ",";
-        tagsString += t;
-    });
-
-    function add(e) {
-        e.stopPropagation();
-    }
 
     function logout() {
         ui.setEditMe(false)
@@ -473,7 +451,7 @@ export default function PersonView(props: any) {
                             <a href={qrString}>
                                 <Button
                                     text='Connect'
-                                    onClick={add}
+                                    onClick={(e) => e.stopPropagation()}
                                     color='primary'
                                     height={42}
                                     width={120}
@@ -792,12 +770,13 @@ export default function PersonView(props: any) {
             <Modal
                 visible={showFocusView}
                 style={{
-                    top: -64,
-                    height: 'calc(100% + 64px)'
+                    // top: -64,
+                    // height: 'calc(100% + 64px)'
+                    height: '100%'
                 }}
                 envStyle={{
-                    marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
-                    height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
+                    marginTop: (isMobile) ? 64 : 0, borderRadius: 0, background: '#fff',
+                    height: '100%', width: '60%',
                     minWidth: 500, maxWidth: 602, zIndex: 20,//minHeight: 300, 
                     ...focusedDesktopModalStyles
                 }}
@@ -843,8 +822,9 @@ export default function PersonView(props: any) {
                 visible={showSupport}
                 close={() => setShowSupport(false)}
                 style={{
-                    top: -64,
-                    height: 'calc(100% + 64px)'
+                    // top: -64,
+                    // height: 'calc(100% + 64px)'
+                    height: '100%'
                 }}
                 envStyle={{
                     marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0
