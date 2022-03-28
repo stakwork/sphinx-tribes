@@ -158,7 +158,7 @@ export default function WantedSummary(props: any) {
                                         }}>{renderMarkdown(description)}</Paragraph>
                                 </div>
 
-                                <div style={{ width: 410, padding: 20, overflowY: 'auto', height: envHeight }}>
+                                <div style={{ width: 410, padding: 20, height: envHeight }}>
                                         <Pad>
                                                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                                                         <NameTag
