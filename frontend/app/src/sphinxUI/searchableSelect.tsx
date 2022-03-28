@@ -17,6 +17,7 @@ export default function SearchableSelect(props: any) {
         <S
             options={opts}
             isLoading={loading}
+            placeholder={'Type to search...'}
             isClearable={true}
             isSearchable={true}
             value={value}
