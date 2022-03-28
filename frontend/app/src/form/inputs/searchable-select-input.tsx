@@ -14,11 +14,11 @@ export default function SearchableSelectInput({ error, note, name, type, label, 
 
     const [opts, setOptions] = useState(options)
     const [loading, setLoading] = useState(false)
-    const [search, setSearch]: any = useState(options)
+    const [search, setSearch]: any = useState('')
 
     useEffect(() => {
         (async () => {
-            if (name === 'assignee') {
+            if (search && name === 'assignee') {
                 setLoading(true)
                 try {
                     const p = await main.getPeopleByNameAliasPubkey(search)
@@ -55,8 +55,7 @@ export default function SearchableSelectInput({ error, note, name, type, label, 
                         handleChange(e)
                     }}
                     onInputChange={(e) => {
-                        console.log(e)
-                        setSearch(e)
+                        if (e) setSearch(e)
                     }}
                 />
                 {error && <E>

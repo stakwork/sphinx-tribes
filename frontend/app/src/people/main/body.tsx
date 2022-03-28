@@ -27,8 +27,6 @@ import PageLoadSpinner from '../utils/pageLoadSpinner';
 const getFuse = useFuse
 const getPageScroll = usePageScroll
 
-let deeplinkTimeout
-
 export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(true)
@@ -72,13 +70,7 @@ export default function BodyComponent() {
 
     // deeplink page navigation
     useEffect(() => {
-        deeplinkTimeout = setTimeout(() => {
-            doDeeplink()
-        }, 500)
-
-        return function cleanup() {
-            clearTimeout(deeplinkTimeout)
-        }
+        doDeeplink()
     }, [])
 
 
