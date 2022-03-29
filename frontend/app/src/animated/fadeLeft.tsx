@@ -43,7 +43,7 @@ export default function FadeLeft(props) {
                 if (props.speed) speed = props.speed
                 doAnimation(0)
                 await sleep(speed)
-                console.log('unmount')
+                // console.log('unmount')
                 setShouldRender(false)
                 if (dismountCallback) dismountCallback()
             } else {

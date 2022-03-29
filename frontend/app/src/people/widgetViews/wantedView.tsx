@@ -83,16 +83,16 @@ export default function WantedView(props: any) {
                     position: 'absolute', top: -1,
                     right: 0, width: 64, height: 72
                 }} />}
-                <Wrap isClosed={isClosed}>
+                <Wrap isClosed={isClosed} style={{ padding: 15 }}>
                     <Body style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', }}>
                             <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
                         </div>
-                        <T style={{ marginBottom: 5 }}>{title}</T>
-                        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                        <DT style={{ margin: '15px 0' }}>{title}</DT>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
                             <GithubStatusPill status={status} assignee={assignee} />
-                            <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
                         </div>
+                        <P style={{ margin: '15px 0 0' }}><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
                     </Body>
                 </Wrap>
             </>
@@ -244,15 +244,10 @@ filter: ${p => p.isClosed ? 'grayscale(1)' : 'grayscale(0)'};
 const Wrap = styled.div<WrapProps>`
 display: flex;
 justify-content:flex-start;
-
+opacity:${p => p.isClosed ? '0.5' : '1'};
+filter: ${p => p.isClosed ? 'grayscale(1)' : 'grayscale(0)'};
 `;
 
-const Link = styled.div`
-color:blue;
-overflow-wrap:break-word;
-font-size:15px;
-font-weight:300;
-`;
 
 const T = styled.div`
 font-weight:bold;
@@ -297,7 +292,7 @@ justify-content: space-around;
 
 color: #292C33;
 overflow:hidden;
-height:132px;
+min-height:132px;
 `;
 
 const Pad = styled.div`
