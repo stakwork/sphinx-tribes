@@ -276,7 +276,7 @@ export default function PersonView(props: any) {
 
 
             if (single) {
-                return <Panel>
+                return <Panel isMobile={isMobile}>
                     {child}
                 </Panel>
             }
@@ -300,7 +300,12 @@ export default function PersonView(props: any) {
                     return
                 }
 
-                elementArray.push(<Panel key={i}
+                const conditionalStyles = (!isMobile && s?.paid) ? {
+                    border: '1px solid #dde1e5',
+                    boxShadow: 'none'
+                } : {}
+
+                elementArray.push(<Panel isMobile={isMobile} key={i}
                     onClick={() => {
                         setShowFocusView(true)
                         setFocusIndex(i)
@@ -308,6 +313,7 @@ export default function PersonView(props: any) {
                     }}
                     style={{
                         ...panelStyles,
+                        ...conditionalStyles,
                         cursor: 'pointer',
                         padding: 0, overflow: 'hidden'
                     }}
@@ -330,7 +336,7 @@ export default function PersonView(props: any) {
 
         switch (selectedWidget) {
             case 'about':
-                return <Panel>
+                return <Panel isMobile={isMobile}>
                     <AboutView {...person} />
                 </Panel>
             case 'post':
@@ -417,7 +423,7 @@ export default function PersonView(props: any) {
             display: 'flex', flexDirection: 'column',
             width: '100%', overflow: 'auto', height: '100%'
         }}>
-            <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
+            <Panel isMobile={isMobile} style={{ paddingBottom: 0, paddingTop: 80 }}>
                 <div style={{
                     position: 'absolute',
                     top: 20, left: 0,
@@ -475,7 +481,15 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = (extras && extras[name] && extras[name].length > 0) ? extras[name].length : null
+                        const hasExtras = (extras && extras[name] && (extras[name].length > 0))
+                        let count: any = hasExtras ? extras[name].filter(f => {
+                            if ('show' in f) {
+                                // show has a value
+                                if (!f.show) return false
+                            }
+                            // if no value default to true
+                            return true;
+                        }).length : null
 
                         return <Tab key={i}
                             selected={selected}
@@ -713,16 +727,15 @@ export default function PersonView(props: any) {
                         const label = t.label
                         const selected = name === newSelectedWidget
                         const hasExtras = (extras && extras[name] && (extras[name].length > 0))
-                        let count: any = hasExtras ? extras[name].length : null
-                        // count only open ones
-                        if (hasExtras && name === 'wanted') {
-                            count = 0
-                            extras[name].forEach((w => {
-                                const { repo, issue } = w
-                                const { status } = extractGithubIssue(person, repo, issue)
-                                if (status === '' || status === 'open') count++
-                            }))
-                        }
+                        let count: any = hasExtras ? extras[name].filter(f => {
+                            if ('show' in f) {
+                                // show has a value
+                                if (!f.show) return false
+                            }
+                            // if no value default to true
+                            return true;
+                        }).length : null
+
                         return <Tab key={i}
                             style={{ height: 64, alignItems: 'center' }}
                             selected={selected}
@@ -846,8 +859,8 @@ export default function PersonView(props: any) {
     );
 
 }
-interface ContentProps {
-    selected: boolean;
+interface PanelProps {
+    isMobile: boolean;
 }
 
 const PeopleList = styled.div`
@@ -870,13 +883,13 @@ const DBack = styled.div`
             z-index:0;
             `
 
-const Panel = styled.div`
+const Panel = styled.div<PanelProps>`
             position:relative;
             background:#ffffff;
             color:#000000;
-            margin-bottom:10px;
             padding:20px;
-            box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
+            box-shadow:${p => p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)'};
+            border-bottom:${p => p.isMobile ? '2px solid #EBEDEF' : 'none'};
             `;
 const Content = styled.div`
             display: flex;
@@ -954,17 +967,6 @@ const Tab = styled.div<TagProps>`
                 cursor:pointer;
                 `;
 
-
-
-const Bottom = styled.div`
-                height:80px;
-                width:100%;
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                background: #FFFFFF;
-                box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
-                `;
 const Head = styled.div`
                 display:flex;
                 flex-direction:column;
@@ -991,16 +993,6 @@ const Name = styled.div`
 const Sleeve = styled.div`
 
                     `;
-
-const Loader = styled.div`
-            position:absolute;
-            width:100%;
-            display:flex;
-            justify-content:center;
-            padding:10px;
-            left:0px;
-            z-index:20;
-`;
 
 const RowWrap = styled.div`
                     display:flex;
