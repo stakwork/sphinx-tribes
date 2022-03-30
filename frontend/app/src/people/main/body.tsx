@@ -291,7 +291,7 @@ export default function BodyComponent() {
                 <div style={{
                     width: '100%', display: 'flex',
                     justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
-                    height: 62, marginBottom: 20
+                    height: 82, boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)', zIndex: 2
                 }}>
                     <Label style={{ fontSize: 20 }}>
                         Explore

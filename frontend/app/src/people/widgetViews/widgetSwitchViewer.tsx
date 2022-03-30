@@ -53,13 +53,20 @@ export default function WidgetSwitchViewer(props) {
 
         const listItems = (activeList && activeList.length) ? activeList.map((item, i) => {
             const { person, body } = item
+
+            const conditionalStyles = body?.paid ? {
+                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '1px solid #dde1e5',
+                boxShadow: 'none'
+            } : {}
+
             // if this person has entries for this widget
-            return <Panel key={person?.owner_pubkey + i + body?.created}
+            return <Panel isMobile={isMobile} key={person?.owner_pubkey + i + body?.created}
                 onClick={() => {
                     if (onPanelClick) onPanelClick(person, body)
                 }}
                 style={{
                     ...panelStyles,
+                    ...conditionalStyles,
                     cursor: 'pointer',
                     padding: 0, overflow: 'hidden'
                 }}
@@ -78,13 +85,16 @@ export default function WidgetSwitchViewer(props) {
     })
 }
 
+interface PanelProps {
+    isMobile?: boolean;
+}
 
-const Panel = styled.div`
+const Panel = styled.div<PanelProps>`
             position:relative;
             background:#ffffff;
             color:#000000;
-            margin-bottom:10px;
             padding:20px;
-            box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
+            box-shadow:${p => p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)'};
+            border-bottom:${p => p.isMobile ? '2px solid #EBEDEF' : 'none'};
             `;
 
