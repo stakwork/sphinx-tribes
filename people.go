@@ -116,6 +116,7 @@ func processTwitterConfirmationsLoop() {
 
 func processGithubIssuesLoop() {
 	peeps := DB.getListedPeople(nil)
+
 	for _, p := range peeps {
 		wanteds, ok := p.Extras["wanted"].([]interface{})
 		if !ok {
@@ -146,12 +147,34 @@ func processGithubIssuesLoop() {
 				continue
 			}
 			fullissuename := owner + "/" + reponame + "/" + issnum
-			DB.updateGithubIssues(p.ID, map[string]interface{}{
-				fullissuename: map[string]string{
-					"assignee": issue.Assignee,
-					"status":   issue.Status,
-				},
-			})
+
+			// scan original github issue and replace existing or add, if no new info then don't update
+			// does githubissue already have a status here, and is it different?
+			if _, ok5 := p.GithubIssues[fullissuename]; ok5 {
+
+				if w, ok6 := p.GithubIssues[fullissuename].(map[string]interface{}); ok6 {
+
+					assignee, ok7 := w["assignee"].(string)
+					status, ok8 := w["status"].(string)
+
+					if ok7 || ok8 {
+						//if there are no changes to this ticket, then skip it
+						if status == issue.Status && assignee == issue.Assignee {
+							continue
+						}
+					}
+				}
+			}
+
+			clonedGithubIssues := p.GithubIssues
+			// map new values to proper key
+			clonedGithubIssues[fullissuename] = map[string]string{
+				"assignee": issue.Assignee,
+				"status":   issue.Status,
+			}
+
+			// update with altered record
+			DB.updateGithubIssues(p.ID, clonedGithubIssues)
 		}
 	}
 	time.Sleep(1 * time.Minute)
