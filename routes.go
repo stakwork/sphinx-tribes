@@ -97,9 +97,6 @@ func NewRouter() *http.Server {
 		r.Put("/bot", createOrEditBot)
 		r.Delete("/person/{id}", deletePerson)
 		r.Delete("/channel/{id}", deleteChannel)
-	})
-
-	r.Group(func(r chi.Router) {
 		r.Post("/tribe/messageBundle", HandelTribeMessageBundleFromRelay)
 	})
 
