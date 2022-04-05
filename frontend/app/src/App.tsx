@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import '@material/react-material-icon/dist/material-icon.css';
-import "@fontsource/roboto";
 import Header from './tribes/header'
 import Body from './tribes/body'
 import PeopleHeader from './people/main/header'
