@@ -416,7 +416,7 @@ const Tab = styled.div<TagProps>`
                             margin-right:10px;
                             color:${p => p.selected ? '#fff' : '#6B7A8D'};
                             cursor:pointer;
-                            font-weight: 600;
+                            font-weight: 500;
                             font-size: 15px;
                             line-height: 19px;
                             background:${p => p.selected ? 'rgba(255,255,255,0.07)' : '#3C3F4100'};

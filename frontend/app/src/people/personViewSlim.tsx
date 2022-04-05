@@ -325,6 +325,7 @@ export default function PersonView(props: any) {
             const noneKey = canEdit ? 'me' : 'otherUser'
             const panels: any = elementArray.length ? elementArray : (<NoneSpace
                 action={() => setShowFocusView(true)}
+                small
                 {...tabs[selectedWidget]?.noneSpace[noneKey]}
             />)
 
