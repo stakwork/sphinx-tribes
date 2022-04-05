@@ -27,8 +27,6 @@ import PageLoadSpinner from '../utils/pageLoadSpinner';
 const getFuse = useFuse
 const getPageScroll = usePageScroll
 
-let deeplinkTimeout
-
 export default function BodyComponent() {
     const { main, ui } = useStores()
     const [loading, setLoading] = useState(true)
@@ -72,13 +70,7 @@ export default function BodyComponent() {
 
     // deeplink page navigation
     useEffect(() => {
-        deeplinkTimeout = setTimeout(() => {
-            doDeeplink()
-        }, 500)
-
-        return function cleanup() {
-            clearTimeout(deeplinkTimeout)
-        }
+        doDeeplink()
     }, [])
 
 
@@ -133,6 +125,7 @@ export default function BodyComponent() {
 
 
     async function doDeeplink() {
+        console.log('body: doDeeplink', pathname)
         if (pathname) {
             let splitPathname = pathname?.split('/')
             let personPubkey: string = splitPathname[2]
@@ -298,7 +291,7 @@ export default function BodyComponent() {
                 <div style={{
                     width: '100%', display: 'flex',
                     justifyContent: 'space-between', alignItems: 'flex-start', padding: 20,
-                    height: 62, marginBottom: 20
+                    height: 82, boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)', zIndex: 2
                 }}>
                     <Label style={{ fontSize: 20 }}>
                         Explore

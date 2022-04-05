@@ -355,14 +355,26 @@ func (db database) getListedPeople(r *http.Request) []Person {
 	return ms
 }
 
+func (db database) getPeopleBySearch(r *http.Request) []Person {
+	ms := []Person{}
+	offset, limit, sortBy, direction, search := getPaginationParams(r)
+
+	// if search is empty, returns all
+
+	// return if like owner_alias, unique_name, or equals pubkey
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Or("LOWER(unique_name) LIKE ?", "%"+search+"%").Or("LOWER(owner_pub_key) = ?", search).Find(&ms)
+	return ms
+}
+
 type PeopleExtra struct {
 	Body   string `json:"body"`
 	Person string `json:"person"`
 }
 
 func makeExtrasListQuery(columnName string) string {
+	// this is safe because columnName is not provided by the user, its hard-coded in db.go
 	return `SELECT 		
-	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
+	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
 	arr.item_object as body
 	FROM people,
 	jsonb_array_elements(extras->'` + columnName + `') with ordinality 

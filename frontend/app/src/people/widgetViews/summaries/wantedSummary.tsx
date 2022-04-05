@@ -27,6 +27,7 @@ export default function WantedSummary(props: any) {
         const { main } = useStores()
 
         const [tribeInfo, setTribeInfo]: any = useState(null)
+        const [assigneeInfo, setAssigneeInfo]: any = useState(null)
 
         useLayoutEffect(() => {
                 if (imgRef && imgRef.current) {
@@ -38,6 +39,14 @@ export default function WantedSummary(props: any) {
 
         useEffect(() => {
                 (async () => {
+                        if (props.assignee) {
+                                try {
+                                        const p = await main.getPersonByPubkey(props.assignee.owner_pubkey)
+                                        setAssigneeInfo(p)
+                                } catch (e) {
+                                        console.log('e', e)
+                                }
+                        }
                         if (tribe) {
                                 try {
                                         const t = await main.getSingleTribeByUn(tribe)
@@ -45,8 +54,9 @@ export default function WantedSummary(props: any) {
                                 } catch (e) {
                                         console.log('e', e)
                                 }
-
                         }
+
+
                 })()
         }, [])
 
@@ -87,6 +97,25 @@ export default function WantedSummary(props: any) {
         function renderCodingTask() {
                 const { assignee, status } = extractGithubIssue(person, repo, issue)
 
+                let assigneeLabel: any = null
+
+                if (assigneeInfo) {
+                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', }}>
+                                <Img src={assigneeInfo.img || '/static/person_placeholder.png'} style={{ borderRadius: 30 }} />
+                                <div style={{ marginLeft: 5, fontWeight: 300 }}>
+                                        Owner assigned to
+                                </div>
+                                <Assignee
+                                        onClick={() => {
+                                                const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`
+                                                sendToRedirect(profileUrl)
+                                        }}
+                                        style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+                                        {assigneeInfo.owner_alias}
+                                </Assignee>
+                        </div>)
+                }
+
                 if (isMobile) {
                         return <Pad>
                                 <NameTag {...person}
@@ -96,6 +125,7 @@ export default function WantedSummary(props: any) {
                                 <T>{title}</T>
 
                                 <GithubStatusPill status={status} assignee={assignee} />
+                                {assigneeLabel}
 
                                 <ButtonRow style={{ marginTop: 22 }}>
                                         {viewGithub}
@@ -128,7 +158,7 @@ export default function WantedSummary(props: any) {
                                         }}>{renderMarkdown(description)}</Paragraph>
                                 </div>
 
-                                <div style={{ width: 410, padding: 20, overflowY: 'auto', height: envHeight }}>
+                                <div style={{ width: 410, padding: 20, height: envHeight }}>
                                         <Pad>
                                                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                                                         <NameTag
@@ -140,6 +170,8 @@ export default function WantedSummary(props: any) {
                                                 <Divider style={{ margin: '14px 0 20px' }} />
 
                                                 <Title>{title}</Title>
+                                                <div style={{ height: 10 }} />
+                                                {assigneeLabel}
                                                 <div style={{ height: 10 }} />
                                                 <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
                                                 <div style={{ height: 30 }} />
@@ -267,9 +299,13 @@ const D = styled.div`
 
 
 const Assignee = styled.div`
-        display: flex;
-        font-size:12px;
-        font-weight:300;
+        margin-left: 3px;
+        font-weight: 500; 
+        cursor: pointer;
+
+        &:hover{
+                color:#000;
+        }
         `;
 
 const ButtonRow = styled.div`

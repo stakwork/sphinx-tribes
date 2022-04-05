@@ -124,16 +124,7 @@ export class MainStore {
 
     const info = uiStore.meInfo;
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      let relayB: any = await fetch(URL + "/bots", {
-        method: "GET",
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
+      let relayB: any = await this.fetchFromRelay('bots')
 
       relayB = await relayB.json()
       console.log("got bots from relay", relayB);
@@ -160,7 +151,23 @@ export class MainStore {
     }
   }
 
+  @action async fetchFromRelay(path): Promise<any> {
+    if (!uiStore.meInfo) return null;
 
+    const info = uiStore.meInfo;
+    const URL = info.url.startsWith("http")
+      ? info.url
+      : `https://${info.url}`;
+    let r: any = await fetch(URL + `/${path}`, {
+      method: "GET",
+      headers: {
+        "x-jwt": info.jwt,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return r
+  }
 
 
   @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
@@ -217,95 +224,45 @@ export class MainStore {
     }
   }
 
+  @action isTorSave() {
+    let result = false
+    if (uiStore?.meInfo?.url?.includes(".onion")) result = true
+    return result
+  }
+
   @action async makeBot(payload: any): Promise<any> {
 
-    if (!uiStore.meInfo) return null;
-    const info = uiStore.meInfo;
-    try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      let b: any = await fetch(URL + "/bot", {
-        method: "POST",
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-          ...payload
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
+    const [r, error] = await this.doCallToRelay('POST', `bot`, payload)
+    if (error) throw error;
+    if (!r) return // tor user will return here
 
+    const b = await r.json()
+    console.log("made bot", b);
 
-      b = await b.json()
-      console.log("made bot", b);
+    const mybots = await this.getMyBots()
+    console.log("got my bots", mybots);
 
-      const mybots = await this.getMyBots()
-      console.log("got my bots", mybots);
-
-      return b?.response;
-    } catch (e) {
-      console.log('failed', e)
-    }
+    return b?.response;
 
   }
 
   @action async updateBot(payload: any): Promise<any> {
 
-    if (!uiStore.meInfo) return null;
-    const info = uiStore.meInfo;
-    try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const b = await fetch(URL + "/bot", {
-        method: "PUT",
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-          ...payload
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("updated bot", b);
-
-      return b;
-    } catch (e) {
-      console.log('ok')
-    }
-
+    const [r, error] = await this.doCallToRelay('PUT', `bot`, payload)
+    if (error) throw error;
+    if (!r) return // tor user will return here
+    console.log("updated bot", r);
+    return r;
   }
 
   @action async deleteBot(id: string): Promise<any> {
 
-    if (!uiStore.meInfo) return null;
-    const info = uiStore.meInfo;
-
-    // delete from relay
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const b = await fetch(URL + `/bot/${id}`, {
-        method: "DELETE",
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("deleted from relay", b);
-
-      return b;
+      const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null)
+      if (error) throw error;
+      if (!r) return // tor user will return here
+      console.log("deleted from relay", r);
+      return r;
     } catch (e) {
       console.log('failed!')
     }
@@ -332,7 +289,6 @@ export class MainStore {
   }
 
   @action async getBalances(pubkey: any): Promise<any> {
-
     try {
       const URL = 'https://liquid.sphinx.chat'
 
@@ -385,8 +341,6 @@ export class MainStore {
     return torSaveURL
   }
 
-
-
   @action appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
     let query = path
     if (queryParams) {
@@ -404,6 +358,14 @@ export class MainStore {
     }
 
     return query
+  }
+
+  @action async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
+    let smallQueryLimit = 4
+    let query = this.appendQueryParams("people/search", smallQueryLimit, { search: alias, sortBy: 'owner_alias' })
+    let ps = await api.get(query);
+    console.log(ps)
+    return ps;
   }
 
   // @persist("list")
@@ -604,52 +566,25 @@ export class MainStore {
   }
 
 
-
   @action async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
-
-    if (!uiStore.meInfo) return null;
-    const info = uiStore.meInfo;
-
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const b = await fetch(URL + `/claim_on_liquid`, {
-        method: "POST",
-        body: JSON.stringify({
-          ...body,
-          host: getHostIncludingDockerHosts(),
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
+      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body)
+      if (error) throw error;
+      if (!r) return // tor user will return here
 
-      console.log("code from relay", b);
-
-      return b;
+      console.log("code from relay", r);
+      return r;
     } catch (e) {
       console.log('failed!', e)
     }
   }
 
 
-
   @action async refreshJwt() {
     try {
       if (!uiStore.meInfo) return null;
-      const info = uiStore.meInfo;
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const res: any = await fetch(URL + "/refresh_jwt", {
-        method: "GET",
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
+
+      const res: any = await this.fetchFromRelay('refresh_jwt')
       const j = await res.json();
 
       return j.response;
@@ -687,29 +622,16 @@ export class MainStore {
 
   @action async deleteProfile() {
     try {
-      if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const res: any = await fetch(URL + "/profile", {
-        method: "DELETE",
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-          ...info,
-        }),
-      });
+      const [r, error] = await this.doCallToRelay('DELETE', 'profile', info)
+      if (error) throw error;
+      if (!r) return // tor user will return here
 
       uiStore.setMeInfo(null);
       uiStore.setSelectingPerson(0);
       uiStore.setSelectedPerson(0);
 
-      const j = await res.json();
+      const j = await r.json();
       return j;
     } catch (e) {
       console.log("e", e);
@@ -718,32 +640,24 @@ export class MainStore {
     }
   }
 
+
+
   @action async saveProfile(body) {
     console.log("SUBMIT FORM", body);
-
     if (!body) return; // avoid saving bad state
+    if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet) // must be an int
 
-    const info = uiStore.meInfo as any;
-    if (!info) return console.log("no meInfo");
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const r = await fetch(URL + "/profile", {
-        method: "POST",
-        body: JSON.stringify({
-          // use docker host (tribes.sphinx), because relay will post to it
-          host: getHostIncludingDockerHosts(),
-          ...body,
-        }),
-        headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
-      });
+      const [r, error] = await this.doCallToRelay('POST', 'profile', body)
+      if (error) throw error;
+      if (!r) return // tor user will return here
 
-      if (!r.ok) {
-        return alert("Failed to save data");
+      // first time profile makers will need this on first login
+      if (!body.id) {
+        const j = await r.json();
+        if (j.response.id) {
+          body.id = j.response.id
+        }
       }
 
       uiStore.setToasts([
@@ -754,8 +668,80 @@ export class MainStore {
       ]);
 
       await this.getSelf(body);
+
     } catch (e) {
       console.log("e", e);
+    }
+  }
+
+  // this method is used whenever changing data from the frontend, 
+  // forks between tor users and non-tor
+  @action async doCallToRelay(method: string, path: string, body: any): Promise<any> {
+
+    let response: Response
+    let error: any = null
+
+    const info = uiStore.meInfo as any;
+    if (!info) {
+      error = new Error('Youre not logged in')
+      return [null, error]
+    }
+
+    // fork between tor users and not
+    if (this.isTorSave()) {
+      this.submitFormViaApp(method, path, body)
+      return [null, null]
+    }
+
+    const URL = info.url.startsWith("http")
+      ? info.url
+      : `https://${info.url}`;
+
+    response = await fetch(URL + `/${path}`, {
+      method: method,
+      body: JSON.stringify({
+        // use docker host (tribes.sphinx), because relay will post to it
+        host: getHostIncludingDockerHosts(),
+        ...body,
+      }),
+      headers: {
+        "x-jwt": info.jwt,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return [response, error]
+  }
+
+  @action async submitFormViaApp(method: string, path: string, body: any) {
+    try {
+      const torSaveURL = await this.getTorSaveURL(method, path, body)
+      uiStore.setTorFormBodyQR(torSaveURL);
+    } catch (e) {
+      console.log("e", e);
+    }
+  }
+
+  @action async setExtrasPropertyAndSave(extrasName: string, propertyName: string, created: number, newPropertyValue: any): Promise<any> {
+    if (uiStore.meInfo) {
+      let clonedMeInfo = { ...uiStore.meInfo }
+      let clonedExtras = clonedMeInfo?.extras
+      let clonedEx: any = clonedExtras && clonedExtras[extrasName]
+      const targetIndex = clonedEx?.findIndex(f => f.created === created)
+
+      // set wanted show value to !show
+      if (clonedEx && (targetIndex || targetIndex === 0) && (targetIndex > -1)) {
+        try {
+          clonedEx[targetIndex][propertyName] = newPropertyValue
+          clonedMeInfo.extras.wanted = clonedEx
+          await this.saveProfile(clonedMeInfo)
+          return [clonedEx, targetIndex]
+        } catch (e) {
+          console.log('e', e)
+        }
+      }
+
+      return [null, null]
     }
   }
 
@@ -915,6 +901,7 @@ export interface QueryParams {
   limit?: number;
   sortBy?: string;
   direction?: string;
+  search?: string;
 }
 
 

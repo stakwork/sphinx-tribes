@@ -22,7 +22,6 @@ import ConnectCard from "./utils/connectCard";
 import { widgetConfigs } from "./utils/constants";
 import { extractGithubIssue } from "../helpers";
 import { useHistory, useLocation } from "react-router";
-import { EuiLoadingSpinner } from '@elastic/eui';
 import { queryLimit } from '../store/main'
 import NoResults from "./utils/noResults";
 import PageLoadSpinner from "./utils/pageLoadSpinner";
@@ -35,8 +34,6 @@ function makeQR(pubkey: string) {
     return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-let deeplinkTimeout
-
 export default function PersonView(props: any) {
 
     const {
@@ -45,6 +42,8 @@ export default function PersonView(props: any) {
         selectPerson,
         goBack,
     } = props
+
+    // on this screen, there will always be a pubkey in the url, no need for personId
 
     const { main, ui } = useStores()
     const { meInfo, peoplePageNumber } = ui || {}
@@ -117,20 +116,12 @@ export default function PersonView(props: any) {
 
     // deeplink load person
     useEffect(() => {
-        if (loadedPerson) {
-            doDeeplink()
-        } else {
-            deeplinkTimeout = setTimeout(() => {
-                doDeeplink()
-            }, 200)
-        }
+        doDeeplink()
+    }, [pathname])
 
-        return function cleanup() {
-            clearTimeout(deeplinkTimeout)
-        }
-    }, [personId])
-
+    // fill state from url
     async function doDeeplink() {
+        console.log('personviewslim: doDeeplink', pathname)
         if (pathname) {
             let splitPathname = pathname?.split('/')
             let personPubkey: string = splitPathname[2]
@@ -191,17 +182,6 @@ export default function PersonView(props: any) {
             ui.setPersonViewOpenTab('')
         }
     }, [ui.personViewOpenTab])
-
-
-    let tagsString = "";
-    tags && tags.forEach((t: string, i: number) => {
-        if (i !== 0) tagsString += ",";
-        tagsString += t;
-    });
-
-    function add(e) {
-        e.stopPropagation();
-    }
 
     function logout() {
         ui.setEditMe(false)
@@ -296,7 +276,7 @@ export default function PersonView(props: any) {
 
 
             if (single) {
-                return <Panel>
+                return <Panel isMobile={isMobile}>
                     {child}
                 </Panel>
             }
@@ -320,7 +300,12 @@ export default function PersonView(props: any) {
                     return
                 }
 
-                elementArray.push(<Panel key={i}
+                const conditionalStyles = (!isMobile && s?.paid) ? {
+                    border: '1px solid #dde1e5',
+                    boxShadow: 'none'
+                } : {}
+
+                elementArray.push(<Panel isMobile={isMobile} key={i}
                     onClick={() => {
                         setShowFocusView(true)
                         setFocusIndex(i)
@@ -328,6 +313,7 @@ export default function PersonView(props: any) {
                     }}
                     style={{
                         ...panelStyles,
+                        ...conditionalStyles,
                         cursor: 'pointer',
                         padding: 0, overflow: 'hidden'
                     }}
@@ -350,7 +336,7 @@ export default function PersonView(props: any) {
 
         switch (selectedWidget) {
             case 'about':
-                return <Panel>
+                return <Panel isMobile={isMobile}>
                     <AboutView {...person} />
                 </Panel>
             case 'post':
@@ -437,7 +423,7 @@ export default function PersonView(props: any) {
             display: 'flex', flexDirection: 'column',
             width: '100%', overflow: 'auto', height: '100%'
         }}>
-            <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
+            <Panel isMobile={isMobile} style={{ paddingBottom: 0, paddingTop: 80 }}>
                 <div style={{
                     position: 'absolute',
                     top: 20, left: 0,
@@ -471,7 +457,7 @@ export default function PersonView(props: any) {
                             <a href={qrString}>
                                 <Button
                                     text='Connect'
-                                    onClick={add}
+                                    onClick={(e) => e.stopPropagation()}
                                     color='primary'
                                     height={42}
                                     width={120}
@@ -495,7 +481,15 @@ export default function PersonView(props: any) {
                         const t = tabs[name]
                         const label = t.label
                         const selected = name === newSelectedWidget
-                        let count = (extras && extras[name] && extras[name].length > 0) ? extras[name].length : null
+                        const hasExtras = (extras && extras[name] && (extras[name].length > 0))
+                        let count: any = hasExtras ? extras[name].filter(f => {
+                            if ('show' in f) {
+                                // show has a value
+                                if (!f.show) return false
+                            }
+                            // if no value default to true
+                            return true;
+                        }).length : null
 
                         return <Tab key={i}
                             selected={selected}
@@ -733,16 +727,15 @@ export default function PersonView(props: any) {
                         const label = t.label
                         const selected = name === newSelectedWidget
                         const hasExtras = (extras && extras[name] && (extras[name].length > 0))
-                        let count: any = hasExtras ? extras[name].length : null
-                        // count only open ones
-                        if (hasExtras && name === 'wanted') {
-                            count = 0
-                            extras[name].forEach((w => {
-                                const { repo, issue } = w
-                                const { status } = extractGithubIssue(person, repo, issue)
-                                if (status === '' || status === 'open') count++
-                            }))
-                        }
+                        let count: any = hasExtras ? extras[name].filter(f => {
+                            if ('show' in f) {
+                                // show has a value
+                                if (!f.show) return false
+                            }
+                            // if no value default to true
+                            return true;
+                        }).length : null
+
                         return <Tab key={i}
                             style={{ height: 64, alignItems: 'center' }}
                             selected={selected}
@@ -790,12 +783,13 @@ export default function PersonView(props: any) {
             <Modal
                 visible={showFocusView}
                 style={{
-                    top: -64,
-                    height: 'calc(100% + 64px)'
+                    // top: -64,
+                    // height: 'calc(100% + 64px)'
+                    height: '100%'
                 }}
                 envStyle={{
-                    marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0, background: '#fff',
-                    height: (isMobile || canEdit) ? 'calc(100% - 64px)' : '100%', width: '60%',
+                    marginTop: (isMobile) ? 64 : 0, borderRadius: 0, background: '#fff',
+                    height: '100%', width: '60%',
                     minWidth: 500, maxWidth: 602, zIndex: 20,//minHeight: 300, 
                     ...focusedDesktopModalStyles
                 }}
@@ -841,8 +835,9 @@ export default function PersonView(props: any) {
                 visible={showSupport}
                 close={() => setShowSupport(false)}
                 style={{
-                    top: -64,
-                    height: 'calc(100% + 64px)'
+                    // top: -64,
+                    // height: 'calc(100% + 64px)'
+                    height: '100%'
                 }}
                 envStyle={{
                     marginTop: (isMobile || canEdit) ? 64 : 123, borderRadius: 0
@@ -864,8 +859,8 @@ export default function PersonView(props: any) {
     );
 
 }
-interface ContentProps {
-    selected: boolean;
+interface PanelProps {
+    isMobile: boolean;
 }
 
 const PeopleList = styled.div`
@@ -888,13 +883,13 @@ const DBack = styled.div`
             z-index:0;
             `
 
-const Panel = styled.div`
+const Panel = styled.div<PanelProps>`
             position:relative;
             background:#ffffff;
             color:#000000;
-            margin-bottom:10px;
             padding:20px;
-            box-shadow:0px 0px 3px rgb(0 0 0 / 29%);
+            box-shadow:${p => p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)'};
+            border-bottom:${p => p.isMobile ? '2px solid #EBEDEF' : 'none'};
             `;
 const Content = styled.div`
             display: flex;
@@ -972,17 +967,6 @@ const Tab = styled.div<TagProps>`
                 cursor:pointer;
                 `;
 
-
-
-const Bottom = styled.div`
-                height:80px;
-                width:100%;
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                background: #FFFFFF;
-                box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
-                `;
 const Head = styled.div`
                 display:flex;
                 flex-direction:column;
@@ -1009,16 +993,6 @@ const Name = styled.div`
 const Sleeve = styled.div`
 
                     `;
-
-const Loader = styled.div`
-            position:absolute;
-            width:100%;
-            display:flex;
-            justify-content:center;
-            padding:10px;
-            left:0px;
-            z-index:20;
-`;
 
 const RowWrap = styled.div`
                     display:flex;

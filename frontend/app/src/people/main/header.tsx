@@ -5,17 +5,15 @@ import styled from 'styled-components'
 import {
     EuiHeader,
     EuiHeaderSection,
-    EuiFieldSearch,
 } from '@elastic/eui';
-import { useFuse, useIsMobile } from '../../hooks'
+import { useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Modal, Button, Divider } from '../../sphinxUI';
+import { Modal, Button } from '../../sphinxUI';
 
-// import EditInfo from '../edit/editInfo'
 import SignIn from '../auth/signIn';
-
 import api from '../../api';
+import TorSaveQR from '../utils/torSaveQR';
 
 
 export default function Header() {
@@ -48,7 +46,9 @@ export default function Header() {
 
     async function testChallenge(chal: string) {
         try {
+            console.log('testChallenge', chal)
             const me: any = await api.get(`poll/${chal}`)
+            console.log('poll succeeded', me)
             if (me && me.pubkey) {
                 ui.setMeInfo(me)
                 ui.setShowSignIn(false)
@@ -81,30 +81,34 @@ export default function Header() {
     }, [location.pathname])
 
     useEffect(() => {
-
         (async () => {
+            console.log('header deeplink load')
             try {
+
                 var urlObject = new URL(window.location.href);
                 let path = location.pathname
                 var params = urlObject.searchParams;
                 const chal = params.get('challenge')
 
-                console.log('here!')
+                console.log('chal', chal)
+
                 if (chal) {
                     // fix url path if "/p" is not included, add challenge to proper url path 
                     if (!path.includes('/p')) {
                         console.log('fix path!')
-                        path = `/p/?challenge=${chal}`
+                        path = `/p?challenge=${chal}`
                         history.push(path)
                     }
                     await testChallenge(chal)
+                } else {
+                    // update self on reload
+                    await main.getSelf(null);
                 }
                 urlRedirect(path)
-            } catch (e) { }
-            try {
-                // update self on reload
-                await main.getSelf(null);
-            } catch (e) { }
+            } catch (e) {
+                console.log('e', e)
+            }
+
         })()
 
 
@@ -269,7 +273,6 @@ export default function Header() {
                     onSuccess={() => {
                         ui.setShowSignIn(false)
                         setShowWelcome(true)
-
                         // if page is not /p, go to /p (people)
                         let path = location.pathname
                         if (!path.includes('/p')) history.push('/p')
@@ -308,6 +311,17 @@ export default function Header() {
                         />
                     </Column>
                 </div>
+            </Modal>
+
+            <Modal
+                visible={ui?.torFormBodyQR}
+                close={() => {
+                    ui.setTorFormBodyQR('')
+                }}
+            >
+                <TorSaveQR url={ui?.torFormBodyQR} goBack={() => {
+                    ui.setTorFormBodyQR('')
+                }} />
             </Modal>
         </>
     })
