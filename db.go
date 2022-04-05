@@ -395,6 +395,11 @@ func addNewerThanXDaysToExtrasRawQuery(query string, days int) string {
 	return query + ` AND CAST(arr.item_object->>'created' AS INT) > (extract(epoch from now()) - ` + t + `) `
 }
 
+func addNewerThanTimestampToExtrasRawQuery(query string, timestamp int) string {
+	t := strconv.Itoa(timestamp)
+	return query + ` AND CAST(arr.item_object->>'created' AS INT) > ` + t
+}
+
 func addNotMineToExtrasRawQuery(query string, pubkey string) string {
 	return query + ` AND people.owner_pub_key != ` + pubkey + ` `
 }
@@ -428,7 +433,9 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	offset, limit, sortBy, _, search := getPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("wanted")
-	rawQuery = addNewerThanXDaysToExtrasRawQuery(rawQuery, 14)
+
+	// 3/1/2022 = 1646172712, we do this to disclude early test tickets
+	rawQuery = addNewerThanTimestampToExtrasRawQuery(rawQuery, 1646172712)
 
 	// if logged in, dont get mine
 	ctx := r.Context()
