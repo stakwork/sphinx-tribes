@@ -14,7 +14,7 @@ export default function NoneSpace(props) {
             <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} />
 
             <div style={{ marginLeft: 20, padding: 20 }}>
-                <H style={{ paddingLeft: 0 }}>{props.text}</H>
+                <H small={props.small} style={{ paddingLeft: 0 }}>{props.text}</H>
                 <C style={{ paddingLeft: 0 }}>{props.sub}</C>
 
                 {props.buttonText && <Button
@@ -40,7 +40,7 @@ export default function NoneSpace(props) {
         <Icon src={`/static/${props.img}`} />
 
         <>
-            <H>{props.text}</H>
+            <H small={props.small}>{props.text}</H>
             <C>{props.sub}</C>
         </>
 
@@ -77,20 +77,16 @@ const Icon = styled.div<IconProps>`
             overflow:hidden;
             `;
 
-const H = styled.div`
+interface HProps {
+    small: boolean;
+}
+
+const H = styled.div<HProps>`
             margin-top:10px;
-            font-size: 30px;
-            font-style: normal;
-            font-weight: 700;
-            line-height: 37px;
-            letter-spacing: 0.1em;
-            text-align: center;
 
             font-family: Roboto;
             font-style: normal;
-            font-weight: 500;
-            font-size: 22px;
-            line-height: 26px;
+
             display: flex;
             align-items: center;
             text-align: center;
@@ -100,10 +96,13 @@ const H = styled.div`
             color: #292C33;
             padding:0 10px;
             max-width:350px;
-
-            font-weight: 900;
             letter-spacing:0px;
             color: rgb(60, 63, 65);
+
+            font-weight: 700;
+            font-size: ${(p) => p.small ? '22px' : '30px'};
+            line-height: ${(p) => p.small ? '26px' : '40px'};;
+            
             `;
 
 const C = styled.div`

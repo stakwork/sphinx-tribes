@@ -99,6 +99,12 @@ overflow:hidden;
 /* Text 2 */
 
 color: #3C3F41;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 17px;
+line-height: 23px;
 `;
 
 const T = styled.div`
@@ -109,6 +115,12 @@ text-overflow: ellipsis;
 display: -webkit-box;
 -webkit-line-clamp: 2;
 -webkit-box-orient: vertical;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 17px;
+line-height: 23px;
 `;
 const B = styled.span`
 font-weight:300;
