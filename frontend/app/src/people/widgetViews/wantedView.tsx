@@ -121,8 +121,9 @@ export default function WantedView(props: any) {
                     <Divider style={{ margin: '10px 0' }} />
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {isCodingTask &&
+                        {isCodingTask ?
                             <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                            : <div />
                         }
                         {isMine && <Button
                             style={{
