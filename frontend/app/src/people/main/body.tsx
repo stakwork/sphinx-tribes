@@ -556,15 +556,17 @@ const Tab = styled.div<TagProps>`
             padding:10px 25px;
             margin-right:35px;
             height:42px;
-            color:${p => p.selected ? '#5078F2' : '#5F6368'};
-            border:${p => p.selected ? '1px solid #CDE0FF' : '1px solid #5F636800'};
+            color:${p => p.selected ? '#5D8FDD' : '#5F6368'};
+            border:2px solid #5F636800;
+            border-color:${p => p.selected ? '#CDE0FF' : '#5F636800'};
         // border-bottom: ${p => p.selected && '4px solid #618AFF'};
             cursor:pointer;
-            font-weight: 500;
+            font-weight: 400;
             font-size: 15px;
             line-height: 19px;
             background:${p => p.selected ? '#DCEDFE' : '#3C3F4100'};
             border-radius:25px;
+            
             `;
 
 const Link = styled.div`

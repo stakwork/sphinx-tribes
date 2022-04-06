@@ -278,7 +278,7 @@ const Y = styled.div`
         align-items:center;
         `;
 const T = styled.div`
-        font-weight:bold;
+        font-weight:500;
         font-size:20px;
         margin: 10px 0;
         `;

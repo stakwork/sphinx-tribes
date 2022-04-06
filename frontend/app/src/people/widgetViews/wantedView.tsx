@@ -72,10 +72,14 @@ export default function WantedView(props: any) {
     }
 
 
-    function renderCodingTask() {
+    function renderTickets() {
         const { assignee, status } = extractGithubIssue(person, repo, issue)
 
         const isClosed = ((status === 'closed') || paid) ? true : false
+
+        console.log('assignee', assignee)
+
+        const isCodingTask = type === 'coding_task' || type === 'wanted_coding_task'
 
         if (isMobile) {
             return <>
@@ -90,9 +94,13 @@ export default function WantedView(props: any) {
                         </div>
                         <DT style={{ margin: '15px 0' }}>{title}</DT>
                         <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
-                            <GithubStatusPill status={status} assignee={assignee} />
+                            {isCodingTask && <GithubStatusPill status={status} assignee={assignee} />}
                         </div>
-                        <P style={{ margin: '15px 0 0' }}><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                        {priceMin ?
+                            <P style={{ margin: '15px 0 0' }}><B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD</P>
+                            : <P style={{ margin: '15px 0 0' }}><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                        }
+
                     </Body>
                 </Wrap>
             </>
@@ -113,7 +121,10 @@ export default function WantedView(props: any) {
                     <Divider style={{ margin: '10px 0' }} />
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                        {isCodingTask ?
+                            <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                            : <div />
+                        }
                         {isMine && <Button
                             style={{
                                 height: 30,
@@ -130,17 +141,21 @@ export default function WantedView(props: any) {
 
                     <DT>{title}</DT>
 
-                    {/* <Link >github.com/{repo + '/issues/' + issue}</Link> */}
-                    <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                    {isCodingTask &&
+                        <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                    }
 
-                    <Divider style={{ margin: '22px 0' }} />
+                    <Divider style={{ margin: isCodingTask ? '22px 0' : '0 0 22px' }} />
 
                     <DescriptionCodeTask>{description}</DescriptionCodeTask>
 
                 </Pad>
                 <Divider style={{ margin: 0 }} />
                 <Pad style={{ padding: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                    {priceMin ?
+                        <P><B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD</P>
+                        : <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                    }
 
 
                     <div>
@@ -204,15 +219,14 @@ export default function WantedView(props: any) {
         </DWrap>
     }
 
-    if (type === 'coding_task' || type === 'wanted_coding_task') {
-        return renderCodingTask()
-    }
+    return renderTickets()
 
-    if (isMobile) {
-        return getMobileView()
-    }
+    // muted for now
+    // if (isMobile) {
+    //     return getMobileView()
+    // }
 
-    return getDesktopView()
+    // return getDesktopView()
 }
 
 interface WrapProps {
@@ -257,6 +271,12 @@ text-overflow: ellipsis;
 display: -webkit-box;
 -webkit-line-clamp: 2;
 -webkit-box-orient: vertical;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 17px;
+line-height: 23px;
 `;
 const B = styled.span`
 font-size:15px;
@@ -351,6 +371,12 @@ display: -webkit-box;
 -webkit-line-clamp: 2;
 -webkit-box-orient: vertical;
 /* Primary Text 1 */
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 17px;
+line-height: 23px;
 `;
 
 interface ImageProps {
