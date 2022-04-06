@@ -18,7 +18,6 @@
 	"dependencies": {
 		"@elastic/datemath": "^5.0.2",
 		"@elastic/eui": "^19.0.0",
-		"@fontsource/roboto": "^4.5.0",
 		"@material/react-material-icon": "^0.15.0",
 		"@testing-library/jest-dom": "^4.2.4",
 		"@testing-library/react": "^9.3.2",
@@ -55,7 +54,11 @@
 		}
 	},
 	"browserslist": {
-		"production": [">0.2%", "not dead", "not op_mini all"],
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
 		"development": [
 			"last 1 chrome version",
 			"last 1 firefox version",
