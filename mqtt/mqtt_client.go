@@ -67,6 +67,7 @@ func Init() {
 	opts.SetDefaultPublishHandler(f)
 
 	CLIENT.opts = opts
+	CLIENT.signedMsgPrefix = []byte("Lightning Signed Message:")
 
 	CLIENT.client = Client()
 }
