@@ -40,11 +40,11 @@ func HandelTribeMessageBundleFromRelay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if tribe.OwnerPubKey == pubKeyFromAuth {
-		c := mqtt.Client()
-		defer mqtt.Disconnect(c)
+		c := mqtt.CLIENT
+		defer c.Disconnect()
 
 		for _, bc := range tribeBatch.BatchContents {
-			mqtt.Publish(c, bc.MQTTTopic, bc.Data, false)
+			c.Publish(bc.MQTTTopic, bc.Data, false)
 		}
 
 		now := time.Now().Unix()

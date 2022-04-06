@@ -17,7 +17,8 @@ import (
 	"encoding/hex"
 )
 
-var (
+type mqttClient struct {
+	client        mqtt.Client
 	opts          *mqtt.ClientOptions
 	thePrivateKey []byte
 
@@ -26,8 +27,10 @@ var (
 	// accidentally sign a sighash, or other sensitive material. By
 	// prepending this fragment, we mind message signing to our particular
 	// context.
-	signedMsgPrefix = []byte("Lightning Signed Message:")
-)
+	signedMsgPrefix []byte
+}
+
+var CLIENT mqttClient
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("Messages published:\n  [topic= %s\n  payload= %s\n", msg.Topic(), msg.Payload())
@@ -42,62 +45,68 @@ func Init() {
 	mqttScheme := getEnv("MQTT_SCHEME", "tcp")
 	mqttPort := getEnv("MQTT_PORT", "1883")
 	mqttHost := getEnv("MQTT_HOSTNAME", "host.docker.internal")
-	mqttClientID, _ := randomClientName()
+	mqttClientID, _ := CLIENT.randomClientName()
 
-	password, mqttPublicKey, err := signTimestamp()
+	password, mqttPublicKey, err := CLIENT.signTimestamp()
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Printf("password: %s mqttPublicKey: %s", password, mqttPublicKey)
+
 	brokerUri := fmt.Sprintf("%s://%s:%s", mqttScheme, mqttHost, mqttPort)
 
-	opts = mqtt.NewClientOptions()
+	opts := mqtt.NewClientOptions()
 	opts.AddBroker(brokerUri)
 	opts.SetClientID(mqttClientID)
 
 	opts.SetUsername(mqttPublicKey)
 	opts.SetPassword(password)
 	opts.SetCleanSession(false)
-	opts.SetOnConnectHandler(func(c mqtt.Client) { connectedToLocalCallback(c, mqttPublicKey) })
+	opts.SetOnConnectHandler(func(c mqtt.Client) { CLIENT.connectedToLocalCallback(mqttPublicKey) })
 	opts.SetDefaultPublishHandler(f)
+
+	CLIENT.opts = opts
+
+	CLIENT.client = Client()
 }
 
 func Client() mqtt.Client {
-	client := mqtt.NewClient(opts)
+	client := mqtt.NewClient(CLIENT.opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		fmt.Println("=> connection error:", token.Error())
 	}
 	return client
 }
 
-func connectedToLocalCallback(c mqtt.Client, pubkey string) {
-	c.Subscribe(pubkey+"/#", 0, func(c mqtt.Client, msg mqtt.Message) {
+func (c mqttClient) connectedToLocalCallback(pubkey string) {
+	c.client.Subscribe(pubkey+"/#", 0, func(c mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
 	})
-	pwd, pubkey, err := signTimestamp()
+	pwd, pubkey, err := c.signTimestamp()
 	if err != nil {
 		log.Println("there was an error:", err)
 	}
-	c.Publish(pubkey+"/"+pwd, 0, false, "hi")
+	c.client.Publish(pubkey+"/"+pwd, 0, false, "hi")
 }
 
-func signTimestamp() (string, string, error) {
-	if thePrivateKey == nil {
+func (c mqttClient) signTimestamp() (string, string, error) {
+	if c.thePrivateKey == nil {
 		b := make([]byte, 32)
 		_, err := rand.Read(b)
 		if err != nil {
 			return "", "", err
 		}
-		thePrivateKey = b
+		c.thePrivateKey = b
 	}
 
-	p, pub := btcec.PrivKeyFromBytes(btcec.S256(), thePrivateKey)
+	p, pub := btcec.PrivKeyFromBytes(btcec.S256(), c.thePrivateKey)
 	pubHex := hex.EncodeToString(pub.SerializeCompressed())
 
 	t := time.Now().Unix()
 	timeBuf := make([]byte, 4)
 	binary.BigEndian.PutUint32(timeBuf, uint32(t))
-	sig, err := Sign(timeBuf, p)
+	sig, err := c.Sign(timeBuf, p)
 	if err != nil {
 		panic(err)
 	}
@@ -126,12 +135,12 @@ func newNodeSigner(key *btcec.PrivateKey) *nodeSigner {
 }
 
 // Sign ...
-func Sign(msg []byte, privKey *btcec.PrivateKey) ([]byte, error) {
+func (c mqttClient) Sign(msg []byte, privKey *btcec.PrivateKey) ([]byte, error) {
 
 	if privKey == nil || msg == nil {
 		return nil, errors.New("bad")
 	}
-	msg = append(signedMsgPrefix, msg...)
+	msg = append(c.signedMsgPrefix, msg...)
 	digest := chainhash.DoubleHashB(msg)
 	sigBytes, err := btcec.SignCompact(btcec.S256(), privKey, digest, true)
 	if err != nil {
@@ -140,18 +149,18 @@ func Sign(msg []byte, privKey *btcec.PrivateKey) ([]byte, error) {
 	return sigBytes, nil
 }
 
-func Publish(c mqtt.Client, topic string, payload string, wait bool) {
-	token := c.Publish(topic, 0, false, payload)
+func (c mqttClient) Publish(topic string, payload string, wait bool) {
+	token := c.client.Publish(topic, 0, false, payload)
 	if wait {
 		token.Wait()
 	}
 }
 
-func Disconnect(c mqtt.Client) {
-	c.Disconnect(250)
+func (c mqttClient) Disconnect() {
+	c.client.Disconnect(250)
 }
 
-func randomClientName() (string, error) {
+func (c mqttClient) randomClientName() (string, error) {
 	const available = "0123456789abcdefghijklmnopqrstuvwxyz-"
 	r := make([]byte, 6)
 	for i := 0; i < 6; i++ {
