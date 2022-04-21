@@ -14,8 +14,6 @@ export default function SummaryViewer(props: any) {
 
     const isSelectedView = ui?.selectedPerson ? true : false
 
-
-
     function wrapIt(child) {
         return <Wrap style={{
             maxHeight: (config.name === 'post' || isMobile) ? '' : '80vh',

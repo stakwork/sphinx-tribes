@@ -10,7 +10,7 @@ import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schem
 import { formDropdownOptions } from '../people/utils/constants'
 
 export default function Form(props: any) {
-  const { buttonsOnBottom } = props
+  const { buttonsOnBottom, wrapStyle, smallForm } = props
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null)
@@ -131,7 +131,7 @@ export default function Form(props: any) {
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid, initialValues }) => {
 
         return (
-          <Wrap ref={refBody} style={formPad}>
+          <Wrap ref={refBody} style={{ ...formPad, ...wrapStyle }}>
 
             {/* schema flipping dropdown */}
             {dynamicSchema &&
@@ -179,7 +179,7 @@ export default function Form(props: any) {
 
 
             {/* make space at bottom for first sign up */}
-            {buttonsOnBottom && <div style={{ height: 600, minHeight: 600 }} />}
+            {buttonsOnBottom && !smallForm && <div style={{ height: 600, minHeight: 600 }} />}
 
 
             <BWrap style={buttonAlignment}>

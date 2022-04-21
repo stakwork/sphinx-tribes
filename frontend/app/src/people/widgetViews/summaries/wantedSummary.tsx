@@ -3,31 +3,38 @@ import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Divider, Title, Paragraph, Button } from '../../../sphinxUI';
+import { Divider, Title, Paragraph, Button, Modal } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton'
-import { extractGithubIssue } from '../../../helpers';
+import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
 import ReactMarkdown from 'react-markdown'
 import GithubStatusPill from '../parts/statusPill';
-import { useHistory } from 'react-router';
 import { useStores } from '../../../store';
+import Form from '../../../form';
+import { sendBadgeSchema } from '../../../form/schema';
 
 export function renderMarkdown(str) {
         return <ReactMarkdown>{str}</ReactMarkdown>
 }
 
 export default function WantedSummary(props: any) {
-        const { title, description, priceMin, priceMax, url, gallery, person, created, repo, issue, price, type, tribe, paid } = props
+        const { title, description, priceMin, priceMax, url, ticketUrl, gallery, person, created, repo, issue, price, type, tribe, paid, badge_awarded } = props
+        let { } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
-        const history = useHistory()
-        const heart = <FavoriteButton />
+
         const isMobile = useIsMobile()
-        const { main } = useStores()
+        const { main, ui } = useStores()
+        const { peopleWanteds } = main
 
         const [tribeInfo, setTribeInfo]: any = useState(null)
         const [assigneeInfo, setAssigneeInfo]: any = useState(null)
+        const [saving, setSaving]: any = useState('')
+
+        const [showBadgeAwardDialog, setShowBadgeAwardDialog] = useState(false)
+
+        const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey
 
         useLayoutEffect(() => {
                 if (imgRef && imgRef.current) {
@@ -60,6 +67,54 @@ export default function WantedSummary(props: any) {
                 })()
         }, [])
 
+
+
+        async function setExtrasPropertyAndSave(propertyName: string, value: any) {
+                if (peopleWanteds) {
+                        setSaving(propertyName)
+                        try {
+                                const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
+                                        'wanted',
+                                        propertyName,
+                                        created,
+                                        value)
+
+                                // saved? ok update in wanted list if found
+                                const peopleWantedsClone: any = [...peopleWanteds]
+                                const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
+                                        let val = f.body || {}
+                                        return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
+                                })
+
+                                // if we found it in the wanted list, update in people wanted list
+                                if (indexFromPeopleWanted > -1) {
+                                        // if it should be hidden now, remove it from the list
+                                        if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
+                                                peopleWantedsClone.splice(indexFromPeopleWanted, 1)
+                                        } else {
+
+                                                // gotta update person extras! this is what is used for summary viewer
+                                                const personClone: any = person
+                                                personClone.extras['wanted'][targetIndex] = clonedEx[targetIndex]
+
+                                                peopleWantedsClone[indexFromPeopleWanted] = {
+                                                        person: personClone,
+                                                        body: clonedEx[targetIndex]
+                                                }
+                                        }
+
+                                        main.setPeopleWanteds(peopleWantedsClone)
+                                }
+                        } catch (e) {
+                                console.log('e', e)
+                        }
+
+                        setSaving('')
+                }
+        }
+
+        const heart = <FavoriteButton />
+
         const viewGithub = <Button
                 text={'Original Ticket'}
                 color={'white'}
@@ -86,6 +141,62 @@ export default function WantedSummary(props: any) {
                 }}
         />
 
+
+        //  if my own, show this option to show/hide
+        const markPaidButton = <Button
+                color={'primary'}
+                iconSize={14}
+                style={{ fontSize: 14, height: 48, minWidth: 130 }}
+                endingIcon={'paid'}
+                text={paid ? 'Mark Unpaid' : 'Mark Paid'}
+                loading={saving === 'paid'}
+                onClick={e => {
+                        e.stopPropagation()
+                        setExtrasPropertyAndSave('paid', !paid)
+                }} />
+
+        const awardBadgeButton = <Button
+                color={'primary'}
+                iconSize={14}
+                endingIcon={'offline_bolt'}
+                style={{ fontSize: 14, height: 48, minWidth: 130 }}
+                text={'Award Badge'}
+                loading={saving === 'badge_awarded'}
+                onClick={e => {
+                        e.stopPropagation()
+                        setShowBadgeAwardDialog(true)
+                        // setExtrasPropertyAndSave('badge_awarded', '9uagsdif')
+                }} />
+
+        const actionButtons = isMine && (
+                <ButtonRow style={{
+                        marginTop: 20, padding: '20px 10px',
+                        border: '1px solid #618AFF', borderRadius: 15,
+                }}>
+                        {showBadgeAwardDialog ?
+                                <>
+                                        <Form
+                                                loading={saving === 'badge'}
+                                                smallForm
+                                                buttonsOnBottom
+                                                wrapStyle={{ padding: 0, margin: 0 }}
+                                                close={() => setShowBadgeAwardDialog(false)}
+                                                onSubmit={(e) => {
+                                                        console.log('send badge', e)
+                                                }}
+                                                submitText={'Send Badge'}
+                                                schema={sendBadgeSchema}
+                                        />
+                                </> :
+                                <>
+                                        {markPaidButton}
+                                        {awardBadgeButton}
+                                </>
+                        }
+                </ButtonRow>
+        )
+
+
         function sendToRedirect(url) {
                 let el = document.createElement("a");
                 el.href = url;
@@ -95,7 +206,7 @@ export default function WantedSummary(props: any) {
 
 
         function renderCodingTask() {
-                const { assignee, status } = extractGithubIssue(person, repo, issue)
+                const { assignee, status } = ticketUrl ? extractGithubIssueFromUrl(person, ticketUrl) : extractGithubIssue(person, repo, issue)
 
                 let assigneeLabel: any = null
 
@@ -131,6 +242,9 @@ export default function WantedSummary(props: any) {
                                         {viewGithub}
                                         {viewTribe}
                                 </ButtonRow>
+
+                                {actionButtons}
+
                                 <Divider style={{
                                         marginTop: 22
                                 }} />
@@ -148,7 +262,7 @@ export default function WantedSummary(props: any) {
                 return <>
                         {paid && <Img src={'/static/paid_ribbon.svg'} style={{
                                 position: 'absolute', top: -1,
-                                right: 0, width: 64, height: 72
+                                right: 0, width: 64, height: 72, zIndex: 100, pointerEvents: 'none'
                         }} />}<Wrap>
                                 <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
                                         <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
@@ -180,6 +294,8 @@ export default function WantedSummary(props: any) {
                                                         {viewTribe}
                                                 </ButtonRow>
 
+                                                {actionButtons}
+
                                                 <Divider style={{ margin: '20px 0 0' }} />
                                                 <Y>
                                                         <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
@@ -193,8 +309,6 @@ export default function WantedSummary(props: any) {
                         </Wrap>
                 </>
         }
-
-
 
         if (type === 'coding_task' || type === 'wanted_coding_task') {
                 return renderCodingTask()
@@ -311,6 +425,7 @@ const Assignee = styled.div`
 const ButtonRow = styled.div`
         display: flex;
         justify-content:space-around;
+        flex-wrap:wrap;
         `;
 
 const Link = styled.div`

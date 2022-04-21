@@ -8,7 +8,7 @@ import moment from "moment";
 import SummaryViewer from "../widgetViews/summaryViewer";
 import { useIsMobile } from "../../hooks";
 import { dynamicSchemasByType } from "../../form/schema";
-
+import { extractRepoAndIssueFromIssueUrl } from '../../helpers'
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -154,13 +154,15 @@ export default function FocusedView(props: any) {
     // if github repo
 
     let githubError =
-      "Couldn't locate this Github issue. For private repos: add the 'stakwork' user to your repo and try again.";
+      "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (body.type === "wanted_coding_task" || body.type === "coding_task") {
-        let splitString = body.repo.split("/");
-        let owner = splitString[0];
-        let repo = splitString[1];
-        let res = await main.getGithubIssueData(owner, repo, body.issue);
+
+        let { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl)
+        let splitString = repo.split("/");
+        let ownerName = splitString[0];
+        let repoName = splitString[1];
+        let res = await main.getGithubIssueData(ownerName, repoName, issue + '');
 
         if (!res) {
           throw githubError;
@@ -170,7 +172,7 @@ export default function FocusedView(props: any) {
         body.title = title;
 
         // save repo to cookies for autofill in form
-        ui.setLastGithubRepo(body.repo);
+        ui.setLastGithubRepo(body.ticketUrl);
       }
     } catch (e) {
       throw githubError;
