@@ -2,15 +2,14 @@ import React, { useState } from 'react'
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
-import GalleryViewer from '../utils/galleryViewer';
 import { Divider, Title, Button } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
-import { extractGithubIssue } from '../../helpers';
+import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 
 export default function WantedView(props: any) {
-    let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, repo, type, show, paid } = props
+    let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, ticketUrl, repo, type, show, paid } = props
     const isMobile = useIsMobile()
     const { ui, main } = useStores()
     const [saving, setSaving] = useState(false)
@@ -73,11 +72,10 @@ export default function WantedView(props: any) {
 
 
     function renderTickets() {
-        const { assignee, status } = extractGithubIssue(person, repo, issue)
+
+        const { assignee, status } = ticketUrl ? extractGithubIssueFromUrl(person, ticketUrl) : extractGithubIssue(person, repo, issue)
 
         const isClosed = ((status === 'closed') || paid) ? true : false
-
-        console.log('assignee', assignee)
 
         const isCodingTask = type === 'coding_task' || type === 'wanted_coding_task'
 
@@ -124,17 +122,6 @@ export default function WantedView(props: any) {
                         {isCodingTask ?
                             <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
                             : <div />
-                        }
-                        {isMine && <Button
-                            style={{
-                                height: 30,
-                            }}
-                            color={'primary'}
-                            text={paid ? 'Mark Unpaid' : 'Mark Paid'}
-                            onClick={e => {
-                                e.stopPropagation()
-                                setExtrasPropertyAndSave('paid')
-                            }} />
                         }
                     </div>
 
@@ -184,49 +171,8 @@ export default function WantedView(props: any) {
         </>
     }
 
-    function getMobileView() {
-        return <Wrap>
-            <GalleryViewer cover gallery={gallery} selectable={false} wrap={false} big={false} showAll={false} />
-            <Body>
-                <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
-                <T>{title}</T>
-                <D>{description}</D>
-                <P><B>{formatPrice(priceMin) || '0'} - {formatPrice(priceMax)}</B> SAT</P>
-            </Body>
-        </Wrap>
-    }
-
-    function getDesktopView() {
-        return <DWrap>
-            <GalleryViewer
-                cover
-                showAll={false}
-                big={true}
-                wrap={false}
-                selectable={true}
-                gallery={gallery}
-                style={{ maxHeight: 276, overflow: 'hidden' }} />
-
-            <Pad style={{ padding: 20 }}>
-                <NameTag {...person} created={created} widget={'wanted'} />
-                <DT>{title}</DT>
-                <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
-            </Pad>
-            <Divider style={{ margin: 0 }} />
-            <Pad style={{ padding: 20, }}>
-                <P><B>{formatPrice(priceMin) || '0'} - {formatPrice(priceMax)}</B> SAT</P>
-            </Pad>
-        </DWrap>
-    }
-
     return renderTickets()
 
-    // muted for now
-    // if (isMobile) {
-    //     return getMobileView()
-    // }
-
-    // return getDesktopView()
 }
 
 interface WrapProps {

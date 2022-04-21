@@ -38,7 +38,7 @@ export default function NumberInput({ name, error, note, label, value, extraHTML
     </R>
   </FieldEnv>
     {note && <Note>*{note}</Note>}
-    {name.includes('price') && <Note>({satToUsd(value)})</Note>}
+    {name.includes('price') && <Note>({satToUsd(value)} USD)</Note>}
     <ExtraText
       style={{ display: value && extraHTML ? 'block' : 'none' }}
       dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
