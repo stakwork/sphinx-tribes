@@ -425,14 +425,6 @@ export default function BodyComponent() {
                                 setSelectedWidget(t.name)
                             }}>
                             {label}
-                            {/* {isWanted && openGithubIssues && (openGithubIssues.length > 0) &&
-                                <div style={{
-                                    marginLeft: 5, height: '100%', fontSize: 10, fontWeight: 600,
-                                    display: 'flex', alignItems: 'flex-end'
-                                }}>
-                                    {openGithubIssues.length}
-                                </div>
-                            } */}
                         </Tab>
                     })}
 

@@ -11,6 +11,10 @@ const repoArrayStrValidator = Yup.array().of(
         value: repoStrValidator
     })
 )
+const badgeObjectStrValidator = Yup.object().shape({
+    value: strValidator,
+})
+
 
 const nomValidator = Yup.number().required('Required')
 
@@ -359,9 +363,17 @@ export const aboutSchema: FormField[] = [
         validator: repoArrayStrValidator, // look for 1 slash
         page: 1,
     },
+
     {
         name: "lightning",
         label: "Lightning address",
+        widget: true,
+        type: "text",
+        page: 1,
+    },
+    {
+        name: "liquid",
+        label: "Liquid address",
         widget: true,
         type: "text",
         page: 1,
@@ -410,6 +422,31 @@ export const postSchema: FormField[] = [
         type: "gallery",
     },
 ];
+
+export const sendBadgeSchema: FormField[] = [
+    {
+        name: 'recipient',
+        label: "Recipient",
+        type: "searchableselect",
+        options: [],
+        validator: badgeObjectStrValidator,
+    },
+    {
+        name: 'badge',
+        label: "Badge",
+        type: "searchableselect",
+        options: [],
+        validator: badgeObjectStrValidator,
+    },
+    // {
+    //     name: "amount",
+    //     label: "Amount",
+    //     type: "number",
+    //     validator: nomValidator,
+    // },
+];
+
+
 
 //name, webhook, price_per_use, img, description, tags 
 
@@ -579,19 +616,37 @@ export const wantedCodingTaskSchema: FormField[] = [
         type: "hide",
         // validator: strValidator,
     },
+    // {
+    //     name: 'repo',
+    //     label: "Github Repository",
+    //     type: "text",
+    //     note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
+    //     validator: repoStrValidator, // look for 1 slash
+    // },
+    // {
+    //     name: 'issue',
+    //     label: "Issue #",
+    //     type: "number",
+    //     note: 'Add the "stakwork" user to your github repo for issue status updates.',
+    //     validator: nomValidator,
+    // },
     {
-        name: 'repo',
-        label: "Github Repository",
+        name: 'ticketUrl',
+        label: "Github Issue URL",
         type: "text",
-        note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
-        validator: repoStrValidator, // look for 1 slash
+        validator: strValidator,
     },
     {
-        name: 'issue',
-        label: "Issue #",
-        type: "number",
-        note: 'Add the "stakwork" user to your github repo for issue status updates.',
-        validator: nomValidator,
+        name: 'codingLanguage',
+        label: "Coding Language",
+        type: "creatablemultiselect",
+        options: codingLanguages,
+    },
+    {
+        name: 'videoUrl',
+        label: "Video URL",
+        type: "text",
+        validator: strValidatorNotRequired,
     },
     {
         name: 'price',
@@ -663,7 +718,7 @@ export const dynamicSchemasByType = {
 // this object is used to autofill form fields if info is available in local storage
 export const dynamicSchemaAutofillFieldsByType = {
     wanted_coding_task: {
-        repo: 'lastGithubRepo'
+        ticketUrl: 'lastGithubRepo'
     },
 }
 

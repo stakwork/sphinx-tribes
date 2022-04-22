@@ -20,7 +20,6 @@ import Person from "./person";
 import NoneSpace from "./utils/noneSpace";
 import ConnectCard from "./utils/connectCard";
 import { widgetConfigs } from "./utils/constants";
-import { extractGithubIssue } from "../helpers";
 import { useHistory, useLocation } from "react-router";
 import { queryLimit } from '../store/main'
 import NoResults from "./utils/noResults";

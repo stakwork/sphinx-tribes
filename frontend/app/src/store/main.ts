@@ -1,5 +1,5 @@
 import { observable, action } from "mobx";
-import { persist } from "mobx-persist";
+// import { persist } from "mobx-persist";
 import api from "../api";
 import { Extras } from "../form/inputs/widgets/interfaces";
 import { getHostIncludingDockerHosts } from "../host";
@@ -269,6 +269,76 @@ export class MainStore {
 
   }
 
+  @action async awardBadge(userPubkey: string, badgeName: string, badgeIcon: string, memo: string, amount?: number): Promise<any> {
+    const URL = 'https://liquid.sphinx.chat'
+    let error
+
+    const info = uiStore.meInfo as any;
+    if (!info) {
+      error = new Error('Youre not logged in')
+      return [null, error]
+    }
+
+    const headers = {
+      "x-jwt": info.jwt,
+      "Content-Type": "application/json",
+    }
+
+    try {
+      // 1. get user liquid address
+      const userLiquidAddress = await api.get(`liquidAddressByPubkey/${userPubkey}`)
+
+      if (!userLiquidAddress) {
+        throw new Error('No Liquid Address tied to user account')
+      }
+
+      // 2. get password for login, login to "token" aliased as "tt"
+      const res0 = await fetch(URL + `/login`, {
+        method: "POST",
+        body: JSON.stringify({
+          pwd: 'password i got from user'
+        }),
+        headers
+      });
+
+      const j = await res0.json();
+      const tt = j.token || ''
+
+      // 3. first create the badge
+      const res1 = await fetch(URL + `/issue?token=${tt}`, {
+        method: "POST",
+        body: JSON.stringify({
+          name: badgeName,
+          icon: badgeIcon,
+          amount: amount || 1
+        }),
+        headers
+      });
+
+      const createdBadge = await res1.json()
+
+      // 4. then transfer it
+      const res2 = await fetch(URL + `/transfer?token=${tt}`, {
+        method: "POST",
+        body: JSON.stringify({
+          asset: createdBadge.id,
+          to: userLiquidAddress,
+          amount: amount || 1,
+          memo: memo || "1",
+        }),
+        headers
+      })
+
+      const transferredBadge = await res2.json()
+
+      return transferredBadge
+
+    } catch (e) {
+      console.log('ok')
+    }
+
+  }
+
   @action async getBadgeList(): Promise<any> {
 
     try {
@@ -364,7 +434,6 @@ export class MainStore {
     let smallQueryLimit = 4
     let query = this.appendQueryParams("people/search", smallQueryLimit, { search: alias, sortBy: 'owner_alias' })
     let ps = await api.get(query);
-    console.log(ps)
     return ps;
   }
 
@@ -579,6 +648,19 @@ export class MainStore {
     }
   }
 
+  @action async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+    try {
+      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body)
+      if (error) throw error;
+      if (!r) return // tor user will return here
+
+      console.log("code from relay", r);
+      return r;
+    } catch (e) {
+      console.log('failed!', e)
+    }
+  }
+
 
   @action async refreshJwt() {
     try {
@@ -729,11 +811,10 @@ export class MainStore {
       let clonedEx: any = clonedExtras && clonedExtras[extrasName]
       const targetIndex = clonedEx?.findIndex(f => f.created === created)
 
-      // set wanted show value to !show
       if (clonedEx && (targetIndex || targetIndex === 0) && (targetIndex > -1)) {
         try {
           clonedEx[targetIndex][propertyName] = newPropertyValue
-          clonedMeInfo.extras.wanted = clonedEx
+          clonedMeInfo.extras[extrasName] = clonedEx
           await this.saveProfile(clonedMeInfo)
           return [clonedEx, targetIndex]
         } catch (e) {
