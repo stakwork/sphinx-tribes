@@ -648,6 +648,19 @@ export class MainStore {
     }
   }
 
+  @action async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+    try {
+      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body)
+      if (error) throw error;
+      if (!r) return // tor user will return here
+
+      console.log("code from relay", r);
+      return r;
+    } catch (e) {
+      console.log('failed!', e)
+    }
+  }
+
 
   @action async refreshJwt() {
     try {

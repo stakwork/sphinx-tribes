@@ -11,6 +11,10 @@ const repoArrayStrValidator = Yup.array().of(
         value: repoStrValidator
     })
 )
+const badgeObjectStrValidator = Yup.object().shape({
+    value: strValidator,
+})
+
 
 const nomValidator = Yup.number().required('Required')
 
@@ -359,9 +363,17 @@ export const aboutSchema: FormField[] = [
         validator: repoArrayStrValidator, // look for 1 slash
         page: 1,
     },
+
     {
         name: "lightning",
         label: "Lightning address",
+        widget: true,
+        type: "text",
+        page: 1,
+    },
+    {
+        name: "liquid",
+        label: "Liquid address",
         widget: true,
         type: "text",
         page: 1,
@@ -417,19 +429,21 @@ export const sendBadgeSchema: FormField[] = [
         label: "Recipient",
         type: "searchableselect",
         options: [],
+        validator: badgeObjectStrValidator,
     },
     {
         name: 'badge',
         label: "Badge",
         type: "searchableselect",
         options: [],
+        validator: badgeObjectStrValidator,
     },
-    {
-        name: "amount",
-        label: "Amount",
-        type: "number",
-        validator: nomValidator,
-    },
+    // {
+    //     name: "amount",
+    //     label: "Amount",
+    //     type: "number",
+    //     validator: nomValidator,
+    // },
 ];
 
 

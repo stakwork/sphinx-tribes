@@ -189,7 +189,6 @@ export default function Form(props: any) {
                   onClick={() => {
                     if (props.close) props.close()
                   }}
-                  loading={props.loading}
                   style={{ ...buttonStyle, marginRight: 10 }}
                   color={'white'}
                   text={'Cancel'}

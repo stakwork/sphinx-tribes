@@ -25,6 +25,7 @@ export default function SearchableSelectInput({ error, note, name, type, label, 
                         const p = await main.getPeopleByNameAliasPubkey(search)
                         if (p && p.length) {
                             let newOpts = p.map(ot => {
+
                                 return {
                                     owner_alias: ot.owner_alias,
                                     owner_pubkey: ot.owner_pubkey,
@@ -43,6 +44,7 @@ export default function SearchableSelectInput({ error, note, name, type, label, 
                             let newOpts = badgeList.map(ot => {
                                 return {
                                     img: ot.icon,
+                                    id: ot.id,
                                     token: ot.token,
                                     amount: ot.amount,
                                     value: ot.asset,
