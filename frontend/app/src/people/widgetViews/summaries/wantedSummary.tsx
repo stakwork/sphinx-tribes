@@ -19,7 +19,7 @@ export function renderMarkdown(str) {
 }
 
 export default function WantedSummary(props: any) {
-        const { title, description, priceMin, priceMax, url, ticketUrl, gallery, person, created, repo, issue, price, type, tribe, paid, badge_awarded } = props
+        const { title, description, priceMin, priceMax, url, ticketUrl, gallery, person, created, repo, issue, price, type, tribe, paid, badge_recipient } = props
         let { } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
@@ -113,6 +113,56 @@ export default function WantedSummary(props: any) {
                 }
         }
 
+        async function sendBadge(body: any) {
+                const { recipient, badge } = body
+
+                setSaving('badge_recipient')
+                try {
+                        if (badge?.amount < 1) {
+                                alert("You don't have any of the selected badge")
+                                throw new Error("You don't have any of the selected badge")
+                        }
+
+                        // first get the user's liquid address
+                        const recipientDetails = await main.getPersonByPubkey(recipient.owner_pubkey)
+
+                        const liquidAddress = recipientDetails?.extras?.liquid && recipientDetails?.extras?.liquid[0]?.value
+
+                        if (!liquidAddress) {
+                                alert('This user has not provided an L-BTC address')
+                                throw new Error('This user has not provided an L-BTC address')
+                        }
+
+                        // asset: number
+                        // to: string
+                        // amount?: number
+                        // memo: string
+                        const pack = {
+                                asset: badge.id,
+                                to: liquidAddress,
+                                amount: 1,
+                                memo: props.ticketUrl
+                        }
+
+                        const r = await main.sendBadgeOnLiquid(pack)
+
+                        if (r.ok) {
+                                await setExtrasPropertyAndSave('badge_recipient', recipient.owner_pubkey)
+                                setShowBadgeAwardDialog(false)
+                        } else {
+                                alert(r.statusText)
+                                throw new Error(r.statusText)
+                        }
+
+
+                } catch (e) {
+                        console.log(e)
+                }
+
+                setSaving('')
+
+        }
+
         const heart = <FavoriteButton />
 
         const viewGithub = <Button
@@ -155,17 +205,19 @@ export default function WantedSummary(props: any) {
                         setExtrasPropertyAndSave('paid', !paid)
                 }} />
 
-        const awardBadgeButton = <Button
+        const awardBadgeButton = !badge_recipient && <Button
                 color={'primary'}
                 iconSize={14}
                 endingIcon={'offline_bolt'}
                 style={{ fontSize: 14, height: 48, minWidth: 130 }}
                 text={'Award Badge'}
-                loading={saving === 'badge_awarded'}
+                loading={saving === 'badge_recipient'}
                 onClick={e => {
                         e.stopPropagation()
-                        setShowBadgeAwardDialog(true)
-                        // setExtrasPropertyAndSave('badge_awarded', '9uagsdif')
+                        if (!badge_recipient) {
+                                setShowBadgeAwardDialog(true)
+                        }
+
                 }} />
 
         const actionButtons = isMine && (
@@ -176,13 +228,13 @@ export default function WantedSummary(props: any) {
                         {showBadgeAwardDialog ?
                                 <>
                                         <Form
-                                                loading={saving === 'badge'}
+                                                loading={saving === 'badge_recipient'}
                                                 smallForm
                                                 buttonsOnBottom
                                                 wrapStyle={{ padding: 0, margin: 0 }}
                                                 close={() => setShowBadgeAwardDialog(false)}
                                                 onSubmit={(e) => {
-                                                        console.log('send badge', e)
+                                                        sendBadge(e)
                                                 }}
                                                 submitText={'Send Badge'}
                                                 schema={sendBadgeSchema}
@@ -302,7 +354,7 @@ export default function WantedSummary(props: any) {
                                                         {heart}
                                                 </Y>
                                                 <Divider />
-
+                                                <div style={{ height: 200 }} />
                                         </Pad>
                                 </div>
 
