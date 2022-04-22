@@ -61,10 +61,15 @@ export interface Twitter {
     handle: string
 }
 
+export interface SingleValueExtra {
+    value: string
+}
+
 export interface Extras {
     twitter?: Twitter,
     blog?: BlogPost[],
     offers?: Offer[],
     wanted?: Wanted[],
-    supportme?: SupportMe
+    supportme?: SupportMe,
+    liquid?: SingleValueExtra
 }

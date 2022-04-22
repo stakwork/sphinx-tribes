@@ -29,6 +29,43 @@ export function extractGithubIssue(person, repo, issue) {
     return (github_issues && github_issues[keyname]) || {}
 }
 
+export function extractRepoAndIssueFromIssueUrl(url: string) {
+    let orgName = ''
+    let repoName = ''
+    let repo = ''
+    let issue = ''
+
+    // example: https://github.com/stakwork/sphinx-tribes/issues/206
+
+    try {
+        let splitString = url.split('/')
+        const issueIndex = splitString.length - 1
+        const repoNameIndex = splitString.length - 3
+        const orgNameIndex = splitString.length - 4
+
+        // pop last element if not a number (page focus could be "commits", "checks", "files")
+        if (isNaN(parseInt(splitString[issueIndex]))) {
+            splitString.pop()
+        }
+
+        issue = splitString[issueIndex]
+        orgName = splitString[orgNameIndex]
+        repoName = splitString[repoNameIndex]
+        repo = orgName + '/' + repoName
+    } catch (e) {
+        console.log('e', e)
+    }
+
+    return { repo, issue }
+}
+
+export function extractGithubIssueFromUrl(person, url) {
+    const { github_issues } = person
+    const { repo, issue } = extractRepoAndIssueFromIssueUrl(url)
+    const keyname = repo + '/' + issue
+    return (github_issues && github_issues[keyname]) || {}
+}
+
 export const randomString = (l: number): string => {
     return Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte) => {
         return ("0" + (byte & 0xff).toString(16)).slice(-2);
