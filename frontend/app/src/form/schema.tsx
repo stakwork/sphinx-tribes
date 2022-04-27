@@ -636,18 +636,7 @@ export const wantedCodingTaskSchema: FormField[] = [
         type: "text",
         validator: strValidator,
     },
-    {
-        name: 'codingLanguage',
-        label: "Coding Language",
-        type: "creatablemultiselect",
-        options: codingLanguages,
-    },
-    {
-        name: 'videoUrl',
-        label: "Video URL",
-        type: "text",
-        validator: strValidatorNotRequired,
-    },
+
     {
         name: 'price',
         label: "Price",
@@ -673,9 +662,21 @@ export const wantedCodingTaskSchema: FormField[] = [
         options: [],
     },
     {
+        name: 'codingLanguage',
+        label: "Coding Language",
+        type: "creatablemultiselect",
+        options: codingLanguages,
+    },
+    {
         name: 'show',
         label: "Show to public",
         type: "switch",
+    },
+    {
+        name: 'loomEmbedUrl',
+        label: "Loom Video",
+        type: "loom",
+        validator: strValidatorNotRequired,
     },
 
     {
