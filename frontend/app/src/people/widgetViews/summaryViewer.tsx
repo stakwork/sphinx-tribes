@@ -17,7 +17,7 @@ export default function SummaryViewer(props: any) {
     function wrapIt(child) {
         return <Wrap style={{
             maxHeight: (config.name === 'post' || isMobile) ? '' : '80vh',
-            height: isSelectedView ? 'calc(100% - 60px)' : '100%'
+            height: (isSelectedView || isMobile) ? 'calc(100% - 60px)' : '100%'
         }}>
             {child}
         </Wrap>
@@ -36,11 +36,8 @@ export default function SummaryViewer(props: any) {
 }
 
 const Wrap = styled.div`
-overflow: auto;
 display: flex;
 flex-direction:column;
 width:100%;
 min-width:100%;
-padding:20px;
-
 `;

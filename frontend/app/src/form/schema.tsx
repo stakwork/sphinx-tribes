@@ -639,22 +639,16 @@ export const wantedCodingTaskSchema: FormField[] = [
 
     {
         name: 'price',
-        label: "Price",
+        label: "Price (Sats)",
         validator: nomValidator,
         type: "number",
     },
-    {
-        name: 'space',
-        label: 'space',
-        type: 'space'
-    },
-    {
-        name: 'tribe',
-        label: "Tribe",
-        type: "select",
-        options: [],
-        validator: strValidatorNotRequired,
-    },
+    // {
+    //     name: 'space',
+    //     label: 'space',
+    //     type: 'space'
+    // },
+
     {
         name: 'assignee',
         label: "Assignee",
@@ -666,6 +660,13 @@ export const wantedCodingTaskSchema: FormField[] = [
         label: "Coding Language",
         type: "creatablemultiselect",
         options: codingLanguages,
+    },
+    {
+        name: 'tribe',
+        label: "Tribe",
+        type: "select",
+        options: [],
+        validator: strValidatorNotRequired,
     },
     {
         name: 'show',
