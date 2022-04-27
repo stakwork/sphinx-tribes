@@ -6,7 +6,7 @@ import MaterialIcon from '@material/react-material-icon';
 
 export default function Button(props: any) {
 
-    const { iconStyle } = props
+    const { iconStyle, id } = props
 
     const colors = {
         primary: {
@@ -65,6 +65,7 @@ export default function Button(props: any) {
     }
 
     return <B
+        id={id}
         style={{
             ...colors[props.color], padding: props.icon && '0 0 0 15px', position: 'relative',
             opacity: props.disabled ? 0.7 : 1,

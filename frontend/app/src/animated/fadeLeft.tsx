@@ -62,11 +62,19 @@ export default function FadeLeft(props) {
     if (withOverlay) {
         return (
             <Overlay style={{ ...style, background: '#000000cc', opacity: !noFade ? opacity : 1 }}
-                onClick={() => {
-                    if (overlayClick) overlayClick()
-                }}>
+            >
                 <Fader
-                    onClick={(e) => e.stopPropagation()}
+                    id='sphinx-top-level-overlay'
+                    onClick={(e) => {
+                        let elString: any = e.target
+                        elString = elString.outerHTML
+                        // close if clicking the overlay
+                        if (elString && elString.includes('id="sphinx-top-level-overlay"')) {
+                            if (overlayClick) overlayClick()
+                            else if (props.close) props.close()
+                        }
+                    }}
+                    // onClick={(e) => e.stopPropagation()}
                     style={{ height: 'inherit', ...style, transform: transformValue }}>
                     {children}
                 </Fader>

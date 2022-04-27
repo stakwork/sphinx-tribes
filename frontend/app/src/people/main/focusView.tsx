@@ -224,6 +224,7 @@ export default function FocusedView(props: any) {
         initialValues.img = personInfo.img || "";
         initialValues.price_to_meet = personInfo.price_to_meet || 0;
         initialValues.description = personInfo.description || "";
+        initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || "";
         // below are extras,
         initialValues.twitter =
           (personInfo.extras?.twitter &&
