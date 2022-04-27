@@ -197,19 +197,19 @@ export default function WantedSummary(props: any) {
                 }}
         />
 
-        const viewTribe = tribeInfo ? <Button
+        const viewTribe = (tribe && tribe !== 'none') && <Button
                 text={'View Tribe'}
                 color={'white'}
                 leadingImgUrl={tribeInfo?.img || ' '}
                 endingIcon={'launch'}
                 iconSize={14}
                 imgStyle={{ marginRight: 10 }}
-                style={{ fontSize: 14, height: 48, marginRight: 10 }}
+                style={{ fontSize: 14, height: 48 }}
                 onClick={() => {
                         const profileUrl = `https://community.sphinx.chat/t/${tribe}`
                         sendToRedirect(profileUrl)
                 }}
-        /> : <div />
+        />
 
 
         //  if my own, show this option to show/hide
@@ -229,7 +229,7 @@ export default function WantedSummary(props: any) {
                 color={'primary'}
                 iconSize={14}
                 endingIcon={'offline_bolt'}
-                style={{ fontSize: 14, height: 48, minWidth: 130, marginRight: 10 }}
+                style={{ fontSize: 14, height: 48, minWidth: 130 }}
                 text={'Award Badge'}
                 loading={saving === 'badgeRecipient'}
                 onClick={e => {

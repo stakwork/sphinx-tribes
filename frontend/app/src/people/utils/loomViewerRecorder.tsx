@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { setup, isSupported } from "@loomhq/record-sdk";
 import { Button, IconButton } from "../../sphinxUI";
 
-const PUBLIC_APP_ID = "beec6b9b-d84c-44f4-ba70-f63f32f9e603";
+const PUBLIC_APP_DEVELOPMENT_ID = "beec6b9b-d84c-44f4-ba70-f63f32f9e603";
+
+const PUBLIC_APP_ID = "ded90c8e-92ed-496d-bfe3-f742d7fa9785";
+
 const BUTTON_ID = "loom-record-sdk-button";
 
 export default function LoomViewerRecorder(props) {
