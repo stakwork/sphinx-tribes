@@ -190,33 +190,33 @@ export default function WantedSummary(props: any) {
                 color={'white'}
                 endingIcon={'launch'}
                 iconSize={14}
-                style={{ fontSize: 14, height: 48 }}
+                style={{ fontSize: 14, height: 48, marginRight: 10 }}
                 onClick={() => {
                         const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`
                         sendToRedirect(repoUrl)
                 }}
         />
 
-        const viewTribe = <Button
+        const viewTribe = tribeInfo ? <Button
                 text={'View Tribe'}
                 color={'white'}
                 leadingImgUrl={tribeInfo?.img || ' '}
                 endingIcon={'launch'}
                 iconSize={14}
                 imgStyle={{ marginRight: 10 }}
-                style={{ fontSize: 14, height: 48 }}
+                style={{ fontSize: 14, height: 48, marginRight: 10 }}
                 onClick={() => {
                         const profileUrl = `https://community.sphinx.chat/t/${tribe}`
                         sendToRedirect(profileUrl)
                 }}
-        />
+        /> : <div />
 
 
         //  if my own, show this option to show/hide
         const markPaidButton = <Button
                 color={'primary'}
                 iconSize={14}
-                style={{ fontSize: 14, height: 48, minWidth: 130 }}
+                style={{ fontSize: 14, height: 48, minWidth: 130, marginRight: 10 }}
                 endingIcon={'paid'}
                 text={paid ? 'Mark Unpaid' : 'Mark Paid'}
                 loading={saving === 'paid'}
@@ -229,7 +229,7 @@ export default function WantedSummary(props: any) {
                 color={'primary'}
                 iconSize={14}
                 endingIcon={'offline_bolt'}
-                style={{ fontSize: 14, height: 48, minWidth: 130 }}
+                style={{ fontSize: 14, height: 48, minWidth: 130, marginRight: 10 }}
                 text={'Award Badge'}
                 loading={saving === 'badgeRecipient'}
                 onClick={e => {
@@ -242,8 +242,7 @@ export default function WantedSummary(props: any) {
 
         const actionButtons = isMine && (
                 <ButtonRow style={{
-                        marginTop: 20, padding: '20px 10px',
-                        border: '1px solid #618AFF', borderRadius: 15,
+                        marginBottom: 20
                 }}>
                         {showBadgeAwardDialog ?
                                 <>
@@ -283,7 +282,7 @@ export default function WantedSummary(props: any) {
                 let assigneeLabel: any = null
 
                 if (assigneeInfo) {
-                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', marginTop: 10 }}>
+                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', marginTop: 20 }}>
                                 <Img src={assigneeInfo.img || '/static/person_placeholder.png'} style={{ borderRadius: 30 }} />
                                 <div style={{ marginLeft: 5, fontWeight: 300 }}>
                                         Owner assigned to
@@ -300,40 +299,40 @@ export default function WantedSummary(props: any) {
                 }
 
                 if (isMobile) {
-                        return <Pad>
-                                <NameTag {...person}
-                                        created={created}
-                                        widget={'wanted'} />
+                        return <div style={{ padding: 20, overflow: 'auto' }}>
+                                <Pad>
+                                        <NameTag {...person}
+                                                created={created}
+                                                widget={'wanted'} />
 
-                                <T>{title}</T>
+                                        <T>{title}</T>
 
-                                <GithubStatusPill status={status} assignee={assignee} />
-                                {assigneeLabel}
+                                        <GithubStatusPill status={status} assignee={assignee} />
+                                        {assigneeLabel}
 
-                                <ButtonRow style={{ marginTop: 22 }}>
-                                        {viewGithub}
-                                        {viewTribe}
-                                </ButtonRow>
+                                        <ButtonRow style={{ margin: '20px 0' }}>
+                                                {viewGithub}
+                                                {viewTribe}
+                                        </ButtonRow>
 
-                                {actionButtons}
+                                        {actionButtons}
 
-                                <LoomViewerRecorder
-                                        readOnly
-                                        style={{ marginTop: 20 }}
-                                        loomEmbedUrl={loomEmbedUrl} />
+                                        <LoomViewerRecorder
+                                                readOnly
+                                                style={{ marginTop: 20 }}
+                                                loomEmbedUrl={loomEmbedUrl} />
 
-                                <Divider style={{
-                                        marginTop: 22
-                                }} />
-                                <Y>
-                                        <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
-                                        {heart}
-                                </Y>
-                                <Divider style={{ marginBottom: 22 }} />
-                                {/* <Img src={'/static/github_logo.png'} /> */}
-                                <D>{renderMarkdown(description)}</D>
-
-                        </Pad>
+                                        <Divider style={{
+                                                marginTop: 22
+                                        }} />
+                                        <Y>
+                                                <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
+                                                {heart}
+                                        </Y>
+                                        <Divider style={{ marginBottom: 22 }} />
+                                        <D>{renderMarkdown(description)}</D>
+                                </Pad>
+                        </div>
                 }
 
                 return <>
@@ -341,7 +340,7 @@ export default function WantedSummary(props: any) {
                                 position: 'absolute', top: -1,
                                 right: 0, width: 64, height: 72, zIndex: 100, pointerEvents: 'none'
                         }} />}<Wrap>
-                                <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%', overflow: 'auto' }}>
+                                <div style={{ width: 500, padding: 40, borderRight: '1px solid #DDE1E5', minHeight: '100%', overflow: 'auto' }}>
                                         <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
                                         <Paragraph style={{
                                                 overflow: 'hidden',
@@ -349,7 +348,7 @@ export default function WantedSummary(props: any) {
                                         }}>{renderMarkdown(description)}</Paragraph>
                                 </div>
 
-                                <div style={{ width: 410, padding: 20, height: envHeight }}>
+                                <div style={{ width: 410, padding: '40px 20px', height: envHeight, overflow: 'auto' }}>
                                         <Pad>
                                                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                                                         <NameTag
@@ -361,11 +360,11 @@ export default function WantedSummary(props: any) {
                                                 <Divider style={{ margin: '14px 0 20px' }} />
 
                                                 <Title>{title}</Title>
-                                                <div style={{ height: 10 }} />
-                                                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                                                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 25 }} />
                                                 {assigneeLabel}
-                                                <div style={{ height: 30 }} />
-                                                <ButtonRow>
+
+                                                <div style={{ height: 10 }} />
+                                                <ButtonRow style={{ margin: '20px 0' }}>
                                                         {viewGithub}
                                                         {viewTribe}
                                                 </ButtonRow>
@@ -383,7 +382,6 @@ export default function WantedSummary(props: any) {
                                                         {heart}
                                                 </Y>
                                                 <Divider />
-                                                <div style={{ height: 200 }} />
                                         </Pad>
                                 </div>
 
@@ -396,7 +394,7 @@ export default function WantedSummary(props: any) {
         }
 
         if (isMobile) {
-                return <>
+                return <div style={{ padding: 20, overflow: 'auto' }}>
                         <Pad>
                                 <NameTag {...person}
                                         created={created}
@@ -416,7 +414,7 @@ export default function WantedSummary(props: any) {
 
                                 <GalleryViewer gallery={gallery} showAll={true} selectable={false} wrap={false} big={true} />
                         </Pad>
-                </>
+                </div>
         }
 
         return <Wrap>
@@ -424,9 +422,9 @@ export default function WantedSummary(props: any) {
                         innerRef={imgRef}
                         style={{ width: 507, height: 'fit-content' }}
                         gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
-                <div style={{ width: 316, padding: 20, overflowY: 'auto', height: envHeight }}>
+                <div style={{ width: 316, padding: '40px 20px', overflowY: 'auto', height: envHeight }}>
                         <Pad>
-                                <NameTag
+                                < NameTag
                                         style={{ marginBottom: 14 }}
                                         {...person}
                                         created={created}
@@ -443,9 +441,9 @@ export default function WantedSummary(props: any) {
 
                                 <Paragraph>{renderMarkdown(description)}</Paragraph>
                         </Pad>
-                </div>
+                </div >
 
-        </Wrap>
+        </Wrap >
 
 }
 
@@ -457,7 +455,6 @@ min-width:800px;
 font-style: normal;
 font-weight: 500;
 font-size: 24px;
-
 color: #3C3F41;
 justify-content:space-between;
 
@@ -506,7 +503,7 @@ const Assignee = styled.div`
 
 const ButtonRow = styled.div`
         display: flex;
-        justify-content:space-around;
+        // justify-content:space-around;
         flex-wrap:wrap;
         `;
 
