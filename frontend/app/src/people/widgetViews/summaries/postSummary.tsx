@@ -17,7 +17,7 @@ export default function PostSummary(props: any) {
 
     const heart = <FavoriteButton />
 
-    return <Pad>
+    return <div style={{ padding: '40px 20px', overflow: 'auto' }}><Pad>
         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
             <NameTag {...person} created={created} widget={'post'} />
             {heart}
@@ -31,6 +31,7 @@ export default function PostSummary(props: any) {
 
         <GalleryViewer gallery={gallery} showAll={true} wrap={false} selectable={false} big={true} />
     </Pad>
+    </div>
 
 }
 

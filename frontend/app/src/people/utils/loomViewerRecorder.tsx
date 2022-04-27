@@ -39,12 +39,12 @@ export default function LoomViewerRecorder(props) {
         setupLoom();
     }, []);
 
-    const loomViewer = <div dangerouslySetInnerHTML={{
+    const loomViewer = videoUrl && (<div dangerouslySetInnerHTML={{
         __html: `<div class="lo-emb-vid"
         style="position: relative; padding-bottom: 75%; height: 0;">
         <iframe src="${videoUrl}"
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>`
-    }} />
+    }} />)
 
     return (
         <div style={style}>
