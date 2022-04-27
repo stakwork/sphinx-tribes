@@ -8,6 +8,7 @@ import GalleryInput from './gallery-input'
 import NumberInput from './number-input'
 import Widgets from './widgets/index'
 import SwitchInput from './switch-input'
+import LoomVideoInput from './loom-video-input'
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui'
 import SelectInput from './select-input'
 import SearchableSelectInput from './searchable-select-input'
@@ -33,6 +34,8 @@ export default function Input(props: any) {
                 return <GalleryInput {...props} />
             case 'number':
                 return <NumberInput {...props} />
+            case 'loom':
+                return <LoomVideoInput {...props} />
             case 'switch':
                 return <SwitchInput {...props} />
             case 'select':

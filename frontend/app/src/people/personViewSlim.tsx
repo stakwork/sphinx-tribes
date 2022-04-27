@@ -869,6 +869,29 @@ const PeopleList = styled.div`
             flex-direction:column;
             background:#ffffff;
             width: 265px;
+            overflow: overlay;
+
+            // /* Works on Firefox */
+            // * {
+            // scrollbar-width: thin;
+            // scrollbar-color: gray blue;
+            // }
+
+            // /* Works on Chrome, Edge, and Safari */
+            // *::-webkit-scrollbar {
+            // width: 12px;
+            // }
+
+            // *::-webkit-scrollbar-track {
+            // background: #fff;
+            // }
+
+            // *::-webkit-scrollbar-thumb {
+            // background-color: #00000055;
+            // background: #00000055;
+            // opacity:0.25;
+            // border-radius: 20px;
+            // }
             `;
 
 const DBack = styled.div`

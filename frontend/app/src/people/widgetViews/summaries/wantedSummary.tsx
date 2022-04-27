@@ -13,13 +13,33 @@ import GithubStatusPill from '../parts/statusPill';
 import { useStores } from '../../../store';
 import Form from '../../../form';
 import { sendBadgeSchema } from '../../../form/schema';
+import remarkGfm from 'remark-gfm'
+import LoomViewerRecorder from '../../utils/loomViewerRecorder'
 
-export function renderMarkdown(str) {
-        return <ReactMarkdown>{str}</ReactMarkdown>
+export function renderMarkdown(markdown) {
+
+        return <ReactMarkdown children={markdown} remarkPlugins={[remarkGfm]}
+                components={{
+                        code({ node, inline, className, children, ...props }) {
+                                return (
+                                        <code className={className} {...props}>
+                                                {children}
+                                        </code>
+                                )
+                        },
+                        img({ className, ...props }) {
+                                return (
+                                        <img className={className}
+                                                style={{ width: '100%' }}
+                                                {...props} />
+                                )
+                        }
+                }} />
+
 }
 
 export default function WantedSummary(props: any) {
-        const { title, description, priceMin, priceMax, url, ticketUrl, gallery, person, created, repo, issue, price, type, tribe, paid, badge_recipient } = props
+        const { title, description, priceMin, priceMax, url, ticketUrl, gallery, person, created, repo, issue, price, type, tribe, paid, badgeRecipient, loomEmbedUrl } = props
         let { } = props
         const [envHeight, setEnvHeight] = useState('100%')
         const imgRef: any = useRef(null)
@@ -116,7 +136,7 @@ export default function WantedSummary(props: any) {
         async function sendBadge(body: any) {
                 const { recipient, badge } = body
 
-                setSaving('badge_recipient')
+                setSaving('badgeRecipient')
                 try {
                         if (badge?.amount < 1) {
                                 alert("You don't have any of the selected badge")
@@ -147,7 +167,7 @@ export default function WantedSummary(props: any) {
                         const r = await main.sendBadgeOnLiquid(pack)
 
                         if (r.ok) {
-                                await setExtrasPropertyAndSave('badge_recipient', recipient.owner_pubkey)
+                                await setExtrasPropertyAndSave('badgeRecipient', recipient.owner_pubkey)
                                 setShowBadgeAwardDialog(false)
                         } else {
                                 alert(r.statusText)
@@ -172,7 +192,7 @@ export default function WantedSummary(props: any) {
                 iconSize={14}
                 style={{ fontSize: 14, height: 48 }}
                 onClick={() => {
-                        const repoUrl = `https://github.com/${repo}/issues/${issue}`
+                        const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`
                         sendToRedirect(repoUrl)
                 }}
         />
@@ -205,16 +225,16 @@ export default function WantedSummary(props: any) {
                         setExtrasPropertyAndSave('paid', !paid)
                 }} />
 
-        const awardBadgeButton = !badge_recipient && <Button
+        const awardBadgeButton = !badgeRecipient && <Button
                 color={'primary'}
                 iconSize={14}
                 endingIcon={'offline_bolt'}
                 style={{ fontSize: 14, height: 48, minWidth: 130 }}
                 text={'Award Badge'}
-                loading={saving === 'badge_recipient'}
+                loading={saving === 'badgeRecipient'}
                 onClick={e => {
                         e.stopPropagation()
-                        if (!badge_recipient) {
+                        if (!badgeRecipient) {
                                 setShowBadgeAwardDialog(true)
                         }
 
@@ -228,7 +248,7 @@ export default function WantedSummary(props: any) {
                         {showBadgeAwardDialog ?
                                 <>
                                         <Form
-                                                loading={saving === 'badge_recipient'}
+                                                loading={saving === 'badgeRecipient'}
                                                 smallForm
                                                 buttonsOnBottom
                                                 wrapStyle={{ padding: 0, margin: 0 }}
@@ -263,7 +283,7 @@ export default function WantedSummary(props: any) {
                 let assigneeLabel: any = null
 
                 if (assigneeInfo) {
-                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', }}>
+                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', marginTop: 10 }}>
                                 <Img src={assigneeInfo.img || '/static/person_placeholder.png'} style={{ borderRadius: 30 }} />
                                 <div style={{ marginLeft: 5, fontWeight: 300 }}>
                                         Owner assigned to
@@ -297,6 +317,11 @@ export default function WantedSummary(props: any) {
 
                                 {actionButtons}
 
+                                <LoomViewerRecorder
+                                        readOnly
+                                        style={{ marginTop: 20 }}
+                                        loomEmbedUrl={loomEmbedUrl} />
+
                                 <Divider style={{
                                         marginTop: 22
                                 }} />
@@ -316,7 +341,7 @@ export default function WantedSummary(props: any) {
                                 position: 'absolute', top: -1,
                                 right: 0, width: 64, height: 72, zIndex: 100, pointerEvents: 'none'
                         }} />}<Wrap>
-                                <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%' }}>
+                                <div style={{ width: 500, padding: 20, borderRight: '1px solid #DDE1E5', minHeight: '100%', overflow: 'auto' }}>
                                         <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
                                         <Paragraph style={{
                                                 overflow: 'hidden',
@@ -337,9 +362,8 @@ export default function WantedSummary(props: any) {
 
                                                 <Title>{title}</Title>
                                                 <div style={{ height: 10 }} />
-                                                {assigneeLabel}
-                                                <div style={{ height: 10 }} />
                                                 <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                                                {assigneeLabel}
                                                 <div style={{ height: 30 }} />
                                                 <ButtonRow>
                                                         {viewGithub}
@@ -347,6 +371,11 @@ export default function WantedSummary(props: any) {
                                                 </ButtonRow>
 
                                                 {actionButtons}
+
+                                                <LoomViewerRecorder
+                                                        readOnly
+                                                        style={{ marginTop: 20 }}
+                                                        loomEmbedUrl={loomEmbedUrl} />
 
                                                 <Divider style={{ margin: '20px 0 0' }} />
                                                 <Y>
@@ -435,6 +464,7 @@ justify-content:space-between;
 `;
 const Pad = styled.div`
         padding: 0 20px;
+        word-break: break-word;
         `;
 const Y = styled.div`
         display: flex;
