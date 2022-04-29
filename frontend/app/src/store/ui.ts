@@ -121,6 +121,11 @@ class UiStore {
   }
 
 
+  @observable language: string = ''
+  @action setLanguage(s: string) {
+    this.language = s
+  }
+
   @persist('object') @observable meInfo: MeData = null
   @action setMeInfo(t: MeData) {
     if (t) {

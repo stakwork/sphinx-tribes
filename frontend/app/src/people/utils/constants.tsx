@@ -32,7 +32,7 @@ const widgetConfigs = {
                 sub: 'Click here to learn about badges',
                 buttonText: 'Add to Portfolio',
                 // buttonText: 'Sell something',
-                buttonIcon: 'local_offer'
+                buttonIcon: 'work'
             },
             otherUser: {
                 img: '',
@@ -83,7 +83,7 @@ const widgetConfigs = {
         action: {
             text: 'Add to Portfolio',
             // text: 'Sell Something',
-            icon: 'local_offer'
+            icon: 'work'
         },
         noneSpace: {
             me: {
@@ -92,7 +92,7 @@ const widgetConfigs = {
                 // text: 'Use lightning network to sell your digital goods!',
                 buttonText: 'Add to Portfolio',
                 // buttonText: 'Sell something',
-                buttonIcon: 'local_offer'
+                buttonIcon: 'work'
             },
             otherUser: {
                 img: 'no_offers2.png',
@@ -117,14 +117,14 @@ const widgetConfigs = {
         schema: wantedSchema,
         action: {
             text: 'Add New Ticket',
-            icon: 'favorite_outline'
+            icon: 'local_offer'
         },
         noneSpace: {
             me: {
                 img: 'no_wanted.png',
                 text: 'Make a list of github tickets you want help on.',
                 buttonText: 'Add New Ticket',
-                buttonIcon: 'favorite_outline'
+                buttonIcon: 'local_offer'
             },
             otherUser: {
                 img: 'no_wanted2.png',
