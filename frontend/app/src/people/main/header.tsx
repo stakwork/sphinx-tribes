@@ -8,19 +8,22 @@ import {
 } from '@elastic/eui';
 import { useIsMobile } from '../../hooks'
 import { colors } from '../../colors'
+import { languageOptions } from '../../localization'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Modal, Button } from '../../sphinxUI';
 
 import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
-
+import Select from 'react-select';
 
 export default function Header() {
     const { main, ui } = useStores()
     const location = useLocation()
     const history = useHistory()
     const isMobile = useIsMobile()
+
+    const { language } = ui
 
     const c = colors['light']
 
@@ -182,6 +185,14 @@ export default function Header() {
             </ EuiHeader >
         }
 
+        // const locOptions = languageOptions.map(lo => {
+        //     return {
+        //         value: lo,
+        //         label: lo
+        //     }
+        // })
+
+
         // desktop version
         return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px', background: headerBackground }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -223,6 +234,32 @@ export default function Header() {
                 </Row>
 
                 <Corner>
+                    {/* <Select
+                        options={[
+                            {
+                                label: 'English',
+                                value: 'english'
+                            }
+                        ]}
+                        onChange={(e) => {
+                            console.log('e', e)
+                            ui.setLanguage(e)
+                        }}
+                        value={language}
+                        text={language}
+                        color='transparent'
+                        style={{ marginRight: 20, width: 200, border: 'none' }}
+                    /> */}
+
+                    {/* <LanguageSelector
+                        options={locOptions}
+                        value={language || { label: 'Russian', value: 'Russis' }}
+                        onChange={(e: any) => {
+                            console.log('e', e)
+                            ui.setLanguage(e?.value)
+                        }}
+                    /> */}
+
                     <a href={'https://sphinx.chat/'} target="_blank">
                         <Button
                             text={'Get Sphinx'}
@@ -436,3 +473,23 @@ const MTab = styled.div<TagProps>`
                             justify-content:center;
                             border-bottom:${p => p.selected ? '3px solid #618AFF' : 'none'};
                             `;
+
+const LanguageSelector = styled(Select)`
+min-width:150px;
+margin-right:20px;
+color:#fff !important;
+
+div {
+    background:#1a242e !important;
+    border:none;
+}
+
+div.div.div {
+    color:#fff !important;
+}
+
+#react-select-2-input {
+    color:#fff !important;
+}
+}
+`

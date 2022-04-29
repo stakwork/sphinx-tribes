@@ -91,7 +91,7 @@ export default function Person(props: any) {
               </Description>
               {!hideActions &&
                 <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Updated>{lastSeen}</Updated>
+                  {/* <Updated>{lastSeen}</Updated> */}
                   {(!hideActions && owner_pubkey) ?
                     <>
                       <a href={qrString}>
@@ -241,7 +241,7 @@ const Description = styled.div`
         font-size: 12px;
         color: #5F6368;
         white-space: nowrap;
-        height:26px;
+        max-height:26px;
         text-overflow: ellipsis;
         overflow:hidden;
         margin-bottom:10px;
