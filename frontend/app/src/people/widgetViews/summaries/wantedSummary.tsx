@@ -170,7 +170,7 @@ export default function WantedSummary(props: any) {
                                 await setExtrasPropertyAndSave('badgeRecipient', recipient.owner_pubkey)
                                 setShowBadgeAwardDialog(false)
                         } else {
-                                alert(r.statusText)
+                                alert(r.statusText || 'Operation failed! Contact support.')
                                 throw new Error(r.statusText)
                         }
 
@@ -190,7 +190,7 @@ export default function WantedSummary(props: any) {
                 color={'white'}
                 endingIcon={'launch'}
                 iconSize={14}
-                style={{ fontSize: 14, height: 48, marginRight: 10 }}
+                style={{ fontSize: 14, height: 48, marginRight: 10, marginBottom: 10 }}
                 onClick={() => {
                         const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`
                         sendToRedirect(repoUrl)
@@ -204,7 +204,7 @@ export default function WantedSummary(props: any) {
                 endingIcon={'launch'}
                 iconSize={14}
                 imgStyle={{ marginRight: 10 }}
-                style={{ fontSize: 14, height: 48 }}
+                style={{ fontSize: 14, height: 48, marginBottom: 10 }}
                 onClick={() => {
                         const profileUrl = `https://community.sphinx.chat/t/${tribe}`
                         sendToRedirect(profileUrl)
@@ -216,7 +216,7 @@ export default function WantedSummary(props: any) {
         const markPaidButton = <Button
                 color={'primary'}
                 iconSize={14}
-                style={{ fontSize: 14, height: 48, minWidth: 130, marginRight: 10 }}
+                style={{ fontSize: 14, height: 48, minWidth: 130, marginRight: 10, marginBottom: 10 }}
                 endingIcon={'paid'}
                 text={paid ? 'Mark Unpaid' : 'Mark Paid'}
                 loading={saving === 'paid'}
@@ -229,8 +229,9 @@ export default function WantedSummary(props: any) {
                 color={'primary'}
                 iconSize={14}
                 endingIcon={'offline_bolt'}
-                style={{ fontSize: 14, height: 48, minWidth: 130 }}
-                text={'Award Badge'}
+                style={{ fontSize: 14, height: 48, minWidth: 130, marginBottom: 10 }}
+                text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
+                disabled={badgeRecipient ? true : false}
                 loading={saving === 'badgeRecipient'}
                 onClick={e => {
                         e.stopPropagation()
@@ -241,16 +242,14 @@ export default function WantedSummary(props: any) {
                 }} />
 
         const actionButtons = isMine && (
-                <ButtonRow style={{
-                        marginBottom: 20
-                }}>
+                <ButtonRow style={{ margin: '10px 0' }}>
                         {showBadgeAwardDialog ?
                                 <>
                                         <Form
                                                 loading={saving === 'badgeRecipient'}
                                                 smallForm
                                                 buttonsOnBottom
-                                                wrapStyle={{ padding: 0, margin: 0 }}
+                                                wrapStyle={{ padding: 0, margin: 0, marginBottom: 20 }}
                                                 close={() => setShowBadgeAwardDialog(false)}
                                                 onSubmit={(e) => {
                                                         sendBadge(e)
@@ -274,6 +273,15 @@ export default function WantedSummary(props: any) {
                 el.target = '_blank';
                 el.click();
         }
+
+
+        const nametag = <NameTag
+                iconSize={24}
+                textSize={13}
+                style={{ marginBottom: 10 }}
+                {...person}
+                created={created}
+                widget={'wanted'} />
 
 
         function renderCodingTask() {
@@ -301,16 +309,15 @@ export default function WantedSummary(props: any) {
                 if (isMobile) {
                         return <div style={{ padding: 20, overflow: 'auto' }}>
                                 <Pad>
-                                        <NameTag {...person}
-                                                created={created}
-                                                widget={'wanted'} />
+                                        {nametag}
 
                                         <T>{title}</T>
 
                                         <GithubStatusPill status={status} assignee={assignee} />
                                         {assigneeLabel}
 
-                                        <ButtonRow style={{ margin: '20px 0' }}>
+                                        <div style={{ height: 10 }} />
+                                        <ButtonRow style={{ margin: '10px 0' }}>
                                                 {viewGithub}
                                                 {viewTribe}
                                         </ButtonRow>
@@ -319,17 +326,15 @@ export default function WantedSummary(props: any) {
 
                                         <LoomViewerRecorder
                                                 readOnly
-                                                style={{ marginTop: 20 }}
-                                                loomEmbedUrl={loomEmbedUrl} />
+                                                loomEmbedUrl={loomEmbedUrl}
+                                                style={{ marginBottom: 20 }} />
 
-                                        <Divider style={{
-                                                marginTop: 22
-                                        }} />
+                                        <Divider />
                                         <Y>
                                                 <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
                                                 {heart}
                                         </Y>
-                                        <Divider style={{ marginBottom: 22 }} />
+                                        <Divider style={{ marginBottom: 20 }} />
                                         <D>{renderMarkdown(description)}</D>
                                 </Pad>
                         </div>
@@ -341,7 +346,7 @@ export default function WantedSummary(props: any) {
                                 right: 0, width: 64, height: 72, zIndex: 100, pointerEvents: 'none'
                         }} />}<Wrap>
                                 <div style={{ width: 500, padding: 40, borderRight: '1px solid #DDE1E5', minHeight: '100%', overflow: 'auto' }}>
-                                        <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} />
+                                        {/* <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} /> */}
                                         <Paragraph style={{
                                                 overflow: 'hidden',
                                                 wordBreak: 'normal'
@@ -351,20 +356,18 @@ export default function WantedSummary(props: any) {
                                 <div style={{ width: 410, padding: '40px 20px', height: envHeight, overflow: 'auto' }}>
                                         <Pad>
                                                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                                                        <NameTag
-                                                                style={{ marginBottom: 14 }}
-                                                                {...person}
-                                                                created={created}
-                                                                widget={'wanted'} />
+                                                        {nametag}
                                                 </div>
                                                 <Divider style={{ margin: '14px 0 20px' }} />
+
+                                                <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43, margin: '10px 0' }} />
 
                                                 <Title>{title}</Title>
                                                 <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 25 }} />
                                                 {assigneeLabel}
 
-                                                <div style={{ height: 10 }} />
-                                                <ButtonRow style={{ margin: '20px 0' }}>
+                                                <div style={{ height: 15 }} />
+                                                <ButtonRow style={{ margin: '10px 0' }}>
                                                         {viewGithub}
                                                         {viewTribe}
                                                 </ButtonRow>
@@ -373,10 +376,10 @@ export default function WantedSummary(props: any) {
 
                                                 <LoomViewerRecorder
                                                         readOnly
-                                                        style={{ marginTop: 20 }}
+                                                        style={{ marginBottom: 20 }}
                                                         loomEmbedUrl={loomEmbedUrl} />
 
-                                                <Divider style={{ margin: '20px 0 0' }} />
+                                                <Divider />
                                                 <Y>
                                                         <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
                                                         {heart}
@@ -396,9 +399,7 @@ export default function WantedSummary(props: any) {
         if (isMobile) {
                 return <div style={{ padding: 20, overflow: 'auto' }}>
                         <Pad>
-                                <NameTag {...person}
-                                        created={created}
-                                        widget={'wanted'} />
+                                {nametag}
 
                                 <T>{title || 'No title'}</T>
                                 <Divider style={{
@@ -424,11 +425,7 @@ export default function WantedSummary(props: any) {
                         gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
                 <div style={{ width: 316, padding: '40px 20px', overflowY: 'auto', height: envHeight }}>
                         <Pad>
-                                < NameTag
-                                        style={{ marginBottom: 14 }}
-                                        {...person}
-                                        created={created}
-                                        widget={'wanted'} />
+                                {nametag}
 
                                 <Title>{title}</Title>
 
@@ -503,7 +500,6 @@ const Assignee = styled.div`
 
 const ButtonRow = styled.div`
         display: flex;
-        // justify-content:space-around;
         flex-wrap:wrap;
         `;
 

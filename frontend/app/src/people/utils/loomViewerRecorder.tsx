@@ -42,6 +42,11 @@ export default function LoomViewerRecorder(props) {
         setupLoom();
     }, []);
 
+
+    if (readOnly && !videoUrl) {
+        return null
+    }
+
     const loomViewer = videoUrl && (<div dangerouslySetInnerHTML={{
         __html: `<div class="lo-emb-vid"
         style="position: relative; padding-bottom: 75%; height: 0;">

@@ -1,5 +1,4 @@
 
-import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../../helpers';
@@ -33,12 +32,16 @@ export default function OfferSummary(props: any) {
 
         const heart = <FavoriteButton />
 
+        const nametag = <NameTag {...person}
+                iconSize={24}
+                textSize={13}
+                style={{ marginBottom: 14 }}
+                created={created} widget={'offer'} />
+
         if (isMobile) {
                 return <div style={{ padding: 20, overflow: 'auto' }}>
                         <Pad>
-                                <NameTag {...person}
-                                        style={{ marginBottom: 14 }}
-                                        created={created} widget={'offer'} />
+                                {nametag}
 
                                 <T>{title || 'No title'}</T>
 
@@ -62,9 +65,8 @@ export default function OfferSummary(props: any) {
                         gallery={gallery} showAll={false} selectable={false} wrap={false} big={true} />
                 <div style={{ width: 316, padding: '40px 20px', overflowY: 'auto', height: envHeight }}>
                         <Pad>
-                                <NameTag {...person}
-                                        style={{ marginBottom: 14 }}
-                                        created={created} widget={'offer'} />
+                                {nametag}
+                                <Divider style={{ margin: '20px 0 20px' }} />
                                 <Title>{title}</Title>
 
                                 <Divider style={{ marginTop: 22 }} />
