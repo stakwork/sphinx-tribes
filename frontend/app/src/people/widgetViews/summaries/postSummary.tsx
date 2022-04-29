@@ -1,11 +1,8 @@
-import moment from 'moment';
 import React from 'react'
 import styled from "styled-components";
-import { Post } from '../../../form/inputs/widgets/interfaces';
 import GalleryViewer from '../../utils/galleryViewer';
 import ReactMarkdown from 'react-markdown'
 import NameTag from '../../utils/nameTag';
-import MaterialIcon from '@material/react-material-icon';
 import FavoriteButton from '../../utils/favoriteButton';
 
 export function renderMarkdown(str) {
@@ -19,15 +16,17 @@ export default function PostSummary(props: any) {
 
     return <div style={{ padding: '40px 20px', overflow: 'auto' }}><Pad>
         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-            <NameTag {...person} created={created} widget={'post'} />
+            <NameTag
+                {...person}
+                iconSize={24}
+                textSize={13}
+                created={created}
+                widget={'post'} />
             {heart}
         </div>
 
         <T>{title || 'No title'} </T>
-        {/* <Time>{created && moment.unix(created).format('LLL')} </Time> */}
         <M>{renderMarkdown(content)}</M>
-
-        {/* readmore */}
 
         <GalleryViewer gallery={gallery} showAll={true} wrap={false} selectable={false} big={true} />
     </Pad>

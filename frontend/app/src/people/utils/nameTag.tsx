@@ -6,7 +6,7 @@ import { useStores } from '../../store';
 import { useHistory } from 'react-router';
 
 export default function NameTag(props) {
-    const { owner_alias, owner_pubkey, img, created, unique_name, id, style, widget } = props
+    const { owner_alias, owner_pubkey, img, created, unique_name, id, style, widget, iconSize, textSize } = props
     const { ui } = useStores()
 
     const history = useHistory()
@@ -42,8 +42,9 @@ export default function NameTag(props) {
         {!isSelected && <>
             <Img
                 src={img || `/static/person_placeholder.png`}
+                iconSize={iconSize}
             />
-            <Name>
+            <Name textSize={textSize}>
                 {owner_alias}
             </Name>
 
@@ -60,22 +61,26 @@ export default function NameTag(props) {
 
 interface ImageProps {
     readonly src: string;
+    iconSize?: number;
+}
+interface NameProps {
+    textSize?: number;
 }
 const Img = styled.div<ImageProps>`
             background-image: url("${(p) => p.src}");
             background-position: center;
             background-size: cover;
-            height: 16px;
-            width: 16px;
+            height: ${p => p.iconSize ? p.iconSize + 'px' : '16px'};
+            width: ${p => p.iconSize ? p.iconSize + 'px' : '16px'};
             border-radius: 50%;
             position: relative;
             `;
 
-const Name = styled.div`
+const Name = styled.div<NameProps>`
 font-family: Roboto;
 font-style: normal;
 font-weight: normal;
-font-size: 12px;
+font-size: ${p => p.textSize ? p.textSize + 'px' : '12px'};
 line-height: 19px;
 /* or 158% */
 margin-left:5px;

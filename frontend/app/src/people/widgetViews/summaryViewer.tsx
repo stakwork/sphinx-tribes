@@ -12,12 +12,14 @@ export default function SummaryViewer(props: any) {
     const { ui } = useStores();
     const isMobile = useIsMobile()
 
+    // FIXME, make "AND is me"
     const isSelectedView = ui?.selectedPerson ? true : false
+    const thisIsMine = ui?.selectedPerson === ui?.meInfo?.id
 
     function wrapIt(child) {
         return <Wrap style={{
             maxHeight: (config.name === 'post' || isMobile) ? '' : '80vh',
-            height: (isSelectedView || isMobile) ? 'calc(100% - 60px)' : '100%'
+            height: ((isSelectedView && thisIsMine) || isMobile) ? 'calc(100% - 60px)' : '100%'
         }}>
             {child}
         </Wrap>

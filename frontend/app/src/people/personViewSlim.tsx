@@ -436,10 +436,15 @@ export default function PersonView(props: any) {
                         icon='arrow_back'
                     />
                     {canEdit ?
-                        <IconButton
-                            iconStyle={{ transform: 'rotate(270deg)' }}
+                        <Button
+                            text='Sign out'
                             onClick={logout}
-                            icon='logout'
+                            height={42}
+                            style={{ fontSize: 13, color: '#3c3f41', border: 'none', margin: 0, padding: 0 }}
+                            iconStyle={{ color: '#8e969c' }}
+                            iconSize={20}
+                            color='white'
+                            leadingIcon='logout'
                         /> : <div />
                     }
                 </div>
