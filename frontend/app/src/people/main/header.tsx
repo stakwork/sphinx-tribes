@@ -185,14 +185,13 @@ export default function Header() {
             </ EuiHeader >
         }
 
-        const locOptions = languageOptions.map(lo => {
-            return {
-                value: lo,
-                label: lo
-            }
-        })
+        // const locOptions = languageOptions.map(lo => {
+        //     return {
+        //         value: lo,
+        //         label: lo
+        //     }
+        // })
 
-        console.log('language', language)
 
         // desktop version
         return <EuiHeader style={{ color: '#fff', width: '100%', height: 64, padding: '0 20px', background: headerBackground }}>
@@ -252,14 +251,14 @@ export default function Header() {
                         style={{ marginRight: 20, width: 200, border: 'none' }}
                     /> */}
 
-                    <LanguageSelector
+                    {/* <LanguageSelector
                         options={locOptions}
                         value={language || { label: 'Russian', value: 'Russis' }}
                         onChange={(e: any) => {
                             console.log('e', e)
                             ui.setLanguage(e?.value)
                         }}
-                    />
+                    /> */}
 
                     <a href={'https://sphinx.chat/'} target="_blank">
                         <Button
