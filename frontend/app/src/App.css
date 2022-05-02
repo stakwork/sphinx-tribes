@@ -21,6 +21,32 @@ body {
     sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+}
+
+* {
+  scrollbar-width: 8px;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: rgba(176, 183, 188, 0.45);
+  background: rgba(176, 183, 188, 0.45);
+  width: 8px;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track-piece:start {
+  background: transparent url('/transparentScrollbar.png') repeat-y !important;
+}
+
+::-webkit-scrollbar-track-piece:end {
+  background: transparent url('/transparentScrollbar.png') repeat-y !important;
 }
 
 code {

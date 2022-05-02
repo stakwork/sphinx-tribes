@@ -9,12 +9,12 @@ export default function PageLoadSpinner(props) {
 
     if (props.noAnimate) {
         return <BottomLoadmoreWrap show={props.show} style={props.style}>
-            <EuiLoadingSpinner size="l" style={{ marginLeft: -10 }} />
+            <EuiLoadingSpinner size="l" style={{ marginLeft: -10, padding: 10 }} />
         </BottomLoadmoreWrap>
     }
 
     return (<LoadmoreWrap show={props.show} style={props.style}>
-        <EuiLoadingSpinner size="l" style={{ marginLeft: -10 }} />
+        <EuiLoadingSpinner size="l" style={{ marginLeft: -10, padding: 10 }} />
     </LoadmoreWrap>)
 }
 

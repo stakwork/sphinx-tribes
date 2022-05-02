@@ -80,15 +80,15 @@ export default function Person(props: any) {
     function renderPersonCard() {
       if (small) {
         return <div style={{ background: selected ? '#F2F3F5' : '#fff', cursor: 'pointer' }} onClick={() => select(id, unique_name, owner_pubkey)}>
-          <Wrap>
+          <Wrap style={{ padding: hideActions ? 10 : 25 }}>
             <div>
               <Img style={addedStyles} src={mediumPic || defaultPic} />
             </div>
             <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
-              <Title style={hideActions && { fontSize: 17 }}>{owner_alias}</Title>
-              <Description>
+              <Title style={{ fontSize: hideActions ? 17 : 20, margin: 0 }}>{owner_alias}</Title>
+              {description && <Description lineRows={hideActions ? 1 : 2} style={{ margin: 0, marginTop: hideActions ? 5 : 10, fontSize: hideActions ? 12 : 15 }}>
                 {description}
-              </Description>
+              </Description>}
               {!hideActions &&
                 <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                   {/* <Updated>{lastSeen}</Updated> */}
@@ -100,6 +100,7 @@ export default function Person(props: any) {
                           color='white'
                           leadingIcon={'open_in_new'}
                           iconSize={16}
+                          style={{ marginTop: 12 }}
                           onClick={(e) => e.stopPropagation()}
                         />
                       </a>
@@ -109,7 +110,7 @@ export default function Person(props: any) {
               }
             </R>
           </Wrap>
-          <Divider style={{ marginTop: 16 }} />
+          <Divider />
         </div>
       }
       // desktop mode
@@ -136,7 +137,7 @@ export default function Person(props: any) {
                   color='clear'
                   iconStyle={{ color: '#B0B7BC' }}
                   endingIcon={'open_in_new'}
-                  style={{ fontSize: 13, fontWeight: 600 }}
+                  style={{ fontSize: 13, fontWeight: 500 }}
                   iconSize={16}
                   onClick={(e) => {
                     setShowQR(true)
@@ -165,9 +166,11 @@ export default function Person(props: any) {
 
 const Wrap = styled.div`
         cursor:pointer;
-        padding: 25px;
-        padding-bottom:0px;
+        padding:10px;
+        min-height:88px;
         display:flex;
+        align-items:center;
+        justify-content:center;
         width:100%;
         overflow:hidden;
         `;
@@ -192,6 +195,9 @@ const DWrap = styled.div<DWarpProps>`
 
 const R = styled.div`
         margin-left:20px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
         `;
 
 const Updated = styled.div`
@@ -216,7 +222,7 @@ const Row = styled.div`
         `;
 
 const Title = styled.h3`
-        font-weight: 600;
+        font-weight: 500;
         font-size:17px;
         /* Text 2 */
 
@@ -225,7 +231,7 @@ const Title = styled.h3`
 
 const DTitle = styled.h3`
 
-        font-weight: 600;
+        font-weight: 500;
         font-size: 17px;
         line-height: 19px;
 
@@ -237,14 +243,21 @@ const DTitle = styled.h3`
         -webkit-box-orient: vertical;
 
         `;
-const Description = styled.div`
+
+interface DescriptionProps {
+  lineRows: number;
+}
+const Description = styled.div<DescriptionProps>`
         font-size: 12px;
         color: #5F6368;
-        white-space: nowrap;
-        max-height:26px;
         text-overflow: ellipsis;
         overflow:hidden;
         margin-bottom:10px;
+        font-weight:400;
+
+        display: -webkit-box;
+        -webkit-line-clamp: ${p => p.lineRows ? p.lineRows : 1};
+        -webkit-box-orient: vertical;
         `;
 
 const DDescription = styled.div`
