@@ -24,7 +24,7 @@ export default function NoResults(props) {
 const H = styled.div`
             font-size: 16px;
             font-style: normal;
-            font-weight: 600;
+            font-weight: 500;
             line-height: 37px;
             letter-spacing: 0.1em;
             text-align: center;
