@@ -322,11 +322,15 @@ export default function PersonView(props: any) {
             })
 
             const noneKey = canEdit ? 'me' : 'otherUser'
-            const panels: any = elementArray.length ? elementArray : (<NoneSpace
-                action={() => setShowFocusView(true)}
-                small
-                {...tabs[selectedWidget]?.noneSpace[noneKey]}
-            />)
+            const panels: any = elementArray.length ? elementArray : (<div style={{
+                width: '100%'
+            }}><NoneSpace
+                    action={() => setShowFocusView(true)}
+                    small
+                    {...tabs[selectedWidget]?.noneSpace[noneKey]}
+                /></div>)
+
+            console.log('elementArray', elementArray.length)
 
             return <>
                 <PageLoadSpinner show={loadingPerson} />
@@ -540,7 +544,7 @@ export default function PersonView(props: any) {
         </div>
     }
 
-    const loaderTop = <PageLoadSpinner show={loadingTop} style={{ paddingTop: 10 }} />
+    const loaderTop = <PageLoadSpinner show={loadingTop} />
     const loaderBottom = <PageLoadSpinner noAnimate show={loadingBottom} style={{ position: 'absolute', bottom: 0, left: 0 }} />
 
     function renderDesktopView() {
@@ -580,7 +584,7 @@ export default function PersonView(props: any) {
 
 
 
-                    <div style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={handleScroll}>
+                    <PeopleScroller style={{ width: '100%', overflowY: 'auto', height: '100%' }} onScroll={handleScroll}>
                         {loaderTop}
                         {people?.length ? people.map(t => <Person {...t} key={t.id}
                             selected={personId === t.id}
@@ -593,7 +597,7 @@ export default function PersonView(props: any) {
                         {people?.length < queryLimit &&
                             <div style={{ height: 400 }} />
                         }
-                    </div>
+                    </PeopleScroller>
 
                     {loaderBottom}
 
@@ -869,35 +873,46 @@ interface PanelProps {
 }
 
 const PeopleList = styled.div`
-            position:relative;
-            display:flex;
-            flex-direction:column;
-            background:#ffffff;
-            width: 265px;
-            overflow: overlay;
+position:relative;
+display:flex;
+flex-direction:column;
+background:#ffffff;
+width: 265px;
+overflow-y: overlay !important;
 
-            // /* Works on Firefox */
-            // * {
-            // scrollbar-width: thin;
-            // scrollbar-color: gray blue;
-            // }
+* {
+    scrollbar-width: 6px;
+    scrollbar-color: rgba(176, 183, 188, 0.25);
+}
 
-            // /* Works on Chrome, Edge, and Safari */
-            // *::-webkit-scrollbar {
-            // width: 12px;
-            // }
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 6px;
+}
 
-            // *::-webkit-scrollbar-track {
-            // background: #fff;
-            // }
+*::-webkit-scrollbar-thumb {
+    background-color: rgba(176, 183, 188, 0.25);
+    background: rgba(176, 183, 188, 0.25);
+    width:6px;
+    border-radius: 10px;
+    background-clip: padding-box;
+}
 
-            // *::-webkit-scrollbar-thumb {
-            // background-color: #00000055;
-            // background: #00000055;
-            // opacity:0.25;
-            // border-radius: 20px;
-            // }
+::-webkit-scrollbar-track-piece:start {
+    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
+}
+
+::-webkit-scrollbar-track-piece:end {
+    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
+}
             `;
+
+const PeopleScroller = styled.div`
+overflow-y: overlay !important; 
+width: 100%; 
+height: 100%;
+`
+
 
 const DBack = styled.div`
             min-height:64px;
@@ -1005,7 +1020,7 @@ const Head = styled.div`
 
 const Name = styled.div`
                     font-style: normal;
-                    font-weight: 600;
+                    font-weight: 500;
                     font-size: 24px;
                     line-height: 28px;
                     /* or 73% */
