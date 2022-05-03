@@ -6,14 +6,22 @@ import (
 	"github.com/araddon/dateparse"
 )
 
+// https://fixthefood.substack.com/feed
+
+type SubstackEnclosure struct {
+	XMLName xml.Name `xml:"enclosure"`
+	Url     string   `xml:"url,attr"`
+}
+
 type SubstackPost struct {
-	Title   string `xml:"title"`
-	Desc    string `xml:"description"`
-	Link    string `xml:"link"`
-	Guid    string `xml:"guid"`
-	PubDate string `xml:"pubDate"`
-	Updated string `xml:"updated"`
-	Creator string `xml:"creator"`
+	Title     string            `xml:"title"`
+	Desc      string            `xml:"description"`
+	Link      string            `xml:"link"`
+	Guid      string            `xml:"guid"`
+	PubDate   string            `xml:"pubDate"`
+	Updated   string            `xml:"updated"`
+	Creator   string            `xml:"creator"`
+	Enclosure SubstackEnclosure `xml:"enclosure"`
 }
 
 type SubstackImage struct {
@@ -64,6 +72,7 @@ func SubstackFeedToGeneric(url string, mf SubstackFeed) (Feed, error) {
 			Author:        post.Creator,
 			DatePublished: t.Unix(),
 			DateUpdated:   tu.Unix(),
+			ImageUrl:      post.Enclosure.Url,
 		})
 	}
 	lbd, _ := dateparse.ParseAny(c.LastBuildDate)
