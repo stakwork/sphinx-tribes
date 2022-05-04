@@ -190,7 +190,7 @@ export default function WantedSummary(props: any) {
                 color={'white'}
                 endingIcon={'launch'}
                 iconSize={14}
-                style={{ fontSize: 14, height: 48, marginRight: 10, marginBottom: 10 }}
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
                 onClick={() => {
                         const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`
                         sendToRedirect(repoUrl)
@@ -203,12 +203,25 @@ export default function WantedSummary(props: any) {
                 leadingImgUrl={tribeInfo?.img || ' '}
                 endingIcon={'launch'}
                 iconSize={14}
-                imgStyle={{ marginRight: 10 }}
-                style={{ fontSize: 14, height: 48, marginBottom: 10 }}
+                imgStyle={{ position: 'absolute', left: 10 }}
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
                 onClick={() => {
                         const profileUrl = `https://community.sphinx.chat/t/${tribe}`
                         sendToRedirect(profileUrl)
                 }}
+        />
+
+        const addToFavorites = (tribe && tribe !== 'none') && <Button
+                text={'Add to Favorites'}
+                color={'white'}
+                icon={'favorite_outline'}
+                iconSize={18}
+                iconStyle={{ left: 14 }}
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20, paddingLeft: 5 }}
+                onClick={() => {
+
+                }}
+
         />
 
 
@@ -216,7 +229,7 @@ export default function WantedSummary(props: any) {
         const markPaidButton = <Button
                 color={'primary'}
                 iconSize={14}
-                style={{ fontSize: 14, height: 48, minWidth: 130, marginRight: 10, marginBottom: 10 }}
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
                 endingIcon={'paid'}
                 text={paid ? 'Mark Unpaid' : 'Mark Paid'}
                 loading={saving === 'paid'}
@@ -229,7 +242,7 @@ export default function WantedSummary(props: any) {
                 color={'primary'}
                 iconSize={14}
                 endingIcon={'offline_bolt'}
-                style={{ fontSize: 14, height: 48, minWidth: 130, marginBottom: 10 }}
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
                 text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
                 disabled={badgeRecipient ? true : false}
                 loading={saving === 'badgeRecipient'}
@@ -242,14 +255,14 @@ export default function WantedSummary(props: any) {
                 }} />
 
         const actionButtons = isMine && (
-                <ButtonRow style={{ margin: '10px 0' }}>
+                <ButtonRow>
                         {showBadgeAwardDialog ?
                                 <>
                                         <Form
                                                 loading={saving === 'badgeRecipient'}
                                                 smallForm
                                                 buttonsOnBottom
-                                                wrapStyle={{ padding: 0, margin: 0, marginBottom: 20 }}
+                                                wrapStyle={{ padding: 0, margin: 0, maxWidth: '100%' }}
                                                 close={() => setShowBadgeAwardDialog(false)}
                                                 onSubmit={(e) => {
                                                         sendBadge(e)
@@ -257,6 +270,7 @@ export default function WantedSummary(props: any) {
                                                 submitText={'Send Badge'}
                                                 schema={sendBadgeSchema}
                                         />
+                                        <div style={{ height: 100 }} />
                                 </> :
                                 <>
                                         {markPaidButton}
@@ -290,7 +304,7 @@ export default function WantedSummary(props: any) {
                 let assigneeLabel: any = null
 
                 if (assigneeInfo) {
-                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', marginTop: 20 }}>
+                        assigneeLabel = (<div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#8E969C', marginTop: isMobile ? 20 : 0 }}>
                                 <Img src={assigneeInfo.img || '/static/person_placeholder.png'} style={{ borderRadius: 30 }} />
                                 <div style={{ marginLeft: 5, fontWeight: 300 }}>
                                         Owner assigned to
@@ -320,6 +334,7 @@ export default function WantedSummary(props: any) {
                                         <ButtonRow style={{ margin: '10px 0' }}>
                                                 {viewGithub}
                                                 {viewTribe}
+                                                {addToFavorites}
                                         </ButtonRow>
 
                                         {actionButtons}
@@ -345,47 +360,57 @@ export default function WantedSummary(props: any) {
                                 position: 'absolute', top: -1,
                                 right: 0, width: 64, height: 72, zIndex: 100, pointerEvents: 'none'
                         }} />}<Wrap>
-                                <div style={{ width: 500, padding: 40, borderRight: '1px solid #DDE1E5', minHeight: '100%', overflow: 'auto' }}>
-                                        {/* <MaterialIcon icon={'code'} style={{ marginBottom: 5 }} /> */}
-                                        <Paragraph style={{
-                                                overflow: 'hidden',
-                                                wordBreak: 'normal'
-                                        }}>{renderMarkdown(description)}</Paragraph>
-                                </div>
+                                <div style={{ width: 700, borderRight: '1px solid #DDE1E5', minHeight: '100%', overflow: 'auto' }}>
 
-                                <div style={{ width: 410, padding: '40px 20px', height: envHeight, overflow: 'auto' }}>
-                                        <Pad>
-                                                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                                                        {nametag}
-                                                </div>
-                                                <Divider style={{ margin: '14px 0 20px' }} />
-
-                                                <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43, margin: '10px 0' }} />
-
+                                        <SectionPad style={{ height: 148 }}>
                                                 <Title>{title}</Title>
-                                                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 25 }} />
-                                                {assigneeLabel}
+                                                <div style={{ display: 'flex', marginTop: 25 }}>
+                                                        <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
+                                                        {assigneeLabel}
+                                                </div>
+                                        </SectionPad>
 
-                                                <div style={{ height: 15 }} />
-                                                <ButtonRow style={{ margin: '10px 0' }}>
-                                                        {viewGithub}
-                                                        {viewTribe}
-                                                </ButtonRow>
+                                        <Divider />
 
-                                                {actionButtons}
+                                        <SectionPad>
+                                                <Paragraph style={{
+                                                        overflow: 'hidden',
+                                                        wordBreak: 'normal'
+                                                }}>{renderMarkdown(description)}
+                                                </Paragraph>
 
                                                 <LoomViewerRecorder
                                                         readOnly
-                                                        style={{ marginBottom: 20 }}
+                                                        style={{ marginTop: 10 }}
                                                         loomEmbedUrl={loomEmbedUrl} />
+                                        </SectionPad>
+                                </div>
 
-                                                <Divider />
-                                                <Y>
+                                <div style={{ width: 320, height: envHeight, overflow: 'auto' }}>
+                                        <SectionPad style={{ height: 148 }}>
+                                                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                                        {nametag}
+                                                </div>
+                                                <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+                                        </SectionPad>
+                                        <Divider />
+                                        <SectionPad>
+                                                <Y style={{ padding: 0 }}>
                                                         <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
-                                                        {heart}
                                                 </Y>
-                                                <Divider />
-                                        </Pad>
+                                        </SectionPad>
+
+                                        <Divider />
+
+                                        <SectionPad>
+                                                <ButtonRow>
+                                                        {viewGithub}
+                                                        {viewTribe}
+                                                        {addToFavorites}
+                                                </ButtonRow>
+
+                                                {actionButtons}
+                                        </SectionPad>
                                 </div>
 
                         </Wrap>
@@ -456,6 +481,12 @@ color: #3C3F41;
 justify-content:space-between;
 
 `;
+
+const SectionPad = styled.div`
+        padding: 38px;
+        word-break: break-word;
+        `;
+
 const Pad = styled.div`
         padding: 0 20px;
         word-break: break-word;
@@ -500,7 +531,8 @@ const Assignee = styled.div`
 
 const ButtonRow = styled.div`
         display: flex;
-        flex-wrap:wrap;
+        flex-direction:column;
+        width:100%;
         `;
 
 const Link = styled.div`

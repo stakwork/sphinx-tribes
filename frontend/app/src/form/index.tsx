@@ -313,7 +313,7 @@ const Wrap = styled.div`
       flex-direction: column;
       align-content: center;
       // max-width:400px;
-      min-width:320px;
+      min-width:230px;
       `;
 
 interface BWrapProps {
