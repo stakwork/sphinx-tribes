@@ -605,10 +605,9 @@ export default function PersonView(props: any) {
                 </PeopleList>
             }
 
-            <div style={{
+            <AboutWrap style={{
                 width: 364,
-                minWidth: 364, overflowY: 'auto',
-                // position: 'relative',
+                minWidth: 364,
                 background: '#ffffff',
                 color: '#000000',
                 padding: 40,
@@ -718,7 +717,7 @@ export default function PersonView(props: any) {
 
                 {renderWidgets('about')}
 
-            </div>
+            </AboutWrap>
 
             <div style={{
                 width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 628px)',
@@ -912,6 +911,22 @@ overflow-y: overlay !important;
 width: 100%; 
 height: 100%;
 `
+
+const AboutWrap = styled.div`
+overflow-y: overlay !important; 
+::-webkit-scrollbar-thumb {
+    background-color: rgba(176, 183, 188, 0);
+    background: rgba(176, 183, 188, 0);
+  }
+
+&:hover{
+    ::-webkit-scrollbar-thumb {
+        background-color: rgba(176, 183, 188, 0.45);
+        background: rgba(176, 183, 188, 0.45);
+      }
+}
+`
+
 
 
 const DBack = styled.div`
