@@ -110,6 +110,7 @@ align-items:center;
 
 const Link = styled.span`
 font-weight:500;
+cursor:pointer;
 &:hover{
     color:#000;
 }
