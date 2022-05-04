@@ -107,7 +107,7 @@ export default function Button(props: any) {
                     {props.icon &&
                         <div style={{
                             display: 'flex', alignItems: 'center',
-                            position: 'absolute', top: 0, left: 3, height: '100%'
+                            position: 'absolute', top: 0, left: 3, height: '100%', ...iconStyle
                         }}>
                             <MaterialIcon
                                 icon={props.icon}
