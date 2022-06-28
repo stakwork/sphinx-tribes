@@ -5,6 +5,7 @@ import Header from './tribes/header'
 import Body from './tribes/body'
 import PeopleHeader from './people/main/header'
 import PeopleBody from './people/main/body'
+import JarvisBody from './jarvis/main/body'
 import { colors } from './colors'
 import {
   BrowserRouter as Router,
@@ -50,6 +51,9 @@ function App() {
           <Route path="/p/">
             <PeopleBody />
           </Route>
+          <Route path="/sdcp/">
+            <JarvisBody />
+          </Route>
         </Switch>
 
         {/* for global toasts */}
@@ -86,6 +90,7 @@ const hosts: { [k: string]: Mode } = {
   "people-test.sphinx.chat": Mode.COMMUNITY,
   "community-test.sphinx.chat": Mode.COMMUNITY,
   "community.sphinx.chat": Mode.COMMUNITY,
+  "sphinx-jarvis.sphinx1.repl.co": Mode.COMMUNITY
 };
 
 function getMode(): Mode {
