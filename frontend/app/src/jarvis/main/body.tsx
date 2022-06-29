@@ -93,7 +93,7 @@ export default function BodyComponent() {
           data.forEach(moment => {
             _nodes.push({
               id: index,
-              name: moment.podcast_title,
+              name: moment.podcast_title + ":" + moment.episode_title + ":" + moment.timestamp,
               type: 'podcast'
             })
             index++
@@ -116,7 +116,7 @@ export default function BodyComponent() {
           data.forEach(moment => {
             const { topics } = moment
             topics.forEach(topic => {
-              const podcastNode = findNodeByName(moment.podcast_title, _nodes)
+              const podcastNode = findNodeByName(moment.podcast_title + ":" + moment.episode_title + ":" + moment.timestamp, _nodes)
               const topicNode = findNodeByName(topic, _nodes)
               if (podcastNode && topicNode) {
                 const link: Link = {
