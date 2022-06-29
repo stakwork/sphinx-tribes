@@ -2,44 +2,33 @@ import React, {useState} from 'react'
 import { EuiCard, EuiFormFieldset, EuiIcon, EuiFlexItem, EuiFlexGroup } from "@elastic/eui";
 import styled from "styled-components";
 import ForceGraph from './ForceGraph/ForceGraph'
-//import * as d3 from "d3"
+
+interface Node {
+  id: number,
+  name: string,
+  type: string
+}
+
+interface Link {
+  source: number,
+  target: number
+}
+
+interface Moment {
+  episode_title: string,
+  link: string,
+  podcast_title: string,
+  timestamp: string,
+  topics: string[]
+}
 
 export default function BodyComponent() {
 
-  // We should use this data for the graph
- /*const graphData = [
-   {
-     timestamp: "00:00:30",
-     podcast: "Wat bitcoin done",
-     listOfKeyWords: ["bitcoin", "taproot", "tapscript"]
-   },{
-     timestamp: "00:01:42",
-     podcast: "yellow pill podcast",
-     listOfKeyWords: ["bitcoin", "musig2"]
-   },{
-     timestamp: "00:00:11",
-     podcast: "yeast radio podcast",
-     listOfKeyWords: ["barack obama", "democrat"]
-   },{
-     timestamp: "00:00:11",
-     podcast: "meat radio",
-     listOfKeyWords: ["beef", "bitcoin", "lightning"]
-   },{
-     timestamp: "00:00:11",
-     podcast: "meat radio",
-     listOfKeyWords: ["beef", "bitcoin", "lightning"]
-   },{
-     timestamp: "00:00:11",
-     podcast: "meat radio",
-     listOfKeyWords: ["beef", "bitcoin", "lightning"]
-   }
- ]
-  */
   const [textBoxText, setTextBoxText] = useState("");
   const [graphData, setGraphData] = useState([])
-  
-  
- 
+  const [nodes, setNodes] = useState<Node[]>([])
+  const [links, setLinks] = useState<Link[]>([])
+
 
  const hStyle = {
     color: 'white',
@@ -84,27 +73,67 @@ export default function BodyComponent() {
         </div >
     )
   }
-  function callApi(word){
-    fetch(`https://ardent-pastry-basement.wayscript.cloud/prediction/${word}`).then(response => response.json()).then(data => { if(data.length)
-      setGraphData(data)})
-    
+
+  function findNodeByName(name: string, _nodes: Array<Node>) : Node | undefined {
+    return _nodes.find(candidate => candidate.name === name)
   }
-  const nodes = [
-    { id: 0, r: 15, name: 'Podcast1', type: 'podcast'},
-    { id: 1, r: 15, name: 'Podcast2', type: 'podcast'},
-    { id: 2, r: 15, name: 'musig2', type: 'topic'},
-    { id: 3, r: 15, name: 'Podcast4', type: 'podcast'},
-    { id: 4, r: 15, name: 'Podcast5', type: 'podcast'},
-    { id: 5, r: 15, name: 'Podcast6', type: 'podcast'},
-    { id: 6, r: 15, name: 'Podcast7', type: 'podcast'},
-    { id: 7, r: 15, name: 'taproot', type: 'topic'}
-  ]
-  const links = [
-    { source: 0, target: 2},
-    { source: 0, target: 7},
-    { source: 3, target: 7},
-    { source: 6, target: 7},
-  ]
+  
+  function callApi(word: string) {
+    console.log('callApi.word: ', word)
+    let index = 0
+    fetch(`https://ardent-pastry-basement.wayscript.cloud/prediction/${word}`)
+      .then(response => response.json())
+      .then((data: Moment[]) => {
+        if(data.length) {
+          // setGraphData(data)
+          const _nodes: Node[] = []
+          const _links: Link[] = []
+          const topicMap = {}
+          // Populating nodes array with podcasts and constructing a topic map
+          data.forEach(moment => {
+            _nodes.push({
+              id: index,
+              name: moment.podcast_title,
+              type: 'podcast'
+            })
+            index++
+            const topics = moment.topics
+            // @ts-ignore
+            topics.forEach((topic: string) => topicMap[topic] = true)
+          })
+          // Adds topic nodes
+          Object.keys(topicMap)
+            .forEach(topic => {
+              const topicNode: Node = {
+                id: index,
+                name: topic,
+                type: 'topic'
+              }
+              _nodes.push(topicNode)
+              index++
+            })
+          // Populating the links array next
+          data.forEach(moment => {
+            const { topics } = moment
+            topics.forEach(topic => {
+              const podcastNode = findNodeByName(moment.podcast_title, _nodes)
+              const topicNode = findNodeByName(topic, _nodes)
+              if (podcastNode && topicNode) {
+                const link: Link = {
+                  source: podcastNode.id,
+                  target: topicNode.id
+                }
+                _links.push(link)
+              }
+            })
+          })
+          setNodes(_nodes)
+          setLinks(_links)
+        }
+      })
+      .catch(console.error)
+  }
+  
   return(
     <Body>
       <Column className="main-wrap" style={bodyStyle}>

@@ -6,7 +6,6 @@ function ForceGraph({ linksData, nodesData } : any) {
   const containerRef = React.useRef(null);
 
   React.useEffect(() => {
-    console.log('useEffect');
     let destroyFn;
 
     if (containerRef.current) {
@@ -15,7 +14,7 @@ function ForceGraph({ linksData, nodesData } : any) {
     }
 
     return destroyFn;
-  }, []);
+  }, [linksData, nodesData]);
 
   return <div ref={containerRef} className={styles.container} />;
 }
