@@ -45,8 +45,8 @@ export function runForceGraph(
 
   const simulation = d3
     .forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id((d: any) => d.id).strength(0.1))
-    .force('charge', d3.forceManyBody().strength(-800))
+    .force('link', d3.forceLink(links).id((d: any) => d.id).strength(1))
+    .force('charge', d3.forceManyBody().strength(-400))
     .force('x', d3.forceX())
     .force('y', d3.forceY());
 
@@ -64,6 +64,21 @@ export function runForceGraph(
     .join('line')
     .attr('stroke-width', (d: any) => Math.sqrt(d.value));
 
+  let defs = svg.append('svg:defs');
+  nodes.forEach(node => {
+    defs.append("svg:pattern")
+      .attr("id", "grump_avatar")
+      .attr("width", 15) 
+      .attr("height", 15)
+      .attr("patternUnits", "userSpaceOnUse")
+      .append("svg:image")
+      .attr("xlink:href", "https://bitcoin.org/img/icons/opengraph.png")
+      .attr("width", 15)
+      .attr("height", 15)
+      .attr("x", 0)
+      .attr("y", 0);
+  })
+
   const node = svg
     .append('g')
     .attr('stroke', '#000')
@@ -71,8 +86,19 @@ export function runForceGraph(
     .selectAll('circle')
     .data(nodes)
     .join('circle')
-    .attr('r', 30)
+    .attr('r', 15)
     .attr('fill', color)
+    .on("mouseover", function(){
+        // @ts-ignore
+        d3.select(this)
+            .style("fill", "url(#grump_avatar)")
+    })
+    .on("mouseout", function(){
+        // @ts-ignore
+        d3.select(this)
+            .style("fill", color)
+      
+    })
     // @ts-ignore
     .call(drag(simulation));
 
@@ -82,7 +108,7 @@ export function runForceGraph(
     .data(nodes)
     .enter()
     .append('text')
-    .text((d: any) => d.name)
+    .text((d: any) => d.type == 'podcast' ? null : d.name)
     .attr('text-anchor', 'middle')
     .attr('dominant-baseline', 'central')
     // @ts-ignore

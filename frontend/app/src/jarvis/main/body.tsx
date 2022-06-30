@@ -1,7 +1,8 @@
-import React, {useState} from 'react'
+import React, {useState, useCallback } from 'react'
 import { EuiCard, EuiFormFieldset, EuiIcon, EuiFlexItem, EuiFlexGroup } from "@elastic/eui";
 import styled from "styled-components";
 import ForceGraph from './ForceGraph/ForceGraph'
+import _ from 'lodash'
 
 interface Node {
   id: number,
@@ -21,6 +22,8 @@ interface Moment {
   timestamp: string,
   topics: string[]
 }
+
+const DEBOUNCE_LAG = 800
 
 export default function BodyComponent() {
 
@@ -133,25 +136,29 @@ export default function BodyComponent() {
       })
       .catch(console.error)
   }
+
+  const dispatchNetwork = useCallback(_.debounce((word) => {
+    callApi(word)
+  }, DEBOUNCE_LAG), [])
+
+  const onChange = (event: any) => {
+    setTextBoxText(event.target.value)
+    dispatchNetwork(event.target.value)
+  }
   
   return(
     <Body>
-      <Column className="main-wrap" style={bodyStyle}>
           <form>
             <input
               style={{borderRadius: '100px', paddingLeft: '10px', marginBottom: '10px'}}
               type="text" 
               value={textBoxText} 
               placeholder="Search"
-              onChange={e => {
-                setTextBoxText(e.target.value)
-                callApi(e.target.value)             
-                }}
+              onChange={onChange}
             />
           </form>
-          {listMapping()}
+          {/*listMapping()*/}
           <ForceGraph linksData={links} nodesData={nodes}/>
-      </Column>
     </Body>
   )
 }
