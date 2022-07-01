@@ -39,6 +39,11 @@ export default function Header() {
             path: '/p'
         },
         {
+            label: 'Super duper cool page',
+            name: 'superdupercoolpage',
+            path: '/sdcp'
+        },
+        {
             label: 'Bots',
             name: 'bots',
             path: '/b'

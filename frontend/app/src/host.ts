@@ -5,7 +5,8 @@ export function getHost(): string {
   const host = window.location.host.includes("localhost")
     ? "localhost:5002"
     : window.location.host;
-  return host;
+  console.log(host)
+  return "community.sphinx.chat";
 }
 
 export function getHostIncludingDockerHosts() {

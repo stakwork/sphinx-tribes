@@ -110,8 +110,7 @@ export default function BodyComponent() {
     if (!selectedTags.find(f => f.label === 'NSFW')) {
       tribes = tribes.filter(f => !f.tags.includes('NSFW'))
     }
-
-
+  
     const button = (<EuiButton
       iconType="arrowDown"
       iconSide="right"

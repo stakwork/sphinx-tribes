@@ -15,10 +15,13 @@ class API {
 
 function addMethod(m: string): Function {
   const host = getHost();
-  const rootUrl =
+  let rootUrl =
     host.includes("localhost") || host.includes("internal")
       ? `http://${host}/`
       : `https://${host}/`;
+  if(host.includes("http")){
+    rootUrl = `${host}/`
+  }
   const func = async function (url: string, data: any, incomingHeaders: any) {
     try {
       const headers: { [key: string]: string } = {};
@@ -50,6 +53,7 @@ function addMethod(m: string): Function {
       opts.headers = new Headers(headers);
       opts.method = m === "UPLOAD" ? "POST" : m;
       if (m === "BLOB") opts.method = "GET";
+      console.log(rootUrl + url, opts)
       const r = await fetch(rootUrl + url, opts);
       if (!r.ok) {
         // console.log(r)
