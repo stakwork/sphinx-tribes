@@ -3,7 +3,8 @@ import * as d3 from 'd3';
 export function runForceGraph(
   container: any,
   linksData: any,
-  nodesData: any
+  nodesData: any,
+  onNodeClicked: any
 ) {
   const links = linksData.map((d: any) => Object.assign({}, d));
   const nodes = nodesData.map((d: any) => Object.assign({}, d));
@@ -86,6 +87,7 @@ export function runForceGraph(
     .selectAll('circle')
     .data(nodes)
     .join('circle')
+    .on('click', onNodeClicked)
     .attr('r', 15)
     .attr('fill', color)
     .on("mouseover", function(){

@@ -147,6 +147,15 @@ export default function BodyComponent() {
     setTextBoxText(event.target.value)
     dispatchNetwork(event.target.value)
   }
+
+  const onNodeClicked = (event: PointerEvent, data: any) => {
+    if (data.type === 'topic') {
+      if (!isLoading) {
+        setTextBoxText(data.name)
+        callApi(data.name)
+      }
+    }
+  }
   
   return(
     <Body>
@@ -162,7 +171,11 @@ export default function BodyComponent() {
             />
           </form>
           {/*listMapping()*/}
-          <ForceGraph linksData={links} nodesData={nodes}/>
+          <ForceGraph
+            linksData={links}
+            nodesData={nodes}
+            onNodeClicked={onNodeClicked}
+          />
     </Body>
   )
 }
