@@ -3,6 +3,7 @@ import { EuiCard, EuiFormFieldset, EuiIcon, EuiFlexItem, EuiFlexGroup } from "@e
 import styled from "styled-components";
 import ForceGraph from './ForceGraph/ForceGraph'
 import _ from 'lodash'
+import './body.css'
 
 interface Node {
   id: number,
@@ -31,7 +32,7 @@ export default function BodyComponent() {
   const [graphData, setGraphData] = useState([])
   const [nodes, setNodes] = useState<Node[]>([])
   const [links, setLinks] = useState<Link[]>([])
-
+  const [isLoading, setIsLoading] = useState(false)
 
  const hStyle = {
     color: 'white',
@@ -82,7 +83,7 @@ export default function BodyComponent() {
   }
   
   function callApi(word: string) {
-    console.log('callApi.word: ', word)
+    setIsLoading(true)
     let index = 0
     fetch(`https://ardent-pastry-basement.wayscript.cloud/prediction/${word}`)
       .then(response => response.json())
@@ -135,6 +136,7 @@ export default function BodyComponent() {
         }
       })
       .catch(console.error)
+      .finally(() => setIsLoading(false))
   }
 
   const dispatchNetwork = useCallback(_.debounce((word) => {
@@ -150,6 +152,8 @@ export default function BodyComponent() {
     <Body>
           <form>
             <input
+              className={isLoading ? 'loading' : ''}
+              disabled={isLoading}
               style={{borderRadius: '100px', paddingLeft: '10px', marginBottom: '10px'}}
               type="text" 
               value={textBoxText} 
