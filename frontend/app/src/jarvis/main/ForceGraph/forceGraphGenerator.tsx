@@ -133,6 +133,17 @@ export function runForceGraph(
       .attr('y', (d: any) => { return d.y; })
   });
 
+  function handleZoom(e) {
+  d3.selectAll('g')
+    .attr('transform', e.transform);
+  }
+
+  let zoom = d3.zoom()
+    .on('zoom', handleZoom);
+  
+  d3.select('svg')
+    .call(zoom);
+
   return {
     destroy: () => {
       simulation.stop();
