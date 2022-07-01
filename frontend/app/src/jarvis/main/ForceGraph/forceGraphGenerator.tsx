@@ -4,7 +4,8 @@ export function runForceGraph(
   container: any,
   linksData: any,
   nodesData: any,
-  onNodeClicked: any
+  onNodeClicked: any,
+  currentTopic: string
 ) {
   const links = linksData.map((d: any) => Object.assign({}, d));
   const nodes = nodesData.map((d: any) => Object.assign({}, d));
@@ -17,7 +18,10 @@ export function runForceGraph(
   const height = containerRect.height;
   const width = containerRect.width;
 
-  const color = (d: any) => { return d.type === 'podcast' ? '#9D00A0' : '#4a7bd8'; };
+  const color = (d: any) => {
+    if (d.name === currentTopic) return '#2dc34e'
+    return d.type === 'podcast' ? '#9D00A0' : '#4a7bd8';
+  };
 
   const drag = (simulation: any) => {
     const dragstarted = (event: any, d: any) => {

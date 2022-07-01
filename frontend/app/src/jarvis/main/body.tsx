@@ -28,7 +28,7 @@ const DEBOUNCE_LAG = 800
 
 export default function BodyComponent() {
 
-  const [textBoxText, setTextBoxText] = useState("");
+  const [topic, setTopic] = useState("");
   const [graphData, setGraphData] = useState([])
   const [nodes, setNodes] = useState<Node[]>([])
   const [links, setLinks] = useState<Link[]>([])
@@ -144,14 +144,14 @@ export default function BodyComponent() {
   }, DEBOUNCE_LAG), [])
 
   const onChange = (event: any) => {
-    setTextBoxText(event.target.value)
+    setTopic(event.target.value)
     dispatchNetwork(event.target.value)
   }
 
   const onNodeClicked = (event: PointerEvent, data: any) => {
     if (data.type === 'topic') {
       if (!isLoading) {
-        setTextBoxText(data.name)
+        setTopic(data.name)
         callApi(data.name)
       }
     }
@@ -165,7 +165,7 @@ export default function BodyComponent() {
               disabled={isLoading}
               style={{borderRadius: '100px', paddingLeft: '10px', marginBottom: '10px'}}
               type="text" 
-              value={textBoxText} 
+              value={topic}
               placeholder="Search"
               onChange={onChange}
             />
@@ -174,6 +174,7 @@ export default function BodyComponent() {
           <ForceGraph
             linksData={links}
             nodesData={nodes}
+            currentTopic={topic}
             onNodeClicked={onNodeClicked}
           />
     </Body>
