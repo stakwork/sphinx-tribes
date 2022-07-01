@@ -1,0 +1,18 @@
+input[type=text]{
+  position: relative;
+  padding: 12px 60px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.loading {
+  margin: 20px;
+  background-color: #ffffff;
+  background-image: url("https://i.gifer.com/ZZ5H.gif");
+  background-size: 25px 25px;
+  background-position:right center;
+  background-position-x: 95%;
+  background-repeat: no-repeat;
+}
