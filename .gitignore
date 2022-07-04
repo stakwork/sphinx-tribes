@@ -5,4 +5,7 @@ sphinx-tribes
 frontend/app/node_modules
 frontend/app/package-lock.json
 
+backend/venv
+backend/__pycache__
+
 notes.md
