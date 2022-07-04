@@ -1,5 +1,9 @@
 import * as d3 from 'd3';
 
+const SELECTED_TOPIC_COLOR = '#2dc34e';
+const UNSELECTED_TOPIC_COLOR = '#4a7bd8';
+const PODCAST_COLOR = '#9D00A0';
+
 export function runForceGraph(
   container: any,
   linksData: any,
@@ -19,8 +23,8 @@ export function runForceGraph(
   const width = containerRect.width;
 
   const color = (d: any) => {
-    if (d.name === currentTopic) return '#2dc34e'
-    return d.type === 'podcast' ? '#9D00A0' : '#4a7bd8';
+    if (d.name === currentTopic) return SELECTED_TOPIC_COLOR
+    return d.type === 'podcast' ? PODCAST_COLOR : UNSELECTED_TOPIC_COLOR;
   };
 
   const drag = (simulation: any) => {
