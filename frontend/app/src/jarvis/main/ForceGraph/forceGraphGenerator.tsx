@@ -1,9 +1,15 @@
 import * as d3 from 'd3';
 
+const SELECTED_TOPIC_COLOR = '#2dc34e';
+const UNSELECTED_TOPIC_COLOR = '#4a7bd8';
+const PODCAST_COLOR = '#9D00A0';
+
 export function runForceGraph(
   container: any,
   linksData: any,
-  nodesData: any
+  nodesData: any,
+  onNodeClicked: any,
+  currentTopic: string
 ) {
   const links = linksData.map((d: any) => Object.assign({}, d));
   const nodes = nodesData.map((d: any) => Object.assign({}, d));
@@ -16,7 +22,10 @@ export function runForceGraph(
   const height = containerRect.height;
   const width = containerRect.width;
 
-  const color = (d: any) => { return d.type === 'podcast' ? '#9D00A0' : '#4a7bd8'; };
+  const color = (d: any) => {
+    if (d.name === currentTopic) return SELECTED_TOPIC_COLOR
+    return d.type === 'podcast' ? PODCAST_COLOR : UNSELECTED_TOPIC_COLOR;
+  };
 
   const drag = (simulation: any) => {
     const dragstarted = (event: any, d: any) => {
@@ -86,6 +95,7 @@ export function runForceGraph(
     .selectAll('circle')
     .data(nodes)
     .join('circle')
+    .on('click', onNodeClicked)
     .attr('r', 15)
     .attr('fill', color)
     .on("mouseover", function(){

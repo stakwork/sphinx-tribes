@@ -28,7 +28,7 @@ const DEBOUNCE_LAG = 800
 
 export default function BodyComponent() {
 
-  const [textBoxText, setTextBoxText] = useState("");
+  const [topic, setTopic] = useState("");
   const [graphData, setGraphData] = useState([])
   const [nodes, setNodes] = useState<Node[]>([])
   const [links, setLinks] = useState<Link[]>([])
@@ -141,11 +141,19 @@ export default function BodyComponent() {
 
   const dispatchNetwork = useCallback(_.debounce((word) => {
     callApi(word)
-  }, DEBOUNCE_LAG), [])
+  }, DEBOUNCE_LAG), [isLoading])
 
-  const onChange = (event: any) => {
-    setTextBoxText(event.target.value)
-    dispatchNetwork(event.target.value)
+  const onTopicChange = (topic: string) => {
+    setTopic(topic)
+    dispatchNetwork(topic)
+  }
+
+  const onNodeClicked = (event: PointerEvent, data: any) => {
+    if (data.type === 'topic') {
+      if (!isLoading) {
+        onTopicChange(data.name)
+      }
+    }
   }
   
   return(
@@ -156,13 +164,18 @@ export default function BodyComponent() {
               disabled={isLoading}
               style={{borderRadius: '100px', paddingLeft: '10px', marginBottom: '10px'}}
               type="text" 
-              value={textBoxText} 
+              value={topic}
               placeholder="Search"
-              onChange={onChange}
+              onChange={e => onTopicChange(e.target.value)}
             />
           </form>
           {/*listMapping()*/}
-          <ForceGraph linksData={links} nodesData={nodes}/>
+          <ForceGraph
+            linksData={links}
+            nodesData={nodes}
+            currentTopic={topic}
+            onNodeClicked={onNodeClicked}
+          />
     </Body>
   )
 }
