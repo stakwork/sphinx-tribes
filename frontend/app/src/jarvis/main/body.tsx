@@ -143,16 +143,15 @@ export default function BodyComponent() {
     callApi(word)
   }, DEBOUNCE_LAG), [isLoading])
 
-  const onChange = (event: any) => {
-    setTopic(event.target.value)
-    dispatchNetwork(event.target.value)
+  const onTopicChange = (topic: string) => {
+    setTopic(topic)
+    dispatchNetwork(topic)
   }
 
   const onNodeClicked = (event: PointerEvent, data: any) => {
     if (data.type === 'topic') {
       if (!isLoading) {
-        setTopic(data.name)
-        callApi(data.name)
+        onTopicChange(data.name)
       }
     }
   }
@@ -167,7 +166,7 @@ export default function BodyComponent() {
               type="text" 
               value={topic}
               placeholder="Search"
-              onChange={onChange}
+              onChange={e => onTopicChange(e.target.value)}
             />
           </form>
           {/*listMapping()*/}
