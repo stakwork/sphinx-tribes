@@ -1,5 +1,4 @@
 import React, {useState, useCallback } from 'react'
-import { EuiCard, EuiFormFieldset, EuiIcon, EuiFlexItem, EuiFlexGroup } from "@elastic/eui";
 import styled from "styled-components";
 import ForceGraph from './ForceGraph/ForceGraph'
 import _ from 'lodash'
@@ -24,14 +23,17 @@ interface Moment {
   topics: string[]
 }
 
+interface NodesAndLinks{
+  nodes: Node[],
+  links: Link[]
+}
+
 const DEBOUNCE_LAG = 800
 
 export default function BodyComponent() {
 
   const [topic, setTopic] = useState("");
-  const [graphData, setGraphData] = useState([])
-  const [nodes, setNodes] = useState<Node[]>([])
-  const [links, setLinks] = useState<Link[]>([])
+  const [graphData, setGraphData] = useState<NodesAndLinks>({nodes: [], links: []})
   const [isLoading, setIsLoading] = useState(false)
 
  const hStyle = {
@@ -50,33 +52,6 @@ export default function BodyComponent() {
   const divStyle = {
     height: 10
   };
-
-  function LineItemComponent(props){
-    
-    return(
-      <EuiFlexItem grow={false} key={props.index}>
-        <EuiCard
-          icon={<EuiIcon size="xxl" type={`https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg`} />}
-          title={`test`}
-          isDisabled={true}
-          description={props.lineItemData['0']}
-          onClick={() => {}}
-        />
-      </EuiFlexItem >
-    )
-  }
-
-  function listMapping(){
-    return (
-        <div style={{display:'flex', gap: '10px', flexWrap: 'wrap'}}>
-          {graphData.length && graphData.map((item,index) => {
-
-               return <LineItemComponent key={index} lineItemData={item} index/>
-                 
-                })}
-        </div >
-    )
-  }
 
   function findNodeByName(name: string, _nodes: Array<Node>) : Node | undefined {
     return _nodes.find(candidate => candidate.name === name)
@@ -131,12 +106,19 @@ export default function BodyComponent() {
               }
             })
           })
-          setNodes(_nodes)
-          setLinks(_links)
+          console.log(_nodes)
+          setGraphData({nodes: _nodes, links: _links})
+          // setNodes(_nodes)
+          // console.log(_links)
+          // setLinks(_links)
         }
       })
       .catch(console.error)
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        console.log('Running finally block')
+        setIsLoading(false)
+        console.log(isLoading)
+      })
   }
 
   const dispatchNetwork = useCallback(_.debounce((word) => {
@@ -148,7 +130,8 @@ export default function BodyComponent() {
     dispatchNetwork(topic)
   }
 
-  const onNodeClicked = (event: PointerEvent, data: any) => {
+  const onNodeClicked = (event: PointerEvent, data: any, isLoading) => {
+    console.log('onNodeClicked.data: ', data, ', isLoading: ', isLoading)
     if (data.type === 'topic') {
       if (!isLoading) {
         onTopicChange(data.name)
@@ -169,12 +152,11 @@ export default function BodyComponent() {
               onChange={e => onTopicChange(e.target.value)}
             />
           </form>
-          {/*listMapping()*/}
           <ForceGraph
-            linksData={links}
-            nodesData={nodes}
+            linksData={graphData.links}
+            nodesData={graphData.nodes}
             currentTopic={topic}
-            onNodeClicked={onNodeClicked}
+            onNodeClicked={(e,data) => onNodeClicked(e, data, isLoading)}
           />
     </Body>
   )
