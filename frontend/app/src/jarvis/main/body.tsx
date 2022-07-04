@@ -141,7 +141,7 @@ export default function BodyComponent() {
 
   const dispatchNetwork = useCallback(_.debounce((word) => {
     callApi(word)
-  }, DEBOUNCE_LAG), [])
+  }, DEBOUNCE_LAG), [isLoading])
 
   const onChange = (event: any) => {
     setTopic(event.target.value)
