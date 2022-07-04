@@ -33,10 +33,7 @@ const DEBOUNCE_LAG = 800
 export default function BodyComponent() {
 
   const [topic, setTopic] = useState("");
-  //const [graphData, setGraphData] = useState([])
   const [graphData, setGraphData] = useState<NodesAndLinks>({nodes: [], links: []})
-  //const [nodes, setNodes] = useState<Node[]>([])
-  //const [links, setLinks] = useState<Link[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
  const hStyle = {
