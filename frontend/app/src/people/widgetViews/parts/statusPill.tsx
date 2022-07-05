@@ -32,7 +32,15 @@ export default function GithubStatusPill(props: any) {
 
     const isOpen = status === 'open' || !status
 
-    const assignedText = (isOpen && !assignee) ? 'Not assigned' : isOpen ? 'Assigned to ' : 'Completed by '
+    const notAssigned = (isOpen && !assignee)
+    const isAssigned = (isOpen && !!assignee)
+    const isCompleted = (!isOpen && !!assignee)
+
+    const assignedText = () => {
+        if (notAssigned) return 'Not assigned'
+        else if (isAssigned) return 'Assigned to'
+        else if (isCompleted) return 'Completed by'
+    }
 
     return <div style={{ display: 'flex', ...style }}>
         <Pill isOpen={isOpen}>
@@ -43,7 +51,7 @@ export default function GithubStatusPill(props: any) {
         <W>
             <Assignee>
 
-                {assignedText} <Link onClick={(e) => {
+                {assignedText()} <Link onClick={(e) => {
                     e.stopPropagation()
                     findUserByGithubHandle()
                 }}>{assignee}</Link>
