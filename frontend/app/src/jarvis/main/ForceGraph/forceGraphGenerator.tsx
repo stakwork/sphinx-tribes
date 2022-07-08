@@ -156,6 +156,7 @@ export function runForceGraph(
 
   return {
     destroy: () => {
+      d3.select('svg').remove()
       simulation.stop();
     }
   };

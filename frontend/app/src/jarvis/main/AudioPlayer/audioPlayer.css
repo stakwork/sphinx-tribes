@@ -1,0 +1,56 @@
+:root {
+  --white: #fff;
+  --active-color: #00aeb0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+	font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  background: var(--active-color);
+	transition: background 0.4s ease;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.audio-player {
+  max-width: 350px;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 28px 28px rgba(0, 0, 0, 0.2);
+  margin: auto;
+  color: var(--white);
+}
+
+.artwork {
+  border-radius: 120px;
+  display: block;
+  margin: auto;
+  height: 200px;
+  width: 200px;
+}
+
+.track-info {
+  text-align: center;
+	z-index: 1;
+  position: relative;
+}
+
+.title {
+  font-weight: 400;
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+
+.artist {
+  font-weight: 300;
+  font-size: 0.8rem;
+  margin-top: 0;
+}

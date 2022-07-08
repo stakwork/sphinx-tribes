@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<svg
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg2"
+    viewBox="0 0 187.47 186.39"
+    version="1.1"
+  >
+  <g
+      id="layer1"
+      transform="translate(-137.14 -183.01)"
+    >
+    <path
+        id="path3765"
+        d="m302.86 272.36c0 45.761-37.096 82.857-82.857 82.857s-82.857-37.096-82.857-82.857 37.096-82.857 82.857-82.857 82.857 37.096 82.857 82.857z"
+        transform="matrix(1.1248 0 0 1.1248 -16.037 -30.139)"
+        fill="#006261"
+    />
+    <path
+        id="path2985"
+        d="m302.86 272.36c0 45.761-37.096 82.857-82.857 82.857s-82.857-37.096-82.857-82.857 37.096-82.857 82.857-82.857 82.857 37.096 82.857 82.857z"
+        transform="matrix(1.0345 0 0 1.0345 -4.7291 -6.5347)"
+        fill="#008080"
+    />
+    <path
+        id="path3767"
+        d="m207.71 334.05 71.377-44.208-71.377-44.208"
+        fill="#006261"
+    />
+    <path
+        id="path3763"
+        fill="#fff"
+        d="m196.33 324.22 77.332-48.997-77.332-48.997"
+    />
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >Play button (clear style)</dc:title
+        >
+        <dc:date
+          >2013-11-20T12:23:26</dc:date
+        >
+        <dc:description
+          >Play button icon for web. Clear style.</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/188943/play-button-clear-style-by-diamonjohn-188943</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >diamonjohn</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >button</rdf:li
+            >
+            <rdf:li
+              >clear</rdf:li
+            >
+            <rdf:li
+              >clear style</rdf:li
+            >
+            <rdf:li
+              >go</rdf:li
+            >
+            <rdf:li
+              >mp3</rdf:li
+            >
+            <rdf:li
+              >play</rdf:li
+            >
+            <rdf:li
+              >play button</rdf:li
+            >
+            <rdf:li
+              >player</rdf:li
+            >
+            <rdf:li
+              >push</rdf:li
+            >
+            <rdf:li
+              >run</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>
