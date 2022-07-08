@@ -8,12 +8,11 @@ function ForceGraph({ linksData, nodesData, onNodeClicked, currentTopic } : any)
   React.useEffect(() => {
     let destroyFn;
 
-    console.log(containerRef)
     if (containerRef.current) {
       const { destroy } = runForceGraph(containerRef.current, linksData, nodesData, onNodeClicked, currentTopic);
       destroyFn = destroy;
     }
-    console.log(destroyFn)
+   
     return destroyFn;
   }, [linksData, nodesData]);
 
