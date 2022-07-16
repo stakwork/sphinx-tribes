@@ -5,6 +5,7 @@ export function getHost(): string {
   const host = window.location.host.includes("localhost")
     ? "localhost:5002"
     : window.location.host;
+  return "people.sphinx.chat"
   return host;
 }
 
