@@ -86,7 +86,6 @@ const hosts: { [k: string]: Mode } = {
   "people-test.sphinx.chat": Mode.COMMUNITY,
   "community-test.sphinx.chat": Mode.COMMUNITY,
   "community.sphinx.chat": Mode.COMMUNITY,
-  "sphinx-tribes-3.sphinx1.repl.co": Mode.COMMUNITY
 };
 
 function getMode(): Mode {
