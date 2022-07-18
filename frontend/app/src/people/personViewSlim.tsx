@@ -913,7 +913,7 @@ height: 100%;
 `
 
 const AboutWrap = styled.div`
-overflow-y: overlay !important; 
+overflow-y: auto !important; 
 ::-webkit-scrollbar-thumb {
     background-color: rgba(176, 183, 188, 0);
     background: rgba(176, 183, 188, 0);
