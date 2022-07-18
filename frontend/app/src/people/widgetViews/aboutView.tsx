@@ -4,10 +4,7 @@ import { Divider } from '../../sphinxUI';
 import QrBar from '../utils/QrBar'
 import ReactMarkdown from 'react-markdown'
 import { useHistory, useLocation } from 'react-router-dom'
-
-export function renderMarkdown(str) {
-    return <ReactMarkdown>{str}</ReactMarkdown>
-}
+import { renderMarkdown } from '../utils/renderMarkdown'
 
 export default function AboutView(props: any) {
     const history = useHistory()
@@ -319,19 +316,20 @@ margin:10px 0 4px;
 
 const DCollapsed = styled.div`
 color:#5F6368;
-overflow:hidden;
 line-height: 20px;
+padding-bottom: 5px;
 text-overflow: ellipsis;
-display: -webkit-box;
--webkit-line-clamp: 3;
--webkit-box-orient: vertical;
+max-height: 180px;
+display: block;
+overflow:hidden;
+/* -webkit-line-clamp: 3;
+-webkit-box-orient: vertical; */
 `;
 
 const DExpand = styled.div`
 color:#5F6368;
 line-height: 20px;
 `;
-
 
 
 interface IconProps {

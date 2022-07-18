@@ -1,5 +1,5 @@
 import MaterialIcon from '@material/react-material-icon';
-import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
+import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
@@ -13,30 +13,9 @@ import GithubStatusPill from '../parts/statusPill';
 import { useStores } from '../../../store';
 import Form from '../../../form';
 import { sendBadgeSchema } from '../../../form/schema';
-import remarkGfm from 'remark-gfm'
-import LoomViewerRecorder from '../../utils/loomViewerRecorder'
-
-export function renderMarkdown(markdown) {
-
-        return <ReactMarkdown children={markdown} remarkPlugins={[remarkGfm]}
-                components={{
-                        code({ node, inline, className, children, ...props }) {
-                                return (
-                                        <code className={className} {...props}>
-                                                {children}
-                                        </code>
-                                )
-                        },
-                        img({ className, ...props }) {
-                                return (
-                                        <img className={className}
-                                                style={{ width: '100%' }}
-                                                {...props} />
-                                )
-                        }
-                }} />
-
-}
+import remarkGfm from 'remark-gfm';
+import LoomViewerRecorder from '../../utils/loomViewerRecorder';
+import { renderMarkdown } from  '../../utils/renderMarkdown';
 
 export default function WantedSummary(props: any) {
         const { title, description, priceMin, priceMax, url, ticketUrl, gallery, person, created, repo, issue, price, type, tribe, paid, badgeRecipient, loomEmbedUrl } = props

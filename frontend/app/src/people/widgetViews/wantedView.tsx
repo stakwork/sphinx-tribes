@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import styled from "styled-components";
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
@@ -7,6 +7,7 @@ import NameTag from '../utils/nameTag';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
+import { renderMarkdown } from  '../utils/renderMarkdown';
 
 export default function WantedView(props: any) {
     let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, ticketUrl, repo, type, show, paid } = props
@@ -134,7 +135,7 @@ export default function WantedView(props: any) {
 
                     <Divider style={{ margin: isCodingTask ? '22px 0' : '0 0 22px' }} />
 
-                    <DescriptionCodeTask>{description}</DescriptionCodeTask>
+                    <DescriptionCodeTask>{renderMarkdown(description)}</DescriptionCodeTask>
 
                 </Pad>
                 <Divider style={{ margin: 0 }} />
