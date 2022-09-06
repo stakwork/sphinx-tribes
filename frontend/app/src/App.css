@@ -384,7 +384,7 @@ textarea.qr-string {
 
 .copy-btn {
   background: #698cf7;
-  width: 62px;
+  min-width: 62px;
   height: 25px;
   font-size: 10px;
   border-radius: 5px;

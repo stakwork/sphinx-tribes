@@ -27,7 +27,6 @@ export default function Tribe({
   unique_name,
 }: any) {
   const showTags = tags && tags.length && tags.length > 0 ? true : false;
-  const textareaRef = useRef(null);
   const qrString = makeQR(uuid);
   const [copied, setCopied] = useState(false);
 
@@ -36,10 +35,8 @@ export default function Tribe({
     : moment().subtract(1, "months");
   const lastActive = lastActiveM.format("MMM D HH:mm");
 
-  function copyString(e: any, textareaRef: any) {
-    e.stopPropagation();
-    textareaRef.current.select();
-    document.execCommand("copy");
+  function copyString(text: any) {
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2700);
   }
@@ -166,9 +163,9 @@ export default function Tribe({
                   </a>
                   <button
                     className="copy-btn"
-                    onClick={(e) => copyString(e, textareaRef)}
+                    onClick={(e) => copyString(qrString)}
                   >
-                    {copied ? "Copied Link!" : "Copy Link"}
+                    {copied ? "Copied!" : "Copy Link"}
                   </button>
                 </div>
               </div>
