@@ -381,6 +381,7 @@ textarea.qr-string {
   resize: none;
 }
 
+
 .copy-btn {
   background: #698cf7;
   width: 62px;
@@ -389,6 +390,28 @@ textarea.qr-string {
   border-radius: 5px;
   color: #fff;
   text-transform: uppercase;
+}
+
+.preview-btn {
+  background: #698cf7;
+  width: 62px;
+  height: 25px;
+  font-size: 10px;
+  border-radius: 5px;
+  color: #fff;
+  text-transform: uppercase;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.preview-btn:hover {
+  text-decoration: none;
+  color: #fff;
+}
+
+.copy-btn {
+  margin-left: auto;
 }
 
 .join-btn {
