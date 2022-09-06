@@ -1,6 +1,7 @@
 .DS_Store
 sphinx-tribes
 .env
+.env*
 
 frontend/app/node_modules
 frontend/app/package-lock.json
