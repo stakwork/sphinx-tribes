@@ -159,7 +159,7 @@ export default function Tribe({
                   </QRWrap>
                 )}
                 <div className="below-qr">
-                  <a href={preview ? `${preview}?tribe=${uuid}`: 'javscript:void(0)'} target={preview ? '_blank' : '_self'} className="preview-btn">
+                  <a href={`${preview}?tribe=${uuid}`} target={'_blank'} className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}>
                     Preview
                   </a>
                   <button
