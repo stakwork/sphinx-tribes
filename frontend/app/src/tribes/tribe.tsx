@@ -25,6 +25,7 @@ export default function Tribe({
   member_count,
   last_active,
   unique_name,
+  preview,
 }: any) {
   const showTags = tags && tags.length && tags.length > 0 ? true : false;
   const qrString = makeQR(uuid);
@@ -158,7 +159,7 @@ export default function Tribe({
                   </QRWrap>
                 )}
                 <div className="below-qr">
-                  <a href={`https://cache.sphinx.chat?tribe=${uuid}`} target='_blank' className="preview-btn">
+                  <a href={preview ? `${preview}?tribe=${uuid}`: 'javscript:void(0)'} target={preview ? '_blank' : '_self'} className="preview-btn">
                     Preview
                   </a>
                   <button
