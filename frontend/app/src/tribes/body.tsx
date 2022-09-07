@@ -96,8 +96,6 @@ export default function BodyComponent() {
 
     let tribes = main.tribes
     
-    console.log('Tribes ===', tribes);
-
     const loadForwardFunc = () => loadMore(1)
     const loadBackwardFunc = () => loadMore(-1)
     const { loadingTop, loadingBottom, handleScroll } = getPageScroll(loadForwardFunc, loadBackwardFunc)

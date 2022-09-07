@@ -950,3 +950,7 @@ textarea.qr-string {
 input::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
+
+.btn-disabled {
+  pointer-events: none;
+}
