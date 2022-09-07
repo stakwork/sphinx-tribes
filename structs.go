@@ -37,6 +37,7 @@ type Tribe struct {
 	Bots            string         `json:"bots"`
 	OwnerRouteHint  string         `json:"owner_route_hint"`
 	Pin             string         `json:"pin"`
+	Preview         string         `json:"preview"`
 }
 
 // Bot struct
