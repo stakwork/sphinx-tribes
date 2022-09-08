@@ -953,4 +953,5 @@ input::-webkit-search-cancel-button {
 
 .btn-disabled {
   pointer-events: none;
+  opacity: 0.65;
 }

@@ -1,10 +1,10 @@
-import React, {useRef, useState} from "react";
-import {QRCode} from "react-qr-svg";
+import React, { useRef, useState } from "react";
+import { QRCode } from "react-qr-svg";
 import styled from "styled-components";
-import {EuiCheckableCard} from "@elastic/eui";
+import { EuiCheckableCard } from "@elastic/eui";
 import Tag from "./tag";
 import moment from "moment";
-import {getHostIncludingDockerHosts} from "../host";
+import { getHostIncludingDockerHosts } from "../host";
 
 function makeQR(uuid: string) {
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`;
@@ -36,7 +36,8 @@ export default function Tribe({
     : moment().subtract(1, "months");
   const lastActive = lastActiveM.format("MMM D HH:mm");
 
-  function copyString(text: any) {
+  function copyString(e, text: any) {
+    e.stopPropagation();
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2700);
@@ -61,14 +62,14 @@ export default function Tribe({
       >
         <Left>
           <Row className="item-cont">
-            <Img src={img || '/static/placeholder.svg'} />
+            <Img src={img || "/static/placeholder.svg"} />
             <Left
-              style={{padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)"}}
+              style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
             >
               <Row
                 style={
                   selected
-                    ? {flexDirection: "column", alignItems: "flex-start"}
+                    ? { flexDirection: "column", alignItems: "flex-start" }
                     : {}
                 }
               >
@@ -76,7 +77,7 @@ export default function Tribe({
               </Row>
               <Description
                 oneLine={selected ? false : true}
-                style={{minHeight: 20}}
+                style={{ minHeight: 20 }}
               >
                 {description}
               </Description>
@@ -95,7 +96,7 @@ export default function Tribe({
           </Row>
           <div
             className="expand-part"
-            style={selected ? {opacity: 1} : {opacity: 0}}
+            style={selected ? { opacity: 1 } : { opacity: 0 }}
           >
             <div className="section-separator"></div>
             <div className="row info-section">
@@ -122,7 +123,7 @@ export default function Tribe({
               <div className="col-4 col-sm-4 col-md-4 col-lg-4 qr-left">
                 <div className="text-right">
                   <img
-                    style={{width: 100}}
+                    style={{ width: 100 }}
                     src="/static/scan_notification.svg"
                     alt=""
                   />
@@ -137,9 +138,13 @@ export default function Tribe({
                   <div className="lighter-color">{price_per_message || 0}</div>
                 </div>
                 <div className="section-separator"></div>
-                <a href={qrString} className="btn join-btn">
+                <a
+                  onClick={(e) => e.stopPropagation()}
+                  href={qrString}
+                  className="btn join-btn"
+                >
                   <img
-                    style={{width: 13, height: 13, marginRight: 8}}
+                    style={{ width: 13, height: 13, marginRight: 8 }}
                     src="/static/launch-24px.svg"
                     alt=""
                   />
@@ -153,18 +158,23 @@ export default function Tribe({
                       bgColor={selected ? "#FFFFFF" : "#666"}
                       fgColor="#000000"
                       level="Q"
-                      style={{width: 209}}
+                      style={{ width: 209 }}
                       value={qrString}
                     />
                   </QRWrap>
                 )}
                 <div className="below-qr">
-                  <a href={`${preview}?tribe=${uuid}`} target={'_blank'} className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}>
+                  <a
+                    onClick={(e) => e.stopPropagation()}
+                    href={`https://${preview}?tribe=${uuid}`}
+                    target={"_blank"}
+                    className={`preview-btn ${!preview ? "btn-disabled" : ""}`}
+                  >
                     Preview
                   </a>
                   <button
                     className="copy-btn"
-                    onClick={(e) => copyString(qrString)}
+                    onClick={(e) => copyString(e, qrString)}
                   >
                     {copied ? "Copied!" : "Copy Link"}
                   </button>
@@ -261,7 +271,6 @@ const Img = styled.div<ImageProps>`
   border-radius: 5px;
   position: relative;
 `;
-
 
 const Tokens = styled.div`
   display: flex;
