@@ -25,9 +25,9 @@ export default function Tribe({
   member_count,
   last_active,
   unique_name,
+  preview,
 }: any) {
   const showTags = tags && tags.length && tags.length > 0 ? true : false;
-  const textareaRef = useRef(null);
   const qrString = makeQR(uuid);
   const [copied, setCopied] = useState(false);
 
@@ -36,10 +36,9 @@ export default function Tribe({
     : moment().subtract(1, "months");
   const lastActive = lastActiveM.format("MMM D HH:mm");
 
-  function copyString(e: any, textareaRef: any) {
+  function copyString(e, text: any) {
     e.stopPropagation();
-    textareaRef.current.select();
-    document.execCommand("copy");
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2700);
   }
@@ -63,7 +62,7 @@ export default function Tribe({
       >
         <Left>
           <Row className="item-cont">
-            <Img src={img || '/static/placeholder.svg'} />
+            <Img src={img || "/static/placeholder.svg"} />
             <Left
               style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
             >
@@ -117,10 +116,6 @@ export default function Tribe({
                 <div className="uppercase">Admin:</div>
                 <div className="lighter-color">{owner_alias}</div>
               </div>
-              {/* <div className="col-4 col-sm-4 col-md-4 col-lg-4 text-right">
-              <div className="uppercase">Created on:</div>
-              <div className="lighter-color">{moment(created).format('MMM D')}</div>
-            </div> */}
             </div>
             <div className="section-separator"></div>
 
@@ -143,7 +138,11 @@ export default function Tribe({
                   <div className="lighter-color">{price_per_message || 0}</div>
                 </div>
                 <div className="section-separator"></div>
-                <a href={qrString} className="btn join-btn">
+                <a
+                  onClick={(e) => e.stopPropagation()}
+                  href={qrString}
+                  className="btn join-btn"
+                >
                   <img
                     style={{ width: 13, height: 13, marginRight: 8 }}
                     src="/static/launch-24px.svg"
@@ -165,16 +164,19 @@ export default function Tribe({
                   </QRWrap>
                 )}
                 <div className="below-qr">
-                  <textarea
-                    className="qr-string"
-                    ref={textareaRef}
-                    defaultValue={qrString}
-                  />
+                  <a
+                    onClick={(e) => e.stopPropagation()}
+                    href={`https://${preview}?tribe=${uuid}`}
+                    target={"_blank"}
+                    className={`preview-btn ${!preview ? "btn-disabled" : ""}`}
+                  >
+                    Preview
+                  </a>
                   <button
                     className="copy-btn"
-                    onClick={(e) => copyString(e, textareaRef)}
+                    onClick={(e) => copyString(e, qrString)}
                   >
-                    {copied ? "Copied!" : "Copy"}
+                    {copied ? "Copied!" : "Copy Link"}
                   </button>
                 </div>
               </div>
@@ -269,7 +271,6 @@ const Img = styled.div<ImageProps>`
   border-radius: 5px;
   position: relative;
 `;
-
 
 const Tokens = styled.div`
   display: flex;

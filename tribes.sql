@@ -139,3 +139,5 @@ VALUES
 INSERT into people (owner_alias, owner_pub_key, description, tags, img, unique_name)
 VALUES
 ('Jesse', '038c3c1f4d304c7b997fecfdaf8fdfc2215405942c025349b45de9dfe6fdb8a43e', 'Im cool', '{"tag1"}', 'https://cliparting.com/wp-content/uploads/2018/03/cool-pictures-2018-2.jpg', 'jesse');
+
+ALTER TABLE IF EXISTS tribes ADD COLUMN IF NOT EXISTS preview VARCHAR NULL;
