@@ -95,7 +95,7 @@ export default function BodyComponent() {
   return useObserver(() => {
 
     let tribes = main.tribes
-
+    
     const loadForwardFunc = () => loadMore(1)
     const loadBackwardFunc = () => loadMore(-1)
     const { loadingTop, loadingBottom, handleScroll } = getPageScroll(loadForwardFunc, loadBackwardFunc)
