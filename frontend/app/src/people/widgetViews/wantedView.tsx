@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import styled from "styled-components";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import { Divider, Title, Button } from '../../sphinxUI';
@@ -7,333 +7,532 @@ import NameTag from '../utils/nameTag';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
-import { renderMarkdown } from  '../utils/renderMarkdown';
+import { renderMarkdown } from '../utils/renderMarkdown';
 
 export default function WantedView(props: any) {
-    let { title, description, priceMin, priceMax, price, url, gallery, person, created, issue, ticketUrl, repo, type, show, paid } = props
-    const isMobile = useIsMobile()
-    const { ui, main } = useStores()
-    const [saving, setSaving] = useState(false)
-    const { peopleWanteds } = main
+  let {
+    title,
+    description,
+    priceMin,
+    priceMax,
+    price,
+    url,
+    gallery,
+    person,
+    created,
+    issue,
+    ticketUrl,
+    repo,
+    type,
+    show,
+    paid,
+    codingLanguage,
+    assignee,
+  } = props;
+  const isMobile = useIsMobile();
+  const { ui, main } = useStores();
+  const [saving, setSaving] = useState(false);
+  const [labels, setLabels] = useState([]);
+  const [IsAssigned, setIsAssigned] = useState([]);
+  const { peopleWanteds } = main;
 
-    const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey
+  const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
 
-    if ('show' in props) {
-        // show has a value
-    } else {
-        // if no value default to true
-        show = true
-    }
+  if ('show' in props) {
+    // show has a value
+  } else {
+    // if no value default to true
+    show = true;
+  }
 
-    if ('paid' in props) {
-        // show has no value
-    } else {
-        // if no value default to false
-        paid = false
-    }
+  if ('paid' in props) {
+    // show has no value
+  } else {
+    // if no value default to false
+    paid = false;
+  }
 
-    async function setExtrasPropertyAndSave(propertyName: string) {
-        if (peopleWanteds) {
-            setSaving(true)
-            try {
-                const targetProperty = props[propertyName]
-                const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
-                    'wanted',
-                    propertyName,
-                    created,
-                    !targetProperty)
+  async function setExtrasPropertyAndSave(propertyName: string) {
+    if (peopleWanteds) {
+      setSaving(true);
+      try {
+        const targetProperty = props[propertyName];
+        const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
+          'wanted',
+          propertyName,
+          created,
+          !targetProperty
+        );
 
-                // saved? ok update in wanted list if found
-                const peopleWantedsClone: any = [...peopleWanteds]
-                const indexFromPeopleWanted = peopleWantedsClone.findIndex(f => {
-                    let val = f.body || {}
-                    return ((f.person.owner_pubkey === ui.meInfo?.owner_pubkey) && val.created === created)
-                })
+        // saved? ok update in wanted list if found
+        const peopleWantedsClone: any = [...peopleWanteds];
+        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+          let val = f.body || {};
+          return (
+            f.person.owner_pubkey === ui.meInfo?.owner_pubkey &&
+            val.created === created
+          );
+        });
 
-                // if we found it in the wanted list, update in people wanted list
-                if (indexFromPeopleWanted > -1) {
-                    // if it should be hidden now, remove it from the list
-                    if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
-                        peopleWantedsClone.splice(indexFromPeopleWanted, 1)
-                    } else {
-                        peopleWantedsClone[indexFromPeopleWanted] = {
-                            person: person,
-                            body: clonedEx[targetIndex]
-                        }
-                    }
-                    main.setPeopleWanteds(peopleWantedsClone)
-                }
-            } catch (e) {
-                console.log('e', e)
-            }
-
-            setSaving(false)
+        // if we found it in the wanted list, update in people wanted list
+        if (indexFromPeopleWanted > -1) {
+          // if it should be hidden now, remove it from the list
+          if (
+            'show' in clonedEx[targetIndex] &&
+            clonedEx[targetIndex].show === false
+          ) {
+            peopleWantedsClone.splice(indexFromPeopleWanted, 1);
+          } else {
+            peopleWantedsClone[indexFromPeopleWanted] = {
+              person: person,
+              body: clonedEx[targetIndex],
+            };
+          }
+          main.setPeopleWanteds(peopleWantedsClone);
         }
+      } catch (e) {
+        console.log('e', e);
+      }
+
+      setSaving(false);
+    }
+  }
+
+//   console.log({ ...assignee });
+
+  useEffect(() => {
+    if (codingLanguage) {
+      const values = codingLanguage.map((value) => ({ ...value }));
+      setLabels(values);
+    }
+  }, [codingLanguage]);
+
+  function renderTickets() {
+    const { assignee, status } = ticketUrl
+      ? extractGithubIssueFromUrl(person, ticketUrl)
+      : extractGithubIssue(person, repo, issue);
+
+    const isClosed = status === 'closed' || paid ? true : false;
+
+    const isCodingTask =
+      type === 'coding_task' || type === 'wanted_coding_task';
+
+    if (isMobile) {
+      return (
+        <>
+          {paid && (
+            <Img
+              src={'/static/paid_ribbon.svg'}
+              style={{
+                position: 'absolute',
+                top: -1,
+                right: 0,
+                width: 64,
+                height: 72,
+              }}
+            />
+          )}
+          <Wrap isClosed={isClosed} style={{ padding: 15 }}>
+            <Body style={{ width: '100%' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <NameTag
+                  {...person}
+                  created={created}
+                  widget={'wanted'}
+                  style={{ margin: 0 }}
+                />
+              </div>
+              <DT style={{ margin: '15px 0' }}>{title}</DT>
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: '5px 0',
+                }}
+              >
+                {isCodingTask && (
+                  <GithubStatusPill status={status} assignee={assignee} />
+                )}
+              </div>
+
+              <div
+                style={{
+                  minHeight: '45px',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  marginTop: '10px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {labels.length > 0 ? (
+                  labels.map((x: any) => {
+                    return (
+                      <>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            height: '22px',
+                            width: 'fit-content',
+                            backgroundColor: '#cfcfcf',
+                            border: '1px solid #909090',
+                            padding: '0px 14px',
+                            borderRadius: '20px',
+                            marginRight: '3px',
+                            marginBottom: '3px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: '10px',
+                              color: '#202020',
+                            }}
+                          >
+                            {x.label}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        minHeight: '50px',
+                      }}
+                    ></div>
+                  </>
+                )}
+              </div>
+
+              {priceMin ? (
+                <P style={{ margin: '15px 0 0' }}>
+                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B>{' '}
+                  SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B>{' '}
+                  USD
+                </P>
+              ) : (
+                <P style={{ margin: '15px 0 0' }}>
+                  <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+                </P>
+              )}
+            </Body>
+          </Wrap>
+        </>
+      );
     }
 
+    return (
+      <>
+        {paid && (
+          <Img
+            src={'/static/paid_ribbon.svg'}
+            style={{
+              position: 'absolute',
+              top: -1,
+              right: 0,
+              width: 64,
+              height: 72,
+            }}
+          />
+        )}
 
-    function renderTickets() {
-
-        const { assignee, status } = ticketUrl ? extractGithubIssueFromUrl(person, ticketUrl) : extractGithubIssue(person, repo, issue)
-
-        const isClosed = ((status === 'closed') || paid) ? true : false
-
-        const isCodingTask = type === 'coding_task' || type === 'wanted_coding_task'
-
-        if (isMobile) {
-            return <>
-                {paid && <Img src={'/static/paid_ribbon.svg'} style={{
-                    position: 'absolute', top: -1,
-                    right: 0, width: 64, height: 72
-                }} />}
-                <Wrap isClosed={isClosed} style={{ padding: 15 }}>
-                    <Body style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', }}>
-                            <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
-                        </div>
-                        <DT style={{ margin: '15px 0' }}>{title}</DT>
-                        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
-                            {isCodingTask && <GithubStatusPill status={status} assignee={assignee} />}
-                        </div>
-                        {priceMin ?
-                            <P style={{ margin: '15px 0 0' }}><B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD</P>
-                            : <P style={{ margin: '15px 0 0' }}><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
-                        }
-
-                    </Body>
-                </Wrap>
-            </>
-        }
-
-        return <>
-            {paid && <Img src={'/static/paid_ribbon.svg'} style={{
-                position: 'absolute', top: -1,
-                right: 0, width: 64, height: 72
-            }} />}
-
-            <DWrap isClosed={isClosed}>
-                <Pad style={{ padding: 20, height: 410 }}>
-                    <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                        <NameTag {...person} created={created} widget={'wanted'} />
-                    </div>
-
-                    <Divider style={{ margin: '10px 0' }} />
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DWrap isClosed={isClosed}>
+          <Pad style={{ padding: 20, minHeight: 410 }}>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+            >
+              <NameTag {...person} created={created} widget={'wanted'} />
+            </div>
+            <Divider style={{ margin: '10px 0' }} />
+            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         {isCodingTask ?
                             <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
                             : <div />
                         }
-                    </div>
+                    </div> */}
+            <DT>{title}</DT>
+            {isCodingTask && (
+              <GithubStatusPill
+                status={status}
+                assignee={assignee}
+                style={{ marginTop: 10 }}
+              />
+            )}
 
+            <div
+              style={{
+                minHeight: '45px',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                marginTop: '10px',
+                flexWrap: 'wrap',
+              }}
+            >
+              {labels.length > 0 ? (
+                labels.map((x: any) => {
+                  return (
+                    <>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          height: '22px',
+                          width: 'fit-content',
+                          backgroundColor: '#cfcfcf',
+                          border: '1px solid #909090',
+                          padding: '0px 14px',
+                          borderRadius: '20px',
+                          marginRight: '3px',
+                          marginBottom: '3px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            color: '#202020',
+                          }}
+                        >
+                          {x.label}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })
+              ) : (
+                <>
+                  <div
+                    style={{
+                      minHeight: '50px',
+                    }}
+                  ></div>
+                </>
+              )}
+            </div>
+            <Divider style={{ margin: isCodingTask ? '22px 0' : '0 0 22px' }} />
+            <DescriptionCodeTask>
+              {renderMarkdown(description)}
+            </DescriptionCodeTask>
+          </Pad>
+          <Divider style={{ margin: 0 }} />
+          <Pad
+            style={{
+              padding: 20,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            {priceMin ? (
+              <P>
+                <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B>{' '}
+                SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B>{' '}
+                USD
+              </P>
+            ) : (
+              <P>
+                <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+              </P>
+            )}
 
-                    <DT>{title}</DT>
+            <div>
+              {
+                //  if my own, show this option to show/hide
+                isMine && (
+                  <Button
+                    icon={show ? 'visibility' : 'visibility_off'}
+                    disable={saving}
+                    submitting={saving}
+                    iconStyle={{ color: '#555', fontSize: 20 }}
+                    style={{
+                      minWidth: 24,
+                      width: 24,
+                      minHeight: 20,
+                      height: 20,
+                      padding: 0,
+                      background: '#fff',
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExtrasPropertyAndSave('show');
+                    }}
+                  />
+                )
+              }
+            </div>
+          </Pad>
+        </DWrap>
+      </>
+    );
+  }
 
-                    {isCodingTask &&
-                        <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
-                    }
-
-                    <Divider style={{ margin: isCodingTask ? '22px 0' : '0 0 22px' }} />
-
-                    <DescriptionCodeTask>{renderMarkdown(description)}</DescriptionCodeTask>
-
-                </Pad>
-                <Divider style={{ margin: 0 }} />
-                <Pad style={{ padding: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    {priceMin ?
-                        <P><B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD</P>
-                        : <P><B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD</P>
-                    }
-
-
-                    <div>
-                        {
-                            //  if my own, show this option to show/hide
-                            isMine &&
-                            <Button
-                                icon={show ? 'visibility' : 'visibility_off'}
-                                disable={saving}
-                                submitting={saving}
-                                iconStyle={{ color: '#555', fontSize: 20 }}
-                                style={{
-                                    minWidth: 24, width: 24, minHeight: 20,
-                                    height: 20, padding: 0, background: '#fff',
-                                }}
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    setExtrasPropertyAndSave('show')
-                                }}
-                            />
-                        }
-
-                    </div>
-                </Pad>
-            </DWrap>
-        </>
-    }
-
-    return renderTickets()
-
+  return renderTickets();
 }
 
 interface WrapProps {
-    isClosed?: boolean;
+  isClosed?: boolean;
 }
 
 const DWrap = styled.div<WrapProps>`
-display: flex;
-flex:1;
-height:100%;
-min-height:100%;
-flex-direction:column;
-width:100%;
-min-width:100%;
-max-height:471px;
-font-style: normal;
-font-weight: 500;
-font-size: 17px;
-line-height: 23px;
-color: #3C3F41 !important;
-letter-spacing:0px;
-justify-content:space-between;
-opacity:${p => p.isClosed ? '0.5' : '1'};
-filter: ${p => p.isClosed ? 'grayscale(1)' : 'grayscale(0)'};
-
-
+  display: flex;
+  flex: 1;
+  height: 100%;
+  min-height: 100%;
+  flex-direction: column;
+  width: 100%;
+  min-width: 100%;
+  max-height: 471px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 23px;
+  color: #3c3f41 !important;
+  letter-spacing: 0px;
+  justify-content: space-between;
+  opacity: ${(p) => (p.isClosed ? '0.5' : '1')};
+  filter: ${(p) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
 `;
 
 const Wrap = styled.div<WrapProps>`
-display: flex;
-justify-content:flex-start;
-opacity:${p => p.isClosed ? '0.5' : '1'};
-filter: ${p => p.isClosed ? 'grayscale(1)' : 'grayscale(0)'};
+  display: flex;
+  justify-content: flex-start;
+  opacity: ${(p) => (p.isClosed ? '0.5' : '1')};
+  filter: ${(p) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
 `;
-
 
 const T = styled.div`
-font-weight:bold;
-overflow:hidden;
-line-height: 20px;
-text-overflow: ellipsis;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
+  font-weight: bold;
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 500;
-font-size: 17px;
-line-height: 23px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 23px;
 `;
 const B = styled.span`
-font-size:15px;
-font-weight:bold;
-color:#3c3f41;
+  font-size: 15px;
+  font-weight: bold;
+  color: #3c3f41;
 `;
 const P = styled.div`
-font-weight:regular;
-font-size:15px;
-color:#8e969c;
+  font-weight: regular;
+  font-size: 15px;
+  color: #8e969c;
 `;
 const D = styled.div`
-color:#5F6368;
-overflow:hidden;
-line-height:18px;
-text-overflow: ellipsis;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
+  color: #5f6368;
+  overflow: hidden;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 `;
 
-
 const Body = styled.div`
-font-size: 15px;
-line-height: 20px;
-/* or 133% */
-padding:10px;
-display: flex;
-flex-direction:column;
-justify-content: space-around;
+  font-size: 15px;
+  line-height: 20px;
+  /* or 133% */
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 
-/* Primary Text 1 */
+  /* Primary Text 1 */
 
-color: #292C33;
-overflow:hidden;
-min-height:132px;
+  color: #292c33;
+  overflow: hidden;
+  min-height: 132px;
 `;
 
 const Pad = styled.div`
-display:flex;
-flex-direction:column;
-padding:10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
 `;
 
-
-
 const DD = styled.div`
-margin-bottom:10px;
-overflow:hidden;
+  margin-bottom: 10px;
+  overflow: hidden;
 
-font-family: Roboto;
-font-style: normal;
-font-weight: normal;
-font-size: 13px;
-line-height: 20px;
-/* or 154% */
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+  line-height: 20px;
+  /* or 154% */
 
-/* Main bottom icons */
+  /* Main bottom icons */
 
-color: #5F6368;
+  color: #5f6368;
 
-overflow: hidden;
-text-overflow: ellipsis;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
-
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 `;
 
 const DescriptionCodeTask = styled.div`
-margin-bottom:10px;
+  margin-bottom: 10px;
 
-font-family: Roboto;
-font-style: normal;
-font-weight: normal;
-font-size: 13px;
-line-height: 20px;
-color: #5F6368;
-overflow: hidden;
-text-overflow: ellipsis;
-display: -webkit-box;
--webkit-line-clamp: 6;
--webkit-box-orient: vertical;
-height: 120px;
-`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+  line-height: 20px;
+  color: #5f6368;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  height: 120px;
+`;
 const DT = styled(Title)`
-margin-bottom:9px;
-max-height:52px;
-overflow:hidden;
-text-overflow: ellipsis;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
-/* Primary Text 1 */
+  margin-bottom: 9px;
+  max-height: 52px;
+  min-height: 43.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  /* Primary Text 1 */
 
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 500;
-font-size: 17px;
-line-height: 23px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 23px;
 `;
 
 interface ImageProps {
-    readonly src?: string;
+  readonly src?: string;
 }
 const Img = styled.div<ImageProps>`
-                        background-image: url("${(p) => p.src}");
-                        background-position: center;
-                        background-size: cover;
-                        position: relative;
-                        width:22px;
-                        height:22px;
-                        `;
+  background-image: url('${(p) => p.src}');
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  width: 22px;
+  height: 22px;
+`;
