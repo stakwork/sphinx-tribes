@@ -120,16 +120,6 @@ export default function WantedSummary(props: any) {
     }
   }, [codingLanguage]);
 
-  useEffect(() => {
-    if (labels) {
-      labels.map((x: any) => {
-        console.log(x.label);
-      });
-    }
-  }, [labels]);
-
-  //   console.log(codingLanguage.map((value) => ({ ...value })));
-
   async function setExtrasPropertyAndSave(propertyName: string, value: any) {
     if (peopleWanteds) {
       setSaving(propertyName);
@@ -465,6 +455,47 @@ export default function WantedSummary(props: any) {
             <GithubStatusPill status={status} assignee={assignee} />
             {assigneeLabel}
 
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                marginTop: '10px',
+                minHeight: '60px',
+              }}
+            >
+              {labels.length > 0 &&
+                labels.map((x: any) => {
+                  return (
+                    <>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          height: '22px',
+                          width: 'fit-content',
+                          backgroundColor: '#cfcfcf',
+                          border: '1px solid #909090',
+                          padding: '3px 10px',
+                          borderRadius: '20px',
+                          marginRight: '3px',
+                          boxShadow: '1px 1px #909090',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            color: '#202020',
+                          }}
+                        >
+                          {x.label}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })}
+            </div>
+
             <div style={{ height: 10 }} />
             <ButtonRow style={{ margin: '10px 0' }}>
               {viewGithub}
@@ -564,10 +595,50 @@ export default function WantedSummary(props: any) {
               >
                 {nametag}
               </div>
-              <Img
+              {/* <Img
                 src={'/static/github_logo2.png'}
                 style={{ width: 77, height: 43 }}
-              />
+              /> */}
+
+              <div
+                style={{
+                  minHeight: '60px',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}
+              >
+                {labels.length > 0 &&
+                  labels.map((x: any) => {
+                    return (
+                      <>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            height: '22px',
+                            minWidth: 'fit-content',
+                            backgroundColor: '#cfcfcf',
+                            border: '1px solid #909090',
+                            padding: '3px 10px',
+                            borderRadius: '20px',
+                            marginRight: '3px',
+                            boxShadow: '1px 1px #909090',
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: '10px',
+                              color: '#202020',
+                            }}
+                          >
+                            {x.label}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })}
+              </div>
             </SectionPad>
             <Divider />
             <SectionPad>
