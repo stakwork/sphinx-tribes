@@ -420,7 +420,7 @@ export default function PersonView(props: any) {
     }
 
     const defaultPic = '/static/person_placeholder.png'
-    const mediumPic = img && img + '?medium=true'
+    const mediumPic = img 
 
     function renderMobileView() {
         return <div style={{
