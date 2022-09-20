@@ -43,6 +43,8 @@ export default function BodyComponent() {
   const screenWidth = useScreenWidth();
   const [publicFocusPerson, setPublicFocusPerson]: any = useState(null);
   const [publicFocusIndex, setPublicFocusIndex] = useState(-1);
+  const [showFocusView, setShowFocusView] = useState(false);
+  const [focusIndex, setFocusIndex] = useState(-1);
 
   const {
     peoplePageNumber,
@@ -61,6 +63,41 @@ export default function BodyComponent() {
     offer: peopleOffers,
   };
 
+  let person: any =
+    main.people &&
+    main.people.length &&
+    main.people.find((f) => f.id === ui.selectedPerson);
+
+  const { id } = person || {};
+
+  const canEdit = id === ui.meInfo?.id;
+
+  function nextIndex() {
+    if (focusIndex < 0) {
+      console.log('nope!');
+      return;
+    }
+    if (person && person.extras) {
+      let g = person.extras[tabs[selectedWidget]?.name];
+      let nextindex = focusIndex + 1;
+      if (g[nextindex]) setFocusIndex(nextindex);
+      else setFocusIndex(0);
+    }
+  }
+
+  function prevIndex() {
+    if (focusIndex < 0) {
+      console.log('nope!');
+      return;
+    }
+    if (person && person.extras) {
+      let g = person?.extras[tabs[selectedWidget]?.name];
+      let previndex = focusIndex - 1;
+      if (g[previndex]) setFocusIndex(previndex);
+      else setFocusIndex(g.length - 1);
+    }
+  }
+
   const activeList = listSource[selectedWidget];
 
   const history = useHistory();
@@ -77,6 +114,8 @@ export default function BodyComponent() {
     },
     widgetConfigs['wanted'],
   ];
+
+  const tabsModal = widgetConfigs;
 
   const isMobile = useIsMobile();
   const pathname = history?.location?.pathname;
@@ -544,17 +583,68 @@ export default function BodyComponent() {
               })}
           </Tabs>
 
-          <SearchTextInput
-            name="search"
-            type="search"
-            placeholder="Search"
-            value={ui.searchText}
-            style={{ width: 204, height: 40, background: '#DDE1E5' }}
-            onChange={(e) => {
-              console.log('handleChange', e);
-              ui.setSearchText(e);
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
-          />
+          >
+            {ui.meInfo && ui.meInfo?.owner_alias ? (
+              <>
+                <div
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: '400',
+                    marginRight: '10px',
+                    cursor: 'pointer',
+                    borderRadius: '20px',
+                    userSelect: 'none',
+                    background: '#dcedfe',
+                    border: '2px solid #cddffd',
+                    padding: '8px 20px',
+                    color: '#5d92df',
+                  }}
+                  onClick={() => {
+                    setShowFocusView(true);
+                  }}
+                >
+                  {' '}
+                  Create Ticket
+                </div>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '20px',
+                    userSelect: 'none',
+                    cursor: 'not-allowed',
+                    color: '#83737d',
+                    backgroundColor: '#dde0e5',
+                    fontSize: '14px',
+                    marginRight: '10px',
+                  }}
+                >
+                  Login to Create Tickets
+                </div>
+              </>
+            )}
+
+            <SearchTextInput
+              name="search"
+              type="search"
+              placeholder="Search"
+              value={ui.searchText}
+              style={{ width: 204, height: 40, background: '#DDE1E5' }}
+              onChange={(e) => {
+                console.log('handleChange', e);
+                ui.setSearchText(e);
+              }}
+            />
+          </div>
         </div>
         <>
           <div
@@ -635,6 +725,57 @@ export default function BodyComponent() {
           </Modal>
         )}
         {toastsEl}
+
+        {showFocusView && (
+          <Modal
+            visible={showFocusView}
+            style={{
+              // top: -64,
+              // height: 'calc(100% + 64px)'
+              height: '100%',
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              borderRadius: 0,
+              background: '#fff',
+              height: '100%',
+              width: '60%',
+              minWidth: 500,
+              maxWidth: 602,
+              zIndex: 20, //minHeight: 300,
+              ...focusedDesktopModalStyles,
+            }}
+            nextArrow={nextIndex}
+            prevArrow={prevIndex}
+            overlayClick={() => {
+              setShowFocusView(false);
+              setFocusIndex(-1);
+              // if (selectedWidget === 'about') switchWidgets('badges');
+            }}
+            bigClose={() => {
+              setShowFocusView(false);
+              setFocusIndex(-1);
+              // if (selectedWidget === 'about') switchWidgets('badges');
+            }}
+          >
+            <FocusedView
+              person={person}
+              canEdit={!canEdit}
+              selectedIndex={focusIndex}
+              config={tabsModal[selectedWidget] && tabsModal[selectedWidget]}
+              onSuccess={() => {
+                console.log('success');
+                setFocusIndex(-1);
+                // if (selectedWidget === 'about') switchWidgets('badges');
+              }}
+              goBack={() => {
+                setShowFocusView(false);
+                setFocusIndex(-1);
+                // if (selectedWidget === 'about') switchWidgets('badges');
+              }}
+            />
+          </Modal>
+        )}
       </Body>
     );
   });
