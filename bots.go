@@ -71,6 +71,80 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
+func createOrUpdateSphinxBot(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	bot := BotMigrateStruct{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &bot)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if bot.UUID == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	// to ensure that our bot is always unique on this tribes server
+	if bot.Name != "sphinx_ticket_bot" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// check that request contains url and secret
+	if bot.Secret == "" || bot.Url == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// find out if our sphinx ticket bot already exists
+	checkBot := DB.getSphinxTicketBot()
+
+	// if exists then check that it is same uuid as before
+	if checkBot.UUID != "" {
+		if checkBot.UUID != bot.UUID {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
+
+	now := time.Now()
+
+	extractedPubkey, err := VerifyTribeUUID(bot.UUID, false)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		bot.Created = &now
+	} else { // IF PUBKEY IN CONTEXT, MUST AUTH!
+		if pubKeyFromAuth != extractedPubkey {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
+
+	bot.OwnerPubKey = extractedPubkey
+	bot.Updated = &now
+	bot.UniqueName, _ = botUniqueNameFromName(bot.Name)
+
+	_, err = DB.createOrEditTicketBot(bot)
+	if err != nil {
+		fmt.Println("=> ERR createOrEditBot", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bot)
+}
+
 func getListedBots(w http.ResponseWriter, r *http.Request) {
 	bots := DB.getListedBots(r)
 	w.WriteHeader(http.StatusOK)

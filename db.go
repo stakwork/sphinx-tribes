@@ -45,7 +45,7 @@ func initDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
-	db.AutoMigrate(&Person{}, &Channel{})
+	db.AutoMigrate(&Person{}, &Channel{}, &BotMigrateStruct{})
 
 	// data := map[string]string{
 	// 	"assignee": "Evanfeenstra",
@@ -153,6 +153,41 @@ func (db database) createOrEditBot(b Bot) (Bot, error) {
 	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
 		fmt.Println(err)
 		return Bot{}, err
+	}
+	db.db.Exec(`UPDATE bots SET tsv =
+  	setweight(to_tsvector(name), 'A') ||
+	setweight(to_tsvector(description), 'B') ||
+	setweight(array_to_tsvector(tags), 'C')
+	WHERE uuid = '` + b.UUID + "'")
+	return b, nil
+}
+
+func (db database) createOrEditTicketBot(b BotMigrateStruct) (BotMigrateStruct, error) {
+	if b.OwnerPubKey == "" {
+		return BotMigrateStruct{}, errors.New("no pub key")
+	}
+	if b.UniqueName == "" {
+		return BotMigrateStruct{}, errors.New("no unique name")
+	}
+	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
+	for i, u := range botupdatables {
+		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
+		if i < len(botupdatables)-1 {
+			onConflict = onConflict + ","
+		}
+	}
+	if b.Name == "" {
+		b.Name = "name"
+	}
+	if b.Description == "" {
+		b.Description = "description"
+	}
+	if b.Tags == nil {
+		b.Tags = []string{}
+	}
+	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
+		fmt.Println(err)
+		return BotMigrateStruct{}, err
 	}
 	db.db.Exec(`UPDATE bots SET tsv =
   	setweight(to_tsvector(name), 'A') ||
@@ -550,6 +585,12 @@ func (db database) getBotsByOwner(pubkey string) []Bot {
 func (db database) getBotByUniqueName(un string) Bot {
 	m := Bot{}
 	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
+	return m
+}
+
+func (db database) getSphinxTicketBot() BotMigrateStruct {
+	m := BotMigrateStruct{}
+	db.db.Where("name = sphinx_ticket_bot AND (deleted = 'f' OR deleted is null)").Find(&m)
 	return m
 }
 
