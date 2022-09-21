@@ -646,6 +646,7 @@ export default function BodyComponent() {
           >
             {selectedWidget === 'wanted' &&
               (ui.meInfo && ui.meInfo?.owner_alias ? (
+
                   <div
                     style={{
                       fontSize: '15px',
