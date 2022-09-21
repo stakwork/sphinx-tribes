@@ -1,0 +1,26 @@
+name: build and packr2
+on:
+  push:
+    branches: master 
+
+jobs:
+  lint:
+    name: build 
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '^1.18.3'
+      - run: go install github.com/gobuffalo/packr/v2/packr2
+      - name: build and push automatic fixes
+        run: |
+          cd ./frontend/app && npm i --legacy-peer-deps && npm i --dev-only && CI=false npm run build && cd .. && packr2 
+          git config user.name 'Github Actions'
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Automatic build fixes" || echo -n
+          git push
+
