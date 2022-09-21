@@ -431,40 +431,10 @@ export default function PersonView(props: any) {
       )
         return <div />;
     }
-
-    let { action } = tabs[selectedWidget] || {};
-    action = action || {};
-    return (
-      <div
-        style={{
-          padding: isMobile ? 10 : '10 0',
-          margin: isMobile ? '6px 0 5px' : '10px 0',
-          ...style,
-        }}
-      >
-        {!fullSelectedWidget && action.info && (
-          <ActionInfo>
-            <MaterialIcon icon={action.infoIcon} style={{ fontSize: 80 }} />
-            <>{action.info}</>
-          </ActionInfo>
-        )}
-        <Button
-          text={action.text}
-          color={isMobile ? 'widget' : 'desktopWidget'}
-          leadingIcon={action.icon}
-          // width={isMobile ? '100%' : 291}
-          width={'100%'}
-          height={48}
-          onClick={() => {
-            setShowFocusView(true);
-          }}
-        />
-      </div>
-    );
   }
 
   const defaultPic = '/static/person_placeholder.png';
-  const mediumPic = img && img + '?medium=true';
+  const mediumPic = img;
 
   function renderMobileView() {
     return (
@@ -1000,6 +970,7 @@ export default function PersonView(props: any) {
     </Content>
   );
 }
+
 interface PanelProps {
   isMobile: boolean;
 }
