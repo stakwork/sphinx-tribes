@@ -1,7 +1,7 @@
 name: build and packr2
 on:
   push:
-    branches: fixPackr2Build 
+    branches: master 
 
 jobs:
   lint:
