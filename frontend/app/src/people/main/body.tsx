@@ -45,6 +45,7 @@ export default function BodyComponent() {
   const [publicFocusIndex, setPublicFocusIndex] = useState(-1);
   const [showFocusView, setShowFocusView] = useState(false);
   const [focusIndex, setFocusIndex] = useState(-1);
+  const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
 
   const {
     peoplePageNumber,
@@ -446,6 +447,34 @@ export default function BodyComponent() {
               </Link>
             </Label>
 
+            {selectedWidget === 'wanted' &&
+              ui.meInfo &&
+              ui.meInfo?.owner_alias && (
+                <>
+                  <div
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: '400',
+                      marginRight: '10px',
+                      cursor: 'pointer',
+                      borderRadius: '20px',
+                      userSelect: 'none',
+                      background: '#dcedfe',
+                      border: '2px solid #cddffd',
+                      padding: '8px 20px',
+                      color: '#5d92df',
+                    }}
+                    onClick={() => {
+                      // setShowFocusView(true);
+                      setIsMobileViewTicketModal(true);
+                      console.log('hi');
+                    }}
+                  >
+                    +
+                  </div>
+                </>
+              )}
+
             <SearchTextInput
               small
               name="search"
@@ -510,6 +539,28 @@ export default function BodyComponent() {
                   setPublicFocusPerson(null);
                   setPublicFocusIndex(-1);
                   history.push('/p');
+                }}
+              />
+            </Modal>
+          )}
+
+          {isMobileViewTicketModal && (
+            <Modal visible={isMobileViewTicketModal} fill={true}>
+              <FocusedView
+                person={person}
+                canEdit={!canEdit}
+                selectedIndex={focusIndex}
+                config={tabsModal[selectedWidget] && tabsModal[selectedWidget]}
+                onSuccess={() => {
+                  console.log('success');
+                  setFocusIndex(-1);
+                  // if (selectedWidget === 'about') switchWidgets('badges');
+                }}
+                goBack={() => {
+                  setIsMobileViewTicketModal(false);
+                  setFocusIndex(-1);
+                  history.push('/p');
+                  // if (selectedWidget === 'about') switchWidgets('badges');
                 }}
               />
             </Modal>
@@ -591,47 +642,48 @@ export default function BodyComponent() {
               justifyContent: 'space-between',
             }}
           >
-            {ui.meInfo && ui.meInfo?.owner_alias ? (
-              <>
-                <div
-                  style={{
-                    fontSize: '15px',
-                    fontWeight: '400',
-                    marginRight: '10px',
-                    cursor: 'pointer',
-                    borderRadius: '20px',
-                    userSelect: 'none',
-                    background: '#dcedfe',
-                    border: '2px solid #cddffd',
-                    padding: '8px 20px',
-                    color: '#5d92df',
-                  }}
-                  onClick={() => {
-                    setShowFocusView(true);
-                  }}
-                >
-                  {' '}
-                  Create Ticket
-                </div>
-              </>
-            ) : (
-              <>
-                <div
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '20px',
-                    userSelect: 'none',
-                    cursor: 'not-allowed',
-                    color: '#83737d',
-                    backgroundColor: '#dde0e5',
-                    fontSize: '14px',
-                    marginRight: '10px',
-                  }}
-                >
-                  Login to Create Tickets
-                </div>
-              </>
-            )}
+            {selectedWidget === 'wanted' &&
+              (ui.meInfo && ui.meInfo?.owner_alias ? (
+                <>
+                  <div
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: '400',
+                      marginRight: '10px',
+                      cursor: 'pointer',
+                      borderRadius: '20px',
+                      userSelect: 'none',
+                      background: '#dcedfe',
+                      border: '2px solid #cddffd',
+                      padding: '8px 20px',
+                      color: '#5d92df',
+                    }}
+                    onClick={() => {
+                      setShowFocusView(true);
+                    }}
+                  >
+                    {' '}
+                    Create Ticket
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '20px',
+                      userSelect: 'none',
+                      cursor: 'not-allowed',
+                      color: '#83737d',
+                      backgroundColor: '#dde0e5',
+                      fontSize: '14px',
+                      marginRight: '10px',
+                    }}
+                  >
+                    Login to Create Tickets
+                  </div>
+                </>
+              ))}
 
             <SearchTextInput
               name="search"
