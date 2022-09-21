@@ -65,7 +65,7 @@ export default function Person(props: any) {
   if (lastSeen === 'a month') lastSeen = '1 month'
 
   const defaultPic = '/static/person_placeholder.png'
-  const mediumPic = img && img + '?medium=true'
+  const mediumPic = img 
 
   const addedStyles = hideActions ? { width: 56, height: 56 } : {}
 
