@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useStores } from "../../store";
-import { useObserver } from "mobx-react-lite";
-import Form from "../../form";
-import styled, { css } from "styled-components";
-import { Button, IconButton } from "../../sphinxUI";
-import moment from "moment";
-import SummaryViewer from "../widgetViews/summaryViewer";
-import { useIsMobile } from "../../hooks";
-import { dynamicSchemasByType } from "../../form/schema";
-import { extractRepoAndIssueFromIssueUrl } from '../../helpers'
+import React, { useEffect, useState, useRef } from 'react';
+import { useStores } from '../../store';
+import { useObserver } from 'mobx-react-lite';
+import Form from '../../form';
+import styled, { css } from 'styled-components';
+import { Button, IconButton } from '../../sphinxUI';
+import moment from 'moment';
+import SummaryViewer from '../widgetViews/summaryViewer';
+import { useIsMobile } from '../../hooks';
+import { dynamicSchemasByType } from '../../form/schema';
+import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -38,11 +38,11 @@ export default function FocusedView(props: any) {
 
   const isMobile = useIsMobile();
 
-  const torSave = canEdit && ui?.meInfo?.url?.includes(".onion");
+  const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
   function closeModal(override) {
     if (!manualGoBackOnly) {
-      console.log("close modal");
+      console.log('close modal');
       ui.setEditMe(false);
       if (props.goBack) props.goBack();
     }
@@ -65,16 +65,15 @@ export default function FocusedView(props: any) {
 
       // add extras if doesnt exist, for brand new users
       if (!fullMeData.extras) fullMeData.extras = {};
-
       // if about
-      if (config.name === "about") {
+      if (config.name === 'about') {
         config?.schema?.forEach((s) => {
           if (s.widget && fullMeData.extras) {
             // this allows the link widgets to be edited as a part of about me,
             // when really they are stored as extras
 
             // include full tribe info from ownerTribes data
-            if (s.name === "tribes") {
+            if (s.name === 'tribes') {
               let submitTribes: any = [];
 
               v[s.name] &&
@@ -82,6 +81,7 @@ export default function FocusedView(props: any) {
                   let fullTribeInfo =
                     ownerTribes &&
                     ownerTribes?.find((f) => f.unique_name === t.value);
+
                   // disclude sensitive details
                   if (fullTribeInfo)
                     submitTribes.push({
@@ -92,8 +92,9 @@ export default function FocusedView(props: any) {
                       ...t,
                     });
                 });
+
               fullMeData.extras[s.name] = submitTribes;
-            } else if (s.name === "repos" || s.name === "coding_languages") {
+            } else if (s.name === 'repos' || s.name === 'coding_languages') {
               // multiples, so we don't need a wrapper
               fullMeData.extras[s.name] = v[s.name];
             } else {
@@ -137,15 +138,15 @@ export default function FocusedView(props: any) {
     body.extras[config.name].splice(selectedIndex, 1);
 
     const info = ui.meInfo as any;
-    if (!info) return console.log("no meInfo");
+    if (!info) return console.log('no meInfo');
 
     setDeleting(true);
     try {
-      await main.saveProfile(body)
+      await main.saveProfile(body);
       await main.getPeople();
       closeModal(true);
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
     }
     setDeleting(false);
   }
@@ -156,13 +157,16 @@ export default function FocusedView(props: any) {
     let githubError =
       "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
-      if (body.type === "wanted_coding_task" || body.type === "coding_task") {
-
-        let { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl)
-        let splitString = repo.split("/");
+      if (body.type === 'wanted_coding_task' || body.type === 'coding_task') {
+        let { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
+        let splitString = repo.split('/');
         let ownerName = splitString[0];
         let repoName = splitString[1];
-        let res = await main.getGithubIssueData(ownerName, repoName, issue + '');
+        let res = await main.getGithubIssueData(
+          ownerName,
+          repoName,
+          issue + ''
+        );
 
         if (!res) {
           throw githubError;
@@ -182,29 +186,37 @@ export default function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    console.log("START SUBMIT FORM", body);
+    console.log('START SUBMIT FORM', body);
 
     try {
       body = await preSubmitFunctions(body);
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
       alert(e);
       return;
     }
 
     body = mergeFormWithMeData(body);
 
-    console.log("SUBMIT MERGED FORM", body);
     if (!body) return; // avoid saving bad state
     const info = ui.meInfo as any;
-    if (!info) return console.log("no meInfo");
+    if (!info) return console.log('no meInfo');
 
     setLoading(true);
     try {
-      await main.saveProfile(body)
+      const newBody = {
+        ...body,
+        alert: undefined,
+        extras: {
+          ...body?.extras,
+          alert: body.alert,
+        },
+      };
+
+      await main.saveProfile(config.name === 'about' ? { ...newBody } : body);
       closeModal(true);
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
     }
     setLoading(false);
   }
@@ -217,26 +229,27 @@ export default function FocusedView(props: any) {
 
     // set initials here
     if (personInfo) {
-      if (config && config.name === "about") {
+      if (config && config.name === 'about') {
         initialValues.id = personInfo.id || 0;
         initialValues.pubkey = personInfo.pubkey;
-        initialValues.owner_alias = personInfo.owner_alias || "";
-        initialValues.img = personInfo.img || "";
+        initialValues.alert = personInfo.extras.alert || false;
+        initialValues.owner_alias = personInfo.owner_alias || '';
+        initialValues.img = personInfo.img || '';
         initialValues.price_to_meet = personInfo.price_to_meet || 0;
-        initialValues.description = personInfo.description || "";
-        initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || "";
+        initialValues.description = personInfo.description || '';
+        initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
         // below are extras,
         initialValues.twitter =
           (personInfo.extras?.twitter &&
             personInfo.extras?.twitter[0]?.value) ||
-          "";
+          '';
         initialValues.github =
           (personInfo.extras?.github && personInfo.extras?.github[0]?.value) ||
-          "";
+          '';
         initialValues.facebook =
           (personInfo.extras?.facebook &&
             personInfo.extras?.facebook[0]?.value) ||
-          "";
+          '';
         // extras with multiple items
         initialValues.coding_languages =
           personInfo.extras?.coding_languages || [];
@@ -245,15 +258,18 @@ export default function FocusedView(props: any) {
         initialValues.lightning =
           (personInfo.extras?.lightning &&
             personInfo.extras?.lightning[0]?.value) ||
-          "";
+          '';
         initialValues.amboss =
           (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) ||
-          "";
+          '';
       } else {
         // if there is a selected index, fill in values
         if (selectedIndex > -1) {
           const extras = { ...personInfo.extras };
-          let sel = extras[config.name] && extras[config.name].length > (selectedIndex - 1) && extras[config.name][selectedIndex];
+          let sel =
+            extras[config.name] &&
+            extras[config.name].length > selectedIndex - 1 &&
+            extras[config.name][selectedIndex];
 
           if (sel) {
             // if dynamic, find right schema
@@ -281,15 +297,15 @@ export default function FocusedView(props: any) {
     }
 
     const noShadow: any = !isMobile
-      ? { boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }
+      ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' }
       : {};
 
     return (
       <div
         style={{
           ...props.style,
-          width: "100%",
-          height: "100%",
+          width: '100%',
+          height: '100%',
         }}
       >
         {editMode ? (
@@ -313,8 +329,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
-                    }
+                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
+                      }
                     : {}
                 }
               />
@@ -338,25 +354,25 @@ export default function FocusedView(props: any) {
                 {canEdit ? (
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     <Button
                       onClick={() => setEditMode(true)}
-                      color={"widget"}
-                      leadingIcon={"edit"}
+                      color={'widget'}
+                      leadingIcon={'edit'}
                       iconSize={18}
                       width={100}
-                      text={"Edit"}
+                      text={'Edit'}
                     />
                     <Button
                       onClick={() => deleteIt()}
-                      color={"white"}
+                      color={'white'}
                       loading={deleting}
-                      leadingIcon={"delete_outline"}
-                      text={"Delete"}
+                      leadingIcon={'delete_outline'}
+                      text={'Delete'}
                       style={{ marginLeft: 10 }}
                     />
                   </div>
@@ -371,7 +387,9 @@ export default function FocusedView(props: any) {
             {/* display item */}
             <SummaryViewer
               person={person}
-              item={person?.extras && person.extras[config?.name][selectedIndex]}
+              item={
+                person?.extras && person.extras[config?.name][selectedIndex]
+              }
               config={config}
             />
           </>
@@ -422,13 +440,13 @@ interface BProps {
   hide: boolean;
 }
 const B = styled.div<BProps>`
-  display: ${(p) => p.hide && "none"};
+  display: ${(p) => p.hide && 'none'};
   height: 100%;
   width: 100%;
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: "#5a606c",
-  trackBackgroundColor: "rgba(0,0,0,0)",
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)',
+  })}
 `;

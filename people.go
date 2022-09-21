@@ -74,8 +74,6 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
 
-	processAlerts(person)
-
 	p, err := DB.createOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
