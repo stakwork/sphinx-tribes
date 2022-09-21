@@ -451,6 +451,30 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
+func (db database) getPeopleForNewTicket(languages []interface{}) ([]Person, error) {
+	ms := []Person{}
+
+	query := "Select owner_pubkey, json_build_object('coding_languages',extras->'coding_languages') as extras from people" +
+		"where (deleted != true AND unlisted != true) AND " +
+		"extras->'alert' = 'true' AND ("
+
+	for _, lang := range languages {
+		l, ok := lang.(map[string]interface{})
+		if !ok {
+			return ms, errors.New("could not parse coding languages correctly")
+		}
+		label, ok2 := l["label"].(string)
+		if !ok2 {
+			return ms, errors.New("could not find label in language")
+		}
+		query += "extras->'coding_languages' @> '[{\"label\": \"" + label + "\"}]' OR "
+	}
+	query = query[:len(query)-4]
+	query += ");"
+	err := db.db.Raw(query).Find(&ms).Error
+	return ms, err
+}
+
 func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
