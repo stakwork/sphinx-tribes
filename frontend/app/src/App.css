@@ -42,11 +42,11 @@ body {
 }
 
 ::-webkit-scrollbar-track-piece:start {
-  background: transparent url('/transparentScrollbar.png') repeat-y !important;
+  background: transparent url('./transparentScrollbar.png') repeat-y !important;
 }
 
 ::-webkit-scrollbar-track-piece:end {
-  background: transparent url('/transparentScrollbar.png') repeat-y !important;
+  background: transparent url('./transparentScrollbar.png') repeat-y !important;
 }
 
 code {
@@ -125,7 +125,7 @@ button:focus {
   color: #587393;
   background: #101821;
   margin-right: 10px;
-  background-image: url(/static/search-24px.svg) !important;
+  background-image: url(./public/static/search-24px.svg) !important;
   background-repeat: no-repeat;
   background-position: 10px;
   background-size: 20px 20px;
@@ -180,7 +180,7 @@ button:focus {
 }
 
 .popover-tags .euiFieldSearch.euiFieldSearch {
-  background-image: url(/static/search-24px.svg) !important;
+  background-image: url(./public/static/search-24px.svg) !important;
   background-repeat: no-repeat;
   background-position: 10px;
   background-size: 20px 20px;
@@ -240,7 +240,7 @@ fieldset.container {
   width: 90px;
   height: 90px;
   border-radius: 5px;
-  background: url(/static/placeholder.svg);
+  background: url(./public/static/placeholder.svg);
   background-repeat: no-repeat;
   background-size: 40px 33px;
   background-position: center center;
@@ -516,7 +516,7 @@ fieldset.container {
   color: #587393;
   background: #101821;
   margin-right: 10px;
-  background-image: url(/static/search-24px.svg) !important;
+  background-image: url(./public/static/search-24px.svg) !important;
   background-repeat: no-repeat;
   background-position: 10px;
   background-size: 20px 20px;
@@ -583,7 +583,7 @@ fieldset.container {
 }
 
 .popover-tags .euiFieldSearch.euiFieldSearch {
-  background-image: url(/static/search-24px.svg) !important;
+  background-image: url(./public/static/search-24px.svg) !important;
   background-repeat: no-repeat;
   background-position: 10px;
   background-size: 20px 20px;
@@ -643,7 +643,7 @@ fieldset.container {
   width: 90px;
   height: 90px;
   border-radius: 5px;
-  background: url(/static/placeholder.svg);
+  background: url(./public/static/placeholder.svg);
   background-repeat: no-repeat;
   background-size: 40px 33px;
   background-position: center center;
