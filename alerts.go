@@ -9,14 +9,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 )
 
-type TicketMessage struct {
-	Ticket   PropertyMap `json:"ticket"`
-	ChatUuid string      `json:"chat_uuid"`
-	Status   string      `json:"status"` // In case we want to add more notifications other than just opening ticket
-	Action   string      `json:"action"`
-	Members  []Person    `json:"members"`
+type Action struct {
+	Action   string `json:"action"`    // "dm"
+	ChatUuid string `json:"chat_uuid"` // tribe uuid
+	Pubkey   string `json:"pubkey"`
+	Content  string `json:"content"`
 }
 
 func processAlerts(p Person) {
@@ -38,10 +38,12 @@ func processAlerts(p Person) {
 		return
 	}
 
-	var message TicketMessage
-	message.ChatUuid = alertTribeUuid
-	message.Status = "open"
-	message.Action = "dm"
+	var action Action
+	action.ChatUuid = alertTribeUuid
+	action.Action = "dm"
+	action.Content = "A new ticket relevant to your interests has been created on Sphinx Community - https://community.sphinx.chat/p?owner_id="
+	action.Content += p.OwnerPubKey
+	action.Content += "&created=" + strconv.Itoa(int(p.newTicketTime))
 
 	// Check that new ticket time exists
 	if p.newTicketTime == 0 {
@@ -73,7 +75,6 @@ func processAlerts(p Person) {
 		fmt.Println("Ticket alerts: No ticket identified with the correct timestamp")
 	}
 
-	message.Ticket = issue
 	languages, ok4 := issue["codingLanguage"].([]interface{})
 	if !ok4 {
 		fmt.Println("Ticket alerts: No languages found in ticket")
@@ -81,44 +82,47 @@ func processAlerts(p Person) {
 	}
 
 	var err error
-	message.Members, err = DB.getPeopleForNewTicket(languages)
+	people, err := DB.getPeopleForNewTicket(languages)
 	if err != nil {
 		fmt.Println("Ticket alerts: DB query to get interested people failed", err)
 		return
 	}
 
-	var buf bytes.Buffer
-	err = json.NewEncoder(&buf).Encode(message)
-	if err != nil {
-		fmt.Println("Ticket alerts: Unable to parse message into byte buffer", err)
-		return
+	client := http.Client{}
+
+	for _, per := range people {
+		action.Pubkey = per.OwnerPubKey
+		var buf bytes.Buffer
+		err = json.NewEncoder(&buf).Encode(action)
+		if err != nil {
+			fmt.Println("Ticket alerts: Unable to parse message into byte buffer", err)
+			return
+		}
+		request, err := http.NewRequest("POST", relayUrl, &buf)
+		if err != nil {
+			fmt.Println("Ticket alerts: Unable to create a request to send to relay", err)
+			return
+		}
+
+		b := buf.Bytes()
+
+		secret, err := hex.DecodeString(alertSecret)
+		if err != nil {
+			fmt.Println("Ticket alerts: Unable to create a byte array for secret", err)
+			return
+		}
+
+		mac := hmac.New(sha256.New, secret)
+		mac.Write(b)
+		hmac256Byte := mac.Sum(nil)
+		hmac256Hex := "sha256=" + hex.EncodeToString(hmac256Byte)
+
+		request.Header.Set("x-hub-signature-256", hmac256Hex)
+		_, err = client.Do(request)
+		if err != nil {
+			fmt.Println("Ticket alerts: Unable to communicate request to relay", err)
+		}
 	}
 
-	client := &http.Client{}
-	request, err := http.NewRequest("POST", relayUrl, &buf)
-	if err != nil {
-		fmt.Println("Ticket alerts: Unable to create a request to send to relay", err)
-		return
-	}
-
-	bytes := buf.Bytes()
-
-	secret, err := hex.DecodeString(alertSecret)
-	if err != nil {
-		fmt.Println("Ticket alerts: Unable to create a byte array for secret", err)
-		return
-	}
-
-	mac := hmac.New(sha256.New, secret)
-	mac.Write(bytes)
-	hmac256Byte := mac.Sum(nil)
-	hmac256Hex := hex.EncodeToString(hmac256Byte)
-
-	request.Header.Set("x-hub-signature-256", hmac256Hex)
-	_, err = client.Do(request)
-	if err != nil {
-		fmt.Println("Ticket alerts: Unable to communicate request to relay", err)
-		return
-	}
 	return
 }
