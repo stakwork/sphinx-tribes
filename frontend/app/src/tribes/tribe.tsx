@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { QRCode } from "react-qr-svg";
 import styled from "styled-components";
-import { EuiCheckableCard } from "@elastic/eui";
+import { EuiCard } from "@elastic/eui";
 import Tag from "./tag";
 import moment from "moment";
 import { getHostIncludingDockerHosts } from "../host";
@@ -44,14 +44,11 @@ export default function Tribe({
   }
 
   return (
-    <EuiCheckableCard
-      className="col-md-6 col-lg-6 ml-2 mb-2"
+    <EuiCard
+					style={{backgroundColor: "#1a2430"}}
+      className="col-md-6 col-lg-6  mb-2"
       id={uuid}
-      label={name}
-      name={name}
-      value={uuid}
-      checked={selected}
-      onChange={() => select(uuid, unique_name)}
+      title={""}
     >
       <Content
         onClick={() => select(selected ? "" : uuid, unique_name)}
@@ -76,7 +73,7 @@ export default function Tribe({
                 <Title className="tribe-title">{name}</Title>
               </Row>
               <Description
-                oneLine={selected ? false : true}
+                oneLine={!selected }
                 style={{ minHeight: 20 }}
               >
                 {description}
@@ -188,7 +185,7 @@ export default function Tribe({
           </div>
         </Left>
       </Content>
-    </EuiCheckableCard>
+    </EuiCard>
   );
 }
 interface ContentProps {
@@ -251,9 +248,13 @@ interface DescriptionProps {
 const Description = styled.h5<DescriptionProps>`
   font-weight: normal;
   line-height: 20px;
+	align-self: start;
+	font-size: 10px;
+	text-align: left;
   ${(p) =>
     p.oneLine &&
     `
+		max-width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow:hidden;
@@ -273,6 +274,6 @@ const Img = styled.div<ImageProps>`
 `;
 
 const Tokens = styled.div`
-  display: flex;
-  align-items: center;
+  display: flex !important;
+	align-content: start;
 `;
