@@ -185,7 +185,7 @@ export default function BodyComponent() {
       <Column className="main-wrap">
         <PageLoadSpinner show={loadingTop} />
         <EuiFormFieldset style={{ width: '100%', paddingBottom: 0 }} className="container">
-          <div className="row">
+          <div style={{justifyContent: 'center'}} className="row">
             {tribes.length ? tribes.map(t => <Tribe {...t} key={t.uuid}
               selected={selected === t.uuid}
               select={selectTribe}

@@ -25,7 +25,7 @@ export default function Bot(props: any) {
     } = props
 
     const defaultPic = '/static/bot_placeholder.png'
-    const mediumPic = img && img + '?medium=true'
+    const mediumPic = img
 
     return useObserver(() => {
 

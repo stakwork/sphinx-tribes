@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@elastic/datemath": "^5.0.2",
-    "@elastic/eui": "^19.0.0",
+		"@elastic/eui": "^64.0.4",
     "@loomhq/loom-embed": "^1.4.0",
     "@loomhq/record-sdk": "^2.35.16",
     "@material/react-material-icon": "^0.15.0",
@@ -46,7 +46,7 @@
     "react-qr-svg": "^2.2.2",
     "react-qrcode-logo": "^2.5.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.0",
+		"react-scripts": "5.0.1",
     "react-select": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "styled-components": "^5.1.0",
@@ -80,6 +80,6 @@
     "@types/react-dom": "^16.9.5",
     "bootstrap": "^4.5.0",
     "react-error-overlay": "6.0.9",
-    "typescript": "^3.7.5"
+		"typescript": "4.5.3"
   }
 }
