@@ -1,42 +1,34 @@
-import React from 'react'
-import styled from 'styled-components'
-import Select from 'react-select'
+import React from 'react';
+import styled from 'styled-components';
+import Select from 'react-select';
 
 export default function SearchableSelect(props: any) {
-    const {
-        options,
-        onChange,
-        onInputChange,
-        value,
-        style,
-        selectStyle,
-        loading,
-    } = props
+  const { options, onChange, onInputChange, value, style, selectStyle, loading } = props;
 
-    const opts =
-        options.map((o) => {
-            return {
-                ...o,
-                value: o.value,
-                label: o.label,
-            }
-        }) || []
+  const opts =
+    options.map((o) => {
+      return {
+        ...o,
+        value: o.value,
+        label: o.label
+      };
+    }) || [];
 
-    return (
-        <div style={{ position: 'relative', ...style }}>
-            <S
-                options={opts}
-                isLoading={loading}
-                placeholder={'Type to search...'}
-                isClearable={true}
-                isSearchable={true}
-                value={value}
-                onChange={onChange}
-                onInputChange={onInputChange}
-                className={'searchable-select-input'}
-            />
-        </div>
-    )
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      <S
+        options={opts}
+        isLoading={loading}
+        placeholder={'Type to search...'}
+        isClearable={true}
+        isSearchable={true}
+        value={value}
+        onChange={onChange}
+        onInputChange={onInputChange}
+        className={'searchable-select-input'}
+      />
+    </div>
+  );
 }
 
 const S = styled(Select)`
@@ -91,4 +83,4 @@ button {
     background-color:#ffffff !important;
 }
 }
-`
+`;

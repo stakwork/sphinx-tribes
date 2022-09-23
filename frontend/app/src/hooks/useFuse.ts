@@ -1,37 +1,37 @@
-import Fuse from 'fuse.js'
-import { useStores } from '../store'
+import Fuse from 'fuse.js';
+import { useStores } from '../store';
 
 const fuseOptions = {
-    keys: ['name', 'description'],
-    shouldSort: true,
-    // matchAllTokens: true,
-    includeMatches: true,
-    threshold: 0.35,
-    location: 0,
-    distance: 100,
-    maxPatternLength: 32,
-    minMatchCharLength: 1,
-}
+  keys: ['name', 'description'],
+  shouldSort: true,
+  // matchAllTokens: true,
+  includeMatches: true,
+  threshold: 0.35,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1
+};
 
 export function useFuse(array, keys: string[] = []) {
-    const { ui } = useStores()
-    let theArray = array
+  const { ui } = useStores();
+  let theArray = array;
 
-    if (ui.searchText) {
-        var fuse = new Fuse(array, { ...fuseOptions, keys })
-        const res = fuse.search(ui.searchText)
-        theArray = res.map((r) => r.item)
-    }
+  if (ui.searchText) {
+    var fuse = new Fuse(array, { ...fuseOptions, keys });
+    const res = fuse.search(ui.searchText);
+    theArray = res.map((r) => r.item);
+  }
 
-    return theArray
+  return theArray;
 }
 
 export function useLocalFuse(searchText, array, keys: string[] = []) {
-    let theArray = array
-    if (searchText) {
-        var fuse = new Fuse(array, { ...fuseOptions, keys })
-        const res = fuse.search(searchText)
-        theArray = res.map((r) => r.item)
-    }
-    return theArray
+  let theArray = array;
+  if (searchText) {
+    var fuse = new Fuse(array, { ...fuseOptions, keys });
+    const res = fuse.search(searchText);
+    theArray = res.map((r) => r.item);
+  }
+  return theArray;
 }

@@ -1,40 +1,38 @@
-import React, { Fragment } from 'react'
-import styled from 'styled-components'
-import { EuiSuperSelect, EuiText } from '@elastic/eui'
+import React, { Fragment } from 'react';
+import styled from 'styled-components';
+import { EuiSuperSelect, EuiText } from '@elastic/eui';
 
 export default function Select(props: any) {
-    const { options, onChange, value, style, selectStyle } = props
+  const { options, onChange, value, style, selectStyle } = props;
 
-    const opts =
-        options.map((o) => {
-            return {
-                value: o.value,
-                inputDisplay: o.label,
-                dropdownDisplay: (
-                    <Fragment>
-                        <strong>{o.label}</strong>
-                        <EuiText size="s" color="subdued">
-                            <p className="euiTextColor--subdued">
-                                {o.description}
-                            </p>
-                        </EuiText>
-                    </Fragment>
-                ),
-            }
-        }) || []
+  const opts =
+    options.map((o) => {
+      return {
+        value: o.value,
+        inputDisplay: o.label,
+        dropdownDisplay: (
+          <Fragment>
+            <strong>{o.label}</strong>
+            <EuiText size="s" color="subdued">
+              <p className="euiTextColor--subdued">{o.description}</p>
+            </EuiText>
+          </Fragment>
+        )
+      };
+    }) || [];
 
-    return (
-        <div style={{ position: 'relative', ...style }}>
-            <S
-                style={selectStyle}
-                options={opts}
-                valueOfSelected={value}
-                onChange={(value) => onChange(value)}
-                itemLayoutAlign="top"
-                hasDividers
-            />
-        </div>
-    )
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      <S
+        style={selectStyle}
+        options={opts}
+        valueOfSelected={value}
+        onChange={(value) => onChange(value)}
+        itemLayoutAlign="top"
+        hasDividers
+      />
+    </div>
+  );
 }
 
 const S = styled(EuiSuperSelect as any)`
@@ -56,4 +54,4 @@ button {
     background-color:#ffffff !important;
 }
 }
-`
+`;
