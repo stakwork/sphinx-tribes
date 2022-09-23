@@ -48,10 +48,7 @@ export default function PersonView(props: any) {
   const pathname = history?.location?.pathname;
 
   // FOR PEOPLE VIEW
-  let person: any =
-    main.people &&
-    main.people.length &&
-    main.people.find((f) => f.id === personId);
+  let person: any = main.people && main.people.length && main.people.find((f) => f.id === personId);
 
   // migrating to loading person on person view load
   if (loadedPerson) {
@@ -61,22 +58,14 @@ export default function PersonView(props: any) {
   // if i select myself, fill person with meInfo
   if (personId === ui.meInfo?.id) {
     person = {
-      ...ui.meInfo,
+      ...ui.meInfo
     };
   }
 
   let people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
 
-  const {
-    id,
-    img,
-    tags,
-    owner_alias,
-    unique_name,
-    price_to_meet,
-    extras,
-    owner_pubkey,
-  } = person || {};
+  const { id, img, tags, owner_alias, unique_name, price_to_meet, extras, owner_pubkey } =
+    person || {};
 
   let { description } = person || {};
 
@@ -140,9 +129,7 @@ export default function PersonView(props: any) {
             const thisItemIndex =
               thisExtra &&
               thisExtra.length &&
-              thisExtra.findIndex(
-                (f) => f.created === parseInt(widgetTimestamp)
-              );
+              thisExtra.findIndex((f) => f.created === parseInt(widgetTimestamp));
             if (thisItemIndex > -1) {
               // select it!
               setFocusIndex(thisItemIndex);
@@ -159,9 +146,7 @@ export default function PersonView(props: any) {
   }
 
   function updatePathIndex(timestamp) {
-    history.push(
-      location.pathname + `?widget=${selectedWidget}&timestamp=${timestamp}`
-    );
+    history.push(location.pathname + `?widget=${selectedWidget}&timestamp=${timestamp}`);
   }
 
   function switchWidgets(name) {
@@ -204,8 +189,7 @@ export default function PersonView(props: any) {
     widgetSchemas = widgetSchemas && widgetSchemas.extras;
   }
 
-  let fullSelectedWidget: any =
-    extras && selectedWidget ? extras[selectedWidget] : null;
+  let fullSelectedWidget: any = extras && selectedWidget ? extras[selectedWidget] : null;
 
   // we do this because sometimes the widgets are empty arrays
   let filteredExtras = extras && { ...extras };
@@ -217,8 +201,7 @@ export default function PersonView(props: any) {
       if (Array.isArray(p) && !p.length) {
         emptyArrayKeys.push(name);
       }
-      const thisSchema =
-        widgetSchemas && widgetSchemas.find((e) => e.name === name);
+      const thisSchema = widgetSchemas && widgetSchemas.find((e) => e.name === name);
       if (filteredExtras && thisSchema && thisSchema.single) {
         delete filteredExtras[name];
       }
@@ -250,13 +233,9 @@ export default function PersonView(props: any) {
         case 'post':
           return wrapIt(<PostView {...fullSelectedWidget} person={person} />);
         case 'twitter':
-          return wrapIt(
-            <TwitterView {...fullSelectedWidget} person={person} />
-          );
+          return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />);
         case 'supportme':
-          return wrapIt(
-            <SupportMeView {...fullSelectedWidget} person={person} />
-          );
+          return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />);
         case 'offer':
           return wrapIt(<OfferView {...fullSelectedWidget} person={person} />);
         case 'wanted':
@@ -276,8 +255,7 @@ export default function PersonView(props: any) {
     }
 
     const widgetSchema: any =
-      (widgetSchemas && widgetSchemas.find((f) => f.name === selectedWidget)) ||
-      {};
+      (widgetSchemas && widgetSchemas.find((f) => f.name === selectedWidget)) || {};
     const single = widgetSchema.single;
     let fields = widgetSchema.fields && [...widgetSchema.fields];
     // remove show from display
@@ -292,14 +270,14 @@ export default function PersonView(props: any) {
 
       const panelStyles = isMobile
         ? {
-            minHeight: 132,
+            minHeight: 132
           }
         : {
             maxWidth: 291,
             minWidth: 291,
             marginRight: 20,
             marginBottom: 20,
-            minHeight: 472,
+            minHeight: 472
           };
 
       fullSelectedWidget &&
@@ -313,7 +291,7 @@ export default function PersonView(props: any) {
             !isMobile && s?.paid
               ? {
                   border: '1px solid #dde1e5',
-                  boxShadow: 'none',
+                  boxShadow: 'none'
                 }
               : {};
 
@@ -331,7 +309,7 @@ export default function PersonView(props: any) {
                 ...conditionalStyles,
                 cursor: 'pointer',
                 padding: 0,
-                overflow: 'hidden',
+                overflow: 'hidden'
               }}
             >
               {React.cloneElement(child, { ...s })}
@@ -345,7 +323,7 @@ export default function PersonView(props: any) {
       ) : (
         <div
           style={{
-            width: '100%',
+            width: '100%'
           }}
         >
           <NoneSpace
@@ -378,9 +356,7 @@ export default function PersonView(props: any) {
       case 'twitter':
         return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />);
       case 'supportme':
-        return wrapIt(
-          <SupportMeView {...fullSelectedWidget} person={person} />
-        );
+        return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />);
       case 'offer':
         return wrapIt(<OfferView {...fullSelectedWidget} person={person} />);
       case 'wanted':
@@ -425,10 +401,7 @@ export default function PersonView(props: any) {
 
     // don't return button if there are no items in list, the button is returned elsewhere
     if (selectedWidget !== 'about') {
-      if (
-        !fullSelectedWidget ||
-        (fullSelectedWidget && fullSelectedWidget.length < 1)
-      )
+      if (!fullSelectedWidget || (fullSelectedWidget && fullSelectedWidget.length < 1))
         return <div />;
     }
   }
@@ -444,7 +417,7 @@ export default function PersonView(props: any) {
           flexDirection: 'column',
           width: '100%',
           overflow: 'auto',
-          height: '100%',
+          height: '100%'
         }}
       >
         <Panel isMobile={isMobile} style={{ paddingBottom: 0, paddingTop: 80 }}>
@@ -456,7 +429,7 @@ export default function PersonView(props: any) {
               display: 'flex',
               justifyContent: 'space-between',
               width: '100%',
-              padding: '0 20px',
+              padding: '0 20px'
             }}
           >
             <IconButton onClick={goBack} icon="arrow_back" />
@@ -470,7 +443,7 @@ export default function PersonView(props: any) {
                   color: '#3c3f41',
                   border: 'none',
                   margin: 0,
-                  padding: 0,
+                  padding: 0
                 }}
                 iconStyle={{ color: '#8e969c' }}
                 iconSize={20}
@@ -523,8 +496,7 @@ export default function PersonView(props: any) {
                 const t = tabs[name];
                 const label = t.label;
                 const selected = name === newSelectedWidget;
-                const hasExtras =
-                  extras && extras[name] && extras[name].length > 0;
+                const hasExtras = extras && extras[name] && extras[name].length > 0;
                 let count: any = hasExtras
                   ? extras[name].filter((f) => {
                       if ('show' in f) {
@@ -590,7 +562,7 @@ export default function PersonView(props: any) {
   function renderDesktopView() {
     const focusedDesktopModalStyles = newSelectedWidget
       ? {
-          ...tabs[newSelectedWidget]?.modalStyle,
+          ...tabs[newSelectedWidget]?.modalStyle
         }
       : {};
 
@@ -599,18 +571,13 @@ export default function PersonView(props: any) {
         style={{
           display: 'flex',
           width: '100%',
-          height: '100%',
+          height: '100%'
         }}
       >
         {!canEdit && (
           <PeopleList>
             <DBack>
-              <Button
-                color="clear"
-                leadingIcon="arrow_back"
-                text="Back"
-                onClick={goBack}
-              />
+              <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
 
               <SearchTextInput
                 small
@@ -622,7 +589,7 @@ export default function PersonView(props: any) {
                   width: 120,
                   height: 40,
                   border: '1px solid #DDE1E5',
-                  background: '#fff',
+                  background: '#fff'
                 }}
                 onChange={(e) => {
                   console.log('handleChange', e);
@@ -672,7 +639,7 @@ export default function PersonView(props: any) {
             height: canEdit ? 'calc(100% - 64px)' : '100%',
             borderLeft: '1px solid #ebedef',
             borderRight: '1px solid #ebedef',
-            boxShadow: '1px 2px 6px -2px rgba(0, 0, 0, 0.07)',
+            boxShadow: '1px 2px 6px -2px rgba(0, 0, 0, 0.07)'
           }}
         >
           {canEdit && (
@@ -691,15 +658,10 @@ export default function PersonView(props: any) {
                 borderBottom: 'solid 1px #ebedef',
                 paddingRight: 10,
                 height: 64,
-                zIndex: 0,
+                zIndex: 0
               }}
             >
-              <Button
-                color="clear"
-                leadingIcon="arrow_back"
-                text="Back"
-                onClick={goBack}
-              />
+              <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
               <div />
             </div>
           )}
@@ -719,7 +681,7 @@ export default function PersonView(props: any) {
                   background: '#ffffff',
                   border: '1px solid #D0D5D8',
                   boxSizing: 'borderBox',
-                  borderRadius: 4,
+                  borderRadius: 4
                 }}
                 icon={'qr_code_2'}
                 onClick={() => setShowQR(true)}
@@ -736,7 +698,7 @@ export default function PersonView(props: any) {
                 style={{
                   marginBottom: 30,
                   marginTop: 25,
-                  justifyContent: 'space-around',
+                  justifyContent: 'space-around'
                 }}
               >
                 <Button
@@ -767,7 +729,7 @@ export default function PersonView(props: any) {
                 style={{
                   marginBottom: 30,
                   marginTop: 25,
-                  justifyContent: 'space-between',
+                  justifyContent: 'space-between'
                 }}
               >
                 <Button
@@ -796,7 +758,7 @@ export default function PersonView(props: any) {
           style={{
             width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 628px)',
             minWidth: 250,
-            zIndex: canEdit ? 6 : 4,
+            zIndex: canEdit ? 6 : 4
           }}
         >
           <Tabs
@@ -806,7 +768,7 @@ export default function PersonView(props: any) {
               borderBottom: 'solid 1px #ebedef',
               boxShadow: canEdit
                 ? '0px 2px 0px rgba(0, 0, 0, 0.07)'
-                : '0px 2px 6px rgba(0, 0, 0, 0.07)',
+                : '0px 2px 6px rgba(0, 0, 0, 0.07)'
             }}
           >
             {tabs &&
@@ -815,8 +777,7 @@ export default function PersonView(props: any) {
                 const t = tabs[name];
                 const label = t.label;
                 const selected = name === newSelectedWidget;
-                const hasExtras =
-                  extras && extras[name] && extras[name].length > 0;
+                const hasExtras = extras && extras[name] && extras[name].length > 0;
                 let count: any = hasExtras
                   ? extras[name].filter((f) => {
                       if ('show' in f) {
@@ -850,7 +811,7 @@ export default function PersonView(props: any) {
               height: 'calc(100% - 63px)',
               background: '#F2F3F5',
               overflowY: 'auto',
-              position: 'relative',
+              position: 'relative'
             }}
           >
             {renderEditButton({ marginBottom: 15 })}
@@ -860,12 +821,10 @@ export default function PersonView(props: any) {
                 display: 'flex',
                 alignItems: 'flex-start',
                 justifyContent:
-                  fullSelectedWidget && fullSelectedWidget.length > 0
-                    ? 'flex-start'
-                    : 'center',
+                  fullSelectedWidget && fullSelectedWidget.length > 0 ? 'flex-start' : 'center',
                 flexWrap: 'wrap',
                 height: !hasWidgets() ? 'inherit' : '',
-                paddingTop: !hasWidgets() ? 30 : 0,
+                paddingTop: !hasWidgets() ? 30 : 0
               }}
             >
               {renderWidgets('')}
@@ -886,7 +845,7 @@ export default function PersonView(props: any) {
           style={{
             // top: -64,
             // height: 'calc(100% + 64px)'
-            height: '100%',
+            height: '100%'
           }}
           envStyle={{
             marginTop: isMobile ? 64 : 0,
@@ -897,7 +856,7 @@ export default function PersonView(props: any) {
             minWidth: 500,
             maxWidth: 602,
             zIndex: 20, //minHeight: 300,
-            ...focusedDesktopModalStyles,
+            ...focusedDesktopModalStyles
           }}
           nextArrow={nextIndex}
           prevArrow={prevIndex}
@@ -943,11 +902,11 @@ export default function PersonView(props: any) {
         style={{
           // top: -64,
           // height: 'calc(100% + 64px)'
-          height: '100%',
+          height: '100%'
         }}
         envStyle={{
           marginTop: isMobile || canEdit ? 64 : 123,
-          borderRadius: 0,
+          borderRadius: 0
         }}
       >
         <div
@@ -963,7 +922,7 @@ export default function PersonView(props: any) {
                                   mediumPic ||
                                   'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'
                                 }"
-                            ></sphinx-widget>`,
+                            ></sphinx-widget>`
           }}
         />
       </Modal>

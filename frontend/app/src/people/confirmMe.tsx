@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { QRCode } from "react-qr-svg";
-import { EuiLoadingSpinner } from "@elastic/eui";
-import styled from "styled-components";
-import api from "../api";
-import { useStores } from "../store";
-import type { MeInfo } from "../store/ui";
-import { getHost } from "../host";
+import React, { useState, useEffect } from 'react';
+import { QRCode } from 'react-qr-svg';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import styled from 'styled-components';
+import api from '../api';
+import { useStores } from '../store';
+import type { MeInfo } from '../store/ui';
+import { getHost } from '../host';
 // import { useIsMobile } from "../hooks";
 
 const host = getHost();
@@ -17,8 +17,8 @@ let interval;
 
 export default function ConfirmMe(props: any) {
   const { ui, main } = useStores();
-  const [challenge, setChallenge] = useState("");
-  const [ts, setTS] = useState("");
+  const [challenge, setChallenge] = useState('');
+  const [ts, setTS] = useState('');
 
   // const isMobile = useIsMobile()
 
@@ -30,7 +30,7 @@ export default function ConfirmMe(props: any) {
 
   useEffect(() => {
     if (challenge && ts) {
-      let el = document.createElement("a");
+      let el = document.createElement('a');
       el.href = qrString;
       el.click();
     }
@@ -45,7 +45,7 @@ export default function ConfirmMe(props: any) {
         if (me && me.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
-          setChallenge("");
+          setChallenge('');
           if (props.onSuccess) props.onSuccess();
           if (interval) clearInterval(interval);
         }
@@ -53,12 +53,12 @@ export default function ConfirmMe(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) { }
+      } catch (e) {}
     }, 3000);
   }
 
   async function getChallenge() {
-    const res = await api.get("ask");
+    const res = await api.get('ask');
     if (res.challenge) {
       setChallenge(res.challenge);
       startPolling(res.challenge);
