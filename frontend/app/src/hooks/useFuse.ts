@@ -1,5 +1,5 @@
-import Fuse from 'fuse.js'
-import { useStores } from '../store'
+import Fuse from 'fuse.js';
+import { useStores } from '../store';
 
 const fuseOptions = {
   keys: ['name', 'description'],
@@ -10,7 +10,7 @@ const fuseOptions = {
   location: 0,
   distance: 100,
   maxPatternLength: 32,
-  minMatchCharLength: 1,
+  minMatchCharLength: 1
 };
 
 export function useFuse(array, keys: string[] = []) {
@@ -35,4 +35,3 @@ export function useLocalFuse(searchText, array, keys: string[] = []) {
   }
   return theArray;
 }
-

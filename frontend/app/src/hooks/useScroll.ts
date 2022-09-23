@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { uiStore } from "../store/ui";
+import { useState } from 'react';
+import { uiStore } from '../store/ui';
 
 export function useScroll() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [n, setN] = useState(100);
   function handleScroll(e: any) {
-    const bottom =
-      e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight;
+    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight;
     if (bottom) {
       setLoadingMore(true);
       setTimeout(() => {
@@ -17,9 +16,8 @@ export function useScroll() {
       }, 3000);
     }
   }
-  return { handleScroll, n, loadingMore }
+  return { handleScroll, n, loadingMore };
 }
-
 
 export function usePageScroll(goForward, goBackwards) {
   const [loadingBottom, setLoadingBottom] = useState(false);
@@ -30,12 +28,10 @@ export function usePageScroll(goForward, goBackwards) {
     const top = e.target.scrollTop == 0;
 
     try {
-
-
       if (bottom) {
-        setLoadingBottom(true)
-        await goForward()
-        setLoadingBottom(false)
+        setLoadingBottom(true);
+        await goForward();
+        setLoadingBottom(false);
       }
       // else if (top) {
       //   setLoadingTop(true)
@@ -43,8 +39,8 @@ export function usePageScroll(goForward, goBackwards) {
       //   setLoadingTop(false)
       // }
     } catch (e) {
-      console.log('oops!', e)
+      console.log('oops!', e);
     }
   }
-  return { handleScroll, loadingBottom, loadingTop }
+  return { handleScroll, loadingBottom, loadingTop };
 }
