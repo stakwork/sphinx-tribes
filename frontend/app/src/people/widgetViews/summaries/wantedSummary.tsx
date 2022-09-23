@@ -26,6 +26,7 @@ import remarkGfm from 'remark-gfm';
 import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { useLocation } from 'react-router-dom';
+import { EuiText } from '@elastic/eui';
 
 function useQuery() {
   const { search } = useLocation();
@@ -53,6 +54,7 @@ export default function WantedSummary(props: any) {
     badgeRecipient,
     loomEmbedUrl,
     codingLanguage,
+    estimate_session_length,
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -454,7 +456,23 @@ export default function WantedSummary(props: any) {
 
             <GithubStatusPill status={status} assignee={assignee} />
             {assigneeLabel}
-
+            <EuiText
+              style={{
+                fontSize: '13px',
+                color: '#8e969c',
+                fontWeight: '500',
+              }}
+            >
+              {estimate_session_length && 'Session:'}{' '}
+              <span
+                style={{
+                  fontWeight: '500',
+                  color: '#000',
+                }}
+              >
+                {estimate_session_length ?? ''}
+              </span>
+            </EuiText>
             <div
               style={{
                 width: '100%',
@@ -561,6 +579,29 @@ export default function WantedSummary(props: any) {
                   style={{ marginRight: 25 }}
                 />
                 {assigneeLabel}
+              </div>
+              <div
+                style={{
+                  marginTop: '2px',
+                }}
+              >
+                <EuiText
+                  style={{
+                    fontSize: '13px',
+                    color: '#8e969c',
+                    fontWeight: '500',
+                  }}
+                >
+                  {estimate_session_length && 'Session:'}{' '}
+                  <span
+                    style={{
+                      fontWeight: '500',
+                      color: '#000',
+                    }}
+                  >
+                    {estimate_session_length ?? ''}
+                  </span>
+                </EuiText>
               </div>
             </SectionPad>
 

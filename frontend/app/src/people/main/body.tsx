@@ -462,7 +462,7 @@ export default function BodyComponent() {
                       userSelect: 'none',
                       background: '#dcedfe',
                       border: '2px solid #cddffd',
-                      padding: '8px 20px',
+                      padding: '8px 10px',
                       color: '#5d92df',
                     }}
                     onClick={() => {
@@ -483,7 +483,7 @@ export default function BodyComponent() {
               placeholder="Search"
               value={ui.searchText}
               style={{
-                width: 164,
+                width: 114,
                 height: 40,
                 border: '1px solid #DDE1E5',
                 background: '#fff',

@@ -14,7 +14,7 @@ export default function SelectInput({ error, note, label, options, name, value, 
         <FieldEnv label={labeltext}>
             <R>
                 <Select
-                    selectStyle={{ border: 'none' }}
+                    selectStyle={{ border: 'none'   }}
                     options={options}
                     value={value}
                     onChange={(e) => {
@@ -54,6 +54,6 @@ const E = styled.div`
   user-select:none;
 `
 const R = styled.div`
-  position:relative
+  position:relative;
 `
 
