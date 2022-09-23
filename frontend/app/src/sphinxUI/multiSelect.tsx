@@ -1,29 +1,31 @@
 import React from 'react'
 import styled from 'styled-components'
-import Select from 'react-select';
+import Select from 'react-select'
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
     const { options, onChange, value, style, selectStyle } = props
 
-    const opts = options.map((o) => {
-        return {
-            value: o.value,
-            label: o.label
-        }
-    }) || []
+    const opts =
+        options.map((o) => {
+            return {
+                value: o.value,
+                label: o.label,
+            }
+        }) || []
 
-    return <div style={{ position: 'relative', ...style }}>
-        <S
-            closeMenuOnSelect={false}
-            isMulti
-            options={opts}
-            value={value}
-            onChange={(value) => onChange(value)}
-            className={'multi-select-input'}
-        />
-
-    </div>
+    return (
+        <div style={{ position: 'relative', ...style }}>
+            <S
+                closeMenuOnSelect={false}
+                isMulti
+                options={opts}
+                value={value}
+                onChange={(value) => onChange(value)}
+                className={'multi-select-input'}
+            />
+        </div>
+    )
 }
 
 const S = styled(Select)`
@@ -79,4 +81,3 @@ button {
 }
 }
 `
-

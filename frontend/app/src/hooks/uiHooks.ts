@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 function getIsMobile() {
     return window.innerWidth < 900
@@ -16,48 +16,55 @@ function getScreenHeight() {
 }
 
 function useIsMobile() {
-    const [isMobile, setIsMobile] = useState(getIsMobile());
+    const [isMobile, setIsMobile] = useState(getIsMobile())
 
     useEffect(() => {
         function handleResize() {
-            setIsMobile(getIsMobile());
+            setIsMobile(getIsMobile())
         }
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
-    return isMobile;
+    return isMobile
 }
 
 function useScreenWidth() {
-    const [width, setWidth] = useState(getScreenWidth());
+    const [width, setWidth] = useState(getScreenWidth())
 
     useEffect(() => {
         function handleResize2() {
-            setWidth(getScreenWidth());
+            setWidth(getScreenWidth())
         }
 
-        window.addEventListener('resize', handleResize2);
-        return () => window.removeEventListener('resize', handleResize2);
-    }, []);
+        window.addEventListener('resize', handleResize2)
+        return () => window.removeEventListener('resize', handleResize2)
+    }, [])
 
-    return width;
+    return width
 }
 
 function useScreenHeight() {
-    const [h, setH] = useState(getScreenHeight());
+    const [h, setH] = useState(getScreenHeight())
 
     useEffect(() => {
         function handleResize3() {
-            setH(getScreenHeight());
+            setH(getScreenHeight())
         }
 
-        window.addEventListener('resize', handleResize3);
-        return () => window.removeEventListener('resize', handleResize3);
-    }, []);
+        window.addEventListener('resize', handleResize3)
+        return () => window.removeEventListener('resize', handleResize3)
+    }, [])
 
-    return h;
+    return h
 }
 
-export { useIsMobile, useScreenWidth, getScreenWidth, useScreenHeight, getIsMobile, screenWidthOffset }
+export {
+    useIsMobile,
+    useScreenWidth,
+    getScreenWidth,
+    useScreenHeight,
+    getIsMobile,
+    screenWidthOffset,
+}
