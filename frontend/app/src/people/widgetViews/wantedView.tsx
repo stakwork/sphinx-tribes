@@ -29,7 +29,7 @@ export default function WantedView(props: any) {
     paid,
     codingLanguage,
     assignee,
-    estimate_session_length,
+    estimate_session_length
   } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -70,24 +70,18 @@ export default function WantedView(props: any) {
         const peopleWantedsClone: any = [...peopleWanteds];
         const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
           let val = f.body || {};
-          return (
-            f.person.owner_pubkey === ui.meInfo?.owner_pubkey &&
-            val.created === created
-          );
+          return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
         // if we found it in the wanted list, update in people wanted list
         if (indexFromPeopleWanted > -1) {
           // if it should be hidden now, remove it from the list
-          if (
-            'show' in clonedEx[targetIndex] &&
-            clonedEx[targetIndex].show === false
-          ) {
+          if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
             peopleWantedsClone.splice(indexFromPeopleWanted, 1);
           } else {
             peopleWantedsClone[indexFromPeopleWanted] = {
               person: person,
-              body: clonedEx[targetIndex],
+              body: clonedEx[targetIndex]
             };
           }
           main.setPeopleWanteds(peopleWantedsClone);
@@ -116,8 +110,7 @@ export default function WantedView(props: any) {
 
     const isClosed = status === 'closed' || paid ? true : false;
 
-    const isCodingTask =
-      type === 'coding_task' || type === 'wanted_coding_task';
+    const isCodingTask = type === 'coding_task' || type === 'wanted_coding_task';
 
     if (isMobile) {
       return (
@@ -130,7 +123,7 @@ export default function WantedView(props: any) {
                 top: -1,
                 right: 0,
                 width: 64,
-                height: 72,
+                height: 72
               }}
             />
           )}
@@ -140,15 +133,10 @@ export default function WantedView(props: any) {
                 style={{
                   display: 'flex',
                   width: '100%',
-                  justifyContent: 'space-between',
+                  justifyContent: 'space-between'
                 }}
               >
-                <NameTag
-                  {...person}
-                  created={created}
-                  widget={'wanted'}
-                  style={{ margin: 0 }}
-                />
+                <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
               </div>
               <DT style={{ margin: '15px 0' }}>{title}</DT>
               <div
@@ -156,25 +144,23 @@ export default function WantedView(props: any) {
                   width: '100%',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  margin: '5px 0',
+                  margin: '5px 0'
                 }}
               >
-                {isCodingTask && (
-                  <GithubStatusPill status={status} assignee={assignee} />
-                )}
+                {isCodingTask && <GithubStatusPill status={status} assignee={assignee} />}
               </div>
               <EuiText
                 style={{
                   fontSize: '13px',
                   color: '#8e969c',
-                  fontWeight: '500',
+                  fontWeight: '500'
                 }}
               >
                 {estimate_session_length && 'Session:'}{' '}
                 <span
                   style={{
                     fontWeight: '500',
-                    color: '#000',
+                    color: '#000'
                   }}
                 >
                   {estimate_session_length ?? ''}
@@ -187,7 +173,7 @@ export default function WantedView(props: any) {
                   display: 'flex',
                   flexDirection: 'row',
                   marginTop: '10px',
-                  flexWrap: 'wrap',
+                  flexWrap: 'wrap'
                 }}
               >
                 {labels.length > 0 ? (
@@ -205,13 +191,13 @@ export default function WantedView(props: any) {
                             padding: '0px 14px',
                             borderRadius: '20px',
                             marginRight: '3px',
-                            marginBottom: '3px',
+                            marginBottom: '3px'
                           }}
                         >
                           <div
                             style={{
                               fontSize: '10px',
-                              color: '#202020',
+                              color: '#202020'
                             }}
                           >
                             {x.label}
@@ -224,7 +210,7 @@ export default function WantedView(props: any) {
                   <>
                     <div
                       style={{
-                        minHeight: '50px',
+                        minHeight: '50px'
                       }}
                     ></div>
                   </>
@@ -233,9 +219,8 @@ export default function WantedView(props: any) {
 
               {priceMin ? (
                 <P style={{ margin: '15px 0 0' }}>
-                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B>{' '}
-                  SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B>{' '}
-                  USD
+                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
+                  <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
                 </P>
               ) : (
                 <P style={{ margin: '15px 0 0' }}>
@@ -258,7 +243,7 @@ export default function WantedView(props: any) {
               top: -1,
               right: 0,
               width: 64,
-              height: 72,
+              height: 72
             }}
           />
         )}
@@ -269,7 +254,7 @@ export default function WantedView(props: any) {
               style={{
                 display: 'flex',
                 width: '100%',
-                justifyContent: 'space-between',
+                justifyContent: 'space-between'
               }}
             >
               <NameTag {...person} created={created} widget={'wanted'} />
@@ -283,11 +268,7 @@ export default function WantedView(props: any) {
                     </div> */}
             <DT>{title}</DT>
             {isCodingTask && (
-              <GithubStatusPill
-                status={status}
-                assignee={assignee}
-                style={{ marginTop: 10 }}
-              />
+              <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
             )}
 
             <div
@@ -297,7 +278,7 @@ export default function WantedView(props: any) {
                 display: 'flex',
                 flexDirection: 'row',
                 marginTop: '10px',
-                flexWrap: 'wrap',
+                flexWrap: 'wrap'
               }}
             >
               {labels.length > 0 ? (
@@ -315,13 +296,13 @@ export default function WantedView(props: any) {
                           padding: '0px 14px',
                           borderRadius: '20px',
                           marginRight: '3px',
-                          marginBottom: '3px',
+                          marginBottom: '3px'
                         }}
                       >
                         <div
                           style={{
                             fontSize: '10px',
-                            color: '#202020',
+                            color: '#202020'
                           }}
                         >
                           {x.label}
@@ -334,16 +315,14 @@ export default function WantedView(props: any) {
                 <>
                   <div
                     style={{
-                      minHeight: '50px',
+                      minHeight: '50px'
                     }}
                   ></div>
                 </>
               )}
             </div>
             <Divider style={{ margin: isCodingTask ? '22px 0' : '0 0 22px' }} />
-            <DescriptionCodeTask>
-              {renderMarkdown(description)}
-            </DescriptionCodeTask>
+            <DescriptionCodeTask>{renderMarkdown(description)}</DescriptionCodeTask>
           </Pad>
 
           <Divider style={{ margin: 0 }} />
@@ -353,20 +332,19 @@ export default function WantedView(props: any) {
               display: 'flex',
               flexDirection: 'column',
               padding: '10px 20px',
-              minHeight: '100px',
+              minHeight: '100px'
             }}
           >
             <Pad
               style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                justifyContent: 'space-between'
               }}
             >
               {priceMin ? (
                 <P>
-                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B>{' '}
-                  SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B>{' '}
-                  USD
+                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
+                  <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
                 </P>
               ) : (
                 <P>
@@ -376,7 +354,7 @@ export default function WantedView(props: any) {
 
               <div
                 style={{
-                  width: '40px',
+                  width: '40px'
                 }}
               >
                 {
@@ -393,7 +371,7 @@ export default function WantedView(props: any) {
                         minHeight: 20,
                         height: 20,
                         padding: 0,
-                        background: '#fff',
+                        background: '#fff'
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -408,14 +386,14 @@ export default function WantedView(props: any) {
               style={{
                 fontSize: '14px',
                 color: '#8e969c',
-                fontWeight: '500',
+                fontWeight: '500'
               }}
             >
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
-                  color: '#000',
+                  color: '#000'
                 }}
               >
                 {estimate_session_length ?? ''}
