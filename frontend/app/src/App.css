@@ -16,12 +16,11 @@ body {
   margin: 0;
   height: 100%;
   width: 100%;
-  font-family: 'Roboto', "Inter UI", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif !important;
+  font-family: 'Roboto', 'Inter UI', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
 }
 
 * {
@@ -107,7 +106,7 @@ button:focus {
   max-height: 105px;
   height: auto;
   min-height: auto;
-  background: #1E1F25;
+  background: #1e1f25;
   border: 0;
   padding-bottom: 10px;
 }
@@ -136,12 +135,18 @@ button:focus {
 }
 
 #header .euiFieldSearch::placeholder {
-  color: #3B4755;
+  color: #3b4755;
   font-size: 13px;
 }
 
 #header .euiFieldSearch:focus {
-  background-image: linear-gradient(to top, #5D8FDD, #5D8FDD 2px, transparent 2px, transparent 100%);
+  background-image: linear-gradient(
+    to top,
+    #5d8fdd,
+    #5d8fdd 2px,
+    transparent 2px,
+    transparent 100%
+  );
 }
 
 #header-right {
@@ -163,7 +168,7 @@ button:focus {
 }
 
 .euiFieldSearch.euiFieldSearch::placeholder {
-  color: #3B4755;
+  color: #3b4755;
 }
 
 .euiFieldSearch.euiFieldSearch:focus {
@@ -258,7 +263,7 @@ input.input {
 }
 
 .qr-left {
-  color: #6B7A8D;
+  color: #6b7a8d;
   font-size: 12px;
   position: relative;
 }
@@ -269,7 +274,7 @@ input.input {
 
 .qr-left .disabled,
 .qr-left .disabled .lighter-color {
-  color: #3B4755;
+  color: #3b4755;
 }
 
 .qr-left .info {
@@ -303,7 +308,7 @@ input.input {
 }
 
 .section-separator {
-  border: 1px solid #151E27;
+  border: 1px solid #151e27;
   margin-top: 20px;
   margin-bottom: 20px;
 }
@@ -317,7 +322,7 @@ input.input {
   width: 100px;
   height: 40px;
   margin: 0 auto;
-  background: #151E27;
+  background: #151e27;
   margin-bottom: -24px;
   margin-top: 20px;
   border-top-left-radius: 10px;
@@ -353,7 +358,7 @@ input.input {
   top: -4px;
   right: 0px;
   font-size: 10px;
-  color: #6B7A8D;
+  color: #6b7a8d;
   background: #1a2430;
   padding: 10px;
 }
@@ -380,7 +385,6 @@ textarea.qr-string {
   white-space: nowrap;
   resize: none;
 }
-
 
 .copy-btn {
   background: #698cf7;
@@ -452,23 +456,19 @@ fieldset.container {
 #main .euiCheckableCard {
   max-width: 378px;
   /* height: 100px; */
-
 }
 
 #main .euiCheckableCard-isChecked {
   height: auto;
 }
 
-
 #header-right {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-
 .euiModal__flex .euiModalBody .euiModalBody__overflow {
   padding: 24px 0 !important;
-
 }
 
 .euiFormRow {
@@ -478,7 +478,6 @@ fieldset.container {
 .euiFormRow__labelWrapper {
   margin-bottom: 0px;
 }
-
 
 ::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
@@ -500,8 +499,6 @@ fieldset.container {
 .sphinxButton {
   box-shadow: none;
 }
-
-
 
 #logo {
   width: 200px;
@@ -526,8 +523,8 @@ fieldset.container {
   min-width: 80px;
   width: 95px;
   height: 35px;
-  border: 1px solid #5D8FDD;
-  color: #5D8FDD;
+  border: 1px solid #5d8fdd;
+  color: #5d8fdd;
 }
 
 #header .euiButton__text {
@@ -540,12 +537,18 @@ fieldset.container {
 }
 
 #header .euiFieldSearch::placeholder {
-  color: #3B4755;
+  color: #3b4755;
   font-size: 13px;
 }
 
 #header .euiFieldSearch:focus {
-  background-image: linear-gradient(to top, #5D8FDD, #5D8FDD 2px, transparent 2px, transparent 100%);
+  background-image: linear-gradient(
+    to top,
+    #5d8fdd,
+    #5d8fdd 2px,
+    transparent 2px,
+    transparent 100%
+  );
 }
 
 #header-right {
@@ -567,7 +570,7 @@ fieldset.container {
 }
 
 .euiFieldSearch.euiFieldSearch::placeholder {
-  color: #3B4755;
+  color: #3b4755;
 }
 
 .euiFieldSearch.euiFieldSearch:focus {
@@ -621,7 +624,7 @@ fieldset.container {
 }
 
 #main .euiCheckableCard h5 {
-  color: #6B7A8D;
+  color: #6b7a8d;
   font-size: 12px;
   margin-bottom: 0;
 }
@@ -656,7 +659,7 @@ fieldset.container {
 }
 
 .qr-left {
-  color: #6B7A8D;
+  color: #6b7a8d;
   font-size: 12px;
   position: relative;
 }
@@ -667,7 +670,7 @@ fieldset.container {
 
 .qr-left .disabled,
 .qr-left .disabled .lighter-color {
-  color: #3B4755;
+  color: #3b4755;
 }
 
 .qr-left .info {
@@ -701,7 +704,7 @@ fieldset.container {
 }
 
 .section-separator {
-  border: 1px solid #151E27;
+  border: 1px solid #151e27;
   margin-top: 20px;
   margin-bottom: 20px;
 }
@@ -715,7 +718,7 @@ fieldset.container {
   width: 100px;
   height: 40px;
   margin: 0 auto;
-  background: #151E27;
+  background: #151e27;
   margin-bottom: -24px;
   margin-top: 20px;
   border-top-left-radius: 10px;
@@ -751,7 +754,7 @@ fieldset.container {
   top: -4px;
   right: 0px;
   font-size: 10px;
-  color: #6B7A8D;
+  color: #6b7a8d;
   background: #1a2430;
   padding: 10px;
 }
@@ -834,6 +837,28 @@ textarea.qr-string {
     height: auto;
   }
 }
+.euiSuperSelect__listbox {
+  border: none;
+  outline: none;
+}
+.euiPanel.euiPanel--plain.euiPopover__panel {
+  border: 1px solid #dde1e5;
+  overflow: hidden;
+  padding: 0;
+}
+
+.euiSuperSelect__listbox button {
+  background-color: #ffffff !important;
+  border: none;
+  outline: none;
+  padding: 0px 8px;
+}
+
+.euiSuperSelect__listbox .euiContextMenu__icon {
+  color: #000;
+  position: relative;
+  top: 5px;
+}
 
 @media (max-width: 767px) {
   #header-right {
@@ -844,7 +869,6 @@ textarea.qr-string {
 
 .euiModal__flex .euiModalBody .euiModalBody__overflow {
   padding: 24px 0 !important;
-
 }
 
 .euiFormRow {
@@ -854,7 +878,6 @@ textarea.qr-string {
 .euiFormRow__labelWrapper {
   margin-bottom: 0px;
 }
-
 
 .masonry-flex-container {
   display: flex;
@@ -875,11 +898,11 @@ textarea.qr-string {
 }
 
 /* Re-order items into 3 rows */
-.masonry-flex-item:nth-child(3n+1) {
+.masonry-flex-item:nth-child(3n + 1) {
   order: 1;
 }
 
-.masonry-flex-item:nth-child(3n+2) {
+.masonry-flex-item:nth-child(3n + 2) {
   order: 2;
 }
 
@@ -890,7 +913,7 @@ textarea.qr-string {
 /* Force new columns */
 .masonry-flex-container::before,
 .masonry-flex-container::after {
-  content: "";
+  content: '';
   flex-basis: 100%;
   width: 0;
   order: 2;
@@ -904,7 +927,6 @@ textarea.qr-string {
   display: flex;
 
   padding: 1px;
-
 }
 
 .euiFormRow__fieldWrapper .euiFormControlLayout--group label {
@@ -913,7 +935,10 @@ textarea.qr-string {
   background-color: #ffffff00 !important;
 }
 
-.euiFormRow__fieldWrapper .euiFormControlLayout--group .euiFormLabel .euiFormControlLayout__prepend {
+.euiFormRow__fieldWrapper
+  .euiFormControlLayout--group
+  .euiFormLabel
+  .euiFormControlLayout__prepend {
   background-color: #ffffff00 !important;
 }
 
@@ -938,7 +963,7 @@ textarea.qr-string {
 }
 
 .euiFormControlLayout__prepend {
-  color: #B0B7BC !important;
+  color: #b0b7bc !important;
 }
 
 .multi-select-input div {
