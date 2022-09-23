@@ -2,7 +2,7 @@ name: build and packr2
 on:
  push:
     branches:
-      - master
+      - prettier
 
 jobs:
   lint:
