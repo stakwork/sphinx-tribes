@@ -8,6 +8,7 @@ import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 import { renderMarkdown } from '../utils/renderMarkdown';
+import { EuiText } from '@elastic/eui';
 
 export default function WantedView(props: any) {
   let {
@@ -28,6 +29,7 @@ export default function WantedView(props: any) {
     paid,
     codingLanguage,
     assignee,
+    estimate_session_length,
   } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -98,7 +100,7 @@ export default function WantedView(props: any) {
     }
   }
 
-//   console.log({ ...assignee });
+  //   console.log({ ...assignee });
 
   useEffect(() => {
     if (codingLanguage) {
@@ -161,7 +163,23 @@ export default function WantedView(props: any) {
                   <GithubStatusPill status={status} assignee={assignee} />
                 )}
               </div>
-
+              <EuiText
+                style={{
+                  fontSize: '13px',
+                  color: '#8e969c',
+                  fontWeight: '500',
+                }}
+              >
+                {estimate_session_length && 'Session:'}{' '}
+                <span
+                  style={{
+                    fontWeight: '500',
+                    color: '#000',
+                  }}
+                >
+                  {estimate_session_length ?? ''}
+                </span>
+              </EuiText>
               <div
                 style={{
                   minHeight: '45px',
@@ -274,7 +292,7 @@ export default function WantedView(props: any) {
 
             <div
               style={{
-                minHeight: '45px',
+                minHeight: '48px',
                 width: '100%',
                 display: 'flex',
                 flexDirection: 'row',
@@ -327,52 +345,83 @@ export default function WantedView(props: any) {
               {renderMarkdown(description)}
             </DescriptionCodeTask>
           </Pad>
+
           <Divider style={{ margin: 0 }} />
-          <Pad
+
+          <div
             style={{
-              padding: 20,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '10px 20px',
+              minHeight: '100px',
             }}
           >
-            {priceMin ? (
-              <P>
-                <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B>{' '}
-                SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B>{' '}
-                USD
-              </P>
-            ) : (
-              <P>
-                <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
-              </P>
-            )}
+            <Pad
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              {priceMin ? (
+                <P>
+                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B>{' '}
+                  SAT / <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B>{' '}
+                  USD
+                </P>
+              ) : (
+                <P>
+                  <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+                </P>
+              )}
 
-            <div>
-              {
-                //  if my own, show this option to show/hide
-                isMine && (
-                  <Button
-                    icon={show ? 'visibility' : 'visibility_off'}
-                    disable={saving}
-                    submitting={saving}
-                    iconStyle={{ color: '#555', fontSize: 20 }}
-                    style={{
-                      minWidth: 24,
-                      width: 24,
-                      minHeight: 20,
-                      height: 20,
-                      padding: 0,
-                      background: '#fff',
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setExtrasPropertyAndSave('show');
-                    }}
-                  />
-                )
-              }
-            </div>
-          </Pad>
+              <div
+                style={{
+                  width: '40px',
+                }}
+              >
+                {
+                  //  if my own, show this option to show/hide
+                  isMine && (
+                    <Button
+                      icon={show ? 'visibility' : 'visibility_off'}
+                      disable={saving}
+                      submitting={saving}
+                      iconStyle={{ color: '#555', fontSize: 20 }}
+                      style={{
+                        minWidth: 24,
+                        maxWidth: 24,
+                        minHeight: 20,
+                        height: 20,
+                        padding: 0,
+                        background: '#fff',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExtrasPropertyAndSave('show');
+                      }}
+                    />
+                  )
+                }
+              </div>
+            </Pad>
+            <EuiText
+              style={{
+                fontSize: '14px',
+                color: '#8e969c',
+                fontWeight: '500',
+              }}
+            >
+              {estimate_session_length && 'Session:'}{' '}
+              <span
+                style={{
+                  fontWeight: '500',
+                  color: '#000',
+                }}
+              >
+                {estimate_session_length ?? ''}
+              </span>
+            </EuiText>
+          </div>
         </DWrap>
       </>
     );
@@ -389,11 +438,11 @@ const DWrap = styled.div<WrapProps>`
   display: flex;
   flex: 1;
   height: 100%;
-  min-height: 100%;
+  min-height: 510px;
   flex-direction: column;
   width: 100%;
   min-width: 100%;
-  max-height: 471px;
+  max-height: 510px;
   font-style: normal;
   font-weight: 500;
   font-size: 17px;
@@ -428,13 +477,13 @@ const T = styled.div`
   line-height: 23px;
 `;
 const B = styled.span`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   color: #3c3f41;
 `;
 const P = styled.div`
   font-weight: regular;
-  font-size: 15px;
+  font-size: 14px;
   color: #8e969c;
 `;
 const D = styled.div`
@@ -466,7 +515,6 @@ const Body = styled.div`
 const Pad = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px;
 `;
 
 const DD = styled.div`
@@ -506,6 +554,7 @@ const DescriptionCodeTask = styled.div`
   -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
   height: 120px;
+  max-height: 120px;
 `;
 const DT = styled(Title)`
   margin-bottom: 9px;

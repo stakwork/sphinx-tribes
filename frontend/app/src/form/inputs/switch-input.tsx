@@ -23,6 +23,10 @@ export default function SwitchInput({ label, note, value, name, handleChange, ha
                     onBlur={handleBlur}
                     onFocus={handleFocus}
                     compressed
+                    style={{
+                        border: 'none',
+                        background: 'inherit'
+                    }}
                 />
             </div>
         </FieldEnv>
