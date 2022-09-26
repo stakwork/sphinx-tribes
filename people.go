@@ -73,7 +73,7 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
-	if person.newTicketTime != 0 {
+	if person.NewTicketTime != 0 {
 		go processAlerts(person)
 	}
 	p, err := DB.createOrEditPerson(person)
