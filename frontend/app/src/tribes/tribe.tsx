@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
-import { QRCode } from "react-qr-svg";
-import styled from "styled-components";
-import { EuiCard } from "@elastic/eui";
-import Tag from "./tag";
-import moment from "moment";
-import { getHostIncludingDockerHosts } from "../host";
+import React, { useRef, useState } from 'react';
+import { QRCode } from 'react-qr-svg';
+import styled from 'styled-components';
+import { EuiCard } from '@elastic/eui';
+import Tag from './tag';
+import moment from 'moment';
+import { getHostIncludingDockerHosts } from '../host';
 
 function makeQR(uuid: string) {
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`;
@@ -25,16 +25,14 @@ export default function Tribe({
   member_count,
   last_active,
   unique_name,
-  preview,
+  preview
 }: any) {
   const showTags = tags && tags.length && tags.length > 0 ? true : false;
   const qrString = makeQR(uuid);
   const [copied, setCopied] = useState(false);
 
-  const lastActiveM = last_active
-    ? moment(last_active * 1000)
-    : moment().subtract(1, "months");
-  const lastActive = lastActiveM.format("MMM D HH:mm");
+  const lastActiveM = last_active ? moment(last_active * 1000) : moment().subtract(1, 'months');
+  const lastActive = lastActiveM.format('MMM D HH:mm');
 
   function copyString(e, text: any) {
     e.stopPropagation();
@@ -45,37 +43,26 @@ export default function Tribe({
 
   return (
     <EuiCard
-					style={{backgroundColor: "#1a2430"}}
+      style={{ backgroundColor: '#1a2430' }}
       className="col-md-6 col-lg-6  mb-2"
       id={uuid}
-      title={""}
+      title={''}
     >
       <Content
-        onClick={() => select(selected ? "" : uuid, unique_name)}
+        onClick={() => select(selected ? '' : uuid, unique_name)}
         style={{
-          height: selected ? "auto" : 100,
+          height: selected ? 'auto' : 100
         }}
         selected={selected}
       >
         <Left>
           <Row className="item-cont">
-            <Img src={img || "/static/placeholder.svg"} />
-            <Left
-              style={{ padding: "0 0 0 20px", maxWidth: "calc(100% - 100px)" }}
-            >
-              <Row
-                style={
-                  selected
-                    ? { flexDirection: "column", alignItems: "flex-start" }
-                    : {}
-                }
-              >
+            <Img src={img || '/static/placeholder.svg'} />
+            <Left style={{ padding: '0 0 0 20px', maxWidth: 'calc(100% - 100px)' }}>
+              <Row style={selected ? { flexDirection: 'column', alignItems: 'flex-start' } : {}}>
                 <Title className="tribe-title">{name}</Title>
               </Row>
-              <Description
-                oneLine={!selected }
-                style={{ minHeight: 20 }}
-              >
+              <Description oneLine={!selected} style={{ minHeight: 20 }}>
                 {description}
               </Description>
 
@@ -84,17 +71,12 @@ export default function Tribe({
                   {tags.map((t: string) => (
                     <Tag type={t} key={t} />
                   ))}
-                  {tags.length > 3 && (
-                    <span className="more-tags-available">more...</span>
-                  )}
+                  {tags.length > 3 && <span className="more-tags-available">more...</span>}
                 </Tokens>
               )}
             </Left>
           </Row>
-          <div
-            className="expand-part"
-            style={selected ? { opacity: 1 } : { opacity: 0 }}
-          >
+          <div className="expand-part" style={selected ? { opacity: 1 } : { opacity: 0 }}>
             <div className="section-separator"></div>
             <div className="row info-section">
               <div className="col-4 col-sm-4 col-md-4 col-lg-4">
@@ -119,11 +101,7 @@ export default function Tribe({
             <div className="row">
               <div className="col-4 col-sm-4 col-md-4 col-lg-4 qr-left">
                 <div className="text-right">
-                  <img
-                    style={{ width: 100 }}
-                    src="/static/scan_notification.svg"
-                    alt=""
-                  />
+                  <img style={{ width: 100 }} src="/static/scan_notification.svg" alt="" />
                 </div>
                 <div className="text-right info">
                   <div>Price to join</div>
@@ -135,11 +113,7 @@ export default function Tribe({
                   <div className="lighter-color">{price_per_message || 0}</div>
                 </div>
                 <div className="section-separator"></div>
-                <a
-                  onClick={(e) => e.stopPropagation()}
-                  href={qrString}
-                  className="btn join-btn"
-                >
+                <a onClick={(e) => e.stopPropagation()} href={qrString} className="btn join-btn">
                   <img
                     style={{ width: 13, height: 13, marginRight: 8 }}
                     src="/static/launch-24px.svg"
@@ -152,7 +126,7 @@ export default function Tribe({
                 {selected && (
                   <QRWrap className="qr-wrap float-r">
                     <QRCode
-                      bgColor={selected ? "#FFFFFF" : "#666"}
+                      bgColor={selected ? '#FFFFFF' : '#666'}
                       fgColor="#000000"
                       level="Q"
                       style={{ width: 209 }}
@@ -164,16 +138,13 @@ export default function Tribe({
                   <a
                     onClick={(e) => e.stopPropagation()}
                     href={`https://${preview}?tribe=${uuid}`}
-                    target={"_blank"}
-                    className={`preview-btn ${!preview ? "btn-disabled" : ""}`}
+                    target={'_blank'}
+                    className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}
                   >
                     Preview
                   </a>
-                  <button
-                    className="copy-btn"
-                    onClick={(e) => copyString(e, qrString)}
-                  >
-                    {copied ? "Copied!" : "Copy Link"}
+                  <button className="copy-btn" onClick={(e) => copyString(e, qrString)}>
+                    {copied ? 'Copied!' : 'Copy Link'}
                   </button>
                 </div>
               </div>
@@ -248,9 +219,9 @@ interface DescriptionProps {
 const Description = styled.h5<DescriptionProps>`
   font-weight: normal;
   line-height: 20px;
-	align-self: start;
-	font-size: 10px;
-	text-align: left;
+  align-self: start;
+  font-size: 10px;
+  text-align: left;
   ${(p) =>
     p.oneLine &&
     `
@@ -264,7 +235,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url("${(p) => p.src}");
+  background-image: url('${(p) => p.src}');
   background-position: center;
   background-size: cover;
   height: 90px;
@@ -275,5 +246,5 @@ const Img = styled.div<ImageProps>`
 
 const Tokens = styled.div`
   display: flex !important;
-	align-content: start;
+  align-content: start;
 `;

@@ -154,7 +154,7 @@ export default function WantedView(props: any) {
                   width: '100%',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  margin: '5px 0',
+                  margin: '5px 0'
                 }}
               >
                 {isCodingTask && (

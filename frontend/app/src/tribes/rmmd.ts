@@ -1,9 +1,13 @@
-export default function rmmd(md:string) {
-  var options: {[k:string]:boolean} = {}
-  options.listUnicodeChar = options.hasOwnProperty('listUnicodeChar') ? options.listUnicodeChar : false;
-  options.stripListLeaders = options.hasOwnProperty('stripListLeaders') ? options.stripListLeaders : true;
+export default function rmmd(md: string) {
+  var options: { [k: string]: boolean } = {};
+  options.listUnicodeChar = options.hasOwnProperty('listUnicodeChar')
+    ? options.listUnicodeChar
+    : false;
+  options.stripListLeaders = options.hasOwnProperty('stripListLeaders')
+    ? options.stripListLeaders
+    : true;
   options.gfm = options.hasOwnProperty('gfm') ? options.gfm : true;
-  options.useImgAltText = false
+  options.useImgAltText = false;
 
   var output = md || '';
 
@@ -14,8 +18,7 @@ export default function rmmd(md:string) {
     if (options.stripListLeaders) {
       if (options.listUnicodeChar)
         output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, options.listUnicodeChar + ' $1');
-      else
-        output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, '$1');
+      else output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, '$1');
     }
     if (options.gfm) {
       output = output
@@ -55,7 +58,7 @@ export default function rmmd(md:string) {
       .replace(/`(.+?)`/g, '$1')
       // Replace two or more newlines with exactly two? Not entirely sure this belongs here...
       .replace(/\n{2,}/g, '\n\n');
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     return md;
   }

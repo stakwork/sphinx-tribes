@@ -1,11 +1,11 @@
-import { observable, action } from "mobx";
+import { observable, action } from 'mobx';
 // import { persist } from "mobx-persist";
-import api from "../api";
-import { Extras } from "../form/inputs/widgets/interfaces";
-import { getHostIncludingDockerHosts } from "../host";
-import { uiStore } from "./ui";
-import { randomString } from "../helpers";
-export const queryLimit = 100
+import api from '../api';
+import { Extras } from '../form/inputs/widgets/interfaces';
+import { getHostIncludingDockerHosts } from '../host';
+import { uiStore } from './ui';
+import { randomString } from '../helpers';
+export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -18,30 +18,35 @@ export class MainStore {
   ownerTribes: Tribe[] = [];
 
   @action async getTribes(queryParams?: any): Promise<Tribe[]> {
-    let ta = [...uiStore.tags]
+    let ta = [...uiStore.tags];
 
-    console.log('getTribes')
+    console.log('getTribes');
     //make tags string for querys
-    ta = ta.filter(f => f.checked)
-    let tags = ''
+    ta = ta.filter((f) => f.checked);
+    let tags = '';
     if (ta && ta.length) {
       ta.forEach((o, i) => {
-        tags += o.label
+        tags += o.label;
         if (ta.length - 1 !== i) {
-          tags += ','
+          tags += ',';
         }
-      })
+      });
     }
-    queryParams = { ...queryParams, search: uiStore.searchText, tags }
+    queryParams = { ...queryParams, search: uiStore.searchText, tags };
 
-    let query = this.appendQueryParams("tribes", queryLimit, { ...queryParams, sortBy: 'last_active=0, last_active', direction: 'desc' })
+    let query = this.appendQueryParams('tribes', queryLimit, {
+      ...queryParams,
+      sortBy: 'last_active=0, last_active',
+      direction: 'desc'
+    });
     const ts = await api.get(query);
 
     this.tribes = this.doPageListMerger(
       this.tribes,
       ts,
       (n) => uiStore.setTribesPageNumber(n),
-      queryParams)
+      queryParams
+    );
 
     return ts;
   }
@@ -50,9 +55,9 @@ export class MainStore {
   myBots: Bot[] = [];
 
   @action async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
-    console.log("get bots");
+    console.log('get bots');
 
-    let query = this.appendQueryParams("bots", queryParams)
+    let query = this.appendQueryParams('bots', queryParams);
     let b = await api.get(query);
 
     const info = uiStore.meInfo;
@@ -83,27 +88,30 @@ export class MainStore {
     //   description: 'my first bot botmy first bot botmy first bot botmy first bot bot'
     // },]
 
-    const hideBots = ['pleaseprovidedocumentation', 'example']
+    const hideBots = ['pleaseprovidedocumentation', 'example'];
 
     // hide test bots and set images
     b &&
       b.forEach((bb, i) => {
-        if (bb.unique_name === "btc") {
+        if (bb.unique_name === 'btc') {
           // bb.img = "/static/bots_bitcoin.png";
           b.splice(i, 1);
           b.unshift(bb);
         }
-        if (bb.unique_name === "bet") {
+        if (bb.unique_name === 'bet') {
           // bb.img = "/static/bots_betting.png";
           b.splice(i, 1);
           b.unshift(bb);
         }
-        if (bb.unique_name === "hello" || bb.unique_name === "welcome") {
+        if (bb.unique_name === 'hello' || bb.unique_name === 'welcome') {
           // bb.img = "/static/bots_welcome.png";
           b.splice(i, 1);
           b.unshift(bb);
         }
-        if (bb.unique_name && (bb.unique_name.includes("test") || hideBots.includes(bb.unique_name))) {
+        if (
+          bb.unique_name &&
+          (bb.unique_name.includes('test') || hideBots.includes(bb.unique_name))
+        ) {
           // hide all test bots
           bb.hide = true;
         }
@@ -116,7 +124,6 @@ export class MainStore {
 
     this.bots = b;
     return b;
-
   }
 
   @action async getMyBots(): Promise<any> {
@@ -124,30 +131,30 @@ export class MainStore {
 
     const info = uiStore.meInfo;
     try {
-      let relayB: any = await this.fetchFromRelay('bots')
+      let relayB: any = await this.fetchFromRelay('bots');
 
-      relayB = await relayB.json()
-      console.log("got bots from relay", relayB);
-      let relayMyBots = relayB?.response?.bots || []
+      relayB = await relayB.json();
+      console.log('got bots from relay', relayB);
+      let relayMyBots = relayB?.response?.bots || [];
 
       // merge tribe server stuff
-      console.log("get bots");
+      console.log('get bots');
       let tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
-      let mergedBots = relayMyBots.map(b => {
-        const thisBot = tribeServerBots.find(f => f.uuid === b.uuid)
+      let mergedBots = relayMyBots.map((b) => {
+        const thisBot = tribeServerBots.find((f) => f.uuid === b.uuid);
         return {
           ...b,
           ...thisBot
-        }
-      })
+        };
+      });
 
-      this.myBots = mergedBots
+      this.myBots = mergedBots;
 
-      return mergedBots
+      return mergedBots;
     } catch (e) {
-      console.log('ok')
+      console.log('ok');
     }
   }
 
@@ -155,20 +162,17 @@ export class MainStore {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
-    const URL = info.url.startsWith("http")
-      ? info.url
-      : `https://${info.url}`;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     let r: any = await fetch(URL + `/${path}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "x-jwt": info.jwt,
-        "Content-Type": "application/json",
-      },
+        'x-jwt': info.jwt,
+        'Content-Type': 'application/json'
+      }
     });
 
-    return r
+    return r;
   }
-
 
   @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
     const ts = await api.get(`tribes_by_owner/${pubkey}?all=true`);
@@ -180,13 +184,13 @@ export class MainStore {
     const t = await api.get(`tribe_by_un/${un}`);
     // put got on top
     // if already exists, delete
-    const tribesClone = [...this.tribes]
-    const dupIndex = tribesClone.findIndex(f => f.uuid === t.uuid)
+    const tribesClone = [...this.tribes];
+    const dupIndex = tribesClone.findIndex((f) => f.uuid === t.uuid);
     if (dupIndex > -1) {
-      tribesClone.splice(dupIndex, 1)
+      tribesClone.splice(dupIndex, 1);
     }
 
-    this.tribes = [t, ...tribesClone]
+    this.tribes = [t, ...tribesClone];
     return t;
   }
 
@@ -195,16 +199,11 @@ export class MainStore {
     return t;
   }
 
-
-  @action async getGithubIssueData(
-    owner: string,
-    repo: string,
-    issue: string
-  ): Promise<any> {
+  @action async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
     const data = await api.get(`github_issue/${owner}/${repo}/${issue}`);
     const { title, description, assignee, status } = data && data;
 
-    console.log('got github issue', data)
+    console.log('got github issue', data);
 
     // if no title, the github issue isnt real
     if (!title && !status && !description && !assignee) return null;
@@ -214,87 +213,88 @@ export class MainStore {
   @action async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
-      console.log('got openIssues', openIssues)
+      console.log('got openIssues', openIssues);
       if (openIssues) {
-        uiStore.setOpenGithubIssues(openIssues)
+        uiStore.setOpenGithubIssues(openIssues);
       }
       return openIssues;
     } catch (e) {
-      console.log('e', e)
+      console.log('e', e);
     }
   }
 
   @action isTorSave() {
-    let result = false
-    if (uiStore?.meInfo?.url?.includes(".onion")) result = true
-    return result
+    let result = false;
+    if (uiStore?.meInfo?.url?.includes('.onion')) result = true;
+    return result;
   }
 
   @action async makeBot(payload: any): Promise<any> {
-
-    const [r, error] = await this.doCallToRelay('POST', `bot`, payload)
+    const [r, error] = await this.doCallToRelay('POST', `bot`, payload);
     if (error) throw error;
-    if (!r) return // tor user will return here
+    if (!r) return; // tor user will return here
 
-    const b = await r.json()
-    console.log("made bot", b);
+    const b = await r.json();
+    console.log('made bot', b);
 
-    const mybots = await this.getMyBots()
-    console.log("got my bots", mybots);
+    const mybots = await this.getMyBots();
+    console.log('got my bots', mybots);
 
     return b?.response;
-
   }
 
   @action async updateBot(payload: any): Promise<any> {
-
-    const [r, error] = await this.doCallToRelay('PUT', `bot`, payload)
+    const [r, error] = await this.doCallToRelay('PUT', `bot`, payload);
     if (error) throw error;
-    if (!r) return // tor user will return here
-    console.log("updated bot", r);
+    if (!r) return; // tor user will return here
+    console.log('updated bot', r);
     return r;
   }
 
   @action async deleteBot(id: string): Promise<any> {
-
     try {
-      const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null)
+      const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null);
       if (error) throw error;
-      if (!r) return // tor user will return here
-      console.log("deleted from relay", r);
+      if (!r) return; // tor user will return here
+      console.log('deleted from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!')
+      console.log('failed!');
     }
-
   }
 
-  @action async awardBadge(userPubkey: string, badgeName: string, badgeIcon: string, memo: string, amount?: number): Promise<any> {
-    const URL = 'https://liquid.sphinx.chat'
-    let error
+  @action async awardBadge(
+    userPubkey: string,
+    badgeName: string,
+    badgeIcon: string,
+    memo: string,
+    amount?: number
+  ): Promise<any> {
+    const URL = 'https://liquid.sphinx.chat';
+    let error;
 
     const info = uiStore.meInfo as any;
     if (!info) {
-      error = new Error('Youre not logged in')
-      return [null, error]
+      error = new Error('Youre not logged in');
+      return [null, error];
     }
 
     const headers = {
-      "x-jwt": info.jwt,
-      "Content-Type": "application/json",
-    }
+      'x-jwt': info.jwt,
+      'Content-Type': 'application/json'
+    };
 
     try {
       // 1. get user liquid address
-      const userLiquidAddress = await api.get(`liquidAddressByPubkey/${userPubkey}`)
+      const userLiquidAddress = await api.get(`liquidAddressByPubkey/${userPubkey}`);
 
       if (!userLiquidAddress) {
-        throw new Error('No Liquid Address tied to user account')
+        throw new Error('No Liquid Address tied to user account');
       }
 
       // 2. get password for login, login to "token" aliased as "tt"
       const res0 = await fetch(URL + `/login`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           pwd: 'password i got from user'
         }),
@@ -302,11 +302,11 @@ export class MainStore {
       });
 
       const j = await res0.json();
-      const tt = j.token || ''
+      const tt = j.token || '';
 
       // 3. first create the badge
       const res1 = await fetch(URL + `/issue?token=${tt}`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           name: badgeName,
           icon: badgeIcon,
@@ -315,69 +315,64 @@ export class MainStore {
         headers
       });
 
-      const createdBadge = await res1.json()
+      const createdBadge = await res1.json();
 
       // 4. then transfer it
       const res2 = await fetch(URL + `/transfer?token=${tt}`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           asset: createdBadge.id,
           to: userLiquidAddress,
           amount: amount || 1,
-          memo: memo || "1",
+          memo: memo || '1'
         }),
         headers
-      })
+      });
 
-      const transferredBadge = await res2.json()
+      const transferredBadge = await res2.json();
 
-      return transferredBadge
-
+      return transferredBadge;
     } catch (e) {
-      console.log('ok')
+      console.log('ok');
     }
-
   }
 
   @action async getBadgeList(): Promise<any> {
-
     try {
-      const URL = 'https://liquid.sphinx.chat'
+      const URL = 'https://liquid.sphinx.chat';
 
       const l = await fetch(URL + `/list`, {
-        method: "GET",
+        method: 'GET'
       });
 
       const badgelist = await l.json();
 
-      uiStore.setBadgeList(badgelist)
+      uiStore.setBadgeList(badgelist);
       return badgelist;
     } catch (e) {
-      console.log('ok')
+      console.log('ok');
     }
-
   }
 
   @action async getBalances(pubkey: any): Promise<any> {
     try {
-      const URL = 'https://liquid.sphinx.chat'
+      const URL = 'https://liquid.sphinx.chat';
 
       const b = await fetch(URL + `/balances?pubkey=${pubkey}`, {
-        method: "GET",
+        method: 'GET'
       });
 
       const balances = await b.json();
 
       return balances;
     } catch (e) {
-      console.log('ok')
+      console.log('ok');
     }
-
   }
 
   @action async postToCache(payload: any): Promise<void> {
-    await api.post("save", payload, {
-      "Content-Type": "application/json",
+    await api.post('save', payload, {
+      'Content-Type': 'application/json'
     });
     return;
   }
@@ -387,52 +382,55 @@ export class MainStore {
     const gotHost = getHostIncludingDockerHosts();
 
     // make price to meet an integer
-    if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet)
+    if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet);
 
     const data = JSON.stringify({
       host: gotHost,
       ...body
     });
 
-    let torSaveURL = ''
+    let torSaveURL = '';
 
     try {
       await this.postToCache({
         key,
         body: data,
         path,
-        method,
+        method
       });
       torSaveURL = makeTorSaveURL(gotHost, key);
     } catch (e) {
-      console.log('e', e)
+      console.log('e', e);
     }
 
-    return torSaveURL
+    return torSaveURL;
   }
 
   @action appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
-    let query = path
+    let query = path;
     if (queryParams) {
-      queryParams.limit = limit
-      query += '?'
-      const length = Object.keys(queryParams).length
+      queryParams.limit = limit;
+      query += '?';
+      const length = Object.keys(queryParams).length;
       Object.keys(queryParams).forEach((k, i) => {
-        query += `${k}=${queryParams[k]}`
+        query += `${k}=${queryParams[k]}`;
 
         // add & if not last param
         if (i !== length - 1) {
-          query += '&'
+          query += '&';
         }
-      })
+      });
     }
 
-    return query
+    return query;
   }
 
   @action async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
-    let smallQueryLimit = 4
-    let query = this.appendQueryParams("people/search", smallQueryLimit, { search: alias, sortBy: 'owner_alias' })
+    let smallQueryLimit = 4;
+    let query = this.appendQueryParams('people/search', smallQueryLimit, {
+      search: alias,
+      sortBy: 'owner_alias'
+    });
     let ps = await api.get(query);
     return ps;
   }
@@ -442,9 +440,12 @@ export class MainStore {
   people: Person[] = [];
 
   @action async getPeople(queryParams?: any): Promise<Person[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText }
+    queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams("people", queryLimit, { ...queryParams, sortBy: 'last_login' })
+    let query = this.appendQueryParams('people', queryLimit, {
+      ...queryParams,
+      sortBy: 'last_login'
+    });
 
     let ps = await api.get(query);
 
@@ -458,8 +459,8 @@ export class MainStore {
 
     // for search always reset page
     if (queryParams && queryParams.resetPage) {
-      this.people = ps
-      uiStore.setPeoplePageNumber(1)
+      this.people = ps;
+      uiStore.setPeoplePageNumber(1);
     } else {
       // all other cases, merge
       this.people = this.doPageListMerger(
@@ -467,7 +468,7 @@ export class MainStore {
         ps,
         (n) => uiStore.setPeoplePageNumber(n),
         queryParams
-      )
+      );
     }
 
     return ps;
@@ -476,11 +477,11 @@ export class MainStore {
   @action decodeListJSON(li: any): Promise<any[]> {
     if (li?.length) {
       li.forEach((o, i) => {
-        li[i].body = JSON.parse(o.body)
-        li[i].person = JSON.parse(o.person)
-      })
+        li[i].body = JSON.parse(o.body);
+        li[i].person = JSON.parse(o.person);
+      });
     }
-    return li
+    return li;
   }
 
   // @persist("list")
@@ -489,28 +490,32 @@ export class MainStore {
 
   @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     // console.log('queryParams', queryParams)
-    queryParams = { ...queryParams, search: uiStore.searchText }
+    queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams("people/posts", queryLimit, { ...queryParams, sortBy: 'created' })
+    let query = this.appendQueryParams('people/posts', queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
     try {
       let ps = await api.get(query);
-      ps = this.decodeListJSON(ps)
+      ps = this.decodeListJSON(ps);
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peoplePosts = ps
-        uiStore.setPeoplePostsPageNumber(1)
+        this.peoplePosts = ps;
+        uiStore.setPeoplePostsPageNumber(1);
       } else {
         // all other cases, merge
         this.peoplePosts = this.doPageListMerger(
           this.peoplePosts,
           ps,
           (n) => uiStore.setPeoplePostsPageNumber(n),
-          queryParams)
+          queryParams
+        );
       }
       return ps;
     } catch (e) {
-      console.log('fetch failed', e)
+      console.log('fetch failed', e);
       return [];
     }
   }
@@ -520,38 +525,39 @@ export class MainStore {
   peopleWanteds: PersonWanted[] = [];
 
   @action setPeopleWanteds(wanteds: PersonWanted[]) {
-    this.peopleWanteds = wanteds
+    this.peopleWanteds = wanteds;
   }
 
   @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText }
+    queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams("people/wanteds", queryLimit, { ...queryParams, sortBy: 'created' })
+    let query = this.appendQueryParams('people/wanteds', queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
     try {
       let ps = await api.get(query);
-      ps = this.decodeListJSON(ps)
+      ps = this.decodeListJSON(ps);
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleWanteds = ps
-        uiStore.setPeopleWantedsPageNumber(1)
+        this.peopleWanteds = ps;
+        uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps,
           (n) => uiStore.setPeopleWantedsPageNumber(n),
-          queryParams)
+          queryParams
+        );
       }
       return ps;
     } catch (e) {
-      console.log('fetch failed', e)
+      console.log('fetch failed', e);
       return [];
     }
   }
-
-
-
 
   // @persist("list")
   @observable
@@ -559,119 +565,124 @@ export class MainStore {
 
   @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
     // console.log('queryParams', queryParams)
-    queryParams = { ...queryParams, search: uiStore.searchText }
+    queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams("people/offers", queryLimit, { ...queryParams, sortBy: 'created' })
+    let query = this.appendQueryParams('people/offers', queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
     try {
-
       let ps = await api.get(query);
-      ps = this.decodeListJSON(ps)
+      ps = this.decodeListJSON(ps);
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleOffers = ps
-        uiStore.setPeopleOffersPageNumber(1)
+        this.peopleOffers = ps;
+        uiStore.setPeopleOffersPageNumber(1);
       } else {
         // all other cases, merge
         this.peopleOffers = this.doPageListMerger(
           this.peopleOffers,
           ps,
           (n) => uiStore.setPeopleOffersPageNumber(n),
-          queryParams)
+          queryParams
+        );
       }
 
       return ps;
     } catch (e) {
-      console.log('fetch failed', e)
+      console.log('fetch failed', e);
       return [];
     }
-
   }
 
-  @action doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
+  @action doPageListMerger(
+    currentList: any[],
+    newList: any[],
+    setPage: Function,
+    queryParams?: any
+  ) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
-        return []
+        return [];
       } else {
-        return currentList
+        return currentList;
       }
     }
 
     if (queryParams && queryParams.resetPage) {
-      setPage(1)
-      return newList
+      setPage(1);
+      return newList;
     }
 
-    if (queryParams?.page) setPage(queryParams.page)
-    let l = [...currentList, ...newList]
+    if (queryParams?.page) setPage(queryParams.page);
+    let l = [...currentList, ...newList];
 
-    return l
+    return l;
   }
 
   @action async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
     // console.log('p', p)
-    return p
+    return p;
   }
 
   @action async getPersonByGithubName(github: string): Promise<Person> {
     const p = await api.get(`person/githubname/${github}`);
-    console.log('getPersonByGithubName', p)
-    return p
+    console.log('getPersonByGithubName', p);
+    return p;
   }
 
   // this method merges the relay self data with the db self data, they each hold different data
   @action async getSelf(me: any) {
-    console.log('getSelf')
-    let self = me || uiStore.meInfo
+    console.log('getSelf');
+    let self = me || uiStore.meInfo;
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
 
-      let updateSelf = { ...self, ...p }
-      console.log('updateSelf', updateSelf)
+      let updateSelf = { ...self, ...p };
+      console.log('updateSelf', updateSelf);
       uiStore.setMeInfo(updateSelf);
     }
   }
 
-
   @action async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
     try {
-      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body)
+      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body);
       if (error) throw error;
-      if (!r) return // tor user will return here
+      if (!r) return; // tor user will return here
 
-      console.log("code from relay", r);
+      console.log('code from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!', e)
+      console.log('failed!', e);
     }
   }
 
   @action async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
     try {
-      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body)
+      const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body);
       if (error) throw error;
-      if (!r) return // tor user will return here
+      if (!r) return; // tor user will return here
 
-      console.log("code from relay", r);
+      console.log('code from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!', e)
+      console.log('failed!', e);
     }
   }
-
 
   @action async refreshJwt() {
     try {
       if (!uiStore.meInfo) return null;
 
-      const res: any = await this.fetchFromRelay('refresh_jwt')
+      const res: any = await this.fetchFromRelay('refresh_jwt');
       const j = await res.json();
 
       return j.response;
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
       // could not refresh jwt, logout!
       return null;
     }
@@ -680,23 +691,20 @@ export class MainStore {
   @action async getUsdToSatsExchangeRate() {
     try {
       // get rate for 1 USD
-      const res: any = await fetch(
-        "https://blockchain.info/tobtc?currency=USD&value=1",
-        {
-          method: "GET",
-        }
-      );
+      const res: any = await fetch('https://blockchain.info/tobtc?currency=USD&value=1', {
+        method: 'GET'
+      });
       const j = await res.json();
       // 1 bitcoin is 1 million satoshis
       let satoshisInABitcoin = 0.00000001;
       const exchangeRate = j / satoshisInABitcoin;
 
-      console.log("update exchange rate", exchangeRate);
+      console.log('update exchange rate', exchangeRate);
       uiStore.setUsdToSatsExchangeRate(exchangeRate);
 
       return exchangeRate;
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
       // could not refresh jwt, logout!
       return null;
     }
@@ -705,9 +713,9 @@ export class MainStore {
   @action async deleteProfile() {
     try {
       const info = uiStore.meInfo;
-      const [r, error] = await this.doCallToRelay('DELETE', 'profile', info)
+      const [r, error] = await this.doCallToRelay('DELETE', 'profile', info);
       if (error) throw error;
-      if (!r) return // tor user will return here
+      if (!r) return; // tor user will return here
 
       uiStore.setMeInfo(null);
       uiStore.setSelectingPerson(0);
@@ -716,155 +724,152 @@ export class MainStore {
       const j = await r.json();
       return j;
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
       // could not delete profile!
       return null;
     }
   }
 
-
-
   @action async saveProfile(body) {
-    console.log("SUBMIT FORM", body);
+    console.log('SUBMIT FORM', body);
     if (!body) return; // avoid saving bad state
-    if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet) // must be an int
+    if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      const [r, error] = await this.doCallToRelay('POST', 'profile', body)
+      const [r, error] = await this.doCallToRelay('POST', 'profile', body);
       if (error) throw error;
-      if (!r) return // tor user will return here
+      if (!r) return; // tor user will return here
 
       // first time profile makers will need this on first login
       if (!body.id) {
         const j = await r.json();
         if (j.response.id) {
-          body.id = j.response.id
+          body.id = j.response.id;
         }
       }
 
       uiStore.setToasts([
         {
-          id: "1",
-          title: "Saved.",
-        },
+          id: '1',
+          title: 'Saved.'
+        }
       ]);
 
       await this.getSelf(body);
-
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
     }
   }
 
-  // this method is used whenever changing data from the frontend, 
+  // this method is used whenever changing data from the frontend,
   // forks between tor users and non-tor
   @action async doCallToRelay(method: string, path: string, body: any): Promise<any> {
-
-    let response: Response
-    let error: any = null
+    let response: Response;
+    let error: any = null;
 
     const info = uiStore.meInfo as any;
     if (!info) {
-      error = new Error('Youre not logged in')
-      return [null, error]
+      error = new Error('Youre not logged in');
+      return [null, error];
     }
 
     // fork between tor users and not
     if (this.isTorSave()) {
-      this.submitFormViaApp(method, path, body)
-      return [null, null]
+      this.submitFormViaApp(method, path, body);
+      return [null, null];
     }
 
-    const URL = info.url.startsWith("http")
-      ? info.url
-      : `https://${info.url}`;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
 
     response = await fetch(URL + `/${path}`, {
       method: method,
       body: JSON.stringify({
         // use docker host (tribes.sphinx), because relay will post to it
         host: getHostIncludingDockerHosts(),
-        ...body,
+        ...body
       }),
       headers: {
-        "x-jwt": info.jwt,
-        "Content-Type": "application/json",
-      },
+        'x-jwt': info.jwt,
+        'Content-Type': 'application/json'
+      }
     });
 
-    return [response, error]
+    return [response, error];
   }
 
   @action async submitFormViaApp(method: string, path: string, body: any) {
     try {
-      const torSaveURL = await this.getTorSaveURL(method, path, body)
+      const torSaveURL = await this.getTorSaveURL(method, path, body);
       uiStore.setTorFormBodyQR(torSaveURL);
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
     }
   }
 
-  @action async setExtrasPropertyAndSave(extrasName: string, propertyName: string, created: number, newPropertyValue: any): Promise<any> {
+  @action async setExtrasPropertyAndSave(
+    extrasName: string,
+    propertyName: string,
+    created: number,
+    newPropertyValue: any
+  ): Promise<any> {
     if (uiStore.meInfo) {
-      let clonedMeInfo = { ...uiStore.meInfo }
-      let clonedExtras = clonedMeInfo?.extras
-      let clonedEx: any = clonedExtras && clonedExtras[extrasName]
-      const targetIndex = clonedEx?.findIndex(f => f.created === created)
+      let clonedMeInfo = { ...uiStore.meInfo };
+      let clonedExtras = clonedMeInfo?.extras;
+      let clonedEx: any = clonedExtras && clonedExtras[extrasName];
+      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
 
-      if (clonedEx && (targetIndex || targetIndex === 0) && (targetIndex > -1)) {
+      if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {
-          clonedEx[targetIndex][propertyName] = newPropertyValue
-          clonedMeInfo.extras[extrasName] = clonedEx
-          await this.saveProfile(clonedMeInfo)
-          return [clonedEx, targetIndex]
+          clonedEx[targetIndex][propertyName] = newPropertyValue;
+          clonedMeInfo.extras[extrasName] = clonedEx;
+          await this.saveProfile(clonedMeInfo);
+          return [clonedEx, targetIndex];
         } catch (e) {
-          console.log('e', e)
+          console.log('e', e);
         }
       }
 
-      return [null, null]
+      return [null, null];
     }
   }
 
   @action async deleteFavorite() {
     let body: any = {};
-    console.log("SUBMIT FORM", body);
+    console.log('SUBMIT FORM', body);
 
     // console.log('mergeFormWithMeData', body);
     if (!body) return; // avoid saving bad state
 
     const info = uiStore.meInfo as any;
-    if (!info) return console.log("no meInfo");
+    if (!info) return console.log('no meInfo');
     try {
-      const URL = info.url.startsWith("http")
-        ? info.url
-        : `https://${info.url}`;
-      const r = await fetch(URL + "/profile", {
-        method: "POST",
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+      const r = await fetch(URL + '/profile', {
+        method: 'POST',
         body: JSON.stringify({
           // use docker host (tribes.sphinx), because relay will post to it
           host: getHostIncludingDockerHosts(),
           ...body,
-          price_to_meet: parseInt(body.price_to_meet),
+          price_to_meet: parseInt(body.price_to_meet)
         }),
         headers: {
-          "x-jwt": info.jwt,
-          "Content-Type": "application/json",
-        },
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!r.ok) {
-        return alert("Failed to save data");
+        return alert('Failed to save data');
       }
 
       uiStore.setToasts([
         {
-          id: "1",
-          title: "Added to favorites.",
-        },
+          id: '1',
+          title: 'Added to favorites.'
+        }
       ]);
     } catch (e) {
-      console.log("e", e);
+      console.log('e', e);
     }
   }
 }
@@ -985,10 +990,9 @@ export interface QueryParams {
   search?: string;
 }
 
-
 export interface ClaimOnLiquid {
-  asset: number
-  to: string
-  amount?: number
-  memo: string
+  asset: number;
+  to: string;
+  amount?: number;
+  memo: string;
 }
