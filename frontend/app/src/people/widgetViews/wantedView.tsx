@@ -100,8 +100,6 @@ export default function WantedView(props: any) {
     }
   }
 
-  //   console.log({ ...assignee });
-
   useEffect(() => {
     if (codingLanguage) {
       const values = codingLanguage.map((value) => ({ ...value }));
@@ -110,7 +108,7 @@ export default function WantedView(props: any) {
   }, [codingLanguage]);
 
   function renderTickets() {
-    const { assignee, status } = ticketUrl
+    const { status } = ticketUrl
       ? extractGithubIssueFromUrl(person, ticketUrl)
       : extractGithubIssue(person, repo, issue);
 
@@ -151,7 +149,7 @@ export default function WantedView(props: any) {
                 />
               </div>
               <DT style={{ margin: '15px 0' }}>{title}</DT>
-              <div
+              {/* <div
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -162,7 +160,62 @@ export default function WantedView(props: any) {
                 {isCodingTask && (
                   <GithubStatusPill status={status} assignee={assignee} />
                 )}
+              </div> */}
+
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                {isCodingTask && (
+                  <GithubStatusPill
+                    status={status}
+                    assignee={assignee}
+                    style={{ marginTop: 10 }}
+                  />
+                )}
+                {{ ...assignee }.owner_alias && (
+                  <div
+                    style={{
+                      marginTop: '8px',
+                    }}
+                  >
+                    <img
+                      src={
+                        { ...assignee }.img || '/static/person_placeholder.png'
+                      }
+                      alt="assignee_img"
+                      style={{
+                        borderRadius: '50%',
+                        height: '16px',
+                        width: '16px',
+                        margin: '0px 8px',
+                      }}
+                    />
+                    <span
+                      // onClick={(e) => {
+                      //   e.stopPropagation();
+                      //   findUserByGithubHandle();
+                      // }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(
+                          `/p/${{ ...assignee }.owner_pubkey}?widget=wanted`,
+                          '_blank'
+                        );
+                      }}
+                      style={{
+                        fontSize: '12px',
+                      }}
+                    >
+                      {{ ...assignee }.owner_alias}
+                    </span>
+                  </div>
+                )}
               </div>
+
               <EuiText
                 style={{
                   fontSize: '13px',
@@ -198,7 +251,7 @@ export default function WantedView(props: any) {
                           style={{
                             display: 'flex',
                             flexWrap: 'wrap',
-                            height: '22px',
+                            height: 'fit-content',
                             width: 'fit-content',
                             backgroundColor: '#cfcfcf',
                             border: '1px solid #909090',
@@ -282,13 +335,59 @@ export default function WantedView(props: any) {
                         }
                     </div> */}
             <DT>{title}</DT>
-            {isCodingTask && (
-              <GithubStatusPill
-                status={status}
-                assignee={assignee}
-                style={{ marginTop: 10 }}
-              />
-            )}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              {isCodingTask && (
+                <GithubStatusPill
+                  status={status}
+                  assignee={assignee}
+                  style={{ marginTop: 10 }}
+                />
+              )}
+              {{ ...assignee }.owner_alias && (
+                <div
+                  style={{
+                    marginTop: '8px',
+                  }}
+                >
+                  <img
+                    src={
+                      { ...assignee }.img || '/static/person_placeholder.png'
+                    }
+                    alt="assignee_img"
+                    style={{
+                      borderRadius: '50%',
+                      height: '16px',
+                      width: '16px',
+                      margin: '0px 8px',
+                    }}
+                  />
+                  <span
+                    // onClick={(e) => {
+                    //   e.stopPropagation();
+                    //   findUserByGithubHandle();
+                    // }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(
+                        `/p/${{ ...assignee }.owner_pubkey}?widget=wanted`,
+                        '_blank'
+                      );
+                    }}
+                    style={{
+                      fontSize: '12px',
+                    }}
+                  >
+                    {{ ...assignee }.owner_alias}
+                  </span>
+                </div>
+              )}
+            </div>
 
             <div
               style={{
@@ -308,7 +407,7 @@ export default function WantedView(props: any) {
                         style={{
                           display: 'flex',
                           flexWrap: 'wrap',
-                          height: '22px',
+                          height: 'fit-content',
                           width: 'fit-content',
                           backgroundColor: '#cfcfcf',
                           border: '1px solid #909090',

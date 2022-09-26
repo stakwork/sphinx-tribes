@@ -55,6 +55,7 @@ export default function WantedSummary(props: any) {
     loomEmbedUrl,
     codingLanguage,
     estimate_session_length,
+    assignee,
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -409,41 +410,68 @@ export default function WantedSummary(props: any) {
   );
 
   function renderCodingTask() {
-    const { assignee, status } = ticketUrl
+    const { status } = ticketUrl
       ? extractGithubIssueFromUrl(person, ticketUrl)
       : extractGithubIssue(person, repo, issue);
 
     let assigneeLabel: any = null;
-
     if (assigneeInfo) {
-      assigneeLabel = (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: 12,
-            color: '#8E969C',
-            marginTop: isMobile ? 20 : 0,
-          }}
-        >
-          <Img
-            src={assigneeInfo.img || '/static/person_placeholder.png'}
-            style={{ borderRadius: 30 }}
-          />
-          <div style={{ marginLeft: 5, fontWeight: 300 }}>
-            Owner assigned to
-          </div>
-          <Assignee
-            onClick={() => {
-              const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
-              sendToRedirect(profileUrl);
+      if (!isMobile) {
+        assigneeLabel = (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: 12,
+              color: '#8E969C',
+              marginTop: isMobile ? 20 : 0,
+              marginLeft: '-16px',
             }}
-            style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
           >
-            {assigneeInfo.owner_alias}
-          </Assignee>
-        </div>
-      );
+            <Img
+              src={assigneeInfo.img || '/static/person_placeholder.png'}
+              style={{ borderRadius: 30 }}
+            />
+
+            <Assignee
+              onClick={() => {
+                const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
+                sendToRedirect(profileUrl);
+              }}
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
+              {assigneeInfo.owner_alias}
+            </Assignee>
+          </div>
+        );
+      } else {
+        assigneeLabel = (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: 12,
+              color: '#8E969C',
+              marginLeft: '16px',
+            }}
+          >
+            <Img
+              src={assigneeInfo.img || '/static/person_placeholder.png'}
+              style={{ borderRadius: 30 }}
+            />
+
+            <Assignee
+              onClick={() => {
+                const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
+                sendToRedirect(profileUrl);
+              }}
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
+              {assigneeInfo.owner_alias}
+            </Assignee>
+          </div>
+        );
+      }
     }
 
     if (isMobile) {
@@ -454,8 +482,16 @@ export default function WantedSummary(props: any) {
 
             <T>{title}</T>
 
-            <GithubStatusPill status={status} assignee={assignee} />
-            {assigneeLabel}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+              }}
+            >
+              <GithubStatusPill status={status} assignee={assignee} />
+              {assigneeLabel}
+            </div>
+
             <EuiText
               style={{
                 fontSize: '13px',
@@ -545,6 +581,10 @@ export default function WantedSummary(props: any) {
       );
     }
 
+    useEffect(() => {
+      console.log(status);
+    }, [status]);
+
     return (
       <>
         {paid && (
@@ -604,7 +644,6 @@ export default function WantedSummary(props: any) {
                 </EuiText>
               </div>
             </SectionPad>
-
             <Divider />
 
             <SectionPad>

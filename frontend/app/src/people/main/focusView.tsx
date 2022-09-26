@@ -38,8 +38,6 @@ export default function FocusedView(props: any) {
 
   const isMobile = useIsMobile();
 
-  console.log({...person})
-
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
   function closeModal(override) {
@@ -49,7 +47,6 @@ export default function FocusedView(props: any) {
       if (props.goBack) props.goBack();
     }
   }
-
 
   // get self on unmount if tor user
   useEffect(() => {

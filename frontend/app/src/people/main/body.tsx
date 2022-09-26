@@ -104,15 +104,15 @@ export default function BodyComponent() {
   const history = useHistory();
 
   const tabs = [
-    {
-      label: 'People',
-      name: 'people',
-    },
-    // widgetConfigs['post'],
-    {
-      ...widgetConfigs['offer'],
-      label: 'Portfolios',
-    },
+    // {
+    //   label: 'People',
+    //   name: 'people',
+    // },
+    // // widgetConfigs['post'],
+    // {
+    //   ...widgetConfigs['offer'],
+    //   label: 'Portfolios',
+    // },
     widgetConfigs['wanted'],
   ];
 
@@ -447,53 +447,53 @@ export default function BodyComponent() {
               </Link>
             </Label>
 
-							<div style={{display: 'flex'}} >
-            {selectedWidget === 'wanted' &&
-              ui.meInfo &&
-              ui.meInfo?.owner_alias && (
-                <>
-                  <div
-                    style={{
-                      fontSize: '15px',
-                      fontWeight: '400',
-                      marginRight: '10px',
-                      cursor: 'pointer',
-                      borderRadius: '20px',
-                      userSelect: 'none',
-                      background: '#dcedfe',
-                      border: '2px solid #cddffd',
-                      padding: '8px 10px',
-                      color: '#5d92df',
-                    }}
-                    onClick={() => {
-                      // setShowFocusView(true);
-                      setIsMobileViewTicketModal(true);
-                      console.log('hi');
-                    }}
-                  >
-                    +
-                  </div>
-											</>
-              )}
+            <div style={{ display: 'flex' }}>
+              {selectedWidget === 'wanted' &&
+                ui.meInfo &&
+                ui.meInfo?.owner_alias && (
+                  <>
+                    <div
+                      style={{
+                        fontSize: '15px',
+                        fontWeight: '400',
+                        marginRight: '10px',
+                        cursor: 'pointer',
+                        borderRadius: '20px',
+                        userSelect: 'none',
+                        background: '#dcedfe',
+                        border: '2px solid #cddffd',
+                        padding: '8px 10px',
+                        color: '#5d92df',
+                      }}
+                      onClick={() => {
+                        // setShowFocusView(true);
+                        setIsMobileViewTicketModal(true);
+                        console.log('hi');
+                      }}
+                    >
+                      +
+                    </div>
+                  </>
+                )}
 
-            <SearchTextInput
-              small
-              name="search"
-              type="search"
-              placeholder="Search"
-              value={ui.searchText}
-              style={{
-                width: 114,
-                height: 40,
-                border: '1px solid #DDE1E5',
-                background: '#fff',
-              }}
-              onChange={(e) => {
-                console.log('handleChange', e);
-                ui.setSearchText(e);
-              }}
-            />
-							</div>
+              <SearchTextInput
+                small
+                name="search"
+                type="search"
+                placeholder="Search"
+                value={ui.searchText}
+                style={{
+                  width: 114,
+                  height: 40,
+                  border: '1px solid #DDE1E5',
+                  background: '#fff',
+                }}
+                onChange={(e) => {
+                  console.log('handleChange', e);
+                  ui.setSearchText(e);
+                }}
+              />
+            </div>
           </div>
 
           <div style={{ width: '100%' }}>
@@ -646,41 +646,40 @@ export default function BodyComponent() {
           >
             {selectedWidget === 'wanted' &&
               (ui.meInfo && ui.meInfo?.owner_alias ? (
-
-                  <div
-                    style={{
-                      fontSize: '15px',
-                      fontWeight: '400',
-                      marginRight: '10px',
-                      cursor: 'pointer',
-                      borderRadius: '20px',
-                      userSelect: 'none',
-                      background: '#dcedfe',
-                      border: '2px solid #cddffd',
-                      padding: '8px 20px',
-                      color: '#5d92df',
-                    }}
-                    onClick={() => {
-                      setShowFocusView(true);
-                    }}
-                  >
-                    Create Ticket
-                  </div>
+                <div
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: '400',
+                    marginRight: '10px',
+                    cursor: 'pointer',
+                    borderRadius: '20px',
+                    userSelect: 'none',
+                    background: '#dcedfe',
+                    border: '2px solid #cddffd',
+                    padding: '8px 20px',
+                    color: '#5d92df',
+                  }}
+                  onClick={() => {
+                    setShowFocusView(true);
+                  }}
+                >
+                  Create Ticket
+                </div>
               ) : (
-                  <div
-                    style={{
-                      padding: '10px 20px',
-                      borderRadius: '20px',
-                      userSelect: 'none',
-                      cursor: 'not-allowed',
-                      color: '#83737d',
-                      backgroundColor: '#dde0e5',
-                      fontSize: '14px',
-                      marginRight: '10px',
-                    }}
-                  >
-                    Login to Create Tickets
-                  </div>
+                <div
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '20px',
+                    userSelect: 'none',
+                    cursor: 'not-allowed',
+                    color: '#83737d',
+                    backgroundColor: '#dde0e5',
+                    fontSize: '14px',
+                    marginRight: '10px',
+                  }}
+                >
+                  Login to Create Tickets
+                </div>
               ))}
 
             <SearchTextInput

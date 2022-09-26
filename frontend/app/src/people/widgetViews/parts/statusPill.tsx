@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { useStores } from '../../../store';
@@ -6,6 +6,10 @@ import { useStores } from '../../../store';
 export default function GithubStatusPill(props: any) {
   const { status, assignee, style } = props;
   const { main } = useStores();
+
+  const [assigneText, setAssigneText] = useState('');
+
+  const [newAssignee, setNewAssignee] = useState({ ...assignee });
 
   async function findUserByGithubHandle() {
     // look in database for first user with this github handle
@@ -32,12 +36,14 @@ export default function GithubStatusPill(props: any) {
 
   const isOpen = status === 'open' || !status;
 
-  const assignedText =
-    isOpen && !assignee
+  useEffect(() => {
+    const assignedText = !newAssignee.owner_alias
       ? 'Not assigned'
-      : isOpen
+      : !!isOpen
       ? 'Assigned to '
       : 'Completed by ';
+    setAssigneText(assignedText);
+  }, [isOpen, newAssignee]);
 
   return (
     <div style={{ display: 'flex', ...style }}>
@@ -46,15 +52,14 @@ export default function GithubStatusPill(props: any) {
       </Pill>
       <W>
         <Assignee>
-          {assignedText}{' '}
-          <Link
+          {assigneText}{' '}
+          {/* <Link
             onClick={(e) => {
               e.stopPropagation();
-              findUserByGithubHandle();
             }}
           >
-            {assignee}
-          </Link>
+            {newAssignee.owner_alias}
+          </Link> */}
         </Assignee>
       </W>
     </div>
