@@ -43,10 +43,10 @@ func processAlerts(p Person) {
 	action.Action = "dm"
 	action.Content = "A new ticket relevant to your interests has been created on Sphinx Community - https://community.sphinx.chat/p?owner_id="
 	action.Content += p.OwnerPubKey
-	action.Content += "&created=" + strconv.Itoa(int(p.newTicketTime))
+	action.Content += "&created=" + strconv.Itoa(int(p.NewTicketTime))
 
 	// Check that new ticket time exists
-	if p.newTicketTime == 0 {
+	if p.NewTicketTime == 0 {
 		fmt.Println("Ticket alerts: New ticket time not found")
 		return
 	}
@@ -61,11 +61,12 @@ func processAlerts(p Person) {
 		if !ok2 {
 			continue
 		}
-		time, ok3 := w["created"].(int64)
+		timeF, ok3 := w["created"].(float64)
 		if !ok3 {
 			continue
 		}
-		if time == p.newTicketTime {
+		time := int64(timeF)
+		if time == p.NewTicketTime {
 			issue = w
 			break
 		}
