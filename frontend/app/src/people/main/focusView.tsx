@@ -21,12 +21,13 @@ export default function FocusedView(props: any) {
     person,
     buttonsOnBottom,
     formHeader,
-    manualGoBackOnly
+    manualGoBackOnly,
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
 
-  const skipEditLayer = selectedIndex < 0 || config.skipEditLayer ? true : false;
+  const skipEditLayer =
+    selectedIndex < 0 || config.skipEditLayer ? true : false;
 
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -37,7 +38,7 @@ export default function FocusedView(props: any) {
 
   const isMobile = useIsMobile();
 
-  console.log({ ...person });
+  // console.log({ ...person });
 
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
@@ -80,7 +81,8 @@ export default function FocusedView(props: any) {
               v[s.name] &&
                 v[s.name].forEach((t) => {
                   let fullTribeInfo =
-                    ownerTribes && ownerTribes?.find((f) => f.unique_name === t.value);
+                    ownerTribes &&
+                    ownerTribes?.find((f) => f.unique_name === t.value);
 
                   // disclude sensitive details
                   if (fullTribeInfo)
@@ -89,7 +91,7 @@ export default function FocusedView(props: any) {
                       unique_name: fullTribeInfo.unique_name,
                       img: fullTribeInfo.img,
                       description: fullTribeInfo.description,
-                      ...t
+                      ...t,
                     });
                 });
 
@@ -154,14 +156,19 @@ export default function FocusedView(props: any) {
   async function preSubmitFunctions(body) {
     // if github repo
 
-    let githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
+    let githubError =
+      "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (body.type === 'wanted_coding_task' || body.type === 'coding_task') {
         let { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
         let splitString = repo.split('/');
         let ownerName = splitString[0];
         let repoName = splitString[1];
-        let res = await main.getGithubIssueData(ownerName, repoName, issue + '');
+        let res = await main.getGithubIssueData(
+          ownerName,
+          repoName,
+          issue + ''
+        );
 
         if (!res) {
           throw githubError;
@@ -204,8 +211,8 @@ export default function FocusedView(props: any) {
         alert: undefined,
         extras: {
           ...body?.extras,
-          alert: body.alert
-        }
+          alert: body.alert,
+        },
       };
 
       await main.saveProfile(config.name === 'about' ? { ...newBody } : body);
@@ -235,19 +242,28 @@ export default function FocusedView(props: any) {
         initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
         // below are extras,
         initialValues.twitter =
-          (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
+          (personInfo.extras?.twitter &&
+            personInfo.extras?.twitter[0]?.value) ||
+          '';
         initialValues.github =
-          (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
+          (personInfo.extras?.github && personInfo.extras?.github[0]?.value) ||
+          '';
         initialValues.facebook =
-          (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
+          (personInfo.extras?.facebook &&
+            personInfo.extras?.facebook[0]?.value) ||
+          '';
         // extras with multiple items
-        initialValues.coding_languages = personInfo.extras?.coding_languages || [];
+        initialValues.coding_languages =
+          personInfo.extras?.coding_languages || [];
         initialValues.tribes = personInfo.extras?.tribes || [];
         initialValues.repos = personInfo.extras?.repos || [];
         initialValues.lightning =
-          (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
+          (personInfo.extras?.lightning &&
+            personInfo.extras?.lightning[0]?.value) ||
+          '';
         initialValues.amboss =
-          (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
+          (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) ||
+          '';
       } else {
         // if there is a selected index, fill in values
         if (selectedIndex > -1) {
@@ -282,14 +298,16 @@ export default function FocusedView(props: any) {
       }
     }
 
-    const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
+    const noShadow: any = !isMobile
+      ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' }
+      : {};
 
     return (
       <div
         style={{
           ...props.style,
           width: '100%',
-          height: '100%'
+          height: '100%',
         }}
       >
         {editMode ? (
@@ -313,7 +331,7 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`,
                       }
                     : {}
                 }
@@ -340,7 +358,7 @@ export default function FocusedView(props: any) {
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
-                      alignItems: 'center'
+                      alignItems: 'center',
                     }}
                   >
                     <Button
@@ -371,7 +389,9 @@ export default function FocusedView(props: any) {
             {/* display item */}
             <SummaryViewer
               person={person}
-              item={person?.extras && person.extras[config?.name][selectedIndex]}
+              item={
+                person?.extras && person.extras[config?.name][selectedIndex]
+              }
               config={config}
             />
           </>
@@ -429,6 +449,6 @@ const B = styled.div<BProps>`
   box-sizing: border-box;
   ${EnvWithScrollBar({
     thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
+    trackBackgroundColor: 'rgba(0,0,0,0)',
   })}
 `;
