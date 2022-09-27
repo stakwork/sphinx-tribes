@@ -125,6 +125,7 @@ export default function Form(props: any) {
       });
   }
 
+
   return (
     <Formik
       initialValues={initValues || {}}
@@ -147,7 +148,7 @@ export default function Form(props: any) {
             {/* schema flipping dropdown */}
             {dynamicSchema && (
               <Select
-                style={{ marginBottom: 14 }}
+                style={{ marginBottom: 14}}
                 onChange={(v) => {
                   console.log('v', v);
                   const selectedOption = dynamicFormOptions?.find((f) => f.value === v);

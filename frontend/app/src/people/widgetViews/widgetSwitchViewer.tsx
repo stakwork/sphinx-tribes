@@ -16,14 +16,14 @@ export default function WidgetSwitchViewer(props) {
 
   const panelStyles = isMobile
     ? {
-        minHeight: 132
+        minHeight: 132,
       }
     : {
         maxWidth: 291,
         minWidth: 291,
         marginRight: 20,
         marginBottom: 20,
-        minHeight: 472
+        minHeight: 472,
       };
 
   return useObserver(() => {
@@ -38,13 +38,16 @@ export default function WidgetSwitchViewer(props) {
     const listSource = {
       post: peoplePosts,
       wanted: peopleWanteds,
-      offer: peopleOffers
+      offer: peopleOffers,
     };
 
     const activeList = listSource[selectedWidget];
 
-    let searchKeys: any = widgetConfigs[selectedWidget]?.schema?.map((s) => s.name) || [];
-    let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
+    let searchKeys: any =
+      widgetConfigs[selectedWidget]?.schema?.map((s) => s.name) || [];
+    let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(
+      (f) => f.dynamicSchemas
+    );
     // if dynamic schema, get all those fields
     if (foundDynamicSchema) {
       let dynamicFields: any = [];
@@ -63,8 +66,10 @@ export default function WidgetSwitchViewer(props) {
 
           const conditionalStyles = body?.paid
             ? {
-                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '1px solid #dde1e5',
-                boxShadow: 'none'
+                border: isMobile
+                  ? '2px 0 0 0 solid #dde1e5'
+                  : '1px solid #dde1e5',
+                boxShadow: 'none',
               }
             : {};
 
@@ -81,7 +86,7 @@ export default function WidgetSwitchViewer(props) {
                 ...conditionalStyles,
                 cursor: 'pointer',
                 padding: 0,
-                overflow: 'hidden'
+                overflow: 'hidden',
               }}
             >
               {selectedWidget === 'post' ? (
