@@ -104,10 +104,10 @@ export default function BodyComponent() {
   const history = useHistory();
 
   const tabs = [
-    // {
-    //   label: 'People',
-    //   name: 'people',
-    // },
+     {
+       label: 'People',
+       name: 'people',
+     },
     // // widgetConfigs['post'],
     // {
     //   ...widgetConfigs['offer'],
