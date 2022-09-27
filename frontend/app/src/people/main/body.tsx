@@ -5,12 +5,7 @@ import { useStores } from '../../store';
 import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import Person from '../person';
 import PersonViewSlim from '../personViewSlim';
-import {
-  useFuse,
-  usePageScroll,
-  useIsMobile,
-  useScreenWidth,
-} from '../../hooks';
+import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
 import NoneSpace from '../utils/noneSpace';
@@ -52,7 +47,7 @@ export default function BodyComponent() {
     peopleWantedsPageNumber,
     peoplePostsPageNumber,
     peopleOffersPageNumber,
-    openGithubIssues,
+    openGithubIssues
   } = ui;
 
   const [selectedWidget, setSelectedWidget] = useState('wanted');
@@ -61,13 +56,11 @@ export default function BodyComponent() {
   const listSource = {
     post: peoplePosts,
     wanted: peopleWanteds,
-    offer: peopleOffers,
+    offer: peopleOffers
   };
 
   let person: any =
-    main.people &&
-    main.people.length &&
-    main.people.find((f) => f.id === ui.selectedPerson);
+    main.people && main.people.length && main.people.find((f) => f.id === ui.selectedPerson);
 
   const { id } = person || {};
 
@@ -104,16 +97,16 @@ export default function BodyComponent() {
   const history = useHistory();
 
   const tabs = [
-     {
-       label: 'People',
-       name: 'people',
-     },
+    {
+      label: 'People',
+      name: 'people'
+    },
     // // widgetConfigs['post'],
     // {
     //   ...widgetConfigs['offer'],
     //   label: 'Portfolios',
     // },
-    widgetConfigs['wanted'],
+    widgetConfigs['wanted']
   ];
 
   const tabsModal = widgetConfigs;
@@ -125,7 +118,7 @@ export default function BodyComponent() {
     people: (a) => main.getPeople(a),
     post: (a) => main.getPeoplePosts(a),
     offer: (a) => main.getPeopleOffers(a),
-    wanted: (a) => main.getPeopleWanteds(a),
+    wanted: (a) => main.getPeopleWanteds(a)
   };
 
   // deeplink page navigation
@@ -138,16 +131,14 @@ export default function BodyComponent() {
   async function publicPanelClick(person, item) {
     // migrating to load widgets separate from person
     console.log('person', { person }, 'and items', { item });
-    const itemIndex = person[selectedWidget]?.findIndex(
-      (f) => f.created === item.created
-    );
+    const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
     if (itemIndex > -1) {
       // make person into proper structure (derived from widget)
       let p = {
         ...person,
         extras: {
-          [selectedWidget]: person[selectedWidget],
-        },
+          [selectedWidget]: person[selectedWidget]
+        }
       };
       //   console.log(p, itemIndex);
       setPublicFocusPerson(p);
@@ -163,10 +154,7 @@ export default function BodyComponent() {
         activeList && activeList.length
           ? activeList.find((item) => {
               const { person, body } = item;
-              return (
-                owner_id === person.owner_pubkey &&
-                created === body.created + ''
-              );
+              return owner_id === person.owner_pubkey && created === body.created + '';
             })
           : {};
       if (value.person && value.body) {
@@ -340,8 +328,8 @@ export default function BodyComponent() {
               search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
               state: {
                 owner_id: person.owner_pubkey,
-                created: item.created,
-              },
+                created: item.created
+              }
             });
             publicPanelClick(person, item);
           }}
@@ -363,8 +351,7 @@ export default function BodyComponent() {
       return <FirstTimeScreen />;
     }
 
-    const widgetLabel =
-      selectedWidget && tabs.find((f) => f.name === selectedWidget);
+    const widgetLabel = selectedWidget && tabs.find((f) => f.name === selectedWidget);
 
     const toastsEl = (
       <EuiGlobalToastList
@@ -400,17 +387,14 @@ export default function BodyComponent() {
               padding: 20,
               height: 82,
               boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
-              zIndex: 2,
+              zIndex: 2
             }}
           >
             <Label style={{ fontSize: 20 }}>
               Explore
               <Link onClick={() => setShowDropdown(true)}>
                 <div>{widgetLabel && widgetLabel.label}</div>
-                <MaterialIcon
-                  icon={'expand_more'}
-                  style={{ fontSize: 18, marginLeft: 5 }}
-                />
+                <MaterialIcon icon={'expand_more'} style={{ fontSize: 18, marginLeft: 5 }} />
 
                 {showDropdown && (
                   <div
@@ -419,7 +403,7 @@ export default function BodyComponent() {
                       top: 0,
                       left: 0,
                       zIndex: 10,
-                      background: '#fff',
+                      background: '#fff'
                     }}
                   >
                     {tabs &&
@@ -448,33 +432,31 @@ export default function BodyComponent() {
             </Label>
 
             <div style={{ display: 'flex' }}>
-              {selectedWidget === 'wanted' &&
-                ui.meInfo &&
-                ui.meInfo?.owner_alias && (
-                  <>
-                    <div
-                      style={{
-                        fontSize: '15px',
-                        fontWeight: '400',
-                        marginRight: '10px',
-                        cursor: 'pointer',
-                        borderRadius: '20px',
-                        userSelect: 'none',
-                        background: '#dcedfe',
-                        border: '2px solid #cddffd',
-                        padding: '8px 10px',
-                        color: '#5d92df',
-                      }}
-                      onClick={() => {
-                        // setShowFocusView(true);
-                        setIsMobileViewTicketModal(true);
-                        console.log('hi');
-                      }}
-                    >
-                      +
-                    </div>
-                  </>
-                )}
+              {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
+                <>
+                  <div
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: '400',
+                      marginRight: '10px',
+                      cursor: 'pointer',
+                      borderRadius: '20px',
+                      userSelect: 'none',
+                      background: '#dcedfe',
+                      border: '2px solid #cddffd',
+                      padding: '8px 10px',
+                      color: '#5d92df'
+                    }}
+                    onClick={() => {
+                      // setShowFocusView(true);
+                      setIsMobileViewTicketModal(true);
+                      console.log('hi');
+                    }}
+                  >
+                    +
+                  </div>
+                </>
+              )}
 
               <SearchTextInput
                 small
@@ -486,7 +468,7 @@ export default function BodyComponent() {
                   width: 114,
                   height: 40,
                   border: '1px solid #DDE1E5',
-                  background: '#fff',
+                  background: '#fff'
                 }}
                 onChange={(e) => {
                   console.log('handleChange', e);
@@ -511,7 +493,7 @@ export default function BodyComponent() {
               top: 0,
               right: 0,
               zIndex: 10000,
-              width: '100%',
+              width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
             dismountCallback={() => ui.setSelectedPerson(0)}
@@ -529,9 +511,7 @@ export default function BodyComponent() {
                 person={publicFocusPerson}
                 canEdit={false}
                 selectedIndex={publicFocusIndex}
-                config={
-                  widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]
-                }
+                config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
                 onSuccess={() => {
                   console.log('success');
                   setPublicFocusPerson(null);
@@ -576,7 +556,7 @@ export default function BodyComponent() {
     const focusedDesktopModalStyles =
       selectedWidget && widgetConfigs[selectedWidget]
         ? {
-            ...widgetConfigs[selectedWidget].modalStyle,
+            ...widgetConfigs[selectedWidget].modalStyle
           }
         : {};
 
@@ -586,7 +566,7 @@ export default function BodyComponent() {
         onScroll={handleScroll}
         style={{
           background: '#f0f1f3',
-          height: 'calc(100% - 65px)',
+          height: 'calc(100% - 65px)'
         }}
       >
         {!ui.meInfo && (
@@ -610,7 +590,7 @@ export default function BodyComponent() {
             justifyContent: 'space-between',
             alignItems: 'flex-start',
             padding: 20,
-            height: 62,
+            height: 62
           }}
         >
           <Label>Explore</Label>
@@ -641,7 +621,7 @@ export default function BodyComponent() {
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'space-between'
             }}
           >
             {selectedWidget === 'wanted' &&
@@ -657,7 +637,7 @@ export default function BodyComponent() {
                     background: '#dcedfe',
                     border: '2px solid #cddffd',
                     padding: '8px 20px',
-                    color: '#5d92df',
+                    color: '#5d92df'
                   }}
                   onClick={() => {
                     setShowFocusView(true);
@@ -676,7 +656,7 @@ export default function BodyComponent() {
                     backgroundColor: '#dde0e5',
                     fontSize: '14px',
 
-                    marginRight: '10px',
+                    marginRight: '10px'
                   }}
                 >
                   Login to Create Tickets
@@ -705,7 +685,7 @@ export default function BodyComponent() {
               height: '100%',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              padding: 20,
+              padding: 20
             }}
           >
             <PageLoadSpinner show={loadingTop} />
@@ -723,7 +703,7 @@ export default function BodyComponent() {
             top: isMobile ? 0 : 64,
             right: 0,
             zIndex: 10000,
-            width: '100%',
+            width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
           dismountCallback={() => ui.setSelectedPerson(0)}
@@ -747,7 +727,7 @@ export default function BodyComponent() {
               width: '60%',
               minWidth: 500,
               maxWidth: 602,
-              ...focusedDesktopModalStyles,
+              ...focusedDesktopModalStyles
             }}
             bigClose={() => {
               setPublicFocusPerson(null);
@@ -759,9 +739,7 @@ export default function BodyComponent() {
               person={publicFocusPerson}
               canEdit={false}
               selectedIndex={publicFocusIndex}
-              config={
-                widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]
-              }
+              config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
               onSuccess={() => {
                 console.log('success');
                 setPublicFocusPerson(null);
@@ -782,7 +760,7 @@ export default function BodyComponent() {
             style={{
               // top: -64,
               // height: 'calc(100% + 64px)'
-              height: '100%',
+              height: '100%'
             }}
             envStyle={{
               marginTop: isMobile ? 64 : 0,
@@ -793,7 +771,7 @@ export default function BodyComponent() {
               minWidth: 500,
               maxWidth: 602,
               zIndex: 20, //minHeight: 300,
-              ...focusedDesktopModalStyles,
+              ...focusedDesktopModalStyles
             }}
             nextArrow={nextIndex}
             prevArrow={prevIndex}

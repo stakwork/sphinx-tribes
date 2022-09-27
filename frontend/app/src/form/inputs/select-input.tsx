@@ -17,7 +17,7 @@ export default function SelectInput({
   handleFocus,
   readOnly,
   prepend,
-  extraHTML,
+  extraHTML
 }: Props) {
   let labeltext = label;
   if (error) labeltext = labeltext + ` (${error})`;
@@ -36,11 +36,7 @@ export default function SelectInput({
           />
           {error && (
             <E>
-              <EuiIcon
-                type="alert"
-                size="m"
-                style={{ width: 20, height: 20 }}
-              />
+              <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
