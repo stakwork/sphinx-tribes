@@ -581,10 +581,6 @@ export default function WantedSummary(props: any) {
       );
     }
 
-    useEffect(() => {
-      console.log(status);
-    }, [status]);
-
     return (
       <>
         {paid && (

@@ -38,7 +38,7 @@ export default function FocusedView(props: any) {
 
   const isMobile = useIsMobile();
 
-  console.log({ ...person });
+  // console.log({ ...person });
 
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
