@@ -15,7 +15,7 @@ export default function SwitchInput({
   handleFocus,
   readOnly,
   prepend,
-  extraHTML,
+  extraHTML
 }: Props) {
   useEffect(() => {
     // if value not initiated, default value true
@@ -46,7 +46,7 @@ export default function SwitchInput({
             compressed
             style={{
               border: 'none',
-              background: 'inherit',
+              background: 'inherit'
             }}
           />
         </div>
