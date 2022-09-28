@@ -17,8 +17,7 @@ export default function GithubStatusPill(props: any) {
       const p = await main.getPersonByGithubName(assignee);
       if (p) {
         let url = '';
-        if (p.owner_pubkey)
-          url = `https://community.sphinx.chat/p/${p.owner_pubkey}`;
+        if (p.owner_pubkey) url = `https://community.sphinx.chat/p/${p.owner_pubkey}`;
         else url = `https://github.com/${assignee}`;
         sendToRedirect(url);
       }

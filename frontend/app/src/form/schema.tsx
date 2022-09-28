@@ -37,6 +37,17 @@ const languages = [
 
 const estimation = ['Less than 1 hour', 'Less than 3 hours', 'More than 3 hours', 'Not sure yet'];
 
+const help_wanted_coding_task_schema = [
+  'Web development',
+  'Mobile development',
+  'Desktop app',
+  'Dev ops',
+  'Bitcoin / Lightning',
+  'other'
+];
+
+const help_wanted_other_schema = ['Troubleshooting', 'Debugging', 'Tutoring'];
+
 const codingLanguages = languages.map((l) => {
   return {
     value: l,
@@ -45,6 +56,20 @@ const codingLanguages = languages.map((l) => {
 });
 
 const estimated_time = estimation.map((e) => {
+  return {
+    value: e,
+    label: e
+  };
+});
+
+const helpType_wanted_coding_task_schema = help_wanted_coding_task_schema.map((e) => {
+  return {
+    value: e,
+    label: e
+  };
+});
+
+const helpType_wanted_other_schema = help_wanted_other_schema.map((e) => {
   return {
     value: e,
     label: e
@@ -598,11 +623,18 @@ export const offerSchema: FormField[] = [
 
 export const wantedOtherSchema: FormField[] = [
   {
+    name: 'wanted_type',
+    label: 'Tell us about what you need help with',
+    type: 'select',
+    options: helpType_wanted_other_schema
+  },
+  {
     name: 'title',
     label: 'Title*',
     type: 'text',
     validator: strValidator
   },
+
   {
     name: 'description',
     label: 'Description',
@@ -669,12 +701,33 @@ export const wantedCodingTaskSchema: FormField[] = [
   //     validator: nomValidator,
   // },
   {
+    name: 'wanted_type',
+    label: 'Tell us about what you need help with',
+    type: 'select',
+    options: helpType_wanted_coding_task_schema
+  },
+  {
+    name: 'one_sentence_summary',
+    label: 'One Sentence Summary',
+    type: 'text'
+  },
+  {
     name: 'ticketUrl',
     label: 'Github Issue URL',
     type: 'text',
     validator: strValidator
   },
-
+  {
+    name: 'github_description',
+    label: 'Github Description',
+    type: 'switch'
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    type: 'textarea'
+    // validator: strValidator,
+  },
   {
     name: 'price',
     label: 'Price (Sats)',
@@ -713,6 +766,16 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: estimated_time
   },
   {
+    name: 'estimated_completion_date',
+    label: 'Estimate Completion Date',
+    type: 'date'
+  },
+  {
+    name: 'deliverables',
+    label: 'Deliverables',
+    type: 'textarea'
+  },
+  {
     name: 'show',
     label: 'Show to public',
     type: 'switch'
@@ -724,12 +787,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     validator: strValidatorNotRequired
   },
 
-  {
-    name: 'description',
-    label: 'Description',
-    type: 'hide'
-    // validator: strValidator,
-  },
   {
     name: 'type',
     label: 'Type',
@@ -743,7 +800,7 @@ export const wantedSchema: FormField[] = [
     label: 'none',
     type: 'text',
     defaultSchema: wantedCodingTaskSchema,
-    defaultSchemaName: 'wanted_coding_task',
+    defaultSchemaName: 'freelance_job_request',
     dropdownOptions: 'wanted',
     // these are included to allow searching by fields for all possible schema types
     dynamicSchemas: [wantedCodingTaskSchema, wantedOtherSchema]
@@ -755,15 +812,15 @@ export const dynamicSchemasByType = {
   coding_task: wantedCodingTaskSchema,
   other: wantedOtherSchema,
   //
-  wanted_coding_task: wantedCodingTaskSchema,
-  wanted_other: wantedOtherSchema,
+  freelance_job_request: wantedCodingTaskSchema,
+  live_help: wantedOtherSchema,
   offer_skill: offerSkillSchema,
   offer_other: offerOtherSchema
 };
 
 // this object is used to autofill form fields if info is available in local storage
 export const dynamicSchemaAutofillFieldsByType = {
-  wanted_coding_task: {
+  freelance_job_request: {
     ticketUrl: 'lastGithubRepo'
   }
 };

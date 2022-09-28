@@ -148,16 +148,16 @@ const widgetConfigs = {
 const formDropdownOptions = {
   wanted: [
     {
-      value: 'wanted_coding_task',
-      label: 'Coding Task',
-      schema: wantedCodingTaskSchema,
-      description: 'Post a coding task referencing your github repo.'
+      value: 'freelance_job_request',
+      label: 'Freelance Job Request',
+      schema: wantedCodingTaskSchema
+      // description: 'Post a coding task referencing your github repo.',
     },
     {
-      value: 'wanted_other',
-      label: 'Other',
-      schema: wantedOtherSchema,
-      description: 'Could be anything.'
+      value: 'live_help',
+      label: 'Live Help',
+      schema: wantedOtherSchema
+      // description: 'Could be anything.',
     }
   ],
   offer: [

@@ -655,7 +655,6 @@ export default function BodyComponent() {
                     color: '#83737d',
                     backgroundColor: '#dde0e5',
                     fontSize: '14px',
-
                     marginRight: '10px'
                   }}
                 >

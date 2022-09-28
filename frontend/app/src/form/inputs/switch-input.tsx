@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { EuiSwitch } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
+import { wantedCodingTaskSchema } from '../schema';
 
 export default function SwitchInput({
   label,
@@ -19,6 +20,15 @@ export default function SwitchInput({
   useEffect(() => {
     // if value not initiated, default value true
     if (name === 'show' && value === undefined) handleChange(true);
+
+    // if (name === 'github_description') {
+    //   wantedCodingTaskSchema.map((val) => {
+    //     if (val.name === 'description') {
+    //       console.log(val.name, value);
+    //       return { ...val, type: value ? 'hide' : 'textarea' };
+    //     }
+    //   });
+    // }
   }, []);
 
   return (
