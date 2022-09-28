@@ -354,13 +354,11 @@ export default function WantedView(props: any) {
               {{ ...assignee }.owner_alias && (
                 <div
                   style={{
-                    marginTop: '8px',
+                    marginTop: '8px'
                   }}
                 >
                   <img
-                    src={
-                      { ...assignee }.img || '/static/person_placeholder.png'
-                    }
+                    src={{ ...assignee }.img || '/static/person_placeholder.png'}
                     alt="assignee_img"
                     style={{
                       borderRadius: '50%',
