@@ -227,7 +227,7 @@ export default function FocusedView(props: any) {
       if (config && config.name === 'about') {
         initialValues.id = personInfo.id || 0;
         initialValues.pubkey = personInfo.pubkey;
-        initialValues.alert = personInfo.extras.alert || false;
+        initialValues.alert = personInfo.extras?.alert || false;
         initialValues.owner_alias = personInfo.owner_alias || '';
         initialValues.img = personInfo.img || '';
         initialValues.price_to_meet = personInfo.price_to_meet || 0;
