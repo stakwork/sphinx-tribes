@@ -178,7 +178,11 @@ export default function FocusedView(props: any) {
           throw githubError;
         }
         const { description, title } = res;
-        body.description = description;
+        console.log(description, { ...body });
+        if (body.github_description) {
+          body.description = description;
+        }
+        // body.description = description;
         body.title = title;
 
         // save repo to cookies for autofill in form

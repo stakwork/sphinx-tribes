@@ -113,7 +113,7 @@ export default function BodyComponent() {
     //   ...widgetConfigs['offer'],
     //   label: 'Portfolios',
     // },
-    widgetConfigs['wanted']
+    widgetConfigs['wanted'],
   ];
 
   const tabsModal = widgetConfigs;

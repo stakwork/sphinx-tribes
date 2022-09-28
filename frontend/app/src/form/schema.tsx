@@ -714,12 +714,27 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: helpType_wanted_coding_task_schema,
   },
   {
+    name: 'one_sentence_summary',
+    label: 'One Sentence Summary',
+    type: 'text',
+  },
+  {
     name: 'ticketUrl',
     label: 'Github Issue URL',
     type: 'text',
     validator: strValidator,
   },
-
+  {
+    name: 'github_description',
+    label: 'Github Description',
+    type: 'switch',
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    type: 'textarea',
+    // validator: strValidator,
+  },
   {
     name: 'price',
     label: 'Price (Sats)',
@@ -758,6 +773,16 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: estimated_time,
   },
   {
+    name: 'estimated_completion_date',
+    label: 'Estimate Completion Date',
+    type: 'date',
+  },
+  {
+    name: 'deliverables',
+    label: 'Deliverables',
+    type: 'textarea',
+  },
+  {
     name: 'show',
     label: 'Show to public',
     type: 'switch',
@@ -769,12 +794,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     validator: strValidatorNotRequired,
   },
 
-  {
-    name: 'description',
-    label: 'Description',
-    type: 'hide',
-    // validator: strValidator,
-  },
   {
     name: 'type',
     label: 'Type',
