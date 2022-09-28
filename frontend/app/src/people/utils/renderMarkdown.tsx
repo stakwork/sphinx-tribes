@@ -18,8 +18,10 @@ export function renderMarkdown(markdown) {
           );
         },
         img({ className, ...props }) {
-          return <img className={className} style={{ width: '100%' }} {...props} />;
-        }
+          return (
+            <img className={className} style={{ width: '100%' }} {...props} />
+          );
+        },
       }}
     />
   );

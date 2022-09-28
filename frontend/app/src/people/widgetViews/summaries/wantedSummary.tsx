@@ -744,7 +744,11 @@ export default function WantedSummary(props: any) {
     );
   }
 
-  if (type === 'coding_task' || type === 'wanted_coding_task') {
+  if (
+    type === 'coding_task' ||
+    type === 'wanted_coding_task' ||
+    type === 'freelance_job_request'
+  ) {
     return renderCodingTask();
   }
 

@@ -10,11 +10,11 @@ const repoStrValidator = Yup.string()
   .required('Required');
 const repoArrayStrValidator = Yup.array().of(
   Yup.object().shape({
-    value: repoStrValidator
+    value: repoStrValidator,
   })
 );
 const badgeObjectStrValidator = Yup.object().shape({
-  value: strValidator
+  value: strValidator,
 });
 
 const nomValidator = Yup.number().required('Required');
@@ -32,22 +32,54 @@ const languages = [
   'R',
   'C#',
   'C++',
-  'Java'
+  'Java',
 ];
 
-const estimation = ['Less than 1 hour', 'Less than 3 hours', 'More than 3 hours', 'Not sure yet'];
+const estimation = [
+  'Less than 1 hour',
+  'Less than 3 hours',
+  'More than 3 hours',
+  'Not sure yet',
+];
+
+const help_wanted_coding_task_schema = [
+  'Web development',
+  'Mobile development',
+  'Desktop app',
+  'Dev ops',
+  'Bitcoin / Lightning',
+  'other',
+];
+
+const help_wanted_other_schema = ['Troubleshooting', 'Debugging', 'Tutoring'];
 
 const codingLanguages = languages.map((l) => {
   return {
     value: l,
-    label: l
+    label: l,
   };
 });
 
 const estimated_time = estimation.map((e) => {
   return {
     value: e,
-    label: e
+    label: e,
+  };
+});
+
+const helpType_wanted_coding_task_schema = help_wanted_coding_task_schema.map(
+  (e) => {
+    return {
+      value: e,
+      label: e,
+    };
+  }
+);
+
+const helpType_wanted_other_schema = help_wanted_other_schema.map((e) => {
+  return {
+    value: e,
+    label: e,
   };
 });
 
@@ -57,14 +89,14 @@ export const meSchema: FormField[] = [
     name: 'img',
     label: 'Image',
     type: 'img',
-    page: 1
+    page: 1,
   },
   {
     name: 'pubkey',
     label: 'Pubkey*',
     type: 'text',
     readOnly: true,
-    page: 1
+    page: 1,
   },
   {
     name: 'owner_alias',
@@ -72,25 +104,25 @@ export const meSchema: FormField[] = [
     type: 'text',
     required: true,
     validator: strValidator,
-    page: 1
+    page: 1,
   },
   {
     name: 'description',
     label: 'Description',
     type: 'textarea',
-    page: 1
+    page: 1,
   },
   {
     name: 'price_to_meet',
     label: 'Price to Meet',
     type: 'number',
-    page: 1
+    page: 1,
   },
   {
     name: 'id',
     label: 'ID',
     type: 'hidden',
-    page: 1
+    page: 1,
   },
   {
     name: 'extras',
@@ -99,10 +131,10 @@ export const meSchema: FormField[] = [
     validator: Yup.object().shape({
       alert: Yup.boolean(),
       twitter: Yup.object({
-        handle: strValidator
+        handle: strValidator,
       }).default(undefined),
       supportme: Yup.object({
-        url: strValidator
+        url: strValidator,
       }).default(undefined),
       wanted: Yup.array().of(
         Yup.object()
@@ -110,33 +142,33 @@ export const meSchema: FormField[] = [
             title: strValidator,
             priceMin: Yup.number().when('priceMax', (pricemax) =>
               Yup.number().max(pricemax, `Must be less than max`)
-            )
+            ),
           })
           .nullable()
       ),
       offer: Yup.array().of(
         Yup.object().shape({
-          title: strValidator
+          title: strValidator,
         })
       ),
       tribes: Yup.array().of(
         Yup.object().shape({
-          address: strValidator
+          address: strValidator,
         })
       ),
       blog: Yup.array().of(
         Yup.object().shape({
           title: strValidator,
-          markdown: strValidator
+          markdown: strValidator,
         })
-      )
+      ),
     }),
     extras: [
       {
         name: 'alert',
         label: 'Alerts',
         type: 'switch',
-        single: true
+        single: true,
       },
       {
         name: 'twitter',
@@ -150,14 +182,14 @@ export const meSchema: FormField[] = [
             name: 'handle',
             label: 'Twitter*',
             type: 'text',
-            prepend: '@'
+            prepend: '@',
           },
           {
             name: 'show',
             label: 'Show In Link',
-            type: 'switch'
-          }
-        ]
+            type: 'switch',
+          },
+        ],
       },
       {
         name: 'supportme',
@@ -169,24 +201,24 @@ export const meSchema: FormField[] = [
           {
             name: 'url',
             label: 'URL*',
-            type: 'text'
+            type: 'text',
           },
           {
             name: 'description',
             label: 'Description',
-            type: 'textarea'
+            type: 'textarea',
           },
           {
             name: 'gallery',
             label: 'Gallery',
-            type: 'gallery'
+            type: 'gallery',
           },
           {
             name: 'show',
             label: 'Show In Link',
-            type: 'switch'
-          }
-        ]
+            type: 'switch',
+          },
+        ],
       },
       {
         name: 'offer',
@@ -197,24 +229,24 @@ export const meSchema: FormField[] = [
           {
             name: 'title',
             label: 'Title*',
-            type: 'text'
+            type: 'text',
           },
           {
             name: 'price',
             label: 'Price',
-            type: 'number'
+            type: 'number',
           },
           {
             name: 'gallery',
             label: 'Gallery',
-            type: 'gallery'
+            type: 'gallery',
           },
           {
             name: 'show',
             label: 'Show In Link',
-            type: 'switch'
-          }
-        ]
+            type: 'switch',
+          },
+        ],
       },
       {
         name: 'wanted',
@@ -225,29 +257,29 @@ export const meSchema: FormField[] = [
           {
             name: 'title',
             label: 'Title*',
-            type: 'text'
+            type: 'text',
           },
           {
             name: 'priceMin',
             label: 'Price Min',
-            type: 'number'
+            type: 'number',
           },
           {
             name: 'priceMax',
             label: 'Price Max',
-            type: 'number'
+            type: 'number',
           },
           {
             name: 'description',
             label: 'Description',
-            type: 'textarea'
+            type: 'textarea',
           },
           {
             name: 'show',
             label: 'Show In Link',
-            type: 'switch'
-          }
-        ]
+            type: 'switch',
+          },
+        ],
       },
       {
         name: 'post',
@@ -257,19 +289,19 @@ export const meSchema: FormField[] = [
           {
             name: 'title',
             label: 'Title',
-            type: 'text'
+            type: 'text',
           },
           {
             name: 'content',
             label: 'Content',
-            type: 'textarea'
+            type: 'textarea',
           },
           {
             name: 'gallery',
             label: 'Gallery',
-            type: 'gallery'
-          }
-        ]
+            type: 'gallery',
+          },
+        ],
       },
       {
         name: 'tribes',
@@ -279,14 +311,14 @@ export const meSchema: FormField[] = [
           {
             name: 'address',
             label: 'Tribe address*',
-            type: 'text'
+            type: 'text',
           },
           {
             name: 'show',
             label: 'Show In Link',
-            type: 'switch'
-          }
-        ]
+            type: 'switch',
+          },
+        ],
       },
       {
         name: 'blog',
@@ -297,36 +329,36 @@ export const meSchema: FormField[] = [
           {
             name: 'title',
             label: 'Title*',
-            type: 'text'
+            type: 'text',
           },
           {
             name: 'markdown',
             label: 'Markdown*',
-            type: 'textarea'
+            type: 'textarea',
           },
           {
             name: 'gallery',
             label: 'Gallery',
-            type: 'gallery'
+            type: 'gallery',
           },
           {
             name: 'show',
             label: 'Show In Link',
-            type: 'switch'
-          }
-        ]
-      }
+            type: 'switch',
+          },
+        ],
+      },
     ],
-    page: 2
-  }
+    page: 2,
+  },
 ];
 
 export const liquidSchema: FormField[] = [
   {
     name: 'address',
     label: 'Liquid Address',
-    type: 'text'
-  }
+    type: 'text',
+  },
 ];
 
 export const aboutSchema: FormField[] = [
@@ -334,14 +366,14 @@ export const aboutSchema: FormField[] = [
     name: 'img',
     label: 'Image',
     type: 'img',
-    page: 1
+    page: 1,
   },
   {
     name: 'pubkey',
     label: 'Pubkey*',
     type: 'text',
     readOnly: true,
-    page: 1
+    page: 1,
   },
   {
     name: 'owner_alias',
@@ -349,7 +381,7 @@ export const aboutSchema: FormField[] = [
     type: 'text',
     required: true,
     validator: strValidator,
-    page: 1
+    page: 1,
   },
   {
     name: 'price_to_meet',
@@ -357,25 +389,25 @@ export const aboutSchema: FormField[] = [
     type: 'number',
     page: 1,
     extraHTML:
-      '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>'
+      '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>',
   },
   {
     name: 'description',
     label: 'Description',
     type: 'textarea',
-    page: 1
+    page: 1,
   },
   {
     name: 'alert',
     label: 'Alerts',
-    type: 'switch'
+    type: 'switch',
   },
   {
     name: 'tribes',
     label: 'Tribes',
     type: 'multiselect',
     options: [],
-    widget: true
+    widget: true,
   },
   {
     name: 'coding_languages',
@@ -383,7 +415,7 @@ export const aboutSchema: FormField[] = [
     widget: true,
     type: 'creatablemultiselect',
     options: codingLanguages,
-    page: 1
+    page: 1,
   },
   {
     name: 'github',
@@ -391,7 +423,7 @@ export const aboutSchema: FormField[] = [
     widget: true,
     type: 'text',
     prepend: 'https://github.com/',
-    page: 1
+    page: 1,
   },
   {
     name: 'repos',
@@ -401,7 +433,7 @@ export const aboutSchema: FormField[] = [
     options: [],
     note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
     validator: repoArrayStrValidator, // look for 1 slash
-    page: 1
+    page: 1,
   },
 
   {
@@ -409,21 +441,21 @@ export const aboutSchema: FormField[] = [
     label: 'Lightning address',
     widget: true,
     type: 'text',
-    page: 1
+    page: 1,
   },
   {
     name: 'liquid',
     label: 'Liquid address',
     widget: true,
     type: 'text',
-    page: 1
+    page: 1,
   },
   {
     name: 'amboss',
     label: 'Amboss address',
     widget: true,
     type: 'text',
-    page: 1
+    page: 1,
   },
   {
     name: 'twitter',
@@ -431,8 +463,8 @@ export const aboutSchema: FormField[] = [
     widget: true,
     type: 'text',
     prepend: '@',
-    page: 1
-  }
+    page: 1,
+  },
 
   // {
   //     name: "facebook",
@@ -448,19 +480,19 @@ export const postSchema: FormField[] = [
     name: 'title',
     label: 'Title',
     type: 'text',
-    validator: strValidator
+    validator: strValidator,
   },
   {
     name: 'content',
     label: 'Content',
     type: 'textarea',
-    validator: strValidator
+    validator: strValidator,
   },
   {
     name: 'gallery',
     label: 'Gallery',
-    type: 'gallery'
-  }
+    type: 'gallery',
+  },
 ];
 
 export const sendBadgeSchema: FormField[] = [
@@ -469,15 +501,15 @@ export const sendBadgeSchema: FormField[] = [
     label: 'Recipient',
     type: 'searchableselect',
     options: [],
-    validator: badgeObjectStrValidator
+    validator: badgeObjectStrValidator,
   },
   {
     name: 'badge',
     label: 'Badge',
     type: 'searchableselect',
     options: [],
-    validator: badgeObjectStrValidator
-  }
+    validator: badgeObjectStrValidator,
+  },
   // {
   //     name: "amount",
   //     label: "Amount",
@@ -492,31 +524,31 @@ export const botSchema: FormField[] = [
   {
     name: 'img',
     label: 'Logo',
-    type: 'imgcanvas'
+    type: 'imgcanvas',
   },
   {
     name: 'name',
     label: 'Bot Name',
     type: 'text',
-    validator: strValidator
+    validator: strValidator,
   },
   {
     name: 'webhook',
     label: 'Webhook',
     type: 'text',
-    validator: strValidator
+    validator: strValidator,
   },
   {
     name: 'description',
     label: 'How to use',
     type: 'textarea',
-    validator: strValidator
+    validator: strValidator,
   },
   {
     name: 'price_per_use',
     label: 'Price Per Use',
     type: 'number',
-    validator: nomValidator
+    validator: nomValidator,
   },
   {
     name: 'tags',
@@ -525,22 +557,22 @@ export const botSchema: FormField[] = [
     options: [
       {
         value: 'Utility',
-        label: 'Utility'
+        label: 'Utility',
       },
       {
         value: 'Social',
-        label: 'Social'
+        label: 'Social',
       },
       {
         value: 'Fun',
-        label: 'Fun'
+        label: 'Fun',
       },
       {
         value: 'Betting',
-        label: 'Betting'
-      }
-    ]
-  }
+        label: 'Betting',
+      },
+    ],
+  },
 ];
 
 export const offerSkillSchema: FormField[] = [
@@ -548,19 +580,19 @@ export const offerSkillSchema: FormField[] = [
     name: 'title',
     label: 'Title',
     validator: strValidator,
-    type: 'text'
+    type: 'text',
   },
   {
     name: 'description',
     label: 'Description',
     validator: strValidator,
-    type: 'textarea'
+    type: 'textarea',
   },
   {
     name: 'gallery',
     label: 'Gallery',
-    type: 'gallery'
-  }
+    type: 'gallery',
+  },
 ];
 
 export const offerOtherSchema: FormField[] = [
@@ -568,19 +600,19 @@ export const offerOtherSchema: FormField[] = [
     name: 'title',
     label: 'Title',
     validator: strValidator,
-    type: 'text'
+    type: 'text',
   },
   {
     name: 'description',
     label: 'Description',
     validator: strValidator,
-    type: 'textarea'
+    type: 'textarea',
   },
   {
     name: 'gallery',
     label: 'Gallery',
-    type: 'gallery'
-  }
+    type: 'gallery',
+  },
 ];
 
 export const offerSchema: FormField[] = [
@@ -592,22 +624,29 @@ export const offerSchema: FormField[] = [
     defaultSchemaName: 'offer_skill',
     dropdownOptions: 'offer',
     // these are included to allow searching by fields for all possible schema types
-    dynamicSchemas: [offerSkillSchema, offerOtherSchema]
-  }
+    dynamicSchemas: [offerSkillSchema, offerOtherSchema],
+  },
 ];
 
 export const wantedOtherSchema: FormField[] = [
   {
+    name: 'wanted_type',
+    label: 'Tell us about what you need help with',
+    type: 'select',
+    options: helpType_wanted_other_schema,
+  },
+  {
     name: 'title',
     label: 'Title*',
     type: 'text',
-    validator: strValidator
+    validator: strValidator,
   },
+
   {
     name: 'description',
     label: 'Description',
     type: 'textarea',
-    validator: strValidator
+    validator: strValidator,
   },
   {
     name: 'priceMin',
@@ -615,30 +654,30 @@ export const wantedOtherSchema: FormField[] = [
     validator: Yup.number().when('priceMax', (pricemax) =>
       Yup.number().max(pricemax, `Must be less than max`)
     ),
-    type: 'number'
+    type: 'number',
   },
   {
     name: 'priceMax',
     label: 'Price Max',
     validator: nomValidator,
-    type: 'number'
+    type: 'number',
   },
   {
     name: 'show',
     label: 'Show to public',
-    type: 'switch'
+    type: 'switch',
   },
   {
     name: 'gallery',
     label: 'Gallery',
-    type: 'gallery'
+    type: 'gallery',
   },
 
   {
     name: 'type',
     label: 'Type',
-    type: 'hide'
-  }
+    type: 'hide',
+  },
 
   // {
   //     name: 'show',
@@ -651,7 +690,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'title',
     label: 'Title',
-    type: 'hide'
+    type: 'hide',
     // validator: strValidator,
   },
   // {
@@ -669,17 +708,38 @@ export const wantedCodingTaskSchema: FormField[] = [
   //     validator: nomValidator,
   // },
   {
+    name: 'wanted_type',
+    label: 'Tell us about what you need help with',
+    type: 'select',
+    options: helpType_wanted_coding_task_schema,
+  },
+  {
+    name: 'one_sentence_summary',
+    label: 'One Sentence Summary',
+    type: 'text',
+  },
+  {
     name: 'ticketUrl',
     label: 'Github Issue URL',
     type: 'text',
-    validator: strValidator
+    validator: strValidator,
   },
-
+  {
+    name: 'github_description',
+    label: 'Github Description',
+    type: 'switch',
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    type: 'textarea',
+    // validator: strValidator,
+  },
   {
     name: 'price',
     label: 'Price (Sats)',
     validator: nomValidator,
-    type: 'number'
+    type: 'number',
   },
   // {
   //     name: 'space',
@@ -691,50 +751,54 @@ export const wantedCodingTaskSchema: FormField[] = [
     name: 'assignee',
     label: 'Assignee',
     type: 'searchableselect',
-    options: []
+    options: [],
   },
   {
     name: 'codingLanguage',
     label: 'Coding Language',
     type: 'creatablemultiselect',
-    options: codingLanguages
+    options: codingLanguages,
   },
   {
     name: 'tribe',
     label: 'Tribe',
     type: 'select',
     options: [],
-    validator: strValidatorNotRequired
+    validator: strValidatorNotRequired,
   },
   {
     name: 'estimate_session_length',
     label: 'Estimate Seesion Length',
     type: 'select',
-    options: estimated_time
+    options: estimated_time,
+  },
+  {
+    name: 'estimated_completion_date',
+    label: 'Estimate Completion Date',
+    type: 'date',
+  },
+  {
+    name: 'deliverables',
+    label: 'Deliverables',
+    type: 'textarea',
   },
   {
     name: 'show',
     label: 'Show to public',
-    type: 'switch'
+    type: 'switch',
   },
   {
     name: 'loomEmbedUrl',
     label: 'Loom Video',
     type: 'loom',
-    validator: strValidatorNotRequired
+    validator: strValidatorNotRequired,
   },
 
   {
-    name: 'description',
-    label: 'Description',
-    type: 'hide'
-    // validator: strValidator,
-  },
-  {
     name: 'type',
     label: 'Type',
-    type: 'hide'
-  }
+    type: 'hide',
+  },
 ];
 
 export const wantedSchema: FormField[] = [
@@ -743,11 +807,11 @@ export const wantedSchema: FormField[] = [
     label: 'none',
     type: 'text',
     defaultSchema: wantedCodingTaskSchema,
-    defaultSchemaName: 'wanted_coding_task',
+    defaultSchemaName: 'freelance_job_request',
     dropdownOptions: 'wanted',
     // these are included to allow searching by fields for all possible schema types
-    dynamicSchemas: [wantedCodingTaskSchema, wantedOtherSchema]
-  }
+    dynamicSchemas: [wantedCodingTaskSchema, wantedOtherSchema],
+  },
 ];
 
 // this object is used to switch between schemas in form when dynamic
@@ -755,15 +819,15 @@ export const dynamicSchemasByType = {
   coding_task: wantedCodingTaskSchema,
   other: wantedOtherSchema,
   //
-  wanted_coding_task: wantedCodingTaskSchema,
-  wanted_other: wantedOtherSchema,
+  freelance_job_request: wantedCodingTaskSchema,
+  live_help: wantedOtherSchema,
   offer_skill: offerSkillSchema,
-  offer_other: offerOtherSchema
+  offer_other: offerOtherSchema,
 };
 
 // this object is used to autofill form fields if info is available in local storage
 export const dynamicSchemaAutofillFieldsByType = {
-  wanted_coding_task: {
-    ticketUrl: 'lastGithubRepo'
-  }
+  freelance_job_request: {
+    ticketUrl: 'lastGithubRepo',
+  },
 };
