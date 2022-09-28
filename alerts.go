@@ -17,6 +17,7 @@ type Action struct {
 	ChatUuid string `json:"chat_uuid"` // tribe uuid
 	Pubkey   string `json:"pubkey"`
 	Content  string `json:"content"`
+	BotId    string `json:"bot_id"`
 }
 
 func processAlerts(p Person) {
@@ -33,7 +34,8 @@ func processAlerts(p Person) {
 	relayUrl := os.Getenv("ALERT_URL")
 	alertSecret := os.Getenv("ALERT_SECRET")
 	alertTribeUuid := os.Getenv("ALERT_TRIBE_UUID")
-	if relayUrl == "" || alertSecret == "" || alertTribeUuid == "" {
+	botId := os.Getenv("ALERT_BOT_ID")
+	if relayUrl == "" || alertSecret == "" || alertTribeUuid == "" || botId == "" {
 		fmt.Println("Ticket alerts: ENV information not found")
 		return
 	}
@@ -41,6 +43,7 @@ func processAlerts(p Person) {
 	var action Action
 	action.ChatUuid = alertTribeUuid
 	action.Action = "dm"
+	action.BotId = botId
 	action.Content = "A new ticket relevant to your interests has been created on Sphinx Community - https://community.sphinx.chat/p?owner_id="
 	action.Content += p.OwnerPubKey
 	action.Content += "&created=" + strconv.Itoa(int(p.NewTicketTime))
@@ -93,32 +96,23 @@ func processAlerts(p Person) {
 
 	for _, per := range people {
 		action.Pubkey = per.OwnerPubKey
-		var buf bytes.Buffer
-		err = json.NewEncoder(&buf).Encode(action)
+		buf, err := json.Marshal(action)
 		if err != nil {
 			fmt.Println("Ticket alerts: Unable to parse message into byte buffer", err)
 			return
 		}
-		request, err := http.NewRequest("POST", relayUrl, &buf)
+		request, err := http.NewRequest("POST", relayUrl, bytes.NewReader(buf))
 		if err != nil {
 			fmt.Println("Ticket alerts: Unable to create a request to send to relay", err)
 			return
 		}
 
-		b := buf.Bytes()
-
-		secret, err := hex.DecodeString(alertSecret)
-		if err != nil {
-			fmt.Println("Ticket alerts: Unable to create a byte array for secret", err)
-			return
-		}
-
-		mac := hmac.New(sha256.New, secret)
-		mac.Write(b)
+		mac := hmac.New(sha256.New, []byte(alertSecret))
+		mac.Write(buf)
 		hmac256Byte := mac.Sum(nil)
 		hmac256Hex := "sha256=" + hex.EncodeToString(hmac256Byte)
-
 		request.Header.Set("x-hub-signature-256", hmac256Hex)
+		request.Header.Set("Content-Type", "application/json")
 		_, err = client.Do(request)
 		if err != nil {
 			fmt.Println("Ticket alerts: Unable to communicate request to relay", err)
