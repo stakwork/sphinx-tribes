@@ -17,7 +17,7 @@ export default function Select(props: any) {
                 color: '#000',
                 fontSize: '14px',
                 padding: '0px',
-                margin: 0,
+                margin: 0
               }}
             >
               {o.label}
@@ -29,14 +29,14 @@ export default function Select(props: any) {
                 style={{
                   padding: 0,
                   margin: 0,
-                  fontSize: '12px',
+                  fontSize: '12px'
                 }}
               >
                 <p className="euiTextColor--subdued">{o.description}</p>
               </EuiText>
             )}
           </>
-        ),
+        )
       };
     }) || [];
 
@@ -44,7 +44,7 @@ export default function Select(props: any) {
     <div style={{ position: 'relative', ...style }}>
       <S
         style={{
-          ...selectStyle,
+          ...selectStyle
         }}
         options={opts}
         valueOfSelected={value}

@@ -14,6 +14,7 @@ import SelectInput from './select-input';
 import SearchableSelectInput from './searchable-select-input';
 import MultiSelectInput from './multi-select-input';
 import CreatableMultiSelectInput from './creatable-multi-select-input';
+import Date from './widgets/date';
 
 export default function Input(props: any) {
   function getInput() {
@@ -48,6 +49,8 @@ export default function Input(props: any) {
         return <CreatableMultiSelectInput {...props} />;
       case 'widgets':
         return <Widgets {...props} />;
+      // case 'date':
+      //   return <Date {...props} />;
       case 'hidden':
         return <></>;
       default:

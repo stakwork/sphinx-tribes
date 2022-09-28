@@ -156,7 +156,11 @@ export default function FocusedView(props: any) {
 
     let githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
-      if (body.type === 'wanted_coding_task' || body.type === 'coding_task') {
+      if (
+        body.type === 'wanted_coding_task' ||
+        body.type === 'coding_task' ||
+        body.type === 'freelance_job_request'
+      ) {
         let { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
         let splitString = repo.split('/');
         let ownerName = splitString[0];
@@ -167,7 +171,11 @@ export default function FocusedView(props: any) {
           throw githubError;
         }
         const { description, title } = res;
-        body.description = description;
+        console.log(description, { ...body });
+        if (body.github_description) {
+          body.description = description;
+        }
+        // body.description = description;
         body.title = title;
 
         // save repo to cookies for autofill in form
@@ -263,12 +271,12 @@ export default function FocusedView(props: any) {
             if (dynamicSchema) {
               if (sel.type) {
                 let thisDynamicSchema = dynamicSchemasByType[sel.type];
-                thisDynamicSchema.forEach((s) => {
+                thisDynamicSchema?.forEach((s) => {
                   initialValues[s.name] = sel[s.name];
                 });
               } else {
                 // use default schema
-                dynamicSchema.defaultSchema.forEach((s) => {
+                dynamicSchema?.defaultSchema?.forEach((s) => {
                   initialValues[s.name] = sel[s.name];
                 });
               }

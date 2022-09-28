@@ -108,7 +108,8 @@ export default function WantedView(props: any) {
 
     const isClosed = status === 'closed' || paid ? true : false;
 
-    const isCodingTask = type === 'coding_task' || type === 'wanted_coding_task';
+    const isCodingTask =
+      type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request';
 
     if (isMobile) {
       return (
