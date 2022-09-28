@@ -1,6 +1,7 @@
 {
   "name": "catcher",
   "version": "0.1.0",
+	"prettier": "prettier.json",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
