@@ -13,7 +13,7 @@ export default function Date({
   handleFocus,
   readOnly,
   prepend,
-  extraHTML,
+  extraHTML
 }: Props) {
   const [startDate, setStartDate] = useState(moment());
 

@@ -1,11 +1,5 @@
 import MaterialIcon from '@material/react-material-icon';
-import React, {
-  useRef,
-  useState,
-  useLayoutEffect,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
@@ -13,10 +7,7 @@ import { Divider, Title, Paragraph, Button, Modal } from '../../../sphinxUI';
 import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton';
-import {
-  extractGithubIssue,
-  extractGithubIssueFromUrl,
-} from '../../../helpers';
+import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
 import ReactMarkdown from 'react-markdown';
 import GithubStatusPill from '../parts/statusPill';
 import { useStores } from '../../../store';
@@ -55,7 +46,7 @@ export default function WantedSummary(props: any) {
     loomEmbedUrl,
     codingLanguage,
     estimate_session_length,
-    assignee,
+    assignee
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -138,19 +129,13 @@ export default function WantedSummary(props: any) {
         const peopleWantedsClone: any = [...peopleWanteds];
         const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
           let val = f.body || {};
-          return (
-            f.person.owner_pubkey === ui.meInfo?.owner_pubkey &&
-            val.created === created
-          );
+          return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
         // if we found it in the wanted list, update in people wanted list
         if (indexFromPeopleWanted > -1) {
           // if it should be hidden now, remove it from the list
-          if (
-            'show' in clonedEx[targetIndex] &&
-            clonedEx[targetIndex].show === false
-          ) {
+          if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
             peopleWantedsClone.splice(indexFromPeopleWanted, 1);
           } else {
             // gotta update person extras! this is what is used for summary viewer
@@ -159,7 +144,7 @@ export default function WantedSummary(props: any) {
 
             peopleWantedsClone[indexFromPeopleWanted] = {
               person: personClone,
-              body: clonedEx[targetIndex],
+              body: clonedEx[targetIndex]
             };
           }
 
@@ -194,13 +179,10 @@ export default function WantedSummary(props: any) {
       }
 
       // first get the user's liquid address
-      const recipientDetails = await main.getPersonByPubkey(
-        recipient.owner_pubkey
-      );
+      const recipientDetails = await main.getPersonByPubkey(recipient.owner_pubkey);
 
       const liquidAddress =
-        recipientDetails?.extras?.liquid &&
-        recipientDetails?.extras?.liquid[0]?.value;
+        recipientDetails?.extras?.liquid && recipientDetails?.extras?.liquid[0]?.value;
 
       if (!liquidAddress) {
         alert('This user has not provided an L-BTC address');
@@ -215,16 +197,13 @@ export default function WantedSummary(props: any) {
         asset: badge.id,
         to: liquidAddress,
         amount: 1,
-        memo: props.ticketUrl,
+        memo: props.ticketUrl
       };
 
       const r = await main.sendBadgeOnLiquid(pack);
 
       if (r.ok) {
-        await setExtrasPropertyAndSave(
-          'badgeRecipient',
-          recipient.owner_pubkey
-        );
+        await setExtrasPropertyAndSave('badgeRecipient', recipient.owner_pubkey);
         setShowBadgeAwardDialog(false);
       } else {
         alert(r.statusText || 'Operation failed! Contact support.');
@@ -247,9 +226,7 @@ export default function WantedSummary(props: any) {
       iconSize={14}
       style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
       onClick={() => {
-        const repoUrl = ticketUrl
-          ? ticketUrl
-          : `https://github.com/${repo}/issues/${issue}`;
+        const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
         sendToRedirect(repoUrl);
       }}
     />
@@ -283,7 +260,7 @@ export default function WantedSummary(props: any) {
         height: 48,
         width: '100%',
         marginBottom: 20,
-        paddingLeft: 5,
+        paddingLeft: 5
       }}
       onClick={() => {}}
     />
@@ -301,7 +278,7 @@ export default function WantedSummary(props: any) {
         height: 48,
         width: '100%',
         marginBottom: 20,
-        paddingLeft: 5,
+        paddingLeft: 5
       }}
       onClick={handleCopyUrl}
     />
@@ -319,7 +296,7 @@ export default function WantedSummary(props: any) {
         height: 48,
         width: '100%',
         marginBottom: 20,
-        paddingLeft: 5,
+        paddingLeft: 5
       }}
       onClick={() => {
         const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
@@ -425,7 +402,7 @@ export default function WantedSummary(props: any) {
               fontSize: 12,
               color: '#8E969C',
               marginTop: isMobile ? 20 : 0,
-              marginLeft: '-16px',
+              marginLeft: '-16px'
             }}
           >
             <Img
@@ -452,7 +429,7 @@ export default function WantedSummary(props: any) {
               alignItems: 'center',
               fontSize: 12,
               color: '#8E969C',
-              marginLeft: '16px',
+              marginLeft: '16px'
             }}
           >
             <Img
@@ -485,7 +462,7 @@ export default function WantedSummary(props: any) {
             <div
               style={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: 'row'
               }}
             >
               <GithubStatusPill status={status} assignee={assignee} />
@@ -496,14 +473,14 @@ export default function WantedSummary(props: any) {
               style={{
                 fontSize: '13px',
                 color: '#8e969c',
-                fontWeight: '500',
+                fontWeight: '500'
               }}
             >
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
-                  color: '#000',
+                  color: '#000'
                 }}
               >
                 {estimate_session_length ?? ''}
@@ -515,7 +492,7 @@ export default function WantedSummary(props: any) {
                 display: 'flex',
                 flexDirection: 'row',
                 marginTop: '10px',
-                minHeight: '60px',
+                minHeight: '60px'
               }}
             >
               {labels.length > 0 &&
@@ -533,13 +510,13 @@ export default function WantedSummary(props: any) {
                           padding: '3px 10px',
                           borderRadius: '20px',
                           marginRight: '3px',
-                          boxShadow: '1px 1px #909090',
+                          boxShadow: '1px 1px #909090'
                         }}
                       >
                         <div
                           style={{
                             fontSize: '10px',
-                            color: '#202020',
+                            color: '#202020'
                           }}
                         >
                           {x.label}
@@ -561,11 +538,7 @@ export default function WantedSummary(props: any) {
 
             {actionButtons}
 
-            <LoomViewerRecorder
-              readOnly
-              loomEmbedUrl={loomEmbedUrl}
-              style={{ marginBottom: 20 }}
-            />
+            <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
 
             <Divider />
             <Y>
@@ -593,7 +566,7 @@ export default function WantedSummary(props: any) {
               width: 64,
               height: 72,
               zIndex: 100,
-              pointerEvents: 'none',
+              pointerEvents: 'none'
             }}
           />
         )}
@@ -603,36 +576,32 @@ export default function WantedSummary(props: any) {
               width: 700,
               borderRight: '1px solid #DDE1E5',
               minHeight: '100%',
-              overflow: 'auto',
+              overflow: 'auto'
             }}
           >
             <SectionPad style={{ height: 148 }}>
               <Title>{title}</Title>
               <div style={{ display: 'flex', marginTop: 25 }}>
-                <GithubStatusPill
-                  status={status}
-                  assignee={assignee}
-                  style={{ marginRight: 25 }}
-                />
+                <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
                 {assigneeLabel}
               </div>
               <div
                 style={{
-                  marginTop: '2px',
+                  marginTop: '2px'
                 }}
               >
                 <EuiText
                   style={{
                     fontSize: '13px',
                     color: '#8e969c',
-                    fontWeight: '500',
+                    fontWeight: '500'
                   }}
                 >
                   {estimate_session_length && 'Session:'}{' '}
                   <span
                     style={{
                       fontWeight: '500',
-                      color: '#000',
+                      color: '#000'
                     }}
                   >
                     {estimate_session_length ?? ''}
@@ -646,17 +615,13 @@ export default function WantedSummary(props: any) {
               <Paragraph
                 style={{
                   overflow: 'hidden',
-                  wordBreak: 'normal',
+                  wordBreak: 'normal'
                 }}
               >
                 {renderMarkdown(description)}
               </Paragraph>
 
-              <LoomViewerRecorder
-                readOnly
-                style={{ marginTop: 10 }}
-                loomEmbedUrl={loomEmbedUrl}
-              />
+              <LoomViewerRecorder readOnly style={{ marginTop: 10 }} loomEmbedUrl={loomEmbedUrl} />
             </SectionPad>
           </div>
 
@@ -666,7 +631,7 @@ export default function WantedSummary(props: any) {
                 style={{
                   display: 'flex',
                   width: '100%',
-                  justifyContent: 'space-between',
+                  justifyContent: 'space-between'
                 }}
               >
                 {nametag}
@@ -681,7 +646,7 @@ export default function WantedSummary(props: any) {
                   minHeight: '60px',
                   width: '100%',
                   display: 'flex',
-                  flexDirection: 'row',
+                  flexDirection: 'row'
                 }}
               >
                 {labels.length > 0 &&
@@ -699,13 +664,13 @@ export default function WantedSummary(props: any) {
                             padding: '3px 10px',
                             borderRadius: '20px',
                             marginRight: '3px',
-                            boxShadow: '1px 1px #909090',
+                            boxShadow: '1px 1px #909090'
                           }}
                         >
                           <div
                             style={{
                               fontSize: '10px',
-                              color: '#202020',
+                              color: '#202020'
                             }}
                           >
                             {x.label}
@@ -744,11 +709,7 @@ export default function WantedSummary(props: any) {
     );
   }
 
-  if (
-    type === 'coding_task' ||
-    type === 'wanted_coding_task' ||
-    type === 'freelance_job_request'
-  ) {
+  if (type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request') {
     return renderCodingTask();
   }
 
@@ -761,13 +722,12 @@ export default function WantedSummary(props: any) {
           <T>{title || 'No title'}</T>
           <Divider
             style={{
-              marginTop: 22,
+              marginTop: 22
             }}
           />
           <Y>
             <P>
-              {formatPrice(priceMin) || '0'} <B>SAT</B> -{' '}
-              {formatPrice(priceMax)} <B>SAT</B>
+              {formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B>
             </P>
             {heart}
           </Y>
@@ -803,7 +763,7 @@ export default function WantedSummary(props: any) {
           width: 316,
           padding: '40px 20px',
           overflowY: 'auto',
-          height: envHeight,
+          height: envHeight
         }}
       >
         <Pad>
@@ -814,8 +774,7 @@ export default function WantedSummary(props: any) {
           <Divider style={{ marginTop: 22 }} />
           <Y>
             <P>
-              {formatPrice(priceMin) || '0'} <B>SAT</B> -{' '}
-              {formatPrice(priceMax) || '0'} <B>SAT</B>
+              {formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax) || '0'} <B>SAT</B>
             </P>
             {heart}
           </Y>
