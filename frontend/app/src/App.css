@@ -861,7 +861,6 @@ textarea.qr-string {
 .euiDatePicker .euiFieldText {
   background-color: #fff;
   color: #000;
-  outline: 1px solid #dde0e5;
 }
 .euiDatePicker .euiFieldText:focus {
   background-color: #fff;
@@ -899,6 +898,13 @@ textarea.qr-string {
 
 .react-datepicker__month-dropdown,
 .react-datepicker__year-dropdown {
+  background: #fff !important;
+  color: #000 !important;
+  border: none;
+}
+
+.react-datepicker__year-dropdown-container > div:not([class*='read-view']),
+.react-datepicker__month-dropdown {
   background: #fff !important;
   color: #000 !important;
 }

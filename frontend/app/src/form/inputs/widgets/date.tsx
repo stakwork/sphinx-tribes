@@ -1,30 +1,27 @@
 import moment from 'moment';
 import { EuiDatePicker, EuiFormRow } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { Props } from '../propsType';
+import { FieldEnv } from '..';
 
-export default function Date({
-  label,
-  note,
-  value,
-  name,
-  handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
-  extraHTML
-}: Props) {
-  const [startDate, setStartDate] = useState(moment());
+function Date({ label, value, handleChange }: any) {
+  const [startDate, setStartDate] = useState(moment(value) ?? moment());
 
   const handleChangeDate = (date) => {
+    console.log(moment(date).toISOString());
     setStartDate(date);
-    handleChange(startDate);
+    handleChange(date.toISOString());
   };
 
   return (
-    <EuiFormRow label={label}>
-      <EuiDatePicker selected={startDate} onChange={handleChangeDate} />
-    </EuiFormRow>
+    <FieldEnv label={label}>
+      <EuiDatePicker
+        selectsEnd={true}
+        selectsStart={true}
+        selected={startDate}
+        onChange={(e) => handleChangeDate(e)}
+      />
+    </FieldEnv>
   );
 }
+export default memo(Date);
