@@ -19,7 +19,7 @@ jobs:
       - name: build and push automatic fixes
         run: |
           cd ./frontend/app && npm i --legacy-peer-deps && npm i --dev-only && CI=false npm run build && cd .. && packr2 
-          cd app && npx prettier --config prettier.json --ignore-path .prettierignore -w src/**/**/*.ts src/**/**/*.tsx
+          cd app && npx prettier --config .prettierrc.json --ignore-path .prettierignore -w src/**/**/*.ts src/**/**/*.tsx
           git config user.name 'Github Actions'
           git config user.email github-actions@github.com
           cd ..
