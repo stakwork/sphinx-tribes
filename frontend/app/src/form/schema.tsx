@@ -37,6 +37,8 @@ const languages = [
 
 const estimation = ['Less than 1 hour', 'Less than 3 hours', 'More than 3 hours', 'Not sure yet'];
 
+const estimated_budget_15_min = ['USD $10', 'USD $20', 'USD $30', 'USD $40', 'USD $50'];
+
 const help_wanted_coding_task_schema = [
   'Web development',
   'Mobile development',
@@ -70,6 +72,13 @@ const helpType_wanted_coding_task_schema = help_wanted_coding_task_schema.map((e
 });
 
 const helpType_wanted_other_schema = help_wanted_other_schema.map((e) => {
+  return {
+    value: e,
+    label: e
+  };
+});
+
+const estimated_budget_15_min_options = estimated_budget_15_min.map((e) => {
   return {
     value: e,
     label: e
@@ -636,24 +645,49 @@ export const wantedOtherSchema: FormField[] = [
   },
 
   {
+    name: 'one_sentence_summary',
+    label: 'One Sentence Summary',
+    type: 'text'
+  },
+
+  {
     name: 'description',
     label: 'Description',
     type: 'textarea',
     validator: strValidator
   },
+  // {
+  //   name: 'technology_need_help',
+  //   label: 'Technologies you need help with',
+  //   type: 'select',
+  //   options: helpType_wanted_coding_task_schema
+  // },
+
   {
-    name: 'priceMin',
-    label: 'Price Min',
-    validator: Yup.number().when('priceMax', (pricemax) =>
-      Yup.number().max(pricemax, `Must be less than max`)
-    ),
-    type: 'number'
+    name: 'codingLanguage',
+    label: 'Technologies you need help with',
+    type: 'creatablemultiselect',
+    options: codingLanguages
   },
+  // {
+  //   name: 'priceMin',
+  //   label: 'Price Min',
+  //   validator: Yup.number().when('priceMax', (pricemax) =>
+  //     Yup.number().max(pricemax, `Must be less than max`)
+  //   ),
+  //   type: 'number'
+  // },
+  // {
+  //   name: 'priceMax',
+  //   label: 'Price Max',
+  //   validator: nomValidator,
+  //   type: 'number'
+  // },
   {
-    name: 'priceMax',
-    label: 'Price Max',
-    validator: nomValidator,
-    type: 'number'
+    name: 'estimated_budget_for_every_15_minutes',
+    label: 'Estimated budget for every 15 minutes',
+    type: 'select',
+    options: estimated_budget_15_min_options
   },
   {
     name: 'show',
@@ -719,7 +753,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'github_description',
-    label: 'Github Description',
+    label: 'Get Description From Github ',
     type: 'switch'
   },
   {
