@@ -205,11 +205,18 @@ export default function FocusedView(props: any) {
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
 
-    setLoading(true);
+    // const date = new Date();
+    // const unixTimestamp = Math.floor(date.getTime() / 1000);
+
+    // console.log(unixTimestamp);
+
+    // setLoading(true);
+    //  new_ticket_time: unixTimestamp,
     try {
       const newBody = {
         ...body,
         alert: undefined,
+
         extras: {
           ...body?.extras,
           alert: body.alert
@@ -230,6 +237,10 @@ export default function FocusedView(props: any) {
 
     let personInfo = canEdit ? ui.meInfo : person;
 
+    // console.log({...personInfo}.extras.wanted.map((value) => value.estimated_completion_date));
+    personInfo.extras.wanted.map((value) => {
+      console.log(typeof new Date({ ...value }.estimated_completion_date));
+    });
     // set initials here
     if (personInfo) {
       if (config && config.name === 'about') {
@@ -241,6 +252,10 @@ export default function FocusedView(props: any) {
         initialValues.price_to_meet = personInfo.price_to_meet || 0;
         initialValues.description = personInfo.description || '';
         initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
+        initialValues.estimated_completion_date =
+          personInfo.extras.wanted.map((value) => {
+            return moment(value.estimated_completion_date);
+          }) || '';
         // below are extras,
         initialValues.twitter =
           (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -298,8 +313,7 @@ export default function FocusedView(props: any) {
           ...props.style,
           width: '100%',
           height: '100%'
-        }}
-      >
+        }}>
         {editMode ? (
           <B ref={scrollDiv} hide={false}>
             {formHeader && formHeader}
@@ -349,8 +363,7 @@ export default function FocusedView(props: any) {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center'
-                    }}
-                  >
+                    }}>
                     <Button
                       onClick={() => setEditMode(true)}
                       color={'widget'}

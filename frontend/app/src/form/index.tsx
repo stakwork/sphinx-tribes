@@ -130,8 +130,7 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}
-    >
+      validationSchema={validator(schema)}>
       {({
         setFieldTouched,
         handleSubmit,
@@ -269,8 +268,7 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
+                  onClick={() => setShowSettings(!showSettings)}>
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -300,8 +298,7 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}
-                    >
+                      }}>
                       <Button
                         text={'Nevermind'}
                         color={'white'}
