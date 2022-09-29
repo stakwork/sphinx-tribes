@@ -15,7 +15,7 @@ export default function NameTag(props) {
     style,
     widget,
     iconSize,
-    textSize,
+    textSize
   } = props;
   const { ui } = useStores();
 
@@ -48,14 +48,10 @@ export default function NameTag(props) {
       onClick={(e) => {
         selectPerson(e);
       }}
-      style={style}
-    >
+      style={style}>
       {!isSelected && (
         <>
-          <Img
-            src={img || `/static/person_placeholder.png`}
-            iconSize={iconSize}
-          />
+          <Img src={img || `/static/person_placeholder.png`} iconSize={iconSize} />
           <Name textSize={textSize}>{owner_alias}</Name>
 
           <div
@@ -64,7 +60,7 @@ export default function NameTag(props) {
               width: 3,
               borderRadius: '50%',
               margin: '0 6px',
-              background: '#8E969C',
+              background: '#8E969C'
             }}
           />
         </>
