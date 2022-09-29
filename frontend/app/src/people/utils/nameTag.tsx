@@ -48,7 +48,8 @@ export default function NameTag(props) {
       onClick={(e) => {
         selectPerson(e);
       }}
-      style={style}>
+      style={style}
+    >
       {!isSelected && (
         <>
           <Img src={img || `/static/person_placeholder.png`} iconSize={iconSize} />
