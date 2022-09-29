@@ -23,7 +23,7 @@ jobs:
           git config user.name 'Github Actions'
           git config user.email github-actions@github.com
           cd ..
-          git add ./packrd
+          git add ./packrd/packed-packr.go
           cd app && git add .
           git commit -m "Automatic build fixes" || echo -n
           git push
