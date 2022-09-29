@@ -6,10 +6,7 @@ import Input from './inputs';
 import { Button, IconButton, Modal } from '../sphinxUI';
 import { useStores } from '../store';
 import Select from '../sphinxUI/select';
-import {
-  dynamicSchemasByType,
-  dynamicSchemaAutofillFieldsByType,
-} from './schema';
+import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
 import { formDropdownOptions } from '../people/utils/constants';
 
 export default function Form(props: any) {
@@ -53,11 +50,8 @@ export default function Form(props: any) {
     const vals = formRef && formRef.values;
     if (vals) {
       if (dynamicSchemaAutofillFieldsByType[dynamicSchemaName]) {
-        Object.keys(
-          dynamicSchemaAutofillFieldsByType[dynamicSchemaName]
-        ).forEach((k) => {
-          const localStorageKey =
-            dynamicSchemaAutofillFieldsByType[dynamicSchemaName][k];
+        Object.keys(dynamicSchemaAutofillFieldsByType[dynamicSchemaName]).forEach((k) => {
+          const localStorageKey = dynamicSchemaAutofillFieldsByType[dynamicSchemaName][k];
           const valueToAssign = ui[localStorageKey];
           // if no value exists already
           if (!vals[k] || vals[k] == undefined) {
@@ -95,9 +89,7 @@ export default function Form(props: any) {
     });
   }
 
-  let schema = props.paged
-    ? props.schema?.filter((f) => f.page === page)
-    : props.schema;
+  let schema = props.paged ? props.schema?.filter((f) => f.page === page) : props.schema;
 
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema;
@@ -112,20 +104,13 @@ export default function Form(props: any) {
 
   let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {};
 
-  const isAboutMeForm = schema?.find((f) => f.name === 'owner_alias')
-    ? true
-    : false;
+  const isAboutMeForm = schema?.find((f) => f.name === 'owner_alias') ? true : false;
 
   const dynamicFormOptions =
-    (props.schema &&
-      props.schema[0] &&
-      formDropdownOptions[props.schema[0].dropdownOptions]) ||
-    [];
+    (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || [];
 
   // inject owner tribes
-  const tribesSelectorIndex = schema?.findIndex(
-    (f) => f.name === 'tribe' || f.name === 'tribes'
-  );
+  const tribesSelectorIndex = schema?.findIndex((f) => f.name === 'tribe' || f.name === 'tribes');
   if (tribesSelectorIndex > -1) {
     // give "none" option
     schema[tribesSelectorIndex].options = [{ value: 'none', label: 'None' }];
@@ -135,7 +120,7 @@ export default function Form(props: any) {
         schema[tribesSelectorIndex].options.push({
           ...ot,
           value: ot.unique_name,
-          label: ot.name,
+          label: ot.name
         });
       });
   }
@@ -145,8 +130,7 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}
-    >
+      validationSchema={validator(schema)}>
       {({
         setFieldTouched,
         handleSubmit,
@@ -155,7 +139,7 @@ export default function Form(props: any) {
         errors,
         dirty,
         isValid,
-        initialValues,
+        initialValues
       }) => {
         return (
           <Wrap ref={refBody} style={{ ...formPad, ...wrapStyle }}>
@@ -165,9 +149,7 @@ export default function Form(props: any) {
                 style={{ marginBottom: 14 }}
                 onChange={(v) => {
                   console.log('v', v);
-                  const selectedOption = dynamicFormOptions?.find(
-                    (f) => f.value === v
-                  );
+                  const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
                   if (selectedOption) {
                     setDynamicSchemaName(v);
                     setDynamicSchema(selectedOption.schema);
@@ -204,17 +186,12 @@ export default function Form(props: any) {
                   handleBlur={() => setFieldTouched(item.name, false)}
                   handleFocus={() => setFieldTouched(item.name, true)}
                   setDisableFormButtons={setDisableFormButtons}
-                  extraHTML={
-                    (props.extraHTML && props.extraHTML[item.name]) ||
-                    item.extraHTML
-                  }
+                  extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                 />
               ))}
 
             {/* make space at bottom for first sign up */}
-            {buttonsOnBottom && !smallForm && (
-              <div style={{ height: 600, minHeight: 600 }} />
-            )}
+            {buttonsOnBottom && !smallForm && <div style={{ height: 600, minHeight: 600 }} />}
 
             <BWrap style={buttonAlignment}>
               {props.close && buttonsOnBottom ? (
@@ -289,10 +266,9 @@ export default function Form(props: any) {
                     marginTop: 20,
                     fontSize: 12,
                     minHeight: 30,
-                    height: 30,
+                    height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
+                  onClick={() => setShowSettings(!showSettings)}>
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -309,12 +285,9 @@ export default function Form(props: any) {
 
                 <Modal visible={showDeleteWarn}>
                   <div style={{ padding: 40, textAlign: 'center' }}>
-                    <div style={{ fontSize: 30, marginBottom: 10 }}>
-                      Danger zone
-                    </div>
+                    <div style={{ fontSize: 30, marginBottom: 10 }}>Danger zone</div>
                     <p>
-                      Are you sure? Doing so will delete your profile and{' '}
-                      <b>all of your posts.</b>
+                      Are you sure? Doing so will delete your profile and <b>all of your posts.</b>
                     </p>
 
                     <div
@@ -324,9 +297,8 @@ export default function Form(props: any) {
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        marginTop: 20,
-                      }}
-                    >
+                        marginTop: 20
+                      }}>
                       <Button
                         text={'Nevermind'}
                         color={'white'}

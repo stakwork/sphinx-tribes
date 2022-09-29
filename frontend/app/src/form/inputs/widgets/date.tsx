@@ -13,7 +13,7 @@ export default function Date({
   handleFocus,
   readOnly,
   prepend,
-  extraHTML,
+  extraHTML
 }: Props) {
   const [startDate, setStartDate] = useState(moment());
 
@@ -24,9 +24,7 @@ export default function Date({
 
   return (
     <EuiFormRow label={label}>
-      <div>
-        <EuiDatePicker selected={startDate} onChange={handleChangeDate} />
-      </div>
+      <EuiDatePicker selected={startDate} onChange={handleChangeDate} />
     </EuiFormRow>
   );
 }
