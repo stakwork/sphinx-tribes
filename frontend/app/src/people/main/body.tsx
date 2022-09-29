@@ -388,7 +388,8 @@ export default function BodyComponent() {
               height: 82,
               boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
               zIndex: 2
-            }}>
+            }}
+          >
             <Label style={{ fontSize: 20 }}>
               Explore
               <Link onClick={() => setShowDropdown(true)}>
@@ -403,7 +404,8 @@ export default function BodyComponent() {
                       left: 0,
                       zIndex: 10,
                       background: '#fff'
-                    }}>
+                    }}
+                  >
                     {tabs &&
                       tabs.map((t, i) => {
                         const label = t.label;
@@ -418,7 +420,8 @@ export default function BodyComponent() {
                               e.stopPropagation();
                               setShowDropdown(false);
                               setSelectedWidget(t.name);
-                            }}>
+                            }}
+                          >
                             {label}
                           </Tab>
                         );
@@ -448,7 +451,8 @@ export default function BodyComponent() {
                       // setShowFocusView(true);
                       setIsMobileViewTicketModal(true);
                       console.log('hi');
-                    }}>
+                    }}
+                  >
                     +
                   </div>
                 </>
@@ -492,7 +496,8 @@ export default function BodyComponent() {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}>
+            dismountCallback={() => ui.setSelectedPerson(0)}
+          >
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -562,7 +567,8 @@ export default function BodyComponent() {
         style={{
           background: '#f0f1f3',
           height: 'calc(100% - 65px)'
-        }}>
+        }}
+      >
         {!ui.meInfo && (
           <div>
             <NoneSpace
@@ -585,7 +591,8 @@ export default function BodyComponent() {
             alignItems: 'flex-start',
             padding: 20,
             height: 62
-          }}>
+          }}
+        >
           <Label>Explore</Label>
 
           <Tabs>
@@ -601,7 +608,8 @@ export default function BodyComponent() {
                     selected={selected}
                     onClick={() => {
                       setSelectedWidget(t.name);
-                    }}>
+                    }}
+                  >
                     {label}
                   </Tab>
                 );
@@ -614,7 +622,8 @@ export default function BodyComponent() {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between'
-            }}>
+            }}
+          >
             {selectedWidget === 'wanted' &&
               (ui.meInfo && ui.meInfo?.owner_alias ? (
                 <div
@@ -632,7 +641,8 @@ export default function BodyComponent() {
                   }}
                   onClick={() => {
                     setShowFocusView(true);
-                  }}>
+                  }}
+                >
                   Create Ticket
                 </div>
               ) : (
@@ -646,7 +656,8 @@ export default function BodyComponent() {
                     backgroundColor: '#dde0e5',
                     fontSize: '14px',
                     marginRight: '10px'
-                  }}>
+                  }}
+                >
                   Login to Create Tickets
                 </div>
               ))}
@@ -674,7 +685,8 @@ export default function BodyComponent() {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: 20
-            }}>
+            }}
+          >
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -693,7 +705,8 @@ export default function BodyComponent() {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}>
+          dismountCallback={() => ui.setSelectedPerson(0)}
+        >
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -719,7 +732,8 @@ export default function BodyComponent() {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/p');
-            }}>
+            }}
+          >
             <FocusedView
               person={publicFocusPerson}
               canEdit={false}
@@ -769,7 +783,8 @@ export default function BodyComponent() {
               setShowFocusView(false);
               setFocusIndex(-1);
               // if (selectedWidget === 'about') switchWidgets('badges');
-            }}>
+            }}
+          >
             <FocusedView
               person={person}
               canEdit={!canEdit}
