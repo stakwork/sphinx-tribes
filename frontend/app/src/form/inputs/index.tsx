@@ -49,8 +49,8 @@ export default function Input(props: any) {
         return <CreatableMultiSelectInput {...props} />;
       case 'widgets':
         return <Widgets {...props} />;
-      // case 'date':
-      //   return <Date {...props} />;
+      case 'date':
+        return <Date {...props} />;
       case 'hidden':
         return <></>;
       default:

@@ -191,6 +191,8 @@ export default function PersonView(props: any) {
 
   let fullSelectedWidget: any = extras && selectedWidget ? extras[selectedWidget] : null;
 
+  console.log(fullSelectedWidget);
+
   // we do this because sometimes the widgets are empty arrays
   let filteredExtras = extras && { ...extras };
   if (filteredExtras) {
@@ -310,8 +312,7 @@ export default function PersonView(props: any) {
                 cursor: 'pointer',
                 padding: 0,
                 overflow: 'hidden'
-              }}
-            >
+              }}>
               {React.cloneElement(child, { ...s })}
             </Panel>
           );
@@ -324,8 +325,7 @@ export default function PersonView(props: any) {
         <div
           style={{
             width: '100%'
-          }}
-        >
+          }}>
           <NoneSpace
             action={() => setShowFocusView(true)}
             small
@@ -418,8 +418,7 @@ export default function PersonView(props: any) {
           width: '100%',
           overflow: 'auto',
           height: '100%'
-        }}
-      >
+        }}>
         <Panel isMobile={isMobile} style={{ paddingBottom: 0, paddingTop: 80 }}>
           <div
             style={{
@@ -430,8 +429,7 @@ export default function PersonView(props: any) {
               justifyContent: 'space-between',
               width: '100%',
               padding: '0 20px'
-            }}
-          >
+            }}>
             <IconButton onClick={goBack} icon="arrow_back" />
             {canEdit ? (
               <Button
@@ -514,8 +512,7 @@ export default function PersonView(props: any) {
                     selected={selected}
                     onClick={() => {
                       switchWidgets(name);
-                    }}
-                  >
+                    }}>
                     {label}
                     {count && <Counter>{count}</Counter>}
                   </Tab>
@@ -572,8 +569,7 @@ export default function PersonView(props: any) {
           display: 'flex',
           width: '100%',
           height: '100%'
-        }}
-      >
+        }}>
         {!canEdit && (
           <PeopleList>
             <DBack>
@@ -600,8 +596,7 @@ export default function PersonView(props: any) {
 
             <PeopleScroller
               style={{ width: '100%', overflowY: 'auto', height: '100%' }}
-              onScroll={handleScroll}
-            >
+              onScroll={handleScroll}>
               {loaderTop}
               {people?.length ? (
                 people.map((t) => (
@@ -640,8 +635,7 @@ export default function PersonView(props: any) {
             borderLeft: '1px solid #ebedef',
             borderRight: '1px solid #ebedef',
             boxShadow: '1px 2px 6px -2px rgba(0, 0, 0, 0.07)'
-          }}
-        >
+          }}>
           {canEdit && (
             <div
               style={{
@@ -659,8 +653,7 @@ export default function PersonView(props: any) {
                 paddingRight: 10,
                 height: 64,
                 zIndex: 0
-              }}
-            >
+              }}>
               <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
               <div />
             </div>
@@ -699,8 +692,7 @@ export default function PersonView(props: any) {
                   marginBottom: 30,
                   marginTop: 25,
                   justifyContent: 'space-around'
-                }}
-              >
+                }}>
                 <Button
                   text="Edit Profile"
                   onClick={() => {
@@ -730,8 +722,7 @@ export default function PersonView(props: any) {
                   marginBottom: 30,
                   marginTop: 25,
                   justifyContent: 'space-between'
-                }}
-              >
+                }}>
                 <Button
                   text="Connect"
                   onClick={() => setShowQR(true)}
@@ -759,8 +750,7 @@ export default function PersonView(props: any) {
             width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 628px)',
             minWidth: 250,
             zIndex: canEdit ? 6 : 4
-          }}
-        >
+          }}>
           <Tabs
             style={{
               background: '#fff',
@@ -769,8 +759,7 @@ export default function PersonView(props: any) {
               boxShadow: canEdit
                 ? '0px 2px 0px rgba(0, 0, 0, 0.07)'
                 : '0px 2px 6px rgba(0, 0, 0, 0.07)'
-            }}
-          >
+            }}>
             {tabs &&
               Object.keys(tabs).map((name, i) => {
                 if (name === 'about') return <div key={i} />;
@@ -796,8 +785,7 @@ export default function PersonView(props: any) {
                     selected={selected}
                     onClick={() => {
                       switchWidgets(name);
-                    }}
-                  >
+                    }}>
                     {label}
                     {count > 0 && <Counter>{count}</Counter>}
                   </Tab>
@@ -812,8 +800,7 @@ export default function PersonView(props: any) {
               background: '#F2F3F5',
               overflowY: 'auto',
               position: 'relative'
-            }}
-          >
+            }}>
             {renderEditButton({ marginBottom: 15 })}
             {/* <div style={{ height: 15 }} /> */}
             <Sleeve
@@ -825,8 +812,7 @@ export default function PersonView(props: any) {
                 flexWrap: 'wrap',
                 height: !hasWidgets() ? 'inherit' : '',
                 paddingTop: !hasWidgets() ? 30 : 0
-              }}
-            >
+              }}>
               {renderWidgets('')}
             </Sleeve>
             <div style={{ height: 60 }} />
@@ -869,8 +855,7 @@ export default function PersonView(props: any) {
             setShowFocusView(false);
             setFocusIndex(-1);
             if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-        >
+          }}>
           <FocusedView
             person={person}
             canEdit={canEdit}
@@ -907,8 +892,7 @@ export default function PersonView(props: any) {
         envStyle={{
           marginTop: isMobile || canEdit ? 64 : 123,
           borderRadius: 0
-        }}
-      >
+        }}>
         <div
           dangerouslySetInnerHTML={{
             __html: `<sphinx-widget
