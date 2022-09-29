@@ -117,8 +117,7 @@ export default function Badges(props) {
           isMobile={isMobile}
           onClick={() => {
             // setSelectedBadge(packedBadge)
-          }}
-        >
+          }}>
           <Img src={`${badgeDetails?.icon}`} isMobile={isMobile}>
             {showFlag && counter && (
               <div style={{ position: 'absolute', background: '#fff', bottom: -6, left: 12 }}>
@@ -136,8 +135,7 @@ export default function Badges(props) {
                     width: '100%',
                     alignItems: 'center',
                     color: '#fff'
-                  }}
-                >
+                  }}>
                   {counter}
                 </div>
               </div>
@@ -151,8 +149,7 @@ export default function Badges(props) {
               justifyContent: 'center',
               width: '100%',
               paddingRight: 20
-            }}
-          >
+            }}>
             <div style={{ width: 'auto' }}>
               <T>
                 {badgeDetails?.name} {b.balance > 1 && `(${b.balance})`}
@@ -174,8 +171,7 @@ export default function Badges(props) {
                   //on-chain, click to see on blockstream
                   redirectToBlockstream(packedBadge.txid);
                 }
-              }}
-            >
+              }}>
               <BadgeStatus {...packedBadge} />
             </Status>
           </div>
@@ -190,8 +186,7 @@ export default function Badges(props) {
         isMobile={isMobile}
         onClick={() => {
           // setSelectedBadge(packedBadge)
-        }}
-      >
+        }}>
         <Img src={`${badgeDetails?.icon}`} isMobile={isMobile}>
           {showFlag && counter && (
             <div style={{ position: 'absolute', background: '#fff', bottom: -6, left: 12 }}>
@@ -209,8 +204,7 @@ export default function Badges(props) {
                   width: '100%',
                   alignItems: 'center',
                   color: '#fff'
-                }}
-              >
+                }}>
                 {counter}
               </div>
             </div>
@@ -245,8 +239,7 @@ export default function Badges(props) {
               //on-chain, click to see on blockstream
               redirectToBlockstream(packedBadge.txid);
             }
-          }}
-        >
+          }}>
           <BadgeStatus {...packedBadge} />
         </Status>
       </BWrap>
@@ -271,8 +264,7 @@ export default function Badges(props) {
               <BWrap
                 key={i + 'badges'}
                 isMobile={isMobile}
-                style={{ height: 'auto', minHeight: 'auto', cursor: 'default' }}
-              >
+                style={{ height: 'auto', minHeight: 'auto', cursor: 'default' }}>
                 <SmallImg src={`${selectedBadge?.icon}`} isMobile={isMobile} />
                 <div
                   style={{
@@ -281,8 +273,7 @@ export default function Badges(props) {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center'
-                  }}
-                >
+                  }}>
                   <T isMobile={isMobile}>
                     {selectedBadge?.name}{' '}
                     {selectedBadge?.balance > 1 && `(${selectedBadge?.balance})`}
@@ -304,8 +295,7 @@ export default function Badges(props) {
                           justifyContent: 'center',
                           width: '100%',
                           textAlign: 'center'
-                        }}
-                      >
+                        }}>
                         <Divider />
                         <Button
                           style={{
@@ -339,8 +329,7 @@ export default function Badges(props) {
         visible={badgeToPush ? true : false}
         close={() => {
           setBadgeToPush(null);
-        }}
-      >
+        }}>
         <div
           style={{
             padding: 20,
@@ -348,8 +337,7 @@ export default function Badges(props) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center'
-          }}
-        >
+          }}>
           <>
             <TextInput
               style={{ width: 240 }}
@@ -398,8 +386,7 @@ function BadgeStatus(props: any) {
               alignItems: 'center',
               color: '#618AFF',
               letterSpacing: '0.3px'
-            }}
-          >
+            }}>
             OFF-CHAIN
           </div>
         )}
@@ -426,8 +413,7 @@ function Flag(props) {
           width="30"
           height="32"
           filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
-        >
+          colorInterpolationFilters="sRGB">
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"

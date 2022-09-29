@@ -22,8 +22,7 @@ export default function SummaryViewer(props: any) {
         style={{
           maxHeight: config.name === 'post' || isMobile ? '' : '80vh',
           height: (isSelectedView && thisIsMine) || isMobile ? 'calc(100% - 60px)' : '100%'
-        }}
-      >
+        }}>
         {child}
       </Wrap>
     );

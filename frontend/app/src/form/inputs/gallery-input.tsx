@@ -173,8 +173,7 @@ export default function GalleryInput({
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20
-          }}
-        >
+          }}>
           <div style={{ marginBottom: 20 }}>{showError}</div>
           <Button onClick={() => setShowError('')} text={'Okay'} color={'primary'} />
         </div>

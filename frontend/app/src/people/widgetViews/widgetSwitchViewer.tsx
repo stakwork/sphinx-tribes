@@ -82,8 +82,7 @@ export default function WidgetSwitchViewer(props) {
                 cursor: 'pointer',
                 padding: 0,
                 overflow: 'hidden'
-              }}
-            >
+              }}>
               {selectedWidget === 'post' ? (
                 <PostView
                   showName

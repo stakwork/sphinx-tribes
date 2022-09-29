@@ -17,8 +17,7 @@ export default function NoResults(props) {
           alignItems: 'center',
           width: '100%',
           marginTop: 20
-        }}
-      >
+        }}>
         <H>No results</H>
       </div>
     );

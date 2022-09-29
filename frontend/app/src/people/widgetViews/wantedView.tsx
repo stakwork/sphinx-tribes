@@ -133,8 +133,7 @@ export default function WantedView(props: any) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between'
-                }}
-              >
+                }}>
                 <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
               </div>
               <DT style={{ margin: '15px 0' }}>{title}</DT>
@@ -156,8 +155,7 @@ export default function WantedView(props: any) {
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center'
-                }}
-              >
+                }}>
                 {isCodingTask && (
                   <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
                 )}
@@ -165,8 +163,7 @@ export default function WantedView(props: any) {
                   <div
                     style={{
                       marginTop: '8px'
-                    }}
-                  >
+                    }}>
                     <img
                       src={{ ...assignee }.img || '/static/person_placeholder.png'}
                       alt="assignee_img"
@@ -188,8 +185,7 @@ export default function WantedView(props: any) {
                       }}
                       style={{
                         fontSize: '12px'
-                      }}
-                    >
+                      }}>
                       {{ ...assignee }.owner_alias}
                     </span>
                   </div>
@@ -201,15 +197,13 @@ export default function WantedView(props: any) {
                   fontSize: '13px',
                   color: '#8e969c',
                   fontWeight: '500'
-                }}
-              >
+                }}>
                 {estimate_session_length && 'Session:'}{' '}
                 <span
                   style={{
                     fontWeight: '500',
                     color: '#000'
-                  }}
-                >
+                  }}>
                   {estimate_session_length ?? ''}
                 </span>
               </EuiText>
@@ -221,8 +215,7 @@ export default function WantedView(props: any) {
                   flexDirection: 'row',
                   marginTop: '10px',
                   flexWrap: 'wrap'
-                }}
-              >
+                }}>
                 {labels.length > 0 ? (
                   labels.map((x: any) => {
                     return (
@@ -239,14 +232,12 @@ export default function WantedView(props: any) {
                             borderRadius: '20px',
                             marginRight: '3px',
                             marginBottom: '3px'
-                          }}
-                        >
+                          }}>
                           <div
                             style={{
                               fontSize: '10px',
                               color: '#202020'
-                            }}
-                          >
+                            }}>
                             {x.label}
                           </div>
                         </div>
@@ -258,8 +249,7 @@ export default function WantedView(props: any) {
                     <div
                       style={{
                         minHeight: '50px'
-                      }}
-                    ></div>
+                      }}></div>
                   </>
                 )}
               </div>
@@ -302,8 +292,7 @@ export default function WantedView(props: any) {
                 display: 'flex',
                 width: '100%',
                 justifyContent: 'space-between'
-              }}
-            >
+              }}>
               <NameTag {...person} created={created} widget={'wanted'} />
             </div>
             <Divider style={{ margin: '10px 0' }} />
@@ -319,8 +308,7 @@ export default function WantedView(props: any) {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center'
-              }}
-            >
+              }}>
               {isCodingTask && (
                 <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
               )}
@@ -328,8 +316,7 @@ export default function WantedView(props: any) {
                 <div
                   style={{
                     marginTop: '8px'
-                  }}
-                >
+                  }}>
                   <img
                     src={{ ...assignee }.img || '/static/person_placeholder.png'}
                     alt="assignee_img"
@@ -351,8 +338,7 @@ export default function WantedView(props: any) {
                     }}
                     style={{
                       fontSize: '12px'
-                    }}
-                  >
+                    }}>
                     {{ ...assignee }.owner_alias}
                   </span>
                 </div>
@@ -367,8 +353,7 @@ export default function WantedView(props: any) {
                 flexDirection: 'row',
                 marginTop: '10px',
                 flexWrap: 'wrap'
-              }}
-            >
+              }}>
               {labels.length > 0 ? (
                 labels.map((x: any) => {
                   return (
@@ -385,14 +370,12 @@ export default function WantedView(props: any) {
                           borderRadius: '20px',
                           marginRight: '3px',
                           marginBottom: '3px'
-                        }}
-                      >
+                        }}>
                         <div
                           style={{
                             fontSize: '10px',
                             color: '#202020'
-                          }}
-                        >
+                          }}>
                           {x.label}
                         </div>
                       </div>
@@ -404,8 +387,7 @@ export default function WantedView(props: any) {
                   <div
                     style={{
                       minHeight: '50px'
-                    }}
-                  ></div>
+                    }}></div>
                 </>
               )}
             </div>
@@ -421,14 +403,12 @@ export default function WantedView(props: any) {
               flexDirection: 'column',
               padding: '10px 20px',
               minHeight: '100px'
-            }}
-          >
+            }}>
             <Pad
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between'
-              }}
-            >
+              }}>
               {priceMin ? (
                 <P>
                   <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
@@ -443,8 +423,7 @@ export default function WantedView(props: any) {
               <div
                 style={{
                   width: '40px'
-                }}
-              >
+                }}>
                 {
                   //  if my own, show this option to show/hide
                   isMine && (
@@ -475,15 +454,13 @@ export default function WantedView(props: any) {
                 fontSize: '14px',
                 color: '#8e969c',
                 fontWeight: '500'
-              }}
-            >
+              }}>
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: '#000'
-                }}
-              >
+                }}>
                 {estimate_session_length ?? ''}
               </span>
             </EuiText>
