@@ -15,8 +15,7 @@ export default function NoneSpace(props) {
           padding: 40,
           width: '100%',
           ...props.style
-        }}
-      >
+        }}>
         <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} />
 
         <div style={{ marginLeft: 20, padding: 20 }}>
@@ -51,8 +50,7 @@ export default function NoneSpace(props) {
         height: '100%',
         background: '#f0f1f3',
         ...props.style
-      }}
-    >
+      }}>
       <Icon src={`/static/${props.img}`} />
 
       <>

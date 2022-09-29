@@ -19,8 +19,7 @@ export default function TorSaveQR(props: TorSaveQRProps) {
         alignItems: 'center',
         padding: '10px 20px',
         width: '100%'
-      }}
-    >
+      }}>
       <div style={{ height: 40 }} />
       <div style={{ textAlign: 'center', margin: '0 0 20px' }}>Scan to complete this request.</div>
       <QR size={220} value={url} />

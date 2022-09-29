@@ -129,8 +129,7 @@ export default function Header() {
             color: '#fff',
             background: headerBackground,
             paddingBottom: 0
-          }}
-        >
+          }}>
           <div className="container">
             <Row style={{ justifyContent: 'space-between' }}>
               <EuiHeaderSection grow={false}>
@@ -183,8 +182,7 @@ export default function Header() {
                       selected={selected}
                       onClick={() => {
                         history.push(t.path);
-                      }}
-                    >
+                      }}>
                       {label}
                     </MTab>
                   );
@@ -211,16 +209,14 @@ export default function Header() {
           height: 64,
           padding: '0 20px',
           background: headerBackground
-        }}
-      >
+        }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             width: '100%'
-          }}
-        >
+          }}>
           <Row>
             <EuiHeaderSection grow={false}>
               <Img src="/static/people_logo.svg" />
@@ -238,8 +234,7 @@ export default function Header() {
                       selected={selected}
                       onClick={() => {
                         history.push(t.path);
-                      }}
-                    >
+                      }}>
                       {label}
                     </Tab>
                   );
@@ -296,8 +291,7 @@ export default function Header() {
               <Button
                 onClick={() => {
                   goToEditSelf();
-                }}
-              >
+                }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <Imgg
                     style={{ height: 30, width: 30, marginRight: 10 }}
@@ -329,8 +323,7 @@ export default function Header() {
         <Modal
           visible={ui.showSignIn}
           close={() => ui.setShowSignIn(false)}
-          overlayClick={() => ui.setShowSignIn(false)}
-        >
+          overlayClick={() => ui.setShowSignIn(false)}>
           <SignIn
             onSuccess={() => {
               ui.setShowSignIn(false);
@@ -381,8 +374,7 @@ export default function Header() {
           visible={ui?.torFormBodyQR}
           close={() => {
             ui.setTorFormBodyQR('');
-          }}
-        >
+          }}>
           <TorSaveQR
             url={ui?.torFormBodyQR}
             goBack={() => {
