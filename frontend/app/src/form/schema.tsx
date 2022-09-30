@@ -19,6 +19,15 @@ const badgeObjectStrValidator = Yup.object().shape({
 
 const nomValidator = Yup.number().required('Required');
 
+const GetValue = (arr: any) => {
+  return arr.map((val) => {
+    return {
+      label: val,
+      value: val
+    };
+  });
+};
+
 const languages = [
   'Lightning',
   'Javascript',
@@ -47,43 +56,13 @@ const help_wanted_coding_task_schema = [
   'Bitcoin / Lightning',
   'other'
 ];
-
 const help_wanted_other_schema = ['Troubleshooting', 'Debugging', 'Tutoring'];
 
-const codingLanguages = languages.map((l) => {
-  return {
-    value: l,
-    label: l
-  };
-});
-
-const estimated_time = estimation.map((e) => {
-  return {
-    value: e,
-    label: e
-  };
-});
-
-const helpType_wanted_coding_task_schema = help_wanted_coding_task_schema.map((e) => {
-  return {
-    value: e,
-    label: e
-  };
-});
-
-const helpType_wanted_other_schema = help_wanted_other_schema.map((e) => {
-  return {
-    value: e,
-    label: e
-  };
-});
-
-const estimated_budget_15_min_options = estimated_budget_15_min.map((e) => {
-  return {
-    value: e,
-    label: e
-  };
-});
+const codingLanguages = GetValue(languages);
+const estimated_time = GetValue(estimation);
+const helpType_wanted_coding_task_schema = GetValue(help_wanted_coding_task_schema);
+const helpType_wanted_other_schema = GetValue(help_wanted_other_schema);
+const estimated_budget_15_min_options = GetValue(estimated_budget_15_min);
 
 // this is source of truth for widget items!
 export const meSchema: FormField[] = [
@@ -647,7 +626,8 @@ export const wantedOtherSchema: FormField[] = [
   {
     name: 'one_sentence_summary',
     label: 'One Sentence Summary',
-    type: 'text'
+    type: 'text',
+    validator: strValidator
   },
 
   {
@@ -743,7 +723,8 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'one_sentence_summary',
     label: 'One Sentence Summary',
-    type: 'text'
+    type: 'text',
+    validator: strValidator
   },
   {
     name: 'ticketUrl',

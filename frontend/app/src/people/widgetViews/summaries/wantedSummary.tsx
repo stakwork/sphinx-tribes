@@ -462,6 +462,24 @@ export default function WantedSummary(props: any) {
               }}>
               <GithubStatusPill status={status} assignee={assignee} />
               {assigneeLabel}
+              {ticketUrl && (
+                <GithubIconMobile
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(ticketUrl, '_blank');
+                  }}>
+                  <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
+                </GithubIconMobile>
+              )}
+              {loomEmbedUrl && (
+                <LoomIconMobile
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(loomEmbedUrl, '_blank');
+                  }}>
+                  <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
+                </LoomIconMobile>
+              )}
             </div>
 
             <EuiText
@@ -573,6 +591,29 @@ export default function WantedSummary(props: any) {
               <div style={{ display: 'flex', marginTop: 25 }}>
                 <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
                 {assigneeLabel}
+                {ticketUrl && (
+                  <GithubIcon
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(ticketUrl, '_blank');
+                    }}>
+                    <img
+                      height={'100%'}
+                      width={'100%'}
+                      src="/static/github_logo.png"
+                      alt="github"
+                    />
+                  </GithubIcon>
+                )}
+                {loomEmbedUrl && (
+                  <LoomIcon
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(loomEmbedUrl, '_blank');
+                    }}>
+                    <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
+                  </LoomIcon>
+                )}
               </div>
               <div
                 style={{
@@ -836,6 +877,40 @@ const Link = styled.div`
   overflow-wrap: break-word;
   font-size: 15px;
   font-weight: 300;
+`;
+
+const GithubIcon = styled.div`
+  height: 20px;
+  width: 20px;
+  position: relative;
+  top: -6px;
+  margin-left: 20px;
+  cursor: pointer;
+`;
+
+const LoomIcon = styled.div`
+  height: 20px;
+  width: 20px;
+  position: relative;
+  top: -6px;
+  margin-left: 20px;
+  cursor: pointer;
+`;
+
+const GithubIconMobile = styled.div`
+  height: 20px;
+  width: 20px;
+  position: relative;
+  margin-left: 20px;
+  cursor: pointer;
+`;
+
+const LoomIconMobile = styled.div`
+  height: 20px;
+  width: 20px;
+  position: relative;
+  margin-left: 20px;
+  cursor: pointer;
 `;
 
 interface ImageProps {

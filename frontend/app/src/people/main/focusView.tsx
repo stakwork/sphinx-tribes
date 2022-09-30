@@ -176,7 +176,7 @@ export default function FocusedView(props: any) {
           body.description = description;
         }
         // body.description = description;
-        body.title = title;
+        body.title = body.one_sentence_summary;
 
         // save repo to cookies for autofill in form
         ui.setLastGithubRepo(body.ticketUrl);
@@ -205,25 +205,23 @@ export default function FocusedView(props: any) {
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
 
-    // const date = new Date();
-    // const unixTimestamp = Math.floor(date.getTime() / 1000);
-
-    // console.log(unixTimestamp);
-
-    // setLoading(true);
-    //  new_ticket_time: unixTimestamp,
+    const date = new Date();
+    const unixTimestamp = Math.floor(date.getTime() / 1000);
+    setLoading(true);
     try {
       const newBody = {
         ...body,
         alert: undefined,
-
+        new_ticket_time: unixTimestamp,
         extras: {
           ...body?.extras,
           alert: body.alert
         }
       };
 
-      await main.saveProfile(config.name === 'about' ? { ...newBody } : body);
+      await main.saveProfile(
+        config.name === 'about' || config.name === 'wanted' ? { ...newBody } : body
+      );
       closeModal(true);
     } catch (e) {
       console.log('e', e);
@@ -345,14 +343,20 @@ export default function FocusedView(props: any) {
         ) : (
           <>
             {(isMobile || canEdit) && (
-              <BWrap style={{ ...noShadow }}>
+              <BWrap
+                style={{
+                  ...noShadow
+                }}>
                 {goBack ? (
                   <IconButton
                     icon="arrow_back"
                     onClick={() => {
                       if (goBack) goBack();
                     }}
-                    style={{ fontSize: 12, fontWeight: 600 }}
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600
+                    }}
                   />
                 ) : (
                   <div />
@@ -378,7 +382,9 @@ export default function FocusedView(props: any) {
                       loading={deleting}
                       leadingIcon={'delete_outline'}
                       text={'Delete'}
-                      style={{ marginLeft: 10 }}
+                      style={{
+                        marginLeft: 10
+                      }}
                     />
                   </div>
                 ) : (
