@@ -97,6 +97,7 @@ func NewRouter() *http.Server {
 		r.Put("/bot", createOrEditBot)
 		r.Delete("/person/{id}", deletePerson)
 		r.Delete("/channel/{id}", deleteChannel)
+		r.Delete("/ticket/{pubKey}/{created}", deleteTicketByAdmin)
 	})
 
 	PORT := os.Getenv("PORT")
