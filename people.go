@@ -86,6 +86,87 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKey := chi.URLParam(r, "pubKey")
+	createdStr := chi.URLParam(r, "created")
+	created, err := strconv.ParseInt(createdStr, 10, 64)
+	if err != nil {
+		fmt.Println("Unable to convert created to int64")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if created == 0 || pubKey == "" {
+		fmt.Println("Insufficient details to delete ticket")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	existing := DB.getPersonByPubkey(pubKeyFromAuth)
+	if existing.ID == 0 {
+		fmt.Println("Could not fetch admin details from db")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	} else if existing.IsAdmin == false {
+		fmt.Println("Only admin is allowed to delete tickets")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	person := DB.getPersonByPubkey(pubKey)
+	if person.ID == 0 {
+		fmt.Println("Could not fetch person from db")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	wanteds, ok := person.Extras["wanted"].([]interface{})
+	if !ok {
+		fmt.Println("No tickets found for person")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	index := -1
+	for i, wanted := range wanteds {
+		w, ok2 := wanted.(map[string]interface{})
+		if !ok2 {
+			continue
+		}
+		timeF, ok3 := w["created"].(float64)
+		if !ok3 {
+			continue
+		}
+		t := int64(timeF)
+		if t == created {
+			index = i
+			break
+		}
+	}
+
+	if index == -1 {
+		fmt.Println("Ticket to delete not found")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	} else {
+		person.Extras["wanted"] = append(wanteds[:index], wanteds[index+1:]...)
+	}
+
+	_, err = DB.createOrEditPerson(person)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return
+
+}
+
 func processTwitterConfirmationsLoop() {
 	twitterToken := os.Getenv("TWITTER_TOKEN")
 	if twitterToken == "" {
