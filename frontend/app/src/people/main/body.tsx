@@ -115,17 +115,17 @@ export default function BodyComponent() {
       action: {
         text: 'Add New Ticket',
         icon: 'group'
-      },
+      }
     },
     // // widgetConfigs['post'],
     // {
-      //   ...widgetConfigs['offer'],
-      //   label: 'Portfolios',
-      // },
-      {
-        ...widgetConfigs['wanted'],
-        description: 'Earn sats for completing tickets'
-}
+    //   ...widgetConfigs['offer'],
+    //   label: 'Portfolios',
+    // },
+    {
+      ...widgetConfigs['wanted'],
+      description: 'Earn sats for completing tickets'
+    }
   ];
 
   const tabsModal = widgetConfigs;
@@ -172,9 +172,9 @@ export default function BodyComponent() {
       const value =
         activeList && activeList.length
           ? activeList.find((item) => {
-            const { person, body } = item;
-            return owner_id === person.owner_pubkey && created === body.created + '';
-          })
+              const { person, body } = item;
+              return owner_id === person.owner_pubkey && created === body.created + '';
+            })
           : {};
       if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
@@ -409,52 +409,48 @@ export default function BodyComponent() {
               zIndex: 2,
               position: 'relative',
               background: '#fff',
-              borderBottom: '1px solid rgb(0 0 0 / 7%)',
-            }}
-          >
+              borderBottom: '1px solid rgb(0 0 0 / 7%)'
+            }}>
             <Label style={{ fontSize: 20 }}>
               Explore
               <Link onClick={() => setShowDropdown(!showDropdown)}>
                 <div>{widgetLabel && widgetLabel.label}</div>
               </Link>
-              <MaterialIcon icon={showDropdown ? 'expand_less' : 'expand_more'} style={{ fontSize: 18, marginLeft: 5 }} />
-
-                {showDropdown && (
-                    <MobileDropdown>
-                      {tabs &&
-                        tabs.map((t, i) => {
-                          const { label, description } = t;
-                          const selected = selectedWidget === t.name;
-                          return (
-                            <TabMobile
-                              key={i}
-                              selected={selected}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setShowDropdown(false);
-                                setSelectedWidget(t.name);
-                              }}
-                            >
-                              <div className="tab-icon">
-                                {t?.action?.icon && <MaterialIcon icon={t.action.icon} style={{ fontSize: 18 }} />}
-                              </div>
-                              <div className="tab-details">
-                                {label && (
-                                <div className="tab-details__title">
-                                  {label}
-                                </div>
-                                )}
-                                {description && (
-                                <div className="tab-details__subtitle">
-                                  {description}
-                                </div>
-                                )}
-                              </div>
-                            </TabMobile>
-                          );
-                        })}
-                    </MobileDropdown>
-                )}
+              <MaterialIcon
+                icon={showDropdown ? 'expand_less' : 'expand_more'}
+                style={{ fontSize: 18, marginLeft: 5 }}
+              />
+              {showDropdown && (
+                <MobileDropdown>
+                  {tabs &&
+                    tabs.map((t, i) => {
+                      const { label, description } = t;
+                      const selected = selectedWidget === t.name;
+                      return (
+                        <TabMobile
+                          key={i}
+                          selected={selected}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowDropdown(false);
+                            setSelectedWidget(t.name);
+                          }}>
+                          <div className="tab-icon">
+                            {t?.action?.icon && (
+                              <MaterialIcon icon={t.action.icon} style={{ fontSize: 18 }} />
+                            )}
+                          </div>
+                          <div className="tab-details">
+                            {label && <div className="tab-details__title">{label}</div>}
+                            {description && (
+                              <div className="tab-details__subtitle">{description}</div>
+                            )}
+                          </div>
+                        </TabMobile>
+                      );
+                    })}
+                </MobileDropdown>
+              )}
             </Label>
             <div style={{ display: 'flex' }}>
               {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
@@ -501,7 +497,7 @@ export default function BodyComponent() {
               />
             </div>
           </div>
-         {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
+          {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
           <div style={{ width: '100%' }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
@@ -579,8 +575,8 @@ export default function BodyComponent() {
     const focusedDesktopModalStyles =
       selectedWidget && widgetConfigs[selectedWidget]
         ? {
-          ...widgetConfigs[selectedWidget].modalStyle
-        }
+            ...widgetConfigs[selectedWidget].modalStyle
+          }
         : {};
 
     // desktop mode
@@ -883,7 +879,7 @@ const TabMobile = styled(Tab)`
 
   .tab-icon {
     margin-right: 20px;
-    color: ${(p) => p.selected && '#A2C0FD'}
+    color: ${(p) => p.selected && '#A2C0FD'};
   }
 
   .tab-details {
@@ -902,7 +898,7 @@ const TabMobile = styled(Tab)`
       font-size: 12px;
     }
   }
-`
+`;
 
 const Backdrop = styled.div`
   position: fixed;
