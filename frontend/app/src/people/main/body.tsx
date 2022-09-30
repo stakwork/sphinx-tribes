@@ -96,17 +96,36 @@ export default function BodyComponent() {
 
   const history = useHistory();
 
-  const tabs = [
+  interface ITabAction {
+    text?: string;
+    icon?: string;
+  }
+  interface ITab {
+    label: string;
+    name: string;
+    description: string;
+    action?: ITabAction;
+  }
+
+  const tabs: Array<ITab> = [
     {
       label: 'People',
-      name: 'people'
+      name: 'people',
+      description: 'Find fellow Sphinx Chatters',
+      action: {
+        text: 'Add New Ticket',
+        icon: 'group'
+      },
     },
     // // widgetConfigs['post'],
     // {
-    //   ...widgetConfigs['offer'],
-    //   label: 'Portfolios',
-    // },
-    widgetConfigs['wanted']
+      //   ...widgetConfigs['offer'],
+      //   label: 'Portfolios',
+      // },
+      {
+        ...widgetConfigs['wanted'],
+        description: 'Earn sats for completing tickets'
+}
   ];
 
   const tabsModal = widgetConfigs;
@@ -153,9 +172,9 @@ export default function BodyComponent() {
       const value =
         activeList && activeList.length
           ? activeList.find((item) => {
-              const { person, body } = item;
-              return owner_id === person.owner_pubkey && created === body.created + '';
-            })
+            const { person, body } = item;
+            return owner_id === person.owner_pubkey && created === body.created + '';
+          })
           : {};
       if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
@@ -387,47 +406,56 @@ export default function BodyComponent() {
               padding: 20,
               height: 82,
               boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
-              zIndex: 2
-            }}>
+              zIndex: 2,
+              position: 'relative',
+              background: '#fff',
+              borderBottom: '1px solid rgb(0 0 0 / 7%)',
+            }}
+          >
             <Label style={{ fontSize: 20 }}>
               Explore
-              <Link onClick={() => setShowDropdown(true)}>
+              <Link onClick={() => setShowDropdown(!showDropdown)}>
                 <div>{widgetLabel && widgetLabel.label}</div>
-                <MaterialIcon icon={'expand_more'} style={{ fontSize: 18, marginLeft: 5 }} />
+              </Link>
+              <MaterialIcon icon={showDropdown ? 'expand_less' : 'expand_more'} style={{ fontSize: 18, marginLeft: 5 }} />
 
                 {showDropdown && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      zIndex: 10,
-                      background: '#fff'
-                    }}>
-                    {tabs &&
-                      tabs.map((t, i) => {
-                        const label = t.label;
-                        const selected = selectedWidget === t.name;
-
-                        return (
-                          <Tab
-                            key={i}
-                            style={{ borderRadius: 0, margin: 0 }}
-                            selected={selected}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowDropdown(false);
-                              setSelectedWidget(t.name);
-                            }}>
-                            {label}
-                          </Tab>
-                        );
-                      })}
-                  </div>
+                    <MobileDropdown>
+                      {tabs &&
+                        tabs.map((t, i) => {
+                          const { label, description } = t;
+                          const selected = selectedWidget === t.name;
+                          return (
+                            <TabMobile
+                              key={i}
+                              selected={selected}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowDropdown(false);
+                                setSelectedWidget(t.name);
+                              }}
+                            >
+                              <div className="tab-icon">
+                                {t?.action?.icon && <MaterialIcon icon={t.action.icon} style={{ fontSize: 18 }} />}
+                              </div>
+                              <div className="tab-details">
+                                {label && (
+                                <div className="tab-details__title">
+                                  {label}
+                                </div>
+                                )}
+                                {description && (
+                                <div className="tab-details__subtitle">
+                                  {description}
+                                </div>
+                                )}
+                              </div>
+                            </TabMobile>
+                          );
+                        })}
+                    </MobileDropdown>
                 )}
-              </Link>
             </Label>
-
             <div style={{ display: 'flex' }}>
               {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
                 <>
@@ -473,7 +501,7 @@ export default function BodyComponent() {
               />
             </div>
           </div>
-
+         {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
           <div style={{ width: '100%' }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
@@ -551,8 +579,8 @@ export default function BodyComponent() {
     const focusedDesktopModalStyles =
       selectedWidget && widgetConfigs[selectedWidget]
         ? {
-            ...widgetConfigs[selectedWidget].modalStyle
-          }
+          ...widgetConfigs[selectedWidget].modalStyle
+        }
         : {};
 
     // desktop mode
@@ -843,6 +871,49 @@ const Tab = styled.div<TagProps>`
   border-radius: 25px;
 `;
 
+const TabMobile = styled(Tab)`
+  margin: 0;
+  border-radius: 0;
+  height: auto;
+  background: #fff;
+  border: none;
+  padding: 20px 12px 0 20px;
+  display: flex;
+  align-items: top;
+
+  .tab-icon {
+    margin-right: 20px;
+    color: ${(p) => p.selected && '#A2C0FD'}
+  }
+
+  .tab-details {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    &__title {
+      color: ${(p) => p.selected && '#618AFF'};
+      font-size: 16px;
+      font-weight: 600;
+    }
+    &__subtitle {
+      color: ${(p) => p.selected && '#A2C0FD'};
+      font-size: 12px;
+    }
+  }
+`
+
+const Backdrop = styled.div`
+  position: fixed;
+  z-index: 1;
+  background: rgba(0, 0, 0, 70%);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+`;
+
 const Link = styled.div`
   display: flex;
   justify-content: center;
@@ -850,7 +921,6 @@ const Link = styled.div`
   margin-left: 6px;
   color: #618aff;
   cursor: pointer;
-  position: relative;
 `;
 
 const Loader = styled.div`
@@ -869,4 +939,13 @@ export const Spacer = styled.div`
   min-width: 100%;
   height: 10px;
   width: 100%;
+`;
+
+const MobileDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: #fff;
 `;
