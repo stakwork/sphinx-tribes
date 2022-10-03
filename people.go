@@ -86,6 +86,20 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+func personIsAdmin(pk string) bool {
+	adminPubkeys := os.Getenv("ADMIN_PUBKEYS")
+	if adminPubkeys == "" {
+		return false
+	}
+	admins := strings.Split(adminPubkeys, ",")
+	for _, admin := range admins {
+		if admin == pk {
+			return true
+		}
+	}
+	return false
+}
+
 func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
@@ -112,7 +126,7 @@ func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Could not fetch admin details from db")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
-	} else if existing.IsAdmin == false {
+	} else if personIsAdmin(existing.OwnerPubKey) == false {
 		fmt.Println("Only admin is allowed to delete tickets")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
