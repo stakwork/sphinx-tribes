@@ -15,7 +15,9 @@ export default function NameTag(props) {
     style,
     widget,
     iconSize,
-    textSize
+    textSize,
+    ticketUrl,
+    loomEmbedUrl
   } = props;
   const { ui } = useStores();
 
@@ -67,6 +69,24 @@ export default function NameTag(props) {
       )}
 
       <Date>{lastSeen}</Date>
+      {ticketUrl && (
+        <GithubIcon
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(ticketUrl, '_blank');
+          }}>
+          <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
+        </GithubIcon>
+      )}
+      {loomEmbedUrl && (
+        <LoomIcon
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(loomEmbedUrl, '_blank');
+          }}>
+          <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
+        </LoomIcon>
+      )}
     </Wrap>
   );
 }
@@ -78,6 +98,7 @@ interface ImageProps {
 interface NameProps {
   textSize?: number;
 }
+
 const Img = styled.div<ImageProps>`
   background-image: url('${(p) => p.src}');
   background-position: center;
@@ -97,7 +118,7 @@ const Name = styled.div<NameProps>`
   /* or 158% */
   margin-left: 5px;
 
-  display: flex;
+  dis play: flex;
   align-items: center;
 
   /* Secondary Text 4 */
@@ -128,4 +149,22 @@ const Wrap = styled.div<WrapProps>`
   &:hover {
     color: ${(p) => !p.isSelected && '#618AFF'};
   }
+`;
+
+const GithubIcon = styled.div`
+  height: 16px;
+  width: 16px;
+  position: relative;
+  top: -4px;
+  margin-left: 10px;
+  cursor: pointer;
+`;
+
+const LoomIcon = styled.div`
+  height: 16px;
+  width: 16px;
+  position: relative;
+  top: -4px;
+  margin-left: 10px;
+  cursor: pointer;
 `;
