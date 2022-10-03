@@ -29,7 +29,8 @@ export default function WantedView(props: any) {
     paid,
     codingLanguage,
     assignee,
-    estimate_session_length
+    estimate_session_length,
+    loomEmbedUrl
   } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -134,9 +135,23 @@ export default function WantedView(props: any) {
                   width: '100%',
                   justifyContent: 'space-between'
                 }}>
-                <NameTag {...person} created={created} widget={'wanted'} style={{ margin: 0 }} />
+                <NameTag
+                  {...person}
+                  created={created}
+                  widget={'wanted'}
+                  ticketUrl={ticketUrl}
+                  loomEmbedUrl={loomEmbedUrl}
+                  style={{
+                    margin: 0
+                  }}
+                />
               </div>
-              <DT style={{ margin: '15px 0' }}>{title}</DT>
+              <DT
+                style={{
+                  margin: '15px 0'
+                }}>
+                {title}
+              </DT>
               {/* <div
                 style={{
                   width: '100%',
@@ -157,7 +172,13 @@ export default function WantedView(props: any) {
                   alignItems: 'center'
                 }}>
                 {isCodingTask && (
-                  <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                  <GithubStatusPill
+                    status={status}
+                    assignee={assignee}
+                    style={{
+                      marginTop: 10
+                    }}
+                  />
                 )}
                 {{ ...assignee }.owner_alias && (
                   <div
@@ -165,7 +186,11 @@ export default function WantedView(props: any) {
                       marginTop: '8px'
                     }}>
                     <img
-                      src={{ ...assignee }.img || '/static/person_placeholder.png'}
+                      src={
+                        {
+                          ...assignee
+                        }.img || '/static/person_placeholder.png'
+                      }
                       alt="assignee_img"
                       style={{
                         borderRadius: '50%',
@@ -181,12 +206,23 @@ export default function WantedView(props: any) {
                       // }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(`/p/${{ ...assignee }.owner_pubkey}?widget=wanted`, '_blank');
+                        window.open(
+                          `/p/${
+                            {
+                              ...assignee
+                            }.owner_pubkey
+                          }?widget=wanted`,
+                          '_blank'
+                        );
                       }}
                       style={{
                         fontSize: '12px'
                       }}>
-                      {{ ...assignee }.owner_alias}
+                      {
+                        {
+                          ...assignee
+                        }.owner_alias
+                      }
                     </span>
                   </div>
                 )}
@@ -255,12 +291,18 @@ export default function WantedView(props: any) {
               </div>
 
               {priceMin ? (
-                <P style={{ margin: '15px 0 0' }}>
+                <P
+                  style={{
+                    margin: '15px 0 0'
+                  }}>
                   <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
                   <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
                 </P>
               ) : (
-                <P style={{ margin: '15px 0 0' }}>
+                <P
+                  style={{
+                    margin: '15px 0 0'
+                  }}>
                   <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
                 </P>
               )}
@@ -293,7 +335,13 @@ export default function WantedView(props: any) {
                 width: '100%',
                 justifyContent: 'space-between'
               }}>
-              <NameTag {...person} created={created} widget={'wanted'} />
+              <NameTag
+                {...person}
+                created={created}
+                widget={'wanted'}
+                ticketUrl={ticketUrl}
+                loomEmbedUrl={loomEmbedUrl}
+              />
             </div>
             <Divider style={{ margin: '10px 0' }} />
             {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -310,7 +358,13 @@ export default function WantedView(props: any) {
                 alignItems: 'center'
               }}>
               {isCodingTask && (
-                <GithubStatusPill status={status} assignee={assignee} style={{ marginTop: 10 }} />
+                <GithubStatusPill
+                  status={status}
+                  assignee={assignee}
+                  style={{
+                    marginTop: 10
+                  }}
+                />
               )}
               {{ ...assignee }.owner_alias && (
                 <div
@@ -318,7 +372,11 @@ export default function WantedView(props: any) {
                     marginTop: '8px'
                   }}>
                   <img
-                    src={{ ...assignee }.img || '/static/person_placeholder.png'}
+                    src={
+                      {
+                        ...assignee
+                      }.img || '/static/person_placeholder.png'
+                    }
                     alt="assignee_img"
                     style={{
                       borderRadius: '50%',
@@ -334,12 +392,23 @@ export default function WantedView(props: any) {
                     // }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`/p/${{ ...assignee }.owner_pubkey}?widget=wanted`, '_blank');
+                      window.open(
+                        `/p/${
+                          {
+                            ...assignee
+                          }.owner_pubkey
+                        }?widget=wanted`,
+                        '_blank'
+                      );
                     }}
                     style={{
                       fontSize: '12px'
                     }}>
-                    {{ ...assignee }.owner_alias}
+                    {
+                      {
+                        ...assignee
+                      }.owner_alias
+                    }
                   </span>
                 </div>
               )}
@@ -391,7 +460,11 @@ export default function WantedView(props: any) {
                 </>
               )}
             </div>
-            <Divider style={{ margin: isCodingTask ? '22px 0' : '0 0 22px' }} />
+            <Divider
+              style={{
+                margin: isCodingTask ? '22px 0' : '0 0 22px'
+              }}
+            />
             <DescriptionCodeTask>{renderMarkdown(description)}</DescriptionCodeTask>
           </Pad>
 
@@ -431,7 +504,10 @@ export default function WantedView(props: any) {
                       icon={show ? 'visibility' : 'visibility_off'}
                       disable={saving}
                       submitting={saving}
-                      iconStyle={{ color: '#555', fontSize: 20 }}
+                      iconStyle={{
+                        color: '#555',
+                        fontSize: 20
+                      }}
                       style={{
                         minWidth: 24,
                         maxWidth: 24,
