@@ -114,6 +114,7 @@ type Person struct {
 	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
+	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
 }
 
 // Github struct
