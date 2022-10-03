@@ -3,14 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
 )
 
 type database struct {
@@ -22,6 +21,7 @@ var DB database
 
 func initDB() {
 	dbURL := os.Getenv("DATABASE_URL")
+	fmt.Printf("db url : %v", dbURL)
 	if dbURL == "" {
 		rdsHost := os.Getenv("RDS_HOSTNAME")
 		rdsPort := os.Getenv("RDS_PORT")
@@ -449,6 +449,30 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 		rawQuery, "%"+search+"%").Find(&ms)
 
 	return ms, result.Error
+}
+
+func (db database) getPeopleForNewTicket(languages []interface{}) ([]Person, error) {
+	ms := []Person{}
+
+	query := "Select owner_pub_key, json_build_object('coding_languages',extras->'coding_languages') as extras from people" +
+		" where (deleted != true AND unlisted != true) AND " +
+		"extras->'alert' = 'true' AND ("
+
+	for _, lang := range languages {
+		l, ok := lang.(map[string]interface{})
+		if !ok {
+			return ms, errors.New("could not parse coding languages correctly")
+		}
+		label, ok2 := l["label"].(string)
+		if !ok2 {
+			return ms, errors.New("could not find label in language")
+		}
+		query += "extras->'coding_languages' @> '[{\"label\": \"" + label + "\"}]' OR "
+	}
+	query = query[:len(query)-4]
+	query += ");"
+	err := db.db.Raw(query).Find(&ms).Error
+	return ms, err
 }
 
 func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
