@@ -562,6 +562,7 @@ export default function WantedSummary(props: any) {
       );
     }
 
+    // desktop view
     return (
       <>
         {paid && (
@@ -586,9 +587,9 @@ export default function WantedSummary(props: any) {
               minHeight: '100%',
               overflow: 'auto'
             }}>
-            <SectionPad style={{ height: 148 }}>
+            <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
               <Title>{title}</Title>
-              <div style={{ display: 'flex', marginTop: 25 }}>
+              <div style={{ display: 'flex', marginTop: 12 }}>
                 <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
                 {assigneeLabel}
                 {ticketUrl && (
@@ -652,7 +653,7 @@ export default function WantedSummary(props: any) {
           </div>
 
           <div style={{ width: 320, height: envHeight, overflow: 'auto' }}>
-            <SectionPad style={{ height: 148 }}>
+            <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
               <div
                 style={{
                   display: 'flex',
@@ -756,7 +757,6 @@ export default function WantedSummary(props: any) {
           <Divider style={{ marginBottom: 22 }} />
 
           <D>{renderMarkdown(description)}</D>
-
           <GalleryViewer
             gallery={gallery}
             showAll={true}
@@ -770,41 +770,49 @@ export default function WantedSummary(props: any) {
   }
 
   return (
-    <Wrap>
-      <GalleryViewer
-        innerRef={imgRef}
-        style={{ width: 507, height: 'fit-content' }}
-        gallery={gallery}
-        showAll={false}
-        selectable={false}
-        wrap={false}
-        big={true}
-      />
-      <div
-        style={{
-          width: 316,
-          padding: '40px 20px',
-          overflowY: 'auto',
-          height: envHeight
-        }}>
-        <Pad>
-          {nametag}
+    <div
+      style={{
+        paddingTop: gallery && '40px'
+      }}>
+      <Wrap>
+        <div>
+          <GalleryViewer
+            innerRef={imgRef}
+            style={{ width: 507, height: 'fit-content' }}
+            gallery={gallery}
+            showAll={false}
+            selectable={false}
+            wrap={false}
+            big={true}
+          />
+        </div>
+        <div
+          style={{
+            width: 316,
+            padding: '40px 20px',
+            overflowY: 'auto',
+            height: envHeight
+          }}>
+          <Pad>
+            {nametag}
 
-          <Title>{title}</Title>
+            <Title>{title}</Title>
 
-          <Divider style={{ marginTop: 22 }} />
-          <Y>
-            <P>
-              {formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax) || '0'} <B>SAT</B>
-            </P>
-            {heart}
-          </Y>
-          <Divider style={{ marginBottom: 22 }} />
+            <Divider style={{ marginTop: 22 }} />
+            <Y>
+              <P>
+                {formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax) || '0'}{' '}
+                <B>SAT</B>
+              </P>
+              {heart}
+            </Y>
+            <Divider style={{ marginBottom: 22 }} />
 
-          <Paragraph>{renderMarkdown(description)}</Paragraph>
-        </Pad>
-      </div>
-    </Wrap>
+            <Paragraph>{renderMarkdown(description)}</Paragraph>
+          </Pad>
+        </div>
+      </Wrap>
+    </div>
   );
 }
 

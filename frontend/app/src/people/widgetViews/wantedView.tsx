@@ -357,7 +357,7 @@ export default function WantedView(props: any) {
                 flexDirection: 'row',
                 alignItems: 'center'
               }}>
-              {isCodingTask && (
+              {isCodingTask ? (
                 <GithubStatusPill
                   status={status}
                   assignee={assignee}
@@ -365,6 +365,11 @@ export default function WantedView(props: any) {
                     marginTop: 10
                   }}
                 />
+              ) : (
+                <div
+                  style={{
+                    minHeight: '36px'
+                  }}></div>
               )}
               {{ ...assignee }.owner_alias && (
                 <div
@@ -462,10 +467,35 @@ export default function WantedView(props: any) {
             </div>
             <Divider
               style={{
-                margin: isCodingTask ? '22px 0' : '0 0 22px'
+                margin: isCodingTask || gallery ? '22px 0' : '0 0 22px'
               }}
             />
-            <DescriptionCodeTask>{renderMarkdown(description)}</DescriptionCodeTask>
+            <DescriptionCodeTask>
+              {renderMarkdown(description)}
+              {gallery && (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap'
+                  }}>
+                  {gallery.map((val, index) => {
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          height: '48px',
+                          width: '48px',
+                          padding: '0px 2px',
+                          borderRadius: '6px',
+                          overflow: 'hidden'
+                        }}>
+                        <img src={val} alt="image" height={'100%'} width={'100%'} />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </DescriptionCodeTask>
           </Pad>
 
           <Divider style={{ margin: 0 }} />
