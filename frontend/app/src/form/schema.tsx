@@ -41,7 +41,8 @@ const languages = [
   'R',
   'C#',
   'C++',
-  'Java'
+  'Java',
+  'Rust'
 ];
 
 const estimation = ['Less than 1 hour', 'Less than 3 hours', 'More than 3 hours', 'Not sure yet'];
