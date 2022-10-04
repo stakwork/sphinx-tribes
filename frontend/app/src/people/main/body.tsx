@@ -726,7 +726,7 @@ export default function BodyComponent() {
             selectPerson={selectPerson}
           />
         </FadeLeft>
-
+        {/* modal onClick on tickets */}
         {publicFocusPerson && (
           <Modal
             visible={publicFocusPerson ? true : false}
@@ -762,7 +762,7 @@ export default function BodyComponent() {
           </Modal>
         )}
         {toastsEl}
-
+        {/* modal create ticket */}
         {showFocusView && (
           <Modal
             visible={showFocusView}

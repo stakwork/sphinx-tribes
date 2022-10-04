@@ -909,6 +909,15 @@ textarea.qr-string {
   color: #000 !important;
 }
 
+.react-datepicker__day,
+.react-datepicker__day--weekend {
+  color: #000 !important;
+}
+
+.react-datepicker__day--outside-month {
+  color: #71797e !important;
+}
+
 @media (max-width: 767px) {
   #header-right {
     margin-top: 10px;
