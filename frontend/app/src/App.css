@@ -910,6 +910,11 @@ textarea.qr-string {
   color: #71797e !important;
 }
 
+.euiModal__closeIcon {
+  color: #000 !important;
+  background: #fff !important;
+}
+
 @media (max-width: 767px) {
   #header-right {
     margin-top: 10px;

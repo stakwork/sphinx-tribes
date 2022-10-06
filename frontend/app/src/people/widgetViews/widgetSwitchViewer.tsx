@@ -9,22 +9,11 @@ import { useObserver } from 'mobx-react-lite';
 import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
-import api from '../../api';
-import {
-  EuiButton,
-  EuiButtonEmpty,
-  EuiModal,
-  EuiModalBody,
-  EuiModalFooter,
-  EuiModalHeader,
-  EuiModalHeaderTitle,
-  EuiOverlayMask,
-  EuiText
-} from '@elastic/eui';
 import { uiStore } from '../../store/ui';
+import DeleteTicketModal from './modal';
 
 export default function WidgetSwitchViewer(props) {
-  const { main, ui } = useStores();
+  const { main } = useStores();
   const isMobile = useIsMobile();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [deletePayload, setDeletePayload] = useState<object>({});
@@ -76,58 +65,30 @@ export default function WidgetSwitchViewer(props) {
     const deleteTicket = async (payload: any) => {
       const info = uiStore.meInfo as any;
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-
-      await fetch(URL + `/delete_ticket`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'x-jwt': info.jwt,
-          'Content-Type': 'application/json'
-        }
-      });
+      try {
+        await fetch(URL + `/delete_ticket`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            'x-jwt': info.jwt,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     const confirmDelete = async () => {
-      if (!!deletePayload) deleteTicket(deletePayload);
+      try {
+        if (!!deletePayload) {
+          await deleteTicket(deletePayload);
+        }
+      } catch (error) {
+        console.log(error);
+      }
       closeModal();
     };
-
-    let modal;
-
-    if (showDeleteModal) {
-      modal = (
-        <EuiOverlayMask>
-          <EuiModal
-            onClose={closeModal}
-            initialFocus="[name=popswitch]"
-            style={{
-              background: '#fff',
-              padding: '50px 50px 30px 50px'
-            }}>
-            <EuiText>Are you sure you want to delete this Ticket?</EuiText>
-            <ModalButtonContainer>
-              <EuiButtonEmpty
-                onClick={closeModal}
-                style={{
-                  color: '#000'
-                }}>
-                Cancel
-              </EuiButtonEmpty>
-              <EuiButton
-                onClick={confirmDelete}
-                style={{
-                  background: '#fff',
-                  textDecoration: 'none',
-                  color: '#303030',
-                  border: '1px solid #909090'
-                }}>
-                Delete
-              </EuiButton>
-            </ModalButtonContainer>
-          </EuiModal>
-        </EuiOverlayMask>
-      );
-    }
 
     const listItems =
       activeList && activeList.length ? (
@@ -191,7 +152,10 @@ export default function WidgetSwitchViewer(props) {
       <>
         {listItems}
         <Spacer key={'spacer'} />
-        {modal}
+
+        {showDeleteModal && (
+          <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
+        )}
       </>
     );
   });
@@ -208,12 +172,4 @@ const Panel = styled.div<PanelProps>`
   padding: 20px;
   box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
   border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;
-
-const ModalButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 30px;
-  padding: 2px;
 `;

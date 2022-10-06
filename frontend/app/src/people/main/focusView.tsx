@@ -242,27 +242,27 @@ export default function FocusedView(props: any) {
     // set initials here
     if (personInfo) {
       if (config && config.name === 'about') {
-        initialValues.id = personInfo?.id || 0;
-        initialValues.pubkey = personInfo?.pubkey;
-        initialValues.alert = personInfo?.extras?.alert || false;
-        initialValues.owner_alias = personInfo?.owner_alias || '';
-        initialValues.img = personInfo?.img || '';
-        initialValues.price_to_meet = personInfo?.price_to_meet || 0;
-        initialValues.description = personInfo?.description || '';
-        initialValues.loomEmbedUrl = personInfo?.loomEmbedUrl || '';
+        initialValues.id = personInfo.id || 0;
+        initialValues.pubkey = personInfo.pubkey;
+        initialValues.alert = personInfo.extras?.alert || false;
+        initialValues.owner_alias = personInfo.owner_alias || '';
+        initialValues.img = personInfo.img || '';
+        initialValues.price_to_meet = personInfo.price_to_meet || 0;
+        initialValues.description = personInfo.description || '';
+        initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
         initialValues.estimated_completion_date =
-          personInfo?.extras?.wanted?.map((value) => {
+          personInfo.extras?.wanted?.map((value) => {
             return moment(value?.estimated_completion_date);
           }) || '';
         // below are extras,
         initialValues.twitter =
-          (personInfo.extras?.twitter && personInfo?.extras?.twitter[0]?.value) || '';
+          (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
         initialValues.github =
-          (personInfo.extras?.github && personInfo?.extras?.github[0]?.value) || '';
+          (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
         initialValues.facebook =
-          (personInfo.extras?.facebook && personInfo?.extras?.facebook[0]?.value) || '';
+          (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
         // extras with multiple items
-        initialValues.coding_languages = personInfo?.extras?.coding_languages || [];
+        initialValues.coding_languages = personInfo.extras?.coding_languages || [];
         initialValues.tribes = personInfo.extras?.tribes || [];
         initialValues.repos = personInfo.extras?.repos || [];
         initialValues.lightning =
