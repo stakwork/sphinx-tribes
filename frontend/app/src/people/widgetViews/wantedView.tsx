@@ -8,7 +8,7 @@ import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 import { renderMarkdown } from '../utils/renderMarkdown';
-import { EuiText } from '@elastic/eui';
+import { EuiButtonIcon, EuiText } from '@elastic/eui';
 
 export default function WantedView(props: any) {
   let {
@@ -30,13 +30,15 @@ export default function WantedView(props: any) {
     codingLanguage,
     assignee,
     estimate_session_length,
-    loomEmbedUrl
+    loomEmbedUrl,
+    showModal,
+    setDeletePayload
   } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
   const [labels, setLabels] = useState([]);
-  const [IsAssigned, setIsAssigned] = useState([]);
+  // const [IsAssigned, setIsAssigned] = useState([]);
   const { peopleWanteds } = main;
 
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
@@ -112,6 +114,7 @@ export default function WantedView(props: any) {
     const isCodingTask =
       type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request';
 
+    // mobile view
     if (isMobile) {
       return (
         <>
@@ -312,6 +315,7 @@ export default function WantedView(props: any) {
       );
     }
 
+    // desktop view
     return (
       <>
         {paid && (
@@ -555,21 +559,49 @@ export default function WantedView(props: any) {
                 }
               </div>
             </Pad>
-            <EuiText
+            <div
               style={{
-                fontSize: '14px',
-                color: '#8e969c',
-                fontWeight: '500'
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}>
-              {estimate_session_length && 'Session:'}{' '}
-              <span
+              <EuiText
                 style={{
-                  fontWeight: '500',
-                  color: '#000'
+                  fontSize: '14px',
+                  color: '#8e969c',
+                  fontWeight: '500'
                 }}>
-                {estimate_session_length ?? ''}
-              </span>
-            </EuiText>
+                {estimate_session_length && 'Session:'}{' '}
+                <span
+                  style={{
+                    fontWeight: '500',
+                    color: '#000'
+                  }}>
+                  {estimate_session_length ?? ''}
+                </span>
+              </EuiText>
+              {ui?.meInfo?.isSuperAdmin && (
+                <EuiButtonIcon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showModal();
+                    setDeletePayload({
+                      created: created,
+                      host: 'community.sphinx.chat',
+                      pubkey: person.owner_pubkey
+                    });
+                  }}
+                  iconType="trash"
+                  aria-label="Next"
+                  size="s"
+                  style={{
+                    color: '#000',
+                    background: '#fff'
+                  }}
+                />
+              )}
+            </div>
           </div>
         </DWrap>
       </>
