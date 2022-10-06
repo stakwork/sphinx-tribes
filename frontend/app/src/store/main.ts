@@ -635,13 +635,25 @@ export class MainStore {
   }
 
   // this method merges the relay self data with the db self data, they each hold different data
+
   @action async getSelf(me: any) {
     console.log('getSelf');
     let self = me || uiStore.meInfo;
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
 
-      let updateSelf = { ...self, ...p };
+      const getSuperAdmin = () => {
+        const admin_keys = process.env.ADMIN_PUBKEYS || '';
+
+        if (admin_keys !== '') {
+          const super_admin_keys_array = admin_keys.split(',');
+          return !!super_admin_keys_array.find((value) => value === self.owner_pubkey);
+        }
+        return false;
+      };
+
+      const isSuperAdmin = getSuperAdmin();
+      let updateSelf = { ...self, ...p, isSuperAdmin: isSuperAdmin };
       console.log('updateSelf', updateSelf);
       uiStore.setMeInfo(updateSelf);
     }
