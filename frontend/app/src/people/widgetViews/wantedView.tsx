@@ -9,6 +9,7 @@ import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
+import { getHost } from '../../host';
 
 export default function WantedView(props: any) {
   let {
@@ -588,7 +589,7 @@ export default function WantedView(props: any) {
                     showModal();
                     setDeletePayload({
                       created: created,
-                      host: 'community.sphinx.chat',
+                      host: getHost(),
                       pubkey: person.owner_pubkey
                     });
                   }}
