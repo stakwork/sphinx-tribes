@@ -10,7 +10,7 @@ import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
 import { uiStore } from '../../store/ui';
-import DeleteTicketModal from './modal';
+import DeleteTicketModal from './deleteModal';
 
 export default function WidgetSwitchViewer(props) {
   const { main } = useStores();
