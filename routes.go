@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -72,6 +73,7 @@ func NewRouter() *http.Server {
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
 		r.Get("/people/offers", getListedOffers)
+		r.Get("/admin_pubkeys", getAdminPubkeys)
 
 		r.Get("/ask", ask)
 		r.Get("/poll/{challenge}", poll)
@@ -116,6 +118,21 @@ func NewRouter() *http.Server {
 	return server
 }
 
+func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
+	adminPubKeys := os.Getenv("ADMIN_PUBKEYS")
+	admins := strings.Split(adminPubKeys, ",")
+	type PubKeysReturn struct {
+		Pubkeys []string `json:"pubkeys"`
+	}
+	pubkeys := PubKeysReturn{}
+	if adminPubKeys != "" {
+		for _, admin := range admins {
+			pubkeys.Pubkeys = append(pubkeys.Pubkeys, admin)
+		}
+	}
+	json.NewEncoder(w).Encode(pubkeys)
+	w.WriteHeader(http.StatusOK)
+}
 func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	feed, err := feeds.ParseFeed(url)
