@@ -642,17 +642,22 @@ export class MainStore {
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
 
-      const getSuperAdmin = () => {
-        const admin_keys = process.env.ADMIN_PUBKEYS || '';
-
-        if (admin_keys !== '') {
-          const super_admin_keys_array = admin_keys.split(',');
-          return !!super_admin_keys_array.find((value) => value === self.owner_pubkey);
+      // get request for super_admin_array.
+      const getSuperAdmin = async () => {
+        try {
+          const response = await api.get(`admin_pubkeys`);
+          const admin_keys = response?.pubkeys;
+          if (admin_keys !== null) {
+            return !!admin_keys.find((value) => value === self.owner_pubkey);
+          } else {
+            return false;
+          }
+        } catch (error) {
+          return false;
         }
-        return false;
       };
 
-      const isSuperAdmin = getSuperAdmin();
+      const isSuperAdmin = await getSuperAdmin();
       let updateSelf = { ...self, ...p, isSuperAdmin: isSuperAdmin };
       console.log('updateSelf', updateSelf);
       uiStore.setMeInfo(updateSelf);
