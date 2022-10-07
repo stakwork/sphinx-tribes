@@ -235,10 +235,10 @@ export default function FocusedView(props: any) {
 
     let personInfo = canEdit ? ui.meInfo : person;
 
-    // console.log({...personInfo}.extras.wanted.map((value) => value.estimated_completion_date));
-    personInfo.extras.wanted.map((value) => {
-      console.log(typeof new Date({ ...value }.estimated_completion_date));
-    });
+    // // console.log({...personInfo}.extras.wanted.map((value) => value.estimated_completion_date));
+    // personInfo?.extras?.wanted?.map((value: any) => {
+    //   console.log(typeof new Date({ ...value }?.estimated_completion_date));
+    // });
     // set initials here
     if (personInfo) {
       if (config && config.name === 'about') {
@@ -251,8 +251,8 @@ export default function FocusedView(props: any) {
         initialValues.description = personInfo.description || '';
         initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
         initialValues.estimated_completion_date =
-          personInfo.extras.wanted.map((value) => {
-            return moment(value.estimated_completion_date);
+          personInfo.extras?.wanted?.map((value) => {
+            return moment(value?.estimated_completion_date);
           }) || '';
         // below are extras,
         initialValues.twitter =

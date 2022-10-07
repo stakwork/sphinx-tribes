@@ -34,7 +34,7 @@ export default function AuthQR(props: any) {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
         console.log(me);
-        if (me && me.pubkey) {
+        if (me && me?.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
           setChallenge('');

@@ -8,7 +8,8 @@ import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 import { renderMarkdown } from '../utils/renderMarkdown';
-import { EuiText } from '@elastic/eui';
+import { EuiButtonIcon, EuiText } from '@elastic/eui';
+import { getHost } from '../../host';
 
 export default function WantedView(props: any) {
   let {
@@ -30,13 +31,15 @@ export default function WantedView(props: any) {
     codingLanguage,
     assignee,
     estimate_session_length,
-    loomEmbedUrl
+    loomEmbedUrl,
+    showModal,
+    setDeletePayload
   } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
   const [labels, setLabels] = useState([]);
-  const [IsAssigned, setIsAssigned] = useState([]);
+  // const [IsAssigned, setIsAssigned] = useState([]);
   const { peopleWanteds } = main;
 
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
@@ -112,6 +115,7 @@ export default function WantedView(props: any) {
     const isCodingTask =
       type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request';
 
+    // mobile view
     if (isMobile) {
       return (
         <>
@@ -289,29 +293,84 @@ export default function WantedView(props: any) {
                   </>
                 )}
               </div>
-
-              {priceMin ? (
-                <P
-                  style={{
-                    margin: '15px 0 0'
-                  }}>
-                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
-                  <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
-                </P>
-              ) : (
-                <P
-                  style={{
-                    margin: '15px 0 0'
-                  }}>
-                  <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
-                </P>
-              )}
+              <EyeDeleteTextContainerMobile>
+                {priceMin ? (
+                  <P
+                    style={{
+                      margin: '15px 0 0'
+                    }}>
+                    <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
+                    <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
+                  </P>
+                ) : (
+                  <P
+                    style={{
+                      margin: '15px 0 0'
+                    }}>
+                    <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+                  </P>
+                )}
+                <EyeDeleteContainerMobile>
+                  <div
+                    style={{
+                      width: '40px'
+                    }}>
+                    {
+                      //  if my own, show this option to show/hide
+                      isMine && (
+                        <Button
+                          icon={show ? 'visibility' : 'visibility_off'}
+                          disable={saving}
+                          submitting={saving}
+                          iconStyle={{
+                            color: '#555',
+                            fontSize: 20
+                          }}
+                          style={{
+                            minWidth: 24,
+                            maxWidth: 24,
+                            minHeight: 20,
+                            height: 20,
+                            padding: 0,
+                            background: '#fff'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExtrasPropertyAndSave('show');
+                          }}
+                        />
+                      )
+                    }
+                  </div>
+                  {ui?.meInfo?.isSuperAdmin && (
+                    <EuiButtonIcon
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showModal();
+                        setDeletePayload({
+                          created: created,
+                          host: getHost(),
+                          pubkey: person.owner_pubkey
+                        });
+                      }}
+                      iconType="trash"
+                      aria-label="Next"
+                      size="s"
+                      style={{
+                        color: '#000',
+                        background: '#fff'
+                      }}
+                    />
+                  )}
+                </EyeDeleteContainerMobile>
+              </EyeDeleteTextContainerMobile>
             </Body>
           </Wrap>
         </>
       );
     }
 
+    // desktop view
     return (
       <>
         {paid && (
@@ -555,21 +614,49 @@ export default function WantedView(props: any) {
                 }
               </div>
             </Pad>
-            <EuiText
+            <div
               style={{
-                fontSize: '14px',
-                color: '#8e969c',
-                fontWeight: '500'
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}>
-              {estimate_session_length && 'Session:'}{' '}
-              <span
+              <EuiText
                 style={{
-                  fontWeight: '500',
-                  color: '#000'
+                  fontSize: '14px',
+                  color: '#8e969c',
+                  fontWeight: '500'
                 }}>
-                {estimate_session_length ?? ''}
-              </span>
-            </EuiText>
+                {estimate_session_length && 'Session:'}{' '}
+                <span
+                  style={{
+                    fontWeight: '500',
+                    color: '#000'
+                  }}>
+                  {estimate_session_length ?? ''}
+                </span>
+              </EuiText>
+              {ui?.meInfo?.isSuperAdmin && (
+                <EuiButtonIcon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showModal();
+                    setDeletePayload({
+                      created: created,
+                      host: getHost(),
+                      pubkey: person.owner_pubkey
+                    });
+                  }}
+                  iconType="trash"
+                  aria-label="Next"
+                  size="s"
+                  style={{
+                    color: '#000',
+                    background: '#fff'
+                  }}
+                />
+              )}
+            </div>
           </div>
         </DWrap>
       </>
@@ -733,4 +820,19 @@ const Img = styled.div<ImageProps>`
   position: relative;
   width: 22px;
   height: 22px;
+`;
+
+const EyeDeleteTextContainerMobile = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const EyeDeleteContainerMobile = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 `;
