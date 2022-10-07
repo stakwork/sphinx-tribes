@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import OfferView from '../widgetViews/offerView';
 import WantedView from '../widgetViews/wantedView';
 import PostView from '../widgetViews/postView';
@@ -9,10 +9,16 @@ import { useObserver } from 'mobx-react-lite';
 import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
+import { uiStore } from '../../store/ui';
+import DeleteTicketModal from './deleteModal';
 
 export default function WidgetSwitchViewer(props) {
   const { main } = useStores();
   const isMobile = useIsMobile();
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [deletePayload, setDeletePayload] = useState<object>({});
+  const closeModal = () => setShowDeleteModal(false);
+  const showModal = () => setShowDeleteModal(true);
 
   const panelStyles = isMobile
     ? {
@@ -55,6 +61,34 @@ export default function WidgetSwitchViewer(props) {
       });
       searchKeys = dynamicFields;
     }
+
+    const deleteTicket = async (payload: any) => {
+      const info = uiStore.meInfo as any;
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+      try {
+        await fetch(URL + `/delete_ticket`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            'x-jwt': info.jwt,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const confirmDelete = async () => {
+      try {
+        if (!!deletePayload) {
+          await deleteTicket(deletePayload);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      closeModal();
+    };
 
     const listItems =
       activeList && activeList.length ? (
@@ -102,6 +136,8 @@ export default function WidgetSwitchViewer(props) {
                   showName
                   key={i + person.owner_pubkey + 'wview'}
                   person={person}
+                  showModal={showModal}
+                  setDeletePayload={setDeletePayload}
                   {...body}
                 />
               ) : null}
@@ -116,6 +152,10 @@ export default function WidgetSwitchViewer(props) {
       <>
         {listItems}
         <Spacer key={'spacer'} />
+
+        {showDeleteModal && (
+          <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
+        )}
       </>
     );
   });
