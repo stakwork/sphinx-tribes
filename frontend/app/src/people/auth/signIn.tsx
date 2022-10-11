@@ -9,6 +9,7 @@ import { Modal, Button, Divider } from '../../sphinxUI';
 import FadeLeft from '../../animated/fadeLeft';
 import ConfirmMe from '../confirmMe';
 import AuthQR from './authQR';
+import { EuiButton } from '@elastic/eui';
 
 export default function SignIn(props: any) {
   const { main, ui } = useStores();
@@ -67,6 +68,7 @@ export default function SignIn(props: any) {
               <Button
                 text={'Login with Sphinx'}
                 height={60}
+                endingIcon={'input'}
                 width={'100%'}
                 color={'primary'}
                 onClick={() => setShowSignIn(true)}
@@ -75,13 +77,20 @@ export default function SignIn(props: any) {
             <Divider />
             <Column style={{ paddingTop: 0 }}>
               <Description>I don't have Sphinx!</Description>
-              <Button
-                text={'Get Sphinx'}
+              <EuiButton
                 onClick={() => redirect()}
-                height={60}
-                width={'100%'}
-                color={'widget'}
-              />
+                iconType="popout"
+                iconSide="right"
+                style={{
+                  background: '#fff',
+                  border: '1px solid #dde0e5',
+                  borderRadius: '30px',
+                  width: '100%',
+                  height: '60px',
+                  color: '#000'
+                }}>
+                Get Sphinx
+              </EuiButton>
             </Column>
           </>
         )}
