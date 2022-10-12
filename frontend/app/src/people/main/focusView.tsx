@@ -21,7 +21,8 @@ export default function FocusedView(props: any) {
     person,
     buttonsOnBottom,
     formHeader,
-    manualGoBackOnly
+    manualGoBackOnly,
+    isFirstTimeScreen
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -318,6 +319,7 @@ export default function FocusedView(props: any) {
             {ui.meInfo && (
               <Form
                 buttonsOnBottom={buttonsOnBottom}
+                isFirstTimeScreen={isFirstTimeScreen}
                 readOnly={!canEdit}
                 formRef={formRef}
                 submitText={config && config.submitText}

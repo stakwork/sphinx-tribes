@@ -1,7 +1,7 @@
-import { EuiButton, EuiButtonEmpty, EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
+import { EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button } from '../../sphinxUI';
+import IconButton from '../../sphinxUI/icon_button';
 import { useStores } from '../../store';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
@@ -67,7 +67,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           </ModalContainer>
 
           <ButtonContainer>
-            <Button
+            <IconButton
               text={'Get Sphinx'}
               endingIcon={'arrow_forward'}
               width={210}
@@ -79,19 +79,19 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               color={buttonColor}
             />
 
-            <EuiButtonEmpty
-              iconType="sortRight"
-              iconSide="right"
+            <IconButton
+              text={'I have Sphinx'}
+              endingIcon={'arrow_forward'}
+              width={210}
+              height={48}
+              buttonType={'text'}
+              style={{ color: '#83878b', marginTop: '10px' }}
               onClick={() => {
                 closeModal();
                 ui.setShowSignIn(true);
               }}
-              style={{
-                color: '#83878b',
-                marginTop: '10px'
-              }}>
-              I have Sphinx
-            </EuiButtonEmpty>
+              color={buttonColor}
+            />
           </ButtonContainer>
         </EuiModal>
       </EuiOverlayMask>

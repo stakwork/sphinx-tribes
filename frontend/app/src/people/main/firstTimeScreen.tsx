@@ -23,10 +23,11 @@ export default function FirstTimeScreen() {
     <Modal
       visible={true}
       style={{ height: '100%' }}
-      envStyle={{ height: '100%', borderRadius: 0, width: '100%', maxWidth: 375 }}>
+      envStyle={{ height: '100%', borderRadius: 0, width: '100%', maxWidth: 700 }}>
       <div style={{ height: '100%', padding: 20, paddingTop: 0 }}>
         <FocusedView
           formHeader={formHeader}
+          isFirstTimeScreen={true}
           buttonsOnBottom={true}
           person={ui.meInfo}
           canEdit={true}

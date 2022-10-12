@@ -8,6 +8,8 @@ import { useStores } from '../store';
 import Select from '../sphinxUI/select';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
 import { formDropdownOptions } from '../people/utils/constants';
+import FirstTimeInput from './inputs/firstTimeScreenInput';
+import ImageInput from './inputs/img-input';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
@@ -160,7 +162,70 @@ export default function Form(props: any) {
               />
             )}
 
-            {schema &&
+            {schema && props.isFirstTimeScreen ? (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}>
+                <div
+                  style={{
+                    marginRight: '40px'
+                  }}>
+                  {schema.map((item: FormField) => {
+                    if (item.type === 'img') {
+                      console.log(item, values);
+                      return (
+                        <ImageInput
+                          value={values.img}
+                          label={item.label}
+                          handleChange={(e: any) => {
+                            setFieldValue(item.name, e);
+                          }}
+                          handleBlur={() => setFieldTouched(item.name, false)}
+                          handleFocus={() => setFieldTouched(item.name, true)}
+                          readOnly={false}
+                          name={item.name}
+                          error={''}
+                        />
+                      );
+                    }
+                  })}
+                </div>
+
+                <div>
+                  {schema.map((item: FormField) => (
+                    <FirstTimeInput
+                      {...item}
+                      key={item.name}
+                      values={values}
+                      // disabled={readOnly}
+                      // readOnly={readOnly}
+                      errors={errors}
+                      scrollToTop={scrollToTop}
+                      value={values[item.name]}
+                      error={errors[item.name]}
+                      initialValues={initialValues}
+                      deleteErrors={() => {
+                        if (errors[item.name]) delete errors[item.name];
+                      }}
+                      handleChange={(e: any) => {
+                        setFieldValue(item.name, e);
+                      }}
+                      setFieldValue={(e, f) => {
+                        setFieldValue(e, f);
+                      }}
+                      setFieldTouched={setFieldTouched}
+                      handleBlur={() => setFieldTouched(item.name, false)}
+                      handleFocus={() => setFieldTouched(item.name, true)}
+                      setDisableFormButtons={setDisableFormButtons}
+                      extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
               schema.map((item: FormField) => (
                 <Input
                   {...item}
@@ -188,7 +253,8 @@ export default function Form(props: any) {
                   setDisableFormButtons={setDisableFormButtons}
                   extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                 />
-              ))}
+              ))
+            )}
 
             {/* make space at bottom for first sign up */}
             {buttonsOnBottom && !smallForm && <div style={{ height: 600, minHeight: 600 }} />}
@@ -200,7 +266,7 @@ export default function Form(props: any) {
                   onClick={() => {
                     if (props.close) props.close();
                   }}
-                  style={{ ...buttonStyle, marginRight: 10 }}
+                  style={{ ...buttonStyle, marginRight: 10, width: '140px' }}
                   color={'white'}
                   text={'Cancel'}
                 />
@@ -236,7 +302,7 @@ export default function Form(props: any) {
                       // }
                     }}
                     loading={props.loading}
-                    style={buttonStyle}
+                    style={{ ...buttonStyle, width: '140px' }}
                     color={'primary'}
                     text={props.submitText || 'Save'}
                   />
@@ -343,7 +409,7 @@ interface BWrapProps {
 
 const BWrap = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around !important;
   align-items: center;
   width: 100%;
   padding: 10px;
