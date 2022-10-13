@@ -22,9 +22,8 @@ export default function FirstTimeScreen() {
   return (
     <Modal
       visible={true}
-      style={{ height: '100%' }}
-      envStyle={{ height: '100%', borderRadius: 0, width: '100%', maxWidth: 700 }}>
-      <div style={{ height: '100%', padding: 20, paddingTop: 0 }}>
+      envStyle={{ height: 'fit-content', borderRadius: 8, overflow:'hidden', width: '100%', maxWidth: 600 }}>
+      <div style={{ height: '100%', padding: 20, paddingTop: 0, width: '100%' }}>
         <FocusedView
           formHeader={formHeader}
           isFirstTimeScreen={true}
