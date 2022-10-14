@@ -7,6 +7,7 @@ import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
 import { languageOptions } from '../../localization';
 import { useHistory, useLocation } from 'react-router-dom';
+import MaterialIcon from '@material/react-material-icon';
 import { Modal, Button } from '../../sphinxUI';
 
 import SignIn from '../auth/signIn';
@@ -34,6 +35,11 @@ export default function Header() {
       label: 'People',
       name: 'people',
       path: '/p'
+    },
+    {
+      label: 'Tickets',
+      name: 'tickets',
+      path: '/tickets'
     },
     {
       label: 'Bots',
@@ -174,7 +180,7 @@ export default function Header() {
               {tabs &&
                 tabs.map((t, i) => {
                   const label = t.label;
-                  const selected = location.pathname.includes(t.path);
+                  const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
                   return (
                     <MTab
@@ -217,7 +223,7 @@ export default function Header() {
             alignItems: 'center',
             width: '100%'
           }}>
-          <Row>
+          <Row style={{ height: '100%', marginBottom: '-2px' }}>
             <EuiHeaderSection grow={false}>
               <Img src="/static/people_logo.svg" />
             </EuiHeaderSection>
@@ -226,7 +232,7 @@ export default function Header() {
               {tabs &&
                 tabs.map((t, i) => {
                   const label = t.label;
-                  const selected = location.pathname.includes(t.path);
+                  const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
                   return (
                     <Tab
@@ -285,7 +291,7 @@ export default function Header() {
                     /> */}
 
             <a href={'https://sphinx.chat/'} target="_blank">
-              <Button text={'Get Sphinx'} color="transparent" style={{ marginRight: 20 }} />
+              <Button text={'Get Sphinx'} color="primary" style={{ marginRight: 20 }} />
             </a>
             {ui.meInfo ? (
               <Button
@@ -301,12 +307,10 @@ export default function Header() {
                 </div>
               </Button>
             ) : (
-              <Button
-                icon={'account_circle'}
-                text={'Sign in'}
-                color="primary"
-                onClick={() => ui.setShowSignIn(true)}
-              />
+                <LoginBtn onClick={() => ui.setShowSignIn(true)}>
+                  <span>sign in</span>
+                  <MaterialIcon icon={'login'} style={{ fontSize: 18 }} />
+              </LoginBtn>
             )}
           </Corner>
         </div>
@@ -457,6 +461,7 @@ const Imgg = styled.div<ImageProps>`
 const Tabs = styled.div`
   display: flex;
   margin-left: 20px;
+  height: 100%;
 `;
 
 const MTabs = styled.div`
@@ -469,15 +474,15 @@ interface TagProps {
 }
 const Tab = styled.div<TagProps>`
   display: flex;
-  padding: 10px 25px;
-  margin-right: 10px;
+  margin-right: 32px;
   color: ${(p) => (p.selected ? '#fff' : '#6B7A8D')};
   cursor: pointer;
   font-weight: 500;
   font-size: 15px;
   line-height: 19px;
-  background: ${(p) => (p.selected ? 'rgba(255,255,255,0.07)' : '#3C3F4100')};
-  border-radius: 25px;
+  height: 100%;
+  align-items: center;
+  border-bottom: ${(p) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
 `;
 
 const MTab = styled.div<TagProps>`
@@ -492,6 +497,17 @@ const MTab = styled.div<TagProps>`
   line-height: 19px;
   justify-content: center;
   border-bottom: ${(p) => (p.selected ? '3px solid #618AFF' : 'none')};
+`;
+
+const LoginBtn = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  width: 120px;
+  align-items: center;
+  cursor: pointer;
+  span {
+    margin-right: 8px;
+  }
 `;
 
 const LanguageSelector = styled(Select)`
