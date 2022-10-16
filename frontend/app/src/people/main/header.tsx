@@ -307,9 +307,9 @@ export default function Header() {
                 </div>
               </Button>
             ) : (
-                <LoginBtn onClick={() => ui.setShowSignIn(true)}>
-                  <span>sign in</span>
-                  <MaterialIcon icon={'login'} style={{ fontSize: 18 }} />
+              <LoginBtn onClick={() => ui.setShowSignIn(true)}>
+                <span>sign in</span>
+                <MaterialIcon icon={'login'} style={{ fontSize: 18 }} />
               </LoginBtn>
             )}
           </Corner>
