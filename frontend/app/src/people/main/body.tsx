@@ -31,6 +31,7 @@ function useQuery() {
 
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
+
 const StartUpWorkerModelData = {
   getWork: [
     { img: '/static/badges/work_blue1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
@@ -45,6 +46,7 @@ const StartUpWorkerModelData = {
   ]
 };
 export default function BodyComponent() {
+
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -67,7 +69,6 @@ export default function BodyComponent() {
     openGithubIssues
   } = ui;
 
-  const [selectedWidget, setSelectedWidget] = useState('wanted');
   const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
   const listSource = {
@@ -425,7 +426,7 @@ export default function BodyComponent() {
             style={{
               width: '100%',
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               alignItems: 'flex-start',
               padding: 20,
               height: 82,
@@ -435,47 +436,6 @@ export default function BodyComponent() {
               background: '#fff',
               borderBottom: '1px solid rgb(0 0 0 / 7%)'
             }}>
-            <Label style={{ fontSize: 20 }}>
-              Explore
-              <Link onClick={() => setShowDropdown(!showDropdown)}>
-                <div>{widgetLabel && widgetLabel.label}</div>
-              </Link>
-              <MaterialIcon
-                icon={showDropdown ? 'expand_less' : 'expand_more'}
-                style={{ fontSize: 18, marginLeft: 5 }}
-              />
-              {showDropdown && (
-                <MobileDropdown>
-                  {tabs &&
-                    tabs.map((t, i) => {
-                      const { label, description } = t;
-                      const selected = selectedWidget === t.name;
-                      return (
-                        <TabMobile
-                          key={i}
-                          selected={selected}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowDropdown(false);
-                            setSelectedWidget(t.name);
-                          }}>
-                          <div className="tab-icon">
-                            {t?.action?.icon && (
-                              <MaterialIcon icon={t.action.icon} style={{ fontSize: 18 }} />
-                            )}
-                          </div>
-                          <div className="tab-details">
-                            {label && <div className="tab-details__title">{label}</div>}
-                            {description && (
-                              <div className="tab-details__subtitle">{description}</div>
-                            )}
-                          </div>
-                        </TabMobile>
-                      );
-                    })}
-                </MobileDropdown>
-              )}
-            </Label>
             <div style={{ display: 'flex' }}>
               {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
                 <>
@@ -636,33 +596,11 @@ export default function BodyComponent() {
           style={{
             width: '100%',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'flex-start',
             padding: 20,
             height: 62
           }}>
-          <Label>Explore</Label>
-
-          <Tabs>
-            {tabs &&
-              tabs.map((t, i) => {
-                const label = t.label;
-                const selected = selectedWidget === t.name;
-                const isWanted = 'wanted' === t.name;
-
-                return (
-                  <Tab
-                    key={i}
-                    selected={selected}
-                    onClick={() => {
-                      setSelectedWidget(t.name);
-                    }}>
-                    {label}
-                  </Tab>
-                );
-              })}
-          </Tabs>
-
           <div
             style={{
               display: 'flex',
