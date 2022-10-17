@@ -48,7 +48,10 @@ function App() {
             <BotsBody />
           </Route>
           <Route path="/p/">
-            <PeopleBody />
+            <PeopleBody selectedWidget="people" />
+          </Route>
+          <Route path="/tickets/">
+            <PeopleBody selectedWidget="wanted" />
           </Route>
         </Switch>
 
