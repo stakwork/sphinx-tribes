@@ -14,14 +14,15 @@ export default function NumberInput({
   extraHTML,
   handleChange,
   handleBlur,
-  handleFocus
+  handleFocus,
+  borderType
 }: Props) {
   let labeltext = label;
   if (error) labeltext = labeltext + ` (${error})`;
 
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv border={borderType} label={labeltext}>
         <R>
           <FieldText
             name="first"
@@ -59,6 +60,16 @@ export default function NumberInput({
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
+      {/* <ExtraText
+        style={{
+          fontSize: '10px',
+          fontWeight: '400',
+          lineHeight: '11px',
+          color: '#8E969C'
+        }}>
+        *This amount applies to users trying to connect within the Sphinx app. Older versions of the
+        app may not support this feature.
+      </ExtraText> */}
     </>
   );
 }

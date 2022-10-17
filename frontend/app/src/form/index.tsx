@@ -8,7 +8,6 @@ import { useStores } from '../store';
 import Select from '../sphinxUI/select';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
 import { formDropdownOptions } from '../people/utils/constants';
-import FirstTimePageInput from './inputs/firstTimePageInputs';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
@@ -175,7 +174,7 @@ export default function Form(props: any) {
                     {schema
                       .filter((item: FormField) => item.type === 'img')
                       .map((item: FormField) => (
-                        <FirstTimePageInput
+                        <Input
                           {...item}
                           key={item.name}
                           values={values}
@@ -202,20 +201,18 @@ export default function Form(props: any) {
                           extraHTML={
                             (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                           }
+                          borderType={'bottom'}
+                          imageIcon={true}
                         />
                       ))}
                   </div>
 
                   <div style={{ width: '100%' }}>
                     {schema
-                      .filter(
-                        (item: FormField) =>
-                          item.type !== 'img' &&
-                          firstTimeScreenData.some((val) => val === item.name)
-                      )
+                      .filter((item: FormField) => item.type !== 'img')
                       .map((item: FormField) => {
                         return (
-                          <FirstTimePageInput
+                          <Input
                             {...item}
                             key={item.name}
                             values={values}
@@ -242,6 +239,7 @@ export default function Form(props: any) {
                             extraHTML={
                               (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                             }
+                            borderType={'bottom'}
                           />
                         );
                       })}
