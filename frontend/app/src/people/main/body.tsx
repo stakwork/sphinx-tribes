@@ -45,8 +45,7 @@ const StartUpWorkerModelData = {
     { img: '/static/badges/work_green3.svg', step: 'STEP 3', heading: 'Create a ticket' }
   ]
 };
-export default function BodyComponent() {
-
+export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
