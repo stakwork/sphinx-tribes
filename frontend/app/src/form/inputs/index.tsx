@@ -79,10 +79,15 @@ export const Note = styled.div`
   font-style: italic;
 `;
 
-export const FieldEnv = styled(EuiFormRow as any)`
-  border: 1px solid #dde1e5;
+interface fieldEnvProps {
+  readonly border: string;
+}
+
+export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
+  border: ${(p) => (p.border === 'bottom' ? '' : '1px solid #dde1e5')};
+  border-bottom: ${(p) => (p.border === 'bottom' ? '1px solid #dde1e5' : '')};
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
   box-shadow: none !important;
   max-width: 900px;
 

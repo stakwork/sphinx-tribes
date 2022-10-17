@@ -9,7 +9,7 @@ const DeleteTicketModal = ({ closeModal, confirmDelete }) => {
         <EuiModal
           onClose={closeModal}
           style={{
-            background: '#fff',
+            background: '#F2F3F5',
             padding: '50px 50px 30px 50px'
           }}>
           <EuiText>Are you sure you want to delete this Ticket?</EuiText>

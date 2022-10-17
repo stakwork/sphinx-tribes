@@ -20,7 +20,8 @@ export default function ImageInput({
   handleChange,
   handleBlur,
   handleFocus,
-  notProfilePic
+  notProfilePic,
+  imageIcon
 }: Props) {
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
@@ -99,23 +100,60 @@ export default function ImageInput({
       <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
         {({ getRootProps, getInputProps, isDragActive, open }) => (
           <DropzoneStuff>
-            <DottedCircle {...getRootProps()} isDragActive={isDragActive} style={addedStyle}>
-              <input {...getInputProps()} />
-              <ImageCircle style={addedStyle}>
-                {!uploading ? (
-                  <Image
-                    style={{
-                      backgroundImage: `url(${
-                        picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                      })`,
-                      ...addedStyle
-                    }}
+            {imageIcon ? (
+              <DottedCircle isDragActive={isDragActive} style={addedStyle}>
+                <input {...getInputProps()} />
+                <ImageCircle style={addedStyle}>
+                  {!uploading ? (
+                    <Image
+                      style={{
+                        backgroundImage: `url(${
+                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                        })`,
+                        ...addedStyle
+                      }}
+                    />
+                  ) : (
+                    <EuiLoadingSpinner size="xl" />
+                  )}
+                </ImageCircle>
+                <div
+                  style={{
+                    position: 'absolute',
+                    height: '38px',
+                    width: '38px',
+                    top: '260px',
+                    left: '125px'
+                  }}
+                  {...getRootProps()}>
+                  <img
+                    src="/static/badges/Camera.png"
+                    height={'100%'}
+                    width={'100%'}
+                    alt="camera_icon"
                   />
-                ) : (
-                  <EuiLoadingSpinner size="xl" />
-                )}
-              </ImageCircle>
-            </DottedCircle>
+                </div>
+              </DottedCircle>
+            ) : (
+              <DottedCircle {...getRootProps()} isDragActive={isDragActive} style={addedStyle}>
+                <input {...getInputProps()} />
+                <ImageCircle style={addedStyle}>
+                  {!uploading ? (
+                    <Image
+                      style={{
+                        backgroundImage: `url(${
+                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                        })`,
+                        ...addedStyle
+                      }}
+                    />
+                  ) : (
+                    <EuiLoadingSpinner size="xl" />
+                  )}
+                </ImageCircle>
+              </DottedCircle>
+            )}
+
             {/* <div style={{ color: "#6B7A8D", marginTop: 5 }}>Drag and drop or</div>
             <EuiButton onClick={open}
               style={{

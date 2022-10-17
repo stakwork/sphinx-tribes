@@ -14,6 +14,7 @@ import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 import Select from 'react-select';
+import IconButton from '../../sphinxUI/icon_button';
 
 export default function Header() {
   const { main, ui } = useStores();
@@ -347,6 +348,14 @@ export default function Header() {
                 style={{ height: 128, width: 128, marginBottom: 40 }}
                 src={ui.meInfo?.img || '/static/person_placeholder.png'}
               />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '110px',
+                  right: '85px'
+                }}>
+                <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
+              </div>
 
               <T>
                 <div style={{ lineHeight: '26px' }}>
@@ -359,8 +368,9 @@ export default function Header() {
                 favorite podcast!
               </Welcome>
 
-              <Button
+              <IconButton
                 text={'Continue'}
+                endingIcon={'arrow_forward'}
                 height={48}
                 width={'100%'}
                 color={'primary'}

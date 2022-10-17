@@ -911,8 +911,14 @@ textarea.qr-string {
 }
 
 .euiModal__closeIcon {
-  color: #000 !important;
-  background: #fff !important;
+  color: #b0b7bc !important;
+  background: #f2f3f5 !important;
+  padding: 20px;
+}
+
+.euiModal__closeIcon svg {
+  height: 24px;
+  width: 24px;
 }
 
 @media (max-width: 767px) {

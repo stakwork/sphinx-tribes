@@ -14,6 +14,8 @@ export interface Props {
   options?: any[];
   name: string;
   error: string;
+  borderType?: 'bottom' | 'outline';
+  imageIcon?: boolean;
 
   notProfilePic?: boolean;
 }
