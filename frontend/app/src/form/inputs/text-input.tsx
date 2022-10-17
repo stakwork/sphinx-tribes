@@ -15,7 +15,8 @@ export default function TextInput({
   handleFocus,
   readOnly,
   prepend,
-  extraHTML
+  extraHTML,
+  borderType
 }: Props) {
   let labeltext = label;
   if (error) labeltext = labeltext + ` (${error})`;
@@ -23,7 +24,7 @@ export default function TextInput({
   const padStyle = prepend ? { paddingLeft: 0 } : {};
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv border={borderType} label={labeltext}>
         <R>
           <FieldText
             name="first"

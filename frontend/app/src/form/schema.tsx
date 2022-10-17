@@ -343,6 +343,52 @@ export const liquidSchema: FormField[] = [
   }
 ];
 
+export const firstScreenSchema: FormField[] = [
+  {
+    name: 'img',
+    label: 'Image',
+    type: 'img',
+    page: 1
+  },
+  {
+    name: 'pubkey',
+    label: 'Pubkey*',
+    type: 'text',
+    readOnly: true,
+    page: 1
+  },
+  {
+    name: 'owner_alias',
+    label: 'Name*',
+    type: 'text',
+    required: true,
+    validator: strValidator,
+    page: 1
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    type: 'textarea',
+    page: 1
+  },
+  {
+    name: 'price_to_meet',
+    label: 'Price to Meet',
+    type: 'number',
+    page: 1,
+    extraHTML:
+      '<p>*This amount applies to users trying to connect within the Sphinx app. Older versions of the app may not support this feature.</p>'
+  },
+  {
+    name: 'twitter',
+    label: 'Twitter',
+    widget: true,
+    type: 'text',
+    prepend: '@',
+    page: 1
+  }
+];
+
 export const aboutSchema: FormField[] = [
   {
     name: 'img',
@@ -456,6 +502,8 @@ export const aboutSchema: FormField[] = [
   //     page: 1,
   // },
 ];
+
+
 
 export const postSchema: FormField[] = [
   {

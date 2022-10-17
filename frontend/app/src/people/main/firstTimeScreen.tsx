@@ -3,7 +3,7 @@ import { useStores } from '../../store';
 import styled from 'styled-components';
 import { Modal } from '../../sphinxUI';
 import FocusedView from './focusView';
-import { aboutSchema } from '../../form/schema';
+import { firstScreenSchema } from '../../form/schema';
 
 // this is where we see others posts (etc) and edit our own
 export default function FirstTimeScreen() {
@@ -22,7 +22,13 @@ export default function FirstTimeScreen() {
   return (
     <Modal
       visible={true}
-      envStyle={{ height: 'fit-content', borderRadius: 8, overflow:'hidden', width: '100%', maxWidth: 600 }}>
+      envStyle={{
+        height: 'fit-content',
+        borderRadius: 8,
+        overflow: 'hidden',
+        width: '100%',
+        maxWidth: 600
+      }}>
       <div style={{ height: '100%', padding: 20, paddingTop: 0, width: '100%' }}>
         <FocusedView
           formHeader={formHeader}
@@ -43,7 +49,7 @@ export default function FirstTimeScreen() {
             single: true,
             skipEditLayer: true,
             submitText: 'Submit',
-            schema: aboutSchema
+            schema: firstScreenSchema
           }}
           onSuccess={() => {
             console.log('success');
