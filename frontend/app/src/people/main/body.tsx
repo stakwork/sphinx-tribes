@@ -8,7 +8,6 @@ import PersonViewSlim from '../personViewSlim';
 import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
-import NoneSpace from '../utils/noneSpace';
 import { Divider, SearchTextInput, Modal, Button } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
 import MaterialIcon from '@material/react-material-icon';
@@ -19,6 +18,8 @@ import { useHistory } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
+import NoneSpaceHomePage from '../utils/noneSpaceHomePage';
+import StartUpModal from '../utils/start_up_modal';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -31,6 +32,19 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
+const StartUpWorkerModelData = {
+  getWork: [
+    { img: '/static/badges/work_blue1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
+    { img: '/static/badges/work_blue2.svg', step: 'STEP 2', heading: 'Create a profile' },
+    { img: '/static/badges/work_blue3.svg', step: 'STEP 3', heading: 'Do the task' },
+    { img: '/static/badges/work_blue4.svg', step: 'STEP 4', heading: 'Get paid' }
+  ],
+  createWork: [
+    { img: '/static/badges/work_green1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
+    { img: '/static/badges/work_green2.svg', step: 'STEP 2', heading: 'Create a profile' },
+    { img: '/static/badges/work_green3.svg', step: 'STEP 3', heading: 'Create a ticket' }
+  ]
+};
 export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
@@ -41,6 +55,10 @@ export default function BodyComponent({ selectedWidget }) {
   const [showFocusView, setShowFocusView] = useState(false);
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
 
   const {
     peoplePageNumber,
@@ -384,12 +402,19 @@ export default function BodyComponent({ selectedWidget }) {
         <Body onScroll={handleScroll}>
           {!ui.meInfo && (
             <div style={{ marginTop: 60 }}>
-              <NoneSpace
-                buttonText={'Get Started'}
+              <NoneSpaceHomePage
+                buttonText1={'I would like to work'}
                 buttonIcon={'arrow_forward'}
-                action={() => ui.setShowSignIn(true)}
-                img={'explore.png'}
-                text={'Start your own profile'}
+                buttonText2={'I need work done'}
+                action1={() => {
+                  setStartUpModelState('getWork');
+                  showModal();
+                }}
+                action2={() => {
+                  setStartUpModelState('createWork');
+                  showModal();
+                }}
+                text={'Ticket party!'}
                 style={{ height: 320, background: '#fff' }}
               />
               <Divider />
@@ -547,13 +572,20 @@ export default function BodyComponent({ selectedWidget }) {
         }}>
         {!ui.meInfo && (
           <div>
-            <NoneSpace
+            <NoneSpaceHomePage
               banner
-              buttonText={'Get Started'}
+              buttonText1={'I would like to work'}
               buttonIcon={'arrow_forward'}
-              action={() => ui.setShowSignIn(true)}
-              img={'explore.png'}
-              text={'Start your own profile'}
+              buttonText2={'I need work done'}
+              action1={() => {
+                setStartUpModelState('getWork');
+                showModal();
+              }}
+              action2={() => {
+                setStartUpModelState('createWork');
+                showModal();
+              }}
+              text={'Ticket party!'}
               style={{ height: 320 }}
             />
             <Divider />
@@ -696,6 +728,14 @@ export default function BodyComponent({ selectedWidget }) {
               }}
             />
           </Modal>
+        )}
+
+        {openStartUpModel && (
+          <StartUpModal
+            closeModal={closeModal}
+            dataObject={StartUpWorkerModelData[startUpModelState]}
+            buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
+          />
         )}
         {toastsEl}
         {/* modal create ticket */}

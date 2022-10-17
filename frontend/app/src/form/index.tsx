@@ -22,6 +22,8 @@ export default function Form(props: any) {
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
 
+  const firstTimeScreenData = ['pubkey', 'owner_alias', 'description', 'price_to_meet', 'twitter'];
+
   let lastPage = 1;
   const readOnly = props.readOnly;
   const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody;
@@ -160,7 +162,91 @@ export default function Form(props: any) {
               />
             )}
 
-            {schema &&
+            {props.isFirstTimeScreen && schema ? (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%'
+                  }}>
+                  <div style={{ marginRight: '40px' }}>
+                    {schema
+                      .filter((item: FormField) => item.type === 'img')
+                      .map((item: FormField) => (
+                        <Input
+                          {...item}
+                          key={item.name}
+                          values={values}
+                          // disabled={readOnly}
+                          // readOnly={readOnly}
+                          errors={errors}
+                          scrollToTop={scrollToTop}
+                          value={values[item.name]}
+                          error={errors[item.name]}
+                          initialValues={initialValues}
+                          deleteErrors={() => {
+                            if (errors[item.name]) delete errors[item.name];
+                          }}
+                          handleChange={(e: any) => {
+                            setFieldValue(item.name, e);
+                          }}
+                          setFieldValue={(e, f) => {
+                            setFieldValue(e, f);
+                          }}
+                          setFieldTouched={setFieldTouched}
+                          handleBlur={() => setFieldTouched(item.name, false)}
+                          handleFocus={() => setFieldTouched(item.name, true)}
+                          setDisableFormButtons={setDisableFormButtons}
+                          extraHTML={
+                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                          }
+                          borderType={'bottom'}
+                          imageIcon={true}
+                        />
+                      ))}
+                  </div>
+
+                  <div style={{ width: '100%' }}>
+                    {schema
+                      .filter((item: FormField) => item.type !== 'img')
+                      .map((item: FormField) => {
+                        return (
+                          <Input
+                            {...item}
+                            key={item.name}
+                            values={values}
+                            // disabled={readOnly}
+                            // readOnly={readOnly}
+                            errors={errors}
+                            scrollToTop={scrollToTop}
+                            value={values[item.name]}
+                            error={errors[item.name]}
+                            initialValues={initialValues}
+                            deleteErrors={() => {
+                              if (errors[item.name]) delete errors[item.name];
+                            }}
+                            handleChange={(e: any) => {
+                              setFieldValue(item.name, e);
+                            }}
+                            setFieldValue={(e, f) => {
+                              setFieldValue(e, f);
+                            }}
+                            setFieldTouched={setFieldTouched}
+                            handleBlur={() => setFieldTouched(item.name, false)}
+                            handleFocus={() => setFieldTouched(item.name, true)}
+                            setDisableFormButtons={setDisableFormButtons}
+                            extraHTML={
+                              (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                            }
+                            borderType={'bottom'}
+                          />
+                        );
+                      })}
+                  </div>
+                </div>
+              </>
+            ) : (
               schema.map((item: FormField) => (
                 <Input
                   {...item}
@@ -188,11 +274,11 @@ export default function Form(props: any) {
                   setDisableFormButtons={setDisableFormButtons}
                   extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                 />
-              ))}
+              ))
+            )}
 
             {/* make space at bottom for first sign up */}
-            {buttonsOnBottom && !smallForm && <div style={{ height: 600, minHeight: 600 }} />}
-
+            {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
             <BWrap style={buttonAlignment}>
               {props.close && buttonsOnBottom ? (
                 <Button
@@ -200,7 +286,7 @@ export default function Form(props: any) {
                   onClick={() => {
                     if (props.close) props.close();
                   }}
-                  style={{ ...buttonStyle, marginRight: 10 }}
+                  style={{ ...buttonStyle, marginRight: 10, width: '140px' }}
                   color={'white'}
                   text={'Cancel'}
                 />
@@ -236,7 +322,7 @@ export default function Form(props: any) {
                       // }
                     }}
                     loading={props.loading}
-                    style={buttonStyle}
+                    style={{ ...buttonStyle, width: '140px' }}
                     color={'primary'}
                     text={props.submitText || 'Save'}
                   />
@@ -256,9 +342,8 @@ export default function Form(props: any) {
                 </div>
               )}
             </BWrap>
-
             {/*  if schema is AboutMe */}
-            {isAboutMeForm && ui.meInfo?.id != 0 && (
+            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id != 0 && (
               <>
                 <div
                   style={{
@@ -343,7 +428,7 @@ interface BWrapProps {
 
 const BWrap = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between !important;
   align-items: center;
   width: 100%;
   padding: 10px;
