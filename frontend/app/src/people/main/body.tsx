@@ -1,25 +1,25 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
-import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
+import { EuiGlobalToastList, EuiLoadingSpinner, EuiText } from '@elastic/eui';
 import Person from '../person';
 import PersonViewSlim from '../personViewSlim';
 import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
-import { Divider, SearchTextInput, Modal, Button } from '../../sphinxUI';
+import { Divider, SearchTextInput, Modal } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
-import MaterialIcon from '@material/react-material-icon';
 import FocusedView from './focusView';
-
 import { widgetConfigs } from '../utils/constants';
 import { useHistory } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import NoneSpaceHomePage from '../utils/noneSpaceHomePage';
 import StartUpModal from '../utils/start_up_modal';
+import IconButton from '../../sphinxUI/icon_button';
+import BountyViewer from '../widgetViews/bountyViewer';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -59,6 +59,7 @@ export default function BodyComponent({ selectedWidget }) {
   const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
+  const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
 
   const {
     peoplePageNumber,
@@ -176,7 +177,6 @@ export default function BodyComponent({ selectedWidget }) {
           [selectedWidget]: person[selectedWidget]
         }
       };
-      //   console.log(p, itemIndex);
       setPublicFocusPerson(p);
       setPublicFocusIndex(itemIndex);
     }
@@ -206,7 +206,6 @@ export default function BodyComponent({ selectedWidget }) {
       setPublicFocusIndex(-1);
     } else {
       //pull list again, we came back from focus view
-      console.log('pull list');
       let loadMethod = loadMethods[selectedWidget];
       loadMethod({ page: 1, resetPage: true });
     }
@@ -350,7 +349,19 @@ export default function BodyComponent({ selectedWidget }) {
         p = <NoResults />;
       }
 
-      return p;
+      return (
+        <div
+          id="renderPeople"
+          style={{
+            display: 'flex',
+            justifyContent: 'start',
+            alignItems: 'center',
+            flexWrap: 'wrap'
+          }}>
+          {p}
+        </div>
+      );
+      // return p;
     }
 
     const listContent =
@@ -436,7 +447,7 @@ export default function BodyComponent({ selectedWidget }) {
               borderBottom: '1px solid rgb(0 0 0 / 7%)'
             }}>
             <div style={{ display: 'flex' }}>
-              {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
+              {/* {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
                 <>
                   <div
                     style={{
@@ -454,12 +465,11 @@ export default function BodyComponent({ selectedWidget }) {
                     onClick={() => {
                       // setShowFocusView(true);
                       setIsMobileViewTicketModal(true);
-                      console.log('hi');
                     }}>
                     +
                   </div>
                 </>
-              )}
+              )} */}
 
               <SearchTextInput
                 small
@@ -522,7 +532,7 @@ export default function BodyComponent({ selectedWidget }) {
                 goBack={() => {
                   setPublicFocusPerson(null);
                   setPublicFocusIndex(-1);
-                  history.push('/p');
+                  history.push('/tickets');
                 }}
               />
             </Modal>
@@ -591,6 +601,16 @@ export default function BodyComponent({ selectedWidget }) {
             <Divider />
           </div>
         )}
+
+        {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
+
+        {selectedWidget === 'wanted' && (
+          <BountyViewer
+            selectedWidget={selectedWidget}
+            activeList={activeList}
+            setShowFocusView={setShowFocusView}
+          />
+        )}
         <div
           style={{
             width: '100%',
@@ -607,7 +627,7 @@ export default function BodyComponent({ selectedWidget }) {
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-            {selectedWidget === 'wanted' &&
+            {/* {selectedWidget === 'wanted' &&
               (ui.meInfo && ui.meInfo?.owner_alias ? (
                 <div
                   style={{
@@ -641,7 +661,7 @@ export default function BodyComponent({ selectedWidget }) {
                   }}>
                   Login to Create Tickets
                 </div>
-              ))}
+              ))} */}
 
             <SearchTextInput
               name="search"
@@ -710,7 +730,7 @@ export default function BodyComponent({ selectedWidget }) {
             bigClose={() => {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
-              history.push('/p');
+              history.push('/tickets');
             }}>
             <FocusedView
               person={publicFocusPerson}
