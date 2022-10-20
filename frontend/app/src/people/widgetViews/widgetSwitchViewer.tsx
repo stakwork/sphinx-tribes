@@ -25,11 +25,12 @@ export default function WidgetSwitchViewer(props) {
         minHeight: 132
       }
     : {
-        maxWidth: 291,
-        minWidth: 291,
+        // maxWidth: 291,
+        minWidth: '100%',
         marginRight: 20,
         marginBottom: 20,
-        minHeight: 472
+        // minHeight: 472,
+        borderRadius: '10px'
       };
 
   return useObserver(() => {

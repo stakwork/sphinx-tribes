@@ -10,6 +10,7 @@ import { useStores } from '../../store';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import { getHost } from '../../host';
+import PaidBounty from '../utils/paidBounty';
 
 export default function WantedView(props: any) {
   let {
@@ -661,6 +662,17 @@ export default function WantedView(props: any) {
         </DWrap>
       </>
     );
+    return (
+      <>
+        {paid ? (
+          <BountyBox>
+            <PaidBounty {...person} />
+          </BountyBox>
+        ) : (
+          <BountyBox>hi</BountyBox>
+        )}
+      </>
+    );
   }
 
   return renderTickets();
@@ -669,6 +681,15 @@ export default function WantedView(props: any) {
 interface WrapProps {
   isClosed?: boolean;
 }
+
+const BountyBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  min-height: 160px;
+  max-height: 160px;
+  border-radius: 10px;
+`;
 
 const DWrap = styled.div<WrapProps>`
   display: flex;
