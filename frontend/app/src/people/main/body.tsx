@@ -19,7 +19,7 @@ import PageLoadSpinner from '../utils/pageLoadSpinner';
 import NoneSpaceHomePage from '../utils/noneSpaceHomePage';
 import StartUpModal from '../utils/start_up_modal';
 import IconButton from '../../sphinxUI/icon_button';
-import BountyViewer from '../widgetViews/bountyViewer';
+import BountyHeader from '../widgetViews/bountyHeader';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -605,7 +605,7 @@ export default function BodyComponent({ selectedWidget }) {
         {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
 
         {selectedWidget === 'wanted' && (
-          <BountyViewer
+          <BountyHeader
             selectedWidget={selectedWidget}
             activeList={activeList}
             setShowFocusView={setShowFocusView}
