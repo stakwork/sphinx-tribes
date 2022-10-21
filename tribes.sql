@@ -27,7 +27,8 @@ CREATE TABLE tribes (
   bots TEXT,
   owner_route_hint TEXT,
   unique_name TEXT,
-  pin TEXT
+  pin TEXT,
+  profile_filters TEXT
 );
 
 -- for searching 
@@ -105,6 +106,7 @@ SELECT uuid, unique_name, ts_rank(tsv, q) as rank
 
 CREATE TABLE people (
   id SERIAL PRIMARY KEY,
+  uuid TEXT,
   owner_pub_key TEXT NOT NULL,
   owner_alias TEXT,
   owner_route_hint TEXT,
