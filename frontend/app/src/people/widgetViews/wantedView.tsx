@@ -372,296 +372,296 @@ export default function WantedView(props: any) {
     }
 
     // desktop view
-    return (
-      <>
-        {paid && (
-          <Img
-            src={'/static/paid_ribbon.svg'}
-            style={{
-              position: 'absolute',
-              top: -1,
-              right: 0,
-              width: 64,
-              height: 72
-            }}
-          />
-        )}
+    // return (
+    //   <>
+    //     {paid && (
+    //       <Img
+    //         src={'/static/paid_ribbon.svg'}
+    //         style={{
+    //           position: 'absolute',
+    //           top: -1,
+    //           right: 0,
+    //           width: 64,
+    //           height: 72
+    //         }}
+    //       />
+    //     )}
 
-        <DWrap isClosed={isClosed}>
-          <Pad style={{ padding: 20, minHeight: 410 }}>
-            <div
-              style={{
-                display: 'flex',
-                width: '100%',
-                justifyContent: 'space-between'
-              }}>
-              <NameTag
-                {...person}
-                created={created}
-                widget={'wanted'}
-                ticketUrl={ticketUrl}
-                loomEmbedUrl={loomEmbedUrl}
-              />
-            </div>
-            <Divider style={{ margin: '10px 0' }} />
-            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {isCodingTask ?
-                            <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
-                            : <div />
-                        }
-                    </div> */}
-            <DT>{title}</DT>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}>
-              {isCodingTask ? (
-                <GithubStatusPill
-                  status={status}
-                  assignee={assignee}
-                  style={{
-                    marginTop: 10
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    minHeight: '36px'
-                  }}></div>
-              )}
-              {{ ...assignee }.owner_alias && (
-                <div
-                  style={{
-                    marginTop: '8px'
-                  }}>
-                  <img
-                    src={
-                      {
-                        ...assignee
-                      }.img || '/static/person_placeholder.png'
-                    }
-                    alt="assignee_img"
-                    style={{
-                      borderRadius: '50%',
-                      height: '16px',
-                      width: '16px',
-                      margin: '0px 8px'
-                    }}
-                  />
-                  <span
-                    // onClick={(e) => {
-                    //   e.stopPropagation();
-                    //   findUserByGithubHandle();
-                    // }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(
-                        `/p/${
-                          {
-                            ...assignee
-                          }.owner_pubkey
-                        }?widget=wanted`,
-                        '_blank'
-                      );
-                    }}
-                    style={{
-                      fontSize: '12px'
-                    }}>
-                    {
-                      {
-                        ...assignee
-                      }.owner_alias
-                    }
-                  </span>
-                </div>
-              )}
-            </div>
+    //     <DWrap isClosed={isClosed}>
+    //       <Pad style={{ padding: 20, minHeight: 410 }}>
+    //         <div
+    //           style={{
+    //             display: 'flex',
+    //             width: '100%',
+    //             justifyContent: 'space-between'
+    //           }}>
+    //           <NameTag
+    //             {...person}
+    //             created={created}
+    //             widget={'wanted'}
+    //             ticketUrl={ticketUrl}
+    //             loomEmbedUrl={loomEmbedUrl}
+    //           />
+    //         </div>
+    //         <Divider style={{ margin: '10px 0' }} />
+    //         {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    //                     {isCodingTask ?
+    //                         <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
+    //                         : <div />
+    //                     }
+    //                 </div> */}
+    //         <DT>{title}</DT>
+    //         <div
+    //           style={{
+    //             display: 'flex',
+    //             flexDirection: 'row',
+    //             alignItems: 'center'
+    //           }}>
+    //           {isCodingTask ? (
+    //             <GithubStatusPill
+    //               status={status}
+    //               assignee={assignee}
+    //               style={{
+    //                 marginTop: 10
+    //               }}
+    //             />
+    //           ) : (
+    //             <div
+    //               style={{
+    //                 minHeight: '36px'
+    //               }}></div>
+    //           )}
+    //           {{ ...assignee }.owner_alias && (
+    //             <div
+    //               style={{
+    //                 marginTop: '8px'
+    //               }}>
+    //               <img
+    //                 src={
+    //                   {
+    //                     ...assignee
+    //                   }.img || '/static/person_placeholder.png'
+    //                 }
+    //                 alt="assignee_img"
+    //                 style={{
+    //                   borderRadius: '50%',
+    //                   height: '16px',
+    //                   width: '16px',
+    //                   margin: '0px 8px'
+    //                 }}
+    //               />
+    //               <span
+    //                 // onClick={(e) => {
+    //                 //   e.stopPropagation();
+    //                 //   findUserByGithubHandle();
+    //                 // }}
+    //                 onClick={(e) => {
+    //                   e.stopPropagation();
+    //                   window.open(
+    //                     `/p/${
+    //                       {
+    //                         ...assignee
+    //                       }.owner_pubkey
+    //                     }?widget=wanted`,
+    //                     '_blank'
+    //                   );
+    //                 }}
+    //                 style={{
+    //                   fontSize: '12px'
+    //                 }}>
+    //                 {
+    //                   {
+    //                     ...assignee
+    //                   }.owner_alias
+    //                 }
+    //               </span>
+    //             </div>
+    //           )}
+    //         </div>
 
-            <div
-              style={{
-                minHeight: '48px',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                marginTop: '10px',
-                flexWrap: 'wrap'
-              }}>
-              {labels.length > 0 ? (
-                labels.map((x: any) => {
-                  return (
-                    <>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          height: 'fit-content',
-                          width: 'fit-content',
-                          backgroundColor: '#cfcfcf',
-                          border: '1px solid #909090',
-                          padding: '0px 14px',
-                          borderRadius: '20px',
-                          marginRight: '3px',
-                          marginBottom: '3px'
-                        }}>
-                        <div
-                          style={{
-                            fontSize: '10px',
-                            color: '#202020'
-                          }}>
-                          {x.label}
-                        </div>
-                      </div>
-                    </>
-                  );
-                })
-              ) : (
-                <>
-                  <div
-                    style={{
-                      minHeight: '50px'
-                    }}></div>
-                </>
-              )}
-            </div>
-            <Divider
-              style={{
-                margin: isCodingTask || gallery ? '22px 0' : '0 0 22px'
-              }}
-            />
-            <DescriptionCodeTask>
-              {renderMarkdown(description)}
-              {gallery && (
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap'
-                  }}>
-                  {gallery.map((val, index) => {
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          height: '48px',
-                          width: '48px',
-                          padding: '0px 2px',
-                          borderRadius: '6px',
-                          overflow: 'hidden'
-                        }}>
-                        <img src={val} alt="image" height={'100%'} width={'100%'} />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </DescriptionCodeTask>
-          </Pad>
+    //         <div
+    //           style={{
+    //             minHeight: '48px',
+    //             width: '100%',
+    //             display: 'flex',
+    //             flexDirection: 'row',
+    //             marginTop: '10px',
+    //             flexWrap: 'wrap'
+    //           }}>
+    //           {labels.length > 0 ? (
+    //             labels.map((x: any) => {
+    //               return (
+    //                 <>
+    //                   <div
+    //                     style={{
+    //                       display: 'flex',
+    //                       flexWrap: 'wrap',
+    //                       height: 'fit-content',
+    //                       width: 'fit-content',
+    //                       backgroundColor: '#cfcfcf',
+    //                       border: '1px solid #909090',
+    //                       padding: '0px 14px',
+    //                       borderRadius: '20px',
+    //                       marginRight: '3px',
+    //                       marginBottom: '3px'
+    //                     }}>
+    //                     <div
+    //                       style={{
+    //                         fontSize: '10px',
+    //                         color: '#202020'
+    //                       }}>
+    //                       {x.label}
+    //                     </div>
+    //                   </div>
+    //                 </>
+    //               );
+    //             })
+    //           ) : (
+    //             <>
+    //               <div
+    //                 style={{
+    //                   minHeight: '50px'
+    //                 }}></div>
+    //             </>
+    //           )}
+    //         </div>
+    //         <Divider
+    //           style={{
+    //             margin: isCodingTask || gallery ? '22px 0' : '0 0 22px'
+    //           }}
+    //         />
+    //         <DescriptionCodeTask>
+    //           {renderMarkdown(description)}
+    //           {gallery && (
+    //             <div
+    //               style={{
+    //                 display: 'flex',
+    //                 flexWrap: 'wrap'
+    //               }}>
+    //               {gallery.map((val, index) => {
+    //                 return (
+    //                   <div
+    //                     key={index}
+    //                     style={{
+    //                       height: '48px',
+    //                       width: '48px',
+    //                       padding: '0px 2px',
+    //                       borderRadius: '6px',
+    //                       overflow: 'hidden'
+    //                     }}>
+    //                     <img src={val} alt="image" height={'100%'} width={'100%'} />
+    //                   </div>
+    //                 );
+    //               })}
+    //             </div>
+    //           )}
+    //         </DescriptionCodeTask>
+    //       </Pad>
 
-          <Divider style={{ margin: 0 }} />
+    //       <Divider style={{ margin: 0 }} />
 
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              padding: '10px 20px',
-              minHeight: '100px'
-            }}>
-            <Pad
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between'
-              }}>
-              {priceMin ? (
-                <P>
-                  <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
-                  <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
-                </P>
-              ) : (
-                <P>
-                  <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
-                </P>
-              )}
+    //       <div
+    //         style={{
+    //           display: 'flex',
+    //           flexDirection: 'column',
+    //           padding: '10px 20px',
+    //           minHeight: '100px'
+    //         }}>
+    //         <Pad
+    //           style={{
+    //             flexDirection: 'row',
+    //             justifyContent: 'space-between'
+    //           }}>
+    //           {priceMin ? (
+    //             <P>
+    //               <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
+    //               <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
+    //             </P>
+    //           ) : (
+    //             <P>
+    //               <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+    //             </P>
+    //           )}
 
-              <div
-                style={{
-                  width: '40px'
-                }}>
-                {
-                  //  if my own, show this option to show/hide
-                  isMine && (
-                    <Button
-                      icon={show ? 'visibility' : 'visibility_off'}
-                      disable={saving}
-                      submitting={saving}
-                      iconStyle={{
-                        color: '#555',
-                        fontSize: 20
-                      }}
-                      style={{
-                        minWidth: 24,
-                        maxWidth: 24,
-                        minHeight: 20,
-                        height: 20,
-                        padding: 0,
-                        background: '#fff'
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExtrasPropertyAndSave('show');
-                      }}
-                    />
-                  )
-                }
-              </div>
-            </Pad>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-              <EuiText
-                style={{
-                  fontSize: '14px',
-                  color: '#8e969c',
-                  fontWeight: '500'
-                }}>
-                {estimate_session_length && 'Session:'}{' '}
-                <span
-                  style={{
-                    fontWeight: '500',
-                    color: '#000'
-                  }}>
-                  {estimate_session_length ?? ''}
-                </span>
-              </EuiText>
-              {ui?.meInfo?.isSuperAdmin && (
-                <EuiButtonIcon
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showModal();
-                    setDeletePayload({
-                      created: created,
-                      host: getHost(),
-                      pubkey: person.owner_pubkey
-                    });
-                  }}
-                  iconType="trash"
-                  aria-label="Next"
-                  size="s"
-                  style={{
-                    color: '#000',
-                    background: '#fff'
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </DWrap>
-      </>
-    );
+    //           <div
+    //             style={{
+    //               width: '40px'
+    //             }}>
+    //             {
+    //               //  if my own, show this option to show/hide
+    //               isMine && (
+    //                 <Button
+    //                   icon={show ? 'visibility' : 'visibility_off'}
+    //                   disable={saving}
+    //                   submitting={saving}
+    //                   iconStyle={{
+    //                     color: '#555',
+    //                     fontSize: 20
+    //                   }}
+    //                   style={{
+    //                     minWidth: 24,
+    //                     maxWidth: 24,
+    //                     minHeight: 20,
+    //                     height: 20,
+    //                     padding: 0,
+    //                     background: '#fff'
+    //                   }}
+    //                   onClick={(e) => {
+    //                     e.stopPropagation();
+    //                     setExtrasPropertyAndSave('show');
+    //                   }}
+    //                 />
+    //               )
+    //             }
+    //           </div>
+    //         </Pad>
+    //         <div
+    //           style={{
+    //             display: 'flex',
+    //             flexDirection: 'row',
+    //             justifyContent: 'space-between',
+    //             alignItems: 'center'
+    //           }}>
+    //           <EuiText
+    //             style={{
+    //               fontSize: '14px',
+    //               color: '#8e969c',
+    //               fontWeight: '500'
+    //             }}>
+    //             {estimate_session_length && 'Session:'}{' '}
+    //             <span
+    //               style={{
+    //                 fontWeight: '500',
+    //                 color: '#000'
+    //               }}>
+    //               {estimate_session_length ?? ''}
+    //             </span>
+    //           </EuiText>
+    //           {ui?.meInfo?.isSuperAdmin && (
+    //             <EuiButtonIcon
+    //               onClick={(e) => {
+    //                 e.stopPropagation();
+    //                 showModal();
+    //                 setDeletePayload({
+    //                   created: created,
+    //                   host: getHost(),
+    //                   pubkey: person.owner_pubkey
+    //                 });
+    //               }}
+    //               iconType="trash"
+    //               aria-label="Next"
+    //               size="s"
+    //               style={{
+    //                 color: '#000',
+    //                 background: '#fff'
+    //               }}
+    //             />
+    //           )}
+    //         </div>
+    //       </div>
+    //     </DWrap>
+    //   </>
+    // );
     return (
       <>
         {paid ? (
@@ -689,6 +689,7 @@ const BountyBox = styled.div`
   min-height: 160px;
   max-height: 160px;
   border-radius: 10px;
+  width: 1100px;
 `;
 
 const DWrap = styled.div<WrapProps>`

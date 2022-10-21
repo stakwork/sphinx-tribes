@@ -25,12 +25,13 @@ export default function WidgetSwitchViewer(props) {
         minHeight: 132
       }
     : {
-        // maxWidth: 291,
-        minWidth: '100%',
-        marginRight: 20,
+        minWidth: '1100px',
+        maxWidth: '1100px',
+        // marginRight: 20,
         marginBottom: 20,
-        // minHeight: 472,
-        borderRadius: '10px'
+        borderRadius: '10px',
+        display: 'flex',
+        justifyContent: 'center'
       };
 
   return useObserver(() => {
@@ -167,7 +168,7 @@ interface PanelProps {
 }
 
 const Panel = styled.div<PanelProps>`
-  position: relative;
+  // position: ;
   background: #ffffff;
   color: #000000;
   padding: 20px;

@@ -1,8 +1,17 @@
 import { EuiText } from '@elastic/eui';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 const PaidBounty = (props) => {
+  const [codingLabels, setCodingLabels] = useState([]);
+
+  useEffect(() => {
+    if (props.codingLanguage) {
+      const values = props.codingLanguage.map((value) => ({ ...value }));
+      setCodingLabels(values);
+    }
+  }, [props.codingLanguage]);
+
   return (
     <BountyContainer>
       {/* left part */}
@@ -29,8 +38,8 @@ const PaidBounty = (props) => {
           <EuiText>Description</EuiText>
         </Description>
         <LanguageContainer>
-          {props.codingLanguage.map((x) => {
-            return <div>{x.label}</div>;
+          {codingLabels.map((x) => {
+            return <div>{x}</div>;
           })}
         </LanguageContainer>
       </BountyDescription>
