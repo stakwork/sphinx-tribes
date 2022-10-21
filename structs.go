@@ -38,6 +38,7 @@ type Tribe struct {
 	OwnerRouteHint  string         `json:"owner_route_hint"`
 	Pin             string         `json:"pin"`
 	Preview         string         `json:"preview"`
+	ProfileFilters  string         `json:"profile_filters"` // "twitter,github"
 }
 
 // Bot struct
@@ -97,6 +98,7 @@ func (Person) TableName() string {
 // Person struct
 type Person struct {
 	ID               uint           `json:"id"`
+	Uuid 			 string         `json:"uuid"`
 	OwnerPubKey      string         `json:"owner_pubkey"`
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
