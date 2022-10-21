@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/rs/xid"
 )
 
 func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +74,7 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
+	person.Uuid = xid.New().String()
 	if person.NewTicketTime != 0 {
 		go processAlerts(person)
 	}
@@ -330,6 +332,15 @@ func personUniqueNameFromName(name string) (string, error) {
 func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	person := DB.getPersonByPubkey(pubkey)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(person)
+}
+
+func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	person := DB.getPersonByUuid(uuid)
+	// FIXME use http to hit sphinx-element server for badges
+	// FIXME also filter by the tribe "profile_filters"
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
