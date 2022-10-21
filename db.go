@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/rs/xid"
 	_ "github.com/lib/pq"
 	"net/http"
 	"os"
@@ -47,13 +48,13 @@ func initDB() {
 	// migrate table changes
 	db.AutoMigrate(&Person{}, &Channel{})
 
-	// data := map[string]string{
-	// 	"assignee": "Evanfeenstra",
-	// 	"status":   "open",
-	// }
-	// DB.updateGithubIssues(1, map[string]interface{}{
-	// 	"stakwork/sphinx-relay/229": data,
-	// })
+	people := DB.getAllPeople()
+	for _, p := range people {
+		if p.Uuid == "" {
+			DB.addUuidToPerson(p.ID, xid.New().String())
+		}
+	}
+
 }
 
 var updatables = []string{
@@ -63,6 +64,7 @@ var updatables = []string{
 	"unlisted", "private", "deleted",
 	"app_url", "bots", "feed_url", "feed_type",
 	"owner_route_hint", "updated", "pin",
+	"profile_filters",
 }
 var botupdatables = []string{
 	"name", "description", "tags", "img",
@@ -216,6 +218,15 @@ func (db database) updateTwitterConfirmed(id uint, confirmed bool) {
 	})
 }
 
+func (db database) addUuidToPerson(id uint, uuid string) {
+	if id == 0 {
+		return
+	}
+	db.db.Model(&Person{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"uuid": uuid,
+	})
+}
+
 func (db database) getUnconfirmedGithub() []Person {
 	ms := []Person{}
 	db.db.Raw(`SELECT * FROM people where extras -> 'github' IS NOT NULL and github_confirmed = 'f';`).Find(&ms)
@@ -352,6 +363,14 @@ func (db database) getListedPeople(r *http.Request) []Person {
 
 	// if search is empty, returns all
 	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Find(&ms)
+	return ms
+}
+
+
+func (db database) getAllPeople() []Person {
+	ms := []Person{}
+	// if search is empty, returns all
+	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
 
@@ -525,6 +544,13 @@ func (db database) getPerson(id uint) Person {
 func (db database) getPersonByPubkey(pubkey string) Person {
 	m := Person{}
 	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
+
+	return m
+}
+
+func (db database) getPersonByUuid(uuid string) Person {
+	m := Person{}
+	db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null)", uuid).Find(&m)
 
 	return m
 }
