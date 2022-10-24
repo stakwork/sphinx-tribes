@@ -28,6 +28,7 @@ CREATE TABLE tribes (
   owner_route_hint TEXT,
   unique_name TEXT,
   pin TEXT,
+  preview TEXT,
   profile_filters TEXT
 );
 
