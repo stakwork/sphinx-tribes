@@ -27,7 +27,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           style={{
             background: '#F2F3F5',
             padding: '30px',
-            borderRadius: '8px'
+            borderRadius: '8px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}>
           <ModalContainer>
             <figure
