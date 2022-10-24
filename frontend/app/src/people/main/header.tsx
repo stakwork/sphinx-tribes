@@ -291,7 +291,9 @@ export default function Header() {
                         }}
                     /> */}
 
-            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">Get Sphinx</GetSphinxsBtn>
+            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
+              Get Sphinx
+            </GetSphinxsBtn>
             {ui.meInfo ? (
               <LoggedInBtn
                 onClick={() => {
