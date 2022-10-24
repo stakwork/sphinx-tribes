@@ -17,5 +17,3 @@ Please delete options that are not relevant.
 - [ ] I have tested on Chrome and Firefox
 - [ ] I have tested on a mobile device
 - [ ] It has been deployed to people-test.sphinx.chat and tested by others
-- [ ] Do we need to implement analytics?
-- [ ] Will this be part of a product update? If yes, please write one phrase about this update.
