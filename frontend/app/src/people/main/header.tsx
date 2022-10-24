@@ -291,16 +291,16 @@ export default function Header() {
                         }}
                     /> */}
 
-            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">Get Sphinxs</GetSphinxsBtn>
+            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
+              Get Sphinxs
+            </GetSphinxsBtn>
             {ui.meInfo ? (
               <LoggedInBtn
                 onClick={() => {
                   goToEditSelf();
                 }}>
-                  <Imgg
-                    src={ui.meInfo?.img || '/static/person_placeholder.png'}
-                  />
-                  {ui.meInfo?.owner_alias}
+                <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
+                {ui.meInfo?.owner_alias}
               </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
@@ -491,7 +491,7 @@ const Tab = styled.div<TagProps>`
   border-bottom: ${(p) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
 
   &:hover {
-    color: #909BAA;
+    color: #909baa;
   }
 
   &:active {
@@ -545,13 +545,12 @@ const LoggedInBtn = styled.div`
       left: 3px;
     }
   }
-
 `;
 
 const GetSphinxsBtn = styled.a`
   display: flex;
   flex: 1 0 auto;
-  background: #618AFF;
+  background: #618aff;
   box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
   padding: 0 28px;
   height: 40px;
@@ -562,16 +561,16 @@ const GetSphinxsBtn = styled.a`
   font-weight: 600;
   font-size: 14px;
   line-height: 19px;
-  color: #FFFFFF;
+  color: #ffffff;
 
   &:hover {
-    background: #5881F8;
+    background: #5881f8;
     text-decoration: none;
     color: inherit;
   }
 
   &:active {
-    background: #5078F2;
+    background: #5078f2;
     box-shadow: none;
   }
 `;
@@ -593,11 +592,11 @@ const LoginBtn = styled.div`
   }
 
   &:hover {
-    color: #A3C1FF
+    color: #a3c1ff;
   }
 
   &:active {
-    color: #82B4FF
+    color: #82b4ff;
   }
 `;
 
