@@ -5,17 +5,14 @@ import { useStores } from '../store';
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
-  EuiHeader,
   EuiPopover,
   EuiSelectable,
-  EuiHeaderSection,
   EuiButton,
-  EuiFieldSearch,
   EuiHighlight
 } from '@elastic/eui';
 import Tribe from './tribe';
-import { useFuse, useIsMobile, useScroll, usePageScroll } from '../hooks';
-import { Divider, SearchTextInput } from '../sphinxUI';
+import {  useIsMobile, usePageScroll } from '../hooks';
+import { SearchTextInput } from '../sphinxUI';
 import Tag from './tag';
 import tags from './tags';
 import NoResults from '../people/utils/noResults';
@@ -66,10 +63,6 @@ export default function BodyComponent() {
     }
   }
 
-  // do search update
-  useEffect(() => {
-    refreshList();
-  }, [ui.searchText, ui.tags]);
 
   async function refreshList() {
     setLoadingList(true);
@@ -90,6 +83,12 @@ export default function BodyComponent() {
     setLoadingList(false);
     setLoading(false);
   }
+
+  // do search update
+  useEffect(() => {
+    refreshList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ui.searchText, ui.tags]);
 
   return useObserver(() => {
     let tribes = main.tribes;
