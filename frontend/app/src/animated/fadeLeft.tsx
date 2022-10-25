@@ -86,8 +86,7 @@ export default function FadeLeft(props) {
             }
           }}
           // onClick={(e) => e.stopPropagation()}
-          style={{ height: 'inherit', ...style, transform: transformValue }}
-        >
+          style={{ height: 'inherit', ...style, transform: transformValue }}>
           {children}
         </Fader>
       </Overlay>
@@ -100,8 +99,7 @@ export default function FadeLeft(props) {
         ...style,
         transform: transformValue,
         opacity: !noFade ? opacity : 1
-      }}
-    >
+      }}>
       {children}
     </Fader>
   );
