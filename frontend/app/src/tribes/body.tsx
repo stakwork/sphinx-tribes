@@ -11,7 +11,7 @@ import {
   EuiHighlight
 } from '@elastic/eui';
 import Tribe from './tribe';
-import {  useIsMobile, usePageScroll } from '../hooks';
+import { useIsMobile, usePageScroll } from '../hooks';
 import { SearchTextInput } from '../sphinxUI';
 import Tag from './tag';
 import tags from './tags';
@@ -62,7 +62,6 @@ export default function BodyComponent() {
       console.log(e);
     }
   }
-
 
   async function refreshList() {
     setLoadingList(true);
