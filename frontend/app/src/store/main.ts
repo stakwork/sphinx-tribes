@@ -450,7 +450,7 @@ export class MainStore {
     let ps = await api.get(query);
 
     if (uiStore.meInfo) {
-      const index = ps.findIndex((f) => f.id == uiStore.meInfo?.id);
+      const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
       if (index > -1) {
         // add 'hide' property to me in people list
         ps[index].hide = true;
