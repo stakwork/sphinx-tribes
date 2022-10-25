@@ -8,7 +8,6 @@ export default function Modal(props: any) {
     visible,
     fill,
     overlayClick,
-    drift,
     dismountCallback,
     children,
     close,

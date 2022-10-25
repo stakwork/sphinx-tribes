@@ -4,7 +4,7 @@ import CreatableSelect from 'react-select/creatable';
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
-  const { options, onChange, value, style, selectStyle } = props;
+  const { options, onChange, value, style } = props;
 
   const opts =
     options.map((o) => {
