@@ -18,7 +18,6 @@ export default function WantedView(props: any) {
     priceMin,
     priceMax,
     price,
-    url,
     gallery,
     person,
     created,
@@ -548,7 +547,7 @@ export default function WantedView(props: any) {
                           borderRadius: '6px',
                           overflow: 'hidden'
                         }}>
-                        <img src={val} alt="image" height={'100%'} width={'100%'} />
+                        <img src={val} height={'100%'} width={'100%'} />
                       </div>
                     );
                   })}
@@ -697,21 +696,6 @@ const Wrap = styled.div<WrapProps>`
   filter: ${(p) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
 `;
 
-const T = styled.div`
-  font-weight: bold;
-  overflow: hidden;
-  line-height: 20px;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 17px;
-  line-height: 23px;
-`;
 const B = styled.span`
   font-size: 14px;
   font-weight: bold;
@@ -721,15 +705,6 @@ const P = styled.div`
   font-weight: regular;
   font-size: 14px;
   color: #8e969c;
-`;
-const D = styled.div`
-  color: #5f6368;
-  overflow: hidden;
-  line-height: 18px;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 `;
 
 const Body = styled.div`
@@ -751,28 +726,6 @@ const Body = styled.div`
 const Pad = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const DD = styled.div`
-  margin-bottom: 10px;
-  overflow: hidden;
-
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 13px;
-  line-height: 20px;
-  /* or 154% */
-
-  /* Main bottom icons */
-
-  color: #5f6368;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 `;
 
 const DescriptionCodeTask = styled.div`

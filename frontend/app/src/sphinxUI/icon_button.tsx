@@ -198,18 +198,3 @@ const T = styled(EuiButton)`
     background: transparent;
   }
 `;
-
-interface IconProps {
-  src: string;
-}
-
-const Img = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
-  width: 80px;
-  height: 80px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: cover; /* Resize the background image to cover the entire container */
-  border-radius: 80px;
-  overflow: hidden;
-`;
