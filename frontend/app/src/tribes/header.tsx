@@ -1,17 +1,11 @@
-import React, {  useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../store';
 
-import {
-  EuiHeader,
-  EuiHeaderSection,
-} from '@elastic/eui';
-
+import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 
 export default function Header() {
   const { ui } = useStores();
-
-
 
   useEffect(() => {
     if (window.location.host === 'podcasts.sphinx.chat') {
