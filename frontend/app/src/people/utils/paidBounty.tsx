@@ -1,12 +1,13 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import NameTag from './nameTag';
 
 const PaidBounty = (props) => {
   const [codingLabels, setCodingLabels] = useState([]);
 
   useEffect(() => {
-    if (props.codingLanguage) {
+    if (props.codingLanguage && props.codingLanguage.length > 0) {
       const values = props.codingLanguage.map((value) => ({ ...value }));
       setCodingLabels(values);
     }
@@ -17,45 +18,83 @@ const PaidBounty = (props) => {
       {/* left part */}
       <BountyDescription>
         <Header>
-          <OwnerImage>
-            <img
-              height={'100%'}
-              width={'100%'}
-              src={props.img || `/static/person_placeholder.png`}
-              alt=""
-            />
-          </OwnerImage>
           <div
             style={{
               display: 'flex',
               flexDirection: 'column'
             }}>
-            <EuiText>{props.owner_alias}</EuiText>
-            <EuiText>{props.lastSeen}</EuiText>
+            <NameTag {...props} />
           </div>
         </Header>
         <Description>
-          <EuiText>Description</EuiText>
+          <div
+            style={{
+              width: '481px',
+              height: '64px',
+              padding: '8px 0px'
+            }}>
+            <EuiText
+              style={{
+                fontSize: '17px',
+                lineHeight: '20px'
+              }}>
+              {props.title}
+            </EuiText>
+          </div>
         </Description>
         <LanguageContainer>
-          {codingLabels.map((x) => {
-            return <div>{x}</div>;
-          })}
+          {props.codingLanguage?.length > 0 &&
+            props.codingLanguage?.map((lang, index) => {
+              return (
+                <CodingLabels key={index}>
+                  <EuiText
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      textAlign: 'center'
+                    }}>
+                    {lang.label}
+                  </EuiText>
+                </CodingLabels>
+              );
+            })}
         </LanguageContainer>
       </BountyDescription>
       {/* right part */}
-      <UserPriceContainer>
+      <PriceUserContainer>
         <PriceContainer>
-          <div>
-            <span>$@</span>
-            <span>25000SAT</span>
+          <div style={{}}>
+            <span
+              style={{
+                fontSize: '14px',
+                fontWeight: '400',
+                lineHeight: '16.8px'
+              }}>
+              $@
+            </span>
+            <span
+              style={{
+                fontSize: '17px',
+                fontWeight: '700'
+              }}>
+              25000SAT
+            </span>
             <span>110.96 USD</span>
           </div>
           <div>{'Est: > 4 hrs'}</div>
         </PriceContainer>
         <UserProfileContainer>
           <UserImage>
-            <img width={'100%'} height={'100%'} src={''} alt={''} />
+            <img
+              width={'100%'}
+              height={'100%'}
+              src={
+                {
+                  ...props.assignee
+                }.img
+              }
+              alt={''}
+            />
           </UserImage>
           <UserInfo>
             <EuiText>Completed</EuiText>
@@ -63,7 +102,7 @@ const PaidBounty = (props) => {
             <EuiText>{'View Profile(button)'}</EuiText>
           </UserInfo>
         </UserProfileContainer>
-      </UserPriceContainer>
+      </PriceUserContainer>
     </BountyContainer>
   );
 };
@@ -82,12 +121,14 @@ const BountyDescription = styled.div`
   height: 100%;
   min-width: 519px;
   max-width: 519px;
+  padding: 16px;
 `;
 
 const Header = styled.div`
   display: flex;
   flex-direction: row;
   align-item: center;
+  height: 32px;
 `;
 
 const OwnerImage = styled.div`
@@ -97,6 +138,7 @@ const OwnerImage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 `;
 
 const Description = styled.div`
@@ -111,11 +153,12 @@ const LanguageContainer = styled.div`
   width: 100%;
 `;
 
-const UserPriceContainer = styled.div`
+const PriceUserContainer = styled.div`
   display: flex;
   flex-direction: row;
   border: 2px solid #86d9b9;
   border-radius: 10px;
+  min-width: 581px;
 `;
 
 const PriceContainer = styled.div`
@@ -147,4 +190,16 @@ const UserImage = styled.div`
 const UserInfo = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const CodingLabels = styled.div`
+  padding: 0px 8px;
+  border: 1px solid #000;
+  border-radius: 4px;
+  overflow: hidden;
+  max-height: 22px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 4px;
 `;

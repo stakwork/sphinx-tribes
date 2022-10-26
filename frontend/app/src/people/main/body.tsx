@@ -367,6 +367,29 @@ export default function BodyComponent({ selectedWidget }) {
     const listContent =
       selectedWidget === 'people' ? (
         renderPeople()
+      ) : !isMobile ? (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+          <WidgetSwitchViewer
+            onPanelClick={(person, item) => {
+              history.replace({
+                pathname: history?.location?.pathname,
+                search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
+                state: {
+                  owner_id: person.owner_pubkey,
+                  created: item.created
+                }
+              });
+              publicPanelClick(person, item);
+            }}
+            selectedWidget={selectedWidget}
+          />
+        </div>
       ) : (
         <WidgetSwitchViewer
           onPanelClick={(person, item) => {

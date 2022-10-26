@@ -662,11 +662,20 @@ export default function WantedView(props: any) {
     //     </DWrap>
     //   </>
     // );
+
     return (
       <>
         {paid ? (
           <BountyBox>
-            <PaidBounty {...person} />
+            <PaidBounty
+              {...person}
+              assignee={assignee}
+              created={created}
+              ticketUrl={ticketUrl}
+              loomEmbedUrl={loomEmbedUrl}
+              title={title}
+              codingLanguage={labels}
+            />
           </BountyBox>
         ) : (
           <BountyBox>hi</BountyBox>
