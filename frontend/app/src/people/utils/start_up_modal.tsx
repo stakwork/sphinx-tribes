@@ -1,24 +1,11 @@
-import { EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
-import React, { useEffect, useState } from 'react';
+import { EuiModal, EuiOverlayMask } from '@elastic/eui';
+import React from 'react';
 import styled from 'styled-components';
 import IconButton from '../../sphinxUI/icon_button';
 import { useStores } from '../../store';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
-  const [count, setCount] = useState(0);
   const { ui } = useStores();
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (count < dataObject.length) {
-        setCount((p) => (p + 1) % dataObject.length);
-      }
-    }, 3000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
   return (
     <>
       <EuiOverlayMask>
@@ -30,45 +17,22 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             borderRadius: '8px',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            minHeight: '585px',
+            maxHeight: '585px',
+            width: '425px'
           }}>
           <ModalContainer>
-            <figure
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center'
-              }}>
-              {dataObject.map(({ img, step, heading }, index) => {
-                return (
-                  <Container className={count === index ? 'active' : ''}>
-                    <TextContainer>
-                      <EuiText
-                        style={{
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: buttonColor === 'primary' ? '#6189fb' : '#58c998'
-                        }}>
-                        {step ? step : ''}
-                      </EuiText>
-                    </TextContainer>
-                    <TextContainer>
-                      <EuiText
-                        style={{
-                          fontSize: '28px',
-                          fontWeight: '900'
-                        }}>
-                        {' '}
-                        {heading ? heading : ''}{' '}
-                      </EuiText>
-                    </TextContainer>
-                    <img src={img} alt="" height={'164px'} width={'198px'} />
-                  </Container>
-                );
-              })}
-            </figure>
+            <img
+              src={
+                dataObject === 'getWork'
+                  ? '/static/create_profile_blue.gif'
+                  : '/static/create_profile_green.gif'
+              }
+              height={'274px'}
+              alt=""
+            />
           </ModalContainer>
-
           <ButtonContainer>
             <IconButton
               text={'Get Sphinx'}
@@ -76,22 +40,34 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               width={210}
               height={48}
               style={{ marginTop: 20 }}
+              hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+              activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+              shadowColor={
+                buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
+              }
               onClick={() => {
                 window.open('https://sphinx.chat/', '_blank');
               }}
               color={buttonColor}
             />
-
             <IconButton
               text={'I have Sphinx'}
               endingIcon={'arrow_forward'}
               width={210}
               height={48}
               buttonType={'text'}
-              style={{ color: '#83878b', marginTop: '10px' }}
+              style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
               onClick={() => {
                 closeModal();
                 ui.setShowSignIn(true);
+              }}
+              textStyle={{
+                fontSize: '15px',
+                fontWeight: '500',
+                color: '#5F6368'
+              }}
+              iconStyle={{
+                top: '14px'
               }}
               color={buttonColor}
             />
@@ -104,29 +80,13 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
 
 export default StartUpModal;
 
-const Container = styled.div`
-  position: absolute;
-  opacity: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  &.active {
-    opacity: 1;
-  }
-  transition: all ease 0.3s;
-`;
-
 const ModalContainer = styled.div`
-  min-height: 300px;
-`;
-
-const TextContainer = styled.div`
-  width: 100%;
-  padding: 10px;
+  max-height: 274px;
+  overflow-y: auto;
   display: flex;
   justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 50px;
 `;
 
 const ButtonContainer = styled.div`
