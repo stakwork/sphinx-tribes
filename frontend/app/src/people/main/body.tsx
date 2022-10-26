@@ -33,17 +33,8 @@ function useQuery() {
 }
 
 const StartUpWorkerModelData = {
-  getWork: [
-    { img: '/static/badges/work_blue1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
-    { img: '/static/badges/work_blue2.svg', step: 'STEP 2', heading: 'Create a profile' },
-    { img: '/static/badges/work_blue3.svg', step: 'STEP 3', heading: 'Do the task' },
-    { img: '/static/badges/work_blue4.svg', step: 'STEP 4', heading: 'Get paid' }
-  ],
-  createWork: [
-    { img: '/static/badges/work_green1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
-    { img: '/static/badges/work_green2.svg', step: 'STEP 2', heading: 'Create a profile' },
-    { img: '/static/badges/work_green3.svg', step: 'STEP 3', heading: 'Create a ticket' }
-  ]
+  getWork: 'getWork',
+  createWork: 'createWork'
 };
 export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
