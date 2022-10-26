@@ -33,7 +33,7 @@ export default function TextAreaInput({
             onChange={(e) => handleChange(e.target.value)}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            // rows={2}
+            rows={2}
             // prepend={prepend}
           />
           {error && (

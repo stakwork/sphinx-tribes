@@ -12,7 +12,7 @@ export default function IconButton(props: any) {
       color: '#fff'
     },
     success: {
-      background: '#49C998',
+      background: '#3CBE88',
       color: '#fff'
     },
     white: {
@@ -55,7 +55,7 @@ export default function IconButton(props: any) {
       background: 'rgba(0,0,0,0)',
       color: '#3C3F41',
       border: '1px dashed #B0B7BC',
-      boxWizing: 'border-box',
+      boxSizing: 'border-box',
       borderRadius: 4
     },
     transparent: {
@@ -80,7 +80,9 @@ export default function IconButton(props: any) {
       }}
       disabled={props.disabled}
       onClick={props.onClick}>
-      {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
+      <span style={{ ...props.textStyle }}>
+        {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
+      </span>
       {props.endingIcon && (
         <MaterialIcon
           icon={props.endingIcon}
@@ -107,6 +109,9 @@ export default function IconButton(props: any) {
         paddingRight: props.leadingIcon && 10,
         ...props.style
       }}
+      hoverColor={props.hoverColor}
+      activeColor={props.activeColor}
+      shadowColor={props.shadowColor}
       disabled={props.disabled}
       onClick={props.onClick}>
       <div>
@@ -159,7 +164,13 @@ export default function IconButton(props: any) {
   );
 }
 
-const B = styled(EuiButton)`
+interface ButtonHoverProps {
+  hoverColor?: string;
+  activeColor?: string;
+  shadowColor?: string;
+}
+
+const B = styled(EuiButton)<ButtonHoverProps>`
   position: relative;
   border-radius: 100px;
   height: 36px;
@@ -173,6 +184,22 @@ const B = styled(EuiButton)`
   text-align: center;
   box-shadow: none !important;
   text-transform: none !important;
+  transform: none !important;
+  text-decoration: none !important;
+  box-shadow: ${(p) => (p.shadowColor ? `0px 2px 10px ${p.shadowColor}` : 'none')} !important;
+
+  &:hover{
+    background: ${(p) => (p.hoverColor ? p.hoverColor : 'none')} !important;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+
+  &:active{
+    background: ${(p) => (p.activeColor ? p.activeColor : 'none')} !important; !important;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+
 `;
 
 const T = styled(EuiButton)`
@@ -190,11 +217,22 @@ const T = styled(EuiButton)`
   text-align: center;
   box-shadow: none !important;
   text-transform: none !important;
+  transform: none !important;
+  text-decoration: none !important;
 
   &.textButton {
     background: transparent;
+    transform: none !important;
+    text-decoration: none !important;
   }
   &.textButton:hover {
     background: transparent;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+  &.textButton:focus {
+    background: transparent !important;
+    transform: none !important;
+    text-decoration: none !important;
   }
 `;

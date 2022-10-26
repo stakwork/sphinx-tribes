@@ -333,6 +333,9 @@ export default function Header() {
                   setShowWelcome(false);
                   goToEditSelf();
                 }}
+                hoverColor={'#5881F8'}
+                activeColor={'#5078F2'}
+                shadowColor={'rgba(97, 138, 255, 0.5)'}
               />
             </Column>
           </div>

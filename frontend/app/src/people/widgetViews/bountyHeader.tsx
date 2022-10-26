@@ -41,8 +41,12 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
               style={{
                 color: '#fff',
                 fontSize: '16px',
-                fontWeight: '600'
+                fontWeight: '600',
+                textDecoration: 'none'
               }}
+              hoverColor={'#3CBE88'}
+              activeColor={'#2FB379'}
+              shadowColor={'rgba(73, 201, 152, 0.5)'}
               iconStyle={{
                 fontSize: '16px',
                 fontWeight: '600'
@@ -93,7 +97,12 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
               leadingIcon={'tune'}
               width={80}
               height={48}
-              style={{ color: '#909BAA', fontSize: '16px', fontWeight: '500' }}
+              style={{
+                color: '#909BAA',
+                fontSize: '16px',
+                fontWeight: '500',
+                textDecoration: 'none'
+              }}
               iconStyle={{
                 fontSize: '18px',
                 fontWeight: '500'
@@ -166,7 +175,13 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
               leadingIcon={'tune'}
               width={80}
               height={48}
-              style={{ color: '#909BAA', fontSize: '16px', fontWeight: '500' }}
+              style={{
+                color: '#909BAA',
+                fontSize: '16px',
+                fontWeight: '500',
+                textDecoration: 'none',
+                transform: 'none'
+              }}
               iconStyle={{
                 fontSize: '16px',
                 fontWeight: '500'
@@ -186,8 +201,13 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
               style={{
                 color: '#fff',
                 fontSize: '12px',
-                fontWeight: '600'
+                fontWeight: '600',
+                textDecoration: 'none',
+                transform: 'none'
               }}
+              hoverColor={'#3CBE88'}
+              activeColor={'#2FB379'}
+              shadowColor={'rgba(73, 201, 152, 0.5)'}
               iconStyle={{
                 fontSize: '12px',
                 fontWeight: '600',
