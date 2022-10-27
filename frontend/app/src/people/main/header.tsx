@@ -38,7 +38,7 @@ export default function Header() {
       path: '/p'
     },
     {
-      label: 'Tickets',
+      label: 'Bounties',
       name: 'tickets',
       path: '/tickets'
     },
@@ -247,49 +247,9 @@ export default function Header() {
                   );
                 })}
             </Tabs>
-
-            {/* <EuiHeaderSection id="hide-icons" style={{ margin: '10px 10px', borderRadius: 50, overflow: 'hidden', width: 295 }} >
-                        <EuiFieldSearch id="search-input"
-                            placeholder="Search for People"
-                            value={ui.searchText}
-                            onChange={e => ui.setSearchText(e.target.value)}
-                            style={{ width: 295, height: '100%' }}
-                            aria-label="search"
-
-                        />
-                    </EuiHeaderSection> */}
-
-            {/* <Button
-                        text='Tags'
-                    /> */}
           </Row>
 
           <Corner>
-            {/* <Select
-                        options={[
-                            {
-                                label: 'English',
-                                value: 'english'
-                            }
-                        ]}
-                        onChange={(e) => {
-                            console.log('e', e)
-                            ui.setLanguage(e)
-                        }}
-                        value={language}
-                        text={language}
-                        color='transparent'
-                        style={{ marginRight: 20, width: 200, border: 'none' }}
-                    /> */}
-
-            {/* <LanguageSelector
-                        options={locOptions}
-                        value={language || { label: 'Russian', value: 'Russis' }}
-                        onChange={(e: any) => {
-                            console.log('e', e)
-                            ui.setLanguage(e?.value)
-                        }}
-                    /> */}
 
             <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
               Get Sphinx
@@ -304,7 +264,7 @@ export default function Header() {
               </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
-                <span>sign in</span>
+                <span>Sign in</span>
                 <MaterialIcon icon={'login'} style={{ fontSize: 18 }} />
               </LoginBtn>
             )}
