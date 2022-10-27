@@ -264,7 +264,7 @@ export default function Header() {
               </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
-                <span>sign in</span>
+                <span>Sign in</span>
                 <MaterialIcon icon={'login'} style={{ fontSize: 18 }} />
               </LoginBtn>
             )}
