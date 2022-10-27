@@ -250,7 +250,6 @@ export default function Header() {
           </Row>
 
           <Corner>
-
             <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
               Get Sphinx
             </GetSphinxsBtn>
