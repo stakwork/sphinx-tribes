@@ -93,9 +93,9 @@ export default function SignIn(props: any) {
                 hoverColor={'#fff'}
                 activeColor={'#fff'}
                 textStyle={{
-                  color:'#000',
-                  fontSize:'16px',
-                  fontWeight:'600'
+                  color: '#000',
+                  fontSize: '16px',
+                  fontWeight: '600'
                 }}
               />
             </Column>
@@ -115,6 +115,7 @@ const Name = styled.div`
   font-weight: 500;
   font-size: 26px;
   line-height: 19px;
+  font-family: Barlow;
   /* or 73% */
 
   text-align: center;
@@ -129,6 +130,7 @@ const Description = styled.div`
   line-height: 20px;
   text-align: center;
   margin: 20px 0;
+  font-family: Barlow;
 
   /* Main bottom icons */
 

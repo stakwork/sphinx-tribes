@@ -18,8 +18,8 @@ export default function NoneSpaceHomePage(props) {
           width: '100%',
           ...props.style
         }}>
-        <H style={{ paddingLeft: 0, fontSize: '100px' }}>{props.text}</H>
-        <C style={{ paddingLeft: 0 }}>{props.sub}</C>
+        <H style={{ paddingLeft: 0, fontSize: '100px', fontFamily: 'Barlow' }}>{props.text}</H>
+        <C style={{ paddingLeft: 0, fontFamily: 'Barlow' }}>{props.sub}</C>
 
         <ButtonContainer>
           {props.buttonText1 && (
@@ -74,7 +74,8 @@ export default function NoneSpaceHomePage(props) {
       <>
         <H
           style={{
-            fontSize: '40px'
+            fontSize: '40px',
+            fontFamily: 'Barlow'
           }}>
           {props.text}
         </H>
