@@ -12,7 +12,7 @@ export default function IconButton(props: any) {
       color: '#fff'
     },
     success: {
-      background: '#3CBE88',
+      background: '#49C998',
       color: '#fff'
     },
     white: {
