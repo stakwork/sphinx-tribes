@@ -144,6 +144,14 @@ export default function IconButton(props: any) {
               }}
             />
           )}
+          {props.leadingImg && (
+            <div
+              style={{
+                ...props.leadingImgStyle
+              }}>
+              <img height={'100%'} width={'100%'} src={props.leadingImg} alt="leading" />
+            </div>
+          )}
 
           {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
           {props.endingIcon && (
@@ -178,6 +186,7 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   border: none;
   font-weight: 500;
   font-size: 15px;
+  font-family: Barlow;
   line-height: 18px;
   display: flex;
   align-items: center;
@@ -188,29 +197,28 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   text-decoration: none !important;
   box-shadow: ${(p) => (p.shadowColor ? `0px 2px 10px ${p.shadowColor}` : 'none')} !important;
 
-  &:hover{
+  &:hover {
     background: ${(p) => (p.hoverColor ? p.hoverColor : 'none')} !important;
     transform: none !important;
     text-decoration: none !important;
   }
 
-  &:active{
-    background: ${(p) => (p.activeColor ? p.activeColor : 'none')} !important; !important;
+  &:active {
+    background: ${(p) => (p.activeColor ? p.activeColor : 'none')} !important;
     transform: none !important;
     text-decoration: none !important;
   }
-
 `;
 
 const T = styled(EuiButton)`
   position: relative;
   border-radius: 100px;
   height: 36px;
-  font-weight: bold;
   border: none;
 
   font-weight: 500;
   font-size: 15px;
+  font-family: Barlow;
   line-height: 18px;
   display: flex;
   align-items: center;

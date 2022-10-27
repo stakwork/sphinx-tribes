@@ -2,20 +2,23 @@ import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
-import { SearchTextInput } from '../../sphinxUI';
 import IconButton from '../../sphinxUI/icon_button';
+import SearchBar from '../../sphinxUI/search_bar';
 import { useStores } from '../../store';
 
-const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
+const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
+  const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
   useEffect(() => {
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
           const response = await main.getPeople({ page: 1 });
+          const bounty = await main.getPeopleWanteds({ page: 1 });
           setPeopleList(response);
+          setActiveBounty(bounty?.length);
         } catch (error) {
           console.log(error);
         }
@@ -49,7 +52,9 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
               shadowColor={'rgba(73, 201, 152, 0.5)'}
               iconStyle={{
                 fontSize: '16px',
-                fontWeight: '600'
+                fontWeight: '400',
+                top: '18px',
+                right: '24px'
               }}
               onClick={() => {
                 if (ui.meInfo && ui.meInfo?.owner_alias) {
@@ -59,23 +64,35 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
                 }
               }}
             />
-            <SearchTextInput
+            <SearchBar
               name="search"
               type="search"
               placeholder="Search"
               value={ui.searchText}
-              style={{ width: 204, height: 48, background: '#DDE1E5', marginLeft: '16px' }}
+              style={{
+                width: 204,
+                height: 48,
+                background: 'transparent',
+                marginLeft: '16px',
+                fontFamily: 'Barlow'
+              }}
               onChange={(e) => {
-                console.log('handleChange', e);
                 ui.setSearchText(e);
               }}
               iconStyle={{
                 top: '13px'
               }}
+              TextColor={'#B0B7BC'}
+              TextColorHover={'#8E969C'}
+              border={'1px solid #D0D5D8'}
+              borderHover={'1px solid #BAC1C6'}
+              borderActive={'1px solid #A3C1FF'}
+              iconColor={'#B0B7BC'}
+              iconColorHover={'#8E969C'}
             />
             <IconButton
-              text={`${activeList?.length} Bounties opened`}
-              leadingIcon={'content_copy'}
+              text={`${activeBounty} Bounties opened`}
+              leadingImg={'/static/copy.svg'}
               width={230}
               height={48}
               color={'transparent'}
@@ -86,9 +103,10 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
                 cursor: 'default',
                 textDecoration: 'none'
               }}
-              iconStyle={{
-                fontSize: '18px',
-                fontWeight: '500'
+              leadingImgStyle={{
+                height: '22px',
+                width: '18px',
+                marginRight: '10px'
               }}
             />
             <IconButton
@@ -116,7 +134,9 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
             <EuiText
               color={'#909BAA'}
               style={{
-                fontSize: '16px'
+                fontSize: '16px',
+                fontFamily: 'Barlow',
+                fontWeight: '500'
               }}>
               Developers
             </EuiText>
@@ -149,25 +169,44 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
                   );
                 })}
             </div>
-            {peopleList && peopleList?.length}
+            <EuiText
+              style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                fontFamily: 'Barlow'
+              }}>
+              {peopleList && peopleList?.length}
+            </EuiText>
           </D>
         </BountyHeaderDesk>
       ) : (
         <BountyHeaderMobile>
           <LargeActionContainer>
-            <SearchTextInput
+            <SearchBar
               name="search"
               type="search"
               placeholder="Search"
               value={ui.searchText}
-              style={{ width: 230, height: 30, background: '#DDE1E5', marginLeft: '16px' }}
+              style={{
+                width: 240,
+                height: 32,
+                background: 'transparent',
+                marginLeft: '16px',
+                fontFamily: 'Barlow'
+              }}
               onChange={(e) => {
-                console.log('handleChange', e);
                 ui.setSearchText(e);
               }}
               iconStyle={{
                 top: '4px'
               }}
+              border={'1px solid #D0D5D8'}
+              borderHover={'1px solid #BAC1C6'}
+              borderActive={'1px solid #A3C1FF'}
+              TextColor={'#B0B7BC'}
+              TextColorHover={'#8E969C'}
+              iconColor={'#B0B7BC'}
+              iconColorHover={'#8E969C'}
             />
             <IconButton
               text={'Filter'}
@@ -223,8 +262,8 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
               }}
             />
             <IconButton
-              text={`${activeList?.length} Bounties opened`}
-              leadingIcon={'content_copy'}
+              text={`${activeBounty} Bounties opened`}
+              leadingImg={'/static/copy.svg'}
               width={'fit-content'}
               height={48}
               color={'transparent'}
@@ -236,10 +275,10 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
                 textDecoration: 'none',
                 padding: 0
               }}
-              iconStyle={{
-                fontSize: '12px',
-                fontWeight: '500',
-                marginRight: 4
+              leadingImgStyle={{
+                height: '21px',
+                width: '18px',
+                marginRight: '4px'
               }}
             />
             <DevelopersContainerMobile>
@@ -265,7 +304,9 @@ const BountyHeader = ({ selectedWidget, activeList, setShowFocusView }) => {
                 })}
               <EuiText
                 style={{
-                  fontSize: '12px'
+                  fontSize: '14px',
+                  fontFamily: 'Barlow',
+                  fontWeight: '500'
                 }}>
                 {peopleList && peopleList?.length}
               </EuiText>

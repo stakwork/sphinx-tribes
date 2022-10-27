@@ -50,8 +50,6 @@ export default function BodyComponent({ selectedWidget }) {
   const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
-  const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
-
   const {
     peoplePageNumber,
     peopleWantedsPageNumber,
@@ -443,7 +441,6 @@ export default function BodyComponent({ selectedWidget }) {
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
-                activeList={activeList}
                 setShowFocusView={setIsMobileViewTicketModal}
               />
             )}
@@ -588,11 +585,7 @@ export default function BodyComponent({ selectedWidget }) {
         {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
 
         {selectedWidget === 'wanted' && (
-          <BountyHeader
-            selectedWidget={selectedWidget}
-            activeList={activeList}
-            setShowFocusView={setShowFocusView}
-          />
+          <BountyHeader selectedWidget={selectedWidget} setShowFocusView={setShowFocusView} />
         )}
         {selectedWidget === 'people' && (
           <div
