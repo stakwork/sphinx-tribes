@@ -343,8 +343,6 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	person := DB.getPersonByUuid(uuid)
 	assetBalanceData, err := getAssetByPubkey(person.OwnerPubKey)
 
-	//var personResponse PersonResponse
-	//personResponse.Person = person
 	personResponse := make(map[string]interface{})
 	personResponse["id"] = person.ID
 	personResponse["uuid"] = person.Uuid
