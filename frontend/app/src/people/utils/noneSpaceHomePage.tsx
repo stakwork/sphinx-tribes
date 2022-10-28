@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Button } from '../../sphinxUI';
+import IconButton from '../../sphinxUI/icon_button';
 
 export default function NoneSpaceHomePage(props) {
   if (props.banner) {
@@ -17,12 +18,12 @@ export default function NoneSpaceHomePage(props) {
           width: '100%',
           ...props.style
         }}>
-        <H style={{ paddingLeft: 0, fontSize: '100px' }}>{props.text}</H>
-        <C style={{ paddingLeft: 0 }}>{props.sub}</C>
+        <H style={{ paddingLeft: 0, fontSize: '100px', fontFamily: 'Barlow' }}>{props.text}</H>
+        <C style={{ paddingLeft: 0, fontFamily: 'Barlow' }}>{props.sub}</C>
 
         <ButtonContainer>
           {props.buttonText1 && (
-            <Button
+            <IconButton
               text={props.buttonText1}
               endingIcon={props.buttonIcon}
               width={210}
@@ -30,11 +31,18 @@ export default function NoneSpaceHomePage(props) {
               style={{ marginTop: 20 }}
               onClick={props.action1}
               color="primary"
+              hoverColor={'#5881F8'}
+              activeColor={'#5078F2'}
+              shadowColor={'rgba(97, 138, 255, 0.5)'}
+              iconStyle={{
+                top: '13px',
+                right: '14px'
+              }}
             />
           )}
 
           {props.buttonText2 && (
-            <Button
+            <IconButton
               text={props.buttonText2}
               endingIcon={props.buttonIcon}
               width={210}
@@ -42,6 +50,9 @@ export default function NoneSpaceHomePage(props) {
               style={{ marginTop: 20, marginLeft: 10 }}
               onClick={props.action2}
               color="success"
+              hoverColor={'#3CBE88'}
+              activeColor={'#2FB379'}
+              shadowColor={'rgba(73, 201, 152, 0.5)'}
             />
           )}
         </ButtonContainer>
@@ -63,7 +74,8 @@ export default function NoneSpaceHomePage(props) {
       <>
         <H
           style={{
-            fontSize: '40px'
+            fontSize: '40px',
+            fontFamily: 'Barlow'
           }}>
           {props.text}
         </H>
@@ -71,7 +83,7 @@ export default function NoneSpaceHomePage(props) {
       </>
       <ButtonContainerMobile>
         {props.buttonText1 && (
-          <Button
+          <IconButton
             text={props.buttonText1}
             endingIcon={props.buttonIcon}
             width={210}
@@ -79,10 +91,13 @@ export default function NoneSpaceHomePage(props) {
             style={{ marginTop: 40 }}
             onClick={props.action1}
             color="primary"
+            hoverColor={'#5881F8'}
+            activeColor={'#5078F2'}
+            shadowColor={'rgba(97, 138, 255, 0.5)'}
           />
         )}
         {props.buttonText2 && (
-          <Button
+          <IconButton
             text={props.buttonText2}
             endingIcon={props.buttonIcon}
             width={210}
@@ -90,6 +105,9 @@ export default function NoneSpaceHomePage(props) {
             style={{ marginTop: 20 }}
             onClick={props.action2}
             color="success"
+            hoverColor={'#5881F8'}
+            activeColor={'#5078F2'}
+            shadowColor={'rgba(97, 138, 255, 0.5)'}
           />
         )}
       </ButtonContainerMobile>
