@@ -74,7 +74,8 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
                 height: 48,
                 background: 'transparent',
                 marginLeft: '16px',
-                fontFamily: 'Barlow'
+                fontFamily: 'Barlow',
+                color: '#3C3F41'
               }}
               onChange={(e) => {
                 ui.setSearchText(e);
