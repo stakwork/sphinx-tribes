@@ -524,7 +524,7 @@ const GetSphinxsBtn = styled.a`
   font-size: 14px;
   line-height: 19px;
   color: #ffffff;
-	font-family: Barlow;
+  font-family: Barlow;
 
   &:hover {
     background: #5881f8;
