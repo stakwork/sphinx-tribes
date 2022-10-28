@@ -5,17 +5,14 @@ import { useStores } from '../store';
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
-  EuiHeader,
   EuiPopover,
   EuiSelectable,
-  EuiHeaderSection,
   EuiButton,
-  EuiFieldSearch,
   EuiHighlight
 } from '@elastic/eui';
 import Tribe from './tribe';
-import { useFuse, useIsMobile, useScroll, usePageScroll } from '../hooks';
-import { Divider, SearchTextInput } from '../sphinxUI';
+import { useIsMobile, usePageScroll } from '../hooks';
+import { SearchTextInput } from '../sphinxUI';
 import Tag from './tag';
 import tags from './tags';
 import NoResults from '../people/utils/noResults';
@@ -66,11 +63,6 @@ export default function BodyComponent() {
     }
   }
 
-  // do search update
-  useEffect(() => {
-    refreshList();
-  }, [ui.searchText, ui.tags]);
-
   async function refreshList() {
     setLoadingList(true);
     console.log('refreshList');
@@ -90,6 +82,12 @@ export default function BodyComponent() {
     setLoadingList(false);
     setLoading(false);
   }
+
+  // do search update
+  useEffect(() => {
+    refreshList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ui.searchText, ui.tags]);
 
   return useObserver(() => {
     let tribes = main.tribes;
@@ -122,8 +120,7 @@ export default function BodyComponent() {
         onClick={(e) => {
           e.stopPropagation();
           setTagsPop(!tagsPop);
-        }}
-      >
+        }}>
         {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
       </EuiButton>
     );
@@ -138,8 +135,7 @@ export default function BodyComponent() {
             alignItems: 'flex-start',
             padding: 20,
             height: 62
-          }}
-        >
+          }}>
           <Label></Label>
 
           <div style={{ display: 'flex', alignItems: 'baseline' }}>
@@ -147,8 +143,7 @@ export default function BodyComponent() {
               panelPaddingSize="none"
               button={button}
               isOpen={tagsPop}
-              closePopover={() => setTagsPop(false)}
-            >
+              closePopover={() => setTagsPop(false)}>
               <EuiSelectable
                 searchable
                 options={tagOptions}
@@ -158,8 +153,7 @@ export default function BodyComponent() {
                       display: 'flex',
                       alignItems: 'center',
                       opacity: loadingList ? 0.5 : 1
-                    }}
-                  >
+                    }}>
                     <Tag type={option.label} iconOnly />
                     <EuiHighlight
                       search={searchValue}
@@ -167,8 +161,7 @@ export default function BodyComponent() {
                         fontSize: 11,
                         marginLeft: 5,
                         color: tags[option.label].color
-                      }}
-                    >
+                      }}>
                       {option.label}
                     </EuiHighlight>
                   </div>
@@ -179,8 +172,7 @@ export default function BodyComponent() {
                     setTagOptions(opts);
                     ui.setTags(opts);
                   }
-                }}
-              >
+                }}>
                 {(list, search) => (
                   <div style={{ width: 220 }}>
                     {search}

@@ -27,8 +27,7 @@ export default function IconButton(props: any) {
       width={props.style && props.style.width}
       style={{ ...colors[props.color], ...props.style }}
       disabled={props.disabled}
-      onClick={props.onClick}
-    >
+      onClick={props.onClick}>
       <div style={{ display: 'flex', height: '100%', alignItems: 'center' }}>
         <MaterialIcon
           icon={props.icon}

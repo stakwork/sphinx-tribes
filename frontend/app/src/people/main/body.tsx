@@ -33,17 +33,8 @@ function useQuery() {
 }
 
 const StartUpWorkerModelData = {
-  getWork: [
-    { img: '/static/badges/work_blue1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
-    { img: '/static/badges/work_blue2.svg', step: 'STEP 2', heading: 'Create a profile' },
-    { img: '/static/badges/work_blue3.svg', step: 'STEP 3', heading: 'Do the task' },
-    { img: '/static/badges/work_blue4.svg', step: 'STEP 4', heading: 'Get paid' }
-  ],
-  createWork: [
-    { img: '/static/badges/work_green1.svg', step: 'STEP 1', heading: 'Get Sphinx' },
-    { img: '/static/badges/work_green2.svg', step: 'STEP 2', heading: 'Create a profile' },
-    { img: '/static/badges/work_green3.svg', step: 'STEP 3', heading: 'Create a ticket' }
-  ]
+  getWork: 'getWork',
+  createWork: 'createWork'
 };
 export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
@@ -59,8 +50,6 @@ export default function BodyComponent({ selectedWidget }) {
   const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
-  const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
-
   const {
     peoplePageNumber,
     peopleWantedsPageNumber,
@@ -269,7 +258,7 @@ export default function BodyComponent({ selectedWidget }) {
 
   function goBack() {
     ui.setSelectingPerson(0);
-    history.push('/p');
+    history.push('/tickets');
   }
 
   return useObserver(() => {
@@ -432,64 +421,55 @@ export default function BodyComponent({ selectedWidget }) {
             </div>
           )}
 
+          {openStartUpModel && (
+            <StartUpModal
+              closeModal={closeModal}
+              dataObject={StartUpWorkerModelData[startUpModelState]}
+              buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
+            />
+          )}
           <div
             style={{
               width: '100%',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-start',
-              padding: 20,
-              height: 82,
+              padding: '8px 0px',
               boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
               zIndex: 2,
               position: 'relative',
               background: '#fff',
               borderBottom: '1px solid rgb(0 0 0 / 7%)'
             }}>
-            <div style={{ display: 'flex' }}>
-              {/* {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
-                <>
-                  <div
-                    style={{
-                      fontSize: '15px',
-                      fontWeight: '400',
-                      marginRight: '10px',
-                      cursor: 'pointer',
-                      borderRadius: '20px',
-                      userSelect: 'none',
-                      background: '#dcedfe',
-                      border: '2px solid #cddffd',
-                      padding: '8px 10px',
-                      color: '#5d92df'
-                    }}
-                    onClick={() => {
-                      // setShowFocusView(true);
-                      setIsMobileViewTicketModal(true);
-                    }}>
-                    +
-                  </div>
-                </>
-              )} */}
-
-              <SearchTextInput
-                small
-                name="search"
-                type="search"
-                placeholder="Search"
-                value={ui.searchText}
-                style={{
-                  width: 114,
-                  height: 40,
-                  border: '1px solid #DDE1E5',
-                  background: '#fff'
-                }}
-                onChange={(e) => {
-                  console.log('handleChange', e);
-                  ui.setSearchText(e);
-                }}
+            {selectedWidget === 'wanted' && (
+              <BountyHeader
+                selectedWidget={selectedWidget}
+                setShowFocusView={setIsMobileViewTicketModal}
               />
-            </div>
+            )}
+            {selectedWidget === 'people' && (
+              <div
+                style={{
+                  padding: '0 20px'
+                }}>
+                <SearchTextInput
+                  small
+                  name="search"
+                  type="search"
+                  placeholder="Search"
+                  value={ui.searchText}
+                  style={{
+                    width: '100%',
+                    height: 40,
+                    border: '1px solid #DDE1E5',
+                    background: '#fff'
+                  }}
+                  onChange={(e) => {
+                    console.log('handleChange', e);
+                    ui.setSearchText(e);
+                  }}
+                />
+              </div>
+            )}
           </div>
+
           {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
           <div style={{ width: '100%' }}>
             <PageLoadSpinner show={loadingTop} />
@@ -553,7 +533,7 @@ export default function BodyComponent({ selectedWidget }) {
                 goBack={() => {
                   setIsMobileViewTicketModal(false);
                   setFocusIndex(-1);
-                  history.push('/p');
+                  history.push('/tickets');
                   // if (selectedWidget === 'about') switchWidgets('badges');
                 }}
               />
@@ -605,77 +585,33 @@ export default function BodyComponent({ selectedWidget }) {
         {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
 
         {selectedWidget === 'wanted' && (
-          <BountyHeader
-            selectedWidget={selectedWidget}
-            activeList={activeList}
-            setShowFocusView={setShowFocusView}
-          />
+          <BountyHeader selectedWidget={selectedWidget} setShowFocusView={setShowFocusView} />
         )}
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'flex-start',
-            padding: 20,
-            height: 62
-          }}>
+        {selectedWidget === 'people' && (
           <div
             style={{
               display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'flex-end'
             }}>
-            {/* {selectedWidget === 'wanted' &&
-              (ui.meInfo && ui.meInfo?.owner_alias ? (
-                <div
-                  style={{
-                    fontSize: '15px',
-                    fontWeight: '400',
-                    marginRight: '10px',
-                    cursor: 'pointer',
-                    borderRadius: '20px',
-                    userSelect: 'none',
-                    background: '#dcedfe',
-                    border: '2px solid #cddffd',
-                    padding: '8px 20px',
-                    color: '#5d92df'
-                  }}
-                  onClick={() => {
-                    setShowFocusView(true);
-                  }}>
-                  Create Ticket
-                </div>
-              ) : (
-                <div
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '20px',
-                    userSelect: 'none',
-                    cursor: 'not-allowed',
-                    color: '#83737d',
-                    backgroundColor: '#dde0e5',
-                    fontSize: '14px',
-                    marginRight: '10px'
-                  }}>
-                  Login to Create Tickets
-                </div>
-              ))} */}
-
             <SearchTextInput
+              small
               name="search"
               type="search"
               placeholder="Search"
               value={ui.searchText}
-              style={{ width: 204, height: 40, background: '#DDE1E5' }}
+              style={{
+                width: 204,
+                height: 40,
+                border: '1px solid #DDE1E5',
+                background: '#DDE1E5'
+              }}
               onChange={(e) => {
                 console.log('handleChange', e);
                 ui.setSearchText(e);
               }}
             />
           </div>
-        </div>
+        )}
         <>
           <div
             style={{

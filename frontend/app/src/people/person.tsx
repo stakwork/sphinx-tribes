@@ -80,8 +80,7 @@ export default function Person(props: any) {
         return (
           <div
             style={{ background: selected ? '#F2F3F5' : '#fff', cursor: 'pointer' }}
-            onClick={() => select(id, unique_name, owner_pubkey)}
-          >
+            onClick={() => select(id, unique_name, owner_pubkey)}>
             <Wrap style={{ padding: hideActions ? 10 : 25 }}>
               <div>
                 <Img style={addedStyles} src={mediumPic || defaultPic} />
@@ -95,8 +94,7 @@ export default function Person(props: any) {
                       margin: 0,
                       marginTop: hideActions ? 5 : 10,
                       fontSize: hideActions ? 12 : 15
-                    }}
-                  >
+                    }}>
                     {description}
                   </Description>
                 )}
