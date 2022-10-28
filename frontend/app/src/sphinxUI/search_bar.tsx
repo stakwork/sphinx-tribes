@@ -125,6 +125,9 @@ const Container = styled.div<inputProps>`
       border: ${(p) => (p.borderActive ? p.borderActive : '1px solid #000')};
       outline: none;
       caret-color: #a3c1ff;
+      &::placeholder {
+        color: ${(p) => (p.TextColorHover ? p.TextColorHover : '#f2f3f580')};
+      }
     }
   }
 
