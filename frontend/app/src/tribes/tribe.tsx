@@ -46,15 +46,13 @@ export default function Tribe({
       style={{ backgroundColor: '#1a2430' }}
       className="col-md-6 col-lg-6  mb-2"
       id={uuid}
-      title={''}
-    >
+      title={''}>
       <Content
         onClick={() => select(selected ? '' : uuid, unique_name)}
         style={{
           height: selected ? 'auto' : 100
         }}
-        selected={selected}
-      >
+        selected={selected}>
         <Left>
           <Row className="item-cont">
             <Img src={img || '/static/placeholder.svg'} />
@@ -139,8 +137,7 @@ export default function Tribe({
                     onClick={(e) => e.stopPropagation()}
                     href={`https://${preview}?tribe=${uuid}`}
                     target={'_blank'}
-                    className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}
-                  >
+                    className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}>
                     Preview
                   </a>
                   <button className="copy-btn" onClick={(e) => copyString(e, qrString)}>

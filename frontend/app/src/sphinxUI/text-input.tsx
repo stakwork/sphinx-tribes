@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FieldEnv, FieldText, Note } from './../form/inputs/index';
+import { FieldEnv, FieldText } from './../form/inputs/index';
 
 export default function TextInput({
   label,

@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import { create as createPersist, persist } from 'mobx-persist';
+import { persist } from 'mobx-persist';
 import tags from '../tribes/tags';
 import { Extras } from '../form/inputs/widgets/interfaces';
 

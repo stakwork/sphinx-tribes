@@ -222,6 +222,8 @@ const B = styled(EuiButton)`
   text-align: center;
   box-shadow: none !important;
   text-transform: none !important;
+  text-decoration: none !important;
+  transform: none !important;
 `;
 
 interface IconProps {

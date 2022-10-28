@@ -51,7 +51,6 @@ export default function WidgetSwitchViewer(props) {
 
     const activeList = listSource[selectedWidget];
 
-    let searchKeys: any = widgetConfigs[selectedWidget]?.schema?.map((s) => s.name) || [];
     let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
     // if dynamic schema, get all those fields
     if (foundDynamicSchema) {
@@ -61,7 +60,6 @@ export default function WidgetSwitchViewer(props) {
           if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
         });
       });
-      searchKeys = dynamicFields;
     }
 
     const deleteTicket = async (payload: any) => {

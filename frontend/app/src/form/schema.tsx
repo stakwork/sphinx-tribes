@@ -503,8 +503,6 @@ export const aboutSchema: FormField[] = [
   // },
 ];
 
-
-
 export const postSchema: FormField[] = [
   {
     name: 'title',

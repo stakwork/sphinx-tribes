@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
-import { languageOptions } from '../../localization';
+// import { languageOptions } from '../../localization';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
 import { Modal, Button } from '../../sphinxUI';
@@ -291,22 +291,17 @@ export default function Header() {
                         }}
                     /> */}
 
-            <a href={'https://sphinx.chat/'} target="_blank">
-              <Button text={'Get Sphinx'} color="primary" style={{ marginRight: 20 }} />
-            </a>
+            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
+              Get Sphinx
+            </GetSphinxsBtn>
             {ui.meInfo ? (
-              <Button
+              <LoggedInBtn
                 onClick={() => {
                   goToEditSelf();
                 }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Imgg
-                    style={{ height: 30, width: 30, marginRight: 10 }}
-                    src={ui.meInfo?.img || '/static/person_placeholder.png'}
-                  />
-                  <div style={{ color: '#fff' }}>{ui.meInfo?.owner_alias}</div>
-                </div>
-              </Button>
+                <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
+                {ui.meInfo?.owner_alias}
+              </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
                 <span>sign in</span>
@@ -379,6 +374,9 @@ export default function Header() {
                   setShowWelcome(false);
                   goToEditSelf();
                 }}
+                hoverColor={'#5881F8'}
+                activeColor={'#5078F2'}
+                shadowColor={'rgba(97, 138, 255, 0.5)'}
               />
             </Column>
           </div>
@@ -484,7 +482,8 @@ interface TagProps {
 }
 const Tab = styled.div<TagProps>`
   display: flex;
-  margin-right: 32px;
+  margin-right: 50px;
+  padding: 0 8px;
   color: ${(p) => (p.selected ? '#fff' : '#6B7A8D')};
   cursor: pointer;
   font-weight: 500;
@@ -493,6 +492,15 @@ const Tab = styled.div<TagProps>`
   height: 100%;
   align-items: center;
   border-bottom: ${(p) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
+
+  &:hover {
+    color: #909baa;
+  }
+
+  &:active {
+    color: #fff;
+    border-color: transparent;
+  }
 `;
 
 const MTab = styled.div<TagProps>`
@@ -509,33 +517,108 @@ const MTab = styled.div<TagProps>`
   border-bottom: ${(p) => (p.selected ? '3px solid #618AFF' : 'none')};
 `;
 
+const LoggedInBtn = styled.div`
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+  padding: 0 24px 0 50px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  ${Imgg} {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.13);
+    ${Imgg} {
+      height: 34px;
+      width: 34px;
+      left: 3px;
+    }
+  }
+`;
+
+const GetSphinxsBtn = styled.a`
+  display: flex;
+  flex: 1 0 auto;
+  background: #618aff;
+  box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+  padding: 0 28px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  border-radius: 32px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+  color: #ffffff;
+
+  &:hover {
+    background: #5881f8;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &:active {
+    background: #5078f2;
+    box-shadow: none;
+  }
+`;
+
 const LoginBtn = styled.div`
   display: flex;
   flex-wrap: nowrap;
   width: 120px;
   align-items: center;
   cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+  cursor: pointer;
+  margin-left: 18px;
   span {
     margin-right: 8px;
   }
+
+  &:hover {
+    color: #a3c1ff;
+  }
+
+  &:active {
+    color: #82b4ff;
+  }
 `;
 
-const LanguageSelector = styled(Select)`
-min-width:150px;
-margin-right:20px;
-color:#fff !important;
+// const LanguageSelector = styled(Select)`
+// min-width:150px;
+// margin-right:20px;
+// color:#fff !important;
 
-div {
-    background:#1a242e !important;
-    border:none;
-}
+// div {
+//     background:#1a242e !important;
+//     border:none;
+// }
 
-div.div.div {
-    color:#fff !important;
-}
+// div.div.div {
+//     color:#fff !important;
+// }
 
-#react-select-2-input {
-    color:#fff !important;
-}
-}
-`;
+// #react-select-2-input {
+//     color:#fff !important;
+// }
+// }
+// `;
