@@ -25,8 +25,17 @@ export default function SearchTextInput(props: any) {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
-      <Text
+    <Container
+      style={{ position: 'relative' }}
+      border={props.border}
+      borderActive={props.borderActive}
+      borderHover={props.borderHover}
+      TextColor={props.TextColor}
+      TextColorHover={props.TextColorHover}
+      iconColorHover={props.iconColorHover}
+      iconColor={props.iconColor}>
+      <input
+        className="SearchText"
         {...props}
         onFocus={() => setExpand(true)}
         onBlur={() => {
@@ -39,11 +48,6 @@ export default function SearchTextInput(props: any) {
           debounce(doDelayedValueUpdate, 300);
         }}
         placeholder={'Search'}
-        border={props.border}
-        borderActive={props.borderActive}
-        borderHover={props.borderHover}
-        TextColor={props.TextColor}
-        TextColorHover={props.TextColorHover}
         style={{ ...props.style, ...collapseStyles }}
       />
       {searchValue ? (
@@ -52,7 +56,7 @@ export default function SearchTextInput(props: any) {
           onClick={() => erase()}
           style={{
             position: 'absolute',
-            color: '#757778',
+            color: '#B0B7BC',
             cursor: 'pointer',
             top: 9,
             right: 9,
@@ -63,11 +67,10 @@ export default function SearchTextInput(props: any) {
         />
       ) : (
         <MaterialIcon
-          className="MIcon"
+          className="SearchIcon"
           icon="search"
           style={{
             position: 'absolute',
-            color: '#B0B7BC',
             top: 9,
             right: 9,
             fontSize: 22,
@@ -77,7 +80,7 @@ export default function SearchTextInput(props: any) {
           }}
         />
       )}
-    </div>
+    </Container>
   );
 }
 
@@ -96,40 +99,60 @@ interface inputProps {
   borderActive?: string;
   TextColor?: string;
   TextColorHover?: string;
+  iconColor?: string;
+  iconColorHover?: string;
 }
 
-const Text = styled.input<inputProps>`
-  background: #f2f3f580;
-  border: ${(p) => (p.border ? p.border : '1px solid #000')};
-  box-sizing: border-box;
-  border-radius: 21px;
-  padding-left: 20px;
-  padding-right: 30px;
-  font-style: normal;
-  font-weight: 500;
-  font-family: Barlow;
-  font-size: 16px;
-  line-height: 14px;
-  height: 35px;
-  transition: all 0.4s;
+const Container = styled.div<inputProps>`
+  .SearchText {
+    background: #f2f3f580;
+    border: ${(p) => (p.border ? p.border : '1px solid #000')};
+    box-sizing: border-box;
+    border-radius: 21px;
+    padding-left: 20px;
+    padding-right: 30px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: Barlow;
+    font-size: 16px;
+    line-height: 14px;
+    height: 35px;
+    transition: all 0.4s;
+    &::placeholder {
+      color: ${(p) => (p.TextColor ? p.TextColor : '#f2f3f580')};
+    }
+    &:focus {
+      border: ${(p) => (p.borderActive ? p.borderActive : '1px solid #000')};
+      outline: none;
+      caret-color: #a3c1ff;
+    }
+  }
+
+  .SearchIcon {
+    color: ${(p) => (p.iconColor ? p.iconColor : '#000')};
+  }
 
   &:hover {
-    border: ${(p) => (p.borderHover ? p.borderHover : '1px solid #000')};
+    .SearchIcon {
+      color: ${(p) => (p.iconColorHover ? p.iconColorHover : '#000')};
+    }
+    .SearchText {
+      border: ${(p) => (p.borderHover ? p.borderHover : '1px solid #000')};
+      &:focus {
+        border: ${(p) => (p.borderActive ? p.borderActive : '1px solid #000')};
+        outline: none;
+        caret-color: #a3c1ff;
+      }
+      &::placeholder {
+        color: ${(p) => (p.TextColorHover ? p.TextColorHover : '#f2f3f580')};
+      }
+    }
   }
   &:active {
-    border: ${(p) => (p.borderActive ? p.borderActive : '1px solid #000')};
-    outline: none;
-    caret-color: #a3c1ff;
-  }
-  &:focus {
-    border: ${(p) => (p.borderActive ? p.borderActive : '1px solid #000')};
-    outline: none;
-    caret-color: #a3c1ff;
-  }
-  &::placeholder {
-    color: ${(p) => (p.TextColor ? p.TextColor : '#f2f3f580')};
-  }
-  &:hover::placeholder {
-    color: ${(p) => (p.TextColorHover ? p.TextColorHover : '#f2f3f580')};
+    .SearchText {
+      border: ${(p) => (p.borderActive ? p.borderActive : '1px solid #000')};
+      outline: none;
+      caret-color: #a3c1ff;
+    }
   }
 `;
