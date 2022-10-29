@@ -9,3 +9,4 @@ frontend/app/package-lock.json
 notes.md
 frontend/packrd/packed-packr.go
 .idea/
+node_modules/
