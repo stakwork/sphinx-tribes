@@ -15,7 +15,7 @@ import (
 	"github.com/rs/xid"
 )
 
-const testModeUrl = "TEST_ASSET_URL"
+const liquidTestModeUrl = "TEST_ASSET_URL"
 
 func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -351,18 +351,12 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	personResponse["description"] = person.Description
 	personResponse["tags"] = person.Tags
 	personResponse["img"] = person.Img
-	personResponse["created"] = person.Created
-	personResponse["updated"] = person.Updated
-	personResponse["unlisted"] = person.Unlisted
-	personResponse["deleted"] = person.Deleted
-	personResponse["last_login"] = person.LastLogin
 	personResponse["owner_route_hint"] = person.OwnerRouteHint
 	personResponse["owner_contact_key"] = person.OwnerContactKey
 	personResponse["price_to_meet"] = person.PriceToMeet
 	personResponse["extras"] = person.Extras
 	personResponse["twitter_confirmed"] = person.TwitterConfirmed
 	personResponse["github_issues"] = person.GithubIssues
-	personResponse["new_ticket_time"] = person.NewTicketTime
 	if err != nil {
 		fmt.Println("==> error: ", err)
 	} else {
@@ -432,9 +426,9 @@ func getAssetByPubkey(pubkey string) ([]AssetBalanceData, error) {
 		testMode = false
 	}
 
-	url := os.Getenv(testModeUrl)
+	url := os.Getenv(liquidTestModeUrl)
 	if testMode && (url != "") {
-		url = os.Getenv(testModeUrl)
+		url = os.Getenv(liquidTestModeUrl)
 	} else {
 		url = "https://liquid.sphinx.chat/balances?pubkey=" + pubkey
 	}
