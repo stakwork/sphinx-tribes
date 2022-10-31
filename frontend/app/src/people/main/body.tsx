@@ -1,24 +1,25 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
-import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
+import { EuiGlobalToastList, EuiLoadingSpinner, EuiText } from '@elastic/eui';
 import Person from '../person';
 import PersonViewSlim from '../personViewSlim';
 import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
 import FadeLeft from '../../animated/fadeLeft';
 import FirstTimeScreen from './firstTimeScreen';
-import NoneSpace from '../utils/noneSpace';
-import { Divider, SearchTextInput, Modal, Button } from '../../sphinxUI';
+import { Divider, SearchTextInput, Modal } from '../../sphinxUI';
 import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
-import MaterialIcon from '@material/react-material-icon';
 import FocusedView from './focusView';
-
 import { widgetConfigs } from '../utils/constants';
 import { useHistory } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
+import NoneSpaceHomePage from '../utils/noneSpaceHomePage';
+import StartUpModal from '../utils/start_up_modal';
+import IconButton from '../../sphinxUI/icon_button';
+import BountyHeader from '../widgetViews/bountyHeader';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -31,7 +32,11 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function BodyComponent() {
+const StartUpWorkerModelData = {
+  getWork: 'getWork',
+  createWork: 'createWork'
+};
+export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -41,7 +46,10 @@ export default function BodyComponent() {
   const [showFocusView, setShowFocusView] = useState(false);
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
-
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
   const {
     peoplePageNumber,
     peopleWantedsPageNumber,
@@ -50,7 +58,6 @@ export default function BodyComponent() {
     openGithubIssues
   } = ui;
 
-  const [selectedWidget, setSelectedWidget] = useState('wanted');
   const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
   const listSource = {
@@ -159,7 +166,6 @@ export default function BodyComponent() {
           [selectedWidget]: person[selectedWidget]
         }
       };
-      //   console.log(p, itemIndex);
       setPublicFocusPerson(p);
       setPublicFocusIndex(itemIndex);
     }
@@ -189,7 +195,6 @@ export default function BodyComponent() {
       setPublicFocusIndex(-1);
     } else {
       //pull list again, we came back from focus view
-      console.log('pull list');
       let loadMethod = loadMethods[selectedWidget];
       loadMethod({ page: 1, resetPage: true });
     }
@@ -253,7 +258,7 @@ export default function BodyComponent() {
 
   function goBack() {
     ui.setSelectingPerson(0);
-    history.push('/p');
+    history.push('/tickets');
   }
 
   return useObserver(() => {
@@ -333,12 +338,47 @@ export default function BodyComponent() {
         p = <NoResults />;
       }
 
-      return p;
+      return (
+        <div
+          id="renderPeople"
+          style={{
+            display: 'flex',
+            justifyContent: 'start',
+            alignItems: 'center',
+            flexWrap: 'wrap'
+          }}>
+          {p}
+        </div>
+      );
+      // return p;
     }
 
     const listContent =
       selectedWidget === 'people' ? (
         renderPeople()
+      ) : !isMobile ? (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+          <WidgetSwitchViewer
+            onPanelClick={(person, item) => {
+              history.replace({
+                pathname: history?.location?.pathname,
+                search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
+                state: {
+                  owner_id: person.owner_pubkey,
+                  created: item.created
+                }
+              });
+              publicPanelClick(person, item);
+            }}
+            selectedWidget={selectedWidget}
+          />
+        </div>
       ) : (
         <WidgetSwitchViewer
           onPanelClick={(person, item) => {
@@ -385,118 +425,74 @@ export default function BodyComponent() {
         <Body onScroll={handleScroll}>
           {!ui.meInfo && (
             <div style={{ marginTop: 60 }}>
-              <NoneSpace
-                buttonText={'Get Started'}
+              <NoneSpaceHomePage
+                buttonText1={'I would like to work'}
                 buttonIcon={'arrow_forward'}
-                action={() => ui.setShowSignIn(true)}
-                img={'explore.png'}
-                text={'Start your own profile'}
+                buttonText2={'I need work done'}
+                action1={() => {
+                  setStartUpModelState('getWork');
+                  showModal();
+                }}
+                action2={() => {
+                  setStartUpModelState('createWork');
+                  showModal();
+                }}
+                text={'Ticket party!'}
                 style={{ height: 320, background: '#fff' }}
               />
               <Divider />
             </div>
           )}
 
+          {openStartUpModel && (
+            <StartUpModal
+              closeModal={closeModal}
+              dataObject={StartUpWorkerModelData[startUpModelState]}
+              buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
+            />
+          )}
           <div
             style={{
               width: '100%',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              padding: 20,
-              height: 82,
+              padding: '8px 0px',
               boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
               zIndex: 2,
               position: 'relative',
               background: '#fff',
               borderBottom: '1px solid rgb(0 0 0 / 7%)'
             }}>
-            <Label style={{ fontSize: 20 }}>
-              Explore
-              <Link onClick={() => setShowDropdown(!showDropdown)}>
-                <div>{widgetLabel && widgetLabel.label}</div>
-              </Link>
-              <MaterialIcon
-                icon={showDropdown ? 'expand_less' : 'expand_more'}
-                style={{ fontSize: 18, marginLeft: 5 }}
+            {selectedWidget === 'wanted' && (
+              <BountyHeader
+                selectedWidget={selectedWidget}
+                setShowFocusView={setIsMobileViewTicketModal}
               />
-              {showDropdown && (
-                <MobileDropdown>
-                  {tabs &&
-                    tabs.map((t, i) => {
-                      const { label, description } = t;
-                      const selected = selectedWidget === t.name;
-                      return (
-                        <TabMobile
-                          key={i}
-                          selected={selected}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowDropdown(false);
-                            setSelectedWidget(t.name);
-                          }}>
-                          <div className="tab-icon">
-                            {t?.action?.icon && (
-                              <MaterialIcon icon={t.action.icon} style={{ fontSize: 18 }} />
-                            )}
-                          </div>
-                          <div className="tab-details">
-                            {label && <div className="tab-details__title">{label}</div>}
-                            {description && (
-                              <div className="tab-details__subtitle">{description}</div>
-                            )}
-                          </div>
-                        </TabMobile>
-                      );
-                    })}
-                </MobileDropdown>
-              )}
-            </Label>
-            <div style={{ display: 'flex' }}>
-              {selectedWidget === 'wanted' && ui.meInfo && ui.meInfo?.owner_alias && (
-                <>
-                  <div
-                    style={{
-                      fontSize: '15px',
-                      fontWeight: '400',
-                      marginRight: '10px',
-                      cursor: 'pointer',
-                      borderRadius: '20px',
-                      userSelect: 'none',
-                      background: '#dcedfe',
-                      border: '2px solid #cddffd',
-                      padding: '8px 10px',
-                      color: '#5d92df'
-                    }}
-                    onClick={() => {
-                      // setShowFocusView(true);
-                      setIsMobileViewTicketModal(true);
-                      console.log('hi');
-                    }}>
-                    +
-                  </div>
-                </>
-              )}
-
-              <SearchTextInput
-                small
-                name="search"
-                type="search"
-                placeholder="Search"
-                value={ui.searchText}
+            )}
+            {selectedWidget === 'people' && (
+              <div
                 style={{
-                  width: 114,
-                  height: 40,
-                  border: '1px solid #DDE1E5',
-                  background: '#fff'
-                }}
-                onChange={(e) => {
-                  console.log('handleChange', e);
-                  ui.setSearchText(e);
-                }}
-              />
-            </div>
+                  padding: '0 20px'
+                }}>
+                <SearchTextInput
+                  small
+                  name="search"
+                  type="search"
+                  placeholder="Search"
+                  value={ui.searchText}
+                  style={{
+                    width: '100%',
+                    height: 40,
+                    border: '1px solid #DDE1E5',
+                    background: '#fff'
+                  }}
+                  onChange={(e) => {
+                    console.log('handleChange', e);
+                    ui.setSearchText(e);
+                  }}
+                />
+              </div>
+            )}
           </div>
+
           {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
           <div style={{ width: '100%' }}>
             <PageLoadSpinner show={loadingTop} />
@@ -539,7 +535,7 @@ export default function BodyComponent() {
                 goBack={() => {
                   setPublicFocusPerson(null);
                   setPublicFocusIndex(-1);
-                  history.push('/p');
+                  history.push('/tickets');
                 }}
               />
             </Modal>
@@ -560,7 +556,7 @@ export default function BodyComponent() {
                 goBack={() => {
                   setIsMobileViewTicketModal(false);
                   setFocusIndex(-1);
-                  history.push('/p');
+                  history.push('/tickets');
                   // if (selectedWidget === 'about') switchWidgets('badges');
                 }}
               />
@@ -589,105 +585,56 @@ export default function BodyComponent() {
         }}>
         {!ui.meInfo && (
           <div>
-            <NoneSpace
+            <NoneSpaceHomePage
               banner
-              buttonText={'Get Started'}
+              buttonText1={'I would like to work'}
               buttonIcon={'arrow_forward'}
-              action={() => ui.setShowSignIn(true)}
-              img={'explore.png'}
-              text={'Start your own profile'}
+              buttonText2={'I need work done'}
+              action1={() => {
+                setStartUpModelState('getWork');
+                showModal();
+              }}
+              action2={() => {
+                setStartUpModelState('createWork');
+                showModal();
+              }}
+              text={'Ticket party!'}
               style={{ height: 320 }}
             />
             <Divider />
           </div>
         )}
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            padding: 20,
-            height: 62
-          }}>
-          <Label>Explore</Label>
 
-          <Tabs>
-            {tabs &&
-              tabs.map((t, i) => {
-                const label = t.label;
-                const selected = selectedWidget === t.name;
-                const isWanted = 'wanted' === t.name;
+        {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
 
-                return (
-                  <Tab
-                    key={i}
-                    selected={selected}
-                    onClick={() => {
-                      setSelectedWidget(t.name);
-                    }}>
-                    {label}
-                  </Tab>
-                );
-              })}
-          </Tabs>
-
+        {selectedWidget === 'wanted' && (
+          <BountyHeader selectedWidget={selectedWidget} setShowFocusView={setShowFocusView} />
+        )}
+        {selectedWidget === 'people' && (
           <div
             style={{
               display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'flex-end'
             }}>
-            {selectedWidget === 'wanted' &&
-              (ui.meInfo && ui.meInfo?.owner_alias ? (
-                <div
-                  style={{
-                    fontSize: '15px',
-                    fontWeight: '400',
-                    marginRight: '10px',
-                    cursor: 'pointer',
-                    borderRadius: '20px',
-                    userSelect: 'none',
-                    background: '#dcedfe',
-                    border: '2px solid #cddffd',
-                    padding: '8px 20px',
-                    color: '#5d92df'
-                  }}
-                  onClick={() => {
-                    setShowFocusView(true);
-                  }}>
-                  Create Ticket
-                </div>
-              ) : (
-                <div
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '20px',
-                    userSelect: 'none',
-                    cursor: 'not-allowed',
-                    color: '#83737d',
-                    backgroundColor: '#dde0e5',
-                    fontSize: '14px',
-                    marginRight: '10px'
-                  }}>
-                  Login to Create Tickets
-                </div>
-              ))}
-
             <SearchTextInput
+              small
               name="search"
               type="search"
               placeholder="Search"
               value={ui.searchText}
-              style={{ width: 204, height: 40, background: '#DDE1E5' }}
+              style={{
+                width: 204,
+                height: 40,
+                border: '1px solid #DDE1E5',
+                background: '#DDE1E5'
+              }}
               onChange={(e) => {
                 console.log('handleChange', e);
                 ui.setSearchText(e);
               }}
             />
           </div>
-        </div>
+        )}
         <>
           <div
             style={{
@@ -742,7 +689,7 @@ export default function BodyComponent() {
             bigClose={() => {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
-              history.push('/p');
+              history.push('/tickets');
             }}>
             <FocusedView
               person={publicFocusPerson}
@@ -760,6 +707,14 @@ export default function BodyComponent() {
               }}
             />
           </Modal>
+        )}
+
+        {openStartUpModel && (
+          <StartUpModal
+            closeModal={closeModal}
+            dataObject={StartUpWorkerModelData[startUpModelState]}
+            buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
+          />
         )}
         {toastsEl}
         {/* modal create ticket */}

@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import { create as createPersist, persist } from 'mobx-persist';
+import { persist } from 'mobx-persist';
 import tags from '../tribes/tags';
 import { Extras } from '../form/inputs/widgets/interfaces';
 
@@ -161,6 +161,7 @@ export interface MeInfo {
   verification_signature: string;
   twitter_confirmed?: boolean;
   extras: Extras;
+  isSuperAdmin: boolean;
 }
 export const emptyMeData: MeData = {
   pubkey: '',
@@ -173,7 +174,8 @@ export const emptyMeData: MeData = {
   jwt: '',
   description: '',
   verification_signature: '',
-  extras: {}
+  extras: {},
+  isSuperAdmin: false
 };
 export const emptyMeInfo: MeInfo = {
   pubkey: '',
@@ -186,7 +188,8 @@ export const emptyMeInfo: MeInfo = {
   jwt: '',
   description: '',
   verification_signature: '',
-  extras: {}
+  extras: {},
+  isSuperAdmin: false
 };
 
 export const uiStore = new UiStore();

@@ -5,14 +5,16 @@ import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
-import { languageOptions } from '../../localization';
+// import { languageOptions } from '../../localization';
 import { useHistory, useLocation } from 'react-router-dom';
+import MaterialIcon from '@material/react-material-icon';
 import { Modal, Button } from '../../sphinxUI';
 
 import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 import Select from 'react-select';
+import IconButton from '../../sphinxUI/icon_button';
 
 export default function Header() {
   const { main, ui } = useStores();
@@ -34,6 +36,11 @@ export default function Header() {
       label: 'People',
       name: 'people',
       path: '/p'
+    },
+    {
+      label: 'Tickets',
+      name: 'tickets',
+      path: '/tickets'
     },
     {
       label: 'Bots',
@@ -174,7 +181,7 @@ export default function Header() {
               {tabs &&
                 tabs.map((t, i) => {
                   const label = t.label;
-                  const selected = location.pathname.includes(t.path);
+                  const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
                   return (
                     <MTab
@@ -217,7 +224,7 @@ export default function Header() {
             alignItems: 'center',
             width: '100%'
           }}>
-          <Row>
+          <Row style={{ height: '100%', marginBottom: '-2px' }}>
             <EuiHeaderSection grow={false}>
               <Img src="/static/people_logo.svg" />
             </EuiHeaderSection>
@@ -226,7 +233,7 @@ export default function Header() {
               {tabs &&
                 tabs.map((t, i) => {
                   const label = t.label;
-                  const selected = location.pathname.includes(t.path);
+                  const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
                   return (
                     <Tab
@@ -284,29 +291,22 @@ export default function Header() {
                         }}
                     /> */}
 
-            <a href={'https://sphinx.chat/'} target="_blank">
-              <Button text={'Get Sphinx'} color="transparent" style={{ marginRight: 20 }} />
-            </a>
+            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
+              Get Sphinx
+            </GetSphinxsBtn>
             {ui.meInfo ? (
-              <Button
+              <LoggedInBtn
                 onClick={() => {
                   goToEditSelf();
                 }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Imgg
-                    style={{ height: 30, width: 30, marginRight: 10 }}
-                    src={ui.meInfo?.img || '/static/person_placeholder.png'}
-                  />
-                  <div style={{ color: '#fff' }}>{ui.meInfo?.owner_alias}</div>
-                </div>
-              </Button>
+                <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
+                {ui.meInfo?.owner_alias}
+              </LoggedInBtn>
             ) : (
-              <Button
-                icon={'account_circle'}
-                text={'Sign in'}
-                color="primary"
-                onClick={() => ui.setShowSignIn(true)}
-              />
+              <LoginBtn onClick={() => ui.setShowSignIn(true)}>
+                <span>sign in</span>
+                <MaterialIcon icon={'login'} style={{ fontSize: 18 }} />
+              </LoginBtn>
             )}
           </Corner>
         </div>
@@ -343,6 +343,14 @@ export default function Header() {
                 style={{ height: 128, width: 128, marginBottom: 40 }}
                 src={ui.meInfo?.img || '/static/person_placeholder.png'}
               />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '110px',
+                  right: '85px'
+                }}>
+                <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
+              </div>
 
               <T>
                 <div style={{ lineHeight: '26px' }}>
@@ -355,8 +363,9 @@ export default function Header() {
                 favorite podcast!
               </Welcome>
 
-              <Button
+              <IconButton
                 text={'Continue'}
+                endingIcon={'arrow_forward'}
                 height={48}
                 width={'100%'}
                 color={'primary'}
@@ -365,6 +374,9 @@ export default function Header() {
                   setShowWelcome(false);
                   goToEditSelf();
                 }}
+                hoverColor={'#5881F8'}
+                activeColor={'#5078F2'}
+                shadowColor={'rgba(97, 138, 255, 0.5)'}
               />
             </Column>
           </div>
@@ -457,6 +469,7 @@ const Imgg = styled.div<ImageProps>`
 const Tabs = styled.div`
   display: flex;
   margin-left: 20px;
+  height: 100%;
 `;
 
 const MTabs = styled.div`
@@ -469,15 +482,25 @@ interface TagProps {
 }
 const Tab = styled.div<TagProps>`
   display: flex;
-  padding: 10px 25px;
-  margin-right: 10px;
+  margin-right: 50px;
+  padding: 0 8px;
   color: ${(p) => (p.selected ? '#fff' : '#6B7A8D')};
   cursor: pointer;
   font-weight: 500;
   font-size: 15px;
   line-height: 19px;
-  background: ${(p) => (p.selected ? 'rgba(255,255,255,0.07)' : '#3C3F4100')};
-  border-radius: 25px;
+  height: 100%;
+  align-items: center;
+  border-bottom: ${(p) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
+
+  &:hover {
+    color: #909baa;
+  }
+
+  &:active {
+    color: #fff;
+    border-color: transparent;
+  }
 `;
 
 const MTab = styled.div<TagProps>`
@@ -494,22 +517,108 @@ const MTab = styled.div<TagProps>`
   border-bottom: ${(p) => (p.selected ? '3px solid #618AFF' : 'none')};
 `;
 
-const LanguageSelector = styled(Select)`
-min-width:150px;
-margin-right:20px;
-color:#fff !important;
+const LoggedInBtn = styled.div`
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+  padding: 0 24px 0 50px;
+  display: flex;
+  align-items: center;
+  position: relative;
 
-div {
-    background:#1a242e !important;
-    border:none;
-}
+  ${Imgg} {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 0;
+  }
 
-div.div.div {
-    color:#fff !important;
-}
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-#react-select-2-input {
-    color:#fff !important;
-}
-}
+  &:active {
+    background: rgba(255, 255, 255, 0.13);
+    ${Imgg} {
+      height: 34px;
+      width: 34px;
+      left: 3px;
+    }
+  }
 `;
+
+const GetSphinxsBtn = styled.a`
+  display: flex;
+  flex: 1 0 auto;
+  background: #618aff;
+  box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+  padding: 0 28px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  border-radius: 32px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+  color: #ffffff;
+
+  &:hover {
+    background: #5881f8;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &:active {
+    background: #5078f2;
+    box-shadow: none;
+  }
+`;
+
+const LoginBtn = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  width: 120px;
+  align-items: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+  cursor: pointer;
+  margin-left: 18px;
+  span {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    color: #a3c1ff;
+  }
+
+  &:active {
+    color: #82b4ff;
+  }
+`;
+
+// const LanguageSelector = styled(Select)`
+// min-width:150px;
+// margin-right:20px;
+// color:#fff !important;
+
+// div {
+//     background:#1a242e !important;
+//     border:none;
+// }
+
+// div.div.div {
+//     color:#fff !important;
+// }
+
+// #react-select-2-input {
+//     color:#fff !important;
+// }
+// }
+// `;

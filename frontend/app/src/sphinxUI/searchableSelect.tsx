@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Select from 'react-select';
 
 export default function SearchableSelect(props: any) {
-  const { options, onChange, onInputChange, value, style, selectStyle, loading } = props;
+  const { options, onChange, onInputChange, value, style, loading } = props;
 
   const opts =
     options.map((o) => {

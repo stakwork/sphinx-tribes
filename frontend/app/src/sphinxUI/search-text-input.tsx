@@ -1,5 +1,5 @@
 import MaterialIcon from '@material/react-material-icon';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from '../store';
 
@@ -52,7 +52,8 @@ export default function SearchTextInput(props: any) {
             top: 9,
             right: 9,
             fontSize: 22,
-            userSelect: 'none'
+            userSelect: 'none',
+            ...props.iconStyle
           }}
         />
       ) : (
@@ -65,7 +66,8 @@ export default function SearchTextInput(props: any) {
             right: 9,
             fontSize: 22,
             userSelect: 'none',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            ...props.iconStyle
           }}
         />
       )}

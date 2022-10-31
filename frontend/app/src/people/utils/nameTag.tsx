@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useStores } from '../../store';
 import { useHistory } from 'react-router';
+import { useIsMobile } from '../../hooks';
 
 export default function NameTag(props) {
   const {
@@ -22,6 +23,8 @@ export default function NameTag(props) {
   const { ui } = useStores();
 
   const history = useHistory();
+
+  const isMobile = useIsMobile();
 
   const isSelected = ui.selectedPerson == id ? true : false;
 
@@ -44,6 +47,61 @@ export default function NameTag(props) {
   // shorten lastSeen string
   if (lastSeen === 'a few seconds ago') lastSeen = 'just now';
 
+  if (isMobile) {
+    return (
+      <Wrap
+        isSelected={isSelected}
+        onClick={(e) => {
+          selectPerson(e);
+        }}
+        style={style}>
+        {!isSelected && (
+          <>
+            <Img src={img || `/static/person_placeholder.png`} iconSize={iconSize} />
+            <Name
+              textSize={textSize}
+              color={'#9aaec6'}
+              style={{
+                marginLeft: '10px'
+              }}>
+              {owner_alias}
+            </Name>
+
+            <div
+              style={{
+                height: 3,
+                width: 3,
+                borderRadius: '50%',
+                margin: '0 6px',
+                background: '#8E969C'
+              }}
+            />
+          </>
+        )}
+
+        <Date>{lastSeen}</Date>
+        {ticketUrl && (
+          <GithubIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(ticketUrl, '_blank');
+            }}>
+            <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
+          </GithubIcon>
+        )}
+        {loomEmbedUrl && (
+          <LoomIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(loomEmbedUrl, '_blank');
+            }}>
+            <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
+          </LoomIcon>
+        )}
+      </Wrap>
+    );
+  }
+
   return (
     <Wrap
       isSelected={isSelected}
@@ -52,41 +110,51 @@ export default function NameTag(props) {
       }}
       style={style}>
       {!isSelected && (
-        <>
-          <Img src={img || `/static/person_placeholder.png`} iconSize={iconSize} />
-          <Name textSize={textSize}>{owner_alias}</Name>
-
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row'
+          }}>
+          <Img src={img || `/static/person_placeholder.png`} iconSize={32} />
           <div
             style={{
-              height: 3,
-              width: 3,
-              borderRadius: '50%',
-              margin: '0 6px',
-              background: '#8E969C'
-            }}
-          />
-        </>
+              display: 'flex',
+              flexDirection: 'column',
+              paddingLeft: '14px'
+            }}>
+            <Name textSize={textSize} color={'#000'}>
+              {owner_alias}
+            </Name>
+            <Date>{lastSeen}</Date>
+          </div>
+        </div>
       )}
-
-      <Date>{lastSeen}</Date>
-      {ticketUrl && (
-        <GithubIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            window.open(ticketUrl, '_blank');
-          }}>
-          <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
-        </GithubIcon>
-      )}
-      {loomEmbedUrl && (
-        <LoomIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            window.open(loomEmbedUrl, '_blank');
-          }}>
-          <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
-        </LoomIcon>
-      )}
+      <div
+        style={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'flex-start'
+        }}>
+        {ticketUrl && (
+          <GithubIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(ticketUrl, '_blank');
+            }}>
+            <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
+          </GithubIcon>
+        )}
+        {loomEmbedUrl && (
+          <LoomIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(loomEmbedUrl, '_blank');
+            }}>
+            <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
+          </LoomIcon>
+        )}
+      </div>
     </Wrap>
   );
 }
@@ -97,6 +165,7 @@ interface ImageProps {
 }
 interface NameProps {
   textSize?: number;
+  color?: string;
 }
 
 const Img = styled.div<ImageProps>`
@@ -113,12 +182,12 @@ const Name = styled.div<NameProps>`
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
-  font-size: ${(p) => (p.textSize ? p.textSize + 'px' : '12px')};
+  font-size: ${(p) => (p.textSize ? p.textSize + 'px' : '13px')};
+  color: ${(p) => p.color};
   line-height: 19px;
   /* or 158% */
-  margin-left: 5px;
 
-  dis play: flex;
+  display: flex;
   align-items: center;
 
   /* Secondary Text 4 */
@@ -128,7 +197,7 @@ const Date = styled.div`
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 19px;
   /* or 158% */
 

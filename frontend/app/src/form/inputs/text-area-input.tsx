@@ -14,7 +14,8 @@ export default function TextAreaInput({
   handleFocus,
   readOnly,
   prepend,
-  extraHTML
+  extraHTML,
+  borderType
 }: Props) {
   // console.log("TEXTAREA", label, extraHTML)
 
@@ -23,7 +24,7 @@ export default function TextAreaInput({
 
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv border={borderType} label={labeltext}>
         <R>
           <FieldTextArea
             name="first"
@@ -32,6 +33,7 @@ export default function TextAreaInput({
             onChange={(e) => handleChange(e.target.value)}
             onBlur={handleBlur}
             onFocus={handleFocus}
+            rows={2}
             // prepend={prepend}
           />
           {error && (

@@ -13,9 +13,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --max-warnings 22 --ext .ts",
+    "lint": "eslint src --max-warnings 190 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
-		"prettier": "npx prettier --config .prettierrc.json -w src/**/**/*.ts src/**/**/*.tsx"
+		"prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",
