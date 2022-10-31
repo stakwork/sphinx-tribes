@@ -27,7 +27,6 @@ export default function WidgetSwitchViewer(props) {
     : {
         minWidth: '1100px',
         maxWidth: '1100px',
-        // marginRight: 20,
         marginBottom: 20,
         borderRadius: '10px',
         display: 'flex',
@@ -97,7 +96,7 @@ export default function WidgetSwitchViewer(props) {
 
           const conditionalStyles = body?.paid
             ? {
-                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '1px solid #dde1e5',
+                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '',
                 boxShadow: 'none'
               }
             : {};
@@ -115,7 +114,10 @@ export default function WidgetSwitchViewer(props) {
                 ...conditionalStyles,
                 cursor: 'pointer',
                 padding: 0,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                background: 'transparent',
+                height: '160px',
+                boxShadow: 'none'
               }}>
               {selectedWidget === 'post' ? (
                 <PostView

@@ -15,8 +15,8 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
-          const response = await main.getPeople({ page: 1 });
           const bounty = await main.getPeopleWanteds({ page: 1 });
+          const response = await main.getPeople({ page: 1 });
           setPeopleList(response);
           setActiveBounty(bounty?.length);
         } catch (error) {

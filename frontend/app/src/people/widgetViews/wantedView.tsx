@@ -11,6 +11,7 @@ import { renderMarkdown } from '../utils/renderMarkdown';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import { getHost } from '../../host';
 import PaidBounty from '../utils/paidBounty';
+import Bounties from '../utils/assigned_unassigned_bounties';
 
 export default function WantedView(props: any) {
   let {
@@ -674,10 +675,28 @@ export default function WantedView(props: any) {
               loomEmbedUrl={loomEmbedUrl}
               title={title}
               codingLanguage={labels}
+              priceMin={priceMin}
+              priceMax={priceMax}
+              price={price}
+              sessionLength={estimate_session_length}
             />
           </BountyBox>
         ) : (
-          <BountyBox>hi</BountyBox>
+          <BountyBox>
+            <Bounties
+              {...person}
+              assignee={assignee}
+              created={created}
+              ticketUrl={ticketUrl}
+              loomEmbedUrl={loomEmbedUrl}
+              title={title}
+              codingLanguage={labels}
+              priceMin={priceMin}
+              priceMax={priceMax}
+              price={price}
+              sessionLength={estimate_session_length}
+            />
+          </BountyBox>
         )}
       </>
     );
@@ -696,8 +715,10 @@ const BountyBox = styled.div`
   justify-content: space-between;
   min-height: 160px;
   max-height: 160px;
-  border-radius: 10px;
+  // border-radius: 10px;
   width: 1100px;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+  border: none;
 `;
 
 const DWrap = styled.div<WrapProps>`

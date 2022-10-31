@@ -10,7 +10,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
     <>
       <EuiOverlayMask>
         <EuiModal
-          onClose={closeModal}
+          onClose={(e) => {
+            e?.stopPropagation();
+            closeModal();
+          }}
           style={{
             background: '#F2F3F5',
             padding: '30px',
