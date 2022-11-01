@@ -39,14 +39,18 @@ const Bounties = (props) => {
               style={{
                 minWidth: '213px',
                 maxWidth: '213px',
-                borderRight: '1px solid #49C998'
+                borderRight: '1px solid rgba(73, 201, 152, 0.2)'
               }}
             />
 
             <BountyProfileView
               assignee={props.assignee}
               status={'ASSIGNED'}
-              statusCode={'#49C998'}
+              statusStyle={{
+                width: '55px',
+                height: '16px',
+                background: '#49C998'
+              }}
             />
           </div>
         </BountyContainer>

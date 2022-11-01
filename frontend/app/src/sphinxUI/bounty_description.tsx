@@ -98,7 +98,6 @@ const LanguageObject = [
 
 const BountyDescription = (props) => {
   const [dataValue, setDataValue] = useState([]);
-
   useEffect(() => {
     let res;
     if (props.codingLanguage.length > 0) {
@@ -120,15 +119,14 @@ const BountyDescription = (props) => {
               display: 'flex',
               flexDirection: 'column'
             }}>
-            <NameTag {...props} />
+            <NameTag {...props} iconSize={32} isPaid={props?.isPaid} />
           </div>
         </Header>
         <Description>
           <div
             style={{
               width: '481px',
-              height: '64px',
-              padding: '8px 0px',
+              minHeight: '64px',
               display: 'flex',
               alignItems: 'center'
             }}>
@@ -137,7 +135,9 @@ const BountyDescription = (props) => {
                 fontSize: '17px',
                 lineHeight: '20px',
                 fontWeight: '500',
-                color: '#3C3F41'
+                color: props.isPaid ? '#5F6368' : '#3C3F41',
+                display: 'flex',
+                alignItems: 'center'
               }}>
               {props.title}
             </EuiText>
@@ -150,15 +150,16 @@ const BountyDescription = (props) => {
               return (
                 <CodingLabels
                   key={index}
-                  border={lang?.border}
-                  color={lang?.color}
-                  background={lang?.background}>
+                  border={props.isPaid ? '#f0f2f2' : lang?.border}
+                  color={props.isPaid ? '#B0B7BC' : lang?.color}
+                  background={props.isPaid ? '#f7f8f8' : lang?.background}>
                   <EuiText
                     style={{
                       fontSize: '13px',
                       fontWeight: '500',
                       textAlign: 'center',
-                      fontFamily: 'Barlow'
+                      fontFamily: 'Barlow',
+                      lineHeight: '16px'
                     }}>
                     {lang?.label}
                   </EuiText>
@@ -185,7 +186,7 @@ const BountyDescriptionContainer = styled.div`
   height: 100%;
   min-width: 519px;
   max-width: 519px;
-  padding: 16px;
+  padding-left: 17px;
 `;
 
 const Header = styled.div`
@@ -193,6 +194,7 @@ const Header = styled.div`
   flex-direction: row;
   align-item: center;
   height: 32px;
+  margin-top: 16px;
 `;
 
 const Description = styled.div`
@@ -205,6 +207,7 @@ const LanguageContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  margin-top: 9px;
 `;
 
 const CodingLabels = styled.div<codingLangProps>`
@@ -214,7 +217,8 @@ const CodingLabels = styled.div<codingLangProps>`
   background: ${(p) => (p.background ? p?.background : '#fff')};
   border-radius: 4px;
   overflow: hidden;
-  max-height: 22px;
+  max-height: 22.75px;
+  min-height: 22.75px;
   display: flex;
   flex-direction: row;
   align-items: center;
