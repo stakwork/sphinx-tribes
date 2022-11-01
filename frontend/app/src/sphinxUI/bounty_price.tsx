@@ -178,9 +178,7 @@ const BountyPrice = (props) => {
                 fontSize: '13px',
                 fontWeight: '500'
               }}>
-              {satToUsd(props?.priceMin)}
-              {' '}
-              {/* ~ {satToUsd(props?.priceMax)} */}
+              {satToUsd(props?.priceMin)} {/* ~ {satToUsd(props?.priceMax)} */}
               USD
             </EuiText>
           ) : (
