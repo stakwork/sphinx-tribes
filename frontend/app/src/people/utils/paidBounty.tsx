@@ -12,9 +12,7 @@ const PaidBounty = (props) => {
         {...props}
         title={props.title}
         codingLanguage={props.codingLanguage}
-        style={{
-          opacity: '30%'
-        }}
+        isPaid={true}
       />
       {/* right part */}
       <PriceUserContainer>
@@ -24,22 +22,30 @@ const PaidBounty = (props) => {
           price={props.price}
           sessionLength={props.sessionLength}
           style={{
-            borderRight: '1px solid #49C998',
+            borderRight: '1px solid rgba(73, 201, 152, 0.2)',
             maxWidth: '245px',
             minWidth: '245px'
           }}
         />
-        <BountyProfileView assignee={props.assignee} status={'COMPLETED'} statusCode={'#8256D0'} />
+        <BountyProfileView
+          assignee={props.assignee}
+          status={'COMPLETED'}
+          statusStyle={{
+            width: '63px',
+            height: '16px',
+            background: '#8256D0'
+          }}
+        />
       </PriceUserContainer>
       <img
         src={'/static/paid_ribbon.svg'}
         style={{
           position: 'sticky',
-          width: '106px',
-          height: '60px',
-          right: '-4px'
+          width: '80px',
+          height: '80px',
+          right: '-2.5px'
         }}
-        alt={''}
+        alt={'paid_ribbon'}
       />
     </BountyContainer>
   );

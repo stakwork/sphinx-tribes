@@ -39,14 +39,18 @@ const Bounties = (props) => {
               style={{
                 minWidth: '213px',
                 maxWidth: '213px',
-                borderRight: '1px solid #49C998'
+                borderRight: '1px solid rgba(73, 201, 152, 0.2)'
               }}
             />
 
             <BountyProfileView
               assignee={props.assignee}
               status={'ASSIGNED'}
-              statusCode={'#49C998'}
+              statusStyle={{
+                width: '55px',
+                height: '16px',
+                background: '#49C998'
+              }}
             />
           </div>
         </BountyContainer>
@@ -94,7 +98,8 @@ const Bounties = (props) => {
                     fontWeight: '500',
                     fontFamily: 'Barlow',
                     color: '#909BAA',
-                    marginBottom: '-16px'
+                    marginBottom: '-16px',
+                    lineHeight: '18px'
                   }}>
                   Do your skills match?
                 </EuiText>
@@ -112,9 +117,15 @@ const Bounties = (props) => {
                   hoverColor={'#5881F8'}
                   activeColor={'#5078F2'}
                   shadowColor={'rgba(97, 138, 255, 0.5)'}
+                  iconSize={'16px'}
                   iconStyle={{
-                    top: '13px',
+                    top: '17px',
                     right: '14px'
+                  }}
+                  textStyle={{
+                    width: '100px',
+                    display: 'flex',
+                    justifyContent: 'flex-start'
                   }}
                 />
               </div>
