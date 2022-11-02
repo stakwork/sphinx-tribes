@@ -17,7 +17,7 @@ import Tag from './tag';
 import tags from './tags';
 import NoResults from '../people/utils/noResults';
 import PageLoadSpinner from '../people/utils/pageLoadSpinner';
-import {colors} from "../colors"
+import { colors } from '../colors';
 
 export default function BodyComponent() {
   const { main, ui } = useStores();
@@ -132,7 +132,6 @@ export default function BodyComponent() {
             padding: 20,
             height: 62
           }}>
-
           <div style={{ display: 'flex', alignItems: 'baseline' }}>
             <EuiPopover
               panelPaddingSize="none"
@@ -183,7 +182,14 @@ export default function BodyComponent() {
               small={isMobile}
               placeholder="Search"
               value={ui.searchText}
-              style={{ width: 204, height: 40, background: '#111', color: '#fff', border: 'none', marginLeft: 20}}
+              style={{
+                width: 204,
+                height: 40,
+                background: '#111',
+                color: '#fff',
+                border: 'none',
+                marginLeft: 20
+              }}
               onChange={(e) => {
                 console.log('handleChange', e);
                 ui.setSearchText(e);
