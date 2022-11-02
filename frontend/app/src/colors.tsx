@@ -12,7 +12,8 @@ const palette = {
   header: '#1A242E',
   background: '#151E27',
   divider1: '#151E27',
-  divider2: '#101317'
+  divider2: '#101317',
+  tribesBackground: '#212539'
 };
 
 type PalletType = 'dark' | 'light';

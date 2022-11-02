@@ -17,11 +17,7 @@ import Tag from './tag';
 import tags from './tags';
 import NoResults from '../people/utils/noResults';
 import PageLoadSpinner from '../people/utils/pageLoadSpinner';
-// avoid hook within callback warning by renaming hooks
-// const getFuse = useFuse
-// const getScroll = useScroll
-
-const getPageScroll = usePageScroll;
+import {colors} from "../colors"
 
 export default function BodyComponent() {
   const { main, ui } = useStores();
@@ -94,14 +90,14 @@ export default function BodyComponent() {
 
     const loadForwardFunc = () => loadMore(1);
     const loadBackwardFunc = () => loadMore(-1);
-    const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
+    const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
       loadForwardFunc,
       loadBackwardFunc
     );
 
     if (loading) {
       return (
-        <Body style={{ justifyContent: 'center', alignItems: 'center', background: '#212529' }}>
+        <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
           <EuiLoadingSpinner size="xl" />
         </Body>
       );
@@ -131,12 +127,11 @@ export default function BodyComponent() {
           style={{
             width: '100%',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'flex-start',
             padding: 20,
             height: 62
           }}>
-          <Label></Label>
 
           <div style={{ display: 'flex', alignItems: 'baseline' }}>
             <EuiPopover
@@ -182,15 +177,13 @@ export default function BodyComponent() {
               </EuiSelectable>
             </EuiPopover>
 
-            <div style={{ width: 20 }} />
-
             <SearchTextInput
               name="search"
               type="search"
               small={isMobile}
               placeholder="Search"
               value={ui.searchText}
-              style={{ width: 204, height: 40, background: '#111', color: '#fff', border: 'none' }}
+              style={{ width: 204, height: 40, background: '#111', color: '#fff', border: 'none', marginLeft: 20}}
               onChange={(e) => {
                 console.log('handleChange', e);
                 ui.setSearchText(e);
@@ -224,7 +217,7 @@ const Body = styled.div`
   // padding-bottom:80px;
   width: 100%;
   overflow: auto;
-  background: #272c4b;
+  background: ${colors.dark.tribesBackground};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -236,19 +229,4 @@ const Column = styled.div`
   margin-top: 10px;
   // max-width:900px;
   width: 100%;
-`;
-const Label = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 26px;
-  line-height: 40px;
-  /* or 154% */
-
-  display: flex;
-  align-items: center;
-
-  /* Text 2 */
-
-  color: #ffffff;
 `;
