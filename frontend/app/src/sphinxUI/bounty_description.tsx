@@ -96,8 +96,20 @@ const LanguageObject = [
   }
 ];
 
-const BountyDescription = (props) => {
+const BountyDescription = (props: any) => {
   const [dataValue, setDataValue] = useState([]);
+  const [descriptionImage, setDescriptionImage] = useState('');
+  // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
+
+  useEffect(() => {
+    if (props.description) {
+      // const found = props?.description.match(/!\[.*?\]\((.*?)\)/);
+      const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+      setDescriptionImage(found && found.length > 0 && found[0]);
+      // console.log(found2 && found2.length > 0 && found2[0]);
+    }
+  }, [props]);
+
   useEffect(() => {
     let res;
     if (props.codingLanguage.length > 0) {
@@ -125,7 +137,7 @@ const BountyDescription = (props) => {
         <Description>
           <div
             style={{
-              width: '481px',
+              width: descriptionImage ? '334px' : '481px',
               minHeight: '64px',
               display: 'flex',
               alignItems: 'center'
@@ -142,6 +154,42 @@ const BountyDescription = (props) => {
               {props.title}
             </EuiText>
           </div>
+          {descriptionImage && (
+            <div
+              style={{
+                height: '77px',
+                width: '130px',
+                marginLeft: '17px',
+                marginRight: '18px',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                marginTop: '-13px'
+              }}>
+              <img src={descriptionImage} alt={''} height={'100%'} width={'100%'} />
+            </div>
+          )}
+
+          {/* {props?.loomEmbedUrl && (
+            <div
+              style={{
+                height: '64px',
+                width: '130px',
+                marginLeft: '17px',
+                marginRight: '18px',
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}>
+              <iframe
+                src={props?.loomEmbedUrl + '?autoplay=1&mute=1&loop=1&controls=0'}
+                frameBorder="0"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '4px'
+                }}
+              />
+            </div>
+          )} */}
         </Description>
         <LanguageContainer>
           {dataValue &&
@@ -150,7 +198,7 @@ const BountyDescription = (props) => {
               return (
                 <CodingLabels
                   key={index}
-                  border={props.isPaid ? '#f0f2f2' : lang?.border}
+                  border={props.isPaid ? '1px solid rgba(176, 183, 188, 0.1)' : lang?.border}
                   color={props.isPaid ? '#B0B7BC' : lang?.color}
                   background={props.isPaid ? '#f7f8f8' : lang?.background}>
                   <EuiText
@@ -201,13 +249,14 @@ const Description = styled.div`
   display: flex;
   flex-direction: row;
   align-item: center;
+  justify-content: space-between;
 `;
 
 const LanguageContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
-  margin-top: 9px;
+  width: 80%;
+  margin-top: 14px;
 `;
 
 const CodingLabels = styled.div<codingLangProps>`

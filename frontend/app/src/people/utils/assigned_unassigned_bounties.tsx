@@ -81,7 +81,8 @@ const Bounties = (props) => {
                   alignItems: 'center',
                   height: '80px',
                   width: '80px',
-                  borderRadius: '50%'
+                  borderRadius: '50%',
+                  marginTop: '5px'
                 }}>
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>
@@ -90,7 +91,8 @@ const Bounties = (props) => {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  marginLeft: '16px'
+                  marginLeft: '25px',
+                  marginBottom: '2px'
                 }}>
                 <EuiText
                   style={{
@@ -98,8 +100,10 @@ const Bounties = (props) => {
                     fontWeight: '500',
                     fontFamily: 'Barlow',
                     color: '#909BAA',
-                    marginBottom: '-16px',
-                    lineHeight: '18px'
+                    marginBottom: '-13px',
+                    lineHeight: '18px',
+                    display: 'flex',
+                    alignItems: 'center'
                   }}>
                   Do your skills match?
                 </EuiText>
@@ -123,9 +127,10 @@ const Bounties = (props) => {
                     right: '14px'
                   }}
                   textStyle={{
-                    width: '100px',
+                    width: '108px',
                     display: 'flex',
-                    justifyContent: 'flex-start'
+                    justifyContent: 'flex-start',
+                    fontFamily: 'Barlow'
                   }}
                 />
               </div>
@@ -176,6 +181,6 @@ const UnassignedPersonProfile = styled.div`
   border: 1px dashed #b0b7bc;
   border-radius: 10px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  padding-top: 32px;
+  padding-left: 37px;
 `;

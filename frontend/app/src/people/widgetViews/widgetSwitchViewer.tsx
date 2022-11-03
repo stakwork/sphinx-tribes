@@ -19,6 +19,7 @@ export default function WidgetSwitchViewer(props) {
   const [deletePayload, setDeletePayload] = useState<object>({});
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
+  const [currentItems, setCurrentItems] = useState<number>(10);
 
   const panelStyles = isMobile
     ? {
@@ -91,7 +92,7 @@ export default function WidgetSwitchViewer(props) {
 
     const listItems =
       activeList && activeList.length ? (
-        activeList.map((item, i) => {
+        activeList.slice(0, currentItems).map((item, i) => {
           const { person, body } = item;
 
           const conditionalStyles = body?.paid
@@ -158,6 +159,12 @@ export default function WidgetSwitchViewer(props) {
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
+        <LoadMoreButton
+          onClick={() => {
+            setCurrentItems(currentItems + 10);
+          }}>
+          Load More
+        </LoadMoreButton>
       </>
     );
   });
@@ -174,4 +181,29 @@ const Panel = styled.div<PanelProps>`
   padding: 20px;
   box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
   border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
+
+const LoadMoreButton = styled.div`
+  width: 166px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #3c3f41;
+  border: 1px solid #dde1e5;
+  border-radius: 30px;
+  background: #ffffff;
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  cursor: pointer;
+  user-select: none;
+  :hover {
+    border: 1px solid #b0b7bc;
+  }
+  :active {
+    border: 1px solid #8e969c;
+  }
 `;

@@ -50,6 +50,8 @@ export default function BodyComponent({ selectedWidget }) {
   const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
+  const [scrollValue, setScrollValue] = useState<boolean>(false);
+
   const {
     peoplePageNumber,
     peopleWantedsPageNumber,
@@ -423,27 +425,6 @@ export default function BodyComponent({ selectedWidget }) {
     if (isMobile) {
       return (
         <Body onScroll={handleScroll}>
-          {!ui.meInfo && (
-            <div style={{ marginTop: 60 }}>
-              <NoneSpaceHomePage
-                buttonText1={'I would like to work'}
-                buttonIcon={'arrow_forward'}
-                buttonText2={'I need work done'}
-                action1={() => {
-                  setStartUpModelState('getWork');
-                  showModal();
-                }}
-                action2={() => {
-                  setStartUpModelState('createWork');
-                  showModal();
-                }}
-                text={'Ticket party!'}
-                style={{ height: 320, background: '#fff' }}
-              />
-              <Divider />
-            </div>
-          )}
-
           {openStartUpModel && (
             <StartUpModal
               closeModal={closeModal}
@@ -465,6 +446,7 @@ export default function BodyComponent({ selectedWidget }) {
               <BountyHeader
                 selectedWidget={selectedWidget}
                 setShowFocusView={setIsMobileViewTicketModal}
+                scrollValue={scrollValue}
               />
             )}
             {selectedWidget === 'people' && (
@@ -578,43 +560,32 @@ export default function BodyComponent({ selectedWidget }) {
     // desktop mode
     return (
       <Body
-        onScroll={handleScroll}
+        onScroll={(e) => {
+          setScrollValue(e?.currentTarget?.scrollTop >= 20);
+          handleScroll(e);
+        }}
         style={{
           background: '#f0f1f3',
           height: 'calc(100% - 65px)'
         }}>
-        {!ui.meInfo && (
-          <div>
-            <NoneSpaceHomePage
-              banner
-              buttonText1={'I would like to work'}
-              buttonIcon={'arrow_forward'}
-              buttonText2={'I need work done'}
-              action1={() => {
-                setStartUpModelState('getWork');
-                showModal();
-              }}
-              action2={() => {
-                setStartUpModelState('createWork');
-                showModal();
-              }}
-              text={'Ticket party!'}
-              style={{ height: 320 }}
-            />
-            <Divider />
-          </div>
-        )}
-
-        {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
-
+        <div
+          style={{
+            minHeight: '32px'
+          }}
+        />
         {selectedWidget === 'wanted' && (
-          <BountyHeader selectedWidget={selectedWidget} setShowFocusView={setShowFocusView} />
+          <BountyHeader
+            selectedWidget={selectedWidget}
+            setShowFocusView={setShowFocusView}
+            scrollValue={scrollValue}
+          />
         )}
         {selectedWidget === 'people' && (
           <div
             style={{
               display: 'flex',
-              justifyContent: 'flex-end'
+              justifyContent: 'flex-end',
+              padding: '10px 0'
             }}>
             <SearchTextInput
               small
@@ -644,7 +615,8 @@ export default function BodyComponent({ selectedWidget }) {
               height: '100%',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              padding: 20
+              padding: '0px 20px 20px 20px'
+              // marginTop: '60px'
             }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
