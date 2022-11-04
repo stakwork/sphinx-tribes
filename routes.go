@@ -721,8 +721,6 @@ func updateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	leaderBoard.TribeUuid = leaderBoardFromDb.TribeUuid
-	fmt.Println(">>>> leaderBoardFromDb ", leaderBoardFromDb)
-	fmt.Println(">>>> leaderBoard ", leaderBoard)
 
 	DB.updateLeaderBoard(leaderBoardFromDb.TribeUuid, leaderBoardFromDb.Alias, map[string]interface{}{
 		"spent":  leaderBoard.Spent,
