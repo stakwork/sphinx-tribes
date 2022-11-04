@@ -7,29 +7,39 @@ import BountyPrice from '../../sphinxUI/bounty_price';
 import BountyProfileView from '../../sphinxUI/bounty_profile_view';
 import IconButton from '../../sphinxUI/icon_button';
 import StartUpModal from './start_up_modal';
+import ConnectCard from '../utils/connectCard';
+import { useStores } from '../../store';
 
 const Bounties = (props) => {
+  let { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } = props 
   const color = colors['light'];
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
+  const [openConnectModal, setConnectModal] = useState<boolean>(false);
+  const closeConnectModal = () => setConnectModal(false);
+  const showConnectModal = () => setConnectModal(true);
+
+
+				const { ui } = useStores();
   return (
     <>
-      {{ ...props.assignee }.owner_alias ? (
+      {{ ...assignee }.owner_alias ? (
         <BountyContainer assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}>
           <div className="BountyDescriptionContainer">
             <BountyDescription
+							{...person}
               {...props}
-              title={props.title}
-              codingLanguage={props.codingLanguage}
+              title={title}
+              codingLanguage={codingLanguage}
             />
           </div>
           <div className="BountyPriceContainer">
             <BountyPrice
-              priceMin={props.priceMin}
-              priceMax={props.priceMax}
-              price={props.price}
-              sessionLength={props.sessionLength}
+              priceMin={priceMin}
+              priceMax={priceMax}
+              price={price}
+              sessionLength={sessionLength}
               style={{
                 minWidth: '213px',
                 maxWidth: '213px',
@@ -38,7 +48,7 @@ const Bounties = (props) => {
             />
 
             <BountyProfileView
-              assignee={props.assignee}
+              assignee={assignee}
               status={'ASSIGNED'}
               statusStyle={{
                 width: '55px',
@@ -52,15 +62,16 @@ const Bounties = (props) => {
         <BountyContainer>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
             <BountyDescription
+							{...person}
               {...props}
-              title={props.title}
-              codingLanguage={props.codingLanguage}
+              title={title}
+              codingLanguage={codingLanguage}
             />
             <BountyPrice
-              priceMin={props.priceMin}
-              priceMax={props.priceMax}
-              price={props.price}
-              sessionLength={props.sessionLength}
+              priceMin={priceMin}
+              priceMax={priceMax}
+              price={price}
+              sessionLength={sessionLength}
               style={{
                 borderLeft: `1px solid ${color.grayish.G700}`,
                 maxWidth: '245px',
@@ -82,8 +93,14 @@ const Bounties = (props) => {
                   height={48}
                   style={{ marginTop: 20 }}
                   onClick={(e) => {
+													if(ui.meInfo){
+																	
+																	showConnectModal();
+                    e.stopPropagation();
+													}else{
                     e.stopPropagation();
                     showModal();
+													}
                   }}
                   color="primary"
                   hoverColor={color.button_secondary.hover}
@@ -109,6 +126,14 @@ const Bounties = (props) => {
       {openStartUpModel && (
         <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
       )}
+
+<ConnectCard
+          dismiss={() => closeConnectModal()}
+          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+          person={person}
+          visible={openConnectModal}
+        />
+
     </>
   );
 };
