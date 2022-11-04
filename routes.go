@@ -54,6 +54,8 @@ func NewRouter() *http.Server {
 		r.Get("/tribes/{uuid}", getTribe)
 		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
 
+		r.Get("/leaderboard/{tribe_uuid}", getLeaderBoard)
+
 		r.Get("/tribes_by_owner/{pubkey}", getTribesByOwner)
 		r.Post("/tribes", createOrEditTribe)
 		r.Post("/bots", createOrEditBot)
@@ -90,6 +92,8 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Use(PubKeyContext)
 		r.Post("/channel", createChannel)
+		r.Post("/leaderboard/{tribe_uuid}", createLeaderBoard)
+		r.Put("/leaderboard/{tribe_uuid}", updateLeaderBoard)
 		r.Put("/tribe", createOrEditTribe)
 		r.Put("/tribestats", putTribeStats)
 		r.Delete("/tribe/{uuid}", deleteTribe)
@@ -613,4 +617,116 @@ func initChi() *chi.Mux {
 	r.Use(cors.Handler)
 	r.Use(middleware.Timeout(60 * time.Second))
 	return r
+}
+
+func createLeaderBoard(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	uuid := chi.URLParam(r, "tribe_uuid")
+
+	leaderBoard := []LeaderBoard{}
+
+	if uuid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	//from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &leaderBoard)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	_, err = DB.createLeaderBoard(uuid, leaderBoard)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
+
+func getLeaderBoard(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "tribe_uuid")
+	leaderBoards := DB.getLeaderBoard(uuid)
+
+	var board = []LeaderBoard{}
+	for _, leaderboard := range leaderBoards {
+		leaderboard.TribeUuid = ""
+		board = append(board, leaderboard)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(board)
+}
+
+func updateLeaderBoard(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	uuid := chi.URLParam(r, "tribe_uuid")
+
+	if uuid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	//from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	leaderBoard := LeaderBoard{}
+
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &leaderBoard)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	leaderBoardFromDb := DB.getLeaderBoardByUuidAndAlias(uuid, leaderBoard.Alias)
+
+	if leaderBoardFromDb.Alias != leaderBoard.Alias {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	leaderBoard.TribeUuid = leaderBoardFromDb.TribeUuid
+
+	DB.updateLeaderBoard(leaderBoardFromDb.TribeUuid, leaderBoardFromDb.Alias, map[string]interface{}{
+		"spent":  leaderBoard.Spent,
+		"earned": leaderBoard.Earned,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
 }
