@@ -145,16 +145,16 @@ type Channel struct {
 	Deleted   bool       `json:"deleted"`
 }
 
-type LeaderBoard struct {
-	TribeUuid string `json:"tribe_uuid"`
-	Alias     string `json:"alias"`
-	Spent     int64  `json:"spent"`
-	Earned    int64  `json:"earned"`
+type AssetResponse struct {
+	Balances []AssetBalanceData `json:"balances"`
+	Txs      []string           `json:"txs"`
 }
 
-//func (LeaderBoard) TableName() string {
-//	return "leaderboard"
-//}
+type AssetBalanceData struct {
+	OwnerPubkey string `json:"owner_pubkey"`
+	AssetId     uint   `json:"asset_id"`
+	Balance     uint   `json:"balance"`
+}
 
 /*
 GithubIssues
