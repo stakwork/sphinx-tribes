@@ -2,8 +2,10 @@ import { EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../colors';
 
 const BountyProfileView = (props) => {
+  const color = colors['light'];
   return (
     <>
       <UserProfileContainer>
@@ -26,26 +28,15 @@ const BountyProfileView = (props) => {
             }}>
             <EuiText className="statusText">{props.status}</EuiText>
           </Status>
-          <NameContainer>
-            <EuiText
-              style={{
-                fontSize: '17px',
-                fontWeight: '600',
-                color: '#3C3F41'
-              }}>
+          <NameContainer name_text_color={color.grayish.G10}>
+            <EuiText className="Name_Text">
               {{ ...props.assignee }.owner_alias || 'Guest Developer  '}
             </EuiText>
           </NameContainer>
 
-          <div
-            style={{
-              height: '20px',
-              width: '92px',
-              left: '909px',
-              top: '96px',
-              display: 'flex',
-              flexDirection: 'row'
-            }}
+          <ViewProfileButton
+            View_profile_text_color={color.grayish.G300}
+            View_profile_icon_color={color.grayish.G300}
             onClick={(e) => {
               if ({ ...props.assignee }.owner_alias) {
                 e.stopPropagation();
@@ -59,43 +50,11 @@ const BountyProfileView = (props) => {
                 );
               }
             }}>
-            <EuiText
-              style={{
-                fontFamily: 'Barlow',
-                fontStyle: 'normal',
-                fontWeight: '500',
-                fontSize: '13px',
-                lineHeight: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                color: '#B0B7BC'
-              }}>
-              View Profile
-            </EuiText>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '20px',
-                width: '24px'
-              }}>
-              <MaterialIcon
-                icon={'arrow_forward'}
-                style={{
-                  color: '#B0B7BC',
-                  fontStyle: 'normal',
-                  fontWeight: '400',
-                  fontSize: '12px',
-                  lineHeight: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  letterSpacing: '0.01em'
-                }}
-              />
+            <EuiText className="text">View Profile</EuiText>
+            <div className="Icon_Container">
+              <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />
             </div>
-          </div>
+          </ViewProfileButton>
         </UserInfo>
       </UserProfileContainer>
     </>
@@ -103,6 +62,12 @@ const BountyProfileView = (props) => {
 };
 
 export default BountyProfileView;
+
+interface BountyProfileViewProps {
+  name_text_color?: string;
+  View_profile_text_color?: string;
+  View_profile_icon_color?: string;
+}
 
 const UserProfileContainer = styled.div`
   min-width: 336px;
@@ -148,7 +113,7 @@ const Status = styled.div`
   }
 `;
 
-const NameContainer = styled.div`
+const NameContainer = styled.div<BountyProfileViewProps>`
   width: 100%;
   height: 32px;
   font-family: 'Barlow';
@@ -161,4 +126,46 @@ const NameContainer = styled.div`
   color: #3c3f41;
   margin-top: 3px;
   margin-bottom: 1px;
+  .Name_Text {
+    font-size: 17px;
+    font-weight: 600;
+    color: ${(p) => p.name_text_color};
+  }
+`;
+
+const ViewProfileButton = styled.div<BountyProfileViewProps>`
+  height: 20px;
+  width: 92px;
+  left: 909px;
+  top: 96px;
+  display: flex;
+  flex-direction: row;
+  .text {
+    font-family: Barlow;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    color: ${(p) => p.View_profile_text_color};
+  }
+  .Icon_Container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    width: 24px;
+  }
+  .MaterialIcon {
+    color: ${(p) => p.View_profile_icon_color};
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
 `;

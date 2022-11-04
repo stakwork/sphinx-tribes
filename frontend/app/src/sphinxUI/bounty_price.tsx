@@ -1,7 +1,8 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { formatPrice, satToUsd } from '../helpers';
+import { colors } from '../colors';
+import { DollarConverter, satToUsd } from '../helpers';
 
 const Session = [
   {
@@ -23,8 +24,8 @@ const Session = [
 ];
 
 const BountyPrice = (props) => {
+  const color = colors['light'];
   const [session, setSession] = useState<any>();
-  let dollarUSLocale = Intl.NumberFormat('en-US');
 
   useEffect(() => {
     let res;
@@ -47,169 +48,51 @@ const BountyPrice = (props) => {
             display: 'flex',
             alignItems: 'center'
           }}>
-          <div
-            style={{
-              width: '28px',
-              height: '33px',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-            <EuiText
-              style={{
-                fontFamily: 'Barlow',
-                fontStyle: 'normal',
-                fontWeight: '400',
-                fontSize: '14px',
-                lineHeight: '17px'
-              }}>
-              $@
-            </EuiText>
+          <div className="PriceStaticTextContainer">
+            <EuiText className="PriceStaticText">$@</EuiText>
           </div>
           {props.priceMin ? (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '33px',
-                minWidth: '104px',
-                color: '#2F7460',
-                background: 'rgba(73, 201, 152, 0.15)',
-                borderRadius: '2px'
-              }}>
-              <div
-                style={{
-                  minHeight: '33px',
-                  minWidth: '63px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginLeft: '7px'
-                }}>
-                <EuiText
-                  style={{
-                    fontSize: '17px',
-                    fontWeight: '700',
-                    lineHeight: '20px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                  {dollarUSLocale.format(formatPrice(props?.priceMin)).split(',').join(' ')}
-                  {/* ~{' '}
-                  {dollarUSLocale.format(formatPrice(props?.priceMax)).split(',').join(' ')} */}
-                </EuiText>
+            <PriceOuterContainer
+              price_Text_Color={color.primaryColor.P300}
+              priceBackground={color.primaryColor.P100}>
+              <div className="Price_inner_Container">
+                <EuiText className="Price_Dynamic_Text">{DollarConverter(props?.priceMin)}</EuiText>
               </div>
-              <div
-                style={{
-                  height: '33px',
-                  width: '34px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginLeft: '3px'
-                }}>
-                <EuiText
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: '400',
-                    marginLeft: '6px'
-                  }}>
-                  SAT
-                </EuiText>
+              <div className="Price_SAT_Container">
+                <EuiText className="Price_SAT_Text">SAT</EuiText>
               </div>
-            </div>
+            </PriceOuterContainer>
           ) : (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '33px',
-                minWidth: '104px',
-                color: '#2F7460',
-                background: 'rgba(73, 201, 152, 0.15)',
-                borderRadius: '2px'
-              }}>
-              <div
-                style={{
-                  height: '33px',
-                  minWidth: '63px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginLeft: '7px'
-                }}>
-                <EuiText
-                  style={{
-                    fontSize: '17px',
-                    fontWeight: '700',
-                    lineHeight: '20px'
-                  }}>
-                  {dollarUSLocale.format(formatPrice(props?.price)).split(',').join(' ')}
-                </EuiText>
+            <PriceOuterContainer
+              price_Text_Color={color.primaryColor.P300}
+              priceBackground={color.primaryColor.P100}>
+              <div className="Price_inner_Container">
+                <EuiText className="Price_Dynamic_Text">{DollarConverter(props?.price)}</EuiText>
               </div>
 
-              <div
-                style={{
-                  height: '33px',
-                  width: '34px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginTop: '1px'
-                }}>
-                <EuiText
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: '400',
-                    marginLeft: '6px',
-                    lineHeight: '14px'
-                  }}>
-                  SAT
-                </EuiText>
+              <div className="Price_SAT_Container">
+                <EuiText className="Price_SAT_Text">SAT</EuiText>
               </div>
-            </div>
+            </PriceOuterContainer>
           )}
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingLeft: '34px'
-          }}>
+        <USDContainer>
           {props.priceMin ? (
-            <EuiText
-              style={{
-                fontSize: '13px',
-                fontWeight: '500'
-              }}>
+            <EuiText className="USD_Price">
               {satToUsd(props?.priceMin)}
-              {' '}
-              {/* ~ {satToUsd(props?.priceMax)} */}
               USD
             </EuiText>
           ) : (
-            <EuiText
-              style={{
-                fontSize: '13px',
-                fontWeight: '500'
-              }}>
-              {satToUsd(props?.price)} USD{' '}
-            </EuiText>
+            <EuiText className="USD_Price">{satToUsd(props?.price)} USD </EuiText>
           )}
-        </div>
+        </USDContainer>
         {session && (
-          <div
-            style={{
-              height: '28px'
-            }}>
-            <EuiText
-              style={{
-                fontSize: '13px',
-                fontWeight: '700',
-                color: '#3c3f41',
-                fontFamily: 'Barlow'
-              }}>
+          <SessionContainer session_text_color={color.grayish.G10}>
+            <EuiText className="Session_Text">
               <span
+                className="EST_Text"
                 style={{
-                  fontWeight: '400',
-                  fontFamily: 'Barlow',
-                  color: '#8E969C'
+                  color: color.grayish.G100
                 }}>
                 Est:
               </span>{' '}
@@ -218,20 +101,12 @@ const BountyPrice = (props) => {
                 <span>{session.value}</span>
               ) : (
                 <span>
-                  <span
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontSize: '12px',
-                      fontWeight: '400',
-                      lineHeight: '14.06px'
-                    }}>
-                    {session.value.slice(0, 1)}
-                  </span>
+                  <span className="EST_Value">{session.value.slice(0, 1)}</span>
                   {session.value.slice(1)}
                 </span>
               )}
             </EuiText>
-          </div>
+          </SessionContainer>
         )}
       </PriceContainer>
     </>
@@ -240,11 +115,97 @@ const BountyPrice = (props) => {
 
 export default BountyPrice;
 
-const PriceContainer = styled.div`
+interface PriceContainerProps {
+  price_Text_Color?: string;
+  priceBackground?: string;
+  session_text_color?: string;
+}
+
+const PriceContainer = styled.div<PriceContainerProps>`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   padding: 0px 24px;
   color: #909baa;
   padding-top: 41px;
+  .PriceStaticTextContainer {
+    width: 28px;
+    height: 33px;
+    display: flex;
+    align-items: center;
+  }
+  .PriceStaticText {
+    font-family: Barlow;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+  }
+`;
+
+const PriceOuterContainer = styled.div<PriceContainerProps>`
+  display: flex;
+  align-items: center;
+  height: 33px;
+  min-width: 104px;
+  color: ${(p) => (p.price_Text_Color ? p.price_Text_Color : '')};
+  background: ${(p) => (p.priceBackground ? p.priceBackground : '')};
+  border-radius: 2px;
+  .Price_inner_Container {
+    min-height: 33px;
+    min-width: 63px;
+    display: flex;
+    align-items: center;
+    margin-left: 7px;
+  }
+  .Price_Dynamic_Text {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+  }
+  .Price_SAT_Container {
+    height: 33px;
+    width: 34px;
+    display: flex;
+    align-items: center;
+    margin-top: 1px;
+    .Price_SAT_Text {
+      font-size: 12px;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+  }
+`;
+
+const USDContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 34px;
+  .USD_Price {
+    font-size: 13px;
+    font-weight: 500;
+  }
+`;
+
+const SessionContainer = styled.div<PriceContainerProps>`
+  height: 28px;
+  .Session_Text {
+    font-size: 13px;
+    font-weight: 700;
+    color: ${(p) => (p.session_text_color ? p.session_text_color : '')};
+    font-family: Barlow;
+  }
+  .EST_Text {
+    font-weight: 400;
+    font-family: Barlow;
+  }
+  .EST_Value {
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14.06px;
+  }
 `;

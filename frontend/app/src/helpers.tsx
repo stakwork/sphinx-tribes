@@ -17,6 +17,11 @@ export function satToUsd(amount) {
   return returnValue;
 }
 
+export const DollarConverter = (e) => {
+  let dollarUSLocale = Intl.NumberFormat('en-US');
+  return dollarUSLocale.format(formatPrice(e)).split(',').join(' ');
+};
+
 const host = getHost();
 export function makeConnectQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;

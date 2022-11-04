@@ -395,6 +395,7 @@ export default function BodyComponent({ selectedWidget }) {
             publicPanelClick(person, item);
           }}
           selectedWidget={selectedWidget}
+          loading={loading}
         />
       );
 

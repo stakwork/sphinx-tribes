@@ -1,6 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../colors';
 import NameTag from '../people/utils/nameTag';
 
 const LanguageObject = [
@@ -97,16 +98,15 @@ const LanguageObject = [
 ];
 
 const BountyDescription = (props: any) => {
+  const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
   const [descriptionImage, setDescriptionImage] = useState('');
   // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
 
   useEffect(() => {
     if (props.description) {
-      // const found = props?.description.match(/!\[.*?\]\((.*?)\)/);
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
       setDescriptionImage(found && found.length > 0 && found[0]);
-      // console.log(found2 && found2.length > 0 && found2[0]);
     }
   }, [props]);
 
@@ -126,45 +126,26 @@ const BountyDescription = (props: any) => {
     <>
       <BountyDescriptionContainer style={{ ...props.style }}>
         <Header>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
+          <div className="NameContainer">
             <NameTag {...props} iconSize={32} isPaid={props?.isPaid} />
           </div>
         </Header>
         <Description>
           <div
+            className="DescriptionContainer"
             style={{
-              width: descriptionImage ? '334px' : '481px',
-              minHeight: '64px',
-              display: 'flex',
-              alignItems: 'center'
+              width: descriptionImage ? '334px' : '481px'
             }}>
             <EuiText
+              className="DescriptionTitle"
               style={{
-                fontSize: '17px',
-                lineHeight: '20px',
-                fontWeight: '500',
-                color: props.isPaid ? '#5F6368' : '#3C3F41',
-                display: 'flex',
-                alignItems: 'center'
+                color: props.isPaid ? color.grayish.G50 : color.grayish.G10
               }}>
               {props.title}
             </EuiText>
           </div>
           {descriptionImage && (
-            <div
-              style={{
-                height: '77px',
-                width: '130px',
-                marginLeft: '17px',
-                marginRight: '18px',
-                borderRadius: '4px',
-                overflow: 'hidden',
-                marginTop: '-13px'
-              }}>
+            <div className="DescriptionImage">
               <img src={descriptionImage} alt={''} height={'100%'} width={'100%'} />
             </div>
           )}
@@ -199,18 +180,9 @@ const BountyDescription = (props: any) => {
                 <CodingLabels
                   key={index}
                   border={props.isPaid ? '1px solid rgba(176, 183, 188, 0.1)' : lang?.border}
-                  color={props.isPaid ? '#B0B7BC' : lang?.color}
-                  background={props.isPaid ? '#f7f8f8' : lang?.background}>
-                  <EuiText
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: '500',
-                      textAlign: 'center',
-                      fontFamily: 'Barlow',
-                      lineHeight: '16px'
-                    }}>
-                    {lang?.label}
-                  </EuiText>
+                  color={props.isPaid ? color.grayish.G300 : lang?.color}
+                  background={props.isPaid ? color.grayish.G800 : lang?.background}>
+                  <EuiText className="LanguageText">{lang?.label}</EuiText>
                 </CodingLabels>
               );
             })}
@@ -228,7 +200,9 @@ interface codingLangProps {
   color?: string;
 }
 
-const BountyDescriptionContainer = styled.div`
+interface bounty_description_props {}
+
+const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -237,22 +211,47 @@ const BountyDescriptionContainer = styled.div`
   padding-left: 17px;
 `;
 
-const Header = styled.div`
+const Header = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: row;
   align-item: center;
   height: 32px;
   margin-top: 16px;
+  .NameContainer {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
-const Description = styled.div`
+const Description = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: row;
   align-item: center;
   justify-content: space-between;
+  .DescriptionContainer {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+  }
+  .DescriptionTitle {
+    font-size: 17px;
+    line-height: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+  .DescriptionImage {
+    height: 77px;
+    width: 130px;
+    margin-left: 17px;
+    margin-right: 18px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: -13px;
+  }
 `;
 
-const LanguageContainer = styled.div`
+const LanguageContainer = styled.div<bounty_description_props>`
   display: flex;
   flex-wrap: wrap;
   width: 80%;
@@ -272,4 +271,11 @@ const CodingLabels = styled.div<codingLangProps>`
   flex-direction: row;
   align-items: center;
   margin-right: 4px;
+  .LanguageText {
+    font-size: 13px;
+    fontweight: 500;
+    text-align: center;
+    font-family: Barlow;
+    line-height: 16px;
+  }
 `;

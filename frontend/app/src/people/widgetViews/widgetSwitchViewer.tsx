@@ -159,12 +159,14 @@ export default function WidgetSwitchViewer(props) {
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
-        <LoadMoreButton
-          onClick={() => {
-            setCurrentItems(currentItems + 10);
-          }}>
-          Load More
-        </LoadMoreButton>
+        {!props.loading && (
+          <LoadMoreButton
+            onClick={() => {
+              setCurrentItems(currentItems + 10);
+            }}>
+            Load More
+          </LoadMoreButton>
+        )}
       </>
     );
   });

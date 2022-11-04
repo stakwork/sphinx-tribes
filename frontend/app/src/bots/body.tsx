@@ -263,7 +263,12 @@ export default function BotBody() {
                 type="search"
                 placeholder="Search"
                 value={ui.searchText}
-                style={{ width: 204, height: 40, background: '#DDE1E5', marginLeft: 20 }}
+                style={{
+                  width: 204,
+                  height: 40,
+                  background: c.grayish.G400,
+                  marginLeft: 20
+                }}
                 onChange={(e) => {
                   console.log('handleChange', e);
                   ui.setSearchText(e);

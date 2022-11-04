@@ -1,28 +1,28 @@
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../../colors';
 import BountyDescription from '../../sphinxUI/bounty_description';
 import BountyPrice from '../../sphinxUI/bounty_price';
 import BountyProfileView from '../../sphinxUI/bounty_profile_view';
 
 const PaidBounty = (props) => {
+  const color = colors['light'];
   return (
-    <BountyContainer>
-      {/* left part */}
+    <BountyContainer Bounty_Container_Background={color.pureWhite}>
       <BountyDescription
         {...props}
         title={props.title}
         codingLanguage={props.codingLanguage}
         isPaid={true}
       />
-      {/* right part */}
-      <PriceUserContainer>
+      <PriceUserContainer Price_User_Container_Border={color.primaryColor.P400}>
         <BountyPrice
           priceMin={props.priceMin}
           priceMax={props.priceMax}
           price={props.price}
           sessionLength={props.sessionLength}
           style={{
-            borderRight: '1px solid rgba(73, 201, 152, 0.2)',
+            borderRight: `1px solid ${color.primaryColor.P200}`,
             maxWidth: '245px',
             minWidth: '245px'
           }}
@@ -33,7 +33,7 @@ const PaidBounty = (props) => {
           statusStyle={{
             width: '63px',
             height: '16px',
-            background: '#8256D0'
+            background: color.statusCompleted
           }}
         />
       </PriceUserContainer>
@@ -53,19 +53,24 @@ const PaidBounty = (props) => {
 
 export default PaidBounty;
 
-const BountyContainer = styled.div`
+interface PaidBountyProps {
+  Price_User_Container_Border?: string;
+  Bounty_Container_Background?: string;
+}
+
+const BountyContainer = styled.div<PaidBountyProps>`
   display: flex;
   flex-direction: row;
   width: 100%;
   font-family: Barlow;
   height: 100% !important;
-  background: #fff;
+  background: ${(p) => p.Bounty_Container_Background};
 `;
 
-const PriceUserContainer = styled.div`
+const PriceUserContainer = styled.div<PaidBountyProps>`
   display: flex;
   flex-direction: row;
-  border: 2px solid #86d9b9;
+  border: 2px solid ${(p) => p.Price_User_Container_Border};
   border-radius: 10px;
   width: 581px;
 `;

@@ -1,16 +1,22 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../../colors';
 import { useIsMobile } from '../../hooks';
 import IconButton from '../../sphinxUI/icon_button';
 import SearchBar from '../../sphinxUI/search_bar';
 import { useStores } from '../../store';
+import StartUpModal from '../utils/start_up_modal';
 
 const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
+  const color = colors['light'];
   useEffect(() => {
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
@@ -32,7 +38,6 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
   return (
     <>
       {!isMobile ? (
-        // desktop view
         <div
           style={{
             display: 'flex',
@@ -43,9 +48,11 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
             position: 'sticky',
             top: 0,
             zIndex: '1',
-            background: '#f0f1f3',
+            background: 'inherit',
             boxShadow: scrollValue ? ' 0px 1px 6px rgba(0, 0, 0, 0.07)' : '',
-            borderBottom: scrollValue ? '1px solid #DDE1E5' : ''
+            borderBottom: scrollValue
+              ? `1px solid ${color.grayish.G600}`
+              : `0px solid ${color.grayish.G600}`
           }}>
           <BountyHeaderDesk>
             <B>
@@ -56,14 +63,14 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 height={48}
                 color={'success'}
                 style={{
-                  color: '#fff',
+                  color: color.pureWhite,
                   fontSize: '16px',
                   fontWeight: '600',
                   textDecoration: 'none'
                 }}
-                hoverColor={'#3CBE88'}
-                activeColor={'#2FB379'}
-                shadowColor={'rgba(73, 201, 152, 0.5)'}
+                hoverColor={color.button_primary.hover}
+                activeColor={color.button_primary.active}
+                shadowColor={color.button_primary.shadow}
                 iconStyle={{
                   fontSize: '16px',
                   fontWeight: '400',
@@ -74,7 +81,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   if (ui.meInfo && ui.meInfo?.owner_alias) {
                     setShowFocusView(true);
                   } else {
-                    ui.setShowSignIn(true);
+                    showModal();
                   }
                 }}
               />
@@ -89,7 +96,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   background: 'transparent',
                   marginLeft: '16px',
                   fontFamily: 'Barlow',
-                  color: '#3C3F41'
+                  color: color.text2
                 }}
                 onChange={(e) => {
                   ui.setSearchText(e);
@@ -97,13 +104,13 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 iconStyle={{
                   top: '13px'
                 }}
-                TextColor={'#B0B7BC'}
-                TextColorHover={'#8E969C'}
-                border={'1px solid #D0D5D8'}
-                borderHover={'1px solid #BAC1C6'}
+                TextColor={color.grayish.G400}
+                TextColorHover={color.grayish.G100}
+                border={`1px solid ${color.grayish.G500}`}
+                borderHover={`1px solid ${color.grayish.G400}`}
                 borderActive={'1px solid #A3C1FF'}
-                iconColor={'#B0B7BC'}
-                iconColorHover={'#8E969C'}
+                iconColor={color.grayish.G300}
+                iconColorHover={color.grayish.G100}
               />
               <div
                 style={{
@@ -114,7 +121,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 <img src="/static/copy.svg" alt="" height={22} width={18} />
                 <EuiText
                   style={{
-                    color: '#909BAA',
+                    color: color.grayish.G200,
                     fontWeight: '500',
                     fontSize: '16px',
                     lineHeight: '19px',
@@ -127,7 +134,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   }}>
                   <span
                     style={{
-                      color: '#000'
+                      color: color.pureBlack
                     }}>
                     {activeBounty}
                   </span>
@@ -141,7 +148,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 width={80}
                 height={48}
                 style={{
-                  color: '#909BAA',
+                  color: color.grayish.G200,
                   fontSize: '16px',
                   fontWeight: '500',
                   textDecoration: 'none',
@@ -157,7 +164,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
               />
             </B>
             <D>
-              <EuiText className="DText" color={'#909BAA'}>
+              <EuiText className="DText" color={color.grayish.G200}>
                 Developers
               </EuiText>
               <div className="ImageOuterContainer">
@@ -186,7 +193,8 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 style={{
                   fontSize: '16px',
                   fontWeight: '600',
-                  fontFamily: 'Barlow'
+                  fontFamily: 'Barlow',
+                  color: '#222E3A'
                 }}>
                 {peopleList && peopleList?.length}
               </EuiText>
@@ -214,13 +222,13 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
               iconStyle={{
                 top: '4px'
               }}
-              border={'1px solid #D0D5D8'}
-              borderHover={'1px solid #BAC1C6'}
+              TextColor={color.grayish.G400}
+              TextColorHover={color.grayish.G100}
+              border={`1px solid ${color.grayish.G500}`}
+              borderHover={`1px solid ${color.grayish.G400}`}
               borderActive={'1px solid #A3C1FF'}
-              TextColor={'#B0B7BC'}
-              TextColorHover={'#8E969C'}
-              iconColor={'#B0B7BC'}
-              iconColorHover={'#8E969C'}
+              iconColor={color.grayish.G300}
+              iconColorHover={color.grayish.G100}
             />
             <IconButton
               text={'Filter'}
@@ -229,7 +237,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
               width={80}
               height={48}
               style={{
-                color: '#909BAA',
+                color: color.grayish.G200,
                 fontSize: '16px',
                 fontWeight: '500',
                 textDecoration: 'none',
@@ -258,9 +266,9 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 textDecoration: 'none',
                 transform: 'none'
               }}
-              hoverColor={'#3CBE88'}
-              activeColor={'#2FB379'}
-              shadowColor={'rgba(73, 201, 152, 0.5)'}
+              hoverColor={color.button_primary.hover}
+              activeColor={color.button_primary.active}
+              shadowColor={color.button_primary.shadow}
               iconStyle={{
                 fontSize: '12px',
                 fontWeight: '600',
@@ -320,13 +328,17 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 style={{
                   fontSize: '14px',
                   fontFamily: 'Barlow',
-                  fontWeight: '500'
+                  fontWeight: '500',
+                  color: '#222E3A'
                 }}>
                 {peopleList && peopleList?.length}
               </EuiText>
             </DevelopersContainerMobile>
           </ShortActionContainer>
         </BountyHeaderMobile>
+      )}
+      {openStartUpModel && (
+        <StartUpModal closeModal={closeModal} dataObject={'createWork'} buttonColor={'success'} />
       )}
     </>
   );

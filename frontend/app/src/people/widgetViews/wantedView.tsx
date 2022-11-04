@@ -370,8 +370,6 @@ export default function WantedView(props: any) {
         </>
       );
     }
-
-    // desktop view
     // return (
     //   <>
     //     {paid && (
