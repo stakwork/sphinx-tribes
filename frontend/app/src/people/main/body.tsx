@@ -551,7 +551,7 @@ export default function BodyComponent({ selectedWidget }) {
           handleScroll(e);
         }}
         style={{
-          background: color.grayish.G900,
+          background: color.grayish.G950,
           height: 'calc(100% - 65px)'
         }}>
         <div

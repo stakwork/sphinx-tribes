@@ -83,24 +83,6 @@ export default function NameTag(props) {
         )}
 
         <Date>{lastSeen}</Date>
-        {ticketUrl && (
-          <GithubIcon
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(ticketUrl, '_blank');
-            }}>
-            <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
-          </GithubIcon>
-        )}
-        {loomEmbedUrl && (
-          <LoomIcon
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(loomEmbedUrl, '_blank');
-            }}>
-            <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
-          </LoomIcon>
-        )}
       </Wrap>
     );
   }
@@ -132,32 +114,6 @@ export default function NameTag(props) {
           </div>
         </div>
       )}
-      <div
-        style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start'
-        }}>
-        {ticketUrl && (
-          <GithubIcon
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(ticketUrl, '_blank');
-            }}>
-            <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
-          </GithubIcon>
-        )}
-        {loomEmbedUrl && (
-          <LoomIcon
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(loomEmbedUrl, '_blank');
-            }}>
-            <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
-          </LoomIcon>
-        )}
-      </div>
     </Wrap>
   );
 }
@@ -181,6 +137,7 @@ const Img = styled.div<ImageProps>`
   border-radius: 50%;
   position: relative;
   opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
+  filter: ${(p) => p.isPaid && 'grayscale(100%)'};
 `;
 
 const Name = styled.div<NameProps>`
@@ -220,22 +177,4 @@ const Wrap = styled.div<WrapProps>`
   // &:hover {
   //   color: ${(p) => !p.isSelected && '#618AFF'};
   // }
-`;
-
-const GithubIcon = styled.div`
-  height: 16px;
-  width: 16px;
-  position: relative;
-  top: -4px;
-  margin-left: 10px;
-  cursor: pointer;
-`;
-
-const LoomIcon = styled.div`
-  height: 16px;
-  width: 16px;
-  position: relative;
-  top: -4px;
-  margin-left: 10px;
-  cursor: pointer;
 `;

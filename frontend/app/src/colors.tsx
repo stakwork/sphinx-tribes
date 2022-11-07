@@ -42,7 +42,8 @@ const palette = {
     G600: '#DDE1E5',
     G700: '#EBEDEF',
     G800: '#f7f8f8',
-    G900: '#F0F1F2'
+    G900: '#F0F1F2',
+    G950: '#F2F3F5'
   },
   primaryColor: {
     P100: 'rgba(73, 201, 152, 0.15)',

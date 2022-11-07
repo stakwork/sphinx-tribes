@@ -71,7 +71,12 @@ const Bounties = (props) => {
               unassigned_border={color.grayish.G300}
               grayish_G200={color.grayish.G200}>
               <div className="UnassignedPersonContainer">
-                <img src="/static/unassigned_profile.svg" alt="unassigned_person" height={'100%'} width={'100%'} />
+                <img
+                  src="/static/unassigned_profile.svg"
+                  alt="unassigned_person"
+                  height={'100%'}
+                  width={'100%'}
+                />
               </div>
               <div className="UnassignedPersonalDetailContainer">
                 <EuiText className="ProfileText">Do your skills match?</EuiText>
@@ -157,7 +162,12 @@ const DescriptionPriceContainer = styled.div<containerProps>`
 const UnassignedPersonProfile = styled.div<containerProps>`
   min-width: 336px;
   min-height: 160px;
-  border: 1px dashed ${(p) => (p.unassigned_border ? p.unassigned_border : '')};
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+  border-radius: 10px;
+  border-radius: 10px;
+  border-radius: 10px;
+  border-radius: 10px;
+  border-radius: 10px;
   border-radius: 10px;
   display: flex;
   padding-top: 32px;

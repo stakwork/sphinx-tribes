@@ -43,7 +43,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
             display: 'flex',
             justifyContent: 'center',
             width: '100%',
-            height: '80px',
+            minHeight: '80px',
             alignItems: 'center',
             position: 'sticky',
             top: 0,
@@ -74,8 +74,8 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 iconStyle={{
                   fontSize: '16px',
                   fontWeight: '400',
-                  top: '18px',
-                  right: '24px'
+                  top: '17px',
+                  right: '18px'
                 }}
                 onClick={() => {
                   if (ui.meInfo && ui.meInfo?.owner_alias) {
@@ -141,7 +141,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   &nbsp; Bounties opened
                 </EuiText>
               </div>
-              <IconButton
+              {/* <IconButton
                 text={'Filter'}
                 color={'transparent'}
                 leadingIcon={'tune'}
@@ -161,7 +161,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                 onClick={() => {
                   console.log('filter');
                 }}
-              />
+              /> */}
             </B>
             <D>
               <EuiText className="DText" color={color.grayish.G200}>
@@ -230,6 +230,10 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
               iconColor={color.grayish.G300}
               iconColorHover={color.grayish.G100}
             />
+            {/*
+            
+            // TODO: add filter when have functionality.
+
             <IconButton
               text={'Filter'}
               color={'transparent'}
@@ -250,7 +254,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
               onClick={() => {
                 console.log('filter');
               }}
-            />
+            /> */}
           </LargeActionContainer>
           <ShortActionContainer>
             <IconButton
@@ -350,7 +354,6 @@ const BountyHeaderDesk = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 10px 0px;
   align-items: center;
   min-width: 1100px;
   max-width: 1100px;
