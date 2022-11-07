@@ -48,7 +48,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               shadowColor={
                 buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
               }
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 window.open('https://sphinx.chat/', '_blank');
               }}
               color={buttonColor}
@@ -60,7 +61,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               height={48}
               buttonType={'text'}
               style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 closeModal();
                 ui.setShowSignIn(true);
               }}

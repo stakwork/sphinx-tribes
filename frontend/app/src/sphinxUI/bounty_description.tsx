@@ -150,7 +150,11 @@ const BountyDescription = (props: any) => {
             </div>
           )}
 
-          {/* {props?.loomEmbedUrl && (
+          {/* 
+          
+          // TODO : add loom video - unable to add because some not supported features of loom video player.
+
+          {props?.loomEmbedUrl && (
             <div
               style={{
                 height: '64px',

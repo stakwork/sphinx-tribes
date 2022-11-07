@@ -15,6 +15,7 @@ const palette = {
   divider2: '#101317',
   pureWhite: '#fff',
   pureBlack: '#000',
+  black100: 'rgba(0, 0, 0, 0.07)',
   statusAssigned: '#49C998',
   statusCompleted: '#8256D0',
   button_primary: {
@@ -34,12 +35,14 @@ const palette = {
     G50: '#5F6368',
     G100: '#8E969C',
     G200: '#909BAA',
+    G250: '#9AAEC6',
     G300: '#B0B7BC',
     G400: '#bac1c6',
     G500: '#d0d5d8',
     G600: '#DDE1E5',
     G700: '#EBEDEF',
-    G800: '#f7f8f8'
+    G800: '#f7f8f8',
+    G900: '#F0F1F2'
   },
   primaryColor: {
     P100: 'rgba(73, 201, 152, 0.15)',

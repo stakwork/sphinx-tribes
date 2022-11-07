@@ -4,6 +4,7 @@ import moment from 'moment';
 import { useStores } from '../../store';
 import { useHistory } from 'react-router';
 import { useIsMobile } from '../../hooks';
+import { colors } from '../../colors';
 
 export default function NameTag(props) {
   const {
@@ -22,6 +23,7 @@ export default function NameTag(props) {
     isPaid
   } = props;
   const { ui } = useStores();
+  const color = colors['light'];
 
   const history = useHistory();
 
@@ -61,7 +63,7 @@ export default function NameTag(props) {
             <Img src={img || `/static/person_placeholder.png`} iconSize={iconSize} />
             <Name
               textSize={textSize}
-              color={'#9aaec6'}
+              color={color.grayish.G250}
               style={{
                 marginLeft: '10px'
               }}>
@@ -74,7 +76,7 @@ export default function NameTag(props) {
                 width: 3,
                 borderRadius: '50%',
                 margin: '0 6px',
-                background: '#8E969C'
+                background: color.grayish.G100
               }}
             />
           </>
@@ -123,7 +125,7 @@ export default function NameTag(props) {
               flexDirection: 'column',
               marginLeft: '14px'
             }}>
-            <Name textSize={textSize} color={isPaid ? '#B0B7BC' : '#000'}>
+            <Name textSize={textSize} color={isPaid ? color.grayish.G300 : color.pureBlack}>
               {owner_alias}
             </Name>
             <Date>{lastSeen}</Date>
