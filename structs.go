@@ -156,6 +156,13 @@ type AssetBalanceData struct {
 	Balance     uint   `json:"balance"`
 }
 
+type LeaderBoard struct {
+	TribeUuid string `json:"tribe_uuid"`
+	Alias     string `json:"alias"`
+	Spent     int64  `json:"spent"`
+	Earned    int64  `json:"earned"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {

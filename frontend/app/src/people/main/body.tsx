@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
-import { EuiGlobalToastList, EuiLoadingSpinner, EuiText } from '@elastic/eui';
+import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import Person from '../person';
 import PersonViewSlim from '../personViewSlim';
 import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
@@ -16,10 +16,8 @@ import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
-import NoneSpaceHomePage from '../utils/noneSpaceHomePage';
-import StartUpModal from '../utils/start_up_modal';
-import IconButton from '../../sphinxUI/icon_button';
 import BountyHeader from '../widgetViews/bountyHeader';
+import { colors } from '../../colors';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -32,10 +30,6 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-const StartUpWorkerModelData = {
-  getWork: 'getWork',
-  createWork: 'createWork'
-};
 export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
@@ -51,6 +45,8 @@ export default function BodyComponent({ selectedWidget }) {
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
+
+  const color = colors['light'];
 
   const {
     peoplePageNumber,
@@ -437,11 +433,11 @@ export default function BodyComponent({ selectedWidget }) {
             style={{
               width: '100%',
               padding: '8px 0px',
-              boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
+              boxShadow: `0 0 6px 0 ${color.black100}`,
               zIndex: 2,
               position: 'relative',
-              background: '#fff',
-              borderBottom: '1px solid rgb(0 0 0 / 7%)'
+              background: color.pureWhite,
+              borderBottom: `1px solid ${color.black100}`
             }}>
             {selectedWidget === 'wanted' && (
               <BountyHeader
@@ -464,8 +460,8 @@ export default function BodyComponent({ selectedWidget }) {
                   style={{
                     width: '100%',
                     height: 40,
-                    border: '1px solid #DDE1E5',
-                    background: '#fff'
+                    border: `1px solid ${color.grayish.G600}`,
+                    background: color.pureWhite
                   }}
                   onChange={(e) => {
                     console.log('handleChange', e);
@@ -566,7 +562,7 @@ export default function BodyComponent({ selectedWidget }) {
           handleScroll(e);
         }}
         style={{
-          background: '#f0f1f3',
+          background: color.grayish.G950,
           height: 'calc(100% - 65px)'
         }}>
         <div
@@ -597,8 +593,8 @@ export default function BodyComponent({ selectedWidget }) {
               style={{
                 width: 204,
                 height: 40,
-                border: '1px solid #DDE1E5',
-                background: '#DDE1E5'
+                border: `1px solid ${color.grayish.G600}`,
+                background: color.grayish.G600
               }}
               onChange={(e) => {
                 console.log('handleChange', e);
@@ -617,7 +613,6 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-              // marginTop: '60px'
             }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
@@ -652,7 +647,7 @@ export default function BodyComponent({ selectedWidget }) {
             visible={publicFocusPerson ? true : false}
             envStyle={{
               borderRadius: 0,
-              background: '#fff',
+              background: color.pureWhite,
               height: '100%',
               width: '60%',
               minWidth: 500,
@@ -681,14 +676,6 @@ export default function BodyComponent({ selectedWidget }) {
             />
           </Modal>
         )}
-
-        {openStartUpModel && (
-          <StartUpModal
-            closeModal={closeModal}
-            dataObject={StartUpWorkerModelData[startUpModelState]}
-            buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
-          />
-        )}
         {toastsEl}
         {/* modal create ticket */}
         {showFocusView && (
@@ -702,12 +689,12 @@ export default function BodyComponent({ selectedWidget }) {
             envStyle={{
               marginTop: isMobile ? 64 : 0,
               borderRadius: 0,
-              background: '#fff',
+              background: color.pureWhite,
               height: '100%',
               width: '60%',
               minWidth: 500,
               maxWidth: 602,
-              zIndex: 20, //minHeight: 300,
+              zIndex: 20,
               ...focusedDesktopModalStyles
             }}
             nextArrow={nextIndex}

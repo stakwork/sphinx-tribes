@@ -141,7 +141,8 @@ const BountyDescription = (props: any) => {
               style={{
                 color: props.isPaid ? color.grayish.G50 : color.grayish.G10
               }}>
-              {props.title}
+              {props.title.slice(0, descriptionImage ? 80 : 120)}
+              {props.title.length > 80 ? '...' : ''}
             </EuiText>
           </div>
           {descriptionImage && (
@@ -150,7 +151,11 @@ const BountyDescription = (props: any) => {
             </div>
           )}
 
-          {/* {props?.loomEmbedUrl && (
+          {/* 
+          
+          // TODO : add loom video - unable to add because some not supported features of loom video player.
+
+          {props?.loomEmbedUrl && (
             <div
               style={{
                 height: '64px',
@@ -248,6 +253,7 @@ const Description = styled.div<bounty_description_props>`
     border-radius: 4px;
     overflow: hidden;
     margin-top: -13px;
+    border: 1px solid #d0d5d8;
   }
 `;
 
@@ -255,7 +261,7 @@ const LanguageContainer = styled.div<bounty_description_props>`
   display: flex;
   flex-wrap: wrap;
   width: 80%;
-  margin-top: 14px;
+  margin-top: 10px;
 `;
 
 const CodingLabels = styled.div<codingLangProps>`

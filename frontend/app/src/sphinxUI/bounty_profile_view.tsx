@@ -14,11 +14,13 @@ const BountyProfileView = (props) => {
             width={'100%'}
             height={'100%'}
             src={
-              {
-                ...props.assignee
-              }.img || '/static/default_profile_image.svg'
+              { ...props.assignee }.owner_alias
+                ? {
+                    ...props.assignee
+                  }.img || '/static/person_placeholder.png'
+                : '/static/default_profile_image.svg'
             }
-            alt={''}
+            alt={'assigned_person'}
           />
         </UserImage>
         <UserInfo>
