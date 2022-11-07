@@ -141,27 +141,6 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   &nbsp; Bounties opened
                 </EuiText>
               </div>
-              {/* <IconButton
-                text={'Filter'}
-                color={'transparent'}
-                leadingIcon={'tune'}
-                width={80}
-                height={48}
-                style={{
-                  color: color.grayish.G200,
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  padding: 0
-                }}
-                iconStyle={{
-                  fontSize: '18px',
-                  fontWeight: '500'
-                }}
-                onClick={() => {
-                  console.log('filter');
-                }}
-              /> */}
             </B>
             <D>
               <EuiText className="DText" color={color.grayish.G200}>
