@@ -11,7 +11,7 @@ import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 
 const Bounties = (props) => {
-  let { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } = props 
+  let { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } = props;
 
   const color = colors['light'];
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
@@ -21,14 +21,14 @@ const Bounties = (props) => {
   const closeConnectModal = () => setConnectModal(false);
   const showConnectModal = () => setConnectModal(true);
 
-				const { ui } = useStores();
+  const { ui } = useStores();
   return (
     <>
       {{ ...assignee }.owner_alias ? (
         <BountyContainer assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}>
           <div className="BountyDescriptionContainer">
             <BountyDescription
-							{...person}
+              {...person}
               {...props}
               title={title}
               codingLanguage={codingLanguage}
@@ -62,7 +62,7 @@ const Bounties = (props) => {
         <BountyContainer>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
             <BountyDescription
-							{...person}
+              {...person}
               {...props}
               title={title}
               codingLanguage={codingLanguage}
@@ -93,14 +93,13 @@ const Bounties = (props) => {
                   height={48}
                   style={{ marginTop: 20 }}
                   onClick={(e) => {
-													if(ui.meInfo){
-																	
-																	showConnectModal();
-                    e.stopPropagation();
-													}else{
-                    e.stopPropagation();
-                    showModal();
-													}
+                    if (ui.meInfo) {
+                      showConnectModal();
+                      e.stopPropagation();
+                    } else {
+                      e.stopPropagation();
+                      showModal();
+                    }
                   }}
                   color="primary"
                   hoverColor={color.button_secondary.hover}
@@ -126,13 +125,12 @@ const Bounties = (props) => {
       {openStartUpModel && (
         <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
       )}
-<ConnectCard
-          dismiss={() => closeConnectModal()}
-          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-          person={person}
-          visible={openConnectModal}
-        />
-
+      <ConnectCard
+        dismiss={() => closeConnectModal()}
+        modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+        person={person}
+        visible={openConnectModal}
+      />
     </>
   );
 };
