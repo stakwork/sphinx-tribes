@@ -106,12 +106,7 @@ export default function NameTag(props) {
   }
 
   return (
-    <Wrap
-      isSelected={isSelected}
-      onClick={(e) => {
-        selectPerson(e);
-      }}
-      style={style}>
+    <Wrap isSelected={isSelected} style={style}>
       {!isSelected && (
         <div
           style={{
@@ -125,7 +120,12 @@ export default function NameTag(props) {
               flexDirection: 'column',
               marginLeft: '14px'
             }}>
-            <Name textSize={textSize} color={isPaid ? color.grayish.G300 : color.pureBlack}>
+            <Name
+              textSize={textSize}
+              color={isPaid ? color.grayish.G300 : color.pureBlack}
+              onClick={(e) => {
+                selectPerson(e);
+              }}>
               {owner_alias}
             </Name>
             <Date>{lastSeen}</Date>
