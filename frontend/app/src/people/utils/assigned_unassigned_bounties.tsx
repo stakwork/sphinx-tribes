@@ -71,7 +71,7 @@ const Bounties = (props) => {
               unassigned_border={color.grayish.G300}
               grayish_G200={color.grayish.G200}>
               <div className="UnassignedPersonContainer">
-                <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
+                <img src="/static/unassigned_profile.svg" alt="unassigned_person" height={'100%'} width={'100%'} />
               </div>
               <div className="UnassignedPersonalDetailContainer">
                 <EuiText className="ProfileText">Do your skills match?</EuiText>
