@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
-import { EuiGlobalToastList, EuiLoadingSpinner, EuiText } from '@elastic/eui';
+import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import Person from '../person';
 import PersonViewSlim from '../personViewSlim';
 import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
@@ -16,10 +16,8 @@ import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
-import NoneSpaceHomePage from '../utils/noneSpaceHomePage';
-import StartUpModal from '../utils/start_up_modal';
-import IconButton from '../../sphinxUI/icon_button';
 import BountyHeader from '../widgetViews/bountyHeader';
+import { colors } from '../../colors';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -32,10 +30,6 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-const StartUpWorkerModelData = {
-  getWork: 'getWork',
-  createWork: 'createWork'
-};
 export default function BodyComponent({ selectedWidget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
@@ -46,10 +40,10 @@ export default function BodyComponent({ selectedWidget }) {
   const [showFocusView, setShowFocusView] = useState(false);
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
-  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
-  const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
-  const closeModal = () => setOpenStartUpModel(false);
-  const showModal = () => setOpenStartUpModel(true);
+  const [scrollValue, setScrollValue] = useState<boolean>(false);
+
+  const color = colors['light'];
+
   const {
     peoplePageNumber,
     peopleWantedsPageNumber,
@@ -356,6 +350,29 @@ export default function BodyComponent({ selectedWidget }) {
     const listContent =
       selectedWidget === 'people' ? (
         renderPeople()
+      ) : !isMobile ? (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+          <WidgetSwitchViewer
+            onPanelClick={(person, item) => {
+              history.replace({
+                pathname: history?.location?.pathname,
+                search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
+                state: {
+                  owner_id: person.owner_pubkey,
+                  created: item.created
+                }
+              });
+              publicPanelClick(person, item);
+            }}
+            selectedWidget={selectedWidget}
+          />
+        </div>
       ) : (
         <WidgetSwitchViewer
           onPanelClick={(person, item) => {
@@ -370,6 +387,7 @@ export default function BodyComponent({ selectedWidget }) {
             publicPanelClick(person, item);
           }}
           selectedWidget={selectedWidget}
+          loading={loading}
         />
       );
 
@@ -400,48 +418,21 @@ export default function BodyComponent({ selectedWidget }) {
     if (isMobile) {
       return (
         <Body onScroll={handleScroll}>
-          {!ui.meInfo && (
-            <div style={{ marginTop: 60 }}>
-              <NoneSpaceHomePage
-                buttonText1={'I would like to work'}
-                buttonIcon={'arrow_forward'}
-                buttonText2={'I need work done'}
-                action1={() => {
-                  setStartUpModelState('getWork');
-                  showModal();
-                }}
-                action2={() => {
-                  setStartUpModelState('createWork');
-                  showModal();
-                }}
-                text={'Ticket party!'}
-                style={{ height: 320, background: '#fff' }}
-              />
-              <Divider />
-            </div>
-          )}
-
-          {openStartUpModel && (
-            <StartUpModal
-              closeModal={closeModal}
-              dataObject={StartUpWorkerModelData[startUpModelState]}
-              buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
-            />
-          )}
           <div
             style={{
               width: '100%',
               padding: '8px 0px',
-              boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.07)',
+              boxShadow: `0 0 6px 0 ${color.black100}`,
               zIndex: 2,
               position: 'relative',
-              background: '#fff',
-              borderBottom: '1px solid rgb(0 0 0 / 7%)'
+              background: color.pureWhite,
+              borderBottom: `1px solid ${color.black100}`
             }}>
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
                 setShowFocusView={setIsMobileViewTicketModal}
+                scrollValue={scrollValue}
               />
             )}
             {selectedWidget === 'people' && (
@@ -458,8 +449,8 @@ export default function BodyComponent({ selectedWidget }) {
                   style={{
                     width: '100%',
                     height: 40,
-                    border: '1px solid #DDE1E5',
-                    background: '#fff'
+                    border: `1px solid ${color.grayish.G600}`,
+                    background: color.pureWhite
                   }}
                   onChange={(e) => {
                     console.log('handleChange', e);
@@ -555,43 +546,32 @@ export default function BodyComponent({ selectedWidget }) {
     // desktop mode
     return (
       <Body
-        onScroll={handleScroll}
+        onScroll={(e) => {
+          setScrollValue(e?.currentTarget?.scrollTop >= 20);
+          handleScroll(e);
+        }}
         style={{
-          background: '#f0f1f3',
+          background: color.grayish.G950,
           height: 'calc(100% - 65px)'
         }}>
-        {!ui.meInfo && (
-          <div>
-            <NoneSpaceHomePage
-              banner
-              buttonText1={'I would like to work'}
-              buttonIcon={'arrow_forward'}
-              buttonText2={'I need work done'}
-              action1={() => {
-                setStartUpModelState('getWork');
-                showModal();
-              }}
-              action2={() => {
-                setStartUpModelState('createWork');
-                showModal();
-              }}
-              text={'Ticket party!'}
-              style={{ height: 320 }}
-            />
-            <Divider />
-          </div>
-        )}
-
-        {ui.meInfo && ui.meInfo?.owner_alias && <div style={{ minHeight: '30px' }}></div>}
-
+        <div
+          style={{
+            minHeight: '32px'
+          }}
+        />
         {selectedWidget === 'wanted' && (
-          <BountyHeader selectedWidget={selectedWidget} setShowFocusView={setShowFocusView} />
+          <BountyHeader
+            selectedWidget={selectedWidget}
+            setShowFocusView={setShowFocusView}
+            scrollValue={scrollValue}
+          />
         )}
         {selectedWidget === 'people' && (
           <div
             style={{
               display: 'flex',
-              justifyContent: 'flex-end'
+              justifyContent: 'flex-end',
+              padding: '10px 0'
             }}>
             <SearchTextInput
               small
@@ -602,8 +582,8 @@ export default function BodyComponent({ selectedWidget }) {
               style={{
                 width: 204,
                 height: 40,
-                border: '1px solid #DDE1E5',
-                background: '#DDE1E5'
+                border: `1px solid ${color.grayish.G600}`,
+                background: color.grayish.G600
               }}
               onChange={(e) => {
                 console.log('handleChange', e);
@@ -621,7 +601,7 @@ export default function BodyComponent({ selectedWidget }) {
               height: '100%',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              padding: 20
+              padding: '0px 20px 20px 20px'
             }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
@@ -656,7 +636,7 @@ export default function BodyComponent({ selectedWidget }) {
             visible={publicFocusPerson ? true : false}
             envStyle={{
               borderRadius: 0,
-              background: '#fff',
+              background: color.pureWhite,
               height: '100%',
               width: '60%',
               minWidth: 500,
@@ -685,14 +665,6 @@ export default function BodyComponent({ selectedWidget }) {
             />
           </Modal>
         )}
-
-        {openStartUpModel && (
-          <StartUpModal
-            closeModal={closeModal}
-            dataObject={StartUpWorkerModelData[startUpModelState]}
-            buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
-          />
-        )}
         {toastsEl}
         {/* modal create ticket */}
         {showFocusView && (
@@ -706,12 +678,12 @@ export default function BodyComponent({ selectedWidget }) {
             envStyle={{
               marginTop: isMobile ? 64 : 0,
               borderRadius: 0,
-              background: '#fff',
+              background: color.pureWhite,
               height: '100%',
               width: '60%',
               minWidth: 500,
               maxWidth: 602,
-              zIndex: 20, //minHeight: 300,
+              zIndex: 20,
               ...focusedDesktopModalStyles
             }}
             nextArrow={nextIndex}
