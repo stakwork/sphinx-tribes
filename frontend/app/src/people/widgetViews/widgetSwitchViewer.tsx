@@ -19,17 +19,19 @@ export default function WidgetSwitchViewer(props) {
   const [deletePayload, setDeletePayload] = useState<object>({});
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
+  const [currentItems, setCurrentItems] = useState<number>(10);
 
   const panelStyles = isMobile
     ? {
         minHeight: 132
       }
     : {
-        maxWidth: 291,
-        minWidth: 291,
-        marginRight: 20,
+        minWidth: '1100px',
+        maxWidth: '1100px',
         marginBottom: 20,
-        minHeight: 472
+        borderRadius: '10px',
+        display: 'flex',
+        justifyContent: 'center'
       };
 
   return useObserver(() => {
@@ -90,12 +92,12 @@ export default function WidgetSwitchViewer(props) {
 
     const listItems =
       activeList && activeList.length ? (
-        activeList.map((item, i) => {
+        activeList.slice(0, currentItems).map((item, i) => {
           const { person, body } = item;
 
           const conditionalStyles = body?.paid
             ? {
-                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '1px solid #dde1e5',
+                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '',
                 boxShadow: 'none'
               }
             : {};
@@ -113,7 +115,10 @@ export default function WidgetSwitchViewer(props) {
                 ...conditionalStyles,
                 cursor: 'pointer',
                 padding: 0,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                background: 'transparent',
+                height: '160px',
+                boxShadow: 'none'
               }}>
               {selectedWidget === 'post' ? (
                 <PostView
@@ -154,6 +159,14 @@ export default function WidgetSwitchViewer(props) {
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
+        {!props.loading && (
+          <LoadMoreButton
+            onClick={() => {
+              setCurrentItems(currentItems + 10);
+            }}>
+            Load More
+          </LoadMoreButton>
+        )}
       </>
     );
   });
@@ -164,10 +177,35 @@ interface PanelProps {
 }
 
 const Panel = styled.div<PanelProps>`
-  position: relative;
+  // position: ;
   background: #ffffff;
   color: #000000;
   padding: 20px;
   box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
   border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
+
+const LoadMoreButton = styled.div`
+  width: 166px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #3c3f41;
+  border: 1px solid #dde1e5;
+  border-radius: 30px;
+  background: #ffffff;
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  cursor: pointer;
+  user-select: none;
+  :hover {
+    border: 1px solid #b0b7bc;
+  }
+  :active {
+    border: 1px solid #8e969c;
+  }
 `;
