@@ -40,10 +40,6 @@ export default function BodyComponent({ selectedWidget }) {
   const [showFocusView, setShowFocusView] = useState(false);
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
-  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
-  const [startUpModelState, setStartUpModelState] = useState<string>('getWork');
-  const closeModal = () => setOpenStartUpModel(false);
-  const showModal = () => setOpenStartUpModel(true);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
 
   const color = colors['light'];
@@ -422,13 +418,6 @@ export default function BodyComponent({ selectedWidget }) {
     if (isMobile) {
       return (
         <Body onScroll={handleScroll}>
-          {openStartUpModel && (
-            <StartUpModal
-              closeModal={closeModal}
-              dataObject={StartUpWorkerModelData[startUpModelState]}
-              buttonColor={startUpModelState === 'getWork' ? 'primary' : 'success'}
-            />
-          )}
           <div
             style={{
               width: '100%',
