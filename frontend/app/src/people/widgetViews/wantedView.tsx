@@ -683,7 +683,7 @@ export default function WantedView(props: any) {
         ) : (
           <BountyBox>
             <Bounties
-              {...person}
+								person={person}
               assignee={assignee}
               created={created}
               ticketUrl={ticketUrl}
