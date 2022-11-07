@@ -114,32 +114,6 @@ export default function NameTag(props) {
           </div>
         </div>
       )}
-      <div
-        style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start'
-        }}>
-        {ticketUrl && (
-          <GithubIcon
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(ticketUrl, '_blank');
-            }}>
-            <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
-          </GithubIcon>
-        )}
-        {loomEmbedUrl && (
-          <LoomIcon
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(loomEmbedUrl, '_blank');
-            }}>
-            <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loom" />
-          </LoomIcon>
-        )}
-      </div>
     </Wrap>
   );
 }
