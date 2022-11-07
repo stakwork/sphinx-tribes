@@ -50,7 +50,8 @@ const palette = {
     P300: '#2F7460',
     P400: '#86d9b9',
     P700: '#e0f7f0'
-  }
+  },
+  tribesBackground: '#212539'
 };
 
 type PalletType = 'dark' | 'light';
