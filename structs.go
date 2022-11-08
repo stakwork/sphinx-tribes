@@ -98,7 +98,7 @@ func (Person) TableName() string {
 // Person struct
 type Person struct {
 	ID               uint           `json:"id"`
-	Uuid 			 string         `json:"uuid"`
+	Uuid             string         `json:"uuid"`
 	OwnerPubKey      string         `json:"owner_pubkey"`
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
@@ -143,6 +143,24 @@ type Channel struct {
 	Name      string     `json:"name"`
 	Created   *time.Time `json:"created"`
 	Deleted   bool       `json:"deleted"`
+}
+
+type AssetResponse struct {
+	Balances []AssetBalanceData `json:"balances"`
+	Txs      []string           `json:"txs"`
+}
+
+type AssetBalanceData struct {
+	OwnerPubkey string `json:"owner_pubkey"`
+	AssetId     uint   `json:"asset_id"`
+	Balance     uint   `json:"balance"`
+}
+
+type LeaderBoard struct {
+	TribeUuid string `json:"tribe_uuid"`
+	Alias     string `json:"alias"`
+	Spent     int64  `json:"spent"`
+	Earned    int64  `json:"earned"`
 }
 
 /*

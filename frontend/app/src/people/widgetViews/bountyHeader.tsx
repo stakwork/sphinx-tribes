@@ -1,22 +1,28 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../../colors';
 import { useIsMobile } from '../../hooks';
 import IconButton from '../../sphinxUI/icon_button';
 import SearchBar from '../../sphinxUI/search_bar';
 import { useStores } from '../../store';
+import StartUpModal from '../utils/start_up_modal';
 
-const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
+const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
+  const color = colors['light'];
   useEffect(() => {
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
-          const response = await main.getPeople({ page: 1 });
           const bounty = await main.getPeopleWanteds({ page: 1 });
+          const response = await main.getPeople({ page: 1 });
           setPeopleList(response);
           setActiveBounty(bounty?.length);
         } catch (error) {
@@ -32,154 +38,148 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
   return (
     <>
       {!isMobile ? (
-        // desktop view
-        <BountyHeaderDesk>
-          <B>
-            <IconButton
-              text={'Post a Bounty'}
-              endingIcon={'add'}
-              width={204}
-              height={48}
-              color={'success'}
-              style={{
-                color: '#fff',
-                fontSize: '16px',
-                fontWeight: '600',
-                textDecoration: 'none'
-              }}
-              hoverColor={'#3CBE88'}
-              activeColor={'#2FB379'}
-              shadowColor={'rgba(73, 201, 152, 0.5)'}
-              iconStyle={{
-                fontSize: '16px',
-                fontWeight: '400',
-                top: '18px',
-                right: '24px'
-              }}
-              onClick={() => {
-                if (ui.meInfo && ui.meInfo?.owner_alias) {
-                  setShowFocusView(true);
-                } else {
-                  ui.setShowSignIn(true);
-                }
-              }}
-            />
-            <SearchBar
-              name="search"
-              type="search"
-              placeholder="Search"
-              value={ui.searchText}
-              style={{
-                width: 204,
-                height: 48,
-                background: 'transparent',
-                marginLeft: '16px',
-                fontFamily: 'Barlow',
-                color: '#3C3F41'
-              }}
-              onChange={(e) => {
-                ui.setSearchText(e);
-              }}
-              iconStyle={{
-                top: '13px'
-              }}
-              TextColor={'#B0B7BC'}
-              TextColorHover={'#8E969C'}
-              border={'1px solid #D0D5D8'}
-              borderHover={'1px solid #BAC1C6'}
-              borderActive={'1px solid #A3C1FF'}
-              iconColor={'#B0B7BC'}
-              iconColorHover={'#8E969C'}
-            />
-            <IconButton
-              text={`${activeBounty} Bounties opened`}
-              leadingImg={'/static/copy.svg'}
-              width={230}
-              height={48}
-              color={'transparent'}
-              style={{
-                color: '#909BAA',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: 'default',
-                textDecoration: 'none'
-              }}
-              leadingImgStyle={{
-                height: '22px',
-                width: '18px',
-                marginRight: '10px'
-              }}
-            />
-            <IconButton
-              text={'Filter'}
-              color={'transparent'}
-              leadingIcon={'tune'}
-              width={80}
-              height={48}
-              style={{
-                color: '#909BAA',
-                fontSize: '16px',
-                fontWeight: '500',
-                textDecoration: 'none'
-              }}
-              iconStyle={{
-                fontSize: '18px',
-                fontWeight: '500'
-              }}
-              onClick={() => {
-                console.log('filter');
-              }}
-            />
-          </B>
-          <D>
-            <EuiText
-              color={'#909BAA'}
-              style={{
-                fontSize: '16px',
-                fontFamily: 'Barlow',
-                fontWeight: '500'
-              }}>
-              Developers
-            </EuiText>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                color: '#909BAA',
-                padding: '0 10px'
-              }}>
-              {peopleList &&
-                peopleList?.slice(0, 3).map((val, index) => {
-                  return (
-                    <DevelopersImageContainer
-                      style={{
-                        zIndex: 3 - index,
-                        marginLeft: index > 0 ? '-14px' : ''
-                      }}>
-                      <img
-                        height={'23px'}
-                        width={'23px'}
-                        src={val?.img || '/static/person_placeholder.png'}
-                        alt={''}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            minHeight: '80px',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            zIndex: '1',
+            background: 'inherit',
+            boxShadow: scrollValue ? ' 0px 1px 6px rgba(0, 0, 0, 0.07)' : '',
+            borderBottom: scrollValue
+              ? `1px solid ${color.grayish.G600}`
+              : `0px solid ${color.grayish.G600}`
+          }}>
+          <BountyHeaderDesk>
+            <B>
+              <IconButton
+                text={'Post a Bounty'}
+                endingIcon={'add'}
+                width={204}
+                height={48}
+                color={'success'}
+                style={{
+                  color: color.pureWhite,
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  textDecoration: 'none'
+                }}
+                hoverColor={color.button_primary.hover}
+                activeColor={color.button_primary.active}
+                shadowColor={color.button_primary.shadow}
+                iconStyle={{
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  top: '17px',
+                  right: '18px'
+                }}
+                onClick={() => {
+                  if (ui.meInfo && ui.meInfo?.owner_alias) {
+                    setShowFocusView(true);
+                  } else {
+                    showModal();
+                  }
+                }}
+              />
+              <SearchBar
+                name="search"
+                type="search"
+                placeholder="Search"
+                value={ui.searchText}
+                style={{
+                  width: 204,
+                  height: 48,
+                  background: 'transparent',
+                  marginLeft: '16px',
+                  fontFamily: 'Barlow',
+                  color: color.text2
+                }}
+                onChange={(e) => {
+                  ui.setSearchText(e);
+                }}
+                iconStyle={{
+                  top: '13px'
+                }}
+                TextColor={color.grayish.G400}
+                TextColorHover={color.grayish.G100}
+                border={`1px solid ${color.grayish.G500}`}
+                borderHover={`1px solid ${color.grayish.G400}`}
+                borderActive={'1px solid #A3C1FF'}
+                iconColor={color.grayish.G300}
+                iconColorHover={color.grayish.G100}
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginLeft: '33px'
+                }}>
+                <img src="/static/copy.svg" alt="" height={22} width={18} />
+                <EuiText
+                  style={{
+                    color: color.grayish.G200,
+                    fontWeight: '500',
+                    fontSize: '16px',
+                    lineHeight: '19px',
+                    fontFamily: 'Barlow',
+                    marginLeft: '10px',
+                    height: '51px',
+                    width: '153px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                  <span
+                    style={{
+                      color: color.pureBlack
+                    }}>
+                    {activeBounty}
+                  </span>
+                  &nbsp; Bounties opened
+                </EuiText>
+              </div>
+            </B>
+            <D>
+              <EuiText className="DText" color={color.grayish.G200}>
+                Developers
+              </EuiText>
+              <div className="ImageOuterContainer">
+                {peopleList &&
+                  peopleList?.slice(0, 3).map((val, index) => {
+                    return (
+                      <DevelopersImageContainer
                         style={{
-                          borderRadius: '50%'
-                        }}
-                      />
-                    </DevelopersImageContainer>
-                  );
-                })}
-            </div>
-            <EuiText
-              style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                fontFamily: 'Barlow'
-              }}>
-              {peopleList && peopleList?.length}
-            </EuiText>
-          </D>
-        </BountyHeaderDesk>
+                          zIndex: 3 - index,
+                          marginLeft: index > 0 ? '-14px' : ''
+                        }}>
+                        <img
+                          height={'23px'}
+                          width={'23px'}
+                          src={val?.img || '/static/person_placeholder.png'}
+                          alt={''}
+                          style={{
+                            borderRadius: '50%'
+                          }}
+                        />
+                      </DevelopersImageContainer>
+                    );
+                  })}
+              </div>
+              <EuiText
+                style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  fontFamily: 'Barlow',
+                  color: '#222E3A'
+                }}>
+                {peopleList && peopleList?.length}
+              </EuiText>
+            </D>
+          </BountyHeaderDesk>
+        </div>
       ) : (
         <BountyHeaderMobile>
           <LargeActionContainer>
@@ -201,14 +201,18 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
               iconStyle={{
                 top: '4px'
               }}
-              border={'1px solid #D0D5D8'}
-              borderHover={'1px solid #BAC1C6'}
+              TextColor={color.grayish.G400}
+              TextColorHover={color.grayish.G100}
+              border={`1px solid ${color.grayish.G500}`}
+              borderHover={`1px solid ${color.grayish.G400}`}
               borderActive={'1px solid #A3C1FF'}
-              TextColor={'#B0B7BC'}
-              TextColorHover={'#8E969C'}
-              iconColor={'#B0B7BC'}
-              iconColorHover={'#8E969C'}
+              iconColor={color.grayish.G300}
+              iconColorHover={color.grayish.G100}
             />
+            {/*
+            
+            // TODO: add filter when have functionality.
+
             <IconButton
               text={'Filter'}
               color={'transparent'}
@@ -216,7 +220,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
               width={80}
               height={48}
               style={{
-                color: '#909BAA',
+                color: color.grayish.G200,
                 fontSize: '16px',
                 fontWeight: '500',
                 textDecoration: 'none',
@@ -229,7 +233,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
               onClick={() => {
                 console.log('filter');
               }}
-            />
+            /> */}
           </LargeActionContainer>
           <ShortActionContainer>
             <IconButton
@@ -245,9 +249,9 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
                 textDecoration: 'none',
                 transform: 'none'
               }}
-              hoverColor={'#3CBE88'}
-              activeColor={'#2FB379'}
-              shadowColor={'rgba(73, 201, 152, 0.5)'}
+              hoverColor={color.button_primary.hover}
+              activeColor={color.button_primary.active}
+              shadowColor={color.button_primary.shadow}
               iconStyle={{
                 fontSize: '12px',
                 fontWeight: '600',
@@ -307,13 +311,17 @@ const BountyHeader = ({ selectedWidget, setShowFocusView }) => {
                 style={{
                   fontSize: '14px',
                   fontFamily: 'Barlow',
-                  fontWeight: '500'
+                  fontWeight: '500',
+                  color: '#222E3A'
                 }}>
                 {peopleList && peopleList?.length}
               </EuiText>
             </DevelopersContainerMobile>
           </ShortActionContainer>
         </BountyHeaderMobile>
+      )}
+      {openStartUpModel && (
+        <StartUpModal closeModal={closeModal} dataObject={'createWork'} buttonColor={'success'} />
       )}
     </>
   );
@@ -325,8 +333,9 @@ const BountyHeaderDesk = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 10px 20px;
   align-items: center;
+  min-width: 1100px;
+  max-width: 1100px;
 `;
 
 const B = styled.div`
@@ -340,7 +349,18 @@ const D = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 20px;
+  .DText {
+    font-size: 16px;
+    font-family: Barlow;
+    font-weight: 500;
+  }
+  .ImageOuterContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: #909baa;
+    padding: 0 10px;
+  }
 `;
 
 const DevelopersImageContainer = styled.div`

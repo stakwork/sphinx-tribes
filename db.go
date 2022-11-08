@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"github.com/rs/xid"
 	_ "github.com/lib/pq"
+	"github.com/rs/xid"
 	"net/http"
 	"os"
 	"strconv"
@@ -46,7 +46,7 @@ func initDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
-	db.AutoMigrate(&Person{}, &Channel{})
+	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{})
 
 	people := DB.getAllPeople()
 	for _, p := range people {
@@ -366,7 +366,6 @@ func (db database) getListedPeople(r *http.Request) []Person {
 	return ms
 }
 
-
 func (db database) getAllPeople() []Person {
 	ms := []Person{}
 	// if search is empty, returns all
@@ -658,4 +657,35 @@ func (db database) searchPeople(s string, limit, offset int) []Person {
 		ORDER BY rank DESC 
 		LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
 	return ms
+}
+
+func (db database) createLeaderBoard(uuid string, leaderboards []LeaderBoard) ([]LeaderBoard, error) {
+	m := LeaderBoard{}
+	db.db.Where("tribe_uuid = ?", uuid).Delete(&m)
+	for _, leaderboard := range leaderboards {
+		leaderboard.TribeUuid = uuid
+		db.db.Create(leaderboard)
+	}
+	return leaderboards, nil
+
+}
+
+func (db database) getLeaderBoard(uuid string) []LeaderBoard {
+	m := []LeaderBoard{}
+	db.db.Where("tribe_uuid = ?", uuid).Find(&m)
+	return m
+}
+
+func (db database) getLeaderBoardByUuidAndAlias(uuid string, alias string) LeaderBoard {
+	m := LeaderBoard{}
+	db.db.Where("tribe_uuid = ? and alias = ?", uuid, alias).Find(&m)
+	return m
+}
+
+func (db database) updateLeaderBoard(uuid string, alias string, u map[string]interface{}) bool {
+	if uuid == "" {
+		return false
+	}
+	db.db.Model(&LeaderBoard{}).Where("tribe_uuid = ? and alias = ?", uuid, alias).Updates(u)
+	return true
 }

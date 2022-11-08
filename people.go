@@ -15,6 +15,8 @@ import (
 	"github.com/rs/xid"
 )
 
+const liquidTestModeUrl = "TEST_ASSET_URL"
+
 func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
@@ -339,10 +341,37 @@ func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	person := DB.getPersonByUuid(uuid)
+	assetBalanceData, err := getAssetByPubkey(person.OwnerPubKey)
+
+	personResponse := make(map[string]interface{})
+	personResponse["id"] = person.ID
+	personResponse["uuid"] = person.Uuid
+	personResponse["owner_alias"] = person.OwnerAlias
+	personResponse["unique_name"] = person.UniqueName
+	personResponse["description"] = person.Description
+	personResponse["tags"] = person.Tags
+	personResponse["img"] = person.Img
+	personResponse["owner_route_hint"] = person.OwnerRouteHint
+	personResponse["owner_contact_key"] = person.OwnerContactKey
+	personResponse["price_to_meet"] = person.PriceToMeet
+	personResponse["extras"] = person.Extras
+	personResponse["twitter_confirmed"] = person.TwitterConfirmed
+	personResponse["github_issues"] = person.GithubIssues
+	if err != nil {
+		fmt.Println("==> error: ", err)
+	} else {
+		var badgeSlice []uint
+		for i := 0; i < len(assetBalanceData); i++ {
+			badgeSlice = append(badgeSlice, assetBalanceData[i].AssetId)
+		}
+		personResponse["badges"] = badgeSlice
+	}
+	fmt.Println()
 	// FIXME use http to hit sphinx-element server for badges
+	// Todo: response should include no pubKey
 	// FIXME also filter by the tribe "profile_filters"
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(person)
+	json.NewEncoder(w).Encode(personResponse)
 }
 
 func getPersonByGithubName(w http.ResponseWriter, r *http.Request) {
@@ -388,4 +417,41 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func getAssetByPubkey(pubkey string) ([]AssetBalanceData, error) {
+	client := &http.Client{}
+	testMode, err := strconv.ParseBool(os.Getenv("TEST_MODE"))
+	if err != nil {
+		testMode = false
+	}
+
+	url := os.Getenv(liquidTestModeUrl)
+	if testMode && (url != "") {
+		url = os.Getenv(liquidTestModeUrl)
+	} else {
+		url = "https://liquid.sphinx.chat/balances?pubkey=" + pubkey
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("GET error:", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var r AssetResponse
+	body, err := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &r)
+	if err != nil {
+		fmt.Println("json unmarshall error", err)
+		return nil, err
+	}
+
+	balances := r.Balances
+
+	return balances, nil
 }
