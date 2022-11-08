@@ -12,7 +12,13 @@ export default function ConnectCard(props) {
   const qrString = makeConnectQR(person?.owner_pubkey);
 
   return (
-    <Modal style={props.modalStyle} close={props.dismiss} visible={visible}>
+    <Modal
+      style={props.modalStyle}
+      close={(e) => {
+        e.stopPropagation();
+        props.dismiss();
+      }}
+      visible={visible}>
       <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
         <ImgWrap>
           <W>
