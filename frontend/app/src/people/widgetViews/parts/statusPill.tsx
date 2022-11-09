@@ -27,7 +27,7 @@ export default function GithubStatusPill(props: any) {
   }
 
   function sendToRedirect(url) {
-    let el = document.createElement('a');
+    const el = document.createElement('a');
     el.href = url;
     el.target = '_blank';
     el.click();
@@ -38,7 +38,7 @@ export default function GithubStatusPill(props: any) {
   useEffect(() => {
     const assignedText = !newAssignee.owner_alias
       ? 'Not assigned'
-      : !!isOpen
+      : isOpen
       ? 'Assigned to '
       : 'Completed by ';
     setAssigneText(assignedText);

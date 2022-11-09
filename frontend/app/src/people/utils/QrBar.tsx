@@ -41,7 +41,8 @@ export default function QrBar(props: any) {
           overflow: 'hidden',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis'
-        }}>
+        }}
+      >
         {!simple && (
           <MaterialIcon
             icon={'qr_code_2'}
@@ -54,7 +55,8 @@ export default function QrBar(props: any) {
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis'
-          }}>
+          }}
+        >
           {value}
         </div>
       </QRWrap>

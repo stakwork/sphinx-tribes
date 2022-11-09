@@ -17,7 +17,8 @@ export default function NoneSpaceHomePage(props) {
           padding: 40,
           width: '100%',
           ...props.style
-        }}>
+        }}
+      >
         <H style={{ paddingLeft: 0, fontSize: '100px', fontFamily: 'Barlow' }}>{props.text}</H>
         <C style={{ paddingLeft: 0, fontFamily: 'Barlow' }}>{props.sub}</C>
 
@@ -70,13 +71,15 @@ export default function NoneSpaceHomePage(props) {
         height: '100%',
         background: '#f0f1f3',
         ...props.style
-      }}>
+      }}
+    >
       <>
         <H
           style={{
             fontSize: '40px',
             fontFamily: 'Barlow'
-          }}>
+          }}
+        >
           {props.text}
         </H>
         <C>{props.sub}</C>

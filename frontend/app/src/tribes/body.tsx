@@ -39,14 +39,14 @@ export default function BodyComponent() {
     if (!uuid) {
       window.history.pushState({}, 'Sphinx Tribes', '/t');
     } else if (unique_name && window.history.pushState) {
-      window.history.pushState({}, 'Sphinx Tribes', '/t/' + unique_name);
+      window.history.pushState({}, 'Sphinx Tribes', `/t/${unique_name}`);
     }
   }
 
   async function loadMore(direction) {
     if (tagsPop) return;
 
-    let currentPage = tribesPageNumber;
+    const currentPage = tribesPageNumber;
     let newPage = currentPage + direction;
     if (newPage < 1) newPage = 1;
 
@@ -71,7 +71,7 @@ export default function BodyComponent() {
       deeplinkUn = window.location.pathname.substr(3);
     }
     if (deeplinkUn) {
-      let t = await main.getTribeByUn(deeplinkUn);
+      const t = await main.getTribeByUn(deeplinkUn);
       setSelected(t.uuid);
       window.history.pushState({}, 'Sphinx Tribes', '/t');
     }
@@ -86,7 +86,7 @@ export default function BodyComponent() {
   }, [ui.searchText, ui.tags]);
 
   return useObserver(() => {
-    let tribes = main.tribes;
+    let { tribes } = main;
 
     const loadForwardFunc = () => loadMore(1);
     const loadBackwardFunc = () => loadMore(-1);
@@ -116,7 +116,8 @@ export default function BodyComponent() {
         onClick={(e) => {
           e.stopPropagation();
           setTagsPop(!tagsPop);
-        }}>
+        }}
+      >
         {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
       </EuiButton>
     );
@@ -131,13 +132,15 @@ export default function BodyComponent() {
             alignItems: 'flex-start',
             padding: 20,
             height: 62
-          }}>
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'baseline' }}>
             <EuiPopover
               panelPaddingSize="none"
               button={button}
               isOpen={tagsPop}
-              closePopover={() => setTagsPop(false)}>
+              closePopover={() => setTagsPop(false)}
+            >
               <EuiSelectable
                 searchable
                 options={tagOptions}
@@ -147,7 +150,8 @@ export default function BodyComponent() {
                       display: 'flex',
                       alignItems: 'center',
                       opacity: loadingList ? 0.5 : 1
-                    }}>
+                    }}
+                  >
                     <Tag type={option.label} iconOnly />
                     <EuiHighlight
                       search={searchValue}
@@ -155,7 +159,8 @@ export default function BodyComponent() {
                         fontSize: 11,
                         marginLeft: 5,
                         color: tags[option.label].color
-                      }}>
+                      }}
+                    >
                       {option.label}
                     </EuiHighlight>
                   </div>
@@ -166,7 +171,8 @@ export default function BodyComponent() {
                     setTagOptions(opts);
                     ui.setTags(opts);
                   }
-                }}>
+                }}
+              >
                 {(list, search) => (
                   <div style={{ width: 220 }}>
                     {search}

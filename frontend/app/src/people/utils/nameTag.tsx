@@ -57,7 +57,8 @@ export default function NameTag(props) {
         onClick={(e) => {
           selectPerson(e);
         }}
-        style={style}>
+        style={style}
+      >
         {!isSelected && (
           <>
             <Img src={img || `/static/person_placeholder.png`} iconSize={iconSize} />
@@ -66,7 +67,8 @@ export default function NameTag(props) {
               color={color.grayish.G250}
               style={{
                 marginLeft: '10px'
-              }}>
+              }}
+            >
               {owner_alias}
             </Name>
 
@@ -94,20 +96,23 @@ export default function NameTag(props) {
           style={{
             display: 'flex',
             flexDirection: 'row'
-          }}>
+          }}
+        >
           <Img src={img || `/static/person_placeholder.png`} iconSize={32} isPaid={isPaid} />
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               marginLeft: '14px'
-            }}>
+            }}
+          >
             <Name
               textSize={textSize}
               color={isPaid ? color.grayish.G300 : color.pureBlack}
               onClick={(e) => {
                 selectPerson(e);
-              }}>
+              }}
+            >
               {owner_alias}
             </Name>
             <Date>{lastSeen}</Date>
@@ -132,8 +137,8 @@ const Img = styled.div<ImageProps>`
   background-image: url('${(p) => p.src}');
   background-position: center;
   background-size: cover;
-  height: ${(p) => (p.iconSize ? p.iconSize + 'px' : '16px')};
-  width: ${(p) => (p.iconSize ? p.iconSize + 'px' : '16px')};
+  height: ${(p) => (p.iconSize ? `${p.iconSize}px` : '16px')};
+  width: ${(p) => (p.iconSize ? `${p.iconSize}px` : '16px')};
   border-radius: 50%;
   position: relative;
   opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
@@ -144,7 +149,7 @@ const Name = styled.div<NameProps>`
   font-family: Barlow;
   font-style: normal;
   font-weight: normal;
-  font-size: ${(p) => (p.textSize ? p.textSize + 'px' : '13px')};
+  font-size: ${(p) => (p.textSize ? `${p.textSize}px` : '13px')};
   color: ${(p) => p.color};
   line-height: 16px;
   /* or 158% */

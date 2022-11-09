@@ -128,7 +128,7 @@ export default function WantedSummary(props: any) {
         // saved? ok update in wanted list if found
         const peopleWantedsClone: any = [...peopleWanteds];
         const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
-          let val = f.body || {};
+          const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
@@ -369,7 +369,7 @@ export default function WantedSummary(props: any) {
   );
 
   function sendToRedirect(url) {
-    let el = document.createElement('a');
+    const el = document.createElement('a');
     el.href = url;
     el.target = '_blank';
     el.click();
@@ -403,7 +403,8 @@ export default function WantedSummary(props: any) {
               color: '#8E969C',
               marginTop: isMobile ? 20 : 0,
               marginLeft: '-16px'
-            }}>
+            }}
+          >
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -414,7 +415,8 @@ export default function WantedSummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -428,7 +430,8 @@ export default function WantedSummary(props: any) {
               fontSize: 12,
               color: '#8E969C',
               marginLeft: '16px'
-            }}>
+            }}
+          >
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -439,7 +442,8 @@ export default function WantedSummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -459,7 +463,8 @@ export default function WantedSummary(props: any) {
               style={{
                 display: 'flex',
                 flexDirection: 'row'
-              }}>
+              }}
+            >
               <GithubStatusPill status={status} assignee={assignee} />
               {assigneeLabel}
               {ticketUrl && (
@@ -467,7 +472,8 @@ export default function WantedSummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(ticketUrl, '_blank');
-                  }}>
+                  }}
+                >
                   <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
                 </GithubIconMobile>
               )}
@@ -476,7 +482,8 @@ export default function WantedSummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(loomEmbedUrl, '_blank');
-                  }}>
+                  }}
+                >
                   <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                 </LoomIconMobile>
               )}
@@ -487,13 +494,15 @@ export default function WantedSummary(props: any) {
                 fontSize: '13px',
                 color: '#8e969c',
                 fontWeight: '500'
-              }}>
+              }}
+            >
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: '#000'
-                }}>
+                }}
+              >
                 {estimate_session_length ?? ''}
               </span>
             </EuiText>
@@ -504,7 +513,8 @@ export default function WantedSummary(props: any) {
                 flexDirection: 'row',
                 marginTop: '10px',
                 minHeight: '60px'
-              }}>
+              }}
+            >
               {labels.length > 0 &&
                 labels.map((x: any) => {
                   return (
@@ -521,12 +531,14 @@ export default function WantedSummary(props: any) {
                           borderRadius: '20px',
                           marginRight: '3px',
                           boxShadow: '1px 1px #909090'
-                        }}>
+                        }}
+                      >
                         <div
                           style={{
                             fontSize: '10px',
                             color: '#202020'
-                          }}>
+                          }}
+                        >
                           {x.label}
                         </div>
                       </div>
@@ -586,7 +598,8 @@ export default function WantedSummary(props: any) {
               borderRight: '1px solid #DDE1E5',
               minHeight: '100%',
               overflow: 'auto'
-            }}>
+            }}
+          >
             <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
               <Title>{title}</Title>
               <div style={{ display: 'flex', marginTop: 12 }}>
@@ -597,7 +610,8 @@ export default function WantedSummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(ticketUrl, '_blank');
-                    }}>
+                    }}
+                  >
                     <img
                       height={'100%'}
                       width={'100%'}
@@ -611,7 +625,8 @@ export default function WantedSummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(loomEmbedUrl, '_blank');
-                    }}>
+                    }}
+                  >
                     <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                   </LoomIcon>
                 )}
@@ -619,19 +634,22 @@ export default function WantedSummary(props: any) {
               <div
                 style={{
                   marginTop: '2px'
-                }}>
+                }}
+              >
                 <EuiText
                   style={{
                     fontSize: '13px',
                     color: '#8e969c',
                     fontWeight: '500'
-                  }}>
+                  }}
+                >
                   {estimate_session_length && 'Session:'}{' '}
                   <span
                     style={{
                       fontWeight: '500',
                       color: '#000'
-                    }}>
+                    }}
+                  >
                     {estimate_session_length ?? ''}
                   </span>
                 </EuiText>
@@ -644,7 +662,8 @@ export default function WantedSummary(props: any) {
                 style={{
                   overflow: 'hidden',
                   wordBreak: 'normal'
-                }}>
+                }}
+              >
                 {renderMarkdown(description)}
               </Paragraph>
 
@@ -659,7 +678,8 @@ export default function WantedSummary(props: any) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between'
-                }}>
+                }}
+              >
                 {nametag}
               </div>
               {/* <Img
@@ -673,7 +693,8 @@ export default function WantedSummary(props: any) {
                   width: '100%',
                   display: 'flex',
                   flexDirection: 'row'
-                }}>
+                }}
+              >
                 {labels.length > 0 &&
                   labels.map((x: any) => {
                     return (
@@ -690,12 +711,14 @@ export default function WantedSummary(props: any) {
                             borderRadius: '20px',
                             marginRight: '3px',
                             boxShadow: '1px 1px #909090'
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               fontSize: '10px',
                               color: '#202020'
-                            }}>
+                            }}
+                          >
                             {x.label}
                           </div>
                         </div>
@@ -773,7 +796,8 @@ export default function WantedSummary(props: any) {
     <div
       style={{
         paddingTop: gallery && '40px'
-      }}>
+      }}
+    >
       <Wrap>
         <div>
           <GalleryViewer
@@ -792,7 +816,8 @@ export default function WantedSummary(props: any) {
             padding: '40px 20px',
             overflowY: 'auto',
             height: envHeight
-          }}>
+          }}
+        >
           <Pad>
             {nametag}
 

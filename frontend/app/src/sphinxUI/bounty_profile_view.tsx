@@ -27,7 +27,8 @@ const BountyProfileView = (props) => {
           <Status
             style={{
               ...props.statusStyle
-            }}>
+            }}
+          >
             <EuiText className="statusText">{props.status}</EuiText>
           </Status>
           <NameContainer name_text_color={color.grayish.G10}>
@@ -51,7 +52,8 @@ const BountyProfileView = (props) => {
                   '_blank'
                 );
               }
-            }}>
+            }}
+          >
             <EuiText className="text">View Profile</EuiText>
             <div className="Icon_Container">
               <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />

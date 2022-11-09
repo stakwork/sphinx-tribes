@@ -79,7 +79,8 @@ export default function IconButton(props: any) {
         ...props.style
       }}
       disabled={props.disabled}
-      onClick={props.onClick}>
+      onClick={props.onClick}
+    >
       <span style={{ ...props.textStyle }}>
         {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
       </span>
@@ -113,7 +114,8 @@ export default function IconButton(props: any) {
       activeColor={props.activeColor}
       shadowColor={props.shadowColor}
       disabled={props.disabled}
-      onClick={props.onClick}>
+      onClick={props.onClick}
+    >
       <div>
         {props.icon && (
           <div
@@ -125,7 +127,8 @@ export default function IconButton(props: any) {
               left: 3,
               height: '100%',
               ...iconStyle
-            }}>
+            }}
+          >
             <MaterialIcon
               icon={props.icon}
               style={{ fontSize: props.iconSize ? props.iconSize : 30, ...iconStyle }}
@@ -148,7 +151,8 @@ export default function IconButton(props: any) {
             <div
               style={{
                 ...props.leadingImgStyle
-              }}>
+              }}
+            >
               <img height={'100%'} width={'100%'} src={props.leadingImg} alt="leading" />
             </div>
           )}

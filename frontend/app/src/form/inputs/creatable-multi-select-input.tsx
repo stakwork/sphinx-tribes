@@ -20,7 +20,7 @@ export default function CreatableMultiSelectInput({
   extraHTML
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (INCORRECT FORMAT)`;
+  if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
 
   return (
     <>

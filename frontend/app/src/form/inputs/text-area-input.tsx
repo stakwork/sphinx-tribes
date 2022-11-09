@@ -20,7 +20,7 @@ export default function TextAreaInput({
   // console.log("TEXTAREA", label, extraHTML)
 
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
+  if (error) labeltext = `${labeltext} (${error})`;
 
   return (
     <>

@@ -6,7 +6,7 @@ import { IconButton } from '../../sphinxUI';
 export default function GalleryViewer(props) {
   const { gallery, wrap, selectable, big, showAll, style, cover } = props;
   const [selectedImage, setSelectedImage] = useState(0);
-  let g = gallery;
+  const g = gallery;
 
   if (!g || !g.length) return <div />;
   //<Square big={big} />
@@ -15,14 +15,14 @@ export default function GalleryViewer(props) {
 
   function next(e) {
     e.stopPropagation();
-    let nextindex = selectedImage + 1;
+    const nextindex = selectedImage + 1;
     if (g[nextindex]) setSelectedImage(nextindex);
     else setSelectedImage(0);
   }
 
   function prev(e) {
     e.stopPropagation();
-    let previndex = selectedImage - 1;
+    const previndex = selectedImage - 1;
     if (g[previndex]) setSelectedImage(previndex);
     else setSelectedImage(g.length - 1);
   }
@@ -31,7 +31,8 @@ export default function GalleryViewer(props) {
     <>
       <Gallery
         style={{ width: big || wrap ? '100%' : 'fit-content', ...style }}
-        ref={props.innerRef}>
+        ref={props.innerRef}
+      >
         {showAll ? (
           <div style={{ textAlign: 'center' }}>
             {g.map((ga, i) => {
