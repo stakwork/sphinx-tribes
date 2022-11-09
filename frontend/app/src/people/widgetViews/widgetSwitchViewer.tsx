@@ -117,7 +117,7 @@ export default function WidgetSwitchViewer(props) {
                 padding: 0,
                 overflow: 'hidden',
                 background: 'transparent',
-                height: '160px',
+                height: !isMobile ? '160px' : '',
                 boxShadow: 'none'
               }}>
               {selectedWidget === 'post' ? (
@@ -141,6 +141,7 @@ export default function WidgetSwitchViewer(props) {
                   person={person}
                   showModal={showModal}
                   setDeletePayload={setDeletePayload}
+                  fromBountyPage={props.fromBountyPage}
                   {...body}
                 />
               ) : null}
@@ -160,12 +161,21 @@ export default function WidgetSwitchViewer(props) {
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
         {!props.loading && (
-          <LoadMoreButton
-            onClick={() => {
-              setCurrentItems(currentItems + 10);
+          <LoadMoreContainer
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}>
-            Load More
-          </LoadMoreButton>
+            <div
+              className="LoadMoreButton"
+              onClick={() => {
+                setCurrentItems(currentItems + 10);
+              }}>
+              Load More
+            </div>
+          </LoadMoreContainer>
         )}
       </>
     );
@@ -185,27 +195,33 @@ const Panel = styled.div<PanelProps>`
   border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
 `;
 
-const LoadMoreButton = styled.div`
-  width: 166px;
-  height: 48px;
+const LoadMoreContainer = styled.div<PanelProps>`
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #3c3f41;
-  border: 1px solid #dde1e5;
-  border-radius: 30px;
-  background: #ffffff;
-  font-family: 'Barlow';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
-  cursor: pointer;
-  user-select: none;
-  :hover {
-    border: 1px solid #b0b7bc;
-  }
-  :active {
-    border: 1px solid #8e969c;
+  .LoadMoreButton {
+    width: 166px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #3c3f41;
+    border: 1px solid #dde1e5;
+    border-radius: 30px;
+    background: #ffffff;
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    cursor: pointer;
+    user-select: none;
+    :hover {
+      border: 1px solid #b0b7bc;
+    }
+    :active {
+      border: 1px solid #8e969c;
+    }
   }
 `;
