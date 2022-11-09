@@ -18,7 +18,7 @@ export function useFuse(array, keys: string[] = []) {
   let theArray = array;
 
   if (ui.searchText) {
-    var fuse = new Fuse(array, { ...fuseOptions, keys });
+    const fuse = new Fuse(array, { ...fuseOptions, keys });
     const res = fuse.search(ui.searchText);
     theArray = res.map((r) => r.item);
   }
@@ -29,7 +29,7 @@ export function useFuse(array, keys: string[] = []) {
 export function useLocalFuse(searchText, array, keys: string[] = []) {
   let theArray = array;
   if (searchText) {
-    var fuse = new Fuse(array, { ...fuseOptions, keys });
+    const fuse = new Fuse(array, { ...fuseOptions, keys });
     const res = fuse.search(searchText);
     theArray = res.map((r) => r.item);
   }

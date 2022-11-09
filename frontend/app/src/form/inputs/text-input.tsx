@@ -19,7 +19,7 @@ export default function TextInput({
   borderType
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
+  if (error) labeltext = `${labeltext} (${error})`;
 
   const padStyle = prepend ? { paddingLeft: 0 } : {};
   return (

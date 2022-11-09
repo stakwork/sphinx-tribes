@@ -24,7 +24,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             minHeight: '585px',
             maxHeight: '585px',
             width: '425px'
-          }}>
+          }}
+        >
           <ModalContainer>
             <img
               src={

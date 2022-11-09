@@ -42,19 +42,22 @@ const BountyPrice = (props) => {
       <PriceContainer
         style={{
           ...props.style
-        }}>
+        }}
+      >
         <div
           style={{
             display: 'flex',
             alignItems: 'center'
-          }}>
+          }}
+        >
           <div className="PriceStaticTextContainer">
             <EuiText className="PriceStaticText">$@</EuiText>
           </div>
           {props.priceMin ? (
             <PriceOuterContainer
               price_Text_Color={color.primaryColor.P300}
-              priceBackground={color.primaryColor.P100}>
+              priceBackground={color.primaryColor.P100}
+            >
               <div className="Price_inner_Container">
                 <EuiText className="Price_Dynamic_Text">{DollarConverter(props?.priceMin)}</EuiText>
               </div>
@@ -65,7 +68,8 @@ const BountyPrice = (props) => {
           ) : (
             <PriceOuterContainer
               price_Text_Color={color.primaryColor.P300}
-              priceBackground={color.primaryColor.P100}>
+              priceBackground={color.primaryColor.P100}
+            >
               <div className="Price_inner_Container">
                 <EuiText className="Price_Dynamic_Text">{DollarConverter(props?.price)}</EuiText>
               </div>
@@ -93,7 +97,8 @@ const BountyPrice = (props) => {
                 className="EST_Text"
                 style={{
                   color: color.grayish.G100
-                }}>
+                }}
+              >
                 Est:
               </span>{' '}
               &nbsp;&nbsp;&nbsp;

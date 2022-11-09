@@ -42,7 +42,7 @@ export default function BotBar(props: any) {
         width={'100%'}
         height={50}
         style={{ width: '100%', padding: '0 5px' }}
-        onClick={() => copyToClipboard('/bot install ' + value)}
+        onClick={() => copyToClipboard(`/bot install ${value}`)}
       />
 
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={1000} />

@@ -165,7 +165,7 @@ export default function BotBody() {
   }
 
   function redirect() {
-    let el = document.createElement('a');
+    const el = document.createElement('a');
     el.target = '_blank';
     el.href = 'https://github.com/stakwork/sphinx-relay/blob/master/docs/deep/bots.md';
     el.click();
@@ -199,7 +199,8 @@ export default function BotBody() {
           style={{
             background: '#f0f1f3',
             height: 'calc(100% - 65px)'
-          }}>
+          }}
+        >
           {!ui.meInfo && (
             <div style={{ marginTop: 50 }}>
               <NoneSpace
@@ -223,14 +224,15 @@ export default function BotBody() {
               alignItems: 'flex-start',
               padding: 20,
               height: 62
-            }}>
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Label style={{ marginRight: 46 }}>Explore</Label>
 
               <Tabs>
                 {tabs &&
                   tabs.map((t, i) => {
-                    const label = t.label;
+                    const { label } = t;
                     const selected = selectedWidget === t.name;
 
                     return (
@@ -239,7 +241,8 @@ export default function BotBody() {
                         selected={selected}
                         onClick={() => {
                           setSelectedWidget(t.name);
-                        }}>
+                        }}
+                      >
                         {label}
                       </Tab>
                     );
@@ -287,7 +290,8 @@ export default function BotBody() {
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 padding: 20
-              }}>
+              }}
+            >
               {bots.map((t) => (
                 <Bot
                   {...t}
@@ -317,7 +321,8 @@ export default function BotBody() {
               width: '100%'
             }}
             isMounted={ui.selectingBot ? true : false}
-            dismountCallback={() => ui.setSelectedBot('')}>
+            dismountCallback={() => ui.setSelectedBot('')}
+          >
             <BotView
               goBack={() => ui.setSelectingBot('')}
               botUniqueName={ui.selectedBot}
@@ -356,7 +361,8 @@ export default function BotBody() {
               padding: 20,
               height: 62,
               marginBottom: 20
-            }}>
+            }}
+          >
             <Label style={{ fontSize: 20 }}>
               Explore
               <Link onClick={() => setShowDropdown(true)}>
@@ -371,10 +377,11 @@ export default function BotBody() {
                       left: 0,
                       zIndex: 10,
                       background: '#fff'
-                    }}>
+                    }}
+                  >
                     {tabs &&
                       tabs.map((t, i) => {
-                        const label = t.label;
+                        const { label } = t;
                         const selected = selectedWidget === t.name;
 
                         return (
@@ -386,7 +393,8 @@ export default function BotBody() {
                               e.stopPropagation();
                               setShowDropdown(false);
                               setSelectedWidget(t.name);
-                            }}>
+                            }}
+                          >
                             {label}
                           </Tab>
                         );
@@ -434,7 +442,8 @@ export default function BotBody() {
             overlayClick={() => ui.setSelectingBot('')}
             style={{ position: 'absolute', top: 0, right: 0, zIndex: 10000, width: '100%' }}
             isMounted={ui.selectingBot ? true : false}
-            dismountCallback={() => ui.setSelectedBot('')}>
+            dismountCallback={() => ui.setSelectedBot('')}
+          >
             <BotView
               goBack={() => ui.setSelectingBot('')}
               botUniqueName={ui.selectedBot}
@@ -447,7 +456,7 @@ export default function BotBody() {
       );
     }
 
-    let renderContent = isMobile ? renderMobile() : renderDesktop();
+    const renderContent = isMobile ? renderMobile() : renderDesktop();
 
     let initialValues: any = {};
 
@@ -487,14 +496,16 @@ export default function BotBody() {
             close={() => {
               setShowBotCreator(false);
             }}
-            visible={showBotCreator}>
+            visible={showBotCreator}
+          >
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center'
-              }}>
+              }}
+            >
               <Icon src={'/static/bots_create.svg'} />
 
               <BotText>Share your awesome bot with other Sphinx chat users!</BotText>
@@ -534,7 +545,8 @@ export default function BotBody() {
               width: '100%',
               maxWidth: 375,
               paddingTop: editThisBot?.secret && 60
-            }}>
+            }}
+          >
             <div style={{ height: '100%', overflowY: 'auto', padding: 20 }}>
               {botEditHeader}
               <Form
@@ -557,7 +569,8 @@ export default function BotBody() {
             close={() => {
               setShowSecret('');
               setEditThisBot(null);
-            }}>
+            }}
+          >
             <div>{botEditHeaderFull}</div>
           </Modal>
         </div>
