@@ -16,6 +16,7 @@ const palette = {
   pureWhite: '#fff',
   pureBlack: '#000',
   black100: 'rgba(0, 0, 0, 0.07)',
+  black200: '#272727',
   statusAssigned: '#49C998',
   statusCompleted: '#8256D0',
   button_primary: {

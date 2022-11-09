@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
@@ -18,6 +19,8 @@ import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { useLocation } from 'react-router-dom';
 import { EuiText } from '@elastic/eui';
+import { colors } from '../../../colors';
+import { LanguageObject } from '../../utils/language_label_style';
 
 function useQuery() {
   const { search } = useLocation();
@@ -46,7 +49,8 @@ export default function WantedSummary(props: any) {
     loomEmbedUrl,
     codingLanguage,
     estimate_session_length,
-    assignee
+    assignee,
+    fromBountyPage
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -55,6 +59,7 @@ export default function WantedSummary(props: any) {
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
   const { peopleWanteds } = main;
+  const color = colors['light'];
 
   const [tribeInfo, setTribeInfo]: any = useState(null);
   const [assigneeInfo, setAssigneeInfo]: any = useState(null);
@@ -62,6 +67,7 @@ export default function WantedSummary(props: any) {
   const [isCopied, setIsCopied] = useState(false);
   const [owner_idURL, setOwnerIdURL] = useState('');
   const [createdURL, setCreatedURL] = useState('');
+  const [dataValue, setDataValue] = useState([]);
 
   const [showBadgeAwardDialog, setShowBadgeAwardDialog] = useState(false);
 
@@ -97,6 +103,19 @@ export default function WantedSummary(props: any) {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    let res;
+    if (codingLanguage?.length > 0) {
+      res = LanguageObject?.filter((value) => {
+        return codingLanguage?.find((val) => {
+          return val.label === value.label;
+        });
+      });
+    }
+    setDataValue(res);
+    setLabels(res);
+  }, [codingLanguage]);
 
   const searchParams = useQuery();
 
@@ -563,6 +582,89 @@ export default function WantedSummary(props: any) {
     }
 
     // desktop view
+    if (fromBountyPage) {
+      return (
+        <>
+          {{ ...person }?.owner_alias === assigneeInfo?.owner_alias ? (
+            <Creator>
+              {paid && (
+                <Img
+                  src={'/static/paid_ribbon.svg'}
+                  style={{
+                    position: 'absolute',
+                    top: -1,
+                    right: 0,
+                    width: 80,
+                    height: 80,
+                    zIndex: 100,
+                    pointerEvents: 'none'
+                  }}
+                />
+              )}
+              <CreatorDescription>
+                <Profile>{nametag}</Profile>
+                <TitleBox>{title}</TitleBox>
+                <LanguageContainer>
+                  {dataValue &&
+                    dataValue?.length > 0 &&
+                    dataValue?.map((lang: any, index) => {
+                      return (
+                        <CodingLabels
+                          key={index}
+                          border={lang?.border}
+                          color={lang?.color}
+                          background={lang?.background}>
+                          <EuiText className="LanguageText">{lang?.label}</EuiText>
+                        </CodingLabels>
+                      );
+                    })}
+                </LanguageContainer>
+                <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
+              </CreatorDescription>
+              <AssigneeProfile>Main hi hun</AssigneeProfile>
+            </Creator>
+          ) : (
+            <NormalUser>
+              {paid && (
+                <Img
+                  src={'/static/paid_ribbon.svg'}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: -4,
+                    width: 85,
+                    height: 85,
+                    zIndex: 100,
+                    pointerEvents: 'none'
+                  }}
+                />
+              )}
+              <CreatorDescription>
+                <Profile>{nametag}</Profile>
+                <TitleBox>{title}</TitleBox>
+                <LanguageContainer>
+                  {dataValue &&
+                    dataValue?.length > 0 &&
+                    dataValue?.map((lang: any, index) => {
+                      return (
+                        <CodingLabels
+                          key={index}
+                          border={lang?.border}
+                          color={lang?.color}
+                          background={lang?.background}>
+                          <EuiText className="LanguageText">{lang?.label}</EuiText>
+                        </CodingLabels>
+                      );
+                    })}
+                </LanguageContainer>
+                <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
+              </CreatorDescription>
+              <AssigneeProfile>bello</AssigneeProfile>
+            </NormalUser>
+          )}
+        </>
+      );
+    }
     return (
       <>
         {paid && (
@@ -931,4 +1033,87 @@ const Img = styled.div<ImageProps>`
   position: relative;
   width: 22px;
   height: 22px;
+`;
+
+const Creator = styled.div`
+  min-width: 892px;
+  max-width: 892px;
+  min-height: 768px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const NormalUser = styled.div`
+  min-width: 892px;
+  max-width: 892px;
+  min-height: 768px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const CreatorDescription = styled.div`
+  min-width: 600px;
+  max-width: 600px;
+  min-height: 768px;
+  border-right: 1px solid #ebedef;
+  background: #fff;
+  padding: 48px 48px 0px 48px;
+`;
+
+const Profile = styled.div`
+  // padding-top: 48px;
+`;
+
+const TitleBox = styled.div`
+  // padding-top: 48px;
+`;
+
+const DescriptionBox = styled.div`
+  min-height: 548px;
+  max-height: 548px;
+  overflow-y: scroll;
+`;
+
+const AssigneeProfile = styled.div`
+  min-width: 292px;
+  max-width: 292px;
+  min-height: 768px;
+  background: #ebedef;
+  padding-top: 43px;
+`;
+
+interface codingLangProps {
+  background?: string;
+  border?: string;
+  color?: string;
+}
+
+const LanguageContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 80%;
+  margin-top: 16px;
+  margin-bottom: 23.25px;
+`;
+
+const CodingLabels = styled.div<codingLangProps>`
+  padding: 0px 8px;
+  border: ${(p) => (p.border ? p?.border : '1px solid #000')};
+  color: ${(p) => (p.color ? p?.color : '#000')};
+  background: ${(p) => (p.background ? p?.background : '#fff')};
+  border-radius: 4px;
+  overflow: hidden;
+  max-height: 22.75px;
+  min-height: 22.75px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 4px;
+  .LanguageText {
+    font-size: 13px;
+    fontweight: 500;
+    text-align: center;
+    font-family: Barlow;
+    line-height: 16px;
+  }
 `;
