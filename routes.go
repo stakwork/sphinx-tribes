@@ -667,16 +667,29 @@ func createLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 func getLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "tribe_uuid")
-	leaderBoards := DB.getLeaderBoard(uuid)
+	alias := r.URL.Query().Get("alias")
 
-	var board = []LeaderBoard{}
-	for _, leaderboard := range leaderBoards {
-		leaderboard.TribeUuid = ""
-		board = append(board, leaderboard)
+	if alias == "" {
+		leaderBoards := DB.getLeaderBoard(uuid)
+
+		var board = []LeaderBoard{}
+		for _, leaderboard := range leaderBoards {
+			leaderboard.TribeUuid = ""
+			board = append(board, leaderboard)
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(board)
+	} else {
+		leaderBoardFromDb := DB.getLeaderBoardByUuidAndAlias(uuid, alias)
+
+		if leaderBoardFromDb.Alias != alias {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(leaderBoardFromDb)
 	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(board)
 }
 
 func updateLeaderBoard(w http.ResponseWriter, r *http.Request) {
@@ -723,8 +736,9 @@ func updateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	leaderBoard.TribeUuid = leaderBoardFromDb.TribeUuid
 
 	DB.updateLeaderBoard(leaderBoardFromDb.TribeUuid, leaderBoardFromDb.Alias, map[string]interface{}{
-		"spent":  leaderBoard.Spent,
-		"earned": leaderBoard.Earned,
+		"spent":      leaderBoard.Spent,
+		"earned":     leaderBoard.Earned,
+		"reputation": leaderBoard.Reputation,
 	})
 
 	w.WriteHeader(http.StatusOK)

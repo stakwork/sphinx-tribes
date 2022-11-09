@@ -157,10 +157,11 @@ type AssetBalanceData struct {
 }
 
 type LeaderBoard struct {
-	TribeUuid string `json:"tribe_uuid"`
-	Alias     string `json:"alias"`
-	Spent     int64  `json:"spent"`
-	Earned    int64  `json:"earned"`
+	TribeUuid  string `json:"tribe_uuid"`
+	Alias      string `json:"alias"`
+	Spent      int64  `json:"spent"`
+	Earned     int64  `json:"earned"`
+	Reputation int64  `json:"reputation"`
 }
 
 /*
