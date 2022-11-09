@@ -152,8 +152,9 @@ export default function IconButton(props: any) {
               <img height={'100%'} width={'100%'} src={props.leadingImg} alt="leading" />
             </div>
           )}
-
-          {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
+          <span style={{ ...props.textStyle }}>
+            {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
+          </span>
           {props.endingIcon && (
             <MaterialIcon
               icon={props.endingIcon}
