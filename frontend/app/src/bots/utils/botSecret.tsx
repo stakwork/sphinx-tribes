@@ -33,11 +33,11 @@ export default function BotSecret(props: any) {
   }
 
   function makeToken() {
-    const url = meInfo?.url + '/action';
-    return btoa(id) + '.' + btoa(secret) + '.' + btoa(url);
+    const url = `${meInfo?.url}/action`;
+    return `${btoa(id)}.${btoa(secret)}.${btoa(url)}`;
   }
 
-  let value = makeToken();
+  const value = makeToken();
 
   return (
     <>
@@ -47,7 +47,8 @@ export default function BotSecret(props: any) {
           borderRadius: 6,
           border: !full ? '1px dashed #618AFF' : '',
           background: !full ? '#618aff0a' : ''
-        }}>
+        }}
+      >
         {full && (
           <Head>
             <RowWrap>
@@ -62,7 +63,8 @@ export default function BotSecret(props: any) {
             width: '100%',
             marginBottom: 20,
             color: '#3C3F41'
-          }}>
+          }}
+        >
           Use this secret to connect with Sphinx.
         </div>
 

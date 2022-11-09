@@ -24,7 +24,7 @@ export default function Widget(props: any) {
     setFieldValue(`${parentName}.${name}`, undefined);
   }
 
-  let highlight = objectOrArrayHasLength(state);
+  const highlight = objectOrArrayHasLength(state);
 
   return (
     <Wrap onClick={() => props.setSelected(props)}>

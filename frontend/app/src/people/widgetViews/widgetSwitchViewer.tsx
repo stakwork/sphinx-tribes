@@ -37,7 +37,7 @@ export default function WidgetSwitchViewer(props) {
   return useObserver(() => {
     const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
-    let { selectedWidget, onPanelClick } = props;
+    const { selectedWidget, onPanelClick } = props;
 
     if (!selectedWidget) {
       return <div style={{ height: 200 }} />;
@@ -51,10 +51,10 @@ export default function WidgetSwitchViewer(props) {
 
     const activeList = listSource[selectedWidget];
 
-    let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
+    const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
     // if dynamic schema, get all those fields
     if (foundDynamicSchema) {
-      let dynamicFields: any = [];
+      const dynamicFields: any = [];
       foundDynamicSchema.dynamicSchemas?.forEach((ds) => {
         ds.forEach((f) => {
           if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
@@ -66,7 +66,7 @@ export default function WidgetSwitchViewer(props) {
       const info = uiStore.meInfo as any;
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       try {
-        await fetch(URL + `/delete_ticket`, {
+        await fetch(`${URL}/delete_ticket`, {
           method: 'POST',
           body: JSON.stringify(payload),
           headers: {
@@ -81,7 +81,7 @@ export default function WidgetSwitchViewer(props) {
 
     const confirmDelete = async () => {
       try {
-        if (!!deletePayload) {
+        if (deletePayload) {
           await deleteTicket(deletePayload);
         }
       } catch (error) {
@@ -119,25 +119,26 @@ export default function WidgetSwitchViewer(props) {
                 background: 'transparent',
                 height: '160px',
                 boxShadow: 'none'
-              }}>
+              }}
+            >
               {selectedWidget === 'post' ? (
                 <PostView
                   showName
-                  key={i + person.owner_pubkey + 'pview'}
+                  key={`${i + person.owner_pubkey}pview`}
                   person={person}
                   {...body}
                 />
               ) : selectedWidget === 'offer' ? (
                 <OfferView
                   showName
-                  key={i + person.owner_pubkey + 'oview'}
+                  key={`${i + person.owner_pubkey}oview`}
                   person={person}
                   {...body}
                 />
               ) : selectedWidget === 'wanted' ? (
                 <WantedView
                   showName
-                  key={i + person.owner_pubkey + 'wview'}
+                  key={`${i + person.owner_pubkey}wview`}
                   person={person}
                   showModal={showModal}
                   setDeletePayload={setDeletePayload}
@@ -163,7 +164,8 @@ export default function WidgetSwitchViewer(props) {
           <LoadMoreButton
             onClick={() => {
               setCurrentItems(currentItems + 10);
-            }}>
+            }}
+          >
             Load More
           </LoadMoreButton>
         )}

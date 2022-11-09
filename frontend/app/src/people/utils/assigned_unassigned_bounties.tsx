@@ -11,7 +11,8 @@ import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 
 const Bounties = (props) => {
-  let { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } = props;
+  const { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } =
+    props;
 
   const color = colors['light'];
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
@@ -80,7 +81,8 @@ const Bounties = (props) => {
             />
             <UnassignedPersonProfile
               unassigned_border={color.grayish.G300}
-              grayish_G200={color.grayish.G200}>
+              grayish_G200={color.grayish.G200}
+            >
               <div className="UnassignedPersonContainer">
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>

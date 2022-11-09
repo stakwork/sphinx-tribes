@@ -34,7 +34,8 @@ export default function Bot(props: any) {
             onClick={() => select(id, unique_name)}
             style={{
               background: selected ? '#F2F3F5' : '#fff'
-            }}>
+            }}
+          >
             <div>
               <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
             </div>
@@ -43,7 +44,7 @@ export default function Bot(props: any) {
               <Description>{description}</Description>
               {!hideActions && (
                 <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div></div>
+                  <div />
                   <div style={{ height: 30 }} />
                 </Row>
               )}
