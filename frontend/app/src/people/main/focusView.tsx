@@ -22,7 +22,8 @@ export default function FocusedView(props: any) {
     buttonsOnBottom,
     formHeader,
     manualGoBackOnly,
-    isFirstTimeScreen
+    isFirstTimeScreen,
+    fromBountyPage
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -402,6 +403,7 @@ export default function FocusedView(props: any) {
               person={person}
               item={person?.extras && person.extras[config?.name][selectedIndex]}
               config={config}
+              fromBountyPage={fromBountyPage}
             />
           </>
         )}

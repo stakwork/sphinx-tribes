@@ -637,16 +637,26 @@ export default function BodyComponent({ selectedWidget }) {
             envStyle={{
               borderRadius: 0,
               background: color.pureWhite,
-              height: '100%',
-              width: '60%',
-              minWidth: 500,
-              maxWidth: 602,
-              ...focusedDesktopModalStyles
+              ...focusedDesktopModalStyles,
+              minHeight: '768px',
+              maxHeight: '768px',
+              minWidth: '892px',
+              maxWidth: '892px',
+              height: '100%'
             }}
-            bigClose={() => {
+            style={{
+              background: color.black200
+            }}
+            bigCloseImage={() => {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/tickets');
+            }}
+            prevArrowNew={() => {
+              console.log('prevArrow');
+            }}
+            nextArrowNew={() => {
+              console.log('nextArrow');
             }}>
             <FocusedView
               person={publicFocusPerson}
@@ -662,6 +672,7 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusPerson(null);
                 setPublicFocusIndex(-1);
               }}
+              fromBountyPage={true}
             />
           </Modal>
         )}

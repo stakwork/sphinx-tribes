@@ -34,7 +34,9 @@ export default function SummaryViewer(props: any) {
     case 'offer':
       return wrapIt(<OfferSummary {...item} person={person} />);
     case 'wanted':
-      return wrapIt(<WantedSummary {...item} person={person} />);
+      return wrapIt(
+        <WantedSummary {...item} person={person} fromBountyPage={props.fromBountyPage} />
+      );
     default:
       return wrapIt(<div>none</div>);
   }
