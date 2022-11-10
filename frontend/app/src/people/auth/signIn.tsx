@@ -27,7 +27,7 @@ export default function SignIn(props: any) {
   const [showSignIn, setShowSignIn] = useState(false);
 
   function redirect() {
-    let el = document.createElement('a');
+    const el = document.createElement('a');
     el.target = '_blank';
     el.href = 'https://sphinx.chat/';
     el.click();

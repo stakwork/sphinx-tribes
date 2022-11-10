@@ -18,7 +18,7 @@ export default function GalleryInput({
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
-  let picsrcArray = value || [];
+  const picsrcArray = value || [];
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
     console.log('uploadBase64Pic', img_type);
@@ -26,7 +26,7 @@ export default function GalleryInput({
       const info = ui.meInfo as any;
       if (!info) return console.log('no meInfo');
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-      const r = await fetch(URL + '/public_pic', {
+      const r = await fetch(`${URL}/public_pic`, {
         method: 'POST',
         body: JSON.stringify({
           img_base64,
@@ -78,7 +78,7 @@ export default function GalleryInput({
   }
 
   async function addImg(img) {
-    let picsClone = [...picsrcArray];
+    const picsClone = [...picsrcArray];
     picsClone.push(img);
     handleChange(picsClone);
   }
@@ -88,7 +88,7 @@ export default function GalleryInput({
   // }
 
   async function deleteImg(index) {
-    let picsClone = [...picsrcArray];
+    const picsClone = [...picsrcArray];
     picsClone.splice(index, 1);
     handleChange(picsClone);
   }
@@ -173,7 +173,8 @@ export default function GalleryInput({
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20
-          }}>
+          }}
+        >
           <div style={{ marginBottom: 20 }}>{showError}</div>
           <Button onClick={() => setShowError('')} text={'Okay'} color={'primary'} />
         </div>

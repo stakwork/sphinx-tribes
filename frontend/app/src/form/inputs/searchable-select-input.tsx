@@ -21,7 +21,7 @@ export default function SearchableSelectInput({
   prepend,
   extraHTML
 }: Props) {
-  let labeltext = label;
+  const labeltext = label;
 
   const { main, ui } = useStores();
 
@@ -37,13 +37,13 @@ export default function SearchableSelectInput({
           if (name === 'assignee' || name === 'recipient') {
             const p = await main.getPeopleByNameAliasPubkey(search);
             if (p && p.length) {
-              let newOpts = p.map((ot) => {
+              const newOpts = p.map((ot) => {
                 return {
                   owner_alias: ot.owner_alias,
                   owner_pubkey: ot.owner_pubkey,
                   img: ot.img,
                   value: ot.owner_pubkey,
-                  label: ot.owner_alias + ` (${ot.unique_name})`
+                  label: `${ot.owner_alias} (${ot.unique_name})`
                 };
               });
               setOptions(newOpts);
@@ -52,7 +52,7 @@ export default function SearchableSelectInput({
             const { badgeList } = ui;
 
             if (badgeList && badgeList.length) {
-              let newOpts = badgeList.map((ot) => {
+              const newOpts = badgeList.map((ot) => {
                 return {
                   img: ot.icon,
                   id: ot.id,

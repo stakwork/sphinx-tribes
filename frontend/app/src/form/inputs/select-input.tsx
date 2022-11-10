@@ -20,7 +20,7 @@ export default function SelectInput({
   extraHTML
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
+  if (error) labeltext = `${labeltext} (${error})`;
 
   return (
     <>

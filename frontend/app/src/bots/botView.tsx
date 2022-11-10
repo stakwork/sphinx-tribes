@@ -15,14 +15,14 @@ export default function BotView(props: any) {
 
   const history = useHistory();
 
-  let bot: any =
+  const bot: any =
     main.bots && main.bots.length && main.bots.find((f) => f.unique_name === botUniqueName);
 
   const { name, unique_name, description, img, owner_pubkey, owner_alias, tags, price_per_use } =
     bot || {};
 
   // FOR BOT VIEW
-  let bots: any = main.bots && main.bots.length && main.bots.filter((f) => !f.hide);
+  const bots: any = main.bots && main.bots.length && main.bots.filter((f) => !f.hide);
 
   const isMobile = useIsMobile();
 
@@ -48,7 +48,8 @@ export default function BotView(props: any) {
         <div>Creator</div>
         <Value
           style={{ cursor: 'pointer', color: '#5078F2' }}
-          onClick={() => history.push(`/p/${owner_pubkey}`)}>
+          onClick={() => history.push(`/p/${owner_pubkey}`)}
+        >
           {owner_alias || ''}
         </Value>
       </RowWrap>
@@ -75,7 +76,8 @@ export default function BotView(props: any) {
           width: '100%',
           overflow: 'auto',
           height: '100%'
-        }}>
+        }}
+      >
         <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
           <div
             style={{
@@ -86,7 +88,8 @@ export default function BotView(props: any) {
               justifyContent: 'space-between',
               width: '100%',
               padding: '0 20px'
-            }}>
+            }}
+          >
             <IconButton onClick={goBack} icon="arrow_back" />
             <div />
           </div>
@@ -110,7 +113,8 @@ export default function BotView(props: any) {
           display: 'flex',
           width: '100%',
           height: '100%'
-        }}>
+        }}
+      >
         <BotList>
           <DBack>
             <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
@@ -143,7 +147,8 @@ export default function BotView(props: any) {
             borderLeft: '1px solid #F2F3F5',
             borderRight: '1px solid #F2F3F5',
             boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
-          }}>
+          }}
+        >
           {/* profile photo */}
           {head}
           {/* Here's where the details go */}
@@ -153,20 +158,23 @@ export default function BotView(props: any) {
           style={{
             width: 'calc(100% - 628px)',
             minWidth: 250
-          }}>
+          }}
+        >
           <div
             style={{
               padding: 62,
               height: 'calc(100% - 63px)',
               overflowY: 'auto',
               position: 'relative'
-            }}>
+            }}
+          >
             <Sleeve
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 flexWrap: 'wrap'
-              }}>
+              }}
+            >
               {description}
             </Sleeve>
             <div style={{ height: 60 }} />

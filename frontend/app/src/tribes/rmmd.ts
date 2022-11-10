@@ -1,5 +1,5 @@
 export default function rmmd(md: string) {
-  var options: { [k: string]: boolean } = {};
+  const options: { [k: string]: boolean } = {};
   options.listUnicodeChar = options.hasOwnProperty('listUnicodeChar')
     ? options.listUnicodeChar
     : false;
@@ -9,7 +9,7 @@ export default function rmmd(md: string) {
   options.gfm = options.hasOwnProperty('gfm') ? options.gfm : true;
   options.useImgAltText = false;
 
-  var output = md || '';
+  let output = md || '';
 
   // Remove horizontal rules (stripListHeaders conflict with this rule, which is why it has been moved to the top)
   output = output.replace(/^(-\s*?|\*\s*?|_\s*?){3,}\s*$/gm, '');
@@ -17,7 +17,7 @@ export default function rmmd(md: string) {
   try {
     if (options.stripListLeaders) {
       if (options.listUnicodeChar)
-        output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, options.listUnicodeChar + ' $1');
+        output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, `${options.listUnicodeChar} $1`);
       else output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, '$1');
     }
     if (options.gfm) {

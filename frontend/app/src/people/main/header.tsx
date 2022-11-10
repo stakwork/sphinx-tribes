@@ -69,7 +69,7 @@ export default function Header() {
   function urlRedirect(directPathname) {
     // if route not supported, redirect
     let pass = false;
-    let path = directPathname || location.pathname;
+    const path = directPathname || location.pathname;
     tabs.forEach((t) => {
       if (path.includes(t.path)) pass = true;
     });
@@ -80,7 +80,7 @@ export default function Header() {
   }
 
   useEffect(() => {
-    let path = location.pathname;
+    const path = location.pathname;
     if (!path.includes('/p') && (ui.selectedPerson || ui.selectingPerson)) {
       ui.setSelectedPerson(0);
       ui.setSelectingPerson(0);
@@ -91,9 +91,9 @@ export default function Header() {
     (async () => {
       console.log('header deeplink load');
       try {
-        var urlObject = new URL(window.location.href);
+        const urlObject = new URL(window.location.href);
         let path = location.pathname;
-        var params = urlObject.searchParams;
+        const params = urlObject.searchParams;
         const chal = params.get('challenge');
 
         console.log('chal', chal);
@@ -136,7 +136,8 @@ export default function Header() {
             color: '#fff',
             background: headerBackground,
             paddingBottom: 0
-          }}>
+          }}
+        >
           <div className="container">
             <Row style={{ justifyContent: 'space-between' }}>
               <EuiHeaderSection grow={false}>
@@ -144,7 +145,7 @@ export default function Header() {
               </EuiHeaderSection>
 
               <Corner>
-                <a href={'https://sphinx.chat/'} target="_blank">
+                <a href={'https://sphinx.chat/'} target="_blank" rel="noreferrer">
                   <Button
                     text={'Get Sphinx'}
                     color="transparent"
@@ -180,7 +181,7 @@ export default function Header() {
             <MTabs>
               {tabs &&
                 tabs.map((t, i) => {
-                  const label = t.label;
+                  const { label } = t;
                   const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
                   return (
@@ -189,7 +190,8 @@ export default function Header() {
                       selected={selected}
                       onClick={() => {
                         history.push(t.path);
-                      }}>
+                      }}
+                    >
                       {label}
                     </MTab>
                   );
@@ -216,14 +218,16 @@ export default function Header() {
           height: 64,
           padding: '0 20px',
           background: headerBackground
-        }}>
+        }}
+      >
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             width: '100%'
-          }}>
+          }}
+        >
           <Row style={{ height: '100%', marginBottom: '-2px' }}>
             <EuiHeaderSection grow={false}>
               <Img src="/static/people_logo.svg" />
@@ -232,7 +236,7 @@ export default function Header() {
             <Tabs>
               {tabs &&
                 tabs.map((t, i) => {
-                  const label = t.label;
+                  const { label } = t;
                   const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
                   return (
@@ -241,7 +245,8 @@ export default function Header() {
                       selected={selected}
                       onClick={() => {
                         history.push(t.path);
-                      }}>
+                      }}
+                    >
                       {label}
                     </Tab>
                   );
@@ -257,7 +262,8 @@ export default function Header() {
               <LoggedInBtn
                 onClick={() => {
                   goToEditSelf();
-                }}>
+                }}
+              >
                 <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
                 {ui.meInfo?.owner_alias}
               </LoggedInBtn>
@@ -282,13 +288,14 @@ export default function Header() {
         <Modal
           visible={ui.showSignIn}
           close={() => ui.setShowSignIn(false)}
-          overlayClick={() => ui.setShowSignIn(false)}>
+          overlayClick={() => ui.setShowSignIn(false)}
+        >
           <SignIn
             onSuccess={() => {
               ui.setShowSignIn(false);
               setShowWelcome(true);
               // if page is not /p, go to /p (people)
-              let path = location.pathname;
+              const path = location.pathname;
               if (!path.includes('/p')) history.push('/p');
             }}
           />
@@ -307,7 +314,8 @@ export default function Header() {
                   position: 'absolute',
                   top: '110px',
                   right: '85px'
-                }}>
+                }}
+              >
                 <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
               </div>
 
@@ -345,7 +353,8 @@ export default function Header() {
           visible={ui?.torFormBodyQR}
           close={() => {
             ui.setTorFormBodyQR('');
-          }}>
+          }}
+        >
           <TorSaveQR
             url={ui?.torFormBodyQR}
             goBack={() => {
