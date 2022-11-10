@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React, { useEffect, useState, useRef } from 'react';
 import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
@@ -23,7 +24,8 @@ export default function FocusedView(props: any) {
     formHeader,
     manualGoBackOnly,
     isFirstTimeScreen,
-    fromBountyPage
+    fromBountyPage,
+    extraModalFunction
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -404,6 +406,7 @@ export default function FocusedView(props: any) {
               item={person?.extras && person.extras[config?.name][selectedIndex]}
               config={config}
               fromBountyPage={fromBountyPage}
+              extraModalFunction={extraModalFunction}
             />
           </>
         )}

@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
@@ -18,6 +19,8 @@ import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import BountyHeader from '../widgetViews/bountyHeader';
 import { colors } from '../../colors';
+import StartUpModal from '../utils/start_up_modal';
+import ConnectCard from '../utils/connectCard';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -41,6 +44,13 @@ export default function BodyComponent({ selectedWidget }) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
+  const [openConnectModal, setConnectModal] = useState<boolean>(false);
+  const closeConnectModal = () => setConnectModal(false);
+  const showConnectModal = () => setConnectModal(true);
+  const [connectPerson, setConnectPerson] = useState<any>();
 
   const color = colors['light'];
 
@@ -66,6 +76,8 @@ export default function BodyComponent({ selectedWidget }) {
   const { id } = person || {};
 
   const canEdit = id === ui.meInfo?.id;
+
+  console.log({ person });
 
   function nextIndex() {
     if (focusIndex < 0) {
@@ -162,6 +174,7 @@ export default function BodyComponent({ selectedWidget }) {
       };
       setPublicFocusPerson(p);
       setPublicFocusIndex(itemIndex);
+      setConnectPerson({ ...person });
     }
   }
 
@@ -664,9 +677,28 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusIndex(-1);
               }}
               fromBountyPage={true}
+              extraModalFunction={() => {
+                setPublicFocusPerson(null);
+                setPublicFocusIndex(-1);
+                history.push('/tickets');
+                if (ui.meInfo) {
+                  showConnectModal();
+                } else {
+                  showModal();
+                }
+              }}
             />
           </Modal>
         )}
+        {openStartUpModel && (
+          <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
+        )}
+        <ConnectCard
+          dismiss={() => closeConnectModal()}
+          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+          person={connectPerson}
+          visible={openConnectModal}
+        />
         {toastsEl}
         {/* modal create ticket */}
         {showFocusView && (

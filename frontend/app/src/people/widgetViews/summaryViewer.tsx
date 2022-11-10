@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React from 'react';
 import { useStores } from '../../store';
 import styled from 'styled-components';
@@ -35,7 +36,12 @@ export default function SummaryViewer(props: any) {
       return wrapIt(<OfferSummary {...item} person={person} />);
     case 'wanted':
       return wrapIt(
-        <WantedSummary {...item} person={person} fromBountyPage={props.fromBountyPage} />
+        <WantedSummary
+          {...item}
+          person={person}
+          fromBountyPage={props.fromBountyPage}
+          extraModalFunction={props.extraModalFunction}
+        />
       );
     default:
       return wrapIt(<div>none</div>);

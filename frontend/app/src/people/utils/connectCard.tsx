@@ -26,9 +26,9 @@ export default function ConnectCard(props) {
           </W>
         </ImgWrap>
         <div style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}>
-          <N>{person?.owner_alias}</N>
+          <N>Discuss this bounty with</N>
           <D>
-            <B>{person?.price_to_meet} SAT</B> is required to connect.
+            <B>{person?.owner_alias} </B>
           </D>
 
           <QR value={qrString} size={210} type={'connect'} />
@@ -76,11 +76,11 @@ const W = styled.div`
   border-radius: 80px;
 `;
 const N = styled.div`
-  font-family: Roboto;
+  font-family: Barlow;
   font-style: normal;
   font-weight: 500;
-  font-size: 20px;
-  line-height: 19px;
+  font-size: 17px;
+  line-height: 26px;
   /* or 95% */
 
   text-align: center;
@@ -88,21 +88,20 @@ const N = styled.div`
   /* Text 2 */
 
   color: #3c3f41;
-  margin-bottom: 12px;
 `;
 
 const D = styled.div`
-  font-family: Roboto;
+  font-family: Barlow;
   font-style: normal;
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 20px;
+  line-height: 26px;
   /* or 129% */
 
   text-align: center;
 
   /* Main bottom icons */
 
-  color: #5f6368;
+  color: #3c3f41;
   margin-bottom: 20px;
 `;
 

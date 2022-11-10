@@ -21,6 +21,9 @@ import { useLocation } from 'react-router-dom';
 import { EuiText } from '@elastic/eui';
 import { colors } from '../../../colors';
 import { LanguageObject } from '../../utils/language_label_style';
+import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
+import IconButton from '../../../sphinxUI/icon_button';
+import ConnectCard from '../../utils/connectCard';
 
 function useQuery() {
   const { search } = useLocation();
@@ -585,7 +588,10 @@ export default function WantedSummary(props: any) {
     if (fromBountyPage) {
       return (
         <>
-          {{ ...person }?.owner_alias === assigneeInfo?.owner_alias ? (
+          {{ ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+            /*
+             * creator view
+             */
             <Creator>
               {paid && (
                 <Img
@@ -621,9 +627,12 @@ export default function WantedSummary(props: any) {
                 </LanguageContainer>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
-              <AssigneeProfile>Main hi hun</AssigneeProfile>
+              <AssigneeProfile>Creator profile</AssigneeProfile>
             </Creator>
           ) : (
+            /*
+             * normal user view
+             */
             <NormalUser>
               {paid && (
                 <Img
@@ -659,7 +668,104 @@ export default function WantedSummary(props: any) {
                 </LanguageContainer>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
-              <AssigneeProfile>bello</AssigneeProfile>
+
+              <AssigneeProfile>
+                {paid ? (
+                  <BountyProfileView
+                    assignee={assignee}
+                    status={'Completed'}
+                    canViewProfile={false}
+                    statusStyle={{
+                      width: '66px',
+                      height: '16px',
+                      background: color.statusCompleted
+                    }}
+                    UserProfileContainerStyle={{
+                      height: 48,
+                      width: 235,
+                      padding: '0px 0px 0px 33px'
+                    }}
+                    UserImageStyle={{
+                      width: '48px',
+                      height: '48px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: '200px',
+                      overflow: 'hidden'
+                    }}
+                    NameContainerStyle={{
+                      height: '28px'
+                    }}
+                  />
+                ) : assignee?.owner_alias ? (
+                  <BountyProfileView
+                    assignee={assignee}
+                    status={'ASSIGNED'}
+                    canViewProfile={false}
+                    statusStyle={{
+                      width: '55px',
+                      height: '16px',
+                      background: color.statusAssigned
+                    }}
+                    UserProfileContainerStyle={{
+                      height: 48,
+                      width: 235,
+                      padding: '0px 0px 0px 33px'
+                    }}
+                    UserImageStyle={{
+                      width: '48px',
+                      height: '48px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: '200px',
+                      overflow: 'hidden'
+                    }}
+                    NameContainerStyle={{
+                      height: '28px'
+                    }}
+                  />
+                ) : (
+                  <UnassignedPersonProfile
+                    unassigned_border={color.grayish.G300}
+                    grayish_G200={color.grayish.G200}>
+                    <div className="UnassignedPersonContainer">
+                      <img
+                        src="/static/unassigned_profile.svg"
+                        alt=""
+                        height={'100%'}
+                        width={'100%'}
+                      />
+                    </div>
+                    <div className="UnassignedPersonalDetailContainer">
+                      <IconButton
+                        text={'I can help'}
+                        endingIcon={'arrow_forward'}
+                        width={153}
+                        height={48}
+                        // style={{ marginTop: 5 }}
+                        onClick={props.extraModalFunction}
+                        color="primary"
+                        hoverColor={color.button_secondary.hover}
+                        activeColor={color.button_secondary.active}
+                        shadowColor={color.button_secondary.shadow}
+                        iconSize={'16px'}
+                        iconStyle={{
+                          top: '16px',
+                          right: '14px'
+                        }}
+                        textStyle={{
+                          width: '106px',
+                          display: 'flex',
+                          justifyContent: 'flex-start',
+                          fontFamily: 'Barlow'
+                        }}
+                      />
+                    </div>
+                  </UnassignedPersonProfile>
+                )}
+              </AssigneeProfile>
             </NormalUser>
           )}
         </>
@@ -1115,5 +1221,33 @@ const CodingLabels = styled.div<codingLangProps>`
     text-align: center;
     font-family: Barlow;
     line-height: 16px;
+  }
+`;
+
+interface containerProps {
+  unAssignedBackgroundImage?: string;
+  assignedBackgroundImage?: string;
+  unassigned_border?: string;
+  grayish_G200?: string;
+}
+
+const UnassignedPersonProfile = styled.div<containerProps>`
+  min-width: 228px;
+  min-height: 57.6px;
+  display: flex;
+  padding-top: 0px;
+  padding-left: 28px;
+  .UnassignedPersonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 57.6px;
+    width: 57.6px;
+    border-radius: 50%;
+  }
+  .UnassignedPersonalDetailContainer {
+    margin-left: 25px;
+    display: flex;
+    align-items: center;
   }
 `;

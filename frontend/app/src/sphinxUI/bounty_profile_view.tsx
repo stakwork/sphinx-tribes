@@ -8,8 +8,14 @@ const BountyProfileView = (props) => {
   const color = colors['light'];
   return (
     <>
-      <UserProfileContainer>
-        <UserImage>
+      <UserProfileContainer
+        style={{
+          ...props?.UserProfileContainerStyle
+        }}>
+        <UserImage
+          style={{
+            ...props.UserImageStyle
+          }}>
           <img
             width={'100%'}
             height={'100%'}
@@ -26,37 +32,42 @@ const BountyProfileView = (props) => {
         <UserInfo>
           <Status
             style={{
-              ...props.statusStyle
+              ...props?.statusStyle
             }}>
-            <EuiText className="statusText">{props.status}</EuiText>
+            <EuiText className="statusText">{props?.status}</EuiText>
           </Status>
-          <NameContainer name_text_color={color.grayish.G10}>
+          <NameContainer
+            name_text_color={color.grayish.G10}
+            style={{
+              ...props.NameContainerStyle
+            }}>
             <EuiText className="Name_Text">
               {{ ...props.assignee }.owner_alias || 'Guest Developer  '}
             </EuiText>
           </NameContainer>
-
-          <ViewProfileButton
-            View_profile_text_color={color.grayish.G300}
-            View_profile_icon_color={color.grayish.G300}
-            onClick={(e) => {
-              if ({ ...props.assignee }.owner_alias) {
-                e.stopPropagation();
-                window.open(
-                  `/p/${
-                    {
-                      ...props.assignee
-                    }.owner_pubkey
-                  }?widget=wanted`,
-                  '_blank'
-                );
-              }
-            }}>
-            <EuiText className="text">View Profile</EuiText>
-            <div className="Icon_Container">
-              <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />
-            </div>
-          </ViewProfileButton>
+          {props.canViewProfile && (
+            <ViewProfileButton
+              View_profile_text_color={color.grayish.G300}
+              View_profile_icon_color={color.grayish.G300}
+              onClick={(e) => {
+                if ({ ...props.assignee }.owner_alias) {
+                  e.stopPropagation();
+                  window.open(
+                    `/p/${
+                      {
+                        ...props.assignee
+                      }.owner_pubkey
+                    }?widget=wanted`,
+                    '_blank'
+                  );
+                }
+              }}>
+              <EuiText className="text">View Profile</EuiText>
+              <div className="Icon_Container">
+                <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />
+              </div>
+            </ViewProfileButton>
+          )}
         </UserInfo>
       </UserProfileContainer>
     </>
