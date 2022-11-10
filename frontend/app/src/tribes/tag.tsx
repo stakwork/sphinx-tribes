@@ -6,10 +6,10 @@ export default function T(props: any) {
   const { type } = props;
   if (!tags[type]) return <></>;
   const Icon = tags[type].icon;
-  const color = tags[type].color;
+  const { color } = tags[type];
   return (
     <Wrap className="tag-wrapper">
-      <IconWrap style={{ borderColor: color, background: color + '22' }}>
+      <IconWrap style={{ borderColor: color, background: `${color}22` }}>
         <Icon height="8" width="8" />
       </IconWrap>
       {!props.iconOnly && <Name style={{ color: '#556171' }}>{type}</Name>}

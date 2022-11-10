@@ -25,16 +25,16 @@ export default function Form(props: any) {
   const firstTimeScreenData = ['pubkey', 'owner_alias', 'description', 'price_to_meet', 'twitter'];
 
   let lastPage = 1;
-  const readOnly = props.readOnly;
+  const { readOnly } = props;
   const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody;
 
-  let initValues = dynamicInitialValues || props.initialValues;
+  const initValues = dynamicInitialValues || props.initialValues;
 
   useEffect(() => {
     const dSchema = props.schema?.find((f) => f.defaultSchema);
     const type = props.initialValues?.type;
     if (dSchema && type) {
-      let editSchema = dynamicSchemasByType[type];
+      const editSchema = dynamicSchemasByType[type];
       setDynamicSchema(editSchema);
       setDynamicSchemaName(type);
     } else if (dSchema) {
@@ -99,12 +99,12 @@ export default function Form(props: any) {
   // if no schema, return empty div
   if (loading || !schema) return <div />;
 
-  let buttonAlignment = buttonsOnBottom
+  const buttonAlignment = buttonsOnBottom
     ? { zIndex: 20, bottom: 0, height: 108, justifyContent: 'center' }
     : { top: 0 };
-  let formPad = buttonsOnBottom ? { paddingTop: 30 } : {};
+  const formPad = buttonsOnBottom ? { paddingTop: 30 } : {};
 
-  let buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {};
+  const buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {};
 
   const isAboutMeForm = schema?.find((f) => f.name === 'owner_alias') ? true : false;
 
@@ -132,7 +132,8 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}>
+      validationSchema={validator(schema)}
+    >
       {({
         setFieldTouched,
         handleSubmit,
@@ -169,7 +170,8 @@ export default function Form(props: any) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
-                  }}>
+                  }}
+                >
                   <div style={{ marginRight: '40px' }}>
                     {schema
                       .filter((item: FormField) => item.type === 'img')
@@ -353,7 +355,8 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}>
+                  onClick={() => setShowSettings(!showSettings)}
+                >
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -383,7 +386,8 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}>
+                      }}
+                    >
                       <Button
                         text={'Nevermind'}
                         color={'white'}

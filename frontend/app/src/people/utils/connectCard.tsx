@@ -6,8 +6,8 @@ import QrBar from './QrBar';
 import { makeConnectQR } from '../../helpers';
 
 export default function ConnectCard(props) {
-  let { visible } = props;
-  let person: any = props.person;
+  const { visible } = props;
+  const { person } = props;
 
   const qrString = makeConnectQR(person?.owner_pubkey);
 

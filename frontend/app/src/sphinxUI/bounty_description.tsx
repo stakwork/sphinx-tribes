@@ -43,12 +43,14 @@ const BountyDescription = (props: any) => {
             className="DescriptionContainer"
             style={{
               width: descriptionImage ? '334px' : '481px'
-            }}>
+            }}
+          >
             <EuiText
               className="DescriptionTitle"
               style={{
                 color: props.isPaid ? color.grayish.G50 : color.grayish.G10
-              }}>
+              }}
+            >
               {props.title.slice(0, descriptionImage ? 80 : 120)}
               {props.title.length > 80 ? '...' : ''}
             </EuiText>
@@ -94,7 +96,8 @@ const BountyDescription = (props: any) => {
                   key={index}
                   border={props.isPaid ? '1px solid rgba(176, 183, 188, 0.1)' : lang?.border}
                   color={props.isPaid ? color.grayish.G300 : lang?.color}
-                  background={props.isPaid ? color.grayish.G800 : lang?.background}>
+                  background={props.isPaid ? color.grayish.G800 : lang?.background}
+                >
                   <EuiText className="LanguageText">{lang?.label}</EuiText>
                 </CodingLabels>
               );

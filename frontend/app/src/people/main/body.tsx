@@ -70,7 +70,7 @@ export default function BodyComponent({ selectedWidget }) {
     offer: peopleOffers
   };
 
-  let person: any =
+  const person: any =
     main.people && main.people.length && main.people.find((f) => f.id === ui.selectedPerson);
 
   const { id } = person || {};
@@ -85,8 +85,8 @@ export default function BodyComponent({ selectedWidget }) {
       return;
     }
     if (person && person.extras) {
-      let g = person.extras[tabs[selectedWidget]?.name];
-      let nextindex = focusIndex + 1;
+      const g = person.extras[tabs[selectedWidget]?.name];
+      const nextindex = focusIndex + 1;
       if (g[nextindex]) setFocusIndex(nextindex);
       else setFocusIndex(0);
     }
@@ -98,8 +98,8 @@ export default function BodyComponent({ selectedWidget }) {
       return;
     }
     if (person && person.extras) {
-      let g = person?.extras[tabs[selectedWidget]?.name];
-      let previndex = focusIndex - 1;
+      const g = person?.extras[tabs[selectedWidget]?.name];
+      const previndex = focusIndex - 1;
       if (g[previndex]) setFocusIndex(previndex);
       else setFocusIndex(g.length - 1);
     }
@@ -166,7 +166,7 @@ export default function BodyComponent({ selectedWidget }) {
     const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
     if (itemIndex > -1) {
       // make person into proper structure (derived from widget)
-      let p = {
+      const p = {
         ...person,
         extras: {
           [selectedWidget]: person[selectedWidget]
@@ -186,7 +186,7 @@ export default function BodyComponent({ selectedWidget }) {
         activeList && activeList.length
           ? activeList.find((item) => {
               const { person, body } = item;
-              return owner_id === person.owner_pubkey && created === body.created + '';
+              return owner_id === person.owner_pubkey && created === `${body.created}`;
             })
           : {};
       if (value.person && value.body) {
@@ -202,7 +202,7 @@ export default function BodyComponent({ selectedWidget }) {
       setPublicFocusIndex(-1);
     } else {
       //pull list again, we came back from focus view
-      let loadMethod = loadMethods[selectedWidget];
+      const loadMethod = loadMethods[selectedWidget];
       loadMethod({ page: 1, resetPage: true });
     }
   }, [ui.selectedPerson]);
@@ -242,10 +242,10 @@ export default function BodyComponent({ selectedWidget }) {
 
   async function doDeeplink() {
     if (pathname) {
-      let splitPathname = pathname?.split('/');
-      let personPubkey: string = splitPathname[2];
+      const splitPathname = pathname?.split('/');
+      const personPubkey: string = splitPathname[2];
       if (personPubkey) {
-        let p = await main.getPersonByPubkey(personPubkey);
+        const p = await main.getPersonByPubkey(personPubkey);
         ui.setSelectedPerson(p?.id);
         ui.setSelectingPerson(p?.id);
         // make sure to load people in a person deeplink
@@ -358,7 +358,8 @@ export default function BodyComponent({ selectedWidget }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
-          }}>
+          }}
+        >
           <WidgetSwitchViewer
             onPanelClick={(person, item) => {
               history.replace({
@@ -431,7 +432,8 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}>
+            }}
+          >
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
@@ -443,7 +445,8 @@ export default function BodyComponent({ selectedWidget }) {
               <div
                 style={{
                   padding: '0 20px'
-                }}>
+                }}
+              >
                 <SearchTextInput
                   small
                   name="search"
@@ -484,7 +487,8 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}>
+            dismountCallback={() => ui.setSelectedPerson(0)}
+          >
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -557,7 +561,8 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}>
+        }}
+      >
         <div
           style={{
             minHeight: '32px'
@@ -576,7 +581,8 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}>
+            }}
+          >
             <SearchTextInput
               small
               name="search"
@@ -606,7 +612,8 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}>
+            }}
+          >
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -625,7 +632,8 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}>
+          dismountCallback={() => ui.setSelectedPerson(0)}
+        >
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -731,7 +739,8 @@ export default function BodyComponent({ selectedWidget }) {
               setShowFocusView(false);
               setFocusIndex(-1);
               // if (selectedWidget === 'about') switchWidgets('badges');
-            }}>
+            }}
+          >
             <FocusedView
               person={person}
               canEdit={!canEdit}
