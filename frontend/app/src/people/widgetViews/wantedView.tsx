@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../helpers';

@@ -30,6 +30,7 @@ const PaidBounty = (props) => {
         <BountyProfileView
           assignee={props.assignee}
           status={'COMPLETED'}
+          canViewProfile={true}
           statusStyle={{
             width: '63px',
             height: '16px',
