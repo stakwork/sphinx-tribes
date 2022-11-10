@@ -41,8 +41,8 @@ export default function FocusedWidget(props: any) {
   useEffect(() => {
     // in order to
     if (single) {
-      let firstInput = item.fields[0];
-      let firstInputName = getFieldToUpdate(firstInput);
+      const firstInput = item.fields[0];
+      const firstInputName = getFieldToUpdate(firstInput);
       let vl = newState && newState[firstInput.name];
       if (!vl) {
         // get initial value by type
@@ -86,9 +86,9 @@ export default function FocusedWidget(props: any) {
   }
 
   function startCreate() {
-    let cloneformState = getFormState();
+    const cloneformState = getFormState();
     setPrevState(cloneformState);
-    let formState = [...cloneformState];
+    const formState = [...cloneformState];
 
     if (single) setFieldTouched(item.name, true);
 
@@ -107,9 +107,9 @@ export default function FocusedWidget(props: any) {
 
   function startEdit(obj, i) {
     console.log('startEdit', obj);
-    let cloneformState = getFormState();
+    const cloneformState = getFormState();
     setPrevState(cloneformState);
-    let formState = [...cloneformState];
+    const formState = [...cloneformState];
 
     let index = i;
     if (obj.id) {
@@ -120,7 +120,7 @@ export default function FocusedWidget(props: any) {
 
   function deleteItem(obj, i) {
     console.log('deleteItem', obj);
-    let formState = (values[name] && [...values[name][item.name]]) || [];
+    const formState = (values[name] && [...values[name][item.name]]) || [];
     let index = i;
     if (obj.id) {
       index = formState && formState.findIndex((f) => f.id === obj.id);
@@ -202,15 +202,15 @@ export default function FocusedWidget(props: any) {
                 error={newErrors && newErrors[e.name]}
                 initialValues={initialValues}
                 handleChange={(c: any) => {
-                  let f = getFieldToUpdate(e);
+                  const f = getFieldToUpdate(e);
                   setFieldValue(f, c);
                 }}
                 handleBlur={() => {
-                  let f = getFieldToUpdate(e);
+                  const f = getFieldToUpdate(e);
                   setFieldTouched(f, false);
                 }}
                 handleFocus={() => {
-                  let f = getFieldToUpdate(e);
+                  const f = getFieldToUpdate(e);
                   setFieldTouched(f, true);
                 }}
               />

@@ -75,7 +75,7 @@ export default function WantedView(props: any) {
         // saved? ok update in wanted list if found
         const peopleWantedsClone: any = [...peopleWanteds];
         const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
-          let val = f.body || {};
+          const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
@@ -140,7 +140,8 @@ export default function WantedView(props: any) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between'
-                }}>
+                }}
+              >
                 <NameTag
                   {...person}
                   created={created}
@@ -155,7 +156,8 @@ export default function WantedView(props: any) {
               <DT
                 style={{
                   margin: '15px 0'
-                }}>
+                }}
+              >
                 {title}
               </DT>
               {/* <div
@@ -176,7 +178,8 @@ export default function WantedView(props: any) {
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center'
-                }}>
+                }}
+              >
                 {isCodingTask && (
                   <GithubStatusPill
                     status={status}
@@ -190,7 +193,8 @@ export default function WantedView(props: any) {
                   <div
                     style={{
                       marginTop: '8px'
-                    }}>
+                    }}
+                  >
                     <img
                       src={
                         {
@@ -223,7 +227,8 @@ export default function WantedView(props: any) {
                       }}
                       style={{
                         fontSize: '12px'
-                      }}>
+                      }}
+                    >
                       {
                         {
                           ...assignee
@@ -239,13 +244,15 @@ export default function WantedView(props: any) {
                   fontSize: '13px',
                   color: '#8e969c',
                   fontWeight: '500'
-                }}>
+                }}
+              >
                 {estimate_session_length && 'Session:'}{' '}
                 <span
                   style={{
                     fontWeight: '500',
                     color: '#000'
-                  }}>
+                  }}
+                >
                   {estimate_session_length ?? ''}
                 </span>
               </EuiText>
@@ -257,7 +264,8 @@ export default function WantedView(props: any) {
                   flexDirection: 'row',
                   marginTop: '10px',
                   flexWrap: 'wrap'
-                }}>
+                }}
+              >
                 {labels.length > 0 ? (
                   labels.map((x: any) => {
                     return (
@@ -274,12 +282,14 @@ export default function WantedView(props: any) {
                             borderRadius: '20px',
                             marginRight: '3px',
                             marginBottom: '3px'
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               fontSize: '10px',
                               color: '#202020'
-                            }}>
+                            }}
+                          >
                             {x.label}
                           </div>
                         </div>
@@ -291,7 +301,8 @@ export default function WantedView(props: any) {
                     <div
                       style={{
                         minHeight: '50px'
-                      }}></div>
+                      }}
+                    />
                   </>
                 )}
               </div>
@@ -300,7 +311,8 @@ export default function WantedView(props: any) {
                   <P
                     style={{
                       margin: '15px 0 0'
-                    }}>
+                    }}
+                  >
                     <B>{formatPrice(priceMin)}</B>~<B>{formatPrice(priceMax)}</B> SAT /{' '}
                     <B>{satToUsd(priceMin)}</B>~<B>{satToUsd(priceMax)}</B> USD
                   </P>
@@ -308,7 +320,8 @@ export default function WantedView(props: any) {
                   <P
                     style={{
                       margin: '15px 0 0'
-                    }}>
+                    }}
+                  >
                     <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
                   </P>
                 )}
@@ -316,7 +329,8 @@ export default function WantedView(props: any) {
                   <div
                     style={{
                       width: '40px'
-                    }}>
+                    }}
+                  >
                     {
                       //  if my own, show this option to show/hide
                       isMine && (

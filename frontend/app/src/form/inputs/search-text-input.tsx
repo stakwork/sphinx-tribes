@@ -16,7 +16,7 @@ export default function SearchTextInput({
   extraHTML
 }: any) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
+  if (error) labeltext = `${labeltext} (${error})`;
 
   return (
     <>
