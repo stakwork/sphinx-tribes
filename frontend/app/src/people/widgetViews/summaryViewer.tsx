@@ -23,8 +23,7 @@ export default function SummaryViewer(props: any) {
         style={{
           maxHeight: config.name === 'post' || isMobile ? '' : '80vh',
           height: (isSelectedView && thisIsMine) || isMobile ? 'calc(100% - 60px)' : '100%'
-        }}
-      >
+        }}>
         {child}
       </Wrap>
     );
@@ -40,8 +39,12 @@ export default function SummaryViewer(props: any) {
         <WantedSummary
           {...item}
           person={person}
-          fromBountyPage={props.fromBountyPage}
-          extraModalFunction={props.extraModalFunction}
+          personBody={props?.personBody}
+          fromBountyPage={props?.fromBountyPage}
+          extraModalFunction={props?.extraModalFunction}
+          deleteAction={props?.deleteAction}
+          deletingState={props?.deletingState}
+          editAction={props?.editAction}
         />
       );
     default:

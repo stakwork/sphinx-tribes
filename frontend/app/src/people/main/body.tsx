@@ -51,6 +51,7 @@ export default function BodyComponent({ selectedWidget }) {
   const closeConnectModal = () => setConnectModal(false);
   const showConnectModal = () => setConnectModal(true);
   const [connectPerson, setConnectPerson] = useState<any>();
+  const [connectPersonBody, setConnectPersonBody] = useState<any>();
 
   const color = colors['light'];
 
@@ -76,8 +77,6 @@ export default function BodyComponent({ selectedWidget }) {
   const { id } = person || {};
 
   const canEdit = id === ui.meInfo?.id;
-
-  console.log({ person });
 
   function nextIndex() {
     if (focusIndex < 0) {
@@ -175,6 +174,7 @@ export default function BodyComponent({ selectedWidget }) {
       setPublicFocusPerson(p);
       setPublicFocusIndex(itemIndex);
       setConnectPerson({ ...person });
+      setConnectPersonBody({ ...item });
     }
   }
 
@@ -358,8 +358,7 @@ export default function BodyComponent({ selectedWidget }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
-          }}
-        >
+          }}>
           <WidgetSwitchViewer
             onPanelClick={(person, item) => {
               history.replace({
@@ -432,8 +431,7 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}
-          >
+            }}>
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
@@ -445,8 +443,7 @@ export default function BodyComponent({ selectedWidget }) {
               <div
                 style={{
                   padding: '0 20px'
-                }}
-              >
+                }}>
                 <SearchTextInput
                   small
                   name="search"
@@ -487,8 +484,7 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}
-          >
+            dismountCallback={() => ui.setSelectedPerson(0)}>
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -561,8 +557,7 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}
-      >
+        }}>
         <div
           style={{
             minHeight: '32px'
@@ -581,8 +576,7 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}
-          >
+            }}>
             <SearchTextInput
               small
               name="search"
@@ -612,8 +606,7 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}
-          >
+            }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -632,8 +625,7 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}
-        >
+          dismountCallback={() => ui.setSelectedPerson(0)}>
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -672,6 +664,7 @@ export default function BodyComponent({ selectedWidget }) {
             }}>
             <FocusedView
               person={publicFocusPerson}
+              personBody={connectPersonBody}
               canEdit={false}
               selectedIndex={publicFocusIndex}
               config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
@@ -694,6 +687,10 @@ export default function BodyComponent({ selectedWidget }) {
                 } else {
                   showModal();
                 }
+              }}
+              deleteExtraFunction={() => {
+                setPublicFocusPerson(null);
+                setPublicFocusIndex(-1);
               }}
             />
           </Modal>
@@ -739,8 +736,7 @@ export default function BodyComponent({ selectedWidget }) {
               setShowFocusView(false);
               setFocusIndex(-1);
               // if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-          >
+            }}>
             <FocusedView
               person={person}
               canEdit={!canEdit}
