@@ -24,8 +24,7 @@ export default function FocusedView(props: any) {
     formHeader,
     manualGoBackOnly,
     isFirstTimeScreen,
-    fromBountyPage,
-    extraModalFunction
+    fromBountyPage
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -35,6 +34,7 @@ export default function FocusedView(props: any) {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
+  const [editable, setEditable] = useState<boolean>(!canEdit);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
@@ -149,6 +149,7 @@ export default function FocusedView(props: any) {
       await main.saveProfile(body);
       await main.getPeople();
       closeModal(true);
+      props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
@@ -312,11 +313,10 @@ export default function FocusedView(props: any) {
     return (
       <div
         style={{
-          ...props.style,
+          ...props?.style,
           width: '100%',
           height: '100%'
-        }}
-      >
+        }}>
         {editMode ? (
           <B ref={scrollDiv} hide={false}>
             {formHeader && formHeader}
@@ -324,7 +324,7 @@ export default function FocusedView(props: any) {
               <Form
                 buttonsOnBottom={buttonsOnBottom}
                 isFirstTimeScreen={isFirstTimeScreen}
-                readOnly={!canEdit}
+                readOnly={editable}
                 formRef={formRef}
                 submitText={config && config.submitText}
                 loading={loading}
@@ -352,8 +352,7 @@ export default function FocusedView(props: any) {
               <BWrap
                 style={{
                   ...noShadow
-                }}
-              >
+                }}>
                 {goBack ? (
                   <IconButton
                     icon="arrow_back"
@@ -374,8 +373,7 @@ export default function FocusedView(props: any) {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center'
-                    }}
-                  >
+                    }}>
                     <Button
                       onClick={() => setEditMode(true)}
                       color={'widget'}
@@ -406,10 +404,18 @@ export default function FocusedView(props: any) {
             {/* display item */}
             <SummaryViewer
               person={person}
+              personBody={props?.personBody}
               item={person?.extras && person.extras[config?.name][selectedIndex]}
               config={config}
               fromBountyPage={fromBountyPage}
-              extraModalFunction={extraModalFunction}
+              extraModalFunction={props?.extraModalFunction}
+              deleteAction={deleteIt}
+              deletingState={deleting}
+              editAction={() => {
+                setEditable(false);
+                setEditMode(true);
+                // props?.deleteExtraFunction();
+              }}
             />
           </>
         )}

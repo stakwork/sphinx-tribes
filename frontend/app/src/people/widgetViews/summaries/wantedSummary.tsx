@@ -24,6 +24,9 @@ import { LanguageObject } from '../../utils/language_label_style';
 import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
 import IconButton from '../../../sphinxUI/icon_button';
 import ConnectCard from '../../utils/connectCard';
+import BountyPrice from '../../../sphinxUI/bounty_price';
+import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
+import ImageButton from '../../../sphinxUI/Image_button';
 
 function useQuery() {
   const { search } = useLocation();
@@ -425,8 +428,7 @@ export default function WantedSummary(props: any) {
               color: '#8E969C',
               marginTop: isMobile ? 20 : 0,
               marginLeft: '-16px'
-            }}
-          >
+            }}>
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -437,8 +439,7 @@ export default function WantedSummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
-            >
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -452,8 +453,7 @@ export default function WantedSummary(props: any) {
               fontSize: 12,
               color: '#8E969C',
               marginLeft: '16px'
-            }}
-          >
+            }}>
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -464,8 +464,7 @@ export default function WantedSummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
-            >
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -485,8 +484,7 @@ export default function WantedSummary(props: any) {
               style={{
                 display: 'flex',
                 flexDirection: 'row'
-              }}
-            >
+              }}>
               <GithubStatusPill status={status} assignee={assignee} />
               {assigneeLabel}
               {ticketUrl && (
@@ -494,8 +492,7 @@ export default function WantedSummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(ticketUrl, '_blank');
-                  }}
-                >
+                  }}>
                   <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
                 </GithubIconMobile>
               )}
@@ -504,8 +501,7 @@ export default function WantedSummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(loomEmbedUrl, '_blank');
-                  }}
-                >
+                  }}>
                   <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                 </LoomIconMobile>
               )}
@@ -516,15 +512,13 @@ export default function WantedSummary(props: any) {
                 fontSize: '13px',
                 color: '#8e969c',
                 fontWeight: '500'
-              }}
-            >
+              }}>
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: '#000'
-                }}
-              >
+                }}>
                 {estimate_session_length ?? ''}
               </span>
             </EuiText>
@@ -535,8 +529,7 @@ export default function WantedSummary(props: any) {
                 flexDirection: 'row',
                 marginTop: '10px',
                 minHeight: '60px'
-              }}
-            >
+              }}>
               {labels.length > 0 &&
                 labels.map((x: any) => {
                   return (
@@ -553,14 +546,12 @@ export default function WantedSummary(props: any) {
                           borderRadius: '20px',
                           marginRight: '3px',
                           boxShadow: '1px 1px #909090'
-                        }}
-                      >
+                        }}>
                         <div
                           style={{
                             fontSize: '10px',
                             color: '#202020'
-                          }}
-                        >
+                          }}>
                           {x.label}
                         </div>
                       </div>
@@ -610,17 +601,57 @@ export default function WantedSummary(props: any) {
                   src={'/static/paid_ribbon.svg'}
                   style={{
                     position: 'absolute',
-                    top: -1,
-                    right: 0,
-                    width: 80,
-                    height: 80,
+                    top: -0,
+                    right: -4,
+                    width: 72.46,
+                    height: 71.82,
                     zIndex: 100,
                     pointerEvents: 'none'
                   }}
                 />
               )}
               <CreatorDescription>
-                <Profile>{nametag}</Profile>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                  }}>
+                  <Profile>{nametag}</Profile>
+                  <div
+                    style={{
+                      minWidth: '250px',
+                      maxWidth: '250px',
+                      minHeight: '40px',
+                      maxHeight: '40px',
+                      display: 'flex',
+                      justifyContent: 'space-between'
+                    }}>
+                    <ImageButton
+                      buttonText={'Edit'}
+                      ButtonContainerStyle={{
+                        width: '117px',
+                        height: '40px'
+                      }}
+                      leadingImageSrc={'/static/editIcon.svg'}
+                      leadingImageContainerStyle={{
+                        left: 300
+                      }}
+                      buttonAction={props?.editAction}
+                    />
+                    <ImageButton
+                      buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
+                      ButtonContainerStyle={{
+                        width: '117px',
+                        height: '40px'
+                      }}
+                      leadingImageSrc={'/static/Delete.svg'}
+                      leadingImageContainerStyle={{
+                        left: 430
+                      }}
+                      buttonAction={props?.deleteAction}
+                    />
+                  </div>
+                </div>
                 <TitleBox>{title}</TitleBox>
                 <LanguageContainer>
                   {dataValue &&
@@ -639,7 +670,193 @@ export default function WantedSummary(props: any) {
                 </LanguageContainer>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
-              <AssigneeProfile>Creator profile</AssigneeProfile>
+              <AssigneeProfile>
+                <>
+                  <UnassignedPersonProfile
+                    unassigned_border={color.grayish.G300}
+                    grayish_G200={color.grayish.G200}>
+                    <div className="UnassignedPersonContainer">
+                      <img
+                        src="/static/unassigned_profile.svg"
+                        alt=""
+                        height={'100%'}
+                        width={'100%'}
+                      />
+                    </div>
+
+                    {assignee?.owner_alias ? (
+                      <>
+                        <BountyProfileView
+                          assignee={assignee}
+                          status={'Completed'}
+                          canViewProfile={false}
+                          statusStyle={{
+                            width: '66px',
+                            height: '16px',
+                            background: color.statusCompleted
+                          }}
+                          UserProfileContainerStyle={{
+                            height: 48,
+                            width: 235,
+                            margin: 0,
+                            padding: 0
+                          }}
+                          UserImageStyle={{
+                            width: '48px',
+                            height: '48px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: '200px',
+                            overflow: 'hidden'
+                          }}
+                          NameContainerStyle={{
+                            height: '28px'
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <div className="UnassignedPersonalDetailContainer">
+                        <ImageButton
+                          buttonText={'Not Assigned'}
+                          ButtonContainerStyle={{
+                            width: '159px',
+                            height: '48px',
+                            background: '#ebedef'
+                          }}
+                          buttonTextStyle={{
+                            color: 'rgb(104, 104, 79)'
+                          }}
+                          endImageSrc={'/static/addIcon.svg'}
+                          endingImageContainerStyle={{
+                            right: '18px',
+                            fontSize: '14px'
+                          }}
+                          buttonAction={() => {
+                            console.log('hi');
+                          }}
+                        />
+                      </div>
+                    )}
+                  </UnassignedPersonProfile>
+                  <BountyPriceContainer margin_top="64px">
+                    <BountyPrice
+                      priceMin={props?.priceMin}
+                      priceMax={props?.priceMax}
+                      price={props?.price}
+                      sessionLength={props?.estimate_session_length}
+                      style={{
+                        padding: 0,
+                        margin: 0
+                      }}
+                    />
+                  </BountyPriceContainer>
+                  <ButtonSet
+                    githubShareAction={() => {
+                      const repoUrl = ticketUrl
+                        ? ticketUrl
+                        : `https://github.com/${repo}/issues/${issue}`;
+                      sendToRedirect(repoUrl);
+                    }}
+                    copyURLAction={handleCopyUrl}
+                    copyStatus={isCopied ? 'Copied' : 'Copy Link'}
+                    twitterAction={() => {
+                      const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                        labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
+                      sendToRedirect(twitterLink);
+                    }}
+                  />
+                  {paid ? (
+                    <IconButton
+                      color={'success'}
+                      width={220}
+                      height={48}
+                      style={{
+                        position: 'absolute',
+                        marginBottom: '113px',
+                        bottom: '0',
+                        marginLeft: '36px'
+                      }}
+                      text={'Mark Unpaid'}
+                      loading={saving === 'paid'}
+                      endingImg={'/static/mark_paid.svg'}
+                      textStyle={{
+                        width: '130px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        fontFamily: 'Barlow',
+                        marginLeft: '30px'
+                      }}
+                      hoverColor={'#3CBE88'}
+                      activeColor={'#2FB379'}
+                      shadowColor={'rgba(73, 201, 152, 0.5)'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExtrasPropertyAndSave('paid', !paid);
+                      }}
+                    />
+                  ) : (
+                    <IconButton
+                      width={220}
+                      height={48}
+                      style={{
+                        position: 'absolute',
+                        marginBottom: '113px',
+                        bottom: '0',
+                        marginLeft: '36px',
+                        border: '1px solid #86D9B9',
+                        background: '#ebedef',
+                        color: '#2FB379'
+                      }}
+                      text={'Mark Paid'}
+                      loading={saving === 'paid'}
+                      endingImg={'/static/mark_unpaid.svg'}
+                      textStyle={{
+                        width: '130px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        fontFamily: 'Barlow',
+                        marginLeft: '30px'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExtrasPropertyAndSave('paid', !paid);
+                      }}
+                    />
+                  )}
+                  <IconButton
+                    width={220}
+                    height={48}
+                    style={{
+                      position: 'absolute',
+                      marginBottom: '49px',
+                      bottom: '0',
+                      marginLeft: '36px',
+                      background: '#fff',
+                      border: '1px solid #DDE1E5'
+                    }}
+                    text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
+                    endingImg={'/static/award.svg'}
+                    hoverColor={'#fff'}
+                    activeColor={'#fff'}
+                    textStyle={{
+                      width: '130px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      fontFamily: 'Barlow',
+                      marginLeft: '30px',
+                      color: '#5F6368'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!badgeRecipient) {
+                        setShowBadgeAwardDialog(true);
+                      }
+                    }}
+                  />
+                </>
+              </AssigneeProfile>
             </Creator>
           ) : (
             /*
@@ -653,8 +870,8 @@ export default function WantedSummary(props: any) {
                     position: 'absolute',
                     top: 0,
                     right: -4,
-                    width: 85,
-                    height: 85,
+                    width: 72.46,
+                    height: 71.82,
                     zIndex: 100,
                     pointerEvents: 'none'
                   }}
@@ -683,99 +900,191 @@ export default function WantedSummary(props: any) {
 
               <AssigneeProfile>
                 {paid ? (
-                  <BountyProfileView
-                    assignee={assignee}
-                    status={'Completed'}
-                    canViewProfile={false}
-                    statusStyle={{
-                      width: '66px',
-                      height: '16px',
-                      background: color.statusCompleted
-                    }}
-                    UserProfileContainerStyle={{
-                      height: 48,
-                      width: 235,
-                      padding: '0px 0px 0px 33px'
-                    }}
-                    UserImageStyle={{
-                      width: '48px',
-                      height: '48px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: '200px',
-                      overflow: 'hidden'
-                    }}
-                    NameContainerStyle={{
-                      height: '28px'
-                    }}
-                  />
+                  <>
+                    <BountyProfileView
+                      assignee={assignee}
+                      status={'Completed'}
+                      canViewProfile={false}
+                      statusStyle={{
+                        width: '66px',
+                        height: '16px',
+                        background: color.statusCompleted
+                      }}
+                      UserProfileContainerStyle={{
+                        height: 48,
+                        width: 235,
+                        padding: '0px 0px 0px 33px',
+                        marginTop: '48px'
+                      }}
+                      UserImageStyle={{
+                        width: '48px',
+                        height: '48px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: '200px',
+                        overflow: 'hidden'
+                      }}
+                      NameContainerStyle={{
+                        height: '28px'
+                      }}
+                    />
+                    <BountyPriceContainer margin_top="64px">
+                      <BountyPrice
+                        priceMin={props?.priceMin}
+                        priceMax={props?.priceMax}
+                        price={props?.price}
+                        sessionLength={props?.estimate_session_length}
+                        style={{
+                          padding: 0,
+                          margin: 0
+                        }}
+                      />
+                    </BountyPriceContainer>
+                    <ButtonSet
+                      githubShareAction={() => {
+                        const repoUrl = ticketUrl
+                          ? ticketUrl
+                          : `https://github.com/${repo}/issues/${issue}`;
+                        sendToRedirect(repoUrl);
+                      }}
+                      copyURLAction={handleCopyUrl}
+                      copyStatus={isCopied ? 'Copied' : 'Copy Link'}
+                      twitterAction={() => {
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                          labels && labels.map((x: any) => x.label)
+                        },sphinxchat`;
+                        sendToRedirect(twitterLink);
+                      }}
+                    />
+                  </>
                 ) : assignee?.owner_alias ? (
-                  <BountyProfileView
-                    assignee={assignee}
-                    status={'ASSIGNED'}
-                    canViewProfile={false}
-                    statusStyle={{
-                      width: '55px',
-                      height: '16px',
-                      background: color.statusAssigned
-                    }}
-                    UserProfileContainerStyle={{
-                      height: 48,
-                      width: 235,
-                      padding: '0px 0px 0px 33px'
-                    }}
-                    UserImageStyle={{
-                      width: '48px',
-                      height: '48px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: '200px',
-                      overflow: 'hidden'
-                    }}
-                    NameContainerStyle={{
-                      height: '28px'
-                    }}
-                  />
+                  <>
+                    <BountyProfileView
+                      assignee={assignee}
+                      status={'ASSIGNED'}
+                      canViewProfile={false}
+                      statusStyle={{
+                        width: '55px',
+                        height: '16px',
+                        background: color.statusAssigned
+                      }}
+                      UserProfileContainerStyle={{
+                        height: 48,
+                        width: 235,
+                        padding: '0px 0px 0px 33px',
+                        marginTop: '48px'
+                      }}
+                      UserImageStyle={{
+                        width: '48px',
+                        height: '48px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: '200px',
+                        overflow: 'hidden'
+                      }}
+                      NameContainerStyle={{
+                        height: '28px'
+                      }}
+                    />
+                    <BountyPriceContainer margin_top="64px">
+                      <BountyPrice
+                        priceMin={props?.priceMin}
+                        priceMax={props?.priceMax}
+                        price={props?.price}
+                        sessionLength={props?.estimate_session_length}
+                        style={{
+                          padding: 0,
+                          margin: 0
+                        }}
+                      />
+                    </BountyPriceContainer>
+                    <ButtonSet
+                      githubShareAction={() => {
+                        const repoUrl = ticketUrl
+                          ? ticketUrl
+                          : `https://github.com/${repo}/issues/${issue}`;
+                        sendToRedirect(repoUrl);
+                      }}
+                      copyURLAction={handleCopyUrl}
+                      copyStatus={isCopied ? 'Copied' : 'Copy Link'}
+                      twitterAction={() => {
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                          labels && labels.map((x: any) => x.label)
+                        },sphinxchat`;
+                        sendToRedirect(twitterLink);
+                      }}
+                    />
+                  </>
                 ) : (
-                  <UnassignedPersonProfile
-                    unassigned_border={color.grayish.G300}
-                    grayish_G200={color.grayish.G200}>
-                    <div className="UnassignedPersonContainer">
-                      <img
-                        src="/static/unassigned_profile.svg"
-                        alt=""
-                        height={'100%'}
-                        width={'100%'}
-                      />
-                    </div>
-                    <div className="UnassignedPersonalDetailContainer">
-                      <IconButton
-                        text={'I can help'}
-                        endingIcon={'arrow_forward'}
-                        width={153}
-                        height={48}
-                        // style={{ marginTop: 5 }}
-                        onClick={props.extraModalFunction}
-                        color="primary"
-                        hoverColor={color.button_secondary.hover}
-                        activeColor={color.button_secondary.active}
-                        shadowColor={color.button_secondary.shadow}
-                        iconSize={'16px'}
-                        iconStyle={{
-                          top: '16px',
-                          right: '14px'
+                  <>
+                    <UnassignedPersonProfile
+                      unassigned_border={color.grayish.G300}
+                      grayish_G200={color.grayish.G200}>
+                      <div className="UnassignedPersonContainer">
+                        <img
+                          src="/static/unassigned_profile.svg"
+                          alt=""
+                          height={'100%'}
+                          width={'100%'}
+                        />
+                      </div>
+                      <div className="UnassignedPersonalDetailContainer">
+                        <IconButton
+                          text={'I can help'}
+                          endingIcon={'arrow_forward'}
+                          width={153}
+                          height={48}
+                          // style={{ marginTop: 5 }}
+                          onClick={props.extraModalFunction}
+                          color="primary"
+                          hoverColor={color.button_secondary.hover}
+                          activeColor={color.button_secondary.active}
+                          shadowColor={color.button_secondary.shadow}
+                          iconSize={'16px'}
+                          iconStyle={{
+                            top: '16px',
+                            right: '14px'
+                          }}
+                          textStyle={{
+                            width: '106px',
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            fontFamily: 'Barlow'
+                          }}
+                        />
+                      </div>
+                    </UnassignedPersonProfile>
+                    <BountyPriceContainer margin_top="59.4px">
+                      <BountyPrice
+                        priceMin={props?.priceMin}
+                        priceMax={props?.priceMax}
+                        price={props?.price}
+                        sessionLength={props?.estimate_session_length}
+                        style={{
+                          padding: 0,
+                          margin: 0
                         }}
-                        textStyle={{
-                          width: '106px',
-                          display: 'flex',
-                          justifyContent: 'flex-start',
-                          fontFamily: 'Barlow'
-                        }}
                       />
-                    </div>
-                  </UnassignedPersonProfile>
+                    </BountyPriceContainer>
+                    <ButtonSet
+                      githubShareAction={() => {
+                        const repoUrl = ticketUrl
+                          ? ticketUrl
+                          : `https://github.com/${repo}/issues/${issue}`;
+                        sendToRedirect(repoUrl);
+                      }}
+                      copyURLAction={handleCopyUrl}
+                      copyStatus={isCopied ? 'Copied' : 'Copy Link'}
+                      twitterAction={() => {
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                          labels && labels.map((x: any) => x.label)
+                        },sphinxchat`;
+                        sendToRedirect(twitterLink);
+                      }}
+                    />
+                  </>
                 )}
               </AssigneeProfile>
             </NormalUser>
@@ -806,8 +1115,7 @@ export default function WantedSummary(props: any) {
               borderRight: '1px solid #DDE1E5',
               minHeight: '100%',
               overflow: 'auto'
-            }}
-          >
+            }}>
             <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
               <Title>{title}</Title>
               <div style={{ display: 'flex', marginTop: 12 }}>
@@ -818,8 +1126,7 @@ export default function WantedSummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(ticketUrl, '_blank');
-                    }}
-                  >
+                    }}>
                     <img
                       height={'100%'}
                       width={'100%'}
@@ -833,8 +1140,7 @@ export default function WantedSummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(loomEmbedUrl, '_blank');
-                    }}
-                  >
+                    }}>
                     <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                   </LoomIcon>
                 )}
@@ -842,22 +1148,19 @@ export default function WantedSummary(props: any) {
               <div
                 style={{
                   marginTop: '2px'
-                }}
-              >
+                }}>
                 <EuiText
                   style={{
                     fontSize: '13px',
                     color: '#8e969c',
                     fontWeight: '500'
-                  }}
-                >
+                  }}>
                   {estimate_session_length && 'Session:'}{' '}
                   <span
                     style={{
                       fontWeight: '500',
                       color: '#000'
-                    }}
-                  >
+                    }}>
                     {estimate_session_length ?? ''}
                   </span>
                 </EuiText>
@@ -870,8 +1173,7 @@ export default function WantedSummary(props: any) {
                 style={{
                   overflow: 'hidden',
                   wordBreak: 'normal'
-                }}
-              >
+                }}>
                 {renderMarkdown(description)}
               </Paragraph>
 
@@ -886,8 +1188,7 @@ export default function WantedSummary(props: any) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between'
-                }}
-              >
+                }}>
                 {nametag}
               </div>
               {/* <Img
@@ -901,10 +1202,9 @@ export default function WantedSummary(props: any) {
                   width: '100%',
                   display: 'flex',
                   flexDirection: 'row'
-                }}
-              >
-                {labels.length > 0 &&
-                  labels.map((x: any) => {
+                }}>
+                {labels?.length > 0 &&
+                  labels?.map((x: any) => {
                     return (
                       <>
                         <div
@@ -919,14 +1219,12 @@ export default function WantedSummary(props: any) {
                             borderRadius: '20px',
                             marginRight: '3px',
                             boxShadow: '1px 1px #909090'
-                          }}
-                        >
+                          }}>
                           <div
                             style={{
                               fontSize: '10px',
                               color: '#202020'
-                            }}
-                          >
+                            }}>
                             {x.label}
                           </div>
                         </div>
@@ -1004,8 +1302,7 @@ export default function WantedSummary(props: any) {
     <div
       style={{
         paddingTop: gallery && '40px'
-      }}
-    >
+      }}>
       <Wrap>
         <div>
           <GalleryViewer
@@ -1024,8 +1321,7 @@ export default function WantedSummary(props: any) {
             padding: '40px 20px',
             overflowY: 'auto',
             height: envHeight
-          }}
-        >
+          }}>
           <Pad>
             {nametag}
 
@@ -1210,7 +1506,15 @@ const AssigneeProfile = styled.div`
   max-width: 292px;
   min-height: 768px;
   background: #ebedef;
-  padding-top: 43px;
+`;
+
+interface BountyPriceContainerProps {
+  margin_top?: string;
+}
+
+const BountyPriceContainer = styled.div<BountyPriceContainerProps>`
+  padding-left: 37px;
+  margin-top: ${(p) => p.margin_top};
 `;
 
 interface codingLangProps {
@@ -1262,6 +1566,7 @@ const UnassignedPersonProfile = styled.div<containerProps>`
   display: flex;
   padding-top: 0px;
   padding-left: 28px;
+  margin-top: 43px;
   .UnassignedPersonContainer {
     display: flex;
     justify-content: center;
