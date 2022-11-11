@@ -1,6 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import api from '../../api';
 import { colors } from '../../colors';
 import { useIsMobile } from '../../hooks';
 import IconButton from '../../sphinxUI/icon_button';
@@ -21,8 +22,10 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
-          const bounty = await main.getPeopleWanteds({ page: 1 });
-          const response = await main.getPeople({ page: 1 });
+          const bounty = await api.get(
+            `people/wanteds?page=1&resetPage=true&search=&sortBy=created&limit=100`
+          );
+          const response = await api.get(`people?page=1&search=&sortBy=last_login&limit=100`);
           setPeopleList(response);
           setActiveBounty(bounty?.length);
         } catch (error) {
