@@ -18,7 +18,8 @@ export default function ConnectCard(props) {
         e.stopPropagation();
         props.dismiss();
       }}
-      visible={visible}>
+      visible={visible}
+    >
       <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
         <ImgWrap>
           <W>
