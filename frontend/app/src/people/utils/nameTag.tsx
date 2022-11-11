@@ -91,34 +91,29 @@ export default function NameTag(props) {
 
   return (
     <Wrap isSelected={isSelected} style={style}>
-      {!isSelected && (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row'
+        }}>
+        <Img src={img || `/static/person_placeholder.png`} iconSize={32} isPaid={isPaid} />
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row'
-          }}
-        >
-          <Img src={img || `/static/person_placeholder.png`} iconSize={32} isPaid={isPaid} />
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginLeft: '14px'
-            }}
-          >
-            <Name
-              textSize={textSize}
-              color={isPaid ? color.grayish.G300 : color.pureBlack}
-              onClick={(e) => {
-                selectPerson(e);
-              }}
-            >
-              {owner_alias}
-            </Name>
-            <Date>{lastSeen}</Date>
-          </div>
+            flexDirection: 'column',
+            marginLeft: '14px'
+          }}>
+          <Name
+            textSize={textSize}
+            color={isPaid ? color.grayish.G300 : color.pureBlack}
+            onClick={(e) => {
+              selectPerson(e);
+            }}>
+            {owner_alias}
+          </Name>
+          <Date>{lastSeen}</Date>
         </div>
-      )}
+      </div>
     </Wrap>
   );
 }

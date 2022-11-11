@@ -332,20 +332,7 @@ export default function BodyComponent({ selectedWidget }) {
         p = <NoResults />;
       }
 
-      return (
-        <div
-          id="renderPeople"
-          style={{
-            display: 'flex',
-            justifyContent: 'start',
-            alignItems: 'center',
-            flexWrap: 'wrap'
-          }}
-        >
-          {p}
-        </div>
-      );
-      // return p;
+      return p;
     }
 
     const listContent =
@@ -372,7 +359,9 @@ export default function BodyComponent({ selectedWidget }) {
               });
               publicPanelClick(person, item);
             }}
+            fromBountyPage={true}
             selectedWidget={selectedWidget}
+            loading={loading}
           />
         </div>
       ) : (
@@ -388,6 +377,7 @@ export default function BodyComponent({ selectedWidget }) {
             });
             publicPanelClick(person, item);
           }}
+          fromBountyPage={true}
           selectedWidget={selectedWidget}
           loading={loading}
         />
