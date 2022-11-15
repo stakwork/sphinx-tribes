@@ -18,7 +18,7 @@ import remarkGfm from 'remark-gfm';
 import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { useLocation } from 'react-router-dom';
-import { EuiText } from '@elastic/eui';
+import { EuiPopover, EuiText } from '@elastic/eui';
 import { colors } from '../../../colors';
 import { LanguageObject } from '../../utils/language_label_style';
 import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
@@ -27,6 +27,9 @@ import ConnectCard from '../../utils/connectCard';
 import BountyPrice from '../../../sphinxUI/bounty_price';
 import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
 import ImageButton from '../../../sphinxUI/Image_button';
+import SearchableSelectInput from '../../../form/inputs/searchable-select-input';
+import AutoComplete from '../../../sphinxUI/custom_autocomplete';
+import api from '../../../api';
 
 function useQuery() {
   const { search } = useLocation();
@@ -56,7 +59,11 @@ export default function WantedSummary(props: any) {
     codingLanguage,
     estimate_session_length,
     assignee,
-    fromBountyPage
+    fromBountyPage,
+    wanted_type,
+    one_sentence_summary,
+    github_description,
+    show
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -74,12 +81,19 @@ export default function WantedSummary(props: any) {
   const [owner_idURL, setOwnerIdURL] = useState('');
   const [createdURL, setCreatedURL] = useState('');
   const [dataValue, setDataValue] = useState([]);
+  const [peopleList, setPeopleList] = useState<any>();
+  const [isAssigned, setIsAssigned] = useState<boolean>(false);
+  const [assignedPerson, setAssignedPerson] = useState<any>();
 
   const [showBadgeAwardDialog, setShowBadgeAwardDialog] = useState(false);
 
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
 
   const [labels, setLabels] = useState([]);
+  const [assigneeValue, setAssigneeValue] = useState(false);
+
+  const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue) => !assigneeValue);
+  const assigneeHandlerClose = () => setAssigneeValue(false);
 
   useLayoutEffect(() => {
     if (imgRef && imgRef.current) {
@@ -88,6 +102,59 @@ export default function WantedSummary(props: any) {
       }
     }
   }, [imgRef]);
+
+  useEffect(() => {
+    if (assignee?.owner_alias) {
+      setIsAssigned(true);
+    }
+  }, [assignee]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await api.get(`people?page=1&search=&sortBy=last_login&limit=100`);
+        setPeopleList(response);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+
+  const handleAssigneeDetails = useCallback(
+    (value) => {
+      setIsAssigned(true);
+      setAssignedPerson(value);
+      const newValue = {
+        title: title,
+        wanted_type: wanted_type,
+        one_sentence_summary: one_sentence_summary,
+        ticketUrl: ticketUrl,
+        github_description: github_description,
+        description: description,
+        price: price,
+        assignee: {
+          owner_alias: value?.owner_alias || '',
+          owner_pubkey: value?.owner_pubkey || '',
+          img: value?.img || '',
+          value: value?.owner_pubkey || '',
+          label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
+        },
+        codingLanguage: codingLanguage?.map((x) => {
+          return { ...x };
+        }),
+        estimate_session_length: estimate_session_length,
+        show: show,
+        type: type,
+        created: created
+      };
+      props.formSubmit(newValue);
+    },
+    [isAssigned, props]
+  );
+
+  const changeAssignedPerson = useCallback(() => {
+    setIsAssigned(false);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -675,31 +742,38 @@ export default function WantedSummary(props: any) {
                   <UnassignedPersonProfile
                     unassigned_border={color.grayish.G300}
                     grayish_G200={color.grayish.G200}>
-                    <div className="UnassignedPersonContainer">
-                      <img
-                        src="/static/unassigned_profile.svg"
-                        alt=""
-                        height={'100%'}
-                        width={'100%'}
-                      />
-                    </div>
+                    {!isAssigned && (
+                      <div className="UnassignedPersonContainer">
+                        <img
+                          src="/static/unassigned_profile.svg"
+                          alt=""
+                          height={'100%'}
+                          width={'100%'}
+                        />
+                      </div>
+                    )}
 
-                    {assignee?.owner_alias ? (
-                      <>
+                    {isAssigned ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between'
+                        }}>
                         <BountyProfileView
-                          assignee={assignee}
-                          status={'Completed'}
+                          assignee={!assignedPerson ? assignee : assignedPerson}
+                          status={paid ? 'completed' : 'assigned'}
                           canViewProfile={false}
                           statusStyle={{
                             width: '66px',
                             height: '16px',
-                            background: color.statusCompleted
+                            background: paid ? color.statusCompleted : color.statusAssigned
                           }}
                           UserProfileContainerStyle={{
                             height: 48,
-                            width: 235,
-                            margin: 0,
+                            width: 200,
                             padding: 0
+                            // marginTop: '48px'
                           }}
                           UserImageStyle={{
                             width: '48px',
@@ -714,28 +788,58 @@ export default function WantedSummary(props: any) {
                             height: '28px'
                           }}
                         />
-                      </>
+                        <div
+                          style={{
+                            height: 32,
+                            width: 32,
+                            position: 'absolute',
+                            right: '16px',
+                            top: '60px'
+                          }}
+                          onClick={changeAssignedPerson}>
+                          <img
+                            src="/static/assignee_close.png"
+                            alt="cross_icon"
+                            height={'100%'}
+                            width={'100%'}
+                          />
+                        </div>
+                      </div>
                     ) : (
                       <div className="UnassignedPersonalDetailContainer">
-                        <ImageButton
-                          buttonText={'Not Assigned'}
-                          ButtonContainerStyle={{
-                            width: '159px',
-                            height: '48px',
-                            background: '#ebedef'
+                        <EuiPopover
+                          anchorPosition={'downRight'}
+                          style={{
+                            margin: 0,
+                            padding: 0
                           }}
-                          buttonTextStyle={{
-                            color: 'rgb(104, 104, 79)'
-                          }}
-                          endImageSrc={'/static/addIcon.svg'}
-                          endingImageContainerStyle={{
-                            right: '18px',
-                            fontSize: '14px'
-                          }}
-                          buttonAction={() => {
-                            console.log('hi');
-                          }}
-                        />
+                          button={
+                            <ImageButton
+                              buttonText={'Not Assigned'}
+                              ButtonContainerStyle={{
+                                width: '159px',
+                                height: '48px',
+                                background: '#ebedef',
+                                marginLeft: '-16px'
+                              }}
+                              buttonTextStyle={{
+                                color: 'rgb(104, 104, 79)'
+                              }}
+                              endImageSrc={'/static/addIcon.svg'}
+                              endingImageContainerStyle={{
+                                right: '-4px',
+                                fontSize: '14px'
+                              }}
+                              buttonAction={assigneeHandlerOpen}
+                            />
+                          }
+                          isOpen={assigneeValue}
+                          closePopover={assigneeHandlerClose}>
+                          <AutoComplete
+                            peopleList={peopleList}
+                            handleAssigneeDetails={handleAssigneeDetails}
+                          />
+                        </EuiPopover>
                       </div>
                     )}
                   </UnassignedPersonProfile>
