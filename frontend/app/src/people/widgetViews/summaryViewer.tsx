@@ -10,6 +10,7 @@ import { useIsMobile } from '../../hooks';
 // this is where we see others posts (etc) and edit our own
 export default function SummaryViewer(props: any) {
   const { item, config, person } = props;
+
   const { ui } = useStores();
   const isMobile = useIsMobile();
 
@@ -38,7 +39,9 @@ export default function SummaryViewer(props: any) {
       return wrapIt(
         <WantedSummary
           {...item}
+          ReCallBounties={props.ReCallBounties}
           person={person}
+          formSubmit={props.formSubmit}
           personBody={props?.personBody}
           fromBountyPage={props?.fromBountyPage}
           extraModalFunction={props?.extraModalFunction}

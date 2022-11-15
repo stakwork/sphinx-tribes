@@ -154,6 +154,7 @@ export default function FocusedView(props: any) {
       console.log('e', e);
     }
     setDeleting(false);
+    props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
@@ -232,6 +233,7 @@ export default function FocusedView(props: any) {
       console.log('e', e);
     }
     setLoading(false);
+    props?.ReCallBounties();
   }
 
   return useObserver(() => {
@@ -403,6 +405,8 @@ export default function FocusedView(props: any) {
 
             {/* display item */}
             <SummaryViewer
+              ReCallBounties={props?.ReCallBounties}
+              formSubmit={submitForm}
               person={person}
               personBody={props?.personBody}
               item={person?.extras && person.extras[config?.name][selectedIndex]}

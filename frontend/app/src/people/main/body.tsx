@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
@@ -103,6 +103,16 @@ export default function BodyComponent({ selectedWidget }) {
       else setFocusIndex(g.length - 1);
     }
   }
+
+  const ReCallBounties = () => {
+    (async () => {
+      /*
+       TODO : after getting the better way to reload the bounty, this code will be removed.
+       */
+      history.push('/tickets');
+      await window.location.reload();
+    })();
+  };
 
   const activeList = listSource[selectedWidget];
 
@@ -663,6 +673,7 @@ export default function BodyComponent({ selectedWidget }) {
               console.log('nextArrow');
             }}>
             <FocusedView
+              ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
               personBody={connectPersonBody}
               canEdit={false}
