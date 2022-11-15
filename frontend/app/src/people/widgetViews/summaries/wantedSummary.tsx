@@ -819,7 +819,7 @@ export default function WantedSummary(props: any) {
                               ButtonContainerStyle={{
                                 width: '159px',
                                 height: '48px',
-                                background: '#ebedef',
+                                background: '#fff',
                                 marginLeft: '-16px'
                               }}
                               buttonTextStyle={{
@@ -873,6 +873,34 @@ export default function WantedSummary(props: any) {
                   />
                   {paid ? (
                     <IconButton
+                      width={220}
+                      height={48}
+                      style={{
+                        position: 'absolute',
+                        marginBottom: '113px',
+                        bottom: '0',
+                        marginLeft: '36px',
+                        border: '1px solid #86D9B9',
+                        background: '#fff',
+                        color: '#2FB379'
+                      }}
+                      text={'Mark Unpaid'}
+                      loading={saving === 'paid'}
+                      endingImg={'/static/mark_unpaid.svg'}
+                      textStyle={{
+                        width: '130px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        fontFamily: 'Barlow',
+                        marginLeft: '30px'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExtrasPropertyAndSave('paid', !paid);
+                      }}
+                    />
+                  ) : (
+                    <IconButton
                       color={'success'}
                       width={220}
                       height={48}
@@ -882,7 +910,7 @@ export default function WantedSummary(props: any) {
                         bottom: '0',
                         marginLeft: '36px'
                       }}
-                      text={'Mark Unpaid'}
+                      text={'Mark Paid'}
                       loading={saving === 'paid'}
                       endingImg={'/static/mark_paid.svg'}
                       textStyle={{
@@ -895,34 +923,6 @@ export default function WantedSummary(props: any) {
                       hoverColor={'#3CBE88'}
                       activeColor={'#2FB379'}
                       shadowColor={'rgba(73, 201, 152, 0.5)'}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExtrasPropertyAndSave('paid', !paid);
-                      }}
-                    />
-                  ) : (
-                    <IconButton
-                      width={220}
-                      height={48}
-                      style={{
-                        position: 'absolute',
-                        marginBottom: '113px',
-                        bottom: '0',
-                        marginLeft: '36px',
-                        border: '1px solid #86D9B9',
-                        background: '#ebedef',
-                        color: '#2FB379'
-                      }}
-                      text={'Mark Paid'}
-                      loading={saving === 'paid'}
-                      endingImg={'/static/mark_unpaid.svg'}
-                      textStyle={{
-                        width: '130px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        fontFamily: 'Barlow',
-                        marginLeft: '30px'
-                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         setExtrasPropertyAndSave('paid', !paid);
@@ -1609,7 +1609,7 @@ const AssigneeProfile = styled.div`
   min-width: 292px;
   max-width: 292px;
   min-height: 768px;
-  background: #ebedef;
+  background: #fff;
 `;
 
 interface BountyPriceContainerProps {
