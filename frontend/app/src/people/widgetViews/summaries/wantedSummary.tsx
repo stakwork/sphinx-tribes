@@ -843,7 +843,13 @@ export default function WantedSummary(props: any) {
                       </div>
                     )}
                   </UnassignedPersonProfile>
-                  <BountyPriceContainer margin_top="64px">
+                  <div
+                    style={{
+                      padding: '32px 36.5px'
+                    }}>
+                    <Divider />
+                  </div>
+                  <BountyPriceContainer margin_top="0px">
                     <BountyPrice
                       priceMin={props?.priceMin}
                       priceMax={props?.priceMax}
@@ -1092,7 +1098,13 @@ export default function WantedSummary(props: any) {
                         height: '28px'
                       }}
                     />
-                    <BountyPriceContainer margin_top="64px">
+                    <div
+                      style={{
+                        padding: '32px 36.5px'
+                      }}>
+                      <Divider />
+                    </div>
+                    <BountyPriceContainer margin_top="0px">
                       <BountyPrice
                         priceMin={props?.priceMin}
                         priceMax={props?.priceMax}
