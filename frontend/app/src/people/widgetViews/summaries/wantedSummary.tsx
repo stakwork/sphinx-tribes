@@ -1172,6 +1172,12 @@ export default function WantedSummary(props: any) {
                         />
                       </div>
                     </UnassignedPersonProfile>
+                    <div
+                      style={{
+                        padding: '32px 36.5px'
+                      }}>
+                      <Divider />
+                    </div>
                     <BountyPriceContainer margin_top="59.4px">
                       <BountyPrice
                         priceMin={props?.priceMin}
