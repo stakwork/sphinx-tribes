@@ -56,8 +56,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
             borderBottom: scrollValue
               ? `1px solid ${color.grayish.G600}`
               : `0px solid ${color.grayish.G600}`
-          }}
-        >
+          }}>
           <BountyHeaderDesk>
             <B>
               <IconButton
@@ -121,8 +120,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   display: 'flex',
                   alignItems: 'center',
                   marginLeft: '33px'
-                }}
-              >
+                }}>
                 <img src="/static/copy.svg" alt="" height={22} width={18} />
                 <EuiText
                   style={{
@@ -136,13 +134,11 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                     width: '153px',
                     display: 'flex',
                     alignItems: 'center'
-                  }}
-                >
+                  }}>
                   <span
                     style={{
                       color: color.pureBlack
-                    }}
-                  >
+                    }}>
                     {activeBounty}
                   </span>
                   &nbsp; Bounties opened
@@ -161,8 +157,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                         style={{
                           zIndex: 3 - index,
                           marginLeft: index > 0 ? '-14px' : ''
-                        }}
-                      >
+                        }}>
                         <img
                           height={'23px'}
                           width={'23px'}
@@ -182,8 +177,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   fontWeight: '600',
                   fontFamily: 'Barlow',
                   color: '#222E3A'
-                }}
-              >
+                }}>
                 {peopleList && peopleList?.length}
               </EuiText>
             </D>
@@ -303,8 +297,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                       style={{
                         zIndex: 3 - index,
                         marginLeft: index > 0 ? '-14px' : ''
-                      }}
-                    >
+                      }}>
                       <img
                         height={'20px'}
                         width={'20px'}
@@ -323,8 +316,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   fontFamily: 'Barlow',
                   fontWeight: '500',
                   color: '#222E3A'
-                }}
-              >
+                }}>
                 {peopleList && peopleList?.length}
               </EuiText>
             </DevelopersContainerMobile>

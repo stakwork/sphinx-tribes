@@ -729,15 +729,11 @@ export default function BodyComponent({ selectedWidget }) {
               marginTop: isMobile ? 64 : 0,
               borderRadius: 0,
               background: color.pureWhite,
-              height: '100%',
-              width: '60%',
-              minWidth: 500,
-              maxWidth: 602,
               zIndex: 20,
               ...focusedDesktopModalStyles
             }}
-            nextArrow={nextIndex}
-            prevArrow={prevIndex}
+            // nextArrow={nextIndex}
+            // prevArrow={prevIndex}
             overlayClick={() => {
               setShowFocusView(false);
               setFocusIndex(-1);
@@ -749,6 +745,7 @@ export default function BodyComponent({ selectedWidget }) {
               // if (selectedWidget === 'about') switchWidgets('badges');
             }}>
             <FocusedView
+              newDesign={true}
               person={person}
               canEdit={!canEdit}
               selectedIndex={focusIndex}

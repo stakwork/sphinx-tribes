@@ -597,8 +597,8 @@ export default function WantedSummary(props: any) {
                 marginTop: '10px',
                 minHeight: '60px'
               }}>
-              {labels.length > 0 &&
-                labels.map((x: any) => {
+              {labels?.length > 0 &&
+                labels?.map((x: any) => {
                   return (
                     <>
                       <div
