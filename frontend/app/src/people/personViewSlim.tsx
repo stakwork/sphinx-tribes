@@ -24,8 +24,10 @@ import { useHistory, useLocation } from 'react-router';
 import { queryLimit } from '../store/main';
 import NoResults from './utils/noResults';
 import PageLoadSpinner from './utils/pageLoadSpinner';
-
 import Badges from './utils/badges';
+import { colors } from '../colors';
+import PersonIconButton from '../sphinxUI/icon_button';
+import {useParams} from 'react-router-dom'
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -46,7 +48,7 @@ export default function PersonView(props: any) {
   const history = useHistory();
   const location = useLocation();
   const pathname = history?.location?.pathname;
-
+  const color = colors['light']
   // FOR PEOPLE VIEW
   let person: any = main.people && main.people.length && main.people.find((f) => f.id === personId);
 
@@ -61,6 +63,7 @@ export default function PersonView(props: any) {
       ...ui.meInfo
     };
   }
+
 
   const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
 
@@ -311,17 +314,52 @@ export default function PersonView(props: any) {
                 ...conditionalStyles,
                 cursor: 'pointer',
                 padding: 0,
-                overflow: 'hidden'
+                overflow: 'hidden',
               }}
             >
               {React.cloneElement(child, { ...s })}
             </Panel>
-          );
+          ); 
         });
-
       const noneKey = canEdit ? 'me' : 'otherUser';
       const panels: any = elementArray.length ? (
-        elementArray
+        <div style={{width:'100%',display:'flex',flexDirection:'column'}}>
+         { person?.owner_pubkey === ui?.meInfo?.pubkey && selectedWidget==='wanted' &&  <div style={{width:'100%',display:'flex',justifyContent:'flex-end',paddingBottom:'16px'}}>
+              <PersonIconButton
+                text={'Post a Bounty'}
+                endingIcon={'add'}
+                width={204}
+                height={48}
+                color={'success'}
+                style={{
+                  color: color.pureWhite,
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  textDecoration: 'none'
+                }}
+                hoverColor={color.button_primary.hover}
+                activeColor={color.button_primary.active}
+                shadowColor={color.button_primary.shadow}
+                iconStyle={{
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  top: '17px',
+                  right: '18px'
+                }}
+                onClick={() => {
+                  if (ui.meInfo && ui.meInfo?.owner_alias) {
+                    setShowFocusView(true);
+                  } 
+                  // else {
+                  //   showModal();
+                  // }
+                }}
+              />
+            </div>     }  
+        <div style={{width:'100%',display:'flex',flexDirection:'row',flexWrap:'wrap'}}>
+         { elementArray}
+        </div>
+        </div>
       ) : (
         <div
           style={{
@@ -338,9 +376,41 @@ export default function PersonView(props: any) {
 
       console.log('elementArray', elementArray.length);
 
+
       return (
         <>
           <PageLoadSpinner show={loadingPerson} />
+          {/* <PersonIconButton
+                text={'Post a Bounty'}
+                endingIcon={'add'}
+                width={204}
+                height={48}
+                color={'success'}
+                style={{
+                  color: color.pureWhite,
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  textDecoration: 'none'
+                }}
+                hoverColor={color.button_primary.hover}
+                activeColor={color.button_primary.active}
+                shadowColor={color.button_primary.shadow}
+                iconStyle={{
+                  fontSize: '16px',
+                  fontWeight: '400',
+                  top: '17px',
+                  right: '18px'
+                }}
+                onClick={() => {
+                  if (ui.meInfo && ui.meInfo?.owner_alias) {
+                    setShowFocusView(true);
+                  } 
+                  // else {
+                  //   showModal();
+                  // }
+                }}
+              />
+          <div>vdsvv</div> */}
           {panels}
         </>
       );

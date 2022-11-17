@@ -8,7 +8,7 @@ import BountyProfileView from '../../sphinxUI/bounty_profile_view';
 const PaidBounty = (props) => {
   const color = colors['light'];
   return (
-    <BountyContainer Bounty_Container_Background={color.pureWhite}>
+    <BountyContainer onClick={props.onPanelClick} Bounty_Container_Background={color.pureWhite}>
       <BountyDescription
         {...props}
         title={props.title}

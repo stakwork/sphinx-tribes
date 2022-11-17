@@ -52,6 +52,7 @@ export default function BodyComponent({ selectedWidget }) {
   const showConnectModal = () => setConnectModal(true);
   const [connectPerson, setConnectPerson] = useState<any>();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
+  const [activeListIndex, setActiveListIndex] = useState<number>(0)
 
   const color = colors['light'];
 
@@ -199,6 +200,13 @@ export default function BodyComponent({ selectedWidget }) {
               return owner_id === person.owner_pubkey && created === `${body.created}`;
             })
           : {};
+        setActiveListIndex( activeList && activeList.length
+          ? activeList.findIndex((item) => {
+              const { person, body } = item;
+              return owner_id === person.owner_pubkey && created === `${body.created}`;
+            })
+          : {})  
+
       if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
       }
@@ -367,7 +375,8 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            height:'100%',
           }}>
           <WidgetSwitchViewer
             onPanelClick={(person, item) => {
@@ -476,7 +485,7 @@ export default function BodyComponent({ selectedWidget }) {
           </div>
 
           {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
-          <div style={{ width: '100%' }}>
+          <div style={{ width: '100%'}}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -557,6 +566,10 @@ export default function BodyComponent({ selectedWidget }) {
           }
         : {};
 
+        // async function publicPanelClick() {
+         
+        // } 
+
     // desktop mode
     return (
       <Body
@@ -615,7 +628,7 @@ export default function BodyComponent({ selectedWidget }) {
               height: '100%',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              padding: '0px 20px 20px 20px'
+              padding: '0px 20px 20px 20px',
             }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
@@ -666,12 +679,35 @@ export default function BodyComponent({ selectedWidget }) {
               setPublicFocusIndex(-1);
               history.push('/tickets');
             }}
-            prevArrowNew={() => {
-              console.log('prevArrow');
+            prevArrowNew={activeListIndex === 0  ? null : () => {
+              const { person, body } = activeList[activeListIndex-1];
+              if(person && body)
+                {
+                history.replace({
+                 pathname: history?.location?.pathname,
+                 search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                 state: {
+                   owner_id: person?.owner_pubkey,
+                   created: body?.created
+                 }
+               })
+              }
             }}
-            nextArrowNew={() => {
-              console.log('nextArrow');
-            }}>
+            nextArrowNew={ activeListIndex+1 > activeList?.length ? null :  () => {
+                const { person, body } = activeList[activeListIndex+1];
+                if(person && body)
+                  {
+                  history.replace({
+                   pathname: history?.location?.pathname,
+                   search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                   state: {
+                     owner_id: person?.owner_pubkey,
+                     created: body?.created
+                   }
+                 })
+                }
+              }
+            }>
             <FocusedView
               ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
@@ -711,7 +747,10 @@ export default function BodyComponent({ selectedWidget }) {
         )}
         <ConnectCard
           dismiss={() => closeConnectModal()}
-          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+          modalStyle={{ 
+            top: '-64px',
+            height: 'calc(100% + 64px)'
+           }}
           person={connectPerson}
           visible={openConnectModal}
         />
