@@ -31,7 +31,7 @@ export default function WidgetSwitchViewer(props) {
         marginBottom: 20,
         borderRadius: '10px',
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'center',
       };
 
   return useObserver(() => {
@@ -107,9 +107,9 @@ export default function WidgetSwitchViewer(props) {
             <Panel
               isMobile={isMobile}
               key={person?.owner_pubkey + i + body?.created}
-              onClick={() => {
-                if (onPanelClick) onPanelClick(person, body);
-              }}
+              // onClick={() => {
+              //   if (onPanelClick) onPanelClick(person, body);
+              // }}
               style={{
                 ...panelStyles,
                 ...conditionalStyles,
@@ -117,8 +117,8 @@ export default function WidgetSwitchViewer(props) {
                 padding: 0,
                 overflow: 'hidden',
                 background: 'transparent',
-                height: !isMobile ? '160px' : '',
-                boxShadow: 'none'
+                minHeight: !isMobile ? '160px' : '',
+                boxShadow: 'none',
               }}
             >
               {selectedWidget === 'post' ? (
@@ -138,6 +138,9 @@ export default function WidgetSwitchViewer(props) {
               ) : selectedWidget === 'wanted' ? (
                 <WantedView
                   showName
+                  onPanelClick={() => {
+                      if (onPanelClick) onPanelClick(person, body);
+                    }}
                   key={`${i + person.owner_pubkey}wview`}
                   person={person}
                   showModal={showModal}
@@ -156,18 +159,18 @@ export default function WidgetSwitchViewer(props) {
     return (
       <>
         {listItems}
-        <Spacer key={'spacer'} />
+        <Spacer key={'spacer'} /> 
 
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
-        {!props.loading && (
+        {activeList?.length > currentItems && (
           <LoadMoreContainer
             style={{
               width: '100%',
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
             <div
@@ -180,6 +183,7 @@ export default function WidgetSwitchViewer(props) {
             </div>
           </LoadMoreContainer>
         )}
+        <Spacer key={'spacer'} />
       </>
     );
   });

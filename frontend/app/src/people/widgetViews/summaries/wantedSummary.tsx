@@ -677,7 +677,9 @@ export default function WantedSummary(props: any) {
                   }}
                 />
               )}
-              <CreatorDescription>
+              <CreatorDescription paid={paid} >
+               
+                <div style={{paddingRight:'28px'}} >
                 <div
                   style={{
                     display: 'flex',
@@ -701,7 +703,7 @@ export default function WantedSummary(props: any) {
                       }}
                       leadingImageSrc={'/static/editIcon.svg'}
                       leadingImageContainerStyle={{
-                        left: 300
+                        left: 320
                       }}
                       buttonAction={props?.editAction}
                     />
@@ -713,7 +715,7 @@ export default function WantedSummary(props: any) {
                       }}
                       leadingImageSrc={'/static/Delete.svg'}
                       leadingImageContainerStyle={{
-                        left: 430
+                        left: 450
                       }}
                       buttonAction={props?.deleteAction}
                     />
@@ -735,7 +737,9 @@ export default function WantedSummary(props: any) {
                       );
                     })}
                 </LanguageContainer>
+                </div>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
+                
               </CreatorDescription>
               <AssigneeProfile>
                 <>
@@ -771,7 +775,8 @@ export default function WantedSummary(props: any) {
                           }}
                           UserProfileContainerStyle={{
                             height: 48,
-                            width: 200,
+                            width: 'fit-content',
+                            minWidth:'fit-content',
                             padding: 0
                             // marginTop: '48px'
                           }}
@@ -785,16 +790,20 @@ export default function WantedSummary(props: any) {
                             overflow: 'hidden'
                           }}
                           NameContainerStyle={{
-                            height: '28px'
+                            height: '28px',
+                            maxWidth:'154px'
                           }}
                         />
                         <div
                           style={{
-                            height: 32,
-                            width: 32,
-                            position: 'absolute',
-                            right: '16px',
-                            top: '60px'
+                            marginLeft:'6px',
+                            marginTop:'5px',
+                            alignSelf:'center',
+                            height: 22,
+                            width: 22,
+                            // position: 'absolute',
+                            // right: '16px',
+                            // top: '60px'
                           }}
                           onClick={changeAssignedPerson}>
                           <img
@@ -987,7 +996,8 @@ export default function WantedSummary(props: any) {
                   }}
                 />
               )}
-              <CreatorDescription>
+              <CreatorDescription paid={paid} >
+              <div style={{paddingRight:'28px'}} >
                 <Profile>{nametag}</Profile>
                 <TitleBox>{title}</TitleBox>
                 <LanguageContainer>
@@ -1005,6 +1015,7 @@ export default function WantedSummary(props: any) {
                       );
                     })}
                 </LanguageContainer>
+                </div>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
 
@@ -1467,6 +1478,10 @@ export default function WantedSummary(props: any) {
   );
 }
 
+interface styleProps{
+  paid?: string;
+}
+
 const Wrap = styled.div`
   display: flex;
   width: 100%;
@@ -1600,13 +1615,13 @@ const NormalUser = styled.div`
   justify-content: space-between;
 `;
 
-const CreatorDescription = styled.div`
+const CreatorDescription = styled.div<styleProps>`
   min-width: 600px;
   max-width: 600px;
   min-height: 768px;
-  border-right: 1px solid #ebedef;
+  border-right: ${(p) => p?.paid ? '3px solid #86D9B9'  : '1px solid #ebedef'};
   background: #fff;
-  padding: 48px 48px 0px 48px;
+  padding: 48px 0px 0px 48px;
 `;
 
 const Profile = styled.div`
@@ -1618,6 +1633,8 @@ const TitleBox = styled.div`
 `;
 
 const DescriptionBox = styled.div`
+  padding-right:44px;
+  margin-right:4px;
   min-height: 548px;
   max-height: 548px;
   overflow-y: scroll;
