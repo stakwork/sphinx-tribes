@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiFormRow, EuiTextArea, EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
@@ -21,18 +21,30 @@ export default function TextAreaInput({
 
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;
-
+  const [active, setActive] = useState<boolean>(false);
   return (
-    <>
-      <FieldEnv border={borderType} label={labeltext}>
+    <OuterContainer>
+      <FieldEnv
+        onClick={() => {
+          setActive(true);
+        }}
+        className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
+        border={borderType}
+        label={labeltext}>
         <R>
           <FieldTextArea
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
             onChange={(e) => handleChange(e.target.value)}
-            onBlur={handleBlur}
-            onFocus={handleFocus}
+            onBlur={(e) => {
+              handleBlur(e);
+              setActive(false);
+            }}
+            onFocus={(e) => {
+              handleFocus(e);
+              setActive(true);
+            }}
             rows={2}
             // prepend={prepend}
           />
@@ -48,9 +60,39 @@ export default function TextAreaInput({
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
-    </>
+    </OuterContainer>
   );
 }
+
+const OuterContainer = styled.div`
+  .euiFormRow_active {
+    border: 1px solid #82b4ff;
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: #b0b7bc !important;
+        background: #ffffff;
+        z-index: 10;
+      }
+    }
+  }
+  .euiFormRow_filed {
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: #b0b7bc !important;
+        background: #ffffff;
+        z-index: 10;
+      }
+    }
+  }
+`;
 
 const ExtraText = styled.div`
   color: #ddd;

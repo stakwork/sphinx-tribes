@@ -15,6 +15,7 @@ import SearchableSelectInput from './searchable-select-input';
 import MultiSelectInput from './multi-select-input';
 import CreatableMultiSelectInput from './creatable-multi-select-input';
 import Date from './widgets/date';
+import TextInputNew from './textInputnew';
 
 export default function Input(props: any) {
   function getInput() {
@@ -84,7 +85,7 @@ interface fieldEnvProps {
 }
 
 export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
-  border: ${(p) => (p.border === 'bottom' ? '' : '1px solid #dde1e5')};
+  border: ${(p) => (p.border === 'bottom' ? '' : '1px solid #DDE1E5')};
   border-bottom: ${(p) => (p.border === 'bottom' ? '1px solid #dde1e5' : '')};
   box-sizing: border-box;
   border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
@@ -92,8 +93,8 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   max-width: 900px;
 
   .euiFormRow__labelWrapper {
-    margin-bottom: 0px;
-    margin-top: -9px;
+    margin-bottom: -20px;
+    margin-top: 10px;
     padding-left: 10px;
     height: 14px;
     label {

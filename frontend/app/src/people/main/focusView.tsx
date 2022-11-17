@@ -24,7 +24,8 @@ export default function FocusedView(props: any) {
     formHeader,
     manualGoBackOnly,
     isFirstTimeScreen,
-    fromBountyPage
+    fromBountyPage,
+    newDesign
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -324,6 +325,7 @@ export default function FocusedView(props: any) {
             {formHeader && formHeader}
             {ui.meInfo && (
               <Form
+                newDesign={newDesign}
                 buttonsOnBottom={buttonsOnBottom}
                 isFirstTimeScreen={isFirstTimeScreen}
                 readOnly={editable}
