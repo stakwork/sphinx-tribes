@@ -11,7 +11,7 @@ import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 
 const Bounties = (props) => {
-  const { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } =
+  const { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person,onPanelClick } =
     props;
 
   const color = colors['light'];
@@ -26,7 +26,7 @@ const Bounties = (props) => {
   return (
     <>
       {{ ...assignee }.owner_alias ? (
-        <BountyContainer assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}>
+        <BountyContainer onClick={onPanelClick} assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}>
           <div className="BountyDescriptionContainer">
             <BountyDescription
               {...person}
@@ -47,7 +47,6 @@ const Bounties = (props) => {
                 borderRight: `1px solid ${color.primaryColor.P200}`
               }}
             />
-
             <BountyProfileView
               assignee={assignee}
               status={'ASSIGNED'}
@@ -63,6 +62,7 @@ const Bounties = (props) => {
       ) : (
         <BountyContainer>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
+            <div style={{display:'flex',flexDirection:'row'}} onClick={onPanelClick} >
             <BountyDescription
               {...person}
               {...props}
@@ -80,6 +80,7 @@ const Bounties = (props) => {
                 minWidth: '245px'
               }}
             />
+            </div>
             <UnassignedPersonProfile
               unassigned_border={color.grayish.G300}
               grayish_G200={color.grayish.G200}

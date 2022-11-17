@@ -19,6 +19,7 @@ const BountyProfileView = (props) => {
           <img
             width={'100%'}
             height={'100%'}
+            style={{objectFit:'cover'}}
             src={
               { ...props.assignee }.owner_alias
                 ? {
@@ -102,7 +103,7 @@ const UserImage = styled.div`
 const UserInfo = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 28px;
+  margin-left: 12px;
   margin-top: 3px;
 `;
 
@@ -140,8 +141,11 @@ const NameContainer = styled.div<BountyProfileViewProps>`
   margin-top: 3px;
   margin-bottom: 1px;
   .Name_Text {
+    white-space: nowrap;
+    overflow: hidden;
     font-size: 17px;
     font-weight: 600;
+    text-overflow: ellipsis;
     color: ${(p) => p.name_text_color};
   }
 `;

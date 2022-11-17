@@ -40,6 +40,7 @@ export default function Modal(props: any) {
       dismountCallback={dismountCallback}
       isMounted={visible ? true : false}
       style={{
+        ...style,
         position: 'absolute',
         top: 0,
         left: 0,
@@ -50,7 +51,6 @@ export default function Modal(props: any) {
         alignItems: 'center',
         justifyContent: 'center',
         // overflow: 'auto',
-        ...style
       }}
     >
       <Env style={{ ...fillStyle, ...envStyle }}>
@@ -119,7 +119,7 @@ export default function Modal(props: any) {
                 icon={'chevron_left'}
                 onClick={(e) => {
                   e.stopPropagation();
-                  prevArrow();
+                  prevArrowNew();
                 }}
               />
             </CircL>
@@ -133,7 +133,7 @@ export default function Modal(props: any) {
                 iconStyle={{ color: '#fff' }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  nextArrow();
+                  nextArrowNew();
                 }}
               />
             </CircR>

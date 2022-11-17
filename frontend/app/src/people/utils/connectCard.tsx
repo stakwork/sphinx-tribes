@@ -12,13 +12,18 @@ export default function ConnectCard(props) {
   const qrString = makeConnectQR(person?.owner_pubkey);
 
   return (
+    <div onClick={(e)=> e.stopPropagation()} >
     <Modal
       style={props.modalStyle}
-      close={(e) => {
-        e.stopPropagation();
-        props.dismiss();
-      }}
-      visible={visible}>
+      // close={(e) => {
+        //   e.stopPropagation();
+        //   props.dismiss();
+        // }}
+        overlayClick={(e: React.SyntheticEvent)=>{
+          props.dismiss();
+        }}
+        visible={visible}>
+      {/* <div style={{position:'relative'}}> */}
       <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
         <ImgWrap>
           <W>
@@ -44,11 +49,17 @@ export default function ConnectCard(props) {
               imgSize={27}
               height={48}
               width={'100%'}
-            />
+              />
           </a>
         </div>
       </div>
+        <div style={{position:'absolute' , bottom:'-36px',  width: 310, backgroundColor:'transparent', display:'flex', justifyContent:'center'}} >
+          <img src="/static/scan_qr.svg" alt="scan" />
+          <div style={{marginLeft:'12px', color:'#FFFFFF'}} >Scan or paste in Sphinx</div>
+        </div>
+     {/* </div> */}
     </Modal>
+   </div>
   );
 }
 
@@ -87,7 +98,7 @@ const N = styled.div`
 
   /* Text 2 */
 
-  color: #3c3f41;
+  color: #8E969C;
 `;
 
 const D = styled.div`
