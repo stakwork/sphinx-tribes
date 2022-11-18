@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EuiSuperSelect, EuiText } from '@elastic/eui';
 
 export default function Select(props: any) {
-  const { options, onChange, value, style, selectStyle } = props;
+  const { options, onChange, value, style, selectStyle, handleActive } = props;
 
   const opts =
     options.map((o) => {
@@ -18,8 +18,7 @@ export default function Select(props: any) {
                 fontSize: '14px',
                 padding: '0px',
                 margin: 0
-              }}
-            >
+              }}>
               {o.label}
             </p>
             {o.description && (
@@ -30,8 +29,7 @@ export default function Select(props: any) {
                   padding: 0,
                   margin: 0,
                   fontSize: '12px'
-                }}
-              >
+                }}>
                 <p className="euiTextColor--subdued">{o.description}</p>
               </EuiText>
             )}
@@ -46,9 +44,18 @@ export default function Select(props: any) {
         style={{
           ...selectStyle
         }}
+        onFocus={() => {
+          handleActive(true);
+        }}
+        onBlur={() => {
+          handleActive(false);
+        }}
         options={opts}
         valueOfSelected={value}
-        onChange={(value) => onChange(value)}
+        onChange={(value) => {
+          onChange(value);
+          handleActive(false);
+        }}
         itemLayoutAlign="top"
       />
     </div>
@@ -69,6 +76,9 @@ const S = styled(EuiSuperSelect as any)`
   .euiSuperSelectControl.euiSuperSelect--isOpen__button {
     background: #ffffff !important;
     background-color: #ffffff !important;
+  }
+  .euiPanel {
+    background: #fff;
   }
   button {
     background: #ffffff !important;

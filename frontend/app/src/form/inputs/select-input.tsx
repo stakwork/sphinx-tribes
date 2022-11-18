@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
@@ -21,17 +21,24 @@ export default function SelectInput({
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;
+  const [active, setActive] = useState<boolean>(false);
 
   return (
-    <>
-      <FieldEnv label={labeltext}>
+    <OuterContainer>
+      <FieldEnv
+        label={labeltext}
+        onClick={() => {}}
+        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}>
         <R>
           <Select
+            name={'first'}
             selectStyle={{ border: 'none' }}
             options={options}
             value={value}
+            handleActive={setActive}
             onChange={(e) => {
               handleChange(e);
+              setActive(false);
             }}
           />
           {error && (
@@ -46,7 +53,7 @@ export default function SelectInput({
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
-    </>
+    </OuterContainer>
   );
 }
 
@@ -71,4 +78,26 @@ const E = styled.div`
 `;
 const R = styled.div`
   position: relative;
+`;
+
+const OuterContainer = styled.div`
+  .euiFormRow_filed {
+    position: relative;
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: #b0b7bc !important;
+        background: #ffffff;
+        z-index: 10;
+      }
+    }
+  }
+  .euiFormRow_active {
+    padding: 1px 0;
+    border: 1px solid #82b4ff;
+    }
+  }
 `;

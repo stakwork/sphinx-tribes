@@ -75,7 +75,7 @@ export default function SearchableSelectInput({
   }, [search]);
 
   return (
-    <>
+    <OuterContainer>
       <FieldEnv label={labeltext}>
         <R>
           <SearchableSelect
@@ -84,6 +84,7 @@ export default function SearchableSelectInput({
             value={value}
             loading={loading}
             onChange={(e) => {
+              console.log(e);
               handleChange(e);
             }}
             onInputChange={(e) => {
@@ -102,7 +103,7 @@ export default function SearchableSelectInput({
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
-    </>
+    </OuterContainer>
   );
 }
 
@@ -127,4 +128,18 @@ user - select: none;
 `;
 const R = styled.div`
   position: relative;
+`;
+
+const OuterContainer = styled.div`
+  .euiFormRow__labelWrapper {
+    margin-bottom: 0px;
+    margin-top: -9px;
+    padding-left: 10px;
+    height: 14px;
+    label {
+      color: #b0b7bc !important;
+      background: #ffffff;
+      z-index: 10;
+    }
+  }
 `;
