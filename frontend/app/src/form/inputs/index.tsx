@@ -16,6 +16,7 @@ import MultiSelectInput from './multi-select-input';
 import CreatableMultiSelectInput from './creatable-multi-select-input';
 import Date from './widgets/date';
 import TextInputNew from './textInputnew';
+import InvitePeopleSearch from './widgets/PeopleSearch';
 
 export default function Input(props: any) {
   function getInput() {
@@ -43,7 +44,11 @@ export default function Input(props: any) {
       case 'select':
         return <SelectInput {...props} />;
       case 'searchableselect':
-        return <SearchableSelectInput {...props} />;
+        return props?.newDesign ? (
+          <InvitePeopleSearch {...props} />
+        ) : (
+          <SearchableSelectInput {...props} />
+        );
       case 'multiselect':
         return <MultiSelectInput {...props} />;
       case 'creatablemultiselect':
@@ -82,25 +87,32 @@ export const Note = styled.div`
 
 interface fieldEnvProps {
   readonly border: string;
+  isTop?: boolean;
+  isFill?: boolean;
 }
 
 export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
-  border: ${(p) => (p.border === 'bottom' ? '' : '1px solid #DDE1E5')};
+  border: ${(p) =>
+    p.border === 'bottom' ? '' : p?.isTop ? '1px solid #fff' : '1px solid #DDE1E5'};
   border-bottom: ${(p) => (p.border === 'bottom' ? '1px solid #dde1e5' : '')};
   box-sizing: border-box;
   border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
   box-shadow: none !important;
   max-width: 900px;
-
+  margin-bottom: 24px;
+  border: ${(p) => p?.isFill && '1px solid #DDE1E5'};
   .euiFormRow__labelWrapper {
     margin-bottom: -20px;
     margin-top: 10px;
     padding-left: 10px;
     height: 14px;
+    position: relative;
     label {
       color: #b0b7bc !important;
       background: #ffffff;
       z-index: 10;
+      position: ${(p) => p?.isTop && 'absolute'};
+      top: ${(p) => p?.isTop && '-20px'};
     }
   }
 `;

@@ -9,6 +9,7 @@ import Select from '../sphinxUI/select';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
 import { formDropdownOptions } from '../people/utils/constants';
 import { EuiText } from '@elastic/eui';
+import api from '../api';
 
 const BountyDetailsCreationData = {
   step_1: {
@@ -22,7 +23,7 @@ const BountyDetailsCreationData = {
     step: 2,
     heading: 'Price and Estimate',
     sub_heading: 'Nemo enim ipsam voluptatem quia voluptas sit magni voluptatem sequi.',
-    schema: ['price', 'coding_language', 'tribe', 'estimate_session_length'],
+    schema: ['price', 'codingLanguage', 'tribe', 'estimate_session_length'],
     schema2: ['estimate_complete_date', 'deliverables', 'show']
   },
   step_3: {
@@ -44,6 +45,7 @@ export default function Form(props: any) {
   const [showSettings, setShowSettings] = useState(false);
   const [showDeleteWarn, setShowDeleteWarn] = useState(false);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
+  const [peopleList, setPeopleList] = useState<any>();
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
 
@@ -79,6 +81,17 @@ export default function Form(props: any) {
         return;
     }
   }, [stepTracker]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await api.get(`people?page=1&search=&sortBy=last_login&limit=100`);
+        setPeopleList(response);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const dSchema = props.schema?.find((f) => f.defaultSchema);
@@ -176,11 +189,6 @@ export default function Form(props: any) {
         });
       });
   }
-
-  schema.map((x) => {
-    console.log(x);
-  });
-
   return (
     <Formik
       initialValues={initValues || {}}
@@ -243,6 +251,7 @@ export default function Form(props: any) {
                           values={values}
                           // disabled={readOnly}
                           // readOnly={readOnly}
+                          label={''}
                           errors={errors}
                           scrollToTop={scrollToTop}
                           value={values[item.name]}
@@ -364,7 +373,7 @@ export default function Form(props: any) {
                     }}>
                     {schemaData.step === 1 && dynamicSchema && (
                       <Select
-                        style={{ marginBottom: 14 }}
+                        style={{ marginBottom: 24 }}
                         onChange={(v) => {
                           console.log('v', v);
                           const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
@@ -373,6 +382,7 @@ export default function Form(props: any) {
                             setDynamicSchema(selectedOption.schema);
                           }
                         }}
+                        handleActive={() => {}}
                         options={dynamicFormOptions}
                         value={dynamicSchemaName}
                       />
@@ -385,6 +395,7 @@ export default function Form(props: any) {
                           key={item.name}
                           newDesign={true}
                           values={values}
+                          peopleList={peopleList}
                           // disabled={readOnly}
                           // readOnly={readOnly}
                           errors={errors}
@@ -420,6 +431,7 @@ export default function Form(props: any) {
                       .map((item: FormField) => (
                         <Input
                           {...item}
+                          peopleList={peopleList}
                           newDesign={true}
                           key={item.name}
                           values={values}
@@ -471,38 +483,11 @@ export default function Form(props: any) {
                   <div
                     style={{
                       display: 'flex',
-                      justifyContent: stepTracker > 1 ? 'space-between' : 'flex-end',
+                      flexDirection: 'row-reverse',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
                       width: stepTracker < 3 ? '45%' : '100%'
                     }}>
-                    {schemaData.step > 1 && (
-                      <div
-                        style={{
-                          width: '120px',
-                          height: '42px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          background: '#fff',
-                          border: '1px solid #DDE1E5',
-                          borderRadius: '32px',
-                          color: '#5F6368'
-                        }}
-                        onClick={PreviousStepHandler}>
-                        <EuiText
-                          style={{
-                            fontFamily: 'Barlow',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            lineHeight: '19px',
-                            userSelect: 'none'
-                          }}>
-                          Back
-                        </EuiText>
-                      </div>
-                    )}
-
                     <div
                       style={{
                         width: '120px',
@@ -539,6 +524,33 @@ export default function Form(props: any) {
                         {schemaData.step === 3 ? 'Skip' : 'Next'}
                       </EuiText>
                     </div>
+                    {schemaData.step > 1 && (
+                      <div
+                        style={{
+                          width: '120px',
+                          height: '42px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          background: '#fff',
+                          border: '1px solid #DDE1E5',
+                          borderRadius: '32px',
+                          color: '#5F6368'
+                        }}
+                        onClick={PreviousStepHandler}>
+                        <EuiText
+                          style={{
+                            fontFamily: 'Barlow',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            lineHeight: '19px',
+                            userSelect: 'none'
+                          }}>
+                          Back
+                        </EuiText>
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
