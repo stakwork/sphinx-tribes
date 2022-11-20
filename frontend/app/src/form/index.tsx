@@ -10,6 +10,7 @@ import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schem
 import { formDropdownOptions } from '../people/utils/constants';
 import { EuiText } from '@elastic/eui';
 import api from '../api';
+import ImageButton from '../sphinxUI/Image_button';
 
 const BountyDetailsCreationData = {
   step_1: {
@@ -24,7 +25,7 @@ const BountyDetailsCreationData = {
     heading: 'Price and Estimate',
     sub_heading: 'Nemo enim ipsam voluptatem quia voluptas sit magni voluptatem sequi.',
     schema: ['price', 'codingLanguage', 'tribe', 'estimate_session_length'],
-    schema2: ['estimate_complete_date', 'deliverables', 'show']
+    schema2: ['estimated_completion_date', 'deliverables', 'show']
   },
   step_3: {
     step: 3,
@@ -189,6 +190,11 @@ export default function Form(props: any) {
         });
       });
   }
+
+  schema.map((x) => {
+    console.log(x);
+  });
+
   return (
     <Formik
       initialValues={initValues || {}}
@@ -525,31 +531,16 @@ export default function Form(props: any) {
                       </EuiText>
                     </div>
                     {schemaData.step > 1 && (
-                      <div
-                        style={{
-                          width: '120px',
-                          height: '42px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          background: '#fff',
-                          border: '1px solid #DDE1E5',
-                          borderRadius: '32px',
-                          color: '#5F6368'
-                        }}
-                        onClick={PreviousStepHandler}>
-                        <EuiText
-                          style={{
-                            fontFamily: 'Barlow',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            lineHeight: '19px',
-                            userSelect: 'none'
-                          }}>
-                          Back
-                        </EuiText>
-                      </div>
+                      <>
+                        <ImageButton
+                          buttonText={'Back'}
+                          ButtonContainerStyle={{
+                            width: '120px',
+                            height: '42px'
+                          }}
+                          buttonAction={PreviousStepHandler}
+                        />
+                      </>
                     )}
                   </div>
                 </div>

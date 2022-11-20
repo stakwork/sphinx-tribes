@@ -52,7 +52,7 @@ export default function BodyComponent({ selectedWidget }) {
   const showConnectModal = () => setConnectModal(true);
   const [connectPerson, setConnectPerson] = useState<any>();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
-  const [activeListIndex, setActiveListIndex] = useState<number>(0)
+  const [activeListIndex, setActiveListIndex] = useState<number>(0);
 
   const color = colors['light'];
 
@@ -200,12 +200,14 @@ export default function BodyComponent({ selectedWidget }) {
               return owner_id === person.owner_pubkey && created === `${body.created}`;
             })
           : {};
-        setActiveListIndex( activeList && activeList.length
+      setActiveListIndex(
+        activeList && activeList.length
           ? activeList.findIndex((item) => {
               const { person, body } = item;
               return owner_id === person.owner_pubkey && created === `${body.created}`;
             })
-          : {})  
+          : {}
+      );
 
       if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
@@ -376,7 +378,7 @@ export default function BodyComponent({ selectedWidget }) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            height:'100%',
+            height: '100%'
           }}>
           <WidgetSwitchViewer
             onPanelClick={(person, item) => {
@@ -485,7 +487,7 @@ export default function BodyComponent({ selectedWidget }) {
           </div>
 
           {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
-          <div style={{ width: '100%'}}>
+          <div style={{ width: '100%' }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -566,9 +568,9 @@ export default function BodyComponent({ selectedWidget }) {
           }
         : {};
 
-        // async function publicPanelClick() {
-         
-        // } 
+    // async function publicPanelClick() {
+
+    // }
 
     // desktop mode
     return (
@@ -628,7 +630,7 @@ export default function BodyComponent({ selectedWidget }) {
               height: '100%',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              padding: '0px 20px 20px 20px',
+              padding: '0px 20px 20px 20px'
             }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
@@ -679,34 +681,39 @@ export default function BodyComponent({ selectedWidget }) {
               setPublicFocusIndex(-1);
               history.push('/tickets');
             }}
-            prevArrowNew={activeListIndex === 0  ? null : () => {
-              const { person, body } = activeList[activeListIndex-1];
-              if(person && body)
-                {
-                history.replace({
-                 pathname: history?.location?.pathname,
-                 search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-                 state: {
-                   owner_id: person?.owner_pubkey,
-                   created: body?.created
-                 }
-               })
-              }
-            }}
-            nextArrowNew={ activeListIndex+1 > activeList?.length ? null :  () => {
-                const { person, body } = activeList[activeListIndex+1];
-                if(person && body)
-                  {
-                  history.replace({
-                   pathname: history?.location?.pathname,
-                   search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-                   state: {
-                     owner_id: person?.owner_pubkey,
-                     created: body?.created
-                   }
-                 })
-                }
-              }
+            prevArrowNew={
+              activeListIndex === 0
+                ? null
+                : () => {
+                    const { person, body } = activeList[activeListIndex - 1];
+                    if (person && body) {
+                      history.replace({
+                        pathname: history?.location?.pathname,
+                        search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                        state: {
+                          owner_id: person?.owner_pubkey,
+                          created: body?.created
+                        }
+                      });
+                    }
+                  }
+            }
+            nextArrowNew={
+              activeListIndex + 1 > activeList?.length
+                ? null
+                : () => {
+                    const { person, body } = activeList[activeListIndex + 1];
+                    if (person && body) {
+                      history.replace({
+                        pathname: history?.location?.pathname,
+                        search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                        state: {
+                          owner_id: person?.owner_pubkey,
+                          created: body?.created
+                        }
+                      });
+                    }
+                  }
             }>
             <FocusedView
               ReCallBounties={ReCallBounties}
@@ -747,10 +754,10 @@ export default function BodyComponent({ selectedWidget }) {
         )}
         <ConnectCard
           dismiss={() => closeConnectModal()}
-          modalStyle={{ 
+          modalStyle={{
             top: '-64px',
             height: 'calc(100% + 64px)'
-           }}
+          }}
           person={connectPerson}
           visible={openConnectModal}
         />
@@ -766,10 +773,10 @@ export default function BodyComponent({ selectedWidget }) {
             }}
             envStyle={{
               marginTop: isMobile ? 64 : 0,
-              borderRadius: 0,
               background: color.pureWhite,
               zIndex: 20,
-              ...focusedDesktopModalStyles
+              ...focusedDesktopModalStyles,
+              borderRadius: '10px'
             }}
             // nextArrow={nextIndex}
             // prevArrow={prevIndex}
@@ -778,10 +785,16 @@ export default function BodyComponent({ selectedWidget }) {
               setFocusIndex(-1);
               // if (selectedWidget === 'about') switchWidgets('badges');
             }}
-            bigClose={() => {
+            bigCloseImage={() => {
               setShowFocusView(false);
               setFocusIndex(-1);
               // if (selectedWidget === 'about') switchWidgets('badges');
+            }}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
             }}>
             <FocusedView
               newDesign={true}
@@ -793,6 +806,7 @@ export default function BodyComponent({ selectedWidget }) {
                 console.log('success');
                 setFocusIndex(-1);
                 // if (selectedWidget === 'about') switchWidgets('badges');
+                setShowFocusView(false);
               }}
               goBack={() => {
                 setShowFocusView(false);

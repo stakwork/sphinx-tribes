@@ -19,7 +19,8 @@ export default function Modal(props: any) {
     nextArrowNew,
     prevArrowNew,
     bigClose,
-    bigCloseImage
+    bigCloseImage,
+    bigCloseImageStyle
   } = props;
 
   const fillStyle = fill
@@ -49,10 +50,9 @@ export default function Modal(props: any) {
         height: '100%',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
         // overflow: 'auto',
-      }}
-    >
+      }}>
       <Env style={{ ...fillStyle, ...envStyle }}>
         {close && (
           <X>
@@ -75,10 +75,11 @@ export default function Modal(props: any) {
               top: '8px',
               right: '-48px',
               cursor: 'pointer',
-              zIndex: 10
+              zIndex: 10,
+              ...bigCloseImageStyle
             }}
             onClick={bigCloseImage}>
-            <img src="static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
+            <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
           </div>
         )}
 

@@ -677,69 +677,67 @@ export default function WantedSummary(props: any) {
                   }}
                 />
               )}
-              <CreatorDescription paid={paid} >
-               
-                <div style={{paddingRight:'28px'}} >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}>
-                  <Profile>{nametag}</Profile>
+              <CreatorDescription paid={paid}>
+                <div style={{ paddingRight: '28px' }}>
                   <div
                     style={{
-                      minWidth: '250px',
-                      maxWidth: '250px',
-                      minHeight: '40px',
-                      maxHeight: '40px',
                       display: 'flex',
                       justifyContent: 'space-between'
                     }}>
-                    <ImageButton
-                      buttonText={'Edit'}
-                      ButtonContainerStyle={{
-                        width: '117px',
-                        height: '40px'
-                      }}
-                      leadingImageSrc={'/static/editIcon.svg'}
-                      leadingImageContainerStyle={{
-                        left: 320
-                      }}
-                      buttonAction={props?.editAction}
-                    />
-                    <ImageButton
-                      buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
-                      ButtonContainerStyle={{
-                        width: '117px',
-                        height: '40px'
-                      }}
-                      leadingImageSrc={'/static/Delete.svg'}
-                      leadingImageContainerStyle={{
-                        left: 450
-                      }}
-                      buttonAction={props?.deleteAction}
-                    />
+                    <Profile>{nametag}</Profile>
+                    <div
+                      style={{
+                        minWidth: '250px',
+                        maxWidth: '250px',
+                        minHeight: '40px',
+                        maxHeight: '40px',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}>
+                      <ImageButton
+                        buttonText={'Edit'}
+                        ButtonContainerStyle={{
+                          width: '117px',
+                          height: '40px'
+                        }}
+                        leadingImageSrc={'/static/editIcon.svg'}
+                        leadingImageContainerStyle={{
+                          left: 320
+                        }}
+                        buttonAction={props?.editAction}
+                      />
+                      <ImageButton
+                        buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
+                        ButtonContainerStyle={{
+                          width: '117px',
+                          height: '40px'
+                        }}
+                        leadingImageSrc={'/static/Delete.svg'}
+                        leadingImageContainerStyle={{
+                          left: 450
+                        }}
+                        buttonAction={props?.deleteAction}
+                      />
+                    </div>
                   </div>
-                </div>
-                <TitleBox>{title}</TitleBox>
-                <LanguageContainer>
-                  {dataValue &&
-                    dataValue?.length > 0 &&
-                    dataValue?.map((lang: any, index) => {
-                      return (
-                        <CodingLabels
-                          key={index}
-                          border={lang?.border}
-                          color={lang?.color}
-                          background={lang?.background}>
-                          <EuiText className="LanguageText">{lang?.label}</EuiText>
-                        </CodingLabels>
-                      );
-                    })}
-                </LanguageContainer>
+                  <TitleBox>{title}</TitleBox>
+                  <LanguageContainer>
+                    {dataValue &&
+                      dataValue?.length > 0 &&
+                      dataValue?.map((lang: any, index) => {
+                        return (
+                          <CodingLabels
+                            key={index}
+                            border={lang?.border}
+                            color={lang?.color}
+                            background={lang?.background}>
+                            <EuiText className="LanguageText">{lang?.label}</EuiText>
+                          </CodingLabels>
+                        );
+                      })}
+                  </LanguageContainer>
                 </div>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
-                
               </CreatorDescription>
               <AssigneeProfile>
                 <>
@@ -776,7 +774,7 @@ export default function WantedSummary(props: any) {
                           UserProfileContainerStyle={{
                             height: 48,
                             width: 'fit-content',
-                            minWidth:'fit-content',
+                            minWidth: 'fit-content',
                             padding: 0
                             // marginTop: '48px'
                           }}
@@ -791,21 +789,27 @@ export default function WantedSummary(props: any) {
                           }}
                           NameContainerStyle={{
                             height: '28px',
-                            maxWidth:'154px'
+                            maxWidth: '154px'
+                          }}
+                          userInfoStyle={{
+                            marginLeft: '12px'
                           }}
                         />
                         <div
                           style={{
-                            marginLeft:'6px',
-                            marginTop:'5px',
-                            alignSelf:'center',
+                            marginLeft: '6px',
+                            marginTop: '5px',
+                            alignSelf: 'center',
                             height: 22,
-                            width: 22,
+                            width: 22
                             // position: 'absolute',
                             // right: '16px',
                             // top: '60px'
                           }}
-                          onClick={changeAssignedPerson}>
+                          onClick={() => {
+                            changeAssignedPerson();
+                            assigneeHandlerOpen();
+                          }}>
                           <img
                             src="/static/assignee_close.png"
                             alt="cross_icon"
@@ -816,39 +820,44 @@ export default function WantedSummary(props: any) {
                       </div>
                     ) : (
                       <div className="UnassignedPersonalDetailContainer">
-                        <EuiPopover
-                          anchorPosition={'downRight'}
-                          style={{
-                            margin: 0,
-                            padding: 0
+                        <ImageButton
+                          buttonText={'Not Assigned'}
+                          ButtonContainerStyle={{
+                            width: '159px',
+                            height: '48px',
+                            background: '#fff',
+                            marginLeft: '-12px'
                           }}
-                          button={
-                            <ImageButton
-                              buttonText={'Not Assigned'}
-                              ButtonContainerStyle={{
-                                width: '159px',
-                                height: '48px',
-                                background: '#fff',
-                                marginLeft: '-16px'
-                              }}
-                              buttonTextStyle={{
-                                color: 'rgb(104, 104, 79)'
-                              }}
-                              endImageSrc={'/static/addIcon.svg'}
-                              endingImageContainerStyle={{
-                                right: '-4px',
-                                fontSize: '14px'
-                              }}
-                              buttonAction={assigneeHandlerOpen}
-                            />
-                          }
-                          isOpen={assigneeValue}
-                          closePopover={assigneeHandlerClose}>
-                          <AutoComplete
-                            peopleList={peopleList}
-                            handleAssigneeDetails={handleAssigneeDetails}
-                          />
-                        </EuiPopover>
+                          buttonTextStyle={{
+                            color: 'rgb(104, 104, 79)'
+                          }}
+                          endImageSrc={'/static/addIcon.svg'}
+                          endingImageContainerStyle={{
+                            right: '34px',
+                            fontSize: '12px'
+                          }}
+                          buttonAction={assigneeHandlerOpen}
+                        />
+                      </div>
+                    )}
+                    {assigneeValue && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '110px',
+                          right: '36px',
+                          boxShadow: '0px 1px 20px rgba(0, 0, 0, 0.25)',
+                          borderRadius: '10px',
+                          overflow: 'hidden',
+                          zIndex: '10'
+                        }}>
+                        <AutoComplete
+                          peopleList={peopleList}
+                          handleAssigneeDetails={(value) => {
+                            handleAssigneeDetails(value);
+                            assigneeHandlerClose();
+                          }}
+                        />
                       </div>
                     )}
                   </UnassignedPersonProfile>
@@ -996,25 +1005,25 @@ export default function WantedSummary(props: any) {
                   }}
                 />
               )}
-              <CreatorDescription paid={paid} >
-              <div style={{paddingRight:'28px'}} >
-                <Profile>{nametag}</Profile>
-                <TitleBox>{title}</TitleBox>
-                <LanguageContainer>
-                  {dataValue &&
-                    dataValue?.length > 0 &&
-                    dataValue?.map((lang: any, index) => {
-                      return (
-                        <CodingLabels
-                          key={index}
-                          border={lang?.border}
-                          color={lang?.color}
-                          background={lang?.background}>
-                          <EuiText className="LanguageText">{lang?.label}</EuiText>
-                        </CodingLabels>
-                      );
-                    })}
-                </LanguageContainer>
+              <CreatorDescription paid={paid}>
+                <div style={{ paddingRight: '28px' }}>
+                  <Profile>{nametag}</Profile>
+                  <TitleBox>{title}</TitleBox>
+                  <LanguageContainer>
+                    {dataValue &&
+                      dataValue?.length > 0 &&
+                      dataValue?.map((lang: any, index) => {
+                        return (
+                          <CodingLabels
+                            key={index}
+                            border={lang?.border}
+                            color={lang?.color}
+                            background={lang?.background}>
+                            <EuiText className="LanguageText">{lang?.label}</EuiText>
+                          </CodingLabels>
+                        );
+                      })}
+                  </LanguageContainer>
                 </div>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
@@ -1049,8 +1058,17 @@ export default function WantedSummary(props: any) {
                       NameContainerStyle={{
                         height: '28px'
                       }}
+                      userInfoStyle={{
+                        marginLeft: '12px'
+                      }}
                     />
-                    <BountyPriceContainer margin_top="64px">
+                    <div
+                      style={{
+                        padding: '32px 36.5px'
+                      }}>
+                      <Divider />
+                    </div>
+                    <BountyPriceContainer margin_top="0px">
                       <BountyPrice
                         priceMin={props?.priceMin}
                         priceMax={props?.priceMax}
@@ -1107,6 +1125,9 @@ export default function WantedSummary(props: any) {
                       }}
                       NameContainerStyle={{
                         height: '28px'
+                      }}
+                      userInfoStyle={{
+                        marginLeft: '12px'
                       }}
                     />
                     <div
@@ -1478,7 +1499,7 @@ export default function WantedSummary(props: any) {
   );
 }
 
-interface styleProps{
+interface styleProps {
   paid?: string;
 }
 
@@ -1619,7 +1640,7 @@ const CreatorDescription = styled.div<styleProps>`
   min-width: 600px;
   max-width: 600px;
   min-height: 768px;
-  border-right: ${(p) => p?.paid ? '3px solid #86D9B9'  : '1px solid #ebedef'};
+  border-right: ${(p) => (p?.paid ? '3px solid #86D9B9' : '1px solid #ebedef')};
   background: #fff;
   padding: 48px 0px 0px 48px;
 `;
@@ -1630,11 +1651,19 @@ const Profile = styled.div`
 
 const TitleBox = styled.div`
   // padding-top: 48px;
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 26px;
+  display: flex;
+  align-items: center;
+  color: #292c33;
 `;
 
 const DescriptionBox = styled.div`
-  padding-right:44px;
-  margin-right:4px;
+  padding-right: 44px;
+  margin-right: 4px;
   min-height: 548px;
   max-height: 548px;
   overflow-y: scroll;
