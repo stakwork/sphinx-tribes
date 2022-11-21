@@ -1210,7 +1210,7 @@ export default function WantedSummary(props: any) {
                       }}>
                       <Divider />
                     </div>
-                    <BountyPriceContainer margin_top="59.4px">
+                    <BountyPriceContainer margin_top="0px">
                       <BountyPrice
                         priceMin={props?.priceMin}
                         priceMax={props?.priceMax}
