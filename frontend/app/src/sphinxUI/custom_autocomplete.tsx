@@ -1,6 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import ImageButton from './Image_button';
 
 const AutoComplete = (props) => {
   const [searchValue, setSearchValue] = useState<string>('');
@@ -36,22 +37,8 @@ const AutoComplete = (props) => {
         {peopleData?.slice(0, 5)?.map((value, index) => {
           return (
             <div className="People" key={index}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                <div
-                  style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
+              <div className="PeopleDetailContainer">
+                <div className="ImageContainer">
                   <img
                     src={value.img || '/static/person_placeholder.png'}
                     alt={'user-image'}
@@ -59,47 +46,18 @@ const AutoComplete = (props) => {
                     width={'100%'}
                   />
                 </div>
-                <EuiText
-                  style={{
-                    fontFamily: 'Barlow',
-                    fontStyle: 'normal',
-                    fontWeight: '500',
-                    fontSize: '13px',
-                    lineHeight: '16px',
-                    color: '#3C3F41',
-                    marginLeft: '10px'
-                  }}>
-                  {value.owner_alias}
-                </EuiText>
+                <EuiText className="PeopleName">{value.owner_alias}</EuiText>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  minHeight: '32px',
-                  minWidth: '74.58px',
-                  borderRadius: '50px',
-                  background: '#FFFFFF',
-                  border: ' 1px solid #DDE1E5',
-                  cursor: 'pointer'
+              <ImageButton
+                buttonText={'Assign'}
+                ButtonContainerStyle={{
+                  width: '74.58px',
+                  height: '32px'
                 }}
-                onClick={() => {
+                buttonAction={() => {
                   props?.handleAssigneeDetails(value);
-                }}>
-                <EuiText
-                  style={{
-                    fontFamily: 'Barlow',
-                    fontStyle: 'normal',
-                    fontWeight: '500',
-                    fontSize: '13px',
-                    lineHeight: '16px',
-                    letterSpacing: '0.01em',
-                    color: '#5F6368'
-                  }}>
-                  Assign
-                </EuiText>
-              </div>
+                }}
+              />
             </div>
           );
         })}
@@ -160,6 +118,30 @@ const SearchOuterContainer = styled.div`
       align-items: center;
       justify-content: space-between;
       margin-top: 16px;
+      .PeopleDetailContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .ImageContainer {
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+          overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          object-fit: cover;
+        }
+        .PeopleName {
+          font-family: Barlow;
+          font-style: normal;
+          font-weight: 500;
+          font-size: 13px;
+          line-height: 16px;
+          color: #3c3f41;
+          margin-left: 10px;
+        }
+      }
     }
   }
 `;
