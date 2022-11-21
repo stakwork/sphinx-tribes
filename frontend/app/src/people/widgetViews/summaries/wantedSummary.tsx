@@ -678,22 +678,10 @@ export default function WantedSummary(props: any) {
                 />
               )}
               <CreatorDescription paid={paid}>
-                <div style={{ paddingRight: '28px' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between'
-                    }}>
+                <div className="CreatorDescriptionOuterContainerCreatorView">
+                  <div className="CreatorDescriptionInnerContainerCreatorView">
                     <Profile>{nametag}</Profile>
-                    <div
-                      style={{
-                        minWidth: '250px',
-                        maxWidth: '250px',
-                        minHeight: '40px',
-                        maxHeight: '40px',
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                      }}>
+                    <div className="CreatorDescriptionExtraButton">
                       <ImageButton
                         buttonText={'Edit'}
                         ButtonContainerStyle={{
@@ -756,12 +744,7 @@ export default function WantedSummary(props: any) {
                     )}
 
                     {isAssigned ? (
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between'
-                        }}>
+                      <div className="BountyProfileOuterContainerCreatorView">
                         <BountyProfileView
                           assignee={!assignedPerson ? assignee : assignedPerson}
                           status={paid ? 'completed' : 'assigned'}
@@ -796,16 +779,7 @@ export default function WantedSummary(props: any) {
                           }}
                         />
                         <div
-                          style={{
-                            marginLeft: '6px',
-                            marginTop: '5px',
-                            alignSelf: 'center',
-                            height: 22,
-                            width: 22
-                            // position: 'absolute',
-                            // right: '16px',
-                            // top: '60px'
-                          }}
+                          className="AssigneeCloseButtonContainer"
                           onClick={() => {
                             changeAssignedPerson();
                             assigneeHandlerOpen();
@@ -841,16 +815,7 @@ export default function WantedSummary(props: any) {
                       </div>
                     )}
                     {assigneeValue && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '110px',
-                          right: '36px',
-                          boxShadow: '0px 1px 20px rgba(0, 0, 0, 0.25)',
-                          borderRadius: '10px',
-                          overflow: 'hidden',
-                          zIndex: '10'
-                        }}>
+                      <div className="AutoCompleteContainer">
                         <AutoComplete
                           peopleList={peopleList}
                           handleAssigneeDetails={(value) => {
@@ -861,12 +826,9 @@ export default function WantedSummary(props: any) {
                       </div>
                     )}
                   </UnassignedPersonProfile>
-                  <div
-                    style={{
-                      padding: '32px 36.5px'
-                    }}>
+                  <DividerContainer>
                     <Divider />
-                  </div>
+                  </DividerContainer>
                   <BountyPriceContainer margin_top="0px">
                     <BountyPrice
                       priceMin={props?.priceMin}
@@ -1006,7 +968,7 @@ export default function WantedSummary(props: any) {
                 />
               )}
               <CreatorDescription paid={paid}>
-                <div style={{ paddingRight: '28px' }}>
+                <div className="DescriptionUpperContainerNormalView">
                   <Profile>{nametag}</Profile>
                   <TitleBox>{title}</TitleBox>
                   <LanguageContainer>
@@ -1062,12 +1024,9 @@ export default function WantedSummary(props: any) {
                         marginLeft: '12px'
                       }}
                     />
-                    <div
-                      style={{
-                        padding: '32px 36.5px'
-                      }}>
+                    <DividerContainer>
                       <Divider />
-                    </div>
+                    </DividerContainer>
                     <BountyPriceContainer margin_top="0px">
                       <BountyPrice
                         priceMin={props?.priceMin}
@@ -1130,12 +1089,9 @@ export default function WantedSummary(props: any) {
                         marginLeft: '12px'
                       }}
                     />
-                    <div
-                      style={{
-                        padding: '32px 36.5px'
-                      }}>
+                    <DividerContainer>
                       <Divider />
-                    </div>
+                    </DividerContainer>
                     <BountyPriceContainer margin_top="0px">
                       <BountyPrice
                         priceMin={props?.priceMin}
@@ -1204,12 +1160,9 @@ export default function WantedSummary(props: any) {
                         />
                       </div>
                     </UnassignedPersonProfile>
-                    <div
-                      style={{
-                        padding: '32px 36.5px'
-                      }}>
+                    <DividerContainer>
                       <Divider />
-                    </div>
+                    </DividerContainer>
                     <BountyPriceContainer margin_top="0px">
                       <BountyPrice
                         priceMin={props?.priceMin}
@@ -1643,6 +1596,24 @@ const CreatorDescription = styled.div<styleProps>`
   border-right: ${(p) => (p?.paid ? '3px solid #86D9B9' : '1px solid #ebedef')};
   background: #fff;
   padding: 48px 0px 0px 48px;
+  .DescriptionUpperContainerNormalView {
+    padding-right: 28px;
+  }
+  .CreatorDescriptionOuterContainerCreatorView {
+    padding-right: 28px;
+  }
+  .CreatorDescriptionInnerContainerCreatorView {
+    display: flex;
+    justify-content: space-between;
+    .CreatorDescriptionExtraButton {
+      min-width: 250px;
+      max-width: 250px;
+      min-height: 40px;
+      max-height: 40px;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 `;
 
 const Profile = styled.div`
@@ -1721,6 +1692,10 @@ const CodingLabels = styled.div<codingLangProps>`
   }
 `;
 
+const DividerContainer = styled.div`
+  padding: 32px 36.5px;
+`;
+
 interface containerProps {
   unAssignedBackgroundImage?: string;
   assignedBackgroundImage?: string;
@@ -1747,5 +1722,26 @@ const UnassignedPersonProfile = styled.div<containerProps>`
     margin-left: 25px;
     display: flex;
     align-items: center;
+  }
+  .BountyProfileOuterContainerCreatorView {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .AssigneeCloseButtonContainer {
+    margin-left: 6px;
+    margin-top: 5px;
+    align-self: center;
+    height: 22px;
+    width: 22px;
+  }
+  .AutoCompleteContainer {
+    position: absolute;
+    top: 110px;
+    right: 36px;
+    box-shadow: 0px 1px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 10;
   }
 `;

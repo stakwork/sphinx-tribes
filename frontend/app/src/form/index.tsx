@@ -326,57 +326,20 @@ export default function Form(props: any) {
               </>
             ) : props?.newDesign ? (
               <>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    padding: '0 48px'
-                  }}>
+                <CreateBountyHeaderContainer>
+                  <EuiText className="stepText">{`STEP ${schemaData.step}/3`}</EuiText>
+                  <EuiText className="HeadingText">{schemaData.heading}</EuiText>
                   <EuiText
+                    className="SubHeadingText"
                     style={{
-                      fontFamily: 'Barlow',
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      lineHeight: '18px',
-                      letterSpacing: '0.06em'
-                    }}>{`STEP ${schemaData.step}/3`}</EuiText>
-                  <EuiText
-                    style={{
-                      fontFamily: 'Barlow',
-                      fontSize: '36px',
-                      fontWeight: '800',
-                      lineHeight: '43px',
-                      color: '#3C3F41',
-                      marginBottom: '26px',
-                      marginTop: '16px'
-                    }}>
-                    {schemaData.heading}
-                  </EuiText>
-                  <EuiText
-                    style={{
-                      fontFamily: 'Barlow',
-                      fontSize: '17px',
-                      fontWeight: '400',
-                      lineHeight: '20px',
-                      color: '#292C33',
                       marginBottom: schemaData.step === 1 ? '29px' : '37px'
                     }}>
                     {schemaData.sub_heading}
                   </EuiText>
-                </div>
+                </CreateBountyHeaderContainer>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    height: '100%',
-                    padding: '0px 48px'
-                  }}>
-                  <div
-                    style={{
-                      width: '292px'
-                    }}>
+                <SchemaTagsContainer>
+                  <div className="LeftSchema">
                     {schemaData.step === 1 && dynamicSchema && (
                       <Select
                         style={{ marginBottom: 24 }}
@@ -428,10 +391,7 @@ export default function Form(props: any) {
                         />
                       ))}
                   </div>
-                  <div
-                    style={{
-                      width: '292px'
-                    }}>
+                  <div className="RightSchema">
                     {schema
                       .filter((item) => schemaData.schema2.includes(item.name))
                       .map((item: FormField) => (
@@ -467,47 +427,16 @@ export default function Form(props: any) {
                         />
                       ))}
                   </div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    padding: '0px 48px'
-                  }}>
-                  {stepTracker < 3 && (
-                    <EuiText
-                      style={{
-                        fontSize: '13px',
-                        fontFamily: 'Barlow',
-                        fontWeight: '400',
-                        lineHeight: '35px',
-                        color: '#B0B7BC'
-                      }}>
-                      * Required
-                    </EuiText>
-                  )}
+                </SchemaTagsContainer>
+                <BottomContainer>
+                  {stepTracker < 3 && <EuiText className="RequiredText">* Required</EuiText>}
                   <div
+                    className="ButtonContainer"
                     style={{
-                      display: 'flex',
-                      flexDirection: 'row-reverse',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
                       width: stepTracker < 3 ? '45%' : '100%'
                     }}>
                     <div
-                      style={{
-                        width: '120px',
-                        height: '42px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        background: '#618AFF',
-                        boxShadow: '0px 2px 10px rgba(97, 138, 255, 0.5)',
-
-                        borderRadius: '32px',
-                        color: '#fff'
-                      }}
+                      className="nextButton"
                       onClick={() => {
                         if (schemaData.step === 3) {
                           if (dynamicSchemaName) {
@@ -519,14 +448,7 @@ export default function Form(props: any) {
                           NextStepHandler();
                         }
                       }}>
-                      <EuiText
-                        style={{
-                          fontFamily: 'Barlow',
-                          fontSize: '16px',
-                          fontWeight: '600',
-                          lineHeight: '19px',
-                          userSelect: 'none'
-                        }}>
+                      <EuiText className="nextText">
                         {schemaData.step === 3 ? 'Skip' : 'Next'}
                       </EuiText>
                     </div>
@@ -543,19 +465,11 @@ export default function Form(props: any) {
                       </>
                     )}
                   </div>
-                </div>
+                </BottomContainer>
               </>
             ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  width: '100%'
-                }}>
-                <div
-                  style={{
-                    width: '100%'
-                  }}>
+              <SchemaOuterContainer>
+                <div className="SchemaInnerContainer">
                   {schema.map((item: FormField) => (
                     <Input
                       {...item}
@@ -585,7 +499,7 @@ export default function Form(props: any) {
                     />
                   ))}
                 </div>
-              </div>
+              </SchemaOuterContainer>
             )}
 
             {/* make space at bottom for first sign up */}
@@ -754,6 +668,102 @@ const BWrap = styled.div`
   background: #ffffff;
   z-index: 10;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+`;
+
+const CreateBountyHeaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0px 48px;
+  .stepText {
+    fontfamily: Barlow;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.06em;
+  }
+  .HeadingText {
+    font-family: Barlow;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 43px;
+    color: #3c3f41;
+    margin-bottom: 26px;
+    margin-top: 16px;
+  }
+  .SubHeadingText {
+    font-family: Barlow;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #292c33;
+  }
+`;
+
+const SchemaTagsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0px 48px;
+  .LeftSchema {
+    width: 292px;
+  }
+  .RightSchema {
+    width: 292px;
+  }
+`;
+
+const BottomContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 48px;
+  .RequiredText {
+    font-size: 13px;
+    font-family: Barlow;
+    font-weight: 400;
+    line-height: 35px;
+    color: #b0b7bc;
+  }
+  .ButtonContainer {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .nextButton {
+    width: 120px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: #618aff;
+    box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+    border-radius: 32px;
+    color: #fff;
+    :hover {
+      background: #5881f8;
+    }
+    :active {
+      background: #5078f2;
+    }
+    .nextText {
+      font-family: Barlow;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 19px;
+      user-select: none;
+    }
+  }
+`;
+
+const SchemaOuterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  .SchemaInnerContainer {
+    width: 100%;
+  }
 `;
 
 type FormFieldType =
