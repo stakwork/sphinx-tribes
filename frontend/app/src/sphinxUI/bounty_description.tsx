@@ -57,7 +57,13 @@ const BountyDescription = (props: any) => {
           </div>
           {descriptionImage && (
             <div className="DescriptionImage">
-              <img src={descriptionImage} alt={'desc'} style={{objectFit:'cover'}} height={'100%'} width={'100%'} />
+              <img
+                src={descriptionImage}
+                alt={'desc'}
+                style={{ objectFit: 'cover' }}
+                height={'100%'}
+                width={'100%'}
+              />
             </div>
           )}
 

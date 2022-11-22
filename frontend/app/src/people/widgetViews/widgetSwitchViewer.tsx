@@ -31,7 +31,7 @@ export default function WidgetSwitchViewer(props) {
         marginBottom: 20,
         borderRadius: '10px',
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'center'
       };
 
   return useObserver(() => {
@@ -118,7 +118,7 @@ export default function WidgetSwitchViewer(props) {
                 overflow: 'hidden',
                 background: 'transparent',
                 minHeight: !isMobile ? '160px' : '',
-                boxShadow: 'none',
+                boxShadow: 'none'
               }}
             >
               {selectedWidget === 'post' ? (
@@ -139,8 +139,8 @@ export default function WidgetSwitchViewer(props) {
                 <WantedView
                   showName
                   onPanelClick={() => {
-                      if (onPanelClick) onPanelClick(person, body);
-                    }}
+                    if (onPanelClick) onPanelClick(person, body);
+                  }}
                   key={`${i + person.owner_pubkey}wview`}
                   person={person}
                   showModal={showModal}
@@ -159,7 +159,7 @@ export default function WidgetSwitchViewer(props) {
     return (
       <>
         {listItems}
-        <Spacer key={'spacer'} /> 
+        <Spacer key={'spacer'} />
 
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
@@ -170,7 +170,7 @@ export default function WidgetSwitchViewer(props) {
               width: '100%',
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'center'
             }}
           >
             <div
