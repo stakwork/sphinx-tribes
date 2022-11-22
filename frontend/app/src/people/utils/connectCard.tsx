@@ -12,54 +12,66 @@ export default function ConnectCard(props) {
   const qrString = makeConnectQR(person?.owner_pubkey);
 
   return (
-    <div onClick={(e)=> e.stopPropagation()} >
-    <Modal
-      style={props.modalStyle}
-      // close={(e) => {
+    <div onClick={(e) => e.stopPropagation()}>
+      <Modal
+        style={props.modalStyle}
+        // close={(e) => {
         //   e.stopPropagation();
         //   props.dismiss();
         // }}
-        overlayClick={(e: React.SyntheticEvent)=>{
+        overlayClick={(e: React.SyntheticEvent) => {
           props.dismiss();
         }}
-        visible={visible}>
-      {/* <div style={{position:'relative'}}> */}
-      <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
-        <ImgWrap>
-          <W>
-            <Icon src={person?.img || '/static/person_placeholder.png'} />
-          </W>
-        </ImgWrap>
-        <div style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}>
-          <N>Discuss this bounty with</N>
-          <D>
-            <B>{person?.owner_alias} </B>
-          </D>
+        visible={visible}
+      >
+        {/* <div style={{position:'relative'}}> */}
+        <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
+          <ImgWrap>
+            <W>
+              <Icon src={person?.img || '/static/person_placeholder.png'} />
+            </W>
+          </ImgWrap>
+          <div
+            style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}
+          >
+            <N>Discuss this bounty with</N>
+            <D>
+              <B>{person?.owner_alias} </B>
+            </D>
 
-          <QR value={qrString} size={210} type={'connect'} />
+            <QR value={qrString} size={210} type={'connect'} />
 
-          <QrBar value={person?.owner_pubkey} simple style={{ marginTop: 11 }} />
+            <QrBar value={person?.owner_pubkey} simple style={{ marginTop: 11 }} />
 
-          <a href={qrString}>
-            <Button
-              text={'Connect with Sphinx'}
-              color={'primary'}
-              style={{ paddingLeft: 25, margin: '12px 0 40px' }}
-              img={'sphinx_white.png'}
-              imgSize={27}
-              height={48}
-              width={'100%'}
+            <a href={qrString}>
+              <Button
+                text={'Connect with Sphinx'}
+                color={'primary'}
+                style={{ paddingLeft: 25, margin: '12px 0 40px' }}
+                img={'sphinx_white.png'}
+                imgSize={27}
+                height={48}
+                width={'100%'}
               />
-          </a>
+            </a>
+          </div>
         </div>
-      </div>
-        <div style={{position:'absolute' , bottom:'-36px',  width: 310, backgroundColor:'transparent', display:'flex', justifyContent:'center'}} >
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-36px',
+            width: 310,
+            backgroundColor: 'transparent',
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        >
           <img src="/static/scan_qr.svg" alt="scan" />
-          <div style={{marginLeft:'12px', color:'#FFFFFF'}} >Scan or paste in Sphinx</div>
+          <div style={{ marginLeft: '12px', color: '#FFFFFF' }}>Scan or paste in Sphinx</div>
         </div>
-     {/* </div> */}
-    </Modal>
-   </div>
+        {/* </div> */}
+      </Modal>
+    </div>
   );
 }
 
@@ -98,7 +110,7 @@ const N = styled.div`
 
   /* Text 2 */
 
-  color: #8E969C;
+  color: #8e969c;
 `;
 
 const D = styled.div`

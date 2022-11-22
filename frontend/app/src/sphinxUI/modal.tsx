@@ -49,7 +49,7 @@ export default function Modal(props: any) {
         height: '100%',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
         // overflow: 'auto',
       }}
     >
@@ -77,7 +77,8 @@ export default function Modal(props: any) {
               cursor: 'pointer',
               zIndex: 10
             }}
-            onClick={bigCloseImage}>
+            onClick={bigCloseImage}
+          >
             <img src="static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
           </div>
         )}
