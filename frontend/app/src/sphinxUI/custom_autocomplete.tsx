@@ -41,7 +41,8 @@ const AutoComplete = (props) => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center'
-                }}>
+                }}
+              >
                 <div
                   style={{
                     height: '32px',
@@ -51,7 +52,8 @@ const AutoComplete = (props) => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center'
-                  }}>
+                  }}
+                >
                   <img
                     src={value.img || '/static/person_placeholder.png'}
                     alt={'user-image'}
@@ -68,7 +70,8 @@ const AutoComplete = (props) => {
                     lineHeight: '16px',
                     color: '#3C3F41',
                     marginLeft: '10px'
-                  }}>
+                  }}
+                >
                   {value.owner_alias}
                 </EuiText>
               </div>
@@ -86,7 +89,8 @@ const AutoComplete = (props) => {
                 }}
                 onClick={() => {
                   props?.handleAssigneeDetails(value);
-                }}>
+                }}
+              >
                 <EuiText
                   style={{
                     fontFamily: 'Barlow',
@@ -96,7 +100,8 @@ const AutoComplete = (props) => {
                     lineHeight: '16px',
                     letterSpacing: '0.01em',
                     color: '#5F6368'
-                  }}>
+                  }}
+                >
                   Assign
                 </EuiText>
               </div>

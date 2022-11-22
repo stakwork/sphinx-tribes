@@ -27,7 +27,7 @@ import PageLoadSpinner from './utils/pageLoadSpinner';
 import Badges from './utils/badges';
 import { colors } from '../colors';
 import PersonIconButton from '../sphinxUI/icon_button';
-import {useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom';
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -48,7 +48,7 @@ export default function PersonView(props: any) {
   const history = useHistory();
   const location = useLocation();
   const pathname = history?.location?.pathname;
-  const color = colors['light']
+  const color = colors['light'];
   // FOR PEOPLE VIEW
   let person: any = main.people && main.people.length && main.people.find((f) => f.id === personId);
 
@@ -63,7 +63,6 @@ export default function PersonView(props: any) {
       ...ui.meInfo
     };
   }
-
 
   const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
 
@@ -314,17 +313,25 @@ export default function PersonView(props: any) {
                 ...conditionalStyles,
                 cursor: 'pointer',
                 padding: 0,
-                overflow: 'hidden',
+                overflow: 'hidden'
               }}
             >
               {React.cloneElement(child, { ...s })}
             </Panel>
-          ); 
+          );
         });
       const noneKey = canEdit ? 'me' : 'otherUser';
       const panels: any = elementArray.length ? (
-        <div style={{width:'100%',display:'flex',flexDirection:'column'}}>
-         { person?.owner_pubkey === ui?.meInfo?.pubkey && selectedWidget==='wanted' &&  <div style={{width:'100%',display:'flex',justifyContent:'flex-end',paddingBottom:'16px'}}>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+          {person?.owner_pubkey === ui?.meInfo?.pubkey && selectedWidget === 'wanted' && (
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                paddingBottom: '16px'
+              }}
+            >
               <PersonIconButton
                 text={'Post a Bounty'}
                 endingIcon={'add'}
@@ -349,16 +356,17 @@ export default function PersonView(props: any) {
                 onClick={() => {
                   if (ui.meInfo && ui.meInfo?.owner_alias) {
                     setShowFocusView(true);
-                  } 
+                  }
                   // else {
                   //   showModal();
                   // }
                 }}
               />
-            </div>     }  
-        <div style={{width:'100%',display:'flex',flexDirection:'row',flexWrap:'wrap'}}>
-         { elementArray}
-        </div>
+            </div>
+          )}
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+            {elementArray}
+          </div>
         </div>
       ) : (
         <div
@@ -375,7 +383,6 @@ export default function PersonView(props: any) {
       );
 
       console.log('elementArray', elementArray.length);
-
 
       return (
         <>
