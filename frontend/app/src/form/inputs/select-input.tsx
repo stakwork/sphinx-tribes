@@ -4,6 +4,7 @@ import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { Select } from '../../sphinxUI';
+import { colors } from '../../colors';
 
 export default function SelectInput({
   error,
@@ -20,11 +21,12 @@ export default function SelectInput({
   extraHTML
 }: Props) {
   let labeltext = label;
+  const color = colors['light'];
   if (error) labeltext = `${labeltext} (${error})`;
   const [active, setActive] = useState<boolean>(false);
 
   return (
-    <OuterContainer>
+    <OuterContainer color={color}>
       <FieldEnv
         label={labeltext}
         onClick={() => {}}
@@ -42,7 +44,7 @@ export default function SelectInput({
             }}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
@@ -57,6 +59,10 @@ export default function SelectInput({
   );
 }
 
+interface styledProps {
+  color?: any;
+}
+
 const ExtraText = styled.div`
   padding: 2px 10px 25px 10px;
   max-width: calc(100% - 20px);
@@ -64,7 +70,7 @@ const ExtraText = styled.div`
   font-size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 0px;
@@ -72,7 +78,7 @@ const E = styled.div`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p?.color && p?.color.blue3};
   pointer-events: none;
   user-select: none;
 `;
@@ -80,7 +86,7 @@ const R = styled.div`
   position: relative;
 `;
 
-const OuterContainer = styled.div`
+const OuterContainer = styled.div<styledProps>`
   .euiFormRow_filed {
     position: relative;
     .euiFormRow__labelWrapper {
@@ -89,15 +95,15 @@ const OuterContainer = styled.div`
       padding-left: 10px;
       height: 14px;
       label {
-        color: #b0b7bc !important;
-        background: #ffffff;
+        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
   }
   .euiFormRow_active {
     padding: 1px 0;
-    border: 1px solid #82b4ff;
+    border: 1px solid ${(p) => p?.color && p?.color.blue2};
     }
   }
 `;

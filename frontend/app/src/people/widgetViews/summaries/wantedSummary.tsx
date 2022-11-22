@@ -492,7 +492,7 @@ export default function WantedSummary(props: any) {
               display: 'flex',
               alignItems: 'center',
               fontSize: 12,
-              color: '#8E969C',
+              color: color.grayish.G100,
               marginTop: isMobile ? 20 : 0,
               marginLeft: '-16px'
             }}>
@@ -502,6 +502,7 @@ export default function WantedSummary(props: any) {
             />
 
             <Assignee
+              color={color}
               onClick={() => {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
@@ -518,7 +519,7 @@ export default function WantedSummary(props: any) {
               display: 'flex',
               alignItems: 'center',
               fontSize: 12,
-              color: '#8E969C',
+              color: color.grayish.G100,
               marginLeft: '16px'
             }}>
             <Img
@@ -527,6 +528,7 @@ export default function WantedSummary(props: any) {
             />
 
             <Assignee
+              color={color}
               onClick={() => {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
@@ -577,14 +579,14 @@ export default function WantedSummary(props: any) {
             <EuiText
               style={{
                 fontSize: '13px',
-                color: '#8e969c',
+                color: color.grayish.G100,
                 fontWeight: '500'
               }}>
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
-                  color: '#000'
+                  color: color.pureBlack
                 }}>
                 {estimate_session_length ?? ''}
               </span>
@@ -607,17 +609,17 @@ export default function WantedSummary(props: any) {
                           flexWrap: 'wrap',
                           height: '22px',
                           width: 'fit-content',
-                          backgroundColor: '#cfcfcf',
-                          border: '1px solid #909090',
+                          backgroundColor: color.grayish.G1000,
+                          border: `1px solid ${color.grayish.G70}`,
                           padding: '3px 10px',
                           borderRadius: '20px',
                           marginRight: '3px',
-                          boxShadow: '1px 1px #909090'
+                          boxShadow: `1px 1px ${color.grayish.G70}`
                         }}>
                         <div
                           style={{
                             fontSize: '10px',
-                            color: '#202020'
+                            color: color.black300
                           }}>
                           {x.label}
                         </div>
@@ -642,13 +644,14 @@ export default function WantedSummary(props: any) {
 
             <Divider />
             <Y>
-              <P>
-                <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+              <P color={color}>
+                <B color={color}>{formatPrice(price)}</B> SAT /{' '}
+                <B color={color}>{satToUsd(price)}</B> USD
               </P>
               {heart}
             </Y>
             <Divider style={{ marginBottom: 20 }} />
-            <D>{renderMarkdown(description)}</D>
+            <D color={color}>{renderMarkdown(description)}</D>
           </Pad>
         </div>
       );
@@ -677,7 +680,7 @@ export default function WantedSummary(props: any) {
                   }}
                 />
               )}
-              <CreatorDescription paid={paid}>
+              <CreatorDescription paid={paid} color={color}>
                 <div className="CreatorDescriptionOuterContainerCreatorView">
                   <div className="CreatorDescriptionInnerContainerCreatorView">
                     <Profile>{nametag}</Profile>
@@ -708,7 +711,7 @@ export default function WantedSummary(props: any) {
                       />
                     </div>
                   </div>
-                  <TitleBox>{title}</TitleBox>
+                  <TitleBox color={color}>{title}</TitleBox>
                   <LanguageContainer>
                     {dataValue &&
                       dataValue?.length > 0 &&
@@ -716,6 +719,7 @@ export default function WantedSummary(props: any) {
                         return (
                           <CodingLabels
                             key={index}
+                            styledColors={color}
                             border={lang?.border}
                             color={lang?.color}
                             background={lang?.background}>
@@ -727,11 +731,12 @@ export default function WantedSummary(props: any) {
                 </div>
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
-              <AssigneeProfile>
+              <AssigneeProfile color={color}>
                 <>
                   <UnassignedPersonProfile
                     unassigned_border={color.grayish.G300}
-                    grayish_G200={color.grayish.G200}>
+                    grayish_G200={color.grayish.G200}
+                    color={color}>
                     {!isAssigned && (
                       <div className="UnassignedPersonContainer">
                         <img
@@ -799,11 +804,11 @@ export default function WantedSummary(props: any) {
                           ButtonContainerStyle={{
                             width: '159px',
                             height: '48px',
-                            background: '#fff',
+                            background: color.pureWhite,
                             marginLeft: '-12px'
                           }}
                           buttonTextStyle={{
-                            color: 'rgb(104, 104, 79)'
+                            color: color.grayish.G1100
                           }}
                           endImageSrc={'/static/addIcon.svg'}
                           endingImageContainerStyle={{
@@ -866,9 +871,9 @@ export default function WantedSummary(props: any) {
                         marginBottom: '113px',
                         bottom: '0',
                         marginLeft: '36px',
-                        border: '1px solid #86D9B9',
-                        background: '#fff',
-                        color: '#2FB379'
+                        border: `1px solid ${color.primary.P400}`,
+                        background: color.pureWhite,
+                        color: color.borderGreen1
                       }}
                       text={'Mark Unpaid'}
                       loading={saving === 'paid'}
@@ -906,9 +911,9 @@ export default function WantedSummary(props: any) {
                         fontFamily: 'Barlow',
                         marginLeft: '30px'
                       }}
-                      hoverColor={'#3CBE88'}
-                      activeColor={'#2FB379'}
-                      shadowColor={'rgba(73, 201, 152, 0.5)'}
+                      hoverColor={color.button_primary.hover}
+                      activeColor={color.button_primary.active}
+                      shadowColor={color.button_primary.shadow}
                       onClick={(e) => {
                         e.stopPropagation();
                         setExtrasPropertyAndSave('paid', !paid);
@@ -923,20 +928,20 @@ export default function WantedSummary(props: any) {
                       marginBottom: '49px',
                       bottom: '0',
                       marginLeft: '36px',
-                      background: '#fff',
-                      border: '1px solid #DDE1E5'
+                      background: color.pureWhite,
+                      border: `1px solid ${color.grayish.G600}`
                     }}
                     text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
                     endingImg={'/static/award.svg'}
-                    hoverColor={'#fff'}
-                    activeColor={'#fff'}
+                    hoverColor={color.pureWhite}
+                    activeColor={color.pureWhite}
                     textStyle={{
                       width: '130px',
                       display: 'flex',
                       justifyContent: 'center',
                       fontFamily: 'Barlow',
                       marginLeft: '30px',
-                      color: '#5F6368'
+                      color: color.grayish.G50
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -967,10 +972,10 @@ export default function WantedSummary(props: any) {
                   }}
                 />
               )}
-              <CreatorDescription paid={paid}>
+              <CreatorDescription paid={paid} color={color}>
                 <div className="DescriptionUpperContainerNormalView">
                   <Profile>{nametag}</Profile>
-                  <TitleBox>{title}</TitleBox>
+                  <TitleBox color={color}>{title}</TitleBox>
                   <LanguageContainer>
                     {dataValue &&
                       dataValue?.length > 0 &&
@@ -978,6 +983,7 @@ export default function WantedSummary(props: any) {
                         return (
                           <CodingLabels
                             key={index}
+                            styledColors={color}
                             border={lang?.border}
                             color={lang?.color}
                             background={lang?.background}>
@@ -990,7 +996,7 @@ export default function WantedSummary(props: any) {
                 <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
 
-              <AssigneeProfile>
+              <AssigneeProfile color={color}>
                 {paid ? (
                   <>
                     <BountyProfileView
@@ -1125,7 +1131,8 @@ export default function WantedSummary(props: any) {
                   <>
                     <UnassignedPersonProfile
                       unassigned_border={color.grayish.G300}
-                      grayish_G200={color.grayish.G200}>
+                      grayish_G200={color.grayish.G200}
+                      color={color}>
                       <div className="UnassignedPersonContainer">
                         <img
                           src="/static/unassigned_profile.svg"
@@ -1215,11 +1222,11 @@ export default function WantedSummary(props: any) {
             }}
           />
         )}
-        <Wrap>
+        <Wrap color={color}>
           <div
             style={{
               width: 700,
-              borderRight: '1px solid #DDE1E5',
+              borderRight: `1px solid ${color.grayish.G600}`,
               minHeight: '100%',
               overflow: 'auto'
             }}>
@@ -1259,14 +1266,14 @@ export default function WantedSummary(props: any) {
                 <EuiText
                   style={{
                     fontSize: '13px',
-                    color: '#8e969c',
+                    color: color.text2_4,
                     fontWeight: '500'
                   }}>
                   {estimate_session_length && 'Session:'}{' '}
                   <span
                     style={{
                       fontWeight: '500',
-                      color: '#000'
+                      color: color.pureWhite
                     }}>
                     {estimate_session_length ?? ''}
                   </span>
@@ -1320,17 +1327,17 @@ export default function WantedSummary(props: any) {
                             flexWrap: 'wrap',
                             height: '22px',
                             minWidth: 'fit-content',
-                            backgroundColor: '#cfcfcf',
-                            border: '1px solid #909090',
+                            backgroundColor: color.grayish.G1000,
+                            border: `1px solid ${color.grayish.G70}`,
                             padding: '3px 10px',
                             borderRadius: '20px',
                             marginRight: '3px',
-                            boxShadow: '1px 1px #909090'
+                            boxShadow: `1px 1px ${color.grayish.G70}`
                           }}>
                           <div
                             style={{
                               fontSize: '10px',
-                              color: '#202020'
+                              color: color.black300
                             }}>
                             {x.label}
                           </div>
@@ -1343,8 +1350,9 @@ export default function WantedSummary(props: any) {
             <Divider />
             <SectionPad>
               <Y style={{ padding: 0 }}>
-                <P>
-                  <B>{formatPrice(price)}</B> SAT / <B>{satToUsd(price)}</B> USD
+                <P color={color}>
+                  <B color={color}>{formatPrice(price)}</B> SAT /{' '}
+                  <B color={color}>{satToUsd(price)}</B> USD
                 </P>
               </Y>
             </SectionPad>
@@ -1385,14 +1393,15 @@ export default function WantedSummary(props: any) {
             }}
           />
           <Y>
-            <P>
-              {formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax)} <B>SAT</B>
+            <P color={color}>
+              {formatPrice(priceMin) || '0'} <B color={color}>SAT</B> - {formatPrice(priceMax)}{' '}
+              <B color={color}>SAT</B>
             </P>
             {heart}
           </Y>
           <Divider style={{ marginBottom: 22 }} />
 
-          <D>{renderMarkdown(description)}</D>
+          <D color={color}>{renderMarkdown(description)}</D>
           <GalleryViewer
             gallery={gallery}
             showAll={true}
@@ -1410,7 +1419,7 @@ export default function WantedSummary(props: any) {
       style={{
         paddingTop: gallery && '40px'
       }}>
-      <Wrap>
+      <Wrap color={color}>
         <div>
           <GalleryViewer
             innerRef={imgRef}
@@ -1436,9 +1445,9 @@ export default function WantedSummary(props: any) {
 
             <Divider style={{ marginTop: 22 }} />
             <Y>
-              <P>
-                {formatPrice(priceMin) || '0'} <B>SAT</B> - {formatPrice(priceMax) || '0'}{' '}
-                <B>SAT</B>
+              <P color={color}>
+                {formatPrice(priceMin) || '0'} <B color={color}>SAT</B> -{' '}
+                {formatPrice(priceMax) || '0'} <B color={color}>SAT</B>
               </P>
               {heart}
             </Y>
@@ -1452,11 +1461,14 @@ export default function WantedSummary(props: any) {
   );
 }
 
-interface styleProps {
+interface colorProps {
+  color?: any;
+}
+interface styleProps extends colorProps {
   paid?: string;
 }
 
-const Wrap = styled.div`
+const Wrap = styled.div<colorProps>`
   display: flex;
   width: 100%;
   height: 100%;
@@ -1464,7 +1476,7 @@ const Wrap = styled.div`
   font-style: normal;
   font-weight: 500;
   font-size: 24px;
-  color: #3c3f41;
+  color: ${(p) => p?.color && p.color.grayish.G10};
   justify-content: space-between;
 `;
 
@@ -1489,28 +1501,28 @@ const T = styled.div`
   font-size: 20px;
   margin: 10px 0;
 `;
-const B = styled.span`
+const B = styled.span<colorProps>`
   font-size: 15px;
   font-weight: bold;
-  color: #3c3f41;
+  color: ${(p) => p?.color && p.color.grayish.G10};
 `;
-const P = styled.div`
+const P = styled.div<colorProps>`
   font-weight: regular;
   font-size: 15px;
-  color: #8e969c;
+  color: ${(p) => p?.color && p.color.grayish.G100};
 `;
-const D = styled.div`
-  color: #5f6368;
+const D = styled.div<colorProps>`
+  color: ${(p) => p?.color && p.color.grayish.G50};
   margin: 10px 0 30px;
 `;
 
-const Assignee = styled.div`
+const Assignee = styled.div<colorProps>`
   margin-left: 3px;
   font-weight: 500;
   cursor: pointer;
 
   &:hover {
-    color: #000;
+    color: ${(p) => p?.color && p.color.pureBlack};
   }
 `;
 
@@ -1593,8 +1605,9 @@ const CreatorDescription = styled.div<styleProps>`
   min-width: 600px;
   max-width: 600px;
   min-height: 768px;
-  border-right: ${(p) => (p?.paid ? '3px solid #86D9B9' : '1px solid #ebedef')};
-  background: #fff;
+  border-right: ${(p) =>
+    p?.paid ? `3px solid ${p?.color?.primaryColor.P400}` : `1px solid ${p?.color.grayish.G700}`};
+  background: ${(p) => p?.color && p.color.pureWhite};
   padding: 48px 0px 0px 48px;
   .DescriptionUpperContainerNormalView {
     padding-right: 28px;
@@ -1620,7 +1633,7 @@ const Profile = styled.div`
   // padding-top: 48px;
 `;
 
-const TitleBox = styled.div`
+const TitleBox = styled.div<colorProps>`
   // padding-top: 48px;
   font-family: 'Barlow';
   font-style: normal;
@@ -1629,7 +1642,7 @@ const TitleBox = styled.div`
   line-height: 26px;
   display: flex;
   align-items: center;
-  color: #292c33;
+  color: ${(p) => p?.color && p.color.text1};
 `;
 
 const DescriptionBox = styled.div`
@@ -1640,11 +1653,11 @@ const DescriptionBox = styled.div`
   overflow-y: scroll;
 `;
 
-const AssigneeProfile = styled.div`
+const AssigneeProfile = styled.div<colorProps>`
   min-width: 292px;
   max-width: 292px;
   min-height: 768px;
-  background: #fff;
+  background: ${(p) => p?.color && p.color.pureWhite};
 `;
 
 interface BountyPriceContainerProps {
@@ -1660,6 +1673,7 @@ interface codingLangProps {
   background?: string;
   border?: string;
   color?: string;
+  styledColors?: any;
 }
 
 const LanguageContainer = styled.div`
@@ -1672,9 +1686,9 @@ const LanguageContainer = styled.div`
 
 const CodingLabels = styled.div<codingLangProps>`
   padding: 0px 8px;
-  border: ${(p) => (p.border ? p?.border : '1px solid #000')};
-  color: ${(p) => (p.color ? p?.color : '#000')};
-  background: ${(p) => (p.background ? p?.background : '#fff')};
+  border: ${(p) => (p.border ? p?.border : `1px solid ${p?.styledColors.pureBlack}`)};
+  color: ${(p) => (p.color ? p?.color : `${p?.styledColors.pureBlack}`)};
+  background: ${(p) => (p.background ? p?.background : `${p?.styledColors.pureWhite}`)};
   border-radius: 4px;
   overflow: hidden;
   max-height: 22.75px;
@@ -1697,6 +1711,7 @@ const DividerContainer = styled.div`
 `;
 
 interface containerProps {
+  color?: any;
   unAssignedBackgroundImage?: string;
   assignedBackgroundImage?: string;
   unassigned_border?: string;
@@ -1739,7 +1754,7 @@ const UnassignedPersonProfile = styled.div<containerProps>`
     position: absolute;
     top: 110px;
     right: 36px;
-    box-shadow: 0px 1px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 1px 20px ${(p) => p?.color && p?.color.black90};
     border-radius: 10px;
     overflow: hidden;
     z-index: 10;

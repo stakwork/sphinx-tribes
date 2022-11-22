@@ -1,9 +1,11 @@
 import { EuiText } from '@elastic/eui';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../../../colors';
 import ImageButton from '../../../sphinxUI/Image_button';
 
 const InvitePeopleSearch = (props) => {
+  const color = colors['light'];
   const [searchValue, setSearchValue] = useState<string>('');
   const [peopleData, setPeopleData] = useState<any>(props?.peopleList);
   const [inviteNameId, setInviteNameId] = useState<number>(0);
@@ -30,7 +32,7 @@ const InvitePeopleSearch = (props) => {
   }, [searchValue, props]);
 
   return (
-    <SearchOuterContainer>
+    <SearchOuterContainer color={color}>
       <input
         value={searchValue}
         className="SearchInput"
@@ -39,8 +41,8 @@ const InvitePeopleSearch = (props) => {
         }}
         placeholder={'Search'}
         style={{
-          background: '#fff',
-          color: '#292C33',
+          background: color.pureWhite,
+          color: color.text1,
           fontFamily: 'Barlow'
         }}
       />
@@ -95,47 +97,50 @@ const InvitePeopleSearch = (props) => {
 
 export default InvitePeopleSearch;
 
-const SearchOuterContainer = styled.div`
+interface styledProps {
+  color?: any;
+}
+
+const SearchOuterContainer = styled.div<styledProps>`
   min-height: 256x;
   max-height: 256x;
   min-width: 302px;
   max-width: 302px;
-  //   overflow: visible;
-  background: #fff;
+  background: ${(p) => p?.color && p?.color?.pureWhite};
   display: flex;
   flex-direction: column;
   align-items: center;
 
   .SearchInput {
-    background: #ffffff;
-    border: 1px solid #dde1e5;
+    background: ${(p) => p?.color && p?.color?.pureWhite};
+    border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
     border-radius: 200px;
     width: 302px;
     height: 40px;
     outline: none;
     overflow: hidden;
-    caret-color: #a3c1ff;
+    caret-color: ${(p) => p?.color && p?.color?.textBlue1};
     margin-bottom: 8px;
     padding: 0px 18px;
 
     :focus-visible {
-      background: #ffffff;
-      border: 1px solid #dde1e5;
+      background: ${(p) => p?.color && p?.color?.pureWhite};
+      border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
       border-radius: 200px;
       outline: none;
     }
     :active {
       .SearchText {
         outline: none;
-        background: #ffffff;
-        border: 1px solid #dde1e5;
+        background: ${(p) => p?.color && p?.color?.pureWhite};
+        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
         border-radius: 200px;
         outline: none;
       }
     }
   }
   .PeopleList {
-    background: #f2f3f5;
+    background: ${(p) => p?.color && p?.color?.grayish.G950};
     width: 400px;
     padding: 0 49px 16px;
     min-height: 256px;
@@ -168,7 +173,7 @@ const SearchOuterContainer = styled.div`
           font-weight: 500;
           font-size: 13px;
           line-height: 16px;
-          color: #3c3f41;
+          color: ${(p) => p?.color && p?.color?.grayish.G10};
           margin-left: 10px;
         }
       }
@@ -182,7 +187,7 @@ const SearchOuterContainer = styled.div`
         font-family: Barlow;
         font-size: 16px;
         font-weight: 600;
-        color: #5f6368;
+        color: ${(p) => p?.color && p?.color?.grayish.G50};
         word-spacing: 0.08em;
       }
     }

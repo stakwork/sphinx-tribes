@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui';
 import { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from '.';
+import { colors } from '../../colors';
 
 export default function TextInputNew({
   name,
@@ -19,11 +20,12 @@ export default function TextInputNew({
   borderType
 }: Props) {
   let labeltext = label;
+  const color = colors['light'];
   if (error) labeltext = `${labeltext} (${error})`;
 
   const padStyle = prepend ? { paddingLeft: 0 } : {};
   return (
-    <TextContainer>
+    <TextContainer color={color}>
       <div className="label-float">
         <input
           type="text"
@@ -38,44 +40,22 @@ export default function TextInputNew({
   );
 }
 
-const ExtraText = styled.div`
-  padding: 0px 10px 5px;
-  margin: -5px 0 10px;
-  color: #b75858;
-  font-style: italic;
-  max-width: calc(100% - 20px);
-  word-break: break-all;
-  font-size: 14px;
-`;
+interface styledProps {
+  color?: any;
+}
 
-const E = styled.div`
-  position: absolute;
-  right: 10px;
-  top: 0px;
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-  color: #45b9f6;
-  pointer-events: none;
-  user-select: none;
-`;
-const R = styled.div`
-  position: relative;
-`;
-
-const TextContainer = styled.div`
+const TextContainer = styled.div<styledProps>`
   margin-bottom: 13px;
   .label-float {
     position: relative;
     padding-top: 13px;
     font-size: 13px;
-    color: #b0b7bc;
+    color: ${(p) => p?.color && p?.color.grayish.G300};
     font-family: Barlow;
   }
 
   .label-float input {
-    border: 1px solid #dde1e5;
+    border: 1px solid ${(p) => p?.color && p?.color.grayish.G600};
     border-radius: 4px;
     outline: none;
     min-width: 290px;
@@ -89,11 +69,11 @@ const TextContainer = styled.div`
   }
 
   .label-float input:focus {
-    border: 1px solid #82b4ff;
+    border: 1px solid ${(p) => p?.color && p?.color.blue2};
   }
 
   .label-float input::placeholder {
-    color: #b0b7bc;
+    color: ${(p) => p?.color && p?.color.grayish.G300};
   }
 
   .label-float label {
@@ -122,6 +102,6 @@ const TextContainer = styled.div`
   .label-float input:not(:placeholder-shown) + label {
     font-size: 13px;
     top: 0;
-    color: #b0b7bc;
+    color: ${(p) => p?.color && p?.color.grayish.G300};
   }
 `;
