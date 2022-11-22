@@ -355,6 +355,7 @@ export default function PersonView(props: any) {
                 onClick={() => {
                   if (ui.meInfo && ui.meInfo?.owner_alias) {
                     setShowCreateBountyModal(true);
+                    setShowFocusView(true);
                   }
                 }}
               />

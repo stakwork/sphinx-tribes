@@ -379,7 +379,8 @@ export default function BodyComponent({ selectedWidget }) {
             flexDirection: 'column',
             alignItems: 'center',
             height: '100%'
-          }}>
+          }}
+        >
           <WidgetSwitchViewer
             onPanelClick={(person, item) => {
               history.replace({
@@ -452,7 +453,8 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}>
+            }}
+          >
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
@@ -464,7 +466,8 @@ export default function BodyComponent({ selectedWidget }) {
               <div
                 style={{
                   padding: '0 20px'
-                }}>
+                }}
+              >
                 <SearchTextInput
                   small
                   name="search"
@@ -505,7 +508,8 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}>
+            dismountCallback={() => ui.setSelectedPerson(0)}
+          >
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -582,7 +586,8 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}>
+        }}
+      >
         <div
           style={{
             minHeight: '32px'
@@ -601,7 +606,8 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}>
+            }}
+          >
             <SearchTextInput
               small
               name="search"
@@ -650,7 +656,8 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}>
+          dismountCallback={() => ui.setSelectedPerson(0)}
+        >
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -714,7 +721,8 @@ export default function BodyComponent({ selectedWidget }) {
                       });
                     }
                   }
-            }>
+            }
+          >
             <FocusedView
               ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
