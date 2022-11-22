@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable func-style */
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
@@ -18,6 +19,8 @@ import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import BountyHeader from '../widgetViews/bountyHeader';
 import { colors } from '../../colors';
+import StartUpModal from '../utils/start_up_modal';
+import ConnectCard from '../utils/connectCard';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -41,6 +44,15 @@ export default function BodyComponent({ selectedWidget }) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
+  const [openConnectModal, setConnectModal] = useState<boolean>(false);
+  const closeConnectModal = () => setConnectModal(false);
+  const showConnectModal = () => setConnectModal(true);
+  const [connectPerson, setConnectPerson] = useState<any>();
+  const [connectPersonBody, setConnectPersonBody] = useState<any>();
+  const [activeListIndex, setActiveListIndex] = useState<number>(0)
 
   const color = colors['light'];
 
@@ -92,6 +104,16 @@ export default function BodyComponent({ selectedWidget }) {
       else setFocusIndex(g.length - 1);
     }
   }
+
+  const ReCallBounties = () => {
+    (async () => {
+      /*
+       TODO : after getting the better way to reload the bounty, this code will be removed.
+       */
+      history.push('/tickets');
+      await window.location.reload();
+    })();
+  };
 
   const activeList = listSource[selectedWidget];
 
@@ -162,6 +184,8 @@ export default function BodyComponent({ selectedWidget }) {
       };
       setPublicFocusPerson(p);
       setPublicFocusIndex(itemIndex);
+      setConnectPerson({ ...person });
+      setConnectPersonBody({ ...item });
     }
   }
 
@@ -176,6 +200,13 @@ export default function BodyComponent({ selectedWidget }) {
               return owner_id === person.owner_pubkey && created === `${body.created}`;
             })
           : {};
+        setActiveListIndex( activeList && activeList.length
+          ? activeList.findIndex((item) => {
+              const { person, body } = item;
+              return owner_id === person.owner_pubkey && created === `${body.created}`;
+            })
+          : {})  
+
       if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
       }
@@ -344,9 +375,9 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
-          }}
-        >
+            alignItems: 'center',
+            height:'100%',
+          }}>
           <WidgetSwitchViewer
             onPanelClick={(person, item) => {
               history.replace({
@@ -419,8 +450,7 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}
-          >
+            }}>
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
@@ -432,8 +462,7 @@ export default function BodyComponent({ selectedWidget }) {
               <div
                 style={{
                   padding: '0 20px'
-                }}
-              >
+                }}>
                 <SearchTextInput
                   small
                   name="search"
@@ -456,7 +485,7 @@ export default function BodyComponent({ selectedWidget }) {
           </div>
 
           {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
-          <div style={{ width: '100%' }}>
+          <div style={{ width: '100%'}}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -474,8 +503,7 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}
-          >
+            dismountCallback={() => ui.setSelectedPerson(0)}>
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -538,6 +566,10 @@ export default function BodyComponent({ selectedWidget }) {
           }
         : {};
 
+        // async function publicPanelClick() {
+         
+        // } 
+
     // desktop mode
     return (
       <Body
@@ -548,8 +580,7 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}
-      >
+        }}>
         <div
           style={{
             minHeight: '32px'
@@ -568,8 +599,7 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}
-          >
+            }}>
             <SearchTextInput
               small
               name="search"
@@ -598,9 +628,8 @@ export default function BodyComponent({ selectedWidget }) {
               height: '100%',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              padding: '0px 20px 20px 20px'
-            }}
-          >
+              padding: '0px 20px 20px 20px',
+            }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -619,8 +648,7 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}
-        >
+          dismountCallback={() => ui.setSelectedPerson(0)}>
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -636,20 +664,54 @@ export default function BodyComponent({ selectedWidget }) {
             envStyle={{
               borderRadius: 0,
               background: color.pureWhite,
-              height: '100%',
-              width: '60%',
-              minWidth: 500,
-              maxWidth: 602,
-              ...focusedDesktopModalStyles
+              ...focusedDesktopModalStyles,
+              minHeight: '768px',
+              maxHeight: '768px',
+              minWidth: '892px',
+              maxWidth: '892px',
+              height: '100%'
             }}
-            bigClose={() => {
+            style={{
+              background: color.black200
+            }}
+            bigCloseImage={() => {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/tickets');
             }}
-          >
+            prevArrowNew={activeListIndex === 0  ? null : () => {
+              const { person, body } = activeList[activeListIndex-1];
+              if(person && body)
+                {
+                history.replace({
+                 pathname: history?.location?.pathname,
+                 search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                 state: {
+                   owner_id: person?.owner_pubkey,
+                   created: body?.created
+                 }
+               })
+              }
+            }}
+            nextArrowNew={ activeListIndex+1 > activeList?.length ? null :  () => {
+                const { person, body } = activeList[activeListIndex+1];
+                if(person && body)
+                  {
+                  history.replace({
+                   pathname: history?.location?.pathname,
+                   search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                   state: {
+                     owner_id: person?.owner_pubkey,
+                     created: body?.created
+                   }
+                 })
+                }
+              }
+            }>
             <FocusedView
+              ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
+              personBody={connectPersonBody}
               canEdit={false}
               selectedIndex={publicFocusIndex}
               config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
@@ -662,9 +724,36 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusPerson(null);
                 setPublicFocusIndex(-1);
               }}
+              fromBountyPage={true}
+              extraModalFunction={() => {
+                setPublicFocusPerson(null);
+                setPublicFocusIndex(-1);
+                history.push('/tickets');
+                if (ui.meInfo) {
+                  showConnectModal();
+                } else {
+                  showModal();
+                }
+              }}
+              deleteExtraFunction={() => {
+                setPublicFocusPerson(null);
+                setPublicFocusIndex(-1);
+              }}
             />
           </Modal>
         )}
+        {openStartUpModel && (
+          <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
+        )}
+        <ConnectCard
+          dismiss={() => closeConnectModal()}
+          modalStyle={{ 
+            top: '-64px',
+            height: 'calc(100% + 64px)'
+           }}
+          person={connectPerson}
+          visible={openConnectModal}
+        />
         {toastsEl}
         {/* modal create ticket */}
         {showFocusView && (
@@ -697,8 +786,7 @@ export default function BodyComponent({ selectedWidget }) {
               setShowFocusView(false);
               setFocusIndex(-1);
               // if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-          >
+            }}>
             <FocusedView
               person={person}
               canEdit={!canEdit}

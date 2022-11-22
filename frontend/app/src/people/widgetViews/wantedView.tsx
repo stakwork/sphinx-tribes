@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../helpers';
@@ -34,7 +35,8 @@ export default function WantedView(props: any) {
     estimate_session_length,
     loomEmbedUrl,
     showModal,
-    setDeletePayload
+    setDeletePayload,
+    onPanelClick
   } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -119,7 +121,7 @@ export default function WantedView(props: any) {
     // mobile view
     if (isMobile) {
       return (
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative' }} onClick={onPanelClick}>
           {paid && (
             <Img
               src={'/static/paid_ribbon.svg'}
@@ -151,7 +153,7 @@ export default function WantedView(props: any) {
                     margin: 0
                   }}
                 />
-              </div>
+              </div> 
               <DT
                 style={{
                   margin: '15px 0'
@@ -392,6 +394,7 @@ export default function WantedView(props: any) {
             <BountyBox>
               <PaidBounty
                 {...person}
+                onPanelClick={onPanelClick}
                 assignee={assignee}
                 created={created}
                 ticketUrl={ticketUrl}
@@ -408,6 +411,7 @@ export default function WantedView(props: any) {
           ) : (
             <BountyBox>
               <Bounties
+                onPanelClick={onPanelClick}
                 person={person}
                 assignee={assignee}
                 created={created}
@@ -429,6 +433,7 @@ export default function WantedView(props: any) {
 
     return (
       <>
+
         {paid && (
           <Img
             src={'/static/paid_ribbon.svg'}
@@ -744,7 +749,7 @@ interface WrapProps {
 }
 
 const BountyBox = styled.div`
-  display: flex;
+  // display: flex;
   flex-direction: row;
   justify-content: space-between;
   min-height: 160px;

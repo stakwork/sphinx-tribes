@@ -16,7 +16,10 @@ export default function Modal(props: any) {
     envStyle,
     nextArrow,
     prevArrow,
-    bigClose
+    nextArrowNew,
+    prevArrowNew,
+    bigClose,
+    bigCloseImage
   } = props;
 
   const fillStyle = fill
@@ -37,6 +40,7 @@ export default function Modal(props: any) {
       dismountCallback={dismountCallback}
       isMounted={visible ? true : false}
       style={{
+        ...style,
         position: 'absolute',
         top: 0,
         left: 0,
@@ -47,7 +51,6 @@ export default function Modal(props: any) {
         alignItems: 'center',
         justifyContent: 'center',
         // overflow: 'auto',
-        ...style
       }}
     >
       <Env style={{ ...fillStyle, ...envStyle }}>
@@ -61,6 +64,22 @@ export default function Modal(props: any) {
           <BigX>
             <IconButton onClick={bigClose} size={36} icon="close" />
           </BigX>
+        )}
+
+        {bigCloseImage && (
+          <div
+            style={{
+              height: '40px',
+              width: '40px',
+              position: 'absolute',
+              top: '8px',
+              right: '-48px',
+              cursor: 'pointer',
+              zIndex: 10
+            }}
+            onClick={bigCloseImage}>
+            <img src="static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
+          </div>
         )}
 
         {prevArrow && (
@@ -91,6 +110,35 @@ export default function Modal(props: any) {
             </Circ>
           </R>
         )}
+
+        {prevArrowNew && (
+          <LNew>
+            <CircL>
+              <IconButton
+                iconStyle={{ color: '#fff' }}
+                icon={'chevron_left'}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevArrowNew();
+                }}
+              />
+            </CircL>
+          </LNew>
+        )}
+        {nextArrowNew && (
+          <RNew>
+            <CircR>
+              <IconButton
+                icon={'chevron_right'}
+                iconStyle={{ color: '#fff' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextArrowNew();
+                }}
+              />
+            </CircR>
+          </RNew>
+        )}
         {children}
       </Env>
     </FadeLeft>
@@ -117,6 +165,48 @@ const L = styled.div`
   justify-content: center;
 `;
 
+const RNew = styled.div`
+  position: absolute;
+  right: -63.9px;
+  top: 0px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LNew = styled.div`
+  position: absolute;
+  left: -62.9px;
+  top: 0px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CircL = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 88px;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 10px 0px 0px 10px;
+  cursor: pointer;
+`;
+
+const CircR = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 88px;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 0px 10px 10px 0px;
+  cursor: pointer;
+`;
+
 const Circ = styled.div`
   display: flex;
   align-items: center;
@@ -127,6 +217,7 @@ const Circ = styled.div`
   border-radius: 50px;
   cursor: pointer;
 `;
+
 const X = styled.div`
   position: absolute;
   top: 5px;

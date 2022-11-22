@@ -1042,3 +1042,10 @@ input::-webkit-search-cancel-button {
   pointer-events: none;
   opacity: 0.65;
 }
+
+.euiPanel:focus-visible,
+.euiPanel > div:focus-visible,
+.euiPanel > div > div:focus-visible {
+  outline: none;
+  border: none;
+}

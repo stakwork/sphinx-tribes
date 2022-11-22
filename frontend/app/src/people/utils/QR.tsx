@@ -55,7 +55,7 @@ export default function QR(props) {
           alignItems: 'center'
         }}
       >
-        <div style={{ background: '#fff', height: 63, width: 63, borderRadius: '50%' }} />
+        <div style={{ background: '#fff', height: 75, width: 75,  }} />
       </div>
     </div>
   );
