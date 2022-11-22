@@ -4,6 +4,7 @@ import { EuiSwitch, EuiText } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { wantedCodingTaskSchema } from '../schema';
+import { colors } from '../../colors';
 
 export default function SwitchInput({
   label,
@@ -31,9 +32,11 @@ export default function SwitchInput({
     // }
   }, []);
 
+  const color = colors['light'];
+
   return (
     <>
-      <Container>
+      <Container color={color}>
         <EuiText className="Label">{label}</EuiText>
         <EuiSwitch
           label=""
@@ -59,15 +62,19 @@ export default function SwitchInput({
   );
 }
 
-const ExtraText = styled.div`
-  color: #ddd;
+interface styledProps {
+  color?: any;
+}
+
+const ExtraText = styled.div<styledProps>`
+  color: ${(p) => p?.color && p?.color.grayish.G760};
   padding: 10px 10px 25px 10px;
   max-width: calc(100% - 20px);
   word-break: break-all;
   font-size: 14px;
 `;
 
-const Container = styled.div`
+const Container = styled.div<styledProps>`
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -80,6 +87,6 @@ const Container = styled.div`
     line-height: 35px;
     display: flex;
     align-items: center;
-    color: #292c33;
+    color: ${(p) => p?.color && p?.color.grayish.G05};
   }
 `;

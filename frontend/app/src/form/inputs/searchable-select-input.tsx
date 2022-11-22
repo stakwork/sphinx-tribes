@@ -5,6 +5,7 @@ import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { SearchableSelect } from '../../sphinxUI';
 import { useStores } from '../../store';
+import { colors } from '../../colors';
 
 export default function SearchableSelectInput({
   error,
@@ -24,6 +25,7 @@ export default function SearchableSelectInput({
   const labeltext = label;
 
   const { main, ui } = useStores();
+  const color = colors['light'];
 
   const [opts, setOptions] = useState(options);
   const [loading, setLoading] = useState(false);
@@ -81,7 +83,7 @@ export default function SearchableSelectInput({
         label={labeltext}
         isTop={true}
         style={{
-          border: isBorder ? '1px solid #DDE1E5' : '1px solid #fff'
+          border: isBorder ? `1px solid ${color.grayish.G600} ` : `1px solid ${color.pureWhite}`
         }}>
         <R>
           <SearchableSelect
@@ -99,7 +101,7 @@ export default function SearchableSelectInput({
             }}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
@@ -114,6 +116,10 @@ export default function SearchableSelectInput({
   );
 }
 
+interface styledProps {
+  color?: any;
+}
+
 const ExtraText = styled.div`
 padding: 2px 10px 25px 10px;
 max - width: calc(100 % - 20px);
@@ -121,7 +127,7 @@ word -break: break-all;
 font - size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
 position: absolute;
 right: 10px;
 top: 0px;
@@ -129,7 +135,7 @@ display: flex;
 height: 100 %;
 justify - content: center;
 align - items: center;
-color:#45b9f6;
+color: ${(p) => p?.color && p?.color.blue3};
 pointer - events: none;
 user - select: none;
 `;

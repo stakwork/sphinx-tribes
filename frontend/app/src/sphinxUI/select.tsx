@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { EuiSuperSelect, EuiText } from '@elastic/eui';
+import { colors } from '../colors';
 
 export default function Select(props: any) {
+  const color = colors['light'];
   const { options, onChange, value, style, selectStyle, handleActive } = props;
 
   const opts =
@@ -14,7 +16,7 @@ export default function Select(props: any) {
           <>
             <p
               style={{
-                color: '#000',
+                color: color.pureBlack,
                 fontSize: '14px',
                 padding: '0px',
                 margin: 0
@@ -41,6 +43,7 @@ export default function Select(props: any) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <S
+        color={color}
         style={{
           ...selectStyle
         }}
@@ -62,26 +65,26 @@ export default function Select(props: any) {
   );
 }
 
-//euiContextMenuItem euiSuperSelect__item euiSuperSelect__item--hasDividers
+interface styleProps {
+  color?: any;
+}
 
-const S = styled(EuiSuperSelect as any)`
-  background: #ffffff00;
-  border: 1px solid #e0e0e0;
-  color: #000;
+const S = styled(EuiSuperSelect as any)<styleProps>`
+  background: ${(p) => p?.color && p.color.pureWhite};
+  border: 1px solid ${(p) => p?.color && p?.color.grayish.G750};
+  color: ${(p) => p?.color && p?.color.pureBlack};
   box-sizing: border-box;
   box-shadow: none;
-
   user-select: none;
-
   .euiSuperSelectControl.euiSuperSelect--isOpen__button {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
+    background: ${(p) => p?.color && p?.color.pureWhite} !important;
+    background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
   }
   .euiPanel {
-    background: #fff;
+    background: ${(p) => p?.color && p?.color.pureWhite};
   }
   button {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
+    background: ${(p) => p?.color && p?.color.pureWhite} !important;
+    background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
   }
 `;

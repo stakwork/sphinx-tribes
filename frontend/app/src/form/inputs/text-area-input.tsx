@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { EuiFormRow, EuiTextArea, EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldTextArea, Note } from './index';
+import { colors } from '../../colors';
 
 export default function TextAreaInput({
   error,
@@ -20,6 +21,7 @@ export default function TextAreaInput({
   // console.log("TEXTAREA", label, extraHTML)
 
   let labeltext = label;
+  const color = colors['light'];
   if (error) labeltext = `${labeltext} (${error})`;
   const [active, setActive] = useState<boolean>(false);
   return (
@@ -64,17 +66,21 @@ export default function TextAreaInput({
   );
 }
 
-const OuterContainer = styled.div`
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
   .euiFormRow_active {
-    border: 1px solid #82b4ff;
+    border: 1px solid ${(p) => p?.color && p?.color.blue2};
     .euiFormRow__labelWrapper {
       margin-bottom: 0px;
       margin-top: -9px;
       padding-left: 10px;
       height: 14px;
       label {
-        color: #b0b7bc !important;
-        background: #ffffff;
+        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
@@ -86,30 +92,30 @@ const OuterContainer = styled.div`
       padding-left: 10px;
       height: 14px;
       label {
-        color: #b0b7bc !important;
-        background: #ffffff;
+        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
   }
 `;
 
-const ExtraText = styled.div`
-  color: #ddd;
+const ExtraText = styled.div<styledProps>`
+  color: ${(p) => p?.color && p?.color.grayish.G760};
   padding: 10px 10px 25px 10px;
   max-width: calc(100% - 20px);
   word-break: break-all;
   font-size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p?.color && p?.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

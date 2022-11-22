@@ -354,12 +354,8 @@ export default function PersonView(props: any) {
                 }}
                 onClick={() => {
                   if (ui.meInfo && ui.meInfo?.owner_alias) {
-                    // setShowFocusView(true);
                     setShowCreateBountyModal(true);
                   }
-                  // else {
-                  //   showModal();
-                  // }
                 }}
               />
             </div>
@@ -386,37 +382,6 @@ export default function PersonView(props: any) {
       return (
         <>
           <PageLoadSpinner show={loadingPerson} />
-          {/* <PersonIconButton
-                text={'Post a Bounty'}
-                endingIcon={'add'}
-                width={204}
-                height={48}
-                color={'success'}
-                style={{
-                  color: color.pureWhite,
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  textDecoration: 'none'
-                }}
-                hoverColor={color.button_primary.hover}
-                activeColor={color.button_primary.active}
-                shadowColor={color.button_primary.shadow}
-                iconStyle={{
-                  fontSize: '16px',
-                  fontWeight: '400',
-                  top: '17px',
-                  right: '18px'
-                }}
-                onClick={() => {
-                  if (ui.meInfo && ui.meInfo?.owner_alias) {
-                    setShowFocusView(true);
-                  } 
-                  // else {
-                  //   showModal();
-                  // }
-                }}
-              />
-          <div>vdsvv</div> */}
           {panels}
         </>
       );

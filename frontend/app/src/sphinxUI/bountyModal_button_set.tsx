@@ -1,14 +1,17 @@
 import { EuiText } from '@elastic/eui';
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../colors';
 
 const ButtonSet = (props) => {
+  const color = colors['light'];
   return (
     <ButtonSetContainer
       style={{
         ...props.ButtonSetContainerStyle
-      }}>
-      <ButtonContainer onClick={props?.githubShareAction}>
+      }}
+      color={color}>
+      <ButtonContainer onClick={props?.githubShareAction} color={color}>
         <EuiText className="ButtonText">Github Ticket</EuiText>
         <div className="ImageContainer">
           <img
@@ -20,7 +23,7 @@ const ButtonSet = (props) => {
           />
         </div>
       </ButtonContainer>
-      <ButtonContainer topMargin={'16px'} onClick={props.copyURLAction}>
+      <ButtonContainer topMargin={'16px'} onClick={props.copyURLAction} color={color}>
         <EuiText className="ButtonText">{props.copyStatus}</EuiText>
         <div className="ImageContainer">
           <img
@@ -32,7 +35,7 @@ const ButtonSet = (props) => {
           />
         </div>
       </ButtonContainer>
-      <ButtonContainer topMargin={'16px'} onClick={props.twitterAction}>
+      <ButtonContainer topMargin={'16px'} onClick={props.twitterAction} color={color}>
         <EuiText className="ButtonText">Share to Twitter</EuiText>
         <div className="ImageContainer">
           <img
@@ -50,7 +53,11 @@ const ButtonSet = (props) => {
 
 export default ButtonSet;
 
-interface ButtonContainerProps {
+interface styledColor {
+  color?: any;
+}
+
+interface ButtonContainerProps extends styledColor {
   topMargin?: string;
 }
 
@@ -68,8 +75,8 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   align-items: center;
   justify-content: center;
   margin-top: ${(p) => p?.topMargin};
-  background: #ffffff;
-  border: 1px solid #dde1e5;
+  background: ${(p) => p?.color && p?.color.pureWhite};
+  border: 1px solid ${(p) => p?.color && p?.color.grayish.G600};
   border-radius: 30px;
   user-select: none;
   .ImageContainer {
@@ -86,10 +93,10 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
       brightness(87%) contrast(83%);
   }
   :hover {
-    border: 1px solid #b0b7bc;
+    border: 1px solid ${(p) => p?.color && p?.color.grayish.G300};
   }
   :active {
-    border: 1px solid #8e969c;
+    border: 1px solid ${(p) => p?.color && p?.color.grayish.G100};
     .buttonImage {
       filter: brightness(0) saturate(100%) invert(22%) sepia(5%) saturate(563%) hue-rotate(161deg)
         brightness(91%) contrast(86%);
@@ -101,6 +108,6 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
     font-weight: 500;
     font-size: 14px;
     line-height: 17px;
-    color: #5f6368;
+    color: ${(p) => p?.color && p?.color.grayish.G50};
   }
 `;
