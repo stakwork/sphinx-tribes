@@ -30,7 +30,7 @@ const BountyDetailsCreationData = {
   step_3: {
     step: 3,
     heading: 'Invite Developer',
-    sub_heading: 'Nemo enim ipsam quia voluptas sit',
+    sub_heading: '',
     schema: ['assignee'],
     schema2: ['']
   }
@@ -191,10 +191,6 @@ export default function Form(props: any) {
       });
   }
 
-  schema.map((x) => {
-    console.log(x);
-  });
-
   return (
     <Formik
       initialValues={initValues || {}}
@@ -329,13 +325,15 @@ export default function Form(props: any) {
                 <CreateBountyHeaderContainer>
                   <EuiText className="stepText">{`STEP ${schemaData.step}/3`}</EuiText>
                   <EuiText className="HeadingText">{schemaData.heading}</EuiText>
-                  <EuiText
-                    className="SubHeadingText"
-                    style={{
-                      marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                    }}>
-                    {schemaData.sub_heading}
-                  </EuiText>
+                  {schemaData.sub_heading && (
+                    <EuiText
+                      className="SubHeadingText"
+                      style={{
+                        marginBottom: schemaData.step === 1 ? '29px' : '37px'
+                      }}>
+                      {schemaData.sub_heading}
+                    </EuiText>
+                  )}
                 </CreateBountyHeaderContainer>
 
                 <SchemaTagsContainer>
@@ -449,7 +447,7 @@ export default function Form(props: any) {
                         }
                       }}>
                       <EuiText className="nextText">
-                        {schemaData.step === 3 ? 'Skip' : 'Next'}
+                        {schemaData.step === 3 ? 'Decide Later' : 'Next'}
                       </EuiText>
                     </div>
                     {schemaData.step > 1 && (
@@ -688,7 +686,7 @@ const CreateBountyHeaderContainer = styled.div`
     font-weight: 800;
     line-height: 43px;
     color: #3c3f41;
-    margin-bottom: 26px;
+    margin-bottom: 11px;
     margin-top: 16px;
   }
   .SubHeadingText {
@@ -697,6 +695,7 @@ const CreateBountyHeaderContainer = styled.div`
     font-weight: 400;
     line-height: 20px;
     color: #292c33;
+    margin-top: 15px;
   }
 `;
 
@@ -731,7 +730,7 @@ const BottomContainer = styled.div`
     align-items: center;
   }
   .nextButton {
-    width: 120px;
+    width: 145px;
     height: 42px;
     display: flex;
     justify-content: center;
