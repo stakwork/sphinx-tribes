@@ -5,6 +5,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../../colors';
 import { LanguageObject } from '../../../people/utils/language_label_style';
+import { SvgMask } from '../../../people/utils/svgMask';
+import IconButton from '../../../sphinxUI/icon_button';
 import ImageButton from '../../../sphinxUI/Image_button';
 
 const languages = [
@@ -117,22 +119,34 @@ const InvitePeopleSearch = (props) => {
             outline: 'none'
           }}
           button={
-            <div
-              className="SkillSetContainer"
-              onClick={onButtonClick}
-              style={{
+            <ImageButton
+              buttonText={'Skills'}
+              ButtonContainerStyle={{
+                width: '102px',
+                height: '40px',
                 border: !isPopoverOpen ? '' : `1px solid ${color?.blue1}`,
                 borderBottom: !isPopoverOpen ? '' : `1px solid ${color?.grayish.G700}`,
-                borderRadius: !isPopoverOpen ? '' : '4px 4px 0px 0px'
-              }}>
-              <EuiText
-                style={{
-                  fontSize: '12px',
-                  fontFamily: 'Barlow'
-                }}>
-                Skills
-              </EuiText>
-            </div>
+                borderRadius: !isPopoverOpen ? '4px' : '4px 4px 0px 0px',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                paddingLeft: '18px'
+              }}
+              endImageSrc={'/static/Skill_drop_down.svg'}
+              endingImageContainerStyle={{
+                left: 60,
+                top: -2
+              }}
+              buttonTextStyle={{
+                color: '#B0B7BC',
+                textAlign: 'center',
+                fontSize: '13px',
+                fontWeight: '400',
+                fontFamily: 'Roboto'
+              }}
+              buttonAction={() => {
+                onButtonClick();
+              }}
+            />
           }
           isOpen={isPopoverOpen}
           closePopover={closePopover}>
@@ -157,6 +171,17 @@ const InvitePeopleSearch = (props) => {
                 onChange(x.label);
               }}>
               <EuiText className="labelText">{x.label}</EuiText>
+              <SvgMask
+                src={'/static/label_cross.svg'}
+                bgcolor={x.color}
+                height={'23px'}
+                width={'16px'}
+                size={'8px'}
+                svgStyle={{
+                  marginLeft: '2px',
+                  marginTop: '1px'
+                }}
+              />
             </Label>
           ))}
       </LabelsContainer>
@@ -176,27 +201,34 @@ const InvitePeopleSearch = (props) => {
                 </div>
                 <EuiText className="PeopleName">{value.owner_alias}</EuiText>
               </div>
-              <ImageButton
-                buttonText={inviteNameId === value?.id ? ' Invited' : ' Invite'}
-                ButtonContainerStyle={{
-                  width: '74.58px',
-                  height: '32px'
-                }}
-                buttonAction={(e) => {
-                  handler('', value.owner_alias);
-                  setInviteNameId(value.id);
-                  props?.handleChange({
-                    owner_alias: value.owner_alias,
-                    owner_pubkey: value.owner_pubkey,
-                    img: value.img,
-                    value: value.owner_pubkey,
-                    label: `${value.owner_alias} (${value.owner_alias
-                      .toLowerCase()
-                      .replace(' ', '')})`
-                  });
-                  setSearchValue(value.owner_alias);
-                }}
-              />
+              {inviteNameId === value?.id ? (
+                <InvitedButton>
+                  <EuiText className="nextText">Invited</EuiText>
+                </InvitedButton>
+              ) : (
+                <ImageButton
+                  buttonText={'Invite'}
+                  ButtonContainerStyle={{
+                    width: '74.58px',
+                    height: '32px'
+                  }}
+                  buttonAction={(e) => {
+                    handler('', value.owner_alias);
+                    setInviteNameId(value.id);
+                    props?.handleChange({
+                      owner_alias: value.owner_alias,
+                      owner_pubkey: value.owner_pubkey,
+                      img: value.img,
+                      value: value.owner_pubkey,
+                      label: `${value.owner_alias} (${value.owner_alias
+                        .toLowerCase()
+                        .replace(' ', '')})`
+                    });
+                    setSearchValue(value.owner_alias);
+                    props.setAssigneefunction(value.owner_alias);
+                  }}
+                />
+              )}
             </div>
           );
         })}
@@ -399,6 +431,7 @@ const Label = styled.div<labelProps>`
   height: 23px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   text-align: center;
   border: ${(p) => p?.value && p?.value.border};
   background: ${(p) => p?.value && p?.value.background};
@@ -413,5 +446,33 @@ const Label = styled.div<labelProps>`
     font-size: 13px;
     line-height: 16px;
     color: ${(p) => p?.value && p?.value.color};
+  }
+`;
+
+const InvitedButton = styled.div`
+  width: 74.58px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: #618aff;
+  box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+  border-radius: 32px;
+  color: #fff;
+  :hover {
+    background: #5881f8;
+  }
+  :active {
+    background: #5078f2;
+  }
+  .nextText {
+    font-family: Barlow;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 15px;
+    user-select: none;
+    text-align: center;
+    letter-spacing: 0.01em;
   }
 `;
