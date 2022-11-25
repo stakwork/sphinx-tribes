@@ -150,14 +150,19 @@ const InvitePeopleSearch = (props) => {
       <LabelsContainer>
         {labels &&
           labels?.map((x, index) => (
-            <Label key={x.label} value={x}>
+            <Label
+              key={x.label}
+              value={x}
+              onClick={() => {
+                onChange(x.label);
+              }}>
               <EuiText className="labelText">{x.label}</EuiText>
             </Label>
           ))}
       </LabelsContainer>
 
       <div className="PeopleList">
-        {peopleData?.slice(0, 50)?.map((value) => {
+        {peopleData?.slice(0, 100)?.map((value) => {
           return (
             <div className="People" key={value.id}>
               <div className="PeopleDetailContainer">
@@ -400,6 +405,7 @@ const Label = styled.div<labelProps>`
   margin-right: 4px;
   border-radius: 4px;
   padding: 2px 6px;
+  cursor: pointer;
   .labelText {
     font-family: 'Barlow';
     font-style: normal;

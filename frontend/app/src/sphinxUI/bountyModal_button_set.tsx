@@ -17,7 +17,7 @@ const ButtonSet = (props) => {
           <img
             className="buttonImage"
             src={'/static/github_ticket.svg'}
-            alt={''}
+            alt={'github_ticket'}
             height={'14px'}
             width={'14px'}
           />
@@ -29,7 +29,7 @@ const ButtonSet = (props) => {
           <img
             className="buttonImage"
             src={'/static/copy_link.svg'}
-            alt={''}
+            alt={'copy_link'}
             height={'10px'}
             width={'20px'}
           />
@@ -41,7 +41,7 @@ const ButtonSet = (props) => {
           <img
             className="buttonImage"
             src={'/static/share_with_twitter.svg'}
-            alt={''}
+            alt={'twitter'}
             height={'15px'}
             width={'19px'}
           />
