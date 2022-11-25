@@ -80,8 +80,9 @@ export default function Modal(props: any) {
               zIndex: 10,
               ...bigCloseImageStyle
             }}
-            onClick={bigCloseImage}>
-            <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
+            onClick={bigCloseImage}
+          >
+            <img src="static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
           </div>
         )}
 

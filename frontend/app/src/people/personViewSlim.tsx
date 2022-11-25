@@ -315,7 +315,8 @@ export default function PersonView(props: any) {
                 cursor: 'pointer',
                 padding: 0,
                 overflow: 'hidden'
-              }}>
+              }}
+            >
               {React.cloneElement(child, { ...s })}
             </Panel>
           );
@@ -330,7 +331,8 @@ export default function PersonView(props: any) {
                 display: 'flex',
                 justifyContent: 'flex-end',
                 paddingBottom: '16px'
-              }}>
+              }}
+            >
               <PersonIconButton
                 text={'Post a Bounty'}
                 endingIcon={'add'}
