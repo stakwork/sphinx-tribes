@@ -47,6 +47,7 @@ export default function Form(props: any) {
   const [showDeleteWarn, setShowDeleteWarn] = useState(false);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [peopleList, setPeopleList] = useState<any>();
+  const [assigneeName, setAssigneeName] = useState<string>('');
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
 
@@ -362,6 +363,7 @@ export default function Form(props: any) {
                           key={item.name}
                           newDesign={true}
                           values={values}
+                          setAssigneefunction={item.name === 'assignee' && setAssigneeName}
                           peopleList={peopleList}
                           // disabled={readOnly}
                           // readOnly={readOnly}
@@ -426,7 +428,7 @@ export default function Form(props: any) {
                       ))}
                   </div>
                 </SchemaTagsContainer>
-                <BottomContainer>
+                <BottomContainer assigneeName={assigneeName}>
                   {stepTracker < 3 && <EuiText className="RequiredText">* Required</EuiText>}
                   <div
                     className="ButtonContainer"
@@ -438,17 +440,24 @@ export default function Form(props: any) {
                       onClick={() => {
                         if (schemaData.step === 3) {
                           if (dynamicSchemaName) {
-                            // inject type in body
                             setFieldValue('type', dynamicSchemaName);
                           }
-                          handleSubmit();
+                          if (assigneeName !== '') {
+                            handleSubmit();
+                          } else {
+                            setAssigneeName('a');
+                          }
                         } else {
                           NextStepHandler();
                         }
                       }}>
-                      <EuiText className="nextText">
-                        {schemaData.step === 3 ? 'Decide Later' : 'Next'}
-                      </EuiText>
+                      {assigneeName === '' ? (
+                        <EuiText className="nextText">
+                          {schemaData.step === 3 ? 'Decide Later' : 'Next'}
+                        </EuiText>
+                      ) : (
+                        <EuiText className="nextText">Finish</EuiText>
+                      )}
                     </div>
                     {schemaData.step > 1 && (
                       <>
@@ -458,7 +467,10 @@ export default function Form(props: any) {
                             width: '120px',
                             height: '42px'
                           }}
-                          buttonAction={PreviousStepHandler}
+                          buttonAction={() => {
+                            PreviousStepHandler();
+                            setAssigneeName('');
+                          }}
                         />
                       </>
                     )}
@@ -654,6 +666,10 @@ interface BWrapProps {
   readonly floatingButtons: boolean;
 }
 
+interface bottomButtonProps {
+  assigneeName?: string;
+}
+
 const BWrap = styled.div`
   display: flex;
   justify-content: space-between !important;
@@ -712,7 +728,7 @@ const SchemaTagsContainer = styled.div`
   }
 `;
 
-const BottomContainer = styled.div`
+const BottomContainer = styled.div<bottomButtonProps>`
   display: flex;
   justify-content: space-between;
   padding: 0px 48px;
@@ -736,15 +752,16 @@ const BottomContainer = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background: #618aff;
-    box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+    background: ${(p) => (p?.assigneeName === '' ? '#618aff' : '#49C998')};
+    box-shadow: 0px 2px 10px
+      ${(p) => (p?.assigneeName === '' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)')};
     border-radius: 32px;
     color: #fff;
     :hover {
-      background: #5881f8;
+      background: ${(p) => (p?.assigneeName === '' ? '#5881f8' : '#3CBE88')};
     }
     :active {
-      background: #5078f2;
+      background: ${(p) => (p?.assigneeName === '' ? '#5078f2' : '#2FB379')};
     }
     .nextText {
       font-family: Barlow;
