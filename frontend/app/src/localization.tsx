@@ -6,7 +6,7 @@ const loc: { [key in LocType]: any } = {
     people: 'People',
     bots: 'Bots',
     portfolios: 'Portfolios',
-    tickets: 'Tickets',
+    tickets: 'Bounties',
 
     startYourOwnProfile: 'Start your own profile',
     getStarted: 'Get Started',
