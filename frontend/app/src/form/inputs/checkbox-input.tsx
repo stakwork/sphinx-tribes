@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { EuiCheckbox } from '@elastic/eui';
 import type { Props } from './propsType';
 import { Note } from './index';
+import { colors } from '../../colors';
 
 export default function CheckBox({
   label,
@@ -16,6 +17,7 @@ export default function CheckBox({
   prepend,
   extraHTML
 }: Props) {
+  const color = colors['light'];
   useEffect(() => {
     // if value not initiated, default value true
     if (name === 'show' && value === undefined) handleChange(true);
@@ -34,7 +36,7 @@ export default function CheckBox({
         onFocus={handleFocus}
         compressed
       />
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
     </>
   );
 }

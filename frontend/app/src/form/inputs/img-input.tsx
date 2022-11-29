@@ -12,6 +12,7 @@ import { useStores } from '../../store';
 import { Button, Modal } from '../../sphinxUI';
 import { MAX_UPLOAD_SIZE } from '../../people/utils/constants';
 import { Note } from './index';
+import { colors } from '../../colors';
 
 export default function ImageInput({
   label,
@@ -23,6 +24,7 @@ export default function ImageInput({
   notProfilePic,
   imageIcon
 }: Props) {
+  const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
@@ -101,7 +103,7 @@ export default function ImageInput({
         {({ getRootProps, getInputProps, isDragActive, open }) => (
           <DropzoneStuff>
             {imageIcon ? (
-              <DottedCircle isDragActive={isDragActive} style={addedStyle}>
+              <DottedCircle isDragActive={isDragActive} style={addedStyle} color={color}>
                 <input {...getInputProps()} />
                 <ImageCircle style={addedStyle}>
                   {!uploading ? (
@@ -136,7 +138,12 @@ export default function ImageInput({
                 </div>
               </DottedCircle>
             ) : (
-              <DottedCircle {...getRootProps()} isDragActive={isDragActive} style={addedStyle}>
+              <DottedCircle
+                {...getRootProps()}
+                isDragActive={isDragActive}
+                style={addedStyle}
+                color={color}
+              >
                 <input {...getInputProps()} />
                 <ImageCircle style={addedStyle}>
                   {!uploading ? (
@@ -189,7 +196,7 @@ export default function ImageInput({
         </div>
       </Modal>
 
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
     </ImageWrap>
   );
 }
@@ -226,6 +233,7 @@ const ImageWrap = styled.div`
 `;
 export interface DottedCircleProps {
   isDragActive: boolean;
+  color?: any;
 }
 const DottedCircle = styled.div<DottedCircleProps>`
   display: flex;
@@ -235,7 +243,7 @@ const DottedCircle = styled.div<DottedCircleProps>`
   width: 120px;
   border-radius: 50%;
   border-style: dashed;
-  border-color: ${(p) => (p.isDragActive ? 'white' : '#6b7a8d')};
+  border-color: ${(p) => (p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`)};
   border-width: thin;
   cursor: pointer;
 `;

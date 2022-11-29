@@ -10,7 +10,8 @@ const ButtonSet = (props) => {
       style={{
         ...props.ButtonSetContainerStyle
       }}
-      color={color}>
+      color={color}
+    >
       <ButtonContainer onClick={props?.githubShareAction} color={color}>
         <EuiText className="ButtonText">Github Ticket</EuiText>
         <div className="ImageContainer">
