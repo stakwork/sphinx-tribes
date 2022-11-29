@@ -54,7 +54,8 @@ export default function Modal(props: any) {
         alignItems: 'center',
         justifyContent: 'center'
         // overflow: 'auto',
-      }}>
+      }}
+    >
       <Env style={{ ...fillStyle, ...envStyle }} color={color}>
         {close && (
           <X color={color}>

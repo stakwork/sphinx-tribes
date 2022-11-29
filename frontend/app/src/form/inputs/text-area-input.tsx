@@ -25,16 +25,19 @@ export default function TextAreaInput({
   if (error) labeltext = `${labeltext} (${error})`;
   const [active, setActive] = useState<boolean>(false);
   return (
-    <OuterContainer>
+    <OuterContainer color={color}>
       <FieldEnv
+        color={color}
         onClick={() => {
           setActive(true);
         }}
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
-        label={labeltext}>
+        label={labeltext}
+      >
         <R>
           <FieldTextArea
+            color={color}
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
@@ -51,14 +54,15 @@ export default function TextAreaInput({
             // prepend={prepend}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
+        color={color}
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />

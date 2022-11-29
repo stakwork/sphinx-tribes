@@ -11,6 +11,7 @@ import { formDropdownOptions } from '../people/utils/constants';
 import { EuiText } from '@elastic/eui';
 import api from '../api';
 import ImageButton from '../sphinxUI/Image_button';
+import { colors } from '../colors';
 
 const BountyDetailsCreationData = {
   step_1: {
@@ -50,6 +51,7 @@ export default function Form(props: any) {
   const [assigneeName, setAssigneeName] = useState<string>('');
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
+  const color = colors['light'];
 
   const [schemaData, setSchemaData] = useState(BountyDetailsCreationData.step_1);
   const [stepTracker, setStepTracker] = useState<number>(1);
@@ -197,7 +199,8 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}>
+      validationSchema={validator(schema)}
+    >
       {({
         setFieldTouched,
         handleSubmit,
@@ -218,7 +221,8 @@ export default function Form(props: any) {
               minWidth: stepTracker === 3 ? '388px' : '712px',
               maxWidth: stepTracker === 3 ? '388px' : '712px'
             }}
-            newDesign={props?.newDesign}>
+            newDesign={props?.newDesign}
+          >
             {/* schema flipping dropdown */}
             {/* {dynamicSchema && (
               <Select
@@ -243,7 +247,8 @@ export default function Form(props: any) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
-                  }}>
+                  }}
+                >
                   <div style={{ marginRight: '40px' }}>
                     {schema
                       .filter((item: FormField) => item.type === 'img')
@@ -323,7 +328,7 @@ export default function Form(props: any) {
               </>
             ) : props?.newDesign ? (
               <>
-                <CreateBountyHeaderContainer>
+                <CreateBountyHeaderContainer color={color}>
                   <EuiText className="stepText">{`STEP ${schemaData.step}/3`}</EuiText>
                   <EuiText className="HeadingText">{schemaData.heading}</EuiText>
                   {schemaData.sub_heading && (
@@ -331,7 +336,8 @@ export default function Form(props: any) {
                       className="SubHeadingText"
                       style={{
                         marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                      }}>
+                      }}
+                    >
                       {schemaData.sub_heading}
                     </EuiText>
                   )}
@@ -428,13 +434,14 @@ export default function Form(props: any) {
                       ))}
                   </div>
                 </SchemaTagsContainer>
-                <BottomContainer assigneeName={assigneeName}>
+                <BottomContainer color={color} assigneeName={assigneeName}>
                   {stepTracker < 3 && <EuiText className="RequiredText">* Required</EuiText>}
                   <div
                     className="ButtonContainer"
                     style={{
                       width: stepTracker < 3 ? '45%' : '100%'
-                    }}>
+                    }}
+                  >
                     <div
                       className="nextButton"
                       onClick={() => {
@@ -450,7 +457,8 @@ export default function Form(props: any) {
                         } else {
                           NextStepHandler();
                         }
-                      }}>
+                      }}
+                    >
                       {assigneeName === '' ? (
                         <EuiText className="nextText">
                           {schemaData.step === 3 ? 'Decide Later' : 'Next'}
@@ -515,7 +523,7 @@ export default function Form(props: any) {
             {/* make space at bottom for first sign up */}
             {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
             {!props?.newDesign && (
-              <BWrap style={buttonAlignment}>
+              <BWrap style={buttonAlignment} color={color}>
                 {props?.close && buttonsOnBottom ? (
                   <Button
                     disabled={disableFormButtons || props.loading}
@@ -590,7 +598,8 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}>
+                  onClick={() => setShowSettings(!showSettings)}
+                >
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -620,7 +629,8 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}>
+                      }}
+                    >
                       <Button
                         text={'Nevermind'}
                         color={'white'}
@@ -647,6 +657,9 @@ export default function Form(props: any) {
   );
 }
 
+interface styledProps {
+  color?: any;
+}
 interface WrapProps {
   newDesign?: string;
 }
@@ -668,9 +681,10 @@ interface BWrapProps {
 
 interface bottomButtonProps {
   assigneeName?: string;
+  color?: any;
 }
 
-const BWrap = styled.div`
+const BWrap = styled.div<styledProps>`
   display: flex;
   justify-content: space-between !important;
   align-items: center;
@@ -679,12 +693,12 @@ const BWrap = styled.div`
   min-height: 42px;
   position: absolute;
   left: 0px;
-  background: #ffffff;
+  background: ${(p) => p?.color && p.color.pureWhite};
   z-index: 10;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+  box-shadow: 0px 1px 6px ${(p) => p?.color && p.color.black100};
 `;
 
-const CreateBountyHeaderContainer = styled.div`
+const CreateBountyHeaderContainer = styled.div<styledProps>`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -701,7 +715,7 @@ const CreateBountyHeaderContainer = styled.div`
     font-size: 36px;
     font-weight: 800;
     line-height: 43px;
-    color: #3c3f41;
+    color: ${(p) => p?.color && p.color.grayish.G10};
     margin-bottom: 11px;
     margin-top: 16px;
   }
@@ -710,7 +724,7 @@ const CreateBountyHeaderContainer = styled.div`
     font-size: 17px;
     font-weight: 400;
     line-height: 20px;
-    color: #292c33;
+    color: ${(p) => p?.color && p.color.grayish.G05};
     margin-top: 15px;
   }
 `;
@@ -737,7 +751,7 @@ const BottomContainer = styled.div<bottomButtonProps>`
     font-family: Barlow;
     font-weight: 400;
     line-height: 35px;
-    color: #b0b7bc;
+    color: ${(p) => p?.color && p.color.grayish.G300};
   }
   .ButtonContainer {
     display: flex;
@@ -752,16 +766,26 @@ const BottomContainer = styled.div<bottomButtonProps>`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background: ${(p) => (p?.assigneeName === '' ? '#618aff' : '#49C998')};
+    background: ${(p) =>
+      p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
     box-shadow: 0px 2px 10px
-      ${(p) => (p?.assigneeName === '' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)')};
+      ${(p) =>
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.shadow}`
+          : `${p.color.button_primary.shadow}`};
     border-radius: 32px;
-    color: #fff;
+    color: ${(p) => p?.color && p.color.pureWhite};
     :hover {
-      background: ${(p) => (p?.assigneeName === '' ? '#5881f8' : '#3CBE88')};
+      background: ${(p) =>
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.hover}`
+          : `${p.color.button_primary.hover}`};
     }
     :active {
-      background: ${(p) => (p?.assigneeName === '' ? '#5078f2' : '#2FB379')};
+      background: ${(p) =>
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.active}`
+          : `${p.color.button_primary.active}`};
     }
     .nextText {
       font-family: Barlow;

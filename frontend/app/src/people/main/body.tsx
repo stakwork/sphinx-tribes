@@ -804,7 +804,8 @@ export default function BodyComponent({ selectedWidget }) {
               right: '-18px',
               background: '#000',
               borderRadius: '50%'
-            }}>
+            }}
+          >
             <FocusedView
               newDesign={true}
               person={person}

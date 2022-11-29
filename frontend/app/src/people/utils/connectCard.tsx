@@ -20,7 +20,8 @@ export default function ConnectCard(props) {
         overlayClick={(e: React.SyntheticEvent) => {
           props.dismiss();
         }}
-        visible={visible}>
+        visible={visible}
+      >
         <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
           <ImgWrap>
             <W color={color}>
@@ -28,7 +29,8 @@ export default function ConnectCard(props) {
             </W>
           </ImgWrap>
           <div
-            style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}>
+            style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}
+          >
             <N color={color}>Discuss this bounty with</N>
             <D color={color}>
               <B>{person?.owner_alias} </B>

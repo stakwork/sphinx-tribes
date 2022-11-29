@@ -28,9 +28,11 @@ export default function SelectInput({
   return (
     <OuterContainer color={color}>
       <FieldEnv
+        color={color}
         label={labeltext}
         onClick={() => {}}
-        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}>
+        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
+      >
         <R>
           <Select
             name={'first'}
@@ -50,7 +52,7 @@ export default function SelectInput({
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
