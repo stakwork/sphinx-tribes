@@ -80,11 +80,13 @@ export default function SearchableSelectInput({
   return (
     <>
       <FieldEnv
+        color={color}
         label={labeltext}
         isTop={true}
         style={{
           border: isBorder ? `1px solid ${color.grayish.G600} ` : `1px solid ${color.pureWhite}`
-        }}>
+        }}
+      >
         <R>
           <SearchableSelect
             selectStyle={{ border: 'none' }}
@@ -107,7 +109,7 @@ export default function SearchableSelectInput({
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

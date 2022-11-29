@@ -39,7 +39,8 @@ export default function QR(props) {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
+        }}
+      >
         {centerIcon}
       </div>
 
@@ -54,7 +55,8 @@ export default function QR(props) {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <div style={{ background: color.pureWhite, height: 75, width: 75 }} />
       </div>
     </div>

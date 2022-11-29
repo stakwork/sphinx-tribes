@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
+import { colors } from '../colors';
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
   const { options, onChange, value, style, setIsTop } = props;
+  const color = colors['light'];
 
   const opts =
     options.map((o) => {
@@ -17,6 +19,7 @@ export default function Sel(props: any) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <S
+        color={color}
         closeMenuOnSelect={false}
         isMulti
         options={opts}
@@ -34,10 +37,14 @@ export default function Sel(props: any) {
   );
 }
 
-const S = styled(CreatableSelect)`
+interface styledProps {
+  color?: any;
+}
+
+const S = styled(CreatableSelect)<styledProps>`
 background:#ffffff00;
-border: 1px solid #E0E0E0;
-color:#000;
+border: 1px solid ${(p) => p.color && p.color.grayish.G750};
+color: ${(p) => p.color && p.color.pureBlack};
 box-sizing: border-box;
 box-shadow:none;
 border: none !important;
@@ -82,8 +89,8 @@ div {
 }
 
 button {
-    background:#ffffff !important;
-    background-color:#ffffff !important;
+    background: ${(p) => p.color && p.color.pureWhite} !important;
+    background-color: ${(p) => p.color && p.color.pureWhite} !important;
 }
 }
 `;

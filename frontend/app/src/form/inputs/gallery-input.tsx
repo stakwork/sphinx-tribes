@@ -7,6 +7,7 @@ import MaterialIcon from '@material/react-material-icon';
 
 import { Button, Modal } from '../../sphinxUI';
 import { MAX_UPLOAD_SIZE } from '../../people/utils/constants';
+import { colors } from '../../colors';
 
 export default function GalleryInput({
   label,
@@ -15,6 +16,7 @@ export default function GalleryInput({
   handleBlur,
   handleFocus
 }: Props) {
+  const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
@@ -107,7 +109,7 @@ export default function GalleryInput({
             return (
               <ImageWrap key={i}>
                 <Close onClick={() => deleteImg(i)}>
-                  <MaterialIcon icon={'close'} style={{ color: '#000', fontSize: 12 }} />
+                  <MaterialIcon icon={'close'} style={{ color: color.pureBlack, fontSize: 12 }} />
                 </Close>
                 <Sq>
                   <ImageCircle>
@@ -152,8 +154,6 @@ export default function GalleryInput({
                     width: 154,
                     paddingRight: 20
                   }}
-                  // iconSize={18}
-                  // width={150}
                   height={48}
                   text={'Add Media'}
                   color="widget"

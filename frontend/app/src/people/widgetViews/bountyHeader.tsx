@@ -83,7 +83,8 @@ const BountyHeader = ({
             borderBottom: scrollValue
               ? `1px solid ${color.grayish.G600}`
               : `0px solid ${color.grayish.G600}`
-          }}>
+          }}
+        >
           <BountyHeaderDesk>
             <B>
               <IconButton
@@ -223,7 +224,8 @@ const BountyHeader = ({
                           zIndex: 3 - index,
                           marginLeft: index > 0 ? '-14px' : '',
                           objectFit: 'cover'
-                        }}>
+                        }}
+                      >
                         <img
                           height={'23px'}
                           width={'23px'}
@@ -364,7 +366,8 @@ const BountyHeader = ({
                       style={{
                         zIndex: 3 - index,
                         marginLeft: index > 0 ? '-14px' : ''
-                      }}>
+                      }}
+                    >
                       <img
                         height={'20px'}
                         width={'20px'}
