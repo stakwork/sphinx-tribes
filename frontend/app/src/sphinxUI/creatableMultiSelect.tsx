@@ -4,7 +4,7 @@ import CreatableSelect from 'react-select/creatable';
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
-  const { options, onChange, value, style } = props;
+  const { options, onChange, value, style, setIsTop } = props;
 
   const opts =
     options.map((o) => {
@@ -22,6 +22,12 @@ export default function Sel(props: any) {
         options={opts}
         value={value}
         onChange={(value) => onChange(value)}
+        onBlur={() => {
+          setIsTop(false);
+        }}
+        onFocus={() => {
+          setIsTop(true);
+        }}
         className={'multi-select-input'}
       />
     </div>

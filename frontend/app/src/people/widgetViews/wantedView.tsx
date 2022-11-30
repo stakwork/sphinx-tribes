@@ -153,7 +153,7 @@ export default function WantedView(props: any) {
                     margin: 0
                   }}
                 />
-              </div> 
+              </div>
               <DT
                 style={{
                   margin: '15px 0'
@@ -433,7 +433,6 @@ export default function WantedView(props: any) {
 
     return (
       <>
-
         {paid && (
           <Img
             src={'/static/paid_ribbon.svg'}

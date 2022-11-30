@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -13,21 +14,29 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
+  const [developerCount, setDeveloperCount] = useState<number>(0);
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
   const color = colors['light'];
   useEffect(() => {
+    // eslint-disable-next-line func-style
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
-          const bounty = await api.get(
-            `people/wanteds?page=1&resetPage=true&search=&sortBy=created&limit=100`
-          );
-          const response = await api.get(`people?page=1&search=&sortBy=last_login&limit=100`);
-          setPeopleList(response);
-          setActiveBounty(bounty?.length);
+          /*
+          
+           * TODO : Since this PR is merged only in people-test we will be using this api, when it will be merge in master then remove this fetch and use api.get() function.
+
+           */
+
+          const responseNew = await fetch(
+            'https://people-test.sphinx.chat/people/wanteds/header'
+          ).then((response) => response.json());
+          setPeopleList(responseNew.people);
+          setDeveloperCount(responseNew?.developer_count || 0);
+          setActiveBounty(responseNew?.bounties_count);
         } catch (error) {
           console.log(error);
         }
@@ -56,8 +65,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
             borderBottom: scrollValue
               ? `1px solid ${color.grayish.G600}`
               : `0px solid ${color.grayish.G600}`
-          }}
-        >
+          }}>
           <BountyHeaderDesk>
             <B>
               <IconButton
@@ -121,8 +129,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   display: 'flex',
                   alignItems: 'center',
                   marginLeft: '33px'
-                }}
-              >
+                }}>
                 <img src="/static/copy.svg" alt="" height={22} width={18} />
                 <EuiText
                   style={{
@@ -136,13 +143,11 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                     width: '153px',
                     display: 'flex',
                     alignItems: 'center'
-                  }}
-                >
+                  }}>
                   <span
                     style={{
                       color: color.pureBlack
-                    }}
-                  >
+                    }}>
                     {activeBounty}
                   </span>
                   &nbsp; Bounties opened
@@ -160,9 +165,9 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                       <DevelopersImageContainer
                         style={{
                           zIndex: 3 - index,
-                          marginLeft: index > 0 ? '-14px' : ''
-                        }}
-                      >
+                          marginLeft: index > 0 ? '-14px' : '',
+                          objectFit: 'cover'
+                        }}>
                         <img
                           height={'23px'}
                           width={'23px'}
@@ -182,9 +187,8 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   fontWeight: '600',
                   fontFamily: 'Barlow',
                   color: '#222E3A'
-                }}
-              >
-                {peopleList && peopleList?.length}
+                }}>
+                {developerCount}
               </EuiText>
             </D>
           </BountyHeaderDesk>
@@ -303,8 +307,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                       style={{
                         zIndex: 3 - index,
                         marginLeft: index > 0 ? '-14px' : ''
-                      }}
-                    >
+                      }}>
                       <img
                         height={'20px'}
                         width={'20px'}
@@ -323,8 +326,7 @@ const BountyHeader = ({ selectedWidget, setShowFocusView, scrollValue }) => {
                   fontFamily: 'Barlow',
                   fontWeight: '500',
                   color: '#222E3A'
-                }}
-              >
+                }}>
                 {peopleList && peopleList?.length}
               </EuiText>
             </DevelopersContainerMobile>

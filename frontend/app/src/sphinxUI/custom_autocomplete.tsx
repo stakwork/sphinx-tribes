@@ -1,8 +1,11 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../colors';
+import ImageButton from './Image_button';
 
 const AutoComplete = (props) => {
+  const color = colors['light'];
   const [searchValue, setSearchValue] = useState<string>('');
   const [peopleData, setPeopleData] = useState<any>(props.peopleList);
 
@@ -21,14 +24,14 @@ const AutoComplete = (props) => {
   }, [searchValue, props]);
 
   return (
-    <SearchOuterContainer>
+    <SearchOuterContainer color={color}>
       <input
         className="SearchInput"
         onChange={handler}
         placeholder={'Search'}
         style={{
-          background: '#fff',
-          color: '#292C33',
+          background: color.pureWhite,
+          color: color.text1,
           fontFamily: 'Barlow'
         }}
       />
@@ -36,22 +39,8 @@ const AutoComplete = (props) => {
         {peopleData?.slice(0, 5)?.map((value, index) => {
           return (
             <div className="People" key={index}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                <div
-                  style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
+              <div className="PeopleDetailContainer">
+                <div className="ImageContainer">
                   <img
                     src={value.img || '/static/person_placeholder.png'}
                     alt={'user-image'}
@@ -59,47 +48,18 @@ const AutoComplete = (props) => {
                     width={'100%'}
                   />
                 </div>
-                <EuiText
-                  style={{
-                    fontFamily: 'Barlow',
-                    fontStyle: 'normal',
-                    fontWeight: '500',
-                    fontSize: '13px',
-                    lineHeight: '16px',
-                    color: '#3C3F41',
-                    marginLeft: '10px'
-                  }}>
-                  {value.owner_alias}
-                </EuiText>
+                <EuiText className="PeopleName">{value.owner_alias}</EuiText>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  minHeight: '32px',
-                  minWidth: '74.58px',
-                  borderRadius: '50px',
-                  background: '#FFFFFF',
-                  border: ' 1px solid #DDE1E5',
-                  cursor: 'pointer'
+              <ImageButton
+                buttonText={'Assign'}
+                ButtonContainerStyle={{
+                  width: '74.58px',
+                  height: '32px'
                 }}
-                onClick={() => {
+                buttonAction={() => {
                   props?.handleAssigneeDetails(value);
-                }}>
-                <EuiText
-                  style={{
-                    fontFamily: 'Barlow',
-                    fontStyle: 'normal',
-                    fontWeight: '500',
-                    fontSize: '13px',
-                    lineHeight: '16px',
-                    letterSpacing: '0.01em',
-                    color: '#5F6368'
-                  }}>
-                  Assign
-                </EuiText>
-              </div>
+                }}
+              />
             </div>
           );
         })}
@@ -110,49 +70,53 @@ const AutoComplete = (props) => {
 
 export default AutoComplete;
 
-const SearchOuterContainer = styled.div`
+interface styledProps {
+  color?: any;
+}
+
+const SearchOuterContainer = styled.div<styledProps>`
   min-height: 347px;
   max-height: 347px;
   min-width: 336px;
   max-width: 336px;
   overflow-x: hidden;
   overflow-y: scroll;
-  background: #fff;
+  background: ${(p) => p?.color && p.color.pureWhite};
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 25px 0 0 0;
 
   .SearchInput {
-    background: #ffffff;
-    border: 1px solid #dde1e5;
+    background: ${(p) => p?.color && p.color.pureWhite};
+    border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
     border-radius: 200px;
     width: 292px;
     height: 40px;
     outline: none;
     overflow: hidden;
-    caret-color: #a3c1ff;
+    caret-color: ${(p) => p?.color && p.color.light_blue100};
     margin-bottom: 8px;
     padding: 0px 18px;
 
     :focus-visible {
-      background: #ffffff;
-      border: 1px solid #dde1e5;
+      background: ${(p) => p?.color && p.color.pureWhite};
+      border: 1px solid ${(p) => p?.color && p.color.grayish.G600};
       border-radius: 200px;
       outline: none;
     }
     :active {
       .SearchText {
         outline: none;
-        background: #ffffff;
-        border: 1px solid #dde1e5;
+        background: ${(p) => p?.color && p.color.pureWhite};
+        border: 1px solid ${(p) => p?.color && p.color.grayish.G600};
         border-radius: 200px;
         outline: none;
       }
     }
   }
   .PeopleList {
-    background: #ffffff;
+    background: ${(p) => p?.color && p.color.pureWhite};
     .People {
       height: 32px;
       min-width: 291.5813903808594px;
@@ -160,6 +124,30 @@ const SearchOuterContainer = styled.div`
       align-items: center;
       justify-content: space-between;
       margin-top: 16px;
+      .PeopleDetailContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .ImageContainer {
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+          overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          object-fit: cover;
+        }
+        .PeopleName {
+          font-family: Barlow;
+          font-style: normal;
+          font-weight: 500;
+          font-size: 13px;
+          line-height: 16px;
+          color: ${(p) => p?.color && p.color.grayish.G10};
+          margin-left: 10px;
+        }
+      }
     }
   }
 `;

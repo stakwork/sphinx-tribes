@@ -24,7 +24,8 @@ export default function FocusedView(props: any) {
     formHeader,
     manualGoBackOnly,
     isFirstTimeScreen,
-    fromBountyPage
+    fromBountyPage,
+    newDesign
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -35,6 +36,7 @@ export default function FocusedView(props: any) {
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
   const [editable, setEditable] = useState<boolean>(!canEdit);
+  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
@@ -318,12 +320,14 @@ export default function FocusedView(props: any) {
           ...props?.style,
           width: '100%',
           height: '100%'
-        }}>
+        }}
+      >
         {editMode ? (
           <B ref={scrollDiv} hide={false}>
             {formHeader && formHeader}
             {ui.meInfo && (
               <Form
+                newDesign={newDesign}
                 buttonsOnBottom={buttonsOnBottom}
                 isFirstTimeScreen={isFirstTimeScreen}
                 readOnly={editable}
@@ -354,7 +358,8 @@ export default function FocusedView(props: any) {
               <BWrap
                 style={{
                   ...noShadow
-                }}>
+                }}
+              >
                 {goBack ? (
                   <IconButton
                     icon="arrow_back"
@@ -375,7 +380,8 @@ export default function FocusedView(props: any) {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center'
-                    }}>
+                    }}
+                  >
                     <Button
                       onClick={() => setEditMode(true)}
                       color={'widget'}
@@ -469,7 +475,8 @@ interface BProps {
   hide: boolean;
 }
 const B = styled.div<BProps>`
-  display: ${(p) => p.hide && 'none'};
+  display: ${(p) => (p.hide ? 'none' : 'flex')};
+  justify-content: ${(p) => (p.hide ? 'none' : 'center')};
   height: 100%;
   width: 100%;
   overflow-y: auto;
