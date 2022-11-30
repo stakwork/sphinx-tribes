@@ -300,12 +300,3 @@ const CodingLabels = styled.div<codingLangProps>`
     line-height: 16px;
   }
 `;
-
-const ReplitImg = styled.div<replit_image_props>`
-  border-radius: 10%;
-  align-self: center;
-  margin-right: 5px;
-	background-color: black;
-	padding: 2px;
-	color: white;
-`;
