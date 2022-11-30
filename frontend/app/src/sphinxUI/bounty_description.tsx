@@ -182,9 +182,15 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
-          {containsReplitLink && (
-            <ReplitImg src={'/static/replit.png'} alt={''} height={'20px'} width={'20px'} />
-          )}
+					{containsReplitLink && <div style={{display: 'flex'}}><CodingLabels key={0}
+                  border={'1px solid rgba(176, 183, 188, 0.1)'}
+
+                  color={color.grayish.G300 }
+
+                  background={color.grayish.G10}><img style={{marginRight: '5px'}} src={'/static/replit.png'} alt={''} height={'15px'} width={'15px'} />
+                  <EuiText className="LanguageText">Replit</EuiText>
+									</CodingLabels>
+									</div>}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
@@ -295,8 +301,11 @@ const CodingLabels = styled.div<codingLangProps>`
   }
 `;
 
-const ReplitImg = styled.img<replit_image_props>`
-  border-radius: 50%;
+const ReplitImg = styled.div<replit_image_props>`
+  border-radius: 10%;
   align-self: center;
   margin-right: 5px;
+	background-color: black;
+	padding: 2px;
+	color: white;
 `;
