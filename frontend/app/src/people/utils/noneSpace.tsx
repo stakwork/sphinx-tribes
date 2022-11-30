@@ -13,7 +13,8 @@ export default function NoneSpace(props) {
           width: '100%',
           ...props.style
         }}
-        color={color}>
+        color={color}
+      >
         <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} color={color} />
 
         <div style={{ marginLeft: 20, padding: 20 }}>
@@ -45,7 +46,8 @@ export default function NoneSpace(props) {
       style={{
         ...props.style
       }}
-      color={color}>
+      color={color}
+    >
       <Icon src={`/static/${props.img}`} color={color} />
 
       <>
