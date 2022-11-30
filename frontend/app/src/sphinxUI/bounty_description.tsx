@@ -107,7 +107,7 @@ const BountyDescription = (props: any) => {
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
-				setContainsReplitLink(props?.description.match(/(replit)/))
+      setContainsReplitLink(props?.description.match(/(replit)/));
       setDescriptionImage(found && found.length > 0 && found[0]);
     }
   }, [props]);
@@ -182,7 +182,9 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
-					{containsReplitLink && <ReplitImg src={'/static/replit.png'} alt={''} height={'20px'} width={'20px'} />}
+          {containsReplitLink && (
+            <ReplitImg src={'/static/replit.png'} alt={''} height={'20px'} width={'20px'} />
+          )}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
