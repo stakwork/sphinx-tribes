@@ -100,12 +100,14 @@ const LanguageObject = [
 const BountyDescription = (props: any) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
+  const [containsReplitLink, setContainsReplitLink] = useState([]);
   const [descriptionImage, setDescriptionImage] = useState('');
   // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
 
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+				setContainsReplitLink(props?.description.match(/(replit)/))
       setDescriptionImage(found && found.length > 0 && found[0]);
     }
   }, [props]);
@@ -180,6 +182,7 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
+					{containsReplitLink && <img style={{borderRadius: '50%', alignSelf: 'center', marginRight: '5px'}} src={'/static/replit.png'} alt={''} height={'20px'} width={'20px'} />}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
