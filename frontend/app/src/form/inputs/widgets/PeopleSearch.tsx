@@ -1,42 +1,18 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
-import { url } from 'inspector';
+import { EuiCheckboxGroup, EuiLoadingSpinner, EuiPopover, EuiText } from '@elastic/eui';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { colors } from '../../../colors';
-import { LanguageObject } from '../../../people/utils/language_label_style';
+import {
+  coding_languages,
+  GetValue,
+  LanguageObject
+} from '../../../people/utils/language_label_style';
 import { SvgMask } from '../../../people/utils/svgMask';
-import IconButton from '../../../sphinxUI/icon_button';
 import ImageButton from '../../../sphinxUI/Image_button';
 
-const languages = [
-  'Lightning',
-  'Javascript',
-  'Typescript',
-  'Node',
-  'Golang',
-  'Swift',
-  'Kotlin',
-  'MySQL',
-  'PHP',
-  'R',
-  'C#',
-  'C++',
-  'Java',
-  'Rust'
-];
-
-const GetValue = (arr: any) => {
-  return arr.map((val) => {
-    return {
-      id: val,
-      label: val,
-      value: val
-    };
-  });
-};
-
-const codingLanguages = GetValue(languages);
+const codingLanguages = GetValue(coding_languages);
 
 const InvitePeopleSearch = (props) => {
   const color = colors['light'];
@@ -46,9 +22,23 @@ const InvitePeopleSearch = (props) => {
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [labels, setLabels] = useState<any>([]);
+  const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
 
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
+
+  const { ref, inView } = useInView({
+    triggerOnce: false,
+    threshold: 0
+  });
+
+  useEffect(() => {
+    if (inView) {
+      setTimeout(() => {
+        setInitialPeopleCount(initialPeopleCount + 10);
+      }, 2000);
+    }
+  }, [inView, initialPeopleCount]);
 
   useEffect(() => {
     setLabels(LanguageObject.filter((x) => checkboxIdToSelectedMap[x.label]));
@@ -187,7 +177,7 @@ const InvitePeopleSearch = (props) => {
       </LabelsContainer>
 
       <div className="PeopleList">
-        {peopleData?.slice(0, 100)?.map((value) => {
+        {peopleData?.slice(0, initialPeopleCount)?.map((value) => {
           return (
             <div className="People" key={value.id}>
               <div className="PeopleDetailContainer">
@@ -232,6 +222,12 @@ const InvitePeopleSearch = (props) => {
             </div>
           );
         })}
+        {peopleData && peopleData.length > initialPeopleCount && (
+          <LoaderContainer ref={ref}>
+            <EuiLoadingSpinner size="l" />
+          </LoaderContainer>
+        )}
+
         {peopleData?.length === 0 && (
           <div className="no_result_container">
             <EuiText className="no_result_text">No Result Found</EuiText>
@@ -475,4 +471,12 @@ const InvitedButton = styled.div`
     text-align: center;
     letter-spacing: 0.01em;
   }
+`;
+
+const LoaderContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
