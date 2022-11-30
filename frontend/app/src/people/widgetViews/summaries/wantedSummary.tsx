@@ -1273,7 +1273,7 @@ export default function WantedSummary(props: any) {
                   <span
                     style={{
                       fontWeight: '500',
-                      color: color.pureWhite
+                      color: color.pureBlack
                     }}>
                     {estimate_session_length ?? ''}
                   </span>
