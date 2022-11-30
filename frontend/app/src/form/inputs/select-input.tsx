@@ -30,7 +30,8 @@ export default function SelectInput({
       <FieldEnv
         label={labeltext}
         onClick={() => {}}
-        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}>
+        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
+      >
         <R>
           <Select
             name={'first'}

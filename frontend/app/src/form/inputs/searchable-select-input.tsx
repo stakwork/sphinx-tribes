@@ -84,7 +84,8 @@ export default function SearchableSelectInput({
         isTop={true}
         style={{
           border: isBorder ? `1px solid ${color.grayish.G600} ` : `1px solid ${color.pureWhite}`
-        }}>
+        }}
+      >
         <R>
           <SearchableSelect
             selectStyle={{ border: 'none' }}

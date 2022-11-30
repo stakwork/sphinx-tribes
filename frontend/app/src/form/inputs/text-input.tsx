@@ -31,7 +31,8 @@ export default function TextInput({
         }}
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
-        label={labeltext}>
+        label={labeltext}
+      >
         <R>
           <FieldText
             name={'first'}

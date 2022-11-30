@@ -637,7 +637,8 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}>
+            }}
+          >
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -803,7 +804,8 @@ export default function BodyComponent({ selectedWidget }) {
               right: '-18px',
               background: '#000',
               borderRadius: '50%'
-            }}>
+            }}
+          >
             <FocusedView
               newDesign={true}
               person={person}

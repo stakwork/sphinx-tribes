@@ -35,7 +35,8 @@ const BountyProfileView = (props) => {
         <UserInfo
           style={{
             ...props.userInfoStyle
-          }}>
+          }}
+        >
           <Status
             style={{
               ...props?.statusStyle
