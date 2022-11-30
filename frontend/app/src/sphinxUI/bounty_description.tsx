@@ -100,12 +100,14 @@ const LanguageObject = [
 const BountyDescription = (props: any) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
+  const [containsReplitLink, setContainsReplitLink] = useState([]);
   const [descriptionImage, setDescriptionImage] = useState('');
   // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
 
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+				setContainsReplitLink(props?.description.match(/(replit)/))
       setDescriptionImage(found && found.length > 0 && found[0]);
     }
   }, [props]);
@@ -180,6 +182,7 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
+					{containsReplitLink && <ReplitImg src={'/static/replit.png'} alt={''} height={'20px'} width={'20px'} />}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
@@ -209,6 +212,7 @@ interface codingLangProps {
 }
 
 interface bounty_description_props {}
+interface replit_image_props {}
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;
@@ -287,4 +291,10 @@ const CodingLabels = styled.div<codingLangProps>`
     font-family: Barlow;
     line-height: 16px;
   }
+`;
+
+const ReplitImg = styled.img<replit_image_props>`
+  border-radius: 50%;
+  align-self: center;
+  margin-right: 5px;
 `;
