@@ -871,7 +871,7 @@ export default function WantedSummary(props: any) {
                         marginBottom: '113px',
                         bottom: '0',
                         marginLeft: '36px',
-                        border: `1px solid ${color.primary.P400}`,
+                        border: `1px solid ${color.primaryColor.P400}`,
                         background: color.pureWhite,
                         color: color.borderGreen1
                       }}
