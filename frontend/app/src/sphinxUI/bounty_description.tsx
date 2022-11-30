@@ -182,15 +182,25 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
-					{containsReplitLink && <div style={{display: 'flex'}}><CodingLabels key={0}
-                  border={'1px solid rgba(176, 183, 188, 0.1)'}
-
-                  color={color.grayish.G300 }
-
-                  background={color.grayish.G10}><img style={{marginRight: '5px'}} src={'/static/replit.png'} alt={''} height={'15px'} width={'15px'} />
-                  <EuiText className="LanguageText">Replit</EuiText>
-									</CodingLabels>
-									</div>}
+          {containsReplitLink && (
+            <div style={{ display: 'flex' }}>
+              <CodingLabels
+                key={0}
+                border={'1px solid rgba(176, 183, 188, 0.1)'}
+                color={color.grayish.G300}
+                background={color.grayish.G10}
+              >
+                <img
+                  style={{ marginRight: '5px' }}
+                  src={'/static/replit.png'}
+                  alt={''}
+                  height={'15px'}
+                  width={'15px'}
+                />
+                <EuiText className="LanguageText">Replit</EuiText>
+              </CodingLabels>
+            </div>
+          )}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
