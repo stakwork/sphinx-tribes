@@ -1,6 +1,9 @@
 const palette = {
   blue1: '#618AFF',
+  blue2: '#82b4ff',
+  blue3: '#45b9f6',
   borderBlue1: '#5078F2',
+  light_blue100: '#a3c1ff',
   textBlue1: '#A3C1FF',
   text1: '#292C33',
   text2: '#3C3F41',
@@ -15,8 +18,12 @@ const palette = {
   divider2: '#101317',
   pureWhite: '#fff',
   pureBlack: '#000',
+  black90: 'rgba(0, 0, 0, 0.25)',
   black100: 'rgba(0, 0, 0, 0.07)',
+  black150: 'rgba(0, 0, 0, 0.75)',
   black200: '#272727',
+  black300: '#202020',
+  background100: '#f0f1f3',
   statusAssigned: '#49C998',
   statusCompleted: '#8256D0',
   button_primary: {
@@ -32,8 +39,12 @@ const palette = {
     shadow: 'rgba(97, 138, 255, 0.5)'
   },
   grayish: {
+    G05: '#292c33',
+    G07: 'rgb(60, 63, 65)',
     G10: '#3C3F41',
     G50: '#5F6368',
+    G60: '#ffffff44',
+    G70: '#909090',
     G100: '#8E969C',
     G200: '#909BAA',
     G250: '#9AAEC6',
@@ -42,9 +53,13 @@ const palette = {
     G500: '#d0d5d8',
     G600: '#DDE1E5',
     G700: '#EBEDEF',
+    G750: '#e0e0e0',
+    G760: '#ddd',
     G800: '#f7f8f8',
     G900: '#F0F1F2',
-    G950: '#F2F3F5'
+    G950: '#F2F3F5',
+    G1000: '#cfcfcf',
+    G1100: 'rgb(104, 104, 79)'
   },
   primaryColor: {
     P100: 'rgba(73, 201, 152, 0.15)',

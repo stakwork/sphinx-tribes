@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
@@ -22,9 +22,11 @@ export default function CreatableMultiSelectInput({
   let labeltext = label;
   if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
 
+  const [isTop, setIsTop] = useState<boolean>(false);
+
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv label={labeltext} isTop={isTop || value?.length > 0} isFill={value?.length > 0}>
         <R>
           <CreatableMultiSelect
             selectStyle={{ border: 'none' }}
@@ -34,7 +36,9 @@ export default function CreatableMultiSelectInput({
             onChange={(e) => {
               console.log('onChange', e);
               handleChange(e);
+              setIsTop(true);
             }}
+            setIsTop={setIsTop}
           />
           {error && (
             <E>
