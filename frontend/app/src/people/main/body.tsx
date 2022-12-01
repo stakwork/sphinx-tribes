@@ -699,7 +699,7 @@ export default function BodyComponent({ selectedWidget }) {
               borderRadius: 0,
               background: color.pureWhite,
               ...focusedDesktopModalStyles,
-              minHeight: '768px',
+              // minHeight: '768px',
               maxHeight: '768px',
               minWidth: '892px',
               maxWidth: '892px',

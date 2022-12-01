@@ -85,6 +85,7 @@ const E = styled.div<styledProps>`
   user-select: none;
 `;
 const R = styled.div`
+  margin-top: 1px;
   position: relative;
 `;
 
