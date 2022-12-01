@@ -95,10 +95,6 @@ func (Person) TableName() string {
 	return "people"
 }
 
-func (PersonInShort) TableName() string {
-	return "people"
-}
-
 // Person struct
 type Person struct {
 	ID               uint           `json:"id"`
@@ -121,15 +117,6 @@ type Person struct {
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
-}
-
-type PersonInShort struct {
-	ID          uint   `json:"id"`
-	Uuid        string `json:"uuid"`
-	OwnerPubKey string `json:"owner_pubkey"`
-	OwnerAlias  string `json:"owner_alias"`
-	UniqueName  string `json:"unique_name"`
-	Img         string `json:"img"`
 }
 
 // Github struct
