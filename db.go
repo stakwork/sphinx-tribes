@@ -392,7 +392,7 @@ type PeopleExtra struct {
 func makeExtrasListQuery(columnName string) string {
 	// this is safe because columnName is not provided by the user, its hard-coded in db.go
 	return `SELECT 		
-	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'github_issues', github_issues) #>> '{}' as person,
+	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
 	arr.item_object as body
 	FROM people,
 	jsonb_array_elements(extras->'` + columnName + `') with ordinality 
@@ -688,31 +688,4 @@ func (db database) updateLeaderBoard(uuid string, alias string, u map[string]int
 	}
 	db.db.Model(&LeaderBoard{}).Where("tribe_uuid = ? and alias = ?", uuid, alias).Updates(u)
 	return true
-}
-
-func (db database) countDevelopers() uint64 {
-	var count uint64
-	db.db.Model(&Person{}).Where("deleted = 'f' OR deleted is null").Count(&count)
-	return count
-}
-
-func (db database) countBounties() uint64 {
-	var count struct {
-		Sum uint64 `db:"sum"`
-	}
-	db.db.Raw(`Select sum(jsonb_array_length(extras -> 'wanted')) from people where 
-                   people.deleted = 'f' OR people.deleted is null`).Scan(&count)
-	return count.Sum
-}
-
-func (db database) getPeopleListShort(count uint32) *[]PersonInShort {
-	p := []PersonInShort{}
-	db.db.Raw(
-		`SELECT id, owner_pub_key, unique_name, img, uuid, owner_alias
-		FROM people
-		WHERE
-		(deleted = 'f' OR deleted is null)
-		ORDER BY random() 
-		LIMIT ?;`, count).Find(&p)
-	return &p
 }
