@@ -277,6 +277,27 @@ func getListedWanteds(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getWantedsHeader(w http.ResponseWriter, r *http.Request) {
+	var ret struct {
+		DeveloperCount uint64           `json:"developer_count"`
+		BountiesCount  uint64           `json:"bounties_count"`
+		People         *[]PersonInShort `json:"people"`
+	}
+	ret.DeveloperCount = DB.countDevelopers()
+	ret.BountiesCount = DB.countBounties()
+	ret.People = DB.getPeopleListShort(3)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ret)
+}
+
+func getPeopleShortList(w http.ResponseWriter, r *http.Request) {
+	var maxCount uint32 = 10000
+	people := DB.getPeopleListShort(maxCount)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
 func getListedOffers(w http.ResponseWriter, r *http.Request) {
 	people, err := DB.getListedOffers(r)
 	if err != nil {
