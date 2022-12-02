@@ -26,3 +26,10 @@ To run tribes frontend locally, use these ports:
 
 - tribes: `yarn start:tribes:docker` (localhost:23000)
 - people: `yarn start:people:docker` (localhost:23007)
+
+### Run frontend locally against people.sphinx.chat
+If you would like to run just the frontend do the following
+
+line 77 in `frontend/app/src/App.tsx` change `'localhost:3000': Mode.TRIBES` -> `'localhost:3000': Mode.COMMUNITY`
+
+in `frontend/app/src/host.ts` return `"people.sphinx.chat"`
