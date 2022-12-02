@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React from 'react';
 import { useStores } from '../../store';
 import styled from 'styled-components';
@@ -9,6 +10,7 @@ import { useIsMobile } from '../../hooks';
 // this is where we see others posts (etc) and edit our own
 export default function SummaryViewer(props: any) {
   const { item, config, person } = props;
+
   const { ui } = useStores();
   const isMobile = useIsMobile();
 
@@ -35,7 +37,20 @@ export default function SummaryViewer(props: any) {
     case 'offer':
       return wrapIt(<OfferSummary {...item} person={person} />);
     case 'wanted':
-      return wrapIt(<WantedSummary {...item} person={person} />);
+      return wrapIt(
+        <WantedSummary
+          {...item}
+          ReCallBounties={props.ReCallBounties}
+          person={person}
+          formSubmit={props.formSubmit}
+          personBody={props?.personBody}
+          fromBountyPage={props?.fromBountyPage}
+          extraModalFunction={props?.extraModalFunction}
+          deleteAction={props?.deleteAction}
+          deletingState={props?.deletingState}
+          editAction={props?.editAction}
+        />
+      );
     default:
       return wrapIt(<div>none</div>);
   }

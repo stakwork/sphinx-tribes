@@ -1,29 +1,29 @@
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../../colors';
 import { Button } from '../../sphinxUI';
 
 export default function NoneSpace(props) {
+  const color = colors['light'];
   if (props.banner) {
     return (
-      <div
+      <OuterContainer
         style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          background: '#f0f1f3',
           padding: 40,
           width: '100%',
           ...props.style
         }}
+        color={color}
       >
-        <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} />
+        <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} color={color} />
 
         <div style={{ marginLeft: 20, padding: 20 }}>
-          <H small={props.small} style={{ paddingLeft: 0 }}>
+          <H small={props.small} style={{ paddingLeft: 0 }} color={color}>
             {props.text}
           </H>
-          <C style={{ paddingLeft: 0 }}>{props.sub}</C>
+          <C style={{ paddingLeft: 0 }} color={color}>
+            {props.sub}
+          </C>
 
           {props.buttonText && (
             <Button
@@ -37,27 +37,24 @@ export default function NoneSpace(props) {
             />
           )}
         </div>
-      </div>
+      </OuterContainer>
     );
   }
 
   return (
-    <div
+    <OuterContainer
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-        background: '#f0f1f3',
         ...props.style
       }}
+      color={color}
     >
-      <Icon src={`/static/${props.img}`} />
+      <Icon src={`/static/${props.img}`} color={color} />
 
       <>
-        <H small={props.small}>{props.text}</H>
-        <C>{props.sub}</C>
+        <H small={props.small} color={color}>
+          {props.text}
+        </H>
+        <C color={color}>{props.sub}</C>
       </>
 
       <div style={{ height: 200 }}>
@@ -73,13 +70,27 @@ export default function NoneSpace(props) {
           />
         )}
       </div>
-    </div>
+    </OuterContainer>
   );
 }
 
 interface IconProps {
   src: string;
+  color?: any;
 }
+
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: ${(p) => p?.color && p.color.background100};
+`;
 
 const Icon = styled.div<IconProps>`
   background-image: ${(p) => `url(${p.src})`};
@@ -95,6 +106,7 @@ const Icon = styled.div<IconProps>`
 
 interface HProps {
   small: boolean;
+  color?: any;
 }
 
 const H = styled.div<HProps>`
@@ -102,25 +114,20 @@ const H = styled.div<HProps>`
 
   font-family: Roboto;
   font-style: normal;
-
   display: flex;
   align-items: center;
   text-align: center;
-
-  /* Primary Text 1 */
-
-  color: #292c33;
+  color: ${(p) => p?.color && p.color.grayish.G05};
   padding: 0 10px;
   max-width: 350px;
   letter-spacing: 0px;
-  color: rgb(60, 63, 65);
-
+  color: ${(p) => p?.color && p.color.grayish.G07};
   font-weight: 700;
   font-size: ${(p) => (p.small ? '22px' : '30px')};
   line-height: ${(p) => (p.small ? '26px' : '40px')}; ;
 `;
 
-const C = styled.div`
+const C = styled.div<styledProps>`
   margin-top: 10px;
   font-family: Roboto;
   font-size: 22px;
@@ -129,20 +136,15 @@ const C = styled.div`
   line-height: 26px;
   letter-spacing: 0em;
   text-align: center;
-  color: #8e969c;
-
+  color: ${(p) => p?.color && p.color.grayish.G100};
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
   font-size: 15px;
   line-height: 18px;
   text-align: center;
-
-  /* Main bottom icons */
-
-  color: #5f6368;
+  color: ${(p) => p?.color && p.color.grayish.G50};
   padding: 0 10px;
-
   max-width: 350px;
   padding: 0 65px;
 `;

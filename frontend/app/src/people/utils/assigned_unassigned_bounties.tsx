@@ -11,8 +11,17 @@ import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 
 const Bounties = (props) => {
-  const { assignee, price, sessionLength, priceMin, priceMax, codingLanguage, title, person } =
-    props;
+  const {
+    assignee,
+    price,
+    sessionLength,
+    priceMin,
+    priceMax,
+    codingLanguage,
+    title,
+    person,
+    onPanelClick
+  } = props;
 
   const color = colors['light'];
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
@@ -26,7 +35,10 @@ const Bounties = (props) => {
   return (
     <>
       {{ ...assignee }.owner_alias ? (
-        <BountyContainer assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}>
+        <BountyContainer
+          onClick={onPanelClick}
+          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
+        >
           <div className="BountyDescriptionContainer">
             <BountyDescription
               {...person}
@@ -47,10 +59,10 @@ const Bounties = (props) => {
                 borderRight: `1px solid ${color.primaryColor.P200}`
               }}
             />
-
             <BountyProfileView
               assignee={assignee}
               status={'ASSIGNED'}
+              canViewProfile={true}
               statusStyle={{
                 width: '55px',
                 height: '16px',
@@ -62,23 +74,25 @@ const Bounties = (props) => {
       ) : (
         <BountyContainer>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
-            <BountyDescription
-              {...person}
-              {...props}
-              title={title}
-              codingLanguage={codingLanguage}
-            />
-            <BountyPrice
-              priceMin={priceMin}
-              priceMax={priceMax}
-              price={price}
-              sessionLength={sessionLength}
-              style={{
-                borderLeft: `1px solid ${color.grayish.G700}`,
-                maxWidth: '245px',
-                minWidth: '245px'
-              }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'row' }} onClick={onPanelClick}>
+              <BountyDescription
+                {...person}
+                {...props}
+                title={title}
+                codingLanguage={codingLanguage}
+              />
+              <BountyPrice
+                priceMin={priceMin}
+                priceMax={priceMax}
+                price={price}
+                sessionLength={sessionLength}
+                style={{
+                  borderLeft: `1px solid ${color.grayish.G700}`,
+                  maxWidth: '245px',
+                  minWidth: '245px'
+                }}
+              />
+            </div>
             <UnassignedPersonProfile
               unassigned_border={color.grayish.G300}
               grayish_G200={color.grayish.G200}
@@ -182,11 +196,6 @@ const UnassignedPersonProfile = styled.div<containerProps>`
   min-width: 336px;
   min-height: 160px;
   background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
-  border-radius: 10px;
-  border-radius: 10px;
-  border-radius: 10px;
-  border-radius: 10px;
-  border-radius: 10px;
   border-radius: 10px;
   display: flex;
   padding-top: 32px;

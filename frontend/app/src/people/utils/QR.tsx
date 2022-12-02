@@ -2,9 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { QRCode } from 'react-qr-svg';
 import MaterialIcon from '@material/react-material-icon';
+import { colors } from '../../colors';
 
 export default function QR(props) {
   const { type } = props;
+  const color = colors['light'];
 
   const centerIcon =
     type === 'connect' ? (
@@ -18,8 +20,8 @@ export default function QR(props) {
   return (
     <div style={{ position: 'relative' }}>
       <QRCode
-        bgColor="#FFFFFF"
-        fgColor="#000000"
+        bgColor={color.pureWhite}
+        fgColor={color.pureBlack}
         level={'Q'}
         style={{ width: props.size }}
         value={props.value}
@@ -55,7 +57,7 @@ export default function QR(props) {
           alignItems: 'center'
         }}
       >
-        <div style={{ background: '#fff', height: 63, width: 63, borderRadius: '50%' }} />
+        <div style={{ background: color.pureWhite, height: 75, width: 75 }} />
       </div>
     </div>
   );
