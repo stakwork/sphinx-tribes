@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
@@ -19,10 +19,18 @@ export default function NumberInput({
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;
+  const [active, setActive] = useState<boolean>(false);
 
   return (
-    <>
-      <FieldEnv border={borderType} label={labeltext}>
+    <OuterContainer>
+      <FieldEnv
+        onClick={() => {
+          setActive(true);
+        }}
+        className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
+        border={borderType}
+        label={labeltext}
+      >
         <R>
           <FieldText
             name="first"
@@ -39,12 +47,14 @@ export default function NumberInput({
               if (value === '') handleChange(0);
               if (value === '0') handleChange(0);
               handleBlur(e);
+              setActive(false);
             }}
             onFocus={(e) => {
               // remove 0 on focus
               console.log('onFocus', value);
               if (value === 0) handleChange('');
               handleFocus(e);
+              setActive(true);
             }}
           />
           {error && (
@@ -70,9 +80,40 @@ export default function NumberInput({
         *This amount applies to users trying to connect within the Sphinx app. Older versions of the
         app may not support this feature.
       </ExtraText> */}
-    </>
+    </OuterContainer>
   );
 }
+
+const OuterContainer = styled.div`
+  .euiFormRow_active {
+    border: 1px solid #82b4ff;
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: #b0b7bc !important;
+        background: #ffffff;
+        z-index: 10;
+      }
+    }
+  }
+  .euiFormRow_filed {
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: #b0b7bc !important;
+        background: #ffffff;
+        z-index: 10;
+      }
+    }
+  }
+`;
+
 const ExtraText = styled.div`
   padding: 0px 10px 5px;
   margin: -5px 0 10px;

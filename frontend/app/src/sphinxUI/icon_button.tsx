@@ -171,6 +171,15 @@ export default function IconButton(props: any) {
               }}
             />
           )}
+          {props.endingImg && (
+            <div
+              style={{
+                ...props.endingImgStyle
+              }}
+            >
+              <img height={'100%'} width={'100%'} src={props.endingImg} alt="leading" />
+            </div>
+          )}
         </div>
       </div>
     </B>

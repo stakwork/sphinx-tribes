@@ -107,9 +107,9 @@ export default function WidgetSwitchViewer(props) {
             <Panel
               isMobile={isMobile}
               key={person?.owner_pubkey + i + body?.created}
-              onClick={() => {
-                if (onPanelClick) onPanelClick(person, body);
-              }}
+              // onClick={() => {
+              //   if (onPanelClick) onPanelClick(person, body);
+              // }}
               style={{
                 ...panelStyles,
                 ...conditionalStyles,
@@ -117,7 +117,7 @@ export default function WidgetSwitchViewer(props) {
                 padding: 0,
                 overflow: 'hidden',
                 background: 'transparent',
-                height: !isMobile ? '160px' : '',
+                minHeight: !isMobile ? '160px' : '',
                 boxShadow: 'none'
               }}
             >
@@ -138,6 +138,9 @@ export default function WidgetSwitchViewer(props) {
               ) : selectedWidget === 'wanted' ? (
                 <WantedView
                   showName
+                  onPanelClick={() => {
+                    if (onPanelClick) onPanelClick(person, body);
+                  }}
                   key={`${i + person.owner_pubkey}wview`}
                   person={person}
                   showModal={showModal}
@@ -161,7 +164,7 @@ export default function WidgetSwitchViewer(props) {
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
-        {!props.loading && (
+        {activeList?.length > currentItems && (
           <LoadMoreContainer
             style={{
               width: '100%',
@@ -180,6 +183,7 @@ export default function WidgetSwitchViewer(props) {
             </div>
           </LoadMoreContainer>
         )}
+        <Spacer key={'spacer'} />
       </>
     );
   });

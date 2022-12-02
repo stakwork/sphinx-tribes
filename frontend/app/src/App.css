@@ -1042,3 +1042,50 @@ input::-webkit-search-cancel-button {
   pointer-events: none;
   opacity: 0.65;
 }
+
+.euiPanel:focus-visible,
+.euiPanel > div:focus-visible,
+.euiPanel > div > div:focus-visible {
+  outline: none;
+  border: none;
+}
+
+.euiSwitch.euiSwitch--compressed .euiSwitch__thumb {
+  color: #fff;
+  background-color: #fff !important;
+}
+.euiSwitch .euiSwitch__button[aria-checked='true'] .euiSwitch__body {
+  background-color: #49c998 !important;
+}
+
+.euiPanel.euiPanel--plain.euiPopover__panel {
+  background-color: #fff !important;
+  border: 1px solid #82b4ff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-top: 0px solid #fff !important;
+  border-radius: 0px 0px 3px 3px;
+  overflow: hidden !important;
+  width: 291px !important;
+}
+.euiSuperSelect__listbox button:active {
+  text-decoration: none;
+  text-transform: none;
+}
+.euiSuperSelect__listbox button:focus {
+  text-decoration: none;
+  text-transform: none;
+}
+
+.euiSuperSelect__listbox button {
+  padding: 4px 8px;
+  text-decoration: none;
+  text-transform: none;
+  font-size: 13px;
+}
+
+.euiSuperSelect__listbox button:hover {
+  background-color: rgba(130, 180, 255, 0.25) !important;
+  color: #3c3f41 !important;
+  text-decoration: none;
+  text-transform: none;
+}
