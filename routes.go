@@ -75,6 +75,7 @@ func NewRouter() *http.Server {
 		r.Get("/people/search", getPeopleBySearch)
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
+		r.Get("/people/wanteds/header", getWantedsHeader)
 		r.Get("/people/offers", getListedOffers)
 		r.Get("/admin_pubkeys", getAdminPubkeys)
 
