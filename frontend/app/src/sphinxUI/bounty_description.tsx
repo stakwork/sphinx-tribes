@@ -8,12 +8,18 @@ import NameTag from '../people/utils/nameTag';
 const BountyDescription = (props: any) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
+  const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
   // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
 
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+      setReplitLink(
+        props?.description.match(
+          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+        )
+      );
       setDescriptionImage(found && found.length > 0 && found[0]);
     }
   }, [props]);
@@ -94,6 +100,25 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
+          {replitLink && (
+            <div onClick={() => window.open(replitLink[0])} style={{ display: 'flex' }}>
+              <CodingLabels
+                key={0}
+                border={'1px solid rgba(176, 183, 188, 0.1)'}
+                color={color.grayish.G300}
+                background={color.grayish.G10}
+              >
+                <img
+                  style={{ marginRight: '5px' }}
+                  src={'/static/replit.png'}
+                  alt={''}
+                  height={'15px'}
+                  width={'15px'}
+                />
+                <EuiText className="LanguageText">Replit</EuiText>
+              </CodingLabels>
+            </div>
+          )}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
@@ -122,7 +147,10 @@ interface codingLangProps {
   color?: string;
 }
 
-const BountyDescriptionContainer = styled.div`
+interface bounty_description_props {}
+interface replit_image_props {}
+
+const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: column;
   height: 100%;
