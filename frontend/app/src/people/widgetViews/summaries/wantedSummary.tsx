@@ -862,94 +862,90 @@ export default function WantedSummary(props: any) {
                       sendToRedirect(twitterLink);
                     }}
                   />
-                  {paid ? (
+                  <BottomButtonContainer>
+                    {paid ? (
+                      <IconButton
+                        width={220}
+                        height={48}
+                        style={{
+                          bottom: '0',
+                          marginLeft: '36px',
+                          border: `1px solid ${color.primaryColor.P400}`,
+                          background: color.pureWhite,
+                          color: color.borderGreen1
+                        }}
+                        text={'Mark Unpaid'}
+                        loading={saving === 'paid'}
+                        endingImg={'/static/mark_unpaid.svg'}
+                        textStyle={{
+                          width: '130px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          fontFamily: 'Barlow',
+                          marginLeft: '30px'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExtrasPropertyAndSave('paid', !paid);
+                        }}
+                      />
+                    ) : (
+                      <IconButton
+                        color={'success'}
+                        width={220}
+                        height={48}
+                        style={{
+                          bottom: '0',
+                          marginLeft: '36px'
+                        }}
+                        text={'Mark Paid'}
+                        loading={saving === 'paid'}
+                        endingImg={'/static/mark_paid.svg'}
+                        textStyle={{
+                          width: '130px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          fontFamily: 'Barlow',
+                          marginLeft: '30px'
+                        }}
+                        hoverColor={color.button_primary.hover}
+                        activeColor={color.button_primary.active}
+                        shadowColor={color.button_primary.shadow}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExtrasPropertyAndSave('paid', !paid);
+                        }}
+                      />
+                    )}
                     <IconButton
                       width={220}
                       height={48}
                       style={{
-                        position: 'absolute',
-                        marginBottom: '113px',
                         bottom: '0',
                         marginLeft: '36px',
-                        border: `1px solid ${color.primaryColor.P400}`,
                         background: color.pureWhite,
-                        color: color.borderGreen1
+                        border: `1px solid ${color.grayish.G600}`
                       }}
-                      text={'Mark Unpaid'}
-                      loading={saving === 'paid'}
-                      endingImg={'/static/mark_unpaid.svg'}
+                      text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
+                      endingImg={'/static/award.svg'}
+                      hoverColor={color.pureWhite}
+                      activeColor={color.pureWhite}
                       textStyle={{
                         width: '130px',
                         display: 'flex',
                         justifyContent: 'center',
                         fontFamily: 'Barlow',
-                        marginLeft: '30px'
+                        marginLeft: '30px',
+                        color: color.grayish.G50
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setExtrasPropertyAndSave('paid', !paid);
+                        if (!badgeRecipient) {
+                          setShowBadgeAwardDialog(true);
+                        }
                       }}
                     />
-                  ) : (
-                    <IconButton
-                      color={'success'}
-                      width={220}
-                      height={48}
-                      style={{
-                        position: 'absolute',
-                        marginBottom: '113px',
-                        bottom: '0',
-                        marginLeft: '36px'
-                      }}
-                      text={'Mark Paid'}
-                      loading={saving === 'paid'}
-                      endingImg={'/static/mark_paid.svg'}
-                      textStyle={{
-                        width: '130px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        fontFamily: 'Barlow',
-                        marginLeft: '30px'
-                      }}
-                      hoverColor={color.button_primary.hover}
-                      activeColor={color.button_primary.active}
-                      shadowColor={color.button_primary.shadow}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExtrasPropertyAndSave('paid', !paid);
-                      }}
-                    />
-                  )}
-                  <IconButton
-                    width={220}
-                    height={48}
-                    style={{
-                      position: 'absolute',
-                      marginBottom: '49px',
-                      bottom: '0',
-                      marginLeft: '36px',
-                      background: color.pureWhite,
-                      border: `1px solid ${color.grayish.G600}`
-                    }}
-                    text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
-                    endingImg={'/static/award.svg'}
-                    hoverColor={color.pureWhite}
-                    activeColor={color.pureWhite}
-                    textStyle={{
-                      width: '130px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      fontFamily: 'Barlow',
-                      marginLeft: '30px',
-                      color: color.grayish.G50
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!badgeRecipient) {
-                        setShowBadgeAwardDialog(true);
-                      }
-                    }}
-                  />
+                  </BottomButtonContainer>
                 </>
               </AssigneeProfile>
             </Creator>
@@ -1759,4 +1755,11 @@ const UnassignedPersonProfile = styled.div<containerProps>`
     overflow: hidden;
     z-index: 10;
   }
+`;
+
+const BottomButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  margin-top: 150px;
 `;
