@@ -104,7 +104,7 @@ const BountyDescription = (props: any) => {
                 key={0}
                 border={`1px solid ${color.grayish.G06}`}
                 LabelColor={color.grayish.G300}
-                background={color.grayish.G10}
+                background={color.pureWhite}
                 color={color}>
                 <img
                   style={{ marginRight: '5px' }}
