@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import type { Props } from './propsType';
 import { FieldEnv } from './index';
 import LoomViewerRecorder from '../../people/utils/loomViewerRecorder';
+import { colors } from '../../colors';
 
 export default function LoomVideoInput({
   name,
@@ -17,6 +18,7 @@ export default function LoomVideoInput({
   prepend,
   extraHTML
 }: Props) {
+  const color = colors['light'];
   return (
     <>
       <LoomViewerRecorder

@@ -18,7 +18,7 @@ function Date({ label, value, handleChange }: any) {
   };
 
   return (
-    <FieldEnv label={label} isTop={true}>
+    <FieldEnv label={label} isTop={true} color={color}>
       <DataPicker
         selectsEnd={true}
         selectsStart={true}

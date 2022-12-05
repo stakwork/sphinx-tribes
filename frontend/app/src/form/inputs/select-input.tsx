@@ -28,6 +28,7 @@ export default function SelectInput({
   return (
     <OuterContainer color={color}>
       <FieldEnv
+        color={color}
         label={labeltext}
         onClick={() => {}}
         className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
@@ -51,7 +52,7 @@ export default function SelectInput({
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
@@ -84,6 +85,7 @@ const E = styled.div<styledProps>`
   user-select: none;
 `;
 const R = styled.div`
+  margin-top: 1px;
   position: relative;
 `;
 
