@@ -405,7 +405,8 @@ export default function BodyComponent({ selectedWidget }) {
             flexDirection: 'column',
             alignItems: 'center',
             height: '100%'
-          }}>
+          }}
+        >
           <WidgetSwitchViewer
             checkboxIdToSelectedMap={checkboxIdToSelectedMap}
             checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
@@ -663,7 +664,8 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}>
+            }}
+          >
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -746,7 +748,8 @@ export default function BodyComponent({ selectedWidget }) {
                       });
                     }
                   }
-            }>
+            }
+          >
             <FocusedView
               ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
