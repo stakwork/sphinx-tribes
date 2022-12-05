@@ -4,6 +4,7 @@ import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
 import { satToUsd } from '../../helpers';
+import { colors } from '../../colors';
 
 export default function NumberInput({
   name,
@@ -20,10 +21,12 @@ export default function NumberInput({
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;
   const [active, setActive] = useState<boolean>(false);
+  const color = colors['light'];
 
   return (
-    <OuterContainer>
+    <OuterContainer color={color}>
       <FieldEnv
+        color={color}
         onClick={() => {
           setActive(true);
         }}
@@ -33,6 +36,7 @@ export default function NumberInput({
       >
         <R>
           <FieldText
+            color={color}
             name="first"
             value={value}
             type="number"
@@ -58,15 +62,16 @@ export default function NumberInput({
             }}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
-      {name.includes('price') && <Note>({satToUsd(value)} USD)</Note>}
+      {note && <Note color={color}>*{note}</Note>}
+      {name.includes('price') && <Note color={color}>({satToUsd(value)} USD)</Note>}
       <ExtraText
+        color={color}
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
@@ -84,17 +89,21 @@ export default function NumberInput({
   );
 }
 
-const OuterContainer = styled.div`
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
   .euiFormRow_active {
-    border: 1px solid #82b4ff;
+    border: 1px solid ${(p) => p.color && p.color.blue2};
     .euiFormRow__labelWrapper {
       margin-bottom: 0px;
       margin-top: -9px;
       padding-left: 10px;
       height: 14px;
       label {
-        color: #b0b7bc !important;
-        background: #ffffff;
+        color: ${(p) => p.color && p.color.grayish.G300} !important;
+        background: ${(p) => p.color && p.color.pureWhite};
         z-index: 10;
       }
     }
@@ -106,24 +115,24 @@ const OuterContainer = styled.div`
       padding-left: 10px;
       height: 14px;
       label {
-        color: #b0b7bc !important;
-        background: #ffffff;
+        color: ${(p) => p.color && p.color.grayish.G300} !important;
+        background: ${(p) => p.color && p.color.pureWhite};
         z-index: 10;
       }
     }
   }
 `;
 
-const ExtraText = styled.div`
+const ExtraText = styled.div<styledProps>`
   padding: 0px 10px 5px;
   margin: -5px 0 10px;
-  color: #b75858;
+  color: ${(p) => p.color && p.color.red3};
   font-style: italic;
   max-width: calc(100% - 20px);
   word-break: break;
   font-size: 14px;
 `;
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 0px;
@@ -131,7 +140,7 @@ const E = styled.div`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

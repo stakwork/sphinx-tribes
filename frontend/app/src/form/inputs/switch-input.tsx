@@ -53,7 +53,7 @@ export default function SwitchInput({
           }}
         />
       </Container>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}

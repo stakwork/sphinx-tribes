@@ -11,6 +11,7 @@ import { formDropdownOptions } from '../people/utils/constants';
 import { EuiText } from '@elastic/eui';
 import api from '../api';
 import ImageButton from '../sphinxUI/Image_button';
+import { colors } from '../colors';
 
 const BountyDetailsCreationData = {
   step_1: {
@@ -30,7 +31,7 @@ const BountyDetailsCreationData = {
   step_3: {
     step: 3,
     heading: 'Invite Developer',
-    sub_heading: 'Nemo enim ipsam quia voluptas sit',
+    sub_heading: '',
     schema: ['assignee'],
     schema2: ['']
   }
@@ -47,8 +48,10 @@ export default function Form(props: any) {
   const [showDeleteWarn, setShowDeleteWarn] = useState(false);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [peopleList, setPeopleList] = useState<any>();
+  const [assigneeName, setAssigneeName] = useState<string>('');
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
+  const color = colors['light'];
 
   const [schemaData, setSchemaData] = useState(BountyDetailsCreationData.step_1);
   const [stepTracker, setStepTracker] = useState<number>(1);
@@ -191,10 +194,6 @@ export default function Form(props: any) {
       });
   }
 
-  schema.map((x) => {
-    console.log(x);
-  });
-
   return (
     <Formik
       initialValues={initValues || {}}
@@ -329,17 +328,18 @@ export default function Form(props: any) {
               </>
             ) : props?.newDesign ? (
               <>
-                <CreateBountyHeaderContainer>
+                <CreateBountyHeaderContainer color={color}>
                   <EuiText className="stepText">{`STEP ${schemaData.step}/3`}</EuiText>
                   <EuiText className="HeadingText">{schemaData.heading}</EuiText>
-                  <EuiText
-                    className="SubHeadingText"
-                    style={{
-                      marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                    }}
-                  >
-                    {schemaData.sub_heading}
-                  </EuiText>
+                  {schemaData.sub_heading && (
+                    <EuiText
+                      className="SubHeadingText"
+                      style={{
+                        marginBottom: schemaData.step === 1 ? '29px' : '37px'
+                      }}>
+                      {schemaData.sub_heading}
+                    </EuiText>
+                  )}
                 </CreateBountyHeaderContainer>
 
                 <SchemaTagsContainer>
@@ -368,6 +368,7 @@ export default function Form(props: any) {
                           key={item.name}
                           newDesign={true}
                           values={values}
+                          setAssigneefunction={item.name === 'assignee' && setAssigneeName}
                           peopleList={peopleList}
                           // disabled={readOnly}
                           // readOnly={readOnly}
@@ -432,31 +433,38 @@ export default function Form(props: any) {
                       ))}
                   </div>
                 </SchemaTagsContainer>
-                <BottomContainer>
+                <BottomContainer color={color} assigneeName={assigneeName}>
                   {stepTracker < 3 && <EuiText className="RequiredText">* Required</EuiText>}
                   <div
                     className="ButtonContainer"
                     style={{
-                      width: stepTracker < 3 ? '45%' : '100%'
-                    }}
-                  >
+                      width: stepTracker < 3 ? '45%' : '100%',
+                      height: stepTracker < 3 ? '48px' : '48px',
+                      marginTop: stepTracker <= 3 ? '-20px' : '-10px'
+                    }}>
                     <div
                       className="nextButton"
                       onClick={() => {
                         if (schemaData.step === 3) {
                           if (dynamicSchemaName) {
-                            // inject type in body
                             setFieldValue('type', dynamicSchemaName);
                           }
-                          handleSubmit();
+                          if (assigneeName !== '') {
+                            handleSubmit();
+                          } else {
+                            setAssigneeName('a');
+                          }
                         } else {
                           NextStepHandler();
                         }
-                      }}
-                    >
-                      <EuiText className="nextText">
-                        {schemaData.step === 3 ? 'Skip' : 'Next'}
-                      </EuiText>
+                      }}>
+                      {assigneeName === '' ? (
+                        <EuiText className="nextText">
+                          {schemaData.step === 3 ? 'Decide Later' : 'Next'}
+                        </EuiText>
+                      ) : (
+                        <EuiText className="nextText">Finish</EuiText>
+                      )}
                     </div>
                     {schemaData.step > 1 && (
                       <>
@@ -466,7 +474,10 @@ export default function Form(props: any) {
                             width: '120px',
                             height: '42px'
                           }}
-                          buttonAction={PreviousStepHandler}
+                          buttonAction={() => {
+                            PreviousStepHandler();
+                            setAssigneeName('');
+                          }}
                         />
                       </>
                     )}
@@ -511,7 +522,7 @@ export default function Form(props: any) {
             {/* make space at bottom for first sign up */}
             {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
             {!props?.newDesign && (
-              <BWrap style={buttonAlignment}>
+              <BWrap style={buttonAlignment} color={color}>
                 {props?.close && buttonsOnBottom ? (
                   <Button
                     disabled={disableFormButtons || props.loading}
@@ -645,6 +656,9 @@ export default function Form(props: any) {
   );
 }
 
+interface styledProps {
+  color?: any;
+}
 interface WrapProps {
   newDesign?: string;
 }
@@ -664,7 +678,12 @@ interface BWrapProps {
   readonly floatingButtons: boolean;
 }
 
-const BWrap = styled.div`
+interface bottomButtonProps {
+  assigneeName?: string;
+  color?: any;
+}
+
+const BWrap = styled.div<styledProps>`
   display: flex;
   justify-content: space-between !important;
   align-items: center;
@@ -673,12 +692,12 @@ const BWrap = styled.div`
   min-height: 42px;
   position: absolute;
   left: 0px;
-  background: #ffffff;
+  background: ${(p) => p?.color && p.color.pureWhite};
   z-index: 10;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+  box-shadow: 0px 1px 6px ${(p) => p?.color && p.color.black100};
 `;
 
-const CreateBountyHeaderContainer = styled.div`
+const CreateBountyHeaderContainer = styled.div<styledProps>`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -695,8 +714,8 @@ const CreateBountyHeaderContainer = styled.div`
     font-size: 36px;
     font-weight: 800;
     line-height: 43px;
-    color: #3c3f41;
-    margin-bottom: 26px;
+    color: ${(p) => p?.color && p.color.grayish.G10};
+    margin-bottom: 11px;
     margin-top: 16px;
   }
   .SubHeadingText {
@@ -704,7 +723,8 @@ const CreateBountyHeaderContainer = styled.div`
     font-size: 17px;
     font-weight: 400;
     line-height: 20px;
-    color: #292c33;
+    color: ${(p) => p?.color && p.color.grayish.G05};
+    margin-top: 15px;
   }
 `;
 
@@ -721,7 +741,7 @@ const SchemaTagsContainer = styled.div`
   }
 `;
 
-const BottomContainer = styled.div`
+const BottomContainer = styled.div<bottomButtonProps>`
   display: flex;
   justify-content: space-between;
   padding: 0px 48px;
@@ -730,7 +750,8 @@ const BottomContainer = styled.div`
     font-family: Barlow;
     font-weight: 400;
     line-height: 35px;
-    color: #b0b7bc;
+    color: ${(p) => p?.color && p.color.grayish.G300};
+    user-select: none;
   }
   .ButtonContainer {
     display: flex;
@@ -739,21 +760,32 @@ const BottomContainer = styled.div`
     align-items: center;
   }
   .nextButton {
-    width: 120px;
+    width: 145px;
     height: 42px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background: #618aff;
-    box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+    background: ${(p) =>
+      p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
+    box-shadow: 0px 2px 10px
+      ${(p) =>
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.shadow}`
+          : `${p.color.button_primary.shadow}`};
     border-radius: 32px;
-    color: #fff;
+    color: ${(p) => p?.color && p.color.pureWhite};
     :hover {
-      background: #5881f8;
+      background: ${(p) =>
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.hover}`
+          : `${p.color.button_primary.hover}`};
     }
     :active {
-      background: #5078f2;
+      background: ${(p) =>
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.active}`
+          : `${p.color.button_primary.active}`};
     }
     .nextText {
       font-family: Barlow;

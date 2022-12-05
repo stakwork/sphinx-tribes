@@ -11,8 +11,11 @@ import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
 import { uiStore } from '../../store/ui';
 import DeleteTicketModal from './deleteModal';
+import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
+import { colors } from '../../colors';
 
 export default function WidgetSwitchViewer(props) {
+  const color = colors['light'];
   const { main } = useStores();
   const isMobile = useIsMobile();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -49,7 +52,13 @@ export default function WidgetSwitchViewer(props) {
       offer: peopleOffers
     };
 
-    const activeList = listSource[selectedWidget];
+    const activeList = [...listSource[selectedWidget]].filter(({ body }) => {
+      const value = { ...body };
+      return (
+        bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
+        bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
+      );
+    });
 
     const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
     // if dynamic schema, get all those fields
@@ -97,7 +106,7 @@ export default function WidgetSwitchViewer(props) {
 
           const conditionalStyles = body?.paid
             ? {
-                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '',
+                border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
                 boxShadow: 'none'
               }
             : {};
@@ -105,6 +114,7 @@ export default function WidgetSwitchViewer(props) {
           // if this person has entries for this widget
           return (
             <Panel
+              color={color}
               isMobile={isMobile}
               key={person?.owner_pubkey + i + body?.created}
               // onClick={() => {
@@ -119,8 +129,7 @@ export default function WidgetSwitchViewer(props) {
                 background: 'transparent',
                 minHeight: !isMobile ? '160px' : '',
                 boxShadow: 'none'
-              }}
-            >
+              }}>
               {selectedWidget === 'post' ? (
                 <PostView
                   showName
@@ -159,26 +168,25 @@ export default function WidgetSwitchViewer(props) {
     return (
       <>
         {listItems}
-        <Spacer key={'spacer'} />
+        <Spacer key={'spacer2'} />
 
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
         {activeList?.length > currentItems && (
           <LoadMoreContainer
+            color={color}
             style={{
               width: '100%',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center'
-            }}
-          >
+            }}>
             <div
               className="LoadMoreButton"
               onClick={() => {
                 setCurrentItems(currentItems + 10);
-              }}
-            >
+              }}>
               Load More
             </div>
           </LoadMoreContainer>
@@ -191,15 +199,16 @@ export default function WidgetSwitchViewer(props) {
 
 interface PanelProps {
   isMobile?: boolean;
+  color?: any;
 }
 
 const Panel = styled.div<PanelProps>`
   // position: ;
-  background: #ffffff;
-  color: #000000;
+  background: ${(p) => p.color && p.color.pureWhite};
+  color: ${(p) => p.color && p.color.pureBlack};
   padding: 20px;
   box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+  border-bottom: ${(p) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
 `;
 
 const LoadMoreContainer = styled.div<PanelProps>`
@@ -213,10 +222,10 @@ const LoadMoreContainer = styled.div<PanelProps>`
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #3c3f41;
-    border: 1px solid #dde1e5;
+    color: ${(p) => p.color && p.color.grayish.G10};
+    border: 1px solid ${(p) => p.color && p.color.grayish.G600};
     border-radius: 30px;
-    background: #ffffff;
+    background: ${(p) => p.color && p.color.pureWhite};
     font-family: 'Barlow';
     font-style: normal;
     font-weight: 500;
@@ -225,10 +234,10 @@ const LoadMoreContainer = styled.div<PanelProps>`
     cursor: pointer;
     user-select: none;
     :hover {
-      border: 1px solid #b0b7bc;
+      border: 1px solid ${(p) => p.color && p.color.grayish.G300};
     }
     :active {
-      border: 1px solid #8e969c;
+      border: 1px solid ${(p) => p.color && p.color.grayish.G100};
     }
   }
 `;

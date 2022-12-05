@@ -90,3 +90,32 @@ export const LanguageObject = [
     color: '#FF8D85'
   }
 ];
+
+export const coding_languages = [
+  'Lightning',
+  'Javascript',
+  'Typescript',
+  'Node',
+  'Golang',
+  'Swift',
+  'Kotlin',
+  'MySQL',
+  'PHP',
+  'R',
+  'C#',
+  'C++',
+  'Java',
+  'Rust'
+];
+
+export const status = ['Opened', 'Assigned', 'Paid'];
+
+export const GetValue = (arr: any) => {
+  return arr.map((val) => {
+    return {
+      id: val,
+      label: val,
+      value: val
+    };
+  });
+};

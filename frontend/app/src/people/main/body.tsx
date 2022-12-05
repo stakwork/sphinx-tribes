@@ -53,6 +53,8 @@ export default function BodyComponent({ selectedWidget }) {
   const [connectPerson, setConnectPerson] = useState<any>();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
+  const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
 
   const color = colors['light'];
 
@@ -275,6 +277,30 @@ export default function BodyComponent({ selectedWidget }) {
     }
   }
 
+  const onChangeStatus = (optionId) => {
+    const newCheckboxIdToSelectedMap = {
+      ...checkboxIdToSelectedMap,
+      ...{
+        [optionId]: !checkboxIdToSelectedMap[optionId]
+      }
+    };
+    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+  };
+
+  const onChangeLanguage = (optionId) => {
+    const newCheckboxIdToSelectedMapLanguage = {
+      ...checkboxIdToSelectedMapLanguage,
+      ...{
+        [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
+      }
+    };
+    setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
+  };
+
+  useEffect(() => {
+    console.log(checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap);
+  }, [checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap]);
+
   function selectPerson(id: number, unique_name: string, pubkey: string) {
     console.log('selectPerson', id, unique_name, pubkey);
     ui.setSelectedPerson(id);
@@ -360,7 +386,7 @@ export default function BodyComponent({ selectedWidget }) {
         ));
 
         // add space at bottom
-        p = [...p, <Spacer key={'spacer'} />];
+        p = [...p, <Spacer key={'spacer1'} />];
       } else {
         p = <NoResults />;
       }
@@ -382,6 +408,8 @@ export default function BodyComponent({ selectedWidget }) {
           }}
         >
           <WidgetSwitchViewer
+            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
             onPanelClick={(person, item) => {
               history.replace({
                 pathname: history?.location?.pathname,
@@ -453,21 +481,23 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}
-          >
+            }}>
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
                 setShowFocusView={setIsMobileViewTicketModal}
                 scrollValue={scrollValue}
+                onChangeStatus={onChangeStatus}
+                onChangeLanguage={onChangeLanguage}
+                checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+                checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
               />
             )}
             {selectedWidget === 'people' && (
               <div
                 style={{
                   padding: '0 20px'
-                }}
-              >
+                }}>
                 <SearchTextInput
                   small
                   name="search"
@@ -508,8 +538,7 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}
-          >
+            dismountCallback={() => ui.setSelectedPerson(0)}>
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -572,10 +601,6 @@ export default function BodyComponent({ selectedWidget }) {
           }
         : {};
 
-    // async function publicPanelClick() {
-
-    // }
-
     // desktop mode
     return (
       <Body
@@ -586,8 +611,7 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}
-      >
+        }}>
         <div
           style={{
             minHeight: '32px'
@@ -598,6 +622,10 @@ export default function BodyComponent({ selectedWidget }) {
             selectedWidget={selectedWidget}
             setShowFocusView={setShowFocusView}
             scrollValue={scrollValue}
+            onChangeStatus={onChangeStatus}
+            onChangeLanguage={onChangeLanguage}
+            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
           />
         )}
         {selectedWidget === 'people' && (
@@ -606,8 +634,7 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}
-          >
+            }}>
             <SearchTextInput
               small
               name="search"
@@ -657,8 +684,7 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}
-        >
+          dismountCallback={() => ui.setSelectedPerson(0)}>
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -675,7 +701,7 @@ export default function BodyComponent({ selectedWidget }) {
               borderRadius: 0,
               background: color.pureWhite,
               ...focusedDesktopModalStyles,
-              minHeight: '768px',
+              // minHeight: '768px',
               maxHeight: '768px',
               minWidth: '892px',
               maxWidth: '892px',

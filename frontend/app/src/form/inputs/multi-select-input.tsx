@@ -4,6 +4,7 @@ import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { MultiSelect } from '../../sphinxUI';
+import { colors } from '../../colors';
 
 export default function MultiSelectInput({
   error,
@@ -21,10 +22,11 @@ export default function MultiSelectInput({
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;
+  const color = colors['light'];
 
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv label={labeltext} color={color}>
         <R>
           <MultiSelect
             selectStyle={{ border: 'none' }}
@@ -37,19 +39,23 @@ export default function MultiSelectInput({
             }}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
     </>
   );
+}
+
+interface styledProps {
+  color?: any;
 }
 
 const ExtraText = styled.div`
@@ -59,7 +65,7 @@ const ExtraText = styled.div`
   font-size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 0px;
@@ -67,7 +73,7 @@ const E = styled.div`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;
