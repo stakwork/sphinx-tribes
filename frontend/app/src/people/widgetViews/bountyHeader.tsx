@@ -160,7 +160,8 @@ const BountyHeader = ({
                       className="filterText"
                       style={{
                         color: isPopoverOpen ? color.grayish.G10 : ''
-                      }}>
+                      }}
+                    >
                       Filter
                     </EuiText>
                   </FilterContainer>
@@ -179,12 +180,14 @@ const BountyHeader = ({
                 closePopover={closePopover}
                 panelClassName="yourClassNameHere"
                 panelPaddingSize="none"
-                anchorPosition="downLeft">
+                anchorPosition="downLeft"
+              >
                 <div
                   style={{
                     display: 'flex',
                     flexDirection: 'row'
-                  }}>
+                  }}
+                >
                   <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
                     <EuiText className="leftBoxHeading">STATUS</EuiText>
                     <EuiCheckboxGroup
@@ -245,7 +248,8 @@ const BountyHeader = ({
                   fontWeight: '600',
                   fontFamily: 'Barlow',
                   color: color.black400
-                }}>
+                }}
+              >
                 {developerCount}
               </EuiText>
             </D>
@@ -386,7 +390,8 @@ const BountyHeader = ({
                   fontFamily: 'Barlow',
                   fontWeight: '500',
                   color: color.black400
-                }}>
+                }}
+              >
                 {peopleList && peopleList?.length}
               </EuiText>
             </DevelopersContainerMobile>
