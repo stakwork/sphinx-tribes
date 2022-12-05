@@ -105,7 +105,7 @@ const Container = styled.div<inputProps>`
     background: ${(p) => p.color && p.color.grayish.G600} !important;
     border: ${(p) => (p.border ? p.border : `1px solid ${p.color.pureBlack}`)};
     box-sizing: border-box;
-    border-radius: 21px;
+    border-radius: 200px;
     padding-left: 20px;
     padding-right: 30px;
     font-style: normal;
