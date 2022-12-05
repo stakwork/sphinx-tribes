@@ -74,9 +74,9 @@ func NewRouter() *http.Server {
 		r.Get("/people", getListedPeople)
 		r.Get("/people/search", getPeopleBySearch)
 		r.Get("/people/posts", getListedPosts)
+		r.Get("/people/wanteds", getListedWanteds)
 		r.Get("/people/wanteds/header", getWantedsHeader)
 		r.Get("/people/short", getPeopleShortList)
-		r.Get("/people/wanteds", getListedWanteds)
 		r.Get("/people/offers", getListedOffers)
 		r.Get("/admin_pubkeys", getAdminPubkeys)
 
@@ -299,6 +299,7 @@ func getPeopleShortList(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
 }
+
 func getListedOffers(w http.ResponseWriter, r *http.Request) {
 	people, err := DB.getListedOffers(r)
 	if err != nil {
