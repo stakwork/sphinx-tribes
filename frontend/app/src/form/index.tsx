@@ -336,7 +336,8 @@ export default function Form(props: any) {
                       className="SubHeadingText"
                       style={{
                         marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                      }}>
+                      }}
+                    >
                       {schemaData.sub_heading}
                     </EuiText>
                   )}
@@ -441,7 +442,8 @@ export default function Form(props: any) {
                       width: stepTracker < 3 ? '45%' : '100%',
                       height: stepTracker < 3 ? '48px' : '48px',
                       marginTop: stepTracker <= 3 ? '-20px' : '-10px'
-                    }}>
+                    }}
+                  >
                     <div
                       className="nextButton"
                       onClick={() => {
@@ -457,7 +459,8 @@ export default function Form(props: any) {
                         } else {
                           NextStepHandler();
                         }
-                      }}>
+                      }}
+                    >
                       {assigneeName === '' ? (
                         <EuiText className="nextText">
                           {schemaData.step === 3 ? 'Decide Later' : 'Next'}

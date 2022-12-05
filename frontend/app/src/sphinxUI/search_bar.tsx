@@ -29,7 +29,8 @@ export default function SearchTextInput(props: any) {
       TextColorHover={props.TextColorHover}
       iconColorHover={props.iconColorHover}
       iconColor={props.iconColor}
-      color={color}>
+      color={color}
+    >
       <input
         className="SearchText"
         {...props}

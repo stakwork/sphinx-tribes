@@ -129,7 +129,8 @@ export default function WidgetSwitchViewer(props) {
                 background: 'transparent',
                 minHeight: !isMobile ? '160px' : '',
                 boxShadow: 'none'
-              }}>
+              }}
+            >
               {selectedWidget === 'post' ? (
                 <PostView
                   showName
@@ -181,12 +182,14 @@ export default function WidgetSwitchViewer(props) {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center'
-            }}>
+            }}
+          >
             <div
               className="LoadMoreButton"
               onClick={() => {
                 setCurrentItems(currentItems + 10);
-              }}>
+              }}
+            >
               Load More
             </div>
           </LoadMoreContainer>
