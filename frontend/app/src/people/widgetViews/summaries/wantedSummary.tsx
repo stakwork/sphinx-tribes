@@ -84,6 +84,17 @@ export default function WantedSummary(props: any) {
   const [peopleList, setPeopleList] = useState<any>();
   const [isAssigned, setIsAssigned] = useState<boolean>(false);
   const [assignedPerson, setAssignedPerson] = useState<any>();
+  const [replitLink, setReplitLink] = useState('');
+
+  useEffect(() => {
+    if (description) {
+      setReplitLink(
+        description.match(
+          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+        )
+      );
+    }
+  }, [description]);
 
   const [showBadgeAwardDialog, setShowBadgeAwardDialog] = useState(false);
 
@@ -861,6 +872,7 @@ export default function WantedSummary(props: any) {
                       },sphinxchat`;
                       sendToRedirect(twitterLink);
                     }}
+                    replitLink={replitLink}
                   />
                   <BottomButtonContainer>
                     {paid ? (
@@ -917,7 +929,7 @@ export default function WantedSummary(props: any) {
                         }}
                       />
                     )}
-                    <IconButton
+                    {/* <IconButton
                       width={220}
                       height={48}
                       style={{
@@ -944,7 +956,7 @@ export default function WantedSummary(props: any) {
                           setShowBadgeAwardDialog(true);
                         }
                       }}
-                    />
+                    /> */}
                   </BottomButtonContainer>
                 </>
               </AssigneeProfile>
@@ -1056,6 +1068,7 @@ export default function WantedSummary(props: any) {
                         },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
+                      replitLink={replitLink}
                     />
                   </>
                 ) : assignee?.owner_alias ? (
@@ -1121,6 +1134,7 @@ export default function WantedSummary(props: any) {
                         },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
+                      replitLink={replitLink}
                     />
                   </>
                 ) : (
@@ -1193,6 +1207,7 @@ export default function WantedSummary(props: any) {
                         },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
+                      replitLink={replitLink}
                     />
                   </>
                 )}
@@ -1761,5 +1776,5 @@ const BottomButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   row-gap: 16px;
-  margin-top: 150px;
+  margin-top: 144px;
 `;
