@@ -44,7 +44,7 @@ const BountyDescription = (props: any) => {
             <NameTag {...props} iconSize={32} isPaid={props?.isPaid} />
           </div>
         </Header>
-        <Description>
+        <Description isPaid={props?.isPaid} color={color}>
           <div
             className="DescriptionContainer"
             style={{
@@ -146,7 +146,10 @@ interface codingLangProps {
   color?: any;
 }
 
-interface bounty_description_props {}
+interface bounty_description_props {
+  isPaid?: any;
+  color?: any;
+}
 interface replit_image_props {}
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
@@ -170,7 +173,7 @@ const Header = styled.div`
   }
 `;
 
-const Description = styled.div`
+const Description = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: row;
   align-item: center;
@@ -195,7 +198,9 @@ const Description = styled.div`
     border-radius: 4px;
     overflow: hidden;
     margin-top: -13px;
-    border: 1px solid #d0d5d8;
+    border: 1px solid ${(p) => p?.color && p.color.grayish.G500};
+    opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
+    filter: ${(p) => p.isPaid && 'grayscale(100%)'};
   }
 `;
 
