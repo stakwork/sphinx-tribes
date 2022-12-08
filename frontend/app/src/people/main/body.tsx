@@ -817,6 +817,7 @@ export default function BodyComponent({ selectedWidget }) {
               background: color.pureWhite,
               zIndex: 20,
               ...focusedDesktopModalStyles,
+              maxHeight:'100%',
               borderRadius: '10px'
             }}
             // nextArrow={nextIndex}
