@@ -740,7 +740,7 @@ export default function WantedSummary(props: any) {
                       })}
                   </LanguageContainer>
                 </div>
-                <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
+                <DescriptionBox color={color}>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
               <AssigneeProfile color={color}>
                 <>
@@ -1001,7 +1001,7 @@ export default function WantedSummary(props: any) {
                       })}
                   </LanguageContainer>
                 </div>
-                <DescriptionBox>{renderMarkdown(description)}</DescriptionBox>
+                <DescriptionBox color={color}>{renderMarkdown(description)}</DescriptionBox>
               </CreatorDescription>
 
               <AssigneeProfile color={color}>
@@ -1645,7 +1645,7 @@ const Profile = styled.div`
 `;
 
 const TitleBox = styled.div<colorProps>`
-  // padding-top: 48px;
+  margin-top: 24px;
   font-family: 'Barlow';
   font-style: normal;
   font-weight: 600;
@@ -1656,12 +1656,17 @@ const TitleBox = styled.div<colorProps>`
   color: ${(p) => p?.color && p.color.text1};
 `;
 
-const DescriptionBox = styled.div`
+const DescriptionBox = styled.div<colorProps>`
   padding-right: 44px;
-  margin-right: 4px;
+  margin-right: 7px;
   min-height: 548px;
   max-height: 548px;
   overflow-y: scroll;
+  font-family: Barlow;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 25px;
+  color: ${(p) => p?.color && p.color.black500};
 `;
 
 const AssigneeProfile = styled.div<colorProps>`
