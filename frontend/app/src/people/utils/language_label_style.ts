@@ -119,3 +119,56 @@ export const GetValue = (arr: any) => {
     };
   });
 };
+
+export const awards = [
+  {
+    id: 'Admin',
+    label: 'Admin',
+    label_icon: '/static/awards/Admin_award.svg'
+  },
+  {
+    id: 'Moderator',
+    label: 'Moderator',
+    label_icon: '/static/awards/Moderator_award.svg'
+  },
+  {
+    id: 'Developer',
+    label: 'Developer',
+    label_icon: '/static/awards/Developer_award.svg'
+  },
+  {
+    id: 'First 1000 members',
+    label: 'First 1000 members',
+    label_icon: '/static/awards/1st_1000_member_award.svg'
+  },
+  {
+    id: 'Contributing 1M sats ',
+    label: 'Contributing 1M sats ',
+    label_icon: '/static/awards/1M_sat_award.svg'
+  },
+  {
+    id: 'New Member',
+    label: 'New Member',
+    label_icon: '/static/awards/new_member_award.svg'
+  },
+  {
+    id: 'Early/Founding Member',
+    label: 'Early/Founding Member',
+    label_icon: '/static/awards/early_founding_member_award.svg'
+  },
+  {
+    id: 'Conversation Starter',
+    label: 'Conversation Starter',
+    label_icon: '/static/awards/conversation_award.svg'
+  },
+  {
+    id: 'VIP member',
+    label: 'VIP member',
+    label_icon: '/static/awards/vip_member_award.svg'
+  },
+  {
+    id: 'Group Expert',
+    label: 'Group Expert',
+    label_icon: '/static/awards/group_expert_award.svg'
+  }
+];

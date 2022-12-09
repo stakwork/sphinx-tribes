@@ -25,7 +25,8 @@ export default function FocusedView(props: any) {
     manualGoBackOnly,
     isFirstTimeScreen,
     fromBountyPage,
-    newDesign
+    newDesign,
+    setIsModalSideButton
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -423,6 +424,7 @@ export default function FocusedView(props: any) {
                 setEditMode(true);
                 // props?.deleteExtraFunction();
               }}
+              setIsModalSideButton={setIsModalSideButton}
             />
           </>
         )}

@@ -55,6 +55,7 @@ export default function BodyComponent({ selectedWidget }) {
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const [isModalSideButton, setIsModalSideButton] = useState<boolean>(true);
 
   const color = colors['light'];
 
@@ -701,8 +702,6 @@ export default function BodyComponent({ selectedWidget }) {
               ...focusedDesktopModalStyles,
               // minHeight: '768px',
               maxHeight: '768px',
-              minWidth: '892px',
-              maxWidth: '892px',
               height: '100%'
             }}
             style={{
@@ -716,7 +715,8 @@ export default function BodyComponent({ selectedWidget }) {
             prevArrowNew={
               activeListIndex === 0
                 ? null
-                : () => {
+                : isModalSideButton
+                ? () => {
                     const { person, body } = activeList[activeListIndex - 1];
                     if (person && body) {
                       history.replace({
@@ -729,11 +729,13 @@ export default function BodyComponent({ selectedWidget }) {
                       });
                     }
                   }
+                : null
             }
             nextArrowNew={
               activeListIndex + 1 > activeList?.length
                 ? null
-                : () => {
+                : isModalSideButton
+                ? () => {
                     const { person, body } = activeList[activeListIndex + 1];
                     if (person && body) {
                       history.replace({
@@ -746,6 +748,7 @@ export default function BodyComponent({ selectedWidget }) {
                       });
                     }
                   }
+                : null
             }>
             <FocusedView
               ReCallBounties={ReCallBounties}
@@ -778,6 +781,7 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusPerson(null);
                 setPublicFocusIndex(-1);
               }}
+              setIsModalSideButton={setIsModalSideButton}
             />
           </Modal>
         )}
@@ -808,7 +812,7 @@ export default function BodyComponent({ selectedWidget }) {
               background: color.pureWhite,
               zIndex: 20,
               ...focusedDesktopModalStyles,
-              maxHeight:'100%',
+              maxHeight: '100%',
               borderRadius: '10px'
             }}
             // nextArrow={nextIndex}
