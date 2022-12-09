@@ -18,9 +18,9 @@ import remarkGfm from 'remark-gfm';
 import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { useLocation } from 'react-router-dom';
-import { EuiPopover, EuiText } from '@elastic/eui';
+import { EuiFieldText, EuiPopover, EuiText } from '@elastic/eui';
 import { colors } from '../../../colors';
-import { LanguageObject } from '../../utils/language_label_style';
+import { awards, LanguageObject } from '../../utils/language_label_style';
 import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
 import IconButton from '../../../sphinxUI/icon_button';
 import ConnectCard from '../../utils/connectCard';
@@ -30,12 +30,31 @@ import ImageButton from '../../../sphinxUI/Image_button';
 import SearchableSelectInput from '../../../form/inputs/searchable-select-input';
 import AutoComplete from '../../../sphinxUI/custom_autocomplete';
 import api from '../../../api';
+import NumberInput from '../../../form/inputs/number-input';
+import { number } from 'yup';
 
 function useQuery() {
   const { search } = useLocation();
 
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
+
+// const CreatorPaidSteps = [
+//   {
+//     step: 0,
+//     view: 'normal'
+//   },
+//   {
+//     step: 1,
+//     view: 'Adjust the amount',
+//     heading: 'Adjust the amount',
+//     backButtonText: 'BACK TO BOUNTY',
+
+//   },
+//   {
+
+//   }
+// ];
 
 export default function WantedSummary(props: any) {
   const {
@@ -63,7 +82,8 @@ export default function WantedSummary(props: any) {
     wanted_type,
     one_sentence_summary,
     github_description,
-    show
+    show,
+    setIsModalSideButton
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -85,6 +105,9 @@ export default function WantedSummary(props: any) {
   const [isAssigned, setIsAssigned] = useState<boolean>(false);
   const [assignedPerson, setAssignedPerson] = useState<any>();
   const [replitLink, setReplitLink] = useState('');
+  const [creatorStep, setCreatorStep] = useState<number>(0);
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
+  const [bountyPrice, setBountyPrice] = useState<any>(price ?? priceMin ?? 0);
 
   useEffect(() => {
     if (description) {
@@ -95,6 +118,20 @@ export default function WantedSummary(props: any) {
       );
     }
   }, [description]);
+
+  const handleAwards = (optionId) => {
+    const newCheckboxIdToSelectedMap = {
+      ...checkboxIdToSelectedMap,
+      ...{
+        [optionId]: !checkboxIdToSelectedMap[optionId]
+      }
+    };
+    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+  };
+
+  // useEffect(() => {
+  //   console.log(checkboxIdToSelectedMap);
+  // }, [checkboxIdToSelectedMap]);
 
   const [showBadgeAwardDialog, setShowBadgeAwardDialog] = useState(false);
 
@@ -676,260 +713,266 @@ export default function WantedSummary(props: any) {
             /*
              * creator view
              */
-            <Creator>
-              {paid && (
-                <Img
-                  src={'/static/paid_ribbon.svg'}
-                  style={{
-                    position: 'absolute',
-                    top: -0,
-                    right: -4,
-                    width: 72.46,
-                    height: 71.82,
-                    zIndex: 100,
-                    pointerEvents: 'none'
-                  }}
-                />
-              )}
-              <CreatorDescription paid={paid} color={color}>
-                <div className="CreatorDescriptionOuterContainerCreatorView">
-                  <div className="CreatorDescriptionInnerContainerCreatorView">
-                    <Profile>{nametag}</Profile>
-                    <div className="CreatorDescriptionExtraButton">
-                      <ImageButton
-                        buttonText={'Edit'}
-                        ButtonContainerStyle={{
-                          width: '117px',
-                          height: '40px'
+            <>
+              {creatorStep === 0 && (
+                <Creator>
+                  <>
+                    {paid && (
+                      <Img
+                        src={'/static/paid_ribbon.svg'}
+                        style={{
+                          position: 'absolute',
+                          top: -0,
+                          right: -4,
+                          width: 72.46,
+                          height: 71.82,
+                          zIndex: 100,
+                          pointerEvents: 'none'
                         }}
-                        leadingImageSrc={'/static/editIcon.svg'}
-                        leadingImageContainerStyle={{
-                          left: 320
-                        }}
-                        buttonAction={props?.editAction}
                       />
-                      <ImageButton
-                        buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
-                        ButtonContainerStyle={{
-                          width: '117px',
-                          height: '40px'
-                        }}
-                        leadingImageSrc={'/static/Delete.svg'}
-                        leadingImageContainerStyle={{
-                          left: 450
-                        }}
-                        buttonAction={props?.deleteAction}
-                      />
-                    </div>
-                  </div>
-                  <TitleBox color={color}>{title}</TitleBox>
-                  <LanguageContainer>
-                    {dataValue &&
-                      dataValue?.length > 0 &&
-                      dataValue?.map((lang: any, index) => {
-                        return (
-                          <CodingLabels
-                            key={index}
-                            styledColors={color}
-                            border={lang?.border}
-                            color={lang?.color}
-                            background={lang?.background}>
-                            <EuiText className="LanguageText">{lang?.label}</EuiText>
-                          </CodingLabels>
-                        );
-                      })}
-                  </LanguageContainer>
-                </div>
-                <DescriptionBox color={color}>{renderMarkdown(description)}</DescriptionBox>
-              </CreatorDescription>
-              <AssigneeProfile color={color}>
-                <>
-                  <UnassignedPersonProfile
-                    unassigned_border={color.grayish.G300}
-                    grayish_G200={color.grayish.G200}
-                    color={color}>
-                    {!isAssigned && (
-                      <div className="UnassignedPersonContainer">
-                        <img
-                          src="/static/unassigned_profile.svg"
-                          alt=""
-                          height={'100%'}
-                          width={'100%'}
-                        />
-                      </div>
                     )}
-
-                    {isAssigned ? (
-                      <div className="BountyProfileOuterContainerCreatorView">
-                        <BountyProfileView
-                          assignee={!assignedPerson ? assignee : assignedPerson}
-                          status={paid ? 'completed' : 'assigned'}
-                          canViewProfile={false}
-                          statusStyle={{
-                            width: '66px',
-                            height: '16px',
-                            background: paid ? color.statusCompleted : color.statusAssigned
-                          }}
-                          UserProfileContainerStyle={{
-                            height: 48,
-                            width: 'fit-content',
-                            minWidth: 'fit-content',
-                            padding: 0
-                            // marginTop: '48px'
-                          }}
-                          UserImageStyle={{
-                            width: '48px',
-                            height: '48px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: '200px',
-                            overflow: 'hidden'
-                          }}
-                          NameContainerStyle={{
-                            height: '28px',
-                            maxWidth: '154px'
-                          }}
-                          userInfoStyle={{
-                            marginLeft: '12px'
-                          }}
-                        />
-                        <div
-                          className="AssigneeCloseButtonContainer"
-                          onClick={() => {
-                            changeAssignedPerson();
-                            assigneeHandlerOpen();
-                          }}>
-                          <img
-                            src="/static/assignee_close.png"
-                            alt="cross_icon"
-                            height={'100%'}
-                            width={'100%'}
-                          />
+                    <CreatorDescription paid={paid} color={color}>
+                      <div className="CreatorDescriptionOuterContainerCreatorView">
+                        <div className="CreatorDescriptionInnerContainerCreatorView">
+                          <Profile>{nametag}</Profile>
+                          <div className="CreatorDescriptionExtraButton">
+                            <ImageButton
+                              buttonText={'Edit'}
+                              ButtonContainerStyle={{
+                                width: '117px',
+                                height: '40px'
+                              }}
+                              leadingImageSrc={'/static/editIcon.svg'}
+                              leadingImageContainerStyle={{
+                                left: 320
+                              }}
+                              buttonAction={props?.editAction}
+                            />
+                            <ImageButton
+                              buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
+                              ButtonContainerStyle={{
+                                width: '117px',
+                                height: '40px'
+                              }}
+                              leadingImageSrc={'/static/Delete.svg'}
+                              leadingImageContainerStyle={{
+                                left: 450
+                              }}
+                              buttonAction={props?.deleteAction}
+                            />
+                          </div>
                         </div>
+                        <TitleBox color={color}>{title}</TitleBox>
+                        <LanguageContainer>
+                          {dataValue &&
+                            dataValue?.length > 0 &&
+                            dataValue?.map((lang: any, index) => {
+                              return (
+                                <CodingLabels
+                                  key={index}
+                                  styledColors={color}
+                                  border={lang?.border}
+                                  color={lang?.color}
+                                  background={lang?.background}>
+                                  <EuiText className="LanguageText">{lang?.label}</EuiText>
+                                </CodingLabels>
+                              );
+                            })}
+                        </LanguageContainer>
                       </div>
-                    ) : (
-                      <div className="UnassignedPersonalDetailContainer">
-                        <ImageButton
-                          buttonText={'Not Assigned'}
-                          ButtonContainerStyle={{
-                            width: '159px',
-                            height: '48px',
-                            background: color.pureWhite,
-                            marginLeft: '-12px'
+                      <DescriptionBox color={color}>{renderMarkdown(description)}</DescriptionBox>
+                    </CreatorDescription>
+                    <AssigneeProfile color={color}>
+                      <>
+                        <UnassignedPersonProfile
+                          unassigned_border={color.grayish.G300}
+                          grayish_G200={color.grayish.G200}
+                          color={color}>
+                          {!isAssigned && (
+                            <div className="UnassignedPersonContainer">
+                              <img
+                                src="/static/unassigned_profile.svg"
+                                alt=""
+                                height={'100%'}
+                                width={'100%'}
+                              />
+                            </div>
+                          )}
+
+                          {isAssigned ? (
+                            <div className="BountyProfileOuterContainerCreatorView">
+                              <BountyProfileView
+                                assignee={!assignedPerson ? assignee : assignedPerson}
+                                status={paid ? 'completed' : 'assigned'}
+                                canViewProfile={false}
+                                statusStyle={{
+                                  width: '66px',
+                                  height: '16px',
+                                  background: paid ? color.statusCompleted : color.statusAssigned
+                                }}
+                                UserProfileContainerStyle={{
+                                  height: 48,
+                                  width: 'fit-content',
+                                  minWidth: 'fit-content',
+                                  padding: 0
+                                  // marginTop: '48px'
+                                }}
+                                UserImageStyle={{
+                                  width: '48px',
+                                  height: '48px',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  borderRadius: '200px',
+                                  overflow: 'hidden'
+                                }}
+                                NameContainerStyle={{
+                                  height: '28px',
+                                  maxWidth: '154px'
+                                }}
+                                userInfoStyle={{
+                                  marginLeft: '12px'
+                                }}
+                              />
+                              <div
+                                className="AssigneeCloseButtonContainer"
+                                onClick={() => {
+                                  changeAssignedPerson();
+                                  assigneeHandlerOpen();
+                                }}>
+                                <img
+                                  src="/static/assignee_close.png"
+                                  alt="cross_icon"
+                                  height={'100%'}
+                                  width={'100%'}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="UnassignedPersonalDetailContainer">
+                              <ImageButton
+                                buttonText={'Not Assigned'}
+                                ButtonContainerStyle={{
+                                  width: '159px',
+                                  height: '48px',
+                                  background: color.pureWhite,
+                                  marginLeft: '-12px'
+                                }}
+                                buttonTextStyle={{
+                                  color: color.grayish.G1100
+                                }}
+                                endImageSrc={'/static/addIcon.svg'}
+                                endingImageContainerStyle={{
+                                  right: '34px',
+                                  fontSize: '12px'
+                                }}
+                                buttonAction={assigneeHandlerOpen}
+                              />
+                            </div>
+                          )}
+                          {assigneeValue && (
+                            <div className="AutoCompleteContainer">
+                              <AutoComplete
+                                peopleList={peopleList}
+                                handleAssigneeDetails={(value) => {
+                                  handleAssigneeDetails(value);
+                                  assigneeHandlerClose();
+                                }}
+                              />
+                            </div>
+                          )}
+                        </UnassignedPersonProfile>
+                        <DividerContainer>
+                          <Divider />
+                        </DividerContainer>
+                        <BountyPriceContainer margin_top="0px">
+                          <BountyPrice
+                            priceMin={props?.priceMin}
+                            priceMax={props?.priceMax}
+                            price={props?.price}
+                            sessionLength={props?.estimate_session_length}
+                            style={{
+                              padding: 0,
+                              margin: 0
+                            }}
+                          />
+                        </BountyPriceContainer>
+                        <ButtonSet
+                          githubShareAction={() => {
+                            const repoUrl = ticketUrl
+                              ? ticketUrl
+                              : `https://github.com/${repo}/issues/${issue}`;
+                            sendToRedirect(repoUrl);
                           }}
-                          buttonTextStyle={{
-                            color: color.grayish.G1100
+                          copyURLAction={handleCopyUrl}
+                          copyStatus={isCopied ? 'Copied' : 'Copy Link'}
+                          twitterAction={() => {
+                            const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                              labels && labels.map((x: any) => x.label)
+                            },sphinxchat`;
+                            sendToRedirect(twitterLink);
                           }}
-                          endImageSrc={'/static/addIcon.svg'}
-                          endingImageContainerStyle={{
-                            right: '34px',
-                            fontSize: '12px'
-                          }}
-                          buttonAction={assigneeHandlerOpen}
+                          replitLink={replitLink}
                         />
-                      </div>
-                    )}
-                    {assigneeValue && (
-                      <div className="AutoCompleteContainer">
-                        <AutoComplete
-                          peopleList={peopleList}
-                          handleAssigneeDetails={(value) => {
-                            handleAssigneeDetails(value);
-                            assigneeHandlerClose();
-                          }}
-                        />
-                      </div>
-                    )}
-                  </UnassignedPersonProfile>
-                  <DividerContainer>
-                    <Divider />
-                  </DividerContainer>
-                  <BountyPriceContainer margin_top="0px">
-                    <BountyPrice
-                      priceMin={props?.priceMin}
-                      priceMax={props?.priceMax}
-                      price={props?.price}
-                      sessionLength={props?.estimate_session_length}
-                      style={{
-                        padding: 0,
-                        margin: 0
-                      }}
-                    />
-                  </BountyPriceContainer>
-                  <ButtonSet
-                    githubShareAction={() => {
-                      const repoUrl = ticketUrl
-                        ? ticketUrl
-                        : `https://github.com/${repo}/issues/${issue}`;
-                      sendToRedirect(repoUrl);
-                    }}
-                    copyURLAction={handleCopyUrl}
-                    copyStatus={isCopied ? 'Copied' : 'Copy Link'}
-                    twitterAction={() => {
-                      const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                        labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
-                      sendToRedirect(twitterLink);
-                    }}
-                    replitLink={replitLink}
-                  />
-                  <BottomButtonContainer>
-                    {paid ? (
-                      <IconButton
-                        width={220}
-                        height={48}
-                        style={{
-                          bottom: '0',
-                          marginLeft: '36px',
-                          border: `1px solid ${color.primaryColor.P400}`,
-                          background: color.pureWhite,
-                          color: color.borderGreen1
-                        }}
-                        text={'Mark Unpaid'}
-                        loading={saving === 'paid'}
-                        endingImg={'/static/mark_unpaid.svg'}
-                        textStyle={{
-                          width: '130px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          fontFamily: 'Barlow',
-                          marginLeft: '30px'
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExtrasPropertyAndSave('paid', !paid);
-                        }}
-                      />
-                    ) : (
-                      <IconButton
-                        color={'success'}
-                        width={220}
-                        height={48}
-                        style={{
-                          bottom: '0',
-                          marginLeft: '36px'
-                        }}
-                        text={'Mark Paid'}
-                        loading={saving === 'paid'}
-                        endingImg={'/static/mark_paid.svg'}
-                        textStyle={{
-                          width: '130px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          fontFamily: 'Barlow',
-                          marginLeft: '30px'
-                        }}
-                        hoverColor={color.button_primary.hover}
-                        activeColor={color.button_primary.active}
-                        shadowColor={color.button_primary.shadow}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExtrasPropertyAndSave('paid', !paid);
-                        }}
-                      />
-                    )}
-                    {/* <IconButton
+                        <BottomButtonContainer>
+                          {paid ? (
+                            <IconButton
+                              width={220}
+                              height={48}
+                              style={{
+                                bottom: '0',
+                                marginLeft: '36px',
+                                border: `1px solid ${color.primaryColor.P400}`,
+                                background: color.pureWhite,
+                                color: color.borderGreen1
+                              }}
+                              text={'Mark Unpaid'}
+                              loading={saving === 'paid'}
+                              endingImg={'/static/mark_unpaid.svg'}
+                              textStyle={{
+                                width: '130px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                fontFamily: 'Barlow',
+                                marginLeft: '30px'
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExtrasPropertyAndSave('paid', !paid);
+                                setIsModalSideButton(true);
+                              }}
+                            />
+                          ) : (
+                            <IconButton
+                              color={'success'}
+                              width={220}
+                              height={48}
+                              style={{
+                                bottom: '0',
+                                marginLeft: '36px'
+                              }}
+                              text={'Mark Paid'}
+                              loading={saving === 'paid'}
+                              endingImg={'/static/mark_paid.svg'}
+                              textStyle={{
+                                width: '130px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                fontFamily: 'Barlow',
+                                marginLeft: '30px'
+                              }}
+                              hoverColor={color.button_primary.hover}
+                              activeColor={color.button_primary.active}
+                              shadowColor={color.button_primary.shadow}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // setExtrasPropertyAndSave('paid', !paid);
+                                setCreatorStep(1);
+                                setIsModalSideButton(false);
+                              }}
+                            />
+                          )}
+                          {/* <IconButton
                       width={220}
                       height={48}
                       style={{
@@ -957,10 +1000,256 @@ export default function WantedSummary(props: any) {
                         }
                       }}
                     /> */}
-                  </BottomButtonContainer>
-                </>
-              </AssigneeProfile>
-            </Creator>
+                        </BottomButtonContainer>
+                      </>
+                    </AssigneeProfile>
+                  </>
+                </Creator>
+              )}
+
+              {creatorStep === 1 && (
+                <AdjustAmountContainer>
+                  <div
+                    className="TopHeader"
+                    onClick={() => {
+                      setCreatorStep(0);
+                      setIsModalSideButton(true);
+                    }}>
+                    <div className="imageContainer">
+                      <img
+                        height={'12px'}
+                        width={'8px'}
+                        src={'/static/back_button_image.svg'}
+                        alt={'back_button_icon'}
+                      />
+                    </div>
+                    <EuiText className="TopHeaderText">Back to Bounty</EuiText>
+                  </div>
+                  <div className="Header">
+                    <EuiText className="HeaderText">Adjust the amount</EuiText>
+                  </div>
+                  <div className="AssignedProfile">
+                    <BountyProfileView
+                      assignee={assignee}
+                      status={'Assigned'}
+                      canViewProfile={false}
+                      statusStyle={{
+                        width: '66px',
+                        height: '16px',
+                        background: color.statusAssigned
+                      }}
+                      UserProfileContainerStyle={{
+                        height: 80,
+                        width: 235,
+                        padding: '0px 0px 0px 33px',
+                        marginTop: '48px'
+                      }}
+                      UserImageStyle={{
+                        width: '80px',
+                        height: '80px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: '200px',
+                        overflow: 'hidden'
+                      }}
+                      NameContainerStyle={{
+                        height: '28px'
+                      }}
+                      userInfoStyle={{
+                        marginLeft: '28px',
+                        marginTop: '6px'
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                      }}>
+                      <EuiText
+                        style={{
+                          fontFamily: 'Barlow',
+                          fontStyle: 'normal',
+                          fontWeight: '400',
+                          fontSize: '14px',
+                          lineHeight: '17px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#8E969C',
+                          marginRight: '7px'
+                        }}>
+                        $@
+                      </EuiText>
+                      <EuiFieldText
+                        style={{
+                          width: '296px',
+                          background: '#fff',
+                          border: '1px solid #DDE1E5',
+                          color: '#000'
+                        }}
+                        type={'number'}
+                        value={bountyPrice}
+                        onChange={(e) => {
+                          setBountyPrice(e.target.value);
+                        }}
+                      />
+                      <EuiText
+                        style={{
+                          fontFamily: 'Barlow',
+                          fontStyle: 'normal',
+                          fontWeight: '400',
+                          fontSize: '14px',
+                          lineHeight: '17px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#8E969C',
+                          marginLeft: '14px'
+                        }}>
+                        SAT
+                      </EuiText>
+                    </div>
+                    <EuiText
+                      style={{
+                        fontFamily: 'Barlow',
+                        fontStyle: 'normal',
+                        fontWeight: '500',
+                        fontSize: '13px',
+                        lineHeight: '16px !important',
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: '#8E969C',
+                        marginLeft: '42px',
+                        height: '32px'
+                      }}>
+                      {satToUsd(bountyPrice)} USD
+                    </EuiText>
+                  </div>
+                  <div className="BottomButton">
+                    <IconButton
+                      color={'primary'}
+                      width={120}
+                      height={42}
+                      text={'Next'}
+                      textStyle={{
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        fontFamily: 'Barlow'
+                      }}
+                      hoverColor={color.button_secondary.hover}
+                      activeColor={color.button_secondary.active}
+                      shadowColor={color.button_secondary.shadow}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // setExtrasPropertyAndSave('paid', !paid);
+                        setCreatorStep(2);
+                      }}
+                    />
+                  </div>
+                </AdjustAmountContainer>
+              )}
+              {creatorStep === 2 && (
+                <AwardsContainer>
+                  <div className="header">
+                    <div
+                      className="headerTop"
+                      onClick={() => {
+                        setCreatorStep(1);
+                      }}>
+                      <div className="imageContainer">
+                        <img
+                          height={'12px'}
+                          width={'8px'}
+                          src={'/static/back_button_image.svg'}
+                          alt={'back_button_icon'}
+                        />
+                      </div>
+                      <EuiText className="TopHeaderText">Back</EuiText>
+                    </div>
+                    <EuiText className="headerText">Award Badge</EuiText>
+                  </div>
+                  <div className="AwardContainer">
+                    {awards?.map((award, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          height: '65px',
+                          width: '248px',
+                          alignItems: 'center'
+                        }}>
+                        <input
+                          type="checkbox"
+                          id={award.id}
+                          name={award.id}
+                          value={award.id}
+                          onChange={(e) => {
+                            handleAwards(e.target.value);
+                          }}
+                          style={{
+                            height: '16px',
+                            width: '16px'
+                          }}
+                        />
+                        <div
+                          style={{
+                            height: '40px',
+                            width: '40px',
+                            marginLeft: '13px'
+                          }}>
+                          <img src={award.label_icon} alt="icon" height={'100%'} width={'100%'} />
+                        </div>
+                        <EuiText
+                          style={{
+                            marginLeft: '15px',
+                            fontFamily: 'Barlow',
+                            fontWeight: '500',
+                            fontSize: '13px',
+                            lineHeight: '15px',
+                            color: '#292C33'
+                          }}>
+                          {award.label}
+                        </EuiText>
+                      </div>
+                    ))}
+                  </div>
+                  <AwardBottomContainer>
+                    <IconButton
+                      color={'success'}
+                      width={220}
+                      height={48}
+                      style={{
+                        bottom: '0',
+                        marginLeft: '36px'
+                      }}
+                      text={'Mark Paid'}
+                      loading={saving === 'paid'}
+                      endingImg={'/static/mark_paid.svg'}
+                      textStyle={{
+                        width: '130px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        fontFamily: 'Barlow',
+                        marginLeft: '30px'
+                      }}
+                      hoverColor={color.button_primary.hover}
+                      activeColor={color.button_primary.active}
+                      shadowColor={color.button_primary.shadow}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExtrasPropertyAndSave('paid', !paid);
+                        setTimeout(() => {
+                          setCreatorStep(0);
+                          setIsModalSideButton(true);
+                        }, 3000);
+                      }}
+                    />
+                  </AwardBottomContainer>
+                </AwardsContainer>
+              )}
+            </>
           ) : (
             /*
              * normal user view
@@ -1782,4 +2071,131 @@ const BottomButtonContainer = styled.div`
   flex-direction: column;
   row-gap: 16px;
   margin-top: 144px;
+`;
+
+const AdjustAmountContainer = styled.div<colorProps>`
+  min-height: 768px;
+  max-height: 100%;
+  min-width: 440px;
+  max-width: 440px;
+  padding-top: 32px;
+  .TopHeader {
+    max-height: 48px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: 25px;
+    .imageContainer {
+      height: 48px;
+      width: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .TopHeaderText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 18px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #3c3f41;
+    }
+  }
+  .Header {
+    height: 32px;
+    margin-left: 70px;
+    .HeaderText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 800;
+      font-size: 36px;
+      line-height: 43px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: #3c3f41;
+    }
+  }
+  .AssignedProfile {
+    height: 184px;
+    margin-top: 170px;
+    padding: 0px 31px 0px 38px;
+  }
+  .BottomButton {
+    margin-top: 200px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-right: 36px;
+  }
+`;
+
+const AwardsContainer = styled.div<colorProps>`
+  width: 622px;
+  height: 768px;
+  .header {
+    min-height: 159px;
+    max-height: 159px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #dde1e5;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+    .headerTop {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      margin: 32px 0px 0px 25px;
+      .imageContainer {
+        height: 48px;
+        width: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .TopHeaderText {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 18px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #3c3f41;
+      }
+    }
+    .headerText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 800;
+      font-size: 36px;
+      line-height: 43px;
+      display: flex;
+      align-items: center;
+      color: #3c3f41;
+      margin-left: 73px;
+    }
+  }
+  .AwardContainer {
+    min-height: 481px;
+    max-height: 481px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow-x: scroll;
+    margin-left: 63px;
+  }
+`;
+
+const AwardBottomContainer = styled.div`
+  height: 129px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #dde1e5;
+  box-shadow: 0px -1px 4px rgba(0, 0, 0, 0.1);
 `;
