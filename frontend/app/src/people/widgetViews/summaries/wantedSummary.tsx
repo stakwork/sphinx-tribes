@@ -32,29 +32,13 @@ import AutoComplete from '../../../sphinxUI/custom_autocomplete';
 import api from '../../../api';
 import NumberInput from '../../../form/inputs/number-input';
 import { number } from 'yup';
+import InvitePeopleSearch from '../../../form/inputs/widgets/PeopleSearch';
 
 function useQuery() {
   const { search } = useLocation();
 
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
-
-// const CreatorPaidSteps = [
-//   {
-//     step: 0,
-//     view: 'normal'
-//   },
-//   {
-//     step: 1,
-//     view: 'Adjust the amount',
-//     heading: 'Adjust the amount',
-//     backButtonText: 'BACK TO BOUNTY',
-
-//   },
-//   {
-
-//   }
-// ];
 
 export default function WantedSummary(props: any) {
   const {
@@ -106,8 +90,14 @@ export default function WantedSummary(props: any) {
   const [assignedPerson, setAssignedPerson] = useState<any>();
   const [replitLink, setReplitLink] = useState('');
   const [creatorStep, setCreatorStep] = useState<number>(0);
-  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [bountyPrice, setBountyPrice] = useState<any>(price ?? priceMin ?? 0);
+  const [selectedAward, setSelectedAward] = useState('');
+  const [isPaidStatusPopOver, setIsPaidStatusPopOver] = useState<boolean>(true);
+  const [isPaidStatusBadgeInfo, setIsPaidStatusBadgeInfo] = useState<boolean>(false);
+  const [awardDetails, setAwardDetails] = useState<any>({
+    name: '',
+    image: ''
+  });
 
   useEffect(() => {
     if (description) {
@@ -119,19 +109,19 @@ export default function WantedSummary(props: any) {
     }
   }, [description]);
 
-  const handleAwards = (optionId) => {
-    const newCheckboxIdToSelectedMap = {
-      ...checkboxIdToSelectedMap,
-      ...{
-        [optionId]: !checkboxIdToSelectedMap[optionId]
-      }
-    };
-    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
-  };
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      setIsPaidStatusPopOver(false);
+    }, 3000);
 
-  // useEffect(() => {
-  //   console.log(checkboxIdToSelectedMap);
-  // }, [checkboxIdToSelectedMap]);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isPaidStatusPopOver]);
+
+  const handleAwards = (optionId) => {
+    setSelectedAward(optionId);
+  };
 
   const [showBadgeAwardDialog, setShowBadgeAwardDialog] = useState(false);
 
@@ -297,6 +287,49 @@ export default function WantedSummary(props: any) {
       setSaving('');
     }
   }
+
+  // async function setExtrasPropertyAndSaveMultiple(propertyName: any, dataObject: any) {
+  //   if (peopleWanteds) {
+  //     setSaving(propertyName);
+  //     try {
+  //       const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(
+  //         dataObject,
+  //         'wanted',
+  //         created
+  //       );
+
+  //       // saved? ok update in wanted list if found
+  //       const peopleWantedsClone: any = [...peopleWanteds];
+  //       const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+  //         const val = f.body || {};
+  //         return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
+  //       });
+
+  //       // if we found it in the wanted list, update in people wanted list
+  //       if (indexFromPeopleWanted > -1) {
+  //         // if it should be hidden now, remove it from the list
+  //         if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
+  //           peopleWantedsClone.splice(indexFromPeopleWanted, 1);
+  //         } else {
+  //           // gotta update person extras! this is what is used for summary viewer
+  //           const personClone: any = person;
+  //           personClone.extras['wanted'][targetIndex] = clonedEx[targetIndex];
+
+  //           peopleWantedsClone[indexFromPeopleWanted] = {
+  //             person: personClone,
+  //             body: clonedEx[targetIndex]
+  //           };
+  //         }
+
+  //         main.setPeopleWanteds(peopleWantedsClone);
+  //       }
+  //     } catch (e) {
+  //       console.log('e', e);
+  //     }
+
+  //     setSaving('');
+  //   }
+  // }
 
   const handleCopyUrl = useCallback(() => {
     const el = document.createElement('input');
@@ -731,6 +764,52 @@ export default function WantedSummary(props: any) {
                         }}
                       />
                     )}
+                    {paid && isPaidStatusPopOver && (
+                      <>
+                        <PaidStatusPopover
+                          color={color}
+                          onClick={() => {
+                            if (awardDetails?.name !== '') {
+                              setIsPaidStatusBadgeInfo(!isPaidStatusBadgeInfo);
+                            }
+                          }}>
+                          <div
+                            className="PaidStatusContainer"
+                            style={{
+                              borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px'
+                            }}>
+                            <div className="imageContainer">
+                              <img
+                                src="/static/verified_check_icon.svg"
+                                alt="check icon"
+                                height={'100%'}
+                                width={'100%'}
+                              />
+                            </div>
+                            <EuiText className="PaidStatus">Bounty Paid</EuiText>
+                          </div>
+                          {isPaidStatusBadgeInfo && (
+                            <div className="ExtraBadgeInfo">
+                              <div className="imageContainer">
+                                <img
+                                  src="/static/green_checked_icon.svg"
+                                  alt=""
+                                  height={'100%'}
+                                  width={'100%'}
+                                />
+                              </div>
+                              <img
+                                src={awardDetails?.image !== '' && awardDetails.image}
+                                alt="award_icon"
+                                height={'40px'}
+                                width={'40px'}
+                              />
+                              <EuiText className="badgeText">Badge Awarded</EuiText>
+                            </div>
+                          )}
+                        </PaidStatusPopover>
+                      </>
+                    )}
                     <CreatorDescription paid={paid} color={color}>
                       <div className="CreatorDescriptionOuterContainerCreatorView">
                         <div className="CreatorDescriptionInnerContainerCreatorView">
@@ -1008,7 +1087,7 @@ export default function WantedSummary(props: any) {
               )}
 
               {creatorStep === 1 && (
-                <AdjustAmountContainer>
+                <AdjustAmountContainer color={color}>
                   <div
                     className="TopHeader"
                     onClick={() => {
@@ -1061,69 +1140,19 @@ export default function WantedSummary(props: any) {
                         marginTop: '6px'
                       }}
                     />
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                      }}>
-                      <EuiText
-                        style={{
-                          fontFamily: 'Barlow',
-                          fontStyle: 'normal',
-                          fontWeight: '400',
-                          fontSize: '14px',
-                          lineHeight: '17px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          color: '#8E969C',
-                          marginRight: '7px'
-                        }}>
-                        $@
-                      </EuiText>
+                    <div className="InputContainer">
+                      <EuiText className="InputContainerLeadingText">$@</EuiText>
                       <EuiFieldText
-                        style={{
-                          width: '296px',
-                          background: '#fff',
-                          border: '1px solid #DDE1E5',
-                          color: '#000'
-                        }}
+                        className="InputContainerTextField"
                         type={'number'}
                         value={bountyPrice}
                         onChange={(e) => {
                           setBountyPrice(e.target.value);
                         }}
                       />
-                      <EuiText
-                        style={{
-                          fontFamily: 'Barlow',
-                          fontStyle: 'normal',
-                          fontWeight: '400',
-                          fontSize: '14px',
-                          lineHeight: '17px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          color: '#8E969C',
-                          marginLeft: '14px'
-                        }}>
-                        SAT
-                      </EuiText>
+                      <EuiText className="InputContainerEndingText">SAT</EuiText>
                     </div>
-                    <EuiText
-                      style={{
-                        fontFamily: 'Barlow',
-                        fontStyle: 'normal',
-                        fontWeight: '500',
-                        fontSize: '13px',
-                        lineHeight: '16px !important',
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#8E969C',
-                        marginLeft: '42px',
-                        height: '32px'
-                      }}>
-                      {satToUsd(bountyPrice)} USD
-                    </EuiText>
+                    <EuiText className="USDText">{satToUsd(bountyPrice)} USD</EuiText>
                   </div>
                   <div className="BottomButton">
                     <IconButton
@@ -1143,6 +1172,7 @@ export default function WantedSummary(props: any) {
                       onClick={(e) => {
                         e.stopPropagation();
                         // setExtrasPropertyAndSave('paid', !paid);
+                        // setExtrasPropertyAndSave('price', bountyPrice);
                         setCreatorStep(2);
                       }}
                     />
@@ -1150,7 +1180,7 @@ export default function WantedSummary(props: any) {
                 </AdjustAmountContainer>
               )}
               {creatorStep === 2 && (
-                <AwardsContainer>
+                <AwardsContainer color={color}>
                   <div className="header">
                     <div
                       className="headerTop"
@@ -1172,50 +1202,38 @@ export default function WantedSummary(props: any) {
                   <div className="AwardContainer">
                     {awards?.map((award, index) => (
                       <div
+                        className="RadioImageContainer"
                         key={index}
                         style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          height: '65px',
-                          width: '248px',
-                          alignItems: 'center'
+                          border: selectedAward === award.id ? `1px solid ${color.blue2}` : ''
+                        }}
+                        onClick={() => {
+                          handleAwards(award.id);
+                          setAwardDetails({
+                            name: award.label,
+                            image: award.label_icon
+                          });
                         }}>
                         <input
-                          type="checkbox"
+                          type="radio"
                           id={award.id}
-                          name={award.id}
+                          name={'award'}
                           value={award.id}
-                          onChange={(e) => {
-                            handleAwards(e.target.value);
-                          }}
+                          checked={selectedAward === award.id}
                           style={{
                             height: '16px',
-                            width: '16px'
+                            width: '16px',
+                            cursor: 'pointer'
                           }}
                         />
-                        <div
-                          style={{
-                            height: '40px',
-                            width: '40px',
-                            marginLeft: '13px'
-                          }}>
+                        <div className="awardImageContainer">
                           <img src={award.label_icon} alt="icon" height={'100%'} width={'100%'} />
                         </div>
-                        <EuiText
-                          style={{
-                            marginLeft: '15px',
-                            fontFamily: 'Barlow',
-                            fontWeight: '500',
-                            fontSize: '13px',
-                            lineHeight: '15px',
-                            color: '#292C33'
-                          }}>
-                          {award.label}
-                        </EuiText>
+                        <EuiText className="awardLabelText">{award.label}</EuiText>
                       </div>
                     ))}
                   </div>
-                  <AwardBottomContainer>
+                  <AwardBottomContainer color={color}>
                     <IconButton
                       color={'success'}
                       width={220}
@@ -1224,7 +1242,7 @@ export default function WantedSummary(props: any) {
                         bottom: '0',
                         marginLeft: '36px'
                       }}
-                      text={'Mark Paid'}
+                      text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark Paid'}
                       loading={saving === 'paid'}
                       endingImg={'/static/mark_paid.svg'}
                       textStyle={{
@@ -1232,22 +1250,43 @@ export default function WantedSummary(props: any) {
                         display: 'flex',
                         justifyContent: 'center',
                         fontFamily: 'Barlow',
-                        marginLeft: '30px'
+                        marginLeft: '30px',
+                        marginRight: '10px'
                       }}
                       hoverColor={color.button_primary.hover}
                       activeColor={color.button_primary.active}
                       shadowColor={color.button_primary.shadow}
                       onClick={(e) => {
                         e.stopPropagation();
+                        // setExtrasPropertyAndSaveMultiple('paid', {
+                        //   paid: !paid,
+                        //   price: bountyPrice
+                        // });
                         setExtrasPropertyAndSave('paid', !paid);
+                        setExtrasPropertyAndSave('price', bountyPrice);
                         setTimeout(() => {
                           setCreatorStep(0);
                           setIsModalSideButton(true);
+                          setIsPaidStatusPopOver(true);
                         }, 3000);
                       }}
                     />
                   </AwardBottomContainer>
                 </AwardsContainer>
+              )}
+              {creatorStep === 3 && (
+                <InvitePeopleSearch
+                  key={'assignee'}
+                  newDesign={true}
+                  values={''}
+                  setAssigneefunction={() => {
+                    console.log('hi');
+                  }}
+                  peopleList={peopleList}
+                  handleChange={(e: any) => {
+                    console.log(e);
+                  }}
+                />
               )}
             </>
           ) : (
@@ -1359,6 +1398,56 @@ export default function WantedSummary(props: any) {
                       }}
                       replitLink={replitLink}
                     />
+                    {paid && isPaidStatusPopOver && (
+                      <>
+                        <PaidStatusPopover
+                          color={color}
+                          onClick={() => {
+                            if (awardDetails?.name !== '') {
+                              setIsPaidStatusBadgeInfo(!isPaidStatusBadgeInfo);
+                            }
+                          }}
+                          style={{
+                            right: '54px',
+                            top: '118px'
+                          }}>
+                          <div
+                            className="PaidStatusContainer"
+                            style={{
+                              borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px'
+                            }}>
+                            <div className="imageContainer">
+                              <img
+                                src="/static/verified_check_icon.svg"
+                                alt="check icon"
+                                height={'100%'}
+                                width={'100%'}
+                              />
+                            </div>
+                            <EuiText className="PaidStatus">Bounty Paid</EuiText>
+                          </div>
+                          {isPaidStatusBadgeInfo && (
+                            <div className="ExtraBadgeInfo">
+                              <div className="imageContainer">
+                                <img
+                                  src="/static/green_checked_icon.svg"
+                                  alt=""
+                                  height={'100%'}
+                                  width={'100%'}
+                                />
+                              </div>
+                              <img
+                                src={awardDetails?.image !== '' && awardDetails.image}
+                                alt="award_icon"
+                                height={'40px'}
+                                width={'40px'}
+                              />
+                              <EuiText className="badgeText">Badge Awarded</EuiText>
+                            </div>
+                          )}
+                        </PaidStatusPopover>
+                      </>
+                    )}
                   </>
                 ) : assignee?.owner_alias ? (
                   <>
@@ -2100,7 +2189,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
       line-height: 18px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: #3c3f41;
+      color: ${(p) => p.color && p.color.black500};
     }
   }
   .Header {
@@ -2115,13 +2204,58 @@ const AdjustAmountContainer = styled.div<colorProps>`
       display: flex;
       align-items: center;
       text-align: center;
-      color: #3c3f41;
+      color: ${(p) => p.color && p.color.black500};
     }
   }
   .AssignedProfile {
     height: 184px;
     margin-top: 170px;
     padding: 0px 31px 0px 38px;
+    .InputContainer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .InputContainerLeadingText {
+        font-family: Barlow;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        display: flex;
+        align-items: center;
+        color: ${(p) => (p.color ? p.color.grayish.G100 : '')};
+        margin-right: 7px;
+      }
+      .InputContainerTextField {
+        width: 296px;
+        background: ${(p) => p?.color && p?.color?.pureWhite};
+        border: 1px solid ${(p) => p.color && p.color.grayish.G600};
+        color: ${(p) => p.color && p.color.pureBlack};
+      }
+      .InputContainerEndingText {
+        font-family: Barlow;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        display: flex;
+        align-items: center;
+        color: ${(p) => p.color && p.color.grayish.G100};
+        margin-left: 14px;
+      }
+    }
+    .USDText {
+      font-family: Barlow;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 16px !important;
+      display: flex;
+      align-items: center;
+      color: ${(p) => p.color && p.color.grayish.G100};
+      margin-left: 42px;
+      height: 32px;
+    }
   }
   .BottomButton {
     margin-top: 200px;
@@ -2142,8 +2276,8 @@ const AwardsContainer = styled.div<colorProps>`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-bottom: 1px solid #dde1e5;
-    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid ${(p) => p.color && p.color.grayish.G600};
+    box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black80};
     .headerTop {
       height: 48px;
       display: flex;
@@ -2164,7 +2298,7 @@ const AwardsContainer = styled.div<colorProps>`
         line-height: 18px;
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        color: #3c3f41;
+        color: ${(p) => p.color && p.color.black500};
       }
     }
     .headerText {
@@ -2175,7 +2309,7 @@ const AwardsContainer = styled.div<colorProps>`
       line-height: 43px;
       display: flex;
       align-items: center;
-      color: #3c3f41;
+      color: ${(p) => p.color && p.color.black500};
       margin-left: 73px;
     }
   }
@@ -2185,17 +2319,128 @@ const AwardsContainer = styled.div<colorProps>`
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     flex-wrap: wrap;
     overflow-x: scroll;
     margin-left: 63px;
+    user-select: none;
+    cursor: pointer;
+    .RadioImageContainer {
+      display: flex;
+      flex-direction: row;
+      height: 65px;
+      width: 248px;
+      align-items: center;
+      padding-left: 9px;
+      margin-top: 14px;
+      border-radius: 6px;
+      input[type='radio'] {
+        border: 1px solid ${(p) => p.color && p.color.grayish.G500};
+        border-radius: 2px;
+        -webkit-appearance: none;
+      }
+      input[type='radio']:checked {
+        background: url('/static/Checked.svg');
+        background-repeat: no-repeat;
+        border-radius: 2px;
+        border: none;
+      }
+    }
+    .awardImageContainer {
+      height: 40px;
+      width: 40px;
+      margin-left: 13px;
+    }
+    .awardLabelText {
+      margin-left: 15px;
+      font-family: Barlow;
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 15px;
+      color: ${(p) => p.color && p.color.grayish.G05};
+    }
   }
 `;
 
-const AwardBottomContainer = styled.div`
+const AwardBottomContainer = styled.div<colorProps>`
   height: 129px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-top: 1px solid #dde1e5;
-  box-shadow: 0px -1px 4px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid ${(p) => p.color && p.color.grayish.G600};
+  box-shadow: 0px -1px 4px ${(p) => p.color && p.color.black80};
+`;
+
+const PaidStatusPopover = styled.div<colorProps>`
+  position: absolute;
+  background: transparent;
+  height: 70px;
+  width: 222px;
+  right: 54px;
+  top: 120px;
+  background-image: url('/static/paid_popover_triangle.svg');
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: 16% 0%;
+  filter: drop-shadow(0px 1px 20px rgba(0, 0, 0, 0.15));
+  .PaidStatusContainer {
+    height: 65px;
+    width: 222px;
+    background: #49c998;
+    margin-top: 5px;
+    padding: 18px 0px 0px 21px;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    .imageContainer {
+      width: 31px;
+      height: 31px;
+    }
+    .PaidStatus {
+      font-family: Barlow;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 17px;
+      line-height: 15px;
+      color: #fff;
+      margin-top: 6px;
+      margin-left: 18px;
+      user-select: none;
+    }
+  }
+  .ExtraBadgeInfo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: #222e3a;
+    height: 75px;
+    width: 222px;
+    padding: 14px 0px 0px 19px;
+    object-fit: cover;
+    border-radius: 0px 0px 6px 6px;
+    .imageContainer {
+      position: absolute;
+      top: 96px;
+      left: 14px;
+      height: 15px;
+      width: 15px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      border: none;
+    }
+    .badgeText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 17px;
+      line-height: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      margin-left: 11px;
+    }
+  }
 `;

@@ -20,6 +20,7 @@ const palette = {
   divider2: '#101317',
   pureWhite: '#fff',
   pureBlack: '#000',
+  black80: 'rgba(0, 0, 0, 0.1)',
   black90: 'rgba(0, 0, 0, 0.25)',
   black100: 'rgba(0, 0, 0, 0.07)',
   black150: 'rgba(0, 0, 0, 0.75)',
