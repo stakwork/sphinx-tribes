@@ -839,7 +839,6 @@ export class MainStore {
         try {
           clonedEx[targetIndex][propertyName] = newPropertyValue;
           clonedMeInfo.extras[extrasName] = clonedEx;
-          console.log(clonedMeInfo);
           await this.saveProfile(clonedMeInfo);
           return [clonedEx, targetIndex];
         } catch (e) {
@@ -867,9 +866,8 @@ export class MainStore {
         try {
           clonedEx[targetIndex] = { ...clonedEx?.[targetIndex], ...dataObject };
           clonedMeInfo.extras[extrasName] = clonedEx;
-          console.log(clonedMeInfo);
-          // await this.saveProfile(clonedMeInfo);
-          // return [clonedEx, targetIndex];
+          await this.saveProfile(clonedMeInfo);
+          return [clonedEx, targetIndex];
         } catch (e) {
           console.log('e', e);
         }

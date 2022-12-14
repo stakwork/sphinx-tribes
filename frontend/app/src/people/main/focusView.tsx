@@ -425,6 +425,7 @@ export default function FocusedView(props: any) {
                 // props?.deleteExtraFunction();
               }}
               setIsModalSideButton={setIsModalSideButton}
+              setIsExtraStyle={props?.setIsExtraStyle}
             />
           </>
         )}

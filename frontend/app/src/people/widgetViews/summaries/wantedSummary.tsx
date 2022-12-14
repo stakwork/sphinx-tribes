@@ -92,8 +92,9 @@ export default function WantedSummary(props: any) {
   const [creatorStep, setCreatorStep] = useState<number>(0);
   const [bountyPrice, setBountyPrice] = useState<any>(price ?? priceMin ?? 0);
   const [selectedAward, setSelectedAward] = useState('');
-  const [isPaidStatusPopOver, setIsPaidStatusPopOver] = useState<boolean>(true);
+  const [isPaidStatusPopOver, setIsPaidStatusPopOver] = useState<boolean>(false);
   const [isPaidStatusBadgeInfo, setIsPaidStatusBadgeInfo] = useState<boolean>(false);
+  const [isMarkPaidSaved, setIsMarkPaidSaved] = useState<boolean>(false);
   const [awardDetails, setAwardDetails] = useState<any>({
     name: '',
     image: ''
@@ -112,7 +113,7 @@ export default function WantedSummary(props: any) {
   useEffect(() => {
     let timer = setTimeout(() => {
       setIsPaidStatusPopOver(false);
-    }, 3000);
+    }, 7000);
 
     return () => {
       clearTimeout(timer);
@@ -185,6 +186,7 @@ export default function WantedSummary(props: any) {
         type: type,
         created: created
       };
+      console.log(newValue);
       props.formSubmit(newValue);
     },
     [isAssigned, props]
@@ -288,48 +290,48 @@ export default function WantedSummary(props: any) {
     }
   }
 
-  // async function setExtrasPropertyAndSaveMultiple(propertyName: any, dataObject: any) {
-  //   if (peopleWanteds) {
-  //     setSaving(propertyName);
-  //     try {
-  //       const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(
-  //         dataObject,
-  //         'wanted',
-  //         created
-  //       );
+  async function setExtrasPropertyAndSaveMultiple(propertyName: any, dataObject: any) {
+    if (peopleWanteds) {
+      setIsMarkPaidSaved(true);
+      try {
+        const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(
+          dataObject,
+          'wanted',
+          created
+        );
 
-  //       // saved? ok update in wanted list if found
-  //       const peopleWantedsClone: any = [...peopleWanteds];
-  //       const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
-  //         const val = f.body || {};
-  //         return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
-  //       });
+        // saved? ok update in wanted list if found
+        const peopleWantedsClone: any = [...peopleWanteds];
+        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+          const val = f.body || {};
+          return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
+        });
 
-  //       // if we found it in the wanted list, update in people wanted list
-  //       if (indexFromPeopleWanted > -1) {
-  //         // if it should be hidden now, remove it from the list
-  //         if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
-  //           peopleWantedsClone.splice(indexFromPeopleWanted, 1);
-  //         } else {
-  //           // gotta update person extras! this is what is used for summary viewer
-  //           const personClone: any = person;
-  //           personClone.extras['wanted'][targetIndex] = clonedEx[targetIndex];
+        // if we found it in the wanted list, update in people wanted list
+        if (indexFromPeopleWanted > -1) {
+          // if it should be hidden now, remove it from the list
+          if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
+            peopleWantedsClone.splice(indexFromPeopleWanted, 1);
+          } else {
+            // gotta update person extras! this is what is used for summary viewer
+            const personClone: any = person;
+            personClone.extras['wanted'][targetIndex] = clonedEx[targetIndex];
 
-  //           peopleWantedsClone[indexFromPeopleWanted] = {
-  //             person: personClone,
-  //             body: clonedEx[targetIndex]
-  //           };
-  //         }
+            peopleWantedsClone[indexFromPeopleWanted] = {
+              person: personClone,
+              body: clonedEx[targetIndex]
+            };
+          }
 
-  //         main.setPeopleWanteds(peopleWantedsClone);
-  //       }
-  //     } catch (e) {
-  //       console.log('e', e);
-  //     }
+          main.setPeopleWanteds(peopleWantedsClone);
+        }
+      } catch (e) {
+        console.log('e', e);
+      }
 
-  //     setSaving('');
-  //   }
-  // }
+      setIsMarkPaidSaved(false);
+    }
+  }
 
   const handleCopyUrl = useCallback(() => {
     const el = document.createElement('input');
@@ -748,7 +750,10 @@ export default function WantedSummary(props: any) {
              */
             <>
               {creatorStep === 0 && (
-                <Creator>
+                <Creator
+                  onClick={() => {
+                    setIsPaidStatusPopOver(false);
+                  }}>
                   <>
                     {paid && (
                       <Img
@@ -764,19 +769,22 @@ export default function WantedSummary(props: any) {
                         }}
                       />
                     )}
-                    {paid && isPaidStatusPopOver && (
+                    {paid && (
                       <>
                         <PaidStatusPopover
                           color={color}
-                          onClick={() => {
-                            if (awardDetails?.name !== '') {
-                              setIsPaidStatusBadgeInfo(!isPaidStatusBadgeInfo);
-                            }
+                          isPaidStatusPopOver={isPaidStatusPopOver}
+                          isPaidStatusBadgeInfo={isPaidStatusBadgeInfo}
+                          style={{
+                            opacity: isPaidStatusPopOver ? 1 : 0,
+                            transition: 'all ease 1s'
                           }}>
                           <div
                             className="PaidStatusContainer"
                             style={{
-                              borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px'
+                              borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px',
+                              opacity: isPaidStatusPopOver ? 1 : 0,
+                              transition: 'all ease 1s'
                             }}>
                             <div className="imageContainer">
                               <img
@@ -788,28 +796,32 @@ export default function WantedSummary(props: any) {
                             </div>
                             <EuiText className="PaidStatus">Bounty Paid</EuiText>
                           </div>
-                          {isPaidStatusBadgeInfo && (
-                            <div className="ExtraBadgeInfo">
-                              <div className="imageContainer">
-                                <img
-                                  src="/static/green_checked_icon.svg"
-                                  alt=""
-                                  height={'100%'}
-                                  width={'100%'}
-                                />
-                              </div>
+                          <div
+                            className="ExtraBadgeInfo"
+                            style={{
+                              opacity: isPaidStatusBadgeInfo ? 1 : 0,
+                              transition: 'all ease 1s'
+                            }}>
+                            <div className="imageContainer">
                               <img
-                                src={awardDetails?.image !== '' && awardDetails.image}
-                                alt="award_icon"
-                                height={'40px'}
-                                width={'40px'}
+                                src="/static/green_checked_icon.svg"
+                                alt=""
+                                height={'100%'}
+                                width={'100%'}
                               />
-                              <EuiText className="badgeText">Badge Awarded</EuiText>
                             </div>
-                          )}
+                            <img
+                              src={awardDetails?.image !== '' && awardDetails.image}
+                              alt="award_icon"
+                              height={'40px'}
+                              width={'40px'}
+                            />
+                            <EuiText className="badgeText">Badge Awarded</EuiText>
+                          </div>
                         </PaidStatusPopover>
                       </>
                     )}
+
                     <CreatorDescription paid={paid} color={color}>
                       <div className="CreatorDescriptionOuterContainerCreatorView">
                         <div className="CreatorDescriptionInnerContainerCreatorView">
@@ -918,6 +930,9 @@ export default function WantedSummary(props: any) {
                                 onClick={() => {
                                   changeAssignedPerson();
                                   assigneeHandlerOpen();
+                                  setCreatorStep(3);
+                                  setIsModalSideButton(false);
+                                  props?.setIsExtraStyle(true);
                                 }}>
                                 <img
                                   src="/static/assignee_close.png"
@@ -946,17 +961,6 @@ export default function WantedSummary(props: any) {
                                   fontSize: '12px'
                                 }}
                                 buttonAction={assigneeHandlerOpen}
-                              />
-                            </div>
-                          )}
-                          {assigneeValue && (
-                            <div className="AutoCompleteContainer">
-                              <AutoComplete
-                                peopleList={peopleList}
-                                handleAssigneeDetails={(value) => {
-                                  handleAssigneeDetails(value);
-                                  assigneeHandlerClose();
-                                }}
                               />
                             </div>
                           )}
@@ -1243,7 +1247,7 @@ export default function WantedSummary(props: any) {
                         marginLeft: '36px'
                       }}
                       text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark Paid'}
-                      loading={saving === 'paid'}
+                      loading={isMarkPaidSaved}
                       endingImg={'/static/mark_paid.svg'}
                       textStyle={{
                         width: '130px',
@@ -1258,35 +1262,43 @@ export default function WantedSummary(props: any) {
                       shadowColor={color.button_primary.shadow}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // setExtrasPropertyAndSaveMultiple('paid', {
-                        //   paid: !paid,
-                        //   price: bountyPrice
-                        // });
-                        setExtrasPropertyAndSave('paid', !paid);
-                        setExtrasPropertyAndSave('price', bountyPrice);
+                        setExtrasPropertyAndSaveMultiple('paid', {
+                          paid: !paid,
+                          price: bountyPrice,
+                          award: awardDetails.name
+                        });
+
                         setTimeout(() => {
                           setCreatorStep(0);
                           setIsModalSideButton(true);
-                          setIsPaidStatusPopOver(true);
                         }, 3000);
+                        setTimeout(() => {
+                          setIsPaidStatusPopOver(true);
+                        }, 4000);
+                        setTimeout(() => {
+                          if (awardDetails?.name !== '') {
+                            setIsPaidStatusBadgeInfo(true);
+                          }
+                        }, 5500);
                       }}
                     />
                   </AwardBottomContainer>
                 </AwardsContainer>
               )}
-              {creatorStep === 3 && (
-                <InvitePeopleSearch
-                  key={'assignee'}
-                  newDesign={true}
-                  values={''}
-                  setAssigneefunction={() => {
-                    console.log('hi');
-                  }}
-                  peopleList={peopleList}
-                  handleChange={(e: any) => {
-                    console.log(e);
-                  }}
-                />
+
+              {creatorStep === 3 && assigneeValue && (
+                <AutoCompleteContainer color={color}>
+                  <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
+                  <InvitePeopleSearch
+                    peopleList={peopleList}
+                    isProvidingHandler={true}
+                    handleAssigneeDetails={(value) => {
+                      handleAssigneeDetails(value);
+                      setCreatorStep(0);
+                      setIsModalSideButton(true);
+                    }}
+                  />
+                </AutoCompleteContainer>
               )}
             </>
           ) : (
@@ -1398,56 +1410,6 @@ export default function WantedSummary(props: any) {
                       }}
                       replitLink={replitLink}
                     />
-                    {paid && isPaidStatusPopOver && (
-                      <>
-                        <PaidStatusPopover
-                          color={color}
-                          onClick={() => {
-                            if (awardDetails?.name !== '') {
-                              setIsPaidStatusBadgeInfo(!isPaidStatusBadgeInfo);
-                            }
-                          }}
-                          style={{
-                            right: '54px',
-                            top: '118px'
-                          }}>
-                          <div
-                            className="PaidStatusContainer"
-                            style={{
-                              borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px'
-                            }}>
-                            <div className="imageContainer">
-                              <img
-                                src="/static/verified_check_icon.svg"
-                                alt="check icon"
-                                height={'100%'}
-                                width={'100%'}
-                              />
-                            </div>
-                            <EuiText className="PaidStatus">Bounty Paid</EuiText>
-                          </div>
-                          {isPaidStatusBadgeInfo && (
-                            <div className="ExtraBadgeInfo">
-                              <div className="imageContainer">
-                                <img
-                                  src="/static/green_checked_icon.svg"
-                                  alt=""
-                                  height={'100%'}
-                                  width={'100%'}
-                                />
-                              </div>
-                              <img
-                                src={awardDetails?.image !== '' && awardDetails.image}
-                                alt="award_icon"
-                                height={'40px'}
-                                width={'40px'}
-                              />
-                              <EuiText className="badgeText">Badge Awarded</EuiText>
-                            </div>
-                          )}
-                        </PaidStatusPopover>
-                      </>
-                    )}
                   </>
                 ) : assignee?.owner_alias ? (
                   <>
@@ -1852,6 +1814,8 @@ export default function WantedSummary(props: any) {
 
 interface colorProps {
   color?: any;
+  isPaidStatusPopOver?: any;
+  isPaidStatusBadgeInfo?: any;
 }
 interface styleProps extends colorProps {
   paid?: string;
@@ -2143,15 +2107,23 @@ const UnassignedPersonProfile = styled.div<containerProps>`
     align-self: center;
     height: 22px;
     width: 22px;
+    cursor: pointer;
   }
-  .AutoCompleteContainer {
-    position: absolute;
-    top: 110px;
-    right: 36px;
-    box-shadow: 0px 1px 20px ${(p) => p?.color && p?.color.black90};
-    border-radius: 10px;
-    overflow: hidden;
-    z-index: 10;
+`;
+
+const AutoCompleteContainer = styled.div<colorProps>`
+  overflow: hidden;
+  z-index: 10;
+  padding: 25px 53px 6px 53px;
+  .autoCompleteHeaderText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 36px;
+    color: ${(p) => p.color && p.color.text2};
+    height: 44px;
+    margin-bottom: 11px;
   }
 `;
 
@@ -2383,10 +2355,11 @@ const PaidStatusPopover = styled.div<colorProps>`
   background-repeat: no-repeat;
   background-position: 16% 0%;
   filter: drop-shadow(0px 1px 20px rgba(0, 0, 0, 0.15));
+
   .PaidStatusContainer {
     height: 65px;
     width: 222px;
-    background: #49c998;
+    background: ${(p) => p.color && p.color.green1};
     margin-top: 5px;
     padding: 18px 0px 0px 21px;
     display: flex;
@@ -2402,7 +2375,7 @@ const PaidStatusPopover = styled.div<colorProps>`
       font-weight: 700;
       font-size: 17px;
       line-height: 15px;
-      color: #fff;
+      color: ${(p) => p.color && p.color.pureWhite};
       margin-top: 6px;
       margin-left: 18px;
       user-select: none;
@@ -2412,19 +2385,21 @@ const PaidStatusPopover = styled.div<colorProps>`
     display: flex;
     flex-direction: row;
     align-items: center;
-    background: #222e3a;
+    background: ${(p) => p.color && p.color.black400};
     height: 75px;
     width: 222px;
     padding: 14px 0px 0px 19px;
     object-fit: cover;
     border-radius: 0px 0px 6px 6px;
+    opacity: ${(p) => (p?.isPaidStatusBadgeInfo ? 1 : 0)};
+    transition: all ease 4s;
     .imageContainer {
       position: absolute;
       top: 96px;
       left: 14px;
       height: 15px;
       width: 15px;
-      background: #fff;
+      background: ${(p) => p.color && p.color.pureWhite};
       display: flex;
       justify-content: center;
       align-items: center;
@@ -2439,7 +2414,7 @@ const PaidStatusPopover = styled.div<colorProps>`
       line-height: 15px;
       display: flex;
       align-items: center;
-      color: #ffffff;
+      color: ${(p) => p.color && p.color.pureWhite};
       margin-left: 11px;
     }
   }

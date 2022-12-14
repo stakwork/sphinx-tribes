@@ -176,63 +176,69 @@ const InvitePeopleSearch = (props) => {
           ))}
       </LabelsContainer>
 
-      <div className="PeopleList">
-        {peopleData?.slice(0, initialPeopleCount)?.map((value) => {
-          return (
-            <div className="People" key={value.id}>
-              <div className="PeopleDetailContainer">
-                <div className="ImageContainer">
-                  <img
-                    src={value.img || '/static/person_placeholder.png'}
-                    alt={'user-image'}
-                    height={'100%'}
-                    width={'100%'}
-                  />
+      <div className="OuterContainer">
+        <div className="PeopleList">
+          {peopleData?.slice(0, initialPeopleCount)?.map((value) => {
+            return (
+              <div className="People" key={value.id}>
+                <div className="PeopleDetailContainer">
+                  <div className="ImageContainer">
+                    <img
+                      src={value.img || '/static/person_placeholder.png'}
+                      alt={'user-image'}
+                      height={'100%'}
+                      width={'100%'}
+                    />
+                  </div>
+                  <EuiText className="PeopleName">{value.owner_alias}</EuiText>
                 </div>
-                <EuiText className="PeopleName">{value.owner_alias}</EuiText>
+                {inviteNameId === value?.id ? (
+                  <InvitedButton>
+                    <EuiText className="nextText">Invited</EuiText>
+                  </InvitedButton>
+                ) : (
+                  <ImageButton
+                    buttonText={'Invite'}
+                    ButtonContainerStyle={{
+                      width: '74.58px',
+                      height: '32px'
+                    }}
+                    buttonAction={(e) => {
+                      if (props.isProvidingHandler) {
+                        props.handleAssigneeDetails(value);
+                      } else {
+                        handler('', value.owner_alias);
+                        setInviteNameId(value.id);
+                        props?.handleChange({
+                          owner_alias: value.owner_alias,
+                          owner_pubkey: value.owner_pubkey,
+                          img: value.img,
+                          value: value.owner_pubkey,
+                          label: `${value.owner_alias} (${value.owner_alias
+                            .toLowerCase()
+                            .replace(' ', '')})`
+                        });
+                        setSearchValue(value.owner_alias);
+                        props.setAssigneefunction(value.owner_alias);
+                      }
+                    }}
+                  />
+                )}
               </div>
-              {inviteNameId === value?.id ? (
-                <InvitedButton>
-                  <EuiText className="nextText">Invited</EuiText>
-                </InvitedButton>
-              ) : (
-                <ImageButton
-                  buttonText={'Invite'}
-                  ButtonContainerStyle={{
-                    width: '74.58px',
-                    height: '32px'
-                  }}
-                  buttonAction={(e) => {
-                    handler('', value.owner_alias);
-                    setInviteNameId(value.id);
-                    props?.handleChange({
-                      owner_alias: value.owner_alias,
-                      owner_pubkey: value.owner_pubkey,
-                      img: value.img,
-                      value: value.owner_pubkey,
-                      label: `${value.owner_alias} (${value.owner_alias
-                        .toLowerCase()
-                        .replace(' ', '')})`
-                    });
-                    setSearchValue(value.owner_alias);
-                    props.setAssigneefunction(value.owner_alias);
-                  }}
-                />
-              )}
-            </div>
-          );
-        })}
-        {peopleData && peopleData.length > initialPeopleCount && (
-          <LoaderContainer ref={ref}>
-            <EuiLoadingSpinner size="l" />
-          </LoaderContainer>
-        )}
+            );
+          })}
+          {peopleData && peopleData.length > initialPeopleCount && (
+            <LoaderContainer ref={ref}>
+              <EuiLoadingSpinner size="l" />
+            </LoaderContainer>
+          )}
 
-        {peopleData?.length === 0 && (
-          <div className="no_result_container">
-            <EuiText className="no_result_text">No Result Found</EuiText>
-          </div>
-        )}
+          {peopleData?.length === 0 && (
+            <div className="no_result_container">
+              <EuiText className="no_result_text">No Result Found</EuiText>
+            </div>
+          )}
+        </div>
       </div>
     </SearchOuterContainer>
   );
@@ -318,57 +324,61 @@ const SearchOuterContainer = styled.div<styledProps>`
     }
   }
 
-  .PeopleList {
+  .OuterContainer {
+    width: 412px;
     background: ${(p) => p?.color && p?.color?.grayish.G950};
-    width: 400px;
-    padding: 0 49px 16px;
-    min-height: 256px;
-    max-height: 256px;
-    overflow-y: scroll;
-    .People {
-      height: 32px;
-      min-width: 291.5813903808594px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 16px;
-      padding: 0px 0px 0px 6px;
-      .PeopleDetailContainer {
+    .PeopleList {
+      background: ${(p) => p?.color && p?.color?.grayish.G950};
+      width: 400px;
+      padding: 0 49px 16px;
+      min-height: 256px;
+      max-height: 256px;
+      overflow-y: scroll;
+      .People {
+        height: 32px;
+        min-width: 291.5813903808594px;
         display: flex;
-        justify-content: center;
         align-items: center;
-        .ImageContainer {
-          height: 32px;
-          width: 32px;
-          border-radius: 50%;
-          overflow: hidden;
+        justify-content: space-between;
+        margin-top: 16px;
+        padding: 0px 0px 0px 6px;
+        .PeopleDetailContainer {
           display: flex;
           justify-content: center;
           align-items: center;
-          object-fit: cover;
-        }
-        .PeopleName {
-          font-family: Barlow;
-          font-style: normal;
-          font-weight: 500;
-          font-size: 13px;
-          line-height: 16px;
-          color: ${(p) => p?.color && p?.color?.grayish.G10};
-          margin-left: 10px;
+          .ImageContainer {
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            object-fit: cover;
+          }
+          .PeopleName {
+            font-family: Barlow;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 16px;
+            color: ${(p) => p?.color && p?.color?.grayish.G10};
+            margin-left: 10px;
+          }
         }
       }
-    }
-    .no_result_container {
-      display: flex;
-      height: 210px;
-      justify-content: center;
-      align-items: center;
-      .no_result_text {
-        font-family: Barlow;
-        font-size: 16px;
-        font-weight: 600;
-        color: ${(p) => p?.color && p?.color?.grayish.G50};
-        word-spacing: 0.08em;
+      .no_result_container {
+        display: flex;
+        height: 210px;
+        justify-content: center;
+        align-items: center;
+        .no_result_text {
+          font-family: Barlow;
+          font-size: 16px;
+          font-weight: 600;
+          color: ${(p) => p?.color && p?.color?.grayish.G50};
+          word-spacing: 0.08em;
+        }
       }
     }
   }
@@ -419,7 +429,7 @@ const LabelsContainer = styled.div<labelProps>`
   flex-direction: row;
   justify-content: flex-start;
   flex-wrap: wrap;
-  min-height: 80px;
+  min-height: 70px;
   width: 100%;
 `;
 
