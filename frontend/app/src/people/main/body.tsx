@@ -56,6 +56,7 @@ export default function BodyComponent({ selectedWidget }) {
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
   const [isModalSideButton, setIsModalSideButton] = useState<boolean>(true);
+  const [isExtraStyle, setIsExtraStyle] = useState<boolean>(false);
 
   const color = colors['light'];
 
@@ -697,12 +698,12 @@ export default function BodyComponent({ selectedWidget }) {
           <Modal
             visible={publicFocusPerson ? true : false}
             envStyle={{
-              borderRadius: 0,
+              borderRadius: isExtraStyle ? '10px' : 0,
               background: color.pureWhite,
               ...focusedDesktopModalStyles,
               // minHeight: '768px',
               maxHeight: '768px',
-              height: '100%'
+              zIndex: 20
             }}
             style={{
               background: color.black200
@@ -711,6 +712,13 @@ export default function BodyComponent({ selectedWidget }) {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/tickets');
+              setIsExtraStyle(false);
+            }}
+            bigCloseImageStyle={{
+              top: isExtraStyle ? '-18px' : '18px',
+              right: isExtraStyle ? '-18px' : '-50px',
+              background: isExtraStyle ? '#000' : '#000',
+              borderRadius: isExtraStyle ? '50%' : '50%'
             }}
             prevArrowNew={
               activeListIndex === 0
@@ -782,6 +790,7 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusIndex(-1);
               }}
               setIsModalSideButton={setIsModalSideButton}
+              setIsExtraStyle={setIsExtraStyle}
             />
           </Modal>
         )}
