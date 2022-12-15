@@ -199,7 +199,8 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}>
+      validationSchema={validator(schema)}
+    >
       {({
         setFieldTouched,
         handleSubmit,
@@ -220,7 +221,8 @@ export default function Form(props: any) {
               minWidth: stepTracker === 3 ? '388px' : '712px',
               maxWidth: stepTracker === 3 ? '388px' : '712px'
             }}
-            newDesign={props?.newDesign}>
+            newDesign={props?.newDesign}
+          >
             {/* schema flipping dropdown */}
             {/* {dynamicSchema && (
               <Select
@@ -245,7 +247,8 @@ export default function Form(props: any) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
-                  }}>
+                  }}
+                >
                   <div style={{ marginRight: '40px' }}>
                     {schema
                       .filter((item: FormField) => item.type === 'img')
@@ -333,7 +336,8 @@ export default function Form(props: any) {
                       className="SubHeadingText"
                       style={{
                         marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                      }}>
+                      }}
+                    >
                       {schemaData.sub_heading}
                     </EuiText>
                   )}
@@ -438,7 +442,8 @@ export default function Form(props: any) {
                       width: stepTracker < 3 ? '45%' : '100%',
                       height: stepTracker < 3 ? '48px' : '48px',
                       marginTop: stepTracker <= 3 ? '-20px' : '-10px'
-                    }}>
+                    }}
+                  >
                     <div
                       className="nextButton"
                       onClick={() => {
@@ -454,7 +459,8 @@ export default function Form(props: any) {
                         } else {
                           NextStepHandler();
                         }
-                      }}>
+                      }}
+                    >
                       {assigneeName === '' ? (
                         <EuiText className="nextText">
                           {schemaData.step === 3 ? 'Decide Later' : 'Next'}
@@ -594,7 +600,8 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}>
+                  onClick={() => setShowSettings(!showSettings)}
+                >
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -624,7 +631,8 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}>
+                      }}
+                    >
                       <Button
                         text={'Nevermind'}
                         color={'white'}
