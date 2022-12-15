@@ -403,7 +403,8 @@ export default function BodyComponent({ selectedWidget }) {
             flexDirection: 'column',
             alignItems: 'center',
             height: '100%'
-          }}>
+          }}
+        >
           <WidgetSwitchViewer
             checkboxIdToSelectedMap={checkboxIdToSelectedMap}
             checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
@@ -478,7 +479,8 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}>
+            }}
+          >
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
@@ -494,7 +496,8 @@ export default function BodyComponent({ selectedWidget }) {
               <div
                 style={{
                   padding: '0 20px'
-                }}>
+                }}
+              >
                 <SearchTextInput
                   small
                   name="search"
@@ -535,7 +538,8 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}>
+            dismountCallback={() => ui.setSelectedPerson(0)}
+          >
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -608,7 +612,8 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}>
+        }}
+      >
         <div
           style={{
             minHeight: '32px'
@@ -631,7 +636,8 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}>
+            }}
+          >
             <SearchTextInput
               small
               name="search"
@@ -661,7 +667,8 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}>
+            }}
+          >
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -680,7 +687,8 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}>
+          dismountCallback={() => ui.setSelectedPerson(0)}
+        >
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -753,7 +761,8 @@ export default function BodyComponent({ selectedWidget }) {
                     }
                   }
                 : null
-            }>
+            }
+          >
             <FocusedView
               ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
@@ -837,7 +846,8 @@ export default function BodyComponent({ selectedWidget }) {
               right: '-18px',
               background: '#000',
               borderRadius: '50%'
-            }}>
+            }}
+          >
             <FocusedView
               newDesign={true}
               person={person}
