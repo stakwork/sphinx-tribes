@@ -10,9 +10,17 @@ const ButtonSet = (props) => {
       style={{
         ...props.ButtonSetContainerStyle
       }}
-      color={color}
-    >
+      color={color}>
       <ButtonContainer onClick={props?.githubShareAction} color={color}>
+        <div className="LeadingImageContainer">
+          <img
+            className="buttonImage"
+            src={'/static/github_icon.svg'}
+            alt={'github_ticket'}
+            height={'20px'}
+            width={'20px'}
+          />
+        </div>
         <EuiText className="ButtonText">Github Ticket</EuiText>
         <div className="ImageContainer">
           <img
@@ -24,21 +32,53 @@ const ButtonSet = (props) => {
           />
         </div>
       </ButtonContainer>
+      {props?.replitLink && (
+        <ButtonContainer
+          topMargin={'16px'}
+          onClick={() => {
+            window.open(props.replitLink[0]);
+          }}
+          color={color}>
+          <div
+            className="LeadingImageContainer"
+            style={{
+              marginLeft: '20px'
+            }}>
+            <img
+              className="buttonImage"
+              src={'/static/replit_icon.svg'}
+              alt={'github_ticket'}
+              height={'18px'}
+              width={'14px'}
+            />
+          </div>
+          <EuiText className="ButtonText">Replit</EuiText>
+          <div className="ImageContainer">
+            <img
+              className="buttonImage"
+              src={'/static/github_ticket.svg'}
+              alt={'github_ticket'}
+              height={'14px'}
+              width={'14px'}
+            />
+          </div>
+        </ButtonContainer>
+      )}
+
       <ButtonContainer topMargin={'16px'} onClick={props.copyURLAction} color={color}>
-        <EuiText className="ButtonText">{props.copyStatus}</EuiText>
-        <div className="ImageContainer">
+        <div className="LeadingImageContainer">
           <img
             className="buttonImage"
-            src={'/static/copy_link.svg'}
+            src={'/static/copy_icon_link.svg'}
             alt={'copy_link'}
-            height={'10px'}
+            height={'20px'}
             width={'20px'}
           />
         </div>
+        <EuiText className="ButtonText">{props.copyStatus}</EuiText>
       </ButtonContainer>
       <ButtonContainer topMargin={'16px'} onClick={props.twitterAction} color={color}>
-        <EuiText className="ButtonText">Share to Twitter</EuiText>
-        <div className="ImageContainer">
+        <div className="LeadingImageContainer">
           <img
             className="buttonImage"
             src={'/static/share_with_twitter.svg'}
@@ -47,6 +87,7 @@ const ButtonSet = (props) => {
             width={'19px'}
           />
         </div>
+        <EuiText className="ButtonText">Share to Twitter</EuiText>
       </ButtonContainer>
     </ButtonSetContainer>
   );
@@ -67,6 +108,7 @@ const ButtonSetContainer = styled.div`
   flex-direction: column;
   padding-left: 36px;
   padding-top: 39px;
+  min-height: 300px;
 `;
 
 const ButtonContainer = styled.div<ButtonContainerProps>`
@@ -74,12 +116,16 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   height: 48px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   margin-top: ${(p) => p?.topMargin};
   background: ${(p) => p?.color && p?.color.pureWhite};
   border: 1px solid ${(p) => p?.color && p?.color.grayish.G600};
   border-radius: 30px;
   user-select: none;
+  .LeadingImageContainer {
+    margin-left: 14px;
+    margin-right: 16px;
+  }
   .ImageContainer {
     position: absolute;
     min-height: 48px;
