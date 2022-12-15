@@ -182,8 +182,7 @@ const BountyContainer = styled.div<containerProps>`
   }
 
   :hover {
-    border: ${(p) =>
-      p.assignedBackgroundImage ? `2px solid ${(p) => p.color && p.color.borderGreen2}` : ''};
+    border: ${(p) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
     border-radius: ${(p) => (p.assignedBackgroundImage ? '10px' : '')};
   }
 `;
