@@ -8,7 +8,10 @@ import BountyProfileView from '../../sphinxUI/bounty_profile_view';
 const PaidBounty = (props) => {
   const color = colors['light'];
   return (
-    <BountyContainer onClick={props.onPanelClick} Bounty_Container_Background={color.pureWhite}>
+    <BountyContainer
+      onClick={props.onPanelClick}
+      Bounty_Container_Background={color.pureWhite}
+      color={color}>
       <BountyDescription
         {...props}
         title={props.title}
@@ -57,6 +60,7 @@ export default PaidBounty;
 interface PaidBountyProps {
   Price_User_Container_Border?: string;
   Bounty_Container_Background?: string;
+  color?: any;
 }
 
 const BountyContainer = styled.div<PaidBountyProps>`
@@ -66,6 +70,11 @@ const BountyContainer = styled.div<PaidBountyProps>`
   font-family: Barlow;
   height: 100% !important;
   background: ${(p) => p.Bounty_Container_Background};
+  border: 2px solid transparent;
+  :hover {
+    border: 2px solid rgba(73, 201, 152, 0.2);
+    border-radius: 10px;
+  }
 `;
 
 const PriceUserContainer = styled.div<PaidBountyProps>`
@@ -73,5 +82,5 @@ const PriceUserContainer = styled.div<PaidBountyProps>`
   flex-direction: row;
   border: 2px solid ${(p) => p.Price_User_Container_Border};
   border-radius: 10px;
-  width: 581px;
+  width: 579px;
 `;

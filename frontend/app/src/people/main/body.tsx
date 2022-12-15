@@ -299,10 +299,6 @@ export default function BodyComponent({ selectedWidget }) {
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
   };
 
-  useEffect(() => {
-    console.log(checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap);
-  }, [checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap]);
-
   function selectPerson(id: number, unique_name: string, pubkey: string) {
     console.log('selectPerson', id, unique_name, pubkey);
     ui.setSelectedPerson(id);
