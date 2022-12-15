@@ -255,7 +255,7 @@ const BountyHeader = ({
             <SearchBar
               name="search"
               type="search"
-              placeholder="Search"
+              placeholder={`Search across ${activeBounty} Bounties`}
               value={ui.searchText}
               style={{
                 width: 240,
@@ -278,31 +278,74 @@ const BountyHeader = ({
               iconColor={color.grayish.G300}
               iconColorHover={color.grayish.G100}
             />
-            {/*
-            
-            // TODO: add filter when have functionality.
 
-            <IconButton
-              text={'Filter'}
-              color={'transparent'}
-              leadingIcon={'tune'}
-              width={80}
-              height={48}
-              style={{
-                color: color.grayish.G200,
-                fontSize: '16px',
-                fontWeight: '500',
-                textDecoration: 'none',
-                transform: 'none'
+            {/* // TODO: add filter when have functionality. */}
+
+            <EuiPopover
+              button={
+                <FilterContainer onClick={onButtonClick} color={color}>
+                  <div className="filterImageContainer">
+                    <MaterialIcon
+                      className="materialIconImage"
+                      icon="tune"
+                      style={{
+                        color: isPopoverOpen ? color.grayish.G10 : ''
+                      }}
+                    />
+                  </div>
+                  <EuiText
+                    className="filterText"
+                    style={{
+                      color: isPopoverOpen ? color.grayish.G10 : ''
+                    }}>
+                    Filter
+                  </EuiText>
+                </FilterContainer>
+              }
+              panelStyle={{
+                border: 'none',
+                boxShadow: `0px 1px 20px ${color.black90}`,
+                background: `${color.pureWhite}`,
+                borderRadius: '6px',
+                minWidth: '432px',
+                minHeight: '304px',
+                marginTop: '0px',
+                marginLeft: '20px'
               }}
-              iconStyle={{
-                fontSize: '16px',
-                fontWeight: '500'
-              }}
-              onClick={() => {
-                console.log('filter');
-              }}
-            /> */}
+              isOpen={isPopoverOpen}
+              closePopover={closePopover}
+              panelClassName="yourClassNameHere"
+              panelPaddingSize="none"
+              anchorPosition="downLeft">
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row'
+                }}>
+                <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
+                  <EuiText className="leftBoxHeading">STATUS</EuiText>
+                  <EuiCheckboxGroup
+                    options={Status}
+                    idToSelectedMap={checkboxIdToSelectedMap}
+                    onChange={(id) => {
+                      onChangeStatus(id);
+                    }}
+                  />
+                </EuiPopOverCheckboxLeft>
+                <PopOverRightBox color={color}>
+                  <EuiText className="rightBoxHeading">Languages</EuiText>
+                  <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
+                    <EuiCheckboxGroup
+                      options={Coding_Languages}
+                      idToSelectedMap={checkboxIdToSelectedMapLanguage}
+                      onChange={(id) => {
+                        onChangeLanguage(id);
+                      }}
+                    />
+                  </EuiPopOverCheckboxRight>
+                </PopOverRightBox>
+              </div>
+            </EuiPopover>
           </LargeActionContainer>
           <ShortActionContainer>
             <IconButton
@@ -335,7 +378,7 @@ const BountyHeader = ({
                 }
               }}
             />
-            <IconButton
+            {/* <IconButton
               text={`${activeBounty} Bounties opened`}
               leadingImg={'/static/copy.svg'}
               width={'fit-content'}
@@ -354,7 +397,7 @@ const BountyHeader = ({
                 width: '18px',
                 marginRight: '4px'
               }}
-            />
+            /> */}
             <DevelopersContainerMobile>
               {peopleList &&
                 peopleList?.slice(0, 3).map((val, index) => {

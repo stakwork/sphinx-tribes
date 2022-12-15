@@ -1125,7 +1125,8 @@ export default function WantedSummary(props: any) {
                         height: 80,
                         width: 235,
                         padding: '0px 0px 0px 33px',
-                        marginTop: '48px'
+                        marginTop: '48px',
+                        marginBottom: '27px'
                       }}
                       UserImageStyle={{
                         width: '80px',
@@ -2139,6 +2140,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
   max-height: 100%;
   min-width: 440px;
   max-width: 440px;
+  background: ${(p) => p.color && p.color.pureWhite};
   padding-top: 32px;
   .TopHeader {
     max-height: 48px;
@@ -2241,6 +2243,8 @@ const AdjustAmountContainer = styled.div<colorProps>`
 const AwardsContainer = styled.div<colorProps>`
   width: 622px;
   height: 768px;
+  background: ${(p) => p.color && p.color.pureWhite};
+
   .header {
     min-height: 159px;
     max-height: 159px;
