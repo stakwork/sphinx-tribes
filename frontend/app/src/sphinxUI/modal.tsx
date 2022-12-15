@@ -54,8 +54,7 @@ export default function Modal(props: any) {
         alignItems: 'center',
         justifyContent: 'center',
         overflowY: 'auto'
-      }}
-    >
+      }}>
       <Env style={{ ...fillStyle, ...envStyle }} color={color}>
         {close && (
           <X color={color}>
@@ -81,8 +80,7 @@ export default function Modal(props: any) {
               zIndex: 10,
               ...bigCloseImageStyle
             }}
-            onClick={bigCloseImage}
-          >
+            onClick={bigCloseImage}>
             <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
           </div>
         )}

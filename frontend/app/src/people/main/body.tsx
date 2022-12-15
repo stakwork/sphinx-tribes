@@ -55,6 +55,8 @@ export default function BodyComponent({ selectedWidget }) {
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const [isModalSideButton, setIsModalSideButton] = useState<boolean>(true);
+  const [isExtraStyle, setIsExtraStyle] = useState<boolean>(false);
 
   const color = colors['light'];
 
@@ -405,8 +407,7 @@ export default function BodyComponent({ selectedWidget }) {
             flexDirection: 'column',
             alignItems: 'center',
             height: '100%'
-          }}
-        >
+          }}>
           <WidgetSwitchViewer
             checkboxIdToSelectedMap={checkboxIdToSelectedMap}
             checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
@@ -481,8 +482,7 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}
-          >
+            }}>
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
@@ -498,8 +498,7 @@ export default function BodyComponent({ selectedWidget }) {
               <div
                 style={{
                   padding: '0 20px'
-                }}
-              >
+                }}>
                 <SearchTextInput
                   small
                   name="search"
@@ -540,8 +539,7 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}
-          >
+            dismountCallback={() => ui.setSelectedPerson(0)}>
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -614,8 +612,7 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}
-      >
+        }}>
         <div
           style={{
             minHeight: '32px'
@@ -638,8 +635,7 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}
-          >
+            }}>
             <SearchTextInput
               small
               name="search"
@@ -669,8 +665,7 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}
-          >
+            }}>
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -689,8 +684,7 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}
-        >
+          dismountCallback={() => ui.setSelectedPerson(0)}>
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -704,14 +698,12 @@ export default function BodyComponent({ selectedWidget }) {
           <Modal
             visible={publicFocusPerson ? true : false}
             envStyle={{
-              borderRadius: 0,
+              borderRadius: isExtraStyle ? '10px' : 0,
               background: color.pureWhite,
               ...focusedDesktopModalStyles,
               // minHeight: '768px',
               maxHeight: '768px',
-              minWidth: '892px',
-              maxWidth: '892px',
-              height: '100%'
+              zIndex: 20
             }}
             style={{
               background: color.black200
@@ -720,11 +712,19 @@ export default function BodyComponent({ selectedWidget }) {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/tickets');
+              setIsExtraStyle(false);
+            }}
+            bigCloseImageStyle={{
+              top: isExtraStyle ? '-18px' : '18px',
+              right: isExtraStyle ? '-18px' : '-50px',
+              background: isExtraStyle ? '#000' : '#000',
+              borderRadius: isExtraStyle ? '50%' : '50%'
             }}
             prevArrowNew={
               activeListIndex === 0
                 ? null
-                : () => {
+                : isModalSideButton
+                ? () => {
                     const { person, body } = activeList[activeListIndex - 1];
                     if (person && body) {
                       history.replace({
@@ -737,11 +737,13 @@ export default function BodyComponent({ selectedWidget }) {
                       });
                     }
                   }
+                : null
             }
             nextArrowNew={
               activeListIndex + 1 > activeList?.length
                 ? null
-                : () => {
+                : isModalSideButton
+                ? () => {
                     const { person, body } = activeList[activeListIndex + 1];
                     if (person && body) {
                       history.replace({
@@ -754,8 +756,8 @@ export default function BodyComponent({ selectedWidget }) {
                       });
                     }
                   }
-            }
-          >
+                : null
+            }>
             <FocusedView
               ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
@@ -787,6 +789,8 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusPerson(null);
                 setPublicFocusIndex(-1);
               }}
+              setIsModalSideButton={setIsModalSideButton}
+              setIsExtraStyle={setIsExtraStyle}
             />
           </Modal>
         )}
@@ -817,6 +821,7 @@ export default function BodyComponent({ selectedWidget }) {
               background: color.pureWhite,
               zIndex: 20,
               ...focusedDesktopModalStyles,
+              maxHeight: '100%',
               borderRadius: '10px'
             }}
             // nextArrow={nextIndex}
@@ -836,8 +841,7 @@ export default function BodyComponent({ selectedWidget }) {
               right: '-18px',
               background: '#000',
               borderRadius: '50%'
-            }}
-          >
+            }}>
             <FocusedView
               newDesign={true}
               person={person}

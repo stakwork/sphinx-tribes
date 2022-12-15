@@ -850,6 +850,33 @@ export class MainStore {
     }
   }
 
+  // function to update many value in wanted array of object
+  @action async setExtrasMultipleProperty(
+    dataObject: object,
+    extrasName: string,
+    created: number
+  ): Promise<any> {
+    if (uiStore.meInfo) {
+      const clonedMeInfo = { ...uiStore.meInfo };
+      const clonedExtras = clonedMeInfo?.extras;
+      const clonedEx: any = clonedExtras && clonedExtras[extrasName];
+      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+
+      if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
+        try {
+          clonedEx[targetIndex] = { ...clonedEx?.[targetIndex], ...dataObject };
+          clonedMeInfo.extras[extrasName] = clonedEx;
+          await this.saveProfile(clonedMeInfo);
+          return [clonedEx, targetIndex];
+        } catch (e) {
+          console.log('e', e);
+        }
+      }
+
+      return [null, null];
+    }
+  }
+
   @action async deleteFavorite() {
     const body: any = {};
     console.log('SUBMIT FORM', body);

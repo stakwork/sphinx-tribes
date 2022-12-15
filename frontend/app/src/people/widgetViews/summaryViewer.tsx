@@ -22,10 +22,9 @@ export default function SummaryViewer(props: any) {
     return (
       <Wrap
         style={{
-          maxHeight: config.name === 'post' || isMobile ? '' : '80vh',
+          maxHeight: config.name === 'post' || isMobile ? '' : '100vh',
           height: (isSelectedView && thisIsMine) || isMobile ? 'calc(100% - 60px)' : '100%'
-        }}
-      >
+        }}>
         {child}
       </Wrap>
     );
@@ -49,6 +48,8 @@ export default function SummaryViewer(props: any) {
           deleteAction={props?.deleteAction}
           deletingState={props?.deletingState}
           editAction={props?.editAction}
+          setIsModalSideButton={props?.setIsModalSideButton}
+          setIsExtraStyle={props?.setIsExtraStyle}
         />
       );
     default:
@@ -61,4 +62,5 @@ const Wrap = styled.div`
   flex-direction: column;
   width: 100%;
   min-width: 100%;
+  align-items: center;
 `;

@@ -44,19 +44,17 @@ const BountyDescription = (props: any) => {
             <NameTag {...props} iconSize={32} isPaid={props?.isPaid} />
           </div>
         </Header>
-        <Description>
+        <Description isPaid={props?.isPaid} color={color}>
           <div
             className="DescriptionContainer"
             style={{
               width: descriptionImage ? '334px' : '481px'
-            }}
-          >
+            }}>
             <EuiText
               className="DescriptionTitle"
               style={{
                 color: props.isPaid ? color.grayish.G50 : color.grayish.G10
-              }}
-            >
+              }}>
               {props.title.slice(0, descriptionImage ? 80 : 120)}
               {props.title.length > 80 ? '...' : ''}
             </EuiText>
@@ -107,12 +105,11 @@ const BountyDescription = (props: any) => {
                 border={`1px solid ${color.grayish.G06}`}
                 LabelColor={color.grayish.G300}
                 background={color.pureWhite}
-                color={color}
-              >
+                color={color}>
                 <img
                   style={{ marginRight: '5px' }}
                   src={'/static/replit.png'}
-                  alt={''}
+                  alt={'replit_image'}
                   height={'15px'}
                   width={'15px'}
                 />
@@ -129,8 +126,7 @@ const BountyDescription = (props: any) => {
                   border={props.isPaid ? `1px solid ${color.grayish.G06}` : lang?.border}
                   LabelColor={props.isPaid ? color.grayish.G300 : lang?.color}
                   background={props.isPaid ? color.grayish.G800 : lang?.background}
-                  color={color}
-                >
+                  color={color}>
                   <EuiText className="LanguageText">{lang?.label}</EuiText>
                 </CodingLabels>
               );
@@ -150,7 +146,10 @@ interface codingLangProps {
   color?: any;
 }
 
-interface bounty_description_props {}
+interface bounty_description_props {
+  isPaid?: any;
+  color?: any;
+}
 interface replit_image_props {}
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
@@ -174,7 +173,7 @@ const Header = styled.div`
   }
 `;
 
-const Description = styled.div`
+const Description = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: row;
   align-item: center;
@@ -199,7 +198,9 @@ const Description = styled.div`
     border-radius: 4px;
     overflow: hidden;
     margin-top: -13px;
-    border: 1px solid #d0d5d8;
+    border: 1px solid ${(p) => p?.color && p.color.grayish.G500};
+    opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
+    filter: ${(p) => p.isPaid && 'grayscale(100%)'};
   }
 `;
 
