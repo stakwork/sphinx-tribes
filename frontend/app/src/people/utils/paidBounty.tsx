@@ -72,7 +72,7 @@ const BountyContainer = styled.div<PaidBountyProps>`
   background: ${(p) => p.Bounty_Container_Background};
   border: 2px solid transparent;
   :hover {
-    border: 2px solid rgba(73, 201, 152, 0.2);
+    border: 2px solid ${(p) => p.color && p.color.borderGreen2};
     border-radius: 10px;
   }
 `;
