@@ -733,12 +733,8 @@ interface styledProps {
 }
 
 const BountyBox = styled.div<styledProps>`
-  // display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   min-height: 160px;
   max-height: 160px;
-  // border-radius: 10px;
   width: 1100px;
   box-shadow: 0px 1px 6px ${(p) => p?.color && p?.color.black100};
   border: none;

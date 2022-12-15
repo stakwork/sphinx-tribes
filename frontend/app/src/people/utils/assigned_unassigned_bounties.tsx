@@ -37,7 +37,8 @@ const Bounties = (props) => {
       {{ ...assignee }.owner_alias ? (
         <BountyContainer
           onClick={onPanelClick}
-          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}>
+          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
+          color={color}>
           <div className="BountyDescriptionContainer">
             <BountyDescription
               {...person}
@@ -71,7 +72,7 @@ const Bounties = (props) => {
           </div>
         </BountyContainer>
       ) : (
-        <BountyContainer>
+        <BountyContainer color={color}>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
             <div style={{ display: 'flex', flexDirection: 'row' }} onClick={onPanelClick}>
               <BountyDescription
@@ -156,6 +157,7 @@ interface containerProps {
   assignedBackgroundImage?: string;
   unassigned_border?: string;
   grayish_G200?: string;
+  color?: any;
 }
 
 const BountyContainer = styled.div<containerProps>`
@@ -168,6 +170,7 @@ const BountyContainer = styled.div<containerProps>`
   background: ${(p) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
   background-repeat: no-repeat;
   background-size: cover;
+  border: ${(p) => (p.assignedBackgroundImage ? '2px solid transparent' : '')};
   .BountyDescriptionContainer {
     min-width: 553px;
     max-width: 553px;
@@ -176,6 +179,11 @@ const BountyContainer = styled.div<containerProps>`
     display: flex;
     flex-direction: row;
     width: 545px;
+  }
+
+  :hover {
+    border: ${(p) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
+    border-radius: ${(p) => (p.assignedBackgroundImage ? '10px' : '')};
   }
 `;
 
@@ -188,6 +196,10 @@ const DescriptionPriceContainer = styled.div<containerProps>`
   background: ${(p) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
   background-repeat: no-repeat;
   background-size: cover;
+
+  :hover {
+    background: url('static/unassigned_bounty_hover_bg.svg');
+  }
 `;
 
 const UnassignedPersonProfile = styled.div<containerProps>`
