@@ -2001,15 +2001,26 @@ const TitleBox = styled.div<colorProps>`
 
 const DescriptionBox = styled.div<colorProps>`
   padding-right: 44px;
-  margin-right: 7px;
-  min-height: 548px;
-  max-height: 548px;
+  margin-right: 5px;
+  min-height: 560px;
+  max-height: 563px;
   overflow-y: scroll;
   font-family: Barlow;
   font-weight: 400;
   font-size: 15px;
   line-height: 25px;
   color: ${(p) => p?.color && p.color.black500};
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(175 182 185 /25%) !important;
+    height: 80px;
+  }
+  ::-webkit-scrollbar-track-piece {
+    height: 80px;
+  }
 `;
 
 const AssigneeProfile = styled.div<colorProps>`

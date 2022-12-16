@@ -702,7 +702,7 @@ export default function BodyComponent({ selectedWidget }) {
               zIndex: 20
             }}
             style={{
-              background: color.black200
+              background: 'rgba( 0 0 0 /75% )'
             }}
             bigCloseImage={() => {
               setPublicFocusPerson(null);
