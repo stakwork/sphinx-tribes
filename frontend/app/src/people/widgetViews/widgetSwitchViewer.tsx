@@ -103,7 +103,6 @@ export default function WidgetSwitchViewer(props) {
       activeList && activeList.length ? (
         activeList.slice(0, currentItems).map((item, i) => {
           const { person, body } = item;
-
           const conditionalStyles = body?.paid
             ? {
                 border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
@@ -117,6 +116,7 @@ export default function WidgetSwitchViewer(props) {
               color={color}
               isMobile={isMobile}
               key={person?.owner_pubkey + i + body?.created}
+              isAssignee={!!body.assignee}
               // onClick={() => {
               //   if (onPanelClick) onPanelClick(person, body);
               // }}
@@ -200,15 +200,21 @@ export default function WidgetSwitchViewer(props) {
 interface PanelProps {
   isMobile?: boolean;
   color?: any;
+  isAssignee?: boolean;
 }
 
 const Panel = styled.div<PanelProps>`
-  // position: ;
+  margin-top: 4px;
   background: ${(p) => p.color && p.color.pureWhite};
   color: ${(p) => p.color && p.color.pureBlack};
   padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
   border-bottom: ${(p) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
+  :hover {
+    box-shadow: ${(p) => (p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none')} !important;
+  }
+  :active {
+    box-shadow: none !important;
+  }
 `;
 
 const LoadMoreContainer = styled.div<PanelProps>`
