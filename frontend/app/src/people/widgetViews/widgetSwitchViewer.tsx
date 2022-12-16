@@ -31,7 +31,7 @@ export default function WidgetSwitchViewer(props) {
     : {
         minWidth: '1100px',
         maxWidth: '1100px',
-        marginBottom: 20,
+        marginBottom: 16,
         borderRadius: '10px',
         display: 'flex',
         justifyContent: 'center'
