@@ -426,6 +426,8 @@ export default function BodyComponent({ selectedWidget }) {
         </div>
       ) : (
         <WidgetSwitchViewer
+          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
           onPanelClick={(person, item) => {
             history.replace({
               pathname: history?.location?.pathname,
