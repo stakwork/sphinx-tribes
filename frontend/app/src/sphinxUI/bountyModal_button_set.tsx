@@ -64,6 +64,41 @@ const ButtonSet = (props) => {
           </div>
         </ButtonContainer>
       )}
+      {props.tribe && (
+        <ButtonContainer
+          topMargin={'16px'}
+          onClick={() => {
+            props?.tribeFunction();
+          }}
+          color={color}>
+          <div
+            className="LeadingImageContainer"
+            style={{
+              marginLeft: '6px',
+              marginRight: '12px'
+            }}>
+            <img
+              // className="buttonImage"
+              src={'/static/tribe_demo.svg'}
+              alt={'github_ticket'}
+              height={'32px'}
+              width={'32px'}
+            />
+          </div>
+          <EuiText className="ButtonText">
+            {props.tribe.slice(0, 14)} {props.tribe.length > 14 && '...'}
+          </EuiText>
+          <div className="ImageContainer">
+            <img
+              className="buttonImage"
+              src={'/static/github_ticket.svg'}
+              alt={'github_ticket'}
+              height={'14px'}
+              width={'14px'}
+            />
+          </div>
+        </ButtonContainer>
+      )}
 
       <ButtonContainer topMargin={'16px'} onClick={props.copyURLAction} color={color}>
         <div className="LeadingImageContainer">
