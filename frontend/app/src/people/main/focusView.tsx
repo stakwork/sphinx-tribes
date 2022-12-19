@@ -321,7 +321,8 @@ export default function FocusedView(props: any) {
           ...props?.style,
           width: '100%',
           height: '100%'
-        }}>
+        }}
+      >
         {editMode ? (
           <B ref={scrollDiv} hide={false}>
             {formHeader && formHeader}
@@ -358,7 +359,8 @@ export default function FocusedView(props: any) {
               <BWrap
                 style={{
                   ...noShadow
-                }}>
+                }}
+              >
                 {goBack ? (
                   <IconButton
                     icon="arrow_back"
@@ -379,7 +381,8 @@ export default function FocusedView(props: any) {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center'
-                    }}>
+                    }}
+                  >
                     <Button
                       onClick={() => setEditMode(true)}
                       color={'widget'}
