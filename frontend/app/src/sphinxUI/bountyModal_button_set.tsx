@@ -10,7 +10,8 @@ const ButtonSet = (props) => {
       style={{
         ...props.ButtonSetContainerStyle
       }}
-      color={color}>
+      color={color}
+    >
       <ButtonContainer onClick={props?.githubShareAction} color={color}>
         <div className="LeadingImageContainer">
           <img
@@ -38,12 +39,14 @@ const ButtonSet = (props) => {
           onClick={() => {
             window.open(props.replitLink[0]);
           }}
-          color={color}>
+          color={color}
+        >
           <div
             className="LeadingImageContainer"
             style={{
               marginLeft: '20px'
-            }}>
+            }}
+          >
             <img
               className="buttonImage"
               src={'/static/replit_icon.svg'}
