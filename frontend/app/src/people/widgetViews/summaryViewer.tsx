@@ -49,7 +49,6 @@ export default function SummaryViewer(props: any) {
           deletingState={props?.deletingState}
           editAction={props?.editAction}
           setIsModalSideButton={props?.setIsModalSideButton}
-          setIsExtraStyle={props?.setIsExtraStyle}
         />
       );
     default:
