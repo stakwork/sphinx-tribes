@@ -73,13 +73,15 @@ const ButtonSet = (props) => {
           onClick={() => {
             props?.tribeFunction();
           }}
-          color={color}>
+          color={color}
+        >
           <div
             className="LeadingImageContainer"
             style={{
               marginLeft: '6px',
               marginRight: '12px'
-            }}>
+            }}
+          >
             <img
               // className="buttonImage"
               src={'/static/tribe_demo.svg'}
