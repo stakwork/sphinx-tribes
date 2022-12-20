@@ -61,7 +61,8 @@ export default function WantedSummary(props: any) {
     one_sentence_summary,
     github_description,
     show,
-    setIsModalSideButton
+    setIsModalSideButton,
+    setIsExtraStyle
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -873,115 +874,115 @@ export default function WantedSummary(props: any) {
                       </DescriptionBox>
                     </CreatorDescription>
                     <AssigneeProfile color={color}>
-                      <>
-                        <UnassignedPersonProfile
-                          unassigned_border={color.grayish.G300}
-                          grayish_G200={color.grayish.G200}
-                          color={color}>
-                          {!isAssigned && (
-                            <div className="UnassignedPersonContainer">
-                              <img
-                                src="/static/unassigned_profile.svg"
-                                alt=""
-                                height={'100%'}
-                                width={'100%'}
-                              />
-                            </div>
-                          )}
+                      <UnassignedPersonProfile
+                        unassigned_border={color.grayish.G300}
+                        grayish_G200={color.grayish.G200}
+                        color={color}>
+                        {!isAssigned && (
+                          <div className="UnassignedPersonContainer">
+                            <img
+                              src="/static/unassigned_profile.svg"
+                              alt=""
+                              height={'100%'}
+                              width={'100%'}
+                            />
+                          </div>
+                        )}
 
-                          {isAssigned ? (
-                            <div className="BountyProfileOuterContainerCreatorView">
-                              <BountyProfileView
-                                assignee={!assignedPerson ? assignee : assignedPerson}
-                                status={paid ? 'completed' : 'assigned'}
-                                canViewProfile={false}
-                                statusStyle={{
-                                  width: '66px',
-                                  height: '16px',
-                                  background: paid ? color.statusCompleted : color.statusAssigned
-                                }}
-                                UserProfileContainerStyle={{
-                                  height: 48,
-                                  width: 'fit-content',
-                                  minWidth: 'fit-content',
-                                  padding: 0
-                                  // marginTop: '48px'
-                                }}
-                                isNameClickable={true}
-                                UserImageStyle={{
-                                  width: '48px',
-                                  height: '48px',
-                                  display: 'flex',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  borderRadius: '200px',
-                                  overflow: 'hidden'
-                                }}
-                                NameContainerStyle={{
-                                  height: '28px',
-                                  maxWidth: '154px'
-                                }}
-                                userInfoStyle={{
-                                  marginLeft: '12px'
-                                }}
-                              />
-                              {!paid && (
-                                <div
-                                  className="AssigneeCloseButtonContainer"
-                                  onClick={() => {
-                                    changeAssignedPerson();
-                                    setIsModalSideButton(false);
-                                  }}>
-                                  <img
-                                    src="/static/assignee_close.png"
-                                    alt="cross_icon"
-                                    height={'100%'}
-                                    width={'100%'}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="UnassignedPersonalDetailContainer">
-                              <ImageButton
-                                buttonText={'Not Assigned'}
-                                ButtonContainerStyle={{
-                                  width: '159px',
-                                  height: '48px',
-                                  background: color.pureWhite,
-                                  marginLeft: '-12px'
-                                }}
-                                buttonTextStyle={{
-                                  color: color.grayish.G50,
-                                  width: '114px'
-                                }}
-                                endImageSrc={'/static/addIcon.svg'}
-                                endingImageContainerStyle={{
-                                  right: '34px',
-                                  fontSize: '12px'
-                                }}
-                                buttonAction={() => {
-                                  assigneeHandlerOpen();
-                                }}
-                              />
-                            </div>
-                          )}
-                        </UnassignedPersonProfile>
-                        <DividerContainer>
-                          <Divider />
-                        </DividerContainer>
-                        <BountyPriceContainer margin_top="0px">
-                          <BountyPrice
-                            priceMin={props?.priceMin}
-                            priceMax={props?.priceMax}
-                            price={props?.price}
-                            sessionLength={props?.estimate_session_length}
-                            style={{
-                              padding: 0,
-                              margin: 0
-                            }}
-                          />
-                        </BountyPriceContainer>
+                        {isAssigned ? (
+                          <div className="BountyProfileOuterContainerCreatorView">
+                            <BountyProfileView
+                              assignee={!assignedPerson ? assignee : assignedPerson}
+                              status={paid ? 'completed' : 'assigned'}
+                              canViewProfile={false}
+                              statusStyle={{
+                                width: '66px',
+                                height: '16px',
+                                background: paid ? color.statusCompleted : color.statusAssigned
+                              }}
+                              UserProfileContainerStyle={{
+                                height: 48,
+                                width: 'fit-content',
+                                minWidth: 'fit-content',
+                                padding: 0
+                                // marginTop: '48px'
+                              }}
+                              isNameClickable={true}
+                              UserImageStyle={{
+                                width: '48px',
+                                height: '48px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: '200px',
+                                overflow: 'hidden'
+                              }}
+                              NameContainerStyle={{
+                                height: '28px',
+                                maxWidth: '154px'
+                              }}
+                              userInfoStyle={{
+                                marginLeft: '12px'
+                              }}
+                            />
+                            {!paid && (
+                              <div
+                                className="AssigneeCloseButtonContainer"
+                                onClick={() => {
+                                  changeAssignedPerson();
+                                  setIsModalSideButton(false);
+                                }}>
+                                <img
+                                  src="/static/assignee_close.png"
+                                  alt="cross_icon"
+                                  height={'100%'}
+                                  width={'100%'}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="UnassignedPersonalDetailContainer">
+                            <ImageButton
+                              buttonText={'Not Assigned'}
+                              ButtonContainerStyle={{
+                                width: '159px',
+                                height: '48px',
+                                background: color.pureWhite,
+                                marginLeft: '-12px'
+                              }}
+                              buttonTextStyle={{
+                                color: color.grayish.G50,
+                                width: '114px'
+                              }}
+                              endImageSrc={'/static/addIcon.svg'}
+                              endingImageContainerStyle={{
+                                right: '34px',
+                                fontSize: '12px'
+                              }}
+                              buttonAction={() => {
+                                assigneeHandlerOpen();
+                              }}
+                            />
+                          </div>
+                        )}
+                      </UnassignedPersonProfile>
+                      <DividerContainer>
+                        <Divider />
+                      </DividerContainer>
+                      <BountyPriceContainer margin_top="0px">
+                        <BountyPrice
+                          priceMin={props?.priceMin}
+                          priceMax={props?.priceMax}
+                          price={props?.price}
+                          sessionLength={props?.estimate_session_length}
+                          style={{
+                            padding: 0,
+                            margin: 0
+                          }}
+                        />
+                      </BountyPriceContainer>
+                      <div className="buttonSet">
                         <ButtonSet
                           githubShareAction={() => {
                             const repoUrl = ticketUrl
@@ -1004,66 +1005,67 @@ export default function WantedSummary(props: any) {
                             sendToRedirect(profileUrl);
                           }}
                         />
-                        <BottomButtonContainer>
-                          {paid ? (
-                            <IconButton
-                              width={220}
-                              height={48}
-                              style={{
-                                bottom: '0',
-                                marginLeft: '36px',
-                                border: `1px solid ${color.primaryColor.P400}`,
-                                background: color.pureWhite,
-                                color: color.borderGreen1
-                              }}
-                              text={'Mark Unpaid'}
-                              loading={saving === 'paid'}
-                              endingImg={'/static/mark_unpaid.svg'}
-                              textStyle={{
-                                width: '130px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                fontFamily: 'Barlow',
-                                marginLeft: '30px'
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExtrasPropertyAndSave('paid', !paid);
-                                setIsModalSideButton(true);
-                              }}
-                            />
-                          ) : (
-                            <IconButton
-                              color={'success'}
-                              width={220}
-                              height={48}
-                              style={{
-                                bottom: '0',
-                                marginLeft: '36px'
-                              }}
-                              text={'Mark Paid'}
-                              loading={saving === 'paid'}
-                              endingImg={'/static/mark_paid.svg'}
-                              textStyle={{
-                                width: '130px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                fontFamily: 'Barlow',
-                                marginLeft: '30px'
-                              }}
-                              hoverColor={color.button_primary.hover}
-                              activeColor={color.button_primary.active}
-                              shadowColor={color.button_primary.shadow}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // setExtrasPropertyAndSave('paid', !paid);
-                                setCreatorStep(1);
-                                setIsModalSideButton(false);
-                              }}
-                            />
-                          )}
-                        </BottomButtonContainer>
-                      </>
+                      </div>
+                      <BottomButtonContainer>
+                        {paid ? (
+                          <IconButton
+                            width={220}
+                            height={48}
+                            style={{
+                              bottom: '0',
+                              marginLeft: '36px',
+                              border: `1px solid ${color.primaryColor.P400}`,
+                              background: color.pureWhite,
+                              color: color.borderGreen1
+                            }}
+                            text={'Mark Unpaid'}
+                            loading={saving === 'paid'}
+                            endingImg={'/static/mark_unpaid.svg'}
+                            textStyle={{
+                              width: '130px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              fontFamily: 'Barlow',
+                              marginLeft: '30px'
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExtrasPropertyAndSave('paid', !paid);
+                              setIsModalSideButton(true);
+                            }}
+                          />
+                        ) : (
+                          <IconButton
+                            color={'success'}
+                            width={220}
+                            height={48}
+                            style={{
+                              bottom: '0',
+                              marginLeft: '36px'
+                            }}
+                            text={'Mark Paid'}
+                            loading={saving === 'paid'}
+                            endingImg={'/static/mark_paid.svg'}
+                            textStyle={{
+                              width: '130px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              fontFamily: 'Barlow',
+                              marginLeft: '30px'
+                            }}
+                            hoverColor={color.button_primary.hover}
+                            activeColor={color.button_primary.active}
+                            shadowColor={color.button_primary.shadow}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // setExtrasPropertyAndSave('paid', !paid);
+                              setCreatorStep(1);
+                              setIsModalSideButton(false);
+                              setIsExtraStyle(true);
+                            }}
+                          />
+                        )}
+                      </BottomButtonContainer>
                     </AssigneeProfile>
                   </>
                 </Creator>
@@ -1076,6 +1078,7 @@ export default function WantedSummary(props: any) {
                     onClick={() => {
                       setCreatorStep(0);
                       setIsModalSideButton(true);
+                      setIsExtraStyle(false);
                     }}>
                     <div className="imageContainer">
                       <img
@@ -1159,6 +1162,7 @@ export default function WantedSummary(props: any) {
                         // setExtrasPropertyAndSave('paid', !paid);
                         // setExtrasPropertyAndSave('price', bountyPrice);
                         setCreatorStep(2);
+                        setIsExtraStyle(false);
                       }}
                     />
                   </div>
@@ -1171,6 +1175,7 @@ export default function WantedSummary(props: any) {
                       className="headerTop"
                       onClick={() => {
                         setCreatorStep(1);
+                        setIsExtraStyle(true);
                       }}>
                       <div className="imageContainer">
                         <img
@@ -2072,6 +2077,13 @@ const AssigneeProfile = styled.div<colorProps>`
   min-height: 768px;
   max-height: 100vh;
   background: ${(p) => p?.color && p.color.pureWhite};
+  display: flex;
+  flex-direction: column;
+  .buttonSet {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 `;
 
 interface BountyPriceContainerProps {
@@ -2184,17 +2196,15 @@ const AutoCompleteContainer = styled.div<colorProps>`
 `;
 
 const BottomButtonContainer = styled.div`
-  position: absolute;
-  bottom: 0px;
   margin-bottom: 20px;
 `;
 
 const AdjustAmountContainer = styled.div<colorProps>`
-  min-height: 768px;
-  max-height: 768px;
-  height: 100vh;
+  min-height: 460px;
+  max-height: 460px;
   min-width: 440px;
   max-width: 440px;
+  border-radius: 10px;
   background: ${(p) => p.color && p.color.pureWhite};
   padding-top: 32px;
   .TopHeader {
@@ -2203,6 +2213,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
     display: flex;
     align-items: center;
     margin-left: 25px;
+    cursor: pointer;
     .imageContainer {
       height: 48px;
       width: 48px;
@@ -2238,7 +2249,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
   }
   .AssignedProfile {
     height: 184px;
-    margin-top: 170px;
+    margin-top: 30px;
     padding: 0px 31px 0px 38px;
     .InputContainer {
       display: flex;
@@ -2287,7 +2298,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
     }
   }
   .BottomButton {
-    margin-top: 200px;
+    margin-top: 20px;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -2297,9 +2308,12 @@ const AdjustAmountContainer = styled.div<colorProps>`
 
 const AwardsContainer = styled.div<colorProps>`
   width: 622px;
-  height: 768px;
+  height: 100vh;
+  min-height: 768px;
+  max-height: 100vh;
   background: ${(p) => p.color && p.color.pureWhite};
-
+  display: flex;
+  flex-direction: column;
   .header {
     min-height: 159px;
     max-height: 159px;
@@ -2314,6 +2328,7 @@ const AwardsContainer = styled.div<colorProps>`
       display: flex;
       align-items: center;
       margin: 32px 0px 0px 25px;
+      cursor: pointer;
       .imageContainer {
         height: 48px;
         width: 48px;
@@ -2342,17 +2357,17 @@ const AwardsContainer = styled.div<colorProps>`
       align-items: center;
       color: ${(p) => p.color && p.color.black500};
       margin-left: 73px;
+      margin-bottom: 48px;
     }
   }
   .AwardContainer {
     min-height: 481px;
-    max-height: 481px;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-wrap: wrap;
-    overflow-x: scroll;
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    gap: 10px;
+    place-content: flex-start;
+    overflow-y: scroll;
     margin-left: 63px;
     user-select: none;
     cursor: pointer;
