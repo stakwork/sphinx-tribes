@@ -24,8 +24,7 @@ export default function SummaryViewer(props: any) {
         style={{
           maxHeight: config.name === 'post' || isMobile ? '' : '100vh',
           height: (isSelectedView && thisIsMine) || isMobile ? 'calc(100% - 60px)' : '100%'
-        }}
-      >
+        }}>
         {child}
       </Wrap>
     );
@@ -50,6 +49,7 @@ export default function SummaryViewer(props: any) {
           deletingState={props?.deletingState}
           editAction={props?.editAction}
           setIsModalSideButton={props?.setIsModalSideButton}
+          setIsExtraStyle={props?.setIsExtraStyle}
         />
       );
     default:
