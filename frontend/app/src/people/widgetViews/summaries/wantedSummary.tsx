@@ -9,29 +9,22 @@ import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
-import ReactMarkdown from 'react-markdown';
 import GithubStatusPill from '../parts/statusPill';
 import { useStores } from '../../../store';
 import Form from '../../../form';
 import { sendBadgeSchema } from '../../../form/schema';
-import remarkGfm from 'remark-gfm';
 import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { useLocation } from 'react-router-dom';
-import { EuiFieldText, EuiPopover, EuiText } from '@elastic/eui';
+import { EuiFieldText, EuiText } from '@elastic/eui';
 import { colors } from '../../../colors';
 import { awards, LanguageObject } from '../../utils/language_label_style';
 import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
 import IconButton from '../../../sphinxUI/icon_button';
-import ConnectCard from '../../utils/connectCard';
 import BountyPrice from '../../../sphinxUI/bounty_price';
 import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
 import ImageButton from '../../../sphinxUI/Image_button';
-import SearchableSelectInput from '../../../form/inputs/searchable-select-input';
-import AutoComplete from '../../../sphinxUI/custom_autocomplete';
 import api from '../../../api';
-import NumberInput from '../../../form/inputs/number-input';
-import { number } from 'yup';
 import InvitePeopleSearch from '../../../form/inputs/widgets/PeopleSearch';
 
 function useQuery() {
@@ -44,6 +37,7 @@ export default function WantedSummary(props: any) {
   const {
     title,
     description,
+    deliverables,
     priceMin,
     priceMax,
     url,
@@ -67,7 +61,8 @@ export default function WantedSummary(props: any) {
     one_sentence_summary,
     github_description,
     show,
-    setIsModalSideButton
+    setIsModalSideButton,
+    setIsExtraStyle
   } = props;
   let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
@@ -132,7 +127,6 @@ export default function WantedSummary(props: any) {
   const [assigneeValue, setAssigneeValue] = useState(false);
 
   const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue) => !assigneeValue);
-  const assigneeHandlerClose = () => setAssigneeValue(false);
 
   useLayoutEffect(() => {
     if (imgRef && imgRef.current) {
@@ -163,6 +157,7 @@ export default function WantedSummary(props: any) {
     (value) => {
       setIsAssigned(true);
       setAssignedPerson(value);
+      assigneeHandlerOpen();
       const newValue = {
         title: title,
         wanted_type: wanted_type,
@@ -186,7 +181,6 @@ export default function WantedSummary(props: any) {
         type: type,
         created: created
       };
-      console.log(newValue);
       props.formSubmit(newValue);
     },
     [isAssigned, props]
@@ -279,7 +273,6 @@ export default function WantedSummary(props: any) {
               body: clonedEx[targetIndex]
             };
           }
-
           main.setPeopleWanteds(peopleWantedsClone);
         }
       } catch (e) {
@@ -760,7 +753,6 @@ export default function WantedSummary(props: any) {
                         src={'/static/paid_ribbon.svg'}
                         style={{
                           position: 'absolute',
-                          top: -0,
                           right: -4,
                           width: 72.46,
                           height: 71.82,
@@ -871,68 +863,74 @@ export default function WantedSummary(props: any) {
                             })}
                         </LanguageContainer>
                       </div>
-                      <DescriptionBox color={color}>{renderMarkdown(description)}</DescriptionBox>
+                      <DescriptionBox color={color}>
+                        {renderMarkdown(description)}
+                        {deliverables ? (
+                          <div className="deliverablesContainer">
+                            <EuiText className="deliverablesHeading">Deliverables</EuiText>
+                            <EuiText className="deliverablesDesc">{deliverables}</EuiText>
+                          </div>
+                        ) : null}
+                      </DescriptionBox>
                     </CreatorDescription>
                     <AssigneeProfile color={color}>
-                      <>
-                        <UnassignedPersonProfile
-                          unassigned_border={color.grayish.G300}
-                          grayish_G200={color.grayish.G200}
-                          color={color}>
-                          {!isAssigned && (
-                            <div className="UnassignedPersonContainer">
-                              <img
-                                src="/static/unassigned_profile.svg"
-                                alt=""
-                                height={'100%'}
-                                width={'100%'}
-                              />
-                            </div>
-                          )}
+                      <UnassignedPersonProfile
+                        unassigned_border={color.grayish.G300}
+                        grayish_G200={color.grayish.G200}
+                        color={color}>
+                        {!isAssigned && (
+                          <div className="UnassignedPersonContainer">
+                            <img
+                              src="/static/unassigned_profile.svg"
+                              alt=""
+                              height={'100%'}
+                              width={'100%'}
+                            />
+                          </div>
+                        )}
 
-                          {isAssigned ? (
-                            <div className="BountyProfileOuterContainerCreatorView">
-                              <BountyProfileView
-                                assignee={!assignedPerson ? assignee : assignedPerson}
-                                status={paid ? 'completed' : 'assigned'}
-                                canViewProfile={false}
-                                statusStyle={{
-                                  width: '66px',
-                                  height: '16px',
-                                  background: paid ? color.statusCompleted : color.statusAssigned
-                                }}
-                                UserProfileContainerStyle={{
-                                  height: 48,
-                                  width: 'fit-content',
-                                  minWidth: 'fit-content',
-                                  padding: 0
-                                  // marginTop: '48px'
-                                }}
-                                UserImageStyle={{
-                                  width: '48px',
-                                  height: '48px',
-                                  display: 'flex',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  borderRadius: '200px',
-                                  overflow: 'hidden'
-                                }}
-                                NameContainerStyle={{
-                                  height: '28px',
-                                  maxWidth: '154px'
-                                }}
-                                userInfoStyle={{
-                                  marginLeft: '12px'
-                                }}
-                              />
+                        {isAssigned ? (
+                          <div className="BountyProfileOuterContainerCreatorView">
+                            <BountyProfileView
+                              assignee={!assignedPerson ? assignee : assignedPerson}
+                              status={paid ? 'completed' : 'assigned'}
+                              canViewProfile={false}
+                              statusStyle={{
+                                width: '66px',
+                                height: '16px',
+                                background: paid ? color.statusCompleted : color.statusAssigned
+                              }}
+                              UserProfileContainerStyle={{
+                                height: 48,
+                                width: 'fit-content',
+                                minWidth: 'fit-content',
+                                padding: 0
+                                // marginTop: '48px'
+                              }}
+                              isNameClickable={true}
+                              UserImageStyle={{
+                                width: '48px',
+                                height: '48px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: '200px',
+                                overflow: 'hidden'
+                              }}
+                              NameContainerStyle={{
+                                height: '28px',
+                                maxWidth: '154px'
+                              }}
+                              userInfoStyle={{
+                                marginLeft: '12px'
+                              }}
+                            />
+                            {!paid && (
                               <div
                                 className="AssigneeCloseButtonContainer"
                                 onClick={() => {
                                   changeAssignedPerson();
-                                  assigneeHandlerOpen();
-                                  setCreatorStep(3);
                                   setIsModalSideButton(false);
-                                  props?.setIsExtraStyle(true);
                                 }}>
                                 <img
                                   src="/static/assignee_close.png"
@@ -941,45 +939,50 @@ export default function WantedSummary(props: any) {
                                   width={'100%'}
                                 />
                               </div>
-                            </div>
-                          ) : (
-                            <div className="UnassignedPersonalDetailContainer">
-                              <ImageButton
-                                buttonText={'Not Assigned'}
-                                ButtonContainerStyle={{
-                                  width: '159px',
-                                  height: '48px',
-                                  background: color.pureWhite,
-                                  marginLeft: '-12px'
-                                }}
-                                buttonTextStyle={{
-                                  color: color.grayish.G1100
-                                }}
-                                endImageSrc={'/static/addIcon.svg'}
-                                endingImageContainerStyle={{
-                                  right: '34px',
-                                  fontSize: '12px'
-                                }}
-                                buttonAction={assigneeHandlerOpen}
-                              />
-                            </div>
-                          )}
-                        </UnassignedPersonProfile>
-                        <DividerContainer>
-                          <Divider />
-                        </DividerContainer>
-                        <BountyPriceContainer margin_top="0px">
-                          <BountyPrice
-                            priceMin={props?.priceMin}
-                            priceMax={props?.priceMax}
-                            price={props?.price}
-                            sessionLength={props?.estimate_session_length}
-                            style={{
-                              padding: 0,
-                              margin: 0
-                            }}
-                          />
-                        </BountyPriceContainer>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="UnassignedPersonalDetailContainer">
+                            <ImageButton
+                              buttonText={'Not Assigned'}
+                              ButtonContainerStyle={{
+                                width: '159px',
+                                height: '48px',
+                                background: color.pureWhite,
+                                marginLeft: '-12px'
+                              }}
+                              buttonTextStyle={{
+                                color: color.grayish.G50,
+                                width: '114px'
+                              }}
+                              endImageSrc={'/static/addIcon.svg'}
+                              endingImageContainerStyle={{
+                                right: '34px',
+                                fontSize: '12px'
+                              }}
+                              buttonAction={() => {
+                                assigneeHandlerOpen();
+                              }}
+                            />
+                          </div>
+                        )}
+                      </UnassignedPersonProfile>
+                      <DividerContainer>
+                        <Divider />
+                      </DividerContainer>
+                      <BountyPriceContainer margin_top="0px">
+                        <BountyPrice
+                          priceMin={props?.priceMin}
+                          priceMax={props?.priceMax}
+                          price={props?.price}
+                          sessionLength={props?.estimate_session_length}
+                          style={{
+                            padding: 0,
+                            margin: 0
+                          }}
+                        />
+                      </BountyPriceContainer>
+                      <div className="buttonSet">
                         <ButtonSet
                           githubShareAction={() => {
                             const repoUrl = ticketUrl
@@ -996,95 +999,73 @@ export default function WantedSummary(props: any) {
                             sendToRedirect(twitterLink);
                           }}
                           replitLink={replitLink}
+                          tribe={tribe !== 'none' && tribe}
+                          tribeFunction={() => {
+                            const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
+                            sendToRedirect(profileUrl);
+                          }}
                         />
-                        <BottomButtonContainer>
-                          {paid ? (
-                            <IconButton
-                              width={220}
-                              height={48}
-                              style={{
-                                bottom: '0',
-                                marginLeft: '36px',
-                                border: `1px solid ${color.primaryColor.P400}`,
-                                background: color.pureWhite,
-                                color: color.borderGreen1
-                              }}
-                              text={'Mark Unpaid'}
-                              loading={saving === 'paid'}
-                              endingImg={'/static/mark_unpaid.svg'}
-                              textStyle={{
-                                width: '130px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                fontFamily: 'Barlow',
-                                marginLeft: '30px'
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExtrasPropertyAndSave('paid', !paid);
-                                setIsModalSideButton(true);
-                              }}
-                            />
-                          ) : (
-                            <IconButton
-                              color={'success'}
-                              width={220}
-                              height={48}
-                              style={{
-                                bottom: '0',
-                                marginLeft: '36px'
-                              }}
-                              text={'Mark Paid'}
-                              loading={saving === 'paid'}
-                              endingImg={'/static/mark_paid.svg'}
-                              textStyle={{
-                                width: '130px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                fontFamily: 'Barlow',
-                                marginLeft: '30px'
-                              }}
-                              hoverColor={color.button_primary.hover}
-                              activeColor={color.button_primary.active}
-                              shadowColor={color.button_primary.shadow}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // setExtrasPropertyAndSave('paid', !paid);
-                                setCreatorStep(1);
-                                setIsModalSideButton(false);
-                              }}
-                            />
-                          )}
-                          {/* <IconButton
-                      width={220}
-                      height={48}
-                      style={{
-                        bottom: '0',
-                        marginLeft: '36px',
-                        background: color.pureWhite,
-                        border: `1px solid ${color.grayish.G600}`
-                      }}
-                      text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
-                      endingImg={'/static/award.svg'}
-                      hoverColor={color.pureWhite}
-                      activeColor={color.pureWhite}
-                      textStyle={{
-                        width: '130px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        fontFamily: 'Barlow',
-                        marginLeft: '30px',
-                        color: color.grayish.G50
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!badgeRecipient) {
-                          setShowBadgeAwardDialog(true);
-                        }
-                      }}
-                    /> */}
-                        </BottomButtonContainer>
-                      </>
+                      </div>
+                      <BottomButtonContainer>
+                        {paid ? (
+                          <IconButton
+                            width={220}
+                            height={48}
+                            style={{
+                              bottom: '0',
+                              marginLeft: '36px',
+                              border: `1px solid ${color.primaryColor.P400}`,
+                              background: color.pureWhite,
+                              color: color.borderGreen1
+                            }}
+                            text={'Mark Unpaid'}
+                            loading={saving === 'paid'}
+                            endingImg={'/static/mark_unpaid.svg'}
+                            textStyle={{
+                              width: '130px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              fontFamily: 'Barlow',
+                              marginLeft: '30px'
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExtrasPropertyAndSave('paid', !paid);
+                              setIsModalSideButton(true);
+                            }}
+                          />
+                        ) : (
+                          <IconButton
+                            color={'success'}
+                            width={220}
+                            height={48}
+                            style={{
+                              bottom: '0',
+                              marginLeft: '36px'
+                            }}
+                            text={'Mark Paid'}
+                            loading={saving === 'paid'}
+                            endingImg={'/static/mark_paid.svg'}
+                            textStyle={{
+                              width: '130px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              fontFamily: 'Barlow',
+                              marginLeft: '30px'
+                            }}
+                            hoverColor={color.button_primary.hover}
+                            activeColor={color.button_primary.active}
+                            shadowColor={color.button_primary.shadow}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // setExtrasPropertyAndSave('paid', !paid);
+                              setCreatorStep(1);
+                              setIsModalSideButton(false);
+                              setIsExtraStyle(true);
+                            }}
+                          />
+                        )}
+                      </BottomButtonContainer>
                     </AssigneeProfile>
                   </>
                 </Creator>
@@ -1097,6 +1078,7 @@ export default function WantedSummary(props: any) {
                     onClick={() => {
                       setCreatorStep(0);
                       setIsModalSideButton(true);
+                      setIsExtraStyle(false);
                     }}>
                     <div className="imageContainer">
                       <img
@@ -1121,6 +1103,7 @@ export default function WantedSummary(props: any) {
                         height: '16px',
                         background: color.statusAssigned
                       }}
+                      isNameClickable={true}
                       UserProfileContainerStyle={{
                         height: 80,
                         width: 235,
@@ -1179,6 +1162,7 @@ export default function WantedSummary(props: any) {
                         // setExtrasPropertyAndSave('paid', !paid);
                         // setExtrasPropertyAndSave('price', bountyPrice);
                         setCreatorStep(2);
+                        setIsExtraStyle(false);
                       }}
                     />
                   </div>
@@ -1191,6 +1175,7 @@ export default function WantedSummary(props: any) {
                       className="headerTop"
                       onClick={() => {
                         setCreatorStep(1);
+                        setIsExtraStyle(true);
                       }}>
                       <div className="imageContainer">
                         <img
@@ -1287,19 +1272,34 @@ export default function WantedSummary(props: any) {
                 </AwardsContainer>
               )}
 
-              {creatorStep === 3 && assigneeValue && (
-                <AutoCompleteContainer color={color}>
-                  <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
-                  <InvitePeopleSearch
-                    peopleList={peopleList}
-                    isProvidingHandler={true}
-                    handleAssigneeDetails={(value) => {
-                      handleAssigneeDetails(value);
-                      setCreatorStep(0);
-                      setIsModalSideButton(true);
-                    }}
-                  />
-                </AutoCompleteContainer>
+              {assigneeValue && (
+                <Modal
+                  visible={true}
+                  envStyle={{
+                    borderRadius: '10px',
+                    background: color.pureWhite,
+                    maxHeight: '459px',
+                    width: '44.5%'
+                  }}
+                  bigCloseImage={assigneeHandlerOpen}
+                  bigCloseImageStyle={{
+                    top: '-18px',
+                    right: '-18px',
+                    background: color.pureBlack,
+                    borderRadius: '50%',
+                    zIndex: 11
+                  }}>
+                  <AutoCompleteContainer color={color}>
+                    <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
+                    <InvitePeopleSearch
+                      peopleList={peopleList}
+                      isProvidingHandler={true}
+                      handleAssigneeDetails={(value) => {
+                        handleAssigneeDetails(value);
+                      }}
+                    />
+                  </AutoCompleteContainer>
+                </Modal>
               )}
             </>
           ) : (
@@ -1312,7 +1312,6 @@ export default function WantedSummary(props: any) {
                   src={'/static/paid_ribbon.svg'}
                   style={{
                     position: 'absolute',
-                    top: 0,
                     right: -4,
                     width: 72.46,
                     height: 71.82,
@@ -1342,7 +1341,15 @@ export default function WantedSummary(props: any) {
                       })}
                   </LanguageContainer>
                 </div>
-                <DescriptionBox color={color}>{renderMarkdown(description)}</DescriptionBox>
+                <DescriptionBox color={color}>
+                  {renderMarkdown(description)}
+                  {deliverables ? (
+                    <div className="deliverablesContainer">
+                      <EuiText className="deliverablesHeading">Deliverables</EuiText>
+                      <EuiText className="deliverablesDesc">{deliverables}</EuiText>
+                    </div>
+                  ) : null}
+                </DescriptionBox>
               </CreatorDescription>
 
               <AssigneeProfile color={color}>
@@ -1357,6 +1364,7 @@ export default function WantedSummary(props: any) {
                         height: '16px',
                         background: color.statusCompleted
                       }}
+                      isNameClickable={true}
                       UserProfileContainerStyle={{
                         height: 48,
                         width: 235,
@@ -1410,6 +1418,11 @@ export default function WantedSummary(props: any) {
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
+                      tribe={tribe !== 'none' && tribe}
+                      tribeFunction={() => {
+                        const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
+                        sendToRedirect(profileUrl);
+                      }}
                     />
                   </>
                 ) : assignee?.owner_alias ? (
@@ -1423,6 +1436,7 @@ export default function WantedSummary(props: any) {
                         height: '16px',
                         background: color.statusAssigned
                       }}
+                      isNameClickable={true}
                       UserProfileContainerStyle={{
                         height: 48,
                         width: 235,
@@ -1476,6 +1490,11 @@ export default function WantedSummary(props: any) {
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
+                      tribe={tribe !== 'none' && tribe}
+                      tribeFunction={() => {
+                        const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
+                        sendToRedirect(profileUrl);
+                      }}
                     />
                   </>
                 ) : (
@@ -1549,6 +1568,11 @@ export default function WantedSummary(props: any) {
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
+                      tribe={tribe !== 'none' && tribe}
+                      tribeFunction={() => {
+                        const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
+                        sendToRedirect(profileUrl);
+                      }}
                     />
                   </>
                 )}
@@ -1943,6 +1967,7 @@ const Creator = styled.div`
   min-width: 892px;
   max-width: 892px;
   min-height: 768px;
+  max-height: 100vh;
   display: flex;
   justify-content: space-between;
 `;
@@ -1950,7 +1975,7 @@ const Creator = styled.div`
 const NormalUser = styled.div`
   min-width: 892px;
   max-width: 892px;
-  min-height: 768px;
+  min-height: 100vh;
   display: flex;
   justify-content: space-between;
 `;
@@ -1959,6 +1984,7 @@ const CreatorDescription = styled.div<styleProps>`
   min-width: 600px;
   max-width: 600px;
   min-height: 768px;
+  height: 100vh;
   border-right: ${(p) =>
     p?.paid ? `3px solid ${p?.color?.primaryColor.P400}` : `1px solid ${p?.color.grayish.G700}`};
   background: ${(p) => p?.color && p.color.pureWhite};
@@ -2001,22 +2027,63 @@ const TitleBox = styled.div<colorProps>`
 
 const DescriptionBox = styled.div<colorProps>`
   padding-right: 44px;
-  margin-right: 7px;
-  min-height: 548px;
-  max-height: 548px;
+  margin-right: 5px;
+  min-height: 540px;
+  max-height: 560px;
   overflow-y: scroll;
+  overflow-wrap: anywhere;
   font-family: Barlow;
   font-weight: 400;
   font-size: 15px;
   line-height: 25px;
   color: ${(p) => p?.color && p.color.black500};
+  .deliverablesContainer {
+    margin-top: 23px;
+    .deliverablesHeading {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 25px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: ${(p) => p?.color && p.color.black500};
+    }
+    .deliverablesDesc {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 25px;
+      color: ${(p) => p?.color && p.color.black500};
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: ${(p) => p?.color && p.color.grayish.G300} !important;
+    height: 80px;
+  }
+  ::-webkit-scrollbar-track-piece {
+    height: 80px;
+  }
 `;
 
 const AssigneeProfile = styled.div<colorProps>`
   min-width: 292px;
   max-width: 292px;
   min-height: 768px;
+  max-height: 100vh;
   background: ${(p) => p?.color && p.color.pureWhite};
+  display: flex;
+  flex-direction: column;
+  .buttonSet {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 `;
 
 interface BountyPriceContainerProps {
@@ -2129,17 +2196,15 @@ const AutoCompleteContainer = styled.div<colorProps>`
 `;
 
 const BottomButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  row-gap: 16px;
-  margin-top: 144px;
+  margin-bottom: 20px;
 `;
 
 const AdjustAmountContainer = styled.div<colorProps>`
-  min-height: 768px;
-  max-height: 100%;
+  min-height: 460px;
+  max-height: 460px;
   min-width: 440px;
   max-width: 440px;
+  border-radius: 10px;
   background: ${(p) => p.color && p.color.pureWhite};
   padding-top: 32px;
   .TopHeader {
@@ -2148,6 +2213,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
     display: flex;
     align-items: center;
     margin-left: 25px;
+    cursor: pointer;
     .imageContainer {
       height: 48px;
       width: 48px;
@@ -2183,7 +2249,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
   }
   .AssignedProfile {
     height: 184px;
-    margin-top: 170px;
+    margin-top: 30px;
     padding: 0px 31px 0px 38px;
     .InputContainer {
       display: flex;
@@ -2232,7 +2298,7 @@ const AdjustAmountContainer = styled.div<colorProps>`
     }
   }
   .BottomButton {
-    margin-top: 200px;
+    margin-top: 20px;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -2242,9 +2308,12 @@ const AdjustAmountContainer = styled.div<colorProps>`
 
 const AwardsContainer = styled.div<colorProps>`
   width: 622px;
-  height: 768px;
+  height: 100vh;
+  min-height: 768px;
+  max-height: 100vh;
   background: ${(p) => p.color && p.color.pureWhite};
-
+  display: flex;
+  flex-direction: column;
   .header {
     min-height: 159px;
     max-height: 159px;
@@ -2259,6 +2328,7 @@ const AwardsContainer = styled.div<colorProps>`
       display: flex;
       align-items: center;
       margin: 32px 0px 0px 25px;
+      cursor: pointer;
       .imageContainer {
         height: 48px;
         width: 48px;
@@ -2287,17 +2357,17 @@ const AwardsContainer = styled.div<colorProps>`
       align-items: center;
       color: ${(p) => p.color && p.color.black500};
       margin-left: 73px;
+      margin-bottom: 48px;
     }
   }
   .AwardContainer {
     min-height: 481px;
-    max-height: 481px;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-wrap: wrap;
-    overflow-x: scroll;
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    gap: 10px;
+    place-content: flex-start;
+    overflow-y: scroll;
     margin-left: 63px;
     user-select: none;
     cursor: pointer;

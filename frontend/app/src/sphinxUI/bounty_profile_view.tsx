@@ -11,13 +11,11 @@ const BountyProfileView = (props) => {
       <UserProfileContainer
         style={{
           ...props?.UserProfileContainerStyle
-        }}
-      >
+        }}>
         <UserImage
           style={{
             ...props.UserImageStyle
-          }}
-        >
+          }}>
           <img
             width={'100%'}
             height={'100%'}
@@ -35,21 +33,32 @@ const BountyProfileView = (props) => {
         <UserInfo
           style={{
             ...props.userInfoStyle
-          }}
-        >
+          }}>
           <Status
             style={{
               ...props?.statusStyle
-            }}
-          >
+            }}>
             <EuiText className="statusText">{props?.status}</EuiText>
           </Status>
           <NameContainer
             name_text_color={color.grayish.G10}
             style={{
+              cursor: props.isNameClickable ? 'pointer' : '',
               ...props.NameContainerStyle
             }}
-          >
+            onClick={(e) => {
+              if (props.isNameClickable && { ...props.assignee }.owner_alias) {
+                e.stopPropagation();
+                window.open(
+                  `/p/${
+                    {
+                      ...props.assignee
+                    }.owner_pubkey
+                  }?widget=wanted`,
+                  '_blank'
+                );
+              }
+            }}>
             <EuiText className="Name_Text">
               {{ ...props.assignee }.owner_alias || 'Guest Developer  '}
             </EuiText>
@@ -70,8 +79,7 @@ const BountyProfileView = (props) => {
                     '_blank'
                   );
                 }
-              }}
-            >
+              }}>
               <EuiText className="text">View Profile</EuiText>
               <div className="Icon_Container">
                 <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />

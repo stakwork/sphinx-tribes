@@ -71,7 +71,8 @@ const BountyContainer = styled.div<PaidBountyProps>`
   font-family: Barlow;
   height: 100% !important;
   background: ${(p) => p.Bounty_Container_Background};
-  border: 2px solid transparent;
+  border: 2px solid ${(p) => p.color.grayish.G950};
+  border-radius: 10px;
   :hover {
     border: 2px solid ${(p) => p.color && p.color.borderGreen2};
     border-radius: 10px;
