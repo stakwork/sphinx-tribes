@@ -17,14 +17,14 @@ const BountyDetailsCreationData = {
   step_1: {
     step: 1,
     heading: 'Basic info',
-    sub_heading: 'Nemo enim ipsam voluptatem quia voluptas sit magni voluptatem sequi.',
+    sub_heading: ' ',
     schema: ['wanted_type', 'one_sentence_summary'],
     schema2: ['ticketUrl', 'github_description', 'description']
   },
   step_2: {
     step: 2,
     heading: 'Price and Estimate',
-    sub_heading: 'Nemo enim ipsam voluptatem quia voluptas sit magni voluptatem sequi.',
+    sub_heading: ' ',
     schema: ['price', 'codingLanguage', 'tribe', 'estimate_session_length'],
     schema2: ['estimated_completion_date', 'deliverables', 'show']
   },

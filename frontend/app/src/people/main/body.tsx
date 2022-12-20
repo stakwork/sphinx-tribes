@@ -707,23 +707,23 @@ export default function BodyComponent({ selectedWidget }) {
               borderRadius: isExtraStyle ? '10px' : 0,
               background: color.pureWhite,
               ...focusedDesktopModalStyles,
-              // minHeight: '768px',
-              maxHeight: '768px',
+              maxHeight: '100vh',
               zIndex: 20
             }}
             style={{
-              background: color.black200
+              background: 'rgba( 0 0 0 /75% )'
             }}
             bigCloseImage={() => {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/tickets');
               setIsExtraStyle(false);
+              setIsModalSideButton(true);
             }}
             bigCloseImageStyle={{
               top: isExtraStyle ? '-18px' : '18px',
               right: isExtraStyle ? '-18px' : '-50px',
-              background: isExtraStyle ? '#000' : '#000',
+              // background: isExtraStyle ? '#000' : '#000',
               borderRadius: isExtraStyle ? '50%' : '50%'
             }}
             prevArrowNew={

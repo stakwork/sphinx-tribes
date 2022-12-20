@@ -172,7 +172,8 @@ const BountyContainer = styled.div<containerProps>`
   background: ${(p) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
   background-repeat: no-repeat;
   background-size: cover;
-  border: ${(p) => (p.assignedBackgroundImage ? '2px solid transparent' : '')};
+  border: ${(p) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
+  border-radius: 10px;
   .BountyDescriptionContainer {
     min-width: 553px;
     max-width: 553px;
@@ -201,6 +202,9 @@ const DescriptionPriceContainer = styled.div<containerProps>`
 
   :hover {
     background: url('static/unassigned_bounty_hover_bg.svg');
+  }
+  :active {
+    background: url('static/unassigned_bounty_active_bg.svg');
   }
 `;
 
