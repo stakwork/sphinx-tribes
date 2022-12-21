@@ -50,7 +50,7 @@ export default function TextAreaInput({
               handleFocus(e);
               setActive(true);
             }}
-            rows={4}
+            rows={5}
             // prepend={prepend}
           />
           {error && (

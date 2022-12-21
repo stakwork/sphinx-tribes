@@ -3,7 +3,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import Input from './inputs';
-import { Button, IconButton, Modal } from '../sphinxUI';
+import { Button, Divider, IconButton, Modal } from '../sphinxUI';
 import { useStores } from '../store';
 import Select from '../sphinxUI/select';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
@@ -16,24 +16,68 @@ import { colors } from '../colors';
 const BountyDetailsCreationData = {
   step_1: {
     step: 1,
-    heading: 'Basic info',
-    sub_heading: ' ',
-    schema: ['wanted_type', 'one_sentence_summary'],
-    schema2: ['ticketUrl', 'github_description', 'description']
+    heading: 'Choose Bounty type',
+    sub_heading: '',
+    schema: [''],
+    schema2: [''],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '560px'
+    },
+    extraText: ''
   },
   step_2: {
     step: 2,
-    heading: 'Price and Estimate',
+    heading: 'Basic info',
     sub_heading: ' ',
-    schema: ['price', 'codingLanguage', 'tribe', 'estimate_session_length'],
-    schema2: ['estimated_completion_date', 'deliverables', 'show']
+    schema: ['one_sentence_summary', 'ticketUrl'],
+    schema2: ['wanted_type', 'codingLanguage'],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '416px'
+    },
+    extraText: 'Required fields'
   },
   step_3: {
     step: 3,
-    heading: 'Invite Developer',
+    heading: 'Description',
+    sub_heading: ' ',
+    schema: ['github_description', 'description'],
+    schema2: [' ', 'loomEmbedUrl'],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '488px'
+    },
+    extraText: 'Required fields'
+  },
+  step_4: {
+    step: 4,
+    heading: 'Price and Estimate',
+    sub_heading: ' ',
+    schema: ['price', 'estimate_session_length', 'estimated_completion_date'],
+    schema2: ['tribe', 'deliverables', 'show'],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '528px'
+    },
+    extraText: 'Required fields'
+  },
+  step_5: {
+    step: 5,
+    heading: 'Assign Developer',
     sub_heading: '',
     schema: ['assignee'],
-    schema2: ['']
+    schema2: [''],
+    outerContainerStyle: {
+      minWidth: '388px',
+      maxWidth: '388px',
+      height: '592px'
+    },
+    extraText: ''
   }
 };
 
@@ -63,7 +107,7 @@ export default function Form(props: any) {
   const initValues = dynamicInitialValues || props.initialValues;
 
   const NextStepHandler = useCallback(() => {
-    setStepTracker(stepTracker < 3 ? stepTracker + 1 : stepTracker);
+    setStepTracker(stepTracker < 5 ? stepTracker + 1 : stepTracker);
   }, [stepTracker]);
 
   const PreviousStepHandler = useCallback(() => {
@@ -80,6 +124,12 @@ export default function Form(props: any) {
         break;
       case 3:
         setSchemaData(BountyDetailsCreationData.step_3);
+        break;
+      case 4:
+        setSchemaData(BountyDetailsCreationData.step_4);
+        break;
+      case 5:
+        setSchemaData(BountyDetailsCreationData.step_5);
         break;
       default:
         return;
@@ -199,8 +249,7 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}
-    >
+      validationSchema={validator(schema)}>
       {({
         setFieldTouched,
         handleSubmit,
@@ -217,12 +266,12 @@ export default function Form(props: any) {
             style={{
               ...formPad,
               ...wrapStyle,
-              height: stepTracker === 3 ? '592px' : '560px',
-              minWidth: stepTracker === 3 ? '388px' : '712px',
-              maxWidth: stepTracker === 3 ? '388px' : '712px'
+              // height: stepTracker === 5 ? '592px' : '560px',
+              // minWidth: stepTracker === 5 ? '388px' : '712px',
+              // maxWidth: stepTracker === 5 ? '388px' : '712px'.
+              ...schemaData.outerContainerStyle
             }}
-            newDesign={props?.newDesign}
-          >
+            newDesign={props?.newDesign}>
             {/* schema flipping dropdown */}
             {/* {dynamicSchema && (
               <Select
@@ -247,8 +296,7 @@ export default function Form(props: any) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
-                  }}
-                >
+                  }}>
                   <div style={{ marginRight: '40px' }}>
                     {schema
                       .filter((item: FormField) => item.type === 'img')
@@ -329,163 +377,242 @@ export default function Form(props: any) {
             ) : props?.newDesign ? (
               <>
                 <CreateBountyHeaderContainer color={color}>
-                  <EuiText className="stepText">{`STEP ${schemaData.step}/3`}</EuiText>
+                  <EuiText className="stepText">{`STEP ${schemaData.step}`} / 5</EuiText>
                   <EuiText className="HeadingText">{schemaData.heading}</EuiText>
                   {schemaData.sub_heading && (
                     <EuiText
                       className="SubHeadingText"
                       style={{
                         marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                      }}
-                    >
+                      }}>
                       {schemaData.sub_heading}
                     </EuiText>
                   )}
                 </CreateBountyHeaderContainer>
 
-                <SchemaTagsContainer>
-                  <div className="LeftSchema">
-                    {schemaData.step === 1 && dynamicSchema && (
-                      <Select
-                        style={{ marginBottom: 24 }}
-                        onChange={(v) => {
-                          console.log('v', v);
-                          const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
-                          if (selectedOption) {
-                            setDynamicSchemaName(v);
-                            setDynamicSchema(selectedOption.schema);
-                          }
-                        }}
-                        handleActive={() => {}}
-                        options={dynamicFormOptions}
-                        value={dynamicSchemaName}
-                      />
-                    )}
-                    {schema
-                      .filter((item) => schemaData.schema.includes(item.name))
-                      .map((item: FormField) => (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          newDesign={true}
-                          values={values}
-                          setAssigneefunction={item.name === 'assignee' && setAssigneeName}
-                          peopleList={peopleList}
-                          // disabled={readOnly}
-                          // readOnly={readOnly}
-                          errors={errors}
-                          scrollToTop={scrollToTop}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e, f) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          extraHTML={
-                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                          }
-                        />
-                      ))}
-                  </div>
-                  <div className="RightSchema">
-                    {schema
-                      .filter((item) => schemaData.schema2.includes(item.name))
-                      .map((item: FormField) => (
-                        <Input
-                          {...item}
-                          peopleList={peopleList}
-                          newDesign={true}
-                          key={item.name}
-                          values={values}
-                          // disabled={readOnly}
-                          // readOnly={readOnly}
-                          errors={errors}
-                          scrollToTop={scrollToTop}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e, f) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          extraHTML={
-                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                          }
-                        />
-                      ))}
-                  </div>
-                </SchemaTagsContainer>
-                <BottomContainer color={color} assigneeName={assigneeName}>
-                  {stepTracker < 3 && <EuiText className="RequiredText">* Required</EuiText>}
-                  <div
-                    className="ButtonContainer"
-                    style={{
-                      width: stepTracker < 3 ? '45%' : '100%',
-                      height: stepTracker < 3 ? '48px' : '48px',
-                      marginTop: stepTracker <= 3 ? '-20px' : '-10px'
-                    }}
-                  >
-                    <div
-                      className="nextButton"
-                      onClick={() => {
-                        if (schemaData.step === 3) {
-                          if (dynamicSchemaName) {
-                            setFieldValue('type', dynamicSchemaName);
-                          }
-                          if (assigneeName !== '') {
-                            handleSubmit();
-                          } else {
-                            setAssigneeName('a');
-                          }
-                        } else {
-                          NextStepHandler();
+                {schemaData.step === 1 && dynamicSchema && (
+                  <ChooseBountyContainer>
+                    {/* <Select
+                      style={{ marginBottom: 24 }}
+                      onChange={(v) => {
+                        const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
+                        if (selectedOption) {
+                          setDynamicSchemaName(v);
+                          setDynamicSchema(selectedOption.schema);
+                          console.log(v);
+                          console.log(selectedOption.schema);
                         }
                       }}
-                    >
-                      {assigneeName === '' ? (
-                        <EuiText className="nextText">
-                          {schemaData.step === 3 ? 'Decide Later' : 'Next'}
-                        </EuiText>
-                      ) : (
-                        <EuiText className="nextText">Finish</EuiText>
-                      )}
-                    </div>
-                    {schemaData.step > 1 && (
-                      <>
-                        <ImageButton
-                          buttonText={'Back'}
-                          ButtonContainerStyle={{
-                            width: '120px',
-                            height: '42px'
-                          }}
-                          buttonAction={() => {
-                            PreviousStepHandler();
-                            setAssigneeName('');
-                          }}
-                        />
-                      </>
-                    )}
-                  </div>
-                </BottomContainer>
+                      handleActive={() => {}}
+                      options={dynamicFormOptions}
+                      value={dynamicSchemaName}
+                    /> */}
+                    {dynamicFormOptions.map((v) => (
+                      <div className="BountyContainer" key={v.label}>
+                        <div className="freelancerContainer">
+                          <div
+                            style={{
+                              minHeight: '134px !important',
+                              maxHeight: '134px !important',
+                              height: '134px',
+                              width: '290px',
+                              background: '#F5F6F8',
+                              borderRadius: '20px 20px 0px 0px'
+                            }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'flex-end',
+                                position: 'relative'
+                              }}>
+                              <img
+                                src={
+                                  v.value === 'freelance_job_request'
+                                    ? '/static/freelancer_bounty.svg'
+                                    : '/static/live_help.svg'
+                                }
+                                alt="select_type"
+                                height={'121px'}
+                                width={'130.1px'}
+                                style={{
+                                  position: 'absolute',
+                                  top: '52px'
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div className="TextButtonContainer">
+                            <EuiText className="textTop">{v.label}</EuiText>
+                            <EuiText className="textBottom">
+                              {v.value === 'freelance_job_request'
+                                ? 'Find right developer for your task'
+                                : 'Get instant help for your task'}
+                            </EuiText>
+                            {v.value === 'freelance_job_request' ? (
+                              <div
+                                className="StartButton"
+                                onClick={() => {
+                                  NextStepHandler();
+                                  setDynamicSchemaName(v.value);
+                                  setDynamicSchema(v.schema);
+                                }}>
+                                Start
+                              </div>
+                            ) : (
+                              <div className="ComingSoonContainer">
+                                <Divider
+                                  style={{
+                                    width: '26px',
+                                    background: '#DDE1E5'
+                                  }}
+                                />
+                                <EuiText className="ComingSoonText">Coming soon</EuiText>
+                                <Divider
+                                  style={{
+                                    width: '26px',
+                                    background: '#DDE1E5'
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </ChooseBountyContainer>
+                )}
+
+                {schemaData.step !== 1 && (
+                  <>
+                    <SchemaTagsContainer>
+                      <div className="LeftSchema">
+                        {schema
+                          .filter((item) => schemaData.schema.includes(item.name))
+                          .map((item: FormField) => (
+                            <Input
+                              {...item}
+                              key={item.name}
+                              newDesign={true}
+                              values={values}
+                              setAssigneefunction={item.name === 'assignee' && setAssigneeName}
+                              peopleList={peopleList}
+                              // disabled={readOnly}
+                              // readOnly={readOnly}
+                              errors={errors}
+                              scrollToTop={scrollToTop}
+                              value={values[item.name]}
+                              error={errors[item.name]}
+                              initialValues={initialValues}
+                              deleteErrors={() => {
+                                if (errors[item.name]) delete errors[item.name];
+                              }}
+                              handleChange={(e: any) => {
+                                setFieldValue(item.name, e);
+                              }}
+                              setFieldValue={(e, f) => {
+                                setFieldValue(e, f);
+                              }}
+                              setFieldTouched={setFieldTouched}
+                              handleBlur={() => setFieldTouched(item.name, false)}
+                              handleFocus={() => setFieldTouched(item.name, true)}
+                              setDisableFormButtons={setDisableFormButtons}
+                              extraHTML={
+                                (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                              }
+                            />
+                          ))}
+                      </div>
+                      <div className="RightSchema">
+                        {schema
+                          .filter((item) => schemaData.schema2.includes(item.name))
+                          .map((item: FormField) => (
+                            <Input
+                              {...item}
+                              peopleList={peopleList}
+                              newDesign={true}
+                              key={item.name}
+                              values={values}
+                              // disabled={readOnly}
+                              // readOnly={readOnly}
+                              errors={errors}
+                              scrollToTop={scrollToTop}
+                              value={values[item.name]}
+                              error={errors[item.name]}
+                              initialValues={initialValues}
+                              deleteErrors={() => {
+                                if (errors[item.name]) delete errors[item.name];
+                              }}
+                              handleChange={(e: any) => {
+                                setFieldValue(item.name, e);
+                              }}
+                              setFieldValue={(e, f) => {
+                                setFieldValue(e, f);
+                              }}
+                              setFieldTouched={setFieldTouched}
+                              handleBlur={() => setFieldTouched(item.name, false)}
+                              handleFocus={() => setFieldTouched(item.name, true)}
+                              setDisableFormButtons={setDisableFormButtons}
+                              extraHTML={
+                                (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                              }
+                            />
+                          ))}
+                      </div>
+                    </SchemaTagsContainer>
+                    <BottomContainer color={color} assigneeName={assigneeName}>
+                      <EuiText className="RequiredText">* {schemaData?.extraText}</EuiText>
+                      <div
+                        className="ButtonContainer"
+                        style={{
+                          width: stepTracker < 5 ? '45%' : '100%',
+                          height: stepTracker < 5 ? '48px' : '48px',
+                          marginTop: stepTracker <= 5 ? '-20px' : '-10px'
+                        }}>
+                        <div
+                          className="nextButton"
+                          onClick={() => {
+                            if (schemaData.step === 5) {
+                              if (dynamicSchemaName) {
+                                setFieldValue('type', dynamicSchemaName);
+                              }
+                              if (assigneeName !== '') {
+                                handleSubmit();
+                              } else {
+                                setAssigneeName('a');
+                              }
+                            } else {
+                              NextStepHandler();
+                            }
+                          }}>
+                          {assigneeName === '' ? (
+                            <EuiText className="nextText">
+                              {schemaData.step === 5 ? 'Decide Later' : 'Next'}
+                            </EuiText>
+                          ) : (
+                            <EuiText className="nextText">Finish</EuiText>
+                          )}
+                        </div>
+                        {schemaData.step > 1 && (
+                          <>
+                            <ImageButton
+                              buttonText={'Back'}
+                              ButtonContainerStyle={{
+                                width: '120px',
+                                height: '42px'
+                              }}
+                              buttonAction={() => {
+                                PreviousStepHandler();
+                                setAssigneeName('');
+                              }}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </BottomContainer>
+                  </>
+                )}
               </>
             ) : (
               <SchemaOuterContainer>
@@ -600,8 +727,7 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
+                  onClick={() => setShowSettings(!showSettings)}>
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -631,8 +757,7 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}
-                    >
+                      }}>
                       <Button
                         text={'Nevermind'}
                         color={'white'}
@@ -706,11 +831,14 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
   justify-content: center;
   padding: 0px 48px;
   .stepText {
-    fontfamily: Barlow;
-    font-size: 15px;
+    font-family: 'Barlow';
+    font-style: normal;
     font-weight: 500;
+    font-size: 15px;
     line-height: 18px;
     letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #3c3f41;
   }
   .HeadingText {
     font-family: Barlow;
@@ -806,6 +934,120 @@ const SchemaOuterContainer = styled.div`
   width: 100%;
   .SchemaInnerContainer {
     width: 100%;
+  }
+`;
+
+const ChooseBountyContainer = styled.div<styledProps>`
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  .BountyContainer {
+    min-height: 352px;
+    max-height: 352px;
+    min-width: 290px;
+    max-width: 290px;
+    background: #ffffff;
+    outline: 2px solid #dde1e5;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.07);
+    border-radius: 20px;
+    // margin-left: 34px;
+    overflow: hidden;
+    .freelancerContainer {
+      min-height: 352px;
+      max-height: 352px;
+      width: 100%;
+    }
+    :hover {
+      outline: 2px solid rgba(73, 201, 152, 0.5);
+      box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+    }
+    :active {
+      outline: 2px solid rgba(73, 201, 152, 0.5) !important;
+    }
+    .TextButtonContainer {
+      height: 218px;
+      width: 290px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .textTop {
+        height: 40px;
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 23px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #444851;
+      }
+      .textBottom {
+        height: 31px;
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        text-align: center;
+        color: #8e969c;
+      }
+      .StartButton {
+        height: 42px;
+        width: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #618aff;
+        box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+        color: #fff;
+        border-radius: 32px;
+        margin-top: 10px;
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 19px;
+        cursor: pointer;
+        :hover {
+          background: #5881f8;
+          box-shadow: 0px 1px 5px rgba(97, 138, 255, 0.5);
+        }
+        :active {
+          background: #5078f2;
+        }
+        :focus-visible {
+          outline: 2px solid rgba(73, 201, 152, 0.5) !important;
+        }
+      }
+      .ComingSoonContainer {
+        height: 42px;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        .ComingSoonText {
+          font-family: 'Barlow';
+          font-style: normal;
+          font-weight: 500;
+          font-size: 14px;
+          line-height: 17px;
+          display: flex;
+          align-items: center;
+          text-align: center;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #b0b7bc;
+          margin-right: 18px;
+          margin-left: 18px;
+        }
+      }
+    }
   }
 `;
 
