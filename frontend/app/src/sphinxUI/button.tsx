@@ -79,8 +79,7 @@ export default function Button(props: any) {
         ...props.style
       }}
       disabled={props.disabled}
-      onClick={props.onClick}
-    >
+      onClick={props.onClick}>
       {props.children ? (
         props.children
       ) : props.wideButton ? (
@@ -90,8 +89,7 @@ export default function Button(props: any) {
             justifyContent: 'flex-start',
             width: '100%',
             minWidth: '100%'
-          }}
-        >
+          }}>
           {props.text && (
             <div
               style={{
@@ -102,15 +100,13 @@ export default function Button(props: any) {
                 top: 0,
                 height: props.height,
                 maxWidth: '80%'
-              }}
-            >
+              }}>
               <div
                 style={{
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis'
-                }}
-              >
+                }}>
                 {props.text}
               </div>
             </div>
@@ -124,8 +120,7 @@ export default function Button(props: any) {
                 right: 13,
                 top: 0,
                 height: props.height
-              }}
-            >
+              }}>
               <MaterialIcon
                 icon={props.icon}
                 style={{ fontSize: props.iconSize ? props.iconSize : 30, ...iconStyle }}
@@ -145,8 +140,7 @@ export default function Button(props: any) {
                 left: 3,
                 height: '100%',
                 ...iconStyle
-              }}
-            >
+              }}>
               <MaterialIcon
                 icon={props.icon}
                 style={{ fontSize: props.iconSize ? props.iconSize : 30, ...iconStyle }}
@@ -162,8 +156,7 @@ export default function Button(props: any) {
                 top: 0,
                 left: 10,
                 height: '100%'
-              }}
-            >
+              }}>
               <Img
                 src={`/static/${props.img}`}
                 style={{
@@ -197,7 +190,16 @@ export default function Button(props: any) {
               />
             )}
 
-            {props.loading || props.submitting ? <EuiLoadingSpinner size="m" /> : <>{props.text}</>}
+            {props.loading || props.submitting ? (
+              <EuiLoadingSpinner size="m" />
+            ) : (
+              <div
+                style={{
+                  ...props.ButtonTextStyle
+                }}>
+                {props.text}
+              </div>
+            )}
             {props.endingIcon && (
               <MaterialIcon
                 icon={props.endingIcon}
