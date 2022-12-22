@@ -33,8 +33,7 @@ export default function TextAreaInput({
         }}
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
-        label={labeltext}
-      >
+        label={labeltext}>
         <R>
           <FieldTextArea
             color={color}

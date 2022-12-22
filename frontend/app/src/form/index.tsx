@@ -16,6 +16,7 @@ import { colors } from '../colors';
 const BountyDetailsCreationData = {
   step_1: {
     step: 1,
+    schemaName: '',
     heading: 'Choose Bounty type',
     sub_heading: '',
     schema: [''],
@@ -25,10 +26,12 @@ const BountyDetailsCreationData = {
       maxWidth: '712px',
       height: '560px'
     },
+    headingStyle: {},
     extraText: ''
   },
   step_2: {
     step: 2,
+    schemaName: 'Freelance Job Request',
     heading: 'Basic info',
     sub_heading: ' ',
     schema: ['one_sentence_summary', 'ticketUrl'],
@@ -38,10 +41,14 @@ const BountyDetailsCreationData = {
       maxWidth: '712px',
       height: '416px'
     },
-    extraText: 'Required fields'
+    headingStyle: {
+      marginBottom: '40px'
+    },
+    extraText: '* Required fields'
   },
   step_3: {
     step: 3,
+    schemaName: 'Freelance Job Request',
     heading: 'Description',
     sub_heading: ' ',
     schema: ['github_description', 'description'],
@@ -51,10 +58,14 @@ const BountyDetailsCreationData = {
       maxWidth: '712px',
       height: '488px'
     },
-    extraText: 'Required fields'
+    headingStyle: {
+      marginBottom: '34px'
+    },
+    extraText: '* Required fields'
   },
   step_4: {
     step: 4,
+    schemaName: 'Freelance Job Request',
     heading: 'Price and Estimate',
     sub_heading: ' ',
     schema: ['price', 'estimate_session_length', 'estimated_completion_date'],
@@ -64,10 +75,14 @@ const BountyDetailsCreationData = {
       maxWidth: '712px',
       height: '528px'
     },
-    extraText: 'Required fields'
+    headingStyle: {
+      marginBottom: '50px'
+    },
+    extraText: '* Required fields'
   },
   step_5: {
     step: 5,
+    schemaName: '',
     heading: 'Assign Developer',
     sub_heading: '',
     schema: ['assignee'],
@@ -77,6 +92,7 @@ const BountyDetailsCreationData = {
       maxWidth: '388px',
       height: '592px'
     },
+    headingStyle: {},
     extraText: ''
   }
 };
@@ -266,9 +282,6 @@ export default function Form(props: any) {
             style={{
               ...formPad,
               ...wrapStyle,
-              // height: stepTracker === 5 ? '592px' : '560px',
-              // minWidth: stepTracker === 5 ? '388px' : '712px',
-              // maxWidth: stepTracker === 5 ? '388px' : '712px'.
               ...schemaData.outerContainerStyle
             }}
             newDesign={props?.newDesign}>
@@ -377,36 +390,19 @@ export default function Form(props: any) {
             ) : props?.newDesign ? (
               <>
                 <CreateBountyHeaderContainer color={color}>
-                  <EuiText className="stepText">{`STEP ${schemaData.step}`} / 5</EuiText>
-                  <EuiText className="HeadingText">{schemaData.heading}</EuiText>
-                  {schemaData.sub_heading && (
-                    <EuiText
-                      className="SubHeadingText"
-                      style={{
-                        marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                      }}>
-                      {schemaData.sub_heading}
+                  <div className="TopContainer">
+                    <EuiText className="stepText">
+                      {`STEP ${schemaData.step}`} <span className="stepTextSpan"> / 5</span>
                     </EuiText>
-                  )}
+                    <EuiText className="schemaName">{schemaData.schemaName}</EuiText>
+                  </div>
+                  <EuiText className="HeadingText" style={schemaData.headingStyle}>
+                    {schemaData.heading}
+                  </EuiText>
                 </CreateBountyHeaderContainer>
 
                 {schemaData.step === 1 && dynamicSchema && (
-                  <ChooseBountyContainer>
-                    {/* <Select
-                      style={{ marginBottom: 24 }}
-                      onChange={(v) => {
-                        const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
-                        if (selectedOption) {
-                          setDynamicSchemaName(v);
-                          setDynamicSchema(selectedOption.schema);
-                          console.log(v);
-                          console.log(selectedOption.schema);
-                        }
-                      }}
-                      handleActive={() => {}}
-                      options={dynamicFormOptions}
-                      value={dynamicSchemaName}
-                    /> */}
+                  <ChooseBountyContainer color={color}>
                     {dynamicFormOptions.map((v) => (
                       <div className="BountyContainer" key={v.label}>
                         <div className="freelancerContainer">
@@ -416,7 +412,7 @@ export default function Form(props: any) {
                               maxHeight: '134px !important',
                               height: '134px',
                               width: '290px',
-                              background: '#F5F6F8',
+                              background: color.white100,
                               borderRadius: '20px 20px 0px 0px'
                             }}>
                             <div
@@ -465,14 +461,14 @@ export default function Form(props: any) {
                                 <Divider
                                   style={{
                                     width: '26px',
-                                    background: '#DDE1E5'
+                                    background: color.grayish.G300
                                   }}
                                 />
                                 <EuiText className="ComingSoonText">Coming soon</EuiText>
                                 <Divider
                                   style={{
                                     width: '26px',
-                                    background: '#DDE1E5'
+                                    background: color.grayish.G300
                                   }}
                                 />
                               </div>
@@ -490,85 +486,88 @@ export default function Form(props: any) {
                       <div className="LeftSchema">
                         {schema
                           .filter((item) => schemaData.schema.includes(item.name))
-                          .map((item: FormField) => (
-                            <Input
-                              {...item}
-                              key={item.name}
-                              newDesign={true}
-                              values={values}
-                              setAssigneefunction={item.name === 'assignee' && setAssigneeName}
-                              peopleList={peopleList}
-                              // disabled={readOnly}
-                              // readOnly={readOnly}
-                              errors={errors}
-                              scrollToTop={scrollToTop}
-                              value={values[item.name]}
-                              error={errors[item.name]}
-                              initialValues={initialValues}
-                              deleteErrors={() => {
-                                if (errors[item.name]) delete errors[item.name];
-                              }}
-                              handleChange={(e: any) => {
-                                setFieldValue(item.name, e);
-                              }}
-                              setFieldValue={(e, f) => {
-                                setFieldValue(e, f);
-                              }}
-                              setFieldTouched={setFieldTouched}
-                              handleBlur={() => setFieldTouched(item.name, false)}
-                              handleFocus={() => setFieldTouched(item.name, true)}
-                              setDisableFormButtons={setDisableFormButtons}
-                              extraHTML={
-                                (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                              }
-                            />
-                          ))}
+                          .map((item: FormField) => {
+                            return (
+                              <Input
+                                {...item}
+                                key={item.name}
+                                newDesign={true}
+                                values={values}
+                                setAssigneefunction={item.name === 'assignee' && setAssigneeName}
+                                peopleList={peopleList}
+                                // disabled={readOnly}
+                                // readOnly={readOnly}
+                                errors={errors}
+                                scrollToTop={scrollToTop}
+                                value={values[item.name]}
+                                error={errors[item.name]}
+                                initialValues={initialValues}
+                                deleteErrors={() => {
+                                  if (errors[item.name]) delete errors[item.name];
+                                }}
+                                handleChange={(e: any) => {
+                                  setFieldValue(item.name, e);
+                                }}
+                                setFieldValue={(e, f) => {
+                                  setFieldValue(e, f);
+                                }}
+                                setFieldTouched={setFieldTouched}
+                                handleBlur={() => setFieldTouched(item.name, false)}
+                                handleFocus={() => setFieldTouched(item.name, true)}
+                                setDisableFormButtons={setDisableFormButtons}
+                                extraHTML={
+                                  (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                                }
+                              />
+                            );
+                          })}
                       </div>
                       <div className="RightSchema">
                         {schema
                           .filter((item) => schemaData.schema2.includes(item.name))
-                          .map((item: FormField) => (
-                            <Input
-                              {...item}
-                              peopleList={peopleList}
-                              newDesign={true}
-                              key={item.name}
-                              values={values}
-                              // disabled={readOnly}
-                              // readOnly={readOnly}
-                              errors={errors}
-                              scrollToTop={scrollToTop}
-                              value={values[item.name]}
-                              error={errors[item.name]}
-                              initialValues={initialValues}
-                              deleteErrors={() => {
-                                if (errors[item.name]) delete errors[item.name];
-                              }}
-                              handleChange={(e: any) => {
-                                setFieldValue(item.name, e);
-                              }}
-                              setFieldValue={(e, f) => {
-                                setFieldValue(e, f);
-                              }}
-                              setFieldTouched={setFieldTouched}
-                              handleBlur={() => setFieldTouched(item.name, false)}
-                              handleFocus={() => setFieldTouched(item.name, true)}
-                              setDisableFormButtons={setDisableFormButtons}
-                              extraHTML={
-                                (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                              }
-                            />
-                          ))}
+                          .map((item: FormField) => {
+                            return (
+                              <Input
+                                {...item}
+                                peopleList={peopleList}
+                                newDesign={true}
+                                key={item.name}
+                                values={values}
+                                // disabled={readOnly}
+                                // readOnly={readOnly}
+                                errors={errors}
+                                scrollToTop={scrollToTop}
+                                value={values[item.name]}
+                                error={errors[item.name]}
+                                initialValues={initialValues}
+                                deleteErrors={() => {
+                                  if (errors[item.name]) delete errors[item.name];
+                                }}
+                                handleChange={(e: any) => {
+                                  setFieldValue(item.name, e);
+                                }}
+                                setFieldValue={(e, f) => {
+                                  setFieldValue(e, f);
+                                }}
+                                setFieldTouched={setFieldTouched}
+                                handleBlur={() => setFieldTouched(item.name, false)}
+                                handleFocus={() => setFieldTouched(item.name, true)}
+                                setDisableFormButtons={setDisableFormButtons}
+                                extraHTML={
+                                  (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                                }
+                              />
+                            );
+                          })}
                       </div>
                     </SchemaTagsContainer>
                     <BottomContainer color={color} assigneeName={assigneeName}>
-                      <EuiText className="RequiredText">* {schemaData?.extraText}</EuiText>
+                      <EuiText className="RequiredText">{schemaData?.extraText}</EuiText>
                       <div
                         className="ButtonContainer"
                         style={{
                           width: stepTracker < 5 ? '45%' : '100%',
-                          height: stepTracker < 5 ? '48px' : '48px',
-                          marginTop: stepTracker <= 5 ? '-20px' : '-10px'
+                          height: stepTracker < 5 ? '48px' : '48px'
                         }}>
                         <div
                           className="nextButton"
@@ -830,16 +829,45 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
   flex-direction: column;
   justify-content: center;
   padding: 0px 48px;
-  .stepText {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 15px;
-    line-height: 18px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #3c3f41;
+  .TopContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .stepText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 18px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: ${(p) => p.color && p.color.black500};
+      .stepTextSpan {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 18px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: ${(p) => p.color && p.color.grayish.G300};
+      }
+    }
+    .schemaName {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 23px;
+      display: flex;
+      align-items: center;
+      text-align: right;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: ${(p) => p.color && p.color.grayish.G300};
+    }
   }
+
   .HeadingText {
     font-family: Barlow;
     font-size: 36px;
@@ -848,14 +876,6 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
     color: ${(p) => p?.color && p.color.grayish.G10};
     margin-bottom: 11px;
     margin-top: 16px;
-  }
-  .SubHeadingText {
-    font-family: Barlow;
-    font-size: 17px;
-    font-weight: 400;
-    line-height: 20px;
-    color: ${(p) => p?.color && p.color.grayish.G05};
-    margin-top: 15px;
   }
 `;
 
@@ -875,6 +895,7 @@ const SchemaTagsContainer = styled.div`
 const BottomContainer = styled.div<bottomButtonProps>`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0px 48px;
   .RequiredText {
     font-size: 13px;
@@ -949,9 +970,9 @@ const ChooseBountyContainer = styled.div<styledProps>`
     max-height: 352px;
     min-width: 290px;
     max-width: 290px;
-    background: #ffffff;
-    outline: 2px solid #dde1e5;
-    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.07);
+    background: ${(p) => p.color && p.color.pureWhite};
+    outline: 2px solid ${(p) => p.color && p.color.grayish.G600};
+    box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black100};
     border-radius: 20px;
     // margin-left: 34px;
     overflow: hidden;
@@ -961,11 +982,11 @@ const ChooseBountyContainer = styled.div<styledProps>`
       width: 100%;
     }
     :hover {
-      outline: 2px solid rgba(73, 201, 152, 0.5);
-      box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+      outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow};
+      box-shadow: 1px 1px 6px ${(p) => p.color && p.color.black85};
     }
     :active {
-      outline: 2px solid rgba(73, 201, 152, 0.5) !important;
+      outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
     }
     .TextButtonContainer {
       height: 218px;
@@ -984,7 +1005,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
         display: flex;
         align-items: center;
         text-align: center;
-        color: #444851;
+        color: ${(p) => p.color && p.color.grayish.G25};
       }
       .textBottom {
         height: 31px;
@@ -994,7 +1015,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
         font-size: 14px;
         line-height: 17px;
         text-align: center;
-        color: #8e969c;
+        color: ${(p) => p.color && p.color.grayish.G100};
       }
       .StartButton {
         height: 42px;
@@ -1002,9 +1023,9 @@ const ChooseBountyContainer = styled.div<styledProps>`
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #618aff;
-        box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
-        color: #fff;
+        background: ${(p) => p.color && p.color.button_secondary.main};
+        box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
+        color: ${(p) => p.color && p.color.pureWhite};
         border-radius: 32px;
         margin-top: 10px;
         font-family: 'Barlow';
@@ -1014,14 +1035,14 @@ const ChooseBountyContainer = styled.div<styledProps>`
         line-height: 19px;
         cursor: pointer;
         :hover {
-          background: #5881f8;
-          box-shadow: 0px 1px 5px rgba(97, 138, 255, 0.5);
+          background: ${(p) => p.color && p.color.button_secondary.hover};
+          box-shadow: 0px 1px 5px ${(p) => p.color && p.color.button_secondary.shadow};
         }
         :active {
-          background: #5078f2;
+          background: ${(p) => p.color && p.color.button_secondary.active};
         }
         :focus-visible {
-          outline: 2px solid rgba(73, 201, 152, 0.5) !important;
+          outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
         }
       }
       .ComingSoonContainer {
@@ -1042,7 +1063,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
           text-align: center;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #b0b7bc;
+          color: ${(p) => p.color && p.color.grayish.G300};
           margin-right: 18px;
           margin-left: 18px;
         }

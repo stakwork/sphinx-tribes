@@ -17,6 +17,7 @@ import CreatableMultiSelectInput from './creatable-multi-select-input';
 import Date from './widgets/date';
 import InvitePeopleSearch from './widgets/PeopleSearch';
 import { colors } from '../../colors';
+import LoomVideoInputNew from './loom-video-input-new';
 
 export default function Input(props: any) {
   const color = colors['light'];
@@ -39,7 +40,7 @@ export default function Input(props: any) {
       case 'number':
         return <NumberInput {...props} />;
       case 'loom':
-        return <LoomVideoInput {...props} />;
+        return props?.newDesign ? <LoomVideoInputNew {...props} /> : <LoomVideoInput {...props} />;
       case 'switch':
         return <SwitchInput {...props} />;
       case 'select':
