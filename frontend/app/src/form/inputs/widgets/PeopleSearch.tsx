@@ -194,11 +194,13 @@ const InvitePeopleSearch = (props) => {
                 </div>
                 {inviteNameId === value?.id ? (
                   <InvitedButton>
-                    <EuiText className="nextText">Invited</EuiText>
+                    <EuiText className="nextText">
+                      {props.newDesign ? 'Assigned' : 'Invited'}
+                    </EuiText>
                   </InvitedButton>
                 ) : (
                   <ImageButton
-                    buttonText={'Invite'}
+                    buttonText={props.newDesign ? 'Assign' : 'Invite'}
                     ButtonContainerStyle={{
                       width: '74.58px',
                       height: '32px'
