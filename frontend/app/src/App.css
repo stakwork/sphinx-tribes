@@ -1053,19 +1053,33 @@ input::-webkit-search-cancel-button {
 .euiSwitch.euiSwitch--compressed .euiSwitch__thumb {
   color: #fff;
   background-color: #fff !important;
+  border: none !important;
+  height: 18px;
+  width: 18px;
+  margin-top: 2px;
+  margin-left: 4px;
+  margin-right: -2px;
 }
 .euiSwitch .euiSwitch__button[aria-checked='true'] .euiSwitch__body {
   background-color: #49c998 !important;
+  height: 24px;
+  width: 40px;
+}
+.euiSwitch .euiSwitch__button[aria-checked='false'] .euiSwitch__body {
+  background-color: #d0d5d8 !important;
+  height: 24px;
+  width: 40px;
 }
 
 .euiPanel.euiPanel--plain.euiPopover__panel {
   background-color: #fff !important;
   border: 1px solid #82b4ff;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  border-top: 0px solid #fff !important;
+  border-top: 1px solid #ebedef !important;
   border-radius: 0px 0px 3px 3px;
   overflow: hidden !important;
-  width: 291px !important;
+  width: 292px !important;
+  margin-left: -1px !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
 .euiSuperSelect__listbox button:active {
   text-decoration: none;
@@ -1077,10 +1091,10 @@ input::-webkit-search-cancel-button {
 }
 
 .euiSuperSelect__listbox button {
-  padding: 4px 8px;
+  /* padding: 4px 8px; */
   text-decoration: none;
   text-transform: none;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .euiSuperSelect__listbox button:hover {

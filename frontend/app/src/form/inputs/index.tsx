@@ -18,6 +18,9 @@ import Date from './widgets/date';
 import InvitePeopleSearch from './widgets/PeopleSearch';
 import { colors } from '../../colors';
 import LoomVideoInputNew from './loom-video-input-new';
+import TextInputNew from './text-input-new';
+import NumberInputNew from './number-input-new';
+import TextAreaInputNew from './text-area-input-new';
 
 export default function Input(props: any) {
   const color = colors['light'];
@@ -26,9 +29,9 @@ export default function Input(props: any) {
       case 'space':
         return <div style={{ height: 10 }} />;
       case 'text':
-        return <TextInput {...props} />;
+        return props?.newDesign ? <TextInputNew {...props} /> : <TextInput {...props} />;
       case 'textarea':
-        return <TextAreaInput {...props} />;
+        return props?.newDesign ? <TextAreaInputNew {...props} /> : <TextAreaInput {...props} />;
       case 'search':
         return <SearchTextInput {...props} />;
       case 'img':
@@ -38,7 +41,7 @@ export default function Input(props: any) {
       case 'gallery':
         return <GalleryInput {...props} />;
       case 'number':
-        return <NumberInput {...props} />;
+        return props?.newDesign ? <NumberInputNew {...props} /> : <NumberInput {...props} />;
       case 'loom':
         return props?.newDesign ? <LoomVideoInputNew {...props} /> : <LoomVideoInput {...props} />;
       case 'switch':
@@ -71,6 +74,9 @@ export default function Input(props: any) {
 
 interface styledProps {
   color?: any;
+  height?: any;
+  width?: any;
+  isTextField?: any;
 }
 
 const FieldWrap = styled.div<styledProps>`
@@ -96,6 +102,9 @@ interface fieldEnvProps {
   isTop?: boolean;
   isFill?: boolean;
   color?: any;
+  height?: any;
+  width?: any;
+  isTextField?: any;
 }
 
 export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
@@ -110,20 +119,28 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
   box-shadow: none !important;
   max-width: 900px;
+  min-height: ${(p) => (p?.isTextField ? '40' : '')};
+  max-height: ${(p) => (p?.isTextField ? '40' : '')};
   margin-bottom: 24px;
   border: ${(p) => p?.isFill && `1px solid ${p.color.grayish.G600}`};
   .euiFormRow__labelWrapper {
     margin-bottom: -20px;
-    margin-top: 10px;
+    margin-top: ${(p) => (p?.isTextField ? '12px' : '10px')};
     padding-left: 10px;
-    height: 14px;
+    height: ${(p) => (p?.isTextField ? '6px' : '14px')};
     position: relative;
     label {
       color: ${(p) => p.color && p.color.grayish.G300} !important;
       background: ${(p) => p?.color && p.color.pureWhite};
       z-index: 10;
       position: ${(p) => p?.isTop && 'absolute'};
-      top: ${(p) => p?.isTop && '-20px'};
+      top: ${(p) => p?.isTop && '-20px'} !important;
+      font-family: Barlow;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
     }
   }
 `;
@@ -132,7 +149,9 @@ background-color: ${(p) => p?.color && p.color.pureWhite} !important;
 max-width:900px;
 background:${(p) => p?.color && p.color.pureWhite} !important;
 color:${(p) => (p.readOnly ? `${p.color.grayish.G60A}` : `${p.color.pureBlack}`)} !important;
-box-shadow:none !important;
+box-shadow: none !important;
+height: ${(p) => (p?.isTextField ? '12px' : '')}  ;
+margin-top: ${(p) => (p?.isTextField ? '2px' : '')}; 
 
 .euiFormRow__labelWrapper .euiFormControlLayout--group{
     background-color:${(p) => p?.color && p.color.pureWhite} !important;
@@ -144,6 +163,7 @@ box-shadow:none !important;
     background-color:${(p) => p?.color && p.color.pureWhite} !important;
     background:${(p) => p?.color && p.color.pureWhite} !important;
     box-shadow:none !important;
+    
 }
 
 .euiFormLabel euiFormControlLayout__prepend{
@@ -152,6 +172,7 @@ box-shadow:none !important;
     box-shadow:none !important;
     color: ${(p) => p?.color && p.color.grayish.G71} !important;s
     display:none !important;
+    line-height: 1rem;
 }
 
 .euiFormControlLayout--group {
@@ -165,9 +186,14 @@ box-shadow:none !important;
 
 `;
 export const FieldTextArea = styled(EuiTextArea)<styledProps>`
+  // min-height: ${(p) => p?.height && p.height} !important;
+  // max-height: ${(p) => p?.width && p.height} !important;
+  width: ${(p) => p?.color && p.color.width};
   background-color: ${(p) => p?.color && p.color.pureWhite} !important;
   background: ${(p) => p?.color && p.color.pureWhite} !important;
   max-width: 900px;
   color: ${(p) => p?.color && p.color.pureBlack} !important;
   box-shadow: none !important;
+  // border-bottom: ${(p) => p?.color && `1px solid ${p.color.grayish.G600}`};
+  line-height: 17.6px;
 `;

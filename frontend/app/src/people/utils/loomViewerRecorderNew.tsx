@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { setup, isSupported } from '@loomhq/record-sdk';
 import { Button, IconButton } from '../../sphinxUI';
 import styled from 'styled-components';
+import { colors } from '../../colors';
 
 const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';
 
@@ -12,6 +13,7 @@ const BUTTON_ID = 'loom-record-sdk-button';
 export default function LoomViewerRecorderNew(props) {
   const { loomEmbedUrl, onChange, readOnly, style } = props;
   const [videoUrl, setVideoUrl] = useState(loomEmbedUrl || '');
+  const color = colors['light'];
 
   useEffect(() => {
     async function setupLoom() {
@@ -87,7 +89,7 @@ export default function LoomViewerRecorderNew(props) {
               display: 'flex',
               alignItems: 'center',
               textAlign: 'center',
-              color: '#5F6368'
+              color: color.grayish.G50
             }}
           />
           {videoUrl ? (

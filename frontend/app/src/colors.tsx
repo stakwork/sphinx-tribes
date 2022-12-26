@@ -4,6 +4,7 @@ const palette = {
   blue3: '#45b9f6',
   borderBlue1: '#5078F2',
   light_blue100: '#a3c1ff',
+  light_blue200: 'rgba(130, 180, 255, 0.25)',
   textBlue1: '#A3C1FF',
   text1: '#292C33',
   text2: '#3C3F41',
