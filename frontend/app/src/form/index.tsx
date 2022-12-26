@@ -112,6 +112,7 @@ export default function Form(props: any) {
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
   const color = colors['light'];
+  const [isFocused, setIsFocused] = useState({});
 
   const [schemaData, setSchemaData] = useState(BountyDetailsCreationData.step_1);
   const [stepTracker, setStepTracker] = useState<number>(1);
@@ -497,6 +498,7 @@ export default function Form(props: any) {
                                 peopleList={peopleList}
                                 // disabled={readOnly}
                                 // readOnly={readOnly}
+                                isFocused={isFocused}
                                 errors={errors}
                                 scrollToTop={scrollToTop}
                                 value={values[item.name]}
@@ -512,8 +514,14 @@ export default function Form(props: any) {
                                   setFieldValue(e, f);
                                 }}
                                 setFieldTouched={setFieldTouched}
-                                handleBlur={() => setFieldTouched(item.name, false)}
-                                handleFocus={() => setFieldTouched(item.name, true)}
+                                handleBlur={() => {
+                                  setFieldTouched(item.name, false);
+                                  setIsFocused({ [item.label]: false });
+                                }}
+                                handleFocus={() => {
+                                  setFieldTouched(item.name, true);
+                                  setIsFocused({ [item.label]: true });
+                                }}
                                 setDisableFormButtons={setDisableFormButtons}
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
@@ -543,6 +551,7 @@ export default function Form(props: any) {
                                 deleteErrors={() => {
                                   if (errors[item.name]) delete errors[item.name];
                                 }}
+                                isFocused={isFocused}
                                 handleChange={(e: any) => {
                                   setFieldValue(item.name, e);
                                 }}
@@ -550,8 +559,14 @@ export default function Form(props: any) {
                                   setFieldValue(e, f);
                                 }}
                                 setFieldTouched={setFieldTouched}
-                                handleBlur={() => setFieldTouched(item.name, false)}
-                                handleFocus={() => setFieldTouched(item.name, true)}
+                                handleBlur={() => {
+                                  setFieldTouched(item.name, false);
+                                  setIsFocused({ [item.label]: false });
+                                }}
+                                handleFocus={() => {
+                                  setFieldTouched(item.name, true);
+                                  setIsFocused({ [item.label]: true });
+                                }}
                                 setDisableFormButtons={setDisableFormButtons}
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
@@ -638,8 +653,15 @@ export default function Form(props: any) {
                         setFieldValue(e, f);
                       }}
                       setFieldTouched={setFieldTouched}
-                      handleBlur={() => setFieldTouched(item.name, false)}
-                      handleFocus={() => setFieldTouched(item.name, true)}
+                      isFocused={isFocused}
+                      handleBlur={() => {
+                        setFieldTouched(item.name, false);
+                        setIsFocused({ [item.label]: false });
+                      }}
+                      handleFocus={() => {
+                        setFieldTouched(item.name, true);
+                        setIsFocused({ [item.label]: true });
+                      }}
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                     />

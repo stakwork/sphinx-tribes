@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
 import { colors } from '../colors';
+import { StylesConfig } from 'react-select';
+import { ColourOption, colourOptions } from '../people/utils/language_label_style';
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
@@ -9,10 +11,13 @@ export default function Sel(props: any) {
   const color = colors['light'];
 
   const opts =
-    options.map((o) => {
+    colourOptions.map((o) => {
       return {
         value: o.value,
-        label: o.label
+        label: o.label,
+        color: o.color,
+        background: o.background,
+        border: o.border
       };
     }) || [];
 
@@ -32,6 +37,48 @@ export default function Sel(props: any) {
           setIsTop(true);
         }}
         className={'multi-select-input'}
+        styles={{
+          control: (styles) => ({ ...styles, backgroundColor: 'white' }),
+          option: (styles, { data }: any) => {
+            return {
+              ...styles,
+              backgroundColor: '#fff',
+              color: color.text2,
+              fontFamily: 'Barlow',
+              fontSize: '14px',
+              fontWeight: '500',
+              ':hover': {
+                background: color.light_blue200
+              }
+            };
+          },
+          multiValue: (styles, { data }: any) => {
+            return {
+              ...styles,
+              backgroundColor: data.background,
+              border: data.border,
+              color: data.color,
+              fontFamily: 'Barlow',
+              fontSize: '14px',
+              fontWeight: '500'
+            };
+          },
+          multiValueLabel: (styles, { data }: any) => ({
+            ...styles,
+            background: data.background,
+            color: data.color,
+            border: data.border
+          }),
+          multiValueRemove: (styles, { data }: any) => ({
+            ...styles,
+            color: data.color,
+            backgroundColor: data.background,
+            ':hover': {
+              backgroundColor: data.background,
+              color: data.color
+            }
+          })
+        }}
       />
     </div>
   );

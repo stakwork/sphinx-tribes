@@ -16,6 +16,7 @@ export interface Props {
   error: string;
   borderType?: 'bottom' | 'outline';
   imageIcon?: boolean;
+  isFocused?: any;
 
   notProfilePic?: boolean;
 }

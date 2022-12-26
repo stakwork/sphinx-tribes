@@ -24,15 +24,13 @@ export default function SelectInput({
   const color = colors['light'];
   if (error) labeltext = `${labeltext} (${error})`;
   const [active, setActive] = useState<boolean>(false);
-
   return (
     <OuterContainer color={color}>
       <FieldEnv
         color={color}
         label={labeltext}
         onClick={() => {}}
-        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
-      >
+        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}>
         <R>
           <Select
             name={'first'}
@@ -90,23 +88,31 @@ const R = styled.div`
 `;
 
 const OuterContainer = styled.div<styledProps>`
+  box-shadow: 0px 1px 2px ${(p) => p.color && p.color.black100} !important ;
+
   .euiFormRow_filed {
     position: relative;
     .euiFormRow__labelWrapper {
       margin-bottom: 0px;
-      margin-top: -9px;
+      margin-top: -10px;
       padding-left: 10px;
       height: 14px;
+      transition: all 0.4s;
       label {
         color: ${(p) => p?.color && p?.color.grayish.G300} !important;
         background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
+      
     }
+    
   }
   .euiFormRow_active {
     padding: 1px 0;
     border: 1px solid ${(p) => p?.color && p?.color.blue2};
     }
+  }
+  .euiFormControlLayoutCustomIcon{
+    color: ${(p) => p.color && p.color.text2_4} 
   }
 `;
