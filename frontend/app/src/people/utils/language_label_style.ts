@@ -290,3 +290,92 @@ export const colourOptions: readonly ColourOption[] = [
     color: '#FF8D85'
   }
 ];
+
+export const BountyDetailsCreationData = {
+  step_1: {
+    step: 1,
+    schemaName: '',
+    heading: 'Choose Bounty type',
+    sub_heading: '',
+    schema: [''],
+    schema2: [''],
+    required: [''],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '560px'
+    },
+    headingStyle: {},
+    extraText: ''
+  },
+  step_2: {
+    step: 2,
+    schemaName: 'Freelance Job Request',
+    heading: 'Basic info',
+    sub_heading: ' ',
+    schema: ['one_sentence_summary', 'ticketUrl'],
+    schema2: ['wanted_type', 'codingLanguage'],
+    required: ['one_sentence_summary'],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '416px'
+    },
+    headingStyle: {
+      marginBottom: '40px'
+    },
+    extraText: '* Required fields'
+  },
+  step_3: {
+    step: 3,
+    schemaName: 'Freelance Job Request',
+    heading: 'Description',
+    sub_heading: ' ',
+    schema: ['github_description', 'description'],
+    schema2: [' ', 'loomEmbedUrl'],
+    required: [''],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '488px'
+    },
+    headingStyle: {
+      marginBottom: '34px'
+    },
+    extraText: '* Required fields'
+  },
+  step_4: {
+    step: 4,
+    schemaName: 'Freelance Job Request',
+    heading: 'Price and Estimate',
+    sub_heading: ' ',
+    schema: ['price', 'estimate_session_length', 'estimated_completion_date'],
+    schema2: ['tribe', 'deliverables', 'show'],
+    required: ['price'],
+    outerContainerStyle: {
+      minWidth: '712px',
+      maxWidth: '712px',
+      height: '528px'
+    },
+    headingStyle: {
+      marginBottom: '50px'
+    },
+    extraText: '* Required fields'
+  },
+  step_5: {
+    step: 5,
+    schemaName: '',
+    heading: 'Assign Developer',
+    sub_heading: '',
+    schema: ['assignee'],
+    schema2: [''],
+    required: [''],
+    outerContainerStyle: {
+      minWidth: '388px',
+      maxWidth: '388px',
+      height: '100%'
+    },
+    headingStyle: {},
+    extraText: ''
+  }
+};
