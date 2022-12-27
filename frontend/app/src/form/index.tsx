@@ -12,90 +12,7 @@ import { EuiText } from '@elastic/eui';
 import api from '../api';
 import ImageButton from '../sphinxUI/Image_button';
 import { colors } from '../colors';
-
-const BountyDetailsCreationData = {
-  step_1: {
-    step: 1,
-    schemaName: '',
-    heading: 'Choose Bounty type',
-    sub_heading: '',
-    schema: [''],
-    schema2: [''],
-    outerContainerStyle: {
-      minWidth: '712px',
-      maxWidth: '712px',
-      height: '560px'
-    },
-    headingStyle: {},
-    extraText: ''
-  },
-  step_2: {
-    step: 2,
-    schemaName: 'Freelance Job Request',
-    heading: 'Basic info',
-    sub_heading: ' ',
-    schema: ['one_sentence_summary', 'ticketUrl'],
-    schema2: ['wanted_type', 'codingLanguage'],
-    outerContainerStyle: {
-      minWidth: '712px',
-      maxWidth: '712px',
-      height: '416px'
-    },
-    headingStyle: {
-      marginBottom: '40px'
-    },
-    extraText: '* Required fields'
-  },
-  step_3: {
-    step: 3,
-    schemaName: 'Freelance Job Request',
-    heading: 'Description',
-    sub_heading: ' ',
-    schema: ['github_description', 'description'],
-    schema2: [' ', 'loomEmbedUrl'],
-    outerContainerStyle: {
-      minWidth: '712px',
-      maxWidth: '712px',
-      height: '488px'
-    },
-    headingStyle: {
-      marginBottom: '34px'
-    },
-    extraText: '* Required fields'
-  },
-  step_4: {
-    step: 4,
-    schemaName: 'Freelance Job Request',
-    heading: 'Price and Estimate',
-    sub_heading: ' ',
-    schema: ['price', 'estimate_session_length', 'estimated_completion_date'],
-    schema2: ['tribe', 'deliverables', 'show'],
-    outerContainerStyle: {
-      minWidth: '712px',
-      maxWidth: '712px',
-      height: '528px'
-    },
-    headingStyle: {
-      marginBottom: '50px'
-    },
-    extraText: '* Required fields'
-  },
-  step_5: {
-    step: 5,
-    schemaName: '',
-    heading: 'Assign Developer',
-    sub_heading: '',
-    schema: ['assignee'],
-    schema2: [''],
-    outerContainerStyle: {
-      minWidth: '388px',
-      maxWidth: '388px',
-      height: '592px'
-    },
-    headingStyle: {},
-    extraText: ''
-  }
-};
+import { BountyDetailsCreationData } from '../people/utils/language_label_style';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
@@ -277,6 +194,7 @@ export default function Form(props: any) {
         isValid,
         initialValues
       }) => {
+        const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
         return (
           <Wrap
             ref={refBody}
@@ -576,38 +494,48 @@ export default function Form(props: any) {
                           })}
                       </div>
                     </SchemaTagsContainer>
-                    <BottomContainer color={color} assigneeName={assigneeName}>
+                    <BottomContainer color={color} assigneeName={assigneeName} valid={valid}>
                       <EuiText className="RequiredText">{schemaData?.extraText}</EuiText>
                       <div
                         className="ButtonContainer"
                         style={{
                           width: stepTracker < 5 ? '45%' : '100%',
-                          height: stepTracker < 5 ? '48px' : '48px'
+                          height: stepTracker < 5 ? '48px' : '48px',
+                          marginTop: stepTracker === 5 ? '20px' : ''
                         }}>
-                        <div
-                          className="nextButton"
-                          onClick={() => {
-                            if (schemaData.step === 5) {
-                              if (dynamicSchemaName) {
-                                setFieldValue('type', dynamicSchemaName);
-                              }
-                              if (assigneeName !== '') {
-                                handleSubmit();
+                        {!valid && (
+                          <div className="nextButtonDisable">
+                            <EuiText className="disableText">Next</EuiText>
+                          </div>
+                        )}
+                        {valid && (
+                          <div
+                            className="nextButton"
+                            onClick={() => {
+                              if (schemaData.step === 5 && valid) {
+                                if (dynamicSchemaName) {
+                                  setFieldValue('type', dynamicSchemaName);
+                                }
+                                if (assigneeName !== '') {
+                                  handleSubmit();
+                                } else {
+                                  setAssigneeName('a');
+                                }
                               } else {
-                                setAssigneeName('a');
+                                if (valid) {
+                                  NextStepHandler();
+                                }
                               }
-                            } else {
-                              NextStepHandler();
-                            }
-                          }}>
-                          {assigneeName === '' ? (
-                            <EuiText className="nextText">
-                              {schemaData.step === 5 ? 'Decide Later' : 'Next'}
-                            </EuiText>
-                          ) : (
-                            <EuiText className="nextText">Finish</EuiText>
-                          )}
-                        </div>
+                            }}>
+                            {assigneeName === '' ? (
+                              <EuiText className="nextText">
+                                {schemaData.step === 5 ? 'Decide Later' : 'Next'}
+                              </EuiText>
+                            ) : (
+                              <EuiText className="nextText">Finish</EuiText>
+                            )}
+                          </div>
+                        )}
                         {schemaData.step > 1 && (
                           <>
                             <ImageButton
@@ -830,6 +758,7 @@ interface BWrapProps {
 interface bottomButtonProps {
   assigneeName?: string;
   color?: any;
+  valid?: any;
 }
 
 const BWrap = styled.div<styledProps>`
@@ -933,6 +862,28 @@ const BottomContainer = styled.div<bottomButtonProps>`
     justify-content: space-between;
     align-items: center;
   }
+  .nextButtonDisable {
+    width: 145px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: ${(p) => p?.color && p.color.grayish.G950};
+    border-radius: 32px;
+    user-select: none;
+    .disableText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 19px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: ${(p) => p?.color && p.color.grayish.G300};
+    }
+  }
   .nextButton {
     width: 145px;
     height: 42px;
@@ -993,7 +944,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
     min-width: 290px;
     max-width: 290px;
     background: ${(p) => p.color && p.color.pureWhite};
-    outline: 2px solid ${(p) => p.color && p.color.grayish.G600};
+    border: 1px solid ${(p) => p.color && p.color.grayish.G600};
     box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black100};
     border-radius: 20px;
     // margin-left: 34px;
@@ -1004,11 +955,11 @@ const ChooseBountyContainer = styled.div<styledProps>`
       width: 100%;
     }
     :hover {
-      outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow};
+      border: 2px solid ${(p) => p.color && p.color.button_primary.shadow};
       box-shadow: 1px 1px 6px ${(p) => p.color && p.color.black85};
     }
     :active {
-      outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
+      border: 1px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
     }
     .TextButtonContainer {
       height: 218px;
