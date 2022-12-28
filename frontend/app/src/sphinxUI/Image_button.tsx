@@ -8,15 +8,13 @@ const ImageButton = (props) => {
       onClick={props?.buttonAction}
       style={{
         ...props.ButtonContainerStyle
-      }}
-    >
+      }}>
       {props.leadingImageSrc && (
         <div
           className="leadingImageContainer"
           style={{
             ...props.leadingImageContainerStyle
-          }}
-        >
+          }}>
           <img
             className="buttonImage"
             src={props.leadingImageSrc}
@@ -30,8 +28,7 @@ const ImageButton = (props) => {
         className="ButtonText"
         style={{
           ...props.buttonTextStyle
-        }}
-      >
+        }}>
         {props.buttonText}
       </EuiText>
       {props.endImageSrc && (
@@ -39,14 +36,13 @@ const ImageButton = (props) => {
           className="ImageContainer"
           style={{
             ...props.endingImageContainerStyle
-          }}
-        >
+          }}>
           <img
             className="buttonImage"
             src={props.endImageSrc}
-            alt={''}
-            height={'14px'}
-            width={'14px'}
+            alt={'button_end_icon'}
+            height={'12px'}
+            width={'12px'}
           />
         </div>
       )}

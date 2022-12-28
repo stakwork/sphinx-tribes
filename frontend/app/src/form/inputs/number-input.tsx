@@ -61,11 +61,11 @@ export default function NumberInput({
               setActive(true);
             }}
           />
-          {error && (
+          {/* {error && (
             <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
-          )}
+          )} */}
         </R>
       </FieldEnv>
       {note && <Note color={color}>*{note}</Note>}

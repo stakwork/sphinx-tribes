@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { EuiFormRow, EuiTextArea, EuiIcon } from '@elastic/eui';
+import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldTextArea, Note } from './index';
 import { colors } from '../../colors';
+
+const StyleOnText = {
+  Description: {
+    height: '172px',
+    width: '292px'
+  },
+  Deliverables: {
+    height: '135px',
+    width: '192px'
+  }
+};
 
 export default function TextAreaInput({
   error,
@@ -18,8 +29,6 @@ export default function TextAreaInput({
   extraHTML,
   borderType
 }: Props) {
-  // console.log("TEXTAREA", label, extraHTML)
-
   let labeltext = label;
   const color = colors['light'];
   if (error) labeltext = `${labeltext} (${error})`;
@@ -34,10 +43,13 @@ export default function TextAreaInput({
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
         label={labeltext}
-      >
+        height={StyleOnText[label].height}
+        width={StyleOnText[label].width}>
         <R>
           <FieldTextArea
             color={color}
+            height={StyleOnText[label].height}
+            width={StyleOnText[label].width}
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
@@ -50,7 +62,8 @@ export default function TextAreaInput({
               handleFocus(e);
               setActive(true);
             }}
-            rows={4}
+            rows={label === 'Description' ? 8 : 6}
+
             // prepend={prepend}
           />
           {error && (

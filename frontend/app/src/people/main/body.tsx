@@ -831,17 +831,13 @@ export default function BodyComponent({ selectedWidget }) {
               maxHeight: '100%',
               borderRadius: '10px'
             }}
-            // nextArrow={nextIndex}
-            // prevArrow={prevIndex}
             overlayClick={() => {
               setShowFocusView(false);
               setFocusIndex(-1);
-              // if (selectedWidget === 'about') switchWidgets('badges');
             }}
             bigCloseImage={() => {
               setShowFocusView(false);
               setFocusIndex(-1);
-              // if (selectedWidget === 'about') switchWidgets('badges');
             }}
             bigCloseImageStyle={{
               top: '-18px',
@@ -851,6 +847,7 @@ export default function BodyComponent({ selectedWidget }) {
             }}
           >
             <FocusedView
+              ReCallBounties={ReCallBounties}
               newDesign={true}
               person={person}
               canEdit={!canEdit}

@@ -35,7 +35,8 @@ export default function TextInput({
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
         label={labeltext}
-      >
+        isTextField={true}
+        error={error}>
         <R>
           <FieldText
             color={color}
@@ -53,10 +54,11 @@ export default function TextInput({
             }}
             prepend={prepend}
             style={padStyle}
+            isTextField={true}
           />
           {error && (
             <E color={color}>
-              <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
+              {/* <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} /> */}
             </E>
           )}
         </R>

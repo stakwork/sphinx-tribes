@@ -23,7 +23,6 @@ const InvitePeopleSearch = (props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [labels, setLabels] = useState<any>([]);
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
-
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
 
@@ -70,43 +69,69 @@ const InvitePeopleSearch = (props) => {
   }, []);
 
   const onChange = (optionId) => {
-    const newCheckboxIdToSelectedMap = {
-      ...checkboxIdToSelectedMap,
-      ...{
-        [optionId]: !checkboxIdToSelectedMap[optionId]
+    let trueCount = 0;
+    for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
+      if (value) {
+        trueCount += 1;
       }
-    };
+    }
+    if (!(!checkboxIdToSelectedMap[optionId] && trueCount >= 4)) {
+      const newCheckboxIdToSelectedMap = {
+        ...checkboxIdToSelectedMap,
+        ...{
+          [optionId]: !checkboxIdToSelectedMap[optionId]
+        }
+      };
 
-    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+      setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+    }
   };
 
   return (
     <SearchOuterContainer color={color}>
       <div className="SearchSkillContainer">
-        <input
-          value={searchValue}
-          className="SearchInput"
-          onChange={(e) => {
-            handler(e, '');
-          }}
-          placeholder={'Type to search ...'}
-          style={{
-            background: color.pureWhite,
-            color: color.text1,
-            fontFamily: 'Barlow'
-          }}
-        />
+        <div className="SearchContainer">
+          <input
+            value={searchValue}
+            className="SearchInput"
+            onChange={(e) => {
+              handler(e, '');
+            }}
+            placeholder={'Type to search ...'}
+            style={{
+              background: color.pureWhite,
+              color: color.text1,
+              fontFamily: 'Barlow'
+            }}
+          />
+          {searchValue !== '' && (
+            <div
+              className="ImageContainer"
+              onClick={() => {
+                setSearchValue('');
+              }}>
+              <img
+                className="crossImage"
+                src="/static/search_cross.svg"
+                alt="cross_icon"
+                height={'12px'}
+                width={'12px'}
+              />
+            </div>
+          )}
+        </div>
+
         <EuiPopover
           className="EuiPopOver"
           anchorPosition="downRight"
           panelStyle={{
-            marginTop: '-8px',
-            boxShadow: 'none',
+            marginTop: '-9px',
+            boxShadow: 'none !important',
             borderRadius: '6px 0px 6px 6px',
             backgroundImage: "url('/static/panel_bg.svg')",
             backgroundRepeat: 'no-repeat',
-            // backgroundSize: 'cover'
-            outline: 'none'
+            outline: 'none',
+            border: 'none'
           }}
           button={
             <ImageButton
@@ -119,7 +144,9 @@ const InvitePeopleSearch = (props) => {
                 borderRadius: !isPopoverOpen ? '4px' : '4px 4px 0px 0px',
                 display: 'flex',
                 justifyContent: 'flex-start',
-                paddingLeft: '18px'
+                paddingLeft: '18px',
+                marginRight: '1px',
+                marginTop: isPopoverOpen ? '0.9px' : '0px'
               }}
               endImageSrc={'/static/Skill_drop_down.svg'}
               endingImageContainerStyle={{
@@ -127,7 +154,7 @@ const InvitePeopleSearch = (props) => {
                 top: -2
               }}
               buttonTextStyle={{
-                color: '#B0B7BC',
+                color: !isPopoverOpen ? '#B0B7BC' : '#3C3F41',
                 textAlign: 'center',
                 fontSize: '13px',
                 fontWeight: '400',
@@ -151,14 +178,22 @@ const InvitePeopleSearch = (props) => {
           </EuiPopOverCheckbox>
         </EuiPopover>
       </div>
-      <LabelsContainer>
-        {labels &&
+
+      <LabelsContainer
+        style={{
+          padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
+        }}>
+        {!isPopoverOpen &&
+          labels &&
           labels?.map((x, index) => (
             <Label
               key={x.label}
               value={x}
               onClick={() => {
                 onChange(x.label);
+              }}
+              style={{
+                margin: 4
               }}>
               <EuiText className="labelText">{x.label}</EuiText>
               <SvgMask
@@ -188,20 +223,48 @@ const InvitePeopleSearch = (props) => {
                       alt={'user-image'}
                       height={'100%'}
                       width={'100%'}
+                      style={{
+                        opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
+                      }}
                     />
                   </div>
-                  <EuiText className="PeopleName">{value.owner_alias}</EuiText>
+                  <EuiText
+                    className="PeopleName"
+                    style={{
+                      opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
+                    }}>
+                    {value.owner_alias}
+                  </EuiText>
                 </div>
                 {inviteNameId === value?.id ? (
-                  <InvitedButton>
-                    <EuiText className="nextText">Invited</EuiText>
+                  <InvitedButton
+                    color={color}
+                    onClick={(e) => {
+                      handler('', value.owner_alias);
+                      setInviteNameId(0);
+                      props?.handleChange({
+                        owner_alias: '',
+                        owner_pubkey: '',
+                        img: '',
+                        value: '',
+                        label: ''
+                      });
+                      if (searchValue === '') {
+                        setSearchValue('');
+                      }
+                      props.setAssigneefunction('');
+                    }}>
+                    <EuiText className="nextText">
+                      {props.newDesign ? 'Unassign' : 'Invited'}
+                    </EuiText>
                   </InvitedButton>
                 ) : (
                   <ImageButton
-                    buttonText={'Invite'}
+                    buttonText={props.newDesign ? 'Assign' : 'Invite'}
                     ButtonContainerStyle={{
-                      width: '74.58px',
-                      height: '32px'
+                      width: '86px',
+                      height: '30px',
+                      background: '#DDE1E5'
                     }}
                     buttonAction={(e) => {
                       if (props.isProvidingHandler) {
@@ -218,7 +281,9 @@ const InvitePeopleSearch = (props) => {
                             .toLowerCase()
                             .replace(' ', '')})`
                         });
-                        setSearchValue(value.owner_alias);
+                        if (searchValue === '') {
+                          setSearchValue('');
+                        }
                         props.setAssigneefunction(value.owner_alias);
                       }
                     }}
@@ -270,44 +335,64 @@ const SearchOuterContainer = styled.div<styledProps>`
     justify-content: center;
     margin-bottom: 8px;
     height: fit-content;
-    .SearchInput {
-      background: ${(p) => p?.color && p?.color?.pureWhite};
-      border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
-      border-radius: 4px;
-      width: 177px;
-      height: 40px;
-      outline: none;
-      overflow: hidden;
-      caret-color: ${(p) => p?.color && p?.color?.textBlue1};
-      padding: 0px 18px;
-      margin-right: 11px;
-      font-family: Roboto !important;
-      font-weight: 400;
-      font-size: 13px;
-      line-height: 35px;
-
-      :focus-visible {
+    .SearchContainer {
+      position: relative;
+      .SearchInput {
         background: ${(p) => p?.color && p?.color?.pureWhite};
-        border: 1px solid ${(p) => p?.color && p?.color?.blue2};
+        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
+        border-radius: 4px;
+        width: 177px;
+        height: 40px;
         outline: none;
-        .SearchText {
-          outline: none;
-          background: ${(p) => p?.color && p?.color?.pureWhite};
-          border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
-          outline: none;
-        }
-      }
-      ::placeholder {
-        color: ${(p) => p?.color && p?.color?.grayish.G300};
-        font-family: 'Roboto';
-        font-style: normal;
+        overflow: hidden;
+        caret-color: ${(p) => p?.color && p?.color?.textBlue1};
+        padding: 0px 32px 0px 18px;
+        margin-right: 11px;
+        font-family: Roboto !important;
         font-weight: 400;
         font-size: 13px;
         line-height: 35px;
+
+        :focus-visible {
+          background: ${(p) => p?.color && p?.color?.pureWhite};
+          border: 1px solid ${(p) => p?.color && p?.color?.blue2};
+          outline: none;
+          .SearchText {
+            outline: none;
+            background: ${(p) => p?.color && p?.color?.pureWhite};
+            border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
+            outline: none;
+          }
+        }
+        ::placeholder {
+          color: ${(p) => p?.color && p?.color?.grayish.G300};
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 13px;
+          line-height: 35px;
+          display: flex;
+          align-items: center;
+        }
+      }
+      .ImageContainer {
+        height: 40px;
+        width: 43px;
+        position: absolute;
+        top: 0px;
+        right: 10px;
         display: flex;
+        justify-content: center;
         align-items: center;
+        :active {
+          .crossImage {
+            filter: brightness(0) saturate(100%) invert(22%) sepia(5%) saturate(563%)
+              hue-rotate(161deg) brightness(91%) contrast(86%) !important;
+          }
+        }
       }
     }
+
     .EuiPopOver {
       margin-top: 0px;
       .SkillSetContainer {
@@ -326,9 +411,11 @@ const SearchOuterContainer = styled.div<styledProps>`
 
   .OuterContainer {
     width: 412px;
-    background: ${(p) => p?.color && p?.color?.grayish.G950};
+    background: ${(p) => p?.color && p.color.grayish.G950};
+    box-shadow: inset 0px 2px 8px ${(p) => p?.color && p.color.black100};
     .PeopleList {
       background: ${(p) => p?.color && p?.color?.grayish.G950};
+      box-shadow: inset 0px 2px 8px ${(p) => p?.color && p.color.black100};
       width: 400px;
       padding: 0 49px 16px;
       min-height: 256px;
@@ -429,7 +516,7 @@ const LabelsContainer = styled.div<labelProps>`
   flex-direction: row;
   justify-content: flex-start;
   flex-wrap: wrap;
-  min-height: 70px;
+  min-height: 24px;
   width: 100%;
 `;
 
@@ -455,22 +542,22 @@ const Label = styled.div<labelProps>`
   }
 `;
 
-const InvitedButton = styled.div`
-  width: 74.58px;
-  height: 32px;
+const InvitedButton = styled.div<styledProps>`
+  width: 86px;
+  height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  background: #618aff;
-  box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
+  background: ${(p) => p.color && p.color.button_secondary.main};
+  box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
   border-radius: 32px;
-  color: #fff;
+  color: ${(p) => p.color && p.color.pureWhite};
   :hover {
-    background: #5881f8;
+    background: ${(p) => p.color && p.color.button_secondary.hover};
   }
   :active {
-    background: #5078f2;
+    background: ${(p) => p.color && p.color.button_secondary.active};
   }
   .nextText {
     font-family: Barlow;
