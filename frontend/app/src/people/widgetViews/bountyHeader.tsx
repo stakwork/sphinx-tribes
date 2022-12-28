@@ -10,7 +10,7 @@ import IconButton from '../../sphinxUI/icon_button';
 import ImageButton from '../../sphinxUI/Image_button';
 import SearchBar from '../../sphinxUI/search_bar';
 import { useStores } from '../../store';
-import { filterCount } from '../../utils/ExtraFucntions';
+import { filterCount } from '../utils/ExtraFunctions';
 import { coding_languages, GetValue, status } from '../utils/language_label_style';
 import StartUpModal from '../utils/start_up_modal';
 
