@@ -183,7 +183,8 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}>
+      validationSchema={validator(schema)}
+    >
       {({
         setFieldTouched,
         handleSubmit,
@@ -203,7 +204,8 @@ export default function Form(props: any) {
               ...wrapStyle,
               ...schemaData.outerContainerStyle
             }}
-            newDesign={props?.newDesign}>
+            newDesign={props?.newDesign}
+          >
             {/* schema flipping dropdown */}
             {/* {dynamicSchema && (
               <Select
@@ -228,7 +230,8 @@ export default function Form(props: any) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
-                  }}>
+                  }}
+                >
                   <div style={{ marginRight: '40px' }}>
                     {schema
                       .filter((item: FormField) => item.type === 'img')
@@ -326,7 +329,8 @@ export default function Form(props: any) {
                       <BountyContainer
                         key={v.label}
                         color={color}
-                        show={v.value === 'freelance_job_request' ? true : false}>
+                        show={v.value === 'freelance_job_request' ? true : false}
+                      >
                         <div className="freelancerContainer">
                           <div
                             style={{
@@ -336,7 +340,8 @@ export default function Form(props: any) {
                               width: '290px',
                               background: color.white100,
                               borderRadius: '20px 20px 0px 0px'
-                            }}>
+                            }}
+                          >
                             <div
                               style={{
                                 height: '100%',
@@ -344,7 +349,8 @@ export default function Form(props: any) {
                                 justifyContent: 'center',
                                 alignItems: 'flex-end',
                                 position: 'relative'
-                              }}>
+                              }}
+                            >
                               <img
                                 src={
                                   v.value === 'freelance_job_request'
@@ -375,7 +381,8 @@ export default function Form(props: any) {
                                   NextStepHandler();
                                   setDynamicSchemaName(v.value);
                                   setDynamicSchema(v.schema);
-                                }}>
+                                }}
+                              >
                                 Start
                               </div>
                             ) : (
@@ -505,7 +512,8 @@ export default function Form(props: any) {
                           width: stepTracker < 5 ? '45%' : '100%',
                           height: stepTracker < 5 ? '48px' : '48px',
                           marginTop: stepTracker === 5 ? '20px' : ''
-                        }}>
+                        }}
+                      >
                         {!valid && (
                           <div className="nextButtonDisable">
                             <EuiText className="disableText">Next</EuiText>
@@ -529,7 +537,8 @@ export default function Form(props: any) {
                                   NextStepHandler();
                                 }
                               }
-                            }}>
+                            }}
+                          >
                             {assigneeName === '' ? (
                               <EuiText className="nextText">
                                 {schemaData.step === 5 ? 'Decide Later' : 'Next'}
@@ -679,7 +688,8 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}>
+                  onClick={() => setShowSettings(!showSettings)}
+                >
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -709,7 +719,8 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}>
+                      }}
+                    >
                       <Button
                         text={'Nevermind'}
                         color={'white'}
