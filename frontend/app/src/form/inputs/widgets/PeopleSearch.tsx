@@ -23,7 +23,6 @@ const InvitePeopleSearch = (props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [labels, setLabels] = useState<any>([]);
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
-
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
 
@@ -70,14 +69,22 @@ const InvitePeopleSearch = (props) => {
   }, []);
 
   const onChange = (optionId) => {
-    const newCheckboxIdToSelectedMap = {
-      ...checkboxIdToSelectedMap,
-      ...{
-        [optionId]: !checkboxIdToSelectedMap[optionId]
+    let trueCount = 0;
+    for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
+      if (value) {
+        trueCount += 1;
       }
-    };
+    }
+    if (!(!checkboxIdToSelectedMap[optionId] && trueCount >= 4)) {
+      const newCheckboxIdToSelectedMap = {
+        ...checkboxIdToSelectedMap,
+        ...{
+          [optionId]: !checkboxIdToSelectedMap[optionId]
+        }
+      };
 
-    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+      setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+    }
   };
 
   return (
@@ -171,11 +178,13 @@ const InvitePeopleSearch = (props) => {
           </EuiPopOverCheckbox>
         </EuiPopover>
       </div>
+
       <LabelsContainer
         style={{
-          padding: labels.length > 0 ? '16px 0px 24px 0px' : ''
+          padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
         }}>
-        {labels &&
+        {!isPopoverOpen &&
+          labels &&
           labels?.map((x, index) => (
             <Label
               key={x.label}
