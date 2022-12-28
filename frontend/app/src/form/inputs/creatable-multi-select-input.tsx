@@ -32,7 +32,8 @@ export default function CreatableMultiSelectInput({
         color={color}
         label={labeltext}
         isTop={isTop || value?.length > 0}
-        isFill={value?.length > 0}>
+        isFill={value?.length > 0}
+      >
         <R>
           <CreatableMultiSelect
             selectStyle={{ border: 'none' }}
