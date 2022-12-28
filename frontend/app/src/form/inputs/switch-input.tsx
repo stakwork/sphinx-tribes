@@ -39,6 +39,7 @@ export default function SwitchInput({
       <Container color={color}>
         <EuiText className="Label">{label}</EuiText>
         <EuiSwitch
+          className="switcher"
           label=""
           checked={value}
           onChange={(e) => {
@@ -77,16 +78,16 @@ const ExtraText = styled.div<styledProps>`
 const Container = styled.div<styledProps>`
   padding: 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   .Label {
-    font-family: 'Roboto';
+    font-family: 'Barlow';
     font-style: normal;
-    font-weight: 400;
-    font-size: 13px;
+    font-weight: 500;
+    font-size: 14px;
     line-height: 35px;
     display: flex;
     align-items: center;
-    color: ${(p) => p?.color && p?.color.grayish.G05};
+    color: #292c33;
+    margin-right: 4px;
   }
 `;

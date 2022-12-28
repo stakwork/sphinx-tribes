@@ -3,7 +3,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import Input from './inputs';
-import { Button, IconButton, Modal } from '../sphinxUI';
+import { Button, Divider, IconButton, Modal } from '../sphinxUI';
 import { useStores } from '../store';
 import Select from '../sphinxUI/select';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
@@ -12,30 +12,7 @@ import { EuiText } from '@elastic/eui';
 import api from '../api';
 import ImageButton from '../sphinxUI/Image_button';
 import { colors } from '../colors';
-
-const BountyDetailsCreationData = {
-  step_1: {
-    step: 1,
-    heading: 'Basic info',
-    sub_heading: ' ',
-    schema: ['wanted_type', 'one_sentence_summary'],
-    schema2: ['ticketUrl', 'github_description', 'description']
-  },
-  step_2: {
-    step: 2,
-    heading: 'Price and Estimate',
-    sub_heading: ' ',
-    schema: ['price', 'codingLanguage', 'tribe', 'estimate_session_length'],
-    schema2: ['estimated_completion_date', 'deliverables', 'show']
-  },
-  step_3: {
-    step: 3,
-    heading: 'Invite Developer',
-    sub_heading: '',
-    schema: ['assignee'],
-    schema2: ['']
-  }
-};
+import { BountyDetailsCreationData } from '../people/utils/bountyCreation_constant';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
@@ -52,6 +29,7 @@ export default function Form(props: any) {
   const refBody: any = useRef(null);
   const { main, ui } = useStores();
   const color = colors['light'];
+  const [isFocused, setIsFocused] = useState({});
 
   const [schemaData, setSchemaData] = useState(BountyDetailsCreationData.step_1);
   const [stepTracker, setStepTracker] = useState<number>(1);
@@ -63,7 +41,7 @@ export default function Form(props: any) {
   const initValues = dynamicInitialValues || props.initialValues;
 
   const NextStepHandler = useCallback(() => {
-    setStepTracker(stepTracker < 3 ? stepTracker + 1 : stepTracker);
+    setStepTracker(stepTracker < 5 ? stepTracker + 1 : stepTracker);
   }, [stepTracker]);
 
   const PreviousStepHandler = useCallback(() => {
@@ -80,6 +58,12 @@ export default function Form(props: any) {
         break;
       case 3:
         setSchemaData(BountyDetailsCreationData.step_3);
+        break;
+      case 4:
+        setSchemaData(BountyDetailsCreationData.step_4);
+        break;
+      case 5:
+        setSchemaData(BountyDetailsCreationData.step_5);
         break;
       default:
         return;
@@ -199,8 +183,7 @@ export default function Form(props: any) {
       initialValues={initValues || {}}
       onSubmit={props.onSubmit}
       innerRef={props.formRef}
-      validationSchema={validator(schema)}
-    >
+      validationSchema={validator(schema)}>
       {({
         setFieldTouched,
         handleSubmit,
@@ -211,18 +194,16 @@ export default function Form(props: any) {
         isValid,
         initialValues
       }) => {
+        const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
         return (
           <Wrap
             ref={refBody}
             style={{
               ...formPad,
               ...wrapStyle,
-              height: stepTracker === 3 ? '592px' : '560px',
-              minWidth: stepTracker === 3 ? '388px' : '712px',
-              maxWidth: stepTracker === 3 ? '388px' : '712px'
+              ...schemaData.outerContainerStyle
             }}
-            newDesign={props?.newDesign}
-          >
+            newDesign={props?.newDesign}>
             {/* schema flipping dropdown */}
             {/* {dynamicSchema && (
               <Select
@@ -247,8 +228,7 @@ export default function Form(props: any) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
-                  }}
-                >
+                  }}>
                   <div style={{ marginRight: '40px' }}>
                     {schema
                       .filter((item: FormField) => item.type === 'img')
@@ -329,163 +309,255 @@ export default function Form(props: any) {
             ) : props?.newDesign ? (
               <>
                 <CreateBountyHeaderContainer color={color}>
-                  <EuiText className="stepText">{`STEP ${schemaData.step}/3`}</EuiText>
-                  <EuiText className="HeadingText">{schemaData.heading}</EuiText>
-                  {schemaData.sub_heading && (
-                    <EuiText
-                      className="SubHeadingText"
-                      style={{
-                        marginBottom: schemaData.step === 1 ? '29px' : '37px'
-                      }}
-                    >
-                      {schemaData.sub_heading}
+                  <div className="TopContainer">
+                    <EuiText className="stepText">
+                      {`STEP ${schemaData.step}`} <span className="stepTextSpan"> / 5</span>
                     </EuiText>
-                  )}
+                    <EuiText className="schemaName">{schemaData.schemaName}</EuiText>
+                  </div>
+                  <EuiText className="HeadingText" style={schemaData.headingStyle}>
+                    {schemaData.heading}
+                  </EuiText>
                 </CreateBountyHeaderContainer>
 
-                <SchemaTagsContainer>
-                  <div className="LeftSchema">
-                    {schemaData.step === 1 && dynamicSchema && (
-                      <Select
-                        style={{ marginBottom: 24 }}
-                        onChange={(v) => {
-                          console.log('v', v);
-                          const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
-                          if (selectedOption) {
-                            setDynamicSchemaName(v);
-                            setDynamicSchema(selectedOption.schema);
-                          }
-                        }}
-                        handleActive={() => {}}
-                        options={dynamicFormOptions}
-                        value={dynamicSchemaName}
-                      />
-                    )}
-                    {schema
-                      .filter((item) => schemaData.schema.includes(item.name))
-                      .map((item: FormField) => (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          newDesign={true}
-                          values={values}
-                          setAssigneefunction={item.name === 'assignee' && setAssigneeName}
-                          peopleList={peopleList}
-                          // disabled={readOnly}
-                          // readOnly={readOnly}
-                          errors={errors}
-                          scrollToTop={scrollToTop}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e, f) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          extraHTML={
-                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                          }
-                        />
-                      ))}
-                  </div>
-                  <div className="RightSchema">
-                    {schema
-                      .filter((item) => schemaData.schema2.includes(item.name))
-                      .map((item: FormField) => (
-                        <Input
-                          {...item}
-                          peopleList={peopleList}
-                          newDesign={true}
-                          key={item.name}
-                          values={values}
-                          // disabled={readOnly}
-                          // readOnly={readOnly}
-                          errors={errors}
-                          scrollToTop={scrollToTop}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e, f) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          extraHTML={
-                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                          }
-                        />
-                      ))}
-                  </div>
-                </SchemaTagsContainer>
-                <BottomContainer color={color} assigneeName={assigneeName}>
-                  {stepTracker < 3 && <EuiText className="RequiredText">* Required</EuiText>}
-                  <div
-                    className="ButtonContainer"
-                    style={{
-                      width: stepTracker < 3 ? '45%' : '100%',
-                      height: stepTracker < 3 ? '48px' : '48px',
-                      marginTop: stepTracker <= 3 ? '-20px' : '-10px'
-                    }}
-                  >
-                    <div
-                      className="nextButton"
-                      onClick={() => {
-                        if (schemaData.step === 3) {
-                          if (dynamicSchemaName) {
-                            setFieldValue('type', dynamicSchemaName);
-                          }
-                          if (assigneeName !== '') {
-                            handleSubmit();
-                          } else {
-                            setAssigneeName('a');
-                          }
-                        } else {
-                          NextStepHandler();
-                        }
-                      }}
-                    >
-                      {assigneeName === '' ? (
-                        <EuiText className="nextText">
-                          {schemaData.step === 3 ? 'Decide Later' : 'Next'}
-                        </EuiText>
-                      ) : (
-                        <EuiText className="nextText">Finish</EuiText>
-                      )}
-                    </div>
-                    {schemaData.step > 1 && (
-                      <>
-                        <ImageButton
-                          buttonText={'Back'}
-                          ButtonContainerStyle={{
-                            width: '120px',
-                            height: '42px'
-                          }}
-                          buttonAction={() => {
-                            PreviousStepHandler();
-                            setAssigneeName('');
-                          }}
-                        />
-                      </>
-                    )}
-                  </div>
-                </BottomContainer>
+                {schemaData.step === 1 && dynamicSchema && (
+                  <ChooseBountyContainer color={color}>
+                    {dynamicFormOptions?.map((v) => (
+                      <BountyContainer
+                        key={v.label}
+                        color={color}
+                        show={v.value === 'freelance_job_request' ? true : false}>
+                        <div className="freelancerContainer">
+                          <div
+                            style={{
+                              minHeight: '134px !important',
+                              maxHeight: '134px !important',
+                              height: '134px',
+                              width: '290px',
+                              background: color.white100,
+                              borderRadius: '20px 20px 0px 0px'
+                            }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'flex-end',
+                                position: 'relative'
+                              }}>
+                              <img
+                                src={
+                                  v.value === 'freelance_job_request'
+                                    ? '/static/freelancer_bounty.svg'
+                                    : '/static/live_help.svg'
+                                }
+                                alt="select_type"
+                                height={'121px'}
+                                width={'130.1px'}
+                                style={{
+                                  position: 'absolute',
+                                  top: '52px'
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div className="TextButtonContainer">
+                            <EuiText className="textTop">{v.label}</EuiText>
+                            <EuiText className="textBottom">
+                              {v.value === 'freelance_job_request'
+                                ? 'Find right developer for your task'
+                                : 'Get instant help for your task'}
+                            </EuiText>
+                            {v.value === 'freelance_job_request' ? (
+                              <div
+                                className="StartButton"
+                                onClick={() => {
+                                  NextStepHandler();
+                                  setDynamicSchemaName(v.value);
+                                  setDynamicSchema(v.schema);
+                                }}>
+                                Start
+                              </div>
+                            ) : (
+                              <div className="ComingSoonContainer">
+                                <Divider
+                                  style={{
+                                    width: '26px',
+                                    background: color.grayish.G300
+                                  }}
+                                />
+                                <EuiText className="ComingSoonText">Coming soon</EuiText>
+                                <Divider
+                                  style={{
+                                    width: '26px',
+                                    background: color.grayish.G300
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </BountyContainer>
+                    ))}
+                  </ChooseBountyContainer>
+                )}
+
+                {schemaData.step !== 1 && (
+                  <>
+                    <SchemaTagsContainer>
+                      <div className="LeftSchema">
+                        {schema
+                          .filter((item) => schemaData.schema.includes(item.name))
+                          .map((item: FormField) => {
+                            return (
+                              <Input
+                                {...item}
+                                key={item.name}
+                                newDesign={true}
+                                values={values}
+                                setAssigneefunction={item.name === 'assignee' && setAssigneeName}
+                                peopleList={peopleList}
+                                // disabled={readOnly}
+                                // readOnly={readOnly}
+                                isFocused={isFocused}
+                                errors={errors}
+                                scrollToTop={scrollToTop}
+                                value={values[item.name]}
+                                error={errors[item.name]}
+                                initialValues={initialValues}
+                                deleteErrors={() => {
+                                  if (errors[item.name]) delete errors[item.name];
+                                }}
+                                handleChange={(e: any) => {
+                                  setFieldValue(item.name, e);
+                                }}
+                                setFieldValue={(e, f) => {
+                                  setFieldValue(e, f);
+                                }}
+                                setFieldTouched={setFieldTouched}
+                                handleBlur={() => {
+                                  setFieldTouched(item.name, false);
+                                  setIsFocused({ [item.label]: false });
+                                }}
+                                handleFocus={() => {
+                                  setFieldTouched(item.name, true);
+                                  setIsFocused({ [item.label]: true });
+                                }}
+                                setDisableFormButtons={setDisableFormButtons}
+                                extraHTML={
+                                  (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                                }
+                              />
+                            );
+                          })}
+                      </div>
+                      <div className="RightSchema">
+                        {schema
+                          .filter((item) => schemaData.schema2.includes(item.name))
+                          .map((item: FormField) => {
+                            return (
+                              <Input
+                                {...item}
+                                peopleList={peopleList}
+                                newDesign={true}
+                                key={item.name}
+                                values={values}
+                                // disabled={readOnly}
+                                // readOnly={readOnly}
+                                errors={errors}
+                                scrollToTop={scrollToTop}
+                                value={values[item.name]}
+                                error={errors[item.name]}
+                                initialValues={initialValues}
+                                deleteErrors={() => {
+                                  if (errors[item.name]) delete errors[item.name];
+                                }}
+                                isFocused={isFocused}
+                                handleChange={(e: any) => {
+                                  setFieldValue(item.name, e);
+                                }}
+                                setFieldValue={(e, f) => {
+                                  setFieldValue(e, f);
+                                }}
+                                setFieldTouched={setFieldTouched}
+                                handleBlur={() => {
+                                  setFieldTouched(item.name, false);
+                                  setIsFocused({ [item.label]: false });
+                                }}
+                                handleFocus={() => {
+                                  setFieldTouched(item.name, true);
+                                  setIsFocused({ [item.label]: true });
+                                }}
+                                setDisableFormButtons={setDisableFormButtons}
+                                extraHTML={
+                                  (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                                }
+                              />
+                            );
+                          })}
+                      </div>
+                    </SchemaTagsContainer>
+                    <BottomContainer color={color} assigneeName={assigneeName} valid={valid}>
+                      <EuiText className="RequiredText">{schemaData?.extraText}</EuiText>
+                      <div
+                        className="ButtonContainer"
+                        style={{
+                          width: stepTracker < 5 ? '45%' : '100%',
+                          height: stepTracker < 5 ? '48px' : '48px',
+                          marginTop: stepTracker === 5 ? '20px' : ''
+                        }}>
+                        {!valid && (
+                          <div className="nextButtonDisable">
+                            <EuiText className="disableText">Next</EuiText>
+                          </div>
+                        )}
+                        {valid && (
+                          <div
+                            className="nextButton"
+                            onClick={() => {
+                              if (schemaData.step === 5 && valid) {
+                                if (dynamicSchemaName) {
+                                  setFieldValue('type', dynamicSchemaName);
+                                }
+                                if (assigneeName !== '') {
+                                  handleSubmit();
+                                } else {
+                                  setAssigneeName('a');
+                                }
+                              } else {
+                                if (valid) {
+                                  NextStepHandler();
+                                }
+                              }
+                            }}>
+                            {assigneeName === '' ? (
+                              <EuiText className="nextText">
+                                {schemaData.step === 5 ? 'Decide Later' : 'Next'}
+                              </EuiText>
+                            ) : (
+                              <EuiText className="nextText">Finish</EuiText>
+                            )}
+                          </div>
+                        )}
+                        {schemaData.step > 1 && (
+                          <>
+                            <ImageButton
+                              buttonText={'Back'}
+                              ButtonContainerStyle={{
+                                width: '120px',
+                                height: '42px'
+                              }}
+                              buttonAction={() => {
+                                PreviousStepHandler();
+                                setAssigneeName('');
+                              }}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </BottomContainer>
+                  </>
+                )}
               </>
             ) : (
               <SchemaOuterContainer>
@@ -512,8 +584,15 @@ export default function Form(props: any) {
                         setFieldValue(e, f);
                       }}
                       setFieldTouched={setFieldTouched}
-                      handleBlur={() => setFieldTouched(item.name, false)}
-                      handleFocus={() => setFieldTouched(item.name, true)}
+                      isFocused={isFocused}
+                      handleBlur={() => {
+                        setFieldTouched(item.name, false);
+                        setIsFocused({ [item.label]: false });
+                      }}
+                      handleFocus={() => {
+                        setFieldTouched(item.name, true);
+                        setIsFocused({ [item.label]: true });
+                      }}
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                     />
@@ -600,8 +679,7 @@ export default function Form(props: any) {
                     minHeight: 30,
                     height: 30
                   }}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
+                  onClick={() => setShowSettings(!showSettings)}>
                   Advanced Settings {showSettings ? '-' : '+'}
                 </div>
 
@@ -631,8 +709,7 @@ export default function Form(props: any) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginTop: 20
-                      }}
-                    >
+                      }}>
                       <Button
                         text={'Nevermind'}
                         color={'white'}
@@ -661,6 +738,7 @@ export default function Form(props: any) {
 
 interface styledProps {
   color?: any;
+  show?: boolean;
 }
 interface WrapProps {
   newDesign?: string;
@@ -684,6 +762,7 @@ interface BWrapProps {
 interface bottomButtonProps {
   assigneeName?: string;
   color?: any;
+  valid?: any;
 }
 
 const BWrap = styled.div<styledProps>`
@@ -705,13 +784,45 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
   flex-direction: column;
   justify-content: center;
   padding: 0px 48px;
-  .stepText {
-    fontfamily: Barlow;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.06em;
+  .TopContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .stepText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 18px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: ${(p) => p.color && p.color.black500};
+      .stepTextSpan {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 18px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: ${(p) => p.color && p.color.grayish.G300};
+      }
+    }
+    .schemaName {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 23px;
+      display: flex;
+      align-items: center;
+      text-align: right;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: ${(p) => p.color && p.color.grayish.G300};
+    }
   }
+
   .HeadingText {
     font-family: Barlow;
     font-size: 36px;
@@ -720,14 +831,6 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
     color: ${(p) => p?.color && p.color.grayish.G10};
     margin-bottom: 11px;
     margin-top: 16px;
-  }
-  .SubHeadingText {
-    font-family: Barlow;
-    font-size: 17px;
-    font-weight: 400;
-    line-height: 20px;
-    color: ${(p) => p?.color && p.color.grayish.G05};
-    margin-top: 15px;
   }
 `;
 
@@ -747,6 +850,7 @@ const SchemaTagsContainer = styled.div`
 const BottomContainer = styled.div<bottomButtonProps>`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0px 48px;
   .RequiredText {
     font-size: 13px;
@@ -761,6 +865,28 @@ const BottomContainer = styled.div<bottomButtonProps>`
     flex-direction: row-reverse;
     justify-content: space-between;
     align-items: center;
+  }
+  .nextButtonDisable {
+    width: 145px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: ${(p) => p?.color && p.color.grayish.G950};
+    border-radius: 32px;
+    user-select: none;
+    .disableText {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 19px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: ${(p) => p?.color && p.color.grayish.G300};
+    }
   }
   .nextButton {
     width: 145px;
@@ -806,6 +932,127 @@ const SchemaOuterContainer = styled.div`
   width: 100%;
   .SchemaInnerContainer {
     width: 100%;
+  }
+`;
+
+const ChooseBountyContainer = styled.div<styledProps>`
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+`;
+
+const BountyContainer = styled.div<styledProps>`
+  min-height: 352px;
+  max-height: 352px;
+  min-width: 290px;
+  max-width: 290px;
+  background: ${(p) => p.color && p.color.pureWhite};
+  border: 1px solid ${(p) => p.color && p.color.grayish.G600};
+  box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black100};
+  border-radius: 20px;
+  // margin-left: 34px;
+  overflow: hidden;
+  .freelancerContainer {
+    min-height: 352px;
+    max-height: 352px;
+    width: 100%;
+  }
+  :hover {
+    border: ${(p) =>
+      p.show
+        ? `2px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
+  }
+  :active {
+    border: ${(p) =>
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
+  }
+  .TextButtonContainer {
+    height: 218px;
+    width: 290px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .textTop {
+      height: 40px;
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 23px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: ${(p) => p.color && p.color.grayish.G25};
+    }
+    .textBottom {
+      height: 31px;
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+      text-align: center;
+      color: ${(p) => p.color && p.color.grayish.G100};
+    }
+    .StartButton {
+      height: 42px;
+      width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: ${(p) => p.color && p.color.button_secondary.main};
+      box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
+      color: ${(p) => p.color && p.color.pureWhite};
+      border-radius: 32px;
+      margin-top: 10px;
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 19px;
+      cursor: pointer;
+      :hover {
+        background: ${(p) => p.color && p.color.button_secondary.hover};
+        box-shadow: 0px 1px 5px ${(p) => p.color && p.color.button_secondary.shadow};
+      }
+      :active {
+        background: ${(p) => p.color && p.color.button_secondary.active};
+      }
+      :focus-visible {
+        outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
+      }
+    }
+    .ComingSoonContainer {
+      height: 42px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      .ComingSoonText {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 17px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: ${(p) => p.color && p.color.grayish.G300};
+        margin-right: 18px;
+        margin-left: 18px;
+      }
+    }
   }
 `;
 

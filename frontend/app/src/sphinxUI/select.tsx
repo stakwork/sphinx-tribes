@@ -16,12 +16,15 @@ export default function Select(props: any) {
           <>
             <p
               style={{
-                color: color.pureBlack,
+                color: color.text2,
                 fontSize: '14px',
                 padding: '0px',
-                margin: 0
-              }}
-            >
+                margin: 0,
+                fontFamily: 'Barlow',
+                fontWeight: '500',
+                lineHeight: '32px',
+                letterSpacing: '0.01em'
+              }}>
               {o.label}
             </p>
             {o.description && (
@@ -32,8 +35,7 @@ export default function Select(props: any) {
                   padding: 0,
                   margin: 0,
                   fontSize: '12px'
-                }}
-              >
+                }}>
                 <p className="euiTextColor--subdued">{o.description}</p>
               </EuiText>
             )}
@@ -85,7 +87,7 @@ const S = styled(EuiSuperSelect as any)<styleProps>`
   .euiPanel {
     background: ${(p) => p?.color && p?.color.pureWhite};
   }
-  button {
+  . button {
     background: ${(p) => p?.color && p?.color.pureWhite} !important;
     background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
   }

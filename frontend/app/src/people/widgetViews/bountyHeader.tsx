@@ -10,6 +10,7 @@ import IconButton from '../../sphinxUI/icon_button';
 import ImageButton from '../../sphinxUI/Image_button';
 import SearchBar from '../../sphinxUI/search_bar';
 import { useStores } from '../../store';
+import { filterCount } from '../utils/ExtraFunctions';
 import { coding_languages, GetValue, status } from '../utils/language_label_style';
 import StartUpModal from '../utils/start_up_modal';
 
@@ -35,6 +36,7 @@ const BountyHeader = ({
   const closeModal = () => setOpenStartUpModel(false);
   const showModal = () => setOpenStartUpModel(true);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [filterCountNumber, setFilterCountNumber] = useState<number>(0);
 
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
@@ -65,6 +67,12 @@ const BountyHeader = ({
     getPeopleList();
   }, [main, selectedWidget]);
 
+  useEffect(() => {
+    setFilterCountNumber(
+      filterCount(checkboxIdToSelectedMapLanguage) + filterCount(checkboxIdToSelectedMap)
+    );
+  }, [checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap]);
+
   return (
     <>
       {!isMobile ? (
@@ -83,8 +91,7 @@ const BountyHeader = ({
             borderBottom: scrollValue
               ? `1px solid ${color.grayish.G600}`
               : `0px solid ${color.grayish.G600}`
-          }}
-        >
+          }}>
           <BountyHeaderDesk>
             <B>
               <IconButton
@@ -160,8 +167,7 @@ const BountyHeader = ({
                       className="filterText"
                       style={{
                         color: isPopoverOpen ? color.grayish.G10 : ''
-                      }}
-                    >
+                      }}>
                       Filter
                     </EuiText>
                   </FilterContainer>
@@ -180,14 +186,12 @@ const BountyHeader = ({
                 closePopover={closePopover}
                 panelClassName="yourClassNameHere"
                 panelPaddingSize="none"
-                anchorPosition="downLeft"
-              >
+                anchorPosition="downLeft">
                 <div
                   style={{
                     display: 'flex',
                     flexDirection: 'row'
-                  }}
-                >
+                  }}>
                   <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
                     <EuiText className="leftBoxHeading">STATUS</EuiText>
                     <EuiCheckboxGroup
@@ -212,6 +216,11 @@ const BountyHeader = ({
                   </PopOverRightBox>
                 </div>
               </EuiPopover>
+              {filterCountNumber > 0 && (
+                <FilterCount color={color}>
+                  <EuiText className="filterCountText">{filterCountNumber}</EuiText>
+                </FilterCount>
+              )}
             </B>
             <D color={color}>
               <EuiText className="DText" color={color.grayish.G200}>
@@ -227,8 +236,7 @@ const BountyHeader = ({
                           zIndex: 3 - index,
                           marginLeft: index > 0 ? '-14px' : '',
                           objectFit: 'cover'
-                        }}
-                      >
+                        }}>
                         <img
                           height={'23px'}
                           width={'23px'}
@@ -248,8 +256,7 @@ const BountyHeader = ({
                   fontWeight: '600',
                   fontFamily: 'Barlow',
                   color: color.black400
-                }}
-              >
+                }}>
                 {developerCount}
               </EuiText>
             </D>
@@ -284,8 +291,6 @@ const BountyHeader = ({
               iconColor={color.grayish.G300}
               iconColorHover={color.grayish.G100}
             />
-
-            {/* // TODO: add filter when have functionality. */}
 
             <EuiPopover
               button={
@@ -416,8 +421,7 @@ const BountyHeader = ({
                       style={{
                         zIndex: 3 - index,
                         marginLeft: index > 0 ? '-14px' : ''
-                      }}
-                    >
+                      }}>
                       <img
                         height={'20px'}
                         width={'20px'}
@@ -436,8 +440,7 @@ const BountyHeader = ({
                   fontFamily: 'Barlow',
                   fontWeight: '500',
                   color: color.black400
-                }}
-              >
+                }}>
                 {peopleList && peopleList?.length}
               </EuiText>
             </DevelopersContainerMobile>
@@ -587,6 +590,28 @@ const FilterContainer = styled.div<styledProps>`
     .filterText {
       color: ${(p) => p.color && p.color.grayish.G10};
     }
+  }
+`;
+
+const FilterCount = styled.div<styledProps>`
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  margin-left: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  background: ${(p) => p?.color && p.color.blue1};
+  .filterCountText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: ${(p) => p.color && p.color.pureWhite};
   }
 `;
 
