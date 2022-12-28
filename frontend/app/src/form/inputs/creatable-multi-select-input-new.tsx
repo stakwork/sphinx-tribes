@@ -36,6 +36,7 @@ export default function CreatableMultiSelectInputNew({
   const closePopover = () => setIsPopoverOpen(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [labels, setLabels] = useState<any>([]);
+  const [data, setData] = useState<any>([]);
 
   const onChange = (optionId) => {
     let trueCount = 0;
@@ -118,6 +119,8 @@ export default function CreatableMultiSelectInputNew({
             idToSelectedMap={checkboxIdToSelectedMap}
             onChange={(id) => {
               onChange(id);
+              setData([...data, { value: id, label: id }]);
+              handleChange(data)
             }}
           />
         </EuiPopOverCheckbox>

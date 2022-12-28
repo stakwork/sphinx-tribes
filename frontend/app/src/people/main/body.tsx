@@ -837,6 +837,7 @@ export default function BodyComponent({ selectedWidget }) {
               borderRadius: '50%'
             }}>
             <FocusedView
+              ReCallBounties={ReCallBounties}
               newDesign={true}
               person={person}
               canEdit={!canEdit}
