@@ -12,7 +12,7 @@ import { EuiText } from '@elastic/eui';
 import api from '../api';
 import ImageButton from '../sphinxUI/Image_button';
 import { colors } from '../colors';
-import { BountyDetailsCreationData } from '../people/utils/language_label_style';
+import { BountyDetailsCreationData } from '../people/utils/bountyCreation_constant';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
@@ -322,8 +322,11 @@ export default function Form(props: any) {
 
                 {schemaData.step === 1 && dynamicSchema && (
                   <ChooseBountyContainer color={color}>
-                    {dynamicFormOptions.map((v) => (
-                      <div className="BountyContainer" key={v.label}>
+                    {dynamicFormOptions?.map((v) => (
+                      <BountyContainer
+                        key={v.label}
+                        color={color}
+                        show={v.value === 'freelance_job_request' ? true : false}>
                         <div className="freelancerContainer">
                           <div
                             style={{
@@ -394,7 +397,7 @@ export default function Form(props: any) {
                             )}
                           </div>
                         </div>
-                      </div>
+                      </BountyContainer>
                     ))}
                   </ChooseBountyContainer>
                 )}
@@ -735,6 +738,7 @@ export default function Form(props: any) {
 
 interface styledProps {
   color?: any;
+  show?: boolean;
 }
 interface WrapProps {
   newDesign?: string;
@@ -938,108 +942,115 @@ const ChooseBountyContainer = styled.div<styledProps>`
   align-items: center;
   justify-content: center;
   gap: 34px;
-  .BountyContainer {
+`;
+
+const BountyContainer = styled.div<styledProps>`
+  min-height: 352px;
+  max-height: 352px;
+  min-width: 290px;
+  max-width: 290px;
+  background: ${(p) => p.color && p.color.pureWhite};
+  border: 1px solid ${(p) => p.color && p.color.grayish.G600};
+  box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black100};
+  border-radius: 20px;
+  // margin-left: 34px;
+  overflow: hidden;
+  .freelancerContainer {
     min-height: 352px;
     max-height: 352px;
-    min-width: 290px;
-    max-width: 290px;
-    background: ${(p) => p.color && p.color.pureWhite};
-    border: 1px solid ${(p) => p.color && p.color.grayish.G600};
-    box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black100};
-    border-radius: 20px;
-    // margin-left: 34px;
-    overflow: hidden;
-    .freelancerContainer {
-      min-height: 352px;
-      max-height: 352px;
-      width: 100%;
-    }
-    :hover {
-      border: 2px solid ${(p) => p.color && p.color.button_primary.shadow};
-      box-shadow: 1px 1px 6px ${(p) => p.color && p.color.black85};
-    }
-    :active {
-      border: 1px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
-    }
-    .TextButtonContainer {
-      height: 218px;
-      width: 290px;
+    width: 100%;
+  }
+  :hover {
+    border: ${(p) =>
+      p.show
+        ? `2px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
+  }
+  :active {
+    border: ${(p) =>
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
+  }
+  .TextButtonContainer {
+    height: 218px;
+    width: 290px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .textTop {
+      height: 40px;
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 23px;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: ${(p) => p.color && p.color.grayish.G25};
+    }
+    .textBottom {
+      height: 31px;
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+      text-align: center;
+      color: ${(p) => p.color && p.color.grayish.G100};
+    }
+    .StartButton {
+      height: 42px;
+      width: 120px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      .textTop {
-        height: 40px;
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 700;
-        font-size: 20px;
-        line-height: 23px;
-        display: flex;
-        align-items: center;
-        text-align: center;
-        color: ${(p) => p.color && p.color.grayish.G25};
+      background: ${(p) => p.color && p.color.button_secondary.main};
+      box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
+      color: ${(p) => p.color && p.color.pureWhite};
+      border-radius: 32px;
+      margin-top: 10px;
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 19px;
+      cursor: pointer;
+      :hover {
+        background: ${(p) => p.color && p.color.button_secondary.hover};
+        box-shadow: 0px 1px 5px ${(p) => p.color && p.color.button_secondary.shadow};
       }
-      .textBottom {
-        height: 31px;
+      :active {
+        background: ${(p) => p.color && p.color.button_secondary.active};
+      }
+      :focus-visible {
+        outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
+      }
+    }
+    .ComingSoonContainer {
+      height: 42px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      .ComingSoonText {
         font-family: 'Barlow';
         font-style: normal;
-        font-weight: 400;
+        font-weight: 500;
         font-size: 14px;
         line-height: 17px;
+        display: flex;
+        align-items: center;
         text-align: center;
-        color: ${(p) => p.color && p.color.grayish.G100};
-      }
-      .StartButton {
-        height: 42px;
-        width: 120px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: ${(p) => p.color && p.color.button_secondary.main};
-        box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
-        color: ${(p) => p.color && p.color.pureWhite};
-        border-radius: 32px;
-        margin-top: 10px;
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 600;
-        font-size: 14px;
-        line-height: 19px;
-        cursor: pointer;
-        :hover {
-          background: ${(p) => p.color && p.color.button_secondary.hover};
-          box-shadow: 0px 1px 5px ${(p) => p.color && p.color.button_secondary.shadow};
-        }
-        :active {
-          background: ${(p) => p.color && p.color.button_secondary.active};
-        }
-        :focus-visible {
-          outline: 2px solid ${(p) => p.color && p.color.button_primary.shadow} !important;
-        }
-      }
-      .ComingSoonContainer {
-        height: 42px;
-        margin-top: 10px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        .ComingSoonText {
-          font-family: 'Barlow';
-          font-style: normal;
-          font-weight: 500;
-          font-size: 14px;
-          line-height: 17px;
-          display: flex;
-          align-items: center;
-          text-align: center;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: ${(p) => p.color && p.color.grayish.G300};
-          margin-right: 18px;
-          margin-left: 18px;
-        }
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: ${(p) => p.color && p.color.grayish.G300};
+        margin-right: 18px;
+        margin-left: 18px;
       }
     }
   }

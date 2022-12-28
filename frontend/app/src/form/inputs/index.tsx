@@ -21,6 +21,7 @@ import LoomVideoInputNew from './loom-video-input-new';
 import TextInputNew from './text-input-new';
 import NumberInputNew from './number-input-new';
 import TextAreaInputNew from './text-area-input-new';
+import CreatableMultiSelectInputNew from './creatable-multi-select-input-new';
 
 export default function Input(props: any) {
   const color = colors['light'];
@@ -57,7 +58,11 @@ export default function Input(props: any) {
       case 'multiselect':
         return <MultiSelectInput {...props} />;
       case 'creatablemultiselect':
-        return <CreatableMultiSelectInput {...props} />;
+        return props?.newDesign ? (
+          <CreatableMultiSelectInputNew {...props} />
+        ) : (
+          <CreatableMultiSelectInput {...props} />
+        );
       case 'widgets':
         return <Widgets {...props} />;
       case 'date':

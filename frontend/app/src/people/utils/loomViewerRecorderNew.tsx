@@ -53,9 +53,9 @@ export default function LoomViewerRecorderNew(props) {
     <div
       dangerouslySetInnerHTML={{
         __html: `<div class="lo-emb-vid"
-        style="position: relative; padding-bottom: 75%; height: 0;">
+        style="position: relative; padding-bottom: 75%; height: 0; margin-top: -101px; margin-left: -38px">
         <iframe src="${videoUrl}"
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>`
+            style="position: absolute; top: 0; left: 0; width: 290px; height: 175px; border-radius: 4px; " frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>`
       }}
     />
   );
@@ -100,6 +100,11 @@ export default function LoomViewerRecorderNew(props) {
               onClick={() => {
                 setVideoUrl('');
                 if (onChange) onChange('');
+              }}
+              style={{
+                position: 'absolute',
+                top: '160px',
+                right: '45px'
               }}
             />
           ) : (
