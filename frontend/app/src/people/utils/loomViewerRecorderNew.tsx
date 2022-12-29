@@ -3,6 +3,7 @@ import { setup, isSupported } from '@loomhq/record-sdk';
 import { Button, IconButton } from '../../sphinxUI';
 import styled from 'styled-components';
 import { colors } from '../../colors';
+import { EuiText } from '@elastic/eui';
 
 const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';
 
@@ -93,20 +94,23 @@ export default function LoomViewerRecorderNew(props) {
             }}
           />
           {videoUrl ? (
-            <IconButton
-              color={'widget'}
-              icon={'close'}
-              // text={'Delete Video'}
+            <RemoveButtonContainer
               onClick={() => {
                 setVideoUrl('');
                 if (onChange) onChange('');
               }}
-              style={{
-                position: 'absolute',
-                top: '160px',
-                right: '45px'
-              }}
-            />
+              color={color}>
+              <IconButton
+                color={'widget'}
+                icon={'delete'}
+                // text={'Delete Video'}
+
+                iconStyle={{
+                  fontSize: '20px'
+                }}
+              />
+              <EuiText className="buttonText">Remove</EuiText>
+            </RemoveButtonContainer>
           ) : (
             <div />
           )}
@@ -117,11 +121,32 @@ export default function LoomViewerRecorderNew(props) {
   );
 }
 
-interface styleProps {
+interface styledProps {
   color?: any;
 }
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+`;
+
+const RemoveButtonContainer = styled.div<styledProps>`
+  position: absolute;
+  top: 160px;
+  right: 45px;
+  display: flex;
+  justify-content: flex-end;
+  align-item: center;
+  cursor: pointer;
+  .buttonText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 35px;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    color: #5f6368;
+  }
 `;
