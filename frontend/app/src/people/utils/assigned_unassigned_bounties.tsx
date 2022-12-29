@@ -38,7 +38,10 @@ const Bounties = (props) => {
         <BountyContainer
           onClick={onPanelClick}
           assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
-          color={color}>
+          color={color}
+          style={{
+            backgroundPositionY: '-2px'
+          }}>
           <div className="BountyDescriptionContainer">
             <BountyDescription
               {...person}
@@ -95,8 +98,7 @@ const Bounties = (props) => {
             </div>
             <UnassignedPersonProfile
               unassigned_border={color.grayish.G300}
-              grayish_G200={color.grayish.G200}
-            >
+              grayish_G200={color.grayish.G200}>
               <div className="UnassignedPersonContainer">
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>
@@ -201,6 +203,8 @@ const DescriptionPriceContainer = styled.div<containerProps>`
 
   :hover {
     background: url('static/unassigned_bounty_hover_bg.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
   }
   :active {
     background: url('static/unassigned_bounty_active_bg.svg');
