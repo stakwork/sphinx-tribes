@@ -99,7 +99,8 @@ export default function LoomViewerRecorderNew(props) {
                 setVideoUrl('');
                 if (onChange) onChange('');
               }}
-              color={color}>
+              color={color}
+            >
               <IconButton
                 color={'widget'}
                 icon={'delete'}
