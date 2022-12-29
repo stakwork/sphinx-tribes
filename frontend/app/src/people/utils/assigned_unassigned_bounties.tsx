@@ -41,8 +41,8 @@ const Bounties = (props) => {
           color={color}
           style={{
             backgroundPositionY: '-2px'
-          }}>
-
+          }}
+        >
           <div className="BountyDescriptionContainer">
             <BountyDescription
               {...person}
@@ -99,7 +99,8 @@ const Bounties = (props) => {
             </div>
             <UnassignedPersonProfile
               unassigned_border={color.grayish.G300}
-              grayish_G200={color.grayish.G200}>
+              grayish_G200={color.grayish.G200}
+            >
               <div className="UnassignedPersonContainer">
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>
