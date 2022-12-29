@@ -48,7 +48,7 @@ const PaidBounty = (props) => {
           position: 'sticky',
           width: '80px',
           height: '80px',
-          right: '-2.5px'
+          right: '-1.5px'
         }}
         alt={'paid_ribbon'}
       />
@@ -85,4 +85,5 @@ const PriceUserContainer = styled.div<PaidBountyProps>`
   border: 2px solid ${(p) => p.Price_User_Container_Border};
   border-radius: 10px;
   width: 579px;
+  margin: -0.5px -1.1px;
 `;
