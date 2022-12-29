@@ -42,6 +42,7 @@ const Bounties = (props) => {
           style={{
             backgroundPositionY: '-2px'
           }}>
+
           <div className="BountyDescriptionContainer">
             <BountyDescription
               {...person}

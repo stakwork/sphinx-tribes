@@ -24,7 +24,8 @@ export default function LoomVideoInputNew({
       color={color}
       style={{
         marginTop: '55px'
-      }}>
+      }}
+    >
       <LoomViewerRecorderNew
         name="loomVideo"
         onChange={(e) => {

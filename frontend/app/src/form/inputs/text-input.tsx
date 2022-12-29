@@ -36,7 +36,8 @@ export default function TextInput({
         border={borderType}
         label={labeltext}
         isTextField={true}
-        error={error}>
+        error={error}
+      >
         <R>
           <FieldText
             color={color}

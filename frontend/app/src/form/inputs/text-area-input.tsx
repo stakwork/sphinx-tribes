@@ -44,7 +44,8 @@ export default function TextAreaInput({
         border={borderType}
         label={labeltext}
         height={StyleOnText[label].height}
-        width={StyleOnText[label].width}>
+        width={StyleOnText[label].width}
+      >
         <R>
           <FieldTextArea
             color={color}
