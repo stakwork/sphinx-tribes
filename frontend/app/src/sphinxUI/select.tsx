@@ -24,7 +24,8 @@ export default function Select(props: any) {
                 fontWeight: '500',
                 lineHeight: '32px',
                 letterSpacing: '0.01em'
-              }}>
+              }}
+            >
               {o.label}
             </p>
             {o.description && (
@@ -35,7 +36,8 @@ export default function Select(props: any) {
                   padding: 0,
                   margin: 0,
                   fontSize: '12px'
-                }}>
+                }}
+              >
                 <p className="euiTextColor--subdued">{o.description}</p>
               </EuiText>
             )}

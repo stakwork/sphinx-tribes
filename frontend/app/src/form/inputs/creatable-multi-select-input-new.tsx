@@ -65,7 +65,8 @@ export default function CreatableMultiSelectInputNew({
     <div
       style={{
         paddingTop: '11px'
-      }}>
+      }}
+    >
       <EuiPopover
         className="EuiPopOver"
         anchorPosition="downCenter"
@@ -113,7 +114,8 @@ export default function CreatableMultiSelectInputNew({
           />
         }
         isOpen={isPopoverOpen}
-        closePopover={closePopover}>
+        closePopover={closePopover}
+      >
         <EuiPopOverCheckbox className="CheckboxOuter" color={color}>
           <EuiCheckboxGroup
             options={codingLanguages}
@@ -129,7 +131,8 @@ export default function CreatableMultiSelectInputNew({
       <LabelsContainer
         style={{
           padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
-        }}>
+        }}
+      >
         {!isPopoverOpen &&
           labels &&
           labels?.map((x, index) => (
@@ -141,7 +144,8 @@ export default function CreatableMultiSelectInputNew({
               }}
               style={{
                 margin: 4
-              }}>
+              }}
+            >
               <EuiText className="labelText">{x.label}</EuiText>
               <SvgMask
                 src={'/static/label_cross.svg'}

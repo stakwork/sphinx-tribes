@@ -69,7 +69,8 @@ export default function NumberInputNew({
           background: color.pureWhite,
           fontWeight: '500',
           transition: 'all 0.5s'
-        }}>
+        }}
+      >
         {labeltext}
       </label>
       <div className="USD">{satToUsd(textValue)} USD</div>
