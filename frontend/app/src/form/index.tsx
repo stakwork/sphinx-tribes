@@ -540,7 +540,12 @@ export default function Form(props: any) {
                               }
                             }}
                             style={{
-                              width: schemaData.step === 5 ? '145px' : '120px'
+                              width:
+                                schemaData.step === 5
+                                  ? assigneeName === ''
+                                    ? '145px'
+                                    : '120px'
+                                  : '120px'
                             }}>
 
                             {assigneeName === '' ? (
