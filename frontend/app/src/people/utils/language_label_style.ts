@@ -88,6 +88,12 @@ export const LanguageObject = [
     border: '1px solid rgba(255, 141, 133, 0.1)',
     background: 'rgba(255, 141, 133, 0.1)',
     color: '#FF8D85'
+  },
+  {
+    label: 'Other',
+    border: '1px solid rgba(21, 143, 173, 1)',
+    background: 'rgba(21, 143, 173, 0.1)',
+    color: '#158FAD'
   }
 ];
 
@@ -105,7 +111,8 @@ export const coding_languages = [
   'C#',
   'C++',
   'Java',
-  'Rust'
+  'Rust',
+  'Other'
 ];
 
 export const status = ['Opened', 'Assigned', 'Paid'];
@@ -288,5 +295,12 @@ export const colourOptions: readonly ColourOption[] = [
     border: '1px solid rgba(255, 141, 133, 0.1)',
     background: 'rgba(255, 141, 133, 0.1)',
     color: '#FF8D85'
+  },
+  {
+    label: 'Other',
+    value: 'Other',
+    border: '1px solid rgba(21, 143, 173, 1)',
+    background: 'rgba(21, 143, 173, 0.1)',
+    color: '#158FAD'
   }
 ];

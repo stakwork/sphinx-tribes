@@ -75,8 +75,8 @@ export default function CreatableMultiSelectInputNew({
           boxShadow: 'none !important',
           borderRadius: '0px 0px 6px 6px',
           backgroundRepeat: 'no-repeat',
-          border: '1px solid #82B4FF',
-          borderTop: '1px solid #EBEDEF'
+          border: `1px solid ${color.blue2}`,
+          borderTop: `1px solid ${color.grayish.G700}`
         }}
         button={
           <ImageButton
@@ -92,7 +92,8 @@ export default function CreatableMultiSelectInputNew({
               paddingLeft: '18px',
               marginRight: '2px',
               marginTop: isPopoverOpen ? '0.9px' : '0px',
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.07)'
+              boxShadow: `0px 1px 2px ${color.black100} `,
+              fontWeight: '500'
             }}
             endImageSrc={'/static/Skill_drop_down.svg'}
             endingImageContainerStyle={{
@@ -100,11 +101,11 @@ export default function CreatableMultiSelectInputNew({
               top: -2
             }}
             buttonTextStyle={{
-              color: !isPopoverOpen ? '#B0B7BC' : '#3C3F41',
+              color: `${color.grayish.G300}`,
               textAlign: 'center',
-              fontSize: '13px',
-              fontWeight: '400',
-              fontFamily: 'Roboto'
+              fontSize: '14px',
+              fontWeight: '500',
+              fontFamily: 'Barlow'
             }}
             buttonAction={() => {
               onButtonClick();
@@ -120,7 +121,7 @@ export default function CreatableMultiSelectInputNew({
             onChange={(id) => {
               onChange(id);
               setData([...data, { value: id, label: id }]);
-              handleChange(data)
+              handleChange(data);
             }}
           />
         </EuiPopOverCheckbox>

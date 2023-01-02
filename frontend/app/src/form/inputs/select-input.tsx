@@ -34,7 +34,14 @@ export default function SelectInput({
         <R>
           <Select
             name={'first'}
-            selectStyle={{ border: 'none' }}
+            selectStyle={{
+              border: 'none',
+              fontFamily: 'Barlow',
+              fontWeight: '500',
+              fontSize: '14px',
+              color: '#3C3F41',
+              letterSpacing: '0.01em'
+            }}
             options={options}
             value={value}
             handleActive={setActive}
@@ -97,11 +104,15 @@ const OuterContainer = styled.div<styledProps>`
       margin-top: -10px;
       padding-left: 10px;
       height: 14px;
-      transition: all 0.4s;
+      transition: all 0.4s;      
       label {
         color: ${(p) => p?.color && p?.color.grayish.G300} !important;
         background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
+        font-family: 'Barlow';
+        font-size: 12px;
+        font-weight: 500;
+        margin-left: 6px;
       }
       
     }
