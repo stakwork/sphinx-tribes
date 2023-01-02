@@ -65,7 +65,8 @@ export default function TextAreaInputNew({
           fontFamily: 'Barlow',
           fontWeight: '500',
           transition: 'all 0.5s'
-        }}>
+        }}
+      >
         {labeltext}
       </label>
     </InputOuterBox>

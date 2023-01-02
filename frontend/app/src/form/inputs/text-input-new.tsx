@@ -63,7 +63,8 @@ export default function TextInputNew({
           fontFamily: 'Barlow',
           fontWeight: '500',
           transition: 'all 0.5s'
-        }}>
+        }}
+      >
         {labeltext}
       </label>
     </InputOuterBox>
