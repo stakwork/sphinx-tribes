@@ -12,7 +12,7 @@ const PUBLIC_APP_ID = 'ded90c8e-92ed-496d-bfe3-f742d7fa9785';
 const BUTTON_ID = 'loom-record-sdk-button';
 
 export default function LoomViewerRecorderNew(props) {
-  const { loomEmbedUrl, onChange, readOnly, style } = props;
+  const { loomEmbedUrl, onChange, readOnly, style, setIsVideo } = props;
   const [videoUrl, setVideoUrl] = useState(loomEmbedUrl || '');
   const color = colors['light'];
 
@@ -39,6 +39,7 @@ export default function LoomViewerRecorderNew(props) {
 
       sdkButton.on('insert-click', async (video) => {
         setVideoUrl(video.embedUrl);
+        setIsVideo(true);
         if (onChange) onChange(video.embedUrl);
       });
     }
@@ -56,7 +57,7 @@ export default function LoomViewerRecorderNew(props) {
         __html: `<div class="lo-emb-vid"
         style="position: relative; padding-bottom: 75%; height: 0; margin-top: -101px; margin-left: -38px">
         <iframe src="${videoUrl}"
-            style="position: absolute; top: 0; left: 0; width: 290px; height: 175px; border-radius: 4px; " frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>`
+            style="position: absolute; top: 0; left: 0; width: 290px; height: 175px; border-radius: 12px; " frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>`
       }}
     />
   );
@@ -97,6 +98,7 @@ export default function LoomViewerRecorderNew(props) {
             <RemoveButtonContainer
               onClick={() => {
                 setVideoUrl('');
+                setIsVideo('');
                 if (onChange) onChange('');
               }}
               color={color}>

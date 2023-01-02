@@ -18,7 +18,7 @@ export default function Select(props: any) {
               style={{
                 color: color.text2,
                 fontSize: '14px',
-                padding: '0px',
+                paddingLeft: '0px',
                 margin: 0,
                 fontFamily: 'Barlow',
                 fontWeight: '500',
@@ -79,6 +79,7 @@ const S = styled(EuiSuperSelect as any)<styleProps>`
   color: ${(p) => p?.color && p?.color.pureBlack};
   box-sizing: border-box;
   box-shadow: none;
+  padding-left: 16px;
   user-select: none;
   .euiSuperSelectControl.euiSuperSelect--isOpen__button {
     background: ${(p) => p?.color && p?.color.pureWhite} !important;

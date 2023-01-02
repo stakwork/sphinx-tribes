@@ -59,9 +59,11 @@ export default function TextAreaInputNew({
           position: 'absolute',
           left: 16,
           top: !isFocused[label] ? (textValue === undefined || textValue === '' ? 10 : -9) : -9,
-          fontSize: 14,
+          fontSize: !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
           color: color.grayish.G300,
           background: color.pureWhite,
+          fontFamily: 'Barlow',
+          fontWeight: '500',
           transition: 'all 0.5s'
         }}>
         {labeltext}
@@ -87,6 +89,10 @@ const InputOuterBox = styled.div<styledProps>`
     outline: none;
     padding-left: 16px;
     padding-top: 16px;
+    resize: none;
+    color: #3c3f41;
+    font-weight: 500;
+    letter-spacing: 0.01em;
     :active {
       border: 1px solid ${(p) => p.color.blue2 && p.color.blue2} !important;
     }

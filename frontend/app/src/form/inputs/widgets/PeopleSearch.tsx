@@ -154,7 +154,7 @@ const InvitePeopleSearch = (props) => {
                 top: -2
               }}
               buttonTextStyle={{
-                color: !isPopoverOpen ? '#B0B7BC' : '#3C3F41',
+                color: !isPopoverOpen ? `${color.grayish.G300}` : `${color.black500}`,
                 textAlign: 'center',
                 fontSize: '13px',
                 fontWeight: '400',
@@ -184,7 +184,7 @@ const InvitePeopleSearch = (props) => {
           padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
         }}>
         {!isPopoverOpen &&
-          labels &&
+          labels.length > 0 &&
           labels?.map((x, index) => (
             <Label
               key={x.label}
@@ -264,7 +264,7 @@ const InvitePeopleSearch = (props) => {
                     ButtonContainerStyle={{
                       width: '86px',
                       height: '30px',
-                      background: '#DDE1E5'
+                      background: `${color.grayish.G600}`
                     }}
                     buttonAction={(e) => {
                       if (props.isProvidingHandler) {
@@ -474,14 +474,13 @@ const SearchOuterContainer = styled.div<styledProps>`
 const EuiPopOverCheckbox = styled.div<styledProps>`
   width: 292px;
   height: 293px;
-  padding: 33px 10px 31px 18px;
+  padding: 20px 10px 10px 18px;
 
   &.CheckboxOuter > div {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow-y: scroll;
     .euiCheckboxGroup__item {
       .euiCheckbox__square {
         top: 5px;
