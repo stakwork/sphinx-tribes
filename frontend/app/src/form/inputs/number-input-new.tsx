@@ -62,10 +62,12 @@ export default function NumberInputNew({
           position: 'absolute',
           left: 18,
           //   top: !isFocused[label] ? (textValue === undefined ? 10 : -9) : -9,
+          fontFamily: 'Barlow',
           top: -9,
-          fontSize: 14,
+          fontSize: 12,
           color: color.grayish.G300,
           background: color.pureWhite,
+          fontWeight: '500',
           transition: 'all 0.5s'
         }}
       >
@@ -93,6 +95,10 @@ const InputOuterBox = styled.div<styledProps>`
     border-radius: 4px;
     outline: none;
     padding-left: 16px;
+    font-family: 'Barlow';
+    font-weight: 500;
+    color: #3c3f41;
+    letter-spacing: 0.01em;
 
     :active {
       border: 1px solid ${(p) => p.color && p.color.blue2} !important;

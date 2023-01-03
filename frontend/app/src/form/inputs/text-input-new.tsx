@@ -57,9 +57,11 @@ export default function TextInputNew({
           position: 'absolute',
           left: 16,
           top: !isFocused[label] ? (textValue === undefined ? 10 : -9) : -9,
-          fontSize: 14,
+          fontSize: !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
           color: color.grayish.G300,
           background: color.pureWhite,
+          fontFamily: 'Barlow',
+          fontWeight: '500',
           transition: 'all 0.5s'
         }}
       >
@@ -86,6 +88,9 @@ const InputOuterBox = styled.div<styledProps>`
     border-radius: 4px;
     outline: none;
     padding-left: 16px;
+    color: ${(p) => p.color && p.color.text2};
+    font-weight: 500;
+    letter-spacing: 0.01em;
     :active {
       border: 1px solid ${(p) => p.color.blue2 && p.color.blue2} !important;
     }

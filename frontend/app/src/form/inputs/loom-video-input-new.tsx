@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
 import { colors } from '../../colors';
@@ -19,9 +19,13 @@ export default function LoomVideoInputNew({
   extraHTML
 }: Props) {
   const color = colors['light'];
+
+  const [isVideo, setIsVideo] = useState<boolean>(false);
+
   return (
     <LoomVideoContainer
       color={color}
+      isVideo={isVideo}
       style={{
         marginTop: '55px'
       }}
@@ -34,15 +38,17 @@ export default function LoomVideoInputNew({
         loomEmbedUrl={value}
         onBlur={handleBlur}
         onFocus={handleFocus}
+        setIsVideo={setIsVideo}
         style={{ marginTop: 59 }}
       />
-      <EuiText className="optionalText">Optional</EuiText>
+      {!isVideo && <EuiText className="optionalText">Optional</EuiText>}
     </LoomVideoContainer>
   );
 }
 
 interface styleProps {
   color?: any;
+  isVideo?: boolean;
 }
 
 const LoomVideoContainer = styled.div<styleProps>`
@@ -50,7 +56,7 @@ const LoomVideoContainer = styled.div<styleProps>`
   height: 175px;
   left: 698px;
   top: 313px;
-  background: url('/static/loom_video_outer_border.svg');
+  background: ${(p) => !p.isVideo && "url('/static/loom_video_outer_border.svg')"};
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -64,7 +70,7 @@ const LoomVideoContainer = styled.div<styleProps>`
     display: flex;
     align-items: center;
     text-align: center;
-    color: #b0b7bc;
+    color: ${(p) => p.color && p.color.grayish.G300};
     margin-top: 6px;
   }
 `;
