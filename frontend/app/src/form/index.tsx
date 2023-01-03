@@ -546,8 +546,8 @@ export default function Form(props: any) {
                                     ? '145px'
                                     : '120px'
                                   : '120px'
-                            }}>
-
+                            }}
+                          >
                             {assigneeName === '' ? (
                               <EuiText className="nextText">
                                 {schemaData.step === 5 ? 'Decide Later' : 'Next'}
