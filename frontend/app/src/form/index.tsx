@@ -345,6 +345,7 @@ export default function Form(props: any) {
                             <div
                               style={{
                                 height: '100%',
+                                width: '100%',
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'flex-end',
@@ -358,11 +359,11 @@ export default function Form(props: any) {
                                     : '/static/live_help.svg'
                                 }
                                 alt="select_type"
-                                height={'121px'}
-                                width={'130.1px'}
+                                height={'114%'}
+                                width={'114%'}
                                 style={{
                                   position: 'absolute',
-                                  top: '52px'
+                                  top: '32px'
                                 }}
                               />
                             </div>
@@ -371,7 +372,7 @@ export default function Form(props: any) {
                             <EuiText className="textTop">{v.label}</EuiText>
                             <EuiText className="textBottom">
                               {v.value === 'freelance_job_request'
-                                ? 'Find right developer for your task'
+                                ? 'Choose the right developer'
                                 : 'Get instant help for your task'}
                             </EuiText>
                             {v.value === 'freelance_job_request' ? (
@@ -538,7 +539,15 @@ export default function Form(props: any) {
                                 }
                               }
                             }}
-                          >
+                            style={{
+                              width:
+                                schemaData.step === 5
+                                  ? assigneeName === ''
+                                    ? '145px'
+                                    : '120px'
+                                  : '120px'
+                            }}>
+
                             {assigneeName === '' ? (
                               <EuiText className="nextText">
                                 {schemaData.step === 5 ? 'Decide Later' : 'Next'}
@@ -878,7 +887,7 @@ const BottomContainer = styled.div<bottomButtonProps>`
     align-items: center;
   }
   .nextButtonDisable {
-    width: 145px;
+    width: 120px;
     height: 42px;
     display: flex;
     justify-content: center;
@@ -900,7 +909,6 @@ const BottomContainer = styled.div<bottomButtonProps>`
     }
   }
   .nextButton {
-    width: 145px;
     height: 42px;
     display: flex;
     justify-content: center;
@@ -962,10 +970,11 @@ const BountyContainer = styled.div<styledProps>`
   max-width: 290px;
   background: ${(p) => p.color && p.color.pureWhite};
   border: 1px solid ${(p) => p.color && p.color.grayish.G600};
+  outline: 1px solid ${(p) => p.color && p.color.pureWhite};
   box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black100};
   border-radius: 20px;
-  // margin-left: 34px;
   overflow: hidden;
+  transition: all 0.2s;
   .freelancerContainer {
     min-height: 352px;
     max-height: 352px;
@@ -974,7 +983,11 @@ const BountyContainer = styled.div<styledProps>`
   :hover {
     border: ${(p) =>
       p.show
-        ? `2px solid ${p.color.button_primary.shadow}`
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    outline: ${(p) =>
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
         : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
   }
@@ -990,7 +1003,7 @@ const BountyContainer = styled.div<styledProps>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    padding-top: 60px;
     .textTop {
       height: 40px;
       font-family: 'Barlow';
