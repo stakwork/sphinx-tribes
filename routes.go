@@ -53,6 +53,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
+		r.Get("/tribes/total", getListedTribes)
 		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
 
 		r.Get("/leaderboard/{tribe_uuid}", getLeaderBoard)
@@ -230,6 +231,12 @@ func getAllTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := DB.getAllTribes()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
+}
+
+func getTotalribes(w http.ResponseWriter, r *http.Request) {
+	tribesTotal := DB.getTribesTotal()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribesTotal)
 }
 
 func getListedTribes(w http.ResponseWriter, r *http.Request) {
