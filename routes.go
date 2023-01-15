@@ -53,7 +53,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
-		r.Get("/tribes/total", getListedTribes)
+		r.Get("/tribes/total", getTotalribes)
 		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
 
 		r.Get("/leaderboard/{tribe_uuid}", getLeaderBoard)
