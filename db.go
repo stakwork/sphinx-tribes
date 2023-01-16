@@ -3,14 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
-	"github.com/rs/xid"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
+	"github.com/rs/xid"
 )
 
 type database struct {
@@ -526,6 +527,12 @@ func (db database) getAllTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Where("(deleted = 'f' OR de leted is null)").Find(&ms)
 	return ms
+}
+
+func (db database) getTribesTotal() uint64 {
+	var count uint64
+	db.db.Model(&Tribe{}).Where("deleted = 'false' OR deleted is null").Count(&count)
+	return count
 }
 
 func (db database) getTribe(uuid string) Tribe {
