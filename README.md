@@ -48,3 +48,19 @@ in `frontend/app/src/host.ts` return `"people.sphinx.chat"`
 - Build the application by running ``` go build . ```
 - Run the application with ``` ./sphinx-tribes ```
 
+### Run Golang backend with local database
+
+- Create a Postgres database
+- Copy the table creation queries from tribes.sql file, and create the tables in the database created
+- Create a .env file and populate the .env files with these variables
+
+```
+    RDS_HOSTNAME =
+    RDS_PORT = 
+    RDS_DB_NAME = 
+    RDS_USERNAME =
+    RDS_PASSWORD =
+```
+- Build and run the Golang server
+
+
