@@ -124,7 +124,7 @@ const H = styled.div<HProps>`
   color: ${(p) => p?.color && p.color.grayish.G07};
   font-weight: 700;
   font-size: ${(p) => (p.small ? '22px' : '30px')};
-  line-height: ${(p) => (p.small ? '26px' : '40px')}; ;
+  line-height: ${(p) => (p.small ? '26px' : '40px')};
 `;
 
 const C = styled.div<styledProps>`
