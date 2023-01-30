@@ -177,6 +177,17 @@ type LeaderBoard struct {
 	Reputation int64  `json:"reputation"`
 }
 
+type AssetListData struct {
+	ID      uint   `json:"id"`
+	Icon    string `json:"icon"`
+	Name    string `json:"name"`
+	Asset   string `json:"asset"`
+	Token   string `json:"token"`
+	Amount  uint   `json:"amount"`
+	Creator string `json:"creator"`
+	Balance uint   `json:"balance"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {
