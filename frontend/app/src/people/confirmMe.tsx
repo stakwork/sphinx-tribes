@@ -30,7 +30,7 @@ export default function ConfirmMe(props: any) {
 
   useEffect(() => {
     if (challenge && ts) {
-      let el = document.createElement('a');
+      const el = document.createElement('a');
       el.href = qrString;
       el.click();
     }

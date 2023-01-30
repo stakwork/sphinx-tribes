@@ -77,7 +77,7 @@ export default function AboutView(props: any) {
 
           <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
             <Img src={'/static/github_logo.png'} />
-            <a href={`https://github.com/${githubTag}`} target="_blank">
+            <a href={`https://github.com/${githubTag}`} target="_blank" rel="noreferrer">
               {githubTag}
             </a>
           </Row>
@@ -102,9 +102,9 @@ export default function AboutView(props: any) {
           <Grow>
             {repos.map((r, i) => {
               return (
-                <ItemRow key={i + 'myrepo'} style={{ width: 'fit-content' }}>
+                <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
                   <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
-                  <a href={`https://github.com/${r?.label}`} target="_blank">
+                  <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
                     {r?.label}
                   </a>
                 </ItemRow>
@@ -121,7 +121,7 @@ export default function AboutView(props: any) {
           <Grow>
             {tribes.map((t, i) => {
               return (
-                <ItemRow key={i + 'mytribe'} onClick={() => history.push(`/t/${t?.unique_name}`)}>
+                <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
                   <Img src={t?.img || '/static/sphinx.png'} />
                   <div>{t?.name}</div>
                 </ItemRow>

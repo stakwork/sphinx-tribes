@@ -8,7 +8,11 @@ import BountyProfileView from '../../sphinxUI/bounty_profile_view';
 const PaidBounty = (props) => {
   const color = colors['light'];
   return (
-    <BountyContainer Bounty_Container_Background={color.pureWhite}>
+    <BountyContainer
+      onClick={props.onPanelClick}
+      Bounty_Container_Background={color.pureWhite}
+      color={color}
+    >
       <BountyDescription
         {...props}
         title={props.title}
@@ -30,6 +34,7 @@ const PaidBounty = (props) => {
         <BountyProfileView
           assignee={props.assignee}
           status={'COMPLETED'}
+          canViewProfile={true}
           statusStyle={{
             width: '63px',
             height: '16px',
@@ -43,7 +48,7 @@ const PaidBounty = (props) => {
           position: 'sticky',
           width: '80px',
           height: '80px',
-          right: '-2.5px'
+          right: '-1.5px'
         }}
         alt={'paid_ribbon'}
       />
@@ -56,6 +61,7 @@ export default PaidBounty;
 interface PaidBountyProps {
   Price_User_Container_Border?: string;
   Bounty_Container_Background?: string;
+  color?: any;
 }
 
 const BountyContainer = styled.div<PaidBountyProps>`
@@ -65,6 +71,12 @@ const BountyContainer = styled.div<PaidBountyProps>`
   font-family: Barlow;
   height: 100% !important;
   background: ${(p) => p.Bounty_Container_Background};
+  border: 2px solid ${(p) => p.color.grayish.G950};
+  border-radius: 10px;
+  :hover {
+    border: 2px solid ${(p) => p.color && p.color.borderGreen2};
+    border-radius: 10px;
+  }
 `;
 
 const PriceUserContainer = styled.div<PaidBountyProps>`
@@ -72,5 +84,6 @@ const PriceUserContainer = styled.div<PaidBountyProps>`
   flex-direction: row;
   border: 2px solid ${(p) => p.Price_User_Container_Border};
   border-radius: 10px;
-  width: 581px;
+  width: 579px;
+  margin: -0.5px -1.1px;
 `;

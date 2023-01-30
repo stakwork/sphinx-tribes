@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable func-style */
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
@@ -18,6 +19,8 @@ import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import BountyHeader from '../widgetViews/bountyHeader';
 import { colors } from '../../colors';
+import StartUpModal from '../utils/start_up_modal';
+import ConnectCard from '../utils/connectCard';
 // import { SearchTextInput } from '../../sphinxUI/index'
 // avoid hook within callback warning by renaming hooks
 
@@ -41,6 +44,19 @@ export default function BodyComponent({ selectedWidget }) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
+  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const closeModal = () => setOpenStartUpModel(false);
+  const showModal = () => setOpenStartUpModel(true);
+  const [openConnectModal, setConnectModal] = useState<boolean>(false);
+  const closeConnectModal = () => setConnectModal(false);
+  const showConnectModal = () => setConnectModal(true);
+  const [connectPerson, setConnectPerson] = useState<any>();
+  const [connectPersonBody, setConnectPersonBody] = useState<any>();
+  const [activeListIndex, setActiveListIndex] = useState<number>(0);
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
+  const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const [isModalSideButton, setIsModalSideButton] = useState<boolean>(true);
+  const [isExtraStyle, setIsExtraStyle] = useState<boolean>(false);
 
   const color = colors['light'];
 
@@ -60,7 +76,7 @@ export default function BodyComponent({ selectedWidget }) {
     offer: peopleOffers
   };
 
-  let person: any =
+  const person: any =
     main.people && main.people.length && main.people.find((f) => f.id === ui.selectedPerson);
 
   const { id } = person || {};
@@ -73,8 +89,8 @@ export default function BodyComponent({ selectedWidget }) {
       return;
     }
     if (person && person.extras) {
-      let g = person.extras[tabs[selectedWidget]?.name];
-      let nextindex = focusIndex + 1;
+      const g = person.extras[tabs[selectedWidget]?.name];
+      const nextindex = focusIndex + 1;
       if (g[nextindex]) setFocusIndex(nextindex);
       else setFocusIndex(0);
     }
@@ -86,12 +102,22 @@ export default function BodyComponent({ selectedWidget }) {
       return;
     }
     if (person && person.extras) {
-      let g = person?.extras[tabs[selectedWidget]?.name];
-      let previndex = focusIndex - 1;
+      const g = person?.extras[tabs[selectedWidget]?.name];
+      const previndex = focusIndex - 1;
       if (g[previndex]) setFocusIndex(previndex);
       else setFocusIndex(g.length - 1);
     }
   }
+
+  const ReCallBounties = () => {
+    (async () => {
+      /*
+       TODO : after getting the better way to reload the bounty, this code will be removed.
+       */
+      history.push('/tickets');
+      await window.location.reload();
+    })();
+  };
 
   const activeList = listSource[selectedWidget];
 
@@ -154,7 +180,7 @@ export default function BodyComponent({ selectedWidget }) {
     const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
     if (itemIndex > -1) {
       // make person into proper structure (derived from widget)
-      let p = {
+      const p = {
         ...person,
         extras: {
           [selectedWidget]: person[selectedWidget]
@@ -162,6 +188,8 @@ export default function BodyComponent({ selectedWidget }) {
       };
       setPublicFocusPerson(p);
       setPublicFocusIndex(itemIndex);
+      setConnectPerson({ ...person });
+      setConnectPersonBody({ ...item });
     }
   }
 
@@ -173,9 +201,18 @@ export default function BodyComponent({ selectedWidget }) {
         activeList && activeList.length
           ? activeList.find((item) => {
               const { person, body } = item;
-              return owner_id === person.owner_pubkey && created === body.created + '';
+              return owner_id === person.owner_pubkey && created === `${body.created}`;
             })
           : {};
+      setActiveListIndex(
+        activeList && activeList.length
+          ? activeList.findIndex((item) => {
+              const { person, body } = item;
+              return owner_id === person.owner_pubkey && created === `${body.created}`;
+            })
+          : {}
+      );
+
       if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
       }
@@ -189,7 +226,7 @@ export default function BodyComponent({ selectedWidget }) {
       setPublicFocusIndex(-1);
     } else {
       //pull list again, we came back from focus view
-      let loadMethod = loadMethods[selectedWidget];
+      const loadMethod = loadMethods[selectedWidget];
       loadMethod({ page: 1, resetPage: true });
     }
   }, [ui.selectedPerson]);
@@ -229,10 +266,10 @@ export default function BodyComponent({ selectedWidget }) {
 
   async function doDeeplink() {
     if (pathname) {
-      let splitPathname = pathname?.split('/');
-      let personPubkey: string = splitPathname[2];
+      const splitPathname = pathname?.split('/');
+      const personPubkey: string = splitPathname[2];
       if (personPubkey) {
-        let p = await main.getPersonByPubkey(personPubkey);
+        const p = await main.getPersonByPubkey(personPubkey);
         ui.setSelectedPerson(p?.id);
         ui.setSelectingPerson(p?.id);
         // make sure to load people in a person deeplink
@@ -241,6 +278,26 @@ export default function BodyComponent({ selectedWidget }) {
       }
     }
   }
+
+  const onChangeStatus = (optionId) => {
+    const newCheckboxIdToSelectedMap = {
+      ...checkboxIdToSelectedMap,
+      ...{
+        [optionId]: !checkboxIdToSelectedMap[optionId]
+      }
+    };
+    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+  };
+
+  const onChangeLanguage = (optionId) => {
+    const newCheckboxIdToSelectedMapLanguage = {
+      ...checkboxIdToSelectedMapLanguage,
+      ...{
+        [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
+      }
+    };
+    setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
+  };
 
   function selectPerson(id: number, unique_name: string, pubkey: string) {
     console.log('selectPerson', id, unique_name, pubkey);
@@ -327,24 +384,12 @@ export default function BodyComponent({ selectedWidget }) {
         ));
 
         // add space at bottom
-        p = [...p, <Spacer key={'spacer'} />];
+        p = [...p, <Spacer key={'spacer1'} />];
       } else {
         p = <NoResults />;
       }
 
-      return (
-        <div
-          id="renderPeople"
-          style={{
-            display: 'flex',
-            justifyContent: 'start',
-            alignItems: 'center',
-            flexWrap: 'wrap'
-          }}>
-          {p}
-        </div>
-      );
-      // return p;
+      return p;
     }
 
     const listContent =
@@ -356,9 +401,13 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
-          }}>
+            alignItems: 'center',
+            height: '100%'
+          }}
+        >
           <WidgetSwitchViewer
+            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
             onPanelClick={(person, item) => {
               history.replace({
                 pathname: history?.location?.pathname,
@@ -370,11 +419,15 @@ export default function BodyComponent({ selectedWidget }) {
               });
               publicPanelClick(person, item);
             }}
+            fromBountyPage={true}
             selectedWidget={selectedWidget}
+            loading={loading}
           />
         </div>
       ) : (
         <WidgetSwitchViewer
+          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
           onPanelClick={(person, item) => {
             history.replace({
               pathname: history?.location?.pathname,
@@ -386,6 +439,7 @@ export default function BodyComponent({ selectedWidget }) {
             });
             publicPanelClick(person, item);
           }}
+          fromBountyPage={true}
           selectedWidget={selectedWidget}
           loading={loading}
         />
@@ -427,19 +481,25 @@ export default function BodyComponent({ selectedWidget }) {
               position: 'relative',
               background: color.pureWhite,
               borderBottom: `1px solid ${color.black100}`
-            }}>
+            }}
+          >
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
                 setShowFocusView={setIsMobileViewTicketModal}
                 scrollValue={scrollValue}
+                onChangeStatus={onChangeStatus}
+                onChangeLanguage={onChangeLanguage}
+                checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+                checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
               />
             )}
             {selectedWidget === 'people' && (
               <div
                 style={{
                   padding: '0 20px'
-                }}>
+                }}
+              >
                 <SearchTextInput
                   small
                   name="search"
@@ -480,7 +540,8 @@ export default function BodyComponent({ selectedWidget }) {
               width: '100%'
             }}
             isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}>
+            dismountCallback={() => ui.setSelectedPerson(0)}
+          >
             <PersonViewSlim
               goBack={goBack}
               personId={ui.selectedPerson}
@@ -553,7 +614,8 @@ export default function BodyComponent({ selectedWidget }) {
         style={{
           background: color.grayish.G950,
           height: 'calc(100% - 65px)'
-        }}>
+        }}
+      >
         <div
           style={{
             minHeight: '32px'
@@ -564,6 +626,10 @@ export default function BodyComponent({ selectedWidget }) {
             selectedWidget={selectedWidget}
             setShowFocusView={setShowFocusView}
             scrollValue={scrollValue}
+            onChangeStatus={onChangeStatus}
+            onChangeLanguage={onChangeLanguage}
+            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
           />
         )}
         {selectedWidget === 'people' && (
@@ -572,7 +638,8 @@ export default function BodyComponent({ selectedWidget }) {
               display: 'flex',
               justifyContent: 'flex-end',
               padding: '10px 0'
-            }}>
+            }}
+          >
             <SearchTextInput
               small
               name="search"
@@ -602,7 +669,8 @@ export default function BodyComponent({ selectedWidget }) {
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               padding: '0px 20px 20px 20px'
-            }}>
+            }}
+          >
             <PageLoadSpinner show={loadingTop} />
             {listContent}
             <PageLoadSpinner noAnimate show={loadingBottom} />
@@ -621,7 +689,8 @@ export default function BodyComponent({ selectedWidget }) {
             width: '100%'
           }}
           isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}>
+          dismountCallback={() => ui.setSelectedPerson(0)}
+        >
           <PersonViewSlim
             goBack={goBack}
             personId={ui.selectedPerson}
@@ -635,21 +704,71 @@ export default function BodyComponent({ selectedWidget }) {
           <Modal
             visible={publicFocusPerson ? true : false}
             envStyle={{
-              borderRadius: 0,
+              borderRadius: isExtraStyle ? '10px' : 0,
               background: color.pureWhite,
-              height: '100%',
-              width: '60%',
-              minWidth: 500,
-              maxWidth: 602,
-              ...focusedDesktopModalStyles
+              ...focusedDesktopModalStyles,
+              maxHeight: '100vh',
+              zIndex: 20
             }}
-            bigClose={() => {
+            style={{
+              background: 'rgba( 0 0 0 /75% )'
+            }}
+            bigCloseImage={() => {
               setPublicFocusPerson(null);
               setPublicFocusIndex(-1);
               history.push('/tickets');
-            }}>
+              setIsExtraStyle(false);
+              setIsModalSideButton(true);
+            }}
+            bigCloseImageStyle={{
+              top: isExtraStyle ? '-18px' : '18px',
+              right: isExtraStyle ? '-18px' : '-50px',
+              // background: isExtraStyle ? '#000' : '#000',
+              borderRadius: isExtraStyle ? '50%' : '50%'
+            }}
+            prevArrowNew={
+              activeListIndex === 0
+                ? null
+                : isModalSideButton
+                ? () => {
+                    const { person, body } = activeList[activeListIndex - 1];
+                    if (person && body) {
+                      history.replace({
+                        pathname: history?.location?.pathname,
+                        search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                        state: {
+                          owner_id: person?.owner_pubkey,
+                          created: body?.created
+                        }
+                      });
+                    }
+                  }
+                : null
+            }
+            nextArrowNew={
+              activeListIndex + 1 > activeList?.length
+                ? null
+                : isModalSideButton
+                ? () => {
+                    const { person, body } = activeList[activeListIndex + 1];
+                    if (person && body) {
+                      history.replace({
+                        pathname: history?.location?.pathname,
+                        search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                        state: {
+                          owner_id: person?.owner_pubkey,
+                          created: body?.created
+                        }
+                      });
+                    }
+                  }
+                : null
+            }
+          >
             <FocusedView
+              ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
+              personBody={connectPersonBody}
               canEdit={false}
               selectedIndex={publicFocusIndex}
               config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
@@ -662,9 +781,38 @@ export default function BodyComponent({ selectedWidget }) {
                 setPublicFocusPerson(null);
                 setPublicFocusIndex(-1);
               }}
+              fromBountyPage={true}
+              extraModalFunction={() => {
+                setPublicFocusPerson(null);
+                setPublicFocusIndex(-1);
+                history.push('/tickets');
+                if (ui.meInfo) {
+                  showConnectModal();
+                } else {
+                  showModal();
+                }
+              }}
+              deleteExtraFunction={() => {
+                setPublicFocusPerson(null);
+                setPublicFocusIndex(-1);
+              }}
+              setIsModalSideButton={setIsModalSideButton}
+              setIsExtraStyle={setIsExtraStyle}
             />
           </Modal>
         )}
+        {openStartUpModel && (
+          <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
+        )}
+        <ConnectCard
+          dismiss={() => closeConnectModal()}
+          modalStyle={{
+            top: '-64px',
+            height: 'calc(100% + 64px)'
+          }}
+          person={connectPerson}
+          visible={openConnectModal}
+        />
         {toastsEl}
         {/* modal create ticket */}
         {showFocusView && (
@@ -677,28 +825,30 @@ export default function BodyComponent({ selectedWidget }) {
             }}
             envStyle={{
               marginTop: isMobile ? 64 : 0,
-              borderRadius: 0,
               background: color.pureWhite,
-              height: '100%',
-              width: '60%',
-              minWidth: 500,
-              maxWidth: 602,
               zIndex: 20,
-              ...focusedDesktopModalStyles
+              ...focusedDesktopModalStyles,
+              maxHeight: '100%',
+              borderRadius: '10px'
             }}
-            nextArrow={nextIndex}
-            prevArrow={prevIndex}
             overlayClick={() => {
               setShowFocusView(false);
               setFocusIndex(-1);
-              // if (selectedWidget === 'about') switchWidgets('badges');
             }}
-            bigClose={() => {
+            bigCloseImage={() => {
               setShowFocusView(false);
               setFocusIndex(-1);
-              // if (selectedWidget === 'about') switchWidgets('badges');
-            }}>
+            }}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
             <FocusedView
+              ReCallBounties={ReCallBounties}
+              newDesign={true}
               person={person}
               canEdit={!canEdit}
               selectedIndex={focusIndex}
@@ -707,6 +857,7 @@ export default function BodyComponent({ selectedWidget }) {
                 console.log('success');
                 setFocusIndex(-1);
                 // if (selectedWidget === 'about') switchWidgets('badges');
+                setShowFocusView(false);
               }}
               goBack={() => {
                 setShowFocusView(false);

@@ -47,11 +47,13 @@ func NewRouter() *http.Server {
 		r.Get("/p/{pubkey}", frontend.IndexRoute)
 		r.Get("/p", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
+		r.Get("/tickets", frontend.IndexRoute)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
+		r.Get("/tribes/total", getTotalribes)
 		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
 
 		r.Get("/leaderboard/{tribe_uuid}", getLeaderBoard)
@@ -74,6 +76,8 @@ func NewRouter() *http.Server {
 		r.Get("/people/search", getPeopleBySearch)
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
+		r.Get("/people/wanteds/header", getWantedsHeader)
+		r.Get("/people/short", getPeopleShortList)
 		r.Get("/people/offers", getListedOffers)
 		r.Get("/admin_pubkeys", getAdminPubkeys)
 
@@ -230,6 +234,12 @@ func getAllTribes(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tribes)
 }
 
+func getTotalribes(w http.ResponseWriter, r *http.Request) {
+	tribesTotal := DB.getTribesTotal()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribesTotal)
+}
+
 func getListedTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := DB.getListedTribes(r)
 	w.WriteHeader(http.StatusOK)
@@ -276,6 +286,28 @@ func getListedWanteds(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(people)
 	}
 }
+
+func getWantedsHeader(w http.ResponseWriter, r *http.Request) {
+	var ret struct {
+		DeveloperCount uint64           `json:"developer_count"`
+		BountiesCount  uint64           `json:"bounties_count"`
+		People         *[]PersonInShort `json:"people"`
+	}
+	ret.DeveloperCount = DB.countDevelopers()
+	ret.BountiesCount = DB.countBounties()
+	ret.People = DB.getPeopleListShort(3)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ret)
+}
+
+func getPeopleShortList(w http.ResponseWriter, r *http.Request) {
+	var maxCount uint32 = 10000
+	people := DB.getPeopleListShort(maxCount)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
 func getListedOffers(w http.ResponseWriter, r *http.Request) {
 	people, err := DB.getListedOffers(r)
 	if err != nil {

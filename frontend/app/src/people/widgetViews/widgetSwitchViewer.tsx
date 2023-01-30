@@ -11,8 +11,11 @@ import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
 import { uiStore } from '../../store/ui';
 import DeleteTicketModal from './deleteModal';
+import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
+import { colors } from '../../colors';
 
 export default function WidgetSwitchViewer(props) {
+  const color = colors['light'];
   const { main } = useStores();
   const isMobile = useIsMobile();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -28,7 +31,7 @@ export default function WidgetSwitchViewer(props) {
     : {
         minWidth: '1100px',
         maxWidth: '1100px',
-        marginBottom: 20,
+        marginBottom: 16,
         borderRadius: '10px',
         display: 'flex',
         justifyContent: 'center'
@@ -37,7 +40,7 @@ export default function WidgetSwitchViewer(props) {
   return useObserver(() => {
     const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
-    let { selectedWidget, onPanelClick } = props;
+    const { selectedWidget, onPanelClick } = props;
 
     if (!selectedWidget) {
       return <div style={{ height: 200 }} />;
@@ -49,12 +52,18 @@ export default function WidgetSwitchViewer(props) {
       offer: peopleOffers
     };
 
-    const activeList = listSource[selectedWidget];
+    const activeList = [...listSource[selectedWidget]].filter(({ body }) => {
+      const value = { ...body };
+      return (
+        bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
+        bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
+      );
+    });
 
-    let foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
+    const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
     // if dynamic schema, get all those fields
     if (foundDynamicSchema) {
-      let dynamicFields: any = [];
+      const dynamicFields: any = [];
       foundDynamicSchema.dynamicSchemas?.forEach((ds) => {
         ds.forEach((f) => {
           if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
@@ -66,7 +75,7 @@ export default function WidgetSwitchViewer(props) {
       const info = uiStore.meInfo as any;
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       try {
-        await fetch(URL + `/delete_ticket`, {
+        await fetch(`${URL}/delete_ticket`, {
           method: 'POST',
           body: JSON.stringify(payload),
           headers: {
@@ -81,7 +90,7 @@ export default function WidgetSwitchViewer(props) {
 
     const confirmDelete = async () => {
       try {
-        if (!!deletePayload) {
+        if (deletePayload) {
           await deleteTicket(deletePayload);
         }
       } catch (error) {
@@ -94,10 +103,9 @@ export default function WidgetSwitchViewer(props) {
       activeList && activeList.length ? (
         activeList.slice(0, currentItems).map((item, i) => {
           const { person, body } = item;
-
           const conditionalStyles = body?.paid
             ? {
-                border: isMobile ? '2px 0 0 0 solid #dde1e5' : '',
+                border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
                 boxShadow: 'none'
               }
             : {};
@@ -105,11 +113,13 @@ export default function WidgetSwitchViewer(props) {
           // if this person has entries for this widget
           return (
             <Panel
+              color={color}
               isMobile={isMobile}
               key={person?.owner_pubkey + i + body?.created}
-              onClick={() => {
-                if (onPanelClick) onPanelClick(person, body);
-              }}
+              isAssignee={!!body.assignee}
+              // onClick={() => {
+              //   if (onPanelClick) onPanelClick(person, body);
+              // }}
               style={{
                 ...panelStyles,
                 ...conditionalStyles,
@@ -117,30 +127,35 @@ export default function WidgetSwitchViewer(props) {
                 padding: 0,
                 overflow: 'hidden',
                 background: 'transparent',
-                height: '160px',
+                minHeight: !isMobile ? '160px' : '',
                 boxShadow: 'none'
-              }}>
+              }}
+            >
               {selectedWidget === 'post' ? (
                 <PostView
                   showName
-                  key={i + person.owner_pubkey + 'pview'}
+                  key={`${i + person.owner_pubkey}pview`}
                   person={person}
                   {...body}
                 />
               ) : selectedWidget === 'offer' ? (
                 <OfferView
                   showName
-                  key={i + person.owner_pubkey + 'oview'}
+                  key={`${i + person.owner_pubkey}oview`}
                   person={person}
                   {...body}
                 />
               ) : selectedWidget === 'wanted' ? (
                 <WantedView
                   showName
-                  key={i + person.owner_pubkey + 'wview'}
+                  onPanelClick={() => {
+                    if (onPanelClick) onPanelClick(person, body);
+                  }}
+                  key={`${i + person.owner_pubkey}wview`}
                   person={person}
                   showModal={showModal}
                   setDeletePayload={setDeletePayload}
+                  fromBountyPage={props.fromBountyPage}
                   {...body}
                 />
               ) : null}
@@ -154,19 +169,32 @@ export default function WidgetSwitchViewer(props) {
     return (
       <>
         {listItems}
-        <Spacer key={'spacer'} />
+        <Spacer key={'spacer2'} />
 
         {showDeleteModal && (
           <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
         )}
-        {!props.loading && (
-          <LoadMoreButton
-            onClick={() => {
-              setCurrentItems(currentItems + 10);
-            }}>
-            Load More
-          </LoadMoreButton>
+        {activeList?.length > currentItems && (
+          <LoadMoreContainer
+            color={color}
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <div
+              className="LoadMoreButton"
+              onClick={() => {
+                setCurrentItems(currentItems + 10);
+              }}
+            >
+              Load More
+            </div>
+          </LoadMoreContainer>
         )}
+        <Spacer key={'spacer'} />
       </>
     );
   });
@@ -174,38 +202,51 @@ export default function WidgetSwitchViewer(props) {
 
 interface PanelProps {
   isMobile?: boolean;
+  color?: any;
+  isAssignee?: boolean;
 }
 
 const Panel = styled.div<PanelProps>`
-  // position: ;
-  background: #ffffff;
-  color: #000000;
+  margin-top: 4px;
+  background: ${(p) => p.color && p.color.pureWhite};
+  color: ${(p) => p.color && p.color.pureBlack};
   padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+  border-bottom: ${(p) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
+  :hover {
+    box-shadow: ${(p) => (p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none')} !important;
+  }
+  :active {
+    box-shadow: none !important;
+  }
 `;
 
-const LoadMoreButton = styled.div`
-  width: 166px;
-  height: 48px;
+const LoadMoreContainer = styled.div<PanelProps>`
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #3c3f41;
-  border: 1px solid #dde1e5;
-  border-radius: 30px;
-  background: #ffffff;
-  font-family: 'Barlow';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
-  cursor: pointer;
-  user-select: none;
-  :hover {
-    border: 1px solid #b0b7bc;
-  }
-  :active {
-    border: 1px solid #8e969c;
+  .LoadMoreButton {
+    width: 166px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: ${(p) => p.color && p.color.grayish.G10};
+    border: 1px solid ${(p) => p.color && p.color.grayish.G600};
+    border-radius: 30px;
+    background: ${(p) => p.color && p.color.pureWhite};
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    cursor: pointer;
+    user-select: none;
+    :hover {
+      border: 1px solid ${(p) => p.color && p.color.grayish.G300};
+    }
+    :active {
+      border: 1px solid ${(p) => p.color && p.color.grayish.G100};
+    }
   }
 `;

@@ -23,7 +23,8 @@ export default function PostView(props: any) {
             maxHeight: noGallery && !expand ? 340 : !expand ? 80 : '',
             minHeight: noGallery ? 80 : '',
             overflow: 'hidden'
-          }}>
+          }}
+        >
           <ReactMarkdown>{content}</ReactMarkdown>{' '}
         </Paragraph>
 
@@ -33,7 +34,8 @@ export default function PostView(props: any) {
             onClick={(e) => {
               e.stopPropagation();
               setExpand(!expand);
-            }}>
+            }}
+          >
             {!expand ? 'Read more' : 'Show less'}
           </Link>
         )}

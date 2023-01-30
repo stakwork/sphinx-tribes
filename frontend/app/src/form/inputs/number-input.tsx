@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
 import { satToUsd } from '../../helpers';
+import { colors } from '../../colors';
 
 export default function NumberInput({
   name,
@@ -18,13 +19,24 @@ export default function NumberInput({
   borderType
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
+  if (error) labeltext = `${labeltext} (${error})`;
+  const [active, setActive] = useState<boolean>(false);
+  const color = colors['light'];
 
   return (
-    <>
-      <FieldEnv border={borderType} label={labeltext}>
+    <OuterContainer color={color}>
+      <FieldEnv
+        color={color}
+        onClick={() => {
+          setActive(true);
+        }}
+        className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
+        border={borderType}
+        label={labeltext}
+      >
         <R>
           <FieldText
+            color={color}
             name="first"
             value={value}
             type="number"
@@ -39,24 +51,27 @@ export default function NumberInput({
               if (value === '') handleChange(0);
               if (value === '0') handleChange(0);
               handleBlur(e);
+              setActive(false);
             }}
             onFocus={(e) => {
               // remove 0 on focus
               console.log('onFocus', value);
               if (value === 0) handleChange('');
               handleFocus(e);
+              setActive(true);
             }}
           />
-          {error && (
-            <E>
+          {/* {error && (
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
-          )}
+          )} */}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
-      {name.includes('price') && <Note>({satToUsd(value)} USD)</Note>}
+      {note && <Note color={color}>*{note}</Note>}
+      {name.includes('price') && <Note color={color}>({satToUsd(value)} USD)</Note>}
       <ExtraText
+        color={color}
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
@@ -70,19 +85,54 @@ export default function NumberInput({
         *This amount applies to users trying to connect within the Sphinx app. Older versions of the
         app may not support this feature.
       </ExtraText> */}
-    </>
+    </OuterContainer>
   );
 }
-const ExtraText = styled.div`
+
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
+  .euiFormRow_active {
+    border: 1px solid ${(p) => p.color && p.color.blue2};
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: ${(p) => p.color && p.color.grayish.G300} !important;
+        background: ${(p) => p.color && p.color.pureWhite};
+        z-index: 10;
+      }
+    }
+  }
+  .euiFormRow_filed {
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: ${(p) => p.color && p.color.grayish.G300} !important;
+        background: ${(p) => p.color && p.color.pureWhite};
+        z-index: 10;
+      }
+    }
+  }
+`;
+
+const ExtraText = styled.div<styledProps>`
   padding: 0px 10px 5px;
   margin: -5px 0 10px;
-  color: #b75858;
+  color: ${(p) => p.color && p.color.red3};
   font-style: italic;
   max-width: calc(100% - 20px);
   word-break: break;
   font-size: 14px;
 `;
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 0px;
@@ -90,7 +140,7 @@ const E = styled.div`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

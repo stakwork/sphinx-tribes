@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiFormRow, EuiFieldText, EuiIcon, PropertySortType } from '@elastic/eui';
 import type { Props } from './propsType';
+import { colors } from '../../colors';
 
 export default function SearchTextInput({
   placeholder,
@@ -16,12 +17,14 @@ export default function SearchTextInput({
   extraHTML
 }: any) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
+  if (error) labeltext = `${labeltext} (${error})`;
+  const color = colors['light'];
 
   return (
     <>
       <R>
         <Text
+          color={color}
           name="first"
           value={value || ''}
           readOnly={readOnly || false}
@@ -31,7 +34,7 @@ export default function SearchTextInput({
           placeholder={placeholder || 'Search'}
         />
         {error && (
-          <E>
+          <E color={color}>
             <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
           </E>
         )}
@@ -40,9 +43,13 @@ export default function SearchTextInput({
   );
 }
 
-const Text = styled.input`
-  background: #f2f3f580;
-  border: 1px solid #e0e0e0;
+interface styledProps {
+  color?: any;
+}
+
+const Text = styled.input<styledProps>`
+  background: ${(p) => p.color && p.color.grayish.G71A};
+  border: 1px solid ${(p) => p.color && p.color.grayish.G750};
   box-sizing: border-box;
   border-radius: 21px;
   padding-left: 20px;
@@ -54,7 +61,7 @@ const Text = styled.input`
   height: 35px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 0px;
@@ -62,7 +69,7 @@ const E = styled.div`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;
