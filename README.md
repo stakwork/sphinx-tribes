@@ -26,3 +26,41 @@ To run tribes frontend locally, use these ports:
 
 - tribes: `yarn start:tribes:docker` (localhost:23000)
 - people: `yarn start:people:docker` (localhost:23007)
+
+### Run frontend locally against people.sphinx.chat
+If you would like to run just the frontend do the following
+
+line 77 in `frontend/app/src/App.tsx` change `'localhost:3000': Mode.TRIBES` -> `'localhost:3000': Mode.COMMUNITY`
+
+in `frontend/app/src/host.ts` return `"people.sphinx.chat"`
+
+### Run Golang backemd
+
+- Create a .env file and populate the env file with these variables
+
+```
+    TEST_MODE=true
+    PORT=  // Server PORT
+    DATABASE_URL= // Database URL
+    TEST_ASSET_URL= // Test asset URL
+```
+
+- Build the application by running ``` go build . ```
+- Run the application with ``` ./sphinx-tribes ```
+
+### Run Golang backend with local database
+
+- Create a Postgres database
+- Copy the table creation queries from tribes.sql file, and create the tables in the database created
+- Create a .env file and populate the .env files with these variables
+
+```
+    RDS_HOSTNAME =
+    RDS_PORT = 
+    RDS_DB_NAME = 
+    RDS_USERNAME =
+    RDS_PASSWORD =
+```
+- Build and run the Golang server
+
+
