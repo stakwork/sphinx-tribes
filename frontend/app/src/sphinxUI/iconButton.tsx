@@ -2,22 +2,24 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
+import { colors } from '../colors';
 
 export default function IconButton(props: any) {
-  const colors = {
+  const color = colors['light'];
+  const ButtonColors = {
     primary: {
-      background: '#618AFF',
-      color: '#fff'
+      background: color.blue1,
+      color: color.pureWhite
     },
     white: {
-      background: '#fff',
-      color: '#5F6368',
-      border: '1px solid #DDE1E5'
+      background: color.pureWhite,
+      color: color.grayish.G50,
+      border: `1px solid ${color.grayish.G600}`
     },
     link: {
-      background: '#fff',
-      color: '#618AFF',
-      border: '1px solid #A3C1FF'
+      background: color.pureWhite,
+      color: color.blue1,
+      border: `1px solid ${color.textBlue1}`
     }
   };
 
@@ -25,13 +27,18 @@ export default function IconButton(props: any) {
     <B
       background={props.style && props.style.background}
       width={props.style && props.style.width}
-      style={{ ...colors[props.color], ...props.style }}
+      style={{ ...ButtonColors[props.color], ...props.style }}
       disabled={props.disabled}
-      onClick={props.onClick}>
+      onClick={props.onClick}
+    >
       <div style={{ display: 'flex', height: '100%', alignItems: 'center' }}>
         <MaterialIcon
           icon={props.icon}
-          style={{ fontSize: props.size ? props.size : 30, color: '#B0B7BC', ...props.iconStyle }}
+          style={{
+            fontSize: props.size ? props.size : 30,
+            color: color.grayish.G300,
+            ...props.iconStyle
+          }}
         />
       </div>
     </B>

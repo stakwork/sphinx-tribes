@@ -41,7 +41,7 @@ function addMethod(m: string): Function {
         const file = data;
         const filename = file.name || 'name';
         const type = file.type || 'application/octet-stream';
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append('file', new Blob([file], { type }), filename);
         // Object.entries(fields).forEach(e => formData.append(e[0], e[1]))
         opts.body = formData;

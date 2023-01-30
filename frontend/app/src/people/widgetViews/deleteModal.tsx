@@ -11,14 +11,16 @@ const DeleteTicketModal = ({ closeModal, confirmDelete }) => {
           style={{
             background: '#F2F3F5',
             padding: '50px 50px 30px 50px'
-          }}>
+          }}
+        >
           <EuiText>Are you sure you want to delete this Ticket?</EuiText>
           <ModalButtonContainer>
             <EuiButtonEmpty
               onClick={closeModal}
               style={{
                 color: '#000'
-              }}>
+              }}
+            >
               Cancel
             </EuiButtonEmpty>
             <EuiButton
@@ -28,7 +30,8 @@ const DeleteTicketModal = ({ closeModal, confirmDelete }) => {
                 textDecoration: 'none',
                 color: '#303030',
                 border: '1px solid #909090'
-              }}>
+              }}
+            >
               Delete
             </EuiButton>
           </ModalButtonContainer>

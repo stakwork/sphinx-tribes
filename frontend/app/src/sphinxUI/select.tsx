@@ -1,9 +1,11 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { EuiSuperSelect, EuiText } from '@elastic/eui';
+import { colors } from '../colors';
 
 export default function Select(props: any) {
-  const { options, onChange, value, style, selectStyle } = props;
+  const color = colors['light'];
+  const { options, onChange, value, style, selectStyle, handleActive } = props;
 
   const opts =
     options.map((o) => {
@@ -14,11 +16,16 @@ export default function Select(props: any) {
           <>
             <p
               style={{
-                color: '#000',
+                color: color.text2,
                 fontSize: '14px',
-                padding: '0px',
-                margin: 0
-              }}>
+                paddingLeft: '0px',
+                margin: 0,
+                fontFamily: 'Barlow',
+                fontWeight: '500',
+                lineHeight: '32px',
+                letterSpacing: '0.01em'
+              }}
+            >
               {o.label}
             </p>
             {o.description && (
@@ -29,7 +36,8 @@ export default function Select(props: any) {
                   padding: 0,
                   margin: 0,
                   fontSize: '12px'
-                }}>
+                }}
+              >
                 <p className="euiTextColor--subdued">{o.description}</p>
               </EuiText>
             )}
@@ -41,35 +49,49 @@ export default function Select(props: any) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <S
+        color={color}
         style={{
           ...selectStyle
         }}
+        onFocus={() => {
+          handleActive(true);
+        }}
+        onBlur={() => {
+          handleActive(false);
+        }}
         options={opts}
         valueOfSelected={value}
-        onChange={(value) => onChange(value)}
+        onChange={(value) => {
+          onChange(value);
+          handleActive(false);
+        }}
         itemLayoutAlign="top"
       />
     </div>
   );
 }
 
-//euiContextMenuItem euiSuperSelect__item euiSuperSelect__item--hasDividers
+interface styleProps {
+  color?: any;
+}
 
-const S = styled(EuiSuperSelect as any)`
-  background: #ffffff00;
-  border: 1px solid #e0e0e0;
-  color: #000;
+const S = styled(EuiSuperSelect as any)<styleProps>`
+  background: ${(p) => p?.color && p.color.pureWhite};
+  border: 1px solid ${(p) => p?.color && p?.color.grayish.G750};
+  color: ${(p) => p?.color && p?.color.pureBlack};
   box-sizing: border-box;
   box-shadow: none;
-
+  padding-left: 16px;
   user-select: none;
-
   .euiSuperSelectControl.euiSuperSelect--isOpen__button {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
+    background: ${(p) => p?.color && p?.color.pureWhite} !important;
+    background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
   }
-  button {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
+  .euiPanel {
+    background: ${(p) => p?.color && p?.color.pureWhite};
+  }
+  . button {
+    background: ${(p) => p?.color && p?.color.pureWhite} !important;
+    background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
   }
 `;

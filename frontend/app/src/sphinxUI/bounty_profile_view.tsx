@@ -8,11 +8,20 @@ const BountyProfileView = (props) => {
   const color = colors['light'];
   return (
     <>
-      <UserProfileContainer>
-        <UserImage>
+      <UserProfileContainer
+        style={{
+          ...props?.UserProfileContainerStyle
+        }}
+      >
+        <UserImage
+          style={{
+            ...props.UserImageStyle
+          }}
+        >
           <img
             width={'100%'}
             height={'100%'}
+            style={{ objectFit: 'cover' }}
             src={
               { ...props.assignee }.owner_alias
                 ? {
@@ -23,24 +32,26 @@ const BountyProfileView = (props) => {
             alt={'assigned_person'}
           />
         </UserImage>
-        <UserInfo>
+        <UserInfo
+          style={{
+            ...props.userInfoStyle
+          }}
+        >
           <Status
             style={{
-              ...props.statusStyle
-            }}>
-            <EuiText className="statusText">{props.status}</EuiText>
+              ...props?.statusStyle
+            }}
+          >
+            <EuiText className="statusText">{props?.status}</EuiText>
           </Status>
-          <NameContainer name_text_color={color.grayish.G10}>
-            <EuiText className="Name_Text">
-              {{ ...props.assignee }.owner_alias || 'Guest Developer  '}
-            </EuiText>
-          </NameContainer>
-
-          <ViewProfileButton
-            View_profile_text_color={color.grayish.G300}
-            View_profile_icon_color={color.grayish.G300}
+          <NameContainer
+            name_text_color={color.grayish.G10}
+            style={{
+              cursor: props.isNameClickable ? 'pointer' : '',
+              ...props.NameContainerStyle
+            }}
             onClick={(e) => {
-              if ({ ...props.assignee }.owner_alias) {
+              if (props.isNameClickable && { ...props.assignee }.owner_alias) {
                 e.stopPropagation();
                 window.open(
                   `/p/${
@@ -51,12 +62,36 @@ const BountyProfileView = (props) => {
                   '_blank'
                 );
               }
-            }}>
-            <EuiText className="text">View Profile</EuiText>
-            <div className="Icon_Container">
-              <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />
-            </div>
-          </ViewProfileButton>
+            }}
+          >
+            <EuiText className="Name_Text">
+              {{ ...props.assignee }.owner_alias || 'Guest Developer  '}
+            </EuiText>
+          </NameContainer>
+          {props.canViewProfile && (
+            <ViewProfileButton
+              View_profile_text_color={color.grayish.G300}
+              View_profile_icon_color={color.grayish.G300}
+              onClick={(e) => {
+                if ({ ...props.assignee }.owner_alias) {
+                  e.stopPropagation();
+                  window.open(
+                    `/p/${
+                      {
+                        ...props.assignee
+                      }.owner_pubkey
+                    }?widget=wanted`,
+                    '_blank'
+                  );
+                }
+              }}
+            >
+              <EuiText className="text">View Profile</EuiText>
+              <div className="Icon_Container">
+                <MaterialIcon icon={'arrow_forward'} className="MaterialIcon" />
+              </div>
+            </ViewProfileButton>
+          )}
         </UserInfo>
       </UserProfileContainer>
     </>
@@ -91,7 +126,7 @@ const UserImage = styled.div`
 const UserInfo = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 28px;
+  margin-left: 24px;
   margin-top: 3px;
 `;
 
@@ -129,8 +164,11 @@ const NameContainer = styled.div<BountyProfileViewProps>`
   margin-top: 3px;
   margin-bottom: 1px;
   .Name_Text {
+    white-space: nowrap;
+    overflow: hidden;
     font-size: 17px;
     font-weight: 600;
+    text-overflow: ellipsis;
     color: ${(p) => p.name_text_color};
   }
 `;

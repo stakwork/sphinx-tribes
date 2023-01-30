@@ -46,13 +46,15 @@ export default function Tribe({
       style={{ backgroundColor: '#1a2430' }}
       className="col-md-6 col-lg-6  mb-2"
       id={uuid}
-      title={''}>
+      title={''}
+    >
       <Content
         onClick={() => select(selected ? '' : uuid, unique_name)}
         style={{
           height: selected ? 'auto' : 100
         }}
-        selected={selected}>
+        selected={selected}
+      >
         <Left>
           <Row className="item-cont">
             <Img src={img || '/static/placeholder.svg'} />
@@ -75,7 +77,7 @@ export default function Tribe({
             </Left>
           </Row>
           <div className="expand-part" style={selected ? { opacity: 1 } : { opacity: 0 }}>
-            <div className="section-separator"></div>
+            <div className="section-separator" />
             <div className="row info-section">
               <div className="col-4 col-sm-4 col-md-4 col-lg-4">
                 <div className="uppercase">Last Activity:</div>
@@ -94,7 +96,7 @@ export default function Tribe({
                 <div className="lighter-color">{owner_alias}</div>
               </div>
             </div>
-            <div className="section-separator"></div>
+            <div className="section-separator" />
 
             <div className="row">
               <div className="col-4 col-sm-4 col-md-4 col-lg-4 qr-left">
@@ -105,12 +107,12 @@ export default function Tribe({
                   <div>Price to join</div>
                   <div className="lighter-color">{price_to_join || 0}</div>
                 </div>
-                <div className="section-separator"></div>
+                <div className="section-separator" />
                 <div className="text-right info">
                   <div>Price per msg</div>
                   <div className="lighter-color">{price_per_message || 0}</div>
                 </div>
-                <div className="section-separator"></div>
+                <div className="section-separator" />
                 <a onClick={(e) => e.stopPropagation()} href={qrString} className="btn join-btn">
                   <img
                     style={{ width: 13, height: 13, marginRight: 8 }}
@@ -137,7 +139,9 @@ export default function Tribe({
                     onClick={(e) => e.stopPropagation()}
                     href={`https://${preview}?tribe=${uuid}`}
                     target={'_blank'}
-                    className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}>
+                    className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}
+                    rel="noreferrer"
+                  >
                     Preview
                   </a>
                   <button className="copy-btn" onClick={(e) => copyString(e, qrString)}>

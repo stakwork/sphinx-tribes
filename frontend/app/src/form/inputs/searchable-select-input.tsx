@@ -5,6 +5,7 @@ import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { SearchableSelect } from '../../sphinxUI';
 import { useStores } from '../../store';
+import { colors } from '../../colors';
 
 export default function SearchableSelectInput({
   error,
@@ -21,13 +22,15 @@ export default function SearchableSelectInput({
   prepend,
   extraHTML
 }: Props) {
-  let labeltext = label;
+  const labeltext = label;
 
   const { main, ui } = useStores();
+  const color = colors['light'];
 
   const [opts, setOptions] = useState(options);
   const [loading, setLoading] = useState(false);
   const [search, setSearch]: any = useState('');
+  const [isBorder, setIsBorder] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
@@ -37,13 +40,13 @@ export default function SearchableSelectInput({
           if (name === 'assignee' || name === 'recipient') {
             const p = await main.getPeopleByNameAliasPubkey(search);
             if (p && p.length) {
-              let newOpts = p.map((ot) => {
+              const newOpts = p.map((ot) => {
                 return {
                   owner_alias: ot.owner_alias,
                   owner_pubkey: ot.owner_pubkey,
                   img: ot.img,
                   value: ot.owner_pubkey,
-                  label: ot.owner_alias + ` (${ot.unique_name})`
+                  label: `${ot.owner_alias} (${ot.unique_name})`
                 };
               });
               setOptions(newOpts);
@@ -52,7 +55,7 @@ export default function SearchableSelectInput({
             const { badgeList } = ui;
 
             if (badgeList && badgeList.length) {
-              let newOpts = badgeList.map((ot) => {
+              const newOpts = badgeList.map((ot) => {
                 return {
                   img: ot.icon,
                   id: ot.id,
@@ -76,7 +79,14 @@ export default function SearchableSelectInput({
 
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv
+        color={color}
+        label={labeltext}
+        isTop={true}
+        style={{
+          border: isBorder ? `1px solid ${color.grayish.G600} ` : `1px solid ${color.pureWhite}`
+        }}
+      >
         <R>
           <SearchableSelect
             selectStyle={{ border: 'none' }}
@@ -84,26 +94,32 @@ export default function SearchableSelectInput({
             value={value}
             loading={loading}
             onChange={(e) => {
+              console.log(e);
               handleChange(e);
+              setIsBorder(false);
             }}
             onInputChange={(e) => {
               if (e) setSearch(e);
             }}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
     </>
   );
+}
+
+interface styledProps {
+  color?: any;
 }
 
 const ExtraText = styled.div`
@@ -113,7 +129,7 @@ word -break: break-all;
 font - size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
 position: absolute;
 right: 10px;
 top: 0px;
@@ -121,7 +137,7 @@ display: flex;
 height: 100 %;
 justify - content: center;
 align - items: center;
-color:#45b9f6;
+color: ${(p) => p?.color && p?.color.blue3};
 pointer - events: none;
 user - select: none;
 `;

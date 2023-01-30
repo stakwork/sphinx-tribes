@@ -89,7 +89,7 @@ const hosts: { [k: string]: Mode } = {
 };
 
 function getMode(): Mode {
-  const host = window.location.host;
+  const { host } = window.location;
 
   return hosts[host] || Mode.TRIBES;
 }

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { CreatableMultiSelect } from '../../sphinxUI';
+import { colors } from '../../colors';
 
 export default function CreatableMultiSelectInput({
   error,
@@ -20,11 +21,19 @@ export default function CreatableMultiSelectInput({
   extraHTML
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (INCORRECT FORMAT)`;
+  if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
+  const color = colors['light'];
+
+  const [isTop, setIsTop] = useState<boolean>(false);
 
   return (
     <>
-      <FieldEnv label={labeltext}>
+      <FieldEnv
+        color={color}
+        label={labeltext}
+        isTop={isTop || value?.length > 0}
+        isFill={value?.length > 0}
+      >
         <R>
           <CreatableMultiSelect
             selectStyle={{ border: 'none' }}
@@ -34,22 +43,28 @@ export default function CreatableMultiSelectInput({
             onChange={(e) => {
               console.log('onChange', e);
               handleChange(e);
+              setIsTop(true);
             }}
+            setIsTop={setIsTop}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
     </>
   );
+}
+
+interface styledProps {
+  color?: any;
 }
 
 const ExtraText = styled.div`
@@ -59,7 +74,7 @@ word -break: break-all;
 font - size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
 position: absolute;
 right: 10px;
 top: 0px;
@@ -67,7 +82,7 @@ display: flex;
 height: 100 %;
 justify - content: center;
 align - items: center;
-color:#45b9f6;
+color: ${(p) => p?.color && p.color.blue3};
 pointer - events: none;
 user - select: none;
 `;

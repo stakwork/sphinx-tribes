@@ -28,7 +28,8 @@ export default function FirstTimeScreen() {
         overflow: 'hidden',
         width: '100%',
         maxWidth: 600
-      }}>
+      }}
+    >
       <div style={{ height: '100%', padding: 20, paddingTop: 0, width: '100%' }}>
         <FocusedView
           formHeader={formHeader}

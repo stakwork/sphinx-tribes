@@ -13,7 +13,7 @@ export function renderMarkdown(str) {
 }
 
 export default function OfferSummary(props: any) {
-  let { gallery, title, description, price, person, created, type } = props;
+  const { gallery, title, description, price, person, created, type } = props;
 
   const showPrice = !(type === 'offer_skill' || type === 'offer_other');
 

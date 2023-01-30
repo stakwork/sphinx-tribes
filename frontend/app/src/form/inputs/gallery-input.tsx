@@ -7,6 +7,7 @@ import MaterialIcon from '@material/react-material-icon';
 
 import { Button, Modal } from '../../sphinxUI';
 import { MAX_UPLOAD_SIZE } from '../../people/utils/constants';
+import { colors } from '../../colors';
 
 export default function GalleryInput({
   label,
@@ -15,10 +16,11 @@ export default function GalleryInput({
   handleBlur,
   handleFocus
 }: Props) {
+  const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
-  let picsrcArray = value || [];
+  const picsrcArray = value || [];
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
     console.log('uploadBase64Pic', img_type);
@@ -26,7 +28,7 @@ export default function GalleryInput({
       const info = ui.meInfo as any;
       if (!info) return console.log('no meInfo');
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-      const r = await fetch(URL + '/public_pic', {
+      const r = await fetch(`${URL}/public_pic`, {
         method: 'POST',
         body: JSON.stringify({
           img_base64,
@@ -78,7 +80,7 @@ export default function GalleryInput({
   }
 
   async function addImg(img) {
-    let picsClone = [...picsrcArray];
+    const picsClone = [...picsrcArray];
     picsClone.push(img);
     handleChange(picsClone);
   }
@@ -88,7 +90,7 @@ export default function GalleryInput({
   // }
 
   async function deleteImg(index) {
-    let picsClone = [...picsrcArray];
+    const picsClone = [...picsrcArray];
     picsClone.splice(index, 1);
     handleChange(picsClone);
   }
@@ -107,7 +109,7 @@ export default function GalleryInput({
             return (
               <ImageWrap key={i}>
                 <Close onClick={() => deleteImg(i)}>
-                  <MaterialIcon icon={'close'} style={{ color: '#000', fontSize: 12 }} />
+                  <MaterialIcon icon={'close'} style={{ color: color.pureBlack, fontSize: 12 }} />
                 </Close>
                 <Sq>
                   <ImageCircle>
@@ -152,8 +154,6 @@ export default function GalleryInput({
                     width: 154,
                     paddingRight: 20
                   }}
-                  // iconSize={18}
-                  // width={150}
                   height={48}
                   text={'Add Media'}
                   color="widget"
@@ -173,7 +173,8 @@ export default function GalleryInput({
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20
-          }}>
+          }}
+        >
           <div style={{ marginBottom: 20 }}>{showError}</div>
           <Button onClick={() => setShowError('')} text={'Okay'} color={'primary'} />
         </div>
