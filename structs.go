@@ -158,9 +158,19 @@ type Channel struct {
 	Deleted   bool       `json:"deleted"`
 }
 
+type AssetTx struct {
+	Sender   string `json:"sender"`
+	Receiver string `json:"receiver"`
+	AssetId  uint   `json:"asset_id"`
+	Amount   uint   `json:"amount"`
+	Metadata string `json:"metadata"`
+	Txid     string `json:"metadata"`
+	Onchain  bool   `json:"onchain"`
+}
+
 type AssetResponse struct {
 	Balances []AssetBalanceData `json:"balances"`
-	Txs      []string           `json:"txs"`
+	Txs      []AssetTx          `json:"txs"`
 }
 
 type AssetBalanceData struct {
