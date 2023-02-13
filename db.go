@@ -105,8 +105,11 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	if m.Tags == nil {
 		m.Tags = []string{}
 	}
+	if m.Badges == nil {
+		m.Badges = []string{}
+	}
 	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
-		fmt.Println(err)
+		fmt.Println(">>>>>>>>> == ", err)
 		return Tribe{}, err
 	}
 	db.db.Exec(`UPDATE tribes SET tsv =
@@ -533,6 +536,13 @@ func (db database) getTribesTotal() uint64 {
 	var count uint64
 	db.db.Model(&Tribe{}).Where("deleted = 'false' OR deleted is null").Count(&count)
 	return count
+}
+
+func (db database) getTribeByIdAndPubkey(uuid string, pubkey string) Tribe {
+	m := Tribe{}
+	//db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null) AND owner_pubkey = ?", uuid, pubkey).Find(&m)
+	db.db.Where("uuid = ? AND owner_pub_key = ?", uuid, pubkey).Find(&m)
+	return m
 }
 
 func (db database) getTribe(uuid string) Tribe {
