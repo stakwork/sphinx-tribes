@@ -62,7 +62,7 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		person.UniqueName, _ = personUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
-	} else {                // editing! needs ID
+	} else { // editing! needs ID
 		if person.ID == 0 { // cant create that already exists
 			fmt.Println("cant create existing")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -562,6 +562,9 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tribeBadges := tribe.Badges
+	if tribeBadges == nil {
+		tribeBadges = []string{}
+	}
 	if badgeCreationData.Action == "add" {
 		badges := append(tribeBadges, badgeCreationData.Badge)
 		tribeBadges = badges
