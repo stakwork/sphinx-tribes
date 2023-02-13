@@ -12,6 +12,7 @@ import { useStores } from '../../store';
 import { Button, Modal } from '../../sphinxUI';
 import { MAX_UPLOAD_SIZE } from '../../people/utils/constants';
 import { Note } from './index';
+import { colors } from '../../colors';
 
 export default function ImageInput({
   label,
@@ -23,6 +24,7 @@ export default function ImageInput({
   notProfilePic,
   imageIcon
 }: Props) {
+  const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
@@ -37,7 +39,7 @@ export default function ImageInput({
         return console.log('no meInfo');
       }
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-      const r = await fetch(URL + '/public_pic', {
+      const r = await fetch(`${URL}/public_pic`, {
         method: 'POST',
         body: JSON.stringify({
           img_base64,
@@ -101,7 +103,7 @@ export default function ImageInput({
         {({ getRootProps, getInputProps, isDragActive, open }) => (
           <DropzoneStuff>
             {imageIcon ? (
-              <DottedCircle isDragActive={isDragActive} style={addedStyle}>
+              <DottedCircle isDragActive={isDragActive} style={addedStyle} color={color}>
                 <input {...getInputProps()} />
                 <ImageCircle style={addedStyle}>
                   {!uploading ? (
@@ -125,7 +127,8 @@ export default function ImageInput({
                     top: '260px',
                     left: '125px'
                   }}
-                  {...getRootProps()}>
+                  {...getRootProps()}
+                >
                   <img
                     src="/static/badges/Camera.png"
                     height={'100%'}
@@ -135,7 +138,12 @@ export default function ImageInput({
                 </div>
               </DottedCircle>
             ) : (
-              <DottedCircle {...getRootProps()} isDragActive={isDragActive} style={addedStyle}>
+              <DottedCircle
+                {...getRootProps()}
+                isDragActive={isDragActive}
+                style={addedStyle}
+                color={color}
+              >
                 <input {...getInputProps()} />
                 <ImageCircle style={addedStyle}>
                   {!uploading ? (
@@ -181,13 +189,14 @@ export default function ImageInput({
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20
-          }}>
+          }}
+        >
           <div style={{ marginBottom: 20 }}>{showError}</div>
           <Button onClick={() => setShowError('')} text={'Okay'} color={'primary'} />
         </div>
       </Modal>
 
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
     </ImageWrap>
   );
 }
@@ -224,6 +233,7 @@ const ImageWrap = styled.div`
 `;
 export interface DottedCircleProps {
   isDragActive: boolean;
+  color?: any;
 }
 const DottedCircle = styled.div<DottedCircleProps>`
   display: flex;
@@ -233,7 +243,7 @@ const DottedCircle = styled.div<DottedCircleProps>`
   width: 120px;
   border-radius: 50%;
   border-style: dashed;
-  border-color: ${(p) => (p.isDragActive ? 'white' : '#6b7a8d')};
+  border-color: ${(p) => (p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`)};
   border-width: thin;
   cursor: pointer;
 `;

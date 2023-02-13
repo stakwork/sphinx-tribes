@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../colors';
 import { FieldEnv, FieldText } from './../form/inputs/index';
 
 export default function TextInput({
@@ -12,11 +13,13 @@ export default function TextInput({
   prepend,
   style
 }: any) {
+  const color = colors['light'];
   return (
     <>
       <F label={label}>
         <R>
           <FieldText
+            color={color}
             name="first"
             value={value || ''}
             readOnly={readOnly || false}

@@ -34,7 +34,7 @@ export class MainStore {
     }
     queryParams = { ...queryParams, search: uiStore.searchText, tags };
 
-    let query = this.appendQueryParams('tribes', queryLimit, {
+    const query = this.appendQueryParams('tribes', queryLimit, {
       ...queryParams,
       sortBy: 'last_active=0, last_active',
       direction: 'desc'
@@ -57,8 +57,8 @@ export class MainStore {
   @action async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
     console.log('get bots');
 
-    let query = this.appendQueryParams('bots', queryParams);
-    let b = await api.get(query);
+    const query = this.appendQueryParams('bots', queryParams);
+    const b = await api.get(query);
 
     const info = uiStore.meInfo;
 
@@ -135,14 +135,14 @@ export class MainStore {
 
       relayB = await relayB.json();
       console.log('got bots from relay', relayB);
-      let relayMyBots = relayB?.response?.bots || [];
+      const relayMyBots = relayB?.response?.bots || [];
 
       // merge tribe server stuff
       console.log('get bots');
-      let tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
+      const tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
-      let mergedBots = relayMyBots.map((b) => {
+      const mergedBots = relayMyBots.map((b) => {
         const thisBot = tribeServerBots.find((f) => f.uuid === b.uuid);
         return {
           ...b,
@@ -163,7 +163,7 @@ export class MainStore {
 
     const info = uiStore.meInfo;
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-    let r: any = await fetch(URL + `/${path}`, {
+    const r: any = await fetch(`${URL}/${path}`, {
       method: 'GET',
       headers: {
         'x-jwt': info.jwt,
@@ -293,7 +293,7 @@ export class MainStore {
       }
 
       // 2. get password for login, login to "token" aliased as "tt"
-      const res0 = await fetch(URL + `/login`, {
+      const res0 = await fetch(`${URL}/login`, {
         method: 'POST',
         body: JSON.stringify({
           pwd: 'password i got from user'
@@ -305,7 +305,7 @@ export class MainStore {
       const tt = j.token || '';
 
       // 3. first create the badge
-      const res1 = await fetch(URL + `/issue?token=${tt}`, {
+      const res1 = await fetch(`${URL}/issue?token=${tt}`, {
         method: 'POST',
         body: JSON.stringify({
           name: badgeName,
@@ -318,7 +318,7 @@ export class MainStore {
       const createdBadge = await res1.json();
 
       // 4. then transfer it
-      const res2 = await fetch(URL + `/transfer?token=${tt}`, {
+      const res2 = await fetch(`${URL}/transfer?token=${tt}`, {
         method: 'POST',
         body: JSON.stringify({
           asset: createdBadge.id,
@@ -341,7 +341,7 @@ export class MainStore {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
-      const l = await fetch(URL + `/list`, {
+      const l = await fetch(`${URL}/list`, {
         method: 'GET'
       });
 
@@ -358,7 +358,7 @@ export class MainStore {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
-      const b = await fetch(URL + `/balances?pubkey=${pubkey}`, {
+      const b = await fetch(`${URL}/balances?pubkey=${pubkey}`, {
         method: 'GET'
       });
 
@@ -411,7 +411,7 @@ export class MainStore {
     if (queryParams) {
       queryParams.limit = limit;
       query += '?';
-      const length = Object.keys(queryParams).length;
+      const { length } = Object.keys(queryParams);
       Object.keys(queryParams).forEach((k, i) => {
         query += `${k}=${queryParams[k]}`;
 
@@ -426,12 +426,12 @@ export class MainStore {
   }
 
   @action async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
-    let smallQueryLimit = 4;
-    let query = this.appendQueryParams('people/search', smallQueryLimit, {
+    const smallQueryLimit = 4;
+    const query = this.appendQueryParams('people/search', smallQueryLimit, {
       search: alias,
       sortBy: 'owner_alias'
     });
-    let ps = await api.get(query);
+    const ps = await api.get(query);
     return ps;
   }
 
@@ -442,12 +442,12 @@ export class MainStore {
   @action async getPeople(queryParams?: any): Promise<Person[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams('people', queryLimit, {
+    const query = this.appendQueryParams('people', queryLimit, {
       ...queryParams,
       sortBy: 'last_login'
     });
 
-    let ps = await api.get(query);
+    const ps = await api.get(query);
 
     if (uiStore.meInfo) {
       const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
@@ -492,7 +492,7 @@ export class MainStore {
     // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams('people/posts', queryLimit, {
+    const query = this.appendQueryParams('people/posts', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
@@ -531,7 +531,7 @@ export class MainStore {
   @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams('people/wanteds', queryLimit, {
+    const query = this.appendQueryParams('people/wanteds', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
@@ -567,7 +567,7 @@ export class MainStore {
     // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    let query = this.appendQueryParams('people/offers', queryLimit, {
+    const query = this.appendQueryParams('people/offers', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
@@ -617,7 +617,7 @@ export class MainStore {
     }
 
     if (queryParams?.page) setPage(queryParams.page);
-    let l = [...currentList, ...newList];
+    const l = [...currentList, ...newList];
 
     return l;
   }
@@ -638,7 +638,7 @@ export class MainStore {
 
   @action async getSelf(me: any) {
     console.log('getSelf');
-    let self = me || uiStore.meInfo;
+    const self = me || uiStore.meInfo;
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
 
@@ -658,7 +658,7 @@ export class MainStore {
       };
 
       const isSuperAdmin = await getSuperAdmin();
-      let updateSelf = { ...self, ...p, isSuperAdmin: isSuperAdmin };
+      const updateSelf = { ...self, ...p, isSuperAdmin: isSuperAdmin };
       console.log('updateSelf', updateSelf);
       uiStore.setMeInfo(updateSelf);
     }
@@ -713,7 +713,7 @@ export class MainStore {
       });
       const j = await res.json();
       // 1 bitcoin is 1 million satoshis
-      let satoshisInABitcoin = 0.00000001;
+      const satoshisInABitcoin = 0.00000001;
       const exchangeRate = j / satoshisInABitcoin;
 
       console.log('update exchange rate', exchangeRate);
@@ -798,7 +798,7 @@ export class MainStore {
 
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
 
-    response = await fetch(URL + `/${path}`, {
+    response = await fetch(`${URL}/${path}`, {
       method: method,
       body: JSON.stringify({
         // use docker host (tribes.sphinx), because relay will post to it
@@ -830,9 +830,9 @@ export class MainStore {
     newPropertyValue: any
   ): Promise<any> {
     if (uiStore.meInfo) {
-      let clonedMeInfo = { ...uiStore.meInfo };
-      let clonedExtras = clonedMeInfo?.extras;
-      let clonedEx: any = clonedExtras && clonedExtras[extrasName];
+      const clonedMeInfo = { ...uiStore.meInfo };
+      const clonedExtras = clonedMeInfo?.extras;
+      const clonedEx: any = clonedExtras && clonedExtras[extrasName];
       const targetIndex = clonedEx?.findIndex((f) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
@@ -850,8 +850,35 @@ export class MainStore {
     }
   }
 
+  // function to update many value in wanted array of object
+  @action async setExtrasMultipleProperty(
+    dataObject: object,
+    extrasName: string,
+    created: number
+  ): Promise<any> {
+    if (uiStore.meInfo) {
+      const clonedMeInfo = { ...uiStore.meInfo };
+      const clonedExtras = clonedMeInfo?.extras;
+      const clonedEx: any = clonedExtras && clonedExtras[extrasName];
+      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+
+      if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
+        try {
+          clonedEx[targetIndex] = { ...clonedEx?.[targetIndex], ...dataObject };
+          clonedMeInfo.extras[extrasName] = clonedEx;
+          await this.saveProfile(clonedMeInfo);
+          return [clonedEx, targetIndex];
+        } catch (e) {
+          console.log('e', e);
+        }
+      }
+
+      return [null, null];
+    }
+  }
+
   @action async deleteFavorite() {
-    let body: any = {};
+    const body: any = {};
     console.log('SUBMIT FORM', body);
 
     // console.log('mergeFormWithMeData', body);
@@ -861,7 +888,7 @@ export class MainStore {
     if (!info) return console.log('no meInfo');
     try {
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-      const r = await fetch(URL + '/profile', {
+      const r = await fetch(`${URL}/profile`, {
         method: 'POST',
         body: JSON.stringify({
           // use docker host (tribes.sphinx), because relay will post to it

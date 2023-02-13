@@ -2,110 +2,24 @@ import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../colors';
+import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
-
-const LanguageObject = [
-  {
-    label: 'Lightning',
-    border: '1px solid rgba(184, 37, 95, 0.1)',
-    background: 'rgba(184, 37, 95, 0.1)',
-    color: '#B8255F'
-  },
-  {
-    label: 'Javascript',
-    border: '1px solid rgba(219, 64, 53, 0.1)',
-    background: 'rgba(219, 64, 53, 0.1)',
-    color: '#DB4035'
-  },
-  {
-    label: 'Typescript',
-    border: '1px solid rgba(255, 153, 51, 0.1)',
-    background: ' rgba(255, 153, 51, 0.1)',
-    color: '#FF9933'
-  },
-  {
-    label: 'Node',
-    border: '1px solid rgba(255, 191, 59, 0.1)',
-    background: 'rgba(255, 191, 59, 0.1)',
-    color: '#FFBF3B'
-  },
-  {
-    label: 'Golang',
-    border: '1px solid rgba(175, 184, 59, 0.1)',
-    background: 'rgba(175, 184, 59, 0.1)',
-    color: '#AFB83B'
-  },
-  {
-    label: 'Swift',
-    border: '1px solid rgba(126, 204, 73, 0.1)',
-    background: 'rgba(126, 204, 73, 0.1)',
-    color: '#7ECC49'
-  },
-  {
-    label: 'Kotlin',
-    border: '1px solid rgba(41, 148, 56, 0.1)',
-    background: 'rgba(41, 148, 56, 0.1)',
-    color: '#299438'
-  },
-  {
-    label: 'MySQL',
-    border: '1px solid rgba(106, 204, 188, 0.1)',
-    background: 'rgba(106, 204, 188, 0.1)',
-    color: '#6ACCBC'
-  },
-  {
-    label: 'PHP',
-    border: '1px solid rgba(21, 143, 173, 0.1)',
-    background: 'rgba(21, 143, 173, 0.1)',
-    color: '#158FAD'
-  },
-  {
-    label: 'R',
-    border: '1px solid rgba(64, 115, 255, 0.1)',
-    background: 'rgba(64, 115, 255, 0.1)',
-    color: '#4073FF'
-  },
-  {
-    label: 'C#',
-    border: '1px solid rgba(136, 77, 255, 0.1)',
-    background: 'rgba(136, 77, 255, 0.1)',
-    color: '#884DFF'
-  },
-  {
-    label: 'C++',
-    border: '1px solid rgba(175, 56, 235, 0.1)',
-    background: 'rgba(175, 56, 235, 0.1)',
-    color: '#AF38EB'
-  },
-  {
-    label: 'Java',
-    border: '1px solid rgba(235, 150, 235, 0.1)',
-    background: 'rgba(235, 150, 235, 0.1)',
-    color: '#EB96EB'
-  },
-  {
-    label: 'Rust',
-    border: '1px solid rgba(224, 81, 148, 0.1)',
-    background: 'rgba(224, 81, 148, 0.1)',
-    color: '#E05194'
-  },
-  {
-    label: 'No-code',
-    border: '1px solid rgba(255, 141, 133, 0.1)',
-    background: 'rgba(255, 141, 133, 0.1)',
-    color: '#FF8D85'
-  }
-];
 
 const BountyDescription = (props: any) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
+  const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
   // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
 
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+      setReplitLink(
+        props?.description.match(
+          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+        )
+      );
       setDescriptionImage(found && found.length > 0 && found[0]);
     }
   }, [props]);
@@ -130,24 +44,32 @@ const BountyDescription = (props: any) => {
             <NameTag {...props} iconSize={32} isPaid={props?.isPaid} />
           </div>
         </Header>
-        <Description>
+        <Description isPaid={props?.isPaid} color={color}>
           <div
             className="DescriptionContainer"
             style={{
               width: descriptionImage ? '334px' : '481px'
-            }}>
+            }}
+          >
             <EuiText
               className="DescriptionTitle"
               style={{
                 color: props.isPaid ? color.grayish.G50 : color.grayish.G10
-              }}>
+              }}
+            >
               {props.title.slice(0, descriptionImage ? 80 : 120)}
               {props.title.length > 80 ? '...' : ''}
             </EuiText>
           </div>
           {descriptionImage && (
             <div className="DescriptionImage">
-              <img src={descriptionImage} alt={''} height={'100%'} width={'100%'} />
+              <img
+                src={descriptionImage}
+                alt={'desc'}
+                style={{ objectFit: 'cover' }}
+                height={'100%'}
+                width={'100%'}
+              />
             </div>
           )}
 
@@ -178,15 +100,37 @@ const BountyDescription = (props: any) => {
           )} */}
         </Description>
         <LanguageContainer>
+          {replitLink && (
+            <div onClick={() => window.open(replitLink[0])} style={{ display: 'flex' }}>
+              <CodingLabels
+                key={0}
+                border={`1px solid ${color.grayish.G06}`}
+                LabelColor={color.grayish.G300}
+                background={color.pureWhite}
+                color={color}
+              >
+                <img
+                  style={{ marginRight: '5px' }}
+                  src={'/static/replit.png'}
+                  alt={'replit_image'}
+                  height={'15px'}
+                  width={'15px'}
+                />
+                <EuiText className="LanguageText">Replit</EuiText>
+              </CodingLabels>
+            </div>
+          )}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index) => {
               return (
                 <CodingLabels
                   key={index}
-                  border={props.isPaid ? '1px solid rgba(176, 183, 188, 0.1)' : lang?.border}
-                  color={props.isPaid ? color.grayish.G300 : lang?.color}
-                  background={props.isPaid ? color.grayish.G800 : lang?.background}>
+                  border={props.isPaid ? `1px solid ${color.grayish.G06}` : lang?.border}
+                  LabelColor={props.isPaid ? color.grayish.G300 : lang?.color}
+                  background={props.isPaid ? color.grayish.G800 : lang?.background}
+                  color={color}
+                >
                   <EuiText className="LanguageText">{lang?.label}</EuiText>
                 </CodingLabels>
               );
@@ -202,10 +146,15 @@ export default BountyDescription;
 interface codingLangProps {
   background?: string;
   border?: string;
-  color?: string;
+  LabelColor?: string;
+  color?: any;
 }
 
-interface bounty_description_props {}
+interface bounty_description_props {
+  isPaid?: any;
+  color?: any;
+}
+interface replit_image_props {}
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;
@@ -216,7 +165,7 @@ const BountyDescriptionContainer = styled.div<bounty_description_props>`
   padding-left: 17px;
 `;
 
-const Header = styled.div<bounty_description_props>`
+const Header = styled.div`
   display: flex;
   flex-direction: row;
   align-item: center;
@@ -253,11 +202,13 @@ const Description = styled.div<bounty_description_props>`
     border-radius: 4px;
     overflow: hidden;
     margin-top: -13px;
-    border: 1px solid #d0d5d8;
+    border: 1px solid ${(p) => p?.color && p.color.grayish.G500};
+    opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
+    filter: ${(p) => p.isPaid && 'grayscale(100%)'};
   }
 `;
 
-const LanguageContainer = styled.div<bounty_description_props>`
+const LanguageContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 80%;
@@ -266,9 +217,9 @@ const LanguageContainer = styled.div<bounty_description_props>`
 
 const CodingLabels = styled.div<codingLangProps>`
   padding: 0px 8px;
-  border: ${(p) => (p.border ? p?.border : '1px solid #000')};
-  color: ${(p) => (p.color ? p?.color : '#000')};
-  background: ${(p) => (p.background ? p?.background : '#fff')};
+  border: ${(p) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
+  color: ${(p) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
+  background: ${(p) => (p.background ? p?.background : `${p.color.pureWhite}`)};
   border-radius: 4px;
   overflow: hidden;
   max-height: 22.75px;

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { Select } from '../../sphinxUI';
+import { colors } from '../../colors';
 
 export default function SelectInput({
   error,
@@ -20,34 +21,54 @@ export default function SelectInput({
   extraHTML
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = labeltext + ` (${error})`;
-
+  const color = colors['light'];
+  if (error) labeltext = `${labeltext} (${error})`;
+  const [active, setActive] = useState<boolean>(false);
   return (
-    <>
-      <FieldEnv label={labeltext}>
+    <OuterContainer color={color}>
+      <FieldEnv
+        color={color}
+        label={labeltext}
+        onClick={() => {}}
+        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
+      >
         <R>
           <Select
-            selectStyle={{ border: 'none' }}
+            name={'first'}
+            selectStyle={{
+              border: 'none',
+              fontFamily: 'Barlow',
+              fontWeight: '500',
+              fontSize: '14px',
+              color: '#3C3F41',
+              letterSpacing: '0.01em'
+            }}
             options={options}
             value={value}
+            handleActive={setActive}
             onChange={(e) => {
               handleChange(e);
+              setActive(false);
             }}
           />
           {error && (
-            <E>
+            <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
           )}
         </R>
       </FieldEnv>
-      {note && <Note>*{note}</Note>}
+      {note && <Note color={color}>*{note}</Note>}
       <ExtraText
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
-    </>
+    </OuterContainer>
   );
+}
+
+interface styledProps {
+  color?: any;
 }
 
 const ExtraText = styled.div`
@@ -57,7 +78,7 @@ const ExtraText = styled.div`
   font-size: 14px;
 `;
 
-const E = styled.div`
+const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
   top: 0px;
@@ -65,10 +86,45 @@ const E = styled.div`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: #45b9f6;
+  color: ${(p) => p?.color && p?.color.blue3};
   pointer-events: none;
   user-select: none;
 `;
 const R = styled.div`
+  margin-top: 1px;
   position: relative;
+`;
+
+const OuterContainer = styled.div<styledProps>`
+  box-shadow: 0px 1px 2px ${(p) => p.color && p.color.black100} !important ;
+
+  .euiFormRow_filed {
+    position: relative;
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -10px;
+      padding-left: 10px;
+      height: 14px;
+      transition: all 0.4s;      
+      label {
+        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p) => p?.color && p?.color.pureWhite};
+        z-index: 10;
+        font-family: 'Barlow';
+        font-size: 12px;
+        font-weight: 500;
+        margin-left: 6px;
+      }
+      
+    }
+    
+  }
+  .euiFormRow_active {
+    padding: 1px 0;
+    border: 1px solid ${(p) => p?.color && p?.color.blue2};
+    }
+  }
+  .euiFormControlLayoutCustomIcon{
+    color: ${(p) => p.color && p.color.text2_4} 
+  }
 `;

@@ -95,6 +95,10 @@ func (Person) TableName() string {
 	return "people"
 }
 
+func (PersonInShort) TableName() string {
+	return "people"
+}
+
 // Person struct
 type Person struct {
 	ID               uint           `json:"id"`
@@ -117,6 +121,15 @@ type Person struct {
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
+}
+
+type PersonInShort struct {
+	ID          uint   `json:"id"`
+	Uuid        string `json:"uuid"`
+	OwnerPubKey string `json:"owner_pubkey"`
+	OwnerAlias  string `json:"owner_alias"`
+	UniqueName  string `json:"unique_name"`
+	Img         string `json:"img"`
 }
 
 // Github struct
@@ -145,9 +158,19 @@ type Channel struct {
 	Deleted   bool       `json:"deleted"`
 }
 
+type AssetTx struct {
+	Sender   string `json:"sender"`
+	Receiver string `json:"receiver"`
+	AssetId  uint   `json:"asset_id"`
+	Amount   uint   `json:"amount"`
+	Metadata string `json:"metadata"`
+	Txid     string `json:"metadata"`
+	Onchain  bool   `json:"onchain"`
+}
+
 type AssetResponse struct {
 	Balances []AssetBalanceData `json:"balances"`
-	Txs      []string           `json:"txs"`
+	Txs      []AssetTx          `json:"txs"`
 }
 
 type AssetBalanceData struct {
@@ -157,10 +180,22 @@ type AssetBalanceData struct {
 }
 
 type LeaderBoard struct {
-	TribeUuid string `json:"tribe_uuid"`
-	Alias     string `json:"alias"`
-	Spent     int64  `json:"spent"`
-	Earned    int64  `json:"earned"`
+	TribeUuid  string `json:"tribe_uuid"`
+	Alias      string `json:"alias"`
+	Spent      int64  `json:"spent"`
+	Earned     int64  `json:"earned"`
+	Reputation int64  `json:"reputation"`
+}
+
+type AssetListData struct {
+	ID      uint   `json:"id"`
+	Icon    string `json:"icon"`
+	Name    string `json:"name"`
+	Asset   string `json:"asset"`
+	Token   string `json:"token"`
+	Amount  uint   `json:"amount"`
+	Creator string `json:"creator"`
+	Balance uint   `json:"balance"`
 }
 
 /*

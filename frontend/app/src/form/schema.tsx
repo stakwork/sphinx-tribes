@@ -763,13 +763,13 @@ export const wantedCodingTaskSchema: FormField[] = [
   // },
   {
     name: 'wanted_type',
-    label: 'Tell us about what you need help with',
+    label: 'Category',
     type: 'select',
     options: helpType_wanted_coding_task_schema
   },
   {
     name: 'one_sentence_summary',
-    label: 'One Sentence Summary',
+    label: 'Bounty Title',
     type: 'text',
     validator: strValidator
   },

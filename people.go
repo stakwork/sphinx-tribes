@@ -354,7 +354,7 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	personResponse["owner_route_hint"] = person.OwnerRouteHint
 	personResponse["owner_contact_key"] = person.OwnerContactKey
 	personResponse["price_to_meet"] = person.PriceToMeet
-	personResponse["extras"] = person.Extras
+	// personResponse["extras"] = person.Extras
 	personResponse["twitter_confirmed"] = person.TwitterConfirmed
 	personResponse["github_issues"] = person.GithubIssues
 	if err != nil {
@@ -372,6 +372,20 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	// FIXME also filter by the tribe "profile_filters"
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(personResponse)
+}
+
+func getPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	person := DB.getPersonByUuid(uuid)
+	assetList, err := getAssetList(person.OwnerPubKey)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	fmt.Println()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(assetList)
 }
 
 func getPersonByGithubName(w http.ResponseWriter, r *http.Request) {
@@ -454,4 +468,35 @@ func getAssetByPubkey(pubkey string) ([]AssetBalanceData, error) {
 	balances := r.Balances
 
 	return balances, nil
+}
+
+func getAssetList(pubkey string) ([]AssetListData, error) {
+	client := &http.Client{}
+
+	url := os.Getenv("ASSET_LIST_URL")
+	if url == "" {
+		url = "https://liquid.sphinx.chat/assets"
+	}
+
+	url = url + "?pubkey=" + pubkey
+
+	req, err := http.NewRequest("GET", url, nil)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("GET error:", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var r []AssetListData
+	body, err := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &r)
+	if err != nil {
+		fmt.Println("json unmarshall error", err)
+		return nil, err
+	}
+
+	return r, nil
 }

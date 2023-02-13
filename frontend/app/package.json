@@ -13,7 +13,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --max-warnings 817 --ext .ts --ext .tsx",
+    "lint": "eslint src --max-warnings 410 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
   },
@@ -44,6 +44,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-dropzone": "^11.3.2",
+    "react-intersection-observer": "^9.4.1",
     "react-markdown": "^8.0.3",
     "react-qr-svg": "^2.2.2",
     "react-qrcode-logo": "^2.5.0",
@@ -57,34 +58,47 @@
     "yup": "^0.32.9"
   },
   "eslintConfig": {
-    "extends": ["react-app", "eslint:recommended", "plugin:react/recommended"],
+    "extends": [
+      "react-app",
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
     "rules": {
       "react-hooks/rules-of-hooks": "warn",
       "react-hooks/exhaustive-deps": "warn",
       "react/prop-types": "off",
-			"no-unused-vars": "off",
-			"no-extra-boolean-cast": "warn",
-			"no-useless-escape": "warn",
-			"no-prototype-builtins": "warn",
-			"no-empty-pattern": "warn",
-			"no-empty": "warn",
-			"no-unreachable": "warn",
-			"no-useless-catch": "warn",
-			"react/jsx-closing-bracket-location": ["warn", "tag-aligned"],
-			"react/jsx-closing-tag-location": "warn",
-			"jsx-quotes": ["error", "prefer-double"],
-			"prefer-const": "warn",
-			"no-const-assign": "warn",
-			"no-var": "warn",
-			"prefer-destructuring": "warn",
-			"prefer-template": "warn",
-			"func-style": ["warn", "expression"],
-			"react/self-closing-comp": "warn",
-			"react/jsx-no-target-blank": "warn",
-			"react/jsx-key": "warn",
-			"react/no-children-prop": "warn",
-			"react/no-unescaped-entities": "warn"
-		}
+      "no-unused-vars": "off",
+      "no-extra-boolean-cast": "warn",
+      "no-useless-escape": "warn",
+      "no-prototype-builtins": "warn",
+      "no-empty-pattern": "warn",
+      "no-empty": "warn",
+      "no-unreachable": "warn",
+      "no-useless-catch": "warn",
+      "react/jsx-closing-bracket-location": [
+        "warn",
+        "tag-aligned"
+      ],
+      "react/jsx-closing-tag-location": "warn",
+      "jsx-quotes": [
+        "error",
+        "prefer-double"
+      ],
+      "prefer-const": "warn",
+      "no-const-assign": "warn",
+      "no-var": "warn",
+      "prefer-destructuring": "warn",
+      "prefer-template": "warn",
+      "func-style": [
+        "warn",
+        "expression"
+      ],
+      "react/self-closing-comp": "warn",
+      "react/jsx-no-target-blank": "warn",
+      "react/jsx-key": "warn",
+      "react/no-children-prop": "warn",
+      "react/no-unescaped-entities": "warn"
+    }
   },
   "browserslist": {
     "production": [

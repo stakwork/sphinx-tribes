@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React, { useEffect, useState, useRef } from 'react';
 import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
@@ -22,7 +23,10 @@ export default function FocusedView(props: any) {
     buttonsOnBottom,
     formHeader,
     manualGoBackOnly,
-    isFirstTimeScreen
+    isFirstTimeScreen,
+    fromBountyPage,
+    newDesign,
+    setIsModalSideButton
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -32,6 +36,8 @@ export default function FocusedView(props: any) {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
+  const [editable, setEditable] = useState<boolean>(!canEdit);
+  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
@@ -76,11 +82,11 @@ export default function FocusedView(props: any) {
 
             // include full tribe info from ownerTribes data
             if (s.name === 'tribes') {
-              let submitTribes: any = [];
+              const submitTribes: any = [];
 
               v[s.name] &&
                 v[s.name].forEach((t) => {
-                  let fullTribeInfo =
+                  const fullTribeInfo =
                     ownerTribes && ownerTribes?.find((f) => f.unique_name === t.value);
 
                   // disclude sensitive details
@@ -146,27 +152,29 @@ export default function FocusedView(props: any) {
       await main.saveProfile(body);
       await main.getPeople();
       closeModal(true);
+      props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
     setDeleting(false);
+    props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
     // if github repo
 
-    let githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
+    const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
         body.type === 'wanted_coding_task' ||
         body.type === 'coding_task' ||
         body.type === 'freelance_job_request'
       ) {
-        let { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
-        let splitString = repo.split('/');
-        let ownerName = splitString[0];
-        let repoName = splitString[1];
-        let res = await main.getGithubIssueData(ownerName, repoName, issue + '');
+        const { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
+        const splitString = repo.split('/');
+        const ownerName = splitString[0];
+        const repoName = splitString[1];
+        const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
 
         if (!res) {
           throw githubError;
@@ -228,13 +236,14 @@ export default function FocusedView(props: any) {
       console.log('e', e);
     }
     setLoading(false);
+    props?.ReCallBounties();
   }
 
   return useObserver(() => {
     // let initialValues: MeData = emptyMeInfo;
-    let initialValues: any = {};
+    const initialValues: any = {};
 
-    let personInfo = canEdit ? ui.meInfo : person;
+    const personInfo = canEdit ? ui.meInfo : person;
 
     // // console.log({...personInfo}.extras.wanted.map((value) => value.estimated_completion_date));
     // personInfo?.extras?.wanted?.map((value: any) => {
@@ -274,17 +283,17 @@ export default function FocusedView(props: any) {
         // if there is a selected index, fill in values
         if (selectedIndex > -1) {
           const extras = { ...personInfo.extras };
-          let sel =
+          const sel =
             extras[config.name] &&
             extras[config.name].length > selectedIndex - 1 &&
             extras[config.name][selectedIndex];
 
           if (sel) {
             // if dynamic, find right schema
-            let dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
+            const dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
             if (dynamicSchema) {
               if (sel.type) {
-                let thisDynamicSchema = dynamicSchemasByType[sel.type];
+                const thisDynamicSchema = dynamicSchemasByType[sel.type];
                 thisDynamicSchema?.forEach((s) => {
                   initialValues[s.name] = sel[s.name];
                 });
@@ -309,18 +318,20 @@ export default function FocusedView(props: any) {
     return (
       <div
         style={{
-          ...props.style,
+          ...props?.style,
           width: '100%',
           height: '100%'
-        }}>
+        }}
+      >
         {editMode ? (
           <B ref={scrollDiv} hide={false}>
             {formHeader && formHeader}
             {ui.meInfo && (
               <Form
+                newDesign={newDesign}
                 buttonsOnBottom={buttonsOnBottom}
                 isFirstTimeScreen={isFirstTimeScreen}
-                readOnly={!canEdit}
+                readOnly={editable}
                 formRef={formRef}
                 submitText={config && config.submitText}
                 loading={loading}
@@ -348,7 +359,8 @@ export default function FocusedView(props: any) {
               <BWrap
                 style={{
                   ...noShadow
-                }}>
+                }}
+              >
                 {goBack ? (
                   <IconButton
                     icon="arrow_back"
@@ -369,7 +381,8 @@ export default function FocusedView(props: any) {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center'
-                    }}>
+                    }}
+                  >
                     <Button
                       onClick={() => setEditMode(true)}
                       color={'widget'}
@@ -399,9 +412,23 @@ export default function FocusedView(props: any) {
 
             {/* display item */}
             <SummaryViewer
+              ReCallBounties={props?.ReCallBounties}
+              formSubmit={submitForm}
               person={person}
+              personBody={props?.personBody}
               item={person?.extras && person.extras[config?.name][selectedIndex]}
               config={config}
+              fromBountyPage={fromBountyPage}
+              extraModalFunction={props?.extraModalFunction}
+              deleteAction={deleteIt}
+              deletingState={deleting}
+              editAction={() => {
+                setEditable(false);
+                setEditMode(true);
+                // props?.deleteExtraFunction();
+              }}
+              setIsModalSideButton={setIsModalSideButton}
+              setIsExtraStyle={props?.setIsExtraStyle}
             />
           </>
         )}
@@ -451,7 +478,8 @@ interface BProps {
   hide: boolean;
 }
 const B = styled.div<BProps>`
-  display: ${(p) => p.hide && 'none'};
+  display: ${(p) => (p.hide ? 'none' : 'flex')};
+  justify-content: ${(p) => (p.hide ? 'none' : 'center')};
   height: 100%;
   width: 100%;
   overflow-y: auto;
