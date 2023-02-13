@@ -552,17 +552,15 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := DB.getPersonByPubkey(pubKeyFromAuth)
+	tribe := DB.getTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
 
-	if pubKeyFromAuth != existing.OwnerPubKey {
+	if pubKeyFromAuth != tribe.OwnerPubKey {
 		fmt.Println(pubKeyFromAuth)
-		fmt.Println(existing.OwnerPubKey)
 		fmt.Println("mismatched pubkey")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	tribe := DB.getTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
 	tribeBadges := tribe.Badges
 	if badgeCreationData.Action == "add" {
 		badges := append(tribeBadges, badgeCreationData.Badge)
