@@ -106,6 +106,7 @@ func NewRouter() *http.Server {
 		r.Delete("/bot/{uuid}", deleteBot)
 		r.Post("/person", createOrEditPerson)
 		r.Post("/verify/{challenge}", verify)
+		r.Post("/badges", addOrRemoveBadge)
 		r.Put("/bot", createOrEditBot)
 		r.Delete("/person/{id}", deletePerson)
 		r.Delete("/channel/{id}", deleteChannel)
