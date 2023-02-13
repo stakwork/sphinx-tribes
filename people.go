@@ -354,7 +354,7 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	personResponse["owner_route_hint"] = person.OwnerRouteHint
 	personResponse["owner_contact_key"] = person.OwnerContactKey
 	personResponse["price_to_meet"] = person.PriceToMeet
-	personResponse["extras"] = person.Extras
+	// personResponse["extras"] = person.Extras
 	personResponse["twitter_confirmed"] = person.TwitterConfirmed
 	personResponse["github_issues"] = person.GithubIssues
 	if err != nil {
