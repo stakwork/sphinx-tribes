@@ -39,6 +39,7 @@ type Tribe struct {
 	Pin             string         `json:"pin"`
 	Preview         string         `json:"preview"`
 	ProfileFilters  string         `json:"profile_filters"` // "twitter,github"
+	Badges          pq.StringArray `json:"badges"`
 }
 
 // Bot struct
@@ -186,6 +187,12 @@ type AssetListData struct {
 	Amount  uint   `json:"amount"`
 	Creator string `json:"creator"`
 	Balance uint   `json:"balance"`
+}
+
+type BadgeCreationData struct {
+	Badge     string `json:"badge"`
+	TribeUUID string `json:"tribeId"`
+	Action    string `json:"action"`
 }
 
 /*
