@@ -62,7 +62,7 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		person.UniqueName, _ = personUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
-	} else { // editing! needs ID
+	} else {                // editing! needs ID
 		if person.ID == 0 { // cant create that already exists
 			fmt.Println("cant create existing")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -499,4 +499,98 @@ func getAssetList(pubkey string) ([]AssetListData, error) {
 	}
 
 	return r, nil
+}
+
+func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	badgeCreationData := BadgeCreationData{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &badgeCreationData)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if badgeCreationData.Badge == "" {
+		fmt.Println("Badge cannot be Empty")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if badgeCreationData.Action == "" {
+		fmt.Println("Action cannot be Empty")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if !(badgeCreationData.Action == "add" || badgeCreationData.Action == "remove") {
+		fmt.Println("Invalid action in Request")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if badgeCreationData.TribeUUID == "" {
+		fmt.Println("tribeId cannot be Empty")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(badgeCreationData.TribeUUID, false)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	existing := DB.getPersonByPubkey(pubKeyFromAuth)
+
+	if pubKeyFromAuth != existing.OwnerPubKey {
+		fmt.Println(pubKeyFromAuth)
+		fmt.Println(existing.OwnerPubKey)
+		fmt.Println("mismatched pubkey")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	tribe := DB.getTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
+	tribeBadges := tribe.Badges
+	if badgeCreationData.Action == "add" {
+		badges := append(tribeBadges, badgeCreationData.Badge)
+		tribeBadges = badges
+	}
+
+	if badgeCreationData.Action == "remove" {
+		for i, v := range tribeBadges {
+			if strings.ToLower(v) == strings.ToLower(badgeCreationData.Badge) {
+				tribeBadges = append(tribeBadges[:i], tribeBadges[i+1:]...)
+				break
+			}
+		}
+
+	}
+
+	tribe.Badges = tribeBadges
+	updatedTribe := DB.updateTribe(tribe.UUID, map[string]interface{}{
+		"badges": tribeBadges,
+	})
+
+	if updatedTribe {
+		tribe = DB.getTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(tribe)
+	}
+	w.WriteHeader(http.StatusBadRequest)
+	return
+
 }
