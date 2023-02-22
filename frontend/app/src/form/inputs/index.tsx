@@ -117,8 +117,8 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
     p.border === 'bottom'
       ? ''
       : p?.isTop
-      ? `1px solid ${p.color.pureWhite}`
-      : `1px solid ${p.color.grayish.G600}`};
+      ? `1px solid ${p?.color && p.color.pureWhite}`
+      : `1px solid ${p?.color && p.color.grayish.G600}`};
   border-bottom: ${(p) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
   box-sizing: border-box;
   border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
@@ -127,7 +127,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   min-height: ${(p) => (p?.isTextField ? '40' : '')};
   max-height: ${(p) => (p?.isTextField ? '40' : '')};
   margin-bottom: 24px;
-  border: ${(p) => p?.isFill && `1px solid ${p.color.grayish.G600}`};
+  border: ${(p) => p?.isFill && `1px solid ${p?.color && p.color.grayish.G600}`};
   .euiFormRow__labelWrapper {
     margin-bottom: -20px;
     margin-top: ${(p) => (p?.isTextField ? '12px' : '10px')};
@@ -135,7 +135,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
     height: ${(p) => (p?.isTextField ? '6px' : '14px')};
     position: relative;
     label {
-      color: ${(p) => p.color && p.color.grayish.G300} !important;
+      color: ${(p) => p?.color && p.color.grayish.G300} !important;
       background: ${(p) => p?.color && p.color.pureWhite};
       z-index: 10;
       position: ${(p) => p?.isTop && 'absolute'};

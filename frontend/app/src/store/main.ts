@@ -341,7 +341,7 @@ export class MainStore {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
-      const l = await fetch(`${URL}/list`, {
+      const l = await fetch(`${URL}/list?limit=100000`, {
         method: 'GET'
       });
 
@@ -358,7 +358,7 @@ export class MainStore {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
-      const b = await fetch(`${URL}/balances?pubkey=${pubkey}`, {
+      const b = await fetch(`${URL}/balances?pubkey=${pubkey}&limit=100000`, {
         method: 'GET'
       });
 
@@ -790,8 +790,8 @@ export class MainStore {
       return [null, error];
     }
 
-    // fork between tor users and not
-    if (this.isTorSave()) {
+    // fork between tor users non authentiacted and not
+    if (this.isTorSave() || info.url.startsWith('http://')) {
       this.submitFormViaApp(method, path, body);
       return [null, null];
     }
