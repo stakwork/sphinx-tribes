@@ -145,7 +145,7 @@ export default function BountySummary(props: any) {
     }
   }, [assignee]);
 
-				  useEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const response = await api.get(`people?page=1&search=&sortBy=last_login&limit=100`);
@@ -539,7 +539,6 @@ export default function BountySummary(props: any) {
     </ButtonRow>
   );
 
-
   const nametag = (
     <NameTag
       iconSize={24}
@@ -568,7 +567,8 @@ export default function BountySummary(props: any) {
               color: color.grayish.G100,
               marginTop: isMobile ? 20 : 0,
               marginLeft: '-16px'
-            }}>
+            }}
+          >
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -580,7 +580,8 @@ export default function BountySummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -594,7 +595,8 @@ export default function BountySummary(props: any) {
               fontSize: 12,
               color: color.grayish.G100,
               marginLeft: '16px'
-            }}>
+            }}
+          >
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -606,7 +608,8 @@ export default function BountySummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -626,7 +629,8 @@ export default function BountySummary(props: any) {
               style={{
                 display: 'flex',
                 flexDirection: 'row'
-              }}>
+              }}
+            >
               <GithubStatusPill status={status} assignee={assignee} />
               {assigneeLabel}
               {ticketUrl && (
@@ -634,7 +638,8 @@ export default function BountySummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(ticketUrl, '_blank');
-                  }}>
+                  }}
+                >
                   <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
                 </GithubIconMobile>
               )}
@@ -643,7 +648,8 @@ export default function BountySummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(loomEmbedUrl, '_blank');
-                  }}>
+                  }}
+                >
                   <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                 </LoomIconMobile>
               )}
@@ -654,13 +660,15 @@ export default function BountySummary(props: any) {
                 fontSize: '13px',
                 color: color.grayish.G100,
                 fontWeight: '500'
-              }}>
+              }}
+            >
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: color.pureBlack
-                }}>
+                }}
+              >
                 {estimate_session_length ?? ''}
               </span>
             </EuiText>
@@ -671,7 +679,8 @@ export default function BountySummary(props: any) {
                 flexDirection: 'row',
                 marginTop: '10px',
                 minHeight: '60px'
-              }}>
+              }}
+            >
               {labels?.length > 0 &&
                 labels?.map((x: any) => {
                   return (
@@ -688,12 +697,14 @@ export default function BountySummary(props: any) {
                           borderRadius: '20px',
                           marginRight: '3px',
                           boxShadow: `1px 1px ${color.grayish.G70}`
-                        }}>
+                        }}
+                      >
                         <div
                           style={{
                             fontSize: '10px',
                             color: color.black300
-                          }}>
+                          }}
+                        >
                           {x.label}
                         </div>
                       </div>
@@ -743,7 +754,8 @@ export default function BountySummary(props: any) {
                 <Creator
                   onClick={() => {
                     setIsPaidStatusPopOver(false);
-                  }}>
+                  }}
+                >
                   <>
                     {paid && (
                       <Img
@@ -767,14 +779,16 @@ export default function BountySummary(props: any) {
                           style={{
                             opacity: isPaidStatusPopOver ? 1 : 0,
                             transition: 'all ease 1s'
-                          }}>
+                          }}
+                        >
                           <div
                             className="PaidStatusContainer"
                             style={{
                               borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px',
                               opacity: isPaidStatusPopOver ? 1 : 0,
                               transition: 'all ease 1s'
-                            }}>
+                            }}
+                          >
                             <div className="imageContainer">
                               <img
                                 src="/static/verified_check_icon.svg"
@@ -790,7 +804,8 @@ export default function BountySummary(props: any) {
                             style={{
                               opacity: isPaidStatusBadgeInfo ? 1 : 0,
                               transition: 'all ease 1s'
-                            }}>
+                            }}
+                          >
                             <div className="imageContainer">
                               <img
                                 src="/static/green_checked_icon.svg"
@@ -853,7 +868,8 @@ export default function BountySummary(props: any) {
                                   styledColors={color}
                                   border={lang?.border}
                                   color={lang?.color}
-                                  background={lang?.background}>
+                                  background={lang?.background}
+                                >
                                   <EuiText className="LanguageText">{lang?.label}</EuiText>
                                 </CodingLabels>
                               );
@@ -874,7 +890,8 @@ export default function BountySummary(props: any) {
                       <UnassignedPersonProfile
                         unassigned_border={color.grayish.G300}
                         grayish_G200={color.grayish.G200}
-                        color={color}>
+                        color={color}
+                      >
                         {!isAssigned && (
                           <div className="UnassignedPersonContainer">
                             <img
@@ -928,7 +945,8 @@ export default function BountySummary(props: any) {
                                 onClick={() => {
                                   changeAssignedPerson();
                                   setIsModalSideButton(false);
-                                }}>
+                                }}
+                              >
                                 <img
                                   src="/static/assignee_close.png"
                                   alt="cross_icon"
@@ -1076,7 +1094,8 @@ export default function BountySummary(props: any) {
                       setCreatorStep(0);
                       setIsModalSideButton(true);
                       setIsExtraStyle(false);
-                    }}>
+                    }}
+                  >
                     <div className="imageContainer">
                       <img
                         height={'12px'}
@@ -1173,7 +1192,8 @@ export default function BountySummary(props: any) {
                       onClick={() => {
                         setCreatorStep(1);
                         setIsExtraStyle(true);
-                      }}>
+                      }}
+                    >
                       <div className="imageContainer">
                         <img
                           height={'12px'}
@@ -1200,7 +1220,8 @@ export default function BountySummary(props: any) {
                             name: award.label,
                             image: award.label_icon
                           });
-                        }}>
+                        }}
+                      >
                         <input
                           type="radio"
                           id={award.id}
@@ -1269,7 +1290,7 @@ export default function BountySummary(props: any) {
                 </AwardsContainer>
               )}
 
-              {assigneeValue && ( 
+              {assigneeValue && (
                 <Modal
                   visible={true}
                   envStyle={{
@@ -1285,7 +1306,8 @@ export default function BountySummary(props: any) {
                     background: color.pureBlack,
                     borderRadius: '50%',
                     zIndex: 11
-                  }}>
+                  }}
+                >
                   <AutoCompleteContainer color={color}>
                     <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
                     <InvitePeopleSearch
@@ -1297,8 +1319,7 @@ export default function BountySummary(props: any) {
                     />
                   </AutoCompleteContainer>
                 </Modal>
-
-             )}
+              )}
             </>
           ) : (
             /*
@@ -1332,7 +1353,8 @@ export default function BountySummary(props: any) {
                             styledColors={color}
                             border={lang?.border}
                             color={lang?.color}
-                            background={lang?.background}>
+                            background={lang?.background}
+                          >
                             <EuiText className="LanguageText">{lang?.label}</EuiText>
                           </CodingLabels>
                         );
@@ -1500,7 +1522,8 @@ export default function BountySummary(props: any) {
                     <UnassignedPersonProfile
                       unassigned_border={color.grayish.G300}
                       grayish_G200={color.grayish.G200}
-                      color={color}>
+                      color={color}
+                    >
                       <div className="UnassignedPersonContainer">
                         <img
                           src="/static/unassigned_profile.svg"
@@ -1603,7 +1626,8 @@ export default function BountySummary(props: any) {
               borderRight: `1px solid ${color.grayish.G600}`,
               minHeight: '100%',
               overflow: 'auto'
-            }}>
+            }}
+          >
             <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
               <Title>{title}</Title>
               <div style={{ display: 'flex', marginTop: 12 }}>
@@ -1614,7 +1638,8 @@ export default function BountySummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(ticketUrl, '_blank');
-                    }}>
+                    }}
+                  >
                     <img
                       height={'100%'}
                       width={'100%'}
@@ -1628,7 +1653,8 @@ export default function BountySummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(loomEmbedUrl, '_blank');
-                    }}>
+                    }}
+                  >
                     <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                   </LoomIcon>
                 )}
@@ -1636,19 +1662,22 @@ export default function BountySummary(props: any) {
               <div
                 style={{
                   marginTop: '2px'
-                }}>
+                }}
+              >
                 <EuiText
                   style={{
                     fontSize: '13px',
                     color: color.text2_4,
                     fontWeight: '500'
-                  }}>
+                  }}
+                >
                   {estimate_session_length && 'Session:'}{' '}
                   <span
                     style={{
                       fontWeight: '500',
                       color: color.pureBlack
-                    }}>
+                    }}
+                  >
                     {estimate_session_length ?? ''}
                   </span>
                 </EuiText>
@@ -1661,7 +1690,8 @@ export default function BountySummary(props: any) {
                 style={{
                   overflow: 'hidden',
                   wordBreak: 'normal'
-                }}>
+                }}
+              >
                 {renderMarkdown(description)}
               </Paragraph>
 
@@ -1676,7 +1706,8 @@ export default function BountySummary(props: any) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between'
-                }}>
+                }}
+              >
                 {nametag}
               </div>
               {/* <Img
@@ -1690,7 +1721,8 @@ export default function BountySummary(props: any) {
                   width: '100%',
                   display: 'flex',
                   flexDirection: 'row'
-                }}>
+                }}
+              >
                 {labels?.length > 0 &&
                   labels?.map((x: any) => {
                     return (
@@ -1707,12 +1739,14 @@ export default function BountySummary(props: any) {
                             borderRadius: '20px',
                             marginRight: '3px',
                             boxShadow: `1px 1px ${color.grayish.G70}`
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               fontSize: '10px',
                               color: color.black300
-                            }}>
+                            }}
+                          >
                             {x.label}
                           </div>
                         </div>
@@ -1792,7 +1826,8 @@ export default function BountySummary(props: any) {
     <div
       style={{
         paddingTop: gallery && '40px'
-      }}>
+      }}
+    >
       <Wrap color={color}>
         <div>
           <GalleryViewer
@@ -1811,7 +1846,8 @@ export default function BountySummary(props: any) {
             padding: '40px 20px',
             overflowY: 'auto',
             height: envHeight
-          }}>
+          }}
+        >
           <Pad>
             {nametag}
 
@@ -2491,4 +2527,3 @@ const PaidStatusPopover = styled.div<colorProps>`
     }
   }
 `;
-
