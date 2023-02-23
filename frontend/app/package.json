@@ -15,7 +15,7 @@
     "eject": "react-scripts eject",
     "lint": "eslint src --max-warnings 410 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
-    "prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
+    "prettier": "npx prettier --config .prettierrc.json -w \"{,!(node_modules)/**/}*.tsx\" \"{,!(node_modules)/**/}*.ts\""
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",

@@ -26,6 +26,8 @@ import ButtonSet from '../../sphinxUI/bountyModal_button_set';
 import ImageButton from '../../sphinxUI/Image_button';
 import api from '../../api';
 import InvitePeopleSearch from '../../form/inputs/widgets/PeopleSearch';
+import { sendToRedirect } from '../utils/bountyUtils';
+import GithubButton from './BountySummary/Components/GithubButton';
 
 function useQuery() {
   const { search } = useLocation();
@@ -525,13 +527,6 @@ export default function BountySummary(props: any) {
       )}
     </ButtonRow>
   );
-
-  function sendToRedirect(url) {
-    const el = document.createElement('a');
-    el.href = url;
-    el.target = '_blank';
-    el.click();
-  }
 
   const nametag = (
     <NameTag
@@ -1763,7 +1758,7 @@ export default function BountySummary(props: any) {
 
             <SectionPad>
               <ButtonRow>
-                {viewGithub}
+                <GithubButton ticketUrl={ticketUrl} repo={repo} issue={issue} />
                 {viewTribe}
                 {addToFavorites}
                 {copyLink}
