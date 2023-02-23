@@ -28,6 +28,7 @@ import api from '../../api';
 import InvitePeopleSearch from '../../form/inputs/widgets/PeopleSearch';
 import { sendToRedirect } from '../utils/bountyUtils';
 import GithubButton from './BountySummary/Components/GithubButton';
+import ShareOnTwitterButton from './BountySummary/Components/ShareOnTwitterButton';
 
 function useQuery() {
   const { search } = useLocation();
@@ -455,29 +456,6 @@ export default function BountySummary(props: any) {
     />
   );
 
-  const shareOnTwitter = (
-    <Button
-      text={'Share to Twitter'}
-      color={'white'}
-      icon={'share'}
-      iconSize={18}
-      iconStyle={{ left: 14 }}
-      style={{
-        fontSize: 14,
-        height: 48,
-        width: '100%',
-        marginBottom: 20,
-        paddingLeft: 5
-      }}
-      onClick={() => {
-        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-          labels && labels.map((x: any) => x.label)
-        },sphinxchat`;
-        sendToRedirect(twitterLink);
-      }}
-    />
-  );
-
   //  if my own, show this option to show/hide
   const markPaidButton = (
     <Button
@@ -719,7 +697,12 @@ export default function BountySummary(props: any) {
               {viewTribe}
               {addToFavorites}
               {copyLink}
-              {shareOnTwitter}
+              <ShareOnTwitterButton
+                title={title}
+                owner_idURL={owner_idURL}
+                createdURL={createdURL}
+                labels={labels}
+              />
             </ButtonRow>
 
             {actionButtons}
@@ -1773,7 +1756,12 @@ export default function BountySummary(props: any) {
                 {viewTribe}
                 {addToFavorites}
                 {copyLink}
-                {shareOnTwitter}
+                <ShareOnTwitterButton
+                  title={title}
+                  owner_idURL={owner_idURL}
+                  createdURL={createdURL}
+                  labels={labels}
+                />
               </ButtonRow>
 
               {actionButtons}
