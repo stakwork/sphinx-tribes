@@ -3,7 +3,7 @@ import React from 'react';
 import { useStores } from '../../store';
 import styled from 'styled-components';
 import PostSummary from './summaries/postSummary';
-import WantedSummary from './summaries/wantedSummary';
+import BountySummary from '../../bounties/Components/BountySummary';
 import OfferSummary from './summaries/offerSummary';
 import { useIsMobile } from '../../hooks';
 
@@ -38,7 +38,7 @@ export default function SummaryViewer(props: any) {
       return wrapIt(<OfferSummary {...item} person={person} />);
     case 'wanted':
       return wrapIt(
-        <WantedSummary
+        <BountySummary
           {...item}
           ReCallBounties={props.ReCallBounties}
           person={person}

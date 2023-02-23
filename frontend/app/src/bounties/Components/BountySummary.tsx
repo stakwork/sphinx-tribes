@@ -2,30 +2,30 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { formatPrice, satToUsd } from '../../../helpers';
-import { useIsMobile } from '../../../hooks';
-import { Divider, Title, Paragraph, Button, Modal } from '../../../sphinxUI';
-import GalleryViewer from '../../utils/galleryViewer';
-import NameTag from '../../utils/nameTag';
-import FavoriteButton from '../../utils/favoriteButton';
-import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
-import GithubStatusPill from '../parts/statusPill';
-import { useStores } from '../../../store';
-import Form from '../../../form';
-import { sendBadgeSchema } from '../../../form/schema';
-import LoomViewerRecorder from '../../utils/loomViewerRecorder';
-import { renderMarkdown } from '../../utils/renderMarkdown';
+import { formatPrice, satToUsd } from '../../helpers';
+import { useIsMobile } from '../../hooks';
+import { Divider, Title, Paragraph, Button, Modal } from '../../sphinxUI';
+import GalleryViewer from '../../people/utils/galleryViewer';
+import NameTag from '../../people/utils/nameTag';
+import FavoriteButton from '../../people/utils/favoriteButton';
+import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
+import GithubStatusPill from '../../people/widgetViews/parts/statusPill';
+import { useStores } from '../../store';
+import Form from '../../form';
+import { sendBadgeSchema } from '../../form/schema';
+import LoomViewerRecorder from '../../people/utils/loomViewerRecorder';
+import { renderMarkdown } from '../../people/utils/renderMarkdown';
 import { useLocation } from 'react-router-dom';
 import { EuiFieldText, EuiText } from '@elastic/eui';
-import { colors } from '../../../colors';
-import { awards, LanguageObject } from '../../utils/language_label_style';
-import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
-import IconButton from '../../../sphinxUI/icon_button';
-import BountyPrice from '../../../sphinxUI/bounty_price';
-import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
-import ImageButton from '../../../sphinxUI/Image_button';
-import api from '../../../api';
-import InvitePeopleSearch from '../../../form/inputs/widgets/PeopleSearch';
+import { colors } from '../../colors';
+import { awards, LanguageObject } from '../../people/utils/language_label_style';
+import BountyProfileView from '../../sphinxUI/bounty_profile_view';
+import IconButton from '../../sphinxUI/icon_button';
+import BountyPrice from '../../sphinxUI/bounty_price';
+import ButtonSet from '../../sphinxUI/bountyModal_button_set';
+import ImageButton from '../../sphinxUI/Image_button';
+import api from '../../api';
+import InvitePeopleSearch from '../../form/inputs/widgets/PeopleSearch';
 
 function useQuery() {
   const { search } = useLocation();
@@ -33,7 +33,7 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function WantedSummary(props: any) {
+export default function BountySummary(props: any) {
   const {
     title,
     description,
@@ -81,6 +81,7 @@ export default function WantedSummary(props: any) {
   const [createdURL, setCreatedURL] = useState('');
   const [dataValue, setDataValue] = useState([]);
   const [peopleList, setPeopleList] = useState<any>();
+
   const [isAssigned, setIsAssigned] = useState<boolean>(false);
   const [assignedPerson, setAssignedPerson] = useState<any>();
   const [replitLink, setReplitLink] = useState('');
@@ -141,17 +142,6 @@ export default function WantedSummary(props: any) {
       setIsAssigned(true);
     }
   }, [assignee]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await api.get(`people?page=1&search=&sortBy=last_login&limit=100`);
-        setPeopleList(response);
-      } catch (error) {
-        console.log(error);
-      }
-    })();
-  }, []);
 
   const handleAssigneeDetails = useCallback(
     (value) => {
@@ -571,7 +561,8 @@ export default function WantedSummary(props: any) {
               color: color.grayish.G100,
               marginTop: isMobile ? 20 : 0,
               marginLeft: '-16px'
-            }}>
+            }}
+          >
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -583,7 +574,8 @@ export default function WantedSummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -597,7 +589,8 @@ export default function WantedSummary(props: any) {
               fontSize: 12,
               color: color.grayish.G100,
               marginLeft: '16px'
-            }}>
+            }}
+          >
             <Img
               src={assigneeInfo.img || '/static/person_placeholder.png'}
               style={{ borderRadius: 30 }}
@@ -609,7 +602,8 @@ export default function WantedSummary(props: any) {
                 const profileUrl = `https://community.sphinx.chat/p/${assigneeInfo.owner_pubkey}`;
                 sendToRedirect(profileUrl);
               }}
-              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ marginLeft: 3, fontWeight: 500, cursor: 'pointer' }}
+            >
               {assigneeInfo.owner_alias}
             </Assignee>
           </div>
@@ -629,7 +623,8 @@ export default function WantedSummary(props: any) {
               style={{
                 display: 'flex',
                 flexDirection: 'row'
-              }}>
+              }}
+            >
               <GithubStatusPill status={status} assignee={assignee} />
               {assigneeLabel}
               {ticketUrl && (
@@ -637,7 +632,8 @@ export default function WantedSummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(ticketUrl, '_blank');
-                  }}>
+                  }}
+                >
                   <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
                 </GithubIconMobile>
               )}
@@ -646,7 +642,8 @@ export default function WantedSummary(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(loomEmbedUrl, '_blank');
-                  }}>
+                  }}
+                >
                   <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                 </LoomIconMobile>
               )}
@@ -657,13 +654,15 @@ export default function WantedSummary(props: any) {
                 fontSize: '13px',
                 color: color.grayish.G100,
                 fontWeight: '500'
-              }}>
+              }}
+            >
               {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: color.pureBlack
-                }}>
+                }}
+              >
                 {estimate_session_length ?? ''}
               </span>
             </EuiText>
@@ -674,7 +673,8 @@ export default function WantedSummary(props: any) {
                 flexDirection: 'row',
                 marginTop: '10px',
                 minHeight: '60px'
-              }}>
+              }}
+            >
               {labels?.length > 0 &&
                 labels?.map((x: any) => {
                   return (
@@ -691,12 +691,14 @@ export default function WantedSummary(props: any) {
                           borderRadius: '20px',
                           marginRight: '3px',
                           boxShadow: `1px 1px ${color.grayish.G70}`
-                        }}>
+                        }}
+                      >
                         <div
                           style={{
                             fontSize: '10px',
                             color: color.black300
-                          }}>
+                          }}
+                        >
                           {x.label}
                         </div>
                       </div>
@@ -746,7 +748,8 @@ export default function WantedSummary(props: any) {
                 <Creator
                   onClick={() => {
                     setIsPaidStatusPopOver(false);
-                  }}>
+                  }}
+                >
                   <>
                     {paid && (
                       <Img
@@ -770,14 +773,16 @@ export default function WantedSummary(props: any) {
                           style={{
                             opacity: isPaidStatusPopOver ? 1 : 0,
                             transition: 'all ease 1s'
-                          }}>
+                          }}
+                        >
                           <div
                             className="PaidStatusContainer"
                             style={{
                               borderRadius: isPaidStatusBadgeInfo ? '6px 6px 0px 0px' : '6px',
                               opacity: isPaidStatusPopOver ? 1 : 0,
                               transition: 'all ease 1s'
-                            }}>
+                            }}
+                          >
                             <div className="imageContainer">
                               <img
                                 src="/static/verified_check_icon.svg"
@@ -793,7 +798,8 @@ export default function WantedSummary(props: any) {
                             style={{
                               opacity: isPaidStatusBadgeInfo ? 1 : 0,
                               transition: 'all ease 1s'
-                            }}>
+                            }}
+                          >
                             <div className="imageContainer">
                               <img
                                 src="/static/green_checked_icon.svg"
@@ -856,7 +862,8 @@ export default function WantedSummary(props: any) {
                                   styledColors={color}
                                   border={lang?.border}
                                   color={lang?.color}
-                                  background={lang?.background}>
+                                  background={lang?.background}
+                                >
                                   <EuiText className="LanguageText">{lang?.label}</EuiText>
                                 </CodingLabels>
                               );
@@ -877,7 +884,8 @@ export default function WantedSummary(props: any) {
                       <UnassignedPersonProfile
                         unassigned_border={color.grayish.G300}
                         grayish_G200={color.grayish.G200}
-                        color={color}>
+                        color={color}
+                      >
                         {!isAssigned && (
                           <div className="UnassignedPersonContainer">
                             <img
@@ -931,7 +939,8 @@ export default function WantedSummary(props: any) {
                                 onClick={() => {
                                   changeAssignedPerson();
                                   setIsModalSideButton(false);
-                                }}>
+                                }}
+                              >
                                 <img
                                   src="/static/assignee_close.png"
                                   alt="cross_icon"
@@ -1079,7 +1088,8 @@ export default function WantedSummary(props: any) {
                       setCreatorStep(0);
                       setIsModalSideButton(true);
                       setIsExtraStyle(false);
-                    }}>
+                    }}
+                  >
                     <div className="imageContainer">
                       <img
                         height={'12px'}
@@ -1176,7 +1186,8 @@ export default function WantedSummary(props: any) {
                       onClick={() => {
                         setCreatorStep(1);
                         setIsExtraStyle(true);
-                      }}>
+                      }}
+                    >
                       <div className="imageContainer">
                         <img
                           height={'12px'}
@@ -1203,7 +1214,8 @@ export default function WantedSummary(props: any) {
                             name: award.label,
                             image: award.label_icon
                           });
-                        }}>
+                        }}
+                      >
                         <input
                           type="radio"
                           id={award.id}
@@ -1288,7 +1300,8 @@ export default function WantedSummary(props: any) {
                     background: color.pureBlack,
                     borderRadius: '50%',
                     zIndex: 11
-                  }}>
+                  }}
+                >
                   <AutoCompleteContainer color={color}>
                     <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
                     <InvitePeopleSearch
@@ -1334,7 +1347,8 @@ export default function WantedSummary(props: any) {
                             styledColors={color}
                             border={lang?.border}
                             color={lang?.color}
-                            background={lang?.background}>
+                            background={lang?.background}
+                          >
                             <EuiText className="LanguageText">{lang?.label}</EuiText>
                           </CodingLabels>
                         );
@@ -1502,7 +1516,8 @@ export default function WantedSummary(props: any) {
                     <UnassignedPersonProfile
                       unassigned_border={color.grayish.G300}
                       grayish_G200={color.grayish.G200}
-                      color={color}>
+                      color={color}
+                    >
                       <div className="UnassignedPersonContainer">
                         <img
                           src="/static/unassigned_profile.svg"
@@ -1605,7 +1620,8 @@ export default function WantedSummary(props: any) {
               borderRight: `1px solid ${color.grayish.G600}`,
               minHeight: '100%',
               overflow: 'auto'
-            }}>
+            }}
+          >
             <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
               <Title>{title}</Title>
               <div style={{ display: 'flex', marginTop: 12 }}>
@@ -1616,7 +1632,8 @@ export default function WantedSummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(ticketUrl, '_blank');
-                    }}>
+                    }}
+                  >
                     <img
                       height={'100%'}
                       width={'100%'}
@@ -1630,7 +1647,8 @@ export default function WantedSummary(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(loomEmbedUrl, '_blank');
-                    }}>
+                    }}
+                  >
                     <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
                   </LoomIcon>
                 )}
@@ -1638,19 +1656,22 @@ export default function WantedSummary(props: any) {
               <div
                 style={{
                   marginTop: '2px'
-                }}>
+                }}
+              >
                 <EuiText
                   style={{
                     fontSize: '13px',
                     color: color.text2_4,
                     fontWeight: '500'
-                  }}>
+                  }}
+                >
                   {estimate_session_length && 'Session:'}{' '}
                   <span
                     style={{
                       fontWeight: '500',
                       color: color.pureBlack
-                    }}>
+                    }}
+                  >
                     {estimate_session_length ?? ''}
                   </span>
                 </EuiText>
@@ -1663,7 +1684,8 @@ export default function WantedSummary(props: any) {
                 style={{
                   overflow: 'hidden',
                   wordBreak: 'normal'
-                }}>
+                }}
+              >
                 {renderMarkdown(description)}
               </Paragraph>
 
@@ -1678,7 +1700,8 @@ export default function WantedSummary(props: any) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between'
-                }}>
+                }}
+              >
                 {nametag}
               </div>
               {/* <Img
@@ -1692,7 +1715,8 @@ export default function WantedSummary(props: any) {
                   width: '100%',
                   display: 'flex',
                   flexDirection: 'row'
-                }}>
+                }}
+              >
                 {labels?.length > 0 &&
                   labels?.map((x: any) => {
                     return (
@@ -1709,12 +1733,14 @@ export default function WantedSummary(props: any) {
                             borderRadius: '20px',
                             marginRight: '3px',
                             boxShadow: `1px 1px ${color.grayish.G70}`
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               fontSize: '10px',
                               color: color.black300
-                            }}>
+                            }}
+                          >
                             {x.label}
                           </div>
                         </div>
@@ -1794,7 +1820,8 @@ export default function WantedSummary(props: any) {
     <div
       style={{
         paddingTop: gallery && '40px'
-      }}>
+      }}
+    >
       <Wrap color={color}>
         <div>
           <GalleryViewer
@@ -1813,7 +1840,8 @@ export default function WantedSummary(props: any) {
             padding: '40px 20px',
             overflowY: 'auto',
             height: envHeight
-          }}>
+          }}
+        >
           <Pad>
             {nametag}
 
