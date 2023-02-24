@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+/* eslint-disable func-style */
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getHost } from '../host';
 import { useStores } from '../store';
@@ -6,28 +7,26 @@ import { useStores } from '../store';
 import AboutView from './widgetViews/aboutView';
 import BlogView from './widgetViews/blogView';
 import OfferView from './widgetViews/offerView';
-import TwitterView from './widgetViews/twitterView';
-import SupportMeView from './widgetViews/supportMeView';
-import WantedView from './widgetViews/wantedView';
 import PostView from './widgetViews/postView';
+import SupportMeView from './widgetViews/supportMeView';
+import TwitterView from './widgetViews/twitterView';
+import WantedView from './widgetViews/wantedView';
 
-import { Button, IconButton, Modal, SearchTextInput } from '../sphinxUI';
-import MaterialIcon from '@material/react-material-icon';
-import FocusedView from './main/focusView';
+import { useHistory, useLocation } from 'react-router';
 import { meSchema } from '../form/schema';
 import { useIsMobile, usePageScroll } from '../hooks';
+import { Button, IconButton, Modal, SearchTextInput } from '../sphinxUI';
+import { queryLimit } from '../store/main';
+import FocusedView from './main/focusView';
 import Person from './person';
-import NoneSpace from './utils/noneSpace';
+import Badges from './utils/badges';
 import ConnectCard from './utils/connectCard';
 import { widgetConfigs } from './utils/constants';
-import { useHistory, useLocation } from 'react-router';
-import { queryLimit } from '../store/main';
 import NoResults from './utils/noResults';
+import NoneSpace from './utils/noneSpace';
 import PageLoadSpinner from './utils/pageLoadSpinner';
-import Badges from './utils/badges';
-import { colors } from '../colors';
-import PersonIconButton from '../sphinxUI/icon_button';
-import { useParams } from 'react-router-dom';
+import { PostBounty } from './widgetViews/postBounty';
+import { Widget } from './main/types';
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -48,7 +47,6 @@ export default function PersonView(props: any) {
   const history = useHistory();
   const location = useLocation();
   const pathname = history?.location?.pathname;
-  const color = colors['light'];
   // FOR PEOPLE VIEW
   let person: any = main.people && main.people.length && main.people.find((f) => f.id === personId);
 
@@ -79,38 +77,34 @@ export default function PersonView(props: any) {
 
   const initialWidget = !isMobile || canEdit ? 'badges' : 'about';
 
-  const [selectedWidget, setSelectedWidget] = useState(initialWidget);
-  const [newSelectedWidget, setNewSelectedWidget] = useState(initialWidget);
+  const [selectedWidget, setSelectedWidget] = useState<Widget>(initialWidget);
+  const [newSelectedWidget, setNewSelectedWidget] = useState<Widget>(initialWidget);
   const [focusIndex, setFocusIndex] = useState(-1);
   const [showSupport, setShowSupport] = useState(false);
 
   const [showQR, setShowQR] = useState(false);
   const [showFocusView, setShowFocusView] = useState(false);
   const qrString = makeQR(owner_pubkey || '');
-  const [showCreateBountyModal, setShowCreateBountyModal] = useState<boolean>(false);
 
   async function loadMorePeople(direction) {
     let newPage = peoplePageNumber + direction;
-    if (newPage < 1) newPage = 1;
-
+    if (newPage < 1) {
+      newPage = 1;
+    }
     await main.getPeople({ page: newPage });
   }
 
   // if no people, load people on mount
   useEffect(() => {
     if (!people.length) main.getPeople({ page: 1, resetPage: true });
-  }, []);
-
-  // deeplink load person
-  useEffect(() => {
-    doDeeplink();
-  }, [pathname]);
+  }, [main, people.length]);
 
   // fill state from url
-  async function doDeeplink() {
+  const doDeeplink = useCallback(async () => {
     console.log('personviewslim: doDeeplink', pathname);
     if (pathname) {
       const splitPathname = pathname?.split('/');
+      // eslint-disable-next-line prefer-destructuring
       const personPubkey: string = splitPathname[2];
       if (personPubkey) {
         setLoadingPerson(true);
@@ -142,23 +136,35 @@ export default function PersonView(props: any) {
         }
       }
     }
-  }
+  }, [location?.search, main, pathname]);
 
-  function updatePath(name) {
-    history.push(`${location.pathname}?widget=${name}`);
-  }
+  // deeplink load person
+  useEffect(() => {
+    doDeeplink();
+  }, [doDeeplink, pathname]);
+
+  const updatePath = useCallback(
+    (name) => {
+      history.push(`${location.pathname}?widget=${name}`);
+    },
+    [history, location.pathname]
+  );
 
   function updatePathIndex(timestamp) {
     history.push(`${location.pathname}?widget=${selectedWidget}&timestamp=${timestamp}`);
   }
 
-  function switchWidgets(name) {
-    setNewSelectedWidget(name);
-    setSelectedWidget(name);
-    updatePath(name);
-    setShowFocusView(false);
-    setFocusIndex(-1);
-  }
+  const switchWidgets = useCallback(
+    (name) => {
+      setNewSelectedWidget(name);
+      setSelectedWidget(name);
+      updatePath(name);
+      setShowFocusView(false);
+      setFocusIndex(-1);
+    },
+
+    [updatePath]
+  );
 
   function selectPersonWithinFocusView(id, unique_name, pubkey) {
     setShowFocusView(false);
@@ -171,7 +177,7 @@ export default function PersonView(props: any) {
       switchWidgets(ui.personViewOpenTab);
       ui.setPersonViewOpenTab('');
     }
-  }, [ui.personViewOpenTab]);
+  }, [switchWidgets, ui, ui.personViewOpenTab]);
 
   function logout() {
     ui.setEditMe(false);
@@ -262,9 +268,6 @@ export default function PersonView(props: any) {
     const widgetSchema: any =
       (widgetSchemas && widgetSchemas.find((f) => f.name === selectedWidget)) || {};
     const { single } = widgetSchema;
-    let fields = widgetSchema.fields && [...widgetSchema.fields];
-    // remove show from display
-    fields = fields && fields.filter((f) => f.name !== 'show');
 
     function wrapIt(child) {
       if (single) {
@@ -322,6 +325,8 @@ export default function PersonView(props: any) {
           );
         });
       const noneKey = canEdit ? 'me' : 'otherUser';
+      const noneSpaceProps = tabs[selectedWidget]?.noneSpace[noneKey];
+
       const panels: any = elementArray.length ? (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {person?.owner_pubkey === ui?.meInfo?.pubkey && selectedWidget === 'wanted' && (
@@ -333,32 +338,8 @@ export default function PersonView(props: any) {
                 paddingBottom: '16px'
               }}
             >
-              <PersonIconButton
-                text={'Post a Bounty'}
-                endingIcon={'add'}
-                width={204}
-                height={48}
-                color={'success'}
-                style={{
-                  color: color.pureWhite,
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  textDecoration: 'none'
-                }}
-                hoverColor={color.button_primary.hover}
-                activeColor={color.button_primary.active}
-                shadowColor={color.button_primary.shadow}
-                iconStyle={{
-                  fontSize: '16px',
-                  fontWeight: '400',
-                  top: '17px',
-                  right: '18px'
-                }}
-                onClick={() => {
-                  if (ui.meInfo && ui.meInfo?.owner_alias) {
-                    setShowCreateBountyModal(true);
-                  }
-                }}
+              <PostBounty 
+                widget={selectedWidget}
               />
             </div>
           )}
@@ -372,9 +353,26 @@ export default function PersonView(props: any) {
             width: '100%'
           }}
         >
+          
           <NoneSpace
-            action={() => setShowCreateBountyModal(true)}
             small
+            Button={
+              canEdit && (
+              <PostBounty
+                title={noneSpaceProps.buttonText}
+                buttonProps={{
+                  leadingIcon:noneSpaceProps.buttonIcon,
+                  color: 'secondary'
+                }}
+                widget={selectedWidget}
+                onSucces={() => {
+                  if (selectedWidget === 'about') switchWidgets('badges');
+                }}
+                onGoBack={() => {
+                  if (selectedWidget === 'about') switchWidgets('badges');
+                }}
+              />)
+            }
             {...tabs[selectedWidget]?.noneSpace[noneKey]}
           />
         </div>
@@ -887,63 +885,8 @@ export default function PersonView(props: any) {
         />
 
         <Modal
-          visible={showCreateBountyModal}
-          style={{
-            // top: -64,
-            // height: 'calc(100% + 64px)'
-            height: '100%'
-          }}
-          envStyle={{
-            marginTop: isMobile ? 64 : 0,
-            background: color.pureWhite,
-            zIndex: 20,
-            ...focusedDesktopModalStyles,
-            borderRadius: '10px'
-          }}
-          // nextArrow={nextIndex}
-          // prevArrow={prevIndex}
-          overlayClick={() => {
-            setShowCreateBountyModal(false);
-            setFocusIndex(-1);
-            if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-          bigCloseImage={() => {
-            setShowCreateBountyModal(false);
-            setFocusIndex(-1);
-            if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-          bigCloseImageStyle={{
-            top: '-18px',
-            right: '-18px',
-            background: '#000',
-            borderRadius: '50%'
-          }}
-        >
-          <FocusedView
-            newDesign={true}
-            person={person}
-            canEdit={canEdit}
-            selectedIndex={focusIndex}
-            config={tabs[selectedWidget] && tabs[selectedWidget]}
-            onSuccess={() => {
-              console.log('success');
-              setFocusIndex(-1);
-              if (selectedWidget === 'about') switchWidgets('badges');
-              setShowCreateBountyModal(false);
-            }}
-            goBack={() => {
-              setShowCreateBountyModal(false);
-              setFocusIndex(-1);
-              if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-          />
-        </Modal>
-
-        <Modal
           visible={showFocusView}
           style={{
-            // top: -64,
-            // height: 'calc(100% + 64px)'
             height: '100%'
           }}
           envStyle={{

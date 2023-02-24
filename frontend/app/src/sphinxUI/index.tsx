@@ -27,3 +27,5 @@ export {
   MultiSelect,
   CreatableMultiSelect
 };
+
+export { Portal } from './portal';
