@@ -1,1 +1,1 @@
-export { default as PeopleBody } from './body'
+export { default as PeopleBody } from './body';

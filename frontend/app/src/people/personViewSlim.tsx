@@ -338,9 +338,7 @@ export default function PersonView(props: any) {
                 paddingBottom: '16px'
               }}
             >
-              <PostBounty 
-                widget={selectedWidget}
-              />
+              <PostBounty widget={selectedWidget} />
             </div>
           )}
           <div style={{ width: '100%', display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -353,25 +351,25 @@ export default function PersonView(props: any) {
             width: '100%'
           }}
         >
-          
           <NoneSpace
             small
             Button={
               canEdit && (
-              <PostBounty
-                title={noneSpaceProps.buttonText}
-                buttonProps={{
-                  leadingIcon:noneSpaceProps.buttonIcon,
-                  color: 'secondary'
-                }}
-                widget={selectedWidget}
-                onSucces={() => {
-                  if (selectedWidget === 'about') switchWidgets('badges');
-                }}
-                onGoBack={() => {
-                  if (selectedWidget === 'about') switchWidgets('badges');
-                }}
-              />)
+                <PostBounty
+                  title={noneSpaceProps.buttonText}
+                  buttonProps={{
+                    leadingIcon: noneSpaceProps.buttonIcon,
+                    color: 'secondary'
+                  }}
+                  widget={selectedWidget}
+                  onSucces={() => {
+                    if (selectedWidget === 'about') switchWidgets('badges');
+                  }}
+                  onGoBack={() => {
+                    if (selectedWidget === 'about') switchWidgets('badges');
+                  }}
+                />
+              )
             }
             {...tabs[selectedWidget]?.noneSpace[noneKey]}
           />
