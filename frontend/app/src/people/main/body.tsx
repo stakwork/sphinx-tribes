@@ -33,7 +33,7 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function BodyComponent({selectedWidget}:{selectedWidget: Widget}) {
+export default function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -72,7 +72,6 @@ export default function BodyComponent({selectedWidget}:{selectedWidget: Widget})
     offer: peopleOffers
   };
 
-
   const ReCallBounties = () => {
     (async () => {
       /*
@@ -86,10 +85,6 @@ export default function BodyComponent({selectedWidget}:{selectedWidget: Widget})
   const activeList = listSource[selectedWidget];
 
   const history = useHistory();
-
-
-
-
 
   const isMobile = useIsMobile();
   const pathname = history?.location?.pathname;

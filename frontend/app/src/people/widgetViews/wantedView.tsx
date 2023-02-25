@@ -498,7 +498,7 @@ export default function WantedView(props: any) {
                   style={{
                     minHeight: '36px'
                   }}
-                ></div>
+                />
               )}
               {{ ...assignee }.owner_alias && (
                 <div
@@ -596,7 +596,7 @@ export default function WantedView(props: any) {
                     style={{
                       minHeight: '50px'
                     }}
-                  ></div>
+                  />
                 </>
               )}
             </div>
