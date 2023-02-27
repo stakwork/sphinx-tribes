@@ -19,6 +19,7 @@ function addMethod(m: string): Function {
     host.includes('localhost') || host.includes('internal')
       ? `http://${host}/`
       : `https://${host}/`;
+      
   const func = async function (url: string, data: any, incomingHeaders: any) {
     try {
       const headers: { [key: string]: string } = {};
