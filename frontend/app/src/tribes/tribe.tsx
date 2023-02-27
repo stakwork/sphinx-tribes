@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import { EuiCard } from '@elastic/eui';
+import moment from 'moment';
+import React, { useState } from 'react';
 import { QRCode } from 'react-qr-svg';
 import styled from 'styled-components';
-import { EuiCard } from '@elastic/eui';
-import Tag from './tag';
-import moment from 'moment';
 import { getHostIncludingDockerHosts } from '../host';
+import Tag from './tag';
 
 function makeQR(uuid: string) {
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`;
@@ -18,7 +18,6 @@ export default function Tribe({
   description,
   selected,
   select,
-  created,
   owner_alias,
   price_to_join,
   price_per_message,

@@ -1,13 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
+import styled from 'styled-components';
 import { colors } from '../colors';
-import { StylesConfig } from 'react-select';
-import { ColourOption, colourOptions } from '../people/utils/language_label_style';
+import { colourOptions } from '../people/utils/language_label_style';
 // import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
-  const { options, onChange, value, style, setIsTop } = props;
+  const { onChange, value, style, setIsTop } = props;
   const color = colors['light'];
 
   const opts =
@@ -39,7 +38,7 @@ export default function Sel(props: any) {
         className={'multi-select-input'}
         styles={{
           control: (styles) => ({ ...styles, backgroundColor: 'white' }),
-          option: (styles, { data }: any) => {
+          option: (styles) => {
             return {
               ...styles,
               backgroundColor: '#fff',

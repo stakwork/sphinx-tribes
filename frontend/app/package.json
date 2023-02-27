@@ -13,7 +13,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --max-warnings 410 --ext .ts --ext .tsx",
+    "lint": "eslint src --max-warnings 288 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
   },
@@ -89,15 +89,13 @@
       "no-var": "warn",
       "prefer-destructuring": "warn",
       "prefer-template": "warn",
-      "func-style": [
-        "warn",
-        "expression"
-      ],
+      "func-style": "off",
       "react/self-closing-comp": "warn",
       "react/jsx-no-target-blank": "warn",
       "react/jsx-key": "warn",
       "react/no-children-prop": "warn",
-      "react/no-unescaped-entities": "warn"
+      "react/no-unescaped-entities": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "_" }]
     }
   },
   "browserslist": {
