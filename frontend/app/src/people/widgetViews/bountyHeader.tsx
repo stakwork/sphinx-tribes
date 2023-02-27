@@ -3,23 +3,19 @@ import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import api from '../../api';
 import { colors } from '../../colors';
 import { useIsMobile } from '../../hooks';
-import IconButton from '../../sphinxUI/icon_button';
-import ImageButton from '../../sphinxUI/Image_button';
 import SearchBar from '../../sphinxUI/search_bar';
 import { useStores } from '../../store';
+import { PostBounty } from './postBounty';
 import { filterCount } from '../utils/ExtraFunctions';
-import { coding_languages, GetValue, status } from '../utils/language_label_style';
-import StartUpModal from '../utils/start_up_modal';
+import { GetValue, coding_languages, status } from '../utils/language_label_style';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
 
 const BountyHeader = ({
   selectedWidget,
-  setShowFocusView,
   scrollValue,
   onChangeStatus,
   onChangeLanguage,
@@ -32,9 +28,6 @@ const BountyHeader = ({
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
   const [developerCount, setDeveloperCount] = useState<number>(0);
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
-  const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
-  const closeModal = () => setOpenStartUpModel(false);
-  const showModal = () => setOpenStartUpModel(true);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [filterCountNumber, setFilterCountNumber] = useState<number>(0);
 
@@ -85,7 +78,7 @@ const BountyHeader = ({
             alignItems: 'center',
             position: 'sticky',
             top: 0,
-            zIndex: '1',
+            zIndex: 1,
             background: 'inherit',
             boxShadow: scrollValue ? `0px 1px 6px ${color.black100}` : '',
             borderBottom: scrollValue
@@ -95,35 +88,7 @@ const BountyHeader = ({
         >
           <BountyHeaderDesk>
             <B>
-              <IconButton
-                text={'Post a Bounty'}
-                endingIcon={'add'}
-                width={204}
-                height={48}
-                color={'success'}
-                style={{
-                  color: color.pureWhite,
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  textDecoration: 'none'
-                }}
-                hoverColor={color.button_primary.hover}
-                activeColor={color.button_primary.active}
-                shadowColor={color.button_primary.shadow}
-                iconStyle={{
-                  fontSize: '16px',
-                  fontWeight: '400',
-                  top: '17px',
-                  right: '18px'
-                }}
-                onClick={() => {
-                  if (ui.meInfo && ui.meInfo?.owner_alias) {
-                    setShowFocusView(true);
-                  } else {
-                    showModal();
-                  }
-                }}
-              />
+              <PostBounty widget={selectedWidget} />
               <SearchBar
                 name="search"
                 type="search"
@@ -236,6 +201,7 @@ const BountyHeader = ({
                     return (
                       <DevelopersImageContainer
                         color={color}
+                        key={index}
                         style={{
                           zIndex: 3 - index,
                           marginLeft: index > 0 ? '-14px' : '',
@@ -258,7 +224,7 @@ const BountyHeader = ({
               <EuiText
                 style={{
                   fontSize: '16px',
-                  fontWeight: '600',
+                  fontWeight: 600,
                   fontFamily: 'Barlow',
                   color: color.black400
                 }}
@@ -280,7 +246,6 @@ const BountyHeader = ({
                 width: 240,
                 height: 32,
                 background: 'transparent',
-                marginLeft: '16px',
                 fontFamily: 'Barlow'
               }}
               onChange={(e) => {
@@ -368,61 +333,13 @@ const BountyHeader = ({
             </EuiPopover>
           </LargeActionContainer>
           <ShortActionContainer>
-            <IconButton
-              text={'Post a Bounty'}
-              endingIcon={'add'}
-              width={130}
-              height={30}
-              color={'success'}
-              style={{
-                color: color.pureWhite,
-                fontSize: '12px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                transform: 'none'
-              }}
-              hoverColor={color.button_primary.hover}
-              activeColor={color.button_primary.active}
-              shadowColor={color.button_primary.shadow}
-              iconStyle={{
-                fontSize: '12px',
-                fontWeight: '600',
-                right: '8px',
-                top: '9px'
-              }}
-              onClick={() => {
-                if (ui.meInfo && ui.meInfo?.owner_alias) {
-                  setShowFocusView(true);
-                } else {
-                  ui.setShowSignIn(true);
-                }
-              }}
-            />
-            {/* <IconButton
-              text={`${activeBounty} Bounties opened`}
-              leadingImg={'/static/copy.svg'}
-              width={'fit-content'}
-              height={48}
-              color={'transparent'}
-              style={{
-                color: color.grayish.G200,
-                fontSize: '12px',
-                fontWeight: '500',
-                cursor: 'default',
-                textDecoration: 'none',
-                padding: 0
-              }}
-              leadingImgStyle={{
-                height: '21px',
-                width: '18px',
-                marginRight: '4px'
-              }}
-            /> */}
+            <PostBounty widget={selectedWidget} />
             <DevelopersContainerMobile>
               {peopleList &&
                 peopleList?.slice(0, 3).map((val, index) => {
                   return (
                     <DevelopersImageContainer
+                      key={index}
                       color={color}
                       style={{
                         zIndex: 3 - index,
@@ -445,18 +362,15 @@ const BountyHeader = ({
                 style={{
                   fontSize: '14px',
                   fontFamily: 'Barlow',
-                  fontWeight: '500',
+                  fontWeight: 500,
                   color: color.black400
                 }}
               >
-                {peopleList && peopleList?.length}
+                {developerCount}
               </EuiText>
             </DevelopersContainerMobile>
           </ShortActionContainer>
         </BountyHeaderMobile>
-      )}
-      {openStartUpModel && (
-        <StartUpModal closeModal={closeModal} dataObject={'createWork'} buttonColor={'success'} />
       )}
     </>
   );
@@ -517,14 +431,14 @@ const DevelopersImageContainer = styled.div<styledProps>`
 const BountyHeaderMobile = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px 0px;
+  padding: 10px 16px;
 `;
 
 const ShortActionContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
 `;
 
 const DevelopersContainerMobile = styled.div`

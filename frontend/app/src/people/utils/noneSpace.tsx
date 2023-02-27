@@ -24,8 +24,8 @@ export default function NoneSpace(props) {
           <C style={{ paddingLeft: 0 }} color={color}>
             {props.sub}
           </C>
-
-          {props.buttonText && (
+          {props.Button && <div style={{ marginTop: 20 }}>{props.Button}</div>}
+          {!props.Button && props.buttonText && (
             <Button
               text={props.buttonText}
               endingIcon={props.buttonIcon}
@@ -58,7 +58,8 @@ export default function NoneSpace(props) {
       </>
 
       <div style={{ height: 200 }}>
-        {props.buttonText && (
+        <div style={{ marginTop: 20 }}>{props.Button}</div>
+        {!props.Button && props.buttonText && (
           <Button
             text={props.buttonText}
             leadingIcon={props.buttonIcon}

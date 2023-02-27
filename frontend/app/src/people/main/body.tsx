@@ -1,27 +1,27 @@
 /* eslint-disable func-style */
-import React, { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useObserver } from 'mobx-react-lite';
-import { useStores } from '../../store';
 import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
-import Person from '../person';
-import PersonViewSlim from '../personViewSlim';
-import { useFuse, usePageScroll, useIsMobile, useScreenWidth } from '../../hooks';
-import FadeLeft from '../../animated/fadeLeft';
-import FirstTimeScreen from './firstTimeScreen';
-import { Divider, SearchTextInput, Modal } from '../../sphinxUI';
-import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
-import FocusedView from './focusView';
-import { widgetConfigs } from '../utils/constants';
+import { useObserver } from 'mobx-react-lite';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import styled from 'styled-components';
+import FadeLeft from '../../animated/fadeLeft';
+import { colors } from '../../colors';
+import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
+import { Modal, SearchTextInput } from '../../sphinxUI';
+import { useStores } from '../../store';
+import Person from '../person';
+import PersonViewSlim from '../personViewSlim';
+import ConnectCard from '../utils/connectCard';
+import { widgetConfigs } from '../utils/constants';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
-import BountyHeader from '../widgetViews/bountyHeader';
-import { colors } from '../../colors';
 import StartUpModal from '../utils/start_up_modal';
-import ConnectCard from '../utils/connectCard';
-// import { SearchTextInput } from '../../sphinxUI/index'
+import BountyHeader from '../widgetViews/bountyHeader';
+import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
+import FirstTimeScreen from './firstTimeScreen';
+import FocusedView from './focusView';
+import { Widget } from './types';
 // avoid hook within callback warning by renaming hooks
 
 const getFuse = useFuse;
@@ -33,16 +33,13 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function BodyComponent({ selectedWidget }) {
+export default function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const screenWidth = useScreenWidth();
   const [publicFocusPerson, setPublicFocusPerson]: any = useState(null);
   const [publicFocusIndex, setPublicFocusIndex] = useState(-1);
-  const [showFocusView, setShowFocusView] = useState(false);
-  const [focusIndex, setFocusIndex] = useState(-1);
-  const [isMobileViewTicketModal, setIsMobileViewTicketModal] = useState(false);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
   const closeModal = () => setOpenStartUpModel(false);
@@ -64,8 +61,7 @@ export default function BodyComponent({ selectedWidget }) {
     peoplePageNumber,
     peopleWantedsPageNumber,
     peoplePostsPageNumber,
-    peopleOffersPageNumber,
-    openGithubIssues
+    peopleOffersPageNumber
   } = ui;
 
   const { peoplePosts, peopleWanteds, peopleOffers } = main;
@@ -75,39 +71,6 @@ export default function BodyComponent({ selectedWidget }) {
     wanted: peopleWanteds,
     offer: peopleOffers
   };
-
-  const person: any =
-    main.people && main.people.length && main.people.find((f) => f.id === ui.selectedPerson);
-
-  const { id } = person || {};
-
-  const canEdit = id === ui.meInfo?.id;
-
-  function nextIndex() {
-    if (focusIndex < 0) {
-      console.log('nope!');
-      return;
-    }
-    if (person && person.extras) {
-      const g = person.extras[tabs[selectedWidget]?.name];
-      const nextindex = focusIndex + 1;
-      if (g[nextindex]) setFocusIndex(nextindex);
-      else setFocusIndex(0);
-    }
-  }
-
-  function prevIndex() {
-    if (focusIndex < 0) {
-      console.log('nope!');
-      return;
-    }
-    if (person && person.extras) {
-      const g = person?.extras[tabs[selectedWidget]?.name];
-      const previndex = focusIndex - 1;
-      if (g[previndex]) setFocusIndex(previndex);
-      else setFocusIndex(g.length - 1);
-    }
-  }
 
   const ReCallBounties = () => {
     (async () => {
@@ -123,75 +86,61 @@ export default function BodyComponent({ selectedWidget }) {
 
   const history = useHistory();
 
-  interface ITabAction {
-    text?: string;
-    icon?: string;
-  }
-  interface ITab {
-    label: string;
-    name: string;
-    description: string;
-    action?: ITabAction;
-  }
-
-  const tabs: Array<ITab> = [
-    {
-      label: 'People',
-      name: 'people',
-      description: 'Find fellow Sphinx Chatters',
-      action: {
-        text: 'Add New Ticket',
-        icon: 'group'
-      }
-    },
-    // // widgetConfigs['post'],
-    // {
-    //   ...widgetConfigs['offer'],
-    //   label: 'Portfolios',
-    // },
-    {
-      ...widgetConfigs['wanted'],
-      description: 'Earn sats for completing tickets'
-    }
-  ];
-
-  const tabsModal = widgetConfigs;
-
   const isMobile = useIsMobile();
   const pathname = history?.location?.pathname;
 
-  const loadMethods = {
-    people: (a) => main.getPeople(a),
-    post: (a) => main.getPeoplePosts(a),
-    offer: (a) => main.getPeopleOffers(a),
-    wanted: (a) => main.getPeopleWanteds(a)
-  };
-
+  const loadMethods = useMemo(
+    () => ({
+      people: (a) => main.getPeople(a),
+      post: (a) => main.getPeoplePosts(a),
+      offer: (a) => main.getPeopleOffers(a),
+      wanted: (a) => main.getPeopleWanteds(a)
+    }),
+    [main]
+  );
+  const doDeeplink = useCallback(async () => {
+    if (pathname) {
+      const splitPathname = pathname?.split('/');
+      // eslint-disable-next-line prefer-destructuring
+      const personPubkey: string = splitPathname[2];
+      if (personPubkey) {
+        const p = await main.getPersonByPubkey(personPubkey);
+        ui.setSelectedPerson(p?.id);
+        ui.setSelectingPerson(p?.id);
+        // make sure to load people in a person deeplink
+        const loadMethod = loadMethods['people'];
+        await loadMethod({ page: 1, resetPage: true });
+      }
+    }
+  }, [loadMethods, main, pathname, ui]);
   // deeplink page navigation
   useEffect(() => {
     doDeeplink();
-  }, []);
+  }, [doDeeplink]);
 
   const searchParams = useQuery();
 
-  async function publicPanelClick(person, item) {
-    // migrating to load widgets separate from person
-    console.log('person', { person }, 'and items', { item });
-    const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
-    if (itemIndex > -1) {
-      // make person into proper structure (derived from widget)
-      const p = {
-        ...person,
-        extras: {
-          [selectedWidget]: person[selectedWidget]
-        }
-      };
-      setPublicFocusPerson(p);
-      setPublicFocusIndex(itemIndex);
-      setConnectPerson({ ...person });
-      setConnectPersonBody({ ...item });
-    }
-  }
+  const publicPanelClick = useCallback(
+    async (person, item) => {
+      // migrating to load widgets separate from person
+      console.log('person', { person }, 'and items', { item });
+      const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
+      if (itemIndex > -1) {
+        // make person into proper structure (derived from widget)
+        const p = {
+          ...person,
+          extras: {
+            [selectedWidget]: person[selectedWidget]
+          }
+        };
+        setPublicFocusPerson(p);
+        setPublicFocusIndex(itemIndex);
+        setConnectPerson({ ...person });
+        setConnectPersonBody({ ...item });
+      }
+    },
+    [selectedWidget]
+  );
 
   useEffect(() => {
     const owner_id = searchParams.get('owner_id');
@@ -217,7 +166,7 @@ export default function BodyComponent({ selectedWidget }) {
         publicPanelClick(value.person, value.body);
       }
     }
-  }, [searchParams, main, activeList]);
+  }, [searchParams, main, activeList, publicPanelClick]);
 
   useEffect(() => {
     // clear public focus is selected person
@@ -229,20 +178,18 @@ export default function BodyComponent({ selectedWidget }) {
       const loadMethod = loadMethods[selectedWidget];
       loadMethod({ page: 1, resetPage: true });
     }
-  }, [ui.selectedPerson]);
+  }, [loadMethods, selectedWidget, ui.selectedPerson]);
 
   useEffect(() => {
-    // loadPeople()
-    // loadPeopleExtras()
     main.getOpenGithubIssues();
     main.getBadgeList();
-  }, []);
+  }, [main]);
 
   useEffect(() => {
     if (ui.meInfo) {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
-  }, [ui.meInfo]);
+  }, [main, ui.meInfo]);
 
   // do search update
   useEffect(() => {
@@ -262,22 +209,7 @@ export default function BodyComponent({ selectedWidget }) {
 
       setLoading(false);
     })();
-  }, [ui.searchText, selectedWidget]);
-
-  async function doDeeplink() {
-    if (pathname) {
-      const splitPathname = pathname?.split('/');
-      const personPubkey: string = splitPathname[2];
-      if (personPubkey) {
-        const p = await main.getPersonByPubkey(personPubkey);
-        ui.setSelectedPerson(p?.id);
-        ui.setSelectingPerson(p?.id);
-        // make sure to load people in a person deeplink
-        const loadMethod = loadMethods['people'];
-        await loadMethod({ page: 1, resetPage: true });
-      }
-    }
-  }
+  }, [ui.searchText, selectedWidget, loadMethods, ui.selectingPerson]);
 
   const onChangeStatus = (optionId) => {
     const newCheckboxIdToSelectedMap = {
@@ -459,8 +391,6 @@ export default function BodyComponent({ selectedWidget }) {
       return <FirstTimeScreen />;
     }
 
-    const widgetLabel = selectedWidget && tabs.find((f) => f.name === selectedWidget);
-
     const toastsEl = (
       <EuiGlobalToastList
         toasts={ui.toasts}
@@ -486,7 +416,6 @@ export default function BodyComponent({ selectedWidget }) {
             {selectedWidget === 'wanted' && (
               <BountyHeader
                 selectedWidget={selectedWidget}
-                setShowFocusView={setIsMobileViewTicketModal}
                 scrollValue={scrollValue}
                 onChangeStatus={onChangeStatus}
                 onChangeLanguage={onChangeLanguage}
@@ -569,29 +498,6 @@ export default function BodyComponent({ selectedWidget }) {
               />
             </Modal>
           )}
-
-          {isMobileViewTicketModal && (
-            <Modal visible={isMobileViewTicketModal} fill={true}>
-              <FocusedView
-                person={person}
-                canEdit={!canEdit}
-                selectedIndex={focusIndex}
-                config={tabsModal[selectedWidget] && tabsModal[selectedWidget]}
-                onSuccess={() => {
-                  console.log('success');
-                  setFocusIndex(-1);
-                  // if (selectedWidget === 'about') switchWidgets('badges');
-                }}
-                goBack={() => {
-                  setIsMobileViewTicketModal(false);
-                  setFocusIndex(-1);
-                  history.push('/tickets');
-                  // if (selectedWidget === 'about') switchWidgets('badges');
-                }}
-              />
-            </Modal>
-          )}
-
           {toastsEl}
         </Body>
       );
@@ -624,7 +530,6 @@ export default function BodyComponent({ selectedWidget }) {
         {selectedWidget === 'wanted' && (
           <BountyHeader
             selectedWidget={selectedWidget}
-            setShowFocusView={setShowFocusView}
             scrollValue={scrollValue}
             onChangeStatus={onChangeStatus}
             onChangeLanguage={onChangeLanguage}
@@ -814,59 +719,6 @@ export default function BodyComponent({ selectedWidget }) {
           visible={openConnectModal}
         />
         {toastsEl}
-        {/* modal create ticket */}
-        {showFocusView && (
-          <Modal
-            visible={showFocusView}
-            style={{
-              // top: -64,
-              // height: 'calc(100% + 64px)'
-              height: '100%'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...focusedDesktopModalStyles,
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={() => {
-              setShowFocusView(false);
-              setFocusIndex(-1);
-            }}
-            bigCloseImage={() => {
-              setShowFocusView(false);
-              setFocusIndex(-1);
-            }}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <FocusedView
-              ReCallBounties={ReCallBounties}
-              newDesign={true}
-              person={person}
-              canEdit={!canEdit}
-              selectedIndex={focusIndex}
-              config={tabsModal[selectedWidget] && tabsModal[selectedWidget]}
-              onSuccess={() => {
-                console.log('success');
-                setFocusIndex(-1);
-                // if (selectedWidget === 'about') switchWidgets('badges');
-                setShowFocusView(false);
-              }}
-              goBack={() => {
-                setShowFocusView(false);
-                setFocusIndex(-1);
-                // if (selectedWidget === 'about') switchWidgets('badges');
-              }}
-            />
-          </Modal>
-        )}
       </Body>
     );
   });
@@ -881,79 +733,6 @@ const Body = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const Label = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 26px;
-  line-height: 40px;
-  /* or 154% */
-  width: 204px;
-
-  display: flex;
-  align-items: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-`;
-
-const Tabs = styled.div`
-  display: flex;
-`;
-
-interface TagProps {
-  selected: boolean;
-}
-const Tab = styled.div<TagProps>`
-  display: flex;
-  padding: 10px 25px;
-  margin-right: 35px;
-  height: 42px;
-  color: ${(p) => (p.selected ? '#5D8FDD' : '#5F6368')};
-  border: 2px solid #5f636800;
-  border-color: ${(p) => (p.selected ? '#CDE0FF' : '#5F636800')};
-  // border-bottom: ${(p) => p.selected && '4px solid #618AFF'};
-  cursor: pointer;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 19px;
-  background: ${(p) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
-  border-radius: 25px;
-`;
-
-const TabMobile = styled(Tab)`
-  margin: 0;
-  border-radius: 0;
-  height: auto;
-  background: #fff;
-  border: none;
-  padding: 20px 12px 0 20px;
-  display: flex;
-  align-items: top;
-
-  .tab-icon {
-    margin-right: 20px;
-    color: ${(p) => p.selected && '#A2C0FD'};
-  }
-
-  .tab-details {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 20px;
-    &__title {
-      color: ${(p) => p.selected && '#618AFF'};
-      font-size: 16px;
-      font-weight: 600;
-    }
-    &__subtitle {
-      color: ${(p) => p.selected && '#A2C0FD'};
-      font-size: 12px;
-    }
-  }
-`;
 
 const Backdrop = styled.div`
   position: fixed;
@@ -965,38 +744,10 @@ const Backdrop = styled.div`
   right: 0;
 `;
 
-const Link = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 6px;
-  color: #618aff;
-  cursor: pointer;
-`;
-
-const Loader = styled.div`
-  position: absolute;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  left: 0px;
-  z-index: 20;
-`;
-
 export const Spacer = styled.div`
   display: flex;
   min-height: 10px;
   min-width: 100%;
   height: 10px;
   width: 100%;
-`;
-
-const MobileDropdown = styled.div`
-  position: absolute;
-  top: calc(100% + 1px);
-  left: 0;
-  right: 0;
-  z-index: 10;
-  background: #fff;
 `;

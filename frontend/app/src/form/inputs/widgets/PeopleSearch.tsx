@@ -109,7 +109,8 @@ const InvitePeopleSearch = (props) => {
               className="ImageContainer"
               onClick={() => {
                 setSearchValue('');
-              }}>
+              }}
+            >
               <img
                 className="crossImage"
                 src="/static/search_cross.svg"
@@ -166,7 +167,8 @@ const InvitePeopleSearch = (props) => {
             />
           }
           isOpen={isPopoverOpen}
-          closePopover={closePopover}>
+          closePopover={closePopover}
+        >
           <EuiPopOverCheckbox className="CheckboxOuter" color={color}>
             <EuiCheckboxGroup
               options={codingLanguages}
@@ -182,7 +184,8 @@ const InvitePeopleSearch = (props) => {
       <LabelsContainer
         style={{
           padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
-        }}>
+        }}
+      >
         {!isPopoverOpen &&
           labels.length > 0 &&
           labels?.map((x, index) => (
@@ -194,7 +197,8 @@ const InvitePeopleSearch = (props) => {
               }}
               style={{
                 margin: 4
-              }}>
+              }}
+            >
               <EuiText className="labelText">{x.label}</EuiText>
               <SvgMask
                 src={'/static/label_cross.svg'}
@@ -232,7 +236,8 @@ const InvitePeopleSearch = (props) => {
                     className="PeopleName"
                     style={{
                       opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
-                    }}>
+                    }}
+                  >
                     {value.owner_alias}
                   </EuiText>
                 </div>
@@ -253,7 +258,8 @@ const InvitePeopleSearch = (props) => {
                         setSearchValue('');
                       }
                       props.setAssigneefunction('');
-                    }}>
+                    }}
+                  >
                     <EuiText className="nextText">
                       {props.newDesign ? 'Unassign' : 'Invited'}
                     </EuiText>

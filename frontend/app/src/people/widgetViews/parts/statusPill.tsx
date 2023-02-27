@@ -1,48 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
-import { useStores } from '../../../store';
 
 export default function GithubStatusPill(props: any) {
   const { status, assignee, style } = props;
-  const { main } = useStores();
 
   const [assigneText, setAssigneText] = useState('');
-
-  const [newAssignee, setNewAssignee] = useState({ ...assignee });
-
-  async function findUserByGithubHandle() {
-    // look in database for first user with this github handle
-    try {
-      const p = await main.getPersonByGithubName(assignee);
-      if (p) {
-        let url = '';
-        if (p.owner_pubkey) url = `https://community.sphinx.chat/p/${p.owner_pubkey}`;
-        else url = `https://github.com/${assignee}`;
-        sendToRedirect(url);
-      }
-    } catch (e) {
-      console.log('e', e);
-    }
-  }
-
-  function sendToRedirect(url) {
-    const el = document.createElement('a');
-    el.href = url;
-    el.target = '_blank';
-    el.click();
-  }
 
   const isOpen = status === 'open' || !status;
 
   useEffect(() => {
-    const assignedText = !newAssignee.owner_alias
+    const assignedText = !assignee.owner_alias
       ? 'Not assigned'
       : isOpen
       ? 'Assigned to '
       : 'Completed by ';
     setAssigneText(assignedText);
-  }, [isOpen, newAssignee]);
+  }, [isOpen, assignee]);
 
   return (
     <div style={{ display: 'flex', ...style }}>
@@ -51,14 +24,7 @@ export default function GithubStatusPill(props: any) {
       </Pill>
       <W>
         <Assignee>
-          {assigneText}{' '}
-          {/* <Link
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {newAssignee.owner_alias}
-          </Link> */}
+          {assigneText}
         </Assignee>
       </W>
     </div>
@@ -116,12 +82,4 @@ const Assignee = styled.div`
 const W = styled.div`
   display: flex;
   align-items: center;
-`;
-
-const Link = styled.span`
-  font-weight: 500;
-  cursor: pointer;
-  &:hover {
-    color: #000;
-  }
 `;

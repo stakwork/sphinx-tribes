@@ -5,7 +5,7 @@ import { Extras } from '../form/inputs/widgets/interfaces';
 
 const tagLabels = Object.keys(tags);
 const initialTags = tagLabels.map((label) => {
-  return <EuiSelectableOption>{ label };
+  return { label } as EuiSelectableOption;
 });
 
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;

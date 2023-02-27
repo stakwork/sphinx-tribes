@@ -89,7 +89,7 @@ const palette = {
 
 type PalletType = 'dark' | 'light';
 
-const colors: { [key in PalletType]: any } = {
+const colors: { [key in PalletType]: typeof palette } = {
   dark: {
     ...palette
   },
