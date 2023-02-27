@@ -1,31 +1,29 @@
 /* eslint-disable func-style */
-import MaterialIcon from '@material/react-material-icon';
-import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
-import { formatPrice, satToUsd } from '../../../helpers';
-import { useIsMobile } from '../../../hooks';
-import { Divider, Title, Paragraph, Button, Modal } from '../../../sphinxUI';
-import GalleryViewer from '../../utils/galleryViewer';
-import NameTag from '../../utils/nameTag';
-import FavoriteButton from '../../utils/favoriteButton';
-import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
-import GithubStatusPill from '../parts/statusPill';
-import { useStores } from '../../../store';
-import Form from '../../../form';
-import { sendBadgeSchema } from '../../../form/schema';
-import LoomViewerRecorder from '../../utils/loomViewerRecorder';
-import { renderMarkdown } from '../../utils/renderMarkdown';
-import { useLocation } from 'react-router-dom';
 import { EuiFieldText, EuiText } from '@elastic/eui';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import styled from 'styled-components';
+import api from '../../../api';
 import { colors } from '../../../colors';
-import { awards, LanguageObject } from '../../utils/language_label_style';
+import Form from '../../../form';
+import InvitePeopleSearch from '../../../form/inputs/widgets/PeopleSearch';
+import { sendBadgeSchema } from '../../../form/schema';
+import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice, satToUsd } from '../../../helpers';
+import { useIsMobile } from '../../../hooks';
+import { Button, Divider, Modal, Paragraph, Title } from '../../../sphinxUI';
+import ImageButton from '../../../sphinxUI/Image_button';
+import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
+import BountyPrice from '../../../sphinxUI/bounty_price';
 import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
 import IconButton from '../../../sphinxUI/icon_button';
-import BountyPrice from '../../../sphinxUI/bounty_price';
-import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
-import ImageButton from '../../../sphinxUI/Image_button';
-import api from '../../../api';
-import InvitePeopleSearch from '../../../form/inputs/widgets/PeopleSearch';
+import { useStores } from '../../../store';
+import FavoriteButton from '../../utils/favoriteButton';
+import GalleryViewer from '../../utils/galleryViewer';
+import { LanguageObject, awards } from '../../utils/language_label_style';
+import LoomViewerRecorder from '../../utils/loomViewerRecorder';
+import NameTag from '../../utils/nameTag';
+import { renderMarkdown } from '../../utils/renderMarkdown';
+import GithubStatusPill from '../parts/statusPill';
 
 function useQuery() {
   const { search } = useLocation();
@@ -40,7 +38,6 @@ export default function WantedSummary(props: any) {
     deliverables,
     priceMin,
     priceMax,
-    url,
     ticketUrl,
     gallery,
     person,
@@ -62,9 +59,9 @@ export default function WantedSummary(props: any) {
     github_description,
     show,
     setIsModalSideButton,
-    setIsExtraStyle
+    setIsExtraStyle,
+    formSubmit
   } = props;
-  let {} = props;
   const [envHeight, setEnvHeight] = useState('100%');
   const imgRef: any = useRef(null);
 
@@ -181,9 +178,9 @@ export default function WantedSummary(props: any) {
         type: type,
         created: created
       };
-      props.formSubmit(newValue);
+      formSubmit && formSubmit(newValue);
     },
-    [isAssigned, props]
+    [codingLanguage, created, description, estimate_session_length, formSubmit, github_description, one_sentence_summary, price, show, ticketUrl, title, type, wanted_type]
   );
 
   const changeAssignedPerson = useCallback(() => {
@@ -209,7 +206,7 @@ export default function WantedSummary(props: any) {
         }
       }
     })();
-  }, []);
+  }, [main, props.assignee, tribe]);
 
   useEffect(() => {
     let res;
@@ -231,7 +228,7 @@ export default function WantedSummary(props: any) {
     const created = searchParams.get('created');
     setOwnerIdURL(owner_id ?? '');
     setCreatedURL(created ?? '');
-  }, [owner_idURL, createdURL]);
+  }, [owner_idURL, createdURL, searchParams]);
 
   useEffect(() => {
     if (codingLanguage) {
@@ -334,7 +331,7 @@ export default function WantedSummary(props: any) {
     document.execCommand('copy');
     document.body.removeChild(el);
     setIsCopied(true);
-  }, [isCopied]);
+  }, []);
 
   async function sendBadge(body: any) {
     const { recipient, badge } = body;
@@ -1946,13 +1943,6 @@ const ButtonRow = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-`;
-
-const Link = styled.div`
-  color: blue;
-  overflow-wrap: break-word;
-  font-size: 15px;
-  font-weight: 300;
 `;
 
 const GithubIcon = styled.div`

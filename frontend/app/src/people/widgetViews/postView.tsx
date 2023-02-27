@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import GalleryViewer from '../utils/galleryViewer';
 import ReactMarkdown from 'react-markdown';
+import styled from 'styled-components';
+import { Link, Paragraph, Title } from '../../sphinxUI';
+import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
-import { Title, Paragraph, Date, Link } from '../../sphinxUI';
 
 export default function PostView(props: any) {
-  const { title, content, created, gallery, showName, person } = props;
+  const { title, content, created, gallery, person } = props;
   const isLong = content && content.length > 100;
   const [expand, setExpand] = useState(false);
 

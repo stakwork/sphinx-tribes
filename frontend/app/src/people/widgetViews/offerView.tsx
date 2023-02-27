@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Offer } from '../../form/inputs/widgets/interfaces';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
-import GalleryViewer from '../utils/galleryViewer';
 import { Divider, Title } from '../../sphinxUI';
+import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
 
 export default function OfferView(props: any) {

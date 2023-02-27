@@ -43,17 +43,6 @@ const Pad = styled.div`
   padding: 20px;
 `;
 
-const Time = styled.div`
-  font-style: normal;
-  font-weight: normal;
-  font-size: 12px;
-  line-height: 25px;
-  margin-bottom: 10px;
-
-  /* Main bottom icons */
-
-  color: #8e969c;
-`;
 const T = styled.div`
   font-style: normal;
   font-weight: normal;
