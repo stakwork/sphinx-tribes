@@ -781,7 +781,6 @@ export class MainStore {
   // this method is used whenever changing data from the frontend,
   // forks between tor users and non-tor
   @action async doCallToRelay(method: string, path: string, body: any): Promise<any> {
-    let response: Response;
     let error: any = null;
 
     const info = uiStore.meInfo as any;
@@ -798,7 +797,7 @@ export class MainStore {
 
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
 
-    response = await fetch(`${URL}/${path}`, {
+    const response = await fetch(`${URL}/${path}`, {
       method: method,
       body: JSON.stringify({
         // use docker host (tribes.sphinx), because relay will post to it

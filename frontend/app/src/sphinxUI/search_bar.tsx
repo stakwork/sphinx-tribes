@@ -8,7 +8,7 @@ export default function SearchTextInput(props: any) {
   const color = colors['light'];
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
-  const [expand, setExpand] = useState(ui.searchText ? true : false);
+  const [_, setExpand] = useState(ui.searchText ? true : false);
 
   function doDelayedValueUpdate() {
     props.onChange(debounceValue);

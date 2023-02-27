@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import FadeLeft from '../animated/fadeLeft';
 import { IconButton } from '.';
 import { colors } from '../colors';
+import { Portal } from './portal';
 
 export default function Modal(props: any) {
   const {
@@ -34,119 +35,121 @@ export default function Modal(props: any) {
     : {};
 
   return (
-    <FadeLeft
-      withOverlay={!hideOverlay}
-      drift={100}
-      direction="up"
-      close={close || bigClose}
-      overlayClick={overlayClick}
-      dismountCallback={dismountCallback}
-      isMounted={visible ? true : false}
-      style={{
-        ...style,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        zIndex: 1000000,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflowY: 'auto'
-      }}
-    >
-      <Env style={{ ...fillStyle, ...envStyle }} color={color}>
-        {close && (
-          <X color={color}>
-            <IconButton onClick={close} size={20} icon="close" />
-          </X>
-        )}
+    <Portal>
+      <FadeLeft
+        withOverlay={!hideOverlay}
+        drift={100}
+        direction="up"
+        close={close || bigClose}
+        overlayClick={overlayClick}
+        dismountCallback={dismountCallback}
+        isMounted={visible ? true : false}
+        style={{
+          ...style,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          zIndex: 1000000,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflowY: 'auto'
+        }}
+      >
+        <Env style={{ ...fillStyle, ...envStyle }} color={color}>
+          {close && (
+            <X color={color}>
+              <IconButton onClick={close} size={20} icon="close" />
+            </X>
+          )}
 
-        {bigClose && (
-          <BigX color={color}>
-            <IconButton onClick={bigClose} size={36} icon="close" />
-          </BigX>
-        )}
+          {bigClose && (
+            <BigX color={color}>
+              <IconButton onClick={bigClose} size={36} icon="close" />
+            </BigX>
+          )}
 
-        {bigCloseImage && (
-          <div
-            style={{
-              height: '40px',
-              width: '40px',
-              position: 'absolute',
-              top: '8px',
-              right: '-48px',
-              cursor: 'pointer',
-              zIndex: 10,
-              ...bigCloseImageStyle
-            }}
-            onClick={bigCloseImage}
-          >
-            <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
-          </div>
-        )}
+          {bigCloseImage && (
+            <div
+              style={{
+                height: '40px',
+                width: '40px',
+                position: 'absolute',
+                top: '8px',
+                right: '-48px',
+                cursor: 'pointer',
+                zIndex: 10,
+                ...bigCloseImageStyle
+              }}
+              onClick={bigCloseImage}
+            >
+              <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
+            </div>
+          )}
 
-        {prevArrow && (
-          <L color={color}>
-            <Circ color={color}>
-              <IconButton
-                iconStyle={{ color: color.pureWhite }}
-                icon={'chevron_left'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevArrow();
-                }}
-              />
-            </Circ>
-          </L>
-        )}
-        {nextArrow && (
-          <R color={color}>
-            <Circ color={color}>
-              <IconButton
-                icon={'chevron_right'}
-                iconStyle={{ color: color.pureWhite }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextArrow();
-                }}
-              />
-            </Circ>
-          </R>
-        )}
+          {prevArrow && (
+            <L color={color}>
+              <Circ color={color}>
+                <IconButton
+                  iconStyle={{ color: color.pureWhite }}
+                  icon={'chevron_left'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevArrow();
+                  }}
+                />
+              </Circ>
+            </L>
+          )}
+          {nextArrow && (
+            <R color={color}>
+              <Circ color={color}>
+                <IconButton
+                  icon={'chevron_right'}
+                  iconStyle={{ color: color.pureWhite }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextArrow();
+                  }}
+                />
+              </Circ>
+            </R>
+          )}
 
-        {prevArrowNew && (
-          <LNew color={color}>
-            <CircL color={color}>
-              <IconButton
-                iconStyle={{ color: color.pureWhite }}
-                icon={'chevron_left'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevArrowNew();
-                }}
-              />
-            </CircL>
-          </LNew>
-        )}
-        {nextArrowNew && (
-          <RNew color={color}>
-            <CircR color={color}>
-              <IconButton
-                icon={'chevron_right'}
-                iconStyle={{ color: color.pureWhite }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextArrowNew();
-                }}
-              />
-            </CircR>
-          </RNew>
-        )}
-        {children}
-      </Env>
-    </FadeLeft>
+          {prevArrowNew && (
+            <LNew color={color}>
+              <CircL color={color}>
+                <IconButton
+                  iconStyle={{ color: color.pureWhite }}
+                  icon={'chevron_left'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevArrowNew();
+                  }}
+                />
+              </CircL>
+            </LNew>
+          )}
+          {nextArrowNew && (
+            <RNew color={color}>
+              <CircR color={color}>
+                <IconButton
+                  icon={'chevron_right'}
+                  iconStyle={{ color: color.pureWhite }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextArrowNew();
+                  }}
+                />
+              </CircR>
+            </RNew>
+          )}
+          {children}
+        </Env>
+      </FadeLeft>
+    </Portal>
   );
 }
 

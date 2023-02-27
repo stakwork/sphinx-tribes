@@ -16,7 +16,7 @@ import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../colors';
 
 export default function WantedView(props: any) {
-  let {
+  const {
     title,
     description,
     priceMin,
@@ -29,8 +29,6 @@ export default function WantedView(props: any) {
     ticketUrl,
     repo,
     type,
-    show,
-    paid,
     codingLanguage,
     assignee,
     estimate_session_length,
@@ -39,11 +37,12 @@ export default function WantedView(props: any) {
     setDeletePayload,
     onPanelClick
   } = props;
+
+  let { show, paid } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
   const [labels, setLabels] = useState([]);
-  // const [IsAssigned, setIsAssigned] = useState([]);
   const { peopleWanteds } = main;
   const color = colors['light'];
 
@@ -498,7 +497,7 @@ export default function WantedView(props: any) {
                   style={{
                     minHeight: '36px'
                   }}
-                ></div>
+                />
               )}
               {{ ...assignee }.owner_alias && (
                 <div
@@ -596,7 +595,7 @@ export default function WantedView(props: any) {
                     style={{
                       minHeight: '50px'
                     }}
-                  ></div>
+                  />
                 </>
               )}
             </div>
@@ -626,7 +625,7 @@ export default function WantedView(props: any) {
                           overflow: 'hidden'
                         }}
                       >
-                        <img src={val} alt="image" height={'100%'} width={'100%'} />
+                        <img src={val} alt="wanted preview" height={'100%'} width={'100%'} />
                       </div>
                     );
                   })}
