@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import FadeLeft from '../../animated/fadeLeft';
 import { IconButton } from '../../sphinxUI';
 
 export default function GalleryViewer(props) {
@@ -63,12 +62,6 @@ export default function GalleryViewer(props) {
             </Label>
           </>
         )}
-
-        {/* <FadeLeft isMounted={selectedImage}>
-                <BigEnv onClick={() => setSelectedImage('')}>
-                    <BigImg src={selectedImage} />
-                </BigEnv>
-            </FadeLeft> */}
       </Gallery>
     </>
   );

@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { EuiSwitch, EuiText } from '@elastic/eui';
 import type { Props } from './propsType';
-import { FieldEnv, Note } from './index';
-import { wantedCodingTaskSchema } from '../schema';
+import { Note } from './index';
 import { colors } from '../../colors';
 
 export default function SwitchInput({
@@ -14,22 +13,11 @@ export default function SwitchInput({
   handleChange,
   handleBlur,
   handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   useEffect(() => {
     // if value not initiated, default value true
     if (name === 'show' && value === undefined) handleChange(true);
-
-    // if (name === 'github_description') {
-    //   wantedCodingTaskSchema.map((val) => {
-    //     if (val.name === 'description') {
-    //       console.log(val.name, value);
-    //       return { ...val, type: value ? 'hide' : 'textarea' };
-    //     }
-    //   });
-    // }
   }, []);
 
   const color = colors['light'];

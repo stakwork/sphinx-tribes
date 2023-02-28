@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
 import { colors } from '../../colors';
 
 export default function TextInput({
-  name,
   error,
   note,
   label,
@@ -58,9 +56,7 @@ export default function TextInput({
             isTextField={true}
           />
           {error && (
-            <E color={color}>
-              {/* <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} /> */}
-            </E>
+            <E color={color} />
           )}
         </R>
       </FieldEnv>

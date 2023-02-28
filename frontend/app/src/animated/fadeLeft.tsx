@@ -50,16 +50,19 @@ export default function FadeLeft(props) {
     (async () => {
       if (!isMounted) {
         let speed = 200;
+
         if (props.speed) speed = props.speed;
         doAnimation(0);
+
         await sleep(speed);
-        // console.log('unmount')
         setShouldRender(false);
+
         if (dismountCallback) dismountCallback();
       } else {
         setShouldRender(true);
+
         await sleep(5);
-        console.log('render true');
+
         doAnimation(1);
       }
     })();
@@ -85,7 +88,6 @@ export default function FadeLeft(props) {
               else if (props.close) props.close();
             }
           }}
-          // onClick={(e) => e.stopPropagation()}
           style={{ height: 'inherit', ...style, transform: transformValue }}
         >
           {children}

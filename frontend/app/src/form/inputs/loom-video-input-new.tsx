@@ -6,17 +6,10 @@ import { EuiText } from '@elastic/eui';
 import LoomViewerRecorderNew from '../../people/utils/loomViewerRecorderNew';
 
 export default function LoomVideoInputNew({
-  name,
-  error,
-  note,
-  label,
   value,
   handleChange,
   handleBlur,
   handleFocus,
-  readOnly,
-  prepend,
-  extraHTML
 }: Props) {
   const color = colors['light'];
 

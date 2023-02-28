@@ -1,28 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import styled from 'styled-components';
-import { useFuse, useIsMobile } from '../../hooks';
+import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
-import { Modal, Button, Divider } from '../../sphinxUI';
-import FadeLeft from '../../animated/fadeLeft';
+import { Divider } from '../../sphinxUI';
 import ConfirmMe from '../confirmMe';
 import AuthQR from './authQR';
-import { EuiButton } from '@elastic/eui';
 import IconButton from '../../sphinxUI/icon_button';
 
 export default function SignIn(props: any) {
   const { main, ui } = useStores();
-  // const location = useLocation()
 
-  // function selectPerson(id: number, unique_name: string) {
-  //   console.log('selectPerson', id, unique_name)
-  //   setSelectedPerson(id)
-  //   if (unique_name && window.history.pushState) {
-  //     window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
-  //   }
-  // }
   const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);
 

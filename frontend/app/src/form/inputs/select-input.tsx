@@ -11,13 +11,8 @@ export default function SelectInput({
   note,
   label,
   options,
-  name,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   let labeltext = label;
@@ -29,7 +24,7 @@ export default function SelectInput({
       <FieldEnv
         color={color}
         label={labeltext}
-        onClick={() => {}}
+        onClick={() => { }}
         className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
       >
         <R>

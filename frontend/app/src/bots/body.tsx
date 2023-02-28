@@ -84,11 +84,6 @@ export default function BotBody() {
       // edit
       alert('Bot content cannot be updated right now. Coming soon.');
       return;
-      // try {
-      //     await main.updateBot(v)
-      // } catch (e) {
-      //     console.log('e', e)
-      // }
     } else {
       // create
       try {
@@ -132,11 +127,6 @@ export default function BotBody() {
 
     const ps = await main.getBots(un, null);
     await main.getMyBots();
-
-    // if (un) {
-    //     const initial = ps[0]
-    //     if (initial && initial.unique_name === un) ui.setSelectedBot(initial.id || 0)
-    // }
     setLoading(false);
   }
 
@@ -149,12 +139,6 @@ export default function BotBody() {
       label: 'Top',
       name: 'top'
     }
-    // {
-    //     label: 'Music',
-    //     name: 'music',
-    //     disabled: true
-
-    // },
   ];
 
   if (ui.meInfo) {

@@ -196,7 +196,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
     (async () => {
       // selectedWidget
       // get assets page 1, by widget
-      console.log('refresh list for search');
       let loadMethod = loadMethods[selectedWidget];
 
       // if person is selected, always searching people

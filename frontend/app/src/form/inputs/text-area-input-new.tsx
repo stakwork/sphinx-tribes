@@ -4,18 +4,12 @@ import type { Props } from './propsType';
 import { colors } from '../../colors';
 
 export default function TextAreaInputNew({
-  name,
   error,
-  note,
   label,
   value,
   handleChange,
-  readOnly,
   handleBlur,
   handleFocus,
-  prepend,
-  extraHTML,
-  borderType,
   isFocused
 }: Props) {
   let labeltext = label;

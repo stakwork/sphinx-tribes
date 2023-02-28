@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
 import { colors } from '../colors';
-// import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
   const { options, onChange, value, style } = props;

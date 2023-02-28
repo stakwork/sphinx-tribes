@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button, Divider } from '../../sphinxUI';
 import MaterialIcon from '@material/react-material-icon';
 import { EuiGlobalToastList } from '@elastic/eui';
 

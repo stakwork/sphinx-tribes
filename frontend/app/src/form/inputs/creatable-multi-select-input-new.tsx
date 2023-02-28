@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { EuiCheckboxGroup, EuiIcon, EuiPopover, EuiText } from '@elastic/eui';
+import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import type { Props } from './propsType';
 import { colors } from '../../colors';
 import ImageButton from '../../sphinxUI/Image_button';
@@ -15,17 +15,8 @@ const codingLanguages = GetValue(coding_languages);
 
 export default function CreatableMultiSelectInputNew({
   error,
-  note,
-  type,
   label,
-  options,
-  value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
-  extraHTML
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
