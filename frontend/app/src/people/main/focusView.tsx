@@ -37,14 +37,11 @@ export default function FocusedView(props: any) {
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
   const [editable, setEditable] = useState<boolean>(!canEdit);
-  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
 
   const isMobile = useIsMobile();
-
-  // console.log({ ...person });
 
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
@@ -245,10 +242,6 @@ export default function FocusedView(props: any) {
 
     const personInfo = canEdit ? ui.meInfo : person;
 
-    // // console.log({...personInfo}.extras.wanted.map((value) => value.estimated_completion_date));
-    // personInfo?.extras?.wanted?.map((value: any) => {
-    //   console.log(typeof new Date({ ...value }?.estimated_completion_date));
-    // });
     // set initials here
     if (personInfo) {
       if (config && config.name === 'about') {
@@ -346,8 +339,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                      }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                     : {}
                 }
               />
@@ -485,7 +478,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;

@@ -11,15 +11,10 @@ export default function SearchableSelectInput({
   error,
   note,
   name,
-  type,
   label,
   options,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   const labeltext = label;

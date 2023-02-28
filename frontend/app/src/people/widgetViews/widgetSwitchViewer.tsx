@@ -117,9 +117,6 @@ export default function WidgetSwitchViewer(props) {
               isMobile={isMobile}
               key={person?.owner_pubkey + i + body?.created}
               isAssignee={!!body.assignee}
-              // onClick={() => {
-              //   if (onPanelClick) onPanelClick(person, body);
-              // }}
               style={{
                 ...panelStyles,
                 ...conditionalStyles,

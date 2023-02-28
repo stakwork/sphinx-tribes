@@ -6,7 +6,9 @@ import { colors } from '../colors';
 import { Button, Divider } from '../sphinxUI/index';
 import ConnectCard from './utils/connectCard';
 import moment from 'moment';
+
 const host = getHost();
+
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
@@ -21,16 +23,12 @@ export default function Person(props: any) {
     description,
     selected,
     select,
-    created,
     owner_alias,
     owner_pubkey,
     unique_name,
-    price_to_meet,
     updated,
     last_login,
     squeeze,
-    extras,
-    twitter_confirmed
   } = props;
 
   // backend is adding 'description' to empty descriptions, short term fix
@@ -102,7 +100,6 @@ export default function Person(props: any) {
                 )}
                 {!hideActions && (
                   <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                    {/* <Updated>{lastSeen}</Updated> */}
                     {!hideActions && owner_pubkey ? (
                       <>
                         <a href={qrString}>

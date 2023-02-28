@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button } from '../../sphinxUI';
 import IconButton from '../../sphinxUI/icon_button';
 
 export default function NoneSpaceHomePage(props) {

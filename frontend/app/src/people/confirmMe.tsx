@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { QRCode } from 'react-qr-svg';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
 import api from '../api';
 import { useStores } from '../store';
 import type { MeInfo } from '../store/ui';
 import { getHost } from '../host';
-// import { useIsMobile } from "../hooks";
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
@@ -53,7 +51,7 @@ export default function ConfirmMe(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
 
@@ -68,8 +66,6 @@ export default function ConfirmMe(props: any) {
     }
   }
 
-  // if mobile, automatically kick to sphinx app, dont show qr
-  // if (isMobile)
   return (
     <ConfirmWrap>
       <InnerWrap>
@@ -78,36 +74,6 @@ export default function ConfirmMe(props: any) {
       </InnerWrap>
     </ConfirmWrap>
   );
-
-  // return (
-  //   <ConfirmWrap>
-  //     {!challenge && <EuiLoadingSpinner size="xl" style={{ marginTop: 60 }} />}
-  //     {challenge && (
-  //       <InnerWrap>
-  //         <P>Scan with your Sphinx Mobile App</P>
-  //         <QrWrap>
-  //           <QRCode
-  //             bgColor="#FFFFFF"
-  //             fgColor="#000000"
-  //             level="Q"
-  //             style={{ width: 209 }}
-  //             value={qrString}
-  //           />
-  //         </QrWrap>
-  //         <LinkWrap>
-  //           <a href={qrString} className="btn join-btn">
-  //             <img
-  //               style={{ width: 13, height: 13, marginRight: 8 }}
-  //               src="/static/launch-24px.svg"
-  //               alt=""
-  //             />
-  //             Open Sphinx
-  //           </a>
-  //         </LinkWrap>
-  //       </InnerWrap>
-  //     )}
-  //   </ConfirmWrap>
-  // );
 }
 
 const ConfirmWrap = styled.div`

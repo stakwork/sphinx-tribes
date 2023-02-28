@@ -54,7 +54,6 @@ export default function FocusedWidget(props: any) {
 
   function cancel(dismount) {
     // new widget cancelled, revert form state
-
     let returnState = prevState;
     if (!single && selectedIndex < 0) {
       returnState = getFormState();

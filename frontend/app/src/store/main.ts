@@ -1,5 +1,4 @@
 import { observable, action } from 'mobx';
-// import { persist } from "mobx-persist";
 import api from '../api';
 import { Extras } from '../form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../host';
@@ -12,7 +11,6 @@ function makeTorSaveURL(host: string, key: string) {
 }
 
 export class MainStore {
-  // @persist("list")
   @observable
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
@@ -20,7 +18,6 @@ export class MainStore {
   @action async getTribes(queryParams?: any): Promise<Tribe[]> {
     let ta = [...uiStore.tags];
 
-    console.log('getTribes');
     //make tags string for querys
     ta = ta.filter((f) => f.checked);
     let tags = '';
@@ -70,23 +67,6 @@ export class MainStore {
         }
       });
     }
-
-    // b = [{
-    //   name: 'welcome',
-    //   unique_name: 'welcome',
-    //   label: 'Welcome',
-    //   description: 'my first bot bot'
-    // }, {
-    //   name: 'btc',
-    //   unique_name: 'btc',
-    //   label: 'BTC',
-    //   description: 'my first bot bot'
-    // }, {
-    //   name: 'bet',
-    //   unique_name: 'bet',
-    //   label: 'Bet',
-    //   description: 'my first bot botmy first bot botmy first bot botmy first bot bot'
-    // },]
 
     const hideBots = ['pleaseprovidedocumentation', 'example'];
 
@@ -624,7 +604,6 @@ export class MainStore {
 
   @action async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
-    // console.log('p', p)
     return p;
   }
 

@@ -3,7 +3,6 @@ import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { colors } from '../colors';
 import { colourOptions } from '../people/utils/language_label_style';
-// import makeAnimated from 'react-select/animated';
 
 export default function Sel(props: any) {
   const { onChange, value, style, setIsTop } = props;

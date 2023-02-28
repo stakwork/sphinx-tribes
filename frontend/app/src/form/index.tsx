@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Input from './inputs';
 import { Button, Divider, IconButton, Modal } from '../sphinxUI';
 import { useStores } from '../store';
-import Select from '../sphinxUI/select';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
 import { formDropdownOptions } from '../people/utils/constants';
 import { EuiText } from '@elastic/eui';
@@ -240,8 +239,6 @@ export default function Form(props: any) {
                           {...item}
                           key={item.name}
                           values={values}
-                          // disabled={readOnly}
-                          // readOnly={readOnly}
                           label={''}
                           errors={errors}
                           scrollToTop={scrollToTop}
@@ -279,8 +276,6 @@ export default function Form(props: any) {
                             {...item}
                             key={item.name}
                             values={values}
-                            // disabled={readOnly}
-                            // readOnly={readOnly}
                             errors={errors}
                             scrollToTop={scrollToTop}
                             value={values[item.name]}
@@ -425,8 +420,6 @@ export default function Form(props: any) {
                                 values={values}
                                 setAssigneefunction={item.name === 'assignee' && setAssigneeName}
                                 peopleList={peopleList}
-                                // disabled={readOnly}
-                                // readOnly={readOnly}
                                 isFocused={isFocused}
                                 errors={errors}
                                 scrollToTop={scrollToTop}
@@ -470,8 +463,6 @@ export default function Form(props: any) {
                                 newDesign={true}
                                 key={item.name}
                                 values={values}
-                                // disabled={readOnly}
-                                // readOnly={readOnly}
                                 errors={errors}
                                 scrollToTop={scrollToTop}
                                 value={values[item.name]}
@@ -585,8 +576,6 @@ export default function Form(props: any) {
                       {...item}
                       key={item.name}
                       values={values}
-                      // disabled={readOnly}
-                      // readOnly={readOnly}
                       errors={errors}
                       scrollToTop={scrollToTop}
                       value={values[item.name]}
@@ -655,14 +644,6 @@ export default function Form(props: any) {
                           setFieldValue('type', dynamicSchemaName);
                         }
                         handleSubmit();
-                        // if (lastPage === page) handleSubmit()
-                        // else {
-                        //   // this does form animation between pages
-                        //   setFormMounted(false)
-                        //   await sleep(200)
-                        //   //background
-                        //   setPage(page + 1)
-                        // }
                       }}
                       loading={props.loading}
                       style={{ ...buttonStyle, width: '140px' }}
@@ -774,10 +755,6 @@ const Wrap = styled.div<WrapProps>`
   // max-width:400px;
   min-width: 230px;
 `;
-
-interface BWrapProps {
-  readonly floatingButtons: boolean;
-}
 
 interface bottomButtonProps {
   assigneeName?: string;
@@ -915,25 +892,25 @@ const BottomContainer = styled.div<bottomButtonProps>`
     align-items: center;
     cursor: pointer;
     background: ${(p) =>
-      p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
+    p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
     box-shadow: 0px 2px 10px
       ${(p) =>
-        p?.assigneeName === ''
-          ? `${p.color.button_secondary.shadow}`
-          : `${p.color.button_primary.shadow}`};
+    p?.assigneeName === ''
+      ? `${p.color.button_secondary.shadow}`
+      : `${p.color.button_primary.shadow}`};
     border-radius: 32px;
     color: ${(p) => p?.color && p.color.pureWhite};
     :hover {
       background: ${(p) =>
-        p?.assigneeName === ''
-          ? `${p.color.button_secondary.hover}`
-          : `${p.color.button_primary.hover}`};
+    p?.assigneeName === ''
+      ? `${p.color.button_secondary.hover}`
+      : `${p.color.button_primary.hover}`};
     }
     :active {
       background: ${(p) =>
-        p?.assigneeName === ''
-          ? `${p.color.button_secondary.active}`
-          : `${p.color.button_primary.active}`};
+    p?.assigneeName === ''
+      ? `${p.color.button_secondary.active}`
+      : `${p.color.button_primary.active}`};
     }
     .nextText {
       font-family: Barlow;
@@ -982,20 +959,20 @@ const BountyContainer = styled.div<styledProps>`
   }
   :hover {
     border: ${(p) =>
-      p.show
-        ? `1px solid ${p.color.button_primary.shadow}`
-        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    p.show
+      ? `1px solid ${p.color.button_primary.shadow}`
+      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     outline: ${(p) =>
-      p.show
-        ? `1px solid ${p.color.button_primary.shadow}`
-        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    p.show
+      ? `1px solid ${p.color.button_primary.shadow}`
+      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
   }
   :active {
     border: ${(p) =>
-      p.show
-        ? `1px solid ${p.color.button_primary.shadow}`
-        : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
+    p.show
+      ? `1px solid ${p.color.button_primary.shadow}`
+      : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
   }
   .TextButtonContainer {
     height: 218px;

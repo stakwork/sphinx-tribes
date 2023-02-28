@@ -10,11 +10,8 @@ import { MAX_UPLOAD_SIZE } from '../../people/utils/constants';
 import { colors } from '../../colors';
 
 export default function GalleryInput({
-  label,
   value,
   handleChange,
-  handleBlur,
-  handleFocus
 }: Props) {
   const color = colors['light'];
   const { ui } = useStores();
@@ -123,22 +120,6 @@ export default function GalleryInput({
               </ImageWrap>
             );
           })}
-
-        {/* {newPicsArray && newPicsArray.map((v, i) => {
-                    return <ImageWrap key={i}>
-                        <Close onClick={() => deleteNewImg(i)}>
-                            <MaterialIcon icon={'close'} style={{ color: '#000', fontSize: 12 }} />
-                        </Close>
-                        <Sq>
-                            <ImageCircle>
-                                <Image style={{
-                                    backgroundImage: `url(${v})`
-                                }}
-                                />
-                            </ImageCircle>
-                        </Sq>
-                    </ImageWrap>
-                })} */}
       </Wrapper>
 
       <div style={{ marginTop: 5 }}>

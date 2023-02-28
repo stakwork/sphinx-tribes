@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import '@material/react-material-icon/dist/material-icon.css';
 import Header from './tribes/header';
@@ -74,7 +74,7 @@ enum Mode {
 }
 
 const hosts: { [k: string]: Mode } = {
-  'localhost:3001': Mode.COMMUNITY,
+  'localhost:3001': Mode.TRIBES,
   'localhost:13000': Mode.TRIBES,
   'localhost:23000': Mode.TRIBES,
   'tribes.sphinx.chat': Mode.TRIBES,

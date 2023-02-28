@@ -12,14 +12,11 @@ export default function NameTag(props) {
     owner_pubkey,
     img,
     created,
-    unique_name,
     id,
     style,
     widget,
     iconSize,
     textSize,
-    ticketUrl,
-    loomEmbedUrl,
     isPaid
   } = props;
   const { ui } = useStores();
@@ -35,13 +32,13 @@ export default function NameTag(props) {
     // don't select if already selected
     if (isSelected) return;
     e.stopPropagation();
-    console.log('selectPerson', id, unique_name);
+
     ui.setPersonViewOpenTab(widget || '');
     ui.setSelectedPerson(id);
     ui.setSelectingPerson(id);
+
     if (owner_pubkey) {
       history.push(`/p/${owner_pubkey}`);
-      // window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
     }
   }
 

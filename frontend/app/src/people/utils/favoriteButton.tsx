@@ -9,11 +9,6 @@ export default function Heart(props) {
   const selected = false;
   function clickIt(e) {
     setLoading(true);
-    // if (selected) {
-    //     main.deleteFavorite()
-    // } else {
-    //     main.addFavorite()
-    // }
     setLoading(false);
   }
 

@@ -60,15 +60,11 @@ export default function AuthQR(props: any) {
   }
   return (
     <ConfirmWrap style={{ ...props.style }}>
-      {/* <InnerWrap>
-                <QrWrap> */}
       {challenge ? (
         <QR size={203} style={{ width: 203 }} value={qrString} />
       ) : (
         <EuiLoadingSpinner size="xl" />
       )}
-      {/* </QrWrap>
-            </InnerWrap> */}
     </ConfirmWrap>
   );
 }

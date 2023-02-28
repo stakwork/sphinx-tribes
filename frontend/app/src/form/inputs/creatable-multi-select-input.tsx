@@ -14,10 +14,6 @@ export default function CreatableMultiSelectInput({
   options,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   let labeltext = label;

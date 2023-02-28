@@ -25,7 +25,6 @@ export default function TextAreaInput({
   handleBlur,
   handleFocus,
   readOnly,
-  prepend,
   extraHTML,
   borderType
 }: Props) {
@@ -64,8 +63,6 @@ export default function TextAreaInput({
               setActive(true);
             }}
             rows={label === 'Description' ? 8 : 6}
-
-            // prepend={prepend}
           />
           {error && (
             <E color={color}>

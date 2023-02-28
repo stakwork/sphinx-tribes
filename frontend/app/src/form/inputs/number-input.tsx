@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
 import { satToUsd } from '../../helpers';
@@ -61,11 +60,6 @@ export default function NumberInput({
               setActive(true);
             }}
           />
-          {/* {error && (
-            <E color={color}>
-              <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
-            </E>
-          )} */}
         </R>
       </FieldEnv>
       {note && <Note color={color}>*{note}</Note>}
@@ -75,16 +69,6 @@ export default function NumberInput({
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
-      {/* <ExtraText
-        style={{
-          fontSize: '10px',
-          fontWeight: '400',
-          lineHeight: '11px',
-          color: '#8E969C'
-        }}>
-        *This amount applies to users trying to connect within the Sphinx app. Older versions of the
-        app may not support this feature.
-      </ExtraText> */}
     </OuterContainer>
   );
 }

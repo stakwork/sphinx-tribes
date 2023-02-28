@@ -1,23 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui';
 import { Props } from './propsType';
-import { FieldEnv, FieldText, Note } from '.';
 import { colors } from '../../colors';
 
 export default function TextInputNew({
-  name,
   error,
-  note,
   label,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
   readOnly,
   prepend,
-  extraHTML,
-  borderType
 }: Props) {
   let labeltext = label;
   const color = colors['light'];
