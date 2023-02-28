@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EuiCheckbox } from '@elastic/eui';
 import type { Props } from './propsType';
 import { Note } from './index';
-import { colors } from '../../colors';
+import { colors } from '../../../colors';
 
 export default function CheckBox({
   note,

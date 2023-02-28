@@ -16,7 +16,7 @@ import MultiSelectInput from './multi-select-input';
 import CreatableMultiSelectInput from './creatable-multi-select-input';
 import Date from './widgets/date';
 import InvitePeopleSearch from './widgets/PeopleSearch';
-import { colors } from '../../colors';
+import { colors } from '../../../colors';
 import LoomVideoInputNew from './loom-video-input-new';
 import TextInputNew from './text-input-new';
 import NumberInputNew from './number-input-new';

@@ -1,6 +1,6 @@
 import { observable, action } from 'mobx';
 import api from '../api';
-import { Extras } from '../form/inputs/widgets/interfaces';
+import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../host';
 import { uiStore } from './ui';
 import { randomString } from '../helpers';

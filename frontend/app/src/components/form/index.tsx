@@ -3,15 +3,15 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import Input from './inputs';
-import { Button, Divider, IconButton, Modal } from '../sphinxUI';
-import { useStores } from '../store';
+import { Button, Divider, IconButton, Modal } from '../../sphinxUI';
+import { useStores } from '../../store';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
-import { formDropdownOptions } from '../people/utils/constants';
+import { formDropdownOptions } from '../../people/utils/constants';
 import { EuiText } from '@elastic/eui';
-import api from '../api';
-import ImageButton from '../sphinxUI/Image_button';
-import { colors } from '../colors';
-import { BountyDetailsCreationData } from '../people/utils/bountyCreation_constant';
+import api from '../../api';
+import ImageButton from '../../sphinxUI/Image_button';
+import { colors } from '../../colors';
+import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;

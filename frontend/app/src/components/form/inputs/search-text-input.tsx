@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
-import { colors } from '../../colors';
+import { colors } from '../../../colors';
 
 export default function SearchTextInput({
   placeholder,
