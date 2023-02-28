@@ -5,12 +5,15 @@ ENV GO111MODULE=on
 
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY ./backend/go.mod .
+COPY ./backend/go.sum .
 
 RUN go mod download
 
-COPY . .
+COPY ./backend .
+COPY ./frontend ./frontend
+COPY ./docker ./docker
+COPY ./img ./img
 
 RUN CGO_ENABLED=0 go build
 
