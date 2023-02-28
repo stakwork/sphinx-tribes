@@ -3,11 +3,6 @@
 @import url('https://rsms.me/inter/inter-ui.css');
 
 html {
-  /* position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0; */
   overflow: hidden;
   height: 100%;
   width: 100%;
@@ -56,13 +51,6 @@ button:focus {
   left: 0;
 }
 
-/* .euiCheckableCard {
-  background:none !important;
-  color:none !important;
-  box-shadow: none !important;
-  border-bottom:1px solid #EBEDEF !important;
-} */
-
 .euiCheckableCard__children {
   width: 100%;
   padding: 0 !important;
@@ -78,17 +66,11 @@ button:focus {
 
 .container {
   max-width: 760px !important;
-  /* max-width:90% !important; */
 }
 
 .euiPopover {
   margin-top: -5px;
 }
-
-/* .euiLoadingSpinner {
-  position: absolute;
-  top: 50%;
-} */
 
 #header {
   padding-top: 12px;
@@ -131,13 +113,11 @@ button:focus {
 }
 
 #header .euiFieldSearch:focus {
-  background-image: linear-gradient(
-    to top,
-    #5d8fdd,
-    #5d8fdd 2px,
-    transparent 2px,
-    transparent 100%
-  );
+  background-image: linear-gradient(to top,
+      #5d8fdd,
+      #5d8fdd 2px,
+      transparent 2px,
+      transparent 100%);
 }
 
 #header-right {
@@ -192,7 +172,6 @@ button:focus {
 }
 
 #main {
-  /* background: #17212a; */
   padding-top: 8px;
 }
 
@@ -209,12 +188,10 @@ fieldset.container {
   min-height: 137px;
   padding: 20px;
   border: 0;
-  /* background: #1a2430; */
   position: relative;
 }
 
 #main .euiCheckableCard h5 {
-  /* color: #6B7A8D; */
   font-size: 12px;
   margin-bottom: 0;
 }
@@ -230,7 +207,6 @@ fieldset.container {
 }
 
 .placeholder-img-tribe {
-  /* position: absolute; */
   left: 22px;
   top: 22px;
   width: 90px;
@@ -432,21 +408,12 @@ textarea.qr-string {
   padding: 0;
 }
 
-fieldset.container {
-  /*display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-columns: 375px;
-    grid-gap: 5px;
-    place-items: self-start;*/
-}
-
 #main .euiSpacer--m {
   display: none;
 }
 
 #main .euiCheckableCard {
   max-width: 378px;
-  /* height: 100px; */
 }
 
 #main .euiCheckableCard-isChecked {
@@ -533,13 +500,11 @@ fieldset.container {
 }
 
 #header .euiFieldSearch:focus {
-  background-image: linear-gradient(
-    to top,
-    #5d8fdd,
-    #5d8fdd 2px,
-    transparent 2px,
-    transparent 100%
-  );
+  background-image: linear-gradient(to top,
+      #5d8fdd,
+      #5d8fdd 2px,
+      transparent 2px,
+      transparent 100%);
 }
 
 #header-right {
@@ -807,14 +772,6 @@ textarea.qr-string {
     padding: 0;
   }
 
-  fieldset.container {
-    /*display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-columns: 375px;
-    grid-gap: 5px;
-    place-items: self-start;*/
-  }
-
   #main .euiSpacer--m {
     display: none;
   }
@@ -828,10 +785,12 @@ textarea.qr-string {
     height: auto;
   }
 }
+
 .euiSuperSelect__listbox {
   border: none;
   outline: none;
 }
+
 .euiPanel.euiPanel--plain.euiPopover__panel {
   border: 1px solid #dde1e5;
   overflow: hidden;
@@ -855,12 +814,14 @@ textarea.qr-string {
   background-color: #fff;
   color: #000;
 }
+
 .euiDatePicker .euiFieldText:focus {
   background-color: #fff;
   color: #000;
   outline: 1px solid #dde0e5;
   text-decoration: none;
 }
+
 .react-datepicker {
   background-color: #fff;
 }
@@ -871,6 +832,7 @@ textarea.qr-string {
   outline: 1px solid #dde0e5 !important;
   color: #000 !important;
 }
+
 .react-datepicker__month-read-view span {
   color: #000 !important;
 }
@@ -879,6 +841,7 @@ textarea.qr-string {
   border: none;
   background-color: #dde0e5;
 }
+
 .react-datepicker__navigation--previous:hover {
   border: none;
   background-color: #dde0e5;
@@ -896,7 +859,7 @@ textarea.qr-string {
   border: none;
 }
 
-.react-datepicker__year-dropdown-container > div:not([class*='read-view']),
+.react-datepicker__year-dropdown-container>div:not([class*='read-view']),
 .react-datepicker__month-dropdown {
   background: #fff !important;
   color: #000 !important;
@@ -997,10 +960,7 @@ textarea.qr-string {
   background-color: #ffffff00 !important;
 }
 
-.euiFormRow__fieldWrapper
-  .euiFormControlLayout--group
-  .euiFormLabel
-  .euiFormControlLayout__prepend {
+.euiFormRow__fieldWrapper .euiFormControlLayout--group .euiFormLabel .euiFormControlLayout__prepend {
   background-color: #ffffff00 !important;
 }
 
@@ -1044,8 +1004,8 @@ input::-webkit-search-cancel-button {
 }
 
 .euiPanel:focus-visible,
-.euiPanel > div:focus-visible,
-.euiPanel > div > div:focus-visible {
+.euiPanel>div:focus-visible,
+.euiPanel>div>div:focus-visible {
   outline: none;
   border: none;
 }
@@ -1060,11 +1020,13 @@ input::-webkit-search-cancel-button {
   margin-left: 4px;
   margin-right: -2px;
 }
+
 .euiSwitch .euiSwitch__button[aria-checked='true'] .euiSwitch__body {
   background-color: #49c998 !important;
   height: 24px;
   width: 40px;
 }
+
 .euiSwitch .euiSwitch__button[aria-checked='false'] .euiSwitch__body {
   background-color: #d0d5d8 !important;
   height: 24px;
@@ -1081,10 +1043,12 @@ input::-webkit-search-cancel-button {
   margin-left: -1px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
+
 .euiSuperSelect__listbox button:active {
   text-decoration: none;
   text-transform: none;
 }
+
 .euiSuperSelect__listbox button:focus {
   text-decoration: none;
   text-transform: none;

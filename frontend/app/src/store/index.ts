@@ -6,7 +6,6 @@ import { create } from 'mobx-persist';
 const hydrate = create({ storage: localStorage });
 
 Promise.all([hydrate('main', mainStore), hydrate('ui', uiStore)]).then(() => {
-  console.log('useStore ready!');
   uiStore.setReady(true);
 });
 

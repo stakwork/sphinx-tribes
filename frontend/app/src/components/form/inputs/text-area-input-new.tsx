@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
-import { colors } from '../../colors';
+import { colors } from '../../../colors';
 
-export default function TextInputNew({
-  name,
+export default function TextAreaInputNew({
   error,
-  note,
   label,
   value,
   handleChange,
-  readOnly,
   handleBlur,
   handleFocus,
-  prepend,
-  extraHTML,
-  borderType,
   isFocused
 }: Props) {
   let labeltext = label;
@@ -32,10 +26,9 @@ export default function TextInputNew({
 
   return (
     <InputOuterBox color={color} borderColor={isError ? color.red2 : color.grayish.G600}>
-      <input
+      <textarea
         className="inputText"
         id={'text'}
-        type={'text'}
         value={textValue}
         onFocus={handleFocus}
         onBlur={() => {
@@ -48,6 +41,9 @@ export default function TextInputNew({
           handleChange(e.target.value);
           setTextValue(e.target.value);
         }}
+        style={{
+          height: label === 'Deliverables' ? '137px' : '175px'
+        }}
       />
       <label
         htmlFor={'text'}
@@ -56,7 +52,7 @@ export default function TextInputNew({
         style={{
           position: 'absolute',
           left: 16,
-          top: !isFocused[label] ? (textValue === undefined ? 10 : -9) : -9,
+          top: !isFocused[label] ? (textValue === undefined || textValue === '' ? 10 : -9) : -9,
           fontSize: !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
           color: color.grayish.G300,
           background: color.pureWhite,
@@ -78,9 +74,8 @@ interface styledProps {
 
 const InputOuterBox = styled.div<styledProps>`
   position: relative;
-  margin-bottom: 32px;
+  margin-bottom: 0px;
   .inputText {
-    height: 40px;
     width: 292px;
     font-size: 14px;
     color: ${(p) => p.color && p.color.pureBlack};
@@ -88,7 +83,9 @@ const InputOuterBox = styled.div<styledProps>`
     border-radius: 4px;
     outline: none;
     padding-left: 16px;
-    color: ${(p) => p.color && p.color.text2};
+    padding-top: 16px;
+    resize: none;
+    color: #3c3f41;
     font-weight: 500;
     letter-spacing: 0.01em;
     :active {

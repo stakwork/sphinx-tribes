@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
-import { FormField } from '../form';
-// import { uiStore } from '../store/ui';
+import { FormField } from '.';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
@@ -538,15 +537,7 @@ export const sendBadgeSchema: FormField[] = [
     options: [],
     validator: badgeObjectStrValidator
   }
-  // {
-  //     name: "amount",
-  //     label: "Amount",
-  //     type: "number",
-  //     validator: nomValidator,
-  // },
 ];
-
-//name, webhook, price_per_use, img, description, tags
 
 export const botSchema: FormField[] = [
   {
@@ -683,33 +674,12 @@ export const wantedOtherSchema: FormField[] = [
     type: 'textarea',
     validator: strValidator
   },
-  // {
-  //   name: 'technology_need_help',
-  //   label: 'Technologies you need help with',
-  //   type: 'select',
-  //   options: helpType_wanted_coding_task_schema
-  // },
-
   {
     name: 'codingLanguage',
     label: 'Technologies you need help with',
     type: 'creatablemultiselect',
     options: codingLanguages
   },
-  // {
-  //   name: 'priceMin',
-  //   label: 'Price Min',
-  //   validator: Yup.number().when('priceMax', (pricemax) =>
-  //     Yup.number().max(pricemax, `Must be less than max`)
-  //   ),
-  //   type: 'number'
-  // },
-  // {
-  //   name: 'priceMax',
-  //   label: 'Price Max',
-  //   validator: nomValidator,
-  //   type: 'number'
-  // },
   {
     name: 'estimated_budget_for_every_15_minutes',
     label: 'Estimated budget for every 15 minutes',
@@ -732,12 +702,6 @@ export const wantedOtherSchema: FormField[] = [
     label: 'Type',
     type: 'hide'
   }
-
-  // {
-  //     name: 'show',
-  //     label: "Show In Link",
-  //     type: "switch",
-  // },
 ];
 
 export const wantedCodingTaskSchema: FormField[] = [
@@ -745,22 +709,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     name: 'title',
     label: 'Title',
     type: 'hide'
-    // validator: strValidator,
   },
-  // {
-  //     name: 'repo',
-  //     label: "Github Repository",
-  //     type: "text",
-  //     note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
-  //     validator: repoStrValidator, // look for 1 slash
-  // },
-  // {
-  //     name: 'issue',
-  //     label: "Issue #",
-  //     type: "number",
-  //     note: 'Add the "stakwork" user to your github repo for issue status updates.',
-  //     validator: nomValidator,
-  // },
   {
     name: 'wanted_type',
     label: 'Category',
@@ -777,7 +726,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     name: 'ticketUrl',
     label: 'Github Issue URL',
     type: 'text'
-    // validator: strValidator
   },
   {
     name: 'github_description',
@@ -788,7 +736,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     name: 'description',
     label: 'Description',
     type: 'textarea'
-    // validator: strValidator,
   },
   {
     name: 'price',
@@ -796,12 +743,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     validator: nomValidator,
     type: 'number'
   },
-  // {
-  //     name: 'space',
-  //     label: 'space',
-  //     type: 'space'
-  // },
-
   {
     name: 'assignee',
     label: 'Assignee',

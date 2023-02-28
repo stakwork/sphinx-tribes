@@ -1,10 +1,9 @@
 import moment from 'moment';
-import { EuiDatePicker, EuiFormRow } from '@elastic/eui';
+import { EuiDatePicker } from '@elastic/eui';
 import React, { memo, useState } from 'react';
-import { Props } from '../propsType';
 import { FieldEnv } from '..';
 import styled from 'styled-components';
-import { colors } from '../../../colors';
+import { colors } from '../../../../colors';
 
 function Date({ label, value, handleChange }: any) {
   const color = colors['light'];
@@ -43,7 +42,7 @@ interface datePickerProps {
 }
 
 // @ts-ignore
-const DataPicker = styled(EuiDatePicker)<datePickerProps>`
+const DataPicker = styled(EuiDatePicker) <datePickerProps>`
   border: 1px solid ${(p) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
   :focus {
     background-image: none;

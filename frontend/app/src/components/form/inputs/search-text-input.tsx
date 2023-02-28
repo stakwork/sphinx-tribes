@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { EuiFormRow, EuiFieldText, EuiIcon, PropertySortType } from '@elastic/eui';
-import type { Props } from './propsType';
-import { colors } from '../../colors';
+import { EuiIcon } from '@elastic/eui';
+import { colors } from '../../../colors';
 
 export default function SearchTextInput({
   placeholder,
@@ -13,8 +12,6 @@ export default function SearchTextInput({
   handleBlur,
   handleFocus,
   readOnly,
-  prepend,
-  extraHTML
 }: any) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;

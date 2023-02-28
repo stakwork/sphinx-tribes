@@ -162,18 +162,6 @@ export default function WantedView(props: any) {
               >
                 {title}
               </DT>
-              {/* <div
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  margin: '5px 0'
-                }}
-              >
-                {isCodingTask && (
-                  <GithubStatusPill status={status} assignee={assignee} />
-                )}
-              </div> */}
 
               <div
                 style={{
@@ -212,17 +200,12 @@ export default function WantedView(props: any) {
                       }}
                     />
                     <span
-                      // onClick={(e) => {
-                      //   e.stopPropagation();
-                      //   findUserByGithubHandle();
-                      // }}
                       onClick={(e) => {
                         e.stopPropagation();
                         window.open(
-                          `/p/${
-                            {
-                              ...assignee
-                            }.owner_pubkey
+                          `/p/${{
+                            ...assignee
+                          }.owner_pubkey
                           }?widget=wanted`,
                           '_blank'
                         );
@@ -527,10 +510,9 @@ export default function WantedView(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(
-                        `/p/${
-                          {
-                            ...assignee
-                          }.owner_pubkey
+                        `/p/${{
+                          ...assignee
+                        }.owner_pubkey
                         }?widget=wanted`,
                         '_blank'
                       );

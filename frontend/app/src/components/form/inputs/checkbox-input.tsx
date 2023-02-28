@@ -3,19 +3,15 @@ import styled from 'styled-components';
 import { EuiCheckbox } from '@elastic/eui';
 import type { Props } from './propsType';
 import { Note } from './index';
-import { colors } from '../../colors';
+import { colors } from '../../../colors';
 
 export default function CheckBox({
-  label,
   note,
   value,
   name,
   handleChange,
   handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
-  extraHTML
+  handleFocus
 }: Props) {
   const color = colors['light'];
   useEffect(() => {

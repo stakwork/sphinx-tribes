@@ -3,23 +3,18 @@ import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
-import { SearchableSelect } from '../../sphinxUI';
-import { useStores } from '../../store';
-import { colors } from '../../colors';
+import { SearchableSelect } from '../../../sphinxUI';
+import { useStores } from '../../../store';
+import { colors } from '../../../colors';
 
 export default function SearchableSelectInput({
   error,
   note,
   name,
-  type,
   label,
   options,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   const labeltext = label;

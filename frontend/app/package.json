@@ -13,7 +13,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --max-warnings 288 --ext .ts --ext .tsx",
+    "lint": "eslint src --max-warnings 142 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
   },
@@ -114,7 +114,7 @@
     "@types/dateformat": "^3.0.1",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.27",
-    "@types/react": "^16.9.19",
+    "@types/react": "18.0.0",
     "@types/react-dom": "^16.9.5",
     "bootstrap": "^4.5.0",
     "eslint": "^8.26.0",

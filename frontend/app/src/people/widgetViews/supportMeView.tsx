@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { SupportMe } from '../../form/inputs/widgets/interfaces';
+import { SupportMe } from '../../components/form/inputs/widgets/interfaces';
 
 export default function SupportMeView(props: SupportMe) {
   const { gallery, description, url } = props;

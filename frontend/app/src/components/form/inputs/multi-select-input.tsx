@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
-import { CreatableMultiSelect } from '../../sphinxUI';
-import { colors } from '../../colors';
+import { MultiSelect } from '../../../sphinxUI';
+import { colors } from '../../../colors';
 
-export default function CreatableMultiSelectInput({
+export default function MultiSelectInput({
   error,
   note,
   type,
@@ -14,28 +14,17 @@ export default function CreatableMultiSelectInput({
   options,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   let labeltext = label;
-  if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
+  if (error) labeltext = `${labeltext} (${error})`;
   const color = colors['light'];
-
-  const [isTop, setIsTop] = useState<boolean>(false);
 
   return (
     <>
-      <FieldEnv
-        color={color}
-        label={labeltext}
-        isTop={isTop || value?.length > 0}
-        isFill={value?.length > 0}
-      >
+      <FieldEnv label={labeltext} color={color}>
         <R>
-          <CreatableMultiSelect
+          <MultiSelect
             selectStyle={{ border: 'none' }}
             options={options}
             writeMode={type === 'multiselectwrite'}
@@ -43,9 +32,7 @@ export default function CreatableMultiSelectInput({
             onChange={(e) => {
               console.log('onChange', e);
               handleChange(e);
-              setIsTop(true);
             }}
-            setIsTop={setIsTop}
           />
           {error && (
             <E color={color}>
@@ -68,23 +55,23 @@ interface styledProps {
 }
 
 const ExtraText = styled.div`
-padding: 2px 10px 25px 10px;
-max - width: calc(100 % - 20px);
-word -break: break-all;
-font - size: 14px;
+  padding: 2px 10px 25px 10px;
+  max-width: calc(100% - 20px);
+  word-break: break-all;
+  font-size: 14px;
 `;
 
 const E = styled.div<styledProps>`
-position: absolute;
-right: 10px;
-top: 0px;
-display: flex;
-height: 100 %;
-justify - content: center;
-align - items: center;
-color: ${(p) => p?.color && p.color.blue3};
-pointer - events: none;
-user - select: none;
+  position: absolute;
+  right: 10px;
+  top: 0px;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  color: ${(p) => p.color && p.color.blue3};
+  pointer-events: none;
+  user-select: none;
 `;
 const R = styled.div`
   position: relative;

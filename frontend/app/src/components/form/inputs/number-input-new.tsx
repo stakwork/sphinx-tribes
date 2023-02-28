@@ -1,23 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
-import { colors } from '../../colors';
-import { satToUsd } from '../../helpers';
+import { colors } from '../../../colors';
+import { satToUsd } from '../../../helpers';
 
 export default function NumberInputNew({
-  name,
   error,
-  note,
   label,
   value,
   handleChange,
-  readOnly,
   handleBlur,
   handleFocus,
-  prepend,
-  extraHTML,
-  borderType,
-  isFocused
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext}*`;
@@ -61,7 +54,6 @@ export default function NumberInputNew({
         style={{
           position: 'absolute',
           left: 18,
-          //   top: !isFocused[label] ? (textValue === undefined ? 10 : -9) : -9,
           fontFamily: 'Barlow',
           top: -9,
           fontSize: 12,

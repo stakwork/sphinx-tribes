@@ -39,8 +39,6 @@ export function extractRepoAndIssueFromIssueUrl(url: string) {
   let repo = '';
   let issue = '';
 
-  // example: https://github.com/stakwork/sphinx-tribes/issues/206
-
   try {
     const splitString = url.split('/');
     const issueIndex = splitString.length - 1;

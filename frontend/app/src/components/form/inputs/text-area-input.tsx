@@ -2,27 +2,36 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
-import { FieldEnv, FieldText, Note } from './index';
-import { satToUsd } from '../../helpers';
-import { colors } from '../../colors';
+import { FieldEnv, FieldTextArea, Note } from './index';
+import { colors } from '../../../colors';
 
-export default function NumberInput({
-  name,
+const StyleOnText = {
+  Description: {
+    height: '172px',
+    width: '292px'
+  },
+  Deliverables: {
+    height: '135px',
+    width: '192px'
+  }
+};
+
+export default function TextAreaInput({
   error,
   note,
   label,
   value,
-  extraHTML,
   handleChange,
   handleBlur,
   handleFocus,
+  readOnly,
+  extraHTML,
   borderType
 }: Props) {
   let labeltext = label;
+  const color = colors['light'];
   if (error) labeltext = `${labeltext} (${error})`;
   const [active, setActive] = useState<boolean>(false);
-  const color = colors['light'];
-
   return (
     <OuterContainer color={color}>
       <FieldEnv
@@ -33,58 +42,41 @@ export default function NumberInput({
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
         label={labeltext}
+        height={StyleOnText[label].height}
+        width={StyleOnText[label].width}
       >
         <R>
-          <FieldText
+          <FieldTextArea
             color={color}
+            height={StyleOnText[label].height}
+            width={StyleOnText[label].width}
             name="first"
-            value={value}
-            type="number"
-            onChange={(e) => {
-              // dont allow zero or negative numbers
-              if (parseInt(e.target.value) < 0) return;
-              handleChange(e.target.value);
-            }}
+            value={value || ''}
+            readOnly={readOnly || false}
+            onChange={(e) => handleChange(e.target.value)}
             onBlur={(e) => {
-              // enter 0 on blur if no value
-              console.log('onBlur', value);
-              if (value === '') handleChange(0);
-              if (value === '0') handleChange(0);
               handleBlur(e);
               setActive(false);
             }}
             onFocus={(e) => {
-              // remove 0 on focus
-              console.log('onFocus', value);
-              if (value === 0) handleChange('');
               handleFocus(e);
               setActive(true);
             }}
+            rows={label === 'Description' ? 8 : 6}
           />
-          {/* {error && (
+          {error && (
             <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
             </E>
-          )} */}
+          )}
         </R>
       </FieldEnv>
       {note && <Note color={color}>*{note}</Note>}
-      {name.includes('price') && <Note color={color}>({satToUsd(value)} USD)</Note>}
       <ExtraText
         color={color}
         style={{ display: value && extraHTML ? 'block' : 'none' }}
         dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
       />
-      {/* <ExtraText
-        style={{
-          fontSize: '10px',
-          fontWeight: '400',
-          lineHeight: '11px',
-          color: '#8E969C'
-        }}>
-        *This amount applies to users trying to connect within the Sphinx app. Older versions of the
-        app may not support this feature.
-      </ExtraText> */}
     </OuterContainer>
   );
 }
@@ -95,15 +87,15 @@ interface styledProps {
 
 const OuterContainer = styled.div<styledProps>`
   .euiFormRow_active {
-    border: 1px solid ${(p) => p.color && p.color.blue2};
+    border: 1px solid ${(p) => p?.color && p?.color.blue2};
     .euiFormRow__labelWrapper {
       margin-bottom: 0px;
       margin-top: -9px;
       padding-left: 10px;
       height: 14px;
       label {
-        color: ${(p) => p.color && p.color.grayish.G300} !important;
-        background: ${(p) => p.color && p.color.pureWhite};
+        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
@@ -115,8 +107,8 @@ const OuterContainer = styled.div<styledProps>`
       padding-left: 10px;
       height: 14px;
       label {
-        color: ${(p) => p.color && p.color.grayish.G300} !important;
-        background: ${(p) => p.color && p.color.pureWhite};
+        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
@@ -124,23 +116,21 @@ const OuterContainer = styled.div<styledProps>`
 `;
 
 const ExtraText = styled.div<styledProps>`
-  padding: 0px 10px 5px;
-  margin: -5px 0 10px;
-  color: ${(p) => p.color && p.color.red3};
-  font-style: italic;
+  color: ${(p) => p?.color && p?.color.grayish.G760};
+  padding: 10px 10px 25px 10px;
   max-width: calc(100% - 20px);
-  word-break: break;
+  word-break: break-all;
   font-size: 14px;
 `;
+
 const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;
-  top: 0px;
+  top: 10px;
   display: flex;
-  height: 100%;
   justify-content: center;
   align-items: center;
-  color: ${(p) => p.color && p.color.blue3};
+  color: ${(p) => p?.color && p?.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

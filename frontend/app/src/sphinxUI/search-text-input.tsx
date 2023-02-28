@@ -10,9 +10,7 @@ export default function SearchTextInput(props: any) {
 
   const collapseStyles =
     props.small && !expand
-      ? {
-          // width: 40, maxWidth: 40,
-        }
+      ? {}
       : {};
 
   function doDelayedValueUpdate() {

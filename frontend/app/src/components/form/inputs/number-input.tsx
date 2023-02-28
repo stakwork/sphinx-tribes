@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { EuiFormRow, EuiFieldText, EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
-import { colors } from '../../colors';
+import { satToUsd } from '../../../helpers';
+import { colors } from '../../../colors';
 
-export default function TextInput({
+export default function NumberInput({
   name,
   error,
   note,
   label,
   value,
+  extraHTML,
   handleChange,
   handleBlur,
   handleFocus,
-  readOnly,
-  prepend,
-  extraHTML,
   borderType
 }: Props) {
   let labeltext = label;
@@ -24,7 +22,6 @@ export default function TextInput({
   const [active, setActive] = useState<boolean>(false);
   const color = colors['light'];
 
-  const padStyle = prepend ? { paddingLeft: 0 } : {};
   return (
     <OuterContainer color={color}>
       <FieldEnv
@@ -35,36 +32,38 @@ export default function TextInput({
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
         label={labeltext}
-        isTextField={true}
-        error={error}
       >
         <R>
           <FieldText
             color={color}
-            name={'first'}
-            value={value || ''}
-            readOnly={readOnly || false}
-            onChange={(e) => handleChange(e.target.value)}
+            name="first"
+            value={value}
+            type="number"
+            onChange={(e) => {
+              // dont allow zero or negative numbers
+              if (parseInt(e.target.value) < 0) return;
+              handleChange(e.target.value);
+            }}
             onBlur={(e) => {
+              // enter 0 on blur if no value
+              console.log('onBlur', value);
+              if (value === '') handleChange(0);
+              if (value === '0') handleChange(0);
               handleBlur(e);
               setActive(false);
             }}
             onFocus={(e) => {
+              // remove 0 on focus
+              console.log('onFocus', value);
+              if (value === 0) handleChange('');
               handleFocus(e);
               setActive(true);
             }}
-            prepend={prepend}
-            style={padStyle}
-            isTextField={true}
           />
-          {error && (
-            <E color={color}>
-              {/* <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} /> */}
-            </E>
-          )}
         </R>
       </FieldEnv>
       {note && <Note color={color}>*{note}</Note>}
+      {name.includes('price') && <Note color={color}>({satToUsd(value)} USD)</Note>}
       <ExtraText
         color={color}
         style={{ display: value && extraHTML ? 'block' : 'none' }}
@@ -114,10 +113,9 @@ const ExtraText = styled.div<styledProps>`
   color: ${(p) => p.color && p.color.red3};
   font-style: italic;
   max-width: calc(100% - 20px);
-  word-break: break-all;
+  word-break: break;
   font-size: 14px;
 `;
-
 const E = styled.div<styledProps>`
   position: absolute;
   right: 10px;

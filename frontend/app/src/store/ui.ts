@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
 import { persist } from 'mobx-persist';
 import tags from '../tribes/tags';
-import { Extras } from '../form/inputs/widgets/interfaces';
+import { Extras } from '../components/form/inputs/widgets/interfaces';
 
 const tagLabels = Object.keys(tags);
 const initialTags = tagLabels.map((label) => {

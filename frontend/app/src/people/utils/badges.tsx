@@ -7,8 +7,6 @@ import { Modal, Button, Divider, TextInput } from '../../sphinxUI';
 import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
 
-// import { badges } from './constants';
-
 export default function Badges(props) {
   const { main, ui } = useStores();
   const { badgeList, meInfo } = ui || {};

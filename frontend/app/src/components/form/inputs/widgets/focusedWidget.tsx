@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Input from '../../../form/inputs/';
+import Input from '..';
 import { EuiButton } from '@elastic/eui';
 import WidgetList from './widgetList';
 import MaterialIcon from '@material/react-material-icon';
@@ -54,7 +54,6 @@ export default function FocusedWidget(props: any) {
 
   function cancel(dismount) {
     // new widget cancelled, revert form state
-
     let returnState = prevState;
     if (!single && selectedIndex < 0) {
       returnState = getFormState();

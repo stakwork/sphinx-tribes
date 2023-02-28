@@ -45,7 +45,7 @@ export default function AuthQR(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
   async function getChallenge() {
@@ -60,15 +60,11 @@ export default function AuthQR(props: any) {
   }
   return (
     <ConfirmWrap style={{ ...props.style }}>
-      {/* <InnerWrap>
-                <QrWrap> */}
       {challenge ? (
         <QR size={203} style={{ width: 203 }} value={qrString} />
       ) : (
         <EuiLoadingSpinner size="xl" />
       )}
-      {/* </QrWrap>
-            </InnerWrap> */}
     </ConfirmWrap>
   );
 }
