@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import FadeLeft from '../../animated/fadeLeft';
+import FadeLeft from '../../components/animated/fadeLeft';
 import { colors } from '../../colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
 import { Modal, SearchTextInput } from '../../sphinxUI';

@@ -7,7 +7,7 @@ import { useObserver } from 'mobx-react-lite';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useFuse, useScroll } from '../hooks';
 import { colors } from '../colors';
-import FadeLeft from '../animated/fadeLeft';
+import FadeLeft from '../components/animated/fadeLeft';
 import { useIsMobile } from '../hooks';
 import Bot from './bot';
 import Form from '../components/form';
