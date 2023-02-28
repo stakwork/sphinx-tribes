@@ -9,7 +9,7 @@ export default function GithubStatusPill(props: any) {
   const isOpen = status === 'open' || !status;
 
   useEffect(() => {
-    const assignedText = !assignee?.owner_alias
+    const assignedText = assignee && !assignee?.owner_alias
       ? 'Not assigned'
       : isOpen
       ? 'Assigned to '
