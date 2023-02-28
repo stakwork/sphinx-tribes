@@ -28,7 +28,7 @@ export default function Person(props: any) {
     unique_name,
     updated,
     last_login,
-    squeeze,
+    squeeze
   } = props;
 
   // backend is adding 'description' to empty descriptions, short term fix

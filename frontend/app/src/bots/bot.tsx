@@ -4,17 +4,7 @@ import { useObserver } from 'mobx-react-lite';
 import { Divider } from '../sphinxUI/index';
 
 export default function Bot(props: any) {
-  const {
-    name,
-    hideActions,
-    small,
-    id,
-    img,
-    description,
-    selected,
-    select,
-    unique_name,
-  } = props;
+  const { name, hideActions, small, id, img, description, selected, select, unique_name } = props;
 
   const defaultPic = '/static/bot_placeholder.png';
   const mediumPic = img;
@@ -63,11 +53,7 @@ export default function Bot(props: any) {
       );
     }
 
-    return (
-      <>
-        {renderBotCard()}
-      </>
-    );
+    return <>{renderBotCard()}</>;
   });
 }
 
