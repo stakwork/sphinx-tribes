@@ -51,7 +51,7 @@ export default function ConfirmMe(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) { }
+      } catch (e) {}
     }, 3000);
   }
 

@@ -892,25 +892,25 @@ const BottomContainer = styled.div<bottomButtonProps>`
     align-items: center;
     cursor: pointer;
     background: ${(p) =>
-    p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
+      p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
     box-shadow: 0px 2px 10px
       ${(p) =>
-    p?.assigneeName === ''
-      ? `${p.color.button_secondary.shadow}`
-      : `${p.color.button_primary.shadow}`};
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.shadow}`
+          : `${p.color.button_primary.shadow}`};
     border-radius: 32px;
     color: ${(p) => p?.color && p.color.pureWhite};
     :hover {
       background: ${(p) =>
-    p?.assigneeName === ''
-      ? `${p.color.button_secondary.hover}`
-      : `${p.color.button_primary.hover}`};
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.hover}`
+          : `${p.color.button_primary.hover}`};
     }
     :active {
       background: ${(p) =>
-    p?.assigneeName === ''
-      ? `${p.color.button_secondary.active}`
-      : `${p.color.button_primary.active}`};
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.active}`
+          : `${p.color.button_primary.active}`};
     }
     .nextText {
       font-family: Barlow;
@@ -959,20 +959,20 @@ const BountyContainer = styled.div<styledProps>`
   }
   :hover {
     border: ${(p) =>
-    p.show
-      ? `1px solid ${p.color.button_primary.shadow}`
-      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     outline: ${(p) =>
-    p.show
-      ? `1px solid ${p.color.button_primary.shadow}`
-      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
   }
   :active {
     border: ${(p) =>
-    p.show
-      ? `1px solid ${p.color.button_primary.shadow}`
-      : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
   }
   .TextButtonContainer {
     height: 218px;
