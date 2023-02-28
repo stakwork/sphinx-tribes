@@ -7,18 +7,8 @@ import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
 
 export default function NameTag(props) {
-  const {
-    owner_alias,
-    owner_pubkey,
-    img,
-    created,
-    id,
-    style,
-    widget,
-    iconSize,
-    textSize,
-    isPaid
-  } = props;
+  const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =
+    props;
   const { ui } = useStores();
   const color = colors['light'];
 

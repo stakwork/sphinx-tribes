@@ -8,10 +8,7 @@ export default function SearchTextInput(props: any) {
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
   const [expand, setExpand] = useState(ui.searchText ? true : false);
 
-  const collapseStyles =
-    props.small && !expand
-      ? {}
-      : {};
+  const collapseStyles = props.small && !expand ? {} : {};
 
   function doDelayedValueUpdate() {
     props.onChange(debounceValue);
