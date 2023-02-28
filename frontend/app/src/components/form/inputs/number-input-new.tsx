@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
-import { colors } from '../../colors';
-import { satToUsd } from '../../helpers';
+import { colors } from '../../../colors';
+import { satToUsd } from '../../../helpers';
 
 export default function NumberInputNew({
   error,

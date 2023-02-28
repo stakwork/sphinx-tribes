@@ -3,7 +3,7 @@ import { useStores } from '../../store';
 import styled from 'styled-components';
 import { Modal } from '../../sphinxUI';
 import FocusedView from './focusView';
-import { firstScreenSchema } from '../../form/schema';
+import { firstScreenSchema } from '../../components/form/schema';
 
 // this is where we see others posts (etc) and edit our own
 export default function FirstTimeScreen() {

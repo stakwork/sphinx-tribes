@@ -2,13 +2,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
-import Form from '../../form';
+import Form from '../../components/form';
 import styled, { css } from 'styled-components';
 import { Button, IconButton } from '../../sphinxUI';
 import moment from 'moment';
 import SummaryViewer from '../widgetViews/summaryViewer';
 import { useIsMobile } from '../../hooks';
-import { dynamicSchemasByType } from '../../form/schema';
+import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own

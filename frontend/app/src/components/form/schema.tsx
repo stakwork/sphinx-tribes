@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { FormField } from '../form';
+import { FormField } from '.';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();

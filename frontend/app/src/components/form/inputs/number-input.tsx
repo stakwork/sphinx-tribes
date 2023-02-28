@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
-import { satToUsd } from '../../helpers';
-import { colors } from '../../colors';
+import { satToUsd } from '../../../helpers';
+import { colors } from '../../../colors';
 
 export default function NumberInput({
   name,

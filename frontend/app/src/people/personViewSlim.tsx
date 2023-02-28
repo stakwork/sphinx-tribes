@@ -13,7 +13,7 @@ import TwitterView from './widgetViews/twitterView';
 import WantedView from './widgetViews/wantedView';
 
 import { useHistory, useLocation } from 'react-router';
-import { meSchema } from '../form/schema';
+import { meSchema } from '../components/form/schema';
 import { useIsMobile, usePageScroll } from '../hooks';
 import { Button, IconButton, Modal, SearchTextInput } from '../sphinxUI';
 import { queryLimit } from '../store/main';
