@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
-import { Button, Divider, Modal } from '../sphinxUI/index';
+import { Divider } from '../sphinxUI/index';
 
 export default function Bot(props: any) {
   const {
@@ -10,17 +10,10 @@ export default function Bot(props: any) {
     small,
     id,
     img,
-    tags,
     description,
     selected,
     select,
-    created,
-    owner_alias,
-    owner_pubkey,
     unique_name,
-    price_to_meet,
-    extras,
-    twitter_confirmed
   } = props;
 
   const defaultPic = '/static/bot_placeholder.png';
@@ -73,11 +66,6 @@ export default function Bot(props: any) {
     return (
       <>
         {renderBotCard()}
-
-        {/* <ConnectCard
-                    dismiss={() => setShowQR(false)}
-                    modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-                    person={props} visible={showQR} /> */}
       </>
     );
   });

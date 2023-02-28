@@ -19,6 +19,7 @@ function addMethod(m: string): Function {
     host.includes('localhost') || host.includes('internal')
       ? `http://${host}/`
       : `https://${host}/`;
+      
   const func = async function (url: string, data: any, incomingHeaders: any) {
     try {
       const headers: { [key: string]: string } = {};
@@ -43,7 +44,6 @@ function addMethod(m: string): Function {
         const type = file.type || 'application/octet-stream';
         const formData = new FormData();
         formData.append('file', new Blob([file], { type }), filename);
-        // Object.entries(fields).forEach(e => formData.append(e[0], e[1]))
         opts.body = formData;
       }
       opts.headers = new Headers(headers);

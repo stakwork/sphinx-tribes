@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Divider } from '../../sphinxUI';
 import QrBar from '../utils/QrBar';
-import ReactMarkdown from 'react-markdown';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
 
 export default function AboutView(props: any) {

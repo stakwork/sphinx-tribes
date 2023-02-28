@@ -10,7 +10,6 @@ const BountyDescription = (props: any) => {
   const [dataValue, setDataValue] = useState([]);
   const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
-  // const [descriptionLoomVideo, setDescriptionLoomVideo] = useState(props?.loomEmbedUrl);
 
   useEffect(() => {
     if (props.description) {
@@ -72,32 +71,6 @@ const BountyDescription = (props: any) => {
               />
             </div>
           )}
-
-          {/* 
-          
-          // TODO : add loom video - unable to add because some not supported features of loom video player.
-
-          {props?.loomEmbedUrl && (
-            <div
-              style={{
-                height: '64px',
-                width: '130px',
-                marginLeft: '17px',
-                marginRight: '18px',
-                borderRadius: '4px',
-                overflow: 'hidden'
-              }}>
-              <iframe
-                src={props?.loomEmbedUrl + '?autoplay=1&mute=1&loop=1&controls=0'}
-                frameBorder="0"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-          )} */}
         </Description>
         <LanguageContainer>
           {replitLink && (

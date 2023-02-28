@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
-// import { languageOptions } from '../../localization';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
 import { Modal, Button } from '../../sphinxUI';
@@ -13,7 +12,6 @@ import { Modal, Button } from '../../sphinxUI';
 import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
-import Select from 'react-select';
 import IconButton from '../../sphinxUI/icon_button';
 
 export default function Header() {
@@ -21,8 +19,6 @@ export default function Header() {
   const location = useLocation();
   const history = useHistory();
   const isMobile = useIsMobile();
-
-  const { language } = ui;
 
   const c = colors['light'];
 
@@ -201,13 +197,6 @@ export default function Header() {
         </EuiHeader>
       );
     }
-
-    // const locOptions = languageOptions.map(lo => {
-    //     return {
-    //         value: lo,
-    //         label: lo
-    //     }
-    // })
 
     // desktop version
     return (
@@ -571,23 +560,3 @@ const LoginBtn = styled.div`
     color: #82b4ff;
   }
 `;
-
-// const LanguageSelector = styled(Select)`
-// min-width:150px;
-// margin-right:20px;
-// color:#fff !important;
-
-// div {
-//     background:#1a242e !important;
-//     border:none;
-// }
-
-// div.div.div {
-//     color:#fff !important;
-// }
-
-// #react-select-2-input {
-//     color:#fff !important;
-// }
-// }
-// `;

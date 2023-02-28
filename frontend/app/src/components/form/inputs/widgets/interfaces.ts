@@ -1,5 +1,3 @@
-import { MeInfo } from '../../../store/ui';
-
 export interface FormState {
   img?: string;
   pubkey: string;

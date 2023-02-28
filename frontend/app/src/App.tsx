@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import '@material/react-material-icon/dist/material-icon.css';
 import Header from './tribes/header';

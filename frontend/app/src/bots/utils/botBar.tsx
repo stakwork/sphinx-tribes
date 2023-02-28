@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
-import MaterialIcon from '@material/react-material-icon';
 import { Button } from '../../sphinxUI';
 export default function BotBar(props: any) {
   const { value, simple } = props;

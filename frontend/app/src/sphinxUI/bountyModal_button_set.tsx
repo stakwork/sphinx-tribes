@@ -82,7 +82,6 @@ const ButtonSet = (props) => {
             }}
           >
             <img
-              // className="buttonImage"
               src={'/static/tribe_demo.svg'}
               alt={'github_ticket'}
               height={'32px'}

@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { EuiButton } from '@elastic/eui';
-import Camera from '../../utils/camera-option-icon.svg';
 import Dropzone from 'react-dropzone';
-import avatarIcon from '../../utils/profile_avatar.svg';
-import backgroundIcon from '../../utils/background_icon.svg';
+import avatarIcon from '../../../utils/profile_avatar.svg';
+import backgroundIcon from '../../../utils/background_icon.svg';
 
 import type { Props } from './propsType';
 import { EuiLoadingSpinner } from '@elastic/eui';
-import { useStores } from '../../store';
-import { Button, Modal } from '../../sphinxUI';
-import { MAX_UPLOAD_SIZE } from '../../people/utils/constants';
+import { useStores } from '../../../store';
+import { Button, Modal } from '../../../sphinxUI';
+import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { Note } from './index';
-import { colors } from '../../colors';
+import { colors } from '../../../colors';
 
 export default function ImageInput({
-  label,
   note,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
   notProfilePic,
   imageIcon
 }: Props) {
@@ -31,7 +26,6 @@ export default function ImageInput({
   const [picsrc, setPicsrc] = useState('');
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
-    console.log('uploadBase64Pic', img_type);
     try {
       const info = ui.meInfo as any;
       if (!info) {
@@ -161,22 +155,6 @@ export default function ImageInput({
                 </ImageCircle>
               </DottedCircle>
             )}
-
-            {/* <div style={{ color: "#6B7A8D", marginTop: 5 }}>Drag and drop or</div>
-            <EuiButton onClick={open}
-              style={{
-                borderColor: "#6B7A8D",
-                color: "white",
-                fontWeight: 400,
-                fontSize:12, 
-                marginTop: 5,
-                marginBottom: 10,
-              }}
-              iconType={Camera}
-              iconSide="right"
-            >
-              Change Image
-            </EuiButton> */}
           </DropzoneStuff>
         )}
       </Dropzone>

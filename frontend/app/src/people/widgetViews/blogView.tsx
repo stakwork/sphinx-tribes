@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BlogPost } from '../../form/inputs/widgets/interfaces';
+import { BlogPost } from '../../components/form/inputs/widgets/interfaces';
 import moment from 'moment';
 
 export default function BlogView(props: BlogPost) {

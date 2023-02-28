@@ -3,21 +3,16 @@ import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
-import { Select } from '../../sphinxUI';
-import { colors } from '../../colors';
+import { Select } from '../../../sphinxUI';
+import { colors } from '../../../colors';
 
 export default function SelectInput({
   error,
   note,
   label,
   options,
-  name,
   value,
   handleChange,
-  handleBlur,
-  handleFocus,
-  readOnly,
-  prepend,
   extraHTML
 }: Props) {
   let labeltext = label;
@@ -29,7 +24,7 @@ export default function SelectInput({
       <FieldEnv
         color={color}
         label={labeltext}
-        onClick={() => {}}
+        onClick={() => { }}
         className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
       >
         <R>

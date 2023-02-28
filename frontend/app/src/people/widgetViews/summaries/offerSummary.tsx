@@ -112,6 +112,7 @@ export default function OfferSummary(props: any) {
     </Wrap>
   );
 }
+
 const Wrap = styled.div`
   display: flex;
   width: 100%;

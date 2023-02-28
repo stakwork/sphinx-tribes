@@ -4,7 +4,6 @@ import { useStores } from '../store';
 const fuseOptions = {
   keys: ['name', 'description'],
   shouldSort: true,
-  // matchAllTokens: true,
   includeMatches: true,
   threshold: 0.35,
   location: 0,
