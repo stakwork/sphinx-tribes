@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
-import { Divider, Title, Button } from '../../sphinxUI';
+import { Divider, Title, Button } from '../../components/common';
 import NameTag from '../utils/nameTag';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';

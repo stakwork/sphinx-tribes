@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
-import { colors } from '../colors';
+import { colors } from '../../colors';
 
 export default function Sel(props: any) {
   const { options, onChange, value, style } = props;

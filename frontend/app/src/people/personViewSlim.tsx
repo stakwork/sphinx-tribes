@@ -15,7 +15,7 @@ import WantedView from './widgetViews/wantedView';
 import { useHistory, useLocation } from 'react-router';
 import { meSchema } from '../components/form/schema';
 import { useIsMobile, usePageScroll } from '../hooks';
-import { Button, IconButton, Modal, SearchTextInput } from '../sphinxUI';
+import { Button, IconButton, Modal, SearchTextInput } from '../components/common';
 import { queryLimit } from '../store/main';
 import FocusedView from './main/focusView';
 import Person from './person';

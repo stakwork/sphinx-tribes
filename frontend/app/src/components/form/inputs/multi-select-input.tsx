@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
-import { MultiSelect } from '../../../sphinxUI';
+import { MultiSelect } from '../../common';
 import { colors } from '../../../colors';
 
 export default function MultiSelectInput({

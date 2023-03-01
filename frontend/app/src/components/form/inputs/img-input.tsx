@@ -7,7 +7,7 @@ import backgroundIcon from '../../../utils/background_icon.svg';
 import type { Props } from './propsType';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../../store';
-import { Button, Modal } from '../../../sphinxUI';
+import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { Note } from './index';
 import { colors } from '../../../colors';

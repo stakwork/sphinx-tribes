@@ -3,13 +3,13 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import Input from './inputs';
-import { Button, Divider, IconButton, Modal } from '../../sphinxUI';
+import { Button, Divider, IconButton, Modal } from '../common';
 import { useStores } from '../../store';
 import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
 import { formDropdownOptions } from '../../people/utils/constants';
 import { EuiText } from '@elastic/eui';
 import api from '../../api';
-import ImageButton from '../../sphinxUI/Image_button';
+import ImageButton from '../common/Image_button';
 import { colors } from '../../colors';
 import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
 
@@ -190,8 +190,6 @@ export default function Form(props: any) {
         values,
         setFieldValue,
         errors,
-        dirty,
-        isValid,
         initialValues
       }) => {
         const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
@@ -205,23 +203,6 @@ export default function Form(props: any) {
             }}
             newDesign={props?.newDesign}
           >
-            {/* schema flipping dropdown */}
-            {/* {dynamicSchema && (
-              <Select
-                style={{ marginBottom: 14 }}
-                onChange={(v) => {
-                  console.log('v', v);
-                  const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
-                  if (selectedOption) {
-                    setDynamicSchemaName(v);
-                    setDynamicSchema(selectedOption.schema);
-                  }
-                }}
-                options={dynamicFormOptions}
-                value={dynamicSchemaName}
-              />
-            )} */}
-
             {props.isFirstTimeScreen && schema ? (
               <>
                 <div
@@ -892,25 +873,25 @@ const BottomContainer = styled.div<bottomButtonProps>`
     align-items: center;
     cursor: pointer;
     background: ${(p) =>
-      p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
+    p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
     box-shadow: 0px 2px 10px
       ${(p) =>
-        p?.assigneeName === ''
-          ? `${p.color.button_secondary.shadow}`
-          : `${p.color.button_primary.shadow}`};
+    p?.assigneeName === ''
+      ? `${p.color.button_secondary.shadow}`
+      : `${p.color.button_primary.shadow}`};
     border-radius: 32px;
     color: ${(p) => p?.color && p.color.pureWhite};
     :hover {
       background: ${(p) =>
-        p?.assigneeName === ''
-          ? `${p.color.button_secondary.hover}`
-          : `${p.color.button_primary.hover}`};
+    p?.assigneeName === ''
+      ? `${p.color.button_secondary.hover}`
+      : `${p.color.button_primary.hover}`};
     }
     :active {
       background: ${(p) =>
-        p?.assigneeName === ''
-          ? `${p.color.button_secondary.active}`
-          : `${p.color.button_primary.active}`};
+    p?.assigneeName === ''
+      ? `${p.color.button_secondary.active}`
+      : `${p.color.button_primary.active}`};
     }
     .nextText {
       font-family: Barlow;
@@ -959,20 +940,20 @@ const BountyContainer = styled.div<styledProps>`
   }
   :hover {
     border: ${(p) =>
-      p.show
-        ? `1px solid ${p.color.button_primary.shadow}`
-        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    p.show
+      ? `1px solid ${p.color.button_primary.shadow}`
+      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     outline: ${(p) =>
-      p.show
-        ? `1px solid ${p.color.button_primary.shadow}`
-        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+    p.show
+      ? `1px solid ${p.color.button_primary.shadow}`
+      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
   }
   :active {
     border: ${(p) =>
-      p.show
-        ? `1px solid ${p.color.button_primary.shadow}`
-        : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
+    p.show
+      ? `1px solid ${p.color.button_primary.shadow}`
+      : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
   }
   .TextButtonContainer {
     height: 218px;

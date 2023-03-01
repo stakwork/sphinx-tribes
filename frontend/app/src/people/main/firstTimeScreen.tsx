@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStores } from '../../store';
 import styled from 'styled-components';
-import { Modal } from '../../sphinxUI';
+import { Modal } from '../../components/common';
 import FocusedView from './focusView';
 import { firstScreenSchema } from '../../components/form/schema';
 

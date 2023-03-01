@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Button } from '../../sphinxUI';
+import { Button } from '../../components/common';
 export default function BotBar(props: any) {
   const { value, simple } = props;
   const [toasts, setToasts]: any = useState([]);
