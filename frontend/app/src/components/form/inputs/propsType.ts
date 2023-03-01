@@ -1,5 +1,3 @@
-import React from 'react';
-
 export interface Props {
   value: any;
   label: string;
@@ -17,6 +15,6 @@ export interface Props {
   borderType?: 'bottom' | 'outline';
   imageIcon?: boolean;
   isFocused?: any;
-
+  disabled?: boolean;
   notProfilePic?: boolean;
 }

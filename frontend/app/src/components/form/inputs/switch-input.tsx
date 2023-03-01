@@ -13,12 +13,13 @@ export default function SwitchInput({
   handleChange,
   handleBlur,
   handleFocus,
-  extraHTML
+  extraHTML, 
+  disabled
 }: Props) {
   useEffect(() => {
     // if value not initiated, default value true
     if (name === 'show' && value === undefined) handleChange(true);
-  }, []);
+  }, [handleChange, name, value]);
 
   const color = colors['light'];
 
@@ -36,6 +37,7 @@ export default function SwitchInput({
           onBlur={handleBlur}
           onFocus={handleFocus}
           compressed
+          disabled={disabled}
           style={{
             border: 'none',
             background: 'inherit'

@@ -15,7 +15,7 @@ import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_con
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
-  const [page, setPage] = useState(1);
+  const page = 1;
   const [loading, setLoading] = useState(true);
   const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null);
   const [dynamicSchema, setDynamicSchema]: any = useState(null);
@@ -92,7 +92,7 @@ export default function Form(props: any) {
       setDynamicSchemaName(dSchema.defaultSchemaName);
     }
     setLoading(false);
-  }, []);
+  }, [props.initialValues?.type, props.schema]);
 
   // this useEffect triggers when the dynamic schema name is updated
   // checks if there are autofill fields that we can pull from local storage
@@ -116,23 +116,23 @@ export default function Form(props: any) {
         });
       }
     }
-  }, [dynamicSchemaName]);
+  }, [dynamicSchemaName, initValues, props.formRef, ui]);
+
+  const scrollToTop = useCallback(() => {
+    if (scrollDiv && scrollDiv.current) {
+      scrollDiv.current.scrollTop = 0;
+    }
+  }, [scrollDiv]);
 
   useEffect(() => {
     scrollToTop();
-  }, [page]);
+  }, [scrollToTop]);
 
   function reloadForm() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 20);
-  }
-
-  function scrollToTop() {
-    if (scrollDiv && scrollDiv.current) {
-      scrollDiv.current.scrollTop = 0;
-    }
   }
 
   if (props.paged) {
@@ -184,16 +184,7 @@ export default function Form(props: any) {
       innerRef={props.formRef}
       validationSchema={validator(schema)}
     >
-      {({
-        setFieldTouched,
-        handleSubmit,
-        values,
-        setFieldValue,
-        errors,
-        dirty,
-        isValid,
-        initialValues
-      }) => {
+      {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }) => {
         const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
         return (
           <Wrap
@@ -205,23 +196,6 @@ export default function Form(props: any) {
             }}
             newDesign={props?.newDesign}
           >
-            {/* schema flipping dropdown */}
-            {/* {dynamicSchema && (
-              <Select
-                style={{ marginBottom: 14 }}
-                onChange={(v) => {
-                  console.log('v', v);
-                  const selectedOption = dynamicFormOptions?.find((f) => f.value === v);
-                  if (selectedOption) {
-                    setDynamicSchemaName(v);
-                    setDynamicSchema(selectedOption.schema);
-                  }
-                }}
-                options={dynamicFormOptions}
-                value={dynamicSchemaName}
-              />
-            )} */}
-
             {props.isFirstTimeScreen && schema ? (
               <>
                 <div
@@ -263,6 +237,7 @@ export default function Form(props: any) {
                           }
                           borderType={'bottom'}
                           imageIcon={true}
+                          disabled={item.name === 'github_description' && !values.ticketUrl}
                         />
                       ))}
                   </div>
@@ -298,6 +273,7 @@ export default function Form(props: any) {
                               (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                             }
                             borderType={'bottom'}
+                            disabled={item.name === 'github_description' && !values.ticketUrl}
                           />
                         );
                       })}
@@ -448,6 +424,7 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
+                                disabled={item.name === 'github_description' && !values.ticketUrl}
                               />
                             );
                           })}
@@ -569,6 +546,7 @@ export default function Form(props: any) {
                 )}
               </>
             ) : (
+              //here
               <SchemaOuterContainer>
                 <div className="SchemaInnerContainer">
                   {schema.map((item: FormField) => (
@@ -602,6 +580,7 @@ export default function Form(props: any) {
                       }}
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
+                      disabled={item.name === 'github_description' && !values.ticketUrl}
                     />
                   ))}
                 </div>
@@ -668,7 +647,7 @@ export default function Form(props: any) {
               </BWrap>
             )}
             {/*  if schema is AboutMe */}
-            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id != 0 && (
+            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id !== 0 && (
               <>
                 <div
                   style={{

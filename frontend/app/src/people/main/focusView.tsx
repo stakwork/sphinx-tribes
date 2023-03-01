@@ -163,14 +163,16 @@ export default function FocusedView(props: any) {
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
-        body.type === 'wanted_coding_task' ||
-        body.type === 'coding_task' ||
-        body.type === 'freelance_job_request'
+        body.ticketUrl &&
+        (body.type === 'wanted_coding_task' ||
+          body.type === 'coding_task' ||
+          body.type === 'freelance_job_request')
       ) {
         const { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
         const splitString = repo.split('/');
-        const ownerName = splitString[0];
-        const repoName = splitString[1];
+        const [ownerName, repoName] = splitString;
+        // const ownerName = splitString[0];
+        // const repoName = splitString[1];
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
 
         if (!res) {

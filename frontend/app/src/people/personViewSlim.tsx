@@ -334,8 +334,8 @@ export default function PersonView(props: any) {
               style={{
                 width: '100%',
                 display: 'flex',
-                justifyContent: 'flex-end',
-                paddingBottom: '16px'
+                justifyContent: 'center',
+                padding: '16px 0'
               }}
             >
               <PostBounty widget={selectedWidget} />
@@ -558,8 +558,7 @@ export default function PersonView(props: any) {
                       switchWidgets(name);
                     }}
                   >
-                    {label}
-                    {count && <Counter>{count}</Counter>}
+                    {label} {count && <Counter>{count}</Counter>}
                   </Tab>
                 );
               })}
