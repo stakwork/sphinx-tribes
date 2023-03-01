@@ -7,12 +7,12 @@ import { useIsMobile } from '../../hooks';
 import { colors } from '../../colors';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
-import { Modal, Button } from '../../sphinxUI';
+import { Modal, Button } from '../../components/common';
 
 import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
-import IconButton from '../../sphinxUI/icon_button';
+import IconButton from '../../components/common/icon_button';
 
 export default function Header() {
   const { main, ui } = useStores();

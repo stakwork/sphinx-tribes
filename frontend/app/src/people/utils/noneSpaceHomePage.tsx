@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import IconButton from '../../sphinxUI/icon_button';
+import IconButton from '../../components/common/icon_button';
 
 export default function NoneSpaceHomePage(props) {
   if (props.banner) {

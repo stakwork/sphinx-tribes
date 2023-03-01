@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal } from '../../sphinxUI';
+import { Button, Modal } from '../../components/common';
 import { useStores } from '../../store';
 
 let timeout;

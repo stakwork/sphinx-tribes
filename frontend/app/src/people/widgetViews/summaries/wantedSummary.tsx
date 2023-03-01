@@ -10,12 +10,12 @@ import InvitePeopleSearch from '../../../components/form/inputs/widgets/PeopleSe
 import { sendBadgeSchema } from '../../../components/form/schema';
 import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Button, Divider, Modal, Paragraph, Title } from '../../../sphinxUI';
-import ImageButton from '../../../sphinxUI/Image_button';
-import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
-import BountyPrice from '../../../sphinxUI/bounty_price';
-import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
-import IconButton from '../../../sphinxUI/icon_button';
+import { Button, Divider, Modal, Paragraph, Title } from '../../../components/common';
+import ImageButton from '../../../components/common/Image_button';
+import ButtonSet from '../../../bounties/bountyModal_button_set';
+import BountyPrice from '../../../bounties/bounty_price';
+import BountyProfileView from '../../../bounties/bounty_profile_view';
+import IconButton from '../../../components/common/icon_button';
 import { useStores } from '../../../store';
 import FavoriteButton from '../../utils/favoriteButton';
 import GalleryViewer from '../../utils/galleryViewer';

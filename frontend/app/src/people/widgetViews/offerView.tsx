@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
-import { Divider, Title } from '../../sphinxUI';
+import { Divider, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
 

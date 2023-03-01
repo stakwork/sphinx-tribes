@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
-import { CreatableMultiSelect } from '../../../sphinxUI';
+import { CreatableMultiSelect } from '../../common';
 import { colors } from '../../../colors';
 
 export default function CreatableMultiSelectInput({

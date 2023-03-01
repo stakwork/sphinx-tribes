@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import { colors } from '../colors';
+import { colors } from '../../colors';
 
 export default function IconButton(props: any) {
   const color = colors['light'];
