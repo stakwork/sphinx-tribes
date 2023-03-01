@@ -176,11 +176,14 @@ export default function FocusedView(props: any) {
         if (!res) {
           throw githubError;
         }
-        const { description, title } = res;
+
+        const { description } = res;
+
         console.log(description, { ...body });
         if (body.github_description) {
           body.description = description;
         }
+
         // body.description = description;
         body.title = body.one_sentence_summary;
 
@@ -195,16 +198,6 @@ export default function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    console.log('START SUBMIT FORM', body);
-
-    try {
-      body = await preSubmitFunctions(body);
-    } catch (e) {
-      console.log('e', e);
-      alert(e);
-      return;
-    }
-
     body = mergeFormWithMeData(body);
 
     if (!body) return; // avoid saving bad state
@@ -339,8 +332,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                      }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                     : {}
                 }
               />
@@ -478,7 +471,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
