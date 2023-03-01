@@ -74,7 +74,7 @@ enum Mode {
 }
 
 const hosts: { [k: string]: Mode } = {
-  'localhost:3000': Mode.TRIBES,
+  'localhost:3001': Mode.COMMUNITY,
   'localhost:13000': Mode.TRIBES,
   'localhost:23000': Mode.TRIBES,
   'tribes.sphinx.chat': Mode.TRIBES,
