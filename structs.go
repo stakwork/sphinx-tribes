@@ -205,6 +205,28 @@ type BadgeCreationData struct {
 	Action    string `json:"action"`
 }
 
+type Bounty struct {
+	ID                      uint             `json:"id"`
+	Paid                    bool             `json:"paid"`
+	Show                    bool             `json:"show"`
+	Type                    string           `json:"type"`
+	Award                   string           `json:"award"`
+	Price                   uint             `json:"price"`
+	Title                   string           `json:"title"`
+	Tribe                   string           `json:"tribe"`
+	Created                 uint             `json:"created"`
+	Assignee                Person           `json:"assignee"`
+	Ticket_url              string           `json:"ticket_url"`
+	Description             string           `json:"description"`
+	WantedType              string           `json:"wanted_type"`
+	Deliverables            string           `json:"deliverables"`
+	CodingLanguage          []CodingLanguage `json:"coding_language"`
+	GithuDescription        bool             `json:"github_description"`
+	OneSentenceSummary      string           `json:"one_sentence_summary"`
+	EstimatedSessionLength  string           `json:"estimated_session_length"`
+	EstimatedCompletionDate string           `json:"estimated_completion_date"`
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {
