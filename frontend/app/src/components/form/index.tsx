@@ -237,7 +237,13 @@ export default function Form(props: any) {
                           }
                           borderType={'bottom'}
                           imageIcon={true}
-                          disabled={item.name === 'github_description' && !values.ticketUrl}
+                          style={
+                            item.name === 'github_description' && !values.ticketUrl
+                              ? {
+                                  display: 'none'
+                                }
+                              : undefined
+                          }
                         />
                       ))}
                   </div>
@@ -273,7 +279,13 @@ export default function Form(props: any) {
                               (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                             }
                             borderType={'bottom'}
-                            disabled={item.name === 'github_description' && !values.ticketUrl}
+                            style={
+                              item.name === 'github_description' && !values.ticketUrl
+                                ? {
+                                    display: 'none'
+                                  }
+                                : undefined
+                            }
                           />
                         );
                       })}
@@ -424,7 +436,13 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
-                                disabled={item.name === 'github_description' && !values.ticketUrl}
+                                style={
+                                  item.name === 'github_description' && !values.ticketUrl
+                                    ? {
+                                        display: 'none'
+                                      }
+                                    : undefined
+                                }
                               />
                             );
                           })}
@@ -468,6 +486,13 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
+                                style={
+                                  item.type === 'loom' && values.ticketUrl
+                                    ? {
+                                        marginTop: '55px'
+                                      }
+                                    : undefined
+                                }
                               />
                             );
                           })}
@@ -480,7 +505,7 @@ export default function Form(props: any) {
                         style={{
                           width: stepTracker < 5 ? '45%' : '100%',
                           height: stepTracker < 5 ? '48px' : '48px',
-                          marginTop: stepTracker === 5 ? '20px' : ''
+                          marginTop: stepTracker === 5 || stepTracker === 3 ? '20px' : ''
                         }}
                       >
                         {!valid && (
@@ -580,7 +605,13 @@ export default function Form(props: any) {
                       }}
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
-                      disabled={item.name === 'github_description' && !values.ticketUrl}
+                      style={
+                        item.name === 'github_description' && !values.ticketUrl
+                          ? {
+                              display: 'none'
+                            }
+                          : undefined
+                      }
                     />
                   ))}
                 </div>
@@ -760,6 +791,7 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
   flex-direction: column;
   justify-content: center;
   padding: 0px 48px;
+  margin-bottom: 30px;
   .TopContainer {
     display: flex;
     justify-content: space-between;
@@ -917,6 +949,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
   align-items: center;
   justify-content: center;
   gap: 34px;
+  margin-bottom: 24px;
 `;
 
 const BountyContainer = styled.div<styledProps>`

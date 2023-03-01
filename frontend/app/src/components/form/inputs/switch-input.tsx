@@ -14,7 +14,8 @@ export default function SwitchInput({
   handleBlur,
   handleFocus,
   extraHTML, 
-  disabled
+  disabled, 
+  style = {},
 }: Props) {
   useEffect(() => {
     // if value not initiated, default value true
@@ -25,7 +26,7 @@ export default function SwitchInput({
 
   return (
     <>
-      <Container color={color}>
+      <Container style={style} color={color}>
         <EuiText className="Label">{label}</EuiText>
         <EuiSwitch
           className="switcher"

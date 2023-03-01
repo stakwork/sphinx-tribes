@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface Props {
   value: any;
   label: string;
@@ -17,4 +19,5 @@ export interface Props {
   isFocused?: any;
   disabled?: boolean;
   notProfilePic?: boolean;
+  style? :React.CSSProperties;
 }

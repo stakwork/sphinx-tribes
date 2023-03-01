@@ -26,11 +26,9 @@ export const BountyDetailsCreationData = {
     outerContainerStyle: {
       minWidth: '712px',
       maxWidth: '712px',
-      height: '100%'
+      height: 'auto'
     },
-    headingStyle: {
-      marginBottom: '40px'
-    },
+    headingStyle: {},
     extraText: '* Required fields'
   },
   step_3: {
@@ -44,11 +42,9 @@ export const BountyDetailsCreationData = {
     outerContainerStyle: {
       minWidth: '712px',
       maxWidth: '712px',
-      height: '488px'
+      height: 'auto'
     },
-    headingStyle: {
-      marginBottom: '34px'
-    },
+    headingStyle: {},
     extraText: '* Required fields'
   },
   step_4: {
@@ -62,11 +58,9 @@ export const BountyDetailsCreationData = {
     outerContainerStyle: {
       minWidth: '712px',
       maxWidth: '712px',
-      height: '528px'
+      height: 'auto'
     },
-    headingStyle: {
-      marginBottom: '50px'
-    },
+    headingStyle: {},
     extraText: '* Required fields'
   },
   step_5: {
@@ -80,7 +74,7 @@ export const BountyDetailsCreationData = {
     outerContainerStyle: {
       minWidth: '388px',
       maxWidth: '388px',
-      height: '100%'
+      height: 'auto'
     },
     headingStyle: {},
     extraText: ''
