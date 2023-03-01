@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
-import avatarIcon from '../../../utils/profile_avatar.svg';
-import backgroundIcon from '../../../utils/background_icon.svg';
+import avatarIcon from '../../../public/static/profile_avatar.svg';
+import backgroundIcon from '../../../public/static/background_icon.svg';
 
 import type { Props } from './propsType';
 import { EuiLoadingSpinner } from '@elastic/eui';
