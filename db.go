@@ -733,3 +733,18 @@ func (db database) getPeopleListShort(count uint32) *[]PersonInShort {
 		LIMIT ?;`, count).Find(&p)
 	return &p
 }
+
+func (db database) createConnectionCode(c ConnectionCodes) (ConnectionCodes, error) {
+	if c.DateCreated == nil {
+		now := time.Now()
+		c.DateCreated = &now
+	}
+	db.db.Create(&c)
+	return c, nil
+}
+
+func (db database) getConnectionCode() ConnectionCodes {
+	c := ConnectionCodes{}
+	db.db.Where("is_used = 'false' ORDER BY id DESC").Find(&c)
+	return c
+}

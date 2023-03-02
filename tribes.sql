@@ -63,7 +63,6 @@ LIMIT 12;
 
 
 -- BOTS
-
 CREATE TABLE bots (
   uuid TEXT NOT NULL PRIMARY KEY,
   owner_pub_key TEXT NOT NULL,
@@ -96,12 +95,6 @@ SELECT uuid, unique_name, ts_rank(tsv, q) as rank
   FROM bots, to_tsquery('btc') q
   WHERE tsv @@ q
   ORDER BY rank DESC LIMIT 2 OFFSET 0;
-
-
-
-
-
-
 
 -- PEOPLE
 
