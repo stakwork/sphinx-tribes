@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { colors } from '../../../colors';
 import { useIsMobile } from '../../../hooks';
-import { Modal } from '../../../sphinxUI';
+import { Modal } from '../../../components/common';
 import { useStores } from '../../../store';
 import FocusedView from '../../main/focusView';
 import { Widget } from '../../main/types';

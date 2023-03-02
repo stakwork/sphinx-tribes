@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import FadeLeft from '../../components/animated/fadeLeft';
 import { colors } from '../../colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
-import { Modal, SearchTextInput } from '../../sphinxUI';
+import { Modal, SearchTextInput } from '../../components/common';
 import { useStores } from '../../store';
 import Person from '../person';
 import PersonViewSlim from '../personViewSlim';

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, Modal } from '../../sphinxUI';
+import { Button, Modal } from '../../components/common';
 import QR from './QR';
 import QrBar from './QrBar';
 import { makeConnectQR } from '../../helpers';

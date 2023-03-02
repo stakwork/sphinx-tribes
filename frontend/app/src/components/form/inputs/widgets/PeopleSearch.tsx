@@ -10,7 +10,7 @@ import {
   LanguageObject
 } from '../../../../people/utils/language_label_style';
 import { SvgMask } from '../../../../people/utils/svgMask';
-import ImageButton from '../../../../sphinxUI/Image_button';
+import ImageButton from '../../../common/Image_button';
 
 const codingLanguages = GetValue(coding_languages);
 
