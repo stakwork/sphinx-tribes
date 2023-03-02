@@ -47,7 +47,7 @@ func initDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
-	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{})
+	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{}, &ConnectionCodes{})
 
 	people := DB.getAllPeople()
 	for _, p := range people {
