@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/google/uuid"
 	"github.com/rs/cors"
 
 	"github.com/stakwork/sphinx-tribes/feeds"
@@ -788,7 +789,7 @@ func createConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	code := ConnectionCodes{}
 	now := time.Now()
 
-	code.ConnectionString = ""
+	code.ConnectionString = uuid.New().String()
 	code.IsUsed = false
 	code.DateCreated = &now
 
