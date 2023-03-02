@@ -6,6 +6,9 @@ import { useStores } from '../../store';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
   const { ui } = useStores();
+
+  function getConnectionCode() {}
+
   return (
     <>
       <EuiOverlayMask>
@@ -56,17 +59,30 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               color={buttonColor}
             />
             <IconButton
+              text={'Connection Code'}
+              endingIcon={'key'}
+              width={210}
+              height={48}
+              style={{ marginTop: 20 }}
+              hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+              activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+              shadowColor={
+                buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open('https://sphinx.chat/', '_blank');
+              }}
+              color={buttonColor}
+            />
+            <IconButton
               text={'I have Sphinx'}
               endingIcon={'arrow_forward'}
               width={210}
               height={48}
               buttonType={'text'}
               style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                closeModal();
-                ui.setShowSignIn(true);
-              }}
+              onClick={getConnectionCode}
               textStyle={{
                 fontSize: '15px',
                 fontWeight: '500',

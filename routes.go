@@ -12,7 +12,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/google/uuid"
 	"github.com/rs/cors"
 
 	"github.com/stakwork/sphinx-tribes/feeds"
@@ -785,15 +784,25 @@ func updateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func createConnectionCode(w http.ResponseWriter, _ *http.Request) {
+func createConnectionCode(w http.ResponseWriter, r *http.Request) {
 	code := ConnectionCodes{}
 	now := time.Now()
 
-	code.ConnectionString = uuid.New().String()
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &code)
+
 	code.IsUsed = false
 	code.DateCreated = &now
 
-	_, err := DB.createConnectionCode(code)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	_, err = DB.createConnectionCode(code)
 
 	if err != nil {
 		fmt.Println("=> ERR create connection code", err)
