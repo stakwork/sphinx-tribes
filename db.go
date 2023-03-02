@@ -745,6 +745,11 @@ func (db database) createConnectionCode(c ConnectionCodes) (ConnectionCodes, err
 
 func (db database) getConnectionCode() ConnectionCodes {
 	c := ConnectionCodes{}
-	db.db.Where("is_used = 'false' ORDER BY id DESC").Find(&c)
+	db.db.Where("is_used = ?", false).Order("id DESC").Limit(1).Find(&c)
+
+	db.db.Model(&ConnectionCodes{}).Where("id = ?", c.ID).Updates(map[string]interface{}{
+		"is_used": true,
+	})
+
 	return c
 }
