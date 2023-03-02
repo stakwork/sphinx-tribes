@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colors } from '../colors';
-import { FieldEnv, FieldText } from '../components/form/inputs/index';
+import { colors } from '../../colors';
+import { FieldEnv, FieldText } from '../form/inputs/index';
 
 export default function TextInput({
   label,

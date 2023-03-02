@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../sphinxUI';
+import { Button } from '../../components/common';
 import QR from './QR';
 
 export interface TorSaveQRProps {

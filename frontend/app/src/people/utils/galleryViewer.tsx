@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { IconButton } from '../../sphinxUI';
+import { IconButton } from '../../components/common';
 
 export default function GalleryViewer(props) {
   const { gallery, wrap, selectable, big, showAll, style, cover } = props;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { setup, isSupported } from '@loomhq/record-sdk';
-import { Button, IconButton } from '../../sphinxUI';
+import { Button, IconButton } from '../../components/common';
 import styled from 'styled-components';
 import { colors } from '../../colors';
 import { EuiText } from '@elastic/eui';

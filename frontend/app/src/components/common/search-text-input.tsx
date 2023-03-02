@@ -1,7 +1,7 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useStores } from '../store';
+import { useStores } from '../../store';
 
 export default function SearchTextInput(props: any) {
   const { ui } = useStores();

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
-import { Divider, Title, Button } from '../../sphinxUI';
+import { Divider, Title, Button } from '../../components/common';
 import NameTag from '../utils/nameTag';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import GithubStatusPill from './parts/statusPill';
@@ -203,10 +203,9 @@ export default function WantedView(props: any) {
                       onClick={(e) => {
                         e.stopPropagation();
                         window.open(
-                          `/p/${
-                            {
-                              ...assignee
-                            }.owner_pubkey
+                          `/p/${{
+                            ...assignee
+                          }.owner_pubkey
                           }?widget=wanted`,
                           '_blank'
                         );
@@ -454,12 +453,6 @@ export default function WantedView(props: any) {
               />
             </div>
             <Divider style={{ margin: '10px 0' }} />
-            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {isCodingTask ?
-                            <Img src={'/static/github_logo2.png'} style={{ width: 77, height: 43 }} />
-                            : <div />
-                        }
-                    </div> */}
             <DT>{title}</DT>
             <div
               style={{
@@ -504,17 +497,12 @@ export default function WantedView(props: any) {
                     }}
                   />
                   <span
-                    // onClick={(e) => {
-                    //   e.stopPropagation();
-                    //   findUserByGithubHandle();
-                    // }}
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(
-                        `/p/${
-                          {
-                            ...assignee
-                          }.owner_pubkey
+                        `/p/${{
+                          ...assignee
+                        }.owner_pubkey
                         }?widget=wanted`,
                         '_blank'
                       );
