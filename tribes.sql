@@ -59,9 +59,6 @@ LIMIT 12;
 
 -- plainto_tsquery is another way
 
-
-
-
 -- BOTS
 CREATE TABLE bots (
   uuid TEXT NOT NULL PRIMARY KEY,
@@ -137,3 +134,10 @@ VALUES
 ('Jesse', '038c3c1f4d304c7b997fecfdaf8fdfc2215405942c025349b45de9dfe6fdb8a43e', 'Im cool', '{"tag1"}', 'https://cliparting.com/wp-content/uploads/2018/03/cool-pictures-2018-2.jpg', 'jesse');
 
 ALTER TABLE IF EXISTS tribes ADD COLUMN IF NOT EXISTS preview VARCHAR NULL;
+
+CREATE TABLE connectioncodes {
+  id SERIAL PRIMARY KEY,
+  connection_string TEXT,
+  is_used boolean,
+  date_created timestamptz
+}
