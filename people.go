@@ -607,19 +607,13 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Wanted not there")
 			continue
 		}
+
 		for _, bounty := range bounties {
-
 			migrateBounty := bounty.(Bounty)
-			/*err := json.Unmarshal(bounty, &migrateBounty)
-			if err != nil {
-				fmt.Println("json unmarshall error", err)
-				return
-			}
-			*/
-
 			fmt.Println("Bounty to add:", migrateBounty)
 			DB.addBounty(migrateBounty)
-			//Migrate the wanteds here
+			//Migrate the bounties here
+
 		}
 	}
 	return
