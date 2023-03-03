@@ -600,6 +600,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 	peeps := DB.getListedPeople(nil)
 
 	for _, peep := range peeps {
+		fmt.Println("peep: ", peep)
 		bounties, ok := peep.Extras["wanted"].([]interface{})
 
 		if !ok {
@@ -616,6 +617,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			}
 			*/
 
+			fmt.Println("Bounty to add:", migrateBounty)
 			DB.addBounty(migrateBounty)
 			//Migrate the wanteds here
 		}
