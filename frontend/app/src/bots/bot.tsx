@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useObserver } from 'mobx-react-lite';
-import { Divider } from '../sphinxUI/index';
+import { Divider } from '../components/common/index';
 
 export default function Bot(props: any) {
   const { name, hideActions, small, id, img, description, selected, select, unique_name } = props;

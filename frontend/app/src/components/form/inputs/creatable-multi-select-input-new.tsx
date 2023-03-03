@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import type { Props } from './propsType';
 import { colors } from '../../../colors';
-import ImageButton from '../../../sphinxUI/Image_button';
+import ImageButton from '../../common/Image_button';
 import {
   coding_languages,
   GetValue,

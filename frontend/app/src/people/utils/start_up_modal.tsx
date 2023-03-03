@@ -1,7 +1,7 @@
 import { EuiModal, EuiOverlayMask } from '@elastic/eui';
 import React from 'react';
 import styled from 'styled-components';
-import IconButton from '../../sphinxUI/icon_button';
+import IconButton from '../../components/common/icon_button';
 import { useStores } from '../../store';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {

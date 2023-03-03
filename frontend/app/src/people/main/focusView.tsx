@@ -4,7 +4,7 @@ import { useStores } from '../../store';
 import { useObserver } from 'mobx-react-lite';
 import Form from '../../components/form';
 import styled, { css } from 'styled-components';
-import { Button, IconButton } from '../../sphinxUI';
+import { Button, IconButton } from '../../components/common';
 import moment from 'moment';
 import SummaryViewer from '../widgetViews/summaryViewer';
 import { useIsMobile } from '../../hooks';
@@ -14,7 +14,6 @@ import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
   const {
-    onSuccess,
     goBack,
     config,
     selectedIndex,
@@ -159,7 +158,6 @@ export default function FocusedView(props: any) {
 
   async function preSubmitFunctions(body) {
     // if github repo
-
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
@@ -178,11 +176,14 @@ export default function FocusedView(props: any) {
         if (!res) {
           throw githubError;
         }
-        const { description, title } = res;
+
+        const { description } = res;
+
         console.log(description, { ...body });
         if (body.github_description) {
           body.description = description;
         }
+
         // body.description = description;
         body.title = body.one_sentence_summary;
 
@@ -197,16 +198,6 @@ export default function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    console.log('START SUBMIT FORM', body);
-
-    try {
-      body = await preSubmitFunctions(body);
-    } catch (e) {
-      console.log('e', e);
-      alert(e);
-      return;
-    }
-
     body = mergeFormWithMeData(body);
 
     if (!body) return; // avoid saving bad state
@@ -420,7 +411,6 @@ export default function FocusedView(props: any) {
               editAction={() => {
                 setEditable(false);
                 setEditMode(true);
-                // props?.deleteExtraFunction();
               }}
               setIsModalSideButton={setIsModalSideButton}
               setIsExtraStyle={props?.setIsExtraStyle}

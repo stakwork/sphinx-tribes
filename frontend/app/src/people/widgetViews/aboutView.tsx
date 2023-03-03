@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Divider } from '../../sphinxUI';
+import { Divider } from '../../components/common';
 import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';

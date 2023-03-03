@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
-import { Modal, Button, Divider, TextInput } from '../../sphinxUI';
+import { Modal, Button, Divider, TextInput } from '../../components/common';
 import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
 

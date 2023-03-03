@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { EuiSuperSelect, EuiText } from '@elastic/eui';
-import { colors } from '../colors';
+import { colors } from '../../colors';
 
 export default function Select(props: any) {
   const color = colors['light'];

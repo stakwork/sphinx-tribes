@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
-import avatarIcon from '../../../utils/profile_avatar.svg';
-import backgroundIcon from '../../../utils/background_icon.svg';
+import avatarIcon from '../../../public/static/profile_avatar.svg';
+import backgroundIcon from '../../../public/static/background_icon.svg';
 
 import type { Props } from './propsType';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../../store';
-import { Button, Modal } from '../../../sphinxUI';
+import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { Note } from './index';
 import { colors } from '../../../colors';

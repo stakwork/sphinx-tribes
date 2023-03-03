@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styled from 'styled-components';
-import { Link, Paragraph, Title } from '../../sphinxUI';
+import { Link, Paragraph, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
 

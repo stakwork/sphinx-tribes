@@ -2,7 +2,7 @@ import React, { useRef, useState, useLayoutEffect } from 'react';
 import styled from 'styled-components';
 import { formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Divider, Title, Paragraph } from '../../../sphinxUI';
+import { Divider, Title, Paragraph } from '../../../components/common';
 import GalleryViewer from '../../utils/galleryViewer';
 import NameTag from '../../utils/nameTag';
 import FavoriteButton from '../../utils/favoriteButton';
