@@ -17,7 +17,7 @@ import { colors } from '../../colors';
 
 export default function WantedView(props: any) {
   const {
-    title,
+    one_sentence_summary,
     description,
     priceMin,
     priceMax,
@@ -37,6 +37,7 @@ export default function WantedView(props: any) {
     setDeletePayload,
     onPanelClick
   } = props;
+  const title = one_sentence_summary;
 
   let { show, paid } = props;
   const isMobile = useIsMobile();

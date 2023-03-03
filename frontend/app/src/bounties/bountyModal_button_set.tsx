@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../colors';
 
-const ButtonSet = (props) => {
+const ButtonSet = ({ showGithubBtn, ...props }) => {
   const color = colors['light'];
   return (
     <ButtonSetContainer
@@ -11,27 +11,29 @@ const ButtonSet = (props) => {
         ...props.ButtonSetContainerStyle
       }}
     >
-      <ButtonContainer onClick={props?.githubShareAction} color={color}>
-        <div className="LeadingImageContainer">
-          <img
-            className="buttonImage"
-            src={'/static/github_icon.svg'}
-            alt={'github_ticket'}
-            height={'20px'}
-            width={'20px'}
-          />
-        </div>
-        <EuiText className="ButtonText">Github Ticket</EuiText>
-        <div className="ImageContainer">
-          <img
-            className="buttonImage"
-            src={'/static/github_ticket.svg'}
-            alt={'github_ticket'}
-            height={'14px'}
-            width={'14px'}
-          />
-        </div>
-      </ButtonContainer>
+      {showGithubBtn && (
+        <ButtonContainer onClick={props?.githubShareAction} color={color}>
+          <div className="LeadingImageContainer">
+            <img
+              className="buttonImage"
+              src={'/static/github_icon.svg'}
+              alt={'github_ticket'}
+              height={'20px'}
+              width={'20px'}
+            />
+          </div>
+          <EuiText className="ButtonText">Github Ticket</EuiText>
+          <div className="ImageContainer">
+            <img
+              className="buttonImage"
+              src={'/static/github_ticket.svg'}
+              alt={'github_ticket'}
+              height={'14px'}
+              width={'14px'}
+            />
+          </div>
+        </ButtonContainer>
+      )}
       {props?.replitLink && (
         <ButtonContainer
           topMargin={'16px'}

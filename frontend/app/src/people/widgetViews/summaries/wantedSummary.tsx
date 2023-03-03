@@ -33,7 +33,6 @@ function useQuery() {
 
 export default function WantedSummary(props: any) {
   const {
-    title,
     description,
     deliverables,
     priceMin,
@@ -62,6 +61,7 @@ export default function WantedSummary(props: any) {
     setIsExtraStyle,
     formSubmit
   } = props;
+  const title = one_sentence_summary;
   const [envHeight, setEnvHeight] = useState('100%');
   const imgRef: any = useRef(null);
 
@@ -384,17 +384,19 @@ export default function WantedSummary(props: any) {
   const heart = <FavoriteButton />;
 
   const viewGithub = (
-    <Button
-      text={'Original Ticket'}
-      color={'white'}
-      endingIcon={'launch'}
-      iconSize={14}
-      style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-      onClick={() => {
-        const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
-        sendToRedirect(repoUrl);
-      }}
-    />
+    ticketUrl && (
+      <Button
+        text={'Original Ticket'}
+        color={'white'}
+        endingIcon={'launch'}
+        iconSize={14}
+        style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
+        onClick={() => {
+          const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
+          sendToRedirect(repoUrl);
+        }}
+      />
+    )
   );
 
   const viewTribe = tribe && tribe !== 'none' && (
@@ -1018,6 +1020,7 @@ export default function WantedSummary(props: any) {
                             const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
                             sendToRedirect(profileUrl);
                           }}
+                          showGithubBtn={!!ticketUrl}
                         />
                       </div>
                       <BottomButtonContainer>
@@ -1422,6 +1425,7 @@ export default function WantedSummary(props: any) {
                       />
                     </BountyPriceContainer>
                     <ButtonSet
+                      showGithubBtn={!!ticketUrl}
                       githubShareAction={() => {
                         const repoUrl = ticketUrl
                           ? ticketUrl
@@ -1493,6 +1497,7 @@ export default function WantedSummary(props: any) {
                       />
                     </BountyPriceContainer>
                     <ButtonSet
+                      showGithubBtn={!!ticketUrl}
                       githubShareAction={() => {
                         const repoUrl = ticketUrl
                           ? ticketUrl
@@ -1571,6 +1576,7 @@ export default function WantedSummary(props: any) {
                       />
                     </BountyPriceContainer>
                     <ButtonSet
+                      showGithubBtn={!!ticketUrl}
                       githubShareAction={() => {
                         const repoUrl = ticketUrl
                           ? ticketUrl

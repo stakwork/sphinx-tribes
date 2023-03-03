@@ -185,7 +185,14 @@ export default function Form(props: any) {
       validationSchema={validator(schema)}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }) => {
+        const isDescriptionValid = values.ticketUrl
+          ? values.github_description || !!values.description
+          : !!values.description;
+
         const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
+
+        const isBtnDisabled = !valid || (stepTracker === 3 && !isDescriptionValid);
+
         return (
           <Wrap
             ref={refBody}
@@ -213,7 +220,6 @@ export default function Form(props: any) {
                           {...item}
                           key={item.name}
                           values={values}
-                          label={''}
                           errors={errors}
                           scrollToTop={scrollToTop}
                           value={values[item.name]}
@@ -508,12 +514,12 @@ export default function Form(props: any) {
                           marginTop: stepTracker === 5 || stepTracker === 3 ? '20px' : ''
                         }}
                       >
-                        {!valid && (
+                        {isBtnDisabled && (
                           <div className="nextButtonDisable">
                             <EuiText className="disableText">Next</EuiText>
                           </div>
                         )}
-                        {valid && (
+                        {!isBtnDisabled && (
                           <div
                             className="nextButton"
                             onClick={() => {
@@ -571,7 +577,6 @@ export default function Form(props: any) {
                 )}
               </>
             ) : (
-              //here
               <SchemaOuterContainer>
                 <div className="SchemaInnerContainer">
                   {schema.map((item: FormField) => (
@@ -762,7 +767,6 @@ const Wrap = styled.div<WrapProps>`
   height: inherit;
   flex-direction: column;
   align-content: center;
-  // max-width:400px;
   min-width: 230px;
 `;
 

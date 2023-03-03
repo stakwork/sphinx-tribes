@@ -59,7 +59,7 @@ export default function FocusedView(props: any) {
         main.getSelf(null);
       }
     };
-  }, []);
+  }, [main, torSave]);
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -198,6 +198,14 @@ export default function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
+    try {
+      body = await preSubmitFunctions(body);
+    } catch (e) {
+      console.log('e', e);
+      alert(e);
+      return;
+    }
+
     body = mergeFormWithMeData(body);
 
     if (!body) return; // avoid saving bad state
@@ -431,6 +439,7 @@ const BWrap = styled.div`
   min-height: 42px;
   position: absolute;
   left: 0px;
+  border-bottom: 1px solid rgb(221, 225, 229);
   background: #ffffff;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
   z-index: 100;
