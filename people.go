@@ -607,7 +607,16 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		for _, bounty := range bounties {
-			db.addBounty(bounty)
+
+			migrateBounty := bounty.(Bounty)
+			/*err := json.Unmarshal(bounty, &migrateBounty)
+			if err != nil {
+				fmt.Println("json unmarshall error", err)
+				return
+			}
+			*/
+
+			DB.addBounty(migrateBounty)
 			//Migrate the wanteds here
 		}
 	}

@@ -206,57 +206,26 @@ type BadgeCreationData struct {
 }
 
 type Bounty struct {
-	ID                      uint             `json:"id"`
-	Paid                    bool             `json:"paid"`
-	Show                    bool             `json:"show"`
-	Type                    string           `json:"type"`
-	Award                   string           `json:"award"`
-	Price                   uint             `json:"price"`
-	Title                   string           `json:"title"`
-	Tribe                   string           `json:"tribe"`
-	Created                 uint             `json:"created"`
-	Assignee                Person           `json:"assignee"`
-	Ticket_url              string           `json:"ticket_url"`
-	Description             string           `json:"description"`
-	WantedType              string           `json:"wanted_type"`
-	Deliverables            string           `json:"deliverables"`
-	CodingLanguage          []CodingLanguage `json:"coding_language"`
-	GithuDescription        bool             `json:"github_description"`
-	OneSentenceSummary      string           `json:"one_sentence_summary"`
-	EstimatedSessionLength  string           `json:"estimated_session_length"`
-	EstimatedCompletionDate string           `json:"estimated_completion_date"`
+	ID                      uint        `json:"id"`
+	Paid                    bool        `json:"paid"`
+	Show                    bool        `json:"show"`
+	Type                    string      `json:"type"`
+	Award                   string      `json:"award"`
+	Price                   uint        `json:"price"`
+	Title                   string      `json:"title"`
+	Tribe                   string      `json:"tribe"`
+	Created                 uint        `json:"created"`
+	Assignee                Person      `json:"assignee"`
+	Ticket_url              string      `json:"ticket_url"`
+	Description             string      `json:"description"`
+	WantedType              string      `json:"wanted_type"`
+	Deliverables            string      `json:"deliverables"`
+	CodingLanguage          PropertyMap `json:"coding_language", type: jsonb not null default '{}'::jsonb`
+	GithuDescription        bool        `json:"github_description"`
+	OneSentenceSummary      string      `json:"one_sentence_summary"`
+	EstimatedSessionLength  string      `json:"estimated_session_length"`
+	EstimatedCompletionDate string      `json:"estimated_completion_date"`
 }
-
-/*
-GithubIssues
-stakwork/sphinx-relay/229: {
-	status: open
-	assignee: Evanfeenstra
-}
-*/
-
-/* loopbot:
-{
-	prefix:'/loopout',
-	price:0,
-	commands: [{
-		command: '*',
-		price: 0,
-		min_price: 250000,
-		max_price: 16777215,
-		price_index: 2,
-		admin_only: false
-	}]
-}
-*/
-
-/* btc bot:
-{
-	prefix:'/btc',
-	price:10,
-	commands: null
-}
-*/
 
 // PropertyMap ...
 type PropertyMap map[string]interface{}
