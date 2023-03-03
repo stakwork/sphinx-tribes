@@ -4,7 +4,8 @@ const externalDockerHosts = ['localhost:23007', 'localhost:23000'];
 export function getHost(): string {
   const host = window.location.host.includes('localhost') ? 'localhost:5002' : window.location.host;
   // return host;
-  return "people.sphinx.chat";
+  // return "people.sphinx.chat";
+  return "localhost:5005";
 }
 
 export function getHostIncludingDockerHosts() {

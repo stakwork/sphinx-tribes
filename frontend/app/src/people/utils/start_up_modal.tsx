@@ -3,11 +3,19 @@ import React from 'react';
 import styled from 'styled-components';
 import IconButton from '../../components/common/icon_button';
 import { useStores } from '../../store';
+import api from '../../api';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
-  const { ui } = useStores();
+  const { ui, main } = useStores();
 
-  function getConnectionCode() {}
+  async function getConnectionCode(e) {
+    const code = await api.get("connectioncodes");
+    if (code.connection_string) {
+      ui.setConnectionString(code.connection_string);
+      closeModal();
+      main.getPeople({ resetPage: true });
+    }
+  }
 
   return (
     <>
@@ -69,10 +77,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               shadowColor={
                 buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
               }
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open('https://sphinx.chat/', '_blank');
-              }}
+              onClick={getConnectionCode}
               color={buttonColor}
             />
             <IconButton
@@ -82,7 +87,11 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               height={48}
               buttonType={'text'}
               style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-              onClick={getConnectionCode}
+              onClick={(e) => {
+                e.stopPropagation();
+                closeModal();
+                ui.setShowSignIn(true);
+              }}
               textStyle={{
                 fontSize: '15px',
                 fontWeight: '500',
