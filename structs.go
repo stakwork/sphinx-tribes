@@ -212,6 +212,19 @@ type ConnectionCodes struct {
 	DateCreated      *time.Time `json:"date_created"`
 }
 
+type ConnectionCodesShort struct {
+	ConnectionString string     `json:"connection_string"`
+	DateCreated      *time.Time `json:"date_created"`
+}
+
+func (ConnectionCodes) TableName() string {
+	return "connectioncodes"
+}
+
+func (ConnectionCodesShort) TableName() string {
+	return "connectioncodes"
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {
