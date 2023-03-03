@@ -595,3 +595,21 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
+
+func migrateBounties(w http.ResponseWriter, r *http.Request) {
+	peeps := DB.getListedPeople(nil)
+
+	for _, peep := range peeps {
+		bounties, ok := peep.Extras["wanted"].([]interface{})
+
+		if !ok {
+			fmt.Println("Wanted not there")
+			continue
+		}
+		for _, bounty := range bounties {
+			db.addBounty(bounty)
+			//Migrate the wanteds here
+		}
+	}
+	return
+}

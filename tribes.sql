@@ -144,3 +144,29 @@ VALUES
 ('Jesse', '038c3c1f4d304c7b997fecfdaf8fdfc2215405942c025349b45de9dfe6fdb8a43e', 'Im cool', '{"tag1"}', 'https://cliparting.com/wp-content/uploads/2018/03/cool-pictures-2018-2.jpg', 'jesse');
 
 ALTER TABLE IF EXISTS tribes ADD COLUMN IF NOT EXISTS preview VARCHAR NULL;
+
+
+-- Bounties
+
+CREATE TABLE bounty (
+  id SERIAL PRIMARY KEY,
+  paid BOOLEAN,
+  show BOOLEAN,                   
+  type TEXT,                   
+  award TEXT,                  
+  price BIGINT,                   
+  title TEXT,                  
+  tribe TEXT,                  
+  created BIGINT,                
+  assignee Person,
+  ticket_url TEXT,             
+  description TEXT,            
+  wanted_type TEXT,             
+  deliverables TEXT,           
+  coding_language []TEXT,         
+  githu_description TEXT,      
+  one_sentence_summary TEXT,     
+  estimated_session_length TEXT, 
+  estimated_completion_date TEXT
+);
+
