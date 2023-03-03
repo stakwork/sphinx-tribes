@@ -162,8 +162,6 @@ export default function Header() {
                       goToEditSelf();
                     }}
                   />
-                ) : ui.connection_string ? (
-                  <GuestBtn>Hey! guest</GuestBtn>
                 ) : (
                   <Button
                     icon={'account_circle'}
@@ -257,8 +255,6 @@ export default function Header() {
                 <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
                 {ui.meInfo?.owner_alias}
               </LoggedInBtn>
-            ) : ui.connection_string ? (
-              <GuestBtn>Hey! guest</GuestBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
                 <span>Sign in</span>
