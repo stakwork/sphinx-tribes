@@ -334,8 +334,8 @@ export default function PersonView(props: any) {
               style={{
                 width: '100%',
                 display: 'flex',
-                justifyContent: 'center',
-                padding: '16px 0'
+                justifyContent: 'flex-end',
+                paddingBottom: '16px'
               }}
             >
               <PostBounty widget={selectedWidget} />

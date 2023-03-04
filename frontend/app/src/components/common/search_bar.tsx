@@ -1,34 +1,50 @@
 import MaterialIcon from '@material/react-material-icon';
-import React, { useState } from 'react';
+import React, { CSSProperties, ComponentProps, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../colors';
 import { useStores } from '../../store';
 
-export default function SearchTextInput(props: any) {
+
+type SearchTextInputProps = ComponentProps<'input'> & InputProps & {
+  onChange: (v: string) => void, 
+  iconStyle?: CSSProperties
+} 
+
+export default function SearchTextInput({
+  border,
+  borderActive,
+  borderHover,
+  TextColor,
+  TextColorHover,
+  iconColorHover,
+  iconColor,
+  onChange,
+  iconStyle = {},
+  ...props}:SearchTextInputProps & InputProps) {
   const color = colors['light'];
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
   const [_, setExpand] = useState(ui.searchText ? true : false);
 
   function doDelayedValueUpdate() {
-    props.onChange(debounceValue);
+    onChange(debounceValue);
   }
 
   function erase() {
     setSearchValue('');
-    props.onChange('');
+    onChange('');
   }
 
   return (
     <Container
       style={{ position: 'relative' }}
-      border={props.border}
-      borderActive={props.borderActive}
-      borderHover={props.borderHover}
-      TextColor={props.TextColor}
-      TextColorHover={props.TextColorHover}
-      iconColorHover={props.iconColorHover}
-      iconColor={props.iconColor}
+      border={border}
+      borderActive={borderActive}
+      borderHover={borderHover}
+      TextColor={TextColor}
+      TextColorHover={TextColorHover}
+      iconColorHover={iconColorHover}
+      iconColor={iconColor}
       color={color}
     >
       <input
@@ -59,7 +75,7 @@ export default function SearchTextInput(props: any) {
             right: 9,
             fontSize: 22,
             userSelect: 'none',
-            ...props.iconStyle
+            ...iconStyle
           }}
         />
       ) : (
@@ -73,7 +89,7 @@ export default function SearchTextInput(props: any) {
             fontSize: 22,
             userSelect: 'none',
             pointerEvents: 'none',
-            ...props.iconStyle
+            ...iconStyle
           }}
         />
       )}
@@ -90,7 +106,7 @@ function debounce(func, delay) {
   }, delay);
 }
 
-interface inputProps {
+interface InputProps {
   border?: string;
   borderHover?: string;
   borderActive?: string;
@@ -101,7 +117,7 @@ interface inputProps {
   color?: any;
 }
 
-const Container = styled.div<inputProps>`
+const Container = styled.div<InputProps>`
   .SearchText {
     background: ${(p) => p.color && p.color.grayish.G600} !important;
     border: ${(p) => (p.border ? p.border : `1px solid ${p.color.pureBlack}`)};
@@ -143,7 +159,7 @@ const Container = styled.div<inputProps>`
 
   &:hover {
     .SearchIcon {
-      color: ${(p) => (p.iconColorHover ? p.iconColorHover : `${p.color.pureBlack}`)};
+      color: ${(p) => (p.iconColorHover ?? p.color.pureBlack)};
     }
     .SearchText {
       border: ${(p) => (p.borderHover ? p.borderHover : `1px solid ${p.color.pureBlack}`)};
