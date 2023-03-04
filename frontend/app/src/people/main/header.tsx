@@ -165,7 +165,6 @@ export default function Header() {
                 ) : (
                   <Button
                     icon={'account_circle'}
-                    // text={'Sign in'}
                     style={{ minWidth: 38, width: 38, marginRight: 10, height: 37 }}
                     color="primary"
                     onClick={() => ui.setShowSignIn(true)}
@@ -504,6 +503,27 @@ const LoggedInBtn = styled.div`
       width: 34px;
       left: 3px;
     }
+  }
+`;
+
+const GuestBtn = styled.div`
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+  padding: 0 24px 0 24px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.13);
   }
 `;
 

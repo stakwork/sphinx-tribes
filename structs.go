@@ -205,6 +205,26 @@ type BadgeCreationData struct {
 	Action    string `json:"action"`
 }
 
+type ConnectionCodes struct {
+	ID               uint       `json:"id"`
+	ConnectionString string     `json:"connection_string"`
+	IsUsed           bool       `json:"is_used"`
+	DateCreated      *time.Time `json:"date_created"`
+}
+
+type ConnectionCodesShort struct {
+	ConnectionString string     `json:"connection_string"`
+	DateCreated      *time.Time `json:"date_created"`
+}
+
+func (ConnectionCodes) TableName() string {
+	return "connectioncodes"
+}
+
+func (ConnectionCodesShort) TableName() string {
+	return "connectioncodes"
+}
+
 /*
 GithubIssues
 stakwork/sphinx-relay/229: {
