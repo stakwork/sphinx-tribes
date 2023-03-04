@@ -17,6 +17,7 @@ require (
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/gohornet/hornet v0.3.0
 	github.com/google/go-github/v39 v39.1.1-0.20210928160219-eefa00252998
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imroc/req v0.3.0
 	github.com/iotaledger/hive.go v0.0.0-20200107205115-986a54f82a30
