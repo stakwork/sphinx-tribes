@@ -44,7 +44,7 @@ export default function FocusedView(props: any) {
 
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
-  function closeModal(override) {
+  function closeModal() {
     if (!manualGoBackOnly) {
       console.log('close modal');
       ui.setEditMe(false);
@@ -147,7 +147,7 @@ export default function FocusedView(props: any) {
     try {
       await main.saveProfile(body);
       await main.getPeople();
-      closeModal(true);
+      closeModal();
       props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
@@ -229,7 +229,7 @@ export default function FocusedView(props: any) {
       await main.saveProfile(
         config.name === 'about' || config.name === 'wanted' ? { ...newBody } : body
       );
-      closeModal(true);
+      closeModal();
     } catch (e) {
       console.log('e', e);
     }
