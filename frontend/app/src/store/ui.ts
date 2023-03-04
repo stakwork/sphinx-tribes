@@ -135,7 +135,7 @@ class UiStore {
     this.meInfo = t;
   }
 
-  @persist('object') @observable connection_string: string = "";
+  @persist('object') @observable connection_string: string = '';
   @action setConnectionString(code: string) {
     this.connection_string = code;
   }

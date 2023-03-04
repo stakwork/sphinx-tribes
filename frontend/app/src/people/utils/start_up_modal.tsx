@@ -11,7 +11,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
 
   async function getConnectionCode() {
     if (!ui.connection_string) {
-      const code = await api.get("connectioncodes");
+      const code = await api.get('connectioncodes');
       if (code.connection_string) {
         ui.setConnectionString(code.connection_string);
         main.getPeople({ resetPage: true });
@@ -40,21 +40,24 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           }}
         >
           <ModalContainer>
-            {
-              ui.connection_string ? (
-                <QrContainer>
-                  <QR size={200} value={ui.connection_string} />
-                  <QRText>Scan the QR code with Sphinx app to Sign up, then click the Sign in button below</QRText>
-                </QrContainer>) : (<img
-                  src={
-                    dataObject === 'getWork'
-                      ? '/static/create_profile_blue.gif'
-                      : '/static/create_profile_green.gif'
-                  }
-                  height={'274px'}
-                  alt=""
-                />)
-            }
+            {ui.connection_string ? (
+              <QrContainer>
+                <QR size={200} value={ui.connection_string} />
+                <QRText>
+                  Scan the QR code with Sphinx app to Sign up, then click the Sign in button below
+                </QRText>
+              </QrContainer>
+            ) : (
+              <img
+                src={
+                  dataObject === 'getWork'
+                    ? '/static/create_profile_blue.gif'
+                    : '/static/create_profile_green.gif'
+                }
+                height={'274px'}
+                alt=""
+              />
+            )}
           </ModalContainer>
           <ButtonContainer>
             <IconButton
@@ -74,44 +77,41 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               }}
               color={buttonColor}
             />
-            {
-              ui.connection_string ? (
-                <IconButton
-                  text={'Sign in'}
-                  endingIcon={'arrow_forward'}
-                  width={210}
-                  height={48}
-                  style={{ marginTop: 20 }}
-                  hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-                  activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-                  shadowColor={
-                    buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    closeModal();
-                    ui.setShowSignIn(true);
-                  }}
-
-                  color={buttonColor}
-                />
-              ) : (
-                <IconButton
-                  text={'Connection Code'}
-                  endingIcon={'key'}
-                  width={210}
-                  height={48}
-                  style={{ marginTop: 20 }}
-                  hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-                  activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-                  shadowColor={
-                    buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
-                  }
-                  onClick={getConnectionCode}
-                  color={buttonColor}
-                />
-              )
-            }
+            {ui.connection_string ? (
+              <IconButton
+                text={'Sign in'}
+                endingIcon={'arrow_forward'}
+                width={210}
+                height={48}
+                style={{ marginTop: 20 }}
+                hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+                activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+                shadowColor={
+                  buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeModal();
+                  ui.setShowSignIn(true);
+                }}
+                color={buttonColor}
+              />
+            ) : (
+              <IconButton
+                text={'Connection Code'}
+                endingIcon={'key'}
+                width={210}
+                height={48}
+                style={{ marginTop: 20 }}
+                hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+                activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+                shadowColor={
+                  buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
+                }
+                onClick={getConnectionCode}
+                color={buttonColor}
+              />
+            )}
             <IconButton
               text={'I have Sphinx'}
               endingIcon={'arrow_forward'}
