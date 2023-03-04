@@ -506,27 +506,6 @@ const LoggedInBtn = styled.div`
   }
 `;
 
-const GuestBtn = styled.div`
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 20px;
-  border-radius: 32px;
-  background: rgba(255, 255, 255, 0.07);
-  white-space: nowrap;
-  padding: 0 24px 0 24px;
-  display: flex;
-  align-items: center;
-  position: relative;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  &:active {
-    background: rgba(255, 255, 255, 0.13);
-  }
-`;
-
 const GetSphinxsBtn = styled.a`
   display: flex;
   flex: 1 0 auto;
