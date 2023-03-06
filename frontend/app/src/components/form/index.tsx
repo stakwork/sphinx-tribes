@@ -659,21 +659,18 @@ export default function Form(props: any) {
                     Advanced Settings {showSettings ? '-' : '+'}
                   </div>
                 </SchemaOuterContainer>
-                  {showSettings && (
-                    <SchemaOuterContainer>
-                      <div
-                        style={{ minHeight: 50, height: 50 }}
-                        className="SchemaInnerContainer"
-                      >
-                        <Button
-                          text={'Delete my account'}
-                          color={'link2'}
-                          width="fit-content"
-                          onClick={() => setShowDeleteWarn(true)}
-                        />
-                      </div>
-                    </SchemaOuterContainer>
-                  )}
+                {showSettings && (
+                  <SchemaOuterContainer>
+                    <div style={{ minHeight: 50, height: 50 }} className="SchemaInnerContainer">
+                      <Button
+                        text={'Delete my account'}
+                        color={'link2'}
+                        width="fit-content"
+                        onClick={() => setShowDeleteWarn(true)}
+                      />
+                    </div>
+                  </SchemaOuterContainer>
+                )}
 
                 <Modal visible={showDeleteWarn}>
                   <div style={{ padding: 40, textAlign: 'center' }}>
