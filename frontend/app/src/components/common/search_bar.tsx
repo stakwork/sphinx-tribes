@@ -4,11 +4,11 @@ import styled from 'styled-components';
 import { colors } from '../../colors';
 import { useStores } from '../../store';
 
-
-type SearchTextInputProps = ComponentProps<'input'> & InputProps & {
-  onChange: (v: string) => void, 
-  iconStyle?: CSSProperties
-} 
+type SearchTextInputProps = ComponentProps<'input'> &
+  InputProps & {
+    onChange: (v: string) => void;
+    iconStyle?: CSSProperties;
+  };
 
 export default function SearchTextInput({
   border,
@@ -20,7 +20,8 @@ export default function SearchTextInput({
   iconColor,
   onChange,
   iconStyle = {},
-  ...props}:SearchTextInputProps & InputProps) {
+  ...props
+}: SearchTextInputProps & InputProps) {
   const color = colors['light'];
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
@@ -159,7 +160,7 @@ const Container = styled.div<InputProps>`
 
   &:hover {
     .SearchIcon {
-      color: ${(p) => (p.iconColorHover ?? p.color.pureBlack)};
+      color: ${(p) => p.iconColorHover ?? p.color.pureBlack};
     }
     .SearchText {
       border: ${(p) => (p.borderHover ? p.borderHover : `1px solid ${p.color.pureBlack}`)};

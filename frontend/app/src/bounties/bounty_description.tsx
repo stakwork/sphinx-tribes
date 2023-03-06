@@ -56,8 +56,8 @@ const BountyDescription = (props: any) => {
                 color: props.isPaid ? color.grayish.G50 : color.grayish.G10
               }}
             >
-              {props.title.slice(0, descriptionImage ? 80 : 120)}
-              {props.title.length > 80 ? '...' : ''}
+              {props.title?.slice(0, descriptionImage ? 80 : 120)}
+              {props.title?.length > 80 ? '...' : ''}
             </EuiText>
           </div>
           {descriptionImage && (
