@@ -44,7 +44,14 @@ export default function FocusedView(props: any) {
 
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
-  function closeModal() {
+  function isNotHttps(url: string | undefined) {
+    if (main.isTorSave() || url?.startsWith('http://')) {
+      return true;
+    }
+    return false;
+  }
+
+  function closeModal(override) {
     if (!manualGoBackOnly) {
       console.log('close modal');
       ui.setEditMe(false);
@@ -153,7 +160,7 @@ export default function FocusedView(props: any) {
       console.log('e', e);
     }
     setDeleting(false);
-    props.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url)) props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
@@ -234,7 +241,7 @@ export default function FocusedView(props: any) {
       console.log('e', e);
     }
     setLoading(false);
-    props?.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
   }
 
   return useObserver(() => {
