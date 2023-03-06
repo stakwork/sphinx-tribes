@@ -558,8 +558,7 @@ export default function PersonView(props: any) {
                       switchWidgets(name);
                     }}
                   >
-                    {label}
-                    {count && <Counter>{count}</Counter>}
+                    {label} {count && <Counter>{count}</Counter>}
                   </Tab>
                 );
               })}

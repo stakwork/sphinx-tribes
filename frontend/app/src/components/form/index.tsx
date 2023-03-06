@@ -15,7 +15,7 @@ import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_con
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
-  const [page, setPage] = useState(1);
+  const page = 1;
   const [loading, setLoading] = useState(true);
   const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null);
   const [dynamicSchema, setDynamicSchema]: any = useState(null);
@@ -92,7 +92,7 @@ export default function Form(props: any) {
       setDynamicSchemaName(dSchema.defaultSchemaName);
     }
     setLoading(false);
-  }, []);
+  }, [props.initialValues?.type, props.schema]);
 
   // this useEffect triggers when the dynamic schema name is updated
   // checks if there are autofill fields that we can pull from local storage
@@ -116,23 +116,23 @@ export default function Form(props: any) {
         });
       }
     }
-  }, [dynamicSchemaName]);
+  }, [dynamicSchemaName, initValues, props.formRef, ui]);
+
+  const scrollToTop = useCallback(() => {
+    if (scrollDiv && scrollDiv.current) {
+      scrollDiv.current.scrollTop = 0;
+    }
+  }, [scrollDiv]);
 
   useEffect(() => {
     scrollToTop();
-  }, [page]);
+  }, [scrollToTop]);
 
   function reloadForm() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 20);
-  }
-
-  function scrollToTop() {
-    if (scrollDiv && scrollDiv.current) {
-      scrollDiv.current.scrollTop = 0;
-    }
   }
 
   if (props.paged) {
@@ -185,7 +185,14 @@ export default function Form(props: any) {
       validationSchema={validator(schema)}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }) => {
+        const isDescriptionValid = values.ticketUrl
+          ? values.github_description || !!values.description
+          : !!values.description;
+
         const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
+
+        const isBtnDisabled = !valid || (stepTracker === 3 && !isDescriptionValid);
+
         return (
           <Wrap
             ref={refBody}
@@ -213,7 +220,6 @@ export default function Form(props: any) {
                           {...item}
                           key={item.name}
                           values={values}
-                          label={''}
                           errors={errors}
                           scrollToTop={scrollToTop}
                           value={values[item.name]}
@@ -237,6 +243,13 @@ export default function Form(props: any) {
                           }
                           borderType={'bottom'}
                           imageIcon={true}
+                          style={
+                            item.name === 'github_description' && !values.ticketUrl
+                              ? {
+                                  display: 'none'
+                                }
+                              : undefined
+                          }
                         />
                       ))}
                   </div>
@@ -272,6 +285,13 @@ export default function Form(props: any) {
                               (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                             }
                             borderType={'bottom'}
+                            style={
+                              item.name === 'github_description' && !values.ticketUrl
+                                ? {
+                                    display: 'none'
+                                  }
+                                : undefined
+                            }
                           />
                         );
                       })}
@@ -422,6 +442,13 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
+                                style={
+                                  item.name === 'github_description' && !values.ticketUrl
+                                    ? {
+                                        display: 'none'
+                                      }
+                                    : undefined
+                                }
                               />
                             );
                           })}
@@ -465,6 +492,13 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
+                                style={
+                                  item.type === 'loom' && values.ticketUrl
+                                    ? {
+                                        marginTop: '55px'
+                                      }
+                                    : undefined
+                                }
                               />
                             );
                           })}
@@ -477,15 +511,15 @@ export default function Form(props: any) {
                         style={{
                           width: stepTracker < 5 ? '45%' : '100%',
                           height: stepTracker < 5 ? '48px' : '48px',
-                          marginTop: stepTracker === 5 ? '20px' : ''
+                          marginTop: stepTracker === 5 || stepTracker === 3 ? '20px' : ''
                         }}
                       >
-                        {!valid && (
+                        {isBtnDisabled && (
                           <div className="nextButtonDisable">
                             <EuiText className="disableText">Next</EuiText>
                           </div>
                         )}
-                        {valid && (
+                        {!isBtnDisabled && (
                           <div
                             className="nextButton"
                             onClick={() => {
@@ -576,6 +610,13 @@ export default function Form(props: any) {
                       }}
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
+                      style={
+                        item.name === 'github_description' && !values.ticketUrl
+                          ? {
+                              display: 'none'
+                            }
+                          : undefined
+                      }
                     />
                   ))}
                 </div>
@@ -642,7 +683,7 @@ export default function Form(props: any) {
               </BWrap>
             )}
             {/*  if schema is AboutMe */}
-            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id != 0 && (
+            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id !== 0 && (
               <>
                 <SchemaOuterContainer>
                   <div
@@ -730,7 +771,6 @@ const Wrap = styled.div<WrapProps>`
   height: inherit;
   flex-direction: column;
   align-content: center;
-  // max-width:400px;
   min-width: 230px;
 `;
 
@@ -759,6 +799,7 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
   flex-direction: column;
   justify-content: center;
   padding: 0px 48px;
+  margin-bottom: 30px;
   .TopContainer {
     display: flex;
     justify-content: space-between;
@@ -916,6 +957,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
   align-items: center;
   justify-content: center;
   gap: 34px;
+  margin-bottom: 24px;
 `;
 
 const BountyContainer = styled.div<styledProps>`

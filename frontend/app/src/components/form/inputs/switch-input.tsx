@@ -13,18 +13,20 @@ export default function SwitchInput({
   handleChange,
   handleBlur,
   handleFocus,
-  extraHTML
+  extraHTML, 
+  disabled, 
+  style = {},
 }: Props) {
   useEffect(() => {
     // if value not initiated, default value true
     if (name === 'show' && value === undefined) handleChange(true);
-  }, []);
+  }, [handleChange, name, value]);
 
   const color = colors['light'];
 
   return (
     <>
-      <Container color={color}>
+      <Container style={style} color={color}>
         <EuiText className="Label">{label}</EuiText>
         <EuiSwitch
           className="switcher"
@@ -36,6 +38,7 @@ export default function SwitchInput({
           onBlur={handleBlur}
           onFocus={handleFocus}
           compressed
+          disabled={disabled}
           style={{
             border: 'none',
             background: 'inherit'
