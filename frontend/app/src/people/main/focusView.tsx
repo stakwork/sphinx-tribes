@@ -51,7 +51,7 @@ export default function FocusedView(props: any) {
     return false;
   }
 
-  function closeModal(override) {
+  function closeModal() {
     if (!manualGoBackOnly) {
       console.log('close modal');
       ui.setEditMe(false);
