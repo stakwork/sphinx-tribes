@@ -228,7 +228,7 @@ export class MainStore {
       if (!r) return; // tor user will return here
       return r;
     } catch (e) {
-      console.log('Error deleteBot: ' e);
+      console.log('Error deleteBot: ', e);
     }
   }
 
