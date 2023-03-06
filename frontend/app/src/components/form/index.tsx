@@ -644,29 +644,36 @@ export default function Form(props: any) {
             {/*  if schema is AboutMe */}
             {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id != 0 && (
               <>
-                <div
-                  style={{
-                    cursor: 'pointer',
-                    marginTop: 20,
-                    fontSize: 12,
-                    minHeight: 30,
-                    height: 30
-                  }}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                  Advanced Settings {showSettings ? '-' : '+'}
-                </div>
-
-                {showSettings && (
-                  <div style={{ minHeight: 50, height: 50 }}>
-                    <Button
-                      text={'Delete my account'}
-                      color={'link2'}
-                      width="fit-content"
-                      onClick={() => setShowDeleteWarn(true)}
-                    />
+                <SchemaOuterContainer>
+                  <div
+                    className="SchemaInnerContainer"
+                    style={{
+                      cursor: 'pointer',
+                      marginTop: 20,
+                      fontSize: 12,
+                      minHeight: 30,
+                      height: 30
+                    }}
+                    onClick={() => setShowSettings(!showSettings)}
+                  >
+                    Advanced Settings {showSettings ? '-' : '+'}
                   </div>
-                )}
+                </SchemaOuterContainer>
+                  {showSettings && (
+                    <SchemaOuterContainer>
+                      <div
+                        style={{ minHeight: 50, height: 50 }}
+                        className="SchemaInnerContainer"
+                      >
+                        <Button
+                          text={'Delete my account'}
+                          color={'link2'}
+                          width="fit-content"
+                          onClick={() => setShowDeleteWarn(true)}
+                        />
+                      </div>
+                    </SchemaOuterContainer>
+                  )}
 
                 <Modal visible={showDeleteWarn}>
                   <div style={{ padding: 40, textAlign: 'center' }}>
@@ -901,7 +908,7 @@ const SchemaOuterContainer = styled.div`
   justify-content: center;
   width: 100%;
   .SchemaInnerContainer {
-    width: 100%;
+    width: 70%;
   }
 `;
 
