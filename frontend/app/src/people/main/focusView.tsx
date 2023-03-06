@@ -205,6 +205,9 @@ export default function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
+    if(config.name === 'wanted' && !body?.title) {
+      body.title = body.one_sentence_summary ?? '';
+    }
     try {
       body = await preSubmitFunctions(body);
     } catch (e) {
