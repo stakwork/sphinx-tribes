@@ -10,6 +10,7 @@ export default function LoomVideoInputNew({
   handleChange,
   handleBlur,
   handleFocus,
+  style = {}
 }: Props) {
   const color = colors['light'];
 
@@ -19,9 +20,7 @@ export default function LoomVideoInputNew({
     <LoomVideoContainer
       color={color}
       isVideo={isVideo}
-      style={{
-        marginTop: '55px'
-      }}
+      style={style}
     >
       <LoomViewerRecorderNew
         name="loomVideo"

@@ -17,6 +17,7 @@ import { colors } from '../../colors';
 
 export default function WantedView(props: any) {
   const {
+    one_sentence_summary,
     title,
     description,
     priceMin,
@@ -37,6 +38,7 @@ export default function WantedView(props: any) {
     setDeletePayload,
     onPanelClick
   } = props;
+  const titleString = title ?? one_sentence_summary;
 
   let { show, paid } = props;
   const isMobile = useIsMobile();
@@ -160,7 +162,7 @@ export default function WantedView(props: any) {
                   margin: '15px 0'
                 }}
               >
-                {title}
+                {titleString}
               </DT>
 
               <div
@@ -389,7 +391,7 @@ export default function WantedView(props: any) {
                 created={created}
                 ticketUrl={ticketUrl}
                 loomEmbedUrl={loomEmbedUrl}
-                title={title}
+                title={titleString}
                 codingLanguage={labels}
                 priceMin={priceMin}
                 priceMax={priceMax}
@@ -407,7 +409,7 @@ export default function WantedView(props: any) {
                 created={created}
                 ticketUrl={ticketUrl}
                 loomEmbedUrl={loomEmbedUrl}
-                title={title}
+                title={titleString}
                 codingLanguage={labels}
                 priceMin={priceMin}
                 priceMax={priceMax}
@@ -454,7 +456,7 @@ export default function WantedView(props: any) {
               />
             </div>
             <Divider style={{ margin: '10px 0' }} />
-            <DT>{title}</DT>
+            <DT>{titleString}</DT>
             <div
               style={{
                 display: 'flex',
