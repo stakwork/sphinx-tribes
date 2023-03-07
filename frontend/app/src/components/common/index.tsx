@@ -1,15 +1,15 @@
 import SearchTextInput from './search-text-input';
-import Button from './button';
+import Button from './Button';
 import IconButton from './iconButton';
-import Modal from './modal';
-import Divider from './divider';
+import Modal from './Modal';
+import Divider from './Divider';
 import { Title, Date, Paragraph, Link } from './elements';
-import Select from './select';
-import MultiSelect from './multiSelect';
-import CreatableMultiSelect from './creatableMultiSelect';
-import TextInput from './text-input';
-
-import SearchableSelect from './searchableSelect';
+import Select from './Select';
+import MultiSelect from './MultiSelect';
+import CreatableMultiSelect from './CreatableMultiSelect';
+import TextInput from './TextInput';
+import SearchableSelect from './SearchableSelect';
+import { Portal } from './Portal';
 
 export {
   SearchableSelect,
@@ -25,7 +25,7 @@ export {
   Link,
   Select,
   MultiSelect,
-  CreatableMultiSelect
+  CreatableMultiSelect,
+  Portal
 };
 
-export { Portal } from './portal';
