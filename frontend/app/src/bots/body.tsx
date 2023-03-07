@@ -6,7 +6,7 @@ import { useStores } from '../store';
 import { useObserver } from 'mobx-react-lite';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useFuse, useScroll } from '../hooks';
-import { colors } from '../colors';
+import { colors } from '../config/colors';
 import FadeLeft from '../components/animated/fadeLeft';
 import { useIsMobile } from '../hooks';
 import Bot from './bot';

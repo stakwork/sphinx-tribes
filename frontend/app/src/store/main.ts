@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import { getHostIncludingDockerHosts } from '../host';
+import { getHostIncludingDockerHosts } from '../config/host';
 import { uiStore } from './ui';
 import { randomString } from '../helpers';
 export const queryLimit = 100;

@@ -4,7 +4,7 @@ import { useStores } from '../../store';
 import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
 import { Modal, Button } from '../../components/common';

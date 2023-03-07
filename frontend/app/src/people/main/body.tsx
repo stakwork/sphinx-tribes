@@ -6,7 +6,7 @@ import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import FadeLeft from '../../components/animated/fadeLeft';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
 import { Modal, SearchTextInput } from '../../components/common';
 import { useStores } from '../../store';

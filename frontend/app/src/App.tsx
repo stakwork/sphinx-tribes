@@ -5,7 +5,7 @@ import Header from './tribes/header';
 import Body from './tribes/body';
 import PeopleHeader from './people/main/header';
 import PeopleBody from './people/main/body';
-import { colors } from './colors';
+import { colors } from './config/colors';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import TokenRefresh from './people/utils/tokenRefresh';
 import BotsBody from './bots/body';
