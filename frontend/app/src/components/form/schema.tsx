@@ -1,5 +1,12 @@
 import * as Yup from 'yup';
 import { FormField } from '.';
+import {
+  languages,
+  estimation,
+  estimated_budget_15_min,
+  help_wanted_coding_task_schema,
+  help_wanted_other_schema
+} from '../../config/bounties';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
@@ -26,37 +33,6 @@ const GetValue = (arr: any) => {
     };
   });
 };
-
-const languages = [
-  'Lightning',
-  'Javascript',
-  'Typescript',
-  'Node',
-  'Golang',
-  'Swift',
-  'Kotlin',
-  'MySQL',
-  'PHP',
-  'R',
-  'C#',
-  'C++',
-  'Java',
-  'Rust'
-];
-
-const estimation = ['Less than 1 hour', 'Less than 3 hours', 'More than 3 hours', 'Not sure yet'];
-
-const estimated_budget_15_min = ['USD $10', 'USD $20', 'USD $30', 'USD $40', 'USD $50'];
-
-const help_wanted_coding_task_schema = [
-  'Web development',
-  'Mobile development',
-  'Desktop app',
-  'Dev ops',
-  'Bitcoin / Lightning',
-  'other'
-];
-const help_wanted_other_schema = ['Troubleshooting', 'Debugging', 'Tutoring'];
 
 const codingLanguages = GetValue(languages);
 const estimated_time = GetValue(estimation);
@@ -492,14 +468,6 @@ export const aboutSchema: FormField[] = [
     prepend: '@',
     page: 1
   }
-
-  // {
-  //     name: "facebook",
-  //     label: "Facebook",
-  //     widget: true,
-  //     type: "text",
-  //     page: 1,
-  // },
 ];
 
 export const postSchema: FormField[] = [

@@ -1,8 +1,6 @@
 import {
   aboutSchema,
-  postSchema,
   wantedSchema,
-  meSchema,
   offerSchema,
   offerSkillSchema,
   offerOtherSchema,
