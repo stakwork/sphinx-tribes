@@ -1,4 +1,4 @@
-import { getHost } from '../host';
+import { getHost } from '../config/host';
 
 class API {
   constructor() {

@@ -1,4 +1,4 @@
-import { getHost } from './host';
+import { getHost } from './config/host';
 import { uiStore } from './store/ui';
 
 export function formatPrice(amount) {

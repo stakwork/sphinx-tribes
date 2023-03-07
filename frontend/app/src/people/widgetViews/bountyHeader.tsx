@@ -3,7 +3,7 @@ import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import SearchBar from '../../components/common/search_bar';
 import { useStores } from '../../store';

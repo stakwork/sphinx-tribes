@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import { Modal } from '../../../components/common';
 import { useStores } from '../../../store';

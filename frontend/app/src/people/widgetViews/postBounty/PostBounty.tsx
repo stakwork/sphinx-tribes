@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import IconButton from '../../../components/common/icon_button';
 import { useStores } from '../../../store';

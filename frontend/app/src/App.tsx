@@ -5,7 +5,7 @@ import Header from './tribes/header';
 import Body from './tribes/body';
 import PeopleHeader from './people/main/header';
 import PeopleBody from './people/main/body';
-import { colors } from './colors';
+import { colors } from './config/colors';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import TokenRefresh from './people/utils/tokenRefresh';
 import BotsBody from './bots/body';
@@ -74,7 +74,7 @@ enum Mode {
 }
 
 const hosts: { [k: string]: Mode } = {
-  'localhost:3000': Mode.COMMUNITY,
+  'localhost:3000': Mode.TRIBES,
   'localhost:13000': Mode.TRIBES,
   'localhost:23000': Mode.TRIBES,
   'tribes.sphinx.chat': Mode.TRIBES,

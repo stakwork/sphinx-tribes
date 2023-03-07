@@ -2,7 +2,7 @@ import { EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import React from 'react';
 import styled from 'styled-components';
-import { colors } from '../colors';
+import { colors } from '../config/colors';
 
 const BountyProfileView = (props) => {
   const color = colors['light'];

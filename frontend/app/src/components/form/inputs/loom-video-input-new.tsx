@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import { EuiText } from '@elastic/eui';
 import LoomViewerRecorderNew from '../../../people/utils/loomViewerRecorderNew';
 

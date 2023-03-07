@@ -10,7 +10,7 @@ import { formDropdownOptions } from '../../people/utils/constants';
 import { EuiText } from '@elastic/eui';
 import api from '../../api';
 import ImageButton from '../common/Image_button';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
 
 export default function Form(props: any) {

@@ -782,7 +782,6 @@ export const wantedSchema: FormField[] = [
 export const dynamicSchemasByType = {
   coding_task: wantedCodingTaskSchema,
   other: wantedOtherSchema,
-  //
   freelance_job_request: wantedCodingTaskSchema,
   live_help: wantedOtherSchema,
   offer_skill: offerSkillSchema,

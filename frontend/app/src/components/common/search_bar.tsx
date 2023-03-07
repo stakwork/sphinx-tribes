@@ -1,7 +1,7 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { CSSProperties, ComponentProps, useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 
 type SearchTextInputProps = ComponentProps<'input'> &

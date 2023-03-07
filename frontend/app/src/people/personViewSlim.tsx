@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getHost } from '../host';
+import { getHost } from '../config/host';
 import { useStores } from '../store';
 
 import AboutView from './widgetViews/aboutView';

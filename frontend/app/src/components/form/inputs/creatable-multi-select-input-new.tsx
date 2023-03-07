@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import type { Props } from './propsType';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import ImageButton from '../../common/Image_button';
 import {
   coding_languages,

@@ -3,7 +3,7 @@ import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { Divider } from '../../components/common';
 import ConfirmMe from '../confirmMe';
 import AuthQR from './authQR';

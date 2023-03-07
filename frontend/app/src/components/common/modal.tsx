@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import FadeLeft from '../animated/fadeLeft';
 import { IconButton } from '.';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { Portal } from './portal';
 
 export default function Modal(props: any) {
