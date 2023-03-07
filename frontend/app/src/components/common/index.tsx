@@ -24,6 +24,6 @@ export {
   Link,
   Select,
   MultiSelect,
-  CreatableMultiSelect,
+  CreatableMultiSelect
 };
 
