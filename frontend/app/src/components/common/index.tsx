@@ -7,7 +7,6 @@ import Select from './select';
 import MultiSelect from './multiSelect';
 import CreatableMultiSelect from './creatableMultiSelect';
 import TextInput from './text-input';
-import { Portal } from './portal';
 
 import SearchableSelect from './searchableSelect';
 
