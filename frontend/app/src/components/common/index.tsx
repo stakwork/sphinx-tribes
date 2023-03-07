@@ -25,6 +25,5 @@ export {
   Select,
   MultiSelect,
   CreatableMultiSelect,
-				Portal
 };
 
