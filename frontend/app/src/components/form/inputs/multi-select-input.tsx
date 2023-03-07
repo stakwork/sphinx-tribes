@@ -4,7 +4,7 @@ import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { MultiSelect } from '../../common';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 
 export default function MultiSelectInput({
   error,

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import api from '../../../api';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
 import InvitePeopleSearch from '../../../components/form/inputs/widgets/PeopleSearch';
 import { sendBadgeSchema } from '../../../components/form/schema';

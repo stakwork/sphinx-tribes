@@ -12,7 +12,7 @@ import NoResults from '../utils/noResults';
 import { uiStore } from '../../store/ui';
 import DeleteTicketModal from './deleteModal';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
 export default function WidgetSwitchViewer(props) {
   const color = colors['light'];

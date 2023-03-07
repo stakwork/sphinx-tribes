@@ -1,7 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React from 'react';
 import styled from 'styled-components';
-import { colors } from '../colors';
+import { colors } from '../config/colors';
 
 const ButtonSet = ({ showGithubBtn, ...props }) => {
   const color = colors['light'];

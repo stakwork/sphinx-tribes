@@ -3,7 +3,7 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import { QRCode } from 'react-qr-svg';
 import styled from 'styled-components';
-import { getHostIncludingDockerHosts } from '../host';
+import { getHostIncludingDockerHosts } from '../config/host';
 import Tag from './tag';
 
 function makeQR(uuid: string) {
