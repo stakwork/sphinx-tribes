@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
-import SearchBar from '../../components/common/search_bar';
+import { SearchBar } from '../../components/common/index';
 import { useStores } from '../../store';
 import { PostBounty } from './postBounty';
 import { filterCount } from '../utils/ExtraFunctions';

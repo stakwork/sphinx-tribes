@@ -1,4 +1,5 @@
 import SearchTextInput from './search-text-input';
+import SearchBar from './SearchBar';
 import Button from './Button';
 import IconButton from './iconButton';
 import Modal from './Modal';
@@ -26,5 +27,6 @@ export {
   Select,
   MultiSelect,
   CreatableMultiSelect,
-  Portal
+  Portal,
+  SearchBar
 };
