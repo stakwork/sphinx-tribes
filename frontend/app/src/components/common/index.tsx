@@ -9,7 +9,7 @@ import MultiSelect from './MultiSelect';
 import CreatableMultiSelect from './CreatableMultiSelect';
 import TextInput from './TextInput';
 import SearchableSelect from './SearchableSelect';
-import { Portal } from './portal';
+import { Portal } from './Portal';
 
 export {
   SearchableSelect,
