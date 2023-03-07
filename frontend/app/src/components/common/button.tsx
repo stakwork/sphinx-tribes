@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import {colors} from "../../config/common"
+import { colors } from '../../config/common';
 
 export default function Button(props: any) {
   const { iconStyle, id } = props;

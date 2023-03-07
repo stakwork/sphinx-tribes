@@ -278,15 +278,15 @@ export default function PersonView(props: any) {
 
       const panelStyles = isMobile
         ? {
-          minHeight: 132
-        }
+            minHeight: 132
+          }
         : {
-          maxWidth: 291,
-          minWidth: 291,
-          marginRight: 20,
-          marginBottom: 20,
-          minHeight: 472
-        };
+            maxWidth: 291,
+            minWidth: 291,
+            marginRight: 20,
+            marginBottom: 20,
+            minHeight: 472
+          };
 
       fullSelectedWidget &&
         fullSelectedWidget.forEach((s, i) => {
@@ -298,9 +298,9 @@ export default function PersonView(props: any) {
           const conditionalStyles =
             !isMobile && s?.paid
               ? {
-                border: '1px solid #dde1e5',
-                boxShadow: 'none'
-              }
+                  border: '1px solid #dde1e5',
+                  boxShadow: 'none'
+                }
               : {};
 
           elementArray.push(
@@ -489,7 +489,7 @@ export default function PersonView(props: any) {
                     fontSize: 13,
                     color: '#3c3f41',
                     border: 'none',
-                    marginLeft: 'auto',
+                    marginLeft: 'auto'
                   }}
                   leadingIcon={'edit'}
                   iconSize={15}
@@ -560,13 +560,13 @@ export default function PersonView(props: any) {
                 const hasExtras = extras && extras[name] && extras[name].length > 0;
                 const count: any = hasExtras
                   ? extras[name].filter((f) => {
-                    if ('show' in f) {
-                      // show has a value
-                      if (!f.show) return false;
-                    }
-                    // if no value default to true
-                    return true;
-                  }).length
+                      if ('show' in f) {
+                        // show has a value
+                        if (!f.show) return false;
+                      }
+                      // if no value default to true
+                      return true;
+                    }).length
                   : null;
 
                 return (
@@ -622,8 +622,8 @@ export default function PersonView(props: any) {
   function renderDesktopView() {
     const focusedDesktopModalStyles = newSelectedWidget
       ? {
-        ...tabs[newSelectedWidget]?.modalStyle
-      }
+          ...tabs[newSelectedWidget]?.modalStyle
+        }
       : {};
 
     return (
@@ -840,13 +840,13 @@ export default function PersonView(props: any) {
                 const hasExtras = extras && extras[name] && extras[name].length > 0;
                 const count: any = hasExtras
                   ? extras[name].filter((f) => {
-                    if ('show' in f) {
-                      // show has a value
-                      if (!f.show) return false;
-                    }
-                    // if no value default to true
-                    return true;
-                  }).length
+                      if ('show' in f) {
+                        // show has a value
+                        if (!f.show) return false;
+                      }
+                      // if no value default to true
+                      return true;
+                    }).length
                   : null;
 
                 return (
@@ -976,9 +976,10 @@ export default function PersonView(props: any) {
                                 subtitle="Because I'm awesome"
                                 buttonlabel="Donate"
                                 defaultinterval="weekly"
-                                imgurl="${mediumPic ||
-              'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'
-              }"
+                                imgurl="${
+                                  mediumPic ||
+                                  'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'
+                                }"
                             ></sphinx-widget>`
           }}
         />
