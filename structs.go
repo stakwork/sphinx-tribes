@@ -205,7 +205,6 @@ type BadgeCreationData struct {
 	Action    string `json:"action"`
 }
 
-
 type Bounty struct {
 	ID                      uint        `json:"id"`
 	Paid                    bool        `json:"paid"`
@@ -228,6 +227,10 @@ type Bounty struct {
 	EstimatedCompletionDate string      `json:"estimated_completion_date"`
 }
 
+func (Bounty) TableName() string {
+	return "bounty"
+}
+
 type ConnectionCodes struct {
 	ID               uint       `json:"id"`
 	ConnectionString string     `json:"connection_string"`
@@ -247,7 +250,6 @@ func (ConnectionCodes) TableName() string {
 func (ConnectionCodesShort) TableName() string {
 	return "connectioncodes"
 }
-
 
 // PropertyMap ...
 type PropertyMap map[string]interface{}

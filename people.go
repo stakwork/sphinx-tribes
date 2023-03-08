@@ -599,8 +599,8 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 func migrateBounties(w http.ResponseWriter, r *http.Request) {
 	peeps := DB.getListedPeople(nil)
 
-	for _, peep := range peeps {
-		fmt.Println("peep: ", peep)
+	for indexPeep, peep := range peeps {
+		fmt.Println("peep: ", indexPeep)
 		bounties, ok := peep.Extras["wanted"].([]Bounty)
 
 		if !ok {
@@ -609,9 +609,9 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for index, bounty := range bounties {
-			fmt.Println("looping bounties: ", index, bounty)
+			fmt.Println("looping bounties: ", index)
 			migrateBounty := bounty
-			fmt.Println("Bounty to add: ", migrateBounty)
+			fmt.Println("Bounty about to be added ")
 			DB.addBounty(migrateBounty)
 			//Migrate the bounties here
 
