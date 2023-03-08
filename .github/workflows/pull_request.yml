@@ -14,7 +14,7 @@ jobs:
         run: yarn --cwd ./frontend/app install
       - name: Eslint
         run: yarn --cwd ./frontend/app run lint
-  eslint:
+  test:
     name: Test Job
     runs-on:
       - ubuntu-latest
