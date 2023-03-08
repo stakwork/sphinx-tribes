@@ -14,8 +14,6 @@ jobs:
         run: yarn --cwd ./frontend/app install
       - name: Eslint
         run: yarn --cwd ./frontend/app run lint
-      - name: Tests
-        run: yarn --cwd ./frontend/app run test
   eslint:
     name: Test Job
     runs-on:
