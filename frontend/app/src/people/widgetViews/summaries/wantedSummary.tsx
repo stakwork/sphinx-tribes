@@ -24,6 +24,7 @@ import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import NameTag from '../../utils/nameTag';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import GithubStatusPill from '../parts/statusPill';
+import MobileView from './wantedSummaries/mobileView';
 
 function useQuery() {
   const { search } = useLocation();
@@ -59,7 +60,7 @@ export default function WantedSummary(props: any) {
     show,
     setIsModalSideButton,
     setIsExtraStyle,
-    formSubmit, 
+    formSubmit,
     title
   } = props;
   const titleString = title ?? one_sentence_summary;
@@ -559,6 +560,7 @@ export default function WantedSummary(props: any) {
       : extractGithubIssue(person, repo, issue);
 
     let assigneeLabel: any = null;
+
     if (assigneeInfo) {
       if (!isMobile) {
         assigneeLabel = (
@@ -1713,11 +1715,6 @@ export default function WantedSummary(props: any) {
               >
                 {nametag}
               </div>
-              {/* <Img
-                src={'/static/github_logo2.png'}
-                style={{ width: 77, height: 43 }}
-              /> */}
-
               <div
                 style={{
                   minHeight: '60px',
