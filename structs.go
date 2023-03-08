@@ -216,7 +216,7 @@ type Bounty struct {
 	Tribe                   string      `json:"tribe"`
 	Created                 *time.Time  `json:"created"`
 	Assignee                Person      `json:"assignee"`
-	Ticket_url              string      `json:"ticket_url"`
+	TicketUrl               string      `json:"ticket_url"`
 	Description             string      `json:"description"`
 	WantedType              string      `json:"wanted_type"`
 	Deliverables            string      `json:"deliverables"`

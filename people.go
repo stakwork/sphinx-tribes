@@ -601,7 +601,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 
 	for indexPeep, peep := range peeps {
 		fmt.Println("peep: ", indexPeep)
-		bounties, ok := peep.Extras["wanted"].([]Bounty)
+		bounties, ok := peep.Extras["wanted"].([]interface{})
 
 		if !ok {
 			fmt.Println("Wanted not there")
@@ -609,10 +609,32 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for index, bounty := range bounties {
+
 			fmt.Println("looping bounties: ", index)
-			migrateBounty := bounty
+			migrateBounty := bounty.(map[string]interface{})
+
+			migrateBountyFinal := Bounty{}
+			migrateBountyFinal.Title = migrateBounty["title"].(string)
+
+			migrateBountyFinal.Paid = migrateBounty["paid"].(bool)
+			migrateBountyFinal.Show = migrateBounty["show"].(bool)
+			migrateBountyFinal.Type = migrateBounty["type"].(string)
+			migrateBountyFinal.Award = migrateBounty["award"].(string)
+			migrateBountyFinal.Price = migrateBounty["price"].(uint)
+			migrateBountyFinal.Tribe = migrateBounty["tribe"].(string)
+			migrateBountyFinal.Created = migrateBounty["created"].(*time.Time)
+			migrateBountyFinal.Assignee = migrateBounty["assignee"].(Person)
+			migrateBountyFinal.TicketUrl = migrateBounty["ticket_url"].(string)
+			migrateBountyFinal.Description = migrateBounty["description"].(string)
+			migrateBountyFinal.WantedType = migrateBounty["wanted_type"].(string)
+			migrateBountyFinal.Deliverables = migrateBounty["deliverables"].(string)
+			migrateBountyFinal.CodingLanguage = migrateBounty["coding_language"].(PropertyMap)
+			migrateBountyFinal.GithuDescription = migrateBounty["github_description"].(bool)
+			migrateBountyFinal.OneSentenceSummary = migrateBounty["one_sentence_summary"].(string)
+			migrateBountyFinal.EstimatedSessionLength = migrateBounty["estimated_session_length"].(string)
+			migrateBountyFinal.EstimatedCompletionDate = migrateBounty["estimated_completion_date"].(string)
 			fmt.Println("Bounty about to be added ")
-			DB.addBounty(migrateBounty)
+			DB.addBounty(migrateBountyFinal)
 			//Migrate the bounties here
 
 		}
