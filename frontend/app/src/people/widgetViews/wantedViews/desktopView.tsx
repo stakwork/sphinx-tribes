@@ -1,28 +1,31 @@
 import React from 'react';
-import { Img, EyeDeleteContainerMobile, Wrap, Body, P, B, DT, EyeDeleteTextContainerMobile } from "./components";
+import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from "./components";
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import GithubStatusPill from '../parts/statusPill';
 import { colors } from '../../../config/colors';
 import NameTag from '../../utils/nameTag';
 import { useStores } from '../../../store';
 import { formatPrice, satToUsd } from '../../../helpers';
-import { Button } from '../../../components/common';
+import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
+import { renderMarkdown } from '../../utils/renderMarkdown';
 
 export default function MobileView(props: any) {
     const {
+        description,
         priceMin,
         priceMax,
         price,
         person,
         created,
         ticketUrl,
+        gallery,
         assignee,
         estimate_session_length,
         loomEmbedUrl,
         showModal,
         setDeletePayload,
-        onPanelClick,
+        key,
         setExtrasPropertyAndSave,
         saving,
         labels,
@@ -39,21 +42,22 @@ export default function MobileView(props: any) {
     const color = colors['light'];
 
     return (
-        <div style={{ position: 'relative' }} onClick={onPanelClick}>
+        <div key={key}>
             {paid && (
                 <Img
                     src={'/static/paid_ribbon.svg'}
                     style={{
                         position: 'absolute',
-                        right: '-2.5px',
-                        width: '80px',
-                        height: '80px',
-                        top: 0
+                        top: -1,
+                        right: 0,
+                        width: 64,
+                        height: 72
                     }}
                 />
             )}
-            <Wrap isClosed={isClosed} style={{ padding: 15 }}>
-                <Body style={{ width: '100%' }} color={color}>
+
+            <DWrap isClosed={isClosed} color={color}>
+                <Pad style={{ padding: 20, minHeight: 410 }}>
                     <div
                         style={{
                             display: 'flex',
@@ -67,19 +71,10 @@ export default function MobileView(props: any) {
                             widget={'wanted'}
                             ticketUrl={ticketUrl}
                             loomEmbedUrl={loomEmbedUrl}
-                            style={{
-                                margin: 0
-                            }}
                         />
                     </div>
-                    <DT
-                        style={{
-                            margin: '15px 0'
-                        }}
-                    >
-                        {titleString}
-                    </DT>
-
+                    <Divider style={{ margin: '10px 0' }} />
+                    <DT>{titleString}</DT>
                     <div
                         style={{
                             display: 'flex',
@@ -87,12 +82,18 @@ export default function MobileView(props: any) {
                             alignItems: 'center'
                         }}
                     >
-                        {isCodingTask && (
+                        {isCodingTask ? (
                             <GithubStatusPill
                                 status={status}
                                 assignee={assignee}
                                 style={{
                                     marginTop: 10
+                                }}
+                            />
+                        ) : (
+                            <div
+                                style={{
+                                    minHeight: '36px'
                                 }}
                             />
                         )}
@@ -141,26 +142,9 @@ export default function MobileView(props: any) {
                         )}
                     </div>
 
-                    <EuiText
-                        style={{
-                            fontSize: '13px',
-                            color: color.grayish.G100,
-                            fontWeight: '500'
-                        }}
-                    >
-                        {estimate_session_length && 'Session:'}{' '}
-                        <span
-                            style={{
-                                fontWeight: '500',
-                                color: color.pureBlack
-                            }}
-                        >
-                            {estimate_session_length ?? ''}
-                        </span>
-                    </EuiText>
                     <div
                         style={{
-                            minHeight: '45px',
+                            minHeight: '48px',
                             width: '100%',
                             display: 'flex',
                             flexDirection: 'row',
@@ -208,87 +192,152 @@ export default function MobileView(props: any) {
                             </>
                         )}
                     </div>
-                    <EyeDeleteTextContainerMobile>
-                        {priceMin ? (
-                            <P
-                                color={color}
+                    <Divider
+                        style={{
+                            margin: isCodingTask || gallery ? '22px 0' : '0 0 22px'
+                        }}
+                    />
+                    <DescriptionCodeTask color={color}>
+                        {renderMarkdown(description)}
+                        {gallery && (
+                            <div
                                 style={{
-                                    margin: '15px 0 0'
+                                    display: 'flex',
+                                    flexWrap: 'wrap'
                                 }}
                             >
+                                {gallery.map((val, index) => {
+                                    return (
+                                        <div
+                                            key={index}
+                                            style={{
+                                                height: '48px',
+                                                width: '48px',
+                                                padding: '0px 2px',
+                                                borderRadius: '6px',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
+                                            <img src={val} alt="wanted preview" height={'100%'} width={'100%'} />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </DescriptionCodeTask>
+                </Pad>
+
+                <Divider style={{ margin: 0 }} />
+
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        padding: '10px 20px',
+                        minHeight: '100px'
+                    }}
+                >
+                    <Pad
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        {priceMin ? (
+                            <P color={color}>
                                 <B color={color}>{formatPrice(priceMin)}</B>~
                                 <B color={color}>{formatPrice(priceMax)}</B> SAT /{' '}
                                 <B color={color}>{satToUsd(priceMin)}</B>~
                                 <B color={color}>{satToUsd(priceMax)}</B> USD
                             </P>
                         ) : (
-                            <P
-                                color={color}
-                                style={{
-                                    margin: '15px 0 0'
-                                }}
-                            >
+                            <P color={color}>
                                 <B color={color}>{formatPrice(price)}</B> SAT /{' '}
                                 <B color={color}>{satToUsd(price)}</B> USD
                             </P>
                         )}
-                        <EyeDeleteContainerMobile>
-                            <div
+
+                        <div
+                            style={{
+                                width: '40px'
+                            }}
+                        >
+                            {
+                                //  if my own, show this option to show/hide
+                                isMine && (
+                                    <Button
+                                        icon={show ? 'visibility' : 'visibility_off'}
+                                        disable={saving}
+                                        submitting={saving}
+                                        iconStyle={{
+                                            color: color.grayish.G300,
+                                            fontSize: 20
+                                        }}
+                                        style={{
+                                            minWidth: 24,
+                                            maxWidth: 24,
+                                            minHeight: 20,
+                                            height: 20,
+                                            padding: 0,
+                                            background: `${color.pureWhite}`
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setExtrasPropertyAndSave('show');
+                                        }}
+                                    />
+                                )
+                            }
+                        </div>
+                    </Pad>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <EuiText
+                            style={{
+                                fontSize: '14px',
+                                color: color.grayish.G300,
+                                fontWeight: '500'
+                            }}
+                        >
+                            {estimate_session_length && 'Session:'}{' '}
+                            <span
                                 style={{
-                                    width: '40px'
+                                    fontWeight: '500',
+                                    color: color.pureBlack
                                 }}
                             >
-                                {
-                                    //  if my own, show this option to show/hide
-                                    isMine && (
-                                        <Button
-                                            icon={show ? 'visibility' : 'visibility_off'}
-                                            disable={saving}
-                                            submitting={saving}
-                                            iconStyle={{
-                                                color: color.grayish.G20,
-                                                fontSize: 20
-                                            }}
-                                            style={{
-                                                minWidth: 24,
-                                                maxWidth: 24,
-                                                minHeight: 20,
-                                                height: 20,
-                                                padding: 0,
-                                                background: `${color.pureWhite}`
-                                            }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setExtrasPropertyAndSave('show');
-                                            }}
-                                        />
-                                    )
-                                }
-                            </div>
-                            {ui?.meInfo?.isSuperAdmin && (
-                                <EuiButtonIcon
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        showModal();
-                                        setDeletePayload({
-                                            created: created,
-                                            host: getHost(),
-                                            pubkey: person.owner_pubkey
-                                        });
-                                    }}
-                                    iconType="trash"
-                                    aria-label="Next"
-                                    size="s"
-                                    style={{
-                                        color: `${color.pureBlack}`,
-                                        background: `${color.pureWhite}`
-                                    }}
-                                />
-                            )}
-                        </EyeDeleteContainerMobile>
-                    </EyeDeleteTextContainerMobile>
-                </Body>
-            </Wrap>
+                                {estimate_session_length ?? ''}
+                            </span>
+                        </EuiText>
+                        {ui?.meInfo?.isSuperAdmin && (
+                            <EuiButtonIcon
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    showModal();
+                                    setDeletePayload({
+                                        created: created,
+                                        host: getHost(),
+                                        pubkey: person.owner_pubkey
+                                    });
+                                }}
+                                iconType="trash"
+                                aria-label="Next"
+                                size="s"
+                                style={{
+                                    color: `${color.pureBlack}`,
+                                    background: `${color.pureWhite}`
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </DWrap>
         </div>
-    )
+    );
 }
