@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useStores } from '../store';
 
-import { Button, Divider, IconButton } from '../sphinxUI';
+import { Button, Divider, IconButton } from '../components/common';
 import { useIsMobile } from '../hooks';
 import Bot from './bot';
 import BotBar from './utils/botBar';

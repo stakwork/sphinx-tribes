@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
-import IconButton from '../../../sphinxUI/icon_button';
+import IconButton from '../../../components/common/icon_button';
 import { useStores } from '../../../store';
 import StartUpModal from '../../utils/start_up_modal';
 import { PostModal, PostModalProps } from './PostModal';

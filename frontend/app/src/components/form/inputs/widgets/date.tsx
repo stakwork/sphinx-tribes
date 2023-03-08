@@ -3,7 +3,7 @@ import { EuiDatePicker } from '@elastic/eui';
 import React, { memo, useState } from 'react';
 import { FieldEnv } from '..';
 import styled from 'styled-components';
-import { colors } from '../../../../colors';
+import { colors } from '../../../../config/colors';
 
 function Date({ label, value, handleChange }: any) {
   const color = colors['light'];

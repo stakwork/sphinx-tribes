@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { QRCode } from 'react-qr-svg';
 import MaterialIcon from '@material/react-material-icon';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
 export default function QR(props) {
   const { type } = props;

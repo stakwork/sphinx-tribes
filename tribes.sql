@@ -59,11 +59,7 @@ LIMIT 12;
 
 -- plainto_tsquery is another way
 
-
-
-
 -- BOTS
-
 CREATE TABLE bots (
   uuid TEXT NOT NULL PRIMARY KEY,
   owner_pub_key TEXT NOT NULL,
@@ -96,12 +92,6 @@ SELECT uuid, unique_name, ts_rank(tsv, q) as rank
   FROM bots, to_tsquery('btc') q
   WHERE tsv @@ q
   ORDER BY rank DESC LIMIT 2 OFFSET 0;
-
-
-
-
-
-
 
 -- PEOPLE
 
@@ -145,7 +135,6 @@ VALUES
 
 ALTER TABLE IF EXISTS tribes ADD COLUMN IF NOT EXISTS preview VARCHAR NULL;
 
-
 -- Bounties
 
 CREATE TABLE bounty (
@@ -170,3 +159,10 @@ CREATE TABLE bounty (
   estimated_completion_date TEXT
 );
 
+
+CREATE TABLE connectioncodes {
+  id SERIAL PRIMARY KEY,
+  connection_string TEXT,
+  is_used boolean,
+  date_created timestamptz
+}

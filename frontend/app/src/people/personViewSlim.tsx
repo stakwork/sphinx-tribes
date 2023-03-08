@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getHost } from '../host';
+import { getHost } from '../config/host';
 import { useStores } from '../store';
 
 import AboutView from './widgetViews/aboutView';
@@ -15,7 +15,7 @@ import WantedView from './widgetViews/wantedView';
 import { useHistory, useLocation } from 'react-router';
 import { meSchema } from '../components/form/schema';
 import { useIsMobile, usePageScroll } from '../hooks';
-import { Button, IconButton, Modal, SearchTextInput } from '../sphinxUI';
+import { Button, IconButton, Modal, SearchTextInput } from '../components/common';
 import { queryLimit } from '../store/main';
 import FocusedView from './main/focusView';
 import Person from './person';
@@ -476,22 +476,41 @@ export default function PersonView(props: any) {
           >
             <IconButton onClick={goBack} icon="arrow_back" />
             {canEdit ? (
-              <Button
-                text="Sign out"
-                onClick={logout}
-                height={42}
-                style={{
-                  fontSize: 13,
-                  color: '#3c3f41',
-                  border: 'none',
-                  margin: 0,
-                  padding: 0
-                }}
-                iconStyle={{ color: '#8e969c' }}
-                iconSize={20}
-                color="white"
-                leadingIcon="logout"
-              />
+              <>
+                <Button
+                  text="Edit Profile"
+                  onClick={() => {
+                    switchWidgets('about');
+                    setShowFocusView(true);
+                  }}
+                  color="white"
+                  height={42}
+                  style={{
+                    fontSize: 13,
+                    color: '#3c3f41',
+                    border: 'none',
+                    marginLeft: 'auto'
+                  }}
+                  leadingIcon={'edit'}
+                  iconSize={15}
+                />
+                <Button
+                  text="Sign out"
+                  onClick={logout}
+                  height={42}
+                  style={{
+                    fontSize: 13,
+                    color: '#3c3f41',
+                    border: 'none',
+                    margin: 0,
+                    padding: 0
+                  }}
+                  iconStyle={{ color: '#8e969c' }}
+                  iconSize={20}
+                  color="white"
+                  leadingIcon="logout"
+                />
+              </>
             ) : (
               <div />
             )}
@@ -558,8 +577,7 @@ export default function PersonView(props: any) {
                       switchWidgets(name);
                     }}
                   >
-                    {label}
-                    {count && <Counter>{count}</Counter>}
+                    {label} {count && <Counter>{count}</Counter>}
                   </Tab>
                 );
               })}

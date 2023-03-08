@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, Modal } from '../../sphinxUI';
+import { Button, Modal } from '../../components/common';
 import QR from './QR';
 import QrBar from './QrBar';
 import { makeConnectQR } from '../../helpers';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
 export default function ConnectCard(props) {
   const color = colors['light'];

@@ -12,12 +12,12 @@ import {
 } from '@elastic/eui';
 import Tribe from './tribe';
 import { useIsMobile, usePageScroll } from '../hooks';
-import { SearchTextInput } from '../sphinxUI';
+import { SearchTextInput } from '../components/common';
 import Tag from './tag';
 import tags from './tags';
 import NoResults from '../people/utils/noResults';
 import PageLoadSpinner from '../people/utils/pageLoadSpinner';
-import { colors } from '../colors';
+import { colors } from '../config/colors';
 
 export default function BodyComponent() {
   const { main, ui } = useStores();

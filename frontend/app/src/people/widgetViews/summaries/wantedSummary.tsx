@@ -4,18 +4,18 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import api from '../../../api';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
 import InvitePeopleSearch from '../../../components/form/inputs/widgets/PeopleSearch';
 import { sendBadgeSchema } from '../../../components/form/schema';
 import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice, satToUsd } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Button, Divider, Modal, Paragraph, Title } from '../../../sphinxUI';
-import ImageButton from '../../../sphinxUI/Image_button';
-import ButtonSet from '../../../sphinxUI/bountyModal_button_set';
-import BountyPrice from '../../../sphinxUI/bounty_price';
-import BountyProfileView from '../../../sphinxUI/bounty_profile_view';
-import IconButton from '../../../sphinxUI/icon_button';
+import { Button, Divider, Modal, Paragraph, Title } from '../../../components/common';
+import ImageButton from '../../../components/common/Image_button';
+import ButtonSet from '../../../bounties/bountyModal_button_set';
+import BountyPrice from '../../../bounties/bounty_price';
+import BountyProfileView from '../../../bounties/bounty_profile_view';
+import IconButton from '../../../components/common/icon_button';
 import { useStores } from '../../../store';
 import FavoriteButton from '../../utils/favoriteButton';
 import GalleryViewer from '../../utils/galleryViewer';
@@ -33,7 +33,6 @@ function useQuery() {
 
 export default function WantedSummary(props: any) {
   const {
-    title,
     description,
     deliverables,
     priceMin,
@@ -60,8 +59,10 @@ export default function WantedSummary(props: any) {
     show,
     setIsModalSideButton,
     setIsExtraStyle,
-    formSubmit
+    formSubmit, 
+    title
   } = props;
+  const titleString = title ?? one_sentence_summary;
   const [envHeight, setEnvHeight] = useState('100%');
   const imgRef: any = useRef(null);
 
@@ -96,7 +97,7 @@ export default function WantedSummary(props: any) {
     if (description) {
       setReplitLink(
         description.match(
-          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
         )
       );
     }
@@ -156,7 +157,7 @@ export default function WantedSummary(props: any) {
       setAssignedPerson(value);
       assigneeHandlerOpen();
       const newValue = {
-        title: title,
+        title: titleString,
         wanted_type: wanted_type,
         one_sentence_summary: one_sentence_summary,
         ticketUrl: ticketUrl,
@@ -180,7 +181,7 @@ export default function WantedSummary(props: any) {
       };
       formSubmit && formSubmit(newValue);
     },
-    [codingLanguage, created, description, estimate_session_length, formSubmit, github_description, one_sentence_summary, price, show, ticketUrl, title, type, wanted_type]
+    [codingLanguage, created, description, estimate_session_length, formSubmit, github_description, one_sentence_summary, price, show, ticketUrl, titleString, type, wanted_type]
   );
 
   const changeAssignedPerson = useCallback(() => {
@@ -384,17 +385,19 @@ export default function WantedSummary(props: any) {
   const heart = <FavoriteButton />;
 
   const viewGithub = (
-    <Button
-      text={'Original Ticket'}
-      color={'white'}
-      endingIcon={'launch'}
-      iconSize={14}
-      style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-      onClick={() => {
-        const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
-        sendToRedirect(repoUrl);
-      }}
-    />
+    ticketUrl && (
+      <Button
+        text={'Original Ticket'}
+        color={'white'}
+        endingIcon={'launch'}
+        iconSize={14}
+        style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
+        onClick={() => {
+          const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
+          sendToRedirect(repoUrl);
+        }}
+      />
+    )
   );
 
   const viewTribe = tribe && tribe !== 'none' && (
@@ -464,7 +467,7 @@ export default function WantedSummary(props: any) {
         paddingLeft: 5
       }}
       onClick={() => {
-        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
           },sphinxchat`;
         sendToRedirect(twitterLink);
       }}
@@ -623,7 +626,7 @@ export default function WantedSummary(props: any) {
           <Pad>
             {nametag}
 
-            <T>{title}</T>
+            <T>{titleString}</T>
 
             <div
               style={{
@@ -857,7 +860,7 @@ export default function WantedSummary(props: any) {
                             />
                           </div>
                         </div>
-                        <TitleBox color={color}>{title}</TitleBox>
+                        <TitleBox color={color}>{titleString}</TitleBox>
                         <LanguageContainer>
                           {dataValue &&
                             dataValue?.length > 0 &&
@@ -1008,7 +1011,7 @@ export default function WantedSummary(props: any) {
                           copyURLAction={handleCopyUrl}
                           copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                           twitterAction={() => {
-                            const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                            const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
                               },sphinxchat`;
                             sendToRedirect(twitterLink);
                           }}
@@ -1018,6 +1021,7 @@ export default function WantedSummary(props: any) {
                             const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
                             sendToRedirect(profileUrl);
                           }}
+                          showGithubBtn={!!ticketUrl}
                         />
                       </div>
                       <BottomButtonContainer>
@@ -1341,7 +1345,7 @@ export default function WantedSummary(props: any) {
               <CreatorDescription paid={paid} color={color}>
                 <div className="DescriptionUpperContainerNormalView">
                   <Profile>{nametag}</Profile>
-                  <TitleBox color={color}>{title}</TitleBox>
+                  <TitleBox color={color}>{titleString}</TitleBox>
                   <LanguageContainer>
                     {dataValue &&
                       dataValue?.length > 0 &&
@@ -1422,6 +1426,7 @@ export default function WantedSummary(props: any) {
                       />
                     </BountyPriceContainer>
                     <ButtonSet
+                      showGithubBtn={!!ticketUrl}
                       githubShareAction={() => {
                         const repoUrl = ticketUrl
                           ? ticketUrl
@@ -1431,7 +1436,7 @@ export default function WantedSummary(props: any) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
                           },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
@@ -1493,6 +1498,7 @@ export default function WantedSummary(props: any) {
                       />
                     </BountyPriceContainer>
                     <ButtonSet
+                      showGithubBtn={!!ticketUrl}
                       githubShareAction={() => {
                         const repoUrl = ticketUrl
                           ? ticketUrl
@@ -1502,7 +1508,7 @@ export default function WantedSummary(props: any) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
                           },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
@@ -1571,6 +1577,7 @@ export default function WantedSummary(props: any) {
                       />
                     </BountyPriceContainer>
                     <ButtonSet
+                      showGithubBtn={!!ticketUrl}
                       githubShareAction={() => {
                         const repoUrl = ticketUrl
                           ? ticketUrl
@@ -1580,7 +1587,7 @@ export default function WantedSummary(props: any) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${title} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
                           },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
@@ -1625,7 +1632,7 @@ export default function WantedSummary(props: any) {
             }}
           >
             <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
-              <Title>{title}</Title>
+              <Title>{titleString}</Title>
               <div style={{ display: 'flex', marginTop: 12 }}>
                 <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
                 {assigneeLabel}
@@ -1790,7 +1797,7 @@ export default function WantedSummary(props: any) {
         <Pad>
           {nametag}
 
-          <T>{title || 'No title'}</T>
+          <T>{titleString || 'No title'}</T>
           <Divider
             style={{
               marginTop: 22
@@ -1847,7 +1854,7 @@ export default function WantedSummary(props: any) {
           <Pad>
             {nametag}
 
-            <Title>{title}</Title>
+            <Title>{titleString}</Title>
 
             <Divider style={{ marginTop: 22 }} />
             <Y>

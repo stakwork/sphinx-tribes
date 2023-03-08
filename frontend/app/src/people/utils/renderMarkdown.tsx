@@ -2,7 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
 export function renderMarkdown(markdown) {
   const color = colors['light'];

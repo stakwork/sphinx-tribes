@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { getHost } from '../host';
+import { getHost } from '../config/host';
 import { useObserver } from 'mobx-react-lite';
-import { colors } from '../colors';
-import { Button, Divider } from '../sphinxUI/index';
+import { colors } from '../config/colors';
+import { Button, Divider } from '../components/common/index';
 import ConnectCard from './utils/connectCard';
 import moment from 'moment';
 

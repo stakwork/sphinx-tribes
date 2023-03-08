@@ -47,7 +47,7 @@ func initDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
-	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{})
+	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{}, &ConnectionCodes{})
 
 	people := DB.getAllPeople()
 	for _, p := range people {
@@ -744,4 +744,23 @@ func (db database) addBounty(b Bounty) (Bounty, error) {
 	db.db.Create(&b)
 	return b, nil
 
+func (db database) createConnectionCode(c ConnectionCodes) (ConnectionCodes, error) {
+	if c.DateCreated == nil {
+		now := time.Now()
+		c.DateCreated = &now
+	}
+	db.db.Create(&c)
+	return c, nil
+}
+
+func (db database) getConnectionCode() ConnectionCodesShort {
+	c := ConnectionCodesShort{}
+
+	db.db.Raw(`SELECT connection_string, date_created FROM connectioncodes WHERE is_used =? ORDER BY id DESC LIMIT 1`, false).Find(&c)
+
+	db.db.Model(&ConnectionCodes{}).Where("connection_string = ?", c.ConnectionString).Updates(map[string]interface{}{
+		"is_used": true,
+	})
+
+	return c
 }

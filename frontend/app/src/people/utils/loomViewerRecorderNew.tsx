@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { setup, isSupported } from '@loomhq/record-sdk';
-import { Button, IconButton } from '../../sphinxUI';
+import { Button, IconButton } from '../../components/common';
 import styled from 'styled-components';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { EuiText } from '@elastic/eui';
 
 const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';

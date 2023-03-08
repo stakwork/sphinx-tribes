@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import NoneSpace from '../people/utils/noneSpace';
-import { Button, Modal, SearchTextInput, Divider } from '../sphinxUI';
+import { Button, Modal, SearchTextInput, Divider } from '../components/common';
 import { useStores } from '../store';
 import { useObserver } from 'mobx-react-lite';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useFuse, useScroll } from '../hooks';
-import { colors } from '../colors';
+import { colors } from '../config/colors';
 import FadeLeft from '../components/animated/fadeLeft';
 import { useIsMobile } from '../hooks';
 import Bot from './bot';

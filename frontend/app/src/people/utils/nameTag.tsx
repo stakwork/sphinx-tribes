@@ -4,7 +4,7 @@ import moment from 'moment';
 import { useStores } from '../../store';
 import { useHistory } from 'react-router';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
 export default function NameTag(props) {
   const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =

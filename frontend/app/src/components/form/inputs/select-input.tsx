@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
-import { Select } from '../../../sphinxUI';
-import { colors } from '../../../colors';
+import { Select } from '../../common';
+import { colors } from '../../../config/colors';
 
 export default function SelectInput({
   error,

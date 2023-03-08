@@ -5,9 +5,9 @@ import type { Props } from './propsType';
 import { useStores } from '../../../store';
 import MaterialIcon from '@material/react-material-icon';
 
-import { Button, Modal } from '../../../sphinxUI';
+import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 
 export default function GalleryInput({
   value,

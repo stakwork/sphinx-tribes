@@ -3,11 +3,11 @@ import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
-import { Divider } from '../../sphinxUI';
+import { colors } from '../../config/colors';
+import { Divider } from '../../components/common';
 import ConfirmMe from '../confirmMe';
 import AuthQR from './authQR';
-import IconButton from '../../sphinxUI/icon_button';
+import IconButton from '../../components/common/icon_button';
 
 export default function SignIn(props: any) {
   const { main, ui } = useStores();

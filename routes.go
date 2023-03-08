@@ -114,6 +114,11 @@ func NewRouter() *http.Server {
 		r.Delete("/ticket/{pubKey}/{created}", deleteTicketByAdmin)
 	})
 
+	r.Group(func(r chi.Router) {
+		r.Post("/connectioncodes", createConnectionCode)
+		r.Get("/connectioncodes", getConnectionCode)
+	})
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "5002"
@@ -778,4 +783,39 @@ func updateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func createConnectionCode(w http.ResponseWriter, r *http.Request) {
+	code := ConnectionCodes{}
+	now := time.Now()
+
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &code)
+
+	code.IsUsed = false
+	code.DateCreated = &now
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	_, err = DB.createConnectionCode(code)
+
+	if err != nil {
+		fmt.Println("=> ERR create connection code", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+}
+
+func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
+	connectionCode := DB.getConnectionCode()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(connectionCode)
 }

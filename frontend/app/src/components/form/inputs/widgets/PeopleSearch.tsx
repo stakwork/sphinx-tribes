@@ -3,14 +3,14 @@ import { EuiCheckboxGroup, EuiLoadingSpinner, EuiPopover, EuiText } from '@elast
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
-import { colors } from '../../../../colors';
+import { colors } from '../../../../config/colors';
 import {
   coding_languages,
   GetValue,
   LanguageObject
 } from '../../../../people/utils/language_label_style';
 import { SvgMask } from '../../../../people/utils/svgMask';
-import ImageButton from '../../../../sphinxUI/Image_button';
+import ImageButton from '../../../common/Image_button';
 
 const codingLanguages = GetValue(coding_languages);
 

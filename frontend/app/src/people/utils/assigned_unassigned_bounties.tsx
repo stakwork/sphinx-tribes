@@ -1,11 +1,11 @@
 import { EuiText } from '@elastic/eui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
-import BountyDescription from '../../sphinxUI/bounty_description';
-import BountyPrice from '../../sphinxUI/bounty_price';
-import BountyProfileView from '../../sphinxUI/bounty_profile_view';
-import IconButton from '../../sphinxUI/icon_button';
+import { colors } from '../../config/colors';
+import BountyDescription from '../../bounties/bounty_description';
+import BountyPrice from '../../bounties/bounty_price';
+import BountyProfileView from '../../bounties/bounty_profile_view';
+import IconButton from '../../components/common/icon_button';
 import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';

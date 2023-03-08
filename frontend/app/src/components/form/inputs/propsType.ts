@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export interface Props {
   value: any;
@@ -17,6 +17,7 @@ export interface Props {
   borderType?: 'bottom' | 'outline';
   imageIcon?: boolean;
   isFocused?: any;
-
+  disabled?: boolean;
   notProfilePic?: boolean;
+  style? :React.CSSProperties;
 }
