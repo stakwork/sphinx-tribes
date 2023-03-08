@@ -1,5 +1,6 @@
 import React from "react";
-import { ButtonRow, Pad, GithubIconMobile, T, Y, P, D, B, LoomIconMobile, Heart } from "./components";
+import { ButtonRow, Pad, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } from "./style";
+import { Heart, AddToFavorites, CopyLink, ShareOnTwitter, ViewTribe, ViewGithub } from "./components";
 import GithubStatusPill from '../../parts/statusPill';
 import { EuiText } from '@elastic/eui';
 import { Divider } from '../../../../components/common';
@@ -20,11 +21,6 @@ export default function MobileView(props: any) {
         nametag,
         assigneeLabel,
         labels,
-        viewGithub,
-        viewTribe,
-        shareOnTwitter,
-        copyLink,
-        addToFavorites,
         actionButtons
     } = props;
     const color = colors['light'];
@@ -126,11 +122,11 @@ export default function MobileView(props: any) {
 
                 <div style={{ height: 10 }} />
                 <ButtonRow style={{ margin: '10px 0' }}>
-                    {viewGithub}
-                    {viewTribe}
-                    {addToFavorites}
-                    {copyLink}
-                    {shareOnTwitter}
+                    <ViewGithub />
+                    <ViewTribe />
+                    <AddToFavorites />
+                    <CopyLink />
+                    <ShareOnTwitter />
                 </ButtonRow>
 
                 {actionButtons}
