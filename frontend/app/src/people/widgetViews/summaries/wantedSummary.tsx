@@ -1793,7 +1793,7 @@ export default function WantedSummary(props: any) {
 
   if (isMobile) {
     return (
-      <div style={{ padding: 20, overflow: 'auto' }}>
+      <div style={{ padding: 20, overflow: 'auto' }} key={created}>
         <Pad>
           {nametag}
 
@@ -1827,6 +1827,7 @@ export default function WantedSummary(props: any) {
 
   return (
     <div
+      key={created}
       style={{
         paddingTop: gallery && '40px'
       }}
