@@ -28,7 +28,7 @@
     "@loomhq/record-sdk": "^2.35.16",
     "@material/react-material-icon": "^0.15.0",
     "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
+    "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^7.1.2",
     "@types/react-router-dom": "^5.1.8",
     "@types/styled-components": "^5.1.0",
@@ -95,7 +95,12 @@
       "react/jsx-key": "warn",
       "react/no-children-prop": "warn",
       "react/no-unescaped-entities": "warn",
-      "@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "_" }]
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "varsIgnorePattern": "_"
+        }
+      ]
     }
   },
   "browserslist": {

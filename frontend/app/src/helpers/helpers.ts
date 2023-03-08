@@ -1,5 +1,5 @@
-import { getHost } from './config/host';
-import { uiStore } from './store/ui';
+import { getHost } from '../config/host';
+import { uiStore } from '../store/ui';
 
 export function formatPrice(amount) {
   return amount;
@@ -7,7 +7,7 @@ export function formatPrice(amount) {
 
 export function satToUsd(amount) {
   if (!amount) amount = 0;
-  const satExchange = uiStore.usdToSatsExchangeRate ? uiStore.usdToSatsExchangeRate : 0;
+  const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);
 
   if (returnValue === 'Infinity' || isNaN(parseFloat(returnValue))) {
@@ -27,45 +27,53 @@ export function makeConnectQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-export function extractGithubIssue(person, repo, issue) {
-  const { github_issues } = person;
-  const keyname = `${repo}/${issue}`;
-  return (github_issues && github_issues[keyname]) || {};
-}
-
 export function extractRepoAndIssueFromIssueUrl(url: string) {
   let orgName = '';
   let repoName = '';
   let repo = '';
   let issue = '';
 
-  try {
-    const splitString = url.split('/');
-    const issueIndex = splitString.length - 1;
-    const repoNameIndex = splitString.length - 3;
-    const orgNameIndex = splitString.length - 4;
+  const splitString = url.split('/');
+  const issueIndex = splitString.length - 1;
+  const repoNameIndex = splitString.length - 3;
+  const orgNameIndex = splitString.length - 4;
 
-    // pop last element if not a number (page focus could be "commits", "checks", "files")
-    if (isNaN(parseInt(splitString[issueIndex]))) {
-      splitString.pop();
-    }
-
-    issue = splitString[issueIndex];
-    orgName = splitString[orgNameIndex];
-    repoName = splitString[repoNameIndex];
-    repo = `${orgName}/${repoName}`;
-  } catch (e) {
-    console.log('e', e);
+  // pop last element if not a number (page focus could be "commits", "checks", "files")
+  if (isNaN(parseInt(splitString[issueIndex]))) {
+    splitString.pop();
   }
+
+  issue = splitString[issueIndex];
+  orgName = splitString[orgNameIndex];
+  repoName = splitString[repoNameIndex];
+  if (!issue || !orgName || !repoName) {
+    throw new Error('Invalid github url');
+  }
+  repo = `${orgName}/${repoName}`;
 
   return { repo, issue };
 }
 
-export function extractGithubIssueFromUrl(person, url) {
+export function extractGithubIssue(
+  person: { github_issues: Record<string, any> },
+  repo: string,
+  issue: string
+) {
   const { github_issues } = person;
-  const { repo, issue } = extractRepoAndIssueFromIssueUrl(url);
   const keyname = `${repo}/${issue}`;
   return (github_issues && github_issues[keyname]) || {};
+}
+
+export function extractGithubIssueFromUrl(
+  person: { github_issues: Record<string, any> },
+  url: string
+) {
+  try {
+    const { repo, issue } = extractRepoAndIssueFromIssueUrl(url);
+    return extractGithubIssue(person, repo, issue);
+  } catch (e) {
+    return {};
+  }
 }
 
 export const randomString = (l: number): string => {

@@ -42,7 +42,7 @@ export default function FocusedView(props: any) {
 
   const isMobile = useIsMobile();
 
-  const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
+  const isTorSave = canEdit && main.isTorSave();
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -62,11 +62,11 @@ export default function FocusedView(props: any) {
   // get self on unmount if tor user
   useEffect(() => {
     return function cleanup() {
-      if (torSave) {
+      if (isTorSave) {
         main.getSelf(null);
       }
     };
-  }, [main, torSave]);
+  }, [main, isTorSave]);
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -176,8 +176,6 @@ export default function FocusedView(props: any) {
         const { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
         const splitString = repo.split('/');
         const [ownerName, repoName] = splitString;
-        // const ownerName = splitString[0];
-        // const repoName = splitString[1];
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
 
         if (!res) {
