@@ -601,16 +601,17 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 
 	for _, peep := range peeps {
 		fmt.Println("peep: ", peep)
-		bounties, ok := peep.Extras["wanted"].([]interface{})
+		bounties, ok := peep.Extras["wanted"].([]Bounty)
 
 		if !ok {
 			fmt.Println("Wanted not there")
 			continue
 		}
 
-		for _, bounty := range bounties {
-			migrateBounty := bounty.(Bounty)
-			fmt.Println("Bounty to add:", migrateBounty)
+		for index, bounty := range bounties {
+			fmt.Println("looping bounties: ", index, bounty)
+			migrateBounty := bounty
+			fmt.Println("Bounty to add: ", migrateBounty)
 			DB.addBounty(migrateBounty)
 			//Migrate the bounties here
 
