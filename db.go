@@ -743,6 +743,7 @@ func (db database) addBounty(b Bounty) (Bounty, error) {
 	}
 	db.db.Create(&b)
 	return b, nil
+}
 
 func (db database) createConnectionCode(c ConnectionCodes) (ConnectionCodes, error) {
 	if c.DateCreated == nil {
