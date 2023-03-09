@@ -668,7 +668,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Created = Created
 			}
 
-			Assignee, ok8 := migrateBounty["assignee"].(PropertyMap)
+			Assignee, ok8 := migrateBounty["assignee"].(map[string]interface{})
 			if !ok8 {
 				migrateBountyFinal.Assignee = uint(0)
 			} else {
