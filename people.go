@@ -614,25 +614,127 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			migrateBounty := bounty.(map[string]interface{})
 
 			migrateBountyFinal := Bounty{}
-			migrateBountyFinal.Title = migrateBounty["title"].(string)
+			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
 
-			migrateBountyFinal.Paid = migrateBounty["paid"].(bool)
-			migrateBountyFinal.Show = migrateBounty["show"].(bool)
-			migrateBountyFinal.Type = migrateBounty["type"].(string)
-			migrateBountyFinal.Award = migrateBounty["award"].(string)
-			migrateBountyFinal.Price = migrateBounty["price"].(uint)
-			migrateBountyFinal.Tribe = migrateBounty["tribe"].(string)
-			migrateBountyFinal.Created = migrateBounty["created"].(*time.Time)
-			migrateBountyFinal.Assignee = migrateBounty["assignee"].(Person)
-			migrateBountyFinal.TicketUrl = migrateBounty["ticket_url"].(string)
-			migrateBountyFinal.Description = migrateBounty["description"].(string)
-			migrateBountyFinal.WantedType = migrateBounty["wanted_type"].(string)
-			migrateBountyFinal.Deliverables = migrateBounty["deliverables"].(string)
-			migrateBountyFinal.CodingLanguage = migrateBounty["coding_language"].(PropertyMap)
-			migrateBountyFinal.GithuDescription = migrateBounty["github_description"].(bool)
-			migrateBountyFinal.OneSentenceSummary = migrateBounty["one_sentence_summary"].(string)
-			migrateBountyFinal.EstimatedSessionLength = migrateBounty["estimated_session_length"].(string)
-			migrateBountyFinal.EstimatedCompletionDate = migrateBounty["estimated_completion_date"].(string)
+			Paid, ok1 := migrateBounty["paid"].(bool)
+			if !ok1 {
+				migrateBountyFinal.Paid = false
+			} else {
+				migrateBountyFinal.Paid = Paid
+			}
+
+			Show, ok2 := migrateBounty["show"].(bool)
+			if !ok2 {
+				migrateBountyFinal.Show = true
+			} else {
+				migrateBountyFinal.Show = Show
+			}
+
+			Type, ok3 := migrateBounty["type"].(string)
+			if !ok3 {
+				migrateBountyFinal.Type = ""
+			} else {
+				migrateBountyFinal.Type = Type
+			}
+
+			Award, ok4 := migrateBounty["award"].(string)
+			if !ok4 {
+				migrateBountyFinal.Award = ""
+			} else {
+				migrateBountyFinal.Award = Award
+			}
+
+			Price, ok5 := migrateBounty["price"].(uint)
+			if !ok5 {
+				migrateBountyFinal.Price = 0
+			} else {
+				migrateBountyFinal.Price = Price
+			}
+
+			Tribe, ok6 := migrateBounty["tribe"].(string)
+			if !ok6 {
+				migrateBountyFinal.Tribe = ""
+			} else {
+				migrateBountyFinal.Tribe = Tribe
+			}
+
+			Created, ok7 := migrateBounty["created"].(*time.Time)
+			if !ok7 {
+				now := time.Now()
+				migrateBountyFinal.Created = &now
+			} else {
+				migrateBountyFinal.Created = Created
+			}
+
+			Assignee, ok8 := migrateBounty["assignee"].(Person)
+			if !ok8 {
+				migrateBountyFinal.Assignee = Person{}
+			} else {
+				migrateBountyFinal.Assignee = Assignee
+			}
+
+			TicketUrl, ok9 := migrateBounty["ticket_url"].(string)
+			if !ok9 {
+				migrateBountyFinal.TicketUrl = ""
+			} else {
+				migrateBountyFinal.TicketUrl = TicketUrl
+			}
+
+			Description, ok10 := migrateBounty["description"].(string)
+			if !ok10 {
+				migrateBountyFinal.Description = ""
+			} else {
+				migrateBountyFinal.Description = Description
+			}
+
+			WantedType, ok11 := migrateBounty["wanted_type"].(string)
+			if !ok11 {
+				migrateBountyFinal.WantedType = ""
+			} else {
+				migrateBountyFinal.WantedType = WantedType
+			}
+
+			Deliverables, ok12 := migrateBounty["deliverables"].(string)
+			if !ok12 {
+				migrateBountyFinal.Deliverables = ""
+			} else {
+				migrateBountyFinal.Deliverables = Deliverables
+			}
+
+			CodingLanguage, ok13 := migrateBounty["coding_language"].(PropertyMap)
+			if !ok13 {
+				migrateBountyFinal.CodingLanguage = PropertyMap{}
+			} else {
+				migrateBountyFinal.CodingLanguage = CodingLanguage
+			}
+
+			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
+			if !ok14 {
+				migrateBountyFinal.GithuDescription = false
+			} else {
+				migrateBountyFinal.GithuDescription = GithuDescription
+			}
+
+			OneSentenceSummary, ok15 := migrateBounty["one_sentence_summary"].(string)
+			if !ok15 {
+				migrateBountyFinal.OneSentenceSummary = ""
+			} else {
+				migrateBountyFinal.OneSentenceSummary = OneSentenceSummary
+			}
+
+			EstimatedSessionLength, ok16 := migrateBounty["estimated_session_length"].(string)
+			if !ok16 {
+				migrateBountyFinal.EstimatedSessionLength = ""
+			} else {
+				migrateBountyFinal.EstimatedSessionLength = EstimatedSessionLength
+			}
+
+			EstimatedCompletionDate, ok17 := migrateBounty["estimated_completion_date"].(string)
+			if !ok17 {
+				migrateBountyFinal.EstimatedCompletionDate = ""
+			} else {
+				migrateBountyFinal.EstimatedCompletionDate = EstimatedCompletionDate
+			}
 			fmt.Println("Bounty about to be added ")
 			DB.addBounty(migrateBountyFinal)
 			//Migrate the bounties here
