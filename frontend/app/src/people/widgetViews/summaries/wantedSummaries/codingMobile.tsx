@@ -21,7 +21,8 @@ export default function MobileView(props: any) {
         nametag,
         assigneeLabel,
         labels,
-        actionButtons
+        actionButtons,
+        status
     } = props;
     const color = colors['light'];
 

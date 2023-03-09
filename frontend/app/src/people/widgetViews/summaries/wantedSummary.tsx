@@ -1,29 +1,26 @@
 /* eslint-disable func-style */
-import { EuiText } from '@elastic/eui';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ButtonRow, Pad, T, Y, P, D, B, Img, Assignee, Wrap } from './wantedSummaries/style';
 import { useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
 import { sendBadgeSchema } from '../../../components/form/schema';
-import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice, satToUsd } from '../../../helpers';
+import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
 import { Button, Divider, Paragraph, Title } from '../../../components/common';
 import { useStores } from '../../../store';
 import FavoriteButton from '../../utils/favoriteButton';
 import GalleryViewer from '../../utils/galleryViewer';
 import { LanguageObject, awards } from '../../utils/language_label_style';
-import LoomViewerRecorder from '../../utils/loomViewerRecorder';
 import NameTag from '../../utils/nameTag';
 import { renderMarkdown } from '../../utils/renderMarkdown';
-import GithubStatusPill from '../parts/statusPill';
 import CodingMobile from './wantedSummaries/codingMobile';
 import CodingBounty from './wantedSummaries/codingBounty';
+import CodingDesktop from './wantedSummaries/codingDesktop'
 
 function useQuery() {
   const { search } = useLocation();
-
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
@@ -379,96 +376,6 @@ export default function WantedSummary(props: any) {
 
   const heart = <FavoriteButton />;
 
-  const viewGithub = (
-    ticketUrl && (
-      <Button
-        text={'Original Ticket'}
-        color={'white'}
-        endingIcon={'launch'}
-        iconSize={14}
-        style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-        onClick={() => {
-          const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
-          sendToRedirect(repoUrl);
-        }}
-      />
-    )
-  );
-
-  const viewTribe = tribe && tribe !== 'none' && (
-    <Button
-      text={'View Tribe'}
-      color={'white'}
-      leadingImgUrl={tribeInfo?.img || ' '}
-      endingIcon={'launch'}
-      iconSize={14}
-      imgStyle={{ position: 'absolute', left: 10 }}
-      style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-      onClick={() => {
-        const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
-        sendToRedirect(profileUrl);
-      }}
-    />
-  );
-
-  const addToFavorites = tribe && tribe !== 'none' && (
-    <Button
-      text={'Add to Favorites'}
-      color={'white'}
-      icon={'favorite_outline'}
-      iconSize={18}
-      iconStyle={{ left: 14 }}
-      style={{
-        fontSize: 14,
-        height: 48,
-        width: '100%',
-        marginBottom: 20,
-        paddingLeft: 5
-      }}
-      onClick={() => { }}
-    />
-  );
-
-  const copyLink = (
-    <Button
-      text={isCopied ? 'Copied' : 'Copy Link'}
-      color={'white'}
-      icon={'content_copy'}
-      iconSize={18}
-      iconStyle={{ left: 14 }}
-      style={{
-        fontSize: 14,
-        height: 48,
-        width: '100%',
-        marginBottom: 20,
-        paddingLeft: 5
-      }}
-      onClick={handleCopyUrl}
-    />
-  );
-
-  const shareOnTwitter = (
-    <Button
-      text={'Share to Twitter'}
-      color={'white'}
-      icon={'share'}
-      iconSize={18}
-      iconStyle={{ left: 14 }}
-      style={{
-        fontSize: 14,
-        height: 48,
-        width: '100%',
-        marginBottom: 20,
-        paddingLeft: 5
-      }}
-      onClick={() => {
-        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-          },sphinxchat`;
-        sendToRedirect(twitterLink);
-      }}
-    />
-  );
-
   //  if my own, show this option to show/hide
   const markPaidButton = (
     <Button
@@ -618,7 +525,14 @@ export default function WantedSummary(props: any) {
 
     if (isMobile) {
       return (
-        <CodingMobile  {...props} labels={labels} nametag={nametag} assigneeLabel={assigneeLabel} actionButtons={actionButtons} />
+        <CodingMobile
+          {...props}
+          labels={labels}
+          nametag={nametag}
+          assigneeLabel={assigneeLabel}
+          actionButtons={actionButtons}
+          status={status}
+        />
       );
     }
 
@@ -666,176 +580,16 @@ export default function WantedSummary(props: any) {
 
     return (
       <>
-        {paid && (
-          <Img
-            src={'/static/paid_ribbon.svg'}
-            style={{
-              position: 'absolute',
-              top: -1,
-              right: 0,
-              width: 64,
-              height: 72,
-              zIndex: 100,
-              pointerEvents: 'none'
-            }}
-          />
-        )}
-        <Wrap color={color}>
-          <div
-            style={{
-              width: 700,
-              borderRight: `1px solid ${color.grayish.G600}`,
-              minHeight: '100%',
-              overflow: 'auto'
-            }}
-          >
-            <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
-              <Title>{titleString}</Title>
-              <div style={{ display: 'flex', marginTop: 12 }}>
-                <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
-                {assigneeLabel}
-                {ticketUrl && (
-                  <GithubIcon
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(ticketUrl, '_blank');
-                    }}
-                  >
-                    <img
-                      height={'100%'}
-                      width={'100%'}
-                      src="/static/github_logo.png"
-                      alt="github"
-                    />
-                  </GithubIcon>
-                )}
-                {loomEmbedUrl && (
-                  <LoomIcon
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(loomEmbedUrl, '_blank');
-                    }}
-                  >
-                    <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
-                  </LoomIcon>
-                )}
-              </div>
-              <div
-                style={{
-                  marginTop: '2px'
-                }}
-              >
-                <EuiText
-                  style={{
-                    fontSize: '13px',
-                    color: color.text2_4,
-                    fontWeight: '500'
-                  }}
-                >
-                  {estimate_session_length && 'Session:'}{' '}
-                  <span
-                    style={{
-                      fontWeight: '500',
-                      color: color.pureBlack
-                    }}
-                  >
-                    {estimate_session_length ?? ''}
-                  </span>
-                </EuiText>
-              </div>
-            </SectionPad>
-            <Divider />
-
-            <SectionPad>
-              <Paragraph
-                style={{
-                  overflow: 'hidden',
-                  wordBreak: 'normal'
-                }}
-              >
-                {renderMarkdown(description)}
-              </Paragraph>
-
-              <LoomViewerRecorder readOnly style={{ marginTop: 10 }} loomEmbedUrl={loomEmbedUrl} />
-            </SectionPad>
-          </div>
-
-          <div style={{ width: 320, height: envHeight, overflow: 'auto' }}>
-            <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  justifyContent: 'space-between'
-                }}
-              >
-                {nametag}
-              </div>
-              <div
-                style={{
-                  minHeight: '60px',
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'row'
-                }}
-              >
-                {labels?.length > 0 &&
-                  labels?.map((x: any) => {
-                    return (
-                      <>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            height: '22px',
-                            minWidth: 'fit-content',
-                            backgroundColor: color.grayish.G1000,
-                            border: `1px solid ${color.grayish.G70}`,
-                            padding: '3px 10px',
-                            borderRadius: '20px',
-                            marginRight: '3px',
-                            boxShadow: `1px 1px ${color.grayish.G70}`
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: '10px',
-                              color: color.black300
-                            }}
-                          >
-                            {x.label}
-                          </div>
-                        </div>
-                      </>
-                    );
-                  })}
-              </div>
-            </SectionPad>
-            <Divider />
-            <SectionPad>
-              <Y style={{ padding: 0 }}>
-                <P color={color}>
-                  <B color={color}>{formatPrice(price)}</B> SAT /{' '}
-                  <B color={color}>{satToUsd(price)}</B> USD
-                </P>
-              </Y>
-            </SectionPad>
-
-            <Divider />
-
-            <SectionPad>
-              <ButtonRow>
-                {viewGithub}
-                {viewTribe}
-                {addToFavorites}
-                {copyLink}
-                {shareOnTwitter}
-              </ButtonRow>
-
-              {actionButtons}
-            </SectionPad>
-          </div>
-        </Wrap>
+        <CodingDesktop
+          {...props}
+          actionButtons={actionButtons}
+          nametag={nametag}
+          assigneeLabel={assigneeLabel}
+          assignee={assignee}
+          loomEmbedUrl={loomEmbedUrl}
+          titleString={titleString}
+          status={status}
+        />
       </>
     );
   }
@@ -928,106 +682,7 @@ export default function WantedSummary(props: any) {
   );
 }
 
-interface colorProps {
-  color?: any;
-  isPaidStatusPopOver?: any;
-  isPaidStatusBadgeInfo?: any;
-}
 
-const Wrap = styled.div<colorProps>`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-width: 800px;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  color: ${(p) => p?.color && p.color.grayish.G10};
-  justify-content: space-between;
-`;
-
-const SectionPad = styled.div`
-  padding: 38px;
-  word-break: break-word;
-`;
-
-const Pad = styled.div`
-  padding: 0 20px;
-  word-break: break-word;
-`;
-const Y = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 20px 0;
-  align-items: center;
-`;
-const T = styled.div`
-  font-weight: 500;
-  font-size: 20px;
-  margin: 10px 0;
-`;
-const B = styled.span<colorProps>`
-  font-size: 15px;
-  font-weight: bold;
-  color: ${(p) => p?.color && p.color.grayish.G10};
-`;
-const P = styled.div<colorProps>`
-  font-weight: regular;
-  font-size: 15px;
-  color: ${(p) => p?.color && p.color.grayish.G100};
-`;
-const D = styled.div<colorProps>`
-  color: ${(p) => p?.color && p.color.grayish.G50};
-  margin: 10px 0 30px;
-`;
-
-const Assignee = styled.div<colorProps>`
-  margin-left: 3px;
-  font-weight: 500;
-  cursor: pointer;
-
-  &:hover {
-    color: ${(p) => p?.color && p.color.pureBlack};
-  }
-`;
-
-const ButtonRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
-const GithubIcon = styled.div`
-  height: 20px;
-  width: 20px;
-  position: relative;
-  top: -6px;
-  margin-left: 20px;
-  cursor: pointer;
-`;
-
-const LoomIcon = styled.div`
-  height: 20px;
-  width: 20px;
-  position: relative;
-  top: -6px;
-  margin-left: 20px;
-  cursor: pointer;
-`;
-
-interface ImageProps {
-  readonly src?: string;
-}
-
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
-  background-position: center;
-  background-size: cover;
-  position: relative;
-  width: 22px;
-  height: 22px;
-`;
 
 
 
