@@ -59,7 +59,7 @@ export default function WantedSummary(props: any) {
     show,
     setIsModalSideButton,
     setIsExtraStyle,
-    formSubmit, 
+    formSubmit,
     title
   } = props;
   const titleString = title ?? one_sentence_summary;
