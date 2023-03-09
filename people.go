@@ -701,9 +701,9 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Deliverables = Deliverables
 			}
 
-			CodingLanguage, ok13 := migrateBounty["coding_language"].(PropertyMap)
+			CodingLanguage, ok13 := migrateBounty["coding_language"].(string)
 			if !ok13 {
-				migrateBountyFinal.CodingLanguage = PropertyMap{}
+				migrateBountyFinal.CodingLanguage = ""
 			} else {
 				migrateBountyFinal.CodingLanguage = CodingLanguage
 			}
