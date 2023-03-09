@@ -646,7 +646,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 
 			Price, ok5 := migrateBounty["price"].(string)
 			if !ok5 {
-				migrateBountyFinal.Price = 0
+				migrateBountyFinal.Price = "0"
 			} else {
 				migrateBountyFinal.Price = Price
 			}
