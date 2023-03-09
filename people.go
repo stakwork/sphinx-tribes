@@ -673,7 +673,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Assignee = Assignee
 			}
 
-			TicketUrl, ok9 := migrateBounty["ticket_url"].(string)
+			TicketUrl, ok9 := migrateBounty["ticketUrl"].(string)
 			if !ok9 {
 				migrateBountyFinal.TicketUrl = ""
 			} else {
@@ -701,11 +701,11 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Deliverables = Deliverables
 			}
 
-			CodingLanguage, ok13 := migrateBounty["coding_language"].(string)
+			CodingLanguage, ok13 := migrateBounty["coding_language"].(PropertyMap)
 			if !ok13 {
 				migrateBountyFinal.CodingLanguage = ""
 			} else {
-				migrateBountyFinal.CodingLanguage = CodingLanguage
+				migrateBountyFinal.CodingLanguage = CodingLanguage["value"].(string)
 			}
 
 			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
