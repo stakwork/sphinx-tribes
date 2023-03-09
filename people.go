@@ -616,6 +616,8 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			migrateBountyFinal := Bounty{}
 			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
 
+			migrateBountyFinal.OwnerID = peep.ID
+
 			Paid, ok1 := migrateBounty["paid"].(bool)
 			if !ok1 {
 				migrateBountyFinal.Paid = false
@@ -666,11 +668,18 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Created = Created
 			}
 
-			Assignee, ok8 := migrateBounty["assignee"].(Person)
+			Assignee, ok8 := migrateBounty["assignee"].(PropertyMap)
+			assigneePubkey := Assignee["owner_pubkey"].(string)
+			assigneeId := uint(0)
+			for _, peep := range peeps {
+				if peep.OwnerPubKey == assigneePubkey {
+					assigneeId = peep.ID
+				}
+			}
 			if !ok8 {
-				migrateBountyFinal.Assignee = Person{}
+				migrateBountyFinal.Assignee = uint(0)
 			} else {
-				migrateBountyFinal.Assignee = Assignee
+				migrateBountyFinal.Assignee = assigneeId
 			}
 
 			TicketUrl, ok9 := migrateBounty["ticketUrl"].(string)
