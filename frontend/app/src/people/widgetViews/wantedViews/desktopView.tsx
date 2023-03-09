@@ -1,5 +1,5 @@
 import React from 'react';
-import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from "./components";
+import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from "./style";
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import GithubStatusPill from '../parts/statusPill';
 import { colors } from '../../../config/colors';

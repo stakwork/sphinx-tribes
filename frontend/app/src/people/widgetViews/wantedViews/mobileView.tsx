@@ -1,5 +1,5 @@
 import React from 'react';
-import { Img, EyeDeleteContainerMobile, Wrap, Body, P, B, DT, EyeDeleteTextContainerMobile } from "./components";
+import { Img, EyeDeleteContainerMobile, Wrap, Body, P, B, DT, EyeDeleteTextContainerMobile } from "./style";
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import GithubStatusPill from '../parts/statusPill';
 import { colors } from '../../../config/colors';
