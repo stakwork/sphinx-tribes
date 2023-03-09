@@ -597,7 +597,7 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 }
 
 func migrateBounties(w http.ResponseWriter, r *http.Request) {
-	peeps := DB.getListedPeople(nil)
+	peeps := DB.getAllPeople()
 
 	for indexPeep, peep := range peeps {
 		fmt.Println("peep: ", indexPeep)
