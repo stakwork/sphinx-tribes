@@ -1,7 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import ImageButton from './Image_button';
 
 const AutoComplete = (props) => {

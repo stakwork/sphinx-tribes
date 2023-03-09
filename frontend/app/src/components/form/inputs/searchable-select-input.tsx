@@ -5,7 +5,7 @@ import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 import { SearchableSelect } from '../../common';
 import { useStores } from '../../../store';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 
 export default function SearchableSelectInput({
   error,

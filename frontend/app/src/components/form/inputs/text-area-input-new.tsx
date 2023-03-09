@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 
 export default function TextAreaInputNew({
   error,

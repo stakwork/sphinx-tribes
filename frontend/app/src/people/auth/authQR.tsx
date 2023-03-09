@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
-import { getHost } from '../../host';
+import { getHost } from '../../config/host';
 import QR from '../utils/QR';
 
 const host = getHost();

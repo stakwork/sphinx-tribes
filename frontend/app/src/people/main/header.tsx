@@ -4,7 +4,7 @@ import { useStores } from '../../store';
 import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
 import { Modal, Button } from '../../components/common';
@@ -503,6 +503,27 @@ const LoggedInBtn = styled.div`
       width: 34px;
       left: 3px;
     }
+  }
+`;
+
+const GuestBtn = styled.div`
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+  padding: 0 24px 0 24px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.13);
   }
 `;
 

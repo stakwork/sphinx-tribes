@@ -10,13 +10,14 @@ import GithubStatusPill from './parts/statusPill';
 import { useStores } from '../../store';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
-import { getHost } from '../../host';
+import { getHost } from '../../config/host';
 import PaidBounty from '../utils/paidBounty';
 import Bounties from '../utils/assigned_unassigned_bounties';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
 export default function WantedView(props: any) {
   const {
+    one_sentence_summary,
     title,
     description,
     priceMin,
@@ -37,6 +38,7 @@ export default function WantedView(props: any) {
     setDeletePayload,
     onPanelClick
   } = props;
+  const titleString = title ?? one_sentence_summary;
 
   let { show, paid } = props;
   const isMobile = useIsMobile();
@@ -160,7 +162,7 @@ export default function WantedView(props: any) {
                   margin: '15px 0'
                 }}
               >
-                {title}
+                {titleString}
               </DT>
 
               <div
@@ -203,9 +205,10 @@ export default function WantedView(props: any) {
                       onClick={(e) => {
                         e.stopPropagation();
                         window.open(
-                          `/p/${{
-                            ...assignee
-                          }.owner_pubkey
+                          `/p/${
+                            {
+                              ...assignee
+                            }.owner_pubkey
                           }?widget=wanted`,
                           '_blank'
                         );
@@ -388,7 +391,7 @@ export default function WantedView(props: any) {
                 created={created}
                 ticketUrl={ticketUrl}
                 loomEmbedUrl={loomEmbedUrl}
-                title={title}
+                title={titleString}
                 codingLanguage={labels}
                 priceMin={priceMin}
                 priceMax={priceMax}
@@ -406,7 +409,7 @@ export default function WantedView(props: any) {
                 created={created}
                 ticketUrl={ticketUrl}
                 loomEmbedUrl={loomEmbedUrl}
-                title={title}
+                title={titleString}
                 codingLanguage={labels}
                 priceMin={priceMin}
                 priceMax={priceMax}
@@ -453,7 +456,7 @@ export default function WantedView(props: any) {
               />
             </div>
             <Divider style={{ margin: '10px 0' }} />
-            <DT>{title}</DT>
+            <DT>{titleString}</DT>
             <div
               style={{
                 display: 'flex',
@@ -500,9 +503,10 @@ export default function WantedView(props: any) {
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(
-                        `/p/${{
-                          ...assignee
-                        }.owner_pubkey
+                        `/p/${
+                          {
+                            ...assignee
+                          }.owner_pubkey
                         }?widget=wanted`,
                         '_blank'
                       );

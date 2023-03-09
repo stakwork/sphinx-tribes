@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import { getHostIncludingDockerHosts } from '../host';
+import { getHostIncludingDockerHosts } from '../config/host';
 import { uiStore } from './ui';
 import { randomString } from '../helpers';
 export const queryLimit = 100;
@@ -52,8 +52,6 @@ export class MainStore {
   myBots: Bot[] = [];
 
   @action async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
-    console.log('get bots');
-
     const query = this.appendQueryParams('bots', queryParams);
     const b = await api.get(query);
 
@@ -114,11 +112,9 @@ export class MainStore {
       let relayB: any = await this.fetchFromRelay('bots');
 
       relayB = await relayB.json();
-      console.log('got bots from relay', relayB);
       const relayMyBots = relayB?.response?.bots || [];
 
       // merge tribe server stuff
-      console.log('get bots');
       const tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
@@ -134,7 +130,7 @@ export class MainStore {
 
       return mergedBots;
     } catch (e) {
-      console.log('ok');
+      console.log('Error getMyBots', e);
     }
   }
 
@@ -183,8 +179,6 @@ export class MainStore {
     const data = await api.get(`github_issue/${owner}/${repo}/${issue}`);
     const { title, description, assignee, status } = data && data;
 
-    console.log('got github issue', data);
-
     // if no title, the github issue isnt real
     if (!title && !status && !description && !assignee) return null;
     return data;
@@ -193,13 +187,12 @@ export class MainStore {
   @action async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
-      console.log('got openIssues', openIssues);
       if (openIssues) {
         uiStore.setOpenGithubIssues(openIssues);
       }
       return openIssues;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error getOpenGithubIssues: ', e);
     }
   }
 
@@ -215,10 +208,8 @@ export class MainStore {
     if (!r) return; // tor user will return here
 
     const b = await r.json();
-    console.log('made bot', b);
 
     const mybots = await this.getMyBots();
-    console.log('got my bots', mybots);
 
     return b?.response;
   }
@@ -227,7 +218,6 @@ export class MainStore {
     const [r, error] = await this.doCallToRelay('PUT', `bot`, payload);
     if (error) throw error;
     if (!r) return; // tor user will return here
-    console.log('updated bot', r);
     return r;
   }
 
@@ -236,10 +226,9 @@ export class MainStore {
       const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null);
       if (error) throw error;
       if (!r) return; // tor user will return here
-      console.log('deleted from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!');
+      console.log('Error deleteBot: ', e);
     }
   }
 
@@ -313,7 +302,7 @@ export class MainStore {
 
       return transferredBadge;
     } catch (e) {
-      console.log('ok');
+      console.log('Error awardBadge: ', e);
     }
   }
 
@@ -330,7 +319,7 @@ export class MainStore {
       uiStore.setBadgeList(badgelist);
       return badgelist;
     } catch (e) {
-      console.log('ok');
+      console.log('Error getBadgeList: ', e);
     }
   }
 
@@ -346,7 +335,7 @@ export class MainStore {
 
       return balances;
     } catch (e) {
-      console.log('ok');
+      console.log('Error getBalances: ', e);
     }
   }
 
@@ -380,7 +369,7 @@ export class MainStore {
       });
       torSaveURL = makeTorSaveURL(gotHost, key);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error postToCache getTorSaveURL: ', e);
     }
 
     return torSaveURL;
@@ -469,7 +458,6 @@ export class MainStore {
   peoplePosts: PersonPost[] = [];
 
   @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
-    // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/posts', queryLimit, {
@@ -495,7 +483,7 @@ export class MainStore {
       }
       return ps;
     } catch (e) {
-      console.log('fetch failed', e);
+      console.log('fetch failed getPeoplePosts: ', e);
       return [];
     }
   }
@@ -534,7 +522,7 @@ export class MainStore {
       }
       return ps;
     } catch (e) {
-      console.log('fetch failed', e);
+      console.log('fetch failed getPeopleWanteds: ', e);
       return [];
     }
   }
@@ -544,7 +532,6 @@ export class MainStore {
   peopleOffers: PersonOffer[] = [];
 
   @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
-    // console.log('queryParams', queryParams)
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/offers', queryLimit, {
@@ -571,7 +558,7 @@ export class MainStore {
 
       return ps;
     } catch (e) {
-      console.log('fetch failed', e);
+      console.log('fetch failed getPeopleOffers: ', e);
       return [];
     }
   }
@@ -609,14 +596,12 @@ export class MainStore {
 
   @action async getPersonByGithubName(github: string): Promise<Person> {
     const p = await api.get(`person/githubname/${github}`);
-    console.log('getPersonByGithubName', p);
     return p;
   }
 
   // this method merges the relay self data with the db self data, they each hold different data
 
   @action async getSelf(me: any) {
-    console.log('getSelf');
     const self = me || uiStore.meInfo;
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
@@ -638,7 +623,6 @@ export class MainStore {
 
       const isSuperAdmin = await getSuperAdmin();
       const updateSelf = { ...self, ...p, isSuperAdmin: isSuperAdmin };
-      console.log('updateSelf', updateSelf);
       uiStore.setMeInfo(updateSelf);
     }
   }
@@ -649,10 +633,9 @@ export class MainStore {
       if (error) throw error;
       if (!r) return; // tor user will return here
 
-      console.log('code from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!', e);
+      console.log('Error claimBadgeOnLiquid: ', e);
     }
   }
 
@@ -662,10 +645,9 @@ export class MainStore {
       if (error) throw error;
       if (!r) return; // tor user will return here
 
-      console.log('code from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!', e);
+      console.log('Error sendBadgeOnLiquid: ', e);
     }
   }
 
@@ -678,7 +660,7 @@ export class MainStore {
 
       return j.response;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error refreshJwt: ', e);
       // could not refresh jwt, logout!
       return null;
     }
@@ -695,12 +677,11 @@ export class MainStore {
       const satoshisInABitcoin = 0.00000001;
       const exchangeRate = j / satoshisInABitcoin;
 
-      console.log('update exchange rate', exchangeRate);
       uiStore.setUsdToSatsExchangeRate(exchangeRate);
 
       return exchangeRate;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error getUsdToSatsExchangeRate: ', e);
       // could not refresh jwt, logout!
       return null;
     }
@@ -720,14 +701,13 @@ export class MainStore {
       const j = await r.json();
       return j;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error deleteProfile: ', e);
       // could not delete profile!
       return null;
     }
   }
 
   @action async saveProfile(body) {
-    console.log('SUBMIT FORM', body);
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
@@ -753,7 +733,7 @@ export class MainStore {
 
       await this.getSelf(body);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error saveProfile: ', e);
     }
   }
 
@@ -797,7 +777,7 @@ export class MainStore {
       const torSaveURL = await this.getTorSaveURL(method, path, body);
       uiStore.setTorFormBodyQR(torSaveURL);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error submitFormViaApp: ', e);
     }
   }
 
@@ -820,7 +800,7 @@ export class MainStore {
           await this.saveProfile(clonedMeInfo);
           return [clonedEx, targetIndex];
         } catch (e) {
-          console.log('e', e);
+          console.log('Error setExtrasPropertyAndSave', e);
         }
       }
 
@@ -847,7 +827,7 @@ export class MainStore {
           await this.saveProfile(clonedMeInfo);
           return [clonedEx, targetIndex];
         } catch (e) {
-          console.log('e', e);
+          console.log('Error setExtrasMultipleProperty', e);
         }
       }
 
@@ -857,13 +837,11 @@ export class MainStore {
 
   @action async deleteFavorite() {
     const body: any = {};
-    console.log('SUBMIT FORM', body);
 
-    // console.log('mergeFormWithMeData', body);
     if (!body) return; // avoid saving bad state
 
     const info = uiStore.meInfo as any;
-    if (!info) return console.log('no meInfo');
+    if (!info) return console.log('Error No meInfo');
     try {
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/profile`, {
@@ -891,7 +869,7 @@ export class MainStore {
         }
       ]);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error deleteFavorite', e);
     }
   }
 }

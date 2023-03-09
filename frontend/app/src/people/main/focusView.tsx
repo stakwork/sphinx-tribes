@@ -44,7 +44,14 @@ export default function FocusedView(props: any) {
 
   const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
 
-  function closeModal(override) {
+  function isNotHttps(url: string | undefined) {
+    if (main.isTorSave() || url?.startsWith('http://')) {
+      return true;
+    }
+    return false;
+  }
+
+  function closeModal() {
     if (!manualGoBackOnly) {
       console.log('close modal');
       ui.setEditMe(false);
@@ -59,7 +66,7 @@ export default function FocusedView(props: any) {
         main.getSelf(null);
       }
     };
-  }, []);
+  }, [main, torSave]);
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -147,13 +154,13 @@ export default function FocusedView(props: any) {
     try {
       await main.saveProfile(body);
       await main.getPeople();
-      closeModal(true);
+      closeModal();
       props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
     setDeleting(false);
-    props.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url)) props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
@@ -161,14 +168,16 @@ export default function FocusedView(props: any) {
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
-        body.type === 'wanted_coding_task' ||
-        body.type === 'coding_task' ||
-        body.type === 'freelance_job_request'
+        body.ticketUrl &&
+        (body.type === 'wanted_coding_task' ||
+          body.type === 'coding_task' ||
+          body.type === 'freelance_job_request')
       ) {
         const { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
         const splitString = repo.split('/');
-        const ownerName = splitString[0];
-        const repoName = splitString[1];
+        const [ownerName, repoName] = splitString;
+        // const ownerName = splitString[0];
+        // const repoName = splitString[1];
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
 
         if (!res) {
@@ -196,6 +205,17 @@ export default function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
+    if (config.name === 'wanted' && !body?.title) {
+      body.title = body.one_sentence_summary ?? '';
+    }
+    try {
+      body = await preSubmitFunctions(body);
+    } catch (e) {
+      console.log('e', e);
+      alert(e);
+      return;
+    }
+
     body = mergeFormWithMeData(body);
 
     if (!body) return; // avoid saving bad state
@@ -219,12 +239,12 @@ export default function FocusedView(props: any) {
       await main.saveProfile(
         config.name === 'about' || config.name === 'wanted' ? { ...newBody } : body
       );
-      closeModal(true);
+      closeModal();
     } catch (e) {
       console.log('e', e);
     }
     setLoading(false);
-    props?.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
   }
 
   return useObserver(() => {
@@ -330,8 +350,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                      }
                     : {}
                 }
               />
@@ -429,6 +449,7 @@ const BWrap = styled.div`
   min-height: 42px;
   position: absolute;
   left: 0px;
+  border-bottom: 1px solid rgb(221, 225, 229);
   background: #ffffff;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
   z-index: 100;
@@ -468,7 +489,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: '#5a606c',
-  trackBackgroundColor: 'rgba(0,0,0,0)'
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
 `;

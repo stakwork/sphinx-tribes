@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import type { Props } from './propsType';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 import { EuiText } from '@elastic/eui';
 import LoomViewerRecorderNew from '../../../people/utils/loomViewerRecorderNew';
 
@@ -10,6 +10,7 @@ export default function LoomVideoInputNew({
   handleChange,
   handleBlur,
   handleFocus,
+  style = {}
 }: Props) {
   const color = colors['light'];
 
@@ -19,9 +20,7 @@ export default function LoomVideoInputNew({
     <LoomVideoContainer
       color={color}
       isVideo={isVideo}
-      style={{
-        marginTop: '55px'
-      }}
+      style={style}
     >
       <LoomViewerRecorderNew
         name="loomVideo"

@@ -60,7 +60,7 @@ button:focus {
   display: none !important;
 }
 
-.euiCheckableCard__row:first-child {
+.euiCheckableCard__row:first-of-type{
   display: none;
 }
 

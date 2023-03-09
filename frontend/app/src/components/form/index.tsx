@@ -10,12 +10,12 @@ import { formDropdownOptions } from '../../people/utils/constants';
 import { EuiText } from '@elastic/eui';
 import api from '../../api';
 import ImageButton from '../common/Image_button';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
 
 export default function Form(props: any) {
   const { buttonsOnBottom, wrapStyle, smallForm } = props;
-  const [page, setPage] = useState(1);
+  const page = 1;
   const [loading, setLoading] = useState(true);
   const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null);
   const [dynamicSchema, setDynamicSchema]: any = useState(null);
@@ -92,7 +92,7 @@ export default function Form(props: any) {
       setDynamicSchemaName(dSchema.defaultSchemaName);
     }
     setLoading(false);
-  }, []);
+  }, [props.initialValues?.type, props.schema]);
 
   // this useEffect triggers when the dynamic schema name is updated
   // checks if there are autofill fields that we can pull from local storage
@@ -116,23 +116,23 @@ export default function Form(props: any) {
         });
       }
     }
-  }, [dynamicSchemaName]);
+  }, [dynamicSchemaName, initValues, props.formRef, ui]);
+
+  const scrollToTop = useCallback(() => {
+    if (scrollDiv && scrollDiv.current) {
+      scrollDiv.current.scrollTop = 0;
+    }
+  }, [scrollDiv]);
 
   useEffect(() => {
     scrollToTop();
-  }, [page]);
+  }, [scrollToTop]);
 
   function reloadForm() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 20);
-  }
-
-  function scrollToTop() {
-    if (scrollDiv && scrollDiv.current) {
-      scrollDiv.current.scrollTop = 0;
-    }
   }
 
   if (props.paged) {
@@ -184,15 +184,15 @@ export default function Form(props: any) {
       innerRef={props.formRef}
       validationSchema={validator(schema)}
     >
-      {({
-        setFieldTouched,
-        handleSubmit,
-        values,
-        setFieldValue,
-        errors,
-        initialValues
-      }) => {
+      {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }) => {
+        const isDescriptionValid = values.ticketUrl
+          ? values.github_description || !!values.description
+          : !!values.description;
+
         const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
+
+        const isBtnDisabled = !valid || (stepTracker === 3 && !isDescriptionValid);
+
         return (
           <Wrap
             ref={refBody}
@@ -220,7 +220,6 @@ export default function Form(props: any) {
                           {...item}
                           key={item.name}
                           values={values}
-                          label={''}
                           errors={errors}
                           scrollToTop={scrollToTop}
                           value={values[item.name]}
@@ -244,6 +243,13 @@ export default function Form(props: any) {
                           }
                           borderType={'bottom'}
                           imageIcon={true}
+                          style={
+                            item.name === 'github_description' && !values.ticketUrl
+                              ? {
+                                  display: 'none'
+                                }
+                              : undefined
+                          }
                         />
                       ))}
                   </div>
@@ -279,6 +285,13 @@ export default function Form(props: any) {
                               (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                             }
                             borderType={'bottom'}
+                            style={
+                              item.name === 'github_description' && !values.ticketUrl
+                                ? {
+                                    display: 'none'
+                                  }
+                                : undefined
+                            }
                           />
                         );
                       })}
@@ -429,6 +442,13 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
+                                style={
+                                  item.name === 'github_description' && !values.ticketUrl
+                                    ? {
+                                        display: 'none'
+                                      }
+                                    : undefined
+                                }
                               />
                             );
                           })}
@@ -472,6 +492,13 @@ export default function Form(props: any) {
                                 extraHTML={
                                   (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                                 }
+                                style={
+                                  item.type === 'loom' && values.ticketUrl
+                                    ? {
+                                        marginTop: '55px'
+                                      }
+                                    : undefined
+                                }
                               />
                             );
                           })}
@@ -484,15 +511,15 @@ export default function Form(props: any) {
                         style={{
                           width: stepTracker < 5 ? '45%' : '100%',
                           height: stepTracker < 5 ? '48px' : '48px',
-                          marginTop: stepTracker === 5 ? '20px' : ''
+                          marginTop: stepTracker === 5 || stepTracker === 3 ? '20px' : ''
                         }}
                       >
-                        {!valid && (
+                        {isBtnDisabled && (
                           <div className="nextButtonDisable">
                             <EuiText className="disableText">Next</EuiText>
                           </div>
                         )}
-                        {valid && (
+                        {!isBtnDisabled && (
                           <div
                             className="nextButton"
                             onClick={() => {
@@ -583,6 +610,13 @@ export default function Form(props: any) {
                       }}
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
+                      style={
+                        item.name === 'github_description' && !values.ticketUrl
+                          ? {
+                              display: 'none'
+                            }
+                          : undefined
+                      }
                     />
                   ))}
                 </div>
@@ -649,30 +683,34 @@ export default function Form(props: any) {
               </BWrap>
             )}
             {/*  if schema is AboutMe */}
-            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id != 0 && (
+            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id !== 0 && (
               <>
-                <div
-                  style={{
-                    cursor: 'pointer',
-                    marginTop: 20,
-                    fontSize: 12,
-                    minHeight: 30,
-                    height: 30
-                  }}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                  Advanced Settings {showSettings ? '-' : '+'}
-                </div>
-
-                {showSettings && (
-                  <div style={{ minHeight: 50, height: 50 }}>
-                    <Button
-                      text={'Delete my account'}
-                      color={'link2'}
-                      width="fit-content"
-                      onClick={() => setShowDeleteWarn(true)}
-                    />
+                <SchemaOuterContainer>
+                  <div
+                    className="SchemaInnerContainer"
+                    style={{
+                      cursor: 'pointer',
+                      marginTop: 20,
+                      fontSize: 12,
+                      minHeight: 30,
+                      height: 30
+                    }}
+                    onClick={() => setShowSettings(!showSettings)}
+                  >
+                    Advanced Settings {showSettings ? '-' : '+'}
                   </div>
+                </SchemaOuterContainer>
+                {showSettings && (
+                  <SchemaOuterContainer>
+                    <div style={{ minHeight: 50, height: 50 }} className="SchemaInnerContainer">
+                      <Button
+                        text={'Delete my account'}
+                        color={'link2'}
+                        width="fit-content"
+                        onClick={() => setShowDeleteWarn(true)}
+                      />
+                    </div>
+                  </SchemaOuterContainer>
                 )}
 
                 <Modal visible={showDeleteWarn}>
@@ -733,7 +771,6 @@ const Wrap = styled.div<WrapProps>`
   height: inherit;
   flex-direction: column;
   align-content: center;
-  // max-width:400px;
   min-width: 230px;
 `;
 
@@ -762,6 +799,7 @@ const CreateBountyHeaderContainer = styled.div<styledProps>`
   flex-direction: column;
   justify-content: center;
   padding: 0px 48px;
+  margin-bottom: 30px;
   .TopContainer {
     display: flex;
     justify-content: space-between;
@@ -873,25 +911,25 @@ const BottomContainer = styled.div<bottomButtonProps>`
     align-items: center;
     cursor: pointer;
     background: ${(p) =>
-    p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
+      p?.assigneeName === '' ? `${p?.color.button_secondary.main}` : `${p?.color.statusAssigned}`};
     box-shadow: 0px 2px 10px
       ${(p) =>
-    p?.assigneeName === ''
-      ? `${p.color.button_secondary.shadow}`
-      : `${p.color.button_primary.shadow}`};
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.shadow}`
+          : `${p.color.button_primary.shadow}`};
     border-radius: 32px;
     color: ${(p) => p?.color && p.color.pureWhite};
     :hover {
       background: ${(p) =>
-    p?.assigneeName === ''
-      ? `${p.color.button_secondary.hover}`
-      : `${p.color.button_primary.hover}`};
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.hover}`
+          : `${p.color.button_primary.hover}`};
     }
     :active {
       background: ${(p) =>
-    p?.assigneeName === ''
-      ? `${p.color.button_secondary.active}`
-      : `${p.color.button_primary.active}`};
+        p?.assigneeName === ''
+          ? `${p.color.button_secondary.active}`
+          : `${p.color.button_primary.active}`};
     }
     .nextText {
       font-family: Barlow;
@@ -908,7 +946,7 @@ const SchemaOuterContainer = styled.div`
   justify-content: center;
   width: 100%;
   .SchemaInnerContainer {
-    width: 100%;
+    width: 70%;
   }
 `;
 
@@ -919,6 +957,7 @@ const ChooseBountyContainer = styled.div<styledProps>`
   align-items: center;
   justify-content: center;
   gap: 34px;
+  margin-bottom: 24px;
 `;
 
 const BountyContainer = styled.div<styledProps>`
@@ -940,20 +979,20 @@ const BountyContainer = styled.div<styledProps>`
   }
   :hover {
     border: ${(p) =>
-    p.show
-      ? `1px solid ${p.color.button_primary.shadow}`
-      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     outline: ${(p) =>
-    p.show
-      ? `1px solid ${p.color.button_primary.shadow}`
-      : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`};
     box-shadow: ${(p) => (p.show ? `1px 1px 6px ${p.color.black85}` : ``)};
   }
   :active {
     border: ${(p) =>
-    p.show
-      ? `1px solid ${p.color.button_primary.shadow}`
-      : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
+      p.show
+        ? `1px solid ${p.color.button_primary.shadow}`
+        : `1px solid ${(p) => p.color && p.color.grayish.G600}`} !important;
   }
   .TextButtonContainer {
     height: 218px;

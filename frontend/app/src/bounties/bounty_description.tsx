@@ -1,7 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../colors';
+import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
 
@@ -56,8 +56,8 @@ const BountyDescription = (props: any) => {
                 color: props.isPaid ? color.grayish.G50 : color.grayish.G10
               }}
             >
-              {props.title.slice(0, descriptionImage ? 80 : 120)}
-              {props.title.length > 80 ? '...' : ''}
+              {props.title?.slice(0, descriptionImage ? 80 : 120)}
+              {props.title?.length > 80 ? '...' : ''}
             </EuiText>
           </div>
           {descriptionImage && (

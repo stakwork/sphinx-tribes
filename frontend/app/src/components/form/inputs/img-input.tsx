@@ -10,7 +10,7 @@ import { useStores } from '../../../store';
 import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { Note } from './index';
-import { colors } from '../../../colors';
+import { colors } from '../../../config/colors';
 
 export default function ImageInput({
   note,
