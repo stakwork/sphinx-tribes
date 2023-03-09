@@ -669,16 +669,16 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			}
 
 			Assignee, ok8 := migrateBounty["assignee"].(PropertyMap)
-			assigneePubkey := Assignee["owner_pubkey"].(string)
-			assigneeId := uint(0)
-			for _, peep := range peeps {
-				if peep.OwnerPubKey == assigneePubkey {
-					assigneeId = peep.ID
-				}
-			}
 			if !ok8 {
 				migrateBountyFinal.Assignee = uint(0)
 			} else {
+				assigneePubkey := Assignee["owner_pubkey"].(string)
+				assigneeId := uint(0)
+				for _, peep := range peeps {
+					if peep.OwnerPubKey == assigneePubkey {
+						assigneeId = peep.ID
+					}
+				}
 				migrateBountyFinal.Assignee = assigneeId
 			}
 
