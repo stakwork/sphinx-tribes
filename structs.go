@@ -211,7 +211,7 @@ type Bounty struct {
 	Show                    bool       `json:"show"`
 	Type                    string     `json:"type"`
 	Award                   string     `json:"award"`
-	Price                   uint       `json:"price"`
+	Price                   string     `json:"price"`
 	Title                   string     `json:"title"`
 	Tribe                   string     `json:"tribe"`
 	Created                 *time.Time `json:"created"`
