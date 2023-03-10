@@ -10,7 +10,7 @@ type SearchTextInputProps = ComponentProps<'input'> &
     iconStyle?: CSSProperties;
   };
 
-export default function SearchTextInput({
+export default function SearchBar({
   border,
   borderActive,
   borderHover,

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import FadeLeft from '../animated/fadeLeft';
 import { IconButton } from '.';
 import { colors } from '../../config/colors';
-import { Portal } from './portal';
+import { Portal } from './index';
 
 export default function Modal(props: any) {
   const {
