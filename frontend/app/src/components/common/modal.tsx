@@ -58,7 +58,12 @@ export default function Modal(props: any) {
           overflowY: 'auto'
         }}
       >
-        <Env style={{ ...fillStyle, ...envStyle }} color={color}>
+        <Env
+          role="alertdialog"
+          aria-modal={true}
+          style={{ ...fillStyle, ...envStyle }}
+          color={color}
+        >
           {close && (
             <X color={color}>
               <IconButton onClick={close} size={20} icon="close" />
@@ -73,6 +78,7 @@ export default function Modal(props: any) {
 
           {bigCloseImage && (
             <div
+              data-testid="close-btn"
               style={{
                 height: '40px',
                 width: '40px',

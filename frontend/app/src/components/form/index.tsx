@@ -14,7 +14,14 @@ import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
 
 export default function Form(props: any) {
-  const { buttonsOnBottom, wrapStyle, smallForm } = props;
+  const {
+    buttonsOnBottom,
+    wrapStyle,
+    smallForm,
+    readOnly,
+    scrollDiv: scrollRef,
+    initialValues
+  } = props;
   const page = 1;
   const [loading, setLoading] = useState(true);
   const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null);
@@ -34,10 +41,9 @@ export default function Form(props: any) {
   const [stepTracker, setStepTracker] = useState<number>(1);
 
   let lastPage = 1;
-  const { readOnly } = props;
-  const scrollDiv = props.scrollDiv ? props.scrollDiv : refBody;
+  const scrollDiv = scrollRef ?? refBody;
 
-  const initValues = dynamicInitialValues || props.initialValues;
+  const initValues = dynamicInitialValues || initialValues;
 
   const NextStepHandler = useCallback(() => {
     setStepTracker(stepTracker < 5 ? stepTracker + 1 : stepTracker);
@@ -82,7 +88,7 @@ export default function Form(props: any) {
 
   useEffect(() => {
     const dSchema = props.schema?.find((f) => f.defaultSchema);
-    const type = props.initialValues?.type;
+    const type = initialValues?.type;
     if (dSchema && type) {
       const editSchema = dynamicSchemasByType[type];
       setDynamicSchema(editSchema);
@@ -92,7 +98,7 @@ export default function Form(props: any) {
       setDynamicSchemaName(dSchema.defaultSchemaName);
     }
     setLoading(false);
-  }, [props.initialValues?.type, props.schema]);
+  }, [initialValues?.type, props.schema]);
 
   // this useEffect triggers when the dynamic schema name is updated
   // checks if there are autofill fields that we can pull from local storage
@@ -464,6 +470,7 @@ export default function Form(props: any) {
                                 newDesign={true}
                                 key={item.name}
                                 values={values}
+                                testId={item.label}
                                 errors={errors}
                                 scrollToTop={scrollToTop}
                                 value={values[item.name]}

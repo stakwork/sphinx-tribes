@@ -4,15 +4,15 @@
   "prettier": "prettier.json",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "start:tribes:docker": "PORT=23000 react-scripts start",
-    "start:tribes:cluster": "PORT=13000 react-scripts start",
-    "start:people": "PORT=3007 react-scripts start",
-    "start:people:docker": "PORT=23007 react-scripts start",
-    "start:people:cluster": "PORT=13007 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "craco start",
+    "start:tribes:docker": "PORT=23000 craco start",
+    "start:tribes:cluster": "PORT=13000 craco start",
+    "start:people": "PORT=3007 craco start",
+    "start:people:docker": "PORT=23007 craco start",
+    "start:people:cluster": "PORT=13007 craco start",
+    "build": "craco build",
+    "test": "REACT_APP_IS_TEST=true craco test",
+    "eject": "craco eject",
     "lint": "eslint src --max-warnings 128 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
@@ -27,11 +27,6 @@
     "@loomhq/loom-embed": "^1.4.0",
     "@loomhq/record-sdk": "^2.35.16",
     "@material/react-material-icon": "^0.15.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/react-router-dom": "^5.1.8",
-    "@types/styled-components": "^5.1.0",
     "bootstrap": "^4.5.0",
     "dateformat": "^3.0.3",
     "formik": "^2.2.6",
@@ -116,15 +111,28 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.21.2",
+    "@craco/craco": "^7.0.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^12.1.5",
+    "@testing-library/user-event": "^7.1.2",
     "@types/dateformat": "^3.0.1",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.27",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
+    "@types/react-router-dom": "^5.1.8",
+    "@types/styled-components": "^5.1.0",
     "bootstrap": "^4.5.0",
     "eslint": "^8.26.0",
     "eslint-plugin-react": "^7.31.10",
+    "nock": "^13.3.0",
     "react-error-overlay": "6.0.9",
     "typescript": "4.5.3"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)"
+    ]
   }
 }

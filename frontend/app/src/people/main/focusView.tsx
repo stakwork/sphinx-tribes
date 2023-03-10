@@ -10,6 +10,7 @@ import SummaryViewer from '../widgetViews/summaryViewer';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
+import { cloneDeep } from 'lodash';
 
 // this is where we see others posts (etc) and edit our own
 export default function FocusedView(props: any) {
@@ -164,16 +165,18 @@ export default function FocusedView(props: any) {
   }
 
   async function preSubmitFunctions(body) {
+    const newBody = cloneDeep(body);
+
     // if github repo
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
-        body.ticketUrl &&
-        (body.type === 'wanted_coding_task' ||
-          body.type === 'coding_task' ||
-          body.type === 'freelance_job_request')
+        newBody.ticketUrl &&
+        (newBody.type === 'wanted_coding_task' ||
+          newBody.type === 'coding_task' ||
+          newBody.type === 'freelance_job_request')
       ) {
-        const { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
+        const { repo, issue } = extractRepoAndIssueFromIssueUrl(newBody.ticketUrl);
         const splitString = repo.split('/');
         const [ownerName, repoName] = splitString;
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
@@ -184,39 +187,40 @@ export default function FocusedView(props: any) {
 
         const { description } = res;
 
-        console.log(description, { ...body });
-        if (body.github_description) {
-          body.description = description;
+        console.log(description, { ...newBody });
+        if (newBody.github_description) {
+          newBody.description = description;
         }
 
         // body.description = description;
-        body.title = body.one_sentence_summary;
+        newBody.title = newBody.one_sentence_summary;
 
         // save repo to cookies for autofill in form
-        ui.setLastGithubRepo(body.ticketUrl);
+        ui.setLastGithubRepo(newBody.ticketUrl);
       }
     } catch (e) {
       throw githubError;
     }
 
-    return body;
+    return newBody;
   }
 
   async function submitForm(body) {
     if (config.name === 'wanted' && !body?.title) {
       body.title = body.one_sentence_summary ?? '';
     }
+    let newBody = cloneDeep(body);
     try {
-      body = await preSubmitFunctions(body);
+      newBody = await preSubmitFunctions(newBody);
     } catch (e) {
       console.log('e', e);
       alert(e);
       return;
     }
 
-    body = mergeFormWithMeData(body);
+    newBody = mergeFormWithMeData(newBody);
 
-    if (!body) return; // avoid saving bad state
+    if (!newBody) return; // avoid saving bad state
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
 
@@ -224,19 +228,21 @@ export default function FocusedView(props: any) {
     const unixTimestamp = Math.floor(date.getTime() / 1000);
     setLoading(true);
     try {
-      const newBody = {
-        ...body,
-        alert: undefined,
-        new_ticket_time: unixTimestamp,
-        extras: {
-          ...body?.extras,
-          alert: body.alert
-        }
-      };
+      const requestData =
+        config.name === 'about' || config.name === 'wanted'
+          ? {
+              ...newBody,
+              alert: undefined,
+              new_ticket_time: unixTimestamp,
+              extras: {
+                ...newBody?.extras,
+                alert: newBody.alert
+              }
+            }
+          : newBody;
 
-      await main.saveProfile(
-        config.name === 'about' || config.name === 'wanted' ? { ...newBody } : body
-      );
+      await main.saveProfile(requestData);
+
       closeModal();
     } catch (e) {
       console.log('e', e);
