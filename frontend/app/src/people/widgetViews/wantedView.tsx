@@ -28,8 +28,7 @@ export default function WantedView(props: any) {
     assignee,
     estimate_session_length,
     loomEmbedUrl,
-    onPanelClick,
-    key
+    onPanelClick
   } = props;
   const titleString = title ?? one_sentence_summary;
 
@@ -134,7 +133,7 @@ export default function WantedView(props: any) {
 
     if (props?.fromBountyPage) {
       return (
-        <div key={key}>
+        <div>
           {paid ? (
             <BountyBox color={color}>
               <PaidBounty
