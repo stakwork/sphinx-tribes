@@ -20,4 +20,5 @@ export interface Props {
   disabled?: boolean;
   notProfilePic?: boolean;
   style? :React.CSSProperties;
+  testId?:string;
 }
