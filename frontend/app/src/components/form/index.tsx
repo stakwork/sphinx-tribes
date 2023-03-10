@@ -470,6 +470,7 @@ export default function Form(props: any) {
                                 newDesign={true}
                                 key={item.name}
                                 values={values}
+                                testId={item.label}
                                 errors={errors}
                                 scrollToTop={scrollToTop}
                                 value={values[item.name]}
