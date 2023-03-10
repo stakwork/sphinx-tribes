@@ -2,12 +2,18 @@ import React from 'react';
 import { uiStore } from './ui';
 import { mainStore } from './main';
 import { create } from 'mobx-persist';
+import { appEnv } from '../config/env';
 
-const hydrate = create({ storage: localStorage });
+(() => {
+  if (appEnv.isTests) {
+    return;
+  }
+  const hydrate = create({ storage: localStorage });
 
-Promise.all([hydrate('main', mainStore), hydrate('ui', uiStore)]).then(() => {
-  uiStore.setReady(true);
-});
+  Promise.all([hydrate('main', mainStore), hydrate('ui', uiStore)]).then(() => {
+    uiStore.setReady(true);
+  });
+})();
 
 const ctx = React.createContext({
   ui: uiStore,
