@@ -42,9 +42,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             width={210}
             height={48}
             style={{ marginTop: 20 }}
-            hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-            activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-            shadowColor={
+            hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+            activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+            shadowcolor={
               buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
             }
             onClick={(e) => {
@@ -85,7 +85,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
               onClick={(e) => {
                 e.stopPropagation();
-                setStep(step + 1);
+                setStep(step + 1)
               }}
               textStyle={{
                 fontSize: '15px',
@@ -100,8 +100,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           </DirectionWrap>
         </ButtonContainer>
       </>
-    );
-  };
+    )
+  }
 
   const StepTwo = () => {
     return (
@@ -109,7 +109,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
         <ModalContainer>
           <QrContainer>
             <QR size={200} value={ui.connection_string} />
-            <QRText>Install the Sphinx app on your phone and then scan this QR code</QRText>
+            <QRText>
+              Install the Sphinx app on your phone and then scan this QR code
+            </QRText>
           </QrContainer>
         </ModalContainer>
         <ButtonContainer>
@@ -119,9 +121,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             width={210}
             height={48}
             style={{ marginTop: 20 }}
-            hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-            activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-            shadowColor={
+            hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+            activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+            shadowcolor={
               buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
             }
             onClick={getConnectionCode}
@@ -136,7 +138,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
               onClick={(e) => {
                 e.stopPropagation();
-                setStep(step - 1);
+                setStep(step - 1)
               }}
               textStyle={{
                 fontSize: '15px',
@@ -170,9 +172,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             />
           </DirectionWrap>
         </ButtonContainer>
+
       </>
-    );
-  };
+    )
+  }
 
   const StepThree = () => {
     return (
@@ -183,9 +186,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           width={210}
           height={48}
           style={{ marginTop: 0 }}
-          hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-          activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-          shadowColor={
+          hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+          activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+          shadowcolor={
             buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
           }
           onClick={(e) => {
@@ -204,7 +207,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
           onClick={(e) => {
             e.stopPropagation();
-            setStep(step - 1);
+            setStep(step - 1)
           }}
           textStyle={{
             fontSize: '15px',
@@ -217,8 +220,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           color={buttonColor}
         />
       </ButtonContainer>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -240,12 +243,14 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             width: '425px'
           }}
         >
-          {step === 1 ? <StepOne /> : step === 2 ? <StepTwo /> : <StepThree />}
+          {step === 1 ? (<StepOne />) : step === 2 ? (<StepTwo />) : (<StepThree />)}
         </EuiModal>
       </EuiOverlayMask>
     </>
   );
 };
+
+
 
 export default StartUpModal;
 

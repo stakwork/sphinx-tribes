@@ -12,7 +12,7 @@ export function renderMarkdown(markdown) {
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
       components={{
-        code({ node, inline, className, children, ...props }) {
+        code({ className, children, ...props }) {
           return (
             <code className={className} {...props}>
               {children}
@@ -22,6 +22,7 @@ export function renderMarkdown(markdown) {
         img({ className, ...props }) {
           return (
             <img
+              alt={'Markodown image'}
               className={className}
               style={{
                 width: '100%',

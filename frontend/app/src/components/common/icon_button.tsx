@@ -110,9 +110,9 @@ export default function IconButton(props: any) {
         paddingRight: props.leadingIcon && 10,
         ...props.style
       }}
-      hoverColor={props.hoverColor}
-      activeColor={props.activeColor}
-      shadowColor={props.shadowColor}
+      hovercolor={props.hoverColor}
+      activecolor={props.activeColor}
+      shadowcolor={props.shadowColor}
       disabled={props.disabled}
       onClick={props.onClick}
     >
@@ -187,12 +187,12 @@ export default function IconButton(props: any) {
 }
 
 interface ButtonHoverProps {
-  hoverColor?: string;
-  activeColor?: string;
-  shadowColor?: string;
+  hovercolor?: string;
+  activecolor?: string;
+  shadowcolor?: string;
 }
 
-const B = styled(EuiButton)<ButtonHoverProps>`
+const B = styled(EuiButton) <ButtonHoverProps>`
   position: relative;
   border-radius: 100px;
   height: 36px;
@@ -209,16 +209,16 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   text-transform: none !important;
   transform: none !important;
   text-decoration: none !important;
-  box-shadow: ${(p) => (p.shadowColor ? `0px 2px 10px ${p.shadowColor}` : 'none')} !important;
+  box-shadow: ${(p) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
 
   &:hover {
-    background: ${(p) => (p.hoverColor ? p.hoverColor : 'none')} !important;
+    background: ${(p) => (p.hovercolor ? p.hovercolor : 'none')} !important;
     transform: none !important;
     text-decoration: none !important;
   }
 
   &:active {
-    background: ${(p) => (p.activeColor ? p.activeColor : 'none')} !important;
+    background: ${(p) => (p.activecolor ? p.activecolor : 'none')} !important;
     transform: none !important;
     text-decoration: none !important;
   }
