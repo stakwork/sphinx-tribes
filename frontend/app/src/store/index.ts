@@ -15,9 +15,9 @@ import { appEnv } from '../config/env';
   });
 })();
 
-const ctx = React.createContext({
+const Context = React.createContext({
   ui: uiStore,
   main: mainStore
 });
 
-export const useStores = () => React.useContext(ctx);
+export const useStores = () => React.useContext(Context);

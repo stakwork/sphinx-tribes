@@ -1,22 +1,15 @@
 import React, { useEffect } from 'react';
-import './App.css';
+/* eslint-disable func-style */
 import '@material/react-material-icon/dist/material-icon.css';
-import Header from './tribes/header';
-import Body from './tribes/body';
-import PeopleHeader from './people/main/header';
-import PeopleBody from './people/main/body';
-import { colors } from './config/colors';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import TokenRefresh from './people/utils/tokenRefresh';
-import BotsBody from './bots/body';
+import { BrowserRouter as Router } from 'react-router-dom';
+import './App.css';
+import { ModeDispatcher } from './config/ModeDispatcher';
+import { Pages } from './pages';
 import { mainStore } from './store/main';
 
 let exchangeRateInterval: any = null;
 
 function App() {
-  const mode = getMode();
-  const c = colors['light'];
-
   // get usd/sat exchange rate every 100 seconds
   useEffect(() => {
     mainStore.getUsdToSatsExchangeRate();
@@ -32,66 +25,11 @@ function App() {
 
   return (
     <Router>
-      {
-        // people/community
-        mode === Mode.COMMUNITY ? (
-          <div className="app" style={{ background: c.background }}>
-            <PeopleHeader />
-            <TokenRefresh />
-            <Switch>
-              <Route path="/t/">
-                <Body />
-              </Route>
-              <Route path="/b/">
-                <BotsBody />
-              </Route>
-              <Route path="/p/">
-                <PeopleBody selectedWidget="people" />
-              </Route>
-              <Route path="/tickets/">
-                <PeopleBody selectedWidget="wanted" />
-              </Route>
-            </Switch>
-
-            {/* for global toasts */}
-          </div>
-        ) : (
-          // tribes
-          <div className="app" style={{ background: c.background }}>
-            <Header />
-            <Body />
-          </div>
-        )
-      }
+      <ModeDispatcher>{(mode) => <Pages mode={mode} />}</ModeDispatcher>
     </Router>
   );
 }
 
-enum Mode {
-  TRIBES = 'tribes',
-  PEOPLE = 'people',
-  COMMUNITY = 'community'
-}
 
-const hosts: { [k: string]: Mode } = {
-  'localhost:3000': Mode.COMMUNITY,
-  'localhost:13000': Mode.TRIBES,
-  'localhost:23000': Mode.TRIBES,
-  'tribes.sphinx.chat': Mode.TRIBES,
-  'tribes-test.sphinx.chat': Mode.TRIBES,
-  'localhost:13007': Mode.COMMUNITY,
-  'localhost:23007': Mode.COMMUNITY,
-  'localhost:3007': Mode.COMMUNITY,
-  'people.sphinx.chat': Mode.COMMUNITY,
-  'people-test.sphinx.chat': Mode.COMMUNITY,
-  'community-test.sphinx.chat': Mode.COMMUNITY,
-  'community.sphinx.chat': Mode.COMMUNITY
-};
-
-function getMode(): Mode {
-  const { host } = window.location;
-
-  return hosts[host] || Mode.TRIBES;
-}
 
 export default App;
