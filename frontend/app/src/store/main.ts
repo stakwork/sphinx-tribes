@@ -209,7 +209,7 @@ export class MainStore {
 
     const b = await r.json();
 
-    const mybots = await this.getMyBots();
+    // const mybots = await this.getMyBots();
 
     return b?.response;
   }

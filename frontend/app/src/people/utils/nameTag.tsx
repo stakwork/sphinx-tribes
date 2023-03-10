@@ -16,7 +16,7 @@ export default function NameTag(props) {
 
   const isMobile = useIsMobile();
 
-  const isSelected = ui.selectedPerson == id ? true : false;
+  const isSelected = ui.selectedPerson === id ? true : false;
 
   function selectPerson(e) {
     // don't select if already selected

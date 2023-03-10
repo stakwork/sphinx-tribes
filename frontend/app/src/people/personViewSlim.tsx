@@ -35,7 +35,6 @@ function makeQR(pubkey: string) {
 
 export default function PersonView(props: any) {
   const { personId, loading, selectPerson, goBack } = props;
-
   // on this screen, there will always be a pubkey in the url, no need for personId
 
   const { main, ui } = useStores();
@@ -64,7 +63,7 @@ export default function PersonView(props: any) {
 
   const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
 
-  const { id, img, tags, owner_alias, unique_name, price_to_meet, extras, owner_pubkey } =
+  const { id, img, owner_alias, extras, owner_pubkey } =
     person || {};
 
   let { description } = person || {};
@@ -958,8 +957,6 @@ export default function PersonView(props: any) {
         visible={showSupport}
         close={() => setShowSupport(false)}
         style={{
-          // top: -64,
-          // height: 'calc(100% + 64px)'
           height: '100%'
         }}
         envStyle={{
@@ -1096,25 +1093,6 @@ const Counter = styled.div`
   color: #b0b7bc;
 `;
 
-const ActionInfo = styled.div`
-  font-style: normal;
-  font-weight: normal;
-  font-size: 22px;
-  line-height: 26px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #b0b7bc;
-  margin-bottom: 10px;
-`;
-
-/* Placeholder Text */
-
 const Tabs = styled.div`
   display: flex;
   width: 100%;
@@ -1176,6 +1154,7 @@ const RowWrap = styled.div`
 interface ImageProps {
   readonly src: string;
 }
+
 const Img = styled.div<ImageProps>`
   background-image: url('${(p) => p.src}');
   background-position: center;

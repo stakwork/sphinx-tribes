@@ -30,6 +30,34 @@ function App() {
     };
   }, []);
 
+
+  enum Mode {
+    TRIBES = 'tribes',
+    PEOPLE = 'people',
+    COMMUNITY = 'community'
+  }
+
+  const hosts: { [k: string]: Mode } = {
+    'localhost:3000': Mode.COMMUNITY,
+    'localhost:13000': Mode.TRIBES,
+    'localhost:23000': Mode.TRIBES,
+    'tribes.sphinx.chat': Mode.TRIBES,
+    'tribes-test.sphinx.chat': Mode.TRIBES,
+    'localhost:13007': Mode.COMMUNITY,
+    'localhost:23007': Mode.COMMUNITY,
+    'localhost:3007': Mode.COMMUNITY,
+    'people.sphinx.chat': Mode.COMMUNITY,
+    'people-test.sphinx.chat': Mode.COMMUNITY,
+    'community-test.sphinx.chat': Mode.COMMUNITY,
+    'community.sphinx.chat': Mode.COMMUNITY
+  };
+
+  function getMode(): Mode {
+    const { host } = window.location;
+
+    return hosts[host] || Mode.TRIBES;
+  }
+
   return (
     <Router>
       {
@@ -65,33 +93,6 @@ function App() {
       }
     </Router>
   );
-}
-
-enum Mode {
-  TRIBES = 'tribes',
-  PEOPLE = 'people',
-  COMMUNITY = 'community'
-}
-
-const hosts: { [k: string]: Mode } = {
-  'localhost:3000': Mode.COMMUNITY,
-  'localhost:13000': Mode.TRIBES,
-  'localhost:23000': Mode.TRIBES,
-  'tribes.sphinx.chat': Mode.TRIBES,
-  'tribes-test.sphinx.chat': Mode.TRIBES,
-  'localhost:13007': Mode.COMMUNITY,
-  'localhost:23007': Mode.COMMUNITY,
-  'localhost:3007': Mode.COMMUNITY,
-  'people.sphinx.chat': Mode.COMMUNITY,
-  'people-test.sphinx.chat': Mode.COMMUNITY,
-  'community-test.sphinx.chat': Mode.COMMUNITY,
-  'community.sphinx.chat': Mode.COMMUNITY
-};
-
-function getMode(): Mode {
-  const { host } = window.location;
-
-  return hosts[host] || Mode.TRIBES;
 }
 
 export default App;

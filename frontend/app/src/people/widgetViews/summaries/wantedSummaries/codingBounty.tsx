@@ -412,9 +412,9 @@ export default function MobileView(props: any) {
                                                     fontFamily: 'Barlow',
                                                     marginLeft: '30px'
                                                 }}
-                                                hoverColor={color.button_primary.hover}
-                                                activeColor={color.button_primary.active}
-                                                shadowColor={color.button_primary.shadow}
+                                                hovercolor={color.button_primary.hover}
+                                                activecolor={color.button_primary.active}
+                                                shadowcolor={color.button_primary.shadow}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     // setExtrasPropertyAndSave('paid', !paid);
@@ -514,9 +514,9 @@ export default function MobileView(props: any) {
                                         justifyContent: 'center',
                                         fontFamily: 'Barlow'
                                     }}
-                                    hoverColor={color.button_secondary.hover}
-                                    activeColor={color.button_secondary.active}
-                                    shadowColor={color.button_secondary.shadow}
+                                    hovercolor={color.button_secondary.hover}
+                                    activecolor={color.button_secondary.active}
+                                    shadowcolor={color.button_secondary.shadow}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         // setExtrasPropertyAndSave('paid', !paid);
@@ -605,9 +605,9 @@ export default function MobileView(props: any) {
                                         marginLeft: '30px',
                                         marginRight: '10px'
                                     }}
-                                    hoverColor={color.button_primary.hover}
-                                    activeColor={color.button_primary.active}
-                                    shadowColor={color.button_primary.shadow}
+                                    hovercolor={color.button_primary.hover}
+                                    activecolor={color.button_primary.active}
+                                    shadowcolor={color.button_primary.shadow}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setExtrasPropertyAndSaveMultiple('paid', {
@@ -884,9 +884,9 @@ export default function MobileView(props: any) {
                                             height={48}
                                             onClick={props.extraModalFunction}
                                             color="primary"
-                                            hoverColor={color.button_secondary.hover}
-                                            activeColor={color.button_secondary.active}
-                                            shadowColor={color.button_secondary.shadow}
+                                            hovercolor={color.button_secondary.hover}
+                                            activecolor={color.button_secondary.active}
+                                            shadowcolor={color.button_secondary.shadow}
                                             iconSize={'16px'}
                                             iconStyle={{
                                                 top: '16px',
