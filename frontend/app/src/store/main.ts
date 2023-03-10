@@ -408,6 +408,10 @@ export class MainStore {
   @observable
   people: Person[] = [];
 
+  @action setPeople(p: Person[]) {
+    this.people = p;
+  }
+
   @action async getPeople(queryParams?: any): Promise<Person[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 

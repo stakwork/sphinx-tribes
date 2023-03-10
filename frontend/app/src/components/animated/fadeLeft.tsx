@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -26,32 +26,33 @@ export default function FadeLeft(props) {
     setOpacity(1);
   }
 
-  function close() {
+  const close = useCallback(() => {
     setTranslation(drift ? drift : -40);
     setOpacity(0);
-  }
+  }, [drift]);
 
-  function doAnimation(value) {
-    if (value === 1) {
-      open();
-    } else {
-      close();
-    }
-  }
+  const doAnimation = useCallback(
+    (value) => {
+      if (value === 1) {
+        open();
+      } else {
+        close();
+      }
+    },
+    [close]
+  );
 
   useEffect(() => {
     if (noFadeOnInit) {
       setOpacity(1);
       setTranslation(0);
     }
-  }, []);
+  }, [noFadeOnInit]);
 
   useEffect(() => {
     (async () => {
       if (!isMounted) {
-        let speed = 200;
-
-        if (props.speed) speed = props.speed;
+        const speed = props.speed ?? 200;
         doAnimation(0);
 
         await sleep(speed);
@@ -66,7 +67,7 @@ export default function FadeLeft(props) {
         doAnimation(1);
       }
     })();
-  }, [isMounted]);
+  }, [dismountCallback, doAnimation, isMounted, props.speed]);
 
   if (!alwaysRender && !shouldRender)
     return <div style={{ position: 'absolute', left: 0, top: 0 }} />;
