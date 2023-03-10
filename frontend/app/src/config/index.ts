@@ -1,6 +1,6 @@
 export * from './ModeDispatcher'
 export * from './bounties'
 export * from './colors'
-// export * from './'
+export * from './commonColors'
 export * from './env'
 export * from './host';
