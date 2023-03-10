@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React from "react";
 import { Img, Assignee } from "./style";
 import { colors } from '../../../../config/colors';

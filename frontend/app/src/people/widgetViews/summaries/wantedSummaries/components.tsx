@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React from "react";
 import FavoriteButton from '../../../utils/favoriteButton';
 import { Button } from '../../../../components/common';

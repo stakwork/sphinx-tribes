@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React from "react";
 import { ButtonRow, Y, P, B, Img, Wrap, SectionPad, LoomIcon, GithubIcon } from "./style";
 import { AddToFavorites, CopyLink, ShareOnTwitter, ViewTribe, ViewGithub } from "./components";

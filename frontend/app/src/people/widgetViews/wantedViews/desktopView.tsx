@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 import React from 'react';
 import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from "./style";
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
