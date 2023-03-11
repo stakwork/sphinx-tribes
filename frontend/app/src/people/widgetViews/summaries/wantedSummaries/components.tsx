@@ -2,43 +2,54 @@
 import React from "react";
 import FavoriteButton from '../../../utils/favoriteButton';
 import { Button } from '../../../../components/common';
+import { sendToRedirect } from "../../../../helpers";
 
 export const Heart = () => <FavoriteButton />;
 
-export const AddToFavorites = (props: any) => props.tribe && props.tribe !== 'none' && (
-    <Button
-        text={'Add to Favorites'}
-        color={'white'}
-        icon={'favorite_outline'}
-        iconSize={18}
-        iconStyle={{ left: 14 }}
-        style={{
-            fontSize: 14,
-            height: 48,
-            width: '100%',
-            marginBottom: 20,
-            paddingLeft: 5
-        }}
-        onClick={() => { }}
-    />
-);
+export const AddToFavorites = (props: any) => {
+    if (props.tribe && props.tribe !== 'none') {
+        return (
+            <Button
+                text={'Add to Favorites'}
+                color={'white'}
+                icon={'favorite_outline'}
+                iconSize={18}
+                iconStyle={{ left: 14 }}
+                style={{
+                    fontSize: 14,
+                    height: 48,
+                    width: '100%',
+                    marginBottom: 20,
+                    paddingLeft: 5
+                }}
+                onClick={() => { }}
+            />
+        );
+    }
+    return <></>
+}
+
 
 export const ViewGithub = (props: any) => {
     const { ticketUrl, repo, issue } = props;
 
-    return ticketUrl && (
-        <Button
-            text={'Original Ticket'}
-            color={'white'}
-            endingIcon={'launch'}
-            iconSize={14} xw
-            style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-            onClick={() => {
-                const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
-                props.sendToRedirect(repoUrl);
-            }}
-        />
-    )
+    if (ticketUrl) {
+        return (
+            <Button
+                text={'Original Ticket'}
+                color={'white'}
+                endingIcon={'launch'}
+                iconSize={14} xw
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
+                onClick={() => {
+                    const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
+                    sendToRedirect(repoUrl);
+                }}
+            />
+        )
+    }
+
+    return <></>
 };
 
 export const CopyLink = (props: any) => {
@@ -64,7 +75,7 @@ export const CopyLink = (props: any) => {
 }
 
 export const ShareOnTwitter = (props: any) => {
-    const { sendToRedirect, titleString, labels, createdURL, owner_idURL } = props;
+    const { titleString, labels, createdURL, owner_idURL } = props;
 
     return (
         <Button
@@ -90,21 +101,25 @@ export const ShareOnTwitter = (props: any) => {
 };
 
 export const ViewTribe = (props: any) => {
-    const { tribe, tribeInfo, sendToRedirect } = props;
+    const { tribe, tribeInfo } = props;
 
-    return tribe && tribe !== 'none' && (
-        <Button
-            text={'View Tribe'}
-            color={'white'}
-            leadingImgUrl={tribeInfo?.img || ' '}
-            endingIcon={'launch'}
-            iconSize={14}
-            imgStyle={{ position: 'absolute', left: 10 }}
-            style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-            onClick={() => {
-                const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
-                sendToRedirect(profileUrl);
-            }}
-        />
-    );
+    if (tribe && tribe !== 'none') {
+        return (
+            <Button
+                text={'View Tribe'}
+                color={'white'}
+                leadingImgUrl={tribeInfo?.img || ' '}
+                endingIcon={'launch'}
+                iconSize={14}
+                imgStyle={{ position: 'absolute', left: 10 }}
+                style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
+                onClick={() => {
+                    const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
+                    sendToRedirect(profileUrl);
+                }}
+            />
+        )
+    }
+
+    return <></>
 }

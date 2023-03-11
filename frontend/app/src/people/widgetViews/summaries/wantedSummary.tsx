@@ -17,7 +17,8 @@ import NameTag from '../../utils/nameTag';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import CodingMobile from './wantedSummaries/codingMobile';
 import CodingBounty from './wantedSummaries/codingBounty';
-import CodingDesktop from './wantedSummaries/codingDesktop'
+import CodingDesktop from './wantedSummaries/codingDesktop';
+import { sendToRedirect } from '../../../helpers';
 
 function useQuery() {
   const { search } = useLocation();
@@ -437,13 +438,6 @@ export default function WantedSummary(props: any) {
     </ButtonRow>
   );
 
-  function sendToRedirect(url) {
-    const el = document.createElement('a');
-    el.href = url;
-    el.target = '_blank';
-    el.click();
-  }
-
   const nametag = (
     <NameTag
       iconSize={24}
@@ -532,6 +526,8 @@ export default function WantedSummary(props: any) {
           assigneeLabel={assigneeLabel}
           actionButtons={actionButtons}
           status={status}
+          handleCopyUrl={handleCopyUrl}
+          titleString={titleString}
         />
       );
     }
@@ -589,6 +585,7 @@ export default function WantedSummary(props: any) {
           loomEmbedUrl={loomEmbedUrl}
           titleString={titleString}
           status={status}
+          handleCopyUrl={handleCopyUrl}
         />
       </>
     );
