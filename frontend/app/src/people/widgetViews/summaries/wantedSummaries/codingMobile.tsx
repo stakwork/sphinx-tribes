@@ -124,11 +124,11 @@ export default function MobileView(props: any) {
 
                 <div style={{ height: 10 }} />
                 <ButtonRow style={{ margin: '10px 0' }}>
-                    <ViewGithub />
-                    <ViewTribe />
-                    <AddToFavorites />
-                    <CopyLink />
-                    <ShareOnTwitter />
+                    <ViewGithub {...props} />
+                    <ViewTribe   {...props} />
+                    <AddToFavorites  {...props} />
+                    <CopyLink   {...props} />
+                    <ShareOnTwitter  {...props} />
                 </ButtonRow>
 
                 {actionButtons}

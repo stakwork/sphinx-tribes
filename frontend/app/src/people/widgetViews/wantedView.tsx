@@ -8,7 +8,7 @@ import PaidBounty from '../utils/paidBounty';
 import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
 import MobileView from "./wantedViews/mobileView";
-import DesktopView from "./wantedViews/mobileView";
+import DesktopView from "./wantedViews/desktopView";
 
 export default function WantedView(props: any) {
   const {
@@ -118,6 +118,7 @@ export default function WantedView(props: any) {
       return (
         <MobileView
           {...props} labels={labels}
+          key={ticketUrl}
           saving={saving}
           setExtrasPropertyAndSave={setExtrasPropertyAndSave}
           isClosed={isClosed}
