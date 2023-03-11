@@ -7,8 +7,8 @@ import { useStores } from '../../store';
 import PaidBounty from '../utils/paidBounty';
 import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
-import MobileView from "./wantedViews/mobileView";
-import DesktopView from "./wantedViews/desktopView";
+import MobileView from './wantedViews/mobileView';
+import DesktopView from './wantedViews/desktopView';
 
 export default function WantedView(props: any) {
   const {
@@ -117,7 +117,8 @@ export default function WantedView(props: any) {
     if (isMobile) {
       return (
         <MobileView
-          {...props} labels={labels}
+          {...props}
+          labels={labels}
           key={ticketUrl}
           saving={saving}
           setExtrasPropertyAndSave={setExtrasPropertyAndSave}
@@ -129,7 +130,7 @@ export default function WantedView(props: any) {
           isMine={isMine}
           titleString={titleString}
         />
-      )
+      );
     }
 
     if (props?.fromBountyPage) {
@@ -178,7 +179,8 @@ export default function WantedView(props: any) {
 
     return (
       <DesktopView
-        {...props} labels={labels}
+        {...props}
+        labels={labels}
         saving={saving}
         setExtrasPropertyAndSave={setExtrasPropertyAndSave}
         isClosed={isClosed}
