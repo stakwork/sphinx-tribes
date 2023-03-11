@@ -81,3 +81,10 @@ export const randomString = (l: number): string => {
     return `0${(byte & 0xff).toString(16)}`.slice(-2);
   }).join('');
 };
+
+export function sendToRedirect(url) {
+  const el = document.createElement('a');
+  el.href = url;
+  el.target = '_blank';
+  el.click();
+}
