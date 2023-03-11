@@ -206,5 +206,3 @@ const BountyBox = styled.div<styledProps>`
   box-shadow: 0px 1px 6px ${(p) => p?.color && p?.color.black100};
   border: none;
 `;
-
-
