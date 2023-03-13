@@ -20,7 +20,7 @@ import {
   BountyContainer,
   SchemaTagsContainer
 } from './style';
-import { validator, FormField } from './config';
+import { validator, FormField } from './utils';
 
 export default function Form(props: any) {
   const {

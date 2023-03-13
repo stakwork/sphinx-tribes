@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { FormField } from './config';
+import { FormField } from './utils';
 import {
   languages,
   estimation,
