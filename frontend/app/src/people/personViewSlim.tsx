@@ -15,7 +15,7 @@ import {
   AboutWrap,
   PeopleScroller,
   PeopleList
-} from './slimStyle';
+} from './personSlim/style';
 import { getHost } from '../config/host';
 import { useStores } from '../store';
 
@@ -42,6 +42,7 @@ import NoneSpace from './utils/noneSpace';
 import PageLoadSpinner from './utils/pageLoadSpinner';
 import { PostBounty } from './widgetViews/postBounty';
 import { Widget } from './main/types';
+import { LoaderBottom, LoaderTop } from './personSlim/component';
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -624,16 +625,6 @@ export default function PersonView(props: any) {
     );
   }
 
-  const loaderTop = <PageLoadSpinner show={loadingTop} />;
-
-  const loaderBottom = (
-    <PageLoadSpinner
-      noAnimate
-      show={loadingBottom}
-      style={{ position: 'absolute', bottom: 0, left: 0 }}
-    />
-  );
-
   function renderDesktopView() {
     const focusedDesktopModalStyles = newSelectedWidget
       ? {
@@ -677,7 +668,8 @@ export default function PersonView(props: any) {
               style={{ width: '100%', overflowY: 'auto', height: '100%' }}
               onScroll={handleScroll}
             >
-              {loaderTop}
+              <LoaderTop loadingTop={loadingTop} />
+
               {people?.length ? (
                 people.map((t) => (
                   <Person
@@ -697,7 +689,7 @@ export default function PersonView(props: any) {
               {people?.length < queryLimit && <div style={{ height: 400 }} />}
             </PeopleScroller>
 
-            {loaderBottom}
+            <LoaderBottom loadingBottom={loadingBottom} />
           </PeopleList>
         )}
 
