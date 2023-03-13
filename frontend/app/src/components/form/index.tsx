@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
 import Input from './inputs';
 import { Button, Divider, IconButton, Modal } from '../common';
 import { useStores } from '../../store';
@@ -21,6 +20,7 @@ import {
   BountyContainer,
   SchemaTagsContainer
 } from './style';
+import { validator, FormField } from './config';
 
 export default function Form(props: any) {
   const {
@@ -770,62 +770,4 @@ export default function Form(props: any) {
       }}
     </Formik>
   );
-}
-
-type FormFieldType =
-  | 'text'
-  | 'textarea'
-  | 'img'
-  | 'imgcanvas'
-  | 'gallery'
-  | 'number'
-  | 'hidden'
-  | 'widgets'
-  | 'widget'
-  | 'switch'
-  | 'select'
-  | 'multiselect'
-  | 'creatablemultiselect'
-  | 'searchableselect'
-  | 'loom'
-  | 'space'
-  | 'hide'
-  | 'date';
-
-type FormFieldClass = 'twitter' | 'blog' | 'offer' | 'wanted' | 'supportme';
-
-export interface FormField {
-  name: string;
-  type: FormFieldType;
-  class?: FormFieldClass;
-  label: string;
-  itemLabel?: string;
-  single?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  validator?: any;
-  style?: any;
-  prepend?: string;
-  widget?: boolean;
-  page?: number;
-  extras?: FormField[];
-  fields?: FormField[];
-  icon?: string;
-  note?: string;
-  extraHTML?: string;
-  options?: any[];
-  defaultSchema?: FormField[];
-  defaultSchemaName?: string;
-  dropdownOptions?: string;
-  dynamicSchemas?: any[];
-}
-
-function validator(config: FormField[]) {
-  const shape: { [k: string]: any } = {};
-  config.forEach((field) => {
-    if (typeof field === 'object') {
-      shape[field.name] = field.validator;
-    }
-  });
-  return Yup.object().shape(shape);
 }
