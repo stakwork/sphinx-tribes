@@ -101,7 +101,6 @@ export default function PersonView(props: any) {
 
   // fill state from url
   const doDeeplink = useCallback(async () => {
-    console.log('personviewslim: doDeeplink', pathname);
     if (pathname) {
       const splitPathname = pathname?.split('/');
       // eslint-disable-next-line prefer-destructuring
@@ -199,8 +198,6 @@ export default function PersonView(props: any) {
   }
 
   const fullSelectedWidget: any = extras && selectedWidget ? extras[selectedWidget] : null;
-
-  console.log(fullSelectedWidget);
 
   // we do this because sometimes the widgets are empty arrays
   const filteredExtras = extras && { ...extras };
@@ -376,8 +373,6 @@ export default function PersonView(props: any) {
         </div>
       );
 
-      console.log('elementArray', elementArray.length);
-
       return (
         <>
           <PageLoadSpinner show={loadingPerson} />
@@ -412,7 +407,6 @@ export default function PersonView(props: any) {
 
   function nextIndex() {
     if (focusIndex < 0) {
-      console.log('nope!');
       return;
     }
     if (person && person.extras) {
@@ -425,7 +419,6 @@ export default function PersonView(props: any) {
 
   function prevIndex() {
     if (focusIndex < 0) {
-      console.log('nope!');
       return;
     }
     if (person && person.extras) {

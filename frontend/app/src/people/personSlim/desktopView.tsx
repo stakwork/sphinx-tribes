@@ -79,7 +79,6 @@ export default function DesktopView(props: any) {
                                 background: '#fff'
                             }}
                             onChange={(e) => {
-                                console.log('handleChange', e);
                                 ui.setSearchText(e);
                             }}
                         />
@@ -363,7 +362,6 @@ export default function DesktopView(props: any) {
                     selectedIndex={focusIndex}
                     config={tabs[selectedWidget] && tabs[selectedWidget]}
                     onSuccess={() => {
-                        console.log('success');
                         setFocusIndex(-1);
                         if (selectedWidget === 'about') switchWidgets('badges');
                     }}

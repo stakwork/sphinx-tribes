@@ -39,7 +39,6 @@ export default function FirstTimeScreen() {
           canEdit={true}
           manualGoBackOnly={true}
           goBack={() => {
-            console.log('goBack');
             ui.setMeInfo(null);
             main.getPeople();
           }}
