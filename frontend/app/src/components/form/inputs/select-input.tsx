@@ -13,7 +13,8 @@ export default function SelectInput({
   options,
   value,
   handleChange,
-  extraHTML
+  extraHTML, 
+  testId
 }: Props) {
   let labeltext = label;
   const color = colors['light'];
@@ -29,6 +30,7 @@ export default function SelectInput({
       >
         <R>
           <Select
+            testId={testId}
             name={'first'}
             selectStyle={{
               border: 'none',
