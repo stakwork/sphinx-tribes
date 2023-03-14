@@ -148,7 +148,6 @@ export default function WidgetSwitchViewer(props) {
                   onPanelClick={() => {
                     if (onPanelClick) onPanelClick(person, body);
                   }}
-                  key={`${i + person.owner_pubkey}wview`}
                   person={person}
                   showModal={showModal}
                   setDeletePayload={setDeletePayload}

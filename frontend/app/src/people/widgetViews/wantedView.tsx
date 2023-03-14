@@ -8,7 +8,7 @@ import PaidBounty from '../utils/paidBounty';
 import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
-import DesktopView from './wantedViews/mobileView';
+import DesktopView from './wantedViews/desktopView';
 
 export default function WantedView(props: any) {
   const {
@@ -28,8 +28,7 @@ export default function WantedView(props: any) {
     assignee,
     estimate_session_length,
     loomEmbedUrl,
-    onPanelClick,
-    key
+    onPanelClick
   } = props;
   const titleString = title ?? one_sentence_summary;
 
@@ -120,6 +119,7 @@ export default function WantedView(props: any) {
         <MobileView
           {...props}
           labels={labels}
+          key={ticketUrl}
           saving={saving}
           setExtrasPropertyAndSave={setExtrasPropertyAndSave}
           isClosed={isClosed}
@@ -135,7 +135,7 @@ export default function WantedView(props: any) {
 
     if (props?.fromBountyPage) {
       return (
-        <div key={key}>
+        <div>
           {paid ? (
             <BountyBox color={color}>
               <PaidBounty

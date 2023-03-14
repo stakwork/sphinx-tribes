@@ -190,11 +190,11 @@ export default function DesktopView(props: any) {
 
                     <SectionPad>
                         <ButtonRow>
-                            <ViewGithub />
-                            <ViewTribe />
-                            <AddToFavorites />
-                            <CopyLink />
-                            <ShareOnTwitter />
+                            <ViewGithub {...props} />
+                            <ViewTribe   {...props} />
+                            <AddToFavorites  {...props} />
+                            <CopyLink   {...props} />
+                            <ShareOnTwitter  {...props} />
                         </ButtonRow>
 
                         {actionButtons}
