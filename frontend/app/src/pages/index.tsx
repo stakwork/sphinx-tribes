@@ -15,7 +15,7 @@ import { PeoplePage } from './People';
 import { Modals } from './Modals';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
-  community: () =>(
+  community: () => (
     <MainLayout header={<PeopleHeader />}>
       <TokenRefresh />
       <Switch>
@@ -44,9 +44,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
 
 export const Pages = ({ mode }: { mode: AppMode }) => {
   return (
-  <>
-    {modeDispatchPages[mode]()}
-    <Modals />
-  </>
+    <>
+      {modeDispatchPages[mode]()}
+      <Modals />
+    </>
   );
 };

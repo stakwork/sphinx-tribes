@@ -27,7 +27,11 @@ function getMode(): AppMode {
   return hosts[host] || AppMode.TRIBES;
 }
 
-export const ModeDispatcher = ({ children }: { children: (mode: AppMode) => React.ReactElement }) => {
+export const ModeDispatcher = ({
+  children
+}: {
+  children: (mode: AppMode) => React.ReactElement;
+}) => {
   const mode = getMode();
   return children(mode);
 };

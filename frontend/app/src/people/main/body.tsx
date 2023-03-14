@@ -469,9 +469,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
             isMounted={ui.selectingPerson ? true : false}
             dismountCallback={() => ui.setSelectedPerson(0)}
           >
-            <PersonViewSlim
-              loading={loading}
-            />
+            <PersonViewSlim loading={loading} />
           </FadeLeft>
           {publicFocusPerson && (
             <Modal visible={publicFocusPerson ? true : false} fill={true}>
@@ -591,9 +589,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           isMounted={ui.selectingPerson ? true : false}
           dismountCallback={() => ui.setSelectedPerson(0)}
         >
-          <PersonViewSlim
-            loading={loading}
-          />
+          <PersonViewSlim loading={loading} />
         </FadeLeft>
         {/* modal onClick on tickets */}
         {publicFocusPerson && (

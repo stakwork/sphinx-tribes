@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const AboutWrap = styled.div`
   overflow-y: auto !important;
@@ -41,7 +41,6 @@ export const Name = styled.div`
 interface ImageProps {
   readonly src: string;
 }
-
 
 export const Img = styled.div<ImageProps>`
   background-image: url('${(p) => p.src}');

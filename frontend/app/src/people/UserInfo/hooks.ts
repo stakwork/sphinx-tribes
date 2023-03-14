@@ -1,7 +1,7 @@
-import { getHost } from "config";
-import { useMemo } from "react";
-import { useHistory } from "react-router-dom";
-import { useStores } from "store";
+import { getHost } from 'config';
+import { useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useStores } from 'store';
 
 //TODO: mv into utils
 const host = getHost();
@@ -15,7 +15,8 @@ export const useUserInfo = () => {
   const { meInfo } = ui || {};
   const personId = ui.selectedPerson;
 
-  const person: any = main.people && main.people.length && main.people.find((f) => f.id === personId);
+  const person: any =
+    main.people && main.people.length && main.people.find((f) => f.id === personId);
 
   const { id, img, owner_alias, extras, owner_pubkey } = person || {};
   const canEdit = id === meInfo?.id;
@@ -27,7 +28,7 @@ export const useUserInfo = () => {
 
   const defaultPic = '/static/person_placeholder.png';
   const userImg = img || defaultPic;
-  
+
   function logout() {
     ui.setEditMe(false);
     ui.setMeInfo(null);
@@ -36,12 +37,12 @@ export const useUserInfo = () => {
   }
 
   return {
-    canEdit, 
-    goBack, 
-    userImg, 
-    owner_alias, 
-    logout, 
+    canEdit,
+    goBack,
+    userImg,
+    owner_alias,
+    logout,
     person,
     qrString
-  }
-}
+  };
+};

@@ -27,13 +27,13 @@ import NoneSpace from './utils/noneSpace';
 import PageLoadSpinner from './utils/pageLoadSpinner';
 import { PostBounty } from './widgetViews/postBounty';
 
-export default function PersonView({loading = false}) {
+export default function PersonView({ loading = false }) {
   // on this screen, there will always be a pubkey in the url, no need for personId
   const { main, ui } = useStores();
   const { meInfo, peoplePageNumber } = ui || {};
   const history = useHistory();
   const location = useLocation();
-  
+
   const personId = ui.selectedPerson;
   function goBack() {
     ui.setSelectingPerson(0);
@@ -80,8 +80,6 @@ export default function PersonView({loading = false}) {
 
   const [showQR, setShowQR] = useState(false);
   const [showFocusView, setShowFocusView] = useState(false);
-
-
 
   // if no people, load people on mount
   useEffect(() => {
@@ -155,7 +153,6 @@ export default function PersonView({loading = false}) {
     [updatePath]
   );
 
-
   useEffect(() => {
     if (ui.personViewOpenTab) {
       switchWidgets(ui.personViewOpenTab);
@@ -169,7 +166,6 @@ export default function PersonView({loading = false}) {
     main.getPeople({ resetPage: true });
     goBack();
   }
-
 
   if (loading) return <div>Loading...</div>;
 
@@ -569,9 +565,7 @@ export default function PersonView({loading = false}) {
           height: '100%'
         }}
       >
-        {!canEdit && (
-          <PeopleList />
-        )}
+        {!canEdit && <PeopleList />}
         <UserInfo setShowQR={setShowQR} setShowSupport={setShowSupport} />
 
         <div

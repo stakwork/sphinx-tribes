@@ -9,12 +9,11 @@ import { queryLimit } from 'store/main';
 import styled from 'styled-components';
 import Person from '../person';
 
-
 export const PeopleList = () => {
   const { main, ui } = useStores();
   const { peoplePageNumber } = ui || {};
   const history = useHistory();
-  const personId = ui.selectedPerson
+  const personId = ui.selectedPerson;
   async function loadMorePeople(direction) {
     let newPage = peoplePageNumber + direction;
     if (newPage < 1) {
@@ -34,7 +33,7 @@ export const PeopleList = () => {
 
     history.replace(`/p/${pubkey}`);
   }
-  
+
   const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
 
   const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
@@ -84,7 +83,6 @@ export const PeopleList = () => {
         ) : (
           <NoResults />
         )}
-
         {/* make sure you can always scroll ever with too few people */}
         {people?.length < queryLimit && <div style={{ height: 400 }} />}
       </PeopleScroller>
@@ -95,8 +93,8 @@ export const PeopleList = () => {
         style={{ position: 'absolute', bottom: 0, left: 0 }}
       />
     </PeopleListContainer>
-  )
-}
+  );
+};
 
 const PeopleScroller = styled.div`
   overflow-y: overlay !important;
