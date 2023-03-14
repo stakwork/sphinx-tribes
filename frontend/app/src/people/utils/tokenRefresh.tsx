@@ -10,14 +10,11 @@ export default function TokenRefresh() {
 
   useEffect(() => {
     timeout = setTimeout(async () => {
-      console.log('run token refresh!');
       if (ui.meInfo) {
         const res = await main.refreshJwt();
         if (res && res.jwt) {
-          console.log('token refreshed!');
           ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt });
         } else {
-          console.log('kick!');
           ui.setMeInfo(null);
           ui.setSelectedPerson(0);
           ui.setSelectingPerson(0);

@@ -10,7 +10,7 @@ import AuthQR from './authQR';
 import IconButton from '../../components/common/icon_button';
 
 export default function SignIn(props: any) {
-  const { main, ui } = useStores();
+  const { main } = useStores();
 
   const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);

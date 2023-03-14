@@ -53,26 +53,20 @@ export default function BotBody() {
   const botSelectionAttribute = isMyBots ? 'id' : 'unique_name';
 
   function selectBot(attr: string) {
-    console.log('attr', attr);
-
     // is mybot
     if (isMyBots) {
       const botSource = isMyBots ? main.myBots : main.bots;
       const thisBot = botSource.find((f) => f[botSelectionAttribute] === attr);
-      console.log('thisBot', thisBot);
       setEditThisBot(thisBot);
       setShowCreate(true);
     } else {
       // is other bot
-      console.log('selectBot', attr);
       ui.setSelectedBot(attr);
       ui.setSelectingBot(attr);
     }
   }
 
   async function createOrSaveBot(v: any) {
-    console.log('createOrSaveBot!');
-
     v.tags = v.tags && v.tags.map((t) => t.value);
     v.price_per_use = parseInt(v.price_per_use);
 
@@ -102,8 +96,6 @@ export default function BotBody() {
   }
 
   async function deleteBot() {
-    console.log('deleteBot!');
-
     try {
       const r = await main.deleteBot(editThisBot.id);
       if (r) {
@@ -257,7 +249,6 @@ export default function BotBody() {
                   marginLeft: 20
                 }}
                 onChange={(e) => {
-                  console.log('handleChange', e);
                   ui.setSearchText(e);
                 }}
               />
@@ -283,7 +274,6 @@ export default function BotBody() {
                   small={false}
                   selected={ui.selectedBot === t.uuid}
                   select={() => {
-                    console.log('t', t);
                     selectBot(t[botSelectionAttribute]);
                   }}
                 />
@@ -396,7 +386,6 @@ export default function BotBody() {
               value={ui.searchText}
               style={{ width: 164, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
               onChange={(e) => {
-                console.log('handleChange', e);
                 ui.setSearchText(e);
               }}
             />

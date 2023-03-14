@@ -39,7 +39,6 @@ export default function ConfirmMe(props: any) {
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        // console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
@@ -51,7 +50,7 @@ export default function ConfirmMe(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
 

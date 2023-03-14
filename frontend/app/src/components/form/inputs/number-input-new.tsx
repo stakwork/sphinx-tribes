@@ -41,7 +41,6 @@ export default function NumberInputNew({
         }}
         onChange={(e) => {
           if (!isNaN(Number(e.target.value))) {
-            console.log(Number(e.target.value));
             handleChange(e.target.value);
             setTextValue(e.target.value);
           }

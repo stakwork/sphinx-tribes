@@ -51,7 +51,6 @@ export default function Badges(props) {
       };
 
       const token = await main.claimBadgeOnLiquid(body);
-      console.log('token', token);
       // refresh badges
       getBadges();
     } catch (e) {
