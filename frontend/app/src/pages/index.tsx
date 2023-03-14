@@ -10,9 +10,12 @@ import Body from '../tribes/body';
 import Header from '../tribes/header';
 import { MainLayout } from './MainLayout';
 import { AppMode } from 'config';
+import { TicketsPage } from './Tickets';
+import { PeoplePage } from './People';
+import { Modals } from './Modals';
 
-const modeDispatchPages: Record<AppMode, React.ReactElement> = {
-  community: (
+const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
+  community: () =>(
     <MainLayout header={<PeopleHeader />}>
       <TokenRefresh />
       <Switch>
@@ -23,16 +26,16 @@ const modeDispatchPages: Record<AppMode, React.ReactElement> = {
           <BotsBody />
         </Route>
         <Route path="/p/">
-          <PeopleBody selectedWidget="people" />
+          <PeoplePage />
         </Route>
         <Route path="/tickets/">
-          <PeopleBody selectedWidget="wanted" />
+          <TicketsPage />
         </Route>
       </Switch>
     </MainLayout>
   ),
-  people: <></>,
-  tribes: (
+  people: () => <></>,
+  tribes: () => (
     <MainLayout header={<Header />}>
       <Body />
     </MainLayout>
@@ -40,5 +43,10 @@ const modeDispatchPages: Record<AppMode, React.ReactElement> = {
 };
 
 export const Pages = ({ mode }: { mode: AppMode }) => {
-  return modeDispatchPages[mode];
+  return (
+  <>
+    {modeDispatchPages[mode]()}
+    <Modals />
+  </>
+  );
 };

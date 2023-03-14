@@ -231,7 +231,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
   };
 
   function selectPerson(id: number, unique_name: string, pubkey: string) {
-    console.log('selectPerson', id, unique_name, pubkey);
     ui.setSelectedPerson(id);
     ui.setSelectingPerson(id);
 
@@ -471,9 +470,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
             dismountCallback={() => ui.setSelectedPerson(0)}
           >
             <PersonViewSlim
-              goBack={goBack}
-              personId={ui.selectedPerson}
-              selectPerson={selectPerson}
               loading={loading}
             />
           </FadeLeft>
@@ -596,11 +592,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           dismountCallback={() => ui.setSelectedPerson(0)}
         >
           <PersonViewSlim
-            goBack={goBack}
-            personId={ui.selectedPerson}
             loading={loading}
-            peopleView={true}
-            selectPerson={selectPerson}
           />
         </FadeLeft>
         {/* modal onClick on tickets */}

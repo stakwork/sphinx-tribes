@@ -3,6 +3,7 @@ import { uiStore } from './ui';
 import { mainStore } from './main';
 import { create } from 'mobx-persist';
 import { appEnv } from '../config/env';
+export { modalsVisibility } from './modals'
 
 (() => {
   if (appEnv.isTests) {
@@ -21,3 +22,4 @@ const Context = React.createContext({
 });
 
 export const useStores = () => React.useContext(Context);
+
