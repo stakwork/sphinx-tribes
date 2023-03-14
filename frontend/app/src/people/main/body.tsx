@@ -146,6 +146,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
     const owner_id = searchParams.get('owner_id');
     const created = searchParams.get('created');
     if (owner_id && created) {
+						console.log("activeList", activeList)
       const value =
         activeList && activeList.length
           ? activeList.find((item) => {
@@ -162,7 +163,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           : {}
       );
 
-      if (value.person && value.body) {
+      if (value && value.person && value.body) {
         publicPanelClick(value.person, value.body);
       }
     }
