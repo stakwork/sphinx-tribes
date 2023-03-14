@@ -192,7 +192,7 @@ interface ButtonHoverProps {
   shadowcolor?: string;
 }
 
-const B = styled(EuiButton) <ButtonHoverProps>`
+const B = styled(EuiButton)<ButtonHoverProps>`
   position: relative;
   border-radius: 100px;
   height: 36px;
