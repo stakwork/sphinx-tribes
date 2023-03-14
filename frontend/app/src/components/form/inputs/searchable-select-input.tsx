@@ -89,7 +89,6 @@ export default function SearchableSelectInput({
             value={value}
             loading={loading}
             onChange={(e) => {
-              console.log(e);
               handleChange(e);
               setIsBorder(false);
             }}

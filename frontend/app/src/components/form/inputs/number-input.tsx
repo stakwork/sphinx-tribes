@@ -46,7 +46,6 @@ export default function NumberInput({
             }}
             onBlur={(e) => {
               // enter 0 on blur if no value
-              console.log('onBlur', value);
               if (value === '') handleChange(0);
               if (value === '0') handleChange(0);
               handleBlur(e);
@@ -54,7 +53,6 @@ export default function NumberInput({
             }}
             onFocus={(e) => {
               // remove 0 on focus
-              console.log('onFocus', value);
               if (value === 0) handleChange('');
               handleFocus(e);
               setActive(true);

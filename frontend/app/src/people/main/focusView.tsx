@@ -54,7 +54,6 @@ export default function FocusedView(props: any) {
 
   function closeModal() {
     if (!manualGoBackOnly) {
-      console.log('close modal');
       ui.setEditMe(false);
       if (props.goBack) props.goBack();
     }
@@ -187,7 +186,6 @@ export default function FocusedView(props: any) {
 
         const { description } = res;
 
-        console.log(description, { ...newBody });
         if (newBody.github_description) {
           newBody.description = description;
         }
@@ -231,14 +229,14 @@ export default function FocusedView(props: any) {
       const requestData =
         config.name === 'about' || config.name === 'wanted'
           ? {
-              ...newBody,
-              alert: undefined,
-              new_ticket_time: unixTimestamp,
-              extras: {
-                ...newBody?.extras,
-                alert: newBody.alert
-              }
+            ...newBody,
+            alert: undefined,
+            new_ticket_time: unixTimestamp,
+            extras: {
+              ...newBody?.extras,
+              alert: newBody.alert
             }
+          }
           : newBody;
 
       await main.saveProfile(requestData);
@@ -354,8 +352,8 @@ export default function FocusedView(props: any) {
                 extraHTML={
                   ui.meInfo.verification_signature
                     ? {
-                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                      }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                     : {}
                 }
               />
@@ -493,7 +491,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
