@@ -130,7 +130,7 @@ export default function WantedView(props: any) {
           isMine={isMine}
           titleString={titleString}
         />
-      )
+      );
     }
 
     if (props?.fromBountyPage) {
@@ -179,7 +179,8 @@ export default function WantedView(props: any) {
 
     return (
       <DesktopView
-        {...props} labels={labels}
+        {...props}
+        labels={labels}
         saving={saving}
         setExtrasPropertyAndSave={setExtrasPropertyAndSave}
         isClosed={isClosed}
