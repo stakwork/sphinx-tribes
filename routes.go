@@ -93,6 +93,7 @@ func NewRouter() *http.Server {
 		r.Post("/save", postSave)
 		r.Get("/save/{key}", pollSave)
 		r.Get("/migrate_bounties", migrateBounties)
+		r.Get("/bounty/all", getAllBounties)
 	})
 
 	r.Group(func(r chi.Router) {

@@ -765,3 +765,12 @@ func (db database) getConnectionCode() ConnectionCodesShort {
 
 	return c
 }
+
+func (db database) getAllBounties() []Bounty {
+	ms := []Bounty{}
+	// if search is empty, returns all
+	db.db.Find(&ms)
+	fmt.Printf("getAllBounties %v", ms)
+
+	return ms
+}

@@ -207,7 +207,7 @@ type BadgeCreationData struct {
 
 type Bounty struct {
 	ID                      uint       `json:"id"`
-	OwnerID                 uint       `json:owner_id"`
+	OwnerID                 string     `json:owner_id"`
 	Paid                    bool       `json:"paid"`
 	Show                    bool       `json:"show"`
 	Type                    string     `json:"type"`
@@ -216,7 +216,7 @@ type Bounty struct {
 	Title                   string     `json:"title"`
 	Tribe                   string     `json:"tribe"`
 	Created                 *time.Time `json:"created"`
-	Assignee                uint       `json:"assignee"`
+	Assignee                string     `json:"assignee"`
 	TicketUrl               string     `json:"ticket_url"`
 	Description             string     `json:"description"`
 	WantedType              string     `json:"wanted_type"`
