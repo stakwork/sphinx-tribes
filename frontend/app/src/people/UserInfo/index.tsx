@@ -3,7 +3,7 @@ import React from 'react';
 import { UserInfoDesktopView } from './UserInfoDesktopView';
 import { UserInfoMobileView } from './UserInfoMobileView';
 
-type UserInfoProps = { setShowQR; setShowSupport };
+type UserInfoProps = { setShowSupport };
 
 export const UserInfo = (props: UserInfoProps) => {
   const isMobile = useIsMobile();

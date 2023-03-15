@@ -1,7 +1,8 @@
 import { getHost } from 'config';
-import { useMemo } from 'react';
+import { usePerson } from 'hooks';
 import { useHistory } from 'react-router-dom';
 import { useStores } from 'store';
+import { useModalsVisibility } from 'store/modals';
 
 //TODO: mv into utils
 const host = getHost();
@@ -11,15 +12,13 @@ function makeQR(pubkey: string) {
 
 export const useUserInfo = () => {
   const { main, ui } = useStores();
+  const modals = useModalsVisibility()
   const history = useHistory();
-  const { meInfo } = ui || {};
   const personId = ui.selectedPerson;
+  const { canEdit, person } = usePerson(Number(personId));
+  const { img, owner_alias, owner_pubkey } = person || {};
 
-  const person: any =
-    main.people && main.people.length && main.people.find((f) => f.id === personId);
 
-  const { id, img, owner_alias, extras, owner_pubkey } = person || {};
-  const canEdit = id === meInfo?.id;
   function goBack() {
     ui.setSelectingPerson(0);
     history.goBack();
@@ -36,6 +35,10 @@ export const useUserInfo = () => {
     goBack();
   }
 
+  const onEdit = () => {
+    modals.setUserEditModal(true);
+  }
+
   return {
     canEdit,
     goBack,
@@ -43,6 +46,7 @@ export const useUserInfo = () => {
     owner_alias,
     logout,
     person,
-    qrString
+    qrString,
+    onEdit
   };
 };

@@ -1,7 +1,6 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getHost } from '../config/host';
 import { useStores } from '../store';
 
 import AboutView from './widgetViews/aboutView';
@@ -18,19 +17,19 @@ import { meSchema } from '../components/form/schema';
 import { useIsMobile } from '../hooks';
 import { PeopleList } from './PeopleList';
 import { UserInfo } from './UserInfo';
-import FocusedView from './main/focusView';
 import { Widget } from './main/types';
 import Badges from './utils/badges';
-import ConnectCard from './utils/connectCard';
 import { widgetConfigs } from './utils/constants';
 import NoneSpace from './utils/noneSpace';
 import PageLoadSpinner from './utils/pageLoadSpinner';
 import { PostBounty } from './widgetViews/postBounty';
+import { useModalsVisibility } from 'store/modals';
 
 export default function PersonView({ loading = false }) {
   // on this screen, there will always be a pubkey in the url, no need for personId
   const { main, ui } = useStores();
-  const { meInfo, peoplePageNumber } = ui || {};
+  const modals = useModalsVisibility();
+  const { meInfo } = ui || {};
   const history = useHistory();
   const location = useLocation();
 
@@ -78,7 +77,7 @@ export default function PersonView({ loading = false }) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [showSupport, setShowSupport] = useState(false);
 
-  const [showQR, setShowQR] = useState(false);
+  
   const [showFocusView, setShowFocusView] = useState(false);
 
   // if no people, load people on mount
@@ -175,8 +174,6 @@ export default function PersonView({ loading = false }) {
   }
 
   const fullSelectedWidget: any = extras && selectedWidget ? extras[selectedWidget] : null;
-
-  console.log(fullSelectedWidget);
 
   // we do this because sometimes the widgets are empty arrays
   const filteredExtras = extras && { ...extras };
@@ -386,32 +383,6 @@ export default function PersonView({ loading = false }) {
     }
   }
 
-  function nextIndex() {
-    if (focusIndex < 0) {
-      console.log('nope!');
-      return;
-    }
-    if (person && person.extras) {
-      const g = person.extras[tabs[selectedWidget]?.name];
-      const nextindex = focusIndex + 1;
-      if (g[nextindex]) setFocusIndex(nextindex);
-      else setFocusIndex(0);
-    }
-  }
-
-  function prevIndex() {
-    if (focusIndex < 0) {
-      console.log('nope!');
-      return;
-    }
-    if (person && person.extras) {
-      const g = person?.extras[tabs[selectedWidget]?.name];
-      const previndex = focusIndex - 1;
-      if (g[previndex]) setFocusIndex(previndex);
-      else setFocusIndex(g.length - 1);
-    }
-  }
-
   function renderEditButton(style: any) {
     if (!canEdit || !selectedWidget) return <div />;
 
@@ -455,8 +426,7 @@ export default function PersonView({ loading = false }) {
                 <Button
                   text="Edit Profile"
                   onClick={() => {
-                    switchWidgets('about');
-                    setShowFocusView(true);
+                    modals.setUserEditModal(true);
                   }}
                   color="white"
                   height={42}
@@ -490,7 +460,7 @@ export default function PersonView({ loading = false }) {
               <div />
             )}
           </div>
-          <UserInfo setShowQR={setShowQR} setShowSupport={setShowSupport} />
+          <UserInfo  setShowSupport={setShowSupport} />
           <Tabs>
             {tabs &&
               Object.keys(tabs).map((name, i) => {
@@ -529,34 +499,11 @@ export default function PersonView({ loading = false }) {
           {renderWidgets('')}
           <div style={{ height: 60 }} />
         </Sleeve>
-
-        <Modal fill visible={showFocusView}>
-          <FocusedView
-            person={person}
-            canEdit={canEdit}
-            selectedIndex={focusIndex}
-            config={tabs[selectedWidget] && tabs[selectedWidget]}
-            onSuccess={() => {
-              console.log('success');
-              setFocusIndex(-1);
-            }}
-            goBack={() => {
-              setShowFocusView(false);
-              setFocusIndex(-1);
-            }}
-          />
-        </Modal>
       </div>
     );
   }
 
   function renderDesktopView() {
-    const focusedDesktopModalStyles = newSelectedWidget
-      ? {
-          ...tabs[newSelectedWidget]?.modalStyle
-        }
-      : {};
-
     return (
       <div
         style={{
@@ -566,7 +513,7 @@ export default function PersonView({ loading = false }) {
         }}
       >
         {!canEdit && <PeopleList />}
-        <UserInfo setShowQR={setShowQR} setShowSupport={setShowSupport} />
+        <UserInfo setShowSupport={setShowSupport} />
 
         <div
           style={{
@@ -646,60 +593,6 @@ export default function PersonView({ loading = false }) {
             <div style={{ height: 60 }} />
           </div>
         </div>
-
-        <ConnectCard
-          dismiss={() => setShowQR(false)}
-          modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
-          person={person}
-          visible={showQR}
-        />
-
-        <Modal
-          visible={showFocusView}
-          style={{
-            height: '100%'
-          }}
-          envStyle={{
-            marginTop: isMobile ? 64 : 0,
-            borderRadius: 0,
-            background: '#fff',
-            height: '100%',
-            width: '60%',
-            minWidth: 500,
-            maxWidth: 602,
-            zIndex: 20, //minHeight: 300,
-            ...focusedDesktopModalStyles
-          }}
-          nextArrow={nextIndex}
-          prevArrow={prevIndex}
-          overlayClick={() => {
-            setShowFocusView(false);
-            setFocusIndex(-1);
-            if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-          bigClose={() => {
-            setShowFocusView(false);
-            setFocusIndex(-1);
-            if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-        >
-          <FocusedView
-            person={person}
-            canEdit={canEdit}
-            selectedIndex={focusIndex}
-            config={tabs[selectedWidget] && tabs[selectedWidget]}
-            onSuccess={() => {
-              console.log('success');
-              setFocusIndex(-1);
-              if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-            goBack={() => {
-              setShowFocusView(false);
-              setFocusIndex(-1);
-              if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-          />
-        </Modal>
       </div>
     );
   }

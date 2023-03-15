@@ -1,12 +1,13 @@
 import { Button, IconButton } from 'components/common';
 import AboutView from 'people/widgetViews/aboutView';
-import React from 'react';
+import React, { useState } from 'react';
 import { useUserInfo } from './hooks';
 import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
+import ConnectCard from 'people/utils/connectCard';
 
-export const UserInfoDesktopView = ({ setShowQR, setShowSupport }) => {
-  const { canEdit, goBack, userImg, owner_alias, logout, person } = useUserInfo();
-
+export const UserInfoDesktopView = ({ setShowSupport }) => {
+  const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();
+  const [showQR, setShowQR] = useState(false);
   return (
     <AboutWrap
       style={{
@@ -84,10 +85,7 @@ export const UserInfoDesktopView = ({ setShowQR, setShowSupport }) => {
           >
             <Button
               text="Edit Profile"
-              onClick={() => {
-                // switchWidgets('about');
-                // setShowFocusView(true);
-              }}
+              onClick={onEdit}
               color="widget"
               height={42}
               style={{ fontSize: 13, background: '#f2f3f5' }}
@@ -132,7 +130,12 @@ export const UserInfoDesktopView = ({ setShowQR, setShowSupport }) => {
         )}
       </Head>
       <AboutView canEdit={canEdit} {...person} />
-      {/* {renderWidgets('about')} */}
+      <ConnectCard
+          dismiss={() => setShowQR(false)}
+          modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
+          person={person}
+          visible={showQR}
+      />
     </AboutWrap>
   );
 };

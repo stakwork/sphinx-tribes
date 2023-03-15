@@ -6,6 +6,7 @@ import './App.css';
 import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
 import { mainStore } from './store/main';
+import { WithModalStore } from 'store/modals';
 
 let exchangeRateInterval: any = null;
 
@@ -24,9 +25,11 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <ModeDispatcher>{(mode) => <Pages mode={mode} />}</ModeDispatcher>
-    </Router>
+    <WithModalStore>
+      <Router>
+        <ModeDispatcher>{(mode) => <Pages mode={mode} />}</ModeDispatcher>
+      </Router>
+    </WithModalStore>
   );
 }
 
