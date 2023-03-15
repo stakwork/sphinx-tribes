@@ -20,6 +20,10 @@ func main() {
 		fmt.Println("no .env file")
 	}
 
+	code, _ := encodeLNURL()
+
+	println("code ", code)
+
 	initDB()
 	initCache()
 
