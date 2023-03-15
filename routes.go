@@ -476,7 +476,7 @@ func setTribePreview(w http.ResponseWriter, r *http.Request) {
 	}
 
 	preview := r.URL.Query().Get("preview")
-	DB.updateTribe(preview, map[string]interface{}{
+	DB.updateTribe(uuid, map[string]interface{}{
 		"preview": preview,
 	})
 
