@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/btcsuite/btcd/btcec"
+	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
@@ -103,7 +103,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	digest := chainhash.DoubleHashB(msg)
 
 	// RecoverCompact both recovers the pubkey and validates the signature.
-	pubKey, valid, err := btcec.RecoverCompact(btcec.S256(), sig, digest)
+	pubKey, valid, err := btcecdsa.RecoverCompact(sig, digest)
 	if err != nil {
 		fmt.Printf("ERR: %+v\n", err)
 		return "", false, err
