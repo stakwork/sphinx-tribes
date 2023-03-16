@@ -118,6 +118,11 @@ func NewRouter() *http.Server {
 		r.Get("/connectioncodes", getConnectionCode)
 	})
 
+	r.Group(func(r chi.Router) {
+		r.Get("/lnurl-login", receiveLnAuthData)
+		r.Get("/lnurl", getLnurlAuth)
+	})
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "5002"
@@ -817,4 +822,29 @@ func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(connectionCode)
+}
+
+func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
+	encode, err := encodeLNURL()
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(encode)
+}
+
+func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
+	// Todo
+
+	userKey := r.URL.Query().Get("key")
+
+	if userKey != "" {
+		// Save in DB
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("")
 }

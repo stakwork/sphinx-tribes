@@ -876,6 +876,24 @@ export class MainStore {
       console.log('Error deleteFavorite', e);
     }
   }
+
+  @observable
+  lnurl: string = "";
+
+  @action setLnurl(url: string) {
+    this.lnurl = url;
+  }
+
+  @action async getLnurl(): Promise<string> {
+    try {
+      let data = await api.get('lnurl');
+      this.setLnurl(data)
+      return data;
+    } catch (e) {
+      console.log('fetch failed getLNurl', e);
+      return '';
+    }
+  }
 }
 
 export const mainStore = new MainStore();

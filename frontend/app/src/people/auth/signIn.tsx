@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import styled from 'styled-components';
@@ -26,6 +26,11 @@ export default function SignIn(props: any) {
 
   const isMobile = useIsMobile();
 
+  useEffect(() => {
+    main.getLnurl();
+    console.log("LBURL ===", main.lnurl)
+  }, [])
+
   return useObserver(() => {
     return (
       <div>
@@ -52,7 +57,7 @@ export default function SignIn(props: any) {
               </Description>
 
               {
-                page === 'lnurl' ? (<QR value="" size={200} />) :
+                page === 'lnurl' ? (<QR value={main.lnurl} size={200} />) :
                   !isMobile && (
                     <AuthQR
                       onSuccess={() => {
