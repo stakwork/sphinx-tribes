@@ -123,7 +123,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
   const publicPanelClick = useCallback(
     async (person, item) => {
       // migrating to load widgets separate from person
-      console.log('person', { person }, 'and items', { item });
       const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
       if (itemIndex > -1) {
         // make person into proper structure (derived from widget)
@@ -232,7 +231,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
   };
 
   function selectPerson(id: number, unique_name: string, pubkey: string) {
-    console.log('selectPerson', id, unique_name, pubkey);
     ui.setSelectedPerson(id);
     ui.setSelectingPerson(id);
 
@@ -442,7 +440,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
                     background: color.pureWhite
                   }}
                   onChange={(e) => {
-                    console.log('handleChange', e);
                     ui.setSearchText(e);
                   }}
                 />
@@ -558,7 +555,6 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
                 background: color.grayish.G600
               }}
               onChange={(e) => {
-                console.log('handleChange', e);
                 ui.setSearchText(e);
               }}
             />

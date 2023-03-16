@@ -54,7 +54,6 @@ export default function FocusedView(props: any) {
 
   function closeModal() {
     if (!manualGoBackOnly) {
-      console.log('close modal');
       ui.setEditMe(false);
       if (props.goBack) props.goBack();
     }
@@ -187,7 +186,6 @@ export default function FocusedView(props: any) {
 
         const { description } = res;
 
-        console.log(description, { ...newBody });
         if (newBody.github_description) {
           newBody.description = description;
         }

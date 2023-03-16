@@ -42,9 +42,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             width={210}
             height={48}
             style={{ marginTop: 20 }}
-            hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-            activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-            shadowColor={
+            hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+            activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+            shadowcolor={
               buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
             }
             onClick={(e) => {
@@ -119,9 +119,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             width={210}
             height={48}
             style={{ marginTop: 20 }}
-            hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-            activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-            shadowColor={
+            hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+            activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+            shadowcolor={
               buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
             }
             onClick={getConnectionCode}
@@ -183,9 +183,9 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           width={210}
           height={48}
           style={{ marginTop: 0 }}
-          hoverColor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-          activeColor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-          shadowColor={
+          hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+          activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+          shadowcolor={
             buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
           }
           onClick={(e) => {

@@ -10,7 +10,7 @@ import AuthQR from './authQR';
 import IconButton from '../../components/common/icon_button';
 
 export default function SignIn(props: any) {
-  const { main, ui } = useStores();
+  const { main } = useStores();
 
   const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);
@@ -63,9 +63,9 @@ export default function SignIn(props: any) {
                 style={{ marginTop: 20 }}
                 color={'primary'}
                 onClick={() => setShowSignIn(true)}
-                hoverColor={'#5881F8'}
-                activeColor={'#5078F2'}
-                shadowColor={'rgba(97, 138, 255, 0.5)'}
+                hovercolor={'#5881F8'}
+                activecolor={'#5078F2'}
+                shadowcolor={'rgba(97, 138, 255, 0.5)'}
               />
             </Column>
             <Divider />
@@ -79,8 +79,8 @@ export default function SignIn(props: any) {
                 buttonType={'text'}
                 style={{ color: '#83878b', marginTop: '10px', border: '1px solid #83878b' }}
                 onClick={() => redirect()}
-                hoverColor={'#fff'}
-                activeColor={'#fff'}
+                hovercolor={'#fff'}
+                activecolor={'#fff'}
                 textStyle={{
                   color: '#000',
                   fontSize: '16px',

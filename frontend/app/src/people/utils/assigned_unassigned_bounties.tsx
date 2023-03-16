@@ -122,9 +122,9 @@ const Bounties = (props) => {
                     }
                   }}
                   color="primary"
-                  hoverColor={color.button_secondary.hover}
-                  activeColor={color.button_secondary.active}
-                  shadowColor={color.button_secondary.shadow}
+                  hovercolor={color.button_secondary.hover}
+                  activecolor={color.button_secondary.active}
+                  shadowcolor={color.button_secondary.shadow}
                   iconSize={'16px'}
                   iconStyle={{
                     top: '17px',

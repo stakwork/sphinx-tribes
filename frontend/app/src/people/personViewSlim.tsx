@@ -1,6 +1,6 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import { Content, Panel } from './personSlim/style';
 import { getHost } from '../config/host';
 import { useStores } from '../store';
 
@@ -15,18 +15,16 @@ import WantedView from './widgetViews/wantedView';
 import { useHistory, useLocation } from 'react-router';
 import { meSchema } from '../components/form/schema';
 import { useIsMobile, usePageScroll } from '../hooks';
-import { Button, IconButton, Modal, SearchTextInput } from '../components/common';
+import { Modal } from '../components/common';
 import { queryLimit } from '../store/main';
-import FocusedView from './main/focusView';
-import Person from './person';
 import Badges from './utils/badges';
-import ConnectCard from './utils/connectCard';
 import { widgetConfigs } from './utils/constants';
-import NoResults from './utils/noResults';
 import NoneSpace from './utils/noneSpace';
 import PageLoadSpinner from './utils/pageLoadSpinner';
 import { PostBounty } from './widgetViews/postBounty';
 import { Widget } from './main/types';
+import MobileView from './personSlim/mobileView';
+import DesktopView from './personSlim/desktopView';
 
 const host = getHost();
 function makeQR(pubkey: string) {
@@ -35,7 +33,6 @@ function makeQR(pubkey: string) {
 
 export default function PersonView(props: any) {
   const { personId, loading, selectPerson, goBack } = props;
-
   // on this screen, there will always be a pubkey in the url, no need for personId
 
   const { main, ui } = useStores();
@@ -64,8 +61,7 @@ export default function PersonView(props: any) {
 
   const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
 
-  const { id, img, tags, owner_alias, unique_name, price_to_meet, extras, owner_pubkey } =
-    person || {};
+  const { id, img, owner_alias, extras, owner_pubkey } = person || {};
 
   let { description } = person || {};
 
@@ -101,7 +97,6 @@ export default function PersonView(props: any) {
 
   // fill state from url
   const doDeeplink = useCallback(async () => {
-    console.log('personviewslim: doDeeplink', pathname);
     if (pathname) {
       const splitPathname = pathname?.split('/');
       // eslint-disable-next-line prefer-destructuring
@@ -199,8 +194,6 @@ export default function PersonView(props: any) {
   }
 
   const fullSelectedWidget: any = extras && selectedWidget ? extras[selectedWidget] : null;
-
-  console.log(fullSelectedWidget);
 
   // we do this because sometimes the widgets are empty arrays
   const filteredExtras = extras && { ...extras };
@@ -376,8 +369,6 @@ export default function PersonView(props: any) {
         </div>
       );
 
-      console.log('elementArray', elementArray.length);
-
       return (
         <>
           <PageLoadSpinner show={loadingPerson} />
@@ -412,7 +403,6 @@ export default function PersonView(props: any) {
 
   function nextIndex() {
     if (focusIndex < 0) {
-      console.log('nope!');
       return;
     }
     if (person && person.extras) {
@@ -425,7 +415,6 @@ export default function PersonView(props: any) {
 
   function prevIndex() {
     if (focusIndex < 0) {
-      console.log('nope!');
       return;
     }
     if (person && person.extras) {
@@ -451,515 +440,75 @@ export default function PersonView(props: any) {
   const defaultPic = '/static/person_placeholder.png';
   const mediumPic = img;
 
-  function renderMobileView() {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          overflow: 'auto',
-          height: '100%'
-        }}
-      >
-        <Panel isMobile={isMobile} style={{ paddingBottom: 0, paddingTop: 80 }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              left: 0,
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%',
-              padding: '0 20px'
-            }}
-          >
-            <IconButton onClick={goBack} icon="arrow_back" />
-            {canEdit ? (
-              <>
-                <Button
-                  text="Edit Profile"
-                  onClick={() => {
-                    switchWidgets('about');
-                    setShowFocusView(true);
-                  }}
-                  color="white"
-                  height={42}
-                  style={{
-                    fontSize: 13,
-                    color: '#3c3f41',
-                    border: 'none',
-                    marginLeft: 'auto'
-                  }}
-                  leadingIcon={'edit'}
-                  iconSize={15}
-                />
-                <Button
-                  text="Sign out"
-                  onClick={logout}
-                  height={42}
-                  style={{
-                    fontSize: 13,
-                    color: '#3c3f41',
-                    border: 'none',
-                    margin: 0,
-                    padding: 0
-                  }}
-                  iconStyle={{ color: '#8e969c' }}
-                  iconSize={20}
-                  color="white"
-                  leadingIcon="logout"
-                />
-              </>
-            ) : (
-              <div />
-            )}
-          </div>
-
-          {/* profile photo */}
-          <Head>
-            <Img src={mediumPic || defaultPic} />
-            <RowWrap>
-              <Name>{owner_alias}</Name>
-            </RowWrap>
-
-            {/* only see buttons on other people's profile */}
-            {canEdit ? (
-              <div style={{ height: 40 }} />
-            ) : (
-              <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-                <a href={qrString}>
-                  <Button
-                    text="Connect"
-                    onClick={(e) => e.stopPropagation()}
-                    color="primary"
-                    height={42}
-                    width={120}
-                  />
-                </a>
-
-                <div style={{ width: 15 }} />
-
-                <Button
-                  text="Send Tip"
-                  color="link"
-                  height={42}
-                  width={120}
-                  onClick={() => setShowSupport(true)}
-                />
-              </RowWrap>
-            )}
-          </Head>
-
-          <Tabs>
-            {tabs &&
-              Object.keys(tabs).map((name, i) => {
-                const t = tabs[name];
-                const { label } = t;
-                const selected = name === newSelectedWidget;
-                const hasExtras = extras && extras[name] && extras[name].length > 0;
-                const count: any = hasExtras
-                  ? extras[name].filter((f) => {
-                      if ('show' in f) {
-                        // show has a value
-                        if (!f.show) return false;
-                      }
-                      // if no value default to true
-                      return true;
-                    }).length
-                  : null;
-
-                return (
-                  <Tab
-                    key={i}
-                    selected={selected}
-                    onClick={() => {
-                      switchWidgets(name);
-                    }}
-                  >
-                    {label} {count && <Counter>{count}</Counter>}
-                  </Tab>
-                );
-              })}
-          </Tabs>
-        </Panel>
-
-        <Sleeve>
-          {renderEditButton({})}
-          {renderWidgets('')}
-          <div style={{ height: 60 }} />
-        </Sleeve>
-
-        <Modal fill visible={showFocusView}>
-          <FocusedView
-            person={person}
-            canEdit={canEdit}
-            selectedIndex={focusIndex}
-            config={tabs[selectedWidget] && tabs[selectedWidget]}
-            onSuccess={() => {
-              console.log('success');
-              setFocusIndex(-1);
-            }}
-            goBack={() => {
-              setShowFocusView(false);
-              setFocusIndex(-1);
-            }}
-          />
-        </Modal>
-      </div>
-    );
-  }
-
-  const loaderTop = <PageLoadSpinner show={loadingTop} />;
-  const loaderBottom = (
-    <PageLoadSpinner
-      noAnimate
-      show={loadingBottom}
-      style={{ position: 'absolute', bottom: 0, left: 0 }}
-    />
-  );
-
-  function renderDesktopView() {
-    const focusedDesktopModalStyles = newSelectedWidget
-      ? {
-          ...tabs[newSelectedWidget]?.modalStyle
-        }
-      : {};
-
-    return (
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        {!canEdit && (
-          <PeopleList>
-            <DBack>
-              <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
-
-              <SearchTextInput
-                small
-                name="search"
-                type="search"
-                placeholder="Search"
-                value={ui.searchText}
-                style={{
-                  width: 120,
-                  height: 40,
-                  border: '1px solid #DDE1E5',
-                  background: '#fff'
-                }}
-                onChange={(e) => {
-                  console.log('handleChange', e);
-                  ui.setSearchText(e);
-                }}
-              />
-            </DBack>
-
-            <PeopleScroller
-              style={{ width: '100%', overflowY: 'auto', height: '100%' }}
-              onScroll={handleScroll}
-            >
-              {loaderTop}
-              {people?.length ? (
-                people.map((t) => (
-                  <Person
-                    {...t}
-                    key={t.id}
-                    selected={personId === t.id}
-                    hideActions={true}
-                    small={true}
-                    select={selectPersonWithinFocusView}
-                  />
-                ))
-              ) : (
-                <NoResults />
-              )}
-
-              {/* make sure you can always scroll ever with too few people */}
-              {people?.length < queryLimit && <div style={{ height: 400 }} />}
-            </PeopleScroller>
-
-            {loaderBottom}
-          </PeopleList>
-        )}
-
-        <AboutWrap
-          style={{
-            width: 364,
-            minWidth: 364,
-            background: '#ffffff',
-            color: '#000000',
-            padding: 40,
-            zIndex: 5,
-            // height: '100%',
-            marginTop: canEdit ? 64 : 0,
-            height: canEdit ? 'calc(100% - 64px)' : '100%',
-            borderLeft: '1px solid #ebedef',
-            borderRight: '1px solid #ebedef',
-            boxShadow: '1px 2px 6px -2px rgba(0, 0, 0, 0.07)'
-          }}
-        >
-          {canEdit && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                display: 'flex',
-                background: '#ffffff',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: 364,
-                minWidth: 364,
-                boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.07)',
-                borderBottom: 'solid 1px #ebedef',
-                paddingRight: 10,
-                height: 64,
-                zIndex: 0
-              }}
-            >
-              <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
-              <div />
-            </div>
-          )}
-
-          {/* profile photo */}
-          <Head>
-            <div style={{ height: 35 }} />
-
-            <Img src={mediumPic || defaultPic}>
-              <IconButton
-                iconStyle={{ color: '#5F6368' }}
-                style={{
-                  zIndex: 2,
-                  width: '40px',
-                  height: '40px',
-                  padding: 0,
-                  background: '#ffffff',
-                  border: '1px solid #D0D5D8',
-                  boxSizing: 'borderBox',
-                  borderRadius: 4
-                }}
-                icon={'qr_code_2'}
-                onClick={() => setShowQR(true)}
-              />
-            </Img>
-
-            <RowWrap>
-              <Name>{owner_alias}</Name>
-            </RowWrap>
-
-            {/* only see buttons on other people's profile */}
-            {canEdit ? (
-              <RowWrap
-                style={{
-                  marginBottom: 30,
-                  marginTop: 25,
-                  justifyContent: 'space-around'
-                }}
-              >
-                <Button
-                  text="Edit Profile"
-                  onClick={() => {
-                    switchWidgets('about');
-                    setShowFocusView(true);
-                  }}
-                  color="widget"
-                  height={42}
-                  style={{ fontSize: 13, background: '#f2f3f5' }}
-                  leadingIcon={'edit'}
-                  iconSize={15}
-                />
-                <Button
-                  text="Sign out"
-                  onClick={logout}
-                  height={42}
-                  style={{ fontSize: 13, color: '#3c3f41' }}
-                  iconStyle={{ color: '#8e969c' }}
-                  iconSize={15}
-                  color="white"
-                  leadingIcon="logout"
-                />
-              </RowWrap>
-            ) : (
-              <RowWrap
-                style={{
-                  marginBottom: 30,
-                  marginTop: 25,
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Button
-                  text="Connect"
-                  onClick={() => setShowQR(true)}
-                  color="primary"
-                  height={42}
-                  width={120}
-                />
-
-                <Button
-                  text="Send Tip"
-                  color="link"
-                  height={42}
-                  width={120}
-                  onClick={() => setShowSupport(true)}
-                />
-              </RowWrap>
-            )}
-          </Head>
-
-          {renderWidgets('about')}
-        </AboutWrap>
-
-        <div
-          style={{
-            width: canEdit ? 'calc(100% - 365px)' : 'calc(100% - 628px)',
-            minWidth: 250,
-            zIndex: canEdit ? 6 : 4
-          }}
-        >
-          <Tabs
-            style={{
-              background: '#fff',
-              padding: '0 20px',
-              borderBottom: 'solid 1px #ebedef',
-              boxShadow: canEdit
-                ? '0px 2px 0px rgba(0, 0, 0, 0.07)'
-                : '0px 2px 6px rgba(0, 0, 0, 0.07)'
-            }}
-          >
-            {tabs &&
-              Object.keys(tabs).map((name, i) => {
-                if (name === 'about') return <div key={i} />;
-                const t = tabs[name];
-                const { label } = t;
-                const selected = name === newSelectedWidget;
-                const hasExtras = extras && extras[name] && extras[name].length > 0;
-                const count: any = hasExtras
-                  ? extras[name].filter((f) => {
-                      if ('show' in f) {
-                        // show has a value
-                        if (!f.show) return false;
-                      }
-                      // if no value default to true
-                      return true;
-                    }).length
-                  : null;
-
-                return (
-                  <Tab
-                    key={i}
-                    style={{ height: 64, alignItems: 'center' }}
-                    selected={selected}
-                    onClick={() => {
-                      switchWidgets(name);
-                    }}
-                  >
-                    {label}
-                    {count > 0 && <Counter>{count}</Counter>}
-                  </Tab>
-                );
-              })}
-          </Tabs>
-
-          <div
-            style={{
-              padding: 20,
-              height: 'calc(100% - 63px)',
-              background: '#F2F3F5',
-              overflowY: 'auto',
-              position: 'relative'
-            }}
-          >
-            {renderEditButton({ marginBottom: 15 })}
-            {/* <div style={{ height: 15 }} /> */}
-            <Sleeve
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent:
-                  fullSelectedWidget && fullSelectedWidget.length > 0 ? 'flex-start' : 'center',
-                flexWrap: 'wrap',
-                height: !hasWidgets() ? 'inherit' : '',
-                paddingTop: !hasWidgets() ? 30 : 0
-              }}
-            >
-              {renderWidgets('')}
-            </Sleeve>
-            <div style={{ height: 60 }} />
-          </div>
-        </div>
-
-        <ConnectCard
-          dismiss={() => setShowQR(false)}
-          modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
-          person={person}
-          visible={showQR}
-        />
-
-        <Modal
-          visible={showFocusView}
-          style={{
-            height: '100%'
-          }}
-          envStyle={{
-            marginTop: isMobile ? 64 : 0,
-            borderRadius: 0,
-            background: '#fff',
-            height: '100%',
-            width: '60%',
-            minWidth: 500,
-            maxWidth: 602,
-            zIndex: 20, //minHeight: 300,
-            ...focusedDesktopModalStyles
-          }}
-          nextArrow={nextIndex}
-          prevArrow={prevIndex}
-          overlayClick={() => {
-            setShowFocusView(false);
-            setFocusIndex(-1);
-            if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-          bigClose={() => {
-            setShowFocusView(false);
-            setFocusIndex(-1);
-            if (selectedWidget === 'about') switchWidgets('badges');
-          }}
-        >
-          <FocusedView
-            person={person}
-            canEdit={canEdit}
-            selectedIndex={focusIndex}
-            config={tabs[selectedWidget] && tabs[selectedWidget]}
-            onSuccess={() => {
-              console.log('success');
-              setFocusIndex(-1);
-              if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-            goBack={() => {
-              setShowFocusView(false);
-              setFocusIndex(-1);
-              if (selectedWidget === 'about') switchWidgets('badges');
-            }}
-          />
-        </Modal>
-      </div>
-    );
-  }
-
   return (
     <Content>
-      {isMobile ? renderMobileView() : renderDesktopView()}
+      {isMobile ? (
+        <MobileView
+          logout={logout}
+          person={person}
+          canEdit={canEdit}
+          isMobile={isMobile}
+          mediumPic={mediumPic}
+          defaultPic={defaultPic}
+          tabs={tabs}
+          showFocusView={showFocusView}
+          focusIndex={focusIndex}
+          setFocusIndex={setFocusIndex}
+          setShowFocusView={setShowFocusView}
+          selectedWidget={selectedWidget}
+          extras={extras}
+          goBack={goBack}
+          switchWidgets={switchWidgets}
+          qrString={qrString}
+          owner_alias={owner_alias}
+          setShowSupport={setShowSupport}
+          renderEditButton={renderEditButton}
+          newSelectedWidget={newSelectedWidget}
+          renderWidgets={renderWidgets}
+        />
+      ) : (
+        <DesktopView
+          logout={logout}
+          person={person}
+          personId={personId}
+          canEdit={canEdit}
+          isMobile={isMobile}
+          mediumPic={mediumPic}
+          defaultPic={defaultPic}
+          tabs={tabs}
+          showFocusView={showFocusView}
+          focusIndex={focusIndex}
+          setFocusIndex={setFocusIndex}
+          setShowFocusView={setShowFocusView}
+          selectedWidget={selectedWidget}
+          extras={extras}
+          goBack={goBack}
+          switchWidgets={switchWidgets}
+          qrString={qrString}
+          owner_alias={owner_alias}
+          setShowSupport={setShowSupport}
+          renderEditButton={renderEditButton}
+          newSelectedWidget={newSelectedWidget}
+          renderWidgets={renderWidgets}
+          nextIndex={nextIndex}
+          prevIndex={prevIndex}
+          setShowQR={setShowQR}
+          handleScroll={handleScroll}
+          people={people}
+          loadingTop={loadingTop}
+          loadingBottom={loadingBottom}
+          showQR={showQR}
+          fullSelectedWidget={fullSelectedWidget}
+          hasWidgets={hasWidgets}
+          selectPersonWithinFocusView={selectPersonWithinFocusView}
+          queryLimit={queryLimit}
+        />
+      )}
 
       <Modal
         visible={showSupport}
         close={() => setShowSupport(false)}
         style={{
-          // top: -64,
-          // height: 'calc(100% + 64px)'
           height: '100%'
         }}
         envStyle={{
@@ -987,206 +536,3 @@ export default function PersonView(props: any) {
     </Content>
   );
 }
-
-interface PanelProps {
-  isMobile: boolean;
-}
-
-const PeopleList = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  width: 265px;
-  overflow-y: overlay !important;
-
-  * {
-    scrollbar-width: 6px;
-    scrollbar-color: rgba(176, 183, 188, 0.25);
-  }
-
-  /* Works on Chrome, Edge, and Safari */
-  *::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: rgba(176, 183, 188, 0.25);
-    background: rgba(176, 183, 188, 0.25);
-    width: 6px;
-    border-radius: 10px;
-    background-clip: padding-box;
-  }
-
-  ::-webkit-scrollbar-track-piece:start {
-    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
-  }
-
-  ::-webkit-scrollbar-track-piece:end {
-    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
-  }
-`;
-
-const PeopleScroller = styled.div`
-  overflow-y: overlay !important;
-  width: 100%;
-  height: 100%;
-`;
-
-const AboutWrap = styled.div`
-  overflow-y: auto !important;
-  ::-webkit-scrollbar-thumb {
-    background-color: rgba(176, 183, 188, 0);
-    background: rgba(176, 183, 188, 0);
-  }
-
-  &:hover {
-    ::-webkit-scrollbar-thumb {
-      background-color: rgba(176, 183, 188, 0.45);
-      background: rgba(176, 183, 188, 0.45);
-    }
-  }
-`;
-
-const DBack = styled.div`
-  min-height: 64px;
-  height: 64px;
-  display: flex;
-  padding-right: 10px;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
-  z-index: 0;
-`;
-
-const Panel = styled.div<PanelProps>`
-  position: relative;
-  background: #ffffff;
-  color: #000000;
-  padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  color: #000000;
-  background: #f0f1f3;
-`;
-
-const Counter = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 11px;
-  line-height: 19px;
-  margin-bottom: -3px;
-  /* or 173% */
-  margin-left: 8px;
-
-  display: flex;
-  align-items: center;
-
-  /* Placeholder Text */
-
-  color: #b0b7bc;
-`;
-
-const ActionInfo = styled.div`
-  font-style: normal;
-  font-weight: normal;
-  font-size: 22px;
-  line-height: 26px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #b0b7bc;
-  margin-bottom: 10px;
-`;
-
-/* Placeholder Text */
-
-const Tabs = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  // justify-content:center;
-  overflow-x: auto;
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-interface TagProps {
-  selected: boolean;
-}
-const Tab = styled.div<TagProps>`
-  display: flex;
-  padding: 10px;
-  margin-right: 25px;
-  color: ${(p) => (p.selected ? '#292C33' : '#8E969C')};
-  border-bottom: ${(p) => p.selected && '4px solid #618AFF'};
-  cursor: hover;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 19px;
-  cursor: pointer;
-`;
-
-const Head = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-`;
-
-const Name = styled.div`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 28px;
-  /* or 73% */
-
-  text-align: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-`;
-
-const Sleeve = styled.div``;
-
-const RowWrap = styled.div`
-  display: flex;
-  justify-content: center;
-
-  width: 100%;
-`;
-
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
-  background-position: center;
-  background-size: cover;
-  margin-bottom: 20px;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-`;

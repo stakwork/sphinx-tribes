@@ -49,9 +49,7 @@ export default function Header() {
 
   async function testChallenge(chal: string) {
     try {
-      console.log('testChallenge', chal);
       const me: any = await api.get(`poll/${chal}`);
-      console.log('poll succeeded', me);
       if (me && me.pubkey) {
         ui.setMeInfo(me);
         ui.setShowSignIn(false);
@@ -70,7 +68,6 @@ export default function Header() {
       if (path.includes(t.path)) pass = true;
     });
     if (!pass) {
-      console.log('force fix');
       history.push('/p');
     }
   }
@@ -92,12 +89,9 @@ export default function Header() {
         const params = urlObject.searchParams;
         const chal = params.get('challenge');
 
-        console.log('chal', chal);
-
         if (chal) {
           // fix url path if "/p" is not included, add challenge to proper url path
           if (!path.includes('/p')) {
-            console.log('fix path!');
             path = `/p?challenge=${chal}`;
             history.push(path);
           }
@@ -329,9 +323,9 @@ export default function Header() {
                   setShowWelcome(false);
                   goToEditSelf();
                 }}
-                hoverColor={'#5881F8'}
-                activeColor={'#5078F2'}
-                shadowColor={'rgba(97, 138, 255, 0.5)'}
+                hovercolor={'#5881F8'}
+                activecolor={'#5078F2'}
+                shadowcolor={'rgba(97, 138, 255, 0.5)'}
               />
             </Column>
           </div>

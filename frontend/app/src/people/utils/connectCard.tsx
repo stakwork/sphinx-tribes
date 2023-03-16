@@ -17,7 +17,7 @@ export default function ConnectCard(props) {
     <div onClick={(e) => e.stopPropagation()}>
       <Modal
         style={props.modalStyle}
-        overlayClick={(e: React.SyntheticEvent) => {
+        overlayClick={() => {
           props.dismiss();
         }}
         visible={visible}
