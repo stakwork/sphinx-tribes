@@ -2,19 +2,17 @@ package main
 
 import (
 	"crypto/rand"
-	"encoding/hex"
 	"os"
 
 	lnurl "github.com/fiatjaf/go-lnurl"
+	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
 )
 
 func encodeLNURL() (string, error) {
 	host := os.Getenv("LN_SERVER_BASE_URL")
 
 	k1 := generate32Bytes()
-	println("Host ==", host)
-	println("K1 ===", k1)
-	url := host + "lnurl?tag=login&k1=" + k1 + "action=login"
+	url := host + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
 
 	return lnurl.Encode(url)
 }

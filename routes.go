@@ -119,7 +119,7 @@ func NewRouter() *http.Server {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Get("/lnurl-login", receiveLnAuthData)
+		r.Get("/lnurl_login", receiveLnAuthData)
 		r.Get("/lnurl", getLnurlAuth)
 	})
 
@@ -827,6 +827,8 @@ func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
 func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	encode, err := encodeLNURL()
 
+	println("LNURL ====", encode)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
@@ -837,14 +839,21 @@ func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 }
 
 func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
-	// Todo
-
 	userKey := r.URL.Query().Get("key")
 
+	responseMsg := make(map[string]string)
+
+	// println("user Key ===", userKey)
+
 	if userKey != "" {
-		// Save in DB
+		// Save in DB and send response
+
+		responseMsg["status"] = "OK"
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(responseMsg)
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("")
+	responseMsg["status"] = "ERROR"
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(responseMsg)
 }
