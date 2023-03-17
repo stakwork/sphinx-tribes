@@ -19,13 +19,15 @@ import CodingMobile from './wantedSummaries/codingMobile';
 import CodingBounty from './wantedSummaries/codingBounty';
 import CodingDesktop from './wantedSummaries/codingDesktop';
 import { sendToRedirect } from '../../../helpers';
+import { observer } from 'mobx-react-lite';
 
 function useQuery() {
   const { search } = useLocation();
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function WantedSummary(props: any) {
+export default  observer(WantedSummary);
+function WantedSummary(props: any) {
   const {
     description,
     priceMin,

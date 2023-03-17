@@ -7,6 +7,7 @@ import { useStores } from '../../../store';
 import FocusedView from '../../main/focusView';
 import { Widget } from '../../main/types';
 import { widgetConfigs } from '../../utils/constants';
+import { observer } from 'mobx-react-lite';
 
 const color = colors['light'];
 export interface PostModalProps {
@@ -16,7 +17,7 @@ export interface PostModalProps {
   onSucces?: () => void;
   onGoBack?: () => void;
 }
-export const PostModal: FC<PostModalProps> = ({ isOpen, onClose, widget, onGoBack, onSucces }) => {
+export const PostModal: FC<PostModalProps> = observer(({ isOpen, onClose, widget, onGoBack, onSucces }) => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const [focusIndex, setFocusIndex] = useState(-1);
@@ -103,3 +104,4 @@ export const PostModal: FC<PostModalProps> = ({ isOpen, onClose, widget, onGoBac
 
   )
 }
+)

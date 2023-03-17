@@ -1,9 +1,10 @@
-import React from 'react';
-import { Head, AboutWrap, Img, Name, RowWrap } from './styles';
-import { useUserInfo } from './hooks';
 import { Button } from 'components/common';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useUserInfo } from './hooks';
+import { Head, Img, Name, RowWrap } from './styles';
 
-export const UserInfoMobileView = ({ setShowSupport }) => {
+export const UserInfoMobileView = observer(({ setShowSupport }: any) => {
   const { canEdit, goBack, userImg, owner_alias, logout, person, qrString } = useUserInfo();
   return (
     <Head>
@@ -40,4 +41,4 @@ export const UserInfoMobileView = ({ setShowSupport }) => {
       )}
     </Head>
   );
-};
+});

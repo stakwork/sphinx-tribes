@@ -1,10 +1,9 @@
 import { usePerson } from 'hooks';
 import { useStores } from 'store';
-import { useModalsVisibility } from 'store/modals';
+
 
 export const useUserEdit = () => {
-  const {ui} = useStores()
-  const modals = useModalsVisibility();
+  const {ui, modals} = useStores()
   const personId = ui.selectedPerson;
   // const personId = useParams<{personId: string}>();
   
@@ -15,7 +14,9 @@ export const useUserEdit = () => {
   }
 
   return {
-    showModal: modals.userEditModal,
-    person, canEdit, closeHandler
+    modals,
+    person,
+    canEdit,
+    closeHandler
   }
 }

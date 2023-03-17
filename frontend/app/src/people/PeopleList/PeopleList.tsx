@@ -8,8 +8,9 @@ import { useStores } from 'store';
 import { queryLimit } from 'store/main';
 import styled from 'styled-components';
 import Person from '../person';
+import { observer } from 'mobx-react-lite';
 
-export const PeopleList = () => {
+export const PeopleList = observer(() => {
   const { main, ui } = useStores();
   const { peoplePageNumber } = ui || {};
   const history = useHistory();
@@ -94,7 +95,7 @@ export const PeopleList = () => {
       />
     </PeopleListContainer>
   );
-};
+});
 
 const PeopleScroller = styled.div`
   overflow-y: overlay !important;

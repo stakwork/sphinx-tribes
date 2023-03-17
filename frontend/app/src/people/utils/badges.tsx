@@ -6,8 +6,11 @@ import PageLoadSpinner from './pageLoadSpinner';
 import { Modal, Button, Divider, TextInput } from '../../components/common';
 import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
+import { observer } from 'mobx-react-lite';
 
-export default function Badges(props) {
+export default observer(Badges);
+
+function Badges(props) {
   const { main, ui } = useStores();
   const { badgeList, meInfo } = ui || {};
 

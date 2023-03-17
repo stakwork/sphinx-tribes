@@ -11,8 +11,11 @@ import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { Note } from './index';
 import { colors } from '../../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function ImageInput({
+export default  observer(ImageInput);
+
+function ImageInput({
   note,
   value,
   handleChange,

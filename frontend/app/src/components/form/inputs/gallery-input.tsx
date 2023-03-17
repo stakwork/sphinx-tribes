@@ -8,8 +8,11 @@ import MaterialIcon from '@material/react-material-icon';
 import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { colors } from '../../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function GalleryInput({
+export default observer(GalleryInput);
+
+function GalleryInput({
   value,
   handleChange,
 }: Props) {

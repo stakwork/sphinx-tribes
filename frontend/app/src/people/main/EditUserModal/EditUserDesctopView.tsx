@@ -4,12 +4,13 @@ import React from 'react'
 import { useUserEdit } from './useEditUser';
 import FocusedView from '../focusView';
 import { formConfig } from './config';
+import { observer } from 'mobx-react-lite';
 
-export const EditUserDesctopView = () => {
-  const {canEdit, closeHandler, person, showModal} = useUserEdit();
+export const EditUserDesctopView = observer(() => {
+  const {canEdit, closeHandler, person, modals} = useUserEdit();
   return (
     <Modal
-      visible={showModal}
+      visible={modals.userEditModal}
       style={{
         height: '100%'
       }}
@@ -35,4 +36,4 @@ export const EditUserDesctopView = () => {
       />
     </Modal>
   )
-}
+})

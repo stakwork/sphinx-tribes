@@ -1,18 +1,18 @@
 import React from 'react';
 /* eslint-disable func-style */
 import '@material/react-material-icon/dist/material-icon.css';
+import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import BotsBody from '../bots/body';
-import PeopleBody from '../people/main/body';
 import PeopleHeader from '../people/main/header';
 import TokenRefresh from '../people/utils/tokenRefresh';
 import Body from '../tribes/body';
 import Header from '../tribes/header';
 import { MainLayout } from './MainLayout';
-import { AppMode } from 'config';
-import { TicketsPage } from './Tickets';
-import { PeoplePage } from './People';
 import { Modals } from './Modals';
+import { PeoplePage } from './People';
+import { TicketsPage } from './Tickets';
+import { observer } from 'mobx-react-lite';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
@@ -42,11 +42,11 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   )
 };
 
-export const Pages = ({ mode }: { mode: AppMode }) => {
+export const Pages = observer(({ mode }: { mode: AppMode }) => {
   return (
     <>
       {modeDispatchPages[mode]()}
       <Modals />
     </>
   );
-};
+});

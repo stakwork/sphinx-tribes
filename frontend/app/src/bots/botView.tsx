@@ -7,8 +7,11 @@ import { useIsMobile } from '../hooks';
 import Bot from './bot';
 import BotBar from './utils/botBar';
 import { useHistory } from 'react-router';
+import { observer } from 'mobx-react-lite';
 
-export default function BotView(props: any) {
+export default observer(BotView);
+
+function BotView(props: any) {
   const { botUniqueName, selectBot, loading, goBack } = props;
 
   const { main } = useStores();

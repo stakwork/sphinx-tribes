@@ -6,6 +6,7 @@ import IconButton from '../../../components/common/icon_button';
 import { useStores } from '../../../store';
 import StartUpModal from '../../utils/start_up_modal';
 import { PostModal, PostModalProps } from './PostModal';
+import { observer } from 'mobx-react-lite';
 
 interface Props extends Omit<PostModalProps, 'onClose' | 'isOpen'> {
   title?: string;
@@ -33,7 +34,7 @@ const mapBtnColorProps = {
   }
 }
 
-export const PostBounty: FC<Props> = ({ title = 'Post a Bounty', buttonProps = {
+export const PostBounty: FC<Props> = observer(({ title = 'Post a Bounty', buttonProps = {
   color: 'primary'
 }, ...modalProps }) => {
 
@@ -89,7 +90,7 @@ export const PostBounty: FC<Props> = ({ title = 'Post a Bounty', buttonProps = {
       )}
     </>
   )
-}
+})
 
 const StyledIconButton = styled(IconButton)`
   color: ${color.pureWhite};

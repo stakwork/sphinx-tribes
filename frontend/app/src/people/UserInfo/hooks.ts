@@ -2,7 +2,6 @@ import { getHost } from 'config';
 import { usePerson } from 'hooks';
 import { useHistory } from 'react-router-dom';
 import { useStores } from 'store';
-import { useModalsVisibility } from 'store/modals';
 
 //TODO: mv into utils
 const host = getHost();
@@ -11,13 +10,11 @@ function makeQR(pubkey: string) {
 }
 
 export const useUserInfo = () => {
-  const { main, ui } = useStores();
-  const modals = useModalsVisibility()
+  const { main, ui, modals } = useStores();
   const history = useHistory();
   const personId = ui.selectedPerson;
   const { canEdit, person } = usePerson(Number(personId));
   const { img, owner_alias, owner_pubkey } = person || {};
-
 
   function goBack() {
     ui.setSelectingPerson(0);
@@ -37,7 +34,7 @@ export const useUserInfo = () => {
 
   const onEdit = () => {
     modals.setUserEditModal(true);
-  }
+  };
 
   return {
     canEdit,

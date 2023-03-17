@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { useUserInfo } from './hooks';
 import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
 import ConnectCard from 'people/utils/connectCard';
+import { observer } from 'mobx-react-lite';
 
-export const UserInfoDesktopView = ({ setShowSupport }) => {
+export const UserInfoDesktopView = observer(({ setShowSupport }: any) => {
   const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();
   const [showQR, setShowQR] = useState(false);
   return (
@@ -131,11 +132,11 @@ export const UserInfoDesktopView = ({ setShowSupport }) => {
       </Head>
       <AboutView canEdit={canEdit} {...person} />
       <ConnectCard
-          dismiss={() => setShowQR(false)}
-          modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
-          person={person}
-          visible={showQR}
+        dismiss={() => setShowQR(false)}
+        modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
+        person={person}
+        visible={showQR}
       />
     </AboutWrap>
   );
-};
+});

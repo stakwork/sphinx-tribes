@@ -9,6 +9,7 @@ import IconButton from '../../components/common/icon_button';
 import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
 const Bounties = (props) => {
   const {
@@ -155,7 +156,7 @@ const Bounties = (props) => {
   );
 };
 
-export default Bounties;
+export default observer(Bounties);
 
 interface containerProps {
   unAssignedBackgroundImage?: string;

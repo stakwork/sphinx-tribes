@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from '../../components/common';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
 let timeout;
 
-export default function TokenRefresh() {
+export default observer(TokenRefresh);
+
+function TokenRefresh() {
   const { main, ui } = useStores();
   const [show, setShow] = useState(false);
 

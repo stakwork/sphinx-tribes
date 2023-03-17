@@ -4,12 +4,13 @@ import React from 'react';
 import FocusedView from '../focusView';
 import { formConfig } from './config';
 import { useUserEdit } from './useEditUser';
+import { observer } from 'mobx-react-lite';
 
-export const EditUserMobileView = () => {
+export const EditUserMobileView = observer(() => {
+  const {canEdit, closeHandler, person, modals} = useUserEdit()
 
-  const {canEdit, closeHandler, person, showModal} = useUserEdit()
-  return (
-    <Modal fill visible={showModal}>
+      return (
+  <Modal fill visible={modals.userEditModal}>
     <FocusedView
       person={person}
       canEdit={canEdit}
@@ -18,6 +19,6 @@ export const EditUserMobileView = () => {
       onSuccess={closeHandler}
       goBack={closeHandler}
     />
-    </Modal>
+  </Modal>
   )
-}
+})

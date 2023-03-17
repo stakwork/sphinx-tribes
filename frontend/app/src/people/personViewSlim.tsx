@@ -23,12 +23,13 @@ import { widgetConfigs } from './utils/constants';
 import NoneSpace from './utils/noneSpace';
 import PageLoadSpinner from './utils/pageLoadSpinner';
 import { PostBounty } from './widgetViews/postBounty';
-import { useModalsVisibility } from 'store/modals';
+import { observer } from 'mobx-react-lite';
+import FocusedView from './main/focusView';
 
-export default function PersonView({ loading = false }) {
+export default observer(PersonView);
+function PersonView({ loading = false }) {
   // on this screen, there will always be a pubkey in the url, no need for personId
-  const { main, ui } = useStores();
-  const modals = useModalsVisibility();
+  const { main, ui, modals } = useStores();
   const { meInfo } = ui || {};
   const history = useHistory();
   const location = useLocation();
@@ -77,7 +78,6 @@ export default function PersonView({ loading = false }) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [showSupport, setShowSupport] = useState(false);
 
-  
   const [showFocusView, setShowFocusView] = useState(false);
 
   // if no people, load people on mount
@@ -460,7 +460,7 @@ export default function PersonView({ loading = false }) {
               <div />
             )}
           </div>
-          <UserInfo  setShowSupport={setShowSupport} />
+          <UserInfo setShowSupport={setShowSupport} />
           <Tabs>
             {tabs &&
               Object.keys(tabs).map((name, i) => {
@@ -593,6 +593,52 @@ export default function PersonView({ loading = false }) {
             <div style={{ height: 60 }} />
           </div>
         </div>
+        <Modal
+          visible={showFocusView}
+          style={{
+            height: '100%'
+          }}
+          envStyle={{
+            marginTop: isMobile ? 64 : 0,
+            borderRadius: 0,
+            background: '#fff',
+            height: '100%',
+            width: '60%',
+            minWidth: 500,
+            maxWidth: 602,
+            zIndex: 20 //minHeight: 300,
+            // ...focusedDesktopModalStyles
+          }}
+          // nextArrow={nextIndex}
+          // prevArrow={prevIndex}
+          overlayClick={() => {
+            setShowFocusView(false);
+            setFocusIndex(-1);
+            if (selectedWidget === 'about') switchWidgets('badges');
+          }}
+          bigClose={() => {
+            setShowFocusView(false);
+            setFocusIndex(-1);
+            if (selectedWidget === 'about') switchWidgets('badges');
+          }}
+        >
+          <FocusedView
+            person={person}
+            canEdit={canEdit}
+            selectedIndex={focusIndex}
+            config={tabs[selectedWidget] && tabs[selectedWidget]}
+            onSuccess={() => {
+              console.log('success');
+              setFocusIndex(-1);
+              if (selectedWidget === 'about') switchWidgets('badges');
+            }}
+            goBack={() => {
+              setShowFocusView(false);
+              setFocusIndex(-1);
+              if (selectedWidget === 'about') switchWidgets('badges');
+            }}
+          />
+        </Modal>
       </div>
     );
   }

@@ -12,8 +12,10 @@ import api from '../../api';
 import ImageButton from '../common/Image_button';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
+import { observer } from 'mobx-react-lite';
 
-export default function Form(props: any) {
+export default observer(Form);
+function Form(props: any) {
   const {
     buttonsOnBottom,
     wrapStyle,
