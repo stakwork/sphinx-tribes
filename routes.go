@@ -123,6 +123,8 @@ func NewRouter() *http.Server {
 		r.Get("/lnurl", getLnurlAuth)
 	})
 
+	r.Get("/websocket", handleSocket)
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "5002"
@@ -137,6 +139,10 @@ func NewRouter() *http.Server {
 	}()
 
 	return server
+}
+
+func handleSocket(w http.ResponseWriter, r *http.Request) {
+	socket.HandleRequest(w, r)
 }
 
 func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
@@ -154,6 +160,7 @@ func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pubkeys)
 	w.WriteHeader(http.StatusOK)
 }
+
 func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	feed, err := feeds.ParseFeed(url)
@@ -843,10 +850,11 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 
 	responseMsg := make(map[string]string)
 
-	// println("user Key ===", userKey)
-
 	if userKey != "" {
-		// Save in DB and send response
+		// Save in DB if the user does not exists already
+		DB.createLnUser(userKey)
+
+		socket.Broadcast([]byte("User logged in successflly"))
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)

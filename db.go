@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 )
@@ -753,4 +754,29 @@ func (db database) getConnectionCode() ConnectionCodesShort {
 	})
 
 	return c
+}
+
+func (db database) getLnUser(lnKey string) uint64 {
+	var count uint64
+
+	db.db.Model(&Person{}).Where("owner_pub_key = ?", lnKey).Count(&count)
+
+	return count
+}
+
+func (db database) createLnUser(lnKey string) (Person, error) {
+	now := time.Now()
+	p := Person{}
+
+	if db.getLnUser(lnKey) == 0 {
+		p.OwnerPubKey = lnKey
+		p.OwnerAlias = lnKey
+		p.UniqueName, _ = personUniqueNameFromName(p.OwnerAlias)
+		p.Created = &now
+		p.Tags = pq.StringArray{}
+		p.Uuid = xid.New().String()
+
+		db.db.Create(&p)
+	}
+	return p, nil
 }
