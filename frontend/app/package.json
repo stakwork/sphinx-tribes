@@ -32,6 +32,7 @@
     "formik": "^2.2.6",
     "fuse.js": "^5.2.3",
     "lodash": "^4.17.15",
+    "memo-decorator": "^2.0.1",
     "mobx": "^6.8.0",
     "mobx-persist": "^0.4.1",
     "mobx-persist-store": "^1.1.3",

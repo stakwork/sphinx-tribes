@@ -4,6 +4,9 @@ import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
 import { uiStore } from './ui';
+import memo from 'memo-decorator';
+import { persist } from 'mobx-persist';
+
 export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
@@ -407,7 +410,7 @@ export class MainStore {
     return ps;
   }
 
-  // @persist("list")
+  @persist("list")
   people: Person[] = [];
 
   setPeople(p: Person[]) {
@@ -415,14 +418,8 @@ export class MainStore {
   }
 
   async getPeople(queryParams?: any): Promise<Person[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
-
-    const query = this.appendQueryParams('people', queryLimit, {
-      ...queryParams,
-      sortBy: 'last_login'
-    });
-
-    const ps = await api.get(query);
+    const params = { ...queryParams, search: uiStore.searchText }; 
+    const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
       const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
@@ -433,7 +430,7 @@ export class MainStore {
     }
 
     // for search always reset page
-    if (queryParams && queryParams.resetPage) {
+    if (params && params.resetPage) {
       this.people = ps;
       uiStore.setPeoplePageNumber(1);
     } else {
@@ -442,10 +439,26 @@ export class MainStore {
         this.people,
         ps,
         (n) => uiStore.setPeoplePageNumber(n),
-        queryParams
+        params
       );
     }
 
+    return ps;
+  }
+
+  @memo({
+    resolver: (...args: any[]) => {
+      return JSON.stringify({args} );
+    },
+    cache: new Map()
+  })
+  private async fetchPeople (search: string, queryParams?: any, ): Promise<Person[]> {
+    const params = { ...queryParams, search }; 
+    const query = this.appendQueryParams('people', queryLimit, {
+      ...params,
+      sortBy: 'last_login'
+    });
+    const ps = await api.get(query);
     return ps;
   }
 
@@ -459,7 +472,7 @@ export class MainStore {
     return li;
   }
 
-  // @persist("list")
+  @persist("list")
   peoplePosts: PersonPost[] = [];
 
   async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
@@ -470,7 +483,7 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps = await api.get(query);
+      let ps = await this.fetchPeoplePosts(query);
       ps = this.decodeListJSON(ps);
 
       // for search always reset page
@@ -493,7 +506,17 @@ export class MainStore {
     }
   }
 
-  // @persist("list")
+  @memo({
+    resolver: (...args: any[]) => {
+      return JSON.stringify({args} );
+    },
+    cache: new Map()
+  })
+  private async fetchPeoplePosts(query) {
+    return  await api.get(query);
+  }
+
+  @persist("list")
   peopleWanteds: PersonWanted[] = [];
 
   setPeopleWanteds(wanteds: PersonWanted[]) {
@@ -531,7 +554,7 @@ export class MainStore {
     }
   }
 
-  // @persist("list")
+  @persist("list")
   peopleOffers: PersonOffer[] = [];
 
   async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
