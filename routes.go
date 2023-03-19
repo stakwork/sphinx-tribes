@@ -834,12 +834,12 @@ func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
 func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	encode, err := encodeLNURL()
 
-	println("LNURL ====", encode)
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
 	}
+
+	store.SetLnCache(encode, LnStore{encode, false})
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(encode)

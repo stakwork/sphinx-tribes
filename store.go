@@ -20,6 +20,11 @@ type Store struct {
 	cache *cache.Cache
 }
 
+type LnStore struct {
+	lnurl  string
+	status bool
+}
+
 var store Store
 
 func initCache() {
@@ -50,6 +55,22 @@ func (s Store) GetCache(key string) (string, error) {
 	c, _ := value.(string)
 	if !found || c == "" {
 		return "", errors.New("not found")
+	}
+	return c, nil
+}
+
+// SetCache
+func (s Store) SetLnCache(key string, value LnStore) error {
+	s.cache.Set(key, value, cache.DefaultExpiration)
+	return nil
+}
+
+// GetCache
+func (s Store) GetLnCache(key string) (LnStore, error) {
+	value, found := s.cache.Get(key)
+	c, _ := value.(LnStore)
+	if !found {
+		return LnStore{}, errors.New("not found")
 	}
 	return c, nil
 }
