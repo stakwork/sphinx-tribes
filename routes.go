@@ -121,6 +121,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/lnurl_login", receiveLnAuthData)
 		r.Get("/lnurl", getLnurlAuth)
+		r.Get("/lnurl_poll", pollLnurlAuth)
 	})
 
 	r.Get("/websocket", handleSocket)
@@ -842,7 +843,21 @@ func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	store.SetLnCache(encodeData.k1, LnStore{encodeData.k1, false})
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(encodeData.encode)
+	json.NewEncoder(w).Encode(encodeData)
+}
+
+func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
+	k1 := r.URL.Query().Get("k1")
+
+	res, err := store.GetLnCache(k1)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("LNURL auth data not found")
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res)
 }
 
 func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {

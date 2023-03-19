@@ -28,8 +28,11 @@ export default function SignIn(props: any) {
 
   useEffect(() => {
     main.getLnurl();
-    console.log("LBURL ===", main.lnurl)
   }, [])
+
+  function pollLnurl() {
+
+  }
 
   return useObserver(() => {
     return (
@@ -57,7 +60,7 @@ export default function SignIn(props: any) {
               </Description>
 
               {
-                page === 'lnurl' ? (<QR value={main.lnurl} size={200} />) :
+                page === 'lnurl' ? (<QR value={main.lnurl.encode} size={200} />) :
                   !isMobile && (
                     <AuthQR
                       onSuccess={() => {

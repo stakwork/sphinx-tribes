@@ -878,10 +878,10 @@ export class MainStore {
   }
 
   @observable
-  lnurl: string = "";
+  lnurl: LnurlData = {encode: "", k1: ""};
 
-  @action setLnurl(url: string) {
-    this.lnurl = url;
+  @action setLnurl(lnData: LnurlData) {
+    this.lnurl = lnData;
   }
 
   @action async getLnurl(): Promise<string> {
@@ -1017,4 +1017,9 @@ export interface ClaimOnLiquid {
   to: string;
   amount?: number;
   memo: string;
+}
+
+export interface LnurlData {
+  encode: string;
+  k1: string
 }
