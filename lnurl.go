@@ -8,13 +8,24 @@ import (
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
 )
 
-func encodeLNURL() (string, error) {
+type LnEncodeData struct {
+	encode string
+	k1     string
+}
+
+func encodeLNURL() (LnEncodeData, error) {
 	host := os.Getenv("LN_SERVER_BASE_URL")
 
 	k1 := generate32Bytes()
 	url := host + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
 
-	return lnurl.Encode(url)
+	encode, err := lnurl.Encode(url)
+
+	if err != nil {
+		return LnEncodeData{}, err
+	}
+
+	return LnEncodeData{encode: encode, k1: k1}, nil
 }
 
 func generate32Bytes() string {

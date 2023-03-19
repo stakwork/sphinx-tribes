@@ -832,21 +832,22 @@ func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
 }
 
 func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
-	encode, err := encodeLNURL()
+	encodeData, err := encodeLNURL()
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
 	}
 
-	store.SetLnCache(encode, LnStore{encode, false})
+	store.SetLnCache(encodeData.k1, LnStore{encodeData.k1, false})
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(encode)
+	json.NewEncoder(w).Encode(encodeData.encode)
 }
 
 func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
+	k1 := r.URL.Query().Get("k1")
 
 	responseMsg := make(map[string]string)
 
@@ -855,6 +856,9 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		DB.createLnUser(userKey)
 
 		socket.Broadcast([]byte("User logged in successflly"))
+
+		// Set store data to true
+		store.SetLnCache(k1, LnStore{k1, true})
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)
