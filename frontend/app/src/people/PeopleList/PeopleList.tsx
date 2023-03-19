@@ -117,6 +117,7 @@ const DBack = styled.div`
 
 const PeopleListContainer = styled.div`
   position: relative;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   background: #ffffff;

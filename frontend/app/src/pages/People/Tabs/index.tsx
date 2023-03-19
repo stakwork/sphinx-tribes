@@ -1,11 +1,12 @@
 import { useIsMobile, usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import RenderWidgets from 'people/renderWidgets';
+import RenderWidgets from 'people/widgetViews/renderWidgets';
 import { widgetConfigs } from 'people/utils/constants';
 import React, { useCallback, useEffect } from 'react'
 import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
+import { Wanted } from './Wanted';
 
 const tabs = widgetConfigs;
 export const TabsPages = observer(() => {
@@ -88,7 +89,6 @@ export const TabsPages = observer(() => {
         <Switch>
         {tabsNames.map((name) =>  (
           <Route key={name} path={`${path}${name}`}> 
-
           <div
             style={{
               padding: 20,
@@ -105,10 +105,9 @@ export const TabsPages = observer(() => {
                 justifyContent:
                   fullSelectedWidget && fullSelectedWidget.length > 0 ? 'flex-start' : 'center',
                 flexWrap: 'wrap',
-                // height: !hasWidgets() ? 'inherit' : '',
-                // paddingTop: !hasWidgets() ? 30 : 0
               }}
             >
+              {name === 'wanted' && <Wanted />}
               
           <RenderWidgets widget={name} />
             </div>

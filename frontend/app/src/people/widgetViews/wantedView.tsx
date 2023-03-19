@@ -33,7 +33,7 @@ function WantedView(props: any) {
     loomEmbedUrl,
     onPanelClick
   } = props;
-  const titleString = title ?? one_sentence_summary;
+  const titleString = one_sentence_summary ?? title;
 
   let { show, paid } = props;
   const isMobile = useIsMobile();

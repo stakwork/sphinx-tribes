@@ -9,7 +9,6 @@ import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks
 import { Modal, SearchTextInput } from '../../components/common';
 import { useStores } from '../../store';
 import Person from '../person';
-import PersonViewSlim from '../personViewSlim';
 import ConnectCard from '../utils/connectCard';
 import { widgetConfigs } from '../utils/constants';
 import NoResults from '../utils/noResults';
@@ -456,22 +455,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
           <PageLoadSpinner noAnimate show={loadingBottom} />
         </div>
 
-        <FadeLeft
-          withOverlay
-          drift={40}
-          overlayClick={() => goBack()}
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            zIndex: 10000,
-            width: '100%'
-          }}
-          isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}
-        >
-          <PersonViewSlim loading={loading} />
-        </FadeLeft>
         {publicFocusPerson && (
           <Modal visible={publicFocusPerson ? true : false} fill={true}>
             <FocusedView
@@ -576,22 +559,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
         </div>
       </>
       {/* selected view */}
-      <FadeLeft
-        withOverlay={isMobile}
-        drift={40}
-        overlayClick={() => goBack()}
-        style={{
-          position: 'absolute',
-          top: isMobile ? 0 : 64,
-          right: 0,
-          zIndex: 10000,
-          width: '100%'
-        }}
-        isMounted={ui.selectingPerson ? true : false}
-        dismountCallback={() => ui.setSelectedPerson(0)}
-      >
-        <PersonViewSlim loading={loading} />
-      </FadeLeft>
       {/* modal onClick on tickets */}
       {publicFocusPerson && (
         <Modal

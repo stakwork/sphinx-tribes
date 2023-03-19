@@ -207,7 +207,7 @@ function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    if (config.name === 'wanted' && !body?.title) {
+    if (config.name === 'wanted') {
       body.title = body.one_sentence_summary ?? '';
     }
     let newBody = cloneDeep(body);
@@ -243,11 +243,11 @@ function FocusedView(props: any) {
           : newBody;
 
       await main.saveProfile(requestData);
-
       closeModal();
     } catch (e) {
       console.log('e', e);
     }
+    props.onSuccess();
     setLoading(false);
     if (!isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
   }

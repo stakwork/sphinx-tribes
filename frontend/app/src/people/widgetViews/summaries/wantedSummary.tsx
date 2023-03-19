@@ -57,7 +57,7 @@ function WantedSummary(props: any) {
     formSubmit,
     title
   } = props;
-  const titleString = title ?? one_sentence_summary;
+  const titleString = one_sentence_summary ?? title ;
   const [envHeight, setEnvHeight] = useState('100%');
   const imgRef: any = useRef(null);
 
