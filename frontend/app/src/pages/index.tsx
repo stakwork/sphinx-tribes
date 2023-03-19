@@ -10,7 +10,7 @@ import Body from '../tribes/body';
 import Header from '../tribes/header';
 import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
-import { PeoplePage } from './People';
+import { People } from './People';
 import { TicketsPage } from './Tickets';
 import { observer } from 'mobx-react-lite';
 
@@ -26,7 +26,7 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
           <BotsBody />
         </Route>
         <Route path="/p/">
-          <PeoplePage />
+          <People />
         </Route>
         <Route path="/tickets/">
           <TicketsPage />

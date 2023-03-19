@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 export const UserInfoDesktopView = observer(({ setShowSupport }: any) => {
   const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();
+  console.log({ canEdit });
   const [showQR, setShowQR] = useState(false);
   return (
     <AboutWrap

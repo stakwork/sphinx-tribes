@@ -395,7 +395,7 @@ function PersonView({ loading = false }) {
     }
   }
 
-  const mediumPic = img;
+  // const mediumPic = img;
 
   function renderMobileView() {
     return (
@@ -576,7 +576,6 @@ function PersonView({ loading = false }) {
             }}
           >
             {renderEditButton({ marginBottom: 15 })}
-            {/* <div style={{ height: 15 }} /> */}
             <Sleeve
               style={{
                 display: 'flex',
@@ -647,7 +646,7 @@ function PersonView({ loading = false }) {
     <Content>
       {isMobile ? renderMobileView() : renderDesktopView()}
 
-      <Modal
+      {/* <Modal
         visible={showSupport}
         close={() => setShowSupport(false)}
         style={{
@@ -674,7 +673,7 @@ function PersonView({ loading = false }) {
                             ></sphinx-widget>`
           }}
         />
-      </Modal>
+      </Modal> */}
     </Content>
   );
 }

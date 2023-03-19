@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
@@ -29,19 +29,26 @@ function Badges(props) {
   const thisIsMe = meInfo?.owner_pubkey === person?.owner_pubkey;
 
   useEffect(() => {
-    getBadges();
-  }, [person?.owner_pubkey]);
+    main.getBadgeList();
+  }, [main]);
 
-  async function getBadges() {
-    setLoading(true);
-    setSelectedBadge(null);
-    setBadgeToPush(null);
-    if (person?.owner_pubkey) {
-      const b = await main.getBalances(person?.owner_pubkey);
-      setBalancesTxns(b);
-    }
-    setLoading(false);
-  }
+  const getBadges = useCallback(
+    async function () {
+      setLoading(true);
+      setSelectedBadge(null);
+      setBadgeToPush(null);
+      if (person?.owner_pubkey) {
+        const b = await main.getBalances(person?.owner_pubkey);
+        setBalancesTxns(b);
+      }
+      setLoading(false);
+    },
+    [main, person?.owner_pubkey]
+  );
+
+  useEffect(() => {
+    getBadges();
+  }, [getBadges]);
 
   async function claimBadge() {
     setClaiming(true);

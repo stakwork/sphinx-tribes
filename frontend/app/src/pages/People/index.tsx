@@ -1,17 +1,19 @@
 import { PeopleBody } from 'people/main';
 import React from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import { PersonPage } from './PersonPage';
+import { PeoplePage } from './PeoplePage';
 
-export const PeoplePage = () => {
+export const People = () => {
   const { path } = useRouteMatch();
   console.log(path);
   return (
     <Switch>
-      {/* <Route path={`${path}:personId/`}>
+      <Route path={`${path}:personPubkey/`}>
         <PersonPage />
-      </Route> */}
+      </Route>
       <Route path={`${path}`}>
-        {/* <PersonPage /> */}
+        {/* <PeoplePage /> */}
         <PeopleBody selectedWidget="people" />
       </Route>
     </Switch>

@@ -410,7 +410,7 @@ export class MainStore {
     return ps;
   }
 
-  @persist("list")
+  @persist('list')
   people: Person[] = [];
 
   setPeople(p: Person[]) {
@@ -418,7 +418,7 @@ export class MainStore {
   }
 
   async getPeople(queryParams?: any): Promise<Person[]> {
-    const params = { ...queryParams, search: uiStore.searchText }; 
+    const params = { ...queryParams, search: uiStore.searchText };
     const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
@@ -448,12 +448,12 @@ export class MainStore {
 
   @memo({
     resolver: (...args: any[]) => {
-      return JSON.stringify({args} );
+      return JSON.stringify({ args });
     },
     cache: new Map()
   })
-  private async fetchPeople (search: string, queryParams?: any, ): Promise<Person[]> {
-    const params = { ...queryParams, search }; 
+  private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
+    const params = { ...queryParams, search };
     const query = this.appendQueryParams('people', queryLimit, {
       ...params,
       sortBy: 'last_login'
@@ -472,7 +472,7 @@ export class MainStore {
     return li;
   }
 
-  @persist("list")
+  @persist('list')
   peoplePosts: PersonPost[] = [];
 
   async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
@@ -508,15 +508,15 @@ export class MainStore {
 
   @memo({
     resolver: (...args: any[]) => {
-      return JSON.stringify({args} );
+      return JSON.stringify({ args });
     },
     cache: new Map()
   })
   private async fetchPeoplePosts(query) {
-    return  await api.get(query);
+    return await api.get(query);
   }
 
-  @persist("list")
+  @persist('list')
   peopleWanteds: PersonWanted[] = [];
 
   setPeopleWanteds(wanteds: PersonWanted[]) {
@@ -554,7 +554,7 @@ export class MainStore {
     }
   }
 
-  @persist("list")
+  @persist('list')
   peopleOffers: PersonOffer[] = [];
 
   async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {

@@ -1,44 +1,55 @@
 import { Button } from 'components/common';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useState } from 'react';
 import { useUserInfo } from './hooks';
 import { Head, Img, Name, RowWrap } from './styles';
+import { HeaderMobile } from './MobileHeader';
+import ConnectCard from 'people/utils/connectCard';
 
 export const UserInfoMobileView = observer(({ setShowSupport }: any) => {
-  const { canEdit, goBack, userImg, owner_alias, logout, person, qrString } = useUserInfo();
+  const { canEdit, goBack, userImg, owner_alias, logout, qrString, onEdit, person } = useUserInfo();
+  const [showQR, setShowQR] = useState(false);
   return (
-    <Head>
-      <Img src={userImg} />
-      <RowWrap>
-        <Name>{owner_alias}</Name>
-      </RowWrap>
+    <>
+      <HeaderMobile canEdit={canEdit} goBack={goBack} logout={logout} onEdit={onEdit} />
+      <Head>
+        <Img src={userImg} />
+        <RowWrap>
+          <Name>{owner_alias}</Name>
+        </RowWrap>
 
-      {/* only see buttons on other people's profile */}
-      {canEdit ? (
-        <div style={{ height: 40 }} />
-      ) : (
-        <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
-          <a href={qrString}>
+        {canEdit ? (
+          <div style={{ height: 40 }} />
+        ) : (
+          <RowWrap style={{ marginBottom: 30, marginTop: 25 }}>
+            <a href={qrString}>
+              <Button
+                text="Connect"
+                color="primary"
+                height={42}
+                width={120}
+                onClick={() => setShowQR(true)}
+              />
+            </a>
+
+            <div style={{ width: 15 }} />
+
             <Button
-              text="Connect"
-              onClick={(e) => e.stopPropagation()}
-              color="primary"
+              text="Send Tip"
+              color="link"
               height={42}
               width={120}
+              onClick={() => setShowSupport(true)}
             />
-          </a>
-
-          <div style={{ width: 15 }} />
-
-          <Button
-            text="Send Tip"
-            color="link"
-            height={42}
-            width={120}
-            onClick={() => setShowSupport(true)}
-          />
-        </RowWrap>
-      )}
-    </Head>
+          </RowWrap>
+        )}
+      </Head>
+      <ConnectCard
+        dismiss={() => setShowQR(false)}
+        modalStyle={{ top: -63, height: 'calc(100% + 64px)' }}
+        person={person}
+        visible={showQR}
+      />
+    </>
   );
 });
