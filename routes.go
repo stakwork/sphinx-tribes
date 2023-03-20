@@ -834,27 +834,41 @@ func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
 
 func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	encodeData, err := encodeLNURL()
+	responseData := make(map[string]string)
 
 	if err != nil {
+		responseData["k1"] = ""
+		responseData["encode"] = ""
+
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
 	}
 
 	store.SetLnCache(encodeData.k1, LnStore{encodeData.k1, false})
 
+	responseData["k1"] = encodeData.k1
+	responseData["encode"] = encodeData.encode
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(encodeData)
+	json.NewEncoder(w).Encode(responseData)
 }
 
 func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	k1 := r.URL.Query().Get("k1")
+	responseData := make(map[string]interface{})
 
 	res, err := store.GetLnCache(k1)
 
 	if err != nil {
+		responseData["k1"] = ""
+		responseData["status"] = false
+
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("LNURL auth data not found")
 	}
+
+	responseData["k1"] = res.k1
+	responseData["status"] = res.status
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(res)

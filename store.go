@@ -21,7 +21,7 @@ type Store struct {
 }
 
 type LnStore struct {
-	lnurl  string
+	k1     string
 	status bool
 }
 

@@ -887,6 +887,7 @@ export class MainStore {
   @action async getLnurl(): Promise<string> {
     try {
       let data = await api.get('lnurl');
+      console.log("Data ===",data);
       this.setLnurl(data)
       return data;
     } catch (e) {
