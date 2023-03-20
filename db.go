@@ -775,6 +775,8 @@ func (db database) createLnUser(lnKey string) (Person, error) {
 		p.Created = &now
 		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
+		p.Extras = map[string]interface{}{}
+		p.GithubIssues = map[string]interface{}{}
 
 		db.db.Create(&p)
 	}

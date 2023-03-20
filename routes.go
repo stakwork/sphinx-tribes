@@ -863,6 +863,7 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 		responseData["k1"] = ""
 		responseData["status"] = false
 
+		fmt.Println("=> ERR polling LNURL AUTH", err)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("LNURL auth data not found")
 	}

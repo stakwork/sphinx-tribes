@@ -14,6 +14,7 @@ export default function SignIn(props: any) {
   const { main } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
+  const [lnurlReady] = useState(false);
 
   const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);
@@ -101,7 +102,7 @@ export default function SignIn(props: any) {
               />
 
               {
-                page === 'lnurl' ? (
+                lnurlReady ? page === 'lnurl' ? (
                   <IconButton
                     text={'Scan with Sphinx'}
                     height={48}
@@ -129,7 +130,7 @@ export default function SignIn(props: any) {
                     hovercolor={'#5881F8'}
                     activecolor={'#5078F2'}
                     shadowcolor={'rgba(97, 138, 255, 0.5)'}
-                  />)
+                  />) : (<></>)
               }
             </Column>
             <Divider />

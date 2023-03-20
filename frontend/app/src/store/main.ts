@@ -891,7 +891,6 @@ export class MainStore {
       this.setLnurl(data)
       return data;
     } catch (e) {
-      console.log('fetch failed getLNurl', e);
       return '';
     }
   }
@@ -901,6 +900,7 @@ export class MainStore {
       let data = await api.get(`lnurl_poll?k1=${this.lnurl.k1}`);
       if(data.status) {
         uiStore.setShowSignIn(false);
+
         this.setLnurl({encode: "", k1: ""});
       }
       return data;

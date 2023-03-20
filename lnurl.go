@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"fmt"
 	"os"
 
 	lnurl "github.com/fiatjaf/go-lnurl"
@@ -16,13 +15,6 @@ type LnEncodeData struct {
 
 func encodeLNURL() (LnEncodeData, error) {
 	host := os.Getenv("LN_SERVER_BASE_URL")
-
-	hostname, herr := os.Hostname()
-	if herr != nil {
-		fmt.Println(herr)
-		os.Exit(1)
-	}
-	fmt.Println("Hostname ====", hostname)
 
 	k1 := generate32Bytes()
 	url := host + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
