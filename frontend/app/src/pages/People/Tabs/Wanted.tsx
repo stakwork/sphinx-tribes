@@ -1,6 +1,6 @@
 import { usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import { BountyModal } from 'people/main/BoutnyModal';
+import { BountyModal } from 'people/main/BountyModal';
 import { widgetConfigs } from 'people/utils/constants';
 import NoneSpace from 'people/utils/noneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
@@ -15,7 +15,6 @@ const config = widgetConfigs.wanted;
 export const Wanted = observer(() => {
   const {ui} = useStores();
   const {person, canEdit} = usePerson(ui.selectedPerson);
-
   const {path, url} = useRouteMatch()
   const history = useHistory();
 
@@ -24,27 +23,30 @@ export const Wanted = observer(() => {
   if(!fullSelectedWidgets?.length) {
     return (
       <NoneSpace
-            small
-            Button={
-              canEdit && (
-                <PostBounty
-                  title={config.noneSpace.me.buttonText}
-                  buttonProps={{
-                    leadingIcon: config.noneSpace.me.buttonIcon,
-                    color: 'secondary'
-                  }}
-                  widget={'wanted'}
-                  onSucces={() => {
-                    history.goBack()
-                    window.location.reload()
-                  }}
-                  onGoBack={() => {
-                    history.goBack()
-                  }}
-                />
-              )
-            }
-            {...config.noneSpace.me}
+        style={{
+          margin: 'auto'
+        }}
+        small
+        Button={
+          canEdit && (
+            <PostBounty
+              title={config.noneSpace.me.buttonText}
+              buttonProps={{
+                leadingIcon: config.noneSpace.me.buttonIcon,
+                color: 'secondary'
+              }}
+              widget={'wanted'}
+              onSucces={() => {
+                history.goBack()
+                window.location.reload()
+              }}
+              onGoBack={() => {
+                history.goBack()
+              }}
+            />
+          )
+        }
+        {...(canEdit ? config.noneSpace.me : config.noneSpace.otherUser)}
       />
     )
   }
@@ -56,26 +58,29 @@ export const Wanted = observer(() => {
         </Route>
       </Switch>
       <div
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-end',
-                paddingBottom: '16px'
-              }}
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          paddingBottom: '16px'
+        }}
       >
-              <PostBounty widget="wanted" />
+        {canEdit && <PostBounty widget="wanted" />}
       </div>
       {
-      fullSelectedWidgets.map((w, i) => (
-       <Panel  key={w.created} onClick={() => history.push({
-        pathname: `${url}/${i}`
-       }) } isMobile={false}
-       >
-         <WantedView {...w} person={person} />
-       </Panel>
-        )
-      )
-    }
+        fullSelectedWidgets.map((w, i) => (
+          <Panel  
+            key={w.created} 
+            isMobile={false}
+            onClick={() => history.push({
+                pathname: `${url}/${i}`
+              })
+            }
+          >
+            <WantedView {...w} person={person} />
+          </Panel>
+        ))
+      }
     </Container>
   )
 })

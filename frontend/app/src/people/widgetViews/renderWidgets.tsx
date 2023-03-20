@@ -144,13 +144,11 @@ function RenderWidgets({ widget }) {
           </div>
         </div>
       ) : (
-        <div
-          style={{
-            width: '100%'
-          }}
-        >
           <NoneSpace
             small
+            style={{
+              margin: 'auto'
+            }}
             Button={
               canEdit && (
                 <PostBounty
@@ -165,7 +163,7 @@ function RenderWidgets({ widget }) {
             }
             {...tabs[selectedWidget]?.noneSpace[noneKey]}
           />
-        </div>
+
       );
 
       return <>{panels}</>;

@@ -89,29 +89,28 @@ export const TabsPages = observer(() => {
         <Switch>
         {tabsNames.map((name) =>  (
           <Route key={name} path={`${path}${name}`}> 
-          <div
-            style={{
-              padding: 20,
-              height: 'calc(100% - 63px)',
-              background: '#F2F3F5',
-              overflowY: 'auto',
-              position: 'relative'
-            }}
-          >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent:
-                  fullSelectedWidget && fullSelectedWidget.length > 0 ? 'flex-start' : 'center',
-                flexWrap: 'wrap',
+                padding: 20,
+                height: 'calc(100% - 63px)',
+                overflowY: 'auto',
+                position: 'relative'
               }}
             >
-              {name === 'wanted' && <Wanted />}
-              
-          <RenderWidgets widget={name} />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent:
+                    fullSelectedWidget && fullSelectedWidget.length > 0 ? 'flex-start' : 'center',
+                  flexWrap: 'wrap',
+                  minHeight: '100%'
+                }}
+              >
+                {name === 'wanted' && <Wanted />}
+                <RenderWidgets widget={name} />
+              </div>
             </div>
-          </div>
           </Route>))}
         </Switch>
       </Container>

@@ -9,7 +9,7 @@ export const usePerson = (id) => {
 
   const canEdit = meInfo?.id === person?.id;
   return {
-    person,
+    person: canEdit ? meInfo : person,
     canEdit
   };
 };
