@@ -572,6 +572,8 @@ function WantedSummary(props: any) {
           creatorStep={creatorStep}
           isPaidStatusBadgeInfo={isPaidStatusBadgeInfo}
           isPaidStatusPopOver={isPaidStatusPopOver}
+          titleString={titleString}
+          nametag={nametag}
         />
       );
     }

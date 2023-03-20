@@ -23,10 +23,9 @@ function GalleryInput({
   const picsrcArray = value || [];
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
-    console.log('uploadBase64Pic', img_type);
     try {
       const info = ui.meInfo as any;
-      if (!info) return console.log('no meInfo');
+      if (!info) return;
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/public_pic`, {
         method: 'POST',
@@ -51,7 +50,6 @@ function GalleryInput({
   }
 
   async function dropzoneUpload(files: File[], fileRejections) {
-    console.log('fileRejections', fileRejections);
     if (fileRejections.length) {
       fileRejections.forEach((file) => {
         file.errors.forEach((err) => {
@@ -67,15 +65,15 @@ function GalleryInput({
       return;
     }
 
-    console.log(files);
     const file = files[0];
+
     setUploading(true);
     const reader = new FileReader();
     reader.onload = async (event: any) => {
       await uploadBase64Pic(event.target.result, file.type);
       setUploading(false);
     };
-    console.log('file', file);
+
     reader.readAsDataURL(file);
   }
 

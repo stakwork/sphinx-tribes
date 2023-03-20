@@ -52,8 +52,6 @@ function BodyComponent() {
     let newPage = currentPage + direction;
     if (newPage < 1) newPage = 1;
 
-    console.log('loadmore');
-
     try {
       await main.getTribes({ page: newPage });
     } catch (e) {
@@ -63,7 +61,7 @@ function BodyComponent() {
 
   async function refreshList() {
     setLoadingList(true);
-    console.log('refreshList');
+
     // reset page will replace all results, this is good for a new search!
     await main.getTribes({ page: 1, resetPage: true });
 
@@ -198,7 +196,6 @@ function BodyComponent() {
               marginLeft: 20
             }}
             onChange={(e) => {
-              console.log('handleChange', e);
               ui.setSearchText(e);
             }}
           />

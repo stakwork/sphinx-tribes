@@ -69,7 +69,6 @@ export default function FocusedWidget(props: any) {
     // new widget added, keep form state and reset selected index
     // if errors, prevent!
     if (thereAreErrors()) {
-      console.log('errors!', newErrors);
       alert('validation errors!');
       return;
     }
@@ -105,7 +104,6 @@ export default function FocusedWidget(props: any) {
   }
 
   function startEdit(obj, i) {
-    console.log('startEdit', obj);
     const cloneformState = getFormState();
     setPrevState(cloneformState);
     const formState = [...cloneformState];
@@ -118,7 +116,6 @@ export default function FocusedWidget(props: any) {
   }
 
   function deleteItem(obj, i) {
-    console.log('deleteItem', obj);
     const formState = (values[name] && [...values[name][item.name]]) || [];
     let index = i;
     if (obj.id) {

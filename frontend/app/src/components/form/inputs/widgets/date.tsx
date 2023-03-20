@@ -11,7 +11,6 @@ function Date({ label, value, handleChange }: any) {
   const [isBorder, setIsBorder] = useState<boolean>(false);
 
   const handleChangeDate = (date) => {
-    console.log(moment(date).toISOString());
     setStartDate(date);
     handleChange(date.toISOString());
   };

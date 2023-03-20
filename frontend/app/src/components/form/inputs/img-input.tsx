@@ -33,7 +33,7 @@ function ImageInput({
       const info = ui.meInfo as any;
       if (!info) {
         alert('You are not logged in.');
-        return console.log('no meInfo');
+        return;
       }
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/public_pic`, {
@@ -59,7 +59,6 @@ function ImageInput({
   }
 
   async function dropzoneUpload(files: File[], fileRejections) {
-    console.log('fileRejections', fileRejections);
     if (fileRejections.length) {
       fileRejections.forEach((file) => {
         file.errors.forEach((err) => {
@@ -75,7 +74,6 @@ function ImageInput({
       return;
     }
 
-    console.log(files);
     const file = files[0];
     setUploading(true);
     const reader = new FileReader();
@@ -88,8 +86,8 @@ function ImageInput({
 
   const addedStyle = notProfilePic
     ? {
-        borderRadius: 0
-      }
+      borderRadius: 0
+    }
     : {};
 
   const defaultIcon = notProfilePic ? backgroundIcon : avatarIcon;
@@ -106,9 +104,8 @@ function ImageInput({
                   {!uploading ? (
                     <Image
                       style={{
-                        backgroundImage: `url(${
-                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                        })`,
+                        backgroundImage: `url(${picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                          })`,
                         ...addedStyle
                       }}
                     />
@@ -146,9 +143,8 @@ function ImageInput({
                   {!uploading ? (
                     <Image
                       style={{
-                        backgroundImage: `url(${
-                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                        })`,
+                        backgroundImage: `url(${picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                          })`,
                         ...addedStyle
                       }}
                     />

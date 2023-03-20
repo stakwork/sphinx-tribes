@@ -3,10 +3,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import FadeLeft from '../../components/animated/fadeLeft';
+import { Modal, SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
-import { Modal, SearchTextInput } from '../../components/common';
 import { useStores } from '../../store';
 import Person from '../person';
 import ConnectCard from '../utils/connectCard';
@@ -124,7 +123,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
   const publicPanelClick = useCallback(
     async (person, item) => {
       // migrating to load widgets separate from person
-      console.log('person', { person }, 'and items', { item });
       const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
       if (itemIndex > -1) {
         // make person into proper structure (derived from widget)
@@ -236,11 +234,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
     ui.setSelectingPerson(id);
 
     history.push(`/p/${pubkey}`);
-  }
-
-  function goBack() {
-    ui.setSelectingPerson(0);
-    history.push('/tickets');
   }
 
   let people = getFuse(main.people, ['owner_alias']);
@@ -440,7 +433,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
                   background: color.pureWhite
                 }}
                 onChange={(e) => {
-                  console.log('handleChange', e);
                   ui.setSearchText(e);
                 }}
               />
@@ -535,7 +527,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
               background: color.grayish.G600
             }}
             onChange={(e) => {
-              console.log('handleChange', e);
               ui.setSearchText(e);
             }}
           />
@@ -583,7 +574,6 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
           bigCloseImageStyle={{
             top: isExtraStyle ? '-18px' : '18px',
             right: isExtraStyle ? '-18px' : '-50px',
-            // background: isExtraStyle ? '#000' : '#000',
             borderRadius: isExtraStyle ? '50%' : '50%'
           }}
           prevArrowNew={

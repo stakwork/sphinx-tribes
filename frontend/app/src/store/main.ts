@@ -862,7 +862,7 @@ export class MainStore {
     if (!body) return; // avoid saving bad state
 
     const info = uiStore.meInfo as any;
-    if (!info) return console.log('Error No meInfo');
+    if (!info) return;
     try {
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/profile`, {

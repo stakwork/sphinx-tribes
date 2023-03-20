@@ -43,7 +43,6 @@ function ConfirmMe(props: any) {
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        // console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
