@@ -11,8 +11,9 @@ import IconButton from '../../components/common/icon_button';
 import QR from '../utils/QR';
 
 export default function SignIn(props: any) {
-  const { main, ui } = useStores();
+  const { main } = useStores();
   const [page, setPage] = useState('sphinx');
+  const [pollCount, setPollCount] = useState(0);
 
   const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);
@@ -31,12 +32,19 @@ export default function SignIn(props: any) {
   }, [])
 
   function pollLnurl() {
-
     if (main.lnurl.k1) {
       const lnInterval = setInterval(async () => {
         let data = await main.getLnurlPoll();
+
+        setPollCount(pollCount + 1);
         if (data.status) {
-          clearInterval(lnInterval)
+          clearInterval(lnInterval);
+          setPollCount(0);
+        }
+
+        if (pollCount === 20) {
+          setPollCount(0);
+          clearInterval(lnInterval);
         }
       }, 2000)
     }
