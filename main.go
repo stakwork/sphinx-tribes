@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-
 	var err error
 
 	err = godotenv.Load()

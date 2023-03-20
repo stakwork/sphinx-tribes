@@ -31,22 +31,21 @@ export default function SignIn(props: any) {
     main.getLnurl();
   }, [])
 
-  function pollLnurl() {
+
+
+  async function pollLnurl() {
     if (main.lnurl.k1) {
-      const lnInterval = setInterval(async () => {
-        let data = await main.getLnurlPoll();
+      let data = await main.getLnurlPoll();
+      setPollCount(pollCount + 1);
 
-        setPollCount(pollCount + 1);
-        if (data.status) {
-          clearInterval(lnInterval);
-          setPollCount(0);
-        }
+      let pollTimeout = setTimeout(() => {
+        pollLnurl();
+      }, 1000)
 
-        if (pollCount === 20) {
-          setPollCount(0);
-          clearInterval(lnInterval);
-        }
-      }, 2000)
+      if (pollCount >= 10 || data.status) {
+        clearTimeout(pollTimeout);
+        setPollCount(0);
+      }
     }
   }
 
