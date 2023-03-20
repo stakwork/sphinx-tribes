@@ -19,10 +19,10 @@ import { configure } from 'mobx';
 
 configure({});
 const Context = React.createContext(
-  {} as {
-    ui: typeof uiStore;
-    main: typeof mainStore;
-    modals: typeof modalsVisibilityStore;
+  {
+    ui: uiStore,
+    main: mainStore,
+    modals: modalsVisibilityStore
   }
 );
 

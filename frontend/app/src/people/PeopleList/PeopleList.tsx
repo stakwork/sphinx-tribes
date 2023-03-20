@@ -71,10 +71,10 @@ export const PeopleList = observer(() => {
       >
         <PageLoadSpinner show={loadingTop} />;
         {people?.length ? (
-          people.map((t) => (
+          people.map((t, i) => (
             <Person
+              key={`${t.id}_${i}`}
               {...t}
-              key={t.id}
               selected={personId === t.id}
               hideActions={true}
               small={true}
