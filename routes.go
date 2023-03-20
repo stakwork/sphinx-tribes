@@ -871,7 +871,7 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	responseData["status"] = res.status
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(res)
+	json.NewEncoder(w).Encode(responseData)
 }
 
 func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {

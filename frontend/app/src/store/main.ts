@@ -4,6 +4,7 @@ import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { uiStore } from './ui';
 import { randomString } from '../helpers';
+import { string } from 'yup/lib/locale';
 export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
@@ -884,15 +885,27 @@ export class MainStore {
     this.lnurl = lnData;
   }
 
-  @action async getLnurl(): Promise<string> {
+  @action async getLnurl(): Promise<any> {
     try {
       let data = await api.get('lnurl');
-      console.log("Data ===",data);
       this.setLnurl(data)
       return data;
     } catch (e) {
       console.log('fetch failed getLNurl', e);
       return '';
+    }
+  }
+
+  @action async getLnurlPoll(): Promise<{k1: string, status: boolean}> {
+    try {
+      let data = await api.get(`lnurl_poll?k1=${this.lnurl.k1}`);
+      if(data.status) {
+        uiStore.setShowSignIn(false);
+        this.setLnurl({encode: "", k1: ""});
+      }
+      return data;
+    } catch (e) {
+      return {k1: "", status: false};
     }
   }
 }

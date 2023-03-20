@@ -11,7 +11,7 @@ import IconButton from '../../components/common/icon_button';
 import QR from '../utils/QR';
 
 export default function SignIn(props: any) {
-  const { main } = useStores();
+  const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
 
   const c = colors['light'];
@@ -32,6 +32,14 @@ export default function SignIn(props: any) {
 
   function pollLnurl() {
 
+    if (main.lnurl.k1) {
+      const lnInterval = setInterval(async () => {
+        let data = await main.getLnurlPoll();
+        if (data.status) {
+          clearInterval(lnInterval)
+        }
+      }, 2000)
+    }
   }
 
   return useObserver(() => {
@@ -106,7 +114,11 @@ export default function SignIn(props: any) {
                     width={210}
                     style={{ marginTop: 20 }}
                     color={'primary'}
-                    onClick={() => setPage('lnurl')}
+                    onClick={() => {
+                      setPage('lnurl');
+                      pollLnurl();
+                    }
+                    }
                     hovercolor={'#5881F8'}
                     activecolor={'#5078F2'}
                     shadowcolor={'rgba(97, 138, 255, 0.5)'}
