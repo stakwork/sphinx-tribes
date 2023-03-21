@@ -1,9 +1,12 @@
-import { observable, action } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
-import { uiStore } from './ui';
 import { randomString } from '../helpers';
+import { uiStore } from './ui';
+import memo from 'memo-decorator';
+import { persist } from 'mobx-persist';
+
 export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
@@ -11,11 +14,14 @@ function makeTorSaveURL(host: string, key: string) {
 }
 
 export class MainStore {
-  @observable
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
 
-  @action async getTribes(queryParams?: any): Promise<Tribe[]> {
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  async getTribes(queryParams?: any): Promise<Tribe[]> {
     let ta = [...uiStore.tags];
 
     //make tags string for querys
@@ -51,7 +57,7 @@ export class MainStore {
   bots: Bot[] = [];
   myBots: Bot[] = [];
 
-  @action async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
+  async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
     const query = this.appendQueryParams('bots', queryParams);
     const b = await api.get(query);
 
@@ -104,7 +110,7 @@ export class MainStore {
     return b;
   }
 
-  @action async getMyBots(): Promise<any> {
+  async getMyBots(): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
@@ -134,7 +140,7 @@ export class MainStore {
     }
   }
 
-  @action async fetchFromRelay(path): Promise<any> {
+  async fetchFromRelay(path): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
@@ -150,13 +156,13 @@ export class MainStore {
     return r;
   }
 
-  @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
+  async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
     const ts = await api.get(`tribes_by_owner/${pubkey}?all=true`);
     this.ownerTribes = ts;
     return ts;
   }
 
-  @action async getTribeByUn(un: string): Promise<Tribe> {
+  async getTribeByUn(un: string): Promise<Tribe> {
     const t = await api.get(`tribe_by_un/${un}`);
     // put got on top
     // if already exists, delete
@@ -170,12 +176,12 @@ export class MainStore {
     return t;
   }
 
-  @action async getSingleTribeByUn(un: string): Promise<Tribe> {
+  async getSingleTribeByUn(un: string): Promise<Tribe> {
     const t = await api.get(`tribe_by_un/${un}`);
     return t;
   }
 
-  @action async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
+  async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
     const data = await api.get(`github_issue/${owner}/${repo}/${issue}`);
     const { title, description, assignee, status } = data && data;
 
@@ -184,7 +190,7 @@ export class MainStore {
     return data;
   }
 
-  @action async getOpenGithubIssues(): Promise<any> {
+  async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
       if (openIssues) {
@@ -196,13 +202,13 @@ export class MainStore {
     }
   }
 
-  @action isTorSave() {
+  isTorSave() {
     let result = false;
     if (uiStore?.meInfo?.url?.includes('.onion')) result = true;
     return result;
   }
 
-  @action async makeBot(payload: any): Promise<any> {
+  async makeBot(payload: any): Promise<any> {
     const [r, error] = await this.doCallToRelay('POST', `bot`, payload);
     if (error) throw error;
     if (!r) return; // tor user will return here
@@ -214,14 +220,14 @@ export class MainStore {
     return b?.response;
   }
 
-  @action async updateBot(payload: any): Promise<any> {
+  async updateBot(payload: any): Promise<any> {
     const [r, error] = await this.doCallToRelay('PUT', `bot`, payload);
     if (error) throw error;
     if (!r) return; // tor user will return here
     return r;
   }
 
-  @action async deleteBot(id: string): Promise<any> {
+  async deleteBot(id: string): Promise<any> {
     try {
       const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null);
       if (error) throw error;
@@ -232,7 +238,7 @@ export class MainStore {
     }
   }
 
-  @action async awardBadge(
+  async awardBadge(
     userPubkey: string,
     badgeName: string,
     badgeIcon: string,
@@ -306,7 +312,7 @@ export class MainStore {
     }
   }
 
-  @action async getBadgeList(): Promise<any> {
+  async getBadgeList(): Promise<any> {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
@@ -323,7 +329,7 @@ export class MainStore {
     }
   }
 
-  @action async getBalances(pubkey: any): Promise<any> {
+  async getBalances(pubkey: any): Promise<any> {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
@@ -339,14 +345,14 @@ export class MainStore {
     }
   }
 
-  @action async postToCache(payload: any): Promise<void> {
+  async postToCache(payload: any): Promise<void> {
     await api.post('save', payload, {
       'Content-Type': 'application/json'
     });
     return;
   }
 
-  @action async getTorSaveURL(method: string, path: string, body: any): Promise<string> {
+  async getTorSaveURL(method: string, path: string, body: any): Promise<string> {
     const key = randomString(15);
     const gotHost = getHostIncludingDockerHosts();
 
@@ -375,7 +381,7 @@ export class MainStore {
     return torSaveURL;
   }
 
-  @action appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
+  appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
     let query = path;
     if (queryParams) {
       queryParams.limit = limit;
@@ -394,7 +400,7 @@ export class MainStore {
     return query;
   }
 
-  @action async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
+  async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
     const smallQueryLimit = 4;
     const query = this.appendQueryParams('people/search', smallQueryLimit, {
       search: alias,
@@ -404,23 +410,16 @@ export class MainStore {
     return ps;
   }
 
-  // @persist("list")
-  @observable
+  @persist('list')
   people: Person[] = [];
 
-  @action setPeople(p: Person[]) {
+  setPeople(p: Person[]) {
     this.people = p;
   }
 
-  @action async getPeople(queryParams?: any): Promise<Person[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
-
-    const query = this.appendQueryParams('people', queryLimit, {
-      ...queryParams,
-      sortBy: 'last_login'
-    });
-
-    const ps = await api.get(query);
+  async getPeople(queryParams?: any): Promise<Person[]> {
+    const params = { ...queryParams, search: uiStore.searchText };
+    const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
       const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
@@ -431,7 +430,7 @@ export class MainStore {
     }
 
     // for search always reset page
-    if (queryParams && queryParams.resetPage) {
+    if (params && params.resetPage) {
       this.people = ps;
       uiStore.setPeoplePageNumber(1);
     } else {
@@ -440,14 +439,30 @@ export class MainStore {
         this.people,
         ps,
         (n) => uiStore.setPeoplePageNumber(n),
-        queryParams
+        params
       );
     }
 
     return ps;
   }
 
-  @action decodeListJSON(li: any): Promise<any[]> {
+  @memo({
+    resolver: (...args: any[]) => {
+      return JSON.stringify({ args });
+    },
+    cache: new Map()
+  })
+  private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
+    const params = { ...queryParams, search };
+    const query = this.appendQueryParams('people', queryLimit, {
+      ...params,
+      sortBy: 'last_login'
+    });
+    const ps = await api.get(query);
+    return ps;
+  }
+
+  decodeListJSON(li: any): Promise<any[]> {
     if (li?.length) {
       li.forEach((o, i) => {
         li[i].body = JSON.parse(o.body);
@@ -457,11 +472,10 @@ export class MainStore {
     return li;
   }
 
-  // @persist("list")
-  @observable
+  @persist('list')
   peoplePosts: PersonPost[] = [];
 
-  @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
+  async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/posts', queryLimit, {
@@ -469,7 +483,7 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps = await api.get(query);
+      let ps = await this.fetchPeoplePosts(query);
       ps = this.decodeListJSON(ps);
 
       // for search always reset page
@@ -492,15 +506,24 @@ export class MainStore {
     }
   }
 
-  // @persist("list")
-  @observable
+  @memo({
+    resolver: (...args: any[]) => {
+      return JSON.stringify({ args });
+    },
+    cache: new Map()
+  })
+  private async fetchPeoplePosts(query) {
+    return await api.get(query);
+  }
+
+  @persist('list')
   peopleWanteds: PersonWanted[] = [];
 
-  @action setPeopleWanteds(wanteds: PersonWanted[]) {
+  setPeopleWanteds(wanteds: PersonWanted[]) {
     this.peopleWanteds = wanteds;
   }
 
-  @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
+  async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/wanteds', queryLimit, {
@@ -531,11 +554,10 @@ export class MainStore {
     }
   }
 
-  // @persist("list")
-  @observable
+  @persist('list')
   peopleOffers: PersonOffer[] = [];
 
-  @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
+  async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/offers', queryLimit, {
@@ -567,12 +589,7 @@ export class MainStore {
     }
   }
 
-  @action doPageListMerger(
-    currentList: any[],
-    newList: any[],
-    setPage: Function,
-    queryParams?: any
-  ) {
+  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
@@ -593,19 +610,19 @@ export class MainStore {
     return l;
   }
 
-  @action async getPersonByPubkey(pubkey: string): Promise<Person> {
+  async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
     return p;
   }
 
-  @action async getPersonByGithubName(github: string): Promise<Person> {
+  async getPersonByGithubName(github: string): Promise<Person> {
     const p = await api.get(`person/githubname/${github}`);
     return p;
   }
 
   // this method merges the relay self data with the db self data, they each hold different data
 
-  @action async getSelf(me: any) {
+  async getSelf(me: any) {
     const self = me || uiStore.meInfo;
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
@@ -631,7 +648,7 @@ export class MainStore {
     }
   }
 
-  @action async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+  async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
     try {
       const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body);
       if (error) throw error;
@@ -643,7 +660,7 @@ export class MainStore {
     }
   }
 
-  @action async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+  async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
     try {
       const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body);
       if (error) throw error;
@@ -655,7 +672,7 @@ export class MainStore {
     }
   }
 
-  @action async refreshJwt() {
+  async refreshJwt() {
     try {
       if (!uiStore.meInfo) return null;
 
@@ -670,7 +687,7 @@ export class MainStore {
     }
   }
 
-  @action async getUsdToSatsExchangeRate() {
+  async getUsdToSatsExchangeRate() {
     try {
       // get rate for 1 USD
       const res: any = await fetch('https://blockchain.info/tobtc?currency=USD&value=1', {
@@ -691,7 +708,7 @@ export class MainStore {
     }
   }
 
-  @action async deleteProfile() {
+  async deleteProfile() {
     try {
       const info = uiStore.meInfo;
       const [r, error] = await this.doCallToRelay('DELETE', 'profile', info);
@@ -711,7 +728,7 @@ export class MainStore {
     }
   }
 
-  @action async saveProfile(body) {
+  async saveProfile(body) {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
@@ -743,7 +760,7 @@ export class MainStore {
 
   // this method is used whenever changing data from the frontend,
   // forks between tor users and non-tor
-  @action async doCallToRelay(method: string, path: string, body: any): Promise<any> {
+  async doCallToRelay(method: string, path: string, body: any): Promise<any> {
     let error: any = null;
 
     const info = uiStore.meInfo as any;
@@ -776,7 +793,7 @@ export class MainStore {
     return [response, error];
   }
 
-  @action async submitFormViaApp(method: string, path: string, body: any) {
+  async submitFormViaApp(method: string, path: string, body: any) {
     try {
       const torSaveURL = await this.getTorSaveURL(method, path, body);
       uiStore.setTorFormBodyQR(torSaveURL);
@@ -785,7 +802,7 @@ export class MainStore {
     }
   }
 
-  @action async setExtrasPropertyAndSave(
+  async setExtrasPropertyAndSave(
     extrasName: string,
     propertyName: string,
     created: number,
@@ -813,7 +830,7 @@ export class MainStore {
   }
 
   // function to update many value in wanted array of object
-  @action async setExtrasMultipleProperty(
+  async setExtrasMultipleProperty(
     dataObject: object,
     extrasName: string,
     created: number
@@ -839,7 +856,7 @@ export class MainStore {
     }
   }
 
-  @action async deleteFavorite() {
+  async deleteFavorite() {
     const body: any = {};
 
     if (!body) return; // avoid saving bad state

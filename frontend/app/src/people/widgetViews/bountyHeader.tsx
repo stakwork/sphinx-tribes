@@ -10,6 +10,7 @@ import { useStores } from '../../store';
 import { PostBounty } from './postBounty';
 import { filterCount } from '../utils/ExtraFunctions';
 import { GetValue, coding_languages, status } from '../utils/language_label_style';
+import { observer } from 'mobx-react-lite';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
@@ -376,7 +377,7 @@ const BountyHeader = ({
   );
 };
 
-export default BountyHeader;
+export default observer(BountyHeader);
 
 interface styledProps {
   color?: any;

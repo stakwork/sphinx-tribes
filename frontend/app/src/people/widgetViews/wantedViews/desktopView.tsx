@@ -10,8 +10,11 @@ import { formatPrice, satToUsd } from '../../../helpers';
 import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
+import { observer } from 'mobx-react-lite';
 
-export default function MobileView(props: any) {
+export default observer(MobileView);
+
+function MobileView(props: any) {
     const {
         description,
         priceMin,

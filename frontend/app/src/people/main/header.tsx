@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
@@ -13,8 +12,11 @@ import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 import IconButton from '../../components/common/icon_button';
+import { observer } from 'mobx-react-lite';
 
-export default function Header() {
+export default observer(Header);
+
+function Header() {
   const { main, ui } = useStores();
   const location = useLocation();
   const history = useHistory();
@@ -261,92 +263,90 @@ export default function Header() {
     );
   }
 
-  return useObserver(() => {
-    return (
-      <>
-        {renderHeader()}
+  return (
+    <>
+      {renderHeader()}
 
-        {/* you wanna login modal  */}
-        <Modal
-          visible={ui.showSignIn}
-          close={() => ui.setShowSignIn(false)}
-          overlayClick={() => ui.setShowSignIn(false)}
-        >
-          <SignIn
-            onSuccess={() => {
-              ui.setShowSignIn(false);
-              setShowWelcome(true);
-              // if page is not /p, go to /p (people)
-              const path = location.pathname;
-              if (!path.includes('/p')) history.push('/p');
-            }}
-          />
-        </Modal>
+      {/* you wanna login modal  */}
+      <Modal
+        visible={ui.showSignIn}
+        close={() => ui.setShowSignIn(false)}
+        overlayClick={() => ui.setShowSignIn(false)}
+      >
+        <SignIn
+          onSuccess={() => {
+            ui.setShowSignIn(false);
+            setShowWelcome(true);
+            // if page is not /p, go to /p (people)
+            const path = location.pathname;
+            if (!path.includes('/p')) history.push('/p');
+          }}
+        />
+      </Modal>
 
-        {/* you logged in modal  */}
-        <Modal visible={ui.meInfo && showWelcome ? true : false}>
-          <div>
-            <Column>
-              <Imgg
-                style={{ height: 128, width: 128, marginBottom: 40 }}
-                src={ui.meInfo?.img || '/static/person_placeholder.png'}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '110px',
-                  right: '85px'
-                }}
-              >
-                <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
+      {/* you logged in modal  */}
+      <Modal visible={ui.meInfo && showWelcome ? true : false}>
+        <div>
+          <Column>
+            <Imgg
+              style={{ height: 128, width: 128, marginBottom: 40 }}
+              src={ui.meInfo?.img || '/static/person_placeholder.png'}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: '110px',
+                right: '85px'
+              }}
+            >
+              <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
+            </div>
+
+            <T>
+              <div style={{ lineHeight: '26px' }}>
+                Welcome <Name>{ui.meInfo?.owner_alias}</Name>
               </div>
+            </T>
 
-              <T>
-                <div style={{ lineHeight: '26px' }}>
-                  Welcome <Name>{ui.meInfo?.owner_alias}</Name>
-                </div>
-              </T>
+            <Welcome>
+              Your profile is now public. Connect with other people, join tribes and listen your
+              favorite podcast!
+            </Welcome>
 
-              <Welcome>
-                Your profile is now public. Connect with other people, join tribes and listen your
-                favorite podcast!
-              </Welcome>
+            <IconButton
+              text={'Continue'}
+              endingIcon={'arrow_forward'}
+              height={48}
+              width={'100%'}
+              color={'primary'}
+              onClick={() => {
+                // switch from welcome modal to edit modal
+                setShowWelcome(false);
+                goToEditSelf();
+              }}
+              hovercolor={'#5881F8'}
+              activecolor={'#5078F2'}
+              shadowcolor={'rgba(97, 138, 255, 0.5)'}
+            />
+          </Column>
+        </div>
+      </Modal>
 
-              <IconButton
-                text={'Continue'}
-                endingIcon={'arrow_forward'}
-                height={48}
-                width={'100%'}
-                color={'primary'}
-                onClick={() => {
-                  // switch from welcome modal to edit modal
-                  setShowWelcome(false);
-                  goToEditSelf();
-                }}
-                hovercolor={'#5881F8'}
-                activecolor={'#5078F2'}
-                shadowcolor={'rgba(97, 138, 255, 0.5)'}
-              />
-            </Column>
-          </div>
-        </Modal>
-
-        <Modal
-          visible={ui?.torFormBodyQR}
-          close={() => {
+      <Modal
+        visible={ui?.torFormBodyQR}
+        close={() => {
+          ui.setTorFormBodyQR('');
+        }}
+      >
+        <TorSaveQR
+          url={ui?.torFormBodyQR}
+          goBack={() => {
             ui.setTorFormBodyQR('');
           }}
-        >
-          <TorSaveQR
-            url={ui?.torFormBodyQR}
-            goBack={() => {
-              ui.setTorFormBodyQR('');
-            }}
-          />
-        </Modal>
-      </>
-    );
-  });
+        />
+      </Modal>
+    </>
+  );
 }
 
 const Row = styled.div`
