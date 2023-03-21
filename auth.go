@@ -32,6 +32,9 @@ var ContextKey = contextKey("key")
 func PubKeyContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
+
+		fmt.Println("Token ===", token)
+
 		if token == "" {
 			fmt.Println("[auth] no token")
 			http.Error(w, http.StatusText(401), 401)

@@ -125,8 +125,6 @@ func NewRouter() *http.Server {
 		r.Get("/lnurl_poll", pollLnurlAuth)
 	})
 
-	r.Get("/websocket", handleSocket)
-
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "5002"
@@ -141,10 +139,6 @@ func NewRouter() *http.Server {
 	}()
 
 	return server
-}
-
-func handleSocket(w http.ResponseWriter, r *http.Request) {
-	socket.HandleRequest(w, r)
 }
 
 func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
@@ -857,6 +851,7 @@ func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	k1 := r.URL.Query().Get("k1")
 	responseData := make(map[string]interface{})
+	user := make(map[string]interface{})
 
 	res, err := store.GetLnCache(k1)
 
@@ -885,9 +880,17 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	person := DB.getPersonByPubkey(res.key)
+
+	user["owner_alias"] = person.OwnerAlias
+	user["owner_pubkey"] = person.OwnerPubKey
+	user["uuid"] = person.Uuid
+	user["img"] = person.Img
+
 	responseData["k1"] = res.k1
 	responseData["status"] = res.status
 	responseData["token"] = tokenString
+	responseData["user"] = user
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(responseData)
@@ -902,8 +905,6 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	if userKey != "" {
 		// Save in DB if the user does not exists already
 		DB.createLnUser(userKey)
-
-		socket.Broadcast([]byte("User logged in successflly"))
 
 		// Set store data to true
 		store.SetLnCache(k1, LnStore{k1, userKey, true})

@@ -247,7 +247,7 @@ export default function Header() {
                 }}
               >
                 <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
-                {ui.meInfo?.owner_alias}
+                <Alias> {ui.meInfo?.owner_alias}</Alias>
               </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
@@ -573,4 +573,11 @@ const LoginBtn = styled.div`
   &:active {
     color: #82b4ff;
   }
+`;
+
+const Alias = styled.span`
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

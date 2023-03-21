@@ -273,7 +273,7 @@ export class MainStore {
       });
 
       const j = await res0.json();
-      const tt = j.token || '';
+      const tt = j.token || this.lnToken || '';
 
       // 3. first create the badge
       const res1 = await fetch(`${URL}/issue?token=${tt}`, {
@@ -911,6 +911,7 @@ export class MainStore {
 
         this.setLnurl({encode: "", k1: ""});
         this.setToken(data.token);
+        uiStore.setMeInfo(data.user)
       }
       return data;
     } catch (e) {
