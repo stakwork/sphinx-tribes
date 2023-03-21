@@ -1,4 +1,4 @@
-export const colors = {
+export const commonColors = {
   primary: {
     background: '#618AFF',
     color: '#fff'

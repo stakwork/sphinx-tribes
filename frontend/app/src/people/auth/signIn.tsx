@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { useObserver } from 'mobx-react-lite';
-import { useStores } from '../../store';
 import styled from 'styled-components';
-import { useIsMobile } from '../../hooks';
-import { colors } from '../../config/colors';
 import { Divider } from '../../components/common';
+import IconButton from '../../components/common/icon_button';
+import { useIsMobile } from '../../hooks';
+import { useStores } from '../../store';
 import ConfirmMe from '../confirmMe';
 import AuthQR from './authQR';
-import IconButton from '../../components/common/icon_button';
+import { observer } from 'mobx-react-lite';
 
-export default function SignIn(props: any) {
+export default observer(SignIn);
+
+function SignIn(props: any) {
   const { main } = useStores();
 
-  const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);
 
   function redirect() {
@@ -24,75 +24,73 @@ export default function SignIn(props: any) {
 
   const isMobile = useIsMobile();
 
-  return useObserver(() => {
-    return (
-      <div>
-        {showSignIn ? (
+  return (
+    <div>
+      {showSignIn ? (
+        <Column>
+          <ConfirmMe
+            onSuccess={() => {
+              if (props.onSuccess) props.onSuccess();
+              main.getPeople({ resetPage: true });
+            }}
+          />
+        </Column>
+      ) : (
+        <>
           <Column>
-            <ConfirmMe
-              onSuccess={() => {
-                if (props.onSuccess) props.onSuccess();
-                main.getPeople({ resetPage: true });
+            {isMobile && <Imgg src={'/static/sphinx.png'} />}
+
+            <Name>Welcome</Name>
+
+            <Description>Use Sphinx to login and create or edit your profile.</Description>
+
+            {!isMobile && (
+              <AuthQR
+                onSuccess={() => {
+                  if (props.onSuccess) props.onSuccess();
+                  main.getPeople({ resetPage: true });
+                }}
+                style={{ marginBottom: 20 }}
+              />
+            )}
+
+            <IconButton
+              text={'Login with Sphinx'}
+              height={48}
+              endingIcon={'exit_to_app'}
+              width={210}
+              style={{ marginTop: 20 }}
+              color={'primary'}
+              onClick={() => setShowSignIn(true)}
+              hovercolor={'#5881F8'}
+              activecolor={'#5078F2'}
+              shadowcolor={'rgba(97, 138, 255, 0.5)'}
+            />
+          </Column>
+          <Divider />
+          <Column style={{ paddingTop: 0 }}>
+            <Description>I don't have Sphinx!</Description>
+            <IconButton
+              text={'Get Sphinx'}
+              endingIcon={'launch'}
+              width={210}
+              height={48}
+              buttonType={'text'}
+              style={{ color: '#83878b', marginTop: '10px', border: '1px solid #83878b' }}
+              onClick={() => redirect()}
+              hovercolor={'#fff'}
+              activecolor={'#fff'}
+              textStyle={{
+                color: '#000',
+                fontSize: '16px',
+                fontWeight: '600'
               }}
             />
           </Column>
-        ) : (
-          <>
-            <Column>
-              {isMobile && <Imgg src={'/static/sphinx.png'} />}
-
-              <Name>Welcome</Name>
-
-              <Description>Use Sphinx to login and create or edit your profile.</Description>
-
-              {!isMobile && (
-                <AuthQR
-                  onSuccess={() => {
-                    if (props.onSuccess) props.onSuccess();
-                    main.getPeople({ resetPage: true });
-                  }}
-                  style={{ marginBottom: 20 }}
-                />
-              )}
-
-              <IconButton
-                text={'Login with Sphinx'}
-                height={48}
-                endingIcon={'exit_to_app'}
-                width={210}
-                style={{ marginTop: 20 }}
-                color={'primary'}
-                onClick={() => setShowSignIn(true)}
-                hovercolor={'#5881F8'}
-                activecolor={'#5078F2'}
-                shadowcolor={'rgba(97, 138, 255, 0.5)'}
-              />
-            </Column>
-            <Divider />
-            <Column style={{ paddingTop: 0 }}>
-              <Description>I don't have Sphinx!</Description>
-              <IconButton
-                text={'Get Sphinx'}
-                endingIcon={'launch'}
-                width={210}
-                height={48}
-                buttonType={'text'}
-                style={{ color: '#83878b', marginTop: '10px', border: '1px solid #83878b' }}
-                onClick={() => redirect()}
-                hovercolor={'#fff'}
-                activecolor={'#fff'}
-                textStyle={{
-                  color: '#000',
-                  fontSize: '16px',
-                  fontWeight: '600'
-                }}
-              />
-            </Column>
-          </>
-        )}
-      </div>
-    );
-  });
+        </>
+      )}
+    </div>
+  );
 }
 
 interface ImageProps {

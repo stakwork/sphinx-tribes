@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useObserver } from 'mobx-react-lite';
+
 import { Divider } from '../components/common/index';
 
 export default function Bot(props: any) {
@@ -9,52 +9,50 @@ export default function Bot(props: any) {
   const defaultPic = '/static/bot_placeholder.png';
   const mediumPic = img;
 
-  return useObserver(() => {
-    function renderBotCard() {
-      if (small) {
-        return (
-          <Wrap
-            onClick={() => select(id, unique_name)}
-            style={{
-              background: selected ? '#F2F3F5' : '#fff'
-            }}
-          >
-            <div>
-              <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
-            </div>
-            <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
-              <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
-              <Description>{description}</Description>
-              {!hideActions && (
-                <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div />
-                  <div style={{ height: 30 }} />
-                </Row>
-              )}
-              <Divider style={{ marginTop: 20 }} />
-            </R>
-          </Wrap>
-        );
-      }
-      // desktop mode
+  function renderBotCard() {
+    if (small) {
       return (
-        <DWrap onClick={() => select(id, unique_name)}>
+        <Wrap
+          onClick={() => select(id, unique_name)}
+          style={{
+            background: selected ? '#F2F3F5' : '#fff'
+          }}
+        >
           <div>
-            <Img
-              style={{ height: 210, width: '100%', borderRadius: 0 }}
-              src={mediumPic || defaultPic}
-            />
-            <div style={{ padding: 10 }}>
-              <DTitle>{name}</DTitle>
-              <DDescription>{description}</DDescription>
-            </div>
+            <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
           </div>
-        </DWrap>
+          <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
+            <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
+            <Description>{description}</Description>
+            {!hideActions && (
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <div />
+                <div style={{ height: 30 }} />
+              </Row>
+            )}
+            <Divider style={{ marginTop: 20 }} />
+          </R>
+        </Wrap>
       );
     }
+    // desktop mode
+    return (
+      <DWrap onClick={() => select(id, unique_name)}>
+        <div>
+          <Img
+            style={{ height: 210, width: '100%', borderRadius: 0 }}
+            src={mediumPic || defaultPic}
+          />
+          <div style={{ padding: 10 }}>
+            <DTitle>{name}</DTitle>
+            <DDescription>{description}</DDescription>
+          </div>
+        </div>
+      </DWrap>
+    );
+  }
 
-    return <>{renderBotCard()}</>;
-  });
+  return <>{renderBotCard()}</>;
 }
 
 const Wrap = styled.div`

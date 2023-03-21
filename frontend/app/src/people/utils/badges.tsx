@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
@@ -6,8 +6,11 @@ import PageLoadSpinner from './pageLoadSpinner';
 import { Modal, Button, Divider, TextInput } from '../../components/common';
 import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
+import { observer } from 'mobx-react-lite';
 
-export default function Badges(props) {
+export default observer(Badges);
+
+function Badges(props) {
   const { main, ui } = useStores();
   const { badgeList, meInfo } = ui || {};
 
@@ -26,19 +29,26 @@ export default function Badges(props) {
   const thisIsMe = meInfo?.owner_pubkey === person?.owner_pubkey;
 
   useEffect(() => {
-    getBadges();
-  }, [person?.owner_pubkey]);
+    main.getBadgeList();
+  }, [main]);
 
-  async function getBadges() {
-    setLoading(true);
-    setSelectedBadge(null);
-    setBadgeToPush(null);
-    if (person?.owner_pubkey) {
-      const b = await main.getBalances(person?.owner_pubkey);
-      setBalancesTxns(b);
-    }
-    setLoading(false);
-  }
+  const getBadges = useCallback(
+    async function () {
+      setLoading(true);
+      setSelectedBadge(null);
+      setBadgeToPush(null);
+      if (person?.owner_pubkey) {
+        const b = await main.getBalances(person?.owner_pubkey);
+        setBalancesTxns(b);
+      }
+      setLoading(false);
+    },
+    [main, person?.owner_pubkey]
+  );
+
+  useEffect(() => {
+    getBadges();
+  }, [getBadges]);
 
   async function claimBadge() {
     setClaiming(true);
