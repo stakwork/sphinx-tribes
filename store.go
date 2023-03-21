@@ -22,6 +22,7 @@ type Store struct {
 
 type LnStore struct {
 	k1     string
+	key    string
 	status bool
 }
 

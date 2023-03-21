@@ -21,6 +21,7 @@ func main() {
 
 	initDB()
 	initCache()
+	initJwt()
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {

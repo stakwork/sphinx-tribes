@@ -5,6 +5,7 @@ import { getHostIncludingDockerHosts } from '../config/host';
 import { uiStore } from './ui';
 import { randomString } from '../helpers';
 import { string } from 'yup/lib/locale';
+import { persist } from 'mobx-persist';
 export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
@@ -885,6 +886,13 @@ export class MainStore {
     this.lnurl = lnData;
   }
 
+  @persist('object') @observable
+  lnToken: string = "";
+
+  @action setToken(token: string) {
+    this.lnToken = token;
+  }
+
   @action async getLnurl(): Promise<any> {
     try {
       let data = await api.get('lnurl');
@@ -902,6 +910,7 @@ export class MainStore {
         uiStore.setShowSignIn(false);
 
         this.setLnurl({encode: "", k1: ""});
+        this.setToken(data.token);
       }
       return data;
     } catch (e) {

@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/stakwork/sphinx-tribes/feeds"
 	"github.com/stakwork/sphinx-tribes/frontend"
 )
@@ -844,7 +845,7 @@ func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
 	}
 
-	store.SetLnCache(encodeData.k1, LnStore{encodeData.k1, false})
+	store.SetLnCache(encodeData.k1, LnStore{encodeData.k1, "", false})
 
 	responseData["k1"] = encodeData.k1
 	responseData["encode"] = encodeData.encode
@@ -868,8 +869,25 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("LNURL auth data not found")
 	}
 
+	exp := ExpireInHours(24 * 7)
+
+	claims := jwt.MapClaims{
+		"key": res.key,
+		"exp": exp,
+	}
+
+	_, tokenString, err := TokenAuth.Encode(claims)
+
+	if err != nil {
+		fmt.Println("error creating JWT")
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	responseData["k1"] = res.k1
 	responseData["status"] = res.status
+	responseData["token"] = tokenString
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(responseData)
@@ -888,7 +906,7 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		socket.Broadcast([]byte("User logged in successflly"))
 
 		// Set store data to true
-		store.SetLnCache(k1, LnStore{k1, true})
+		store.SetLnCache(k1, LnStore{k1, userKey, true})
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)

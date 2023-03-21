@@ -14,7 +14,7 @@ export default function SignIn(props: any) {
   const { main } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
-  const [lnurlReady] = useState(false);
+  const [lnurlReady] = useState(true);
 
   const c = colors['light'];
   const [showSignIn, setShowSignIn] = useState(false);
