@@ -144,26 +144,25 @@ function RenderWidgets({ widget }) {
           </div>
         </div>
       ) : (
-          <NoneSpace
-            small
-            style={{
-              margin: 'auto'
-            }}
-            Button={
-              canEdit && (
-                <PostBounty
-                  title={noneSpaceProps.buttonText}
-                  buttonProps={{
-                    leadingIcon: noneSpaceProps.buttonIcon,
-                    color: 'secondary'
-                  }}
-                  widget={selectedWidget}
-                />
-              )
-            }
-            {...tabs[selectedWidget]?.noneSpace[noneKey]}
-          />
-
+        <NoneSpace
+          small
+          style={{
+            margin: 'auto'
+          }}
+          Button={
+            canEdit && (
+              <PostBounty
+                title={noneSpaceProps.buttonText}
+                buttonProps={{
+                  leadingIcon: noneSpaceProps.buttonIcon,
+                  color: 'secondary'
+                }}
+                widget={selectedWidget}
+              />
+            )
+          }
+          {...tabs[selectedWidget]?.noneSpace[noneKey]}
+        />
       );
 
       return <>{panels}</>;
