@@ -851,7 +851,6 @@ func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	k1 := r.URL.Query().Get("k1")
 	responseData := make(map[string]interface{})
-	user := make(map[string]interface{})
 
 	res, err := store.GetLnCache(k1)
 
@@ -882,15 +881,10 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 
 	person := DB.getPersonByPubkey(res.key)
 
-	user["owner_alias"] = person.OwnerAlias
-	user["owner_pubkey"] = person.OwnerPubKey
-	user["uuid"] = person.Uuid
-	user["img"] = person.Img
-
 	responseData["k1"] = res.k1
 	responseData["status"] = res.status
 	responseData["token"] = tokenString
-	responseData["user"] = user
+	responseData["user"] = returnUserMap(person)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(responseData)
@@ -917,4 +911,25 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	responseMsg["status"] = "ERROR"
 	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(responseMsg)
+}
+
+func returnUserMap(p Person) map[string]interface{} {
+	user := make(map[string]interface{})
+
+	user["id"] = p.ID
+	user["created"] = p.Created
+	user["owner_pubkey"] = p.OwnerPubKey
+	user["owner_alias"] = p.OwnerAlias
+	user["contact_key"] = p.OwnerContactKey
+	user["img"] = p.Img
+	user["description"] = p.Description
+	user["tags"] = p.Tags
+	user["unique_name"] = p.UniqueName
+	user["pubkey"] = p.OwnerPubKey
+	user["extraa"] = p.Extras
+	user["last_login"] = p.LastLogin
+	user["price_to_meet"] = p.PriceToMeet
+	user["alias"] = p.OwnerAlias
+
+	return user
 }

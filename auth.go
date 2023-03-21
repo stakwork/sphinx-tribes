@@ -12,6 +12,7 @@ import (
 
 	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/rs/xid"
 )
 
 var (
@@ -41,17 +42,24 @@ func PubKeyContext(next http.Handler) http.Handler {
 			return
 		}
 
-		pubkey, err := VerifyTribeUUID(token, true)
-		if pubkey == "" || err != nil {
-			fmt.Println("[auth] no pubkey || err != nil")
-			if err != nil {
-				fmt.Println(err)
+		_, err := xid.FromString(token)
+
+		if err != nil {
+			pubkey, err := VerifyTribeUUID(token, true)
+			if pubkey == "" || err != nil {
+				fmt.Println("[auth] no pubkey || err != nil")
+				if err != nil {
+					fmt.Println(err)
+				}
+				http.Error(w, http.StatusText(401), 401)
+				return
 			}
-			http.Error(w, http.StatusText(401), 401)
-			return
+
+			ctx := context.WithValue(r.Context(), ContextKey, pubkey)
+			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 
-		ctx := context.WithValue(r.Context(), ContextKey, pubkey)
+		ctx := context.WithValue(r.Context(), ContextKey, "")
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
