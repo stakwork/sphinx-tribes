@@ -22,5 +22,6 @@ export const user: MeInfo = {
 
   twitter_confirmed: false,
 
-  isSuperAdmin: false
+  isSuperAdmin: false,
+				uuid: 'cg8a1dcjiofs739cr8rg'
 };

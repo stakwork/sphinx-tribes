@@ -92,6 +92,7 @@ func NewRouter() *http.Server {
 		r.Get("/github_issue/status/open", getOpenGithubIssues)
 		r.Post("/save", postSave)
 		r.Get("/save/{key}", pollSave)
+
 		r.Get("/migrate_bounties", migrateBounties)
 		r.Get("/bounty/all", getAllBounties)
 	})

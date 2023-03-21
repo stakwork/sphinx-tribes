@@ -422,7 +422,7 @@ export default function FocusedView(props: any) {
               formSubmit={submitForm}
               person={person}
               personBody={props?.personBody}
-              item={person?.extras && person.extras[config?.name][selectedIndex]}
+              item={props?.item}
               config={config}
               fromBountyPage={fromBountyPage}
               extraModalFunction={props?.extraModalFunction}

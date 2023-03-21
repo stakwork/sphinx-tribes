@@ -209,7 +209,7 @@ export class MainStore {
 
     const b = await r.json();
 
-    // const mybots = await this.getMyBots();
+    const mybots = await this.getMyBots();
 
     return b?.response;
   }
@@ -497,6 +497,7 @@ export class MainStore {
   peopleWanteds: PersonWanted[] = [];
 
   @action setPeopleWanteds(wanteds: PersonWanted[]) {
+					console.log("SET WANTEDS:", wanteds)
     this.peopleWanteds = wanteds;
   }
 
@@ -520,11 +521,12 @@ export class MainStore {
 						let ps3: any[] = []
 										for(let i = 0; i < ps2.length; i++){
 														let bounty = ps2[i]
-    const query3 = this.appendQueryParams(`person/uuid/${bounty.assignee}`, queryLimit, {
+														console.log("FROM MAIN:", bounty)
+    const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
-    const query4 = this.appendQueryParams(`person/uuid/${bounty.OwnerID}`, queryLimit, {
+    const query4 = this.appendQueryParams(`person/${bounty.OwnerID}`, queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
@@ -532,12 +534,10 @@ export class MainStore {
 														let ownerResponse = await api.get(query4)
 														console.log(assigneeResponse, ownerResponse)
 								
-										ps3.push({ body: { ...bounty, assignee: assigneeResponse  }, person: ownerResponse })
+										ps3.push({ body: { ...bounty, assignee: assigneeResponse  }, person: { ...ownerResponse, wanteds: [] }})
 
 						}
 
-						console.log("PS: ", ps )
-						console.log("PS3: ", ps3)
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -552,7 +552,8 @@ export class MainStore {
           queryParams
         );
       }
-						this.setPeopleWanteds(ps3)
+						console.log("PS: ", ps )
+						console.log("PS3: ", ps3)
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -874,7 +875,7 @@ export class MainStore {
     if (!body) return; // avoid saving bad state
 
     const info = uiStore.meInfo as any;
-    if (!info) return;
+    if (!info) return console.log('Error No meInfo');
     try {
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/profile`, {

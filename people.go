@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -616,7 +617,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			migrateBountyFinal := Bounty{}
 			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
 
-			migrateBountyFinal.OwnerID = peep.Uuid
+			migrateBountyFinal.OwnerID = peep.OwnerPubKey
 
 			Paid, ok1 := migrateBounty["paid"].(bool)
 			if !ok1 {
@@ -660,12 +661,15 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Tribe = Tribe
 			}
 
-			Created, ok7 := migrateBounty["created"].(*time.Time)
+			Created, ok7 := migrateBounty["created"].(float64)
+			CreatedInt64 := int64(Created)
 			if !ok7 {
-				now := time.Now()
-				migrateBountyFinal.Created = &now
+				now := time.Now().Unix()
+				migrateBountyFinal.Created = now
 			} else {
-				migrateBountyFinal.Created = Created
+				fmt.Println(reflect.TypeOf(CreatedInt64))
+				fmt.Println("Timestamp:", CreatedInt64)
+				migrateBountyFinal.Created = CreatedInt64
 			}
 
 			Assignee, ok8 := migrateBounty["assignee"].(map[string]interface{})
@@ -676,7 +680,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				assigneeId := ""
 				for _, peep := range peeps {
 					if peep.OwnerPubKey == assigneePubkey {
-						assigneeId = peep.Uuid
+						assigneeId = peep.OwnerPubKey
 					}
 				}
 				migrateBountyFinal.Assignee = assigneeId

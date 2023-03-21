@@ -39,6 +39,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
   const [showDropdown, setShowDropdown] = useState(false);
   const screenWidth = useScreenWidth();
   const [publicFocusPerson, setPublicFocusPerson]: any = useState(null);
+  const [publicFocusItem, setPublicFocusItem]: any = useState(null);
   const [publicFocusIndex, setPublicFocusIndex] = useState(-1);
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
@@ -123,7 +124,9 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
   const publicPanelClick = useCallback(
     async (person, item) => {
       // migrating to load widgets separate from person
-      const itemIndex = person[selectedWidget]?.findIndex((f) => f.created === item.created);
+      const itemIndex = person.extras[selectedWidget]?.findIndex((f) => f.created === item.created);
+						
+						console.log("ITEM INDEX:", person, item)
       if (itemIndex > -1) {
         // make person into proper structure (derived from widget)
         const p = {
@@ -133,6 +136,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           }
         };
         setPublicFocusPerson(p);
+        setPublicFocusItem(item);
         setPublicFocusIndex(itemIndex);
         setConnectPerson({ ...person });
         setConnectPersonBody({ ...item });
@@ -162,7 +166,8 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           : {}
       );
 
-      if (value && value.person && value.body) {
+						console.log("VALUE: ", value)
+      if (value.person && value.body) {
         publicPanelClick(value.person, value.body);
       }
     }
@@ -339,6 +344,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
             checkboxIdToSelectedMap={checkboxIdToSelectedMap}
             checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
             onPanelClick={(person, item) => {
+										console.log("ON PANEL CLICK PERSON:", person)
               history.replace({
                 pathname: history?.location?.pathname,
                 search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
@@ -359,6 +365,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           checkboxIdToSelectedMap={checkboxIdToSelectedMap}
           checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
           onPanelClick={(person, item) => {
+										console.log("ON PANEL CLICK PERSON:", person)
             history.replace({
               pathname: history?.location?.pathname,
               search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
@@ -479,6 +486,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
             <Modal visible={publicFocusPerson ? true : false} fill={true}>
               <FocusedView
                 person={publicFocusPerson}
+									item={publicFocusItem}
                 canEdit={false}
                 selectedIndex={publicFocusIndex}
                 config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
@@ -669,6 +677,7 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
             <FocusedView
               ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
+									item={publicFocusItem}
               personBody={connectPersonBody}
               canEdit={false}
               selectedIndex={publicFocusIndex}

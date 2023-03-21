@@ -264,6 +264,7 @@ export default function WantedSummary(props: any) {
               body: clonedEx[targetIndex]
             };
           }
+								console.log("peopleWantedsClone:", peopleWantedsClone)
           main.setPeopleWanteds(peopleWantedsClone);
         }
       } catch (e) {
@@ -307,6 +308,7 @@ export default function WantedSummary(props: any) {
             };
           }
 
+								console.log("peopleWantedsClone:", peopleWantedsClone)
           main.setPeopleWanteds(peopleWantedsClone);
         }
       } catch (e) {

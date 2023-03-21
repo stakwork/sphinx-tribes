@@ -736,11 +736,6 @@ func (db database) getPeopleListShort(count uint32) *[]PersonInShort {
 
 func (db database) addBounty(b Bounty) (Bounty, error) {
 
-	if b.Created == nil {
-		now := time.Now()
-		b.Created = &now
-
-	}
 	db.db.Create(&b)
 	return b, nil
 }
