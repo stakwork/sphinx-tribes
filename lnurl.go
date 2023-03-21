@@ -14,7 +14,12 @@ type LnEncodeData struct {
 }
 
 func encodeLNURL() (LnEncodeData, error) {
-	host := os.Getenv("LN_SERVER_BASE_URL")
+	var host string
+	host = os.Getenv("LN_SERVER_BASE_URL")
+
+	if host == "" {
+		host = "people.sphinx.chat"
+	}
 
 	k1 := generate32Bytes()
 	url := host + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
