@@ -59,7 +59,13 @@ func PubKeyContext(next http.Handler) http.Handler {
 				return
 			}
 
-			fmt.Println("Claims ====", claims)
+			// fmt.Println("Claims ====", claims)
+
+			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
+				fmt.Println("Token has expired")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
 
 			ctx := context.WithValue(r.Context(), ContextKey, claims["pubkey"])
 			next.ServeHTTP(w, r.WithContext(ctx))
