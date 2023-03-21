@@ -106,6 +106,7 @@ func NewRouter() *http.Server {
 		r.Put("/tribestats", putTribeStats)
 		r.Delete("/tribe/{uuid}", deleteTribe)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
+		r.Put("/tribepreview/{uuid}", setTribePreview)
 		r.Delete("/bot/{uuid}", deleteBot)
 		r.Post("/person", createOrEditPerson)
 		r.Post("/verify/{challenge}", verify)
@@ -448,6 +449,38 @@ func putTribeActivity(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	DB.updateTribe(uuid, map[string]interface{}{
 		"last_active": now,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
+
+func setTribePreview(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	uuid := chi.URLParam(r, "uuid")
+	if uuid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	preview := r.URL.Query().Get("preview")
+	DB.updateTribe(uuid, map[string]interface{}{
+		"preview": preview,
 	})
 
 	w.WriteHeader(http.StatusOK)

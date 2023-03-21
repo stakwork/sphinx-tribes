@@ -19,13 +19,15 @@ import CodingMobile from './wantedSummaries/codingMobile';
 import CodingBounty from './wantedSummaries/codingBounty';
 import CodingDesktop from './wantedSummaries/codingDesktop';
 import { sendToRedirect } from '../../../helpers';
+import { observer } from 'mobx-react-lite';
 
 function useQuery() {
   const { search } = useLocation();
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function WantedSummary(props: any) {
+export default  observer(WantedSummary);
+function WantedSummary(props: any) {
   const {
     description,
     priceMin,
@@ -55,7 +57,7 @@ export default function WantedSummary(props: any) {
     formSubmit,
     title
   } = props;
-  const titleString = title ?? one_sentence_summary;
+  const titleString = one_sentence_summary ?? title ;
   const [envHeight, setEnvHeight] = useState('100%');
   const imgRef: any = useRef(null);
 
@@ -572,6 +574,8 @@ export default function WantedSummary(props: any) {
           creatorStep={creatorStep}
           isPaidStatusBadgeInfo={isPaidStatusBadgeInfo}
           isPaidStatusPopOver={isPaidStatusPopOver}
+          titleString={titleString}
+          nametag={nametag}
         />
       );
     }

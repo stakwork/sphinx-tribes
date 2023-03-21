@@ -9,8 +9,11 @@ import { useStores } from '../../../store';
 import { formatPrice, satToUsd } from '../../../helpers';
 import { Button } from '../../../components/common';
 import { getHost } from '../../../config/host';
+import { observer } from 'mobx-react-lite';
 
-export default function MobileView(props: any) {
+export default observer(MobileView);
+
+function MobileView(props: any) {
     const {
         priceMin,
         priceMax,

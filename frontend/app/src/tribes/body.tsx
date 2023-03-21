@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../store';
 import {
   EuiFormFieldset,
@@ -18,8 +17,11 @@ import tags from './tags';
 import NoResults from '../people/utils/noResults';
 import PageLoadSpinner from '../people/utils/pageLoadSpinner';
 import { colors } from '../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function BodyComponent() {
+export default observer(BodyComponent);
+
+function BodyComponent() {
   const { main, ui } = useStores();
   const [selected, setSelected] = useState('');
   const [tagsPop, setTagsPop] = useState(false);
@@ -83,141 +85,139 @@ export default function BodyComponent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ui.searchText, ui.tags]);
 
-  return useObserver(() => {
-    let { tribes } = main;
+  let { tribes } = main;
 
-    const loadForwardFunc = () => loadMore(1);
-    const loadBackwardFunc = () => loadMore(-1);
-    const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
-      loadForwardFunc,
-      loadBackwardFunc
-    );
+  const loadForwardFunc = () => loadMore(1);
+  const loadBackwardFunc = () => loadMore(-1);
+  const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
+    loadForwardFunc,
+    loadBackwardFunc
+  );
 
-    if (loading) {
-      return (
-        <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <EuiLoadingSpinner size="xl" />
-        </Body>
-      );
-    }
-
-    // if NSFW not selected, filter out NSFW
-    if (!selectedTags.find((f) => f.label === 'NSFW')) {
-      tribes = tribes.filter((f) => !f.tags.includes('NSFW'));
-    }
-
-    const button = (
-      <EuiButton
-        iconType="arrowDown"
-        iconSide="right"
-        size="s"
-        onClick={(e) => {
-          e.stopPropagation();
-          setTagsPop(!tagsPop);
-        }}
-      >
-        {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
-      </EuiButton>
-    );
-
+  if (loading) {
     return (
-      <Body id="main" onScroll={handleScroll} style={{ paddingTop: 0 }}>
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'flex-start',
-            padding: 20,
-            height: 62
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline' }}>
-            <EuiPopover
-              panelPaddingSize="none"
-              button={button}
-              isOpen={tagsPop}
-              closePopover={() => setTagsPop(false)}
-            >
-              <EuiSelectable
-                searchable
-                options={tagOptions}
-                renderOption={(option, searchValue) => (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      opacity: loadingList ? 0.5 : 1
-                    }}
-                  >
-                    <Tag type={option.label} iconOnly />
-                    <EuiHighlight
-                      search={searchValue}
-                      style={{
-                        fontSize: 11,
-                        marginLeft: 5,
-                        color: tags[option.label].color
-                      }}
-                    >
-                      {option.label}
-                    </EuiHighlight>
-                  </div>
-                )}
-                listProps={{ rowHeight: 30 }} // showIcons:false
-                onChange={(opts) => {
-                  if (!loadingList) {
-                    setTagOptions(opts);
-                    ui.setTags(opts);
-                  }
-                }}
-              >
-                {(list, search) => (
-                  <div style={{ width: 220 }}>
-                    {search}
-                    {list}
-                  </div>
-                )}
-              </EuiSelectable>
-            </EuiPopover>
-
-            <SearchTextInput
-              name="search"
-              type="search"
-              small={isMobile}
-              placeholder="Search"
-              value={ui.searchText}
-              style={{
-                width: 204,
-                height: 40,
-                background: '#111',
-                color: '#fff',
-                border: 'none',
-                marginLeft: 20
-              }}
-              onChange={(e) => {
-                ui.setSearchText(e);
-              }}
-            />
-          </div>
-        </div>
-        <Column className="main-wrap">
-          <PageLoadSpinner show={loadingTop} />
-          <EuiFormFieldset style={{ width: '100%', paddingBottom: 0 }} className="container">
-            <div style={{ justifyContent: 'center' }} className="row">
-              {tribes.length ? (
-                tribes.map((t) => (
-                  <Tribe {...t} key={t.uuid} selected={selected === t.uuid} select={selectTribe} />
-                ))
-              ) : (
-                <NoResults />
-              )}
-            </div>
-          </EuiFormFieldset>
-          <PageLoadSpinner noAnimate show={loadingBottom} />
-        </Column>
+      <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <EuiLoadingSpinner size="xl" />
       </Body>
     );
-  });
+  }
+
+  // if NSFW not selected, filter out NSFW
+  if (!selectedTags.find((f) => f.label === 'NSFW')) {
+    tribes = tribes.filter((f) => !f.tags.includes('NSFW'));
+  }
+
+  const button = (
+    <EuiButton
+      iconType="arrowDown"
+      iconSide="right"
+      size="s"
+      onClick={(e) => {
+        e.stopPropagation();
+        setTagsPop(!tagsPop);
+      }}
+    >
+      {`Tags ${showTagCount ? `(${selectedTags.length})` : ''}`}
+    </EuiButton>
+  );
+
+  return (
+    <Body id="main" onScroll={handleScroll} style={{ paddingTop: 0 }}>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-start',
+          padding: 20,
+          height: 62
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <EuiPopover
+            panelPaddingSize="none"
+            button={button}
+            isOpen={tagsPop}
+            closePopover={() => setTagsPop(false)}
+          >
+            <EuiSelectable
+              searchable
+              options={tagOptions}
+              renderOption={(option, searchValue) => (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    opacity: loadingList ? 0.5 : 1
+                  }}
+                >
+                  <Tag type={option.label} iconOnly />
+                  <EuiHighlight
+                    search={searchValue}
+                    style={{
+                      fontSize: 11,
+                      marginLeft: 5,
+                      color: tags[option.label].color
+                    }}
+                  >
+                    {option.label}
+                  </EuiHighlight>
+                </div>
+              )}
+              listProps={{ rowHeight: 30 }} // showIcons:false
+              onChange={(opts) => {
+                if (!loadingList) {
+                  setTagOptions(opts);
+                  ui.setTags(opts);
+                }
+              }}
+            >
+              {(list, search) => (
+                <div style={{ width: 220 }}>
+                  {search}
+                  {list}
+                </div>
+              )}
+            </EuiSelectable>
+          </EuiPopover>
+
+          <SearchTextInput
+            name="search"
+            type="search"
+            small={isMobile}
+            placeholder="Search"
+            value={ui.searchText}
+            style={{
+              width: 204,
+              height: 40,
+              background: '#111',
+              color: '#fff',
+              border: 'none',
+              marginLeft: 20
+            }}
+            onChange={(e) => {
+              ui.setSearchText(e);
+            }}
+          />
+        </div>
+      </div>
+      <Column className="main-wrap">
+        <PageLoadSpinner show={loadingTop} />
+        <EuiFormFieldset style={{ width: '100%', paddingBottom: 0 }} className="container">
+          <div style={{ justifyContent: 'center' }} className="row">
+            {tribes.length ? (
+              tribes.map((t) => (
+                <Tribe {...t} key={t.uuid} selected={selected === t.uuid} select={selectTribe} />
+              ))
+            ) : (
+              <NoResults />
+            )}
+          </div>
+        </EuiFormFieldset>
+        <PageLoadSpinner noAnimate show={loadingBottom} />
+      </Column>
+    </Body>
+  );
 }
 
 const Body = styled.div`

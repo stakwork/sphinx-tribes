@@ -3,6 +3,7 @@ import React, { CSSProperties, ComponentProps, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
 type SearchTextInputProps = ComponentProps<'input'> &
   InputProps & {
@@ -10,7 +11,9 @@ type SearchTextInputProps = ComponentProps<'input'> &
     iconStyle?: CSSProperties;
   };
 
-export default function SearchBar({
+export default observer(SearchBar);
+
+function SearchBar({
   border,
   borderActive,
   borderHover,

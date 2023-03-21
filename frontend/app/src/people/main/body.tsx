@@ -1,17 +1,13 @@
-/* eslint-disable func-style */
 import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
-import { useObserver } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import FadeLeft from '../../components/animated/fadeLeft';
+import { Modal, SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
-import { Modal, SearchTextInput } from '../../components/common';
 import { useStores } from '../../store';
 import Person from '../person';
-import PersonViewSlim from '../personViewSlim';
 import ConnectCard from '../utils/connectCard';
 import { widgetConfigs } from '../utils/constants';
 import NoResults from '../utils/noResults';
@@ -22,6 +18,8 @@ import WidgetSwitchViewer from '../widgetViews/widgetSwitchViewer';
 import FirstTimeScreen from './firstTimeScreen';
 import FocusedView from './focusView';
 import { Widget } from './types';
+
+import { observer } from 'mobx-react-lite';
 // avoid hook within callback warning by renaming hooks
 
 const getFuse = useFuse;
@@ -33,7 +31,9 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
+export default observer(BodyComponent);
+
+function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -242,125 +242,98 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
     history.push(`/p/${pubkey}`);
   }
 
-  function goBack() {
-    ui.setSelectingPerson(0);
-    history.push('/tickets');
-  }
+  let people = getFuse(main.people, ['owner_alias']);
 
-  return useObserver(() => {
-    let people = getFuse(main.people, ['owner_alias']);
+  const loadForwardFunc = () => loadMore(1);
+  const loadBackwardFunc = () => loadMore(-1);
+  const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
+    loadForwardFunc,
+    loadBackwardFunc
+  );
 
-    const loadForwardFunc = () => loadMore(1);
-    const loadBackwardFunc = () => loadMore(-1);
-    const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
-      loadForwardFunc,
-      loadBackwardFunc
-    );
+  people = (people && people.filter((f) => !f.hide)) || [];
 
-    people = (people && people.filter((f) => !f.hide)) || [];
+  async function loadMore(direction) {
+    let currentPage = 1;
 
-    async function loadMore(direction) {
-      let currentPage = 1;
+    switch (selectedWidget) {
+      case 'people':
+        currentPage = peoplePageNumber;
+        break;
+      case 'wanted':
+        currentPage = peopleWantedsPageNumber;
+        break;
+      case 'offer':
+        currentPage = peopleOffersPageNumber;
+        break;
+      case 'post':
+        currentPage = peoplePostsPageNumber;
+        break;
+      default:
+        console.log('scroll', direction);
+    }
 
+    let newPage = currentPage + direction;
+    if (newPage < 1) newPage = 1;
+
+    try {
       switch (selectedWidget) {
         case 'people':
-          currentPage = peoplePageNumber;
+          await main.getPeople({ page: newPage });
           break;
         case 'wanted':
-          currentPage = peopleWantedsPageNumber;
+          await main.getPeopleWanteds({ page: newPage });
           break;
         case 'offer':
-          currentPage = peopleOffersPageNumber;
+          await main.getPeopleOffers({ page: newPage });
           break;
         case 'post':
-          currentPage = peoplePostsPageNumber;
+          await main.getPeoplePosts({ page: newPage });
           break;
         default:
           console.log('scroll', direction);
       }
+    } catch (e) {
+      console.log('load failed', e);
+    }
+  }
 
-      let newPage = currentPage + direction;
-      if (newPage < 1) newPage = 1;
+  function renderPeople() {
+    let p;
+    if (people.length) {
+      p = people?.map((t) => (
+        <Person
+          {...t}
+          key={t.id}
+          small={isMobile}
+          squeeze={screenWidth < 1420}
+          selected={ui.selectedPerson === t.id}
+          select={selectPerson}
+        />
+      ));
 
-      try {
-        switch (selectedWidget) {
-          case 'people':
-            await main.getPeople({ page: newPage });
-            break;
-          case 'wanted':
-            await main.getPeopleWanteds({ page: newPage });
-            break;
-          case 'offer':
-            await main.getPeopleOffers({ page: newPage });
-            break;
-          case 'post':
-            await main.getPeoplePosts({ page: newPage });
-            break;
-          default:
-            console.log('scroll', direction);
-        }
-      } catch (e) {
-        console.log('load failed', e);
-      }
+      // add space at bottom
+      p = [...p, <Spacer key={'spacer1'} />];
+    } else {
+      p = <NoResults />;
     }
 
-    function renderPeople() {
-      let p;
-      if (people.length) {
-        p = people?.map((t) => (
-          <Person
-            {...t}
-            key={t.id}
-            small={isMobile}
-            squeeze={screenWidth < 1420}
-            selected={ui.selectedPerson === t.id}
-            select={selectPerson}
-          />
-        ));
+    return p;
+  }
 
-        // add space at bottom
-        p = [...p, <Spacer key={'spacer1'} />];
-      } else {
-        p = <NoResults />;
-      }
-
-      return p;
-    }
-
-    const listContent =
-      selectedWidget === 'people' ? (
-        renderPeople()
-      ) : !isMobile ? (
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            height: '100%'
-          }}
-        >
-          <WidgetSwitchViewer
-            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-            onPanelClick={(person, item) => {
-										console.log("ON PANEL CLICK PERSON:", person)
-              history.replace({
-                pathname: history?.location?.pathname,
-                search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
-                state: {
-                  owner_id: person.owner_pubkey,
-                  created: item.created
-                }
-              });
-              publicPanelClick(person, item);
-            }}
-            fromBountyPage={true}
-            selectedWidget={selectedWidget}
-            loading={loading}
-          />
-        </div>
-      ) : (
+  const listContent =
+    selectedWidget === 'people' ? (
+      renderPeople()
+    ) : !isMobile ? (
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          height: '100%'
+        }}
+      >
         <WidgetSwitchViewer
           checkboxIdToSelectedMap={checkboxIdToSelectedMap}
           checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
@@ -380,305 +353,112 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
           selectedWidget={selectedWidget}
           loading={loading}
         />
-      );
-
-    if (loading) {
-      return (
-        <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <EuiLoadingSpinner size="xl" />
-        </Body>
-      );
-    }
-
-    const showFirstTime = ui.meInfo && ui.meInfo.id === 0;
-
-    if (showFirstTime) {
-      return <FirstTimeScreen />;
-    }
-
-    const toastsEl = (
-      <EuiGlobalToastList
-        toasts={ui.toasts}
-        dismissToast={() => ui.setToasts([])}
-        toastLifeTimeMs={3000}
+      </div>
+    ) : (
+      <WidgetSwitchViewer
+        checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+        checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+        onPanelClick={(person, item) => {
+          history.replace({
+            pathname: history?.location?.pathname,
+            search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
+            state: {
+              owner_id: person.owner_pubkey,
+              created: item.created
+            }
+          });
+          publicPanelClick(person, item);
+        }}
+        fromBountyPage={true}
+        selectedWidget={selectedWidget}
+        loading={loading}
       />
     );
 
-    if (isMobile) {
-      return (
-        <Body onScroll={handleScroll}>
-          <div
-            style={{
-              width: '100%',
-              padding: '8px 0px',
-              boxShadow: `0 0 6px 0 ${color.black100}`,
-              zIndex: 2,
-              position: 'relative',
-              background: color.pureWhite,
-              borderBottom: `1px solid ${color.black100}`
-            }}
-          >
-            {selectedWidget === 'wanted' && (
-              <BountyHeader
-                selectedWidget={selectedWidget}
-                scrollValue={scrollValue}
-                onChangeStatus={onChangeStatus}
-                onChangeLanguage={onChangeLanguage}
-                checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-                checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-              />
-            )}
-            {selectedWidget === 'people' && (
-              <div
-                style={{
-                  padding: '0 20px'
-                }}
-              >
-                <SearchTextInput
-                  small
-                  name="search"
-                  type="search"
-                  placeholder="Search"
-                  value={ui.searchText}
-                  style={{
-                    width: '100%',
-                    height: 40,
-                    border: `1px solid ${color.grayish.G600}`,
-                    background: color.pureWhite
-                  }}
-                  onChange={(e) => {
-                    ui.setSearchText(e);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
-          <div style={{ width: '100%' }}>
-            <PageLoadSpinner show={loadingTop} />
-            {listContent}
-            <PageLoadSpinner noAnimate show={loadingBottom} />
-          </div>
-
-          <FadeLeft
-            withOverlay
-            drift={40}
-            overlayClick={() => goBack()}
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              zIndex: 10000,
-              width: '100%'
-            }}
-            isMounted={ui.selectingPerson ? true : false}
-            dismountCallback={() => ui.setSelectedPerson(0)}
-          >
-            <PersonViewSlim
-              goBack={goBack}
-              personId={ui.selectedPerson}
-              selectPerson={selectPerson}
-              loading={loading}
-            />
-          </FadeLeft>
-          {publicFocusPerson && (
-            <Modal visible={publicFocusPerson ? true : false} fill={true}>
-              <FocusedView
-                person={publicFocusPerson}
-									item={publicFocusItem}
-                canEdit={false}
-                selectedIndex={publicFocusIndex}
-                config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
-                onSuccess={() => {
-                  console.log('success');
-                  setPublicFocusPerson(null);
-                  setPublicFocusIndex(-1);
-                }}
-                goBack={() => {
-                  setPublicFocusPerson(null);
-                  setPublicFocusIndex(-1);
-                  history.push('/tickets');
-                }}
-              />
-            </Modal>
-          )}
-          {toastsEl}
-        </Body>
-      );
-    }
-
-    const focusedDesktopModalStyles =
-      selectedWidget && widgetConfigs[selectedWidget]
-        ? {
-            ...widgetConfigs[selectedWidget].modalStyle
-          }
-        : {};
-
-    // desktop mode
+  if (loading) {
     return (
-      <Body
-        onScroll={(e) => {
-          setScrollValue(e?.currentTarget?.scrollTop >= 20);
-          handleScroll(e);
-        }}
-        style={{
-          background: color.grayish.G950,
-          height: 'calc(100% - 65px)'
-        }}
-      >
+      <Body style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <EuiLoadingSpinner size="xl" />
+      </Body>
+    );
+  }
+
+  const showFirstTime = ui.meInfo && ui.meInfo.id === 0;
+
+  if (showFirstTime) {
+    return <FirstTimeScreen />;
+  }
+
+  const toastsEl = (
+    <EuiGlobalToastList
+      toasts={ui.toasts}
+      dismissToast={() => ui.setToasts([])}
+      toastLifeTimeMs={3000}
+    />
+  );
+
+  if (isMobile) {
+    return (
+      <Body onScroll={handleScroll}>
         <div
           style={{
-            minHeight: '32px'
+            width: '100%',
+            padding: '8px 0px',
+            boxShadow: `0 0 6px 0 ${color.black100}`,
+            zIndex: 2,
+            position: 'relative',
+            background: color.pureWhite,
+            borderBottom: `1px solid ${color.black100}`
           }}
-        />
-        {selectedWidget === 'wanted' && (
-          <BountyHeader
-            selectedWidget={selectedWidget}
-            scrollValue={scrollValue}
-            onChangeStatus={onChangeStatus}
-            onChangeLanguage={onChangeLanguage}
-            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-          />
-        )}
-        {selectedWidget === 'people' && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              padding: '10px 0'
-            }}
-          >
-            <SearchTextInput
-              small
-              name="search"
-              type="search"
-              placeholder="Search"
-              value={ui.searchText}
-              style={{
-                width: 204,
-                height: 40,
-                border: `1px solid ${color.grayish.G600}`,
-                background: color.grayish.G600
-              }}
-              onChange={(e) => {
-                ui.setSearchText(e);
-              }}
-            />
-          </div>
-        )}
-        <>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexWrap: 'wrap',
-              height: '100%',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              padding: '0px 20px 20px 20px'
-            }}
-          >
-            <PageLoadSpinner show={loadingTop} />
-            {listContent}
-            <PageLoadSpinner noAnimate show={loadingBottom} />
-          </div>
-        </>
-        {/* selected view */}
-        <FadeLeft
-          withOverlay={isMobile}
-          drift={40}
-          overlayClick={() => goBack()}
-          style={{
-            position: 'absolute',
-            top: isMobile ? 0 : 64,
-            right: 0,
-            zIndex: 10000,
-            width: '100%'
-          }}
-          isMounted={ui.selectingPerson ? true : false}
-          dismountCallback={() => ui.setSelectedPerson(0)}
         >
-          <PersonViewSlim
-            goBack={goBack}
-            personId={ui.selectedPerson}
-            loading={loading}
-            peopleView={true}
-            selectPerson={selectPerson}
-          />
-        </FadeLeft>
-        {/* modal onClick on tickets */}
+          {selectedWidget === 'wanted' && (
+            <BountyHeader
+              selectedWidget={selectedWidget}
+              scrollValue={scrollValue}
+              onChangeStatus={onChangeStatus}
+              onChangeLanguage={onChangeLanguage}
+              checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+              checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+            />
+          )}
+          {selectedWidget === 'people' && (
+            <div
+              style={{
+                padding: '0 20px'
+              }}
+            >
+              <SearchTextInput
+                small
+                name="search"
+                type="search"
+                placeholder="Search"
+                value={ui.searchText}
+                style={{
+                  width: '100%',
+                  height: 40,
+                  border: `1px solid ${color.grayish.G600}`,
+                  background: color.pureWhite
+                }}
+                onChange={(e) => {
+                  ui.setSearchText(e);
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
+        <div style={{ width: '100%' }}>
+          <PageLoadSpinner show={loadingTop} />
+          {listContent}
+          <PageLoadSpinner noAnimate show={loadingBottom} />
+        </div>
+
         {publicFocusPerson && (
-          <Modal
-            visible={publicFocusPerson ? true : false}
-            envStyle={{
-              borderRadius: isExtraStyle ? '10px' : 0,
-              background: color.pureWhite,
-              ...focusedDesktopModalStyles,
-              maxHeight: '100vh',
-              zIndex: 20
-            }}
-            style={{
-              background: 'rgba( 0 0 0 /75% )'
-            }}
-            bigCloseImage={() => {
-              setPublicFocusPerson(null);
-              setPublicFocusIndex(-1);
-              history.push('/tickets');
-              setIsExtraStyle(false);
-              setIsModalSideButton(true);
-            }}
-            bigCloseImageStyle={{
-              top: isExtraStyle ? '-18px' : '18px',
-              right: isExtraStyle ? '-18px' : '-50px',
-              // background: isExtraStyle ? '#000' : '#000',
-              borderRadius: isExtraStyle ? '50%' : '50%'
-            }}
-            prevArrowNew={
-              activeListIndex === 0
-                ? null
-                : isModalSideButton
-                ? () => {
-                    const { person, body } = activeList[activeListIndex - 1];
-                    if (person && body) {
-                      history.replace({
-                        pathname: history?.location?.pathname,
-                        search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-                        state: {
-                          owner_id: person?.owner_pubkey,
-                          created: body?.created
-                        }
-                      });
-                    }
-                  }
-                : null
-            }
-            nextArrowNew={
-              activeListIndex + 1 > activeList?.length
-                ? null
-                : isModalSideButton
-                ? () => {
-                    const { person, body } = activeList[activeListIndex + 1];
-                    if (person && body) {
-                      history.replace({
-                        pathname: history?.location?.pathname,
-                        search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-                        state: {
-                          owner_id: person?.owner_pubkey,
-                          created: body?.created
-                        }
-                      });
-                    }
-                  }
-                : null
-            }
-          >
+          <Modal visible={publicFocusPerson ? true : false} fill={true}>
             <FocusedView
-              ReCallBounties={ReCallBounties}
               person={publicFocusPerson}
 									item={publicFocusItem}
-              personBody={connectPersonBody}
               canEdit={false}
               selectedIndex={publicFocusIndex}
               config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
@@ -690,43 +470,211 @@ export default function BodyComponent({ selectedWidget }: { selectedWidget: Widg
               goBack={() => {
                 setPublicFocusPerson(null);
                 setPublicFocusIndex(-1);
-              }}
-              fromBountyPage={true}
-              extraModalFunction={() => {
-                setPublicFocusPerson(null);
-                setPublicFocusIndex(-1);
                 history.push('/tickets');
-                if (ui.meInfo) {
-                  showConnectModal();
-                } else {
-                  showModal();
-                }
               }}
-              deleteExtraFunction={() => {
-                setPublicFocusPerson(null);
-                setPublicFocusIndex(-1);
-              }}
-              setIsModalSideButton={setIsModalSideButton}
-              setIsExtraStyle={setIsExtraStyle}
             />
           </Modal>
         )}
-        {openStartUpModel && (
-          <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
-        )}
-        <ConnectCard
-          dismiss={() => closeConnectModal()}
-          modalStyle={{
-            top: '-64px',
-            height: 'calc(100% + 64px)'
-          }}
-          person={connectPerson}
-          visible={openConnectModal}
-        />
         {toastsEl}
       </Body>
     );
-  });
+  }
+
+  const focusedDesktopModalStyles =
+    selectedWidget && widgetConfigs[selectedWidget]
+      ? {
+          ...widgetConfigs[selectedWidget].modalStyle
+        }
+      : {};
+
+  // desktop mode
+  return (
+    <Body
+      onScroll={(e) => {
+        setScrollValue(e?.currentTarget?.scrollTop >= 20);
+        handleScroll(e);
+      }}
+      style={{
+        background: color.grayish.G950,
+        height: 'calc(100% - 65px)'
+      }}
+    >
+      <div
+        style={{
+          minHeight: '32px'
+        }}
+      />
+      {selectedWidget === 'wanted' && (
+        <BountyHeader
+          selectedWidget={selectedWidget}
+          scrollValue={scrollValue}
+          onChangeStatus={onChangeStatus}
+          onChangeLanguage={onChangeLanguage}
+          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+        />
+      )}
+      {selectedWidget === 'people' && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: '10px 0'
+          }}
+        >
+          <SearchTextInput
+            small
+            name="search"
+            type="search"
+            placeholder="Search"
+            value={ui.searchText}
+            style={{
+              width: 204,
+              height: 40,
+              border: `1px solid ${color.grayish.G600}`,
+              background: color.grayish.G600
+            }}
+            onChange={(e) => {
+              ui.setSearchText(e);
+            }}
+          />
+        </div>
+      )}
+      <>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexWrap: 'wrap',
+            height: '100%',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            padding: '0px 20px 20px 20px'
+          }}
+        >
+          <PageLoadSpinner show={loadingTop} />
+          {listContent}
+          <PageLoadSpinner noAnimate show={loadingBottom} />
+        </div>
+      </>
+      {/* selected view */}
+      {/* modal onClick on tickets */}
+      {publicFocusPerson && (
+        <Modal
+          visible={publicFocusPerson ? true : false}
+          envStyle={{
+            borderRadius: isExtraStyle ? '10px' : 0,
+            background: color.pureWhite,
+            ...focusedDesktopModalStyles,
+            maxHeight: '100vh',
+            zIndex: 20
+          }}
+          style={{
+            background: 'rgba( 0 0 0 /75% )'
+          }}
+          bigCloseImage={() => {
+            setPublicFocusPerson(null);
+            setPublicFocusIndex(-1);
+            history.push('/tickets');
+            setIsExtraStyle(false);
+            setIsModalSideButton(true);
+          }}
+          bigCloseImageStyle={{
+            top: isExtraStyle ? '-18px' : '18px',
+            right: isExtraStyle ? '-18px' : '-50px',
+            borderRadius: isExtraStyle ? '50%' : '50%'
+          }}
+          prevArrowNew={
+            activeListIndex === 0
+              ? null
+              : isModalSideButton
+              ? () => {
+                  const { person, body } = activeList[activeListIndex - 1];
+                  if (person && body) {
+                    history.replace({
+                      pathname: history?.location?.pathname,
+                      search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                      state: {
+                        owner_id: person?.owner_pubkey,
+                        created: body?.created
+                      }
+                    });
+                  }
+                }
+              : null
+          }
+          nextArrowNew={
+            activeListIndex + 1 > activeList?.length
+              ? null
+              : isModalSideButton
+              ? () => {
+                  const { person, body } = activeList[activeListIndex + 1];
+                  if (person && body) {
+                    history.replace({
+                      pathname: history?.location?.pathname,
+                      search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+                      state: {
+                        owner_id: person?.owner_pubkey,
+                        created: body?.created
+                      }
+                    });
+                  }
+                }
+              : null
+          }
+        >
+          <FocusedView
+            ReCallBounties={ReCallBounties}
+            person={publicFocusPerson}
+							item={publicFocusItem}
+            personBody={connectPersonBody}
+            canEdit={false}
+            selectedIndex={publicFocusIndex}
+            config={widgetConfigs[selectedWidget] && widgetConfigs[selectedWidget]}
+            onSuccess={() => {
+              console.log('success');
+              setPublicFocusPerson(null);
+              setPublicFocusIndex(-1);
+            }}
+            goBack={() => {
+              setPublicFocusPerson(null);
+              setPublicFocusIndex(-1);
+            }}
+            fromBountyPage={true}
+            extraModalFunction={() => {
+              setPublicFocusPerson(null);
+              setPublicFocusIndex(-1);
+              history.push('/tickets');
+              if (ui.meInfo) {
+                showConnectModal();
+              } else {
+                showModal();
+              }
+            }}
+            deleteExtraFunction={() => {
+              setPublicFocusPerson(null);
+              setPublicFocusIndex(-1);
+            }}
+            setIsModalSideButton={setIsModalSideButton}
+            setIsExtraStyle={setIsExtraStyle}
+          />
+        </Modal>
+      )}
+      {openStartUpModel && (
+        <StartUpModal closeModal={closeModal} dataObject={'getWork'} buttonColor={'primary'} />
+      )}
+      <ConnectCard
+        dismiss={() => closeConnectModal()}
+        modalStyle={{
+          top: '-64px',
+          height: 'calc(100% + 64px)'
+        }}
+        person={connectPerson}
+        visible={openConnectModal}
+      />
+      {toastsEl}
+    </Body>
+  );
 }
 
 const Body = styled.div`

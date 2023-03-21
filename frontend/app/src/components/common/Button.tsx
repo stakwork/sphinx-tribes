@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import { colors } from '../../config/common';
+import { commonColors } from 'config/commonColors';
 
 export default function Button(props: any) {
   const { iconStyle, id } = props;
@@ -11,7 +11,7 @@ export default function Button(props: any) {
     <B
       id={id}
       style={{
-        ...colors[props.color],
+        ...commonColors[props.color],
         padding: props.icon && '0 0 0 15px',
         position: 'relative',
         opacity: props.disabled ? 0.7 : 1,

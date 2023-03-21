@@ -1,28 +1,30 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Formik } from 'formik';
-import Input from './inputs';
-import { Button, Divider, IconButton, Modal } from '../common';
-import { useStores } from '../../store';
-import { dynamicSchemasByType, dynamicSchemaAutofillFieldsByType } from './schema';
-import { formDropdownOptions } from '../../people/utils/constants';
 import { EuiText } from '@elastic/eui';
+import { Formik } from 'formik';
+import { observer } from 'mobx-react-lite';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../../api';
-import ImageButton from '../common/Image_button';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
+import { formDropdownOptions } from '../../people/utils/constants';
+import { useStores } from '../../store';
+import { Button, Divider, IconButton, Modal } from '../common';
+import ImageButton from '../common/Image_button';
+import Input from './inputs';
+import { dynamicSchemaAutofillFieldsByType, dynamicSchemasByType } from './schema';
 import {
-  Wrap,
   BWrap,
-  CreateBountyHeaderContainer,
   BottomContainer,
-  SchemaOuterContainer,
-  ChooseBountyContainer,
   BountyContainer,
-  SchemaTagsContainer
+  ChooseBountyContainer,
+  CreateBountyHeaderContainer,
+  SchemaOuterContainer,
+  SchemaTagsContainer,
+  Wrap
 } from './style';
-import { validator, FormField } from './utils';
+import { FormField, validator } from './utils';
 
-export default function Form(props: any) {
+export default observer(Form);
+function Form(props: any) {
   const {
     buttonsOnBottom,
     wrapStyle,
