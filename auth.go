@@ -8,11 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/rs/xid"
+	"github.com/form3tech-oss/jwt-go"
 )
 
 var (
@@ -42,24 +44,39 @@ func PubKeyContext(next http.Handler) http.Handler {
 			return
 		}
 
-		_, err := xid.FromString(token)
+		isJwt := strings.Contains(token, ".")
+		claims := jwt.MapClaims{}
 
-		if err != nil {
-			pubkey, err := VerifyTribeUUID(token, true)
-			if pubkey == "" || err != nil {
-				fmt.Println("[auth] no pubkey || err != nil")
-				if err != nil {
-					fmt.Println(err)
-				}
+		if isJwt {
+			_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+				key := os.Getenv("LN_JWT_KEY")
+				return []byte(key), nil
+			})
+
+			if err != nil {
+				fmt.Println("Failed to parse JWT")
 				http.Error(w, http.StatusText(401), 401)
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), ContextKey, pubkey)
+			fmt.Println("Claims ====", claims)
+
+			ctx := context.WithValue(r.Context(), ContextKey, claims["pubkey"])
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 
-		ctx := context.WithValue(r.Context(), ContextKey, "")
+		pubkey, err := VerifyTribeUUID(token, true)
+
+		if pubkey == "" || err != nil {
+			fmt.Println("[auth] no pubkey || err != nil")
+			if err != nil {
+				fmt.Println(err)
+			}
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), ContextKey, pubkey)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -911,9 +911,7 @@ export class MainStore {
 
         this.setLnurl({encode: "", k1: ""});
         this.setToken(data.token);
-        uiStore.setMeInfo(data.user)
-
-        console.log("LN RETURNED DATA ===", data)
+        uiStore.setMeInfo({...data.user, jwt: this.lnToken})
       }
       return data;
     } catch (e) {

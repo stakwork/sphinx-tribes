@@ -866,8 +866,8 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	exp := ExpireInHours(24 * 7)
 
 	claims := jwt.MapClaims{
-		"key": res.key,
-		"exp": exp,
+		"pubkey": res.key,
+		"exp":    exp,
 	}
 
 	_, tokenString, err := TokenAuth.Encode(claims)
@@ -880,11 +880,12 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	person := DB.getPersonByPubkey(res.key)
+	user := returnUserMap(person)
 
 	responseData["k1"] = res.k1
 	responseData["status"] = res.status
 	responseData["token"] = tokenString
-	responseData["user"] = returnUserMap(person)
+	responseData["user"] = user
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(responseData)

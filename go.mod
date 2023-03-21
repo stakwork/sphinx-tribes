@@ -10,6 +10,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fiatjaf/go-lnurl v1.12.1
+	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/go-chi/jwtauth v1.2.0 // indirect
 	github.com/gobuffalo/logger v1.0.4 // indirect

@@ -576,7 +576,7 @@ const LoginBtn = styled.div`
 `;
 
 const Alias = styled.span`
-  width: 200px;
+  width: 180px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
