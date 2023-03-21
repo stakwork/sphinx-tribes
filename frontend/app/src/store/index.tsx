@@ -18,13 +18,11 @@ import { configure } from 'mobx';
 })();
 
 configure({});
-const Context = React.createContext(
-  {
-    ui: uiStore,
-    main: mainStore,
-    modals: modalsVisibilityStore
-  }
-);
+const Context = React.createContext({
+  ui: uiStore,
+  main: mainStore,
+  modals: modalsVisibilityStore
+});
 
 export const WithStores = ({ children }) => {
   return (
