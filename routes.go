@@ -914,6 +914,10 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responseMsg)
 }
 
+func refreshToken(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func returnUserMap(p Person) map[string]interface{} {
 	user := make(map[string]interface{})
 

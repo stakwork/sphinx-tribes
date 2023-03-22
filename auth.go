@@ -45,13 +45,9 @@ func PubKeyContext(next http.Handler) http.Handler {
 		}
 
 		isJwt := strings.Contains(token, ".")
-		claims := jwt.MapClaims{}
 
 		if isJwt {
-			_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-				key := os.Getenv("LN_JWT_KEY")
-				return []byte(key), nil
-			})
+			claims, err := DecodeToken(token)
 
 			if err != nil {
 				fmt.Println("Failed to parse JWT")
@@ -145,4 +141,14 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	pubKeyHex := hex.EncodeToString(pubKey.SerializeCompressed())
 
 	return pubKeyHex, valid, nil
+}
+
+func DecodeToken(token string) (jwt.MapClaims, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		key := os.Getenv("LN_JWT_KEY")
+		return []byte(key), nil
+	})
+
+	return claims, err
 }
