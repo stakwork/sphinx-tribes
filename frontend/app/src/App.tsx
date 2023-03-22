@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 /* eslint-disable func-style */
 import '@material/react-material-icon/dist/material-icon.css';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { WithStores } from 'store';
+import { WithStores } from './store';
 import './App.css';
 import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
