@@ -21,8 +21,9 @@ func main() {
 
 	initDB()
 	initCache()
-	initJwt()
+	// Config has to be inited before JWT, if not it will lead to NO JWT error
 	initConfig()
+	initJwt()
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {

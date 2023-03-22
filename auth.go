@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -145,7 +144,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 func DecodeToken(token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		key := os.Getenv("LN_JWT_KEY")
+		key := jwtKey
 		return []byte(key), nil
 	})
 

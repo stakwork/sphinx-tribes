@@ -924,7 +924,6 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 
 	if userCount > 0 {
 		// Generate a new token
-
 		tokenString, err := EncodeToken(pubkey)
 
 		if err != nil {
