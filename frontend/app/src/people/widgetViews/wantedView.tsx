@@ -9,8 +9,11 @@ import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
 import DesktopView from './wantedViews/desktopView';
+import { observer } from 'mobx-react-lite';
 
-export default function WantedView(props: any) {
+export default observer(WantedView);
+
+function WantedView(props: any) {
   const {
     one_sentence_summary,
     title,
@@ -30,7 +33,7 @@ export default function WantedView(props: any) {
     loomEmbedUrl,
     onPanelClick
   } = props;
-  const titleString = title ?? one_sentence_summary;
+  const titleString = one_sentence_summary ?? title;
 
   let { show, paid } = props;
   const isMobile = useIsMobile();

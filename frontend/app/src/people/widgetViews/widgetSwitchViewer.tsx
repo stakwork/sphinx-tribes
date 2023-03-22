@@ -5,7 +5,6 @@ import PostView from '../widgetViews/postView';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
-import { useObserver } from 'mobx-react-lite';
 import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
@@ -13,8 +12,11 @@ import { uiStore } from '../../store/ui';
 import DeleteTicketModal from './deleteModal';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function WidgetSwitchViewer(props) {
+export default observer(WidgetSwitchViewer);
+
+function WidgetSwitchViewer(props) {
   const color = colors['light'];
   const { main } = useStores();
   const isMobile = useIsMobile();
@@ -37,163 +39,161 @@ export default function WidgetSwitchViewer(props) {
         justifyContent: 'center'
       };
 
-  return useObserver(() => {
-    const { peoplePosts, peopleWanteds, peopleOffers } = main;
+  const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
-    const { selectedWidget, onPanelClick } = props;
+  const { selectedWidget, onPanelClick } = props;
 
-    if (!selectedWidget) {
-      return <div style={{ height: 200 }} />;
-    }
+  if (!selectedWidget) {
+    return <div style={{ height: 200 }} />;
+  }
 
-    const listSource = {
-      post: peoplePosts,
-      wanted: peopleWanteds,
-      offer: peopleOffers
-    };
+  const listSource = {
+    post: peoplePosts,
+    wanted: peopleWanteds,
+    offer: peopleOffers
+  };
 
-    const activeList = [...listSource[selectedWidget]].filter(({ body }) => {
-      const value = { ...body };
-      return (
-        bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-        bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
-      );
-    });
-
-    const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
-    // if dynamic schema, get all those fields
-    if (foundDynamicSchema) {
-      const dynamicFields: any = [];
-      foundDynamicSchema.dynamicSchemas?.forEach((ds) => {
-        ds.forEach((f) => {
-          if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
-        });
-      });
-    }
-
-    const deleteTicket = async (payload: any) => {
-      const info = uiStore.meInfo as any;
-      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-      try {
-        await fetch(`${URL}/delete_ticket`, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: {
-            'x-jwt': info.jwt,
-            'Content-Type': 'application/json'
-          }
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const confirmDelete = async () => {
-      try {
-        if (deletePayload) {
-          await deleteTicket(deletePayload);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-      closeModal();
-    };
-
-    const listItems =
-      activeList && activeList.length ? (
-        activeList.slice(0, currentItems).map((item, i) => {
-          const { person, body } = item;
-          const conditionalStyles = body?.paid
-            ? {
-                border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
-                boxShadow: 'none'
-              }
-            : {};
-
-          // if this person has entries for this widget
-          return (
-            <Panel
-              color={color}
-              isMobile={isMobile}
-              key={person?.owner_pubkey + i + body?.created}
-              isAssignee={!!body.assignee}
-              style={{
-                ...panelStyles,
-                ...conditionalStyles,
-                cursor: 'pointer',
-                padding: 0,
-                overflow: 'hidden',
-                background: 'transparent',
-                minHeight: !isMobile ? '160px' : '',
-                boxShadow: 'none'
-              }}
-            >
-              {selectedWidget === 'post' ? (
-                <PostView
-                  showName
-                  key={`${i + person.owner_pubkey}pview`}
-                  person={person}
-                  {...body}
-                />
-              ) : selectedWidget === 'offer' ? (
-                <OfferView
-                  showName
-                  key={`${i + person.owner_pubkey}oview`}
-                  person={person}
-                  {...body}
-                />
-              ) : selectedWidget === 'wanted' ? (
-                <WantedView
-                  showName
-                  onPanelClick={() => {
-                    if (onPanelClick) onPanelClick(person, body);
-                  }}
-                  person={person}
-                  showModal={showModal}
-                  setDeletePayload={setDeletePayload}
-                  fromBountyPage={props.fromBountyPage}
-                  {...body}
-                />
-              ) : null}
-            </Panel>
-          );
-        })
-      ) : (
-        <NoResults />
-      );
-
+  const activeList = [...listSource[selectedWidget]].filter(({ body }) => {
+    const value = { ...body };
     return (
-      <>
-        {listItems}
-        <Spacer key={'spacer2'} />
-
-        {showDeleteModal && (
-          <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
-        )}
-        {activeList?.length > currentItems && (
-          <LoadMoreContainer
-            color={color}
-            style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <div
-              className="LoadMoreButton"
-              onClick={() => {
-                setCurrentItems(currentItems + 10);
-              }}
-            >
-              Load More
-            </div>
-          </LoadMoreContainer>
-        )}
-        <Spacer key={'spacer'} />
-      </>
+      bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
+      bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
     );
   });
+
+  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
+  // if dynamic schema, get all those fields
+  if (foundDynamicSchema) {
+    const dynamicFields: any = [];
+    foundDynamicSchema.dynamicSchemas?.forEach((ds) => {
+      ds.forEach((f) => {
+        if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
+      });
+    });
+  }
+
+  const deleteTicket = async (payload: any) => {
+    const info = uiStore.meInfo as any;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+    try {
+      await fetch(`${URL}/delete_ticket`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      if (deletePayload) {
+        await deleteTicket(deletePayload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    closeModal();
+  };
+
+  const listItems =
+    activeList && activeList.length ? (
+      activeList.slice(0, currentItems).map((item, i) => {
+        const { person, body } = item;
+        const conditionalStyles = body?.paid
+          ? {
+              border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
+              boxShadow: 'none'
+            }
+          : {};
+
+        // if this person has entries for this widget
+        return (
+          <Panel
+            color={color}
+            isMobile={isMobile}
+            key={person?.owner_pubkey + i + body?.created}
+            isAssignee={!!body.assignee}
+            style={{
+              ...panelStyles,
+              ...conditionalStyles,
+              cursor: 'pointer',
+              padding: 0,
+              overflow: 'hidden',
+              background: 'transparent',
+              minHeight: !isMobile ? '160px' : '',
+              boxShadow: 'none'
+            }}
+          >
+            {selectedWidget === 'post' ? (
+              <PostView
+                showName
+                key={`${i + person.owner_pubkey}pview`}
+                person={person}
+                {...body}
+              />
+            ) : selectedWidget === 'offer' ? (
+              <OfferView
+                showName
+                key={`${i + person.owner_pubkey}oview`}
+                person={person}
+                {...body}
+              />
+            ) : selectedWidget === 'wanted' ? (
+              <WantedView
+                showName
+                onPanelClick={() => {
+                  if (onPanelClick) onPanelClick(person, body);
+                }}
+                person={person}
+                showModal={showModal}
+                setDeletePayload={setDeletePayload}
+                fromBountyPage={props.fromBountyPage}
+                {...body}
+              />
+            ) : null}
+          </Panel>
+        );
+      })
+    ) : (
+      <NoResults />
+    );
+
+  return (
+    <>
+      {listItems}
+      <Spacer key={'spacer2'} />
+
+      {showDeleteModal && (
+        <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
+      )}
+      {activeList?.length > currentItems && (
+        <LoadMoreContainer
+          color={color}
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <div
+            className="LoadMoreButton"
+            onClick={() => {
+              setCurrentItems(currentItems + 10);
+            }}
+          >
+            Load More
+          </div>
+        </LoadMoreContainer>
+      )}
+      <Spacer key={'spacer'} />
+    </>
+  );
 }
 
 interface PanelProps {

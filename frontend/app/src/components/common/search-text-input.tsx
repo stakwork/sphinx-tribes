@@ -2,8 +2,10 @@ import MaterialIcon from '@material/react-material-icon';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
-export default function SearchTextInput(props: any) {
+export default observer(SearchTextInput);
+function SearchTextInput(props: any) {
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
   const [expand, setExpand] = useState(ui.searchText ? true : false);

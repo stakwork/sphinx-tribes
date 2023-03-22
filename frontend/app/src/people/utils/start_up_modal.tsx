@@ -6,6 +6,7 @@ import IconButton from '../../components/common/icon_button';
 import { useStores } from '../../store';
 import QR from './QR';
 import api from '../../api';
+import { observer } from 'mobx-react-lite';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
   const { ui, main } = useStores();

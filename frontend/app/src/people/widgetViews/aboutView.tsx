@@ -4,8 +4,10 @@ import { Divider } from '../../components/common';
 import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
+import { observer } from 'mobx-react-lite';
 
-export default function AboutView(props: any) {
+export default observer(AboutView);
+function AboutView(props: any) {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
   const { twitter, github, coding_languages, tribes, repos, lightning, amboss } = extras || {};

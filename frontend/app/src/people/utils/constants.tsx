@@ -82,6 +82,7 @@ const widgetConfigs = {
       }
     }
   },
+  // TODO: REMOVE
   wanted: {
     label: 'Tickets',
     name: 'wanted',

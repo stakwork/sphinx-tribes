@@ -34,8 +34,10 @@ import BountyProfileView from '../../../../bounties/bounty_profile_view';
 import ButtonSet from '../../../../bounties/bountyModal_button_set';
 import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
+import { observer } from "mobx-react-lite";
 
-export default function MobileView(props: any) {
+export default observer(MobileView);
+ function MobileView(props: any) {
     const {
         deliverables,
         description,

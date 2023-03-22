@@ -3,8 +3,11 @@ import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from '../../components/common';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
-export default function BotSecret(props: any) {
+export default observer(BotSecret);
+
+function BotSecret(props: any) {
   const { ui } = useStores();
   const { meInfo } = ui || {};
   const { id, secret, name, full } = props;
