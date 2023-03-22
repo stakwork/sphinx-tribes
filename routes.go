@@ -14,7 +14,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/stakwork/sphinx-tribes/feeds"
 	"github.com/stakwork/sphinx-tribes/frontend"
 )
@@ -123,6 +122,7 @@ func NewRouter() *http.Server {
 		r.Get("/lnurl_login", receiveLnAuthData)
 		r.Get("/lnurl", getLnurlAuth)
 		r.Get("/lnurl_poll", pollLnurlAuth)
+		r.Get("/refresh_jwt", refreshToken)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -863,14 +863,7 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("LNURL auth data not found")
 	}
 
-	exp := ExpireInHours(24 * 7)
-
-	claims := jwt.MapClaims{
-		"pubkey": res.key,
-		"exp":    exp,
-	}
-
-	_, tokenString, err := TokenAuth.Encode(claims)
+	tokenString, err := EncodeToken(res.key)
 
 	if err != nil {
 		fmt.Println("error creating JWT")
@@ -915,7 +908,43 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 }
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("x-jwt")
+	responseData := make(map[string]interface{})
+	claims, err := DecodeToken(token)
 
+	if err != nil {
+		fmt.Println("Failed to parse JWT")
+		http.Error(w, http.StatusText(401), 401)
+		return
+	}
+
+	pubkey := fmt.Sprint(claims["pubkey"])
+
+	userCount := DB.getLnUser(pubkey)
+
+	if userCount > 0 {
+		// Generate a new token
+
+		tokenString, err := EncodeToken(pubkey)
+
+		if err != nil {
+			fmt.Println("error creating  refresh JWT")
+			w.WriteHeader(http.StatusNotAcceptable)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+
+		person := DB.getPersonByPubkey(pubkey)
+		user := returnUserMap(person)
+
+		responseData["k1"] = ""
+		responseData["status"] = true
+		responseData["token"] = tokenString
+		responseData["user"] = user
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(responseData)
+	}
 }
 
 func returnUserMap(p Person) map[string]interface{} {

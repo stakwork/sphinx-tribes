@@ -125,7 +125,6 @@ func VerifyArbitrary(sig string, msg string) (string, error) {
 
 // VerifyAndExtract ... pubkey comes out hex encoded
 func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
-
 	if sig == nil || msg == nil {
 		return "", false, errors.New("bad")
 	}
@@ -151,4 +150,21 @@ func DecodeToken(token string) (jwt.MapClaims, error) {
 	})
 
 	return claims, err
+}
+
+func EncodeToken(pubkey string) (string, error) {
+	exp := ExpireInHours(24 * 7)
+
+	claims := jwt.MapClaims{
+		"pubkey": pubkey,
+		"exp":    exp,
+	}
+
+	_, tokenString, err := TokenAuth.Encode(claims)
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
