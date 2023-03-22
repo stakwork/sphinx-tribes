@@ -64,21 +64,21 @@ func PubKeyContext(next http.Handler) http.Handler {
 
 			ctx := context.WithValue(r.Context(), ContextKey, claims["pubkey"])
 			next.ServeHTTP(w, r.WithContext(ctx))
-		}
+		} else {
+			pubkey, err := VerifyTribeUUID(token, true)
 
-		pubkey, err := VerifyTribeUUID(token, true)
-
-		if pubkey == "" || err != nil {
-			fmt.Println("[auth] no pubkey || err != nil")
-			if err != nil {
-				fmt.Println(err)
+			if pubkey == "" || err != nil {
+				fmt.Println("[auth] no pubkey || err != nil")
+				if err != nil {
+					fmt.Println(err)
+				}
+				http.Error(w, http.StatusText(401), 401)
+				return
 			}
-			http.Error(w, http.StatusText(401), 401)
-			return
-		}
 
-		ctx := context.WithValue(r.Context(), ContextKey, pubkey)
-		next.ServeHTTP(w, r.WithContext(ctx))
+			ctx := context.WithValue(r.Context(), ContextKey, pubkey)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		}
 	})
 }
 

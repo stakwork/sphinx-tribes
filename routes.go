@@ -992,7 +992,7 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["tags"] = p.Tags
 	user["unique_name"] = p.UniqueName
 	user["pubkey"] = p.OwnerPubKey
-	user["extraa"] = p.Extras
+	user["extras"] = p.Extras
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
