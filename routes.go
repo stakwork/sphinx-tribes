@@ -931,6 +931,7 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
+	user["url"] = host
 
 	return user
 }

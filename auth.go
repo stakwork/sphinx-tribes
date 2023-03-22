@@ -36,7 +36,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 
-		fmt.Println("Token ===", token)
+		// fmt.Println("Token ===", token)
 
 		if token == "" {
 			fmt.Println("[auth] no token")

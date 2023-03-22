@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"os"
 
 	lnurl "github.com/fiatjaf/go-lnurl"
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
@@ -14,15 +13,8 @@ type LnEncodeData struct {
 }
 
 func encodeLNURL() (LnEncodeData, error) {
-	var host string
-	host = os.Getenv("LN_SERVER_BASE_URL")
-
-	if host == "" {
-		host = "people.sphinx.chat"
-	}
-
 	k1 := generate32Bytes()
-	url := host + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
+	url := host + "/" + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
 
 	encode, err := lnurl.Encode(url)
 
