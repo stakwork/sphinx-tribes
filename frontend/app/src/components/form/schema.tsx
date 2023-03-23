@@ -526,9 +526,10 @@ export const botSchema: FormField[] = [
     validator: strValidator
   },
   {
+    // change to text area
     name: 'description',
     label: 'How to use',
-    type: 'textarea',
+    type: 'text',
     validator: strValidator
   },
   {

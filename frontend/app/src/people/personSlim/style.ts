@@ -151,6 +151,10 @@ export const Name = styled.div`
   font-weight: 500;
   font-size: 24px;
   line-height: 28px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* or 73% */
 
   text-align: center;

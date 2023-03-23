@@ -36,6 +36,10 @@ export const Name = styled.div`
   line-height: 28px;
   text-align: center;
   color: #3c3f41;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 interface ImageProps {
