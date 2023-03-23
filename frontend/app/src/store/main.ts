@@ -718,7 +718,10 @@ export class MainStore {
   async deleteProfile() {
     try {
       const info = uiStore.meInfo;
-      const [r, error] = await this.doCallToRelay('DELETE', 'profile', info);
+      let request = "profile";
+      if(this.lnToken) request = `person/${info?.id}`;
+
+      const [r, error] = await this.doCallToRelay('DELETE', request, info);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
@@ -739,10 +742,10 @@ export class MainStore {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
-    let request = "profile";
-    if(this.lnToken) request = "person";
-
     try {
+      let request = "profile";
+      if(this.lnToken) request = "person";
+
       const [r, error] = await this.doCallToRelay('POST', request, body);
       if (error) throw error;
       if (!r) return; // tor user will return here

@@ -519,7 +519,7 @@ function BotBody() {
             height: '100%',
             borderRadius: 0,
             width: '100%',
-            maxWidth: 375,
+            maxWidth: 450,
             paddingTop: editThisBot?.secret && 60
           }}
         >
