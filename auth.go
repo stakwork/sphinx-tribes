@@ -55,8 +55,6 @@ func PubKeyContext(next http.Handler) http.Handler {
 				return
 			}
 
-			// fmt.Println("Claims ====", claims)
-
 			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
 				fmt.Println("Token has expired")
 				http.Error(w, http.StatusText(401), 401)
