@@ -352,6 +352,11 @@ func getFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	tribe := DB.getFirstTribeByFeedURL(url)
 
+	if tribe.UUID == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	var theTribe map[string]interface{}
 	j, _ := json.Marshal(tribe)
 	json.Unmarshal(j, &theTribe)
