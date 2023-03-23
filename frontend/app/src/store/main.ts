@@ -144,12 +144,14 @@ export class MainStore {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
+    console.log("User info ===", info.jwt)
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     const r: any = await fetch(`${URL}/${path}`, {
       method: 'GET',
       headers: {
         'x-jwt': info.jwt,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
       }
     });
 
@@ -925,8 +927,8 @@ export class MainStore {
         uiStore.setShowSignIn(false);
 
         this.setLnurl({encode: "", k1: ""});
-        this.setToken(data.token);
-        uiStore.setMeInfo({...data.user, jwt: this.lnToken})
+        this.setToken(data.jwt);
+        uiStore.setMeInfo({...data.user, jwt: data.jwt})
       }
       return data;
     } catch (e) {

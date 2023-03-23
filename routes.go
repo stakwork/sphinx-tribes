@@ -910,7 +910,7 @@ func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 
 	responseData["k1"] = res.k1
 	responseData["status"] = res.status
-	responseData["token"] = tokenString
+	responseData["jwt"] = tokenString
 	responseData["user"] = user
 
 	w.WriteHeader(http.StatusOK)
@@ -942,6 +942,9 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
+
+	fmt.Println("X-JWT ===", token)
+
 	responseData := make(map[string]interface{})
 	claims, err := DecodeToken(token)
 
@@ -971,7 +974,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 
 		responseData["k1"] = ""
 		responseData["status"] = true
-		responseData["token"] = tokenString
+		responseData["jwt"] = tokenString
 		responseData["user"] = user
 
 		w.WriteHeader(http.StatusOK)

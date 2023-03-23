@@ -15,6 +15,7 @@ function TokenRefresh() {
     timeout = setTimeout(async () => {
       if (ui.meInfo) {
         const res = await main.refreshJwt();
+        console.log("Res JSON ====", res);
         if (res && res.jwt) {
           ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt });
         } else {
