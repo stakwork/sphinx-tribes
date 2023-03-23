@@ -8,10 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/btcsuite/btcd/btcec"
+	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/form3tech-oss/jwt-go"
 )
 
 var (
@@ -33,23 +35,49 @@ func PubKeyContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 		if token == "" {
+			token = r.Header.Get("x-jwt")
+		}
+
+		if token == "" {
 			fmt.Println("[auth] no token")
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}
 
-		pubkey, err := VerifyTribeUUID(token, true)
-		if pubkey == "" || err != nil {
-			fmt.Println("[auth] no pubkey || err != nil")
-			if err != nil {
-				fmt.Println(err)
-			}
-			http.Error(w, http.StatusText(401), 401)
-			return
-		}
+		isJwt := strings.Contains(token, ".")
 
-		ctx := context.WithValue(r.Context(), ContextKey, pubkey)
-		next.ServeHTTP(w, r.WithContext(ctx))
+		if isJwt {
+			claims, err := DecodeToken(token)
+
+			if err != nil {
+				fmt.Println("Failed to parse JWT")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
+				fmt.Println("Token has expired")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ContextKey, claims["pubkey"])
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			pubkey, err := VerifyTribeUUID(token, true)
+
+			if pubkey == "" || err != nil {
+				fmt.Println("[auth] no pubkey || err != nil")
+				if err != nil {
+					fmt.Println(err)
+				}
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ContextKey, pubkey)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		}
 	})
 }
 
@@ -95,7 +123,6 @@ func VerifyArbitrary(sig string, msg string) (string, error) {
 
 // VerifyAndExtract ... pubkey comes out hex encoded
 func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
-
 	if sig == nil || msg == nil {
 		return "", false, errors.New("bad")
 	}
@@ -103,7 +130,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	digest := chainhash.DoubleHashB(msg)
 
 	// RecoverCompact both recovers the pubkey and validates the signature.
-	pubKey, valid, err := btcec.RecoverCompact(btcec.S256(), sig, digest)
+	pubKey, valid, err := btcecdsa.RecoverCompact(sig, digest)
 	if err != nil {
 		fmt.Printf("ERR: %+v\n", err)
 		return "", false, err
@@ -111,4 +138,31 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	pubKeyHex := hex.EncodeToString(pubKey.SerializeCompressed())
 
 	return pubKeyHex, valid, nil
+}
+
+func DecodeToken(token string) (jwt.MapClaims, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		key := jwtKey
+		return []byte(key), nil
+	})
+
+	return claims, err
+}
+
+func EncodeToken(pubkey string) (string, error) {
+	exp := ExpireInHours(24 * 7)
+
+	claims := jwt.MapClaims{
+		"pubkey": pubkey,
+		"exp":    exp,
+	}
+
+	_, tokenString, err := TokenAuth.Encode(claims)
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
