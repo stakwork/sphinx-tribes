@@ -933,7 +933,7 @@ export class MainStore {
   @persist('object') @observable
   lnToken: string = "";
 
-  @action setToken(token: string) {
+  @action setLnToken(token: string) {
     this.lnToken = token;
   }
 
@@ -954,7 +954,7 @@ export class MainStore {
         uiStore.setShowSignIn(false);
 
         this.setLnAuth({encode: "", k1: ""});
-        this.setToken(data.jwt);
+        this.setLnToken(data.jwt);
         uiStore.setMeInfo({...data.user, jwt: data.jwt})
       }
       return data;
