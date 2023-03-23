@@ -135,13 +135,13 @@ export default function MobileView(props: any) {
               const hasExtras = extras && extras[name] && extras[name].length > 0;
               const count: any = hasExtras
                 ? extras[name].filter((f) => {
-                  if ('show' in f) {
-                    // show has a value
-                    if (!f.show) return false;
-                  }
-                  // if no value default to true
-                  return true;
-                }).length
+                    if ('show' in f) {
+                      // show has a value
+                      if (!f.show) return false;
+                    }
+                    // if no value default to true
+                    return true;
+                  }).length
                 : null;
 
               return (
