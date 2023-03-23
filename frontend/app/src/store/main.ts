@@ -152,7 +152,7 @@ export class MainStore {
       headers: {
         'x-jwt': info.jwt,
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json'
       }
     });
 
@@ -682,7 +682,7 @@ export class MainStore {
       const res: any = await this.fetchFromRelay('refresh_jwt');
       const j = await res.json();
 
-      if(this.lnToken) {
+      if (this.lnToken) {
         this.lnToken = j.jwt;
         return j;
       }
@@ -718,8 +718,8 @@ export class MainStore {
   async deleteProfile() {
     try {
       const info = uiStore.meInfo;
-      let request = "profile";
-      if(this.lnToken) request = `person/${info?.id}`;
+      let request = 'profile';
+      if (this.lnToken) request = `person/${info?.id}`;
 
       const [r, error] = await this.doCallToRelay('DELETE', request, info);
       if (error) throw error;
@@ -743,8 +743,8 @@ export class MainStore {
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      let request = "profile";
-      if(this.lnToken) request = "person";
+      let request = 'profile';
+      if (this.lnToken) request = 'person';
 
       const [r, error] = await this.doCallToRelay('POST', request, body);
       if (error) throw error;
@@ -783,13 +783,13 @@ export class MainStore {
       return [null, error];
     }
 
-    if(this.lnToken) {
+    if (this.lnToken) {
       const response = await fetch(`${URL}/${path}`, {
         method: method,
         body: JSON.stringify({
           ...body
         }),
-        mode: "cors",
+        mode: 'cors',
         headers: {
           'x-jwt': info.jwt,
           'Content-Type': 'application/json'
@@ -798,28 +798,27 @@ export class MainStore {
 
       return [response, error];
     } else {
-
-    // fork between tor users non authentiacted and not
-    if (this.isTorSave() || info.url.startsWith('http://')) {
-      this.submitFormViaApp(method, path, body);
-      return [null, null];
-    }
-
-    const response = await fetch(`${URL}/${path}`, {
-      method: method,
-      body: JSON.stringify({
-        // use docker host (tribes.sphinx), because relay will post to it
-        host: getHostIncludingDockerHosts(),
-        ...body
-      }),
-      headers: {
-        'x-jwt': info.jwt,
-        'Content-Type': 'application/json'
+      // fork between tor users non authentiacted and not
+      if (this.isTorSave() || info.url.startsWith('http://')) {
+        this.submitFormViaApp(method, path, body);
+        return [null, null];
       }
-    });
 
-    return [response, error];
-  }
+      const response = await fetch(`${URL}/${path}`, {
+        method: method,
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return [response, error];
+    }
   }
 
   async submitFormViaApp(method: string, path: string, body: any) {
@@ -924,14 +923,15 @@ export class MainStore {
   }
 
   @observable
-  lnauth: LnAuthData = {encode: "", k1: ""};
+  lnauth: LnAuthData = { encode: '', k1: '' };
 
   @action setLnAuth(lnData: LnAuthData) {
     this.lnauth = lnData;
   }
 
-  @persist('object') @observable
-  lnToken: string = "";
+  @persist('object')
+  @observable
+  lnToken: string = '';
 
   @action setLnToken(token: string) {
     this.lnToken = token;
@@ -940,26 +940,26 @@ export class MainStore {
   @action async getLnAuth(): Promise<any> {
     try {
       let data = await api.get('lnauth');
-      this.setLnAuth(data)
+      this.setLnAuth(data);
       return data;
     } catch (e) {
       return '';
     }
   }
 
-  @action async getLnAuthPoll(): Promise<{k1: string, status: boolean}> {
+  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
     try {
       let data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
-      if(data.status) {
+      if (data.status) {
         uiStore.setShowSignIn(false);
 
-        this.setLnAuth({encode: "", k1: ""});
+        this.setLnAuth({ encode: '', k1: '' });
         this.setLnToken(data.jwt);
-        uiStore.setMeInfo({...data.user, jwt: data.jwt})
+        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
       }
       return data;
     } catch (e) {
-      return {k1: "", status: false};
+      return { k1: '', status: false };
     }
   }
 }
@@ -1089,5 +1089,5 @@ export interface ClaimOnLiquid {
 
 export interface LnAuthData {
   encode: string;
-  k1: string
+  k1: string;
 }
