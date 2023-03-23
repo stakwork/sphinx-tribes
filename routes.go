@@ -689,10 +689,10 @@ func initChi() *chi.Mux {
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
-		//Debug:            true,
+		// Debug:            true,
 	})
 	r.Use(cors.Handler)
 	r.Use(middleware.Timeout(60 * time.Second))
@@ -999,7 +999,7 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = host
+	user["url"] = "http://localhost:5005"
 
 	return user
 }

@@ -144,14 +144,15 @@ export class MainStore {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
-    console.log("User info ===", info.jwt)
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
     const r: any = await fetch(`${URL}/${path}`, {
       method: 'GET',
+      mode: 'cors',
       headers: {
         'x-jwt': info.jwt,
         'Content-Type': 'application/json',
-        'accept': 'application/json',
+        'Accept': 'application/json',
       }
     });
 
@@ -681,6 +682,10 @@ export class MainStore {
       const res: any = await this.fetchFromRelay('refresh_jwt');
       const j = await res.json();
 
+      if(this.lnToken) {
+        this.lnToken = j.jwt;
+        return j;
+      }
       return j.response;
     } catch (e) {
       console.log('Error refreshJwt: ', e);
@@ -734,8 +739,11 @@ export class MainStore {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
+    let request = "profile";
+    if(this.lnToken) request = "person";
+
     try {
-      const [r, error] = await this.doCallToRelay('POST', 'profile', body);
+      const [r, error] = await this.doCallToRelay('POST', request, body);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
@@ -766,18 +774,33 @@ export class MainStore {
     let error: any = null;
 
     const info = uiStore.meInfo as any;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     if (!info) {
       error = new Error('Youre not logged in');
       return [null, error];
     }
+
+    if(this.lnToken) {
+      const response = await fetch(`${URL}/${path}`, {
+        method: method,
+        body: JSON.stringify({
+          ...body
+        }),
+        mode: "cors",
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return [response, error];
+    } else {
 
     // fork between tor users non authentiacted and not
     if (this.isTorSave() || info.url.startsWith('http://')) {
       this.submitFormViaApp(method, path, body);
       return [null, null];
     }
-
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
 
     const response = await fetch(`${URL}/${path}`, {
       method: method,
@@ -793,6 +816,7 @@ export class MainStore {
     });
 
     return [response, error];
+  }
   }
 
   async submitFormViaApp(method: string, path: string, body: any) {
