@@ -924,10 +924,10 @@ export class MainStore {
   }
 
   @observable
-  lnurl: LnurlData = {encode: "", k1: ""};
+  lnauth: LnAuthData = {encode: "", k1: ""};
 
-  @action setLnurl(lnData: LnurlData) {
-    this.lnurl = lnData;
+  @action setLnAuth(lnData: LnAuthData) {
+    this.lnauth = lnData;
   }
 
   @persist('object') @observable
@@ -937,23 +937,23 @@ export class MainStore {
     this.lnToken = token;
   }
 
-  @action async getLnurl(): Promise<any> {
+  @action async getLnAuth(): Promise<any> {
     try {
-      let data = await api.get('lnurl');
-      this.setLnurl(data)
+      let data = await api.get('lnauth');
+      this.setLnAuth(data)
       return data;
     } catch (e) {
       return '';
     }
   }
 
-  @action async getLnurlPoll(): Promise<{k1: string, status: boolean}> {
+  @action async getLnAuthPoll(): Promise<{k1: string, status: boolean}> {
     try {
-      let data = await api.get(`lnurl_poll?k1=${this.lnurl.k1}`);
+      let data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
       if(data.status) {
         uiStore.setShowSignIn(false);
 
-        this.setLnurl({encode: "", k1: ""});
+        this.setLnAuth({encode: "", k1: ""});
         this.setToken(data.jwt);
         uiStore.setMeInfo({...data.user, jwt: data.jwt})
       }
@@ -1087,7 +1087,7 @@ export interface ClaimOnLiquid {
   memo: string;
 }
 
-export interface LnurlData {
+export interface LnAuthData {
   encode: string;
   k1: string
 }

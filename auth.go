@@ -38,8 +38,6 @@ func PubKeyContext(next http.Handler) http.Handler {
 			token = r.Header.Get("x-jwt")
 		}
 
-		fmt.Println("Token ===", token)
-
 		if token == "" {
 			fmt.Println("[auth] no token")
 			http.Error(w, http.StatusText(401), 401)

@@ -14,7 +14,7 @@ type LnEncodeData struct {
 
 func encodeLNURL() (LnEncodeData, error) {
 	k1 := generate32Bytes()
-	url := host + "/" + "lnurl_login?tag=login&k1=" + k1 + "&action=login"
+	url := host + "/" + "lnauth_login?tag=login&k1=" + k1 + "&action=login"
 
 	encode, err := lnurl.Encode(url)
 

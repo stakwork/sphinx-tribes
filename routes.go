@@ -120,9 +120,9 @@ func NewRouter() *http.Server {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Get("/lnurl_login", receiveLnAuthData)
-		r.Get("/lnurl", getLnurlAuth)
-		r.Get("/lnurl_poll", pollLnurlAuth)
+		r.Get("/lnauth_login", receiveLnAuthData)
+		r.Get("/lnauth", getLnurlAuth)
+		r.Get("/lnauth_poll", pollLnurlAuth)
 		r.Get("/refresh_jwt", refreshToken)
 	})
 

@@ -29,14 +29,14 @@ function SignIn(props: any) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    main.getLnurl();
+    main.getLnAuth();
   }, [])
 
 
 
   async function pollLnurl() {
-    if (main.lnurl.k1) {
-      let data = await main.getLnurlPoll();
+    if (main.lnauth.k1) {
+      let data = await main.getLnAuthPoll();
       setPollCount(pollCount + 1);
 
       let pollTimeout = setTimeout(() => {
@@ -114,7 +114,7 @@ function SignIn(props: any) {
               </Description>
 
               {
-                page === 'lnurl' ? (<QR value={main.lnurl.encode} size={200} />) :
+                page === 'lnurl' ? (<QR value={main.lnauth.encode} size={200} />) :
                   !isMobile && (
                     <AuthQR
                       onSuccess={() => {
