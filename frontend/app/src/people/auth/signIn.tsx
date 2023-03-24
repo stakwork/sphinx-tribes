@@ -163,7 +163,7 @@ function SignIn(props: any) {
                   />
                 ) : (
                   <IconButton
-                    text={'Scan QR with LNURL'}
+                    text={'Login with LNAUTH'}
                     height={48}
                     endingIcon={'login'}
                     width={210}
