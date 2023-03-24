@@ -12,12 +12,13 @@ import { observer } from 'mobx-react-lite';
 export default observer(SignIn);
 
 function SignIn(props: any) {
-  const { main } = useStores();
+  const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
   const [lnurlReady] = useState(true);
 
-  const [showSignIn, setShowSignIn] = useState(false);
+  //const [showSignIn, setShowSignIn] = useState(false);
+  let showSignIn = false;
 
   function redirect() {
     const el = document.createElement('a');
@@ -77,7 +78,7 @@ function SignIn(props: any) {
                 width={210}
                 style={{ marginTop: 20 }}
                 color={'primary'}
-                onClick={() => setShowSignIn(true)}
+                onClick={() => ui.setShowSignIn(true)}
                 hovercolor={'#5881F8'}
                 activecolor={'#5078F2'}
                 shadowcolor={'rgba(97, 138, 255, 0.5)'}
@@ -131,23 +132,25 @@ function SignIn(props: any) {
                 )
               )}
 
-              <IconButton
-                text={'Login with Sphinx'}
-                height={48}
-                endingIcon={'exit_to_app'}
-                width={210}
-                style={{ marginTop: 20 }}
-                color={'primary'}
-                onClick={() => setShowSignIn(true)}
-                hovercolor={'#5881F8'}
-                activecolor={'#5078F2'}
-                shadowcolor={'rgba(97, 138, 255, 0.5)'}
-              />
+              {page !== 'lnurl' && (
+                <IconButton
+                  text={'Login with Sphinx'}
+                  height={48}
+                  endingIcon={'exit_to_app'}
+                  width={210}
+                  style={{ marginTop: 20 }}
+                  color={'primary'}
+                  onClick={() => ui.setShowSignIn(true)}
+                  hovercolor={'#5881F8'}
+                  activecolor={'#5078F2'}
+                  shadowcolor={'rgba(97, 138, 255, 0.5)'}
+                />
+              )}
 
               {lnurlReady ? (
                 page === 'lnurl' ? (
                   <IconButton
-                    text={'Scan with Sphinx'}
+                    text={'Back'}
                     height={48}
                     endingIcon={'login'}
                     width={210}
@@ -160,7 +163,7 @@ function SignIn(props: any) {
                   />
                 ) : (
                   <IconButton
-                    text={'Login with LNURL'}
+                    text={'Scan QR with LNURL'}
                     height={48}
                     endingIcon={'login'}
                     width={210}
