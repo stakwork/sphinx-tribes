@@ -15,13 +15,6 @@ function SignIn(props: any) {
   const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
-<<<<<<< Updated upstream
-  const [lnurlReady] = useState(true);
-
-  //const [showSignIn, setShowSignIn] = useState(false);
-  let showSignIn = false;
-=======
->>>>>>> Stashed changes
 
   function redirect() {
     const el = document.createElement('a');
@@ -96,17 +89,6 @@ function SignIn(props: any) {
               />
             )}
 
-<<<<<<< Updated upstream
-              {page !== 'lnurl' && (
-                <IconButton
-                  text={'Login with Sphinx'}
-                  height={48}
-                  endingIcon={'exit_to_app'}
-                  width={210}
-                  style={{ marginTop: 20 }}
-                  color={'primary'}
-                  onClick={() => ui.setShowSignIn(true)}
-=======
             {page === 'lnurl' ? (
               <IconButton
                 text={'Back'}
@@ -133,72 +115,10 @@ function SignIn(props: any) {
                     setPage('lnurl');
                     pollLnurl();
                   }}
->>>>>>> Stashed changes
                   hovercolor={'#5881F8'}
                   activecolor={'#5078F2'}
                   shadowcolor={'rgba(97, 138, 255, 0.5)'}
                 />
-<<<<<<< Updated upstream
-              )}
-
-              {lnurlReady ? (
-                page === 'lnurl' ? (
-                  <IconButton
-                    text={'Back'}
-                    height={48}
-                    endingIcon={'login'}
-                    width={210}
-                    style={{ marginTop: 20 }}
-                    color={'primary'}
-                    onClick={() => setPage('sphinx')}
-                    hovercolor={'#5881F8'}
-                    activecolor={'#5078F2'}
-                    shadowcolor={'rgba(97, 138, 255, 0.5)'}
-                  />
-                ) : (
-                  <IconButton
-                    text={'Login with LNAUTH'}
-                    height={48}
-                    endingIcon={'login'}
-                    width={210}
-                    style={{ marginTop: 20 }}
-                    color={'primary'}
-                    onClick={() => {
-                      setPage('lnurl');
-                      pollLnurl();
-                    }}
-                    hovercolor={'#5881F8'}
-                    activecolor={'#5078F2'}
-                    shadowcolor={'rgba(97, 138, 255, 0.5)'}
-                  />
-                )
-              ) : (
-                <></>
-              )}
-            </Column>
-            <Divider />
-            <Column style={{ paddingTop: 0 }}>
-              <Description>I don't have Sphinx!</Description>
-              <IconButton
-                text={'Get Sphinx'}
-                endingIcon={'launch'}
-                width={210}
-                height={48}
-                buttonType={'text'}
-                style={{ color: '#83878b', marginTop: '10px', border: '1px solid #83878b' }}
-                onClick={() => redirect()}
-                hovercolor={'#fff'}
-                activecolor={'#fff'}
-                textStyle={{
-                  color: '#000',
-                  fontSize: '16px',
-                  fontWeight: '600'
-                }}
-              />
-            </Column>
-          </>
-        )}
-=======
               )
             )}
           </Column>
@@ -223,7 +143,6 @@ function SignIn(props: any) {
             />
           </Column>
         </>
->>>>>>> Stashed changes
       </div>
     );
   });
