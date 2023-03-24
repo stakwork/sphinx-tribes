@@ -14,7 +14,6 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
   const [connection_string, setConnectionString] = useState('');
 
   async function getConnectionCode() {
-    console.log(connection_string);
     if (!connection_string) {
       const code = await api.get('connectioncodes');
       if (code.connection_string) {
