@@ -1,40 +1,22 @@
 /* eslint-disable func-style */
+import { EuiFieldText, EuiText } from '@elastic/eui';
+import { observer } from "mobx-react-lite";
 import React from "react";
-import {
-    AssigneeProfile,
-    Creator,
-    Img,
-    PaidStatusPopover,
-    CreatorDescription,
-    Profile,
-    BountyPriceContainer,
-    BottomButtonContainer,
-    UnassignedPersonProfile,
-    DividerContainer,
-    NormalUser,
-    LanguageContainer,
-    AwardsContainer,
-    DescriptionBox,
-    AdjustAmountContainer,
-    TitleBox,
-    CodingLabels,
-    AutoCompleteContainer,
-    AwardBottomContainer,
-
-} from "./style";
-import { EuiText, EuiFieldText } from '@elastic/eui';
-import { Divider, Modal } from '../../../../components/common';
-import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
-import { satToUsd } from '../../../../helpers';
-import { useStores } from '../../../../store';
-import IconButton from '../../../../components/common/icon_button';
-import ImageButton from '../../../../components/common/Image_button';
-import BountyProfileView from '../../../../bounties/bounty_profile_view';
 import ButtonSet from '../../../../bounties/bountyModal_button_set';
 import BountyPrice from '../../../../bounties/bounty_price';
+import BountyProfileView from '../../../../bounties/bounty_profile_view';
+import { Divider, Modal } from '../../../../components/common';
+import IconButton from '../../../../components/common/icon_button';
+import ImageButton from '../../../../components/common/Image_button';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
-import { observer } from "mobx-react-lite";
+import { colors } from '../../../../config/colors';
+import { satToUsd } from '../../../../helpers';
+import { useStores } from '../../../../store';
+import { renderMarkdown } from '../../../utils/renderMarkdown';
+import {
+    AdjustAmountContainer, AssigneeProfile, AutoCompleteContainer,
+    AwardBottomContainer, AwardsContainer, BottomButtonContainer, BountyPriceContainer, CodingLabels, Creator, CreatorDescription, DescriptionBox, DividerContainer, Img, LanguageContainer, NormalUser, PaidStatusPopover, Profile, TitleBox, UnassignedPersonProfile
+} from "./style";
 
 export default observer(MobileView);
  function MobileView(props: any) {
@@ -880,7 +862,7 @@ export default observer(MobileView);
                                     </div>
                                     <div className="UnassignedPersonalDetailContainer">
                                         <IconButton
-                                            text={'I can help'}
+                                            text={'Assign user'}
                                             endingIcon={'arrow_forward'}
                                             width={153}
                                             height={48}
