@@ -11,12 +11,14 @@ import { observer } from 'mobx-react-lite';
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
   const { ui, main } = useStores();
   const [step, setStep] = useState(1);
+  const [connection_string, setConnectionString] = useState("")
 
   async function getConnectionCode() {
-    if (!ui.connection_string) {
+					console.log(connection_string)
+    if (!connection_string) {
       const code = await api.get('connectioncodes');
       if (code.connection_string) {
-        ui.setConnectionString(code.connection_string);
+        setConnectionString(code.connection_string);
         main.getPeople({ resetPage: true });
       }
     }
@@ -37,31 +39,13 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           />
         </ModalContainer>
         <ButtonContainer>
-          <IconButton
-            text={'Get Sphinx'}
-            endingIcon={'arrow_forward'}
-            width={210}
-            height={48}
-            style={{ marginTop: 20 }}
-            hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-            activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-            shadowcolor={
-              buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open('https://sphinx.chat/', '_blank');
-            }}
-            color={buttonColor}
-          />
 
-          <DirectionWrap>
+          <DirectionWrap style={{ justifyContent: "space-around"}}>
             <IconButton
               text={'I have Sphinx'}
-              width={210}
+              width={150}
               height={48}
-              buttonType={'text'}
-              style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+              style={{  marginTop: '20px' }}
               onClick={(e) => {
                 e.stopPropagation();
                 closeModal();
@@ -70,7 +54,6 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               textStyle={{
                 fontSize: '15px',
                 fontWeight: '500',
-                color: '#5F6368'
               }}
               iconStyle={{
                 top: '14px'
@@ -79,11 +62,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             />
 
             <IconButton
-              text={'Scan code'}
-              width={210}
+              text={'Get Sphinx'}
+              width={150}
               height={48}
-              buttonType={'text'}
-              style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+              style={{  marginTop: '20px', textDecoration: 'none' }}
               onClick={(e) => {
                 e.stopPropagation();
                 setStep(step + 1);
@@ -91,7 +73,6 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               textStyle={{
                 fontSize: '15px',
                 fontWeight: '500',
-                color: '#5F6368'
               }}
               iconStyle={{
                 top: '14px'
@@ -108,16 +89,51 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
     return (
       <>
         <ModalContainer>
-          <QrContainer>
+						{!!connection_string ? <QrContainer>
             <QR size={200} value={ui.connection_string} />
-            <QRText>Install the Sphinx app on your phone and then scan this QR code</QRText>
-          </QrContainer>
+            <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
+          </QrContainer> : <div style={{display: "flex", flexDirection: "column",  }}><p style={{textAlign: 'center'}} >Download App</p>
+										<AndroidIosButtonConatiner>
+								<IconButton
+              text={'Android'}
+              width={100}
+              height={48}
+              style={{  marginTop: '20px', textDecoration: 'none' }}
+										onClick={()=> window.open("https://play.google.com/store/apps/details?id=chat.sphinx", "_blank")}
+              textStyle={{
+                fontSize: '15px',
+                fontWeight: '500',
+              }}
+              iconStyle={{
+                top: '14px'
+              }}
+              color={buttonColor}
+            />
+								<IconButton
+              text={'IOS'}
+              width={100}
+              height={48}
+              style={{  marginTop: '20px', textDecoration: 'none' }}
+										onClick={()=> window.open("https://testflight.apple.com/join/QoaCkJn6", "_blank")}
+              textStyle={{
+                fontSize: '15px',
+                fontWeight: '500',
+              }}
+              iconStyle={{
+                top: '14px'
+              }}
+              color={buttonColor}
+            />
+										</AndroidIosButtonConatiner>
+
+									
+								</div>}
         </ModalContainer>
         <ButtonContainer>
           <IconButton
-            text={'Connection Code'}
+            text={'Reveal Connection Code'}
             endingIcon={'key'}
-            width={210}
+            width={250}
             height={48}
             style={{ marginTop: 20 }}
             hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
@@ -125,12 +141,12 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             shadowcolor={
               buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
             }
-            onClick={getConnectionCode}
+            onClick={() => getConnectionCode()}
             color={buttonColor}
           />
           <DirectionWrap>
             <IconButton
-              text={'Get app'}
+              text={'Back'}
               width={210}
               height={48}
               buttonType={'text'}
@@ -198,7 +214,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
         />
 
         <IconButton
-          text={'Scan code'}
+          text={'Back'}
           width={210}
           height={48}
           buttonType={'text'}
@@ -286,4 +302,12 @@ const DirectionWrap = styled.div`
   padding: 0px;
   display: flex;
   width: 100%;
+`;
+
+const AndroidIosButtonConatiner= styled.div`
+  padding: 0px;
+  display: flex;
+  width: 100%;
+	margin-right: 20px;
+	justify-content: space-between;
 `;
