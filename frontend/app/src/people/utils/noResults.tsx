@@ -5,7 +5,7 @@ import PageLoadSpinner from './pageLoadSpinner';
 import { observer } from 'mobx-react-lite';
 
 export default observer(NoResults);
-function NoResults(props) {
+function NoResults() {
   const { ui } = useStores();
   const { searchText } = ui || {};
 
