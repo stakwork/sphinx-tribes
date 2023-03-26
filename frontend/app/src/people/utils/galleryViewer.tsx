@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { IconButton } from '../../components/common';
 
 export default function GalleryViewer(props) {
-  const { gallery, wrap, selectable, big, showAll, style, cover } = props;
+  const { gallery, wrap, big, showAll, style, cover } = props;
   const [selectedImage, setSelectedImage] = useState(0);
   const g = gallery;
 

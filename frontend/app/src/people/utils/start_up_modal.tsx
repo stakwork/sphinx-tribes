@@ -87,7 +87,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
     return (
       <>
         <ModalContainer>
-          {!!connection_string ? (
+          {connection_string ? (
             <QrContainer>
               <QR size={200} value={ui.connection_string} />
               <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>

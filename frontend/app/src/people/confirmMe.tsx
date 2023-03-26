@@ -94,16 +94,6 @@ const InnerWrap = styled.div`
   flex-direction: column;
   width: 100%;
 `;
-const LinkWrap = styled.div`
-  width: 100%;
-  text-align: center;
-  margin: 20px 0;
-  & a {
-    width: 115px;
-    position: relative;
-    margin-left: 25px;
-  }
-`;
 const P = styled.p`
   margin-top: 10px;
 `;
