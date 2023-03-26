@@ -939,7 +939,7 @@ export class MainStore {
 
   @action async getLnAuth(): Promise<any> {
     try {
-      let data = await api.get('lnauth');
+      const data = await api.get('lnauth');
       this.setLnAuth(data);
       return data;
     } catch (e) {
@@ -949,7 +949,7 @@ export class MainStore {
 
   @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
     try {
-      let data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
+      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
       if (data.status) {
         uiStore.setShowSignIn(false);
 
