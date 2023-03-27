@@ -963,8 +963,6 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 func refreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
-	fmt.Println("X-JWT ===", token)
-
 	responseData := make(map[string]interface{})
 	claims, err := DecodeToken(token)
 

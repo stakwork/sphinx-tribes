@@ -102,6 +102,7 @@ function Form(props: any) {
     const type = initialValues?.type;
     if (dSchema && type) {
       const editSchema = dynamicSchemasByType[type];
+      console.log("Edit Schema ==", editSchema)
       setDynamicSchema(editSchema);
       setDynamicSchemaName(type);
     } else if (dSchema) {
@@ -263,8 +264,8 @@ function Form(props: any) {
                           style={
                             item.name === 'github_description' && !values.ticketUrl
                               ? {
-                                  display: 'none'
-                                }
+                                display: 'none'
+                              }
                               : undefined
                           }
                         />
@@ -305,8 +306,8 @@ function Form(props: any) {
                             style={
                               item.name === 'github_description' && !values.ticketUrl
                                 ? {
-                                    display: 'none'
-                                  }
+                                  display: 'none'
+                                }
                                 : undefined
                             }
                           />
@@ -462,8 +463,8 @@ function Form(props: any) {
                                 style={
                                   item.name === 'github_description' && !values.ticketUrl
                                     ? {
-                                        display: 'none'
-                                      }
+                                      display: 'none'
+                                    }
                                     : undefined
                                 }
                               />
@@ -513,8 +514,8 @@ function Form(props: any) {
                                 style={
                                   item.type === 'loom' && values.ticketUrl
                                     ? {
-                                        marginTop: '55px'
-                                      }
+                                      marginTop: '55px'
+                                    }
                                     : undefined
                                 }
                               />
@@ -631,8 +632,8 @@ function Form(props: any) {
                       style={
                         item.name === 'github_description' && !values.ticketUrl
                           ? {
-                              display: 'none'
-                            }
+                            display: 'none'
+                          }
                           : undefined
                       }
                     />

@@ -31,12 +31,6 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ?
-	// if person.ID == 0 {
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	return
-	// }
-
 	now := time.Now()
 
 	if pubKeyFromAuth == "" {
@@ -80,6 +74,9 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	if person.NewTicketTime != 0 {
 		go processAlerts(person)
 	}
+
+	fmt.Println("Person ====", person)
+
 	p, err := DB.createOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

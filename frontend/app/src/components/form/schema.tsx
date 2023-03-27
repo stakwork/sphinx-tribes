@@ -90,6 +90,7 @@ export const meSchema: FormField[] = [
       twitter: Yup.object({
         handle: strValidator
       }).default(undefined),
+      email: Yup.string().email(),
       supportme: Yup.object({
         url: strValidator
       }).default(undefined),
