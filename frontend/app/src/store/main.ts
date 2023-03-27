@@ -924,6 +924,15 @@ export class MainStore {
     }
   }
 
+  async getBountyHeaderData() {
+    try {
+      const data = await api.get('people/wanteds/header');
+      return data;
+    } catch (e) {
+      return '';
+    }
+  }
+
   @observable
   lnauth: LnAuthData = { encode: '', k1: '' };
 
