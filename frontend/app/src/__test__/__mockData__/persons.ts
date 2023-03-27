@@ -13,7 +13,7 @@ export const person: Person = {
   verification_signature: 'test_verification_signature',
   extras: {
     email: [{ value: 'testEmail@sphinx.com' }],
-    liquid: [{value: 'none'}],
+    liquid: [{ value: 'none' }],
     wanted: []
   },
   owner_alias: 'Vladimir',

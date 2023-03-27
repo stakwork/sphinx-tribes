@@ -6,8 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
 
-export default observer(AboutView);
-function AboutView(props: any) {
+export const AboutView = observer((props: any) => {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
   const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
@@ -169,7 +168,8 @@ function AboutView(props: any) {
       )}
     </Wrap>
   );
-}
+});
+
 const Badge = styled.div`
 display:flex;
 justify-content:center;
