@@ -482,7 +482,8 @@ export const aboutSchema: FormField[] = [
     widget: true,
     type: 'text',
     prepend: '',
-    page: 1
+    page: 1,
+    validator: Yup.string().email(),
   },
 ];
 
