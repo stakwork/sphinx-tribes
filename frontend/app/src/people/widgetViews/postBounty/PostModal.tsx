@@ -17,43 +17,84 @@ export interface PostModalProps {
   onSucces?: () => void;
   onGoBack?: () => void;
 }
-export const PostModal: FC<PostModalProps> = observer(({ isOpen, onClose, widget, onGoBack, onSucces }) => {
-  const { main, ui } = useStores();
-  const isMobile = useIsMobile();
-  const [focusIndex, setFocusIndex] = useState(-1);
-  const history = useHistory();
+export const PostModal: FC<PostModalProps> = observer(
+  ({ isOpen, onClose, widget, onGoBack, onSucces }) => {
+    const { main, ui } = useStores();
+    const isMobile = useIsMobile();
+    const [focusIndex, setFocusIndex] = useState(-1);
+    const history = useHistory();
 
-  const person: any =
-    (main.people ?? []).find((f) => f.id === ui.selectedPerson);
-  const { id } = person || {};
-  const canEdit = id === ui.meInfo?.id;
-  const config = widgetConfigs[widget];
+    const person: any = (main.people ?? []).find((f) => f.id === ui.selectedPerson);
+    const { id } = person || {};
+    const canEdit = id === ui.meInfo?.id;
+    const config = widgetConfigs[widget];
 
-  const ReCallBounties = async () => {
-    /*
+    const ReCallBounties = async () => {
+      /*
       TODO : after getting the better way to reload the bounty, this code will be removed.
       */
-    history.push('/tickets');
-    await window.location.reload();
-  };
+      history.push('/tickets');
+      await window.location.reload();
+    };
 
-  const closeHandler = () => {
-    onClose();
-    onGoBack && onGoBack();
-    setFocusIndex(-1);
-  }
-  const successHandler = () => {
-    onClose();
-    setFocusIndex(-1);
-    onSucces && onSucces();
-  }
+    const closeHandler = () => {
+      onClose();
+      onGoBack && onGoBack();
+      setFocusIndex(-1);
+    };
+    const successHandler = () => {
+      onClose();
+      setFocusIndex(-1);
+      onSucces && onSucces();
+    };
 
-  if (isMobile) {
+    if (isMobile) {
+      return (
+        <>
+          {isOpen && (
+            <Modal visible={isOpen} fill={true}>
+              <FocusedView
+                person={person}
+                canEdit={!canEdit}
+                selectedIndex={focusIndex}
+                config={config}
+                onSuccess={successHandler}
+                goBack={closeHandler}
+              />
+            </Modal>
+          )}
+        </>
+      );
+    }
     return (
       <>
+        {' '}
         {isOpen && (
-          <Modal visible={isOpen} fill={true}>
+          <Modal
+            visible={isOpen}
+            style={{
+              height: '100%'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeHandler}
+            bigCloseImage={closeHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
             <FocusedView
+              ReCallBounties={ReCallBounties}
+              newDesign={true}
               person={person}
               canEdit={!canEdit}
               selectedIndex={focusIndex}
@@ -63,45 +104,7 @@ export const PostModal: FC<PostModalProps> = observer(({ isOpen, onClose, widget
             />
           </Modal>
         )}
-      </>)
+      </>
+    );
   }
-  return (
-    <> {isOpen && (
-      <Modal
-        visible={isOpen}
-        style={{
-          height: '100%'
-        }}
-        envStyle={{
-          marginTop: isMobile ? 64 : 0,
-          background: color.pureWhite,
-          zIndex: 20,
-          ...(config?.modalStyle ?? {}),
-          maxHeight: '100%',
-          borderRadius: '10px'
-        }}
-        overlayClick={closeHandler}
-        bigCloseImage={closeHandler}
-        bigCloseImageStyle={{
-          top: '-18px',
-          right: '-18px',
-          background: '#000',
-          borderRadius: '50%'
-        }}
-      >
-        <FocusedView
-          ReCallBounties={ReCallBounties}
-          newDesign={true}
-          person={person}
-          canEdit={!canEdit}
-          selectedIndex={focusIndex}
-          config={config}
-          onSuccess={successHandler}
-          goBack={closeHandler}
-        />
-      </Modal>)}
-    </>
-
-  )
-}
-)
+);

@@ -11,7 +11,7 @@ export default function SearchTextInput({
   handleChange,
   handleBlur,
   handleFocus,
-  readOnly,
+  readOnly
 }: any) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (${error})`;

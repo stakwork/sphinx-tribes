@@ -112,13 +112,13 @@ interface fieldEnvProps {
   isTextField?: any;
 }
 
-export const FieldEnv = styled(EuiFormRow as any) <fieldEnvProps>`
+export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   border: ${(p) =>
     p.border === 'bottom'
       ? ''
       : p?.isTop
-        ? `1px solid ${p?.color && p.color.pureWhite}`
-        : `1px solid ${p?.color && p.color.grayish.G600}`};
+      ? `1px solid ${p?.color && p.color.pureWhite}`
+      : `1px solid ${p?.color && p.color.grayish.G600}`};
   border-bottom: ${(p) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
   box-sizing: border-box;
   border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
@@ -149,7 +149,7 @@ export const FieldEnv = styled(EuiFormRow as any) <fieldEnvProps>`
     }
   }
 `;
-export const FieldText = styled(EuiFieldText) <styledProps>`
+export const FieldText = styled(EuiFieldText)<styledProps>`
 background-color: ${(p) => p?.color && p.color.pureWhite} !important;
 max-width:900px;
 background:${(p) => p?.color && p.color.pureWhite} !important;
@@ -190,7 +190,7 @@ margin-top: ${(p) => (p?.isTextField ? '2px' : '')};
 
 
 `;
-export const FieldTextArea = styled(EuiTextArea) <styledProps>`
+export const FieldTextArea = styled(EuiTextArea)<styledProps>`
   // min-height: ${(p) => p?.height && p.height} !important;
   // max-height: ${(p) => p?.width && p.height} !important;
   width: ${(p) => p?.color && p.color.width};

@@ -14,7 +14,7 @@ interface Props extends Omit<PostModalProps, 'onClose' | 'isOpen'> {
     endingIcon?: string;
     leadingIcon?: string;
     color?: 'primary' | 'secondary';
-  }
+  };
 }
 
 const color = colors['light'];
@@ -24,73 +24,85 @@ const mapBtnColorProps = {
     color: 'success',
     hovercolor: color.button_primary.hover,
     activecolor: color.button_primary.active,
-    shadowcolor: color.button_primary.shadow,
+    shadowcolor: color.button_primary.shadow
   },
   secondary: {
     color: 'primary',
     hovercolor: color.button_secondary.hover,
     activecolor: color.button_secondary.active,
-    shadowcolor: color.button_secondary.shadow,
+    shadowcolor: color.button_secondary.shadow
   }
-}
+};
 
-export const PostBounty: FC<Props> = observer(({ title = 'Post a Bounty', buttonProps = {
-  color: 'primary'
-}, ...modalProps }) => {
+export const PostBounty: FC<Props> = observer(
+  ({
+    title = 'Post a Bounty',
+    buttonProps = {
+      color: 'primary'
+    },
+    ...modalProps
+  }) => {
+    const { ui } = useStores();
+    const [isOpenPostModal, setIsOpenPostModal] = useState(false);
+    const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
 
-  const { ui } = useStores();
-  const [isOpenPostModal, setIsOpenPostModal] = useState(false);
-  const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
+    const isMobile = useIsMobile();
+    const showSignIn = () => {
+      if (isMobile) {
+        ui.setShowSignIn(true);
+        return;
+      }
+      setIsOpenStartupModal(true);
+    };
 
-  const isMobile = useIsMobile();
-  const showSignIn = () => {
-    if (isMobile) {
-      ui.setShowSignIn(true);
-      return;
-    }
-    setIsOpenStartupModal(true)
+    const clickHandler = () => {
+      if (ui.meInfo && ui.meInfo?.owner_alias) {
+        setIsOpenPostModal(true);
+      } else {
+        showSignIn();
+      }
+    };
+
+    const icon = (() => {
+      if (buttonProps.endingIcon && buttonProps.leadingIcon) {
+        return { leadingIcon: buttonProps.leadingIcon };
+      }
+      if (buttonProps.leadingIcon) {
+        return { leadingIcon: buttonProps.leadingIcon };
+      }
+      if (buttonProps.endingIcon) {
+        return { endingIcon: buttonProps.endingIcon };
+      }
+      return { endingIcon: 'add' };
+    })();
+
+    return (
+      <>
+        <StyledIconButton
+          {...icon}
+          {...mapBtnColorProps[buttonProps.color || 'primary']}
+          text={title}
+          width={204}
+          height={isMobile ? 36 : 48}
+          iconStyle={iconStyle}
+          onClick={clickHandler}
+        />
+        <PostModal
+          isOpen={isOpenPostModal}
+          onClose={() => setIsOpenPostModal(false)}
+          {...modalProps}
+        />
+        {isOpenStartUpModel && (
+          <StartUpModal
+            closeModal={() => setIsOpenStartupModal(false)}
+            dataObject={'createWork'}
+            buttonColor={'success'}
+          />
+        )}
+      </>
+    );
   }
-
-  const clickHandler = () => {
-    if (ui.meInfo && ui.meInfo?.owner_alias) {
-      setIsOpenPostModal(true);
-    } else {
-      showSignIn()
-    }
-  }
-
-  const icon = (() => {
-    if (buttonProps.endingIcon && buttonProps.leadingIcon) {
-      return { leadingIcon: buttonProps.leadingIcon };
-    }
-    if (buttonProps.leadingIcon) {
-      return { leadingIcon: buttonProps.leadingIcon };
-    }
-    if (buttonProps.endingIcon) {
-      return { endingIcon: buttonProps.endingIcon };
-    }
-    return { endingIcon: 'add' };
-  })()
-
-
-  return (
-    <>
-      <StyledIconButton
-        {...icon}
-        {...mapBtnColorProps[buttonProps.color || 'primary']}
-        text={title}
-        width={204}
-        height={isMobile ? 36 : 48}
-        iconStyle={iconStyle}
-        onClick={clickHandler}
-      />
-      <PostModal isOpen={isOpenPostModal} onClose={() => setIsOpenPostModal(false)} {...modalProps} />
-      {isOpenStartUpModel && (
-        <StartUpModal closeModal={() => setIsOpenStartupModal(false)} dataObject={'createWork'} buttonColor={'success'} />
-      )}
-    </>
-  )
-})
+);
 
 const StyledIconButton = styled(IconButton)`
   color: ${color.pureWhite};
@@ -101,5 +113,5 @@ const StyledIconButton = styled(IconButton)`
 
 const iconStyle = {
   fontSize: '16px',
-  fontWeight: 400,
+  fontWeight: 400
 };

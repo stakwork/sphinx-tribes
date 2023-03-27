@@ -13,7 +13,7 @@ export default function SelectInput({
   options,
   value,
   handleChange,
-  extraHTML, 
+  extraHTML,
   testId
 }: Props) {
   let labeltext = label;
@@ -25,7 +25,7 @@ export default function SelectInput({
       <FieldEnv
         color={color}
         label={labeltext}
-        onClick={() => { }}
+        onClick={() => {}}
         className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
       >
         <R>

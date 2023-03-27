@@ -13,14 +13,14 @@ import styled from 'styled-components';
 const config = widgetConfigs.wanted;
 
 export const Wanted = observer(() => {
-  const {ui} = useStores();
-  const {person, canEdit} = usePerson(ui.selectedPerson);
-  const {path, url} = useRouteMatch()
+  const { ui } = useStores();
+  const { person, canEdit } = usePerson(ui.selectedPerson);
+  const { path, url } = useRouteMatch();
   const history = useHistory();
 
   const fullSelectedWidgets = person?.extras?.wanted;
 
-  if(!fullSelectedWidgets?.length) {
+  if (!fullSelectedWidgets?.length) {
     return (
       <NoneSpace
         style={{
@@ -37,18 +37,18 @@ export const Wanted = observer(() => {
               }}
               widget={'wanted'}
               onSucces={() => {
-                history.goBack()
-                window.location.reload()
+                history.goBack();
+                window.location.reload();
               }}
               onGoBack={() => {
-                history.goBack()
+                history.goBack();
               }}
             />
           )
         }
         {...(canEdit ? config.noneSpace.me : config.noneSpace.otherUser)}
       />
-    )
+    );
   }
   return (
     <Container>
@@ -67,31 +67,29 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {
-        fullSelectedWidgets.map((w, i) => (
-          <Panel  
-            key={w.created} 
-            isMobile={false}
-            onClick={() => history.push({
-                pathname: `${url}/${i}`
-              })
-            }
-          >
-            <WantedView {...w} person={person} />
-          </Panel>
-        ))
-      }
+      {fullSelectedWidgets.map((w, i) => (
+        <Panel
+          key={w.created}
+          isMobile={false}
+          onClick={() =>
+            history.push({
+              pathname: `${url}/${i}`
+            })
+          }
+        >
+          <WantedView {...w} person={person} />
+        </Panel>
+      ))}
     </Container>
-  )
-})
+  );
+});
 
-
-  const Container  = styled.div`
-    display: flex;
-    flex-flow: row wrap;
-    gap: 1rem;
-    flex: 1 1 100%;
-  `;
+const Container = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  flex: 1 1 100%;
+`;
 
 interface PanelProps {
   isMobile: boolean;

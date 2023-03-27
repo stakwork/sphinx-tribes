@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export interface Props {
   value: any;
@@ -19,6 +19,6 @@ export interface Props {
   isFocused?: any;
   disabled?: boolean;
   notProfilePic?: boolean;
-  style? :React.CSSProperties;
-  testId?:string;
+  style?: React.CSSProperties;
+  testId?: string;
 }
