@@ -12,6 +12,8 @@ export const person: Person = {
   description: 'description',
   verification_signature: 'test_verification_signature',
   extras: {
+    email: [{ value: 'testEmail@sphinx.com' }],
+    liquid: [{ value: 'none' }],
     wanted: []
   },
   owner_alias: 'Vladimir',

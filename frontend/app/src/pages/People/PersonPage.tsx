@@ -14,6 +14,7 @@ export const PersonPage = observer(() => {
   const isMobile = useIsMobile();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const [showSupport, setShowSupport] = useState(false);
+
   useEffect(() => {
     (async () => {
       const p = await main.getPersonByPubkey(personPubkey);
@@ -21,6 +22,7 @@ export const PersonPage = observer(() => {
       ui.setSelectingPerson(p?.id);
     })();
   }, [main, personPubkey, ui]);
+
   const personId = ui.selectedPerson;
   const { person, canEdit } = usePerson(personId);
 
