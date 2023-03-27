@@ -2,7 +2,7 @@ import { useIsMobile, usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import RenderWidgets from 'people/widgetViews/renderWidgets';
 import { widgetConfigs } from 'people/utils/constants';
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react';
 import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
@@ -10,85 +10,83 @@ import { Wanted } from './Wanted';
 
 const tabs = widgetConfigs;
 export const TabsPages = observer(() => {
-  
   const location = useLocation();
-  const {ui} = useStores()
-  const {  url, path } = useRouteMatch();
+  const { ui } = useStores();
+  const { url, path } = useRouteMatch();
   const history = useHistory();
   const isMobile = useIsMobile();
   const personId = ui.selectedPerson;
-  const {person, canEdit} = usePerson(personId);
+  const { person, canEdit } = usePerson(personId);
 
   const tabsNames = Object.keys(tabs).filter((name) => {
-    if(name ==='about' && !isMobile) {
+    if (name === 'about' && !isMobile) {
       return false;
     }
-    return true
+    return true;
   });
-  const changeTabHandler = useCallback((tabName) => {
-    history.replace({
-      pathname: `${url}/${tabName}`
-    })
-  }, [history, url]);
+  const changeTabHandler = useCallback(
+    (tabName) => {
+      history.replace({
+        pathname: `${url}/${tabName}`
+      });
+    },
+    [history, url]
+  );
 
   useEffect(() => {
-    const tabSelected =tabsNames.some((name) =>   location.pathname.includes(name))
+    const tabSelected = tabsNames.some((name) => location.pathname.includes(name));
     if (!tabSelected) {
       changeTabHandler(tabsNames[0]);
     }
-  }, [changeTabHandler, location.pathname, tabsNames])
-  
+  }, [changeTabHandler, location.pathname, tabsNames]);
 
-  const fullSelectedWidget = (name) =>  person?.extras?.[name];
+  const fullSelectedWidget = (name) => person?.extras?.[name];
 
-  
   return (
-      <Container isMobile={isMobile}>
-        <Tabs
-            style={{
-            background: '#fff',
-            padding: '0 20px',
-            borderBottom: 'solid 1px #ebedef',
-            boxShadow: canEdit
-              ? '0px 2px 0px rgba(0, 0, 0, 0.07)'
-              : '0px 2px 6px rgba(0, 0, 0, 0.07)'
-          }}
-        >
-          {tabs &&
-            tabsNames.map((name, i) => {
-              const t = tabs[name];
-              const { label } = t;
-              const selected = location.pathname.includes(name);
-              const hasExtras = !!person?.extras?.[name]?.length;
-              const count: any = hasExtras
-                ? person.extras[name].filter((f) => {
-                    if ('show' in f) {
-                      // show has a value
-                      if (!f.show) return false;
-                    }
-                    // if no value default to true
-                     return true;
-                  }).length
-                : null;
+    <Container isMobile={isMobile}>
+      <Tabs
+        style={{
+          background: '#fff',
+          padding: '0 20px',
+          borderBottom: 'solid 1px #ebedef',
+          boxShadow: canEdit ? '0px 2px 0px rgba(0, 0, 0, 0.07)' : '0px 2px 6px rgba(0, 0, 0, 0.07)'
+        }}
+      >
+        {tabs &&
+          tabsNames.map((name, i) => {
+            const t = tabs[name];
+            const { label } = t;
+            const selected = location.pathname.includes(name);
+            const hasExtras = !!person?.extras?.[name]?.length;
+            const count: any = hasExtras
+              ? person.extras[name].filter((f) => {
+                  if ('show' in f) {
+                    // show has a value
+                    if (!f.show) return false;
+                  }
+                  // if no value default to true
+                  return true;
+                }).length
+              : null;
 
-              return (
-                <Tab
-                  key={i}
-                  style={{ height: 64, alignItems: 'center' }}
-                  selected={selected}
-                  onClick={() => {
-                    changeTabHandler(name);
-                  }}
-                >
-                  {label}
-                  {count > 0 && <Counter>{count}</Counter>}
-                </Tab>
-              );
-            })}
-        </Tabs>
-        <Switch>
-        {tabsNames.map((name) =>  (
-          <Route key={name} path={`${path}${name}`}> 
+            return (
+              <Tab
+                key={i}
+                style={{ height: 64, alignItems: 'center' }}
+                selected={selected}
+                onClick={() => {
+                  changeTabHandler(name);
+                }}
+              >
+                {label}
+                {count > 0 && <Counter>{count}</Counter>}
+              </Tab>
+            );
+          })}
+      </Tabs>
+      <Switch>
+        {tabsNames.map((name) => (
+          <Route key={name} path={`${path}${name}`}>
             <div
               style={{
                 padding: 20,
@@ -111,15 +109,16 @@ export const TabsPages = observer(() => {
                 <RenderWidgets widget={name} />
               </div>
             </div>
-          </Route>))}
-        </Switch>
-      </Container>
-  )
-})
+          </Route>
+        ))}
+      </Switch>
+    </Container>
+  );
+});
 
-const Container = styled.div<{isMobile: boolean}>`
+const Container = styled.div<{ isMobile: boolean }>`
   flex-grow: 1;
-  margin: ${p => p.isMobile ? '0 -20px': '0'}
+  margin: ${(p) => (p.isMobile ? '0 -20px' : '0')};
 `;
 
 const Tabs = styled.div`
@@ -165,4 +164,3 @@ const Counter = styled.div`
 
   color: #b0b7bc;
 `;
-

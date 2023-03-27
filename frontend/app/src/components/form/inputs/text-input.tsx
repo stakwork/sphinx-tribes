@@ -55,9 +55,7 @@ export default function TextInput({
             style={padStyle}
             isTextField={true}
           />
-          {error && (
-            <E color={color} />
-          )}
+          {error && <E color={color} />}
         </R>
       </FieldEnv>
       {note && <Note color={color}>*{note}</Note>}

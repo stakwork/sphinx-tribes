@@ -12,10 +12,7 @@ import { observer } from 'mobx-react-lite';
 
 export default observer(GalleryInput);
 
-function GalleryInput({
-  value,
-  handleChange,
-}: Props) {
+function GalleryInput({ value, handleChange }: Props) {
   const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);

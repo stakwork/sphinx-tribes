@@ -1,13 +1,12 @@
-
 import { Modal } from 'components/common';
-import React from 'react'
+import React from 'react';
 import { useUserEdit } from './useEditUser';
 import FocusedView from '../focusView';
 import { formConfig } from './config';
 import { observer } from 'mobx-react-lite';
 
 export const EditUserDesktopView = observer(() => {
-  const {canEdit, closeHandler, person, modals} = useUserEdit();
+  const { canEdit, closeHandler, person, modals } = useUserEdit();
   return (
     <Modal
       visible={modals.userEditModal}
@@ -21,7 +20,7 @@ export const EditUserDesktopView = observer(() => {
         width: '60%',
         minWidth: 500,
         maxWidth: 602,
-        zIndex: 20, 
+        zIndex: 20
       }}
       overlayClick={closeHandler}
       bigClose={closeHandler}
@@ -35,5 +34,5 @@ export const EditUserDesktopView = observer(() => {
         goBack={closeHandler}
       />
     </Modal>
-  )
-})
+  );
+});
