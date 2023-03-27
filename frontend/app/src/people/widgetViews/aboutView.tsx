@@ -60,7 +60,6 @@ function AboutView(props: any) {
         <>
           <Divider />
           <Row>
-            {/* <T>For Normies</T> */}
             <I>
               <div style={{ width: 4 }} />
               <Icon source={`/static/twitter2.png`} />
@@ -80,7 +79,6 @@ function AboutView(props: any) {
         <>
           <Divider />
           <Row>
-            {/* <T>For Normies</T> */}
             <I>
               <div style={{ width: 4 }} />
               <Icon source={`/static/email.png`} />
