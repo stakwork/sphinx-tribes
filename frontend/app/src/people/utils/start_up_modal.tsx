@@ -66,7 +66,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               style={{ marginTop: '20px', textDecoration: 'none' }}
               onClick={(e) => {
                 e.stopPropagation();
-                setStep(step + 1);
+                setStep(step + 1)
               }}
               textStyle={{
                 fontSize: '15px',
@@ -80,62 +80,19 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           </DirectionWrap>
         </ButtonContainer>
       </>
-    );
-  };
+    )
+  }
 
   const StepTwo = () => {
     return (
       <>
         <ModalContainer>
-          {connection_string ? (
-            <QrContainer>
-              <QR size={200} value={ui.connection_string} />
-              <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
-            </QrContainer>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <p style={{ textAlign: 'center' }}>Download App</p>
-              <AndroidIosButtonConatiner>
-                <IconButton
-                  text={'Android'}
-                  width={100}
-                  height={48}
-                  style={{ marginTop: '20px', textDecoration: 'none' }}
-                  onClick={() =>
-                    window.open(
-                      'https://play.google.com/store/apps/details?id=chat.sphinx',
-                      '_blank'
-                    )
-                  }
-                  textStyle={{
-                    fontSize: '15px',
-                    fontWeight: '500'
-                  }}
-                  iconStyle={{
-                    top: '14px'
-                  }}
-                  color={buttonColor}
-                />
-                <IconButton
-                  text={'IOS'}
-                  width={100}
-                  height={48}
-                  style={{ marginTop: '20px', textDecoration: 'none' }}
-                  onClick={() =>
-                    window.open('https://testflight.apple.com/join/QoaCkJn6', '_blank')
-                  }
-                  textStyle={{
-                    fontSize: '15px',
-                    fontWeight: '500'
-                  }}
-                  iconStyle={{
-                    top: '14px'
-                  }}
-                  color={buttonColor}
-                />
-              </AndroidIosButtonConatiner>
-            </div>
-          )}
+          <QrContainer>
+            <QR size={200} value={ui.connection_string} />
+            <QRText>
+              Install the Sphinx app on your phone and then scan this QR code
+            </QRText>
+          </QrContainer>
         </ModalContainer>
         <ButtonContainer>
           <IconButton
@@ -161,7 +118,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
               style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
               onClick={(e) => {
                 e.stopPropagation();
-                setStep(step - 1);
+                setStep(step - 1)
               }}
               textStyle={{
                 fontSize: '15px',
@@ -195,9 +152,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             />
           </DirectionWrap>
         </ButtonContainer>
+
       </>
-    );
-  };
+    )
+  }
 
   const StepThree = () => {
     return (
@@ -229,7 +187,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
           onClick={(e) => {
             e.stopPropagation();
-            setStep(step - 1);
+            setStep(step - 1)
           }}
           textStyle={{
             fontSize: '15px',
@@ -242,8 +200,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
           color={buttonColor}
         />
       </ButtonContainer>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -265,14 +223,14 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
             width: '425px'
           }}
         >
-          {step === 1 ? <StepOne /> : step === 2 ? <StepTwo /> : <StepThree />}
+          {step === 1 ? (<StepOne />) : step === 2 ? (<StepTwo />) : (<StepThree />)}
         </EuiModal>
       </EuiOverlayMask>
     </>
   );
 };
 
-export default observer(StartUpModal);
+export default StartUpModal;
 
 const ModalContainer = styled.div`
   max-height: 274px;
