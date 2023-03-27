@@ -59,20 +59,16 @@ export interface Twitter {
   handle: string;
 }
 
-export interface Email {
-  value: string;
-}
-
 export interface SingleValueExtra {
   value: string;
 }
 
 export interface Extras {
   twitter?: Twitter;
-  email?: Email;
+  email?: SingleValueExtra[];
   blog?: BlogPost[];
   offers?: Offer[];
   wanted?: Wanted[];
   supportme?: SupportMe;
-  liquid?: SingleValueExtra;
+  liquid?: SingleValueExtra[];
 }

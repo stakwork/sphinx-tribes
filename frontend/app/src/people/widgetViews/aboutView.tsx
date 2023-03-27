@@ -13,7 +13,6 @@ function AboutView(props: any) {
   const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
     extras || {};
 
-  console.log('EMAIL: ', email);
   let tag = '';
   let githubTag = '';
   let lightningAddress = '';

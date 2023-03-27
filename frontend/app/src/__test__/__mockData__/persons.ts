@@ -13,29 +13,7 @@ export const person: Person = {
   verification_signature: 'test_verification_signature',
   extras: {
     email: [{ value: 'testEmail@sphinx.com' }],
-    repos: [],
-    amboss: [
-      {
-        value: ''
-      }
-    ],
-    github: [
-      {
-        value: 'vladimir'
-      }
-    ],
-    liquid: [{}],
-    twitter: [
-      {
-        value: 'vladimir'
-      }
-    ],
-    lightning: [
-      {
-        value: ''
-      }
-    ],
-
+    liquid: [{value: 'none'}],
     wanted: []
   },
   owner_alias: 'Vladimir',
