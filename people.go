@@ -75,8 +75,6 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		go processAlerts(person)
 	}
 
-	fmt.Println("Person ====", person)
-
 	p, err := DB.createOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
