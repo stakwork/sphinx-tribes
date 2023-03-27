@@ -65,6 +65,7 @@ export interface SingleValueExtra {
 
 export interface Extras {
   twitter?: Twitter;
+  email?: string;
   blog?: BlogPost[];
   offers?: Offer[];
   wanted?: Wanted[];

@@ -230,7 +230,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
   );
 };
 
-export default StartUpModal;
+export default observer(StartUpModal);
 
 const ModalContainer = styled.div`
   max-height: 274px;
