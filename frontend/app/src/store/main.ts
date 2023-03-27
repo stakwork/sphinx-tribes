@@ -836,7 +836,6 @@ export class MainStore {
     created: number,
     newPropertyValue: any
   ): Promise<any> {
-    alert('In set extras');
     if (uiStore.meInfo) {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;

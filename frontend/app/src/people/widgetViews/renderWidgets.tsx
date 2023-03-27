@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useStores } from '../../store';
 
-import AboutView from './aboutView';
+import { AboutView } from './aboutView';
 import OfferView from './offerView';
 
 import { observer } from 'mobx-react-lite';
@@ -93,15 +93,15 @@ function RenderWidgets({ widget }) {
 
       const panelStyles = isMobile
         ? {
-            minHeight: 132
-          }
+          minHeight: 132
+        }
         : {
-            maxWidth: 291,
-            minWidth: 291,
-            marginRight: 20,
-            marginBottom: 20,
-            minHeight: 472
-          };
+          maxWidth: 291,
+          minWidth: 291,
+          marginRight: 20,
+          marginBottom: 20,
+          minHeight: 472
+        };
 
       fullSelectedWidget &&
         fullSelectedWidget.forEach((s, i) => {
@@ -113,9 +113,9 @@ function RenderWidgets({ widget }) {
           const conditionalStyles =
             !isMobile && s?.paid
               ? {
-                  border: '1px solid #dde1e5',
-                  boxShadow: 'none'
-                }
+                border: '1px solid #dde1e5',
+                boxShadow: 'none'
+              }
               : {};
 
           elementArray.push(

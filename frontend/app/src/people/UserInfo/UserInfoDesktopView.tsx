@@ -1,5 +1,5 @@
 import { Button, IconButton } from 'components/common';
-import AboutView from 'people/widgetViews/aboutView';
+import { AboutView } from 'people/widgetViews/aboutView';
 import React, { useState } from 'react';
 import { useUserInfo } from './hooks';
 import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
