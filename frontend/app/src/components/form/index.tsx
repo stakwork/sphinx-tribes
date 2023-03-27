@@ -102,7 +102,6 @@ function Form(props: any) {
     const type = initialValues?.type;
     if (dSchema && type) {
       const editSchema = dynamicSchemasByType[type];
-      console.log("Edit Schema ==", editSchema)
       setDynamicSchema(editSchema);
       setDynamicSchemaName(type);
     } else if (dSchema) {

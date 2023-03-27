@@ -240,8 +240,6 @@ function FocusedView(props: any) {
           }
           : newBody;
 
-      // console.log("Reqauest Data ====", requestData);
-
       await main.saveProfile(requestData);
       closeModal();
     } catch (e) {
