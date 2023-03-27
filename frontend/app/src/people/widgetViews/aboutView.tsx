@@ -10,8 +10,10 @@ export default observer(AboutView);
 function AboutView(props: any) {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
-  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } = extras || {};
+  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
+    extras || {};
 
+  console.log('EMAIL: ', email);
   let tag = '';
   let githubTag = '';
   let lightningAddress = '';
@@ -73,7 +75,6 @@ function AboutView(props: any) {
           </Row>
         </>
       )}
-
 
       {emailAddress && (
         <>

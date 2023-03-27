@@ -370,7 +370,7 @@ export const firstScreenSchema: FormField[] = [
     type: 'text',
     prepend: '',
     page: 1
-  },
+  }
 ];
 
 export const aboutSchema: FormField[] = [
@@ -483,8 +483,8 @@ export const aboutSchema: FormField[] = [
     type: 'text',
     prepend: '',
     page: 1,
-    validator: Yup.string().email(),
-  },
+    validator: Yup.string().email()
+  }
 ];
 
 export const postSchema: FormField[] = [
