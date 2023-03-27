@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
 import { setupStore } from '__test__/__mockData__/setupStore';
@@ -17,7 +16,6 @@ beforeAll(() => {
 describe('AboutView Component', () => {
   nock(user.url);
   test('display about view with extras', () => {
-    const closeHandler = jest.fn();
     const description = 'test description';
     const extras = {
       email: [{ value: 'testEmail@sphinx.com' }],
