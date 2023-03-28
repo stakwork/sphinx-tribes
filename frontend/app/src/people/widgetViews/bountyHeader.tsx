@@ -39,15 +39,7 @@ const BountyHeader = ({
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
-          /*
-          
-           * TODO : Since this PR is merged only in people-test we will be using this api, when it will be merge in master then remove this fetch and use api.get() function.
-
-           */
-
-          const responseNew = await fetch(
-            'https://people-test.sphinx.chat/people/wanteds/header'
-          ).then((response) => response.json());
+          const responseNew = await main.getBountyHeaderData();
           setPeopleList(responseNew.people);
           setDeveloperCount(responseNew?.developer_count || 0);
           setActiveBounty(responseNew?.bounties_count);

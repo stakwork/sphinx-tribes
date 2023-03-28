@@ -863,6 +863,7 @@ export class MainStore {
     extrasName: string,
     created: number
   ): Promise<any> {
+    alert('In set extras 2');
     if (uiStore.meInfo) {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
@@ -919,6 +920,15 @@ export class MainStore {
       ]);
     } catch (e) {
       console.log('Error deleteFavorite', e);
+    }
+  }
+
+  async getBountyHeaderData() {
+    try {
+      const data = await api.get('people/wanteds/header');
+      return data;
+    } catch (e) {
+      return '';
     }
   }
 

@@ -13,11 +13,7 @@ import { SvgMask } from '../../../people/utils/svgMask';
 
 const codingLanguages = GetValue(coding_languages);
 
-export default function CreatableMultiSelectInputNew({
-  error,
-  label,
-  handleChange,
-}: Props) {
+export default function CreatableMultiSelectInputNew({ error, label, handleChange }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
   const color = colors['light'];

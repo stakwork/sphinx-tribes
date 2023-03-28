@@ -4,7 +4,7 @@ import { Content, Panel } from './personSlim/style';
 import { getHost } from '../config/host';
 import { useStores } from '../store';
 
-import AboutView from './widgetViews/aboutView';
+import { AboutView } from './widgetViews/aboutView';
 import BlogView from './widgetViews/blogView';
 import OfferView from './widgetViews/offerView';
 import PostView from './widgetViews/postView';

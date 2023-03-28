@@ -15,7 +15,7 @@
     "eject": "craco eject",
     "lint": "eslint src --max-warnings 102 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
-    "prettier": "npx prettier --config .prettierrc.json -w src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx src/**/**/*.ts src/**/**/*.tsx"
+    "prettier": "npx prettier --config .prettierrc.json -w ./src"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",

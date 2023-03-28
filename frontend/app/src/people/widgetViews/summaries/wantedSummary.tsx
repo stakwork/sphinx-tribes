@@ -26,7 +26,7 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default  observer(WantedSummary);
+export default observer(WantedSummary);
 function WantedSummary(props: any) {
   const {
     description,
@@ -57,7 +57,7 @@ function WantedSummary(props: any) {
     formSubmit,
     title
   } = props;
-  const titleString = one_sentence_summary ?? title ;
+  const titleString = one_sentence_summary ?? title;
   const [envHeight, setEnvHeight] = useState('100%');
   const imgRef: any = useRef(null);
 
@@ -176,7 +176,21 @@ function WantedSummary(props: any) {
       };
       formSubmit && formSubmit(newValue);
     },
-    [codingLanguage, created, description, estimate_session_length, formSubmit, github_description, one_sentence_summary, price, show, ticketUrl, titleString, type, wanted_type]
+    [
+      codingLanguage,
+      created,
+      description,
+      estimate_session_length,
+      formSubmit,
+      github_description,
+      one_sentence_summary,
+      price,
+      show,
+      ticketUrl,
+      titleString,
+      type,
+      wanted_type
+    ]
   );
 
   const changeAssignedPerson = useCallback(() => {
@@ -682,9 +696,3 @@ function WantedSummary(props: any) {
     </div>
   );
 }
-
-
-
-
-
-

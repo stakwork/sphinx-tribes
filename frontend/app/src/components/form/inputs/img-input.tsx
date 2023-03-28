@@ -13,15 +13,9 @@ import { Note } from './index';
 import { colors } from '../../../config/colors';
 import { observer } from 'mobx-react-lite';
 
-export default  observer(ImageInput);
+export default observer(ImageInput);
 
-function ImageInput({
-  note,
-  value,
-  handleChange,
-  notProfilePic,
-  imageIcon
-}: Props) {
+function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Props) {
   const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
@@ -86,8 +80,8 @@ function ImageInput({
 
   const addedStyle = notProfilePic
     ? {
-      borderRadius: 0
-    }
+        borderRadius: 0
+      }
     : {};
 
   const defaultIcon = notProfilePic ? backgroundIcon : avatarIcon;
@@ -104,8 +98,9 @@ function ImageInput({
                   {!uploading ? (
                     <Image
                       style={{
-                        backgroundImage: `url(${picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                          })`,
+                        backgroundImage: `url(${
+                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                        })`,
                         ...addedStyle
                       }}
                     />
@@ -143,8 +138,9 @@ function ImageInput({
                   {!uploading ? (
                     <Image
                       style={{
-                        backgroundImage: `url(${picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                          })`,
+                        backgroundImage: `url(${
+                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                        })`,
                         ...addedStyle
                       }}
                     />

@@ -10,7 +10,7 @@ export default function NumberInputNew({
   value,
   handleChange,
   handleBlur,
-  handleFocus,
+  handleFocus
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext}*`;
