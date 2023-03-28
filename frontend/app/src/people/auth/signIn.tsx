@@ -31,10 +31,10 @@ function SignIn(props: any) {
 
   async function pollLnurl() {
     if (main.lnauth.k1) {
-      let data = await main.getLnAuthPoll();
+      const data = await main.getLnAuthPoll();
       setPollCount(pollCount + 1);
 
-      let pollTimeout = setTimeout(() => {
+      const pollTimeout = setTimeout(() => {
         pollLnurl();
       }, 1000);
 
