@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -125,6 +126,10 @@ func NewRouter() *http.Server {
 		r.Get("/lnauth", getLnurlAuth)
 		r.Get("/lnauth_poll", pollLnurlAuth)
 		r.Get("/refresh_jwt", refreshToken)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Post("/bounty/pay", payBounty2)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -1020,4 +1025,79 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["url"] = "http://localhost:5005"
 
 	return user
+}
+
+/*
+
+func payBounty(w http.ResponseWriter, r *http.Request) {
+	ip := "https://relay.swarm4.sphinx.chat"
+	body := make(map[string]interface{})
+	body["amount"] = 10
+
+	resp, err := Post(ip+"/invoices", "", body)
+	if err != nil {
+		fmt.Println("error getting invoice")
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (c *http.Client) Post(url string, bodyType string, body io.Reader) (resp *http.Response, err error) {
+	req, err := http.NewRequest("POST", url, body)
+	authToken := "HckupDZ2xZ2YC18SNVuH"
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", bodyType)
+	req.Header.Set("x-auth-token", authToken)
+	return c.doFollowingRedirects(req, shouldRedirectPost)
+}
+*/
+
+func pollInvoice(invoice string) bool {
+	return true
+}
+
+type InvoiceResponse struct {
+	Invoice string `json:"invoice"`
+}
+
+type InvoicePost struct {
+	Success  bool            `json:success`
+	Response InvoiceResponse `json:response`
+}
+
+func payBounty2(w http.ResponseWriter, r *http.Request) {
+	posturl := "replace"
+
+	body := []byte(`{
+		"amount": 10
+	}`)
+
+	r, err := http.NewRequest("POST", posturl, bytes.NewBuffer(body))
+	if err != nil {
+		panic(err)
+	}
+
+	r.Header.Add("Content-Type", "application/json")
+	r.Header.Add("x-user-token", "replace")
+
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+
+	defer res.Body.Close()
+
+	post := &InvoicePost{}
+	fmt.Println(res)
+	derr := json.NewDecoder(res.Body).Decode(post)
+	if derr != nil {
+		panic(derr)
+	}
+
+	fmt.Println("Invoice Created:", post)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(post)
 }
