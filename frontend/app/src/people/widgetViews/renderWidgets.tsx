@@ -13,6 +13,7 @@ import Badges from '../utils/badges';
 import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
 import { PostBounty } from './postBounty';
+import UserTickets from './userTicketsView';
 
 export default observer(RenderWidgets);
 function RenderWidgets({ widget }) {
@@ -93,15 +94,15 @@ function RenderWidgets({ widget }) {
 
       const panelStyles = isMobile
         ? {
-            minHeight: 132
-          }
+          minHeight: 132
+        }
         : {
-            maxWidth: 291,
-            minWidth: 291,
-            marginRight: 20,
-            marginBottom: 20,
-            minHeight: 472
-          };
+          maxWidth: 291,
+          minWidth: 291,
+          marginRight: 20,
+          marginBottom: 20,
+          minHeight: 472
+        };
 
       fullSelectedWidget &&
         fullSelectedWidget.forEach((s, i) => {
@@ -113,9 +114,9 @@ function RenderWidgets({ widget }) {
           const conditionalStyles =
             !isMobile && s?.paid
               ? {
-                  border: '1px solid #dde1e5',
-                  boxShadow: 'none'
-                }
+                border: '1px solid #dde1e5',
+                boxShadow: 'none'
+              }
               : {};
 
           elementArray.push(
@@ -177,6 +178,8 @@ function RenderWidgets({ widget }) {
             <AboutView {...person} />
           </Panel>
         );
+      case 'userwanted':
+        return <UserTickets />
       case 'offer':
         return wrapIt(<OfferView {...fullSelectedWidget} person={person} />);
       default:

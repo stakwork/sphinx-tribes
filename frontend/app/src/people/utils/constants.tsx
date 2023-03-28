@@ -108,6 +108,36 @@ const widgetConfigs = {
       },
       otherUser: {
         img: 'no_wanted2.png',
+        text: 'No Assigned Tickets Yet',
+        sub: 'Looks like this person doesn’t need anything yet.'
+      }
+    }
+  },
+  userwanted: {
+    label: 'Assigned Tickets',
+    name: 'userwanted',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: [],
+    action: {
+      text: 'Add New Ticket',
+      icon: 'local_offer'
+    },
+    noneSpace: {
+      me: {
+        img: 'no_wanted.png',
+        text: 'Make a list of github tickets you want help on.',
+        buttonText: 'Add New Ticket',
+        buttonIcon: 'local_offer'
+      },
+      otherUser: {
+        img: 'no_wanted2.png',
         text: 'No Tickets Yet',
         sub: 'Looks like this person doesn’t need anything yet.'
       }
