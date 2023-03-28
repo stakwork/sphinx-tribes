@@ -113,7 +113,7 @@ const widgetConfigs = {
       }
     }
   },
-  userwanted: {
+  usertickets: {
     label: 'Assigned Tickets',
     name: 'userwanted',
     submitText: 'Save',
