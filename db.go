@@ -471,6 +471,7 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 
 	var rawQuery string
+	var result *gorm.DB
 	// set limit
 	offset, limit, sortBy, _, search := getPaginationParams(r)
 
@@ -491,8 +492,13 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	}
 
 	// sort by newest
-	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-		rawQuery, "%"+search+"%", pubkey).Find(&ms)
+	if pubkey == "" {
+		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
+			rawQuery, "%"+search+"%").Find(&ms)
+	} else {
+		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
+			rawQuery, pubkey, "%"+search+"%").Find(&ms)
+	}
 
 	return ms, result.Error
 }

@@ -52,6 +52,7 @@ const UserTickets = () => {
 
     async function getUserTickets() {
         const tickets = await main.getPersonWanteds({}, personPubkey);
+        console.log("User Tickets ===", tickets);
         setUserTickets(tickets);
     }
 
