@@ -144,10 +144,8 @@ const UserTickets = () => {
             <NoResults />
         );
 
-    console.log("Person Pub key ===", personPubkey)
     return (
         <>
-            <h1>User Tickets</h1>
             {listItems}
             <Spacer key={'spacer2'} />
             {showDeleteModal && (
