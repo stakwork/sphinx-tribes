@@ -343,6 +343,23 @@ function WantedSummary(props: any) {
     setIsCopied(true);
   }, []);
 
+  const handleCopyUrlProfilePage = 
+  useCallback(() => {
+    const {location} = window;
+    const {host} = location
+     // eslint-disable-next-line prefer-destructuring
+    const id = location.href.split("/")[4];
+   
+    const el = document.createElement('input');
+    el.value = `${host}/tickets?owner_id=${id}&created=${created}`
+    document.body.appendChild(el);
+    el.select();
+
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    setIsCopied(true);
+  }, []); 
+
   async function sendBadge(body: any) {
     const { recipient, badge } = body;
 
@@ -534,6 +551,19 @@ function WantedSummary(props: any) {
     }
 
     if (isMobile) {
+      let handleCopy
+
+      handleCopy = handleCopyUrlProfilePage
+
+      const {location} = window;
+      const {href} = location
+      
+
+      if (href.includes("tickets"))
+      {
+        handleCopy = handleCopyUrl
+      }
+
       return (
         <CodingMobile
           {...props}
@@ -542,7 +572,8 @@ function WantedSummary(props: any) {
           assigneeLabel={assigneeLabel}
           actionButtons={actionButtons}
           status={status}
-          handleCopyUrl={handleCopyUrl}
+          handleCopyUrl={handleCopy}
+          isCopied={isCopied}
           titleString={titleString}
         />
       );
@@ -603,7 +634,8 @@ function WantedSummary(props: any) {
           loomEmbedUrl={loomEmbedUrl}
           titleString={titleString}
           status={status}
-          handleCopyUrl={handleCopyUrl}
+          handleCopyUrl={handleCopyUrlProfilePage}
+          isCopied={isCopied}
         />
       </>
     );
