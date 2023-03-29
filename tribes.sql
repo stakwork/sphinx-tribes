@@ -156,7 +156,8 @@ CREATE TABLE bounty (
   githu_description TEXT,      
   one_sentence_summary TEXT,     
   estimated_session_length TEXT, 
-  estimated_completion_date TEXT
+  estimated_completion_date TEXT,
+  updated timestamptz
 );
 
 

@@ -797,3 +797,26 @@ func (db database) createLnUser(lnKey string) (Person, error) {
 	}
 	return p, nil
 }
+
+func (db database) createOrEditBounty(b Bounty) (Bounty, error) {
+	if b.OwnerID == "" {
+		return Bounty{}, errors.New("no pub key")
+	}
+	onConflict := "ON CONFLICT (id) DO UPDATE SET"
+	for i, u := range peopleupdatables {
+		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
+		if i < len(peopleupdatables)-1 {
+			onConflict = onConflict + ","
+		}
+	}
+	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
+		fmt.Println(err)
+		return Bounty{}, err
+	}
+	db.db.Exec(`UPDATE people SET tsv =
+  	setweight(to_tsvector(owner_alias), 'A') ||
+	setweight(to_tsvector(description), 'B') ||
+	setweight(array_to_tsvector(tags), 'C')
+	WHERE id = '` + strconv.Itoa(int(b.ID)) + "'")
+	return b, nil
+}

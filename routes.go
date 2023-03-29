@@ -96,6 +96,7 @@ func NewRouter() *http.Server {
 
 		r.Get("/migrate_bounties", migrateBounties)
 		r.Get("/bounty/all", getAllBounties)
+		r.Post("/bounty", createOrEditBounty)
 	})
 
 	r.Group(func(r chi.Router) {
