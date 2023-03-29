@@ -411,6 +411,21 @@ func makeExtrasListQuery(columnName string) string {
 		END`
 }
 
+func makePersonExtrasListQuery(columnName string, pubkey string) string {
+	// this is safe because columnName is not provided by the user, its hard-coded in db.go
+	return `SELECT 		
+	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
+	arr.item_object as body
+	FROM people,
+	jsonb_array_elements(extras->'` + columnName + `') with ordinality 
+	arr(item_object, position)
+	WHERE arr.item_object->'assignee'->>'owner_pubkey' = '` + pubkey + `' 
+	AND CASE
+			WHEN arr.item_object->>'show' = 'false' THEN false
+			ELSE true
+		END`
+}
+
 func addNewerThanXDaysToExtrasRawQuery(query string, days int) string {
 	secondsInDay := 86400
 	newerThan := secondsInDay * days
