@@ -9,7 +9,7 @@ export default function TextInputNew({
   value,
   handleChange,
   readOnly,
-  prepend,
+  prepend
 }: Props) {
   let labeltext = label;
   const color = colors['light'];

@@ -13,15 +13,14 @@ export const user: MeInfo = {
   description: 'description',
   verification_signature: 'test_verification_signature',
   extras: {
+    email: [{ value: 'testEmail@sphinx.com' }],
+    liquid: [{ value: 'none' }],
     wanted: []
   },
   owner_alias: 'Vladimir',
   owner_pubkey: 'test_pub_key',
-
   img: '',
-
   twitter_confirmed: false,
-
   isSuperAdmin: false,
-				uuid: 'cg8a1dcjiofs739cr8rg'
+  uuid: 'cg8a1dcjiofs739cr8rg'
 };

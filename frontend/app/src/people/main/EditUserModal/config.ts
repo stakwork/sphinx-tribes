@@ -1,4 +1,4 @@
-import { aboutSchema } from "components/form/schema";
+import { aboutSchema } from 'components/form/schema';
 
 export const formConfig = {
   label: 'About',
@@ -11,4 +11,4 @@ export const formConfig = {
     text: 'Edit Profile',
     icon: 'edit'
   }
-}
+};

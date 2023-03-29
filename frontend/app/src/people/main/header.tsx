@@ -13,6 +13,8 @@ import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 import IconButton from '../../components/common/icon_button';
 import { observer } from 'mobx-react-lite';
+import { PostModal } from '../widgetViews/postBounty/PostModal';
+import StartUpModal from '../utils/start_up_modal';
 
 export default observer(Header);
 
@@ -21,8 +23,8 @@ function Header() {
   const location = useLocation();
   const history = useHistory();
   const isMobile = useIsMobile();
-
-  const c = colors['light'];
+  const [isOpenPostModal, setIsOpenPostModal] = useState(false);
+  const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
 
   const tabs = [
     {
@@ -74,6 +76,22 @@ function Header() {
     }
   }
 
+  const showSignIn = () => {
+    if (isMobile) {
+      ui.setShowSignIn(true);
+      return;
+    }
+    setIsOpenStartupModal(true);
+  };
+
+  const clickHandler = () => {
+    if (ui.meInfo && ui.meInfo?.owner_alias) {
+      setIsOpenPostModal(true);
+    } else {
+      showSignIn();
+    }
+  };
+
   useEffect(() => {
     const path = location.pathname;
     if (!path.includes('/p') && (ui.selectedPerson || ui.selectingPerson)) {
@@ -84,7 +102,6 @@ function Header() {
 
   useEffect(() => {
     (async () => {
-      console.log('header deeplink load');
       try {
         const urlObject = new URL(window.location.href);
         let path = location.pathname;
@@ -137,13 +154,15 @@ function Header() {
               </EuiHeaderSection>
 
               <Corner>
-                <a href={'https://sphinx.chat/'} target="_blank" rel="noreferrer">
-                  <Button
-                    text={'Get Sphinx'}
-                    color="transparent"
-                    style={{ marginRight: 14, width: 85 }}
-                  />
-                </a>
+                <Button
+                  text={'Get Sphinx'}
+                  color="transparent"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    clickHandler();
+                  }}
+                  style={{ marginRight: 14, width: 98 }}
+                />
 
                 {ui.meInfo ? (
                   <Imgg
@@ -239,9 +258,33 @@ function Header() {
           </Row>
 
           <Corner>
-            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
+            <GetSphinxsBtn
+              onClick={(e) => {
+                e.preventDefault();
+                clickHandler();
+              }}
+            >
               Get Sphinx
             </GetSphinxsBtn>
+            <PostModal
+              isOpen={isOpenPostModal}
+              onClose={() => setIsOpenPostModal(false)}
+              widget={'wanted'}
+              onSucces={() => {
+                history.goBack();
+                window.location.reload();
+              }}
+              onGoBack={() => {
+                history.goBack();
+              }}
+            />
+            {isOpenStartUpModel && (
+              <StartUpModal
+                closeModal={() => setIsOpenStartupModal(false)}
+                dataObject={'createWork'}
+                buttonColor={'success'}
+              />
+            )}
             {ui.meInfo ? (
               <LoggedInBtn
                 onClick={() => {
@@ -249,7 +292,7 @@ function Header() {
                 }}
               >
                 <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
-                {ui.meInfo?.owner_alias}
+                <Alias> {ui.meInfo?.owner_alias}</Alias>
               </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
@@ -500,38 +543,17 @@ const LoggedInBtn = styled.div`
   }
 `;
 
-const GuestBtn = styled.div`
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 20px;
-  border-radius: 32px;
-  background: rgba(255, 255, 255, 0.07);
-  white-space: nowrap;
-  padding: 0 24px 0 24px;
-  display: flex;
-  align-items: center;
-  position: relative;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  &:active {
-    background: rgba(255, 255, 255, 0.13);
-  }
-`;
-
-const GetSphinxsBtn = styled.a`
+const GetSphinxsBtn = styled.button`
   display: flex;
   flex: 1 0 auto;
   background: #618aff;
-  box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
   padding: 0 28px;
   height: 40px;
   align-items: center;
   justify-content: center;
   margin-right: 20px;
   border-radius: 32px;
+  border: none;
   font-weight: 600;
   font-size: 14px;
   line-height: 19px;
@@ -573,4 +595,11 @@ const LoginBtn = styled.div`
   &:active {
     color: #82b4ff;
   }
+`;
+
+const Alias = styled.span`
+  width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

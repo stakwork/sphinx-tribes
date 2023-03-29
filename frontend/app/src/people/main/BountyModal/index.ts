@@ -1,1 +1,1 @@
-export { BountyModal} from './BountyModal'
+export { BountyModal } from './BountyModal';

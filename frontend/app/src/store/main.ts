@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, observable, action } from 'mobx';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
@@ -145,11 +145,14 @@ export class MainStore {
 
     const info = uiStore.meInfo;
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
     const r: any = await fetch(`${URL}/${path}`, {
       method: 'GET',
+      mode: 'cors',
       headers: {
         'x-jwt': info.jwt,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
       }
     });
 
@@ -277,7 +280,7 @@ export class MainStore {
       });
 
       const j = await res0.json();
-      const tt = j.token || '';
+      const tt = j.token || this.lnToken || '';
 
       // 3. first create the badge
       const res1 = await fetch(`${URL}/issue?token=${tt}`, {
@@ -708,6 +711,10 @@ export class MainStore {
       const res: any = await this.fetchFromRelay('refresh_jwt');
       const j = await res.json();
 
+      if (this.lnToken) {
+        this.lnToken = j.jwt;
+        return j;
+      }
       return j.response;
     } catch (e) {
       console.log('Error refreshJwt: ', e);
@@ -740,7 +747,10 @@ export class MainStore {
   async deleteProfile() {
     try {
       const info = uiStore.meInfo;
-      const [r, error] = await this.doCallToRelay('DELETE', 'profile', info);
+      let request = 'profile';
+      if (this.lnToken) request = `person/${info?.id}`;
+
+      const [r, error] = await this.doCallToRelay('DELETE', request, info);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
@@ -762,7 +772,10 @@ export class MainStore {
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      const [r, error] = await this.doCallToRelay('POST', 'profile', body);
+      let request = 'profile';
+      if (this.lnToken) request = 'person';
+
+      const [r, error] = await this.doCallToRelay('POST', request, body);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
@@ -793,33 +806,48 @@ export class MainStore {
     let error: any = null;
 
     const info = uiStore.meInfo as any;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     if (!info) {
       error = new Error('Youre not logged in');
       return [null, error];
     }
 
-    // fork between tor users non authentiacted and not
-    if (this.isTorSave() || info.url.startsWith('http://')) {
-      this.submitFormViaApp(method, path, body);
-      return [null, null];
-    }
+    if (this.lnToken) {
+      const response = await fetch(`${URL}/${path}`, {
+        method: method,
+        body: JSON.stringify({
+          ...body
+        }),
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
 
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-
-    const response = await fetch(`${URL}/${path}`, {
-      method: method,
-      body: JSON.stringify({
-        // use docker host (tribes.sphinx), because relay will post to it
-        host: getHostIncludingDockerHosts(),
-        ...body
-      }),
-      headers: {
-        'x-jwt': info.jwt,
-        'Content-Type': 'application/json'
+      return [response, error];
+    } else {
+      // fork between tor users non authentiacted and not
+      if (this.isTorSave() || info.url.startsWith('http://')) {
+        this.submitFormViaApp(method, path, body);
+        return [null, null];
       }
-    });
 
-    return [response, error];
+      const response = await fetch(`${URL}/${path}`, {
+        method: method,
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return [response, error];
+    }
   }
 
   async submitFormViaApp(method: string, path: string, body: any) {
@@ -864,6 +892,7 @@ export class MainStore {
     extrasName: string,
     created: number
   ): Promise<any> {
+    alert('In set extras 2');
     if (uiStore.meInfo) {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
@@ -920,6 +949,56 @@ export class MainStore {
       ]);
     } catch (e) {
       console.log('Error deleteFavorite', e);
+    }
+  }
+
+  async getBountyHeaderData() {
+    try {
+      const data = await api.get('people/wanteds/header');
+      return data;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  @observable
+  lnauth: LnAuthData = { encode: '', k1: '' };
+
+  @action setLnAuth(lnData: LnAuthData) {
+    this.lnauth = lnData;
+  }
+
+  @persist('object')
+  @observable
+  lnToken: string = '';
+
+  @action setLnToken(token: string) {
+    this.lnToken = token;
+  }
+
+  @action async getLnAuth(): Promise<any> {
+    try {
+      const data = await api.get('lnauth');
+      this.setLnAuth(data);
+      return data;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
+    try {
+      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
+      if (data.status) {
+        uiStore.setShowSignIn(false);
+
+        this.setLnAuth({ encode: '', k1: '' });
+        this.setLnToken(data.jwt);
+        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
+      }
+      return data;
+    } catch (e) {
+      return { k1: '', status: false };
     }
   }
 }
@@ -1045,4 +1124,9 @@ export interface ClaimOnLiquid {
   to: string;
   amount?: number;
   memo: string;
+}
+
+export interface LnAuthData {
+  encode: string;
+  k1: string;
 }

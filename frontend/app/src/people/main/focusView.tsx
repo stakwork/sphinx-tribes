@@ -247,7 +247,7 @@ function FocusedView(props: any) {
     }
     props.onSuccess();
     setLoading(false);
-    if (!isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
   }
 
   const initialValues: any = {};
@@ -272,6 +272,7 @@ function FocusedView(props: any) {
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
+      initialValues.email = (personInfo.extras?.email && personInfo.extras?.email[0]?.value) || '';
       initialValues.github =
         (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
       initialValues.facebook =
