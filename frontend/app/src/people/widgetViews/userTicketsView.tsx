@@ -135,7 +135,7 @@ const UserTickets = () => {
                             person={person}
                             showModal={showModal}
                             setDeletePayload={setDeletePayload}
-                            fromBountyPage={false}
+                            fromBountyPage={true}
                             {...body}
                         />
                     </Panel>
