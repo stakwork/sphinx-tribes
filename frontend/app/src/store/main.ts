@@ -537,8 +537,6 @@ export class MainStore {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
 
-      console.log("People wanted === ", ps);
-
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
         this.peopleWanteds = ps;
@@ -552,6 +550,26 @@ export class MainStore {
           queryParams
         );
       }
+      return ps;
+    } catch (e) {
+      console.log('fetch failed getPeopleWanteds: ', e);
+      return [];
+    }
+  }
+
+
+   async getPersonWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+
+    const query = this.appendQueryParams(`people/wanteds/${pubkey}`, queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);
+
+      // console.log("Person wanted === ", ps);
       return ps;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
