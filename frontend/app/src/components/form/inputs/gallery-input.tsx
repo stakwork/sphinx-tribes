@@ -8,11 +8,11 @@ import MaterialIcon from '@material/react-material-icon';
 import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { colors } from '../../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function GalleryInput({
-  value,
-  handleChange,
-}: Props) {
+export default observer(GalleryInput);
+
+function GalleryInput({ value, handleChange }: Props) {
   const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
@@ -20,10 +20,9 @@ export default function GalleryInput({
   const picsrcArray = value || [];
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
-    console.log('uploadBase64Pic', img_type);
     try {
       const info = ui.meInfo as any;
-      if (!info) return console.log('no meInfo');
+      if (!info) return;
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/public_pic`, {
         method: 'POST',
@@ -48,7 +47,6 @@ export default function GalleryInput({
   }
 
   async function dropzoneUpload(files: File[], fileRejections) {
-    console.log('fileRejections', fileRejections);
     if (fileRejections.length) {
       fileRejections.forEach((file) => {
         file.errors.forEach((err) => {
@@ -64,15 +62,15 @@ export default function GalleryInput({
       return;
     }
 
-    console.log(files);
     const file = files[0];
+
     setUploading(true);
     const reader = new FileReader();
     reader.onload = async (event: any) => {
       await uploadBase64Pic(event.target.result, file.type);
       setUploading(false);
     };
-    console.log('file', file);
+
     reader.readAsDataURL(file);
   }
 

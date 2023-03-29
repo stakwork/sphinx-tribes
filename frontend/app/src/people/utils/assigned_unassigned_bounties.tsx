@@ -9,6 +9,7 @@ import IconButton from '../../components/common/icon_button';
 import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
 const Bounties = (props) => {
   const {
@@ -122,9 +123,9 @@ const Bounties = (props) => {
                     }
                   }}
                   color="primary"
-                  hoverColor={color.button_secondary.hover}
-                  activeColor={color.button_secondary.active}
-                  shadowColor={color.button_secondary.shadow}
+                  hovercolor={color.button_secondary.hover}
+                  activecolor={color.button_secondary.active}
+                  shadowcolor={color.button_secondary.shadow}
                   iconSize={'16px'}
                   iconStyle={{
                     top: '17px',
@@ -155,7 +156,7 @@ const Bounties = (props) => {
   );
 };
 
-export default Bounties;
+export default observer(Bounties);
 
 interface containerProps {
   unAssignedBackgroundImage?: string;

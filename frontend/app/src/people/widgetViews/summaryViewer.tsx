@@ -6,9 +6,12 @@ import PostSummary from './summaries/postSummary';
 import WantedSummary from './summaries/wantedSummary';
 import OfferSummary from './summaries/offerSummary';
 import { useIsMobile } from '../../hooks';
+import { observer } from 'mobx-react-lite';
 
 // this is where we see others posts (etc) and edit our own
-export default function SummaryViewer(props: any) {
+export default observer(SummaryViewer);
+
+function SummaryViewer(props: any) {
   const { item, config, person } = props;
 
   const { ui } = useStores();

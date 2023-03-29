@@ -11,14 +11,11 @@ import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { Note } from './index';
 import { colors } from '../../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function ImageInput({
-  note,
-  value,
-  handleChange,
-  notProfilePic,
-  imageIcon
-}: Props) {
+export default observer(ImageInput);
+
+function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Props) {
   const color = colors['light'];
   const { ui } = useStores();
   const [uploading, setUploading] = useState(false);
@@ -30,7 +27,7 @@ export default function ImageInput({
       const info = ui.meInfo as any;
       if (!info) {
         alert('You are not logged in.');
-        return console.log('no meInfo');
+        return;
       }
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/public_pic`, {
@@ -56,7 +53,6 @@ export default function ImageInput({
   }
 
   async function dropzoneUpload(files: File[], fileRejections) {
-    console.log('fileRejections', fileRejections);
     if (fileRejections.length) {
       fileRejections.forEach((file) => {
         file.errors.forEach((err) => {
@@ -72,7 +68,6 @@ export default function ImageInput({
       return;
     }
 
-    console.log(files);
     const file = files[0];
     setUploading(true);
     const reader = new FileReader();

@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from '../../components/common';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
 
 let timeout;
 
-export default function TokenRefresh() {
+export default observer(TokenRefresh);
+
+function TokenRefresh() {
   const { main, ui } = useStores();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     timeout = setTimeout(async () => {
-      console.log('run token refresh!');
       if (ui.meInfo) {
         const res = await main.refreshJwt();
         if (res && res.jwt) {
-          console.log('token refreshed!');
           ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt });
         } else {
-          console.log('kick!');
           ui.setMeInfo(null);
           ui.setSelectedPerson(0);
           ui.setSelectingPerson(0);

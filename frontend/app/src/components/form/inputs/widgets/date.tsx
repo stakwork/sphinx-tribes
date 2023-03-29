@@ -11,7 +11,6 @@ function Date({ label, value, handleChange }: any) {
   const [isBorder, setIsBorder] = useState<boolean>(false);
 
   const handleChangeDate = (date) => {
-    console.log(moment(date).toISOString());
     setStartDate(date);
     handleChange(date.toISOString());
   };
@@ -42,7 +41,7 @@ interface datePickerProps {
 }
 
 // @ts-ignore
-const DataPicker = styled(EuiDatePicker) <datePickerProps>`
+const DataPicker = styled(EuiDatePicker)<datePickerProps>`
   border: 1px solid ${(p) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
   :focus {
     background-image: none;

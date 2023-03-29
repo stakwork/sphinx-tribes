@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
-import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../store';
 
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
 
-export default function Header() {
+export default observer(Header);
+
+function Header() {
   const { ui } = useStores();
 
   useEffect(() => {
@@ -18,15 +20,13 @@ export default function Header() {
     }
   });
 
-  return useObserver(() => {
-    return (
-      <EuiHeader id="header">
-        <div className="row" style={{ marginLeft: 15 }}>
-          <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            <img id="logo" src="/static/tribes_logo.svg" alt="Logo" />
-          </EuiHeaderSection>
-        </div>
-      </EuiHeader>
-    );
-  });
+  return (
+    <EuiHeader id="header">
+      <div className="row" style={{ marginLeft: 15 }}>
+        <EuiHeaderSection grow={false} className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+          <img id="logo" src="/static/tribes_logo.svg" alt="Logo" />
+        </EuiHeaderSection>
+      </div>
+    </EuiHeader>
+  );
 }

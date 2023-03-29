@@ -5,7 +5,9 @@ import api from '../api';
 import { useStores } from '../store';
 import type { MeInfo } from '../store/ui';
 import { getHost } from '../config/host';
+import { observer } from 'mobx-react-lite';
 
+//TODO: mv to utils
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
@@ -13,7 +15,9 @@ function makeQR(challenge: string, ts: string) {
 
 let interval;
 
-export default function ConfirmMe(props: any) {
+export default observer(ConfirmMe);
+
+function ConfirmMe(props: any) {
   const { ui, main } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
@@ -39,7 +43,6 @@ export default function ConfirmMe(props: any) {
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        // console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
@@ -90,16 +93,6 @@ const InnerWrap = styled.div`
   justify-content: center;
   flex-direction: column;
   width: 100%;
-`;
-const LinkWrap = styled.div`
-  width: 100%;
-  text-align: center;
-  margin: 20px 0;
-  & a {
-    width: 115px;
-    position: relative;
-    margin-left: 25px;
-  }
 `;
 const P = styled.p`
   margin-top: 10px;

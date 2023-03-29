@@ -10,6 +10,7 @@ import { useStores } from '../../store';
 import { PostBounty } from './postBounty';
 import { filterCount } from '../utils/ExtraFunctions';
 import { GetValue, coding_languages, status } from '../utils/language_label_style';
+import { observer } from 'mobx-react-lite';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
@@ -38,15 +39,7 @@ const BountyHeader = ({
     async function getPeopleList() {
       if (selectedWidget === 'wanted') {
         try {
-          /*
-          
-           * TODO : Since this PR is merged only in people-test we will be using this api, when it will be merge in master then remove this fetch and use api.get() function.
-
-           */
-
-          const responseNew = await fetch(
-            'https://people-test.sphinx.chat/people/wanteds/header'
-          ).then((response) => response.json());
+          const responseNew = await main.getBountyHeaderData();
           setPeopleList(responseNew.people);
           setDeveloperCount(responseNew?.developer_count || 0);
           setActiveBounty(responseNew?.bounties_count);
@@ -376,7 +369,7 @@ const BountyHeader = ({
   );
 };
 
-export default BountyHeader;
+export default observer(BountyHeader);
 
 interface styledProps {
   color?: any;

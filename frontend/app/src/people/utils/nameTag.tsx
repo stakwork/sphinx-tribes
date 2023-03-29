@@ -5,8 +5,11 @@ import { useStores } from '../../store';
 import { useHistory } from 'react-router';
 import { useIsMobile } from '../../hooks';
 import { colors } from '../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function NameTag(props) {
+export default observer(NameTag);
+
+function NameTag(props) {
   const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =
     props;
   const { ui } = useStores();
@@ -16,7 +19,7 @@ export default function NameTag(props) {
 
   const isMobile = useIsMobile();
 
-  const isSelected = ui.selectedPerson == id ? true : false;
+  const isSelected = ui.selectedPerson === id ? true : false;
 
   function selectPerson(e) {
     // don't select if already selected

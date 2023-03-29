@@ -53,6 +53,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
+		r.Get("/tribe_by_feed", getFirstTribeByFeed)
 		r.Get("/tribes/total", getTotalribes)
 		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
 
@@ -103,6 +104,7 @@ func NewRouter() *http.Server {
 		r.Put("/tribestats", putTribeStats)
 		r.Delete("/tribe/{uuid}", deleteTribe)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
+		r.Put("/tribepreview/{uuid}", setTribePreview)
 		r.Delete("/bot/{uuid}", deleteBot)
 		r.Post("/person", createOrEditPerson)
 		r.Post("/verify/{challenge}", verify)
@@ -116,6 +118,13 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Post("/connectioncodes", createConnectionCode)
 		r.Get("/connectioncodes", getConnectionCode)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Get("/lnauth_login", receiveLnAuthData)
+		r.Get("/lnauth", getLnurlAuth)
+		r.Get("/lnauth_poll", pollLnurlAuth)
+		r.Get("/refresh_jwt", refreshToken)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -149,6 +158,7 @@ func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pubkeys)
 	w.WriteHeader(http.StatusOK)
 }
+
 func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	feed, err := feeds.ParseFeed(url)
@@ -338,6 +348,25 @@ func getTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(theTribe)
 }
 
+func getFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
+	url := r.URL.Query().Get("url")
+	tribe := DB.getFirstTribeByFeedURL(url)
+
+	if tribe.UUID == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	var theTribe map[string]interface{}
+	j, _ := json.Marshal(tribe)
+	json.Unmarshal(j, &theTribe)
+
+	theTribe["channels"] = DB.getChannelsByTribe(tribe.UUID)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(theTribe)
+}
+
 func getTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "un")
 	tribe := DB.getTribeByUniqueName(uuid)
@@ -445,6 +474,38 @@ func putTribeActivity(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	DB.updateTribe(uuid, map[string]interface{}{
 		"last_active": now,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(true)
+}
+
+func setTribePreview(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+
+	uuid := chi.URLParam(r, "uuid")
+	if uuid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	extractedPubkey, err := VerifyTribeUUID(uuid, false)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// from token must match
+	if pubKeyFromAuth != extractedPubkey {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	preview := r.URL.Query().Get("preview")
+	DB.updateTribe(uuid, map[string]interface{}{
+		"preview": preview,
 	})
 
 	w.WriteHeader(http.StatusOK)
@@ -648,10 +709,10 @@ func initChi() *chi.Mux {
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
-		//Debug:            true,
+		// Debug:            true,
 	})
 	r.Use(cors.Handler)
 	r.Use(middleware.Timeout(60 * time.Second))
@@ -817,4 +878,146 @@ func getConnectionCode(w http.ResponseWriter, _ *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(connectionCode)
+}
+
+func getLnurlAuth(w http.ResponseWriter, _ *http.Request) {
+	encodeData, err := encodeLNURL()
+	responseData := make(map[string]string)
+
+	if err != nil {
+		responseData["k1"] = ""
+		responseData["encode"] = ""
+
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
+	}
+
+	store.SetLnCache(encodeData.k1, LnStore{encodeData.k1, "", false})
+
+	responseData["k1"] = encodeData.k1
+	responseData["encode"] = encodeData.encode
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(responseData)
+}
+
+func pollLnurlAuth(w http.ResponseWriter, r *http.Request) {
+	k1 := r.URL.Query().Get("k1")
+	responseData := make(map[string]interface{})
+
+	res, err := store.GetLnCache(k1)
+
+	if err != nil {
+		responseData["k1"] = ""
+		responseData["status"] = false
+
+		fmt.Println("=> ERR polling LNURL AUTH", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("LNURL auth data not found")
+	}
+
+	tokenString, err := EncodeToken(res.key)
+
+	if err != nil {
+		fmt.Println("error creating JWT")
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	person := DB.getPersonByPubkey(res.key)
+	user := returnUserMap(person)
+
+	responseData["k1"] = res.k1
+	responseData["status"] = res.status
+	responseData["jwt"] = tokenString
+	responseData["user"] = user
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(responseData)
+}
+
+func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
+	userKey := r.URL.Query().Get("key")
+	k1 := r.URL.Query().Get("k1")
+
+	responseMsg := make(map[string]string)
+
+	if userKey != "" {
+		// Save in DB if the user does not exists already
+		DB.createLnUser(userKey)
+
+		// Set store data to true
+		store.SetLnCache(k1, LnStore{k1, userKey, true})
+
+		responseMsg["status"] = "OK"
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(responseMsg)
+	}
+
+	responseMsg["status"] = "ERROR"
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(responseMsg)
+}
+
+func refreshToken(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("x-jwt")
+
+	responseData := make(map[string]interface{})
+	claims, err := DecodeToken(token)
+
+	if err != nil {
+		fmt.Println("Failed to parse JWT")
+		http.Error(w, http.StatusText(401), 401)
+		return
+	}
+
+	pubkey := fmt.Sprint(claims["pubkey"])
+
+	userCount := DB.getLnUser(pubkey)
+
+	if userCount > 0 {
+		// Generate a new token
+		tokenString, err := EncodeToken(pubkey)
+
+		if err != nil {
+			fmt.Println("error creating  refresh JWT")
+			w.WriteHeader(http.StatusNotAcceptable)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+
+		person := DB.getPersonByPubkey(pubkey)
+		user := returnUserMap(person)
+
+		responseData["k1"] = ""
+		responseData["status"] = true
+		responseData["jwt"] = tokenString
+		responseData["user"] = user
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(responseData)
+	}
+}
+
+func returnUserMap(p Person) map[string]interface{} {
+	user := make(map[string]interface{})
+
+	user["id"] = p.ID
+	user["created"] = p.Created
+	user["owner_pubkey"] = p.OwnerPubKey
+	user["owner_alias"] = p.OwnerAlias
+	user["contact_key"] = p.OwnerContactKey
+	user["img"] = p.Img
+	user["description"] = p.Description
+	user["tags"] = p.Tags
+	user["unique_name"] = p.UniqueName
+	user["pubkey"] = p.OwnerPubKey
+	user["extras"] = p.Extras
+	user["last_login"] = p.LastLogin
+	user["price_to_meet"] = p.PriceToMeet
+	user["alias"] = p.OwnerAlias
+	user["url"] = "http://localhost:5005"
+
+	return user
 }

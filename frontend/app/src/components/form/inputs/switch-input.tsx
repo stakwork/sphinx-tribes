@@ -13,9 +13,9 @@ export default function SwitchInput({
   handleChange,
   handleBlur,
   handleFocus,
-  extraHTML, 
-  disabled, 
-  style = {},
+  extraHTML,
+  disabled,
+  style = {}
 }: Props) {
   useEffect(() => {
     // if value not initiated, default value true

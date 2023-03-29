@@ -30,7 +30,6 @@ export default function MultiSelectInput({
             writeMode={type === 'multiselectwrite'}
             value={value}
             onChange={(e) => {
-              console.log('onChange', e);
               handleChange(e);
             }}
           />

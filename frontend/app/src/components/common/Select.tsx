@@ -5,7 +5,7 @@ import { colors } from '../../config/colors';
 
 export default function Select(props: any) {
   const color = colors['light'];
-  const { options, onChange, value, style, selectStyle, handleActive } = props;
+  const { options, onChange, value, style, selectStyle, handleActive, testId } = props;
 
   const opts =
     options.map((o) => {
@@ -49,6 +49,7 @@ export default function Select(props: any) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <S
+        data-testid={testId}
         color={color}
         style={{
           ...selectStyle

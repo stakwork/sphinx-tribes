@@ -6,8 +6,10 @@ import { FieldEnv, Note } from './index';
 import { SearchableSelect } from '../../common';
 import { useStores } from '../../../store';
 import { colors } from '../../../config/colors';
+import { observer } from 'mobx-react-lite';
 
-export default function SearchableSelectInput({
+export default observer(SearchableSelectInput);
+function SearchableSelectInput({
   error,
   note,
   name,
@@ -89,7 +91,6 @@ export default function SearchableSelectInput({
             value={value}
             loading={loading}
             onChange={(e) => {
-              console.log(e);
               handleChange(e);
               setIsBorder(false);
             }}

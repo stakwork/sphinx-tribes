@@ -4,15 +4,19 @@ import { Divider } from '../../components/common';
 import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
+import { observer } from 'mobx-react-lite';
 
-export default function AboutView(props: any) {
+export const AboutView = observer((props: any) => {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
-  const { twitter, github, coding_languages, tribes, repos, lightning, amboss } = extras || {};
+  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
+    extras || {};
+
   let tag = '';
   let githubTag = '';
   let lightningAddress = '';
   let ambossAddress = '';
+  let emailAddress = '';
 
   let { description } = props;
 
@@ -25,6 +29,7 @@ export default function AboutView(props: any) {
   if (github && github[0] && github[0].value) githubTag = github[0].value;
   if (lightning && lightning[0] && lightning[0].value) lightningAddress = lightning[0].value;
   if (amboss && amboss[0] && amboss[0].value) ambossAddress = amboss[0].value;
+  if (email && email[0] && email[0].value) emailAddress = email[0].value;
 
   const descriptionIsLong = description && description.length && description.length > 120;
 
@@ -55,7 +60,6 @@ export default function AboutView(props: any) {
         <>
           <Divider />
           <Row>
-            {/* <T>For Normies</T> */}
             <I>
               <div style={{ width: 4 }} />
               <Icon source={`/static/twitter2.png`} />
@@ -65,6 +69,19 @@ export default function AboutView(props: any) {
               ) : (
                 <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
               )}
+            </I>
+          </Row>
+        </>
+      )}
+
+      {emailAddress && (
+        <>
+          <Divider />
+          <Row>
+            <I>
+              <div style={{ width: 4 }} />
+              <Icon source={`/static/email.png`} />
+              <Tag>{emailAddress}</Tag>
             </I>
           </Row>
         </>
@@ -151,7 +168,8 @@ export default function AboutView(props: any) {
       )}
     </Wrap>
   );
-}
+});
+
 const Badge = styled.div`
 display:flex;
 justify-content:center;

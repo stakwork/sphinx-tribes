@@ -6,7 +6,9 @@ import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
 import QR from '../utils/QR';
+import { observer } from 'mobx-react-lite';
 
+//TODO: mv to utils
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
@@ -14,7 +16,9 @@ function makeQR(challenge: string, ts: string) {
 
 let interval;
 
-export default function AuthQR(props: any) {
+export default observer(AuthQR);
+
+function AuthQR(props: any) {
   const { ui, main } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
@@ -33,7 +37,6 @@ export default function AuthQR(props: any) {
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        console.log(me);
         if (me && me?.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
