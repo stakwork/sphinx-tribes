@@ -14,10 +14,7 @@ import TorSaveQR from '../utils/torSaveQR';
 import IconButton from '../../components/common/icon_button';
 import { observer } from 'mobx-react-lite';
 import { PostModal } from '../widgetViews/postBounty/PostModal';
-import { widgetConfigs } from '../../people/utils/constants';
 import StartUpModal from '../utils/start_up_modal';
-
-const config = widgetConfigs.wanted;
 
 export default observer(Header);
 
@@ -28,8 +25,6 @@ function Header() {
   const isMobile = useIsMobile();
   const [isOpenPostModal, setIsOpenPostModal] = useState(false);
   const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
-
-  const c = colors['light'];
 
   const tabs = [
     {
@@ -107,7 +102,6 @@ function Header() {
 
   useEffect(() => {
     (async () => {
-      console.log('header deeplink load');
       try {
         const urlObject = new URL(window.location.href);
         let path = location.pathname;
@@ -264,13 +258,15 @@ function Header() {
           </Row>
 
           <Corner>
-<GetSphinxsBtn onClick={(e) => {
-              e.preventDefault();
-              clickHandler();
-            }} >
+            <GetSphinxsBtn
+              onClick={(e) => {
+                e.preventDefault();
+                clickHandler();
+              }}
+            >
               Get Sphinx
             </GetSphinxsBtn>
-              <PostModal
+            <PostModal
               isOpen={isOpenPostModal}
               onClose={() => setIsOpenPostModal(false)}
               widget={'wanted'}
@@ -546,7 +542,6 @@ const LoggedInBtn = styled.div`
     }
   }
 `;
-
 
 const GetSphinxsBtn = styled.button`
   display: flex;
