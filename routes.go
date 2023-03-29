@@ -96,7 +96,6 @@ func NewRouter() *http.Server {
 
 		r.Get("/migrate_bounties", migrateBounties)
 		r.Get("/bounty/all", getAllBounties)
-		r.Post("/bounty", createOrEditBounty)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -117,6 +116,7 @@ func NewRouter() *http.Server {
 		r.Delete("/person/{id}", deletePerson)
 		r.Delete("/channel/{id}", deleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", deleteTicketByAdmin)
+		r.Post("/bounty", createOrEditBounty)
 	})
 
 	r.Group(func(r chi.Router) {
