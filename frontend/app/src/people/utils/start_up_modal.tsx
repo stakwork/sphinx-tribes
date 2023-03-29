@@ -11,10 +11,7 @@ import { observer } from 'mobx-react-lite';
 const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
   const { ui, main } = useStores();
   const [step, setStep] = useState(1);
-<<<<<<< HEAD
-=======
   const [connection_string, setConnectionString] = useState('');
->>>>>>> origin/master
 
   async function getConnectionCode() {
     if (!connection_string) {
