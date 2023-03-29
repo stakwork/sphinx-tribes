@@ -148,16 +148,16 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
       const value =
         activeList && activeList.length
           ? activeList.find((item) => {
-              const { person, body } = item;
-              return owner_id === person.owner_pubkey && created === `${body.created}`;
-            })
+            const { person, body } = item;
+            return owner_id === person.owner_pubkey && created === `${body.created}`;
+          })
           : {};
       setActiveListIndex(
         activeList && activeList.length
           ? activeList.findIndex((item) => {
-              const { person, body } = item;
-              return owner_id === person.owner_pubkey && created === `${body.created}`;
-            })
+            const { person, body } = item;
+            return owner_id === person.owner_pubkey && created === `${body.created}`;
+          })
           : {}
       );
 
@@ -475,8 +475,8 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
   const focusedDesktopModalStyles =
     selectedWidget && widgetConfigs[selectedWidget]
       ? {
-          ...widgetConfigs[selectedWidget].modalStyle
-        }
+        ...widgetConfigs[selectedWidget].modalStyle
+      }
       : {};
 
   // desktop mode
@@ -580,7 +580,7 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
             activeListIndex === 0
               ? null
               : isModalSideButton
-              ? () => {
+                ? () => {
                   const { person, body } = activeList[activeListIndex - 1];
                   if (person && body) {
                     history.replace({
@@ -593,13 +593,13 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
                     });
                   }
                 }
-              : null
+                : null
           }
           nextArrowNew={
             activeListIndex + 1 > activeList?.length
               ? null
               : isModalSideButton
-              ? () => {
+                ? () => {
                   const { person, body } = activeList[activeListIndex + 1];
                   if (person && body) {
                     history.replace({
@@ -612,7 +612,7 @@ function BodyComponent({ selectedWidget }: { selectedWidget: Widget }) {
                     });
                   }
                 }
-              : null
+                : null
           }
         >
           <FocusedView
