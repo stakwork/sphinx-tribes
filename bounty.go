@@ -45,6 +45,27 @@ func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	bounty.Updated = &now
+	bounty.Created = time.Now().Unix()
+
+	if bounty.Type == "" {
+
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Type is a required field")
+		return
+	}
+	if bounty.Title == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Title is a required field")
+		return
+	}
+	if bounty.Description == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Description is a required field")
+		return
+	}
+	if bounty.Tribe == "" {
+		bounty.Tribe = "None"
+	}
 
 	b, err := DB.createOrEditBounty(bounty)
 	if err != nil {
