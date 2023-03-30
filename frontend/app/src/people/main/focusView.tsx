@@ -205,9 +205,6 @@ function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    if (config.name === 'wanted') {
-      body.title = body.one_sentence_summary ?? '';
-    }
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);

@@ -43,30 +43,11 @@ export default function Person(props: any) {
       tagsString += t;
     });
 
-  // no suffix
-  let lastSeen = moment(updated).fromNow(true);
 
-  //which is more recent, login, or update?
-  if (last_login) {
-    if (moment.unix(last_login).valueOf() > moment(updated).valueOf()) {
-      lastSeen = moment.unix(last_login).fromNow(true);
-    }
-  }
-
-  // shorten lastSeen string
-  if (lastSeen === 'a few seconds') lastSeen = 'just now';
-  if (lastSeen === 'an hour') lastSeen = '1 hour';
-  if (lastSeen === 'a minute') lastSeen = '1 minute';
-  if (lastSeen === 'a day') lastSeen = '1 day';
-  if (lastSeen === 'a month') lastSeen = '1 month';
 
   const defaultPic = '/static/person_placeholder.png';
-  const mediumPic = img;
 
   const addedStyles = hideActions ? { width: 56, height: 56 } : {};
-
-  // mute lastseen
-  lastSeen = '';
 
   const qrString = makeQR(owner_pubkey);
 
@@ -79,7 +60,7 @@ export default function Person(props: any) {
         >
           <Wrap style={{ padding: hideActions ? 10 : 25 }}>
             <div>
-              <Img style={addedStyles} src={mediumPic || defaultPic} />
+              <Img style={addedStyles} src={img || defaultPic} />
             </div>
             <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
               <Title style={{ fontSize: hideActions ? 17 : 20, margin: 0 }}>{owner_alias}</Title>
@@ -128,7 +109,7 @@ export default function Person(props: any) {
           <div style={{ height: 210 }}>
             <Img
               style={{ height: '100%', width: '100%', borderRadius: 0 }}
-              src={mediumPic || defaultPic}
+              src={img || defaultPic}
             />
           </div>
           <div style={{ padding: 16 }}>
@@ -139,7 +120,6 @@ export default function Person(props: any) {
         <div>
           <Divider />
           <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
-            <Updated style={{ marginLeft: 10 }}>{lastSeen}</Updated>
             {owner_pubkey ? (
               <>
                 <Button
@@ -212,21 +192,6 @@ const R = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-`;
-
-const Updated = styled.div`
-  font-style: normal;
-  font-weight: normal;
-  font-size: 13px;
-  line-height: 22px;
-  /* or 169% */
-
-  display: flex;
-  align-items: center;
-
-  /* Secondary Text 4 */
-
-  color: #8e969c;
 `;
 
 const Row = styled.div`
