@@ -4,11 +4,11 @@ import { useHistory, useParams } from "react-router-dom";
 import { useStores } from "store";
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import NoResults from "people/utils/noResults";
-import { Panel } from "people/personSlim/style";
 import { useIsMobile } from "hooks";
 import { colors } from '../../config/colors';
 import DeleteTicketModal from "./deleteModal";
 import { Spacer } from "people/main/body";
+import styled from "styled-components";
 
 const UserTickets = () => {
     const color = colors['light'];
@@ -52,13 +52,17 @@ const UserTickets = () => {
 
     async function getUserTickets() {
         const tickets = await main.getPersonWanteds({}, personPubkey);
-        console.log("User Tickets ===", tickets);
         setUserTickets(tickets);
     }
 
     function onPanelClick(person, item) {
+        // history?.location?.pathname
+
+        alert(history?.location?.pathname);
+
+        console.log("DATA ==", person, item)
         history.replace({
-            pathname: history?.location?.pathname,
+            pathname: '/tickets',
             search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
             state: {
                 owner_id: person.owner_pubkey,
@@ -103,31 +107,16 @@ const UserTickets = () => {
         activeList && activeList.length ? (
             activeList.slice(0, currentItems).map((item, i) => {
                 const { person, body } = item;
-                const conditionalStyles = body?.paid
-                    ? {
-                        border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
-                        boxShadow: 'none'
-                    }
-                    : {};
 
                 // if this person has entries for this widget
                 return (
                     <Panel
                         isMobile={isMobile}
                         key={person?.owner_pubkey + i + body?.created}
-                        style={{
-                            ...panelStyles,
-                            ...conditionalStyles,
-                            cursor: 'pointer',
-                            padding: 0,
-                            overflow: 'hidden',
-                            background: 'transparent',
-                            minHeight: !isMobile ? '160px' : '',
-                            boxShadow: 'none'
-                        }}
                     >
 
                         <WantedView
+                            colors={color}
                             showName
                             onPanelClick={() => {
                                 if (onPanelClick) onPanelClick(person, body);
@@ -135,8 +124,9 @@ const UserTickets = () => {
                             person={person}
                             showModal={showModal}
                             setDeletePayload={setDeletePayload}
-                            fromBountyPage={true}
+                            fromBountyPage={false}
                             {...body}
+                            show={true}
                         />
                     </Panel>
                 );
@@ -146,15 +136,38 @@ const UserTickets = () => {
         );
 
     return (
-        <>
+        <Container>
             {listItems}
             <Spacer key={'spacer2'} />
             {showDeleteModal && (
                 <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
             )}
-        </>
+        </Container>
     )
 }
 
 export default UserTickets;
+
+const Container = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  flex: 1 1 100%;
+`;
+
+interface PanelProps {
+    isMobile: boolean;
+}
+const Panel = styled.div<PanelProps>`
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  max-width: 300px;
+  flex: 1 1 auto;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
 
