@@ -10,6 +10,7 @@ const config = widgetConfigs.wanted;
 export const BountyModal = ({ basePath }) => {
   const history = useHistory();
   const { wantedId } = useParams<{ wantedId: string }>();
+
   const { ui } = useStores();
   const { canEdit, person } = usePerson(ui.selectedPerson);
 
@@ -19,6 +20,7 @@ export const BountyModal = ({ basePath }) => {
     if (!wantedLength) return;
     const currentStep = Number(wantedId);
     const newStep = currentStep + step;
+
     if (step === 1) {
       if (newStep < wantedLength) {
         history.replace({
@@ -34,6 +36,7 @@ export const BountyModal = ({ basePath }) => {
       }
     }
   };
+
   const onGoBack = () => {
     history.push({
       pathname: basePath

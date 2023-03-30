@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import WantedView from '../widgetViews/wantedView';
-import { useHistory, useParams } from "react-router-dom";
+import { Route, Switch, useHistory, useParams, useRouteMatch } from "react-router-dom";
 import { useStores } from "store";
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import NoResults from "people/utils/noResults";
@@ -9,6 +9,7 @@ import { colors } from '../../config/colors';
 import DeleteTicketModal from "./deleteModal";
 import { Spacer } from "people/main/body";
 import styled from "styled-components";
+import { BountyModal } from "people/main/BountyModal/BountyModal";
 
 const UserTickets = () => {
     const color = colors['light'];
@@ -16,9 +17,9 @@ const UserTickets = () => {
     const { main, ui } = useStores();
     const isMobile = useIsMobile();
     const history = useHistory();
+    const { path, url } = useRouteMatch();
     const [userTickets, setUserTickets] = useState<any>([]);
-    const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState<any>({});
-    const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+    const [checkboxIdToSelectedMap] = useState<any>({});
     const [currentItems] = useState<number>(10);
     const [deletePayload, setDeletePayload] = useState<object>({});
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -29,24 +30,11 @@ const UserTickets = () => {
         checkboxIdToSelectedMap,
     };
 
-    const panelStyles = isMobile
-        ? {
-            minHeight: 132
-        }
-        : {
-            minWidth: '1100px',
-            maxWidth: '1100px',
-            marginBottom: 16,
-            borderRadius: '10px',
-            display: 'flex',
-            justifyContent: 'center'
-        };
-
     const activeList = userTickets.filter(({ body }) => {
         const value = { ...body };
         return (
-            bountyHeaderFilter(data?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-            bountyHeaderLanguageFilter(value?.codingLanguage, checkboxIdToSelectedMapLanguage)
+            bountyHeaderFilter(data.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
+            bountyHeaderLanguageFilter(value?.codingLanguage, {})
         );
     });
 
@@ -55,19 +43,9 @@ const UserTickets = () => {
         setUserTickets(tickets);
     }
 
-    function onPanelClick(person, item) {
-        // history?.location?.pathname
-
-        alert(history?.location?.pathname);
-
-        console.log("DATA ==", person, item)
-        history.replace({
-            pathname: '/tickets',
-            search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
-            state: {
-                owner_id: person.owner_pubkey,
-                created: item.created
-            }
+    function onPanelClick(i) {
+        history.push({
+            pathname: `${url}/${i}`
         });
     }
 
@@ -114,12 +92,11 @@ const UserTickets = () => {
                         isMobile={isMobile}
                         key={person?.owner_pubkey + i + body?.created}
                     >
-
                         <WantedView
                             colors={color}
                             showName
                             onPanelClick={() => {
-                                if (onPanelClick) onPanelClick(person, body);
+                                if (onPanelClick) onPanelClick(i);
                             }}
                             person={person}
                             showModal={showModal}
@@ -137,6 +114,11 @@ const UserTickets = () => {
 
     return (
         <Container>
+            <Switch>
+                <Route path={`${path}/:wantedId`}>
+                    <BountyModal basePath={url} />
+                </Route>
+            </Switch>
             {listItems}
             <Spacer key={'spacer2'} />
             {showDeleteModal && (

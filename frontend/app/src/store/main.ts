@@ -558,6 +558,12 @@ export class MainStore {
   }
 
 
+  personWanteds: PersonWanted[] = [];
+
+  setPersonWanteds(wanteds: PersonWanted[]) {
+    this.personWanteds = wanteds;
+  }
+
    async getPersonWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
@@ -568,8 +574,9 @@ export class MainStore {
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
+      
+      this.setPersonWanteds(ps);
 
-      // console.log("Person wanted === ", ps);
       return ps;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);

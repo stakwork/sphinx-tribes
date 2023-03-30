@@ -20,8 +20,6 @@ export const Wanted = observer(() => {
 
   const fullSelectedWidgets = person?.extras?.wanted;
 
-  console.log("Data ====", fullSelectedWidgets)
-
   if (!fullSelectedWidgets?.length) {
     return (
       <NoneSpace
@@ -56,9 +54,6 @@ export const Wanted = observer(() => {
     <Container>
       <Switch>
         <Route path={`${path}/:wantedId`}>
-          <BountyModal basePath={url} />
-        </Route>
-        <Route path={`${path}/usertickets/:wantedId`}>
           <BountyModal basePath={url} />
         </Route>
       </Switch>
