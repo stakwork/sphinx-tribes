@@ -49,8 +49,7 @@ function BodyComponent() {
     history.push(`/p/${pubkey}`);
   }
 
-  let people = useFuse(main.people, ['owner_alias']);
-  people = (people && people.filter((f) => !f.hide)) || [];
+  let people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
 
   const loadForwardFunc = () => loadMore(1);
   const loadBackwardFunc = () => loadMore(-1);
@@ -120,7 +119,6 @@ function BodyComponent() {
         />
       </div>
       <div className="content">
-        <PageLoadSpinner show={loadingTop} />
         {(people ?? []).map((t) => (
           <Person
             {...t}
