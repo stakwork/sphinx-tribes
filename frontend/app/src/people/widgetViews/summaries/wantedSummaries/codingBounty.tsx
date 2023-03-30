@@ -89,7 +89,7 @@ function MobileView(props: any) {
   const { ui } = useStores();
 
   return (
-    <>
+    <div>
       {{ ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
@@ -948,6 +948,6 @@ function MobileView(props: any) {
           </AssigneeProfile>
         </NormalUser>
       )}
-    </>
+    </div>
   );
 }
