@@ -34,6 +34,7 @@ function MobileView(props: any) {
     saving,
     labels,
     isClosed,
+    onPanelClick,
     status,
     isCodingTask,
     show,
@@ -46,7 +47,7 @@ function MobileView(props: any) {
   const color = colors['light'];
 
   return (
-    <div key={key}>
+    <div key={key} onClick={onPanelClick}>
       {paid && (
         <Img
           src={'/static/paid_ribbon.svg'}

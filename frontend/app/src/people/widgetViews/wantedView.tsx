@@ -180,6 +180,7 @@ function WantedView(props: any) {
       );
     }
 
+    console.log("desktop")
     return (
       <DesktopView
         {...props}
