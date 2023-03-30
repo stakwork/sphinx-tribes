@@ -13,6 +13,7 @@ export default observer(SummaryViewer);
 
 function SummaryViewer(props: any) {
   const { item, config, person } = props;
+
   const { ui } = useStores();
   const isMobile = useIsMobile();
 

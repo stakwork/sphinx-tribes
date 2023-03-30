@@ -539,6 +539,9 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
+        // Set person wanted to empty array to avoid wrong data
+        this.setPersonWanteds([]);
+        
         this.peopleWanteds = ps;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {

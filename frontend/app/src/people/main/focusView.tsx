@@ -325,7 +325,7 @@ function FocusedView(props: any) {
     if (main.personWanteds.length) {
       return main.peopleWanteds[selectedIndex].body;
     } else if (person?.extras && main.peopleWanteds) {
-      return person.extras[config?.name];
+      return person.extras[config?.name][selectedIndex];
     }
 
     return null
