@@ -2,9 +2,7 @@
 import React from 'react';
 import { useStores } from '../../store';
 import styled from 'styled-components';
-import PostSummary from './summaries/postSummary';
 import WantedSummary from './summaries/wantedSummary';
-import OfferSummary from './summaries/offerSummary';
 import { useIsMobile } from '../../hooks';
 import { observer } from 'mobx-react-lite';
 
@@ -21,26 +19,13 @@ function SummaryViewer(props: any) {
   const isSelectedView = ui?.selectedPerson ? true : false;
   const thisIsMine = ui?.selectedPerson === ui?.meInfo?.id;
 
-  function wrapIt(child) {
-    return (
-      <Wrap
+
+return (      <Wrap
         style={{
           maxHeight: config.name === 'post' || isMobile ? '' : '100vh',
           height: (isSelectedView && thisIsMine) || isMobile ? 'calc(100% - 60px)' : '100%'
         }}
       >
-        {child}
-      </Wrap>
-    );
-  }
-
-  switch (config.name) {
-    case 'post':
-      return wrapIt(<PostSummary {...item} person={person} />);
-    case 'offer':
-      return wrapIt(<OfferSummary {...item} person={person} />);
-    case 'wanted':
-      return wrapIt(
         <WantedSummary
           {...item}
           ReCallBounties={props.ReCallBounties}
@@ -55,10 +40,7 @@ function SummaryViewer(props: any) {
           setIsModalSideButton={props?.setIsModalSideButton}
           setIsExtraStyle={props?.setIsExtraStyle}
         />
-      );
-    default:
-      return wrapIt(<div>none</div>);
-  }
+      </Wrap> )
 }
 
 const Wrap = styled.div`

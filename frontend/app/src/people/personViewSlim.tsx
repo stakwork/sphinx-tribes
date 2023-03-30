@@ -240,12 +240,8 @@ export default function PersonView(props: any) {
           return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />);
         case 'supportme':
           return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />);
-        case 'offer':
-          return wrapIt(<OfferView {...fullSelectedWidget} person={person} />);
         case 'wanted':
           return wrapIt(<WantedView {...fullSelectedWidget} person={person} />);
-        case 'blog':
-          return wrapIt(<BlogView {...fullSelectedWidget} person={person} />);
         default:
           return wrapIt(<></>);
       }
@@ -377,28 +373,7 @@ export default function PersonView(props: any) {
       );
     }
 
-    switch (selectedWidget) {
-      case 'about':
-        return (
-          <Panel isMobile={isMobile}>
-            <AboutView {...person} />
-          </Panel>
-        );
-      case 'post':
-        return wrapIt(<PostView {...fullSelectedWidget} person={person} />);
-      case 'twitter':
-        return wrapIt(<TwitterView {...fullSelectedWidget} person={person} />);
-      case 'supportme':
-        return wrapIt(<SupportMeView {...fullSelectedWidget} person={person} />);
-      case 'offer':
-        return wrapIt(<OfferView {...fullSelectedWidget} person={person} />);
-      case 'wanted':
         return wrapIt(<WantedView {...fullSelectedWidget} person={person} />);
-      case 'blog':
-        return wrapIt(<BlogView {...fullSelectedWidget} person={person} />);
-      default:
-        return wrapIt(<></>);
-    }
   }
 
   function nextIndex() {
