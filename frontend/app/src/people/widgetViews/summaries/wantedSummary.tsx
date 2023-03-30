@@ -1,20 +1,17 @@
 /* eslint-disable func-style */
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ButtonRow, Pad, T, Y, P, D, B, Img, Assignee, Wrap } from './wantedSummaries/style';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
 import { useLocation } from 'react-router-dom';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
 import { sendBadgeSchema } from '../../../components/form/schema';
-import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice } from '../../../helpers';
+import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Button, Divider, Paragraph, Title } from '../../../components/common';
+import { Button } from '../../../components/common';
 import { useStores } from '../../../store';
-import FavoriteButton from '../../utils/favoriteButton';
-import GalleryViewer from '../../utils/galleryViewer';
 import { LanguageObject, awards } from '../../utils/language_label_style';
 import NameTag from '../../utils/nameTag';
-import { renderMarkdown } from '../../utils/renderMarkdown';
 import CodingMobile from './wantedSummaries/codingMobile';
 import CodingBounty from './wantedSummaries/codingBounty';
 import CodingDesktop from './wantedSummaries/codingDesktop';
@@ -31,9 +28,7 @@ function WantedSummary(props: any) {
   const {
     description,
     priceMin,
-    priceMax,
     ticketUrl,
-    gallery,
     person,
     created,
     repo,
@@ -58,15 +53,12 @@ function WantedSummary(props: any) {
     title
   } = props;
   const titleString = one_sentence_summary ?? title;
-  const [envHeight, setEnvHeight] = useState('100%');
-  const imgRef: any = useRef(null);
 
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
   const { peopleWanteds } = main;
   const color = colors['light'];
 
-  const [tribeInfo, setTribeInfo]: any = useState(null);
   const [assigneeInfo, setAssigneeInfo]: any = useState(null);
   const [saving, setSaving]: any = useState('');
   const [isCopied, setIsCopied] = useState(false);
@@ -120,14 +112,6 @@ function WantedSummary(props: any) {
   const [assigneeValue, setAssigneeValue] = useState(false);
 
   const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue) => !assigneeValue);
-
-  useLayoutEffect(() => {
-    if (imgRef && imgRef.current) {
-      if (imgRef.current?.offsetHeight > 100) {
-        setEnvHeight(imgRef.current?.offsetHeight);
-      }
-    }
-  }, [imgRef]);
 
   useEffect(() => {
     if (assignee?.owner_alias) {
@@ -203,14 +187,6 @@ function WantedSummary(props: any) {
         try {
           const p = await main.getPersonByPubkey(props.assignee.owner_pubkey);
           setAssigneeInfo(p);
-        } catch (e) {
-          console.log('e', e);
-        }
-      }
-      if (tribe) {
-        try {
-          const t = await main.getSingleTribeByUn(tribe);
-          setTribeInfo(t);
         } catch (e) {
           console.log('e', e);
         }
@@ -357,7 +333,7 @@ function WantedSummary(props: any) {
     document.execCommand('copy');
     document.body.removeChild(el);
     setIsCopied(true);
-  }, []);
+  }, [created]);
 
   async function sendBadge(body: any) {
     const { recipient, badge } = body;
@@ -380,10 +356,6 @@ function WantedSummary(props: any) {
         throw new Error('This user has not provided an L-BTC address');
       }
 
-      // asset: number
-      // to: string
-      // amount?: number
-      // memo: string
       const pack = {
         asset: badge.id,
         to: liquidAddress,
@@ -406,8 +378,6 @@ function WantedSummary(props: any) {
 
     setSaving('');
   }
-
-  const heart = <FavoriteButton />;
 
   //  if my own, show this option to show/hide
   const markPaidButton = (
@@ -621,7 +591,7 @@ function WantedSummary(props: any) {
     }
 
     return (
-      <>
+      <div>
         <CodingDesktop
           {...props}
           actionButtons={actionButtons}
@@ -634,94 +604,12 @@ function WantedSummary(props: any) {
           handleCopyUrl={handleCopyUrlProfilePage}
           isCopied={isCopied}
         />
-      </>
+      </div>
     );
   }
 
   if (type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request') {
     return renderCodingTask();
   }
-
-  if (isMobile) {
-    return (
-      <div style={{ padding: 20, overflow: 'auto' }} key={created}>
-        <Pad>
-          {nametag}
-
-          <T>{titleString || 'No title'}</T>
-          <Divider
-            style={{
-              marginTop: 22
-            }}
-          />
-          <Y>
-            <P color={color}>
-              {formatPrice(priceMin) || '0'} <B color={color}>SAT</B> - {formatPrice(priceMax)}{' '}
-              <B color={color}>SAT</B>
-            </P>
-            {heart}
-          </Y>
-          <Divider style={{ marginBottom: 22 }} />
-
-          <D color={color}>{renderMarkdown(description)}</D>
-          <GalleryViewer
-            gallery={gallery}
-            showAll={true}
-            selectable={false}
-            wrap={false}
-            big={true}
-          />
-        </Pad>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      key={created}
-      style={{
-        paddingTop: gallery && '40px'
-      }}
-    >
-      <Wrap color={color}>
-        <div>
-          <GalleryViewer
-            innerRef={imgRef}
-            style={{ width: 507, height: 'fit-content' }}
-            gallery={gallery}
-            showAll={false}
-            selectable={false}
-            wrap={false}
-            big={true}
-          />
-        </div>
-        <div
-          style={{
-            width: 316,
-            padding: '40px 20px',
-            overflowY: 'auto',
-            height: envHeight
-          }}
-        >
-          <Pad>
-            {nametag}
-
-            <Title>{titleString}</Title>
-
-            <Divider style={{ marginTop: 22 }} />
-            <Y>
-              <P color={color}>
-                {formatPrice(priceMin) || '0'} <B color={color}>SAT</B> -{' '}
-                {formatPrice(priceMax) || '0'} <B color={color}>SAT</B>
-              </P>
-              {heart}
-            </Y>
-            <Divider style={{ marginBottom: 22 }} />
-
-            <Paragraph>{renderMarkdown(description)}</Paragraph>
-          </Pad>
-        </div>
-      </Wrap>
-    </div>
-  );
+  return <div />;
 }

@@ -24,17 +24,31 @@ function BodyComponent() {
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
   const closeModal = () => setOpenStartUpModel(false);
   const { peoplePageNumber } = ui;
-
   const history = useHistory();
-
   const isMobile = useIsMobile();
+  let people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
+  const loadForwardFunc = () => loadMore(1);
+  const loadBackwardFunc = () => loadMore(-1);
+  const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
+    loadForwardFunc,
+    loadBackwardFunc
+  );
+
+  const toastsEl = (
+    <EuiGlobalToastList
+      toasts={ui.toasts}
+      dismissToast={() => ui.setToasts([])}
+      toastLifeTimeMs={3000}
+    />
+  );
+
   useEffect(() => {
     if (ui.meInfo) {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
   }, [main, ui.meInfo]);
 
-  // do search update
+  // update search
   useEffect(() => {
     (async () => {
       await main.getPeople({ page: 1, resetPage: true });
@@ -48,15 +62,6 @@ function BodyComponent() {
 
     history.push(`/p/${pubkey}`);
   }
-
-  let people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
-
-  const loadForwardFunc = () => loadMore(1);
-  const loadBackwardFunc = () => loadMore(-1);
-  const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
-    loadForwardFunc,
-    loadBackwardFunc
-  );
 
   async function loadMore(direction) {
     let currentPage = 1;
@@ -78,20 +83,6 @@ function BodyComponent() {
       </Body>
     );
   }
-
-  const showFirstTime = ui.meInfo && ui.meInfo.id === 0;
-
-  if (showFirstTime) {
-    return <FirstTimeScreen />;
-  }
-
-  const toastsEl = (
-    <EuiGlobalToastList
-      toasts={ui.toasts}
-      dismissToast={() => ui.setToasts([])}
-      toastLifeTimeMs={3000}
-    />
-  );
 
   return (
     <Body
