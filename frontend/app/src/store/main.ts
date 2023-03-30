@@ -574,7 +574,7 @@ export class MainStore {
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
-      
+
       this.setPersonWanteds(ps);
 
       return ps;
@@ -1095,6 +1095,7 @@ export interface PersonWanted {
   description?: string;
   created: number;
   show?: boolean;
+  assignee?: any;
   body: PersonWanted;
 }
 

@@ -8,9 +8,10 @@ export const usePerson = (id) => {
   let person: Person | undefined;
 
   if(main.personWanteds.length) {
-    const pid = main.personWanteds[0].person.id;
-    person = (main.people || []).find((f) => f.id === pid);
-    
+    const pubkey = main.personWanteds[0].body?.assignee.owner_pubkey;
+    person = (main.people || []).find((f) => f.owner_pubkey === pubkey);
+
+    // if(person) person.extras.tickets = main.peopleWanteds;
   } else {
     person = (main.people || []).find((f) => f.id === id);
   }
