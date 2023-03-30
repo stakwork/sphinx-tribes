@@ -63,7 +63,7 @@ function WantedSummary(props: any) {
 
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
-  const { peopleWanteds } = main;
+  const { peopleWanteds, personWanteds } = main;
   const color = colors['light'];
 
   const [tribeInfo, setTribeInfo]: any = useState(null);
@@ -248,7 +248,7 @@ function WantedSummary(props: any) {
   }, [codingLanguage]);
 
   async function setExtrasPropertyAndSave(propertyName: string, value: any) {
-    if (peopleWanteds) {
+    if (peopleWanteds || peopleWanteds) {
       setSaving(propertyName);
       try {
         const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
@@ -259,7 +259,7 @@ function WantedSummary(props: any) {
         );
 
         // saved? ok update in wanted list if found
-        const peopleWantedsClone: any = [...peopleWanteds];
+        const peopleWantedsClone: any = [...peopleWanteds, ...personWanteds];
         const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
@@ -291,7 +291,8 @@ function WantedSummary(props: any) {
   }
 
   async function setExtrasPropertyAndSaveMultiple(propertyName: any, dataObject: any) {
-    if (peopleWanteds) {
+    if (peopleWanteds || peopleWanteds) {
+
       setIsMarkPaidSaved(true);
       try {
         const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(
@@ -301,7 +302,7 @@ function WantedSummary(props: any) {
         );
 
         // saved? ok update in wanted list if found
-        const peopleWantedsClone: any = [...peopleWanteds];
+        const peopleWantedsClone: any = [...peopleWanteds, ...personWanteds];
         const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;

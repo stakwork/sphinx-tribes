@@ -230,14 +230,14 @@ function FocusedView(props: any) {
       const requestData =
         config.name === 'about' || config.name === 'wanted'
           ? {
-              ...newBody,
-              alert: undefined,
-              new_ticket_time: unixTimestamp,
-              extras: {
-                ...newBody?.extras,
-                alert: newBody.alert
-              }
+            ...newBody,
+            alert: undefined,
+            new_ticket_time: unixTimestamp,
+            extras: {
+              ...newBody?.extras,
+              alert: newBody.alert
             }
+          }
           : newBody;
 
       await main.saveProfile(requestData);
@@ -321,6 +321,16 @@ function FocusedView(props: any) {
 
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
+  function getExtras(): any {
+    if (main.personWanteds.length) {
+      return main.peopleWanteds[selectedIndex].body;
+    } else if (person?.extras && main.peopleWanteds) {
+      return person.extras[config?.name];
+    }
+
+    return null
+  }
+
   return (
     <div
       style={{
@@ -352,8 +362,8 @@ function FocusedView(props: any) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
@@ -422,7 +432,7 @@ function FocusedView(props: any) {
             formSubmit={submitForm}
             person={person}
             personBody={props?.personBody}
-            item={person?.extras && person.extras[config?.name][selectedIndex]}
+            item={getExtras()}
             config={config}
             fromBountyPage={fromBountyPage}
             extraModalFunction={props?.extraModalFunction}
@@ -490,7 +500,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;

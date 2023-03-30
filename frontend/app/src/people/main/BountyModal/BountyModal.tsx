@@ -14,7 +14,7 @@ export const BountyModal = ({ basePath }) => {
   const { ui } = useStores();
   const { canEdit, person } = usePerson(ui.selectedPerson);
 
-  const wantedLength = person?.extras.wanted?.length;
+  const wantedLength = person?.extras ? person?.extras.wanted?.length : 0;
 
   const changeWanted = (step) => {
     if (!wantedLength) return;
