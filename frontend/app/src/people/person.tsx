@@ -43,8 +43,6 @@ export default function Person(props: any) {
       tagsString += t;
     });
 
-
-
   const defaultPic = '/static/person_placeholder.png';
 
   const addedStyles = hideActions ? { width: 56, height: 56 } : {};
