@@ -18,7 +18,6 @@ export default function Person(props: any) {
     small,
     id,
     img,
-    tags,
     selected,
     select,
     owner_alias,
@@ -26,28 +25,13 @@ export default function Person(props: any) {
     unique_name,
     updated,
     last_login,
-    squeeze
+    squeeze,
+    description
   } = props;
-  let { description } = props;
-  // backend is adding 'description' to empty descriptions, short term fix
-  if (description === 'description') description = '';
-
-  const [showQR, setShowQR] = useState(false);
-
-  const c = colors['light'];
-
-  let tagsString = '';
-  tags &&
-    tags.forEach((t: string, i: number) => {
-      if (i !== 0) tagsString += ',';
-      tagsString += t;
-    });
-
   const defaultPic = '/static/person_placeholder.png';
-
   const addedStyles = hideActions ? { width: 56, height: 56 } : {};
-
   const qrString = makeQR(owner_pubkey);
+  const [showQR, setShowQR] = useState(false);
 
   function renderPersonCard() {
     if (small) {
