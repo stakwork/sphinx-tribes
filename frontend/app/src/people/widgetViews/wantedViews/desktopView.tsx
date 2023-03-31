@@ -12,9 +12,9 @@ import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
 
-export default observer(MobileView);
+export default observer(DesktopView);
 
-function MobileView(props: any) {
+function DesktopView(props: any) {
   const {
     description,
     priceMin,
