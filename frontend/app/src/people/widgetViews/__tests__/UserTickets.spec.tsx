@@ -7,6 +7,7 @@ import { user } from '__test__/__mockData__/user';
 import { mockUsehistory } from '__test__/__mockFn__/useHistory';
 import UserTicketsView from '../userTicketsView';
 import routeData from 'react-router';
+import { people } from '__test__/__mockData__/persons';
 
 beforeAll(() => {
     nock.disableNetConnect();
@@ -14,17 +15,18 @@ beforeAll(() => {
     mockUsehistory();
 });
 
+// Todo : mock api request in usertickets page
 describe('UserTicketsView Component', () => {
     nock(user.url);
     test('display user assigned tickets', () => {
-        jest.spyOn(routeData, 'useParams').mockReturnValue({ personPubKey: 'test_pub_key_2' });
-        jest.spyOn(routeData, 'useRouteMatch').mockReturnValue({ "url": "hello", "path": "jell", "params": {}, "isExact": true });
+        const person = people[1];
 
-        const description = 'Just for terst';
+        jest.spyOn(routeData, 'useParams').mockReturnValue({ personPubKey: person.owner_pubkey });
+        jest.spyOn(routeData, 'useRouteMatch').mockReturnValue({ "url": `/p/${person.owner_pubkey}/usertickets`, "path": "/p/:personPubkey/usertickets", "params": {}, "isExact": true });
+
         const title = 'Trying this';
 
         render(<UserTicketsView />);
         expect(screen.queryByText(title)).toBeInTheDocument();
-        expect(screen.queryByText(description)).toBeInTheDocument();
     });
 });

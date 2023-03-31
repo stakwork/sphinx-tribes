@@ -18,6 +18,7 @@ const UserTickets = () => {
     const isMobile = useIsMobile();
     const history = useHistory();
     const { path, url } = useRouteMatch();
+
     const [userTickets, setUserTickets] = useState<any>([]);
     const [checkboxIdToSelectedMap] = useState<any>({});
     const [currentItems] = useState<number>(10);
