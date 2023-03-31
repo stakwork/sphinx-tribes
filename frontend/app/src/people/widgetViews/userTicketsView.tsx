@@ -3,7 +3,7 @@ import WantedView from '../widgetViews/wantedView';
 import { Route, Switch, useHistory, useParams, useRouteMatch } from "react-router-dom";
 import { useStores } from "store";
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
-import NoResults from "people/utils/noResults";
+import NoResults from "people/utils/userNoResults";
 import { useIsMobile } from "hooks";
 import { colors } from '../../config/colors';
 import DeleteTicketModal from "./deleteModal";
@@ -25,7 +25,7 @@ const UserTickets = () => {
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const closeModal = () => setShowDeleteModal(false);
     const showModal = () => setShowDeleteModal(true);
-
+    const [loading, setIsLoading] = useState<boolean>(false);
     const data = {
         checkboxIdToSelectedMap,
     };
@@ -39,8 +39,13 @@ const UserTickets = () => {
     });
 
     async function getUserTickets() {
+        setIsLoading(true);
+
         const tickets = await main.getPersonWanteds({}, personPubkey);
+
         setUserTickets(tickets);
+
+        setIsLoading(false);
     }
 
     function onPanelClick(i) {
@@ -109,7 +114,7 @@ const UserTickets = () => {
                 );
             })
         ) : (
-            <NoResults />
+            <NoResults loading={loading} />
         );
 
     return (

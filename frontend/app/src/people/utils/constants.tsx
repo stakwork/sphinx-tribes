@@ -108,7 +108,7 @@ const widgetConfigs = {
       },
       otherUser: {
         img: 'no_wanted2.png',
-        text: 'No Assigned Tickets Yet',
+        text: 'No Tickets Yet',
         sub: 'Looks like this person doesn’t need anything yet.'
       }
     }
@@ -130,15 +130,9 @@ const widgetConfigs = {
       icon: 'local_offer'
     },
     noneSpace: {
-      me: {
-        img: 'no_wanted.png',
-        text: 'Make a list of github tickets you want help on.',
-        buttonText: 'Add New Ticket',
-        buttonIcon: 'local_offer'
-      },
-      otherUser: {
+      noResult: {
         img: 'no_wanted2.png',
-        text: 'No Tickets Yet',
+        text: 'No Assigned Tickets Yet',
         sub: 'Looks like this person doesn’t need anything yet.'
       }
     }
