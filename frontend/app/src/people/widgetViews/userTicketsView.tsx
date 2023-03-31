@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import WantedView from '../widgetViews/wantedView';
-import { Route, Switch, useHistory, useParams, useRouteMatch } from "react-router-dom";
+import { Route, Switch, useHistory, useParams, useRouteMatch, BrowserRouter } from "react-router-dom";
 import { useStores } from "store";
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import NoResults from "people/utils/userNoResults";
@@ -119,18 +119,22 @@ const UserTickets = () => {
         );
 
     return (
-        <Container>
-            <Switch>
-                <Route path={`${path}/:wantedId`}>
-                    <BountyModal basePath={url} />
-                </Route>
-            </Switch>
-            {listItems}
-            <Spacer key={'spacer2'} />
-            {showDeleteModal && (
-                <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
-            )}
-        </Container>
+        <div data-testid="test">
+            <Container>
+                {/* <BrowserRouter> */}
+                <Switch>
+                    <Route path={`${path}/:wantedId`}>
+                        <BountyModal basePath={url} />
+                    </Route>
+                </Switch>
+                {/* </BrowserRouter> */}
+                {listItems}
+                <Spacer key={'spacer2'} />
+                {showDeleteModal && (
+                    <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
+                )}
+            </Container>
+        </div>
     )
 }
 
