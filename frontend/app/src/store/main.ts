@@ -561,24 +561,22 @@ export class MainStore {
   }
 
 
-  personWanteds: PersonWanted[] = [];
+  personAssignedWanteds: PersonWanted[] = [];
 
   setPersonWanteds(wanteds: PersonWanted[]) {
-    this.personWanteds = wanteds;
+    this.personAssignedWanteds = wanteds;
   }
 
-   async getPersonWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+   async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/${pubkey}`, queryLimit, {
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
-
-      console.log("Person Wanted ==", ps)
 
       this.setPersonWanteds(ps);
 

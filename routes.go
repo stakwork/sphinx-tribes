@@ -77,7 +77,7 @@ func NewRouter() *http.Server {
 		r.Get("/people/search", getPeopleBySearch)
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
-		r.Get("/people/wanteds/{pubkey}", getPersonWanteds)
+		r.Get("/people/wanteds/assigned/{pubkey}", getPersonAssignedWanteds)
 		r.Get("/people/wanteds/header", getWantedsHeader)
 		r.Get("/people/short", getPeopleShortList)
 		r.Get("/people/offers", getListedOffers)
@@ -305,7 +305,7 @@ func getListedWanteds(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getPersonWanteds(w http.ResponseWriter, r *http.Request) {
+func getPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 	people, err := DB.getListedWanteds(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

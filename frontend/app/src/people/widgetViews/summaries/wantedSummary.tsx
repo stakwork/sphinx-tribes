@@ -56,7 +56,7 @@ function WantedSummary(props: any) {
 
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
-  const { peopleWanteds, personWanteds } = main;
+  const { peopleWanteds } = main;
   const color = colors['light'];
 
   const [assigneeInfo, setAssigneeInfo]: any = useState(null);
