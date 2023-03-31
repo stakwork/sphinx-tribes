@@ -4,7 +4,7 @@ import Form from '../../components/form';
 import styled, { css } from 'styled-components';
 import { Button, IconButton } from '../../components/common';
 import moment from 'moment';
-import SummaryViewer from '../widgetViews/summaryViewer';
+import WantedSummary from '../widgetViews/summaries/wantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
@@ -205,9 +205,6 @@ function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    if (config.name === 'wanted') {
-      body.title = body.one_sentence_summary ?? '';
-    }
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);
@@ -249,7 +246,7 @@ function FocusedView(props: any) {
     }
     props.onSuccess();
     setLoading(false);
-    if (ui?.meInfo?.hasOwnProperty("url") && !isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
   }
 
   const initialValues: any = {};
@@ -274,6 +271,7 @@ function FocusedView(props: any) {
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
+      initialValues.email = (personInfo.extras?.email && personInfo.extras?.email[0]?.value) || '';
       initialValues.github =
         (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
       initialValues.facebook =
@@ -418,12 +416,12 @@ function FocusedView(props: any) {
           {(isMobile || canEdit) && <div style={{ height: 60 }} />}
 
           {/* display item */}
-          <SummaryViewer
+          <WantedSummary
+            {...person?.extras[config?.name][selectedIndex]}
             ReCallBounties={props?.ReCallBounties}
             formSubmit={submitForm}
             person={person}
             personBody={props?.personBody}
-            item={person?.extras && person.extras[config?.name][selectedIndex]}
             config={config}
             fromBountyPage={fromBountyPage}
             extraModalFunction={props?.extraModalFunction}

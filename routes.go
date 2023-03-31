@@ -53,6 +53,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribes", getListedTribes)
 		r.Get("/tribes/{uuid}", getTribe)
+		r.Get("/tribe_by_feed", getFirstTribeByFeed)
 		r.Get("/tribes/total", getTotalribes)
 		r.Get("/tribe_by_un/{un}", getTribeByUniqueName)
 
@@ -342,6 +343,25 @@ func getTribe(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(j, &theTribe)
 
 	theTribe["channels"] = DB.getChannelsByTribe(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(theTribe)
+}
+
+func getFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
+	url := r.URL.Query().Get("url")
+	tribe := DB.getFirstTribeByFeedURL(url)
+
+	if tribe.UUID == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	var theTribe map[string]interface{}
+	j, _ := json.Marshal(tribe)
+	json.Unmarshal(j, &theTribe)
+
+	theTribe["channels"] = DB.getChannelsByTribe(tribe.UUID)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(theTribe)
@@ -942,8 +962,6 @@ func receiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
-
-	fmt.Println("X-JWT ===", token)
 
 	responseData := make(map[string]interface{})
 	claims, err := DecodeToken(token)

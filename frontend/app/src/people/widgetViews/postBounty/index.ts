@@ -1,1 +1,1 @@
-export { PostBounty } from './PostBounty'
+export { PostBounty } from './PostBounty';

@@ -117,22 +117,6 @@ export default function NoneSpaceHomePage(props) {
   );
 }
 
-interface IconProps {
-  src: string;
-}
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
-  width: 160px;
-  height: 160px;
-  margin-right: 10px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  border-radius: 5px;
-  overflow: hidden;
-`;
-
 const H = styled.div`
   margin-top: 10px;
 

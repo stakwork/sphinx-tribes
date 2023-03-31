@@ -90,6 +90,7 @@ export const meSchema: FormField[] = [
       twitter: Yup.object({
         handle: strValidator
       }).default(undefined),
+      email: Yup.string().email(),
       supportme: Yup.object({
         url: strValidator
       }).default(undefined),
@@ -361,6 +362,14 @@ export const firstScreenSchema: FormField[] = [
     type: 'text',
     prepend: '@',
     page: 1
+  },
+  {
+    name: 'email',
+    label: 'Email',
+    widget: true,
+    type: 'text',
+    prepend: '',
+    page: 1
   }
 ];
 
@@ -438,7 +447,6 @@ export const aboutSchema: FormField[] = [
     validator: repoArrayStrValidator, // look for 1 slash
     page: 1
   },
-
   {
     name: 'lightning',
     label: 'Lightning address',
@@ -467,6 +475,15 @@ export const aboutSchema: FormField[] = [
     type: 'text',
     prepend: '@',
     page: 1
+  },
+  {
+    name: 'email',
+    label: 'Email',
+    widget: true,
+    type: 'text',
+    prepend: '',
+    page: 1,
+    validator: Yup.string().email()
   }
 ];
 

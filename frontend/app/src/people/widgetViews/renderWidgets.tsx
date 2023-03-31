@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useStores } from '../../store';
 
-import AboutView from './aboutView';
+import { AboutView } from './aboutView';
 import OfferView from './offerView';
 
 import { observer } from 'mobx-react-lite';

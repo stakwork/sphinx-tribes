@@ -11,7 +11,7 @@ export default function WidgetList(props: any) {
       return (
         <IWrap
           style={{ cursor: 'pointer' }}
-          key={`${i  }listItem`}
+          key={`${i}listItem`}
           onClick={() => props.setSelected(v, i)}
         >
           {child}

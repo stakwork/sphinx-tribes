@@ -31,33 +31,18 @@ function WantedView(props: any) {
     assignee,
     estimate_session_length,
     loomEmbedUrl,
-    onPanelClick
+    onPanelClick,
+    show = true,
+    paid = false
   } = props;
   const titleString = one_sentence_summary ?? title;
-
-  let { show, paid } = props;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
   const [labels, setLabels] = useState([]);
   const { peopleWanteds } = main;
   const color = colors['light'];
-
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
-
-  if ('show' in props) {
-    // show has a value
-  } else {
-    // if no value default to true
-    show = true;
-  }
-
-  if ('paid' in props) {
-    // show has no value
-  } else {
-    // if no value default to false
-    paid = false;
-  }
 
   async function setExtrasPropertyAndSave(propertyName: string) {
     if (peopleWanteds) {

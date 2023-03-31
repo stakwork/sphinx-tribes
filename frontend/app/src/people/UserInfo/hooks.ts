@@ -29,7 +29,7 @@ export const useUserInfo = () => {
     ui.setEditMe(false);
     ui.setMeInfo(null);
     main.getPeople({ resetPage: true });
-    main.setLnToken("");
+    main.setLnToken('');
     goBack();
   }
 
