@@ -11,7 +11,7 @@ import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import StartUpModal from '../utils/start_up_modal';
 import FirstTimeScreen from './firstTimeScreen';
-import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui'
+import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui';
 
 export default observer(BodyComponent);
 
@@ -99,7 +99,7 @@ function BodyComponent() {
           placeholder="Search"
           value={ui.searchText}
           style={{
-									width: isMobile ? '95vw' : 240,
+            width: isMobile ? '95vw' : 240,
             height: 40,
             border: `1px solid ${color.grayish.G600}`,
             background: color.grayish.G600
