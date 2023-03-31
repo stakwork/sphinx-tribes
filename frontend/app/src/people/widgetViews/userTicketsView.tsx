@@ -41,7 +41,7 @@ const UserTickets = () => {
     async function getUserTickets() {
         setIsLoading(true);
 
-        const tickets = await main.getPersonWanteds({}, personPubkey);
+        const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
 
         setUserTickets(tickets);
 

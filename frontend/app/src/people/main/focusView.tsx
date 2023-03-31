@@ -319,7 +319,7 @@ function FocusedView(props: any) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-    if (main.personWanteds.length) {
+    if (main.personAssignedWanteds.length) {
       return main.peopleWanteds[selectedIndex].body;
     } else if (person?.extras && main.peopleWanteds) {
       return person.extras[config?.name][selectedIndex];
