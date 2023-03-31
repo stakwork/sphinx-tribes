@@ -578,6 +578,8 @@ export class MainStore {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
 
+      console.log("Person Wanted ==", ps)
+
       this.setPersonWanteds(ps);
 
       return ps;
@@ -1099,7 +1101,9 @@ export interface PersonWanted {
   created: number;
   show?: boolean;
   assignee?: any;
-  body: PersonWanted;
+  body: PersonWanted | any;
+  type?: string,
+  price?: string;
 }
 
 export interface PersonOffer {
