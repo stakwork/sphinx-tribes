@@ -42,7 +42,7 @@ export interface Wanted {
   gallery?: [string];
   description: string;
   url?: string;
-  created: number;
+  created?: number;
   show?: boolean;
 }
 
