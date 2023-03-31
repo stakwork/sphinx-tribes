@@ -7,19 +7,3 @@ export const mockUsehistory = () => {
     })
   }));
 };
-
-export const mockUseParams = () => {
-  jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useParams: ({
-      personPubKey: 'test_pub_key_2'
-    }),
-  }));
-};
-
-export const mockUseRouterMatch = () => {
-  jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useRouteMatch: jest.fn(),
-  }));
-};
