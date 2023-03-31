@@ -49,23 +49,4 @@ export const people: Person[] = [
   }
 ];
 
-export const person: Person = people[0];
-
-export const userTickets: PersonWanted[] = [{
-  person: person,
-  created: 0,
-  body: {
-    assignee: {
-      img: people[1].img,
-      label: `${people[1].alias} (${people[1].unique_name})`,
-      owner_alias: people[1].owner_alias,
-      owner_pubkey: people[1].owner_pubkey,
-      value: people[1].owner_pubkey,
-    },
-    show: true, 
-    type: 'freelance_job_request',
-    price: '400000', 
-    title: 'Trying this', 
-    created: 1680130875
-  }
-}];
+export const person: Person = people[0]; 

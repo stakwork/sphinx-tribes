@@ -577,6 +577,8 @@ export class MainStore {
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
+   
+      navigator.clipboard.writeText(JSON.stringify(ps));
 
       this.setPersonWanteds(ps);
 
@@ -1096,7 +1098,7 @@ export interface PersonWanted {
   person: PersonFlex;
   title?: string;
   description?: string;
-  created: number;
+  created?: number;
   show?: boolean;
   assignee?: any;
   body: PersonWanted | any;
