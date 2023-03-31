@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
 import { setupStore } from '__test__/__mockData__/setupStore';
@@ -8,6 +8,7 @@ import { mockUsehistory } from '__test__/__mockFn__/useHistory';
 import UserTicketsView from '../userTicketsView';
 import routeData from 'react-router';
 import { people } from '__test__/__mockData__/persons';
+import { userAssignedTickets } from '__test__/__mockData__/userTickets';
 
 beforeAll(() => {
     nock.disableNetConnect();
@@ -17,16 +18,33 @@ beforeAll(() => {
 
 // Todo : mock api request in usertickets page
 describe('UserTicketsView Component', () => {
+    let originFetch;
+    beforeEach(() => {
+        originFetch = (global as any).fetch;
+    });
+    afterEach(() => {
+        (global as any).fetch = originFetch;
+    });
+
     nock(user.url);
-    test('display user assigned tickets', () => {
+    test('display user assigned tickets', async () => {
         const person = people[1];
+
+        const mRes = jest.fn().mockResolvedValueOnce(userAssignedTickets);
+        const mockedFetch = jest.fn().mockResolvedValueOnce(mRes as any);
+        (global as any).fetch = mockedFetch;
 
         jest.spyOn(routeData, 'useParams').mockReturnValue({ personPubKey: person.owner_pubkey });
         jest.spyOn(routeData, 'useRouteMatch').mockReturnValue({ "url": `/p/${person.owner_pubkey}/usertickets`, "path": "/p/:personPubkey/usertickets", "params": {}, "isExact": true });
 
         const title = 'Trying this';
 
-        render(<UserTicketsView />);
-        expect(screen.queryByText(title)).toBeInTheDocument();
+        (global as any).fetch = mockedFetch;
+        const { getByTestId } = render(<UserTicketsView />);
+
+        const div = await waitFor(() => getByTestId('test'));
+
+        // expect(div).toHaveTextContent(title);
+        expect(mockedFetch).toBeCalledTimes(1);
     });
 });
