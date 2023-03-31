@@ -1,6 +1,6 @@
 import { Person, PersonWanted } from '../../store/main';
 
-const people: Person[] = [
+export const people: Person[] = [
   {
     id: 1,
     pubkey: 'test_pub_key',
