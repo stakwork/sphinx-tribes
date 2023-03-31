@@ -54,6 +54,7 @@ export default function Person(props: any) {
                     marginTop: hideActions ? 5 : 10,
                     fontSize: hideActions ? 12 : 15
                   }}
+                  isMobile={small}
                 >
                   {description}
                 </Description>
@@ -204,6 +205,7 @@ const DTitle = styled.h3`
 
 interface DescriptionProps {
   lineRows: number;
+  isMobile: boolean
 }
 const Description = styled.div<DescriptionProps>`
   font-size: 12px;
@@ -212,6 +214,7 @@ const Description = styled.div<DescriptionProps>`
   overflow: hidden;
   margin-bottom: 10px;
   font-weight: 400;
+	max-width: ${(p) => (p.isMobile ? '200px' : 'auto')};
 
   display: -webkit-box;
   -webkit-line-clamp: ${(p) => (p.lineRows ? p.lineRows : 1)};
