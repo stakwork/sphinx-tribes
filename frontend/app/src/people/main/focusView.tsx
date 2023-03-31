@@ -425,7 +425,7 @@ function FocusedView(props: any) {
 
           {/* display item */}
           <WantedSummary
-            {...person?.extras[config?.name][selectedIndex]}
+            {...getExtras()}
             ReCallBounties={props?.ReCallBounties}
             formSubmit={submitForm}
             person={person}
