@@ -71,5 +71,4 @@ export interface Extras {
   wanted?: Wanted[];
   supportme?: SupportMe;
   liquid?: SingleValueExtra[];
-  // tickets?: {[key: string]: any}
 }
