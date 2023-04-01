@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import WantedView from '../widgetViews/wantedView';
-import { Route, Switch, useHistory, useParams, useRouteMatch, BrowserRouter } from "react-router-dom";
+import { Route, Switch, useParams, useRouteMatch, Router } from "react-router-dom";
 import { useStores } from "store";
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import NoResults from "people/utils/userNoResults";
@@ -10,13 +10,13 @@ import DeleteTicketModal from "./deleteModal";
 import { Spacer } from "people/main/body";
 import styled from "styled-components";
 import { BountyModal } from "people/main/BountyModal/BountyModal";
+import history from '../../config/history';
 
 const UserTickets = () => {
     const color = colors['light'];
     const { personPubkey } = useParams<{ personPubkey: string }>();
     const { main, ui } = useStores();
     const isMobile = useIsMobile();
-    const history = useHistory();
     const { path, url } = useRouteMatch();
 
     const [userTickets, setUserTickets] = useState<any>([]);
@@ -102,7 +102,7 @@ const UserTickets = () => {
                             colors={color}
                             showName
                             onPanelClick={() => {
-                                if (onPanelClick) onPanelClick(i);
+                                onPanelClick(i);
                             }}
                             person={person}
                             showModal={showModal}
@@ -121,13 +121,13 @@ const UserTickets = () => {
     return (
         <div data-testid="test">
             <Container>
-                {/* <BrowserRouter> */}
-                <Switch>
-                    <Route path={`${path}/:wantedId`}>
-                        <BountyModal basePath={url} />
-                    </Route>
-                </Switch>
-                {/* </BrowserRouter> */}
+                <Router history={history}>
+                    <Switch>
+                        <Route path={`${path}/:wantedId`}>
+                            <BountyModal basePath={url} />
+                        </Route>
+                    </Switch>
+                </Router>
                 {listItems}
                 <Spacer key={'spacer2'} />
                 {showDeleteModal && (

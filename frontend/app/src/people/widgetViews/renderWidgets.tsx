@@ -16,6 +16,7 @@ import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
 
 export default observer(RenderWidgets);
+
 function RenderWidgets({ widget }) {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
