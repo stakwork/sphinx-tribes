@@ -1,4 +1,3 @@
-import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
@@ -12,6 +11,7 @@ import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import StartUpModal from '../utils/start_up_modal';
 import FirstTimeScreen from './firstTimeScreen';
+import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui';
 
 export default observer(BodyComponent);
 
@@ -99,7 +99,7 @@ function BodyComponent() {
           placeholder="Search"
           value={ui.searchText}
           style={{
-            width: 204,
+            width: isMobile ? '95vw' : 240,
             height: 40,
             border: `1px solid ${color.grayish.G600}`,
             background: color.grayish.G600
