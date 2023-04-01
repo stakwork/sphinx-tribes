@@ -14,7 +14,7 @@ func initConfig() {
 	jwtKey = os.Getenv("LN_JWT_KEY")
 
 	if host == "" {
-		host = "people.sphinx.chat"
+		host = "https://people.sphinx.chat"
 	}
 
 	if jwtKey == "" {
