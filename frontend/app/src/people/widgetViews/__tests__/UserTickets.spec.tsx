@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
 import { setupStore } from '__test__/__mockData__/setupStore';
@@ -28,7 +28,7 @@ describe('UserTicketsView Component', () => {
 
     nock(user.url);
     test('display no assigned tickets when the api request fails, or user has no assigned tickets', async () => {
-        const person = people[1];
+        const [person] = people;
 
         const mRes = jest.fn().mockResolvedValueOnce(userAssignedTickets);
         const mockedFetch = jest.fn().mockResolvedValueOnce(mRes as any);

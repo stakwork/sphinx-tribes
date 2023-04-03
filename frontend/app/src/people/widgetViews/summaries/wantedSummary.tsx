@@ -268,7 +268,6 @@ function WantedSummary(props: any) {
 
   async function setExtrasPropertyAndSaveMultiple(propertyName: any, dataObject: any) {
     if (peopleWanteds) {
-
       setIsMarkPaidSaved(true);
       try {
         const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(

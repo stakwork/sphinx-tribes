@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 export default function Heart() {
   const [loading, setLoading] = useState(false);
   const selected = false;
-  function clickIt(e) {
+  function clickIt() {
     setLoading(true);
     setLoading(false);
   }

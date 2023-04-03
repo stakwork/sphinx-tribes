@@ -14,12 +14,7 @@ beforeAll(() => {
 });
 
 describe('AboutView Component', () => {
-
-  beforeEach(() => {
-  })
-
   nock(user.url);
-
   test('display about view with extras', () => {
     const description = 'test description';
     const extras = {
@@ -34,8 +29,3 @@ describe('AboutView Component', () => {
     expect(screen.queryByText(description)).toBeInTheDocument();
   });
 });
-
-const fakeUsers = [
-  { id: 1, name: 'Joe' },
-  { id: 2, name: 'Tony' },
-]
