@@ -537,8 +537,6 @@ export class MainStore {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
 
-      console.log("Peiople Wanted", ps)
-
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
         this.peopleWanteds = ps;
