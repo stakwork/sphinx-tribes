@@ -35,14 +35,12 @@ describe('UserTicketsView Component', () => {
     (global as any).fetch = mockedFetch;
 
     jest.spyOn(routeData, 'useParams').mockReturnValue({ personPubKey: person.owner_pubkey });
-    jest
-      .spyOn(routeData, 'useRouteMatch')
-      .mockReturnValue({
-        url: `/p/${person.owner_pubkey}/usertickets`,
-        path: '/p/:personPubkey/usertickets',
-        params: {},
-        isExact: true
-      });
+    jest.spyOn(routeData, 'useRouteMatch').mockReturnValue({
+      url: `/p/${person.owner_pubkey}/usertickets`,
+      path: '/p/:personPubkey/usertickets',
+      params: {},
+      isExact: true
+    });
 
     (global as any).fetch = mockedFetch;
     const { getByTestId } = render(<UserTicketsView />);
