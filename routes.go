@@ -81,6 +81,7 @@ func NewRouter() *http.Server {
 		r.Get("/people/short", getPeopleShortList)
 		r.Get("/people/offers", getListedOffers)
 		r.Get("/admin_pubkeys", getAdminPubkeys)
+		r.Get("/people/bounty/leaderboard", getBountiesLeaderboard)
 
 		r.Get("/ask", ask)
 		r.Get("/poll/{challenge}", poll)
@@ -93,7 +94,6 @@ func NewRouter() *http.Server {
 		r.Get("/github_issue/status/open", getOpenGithubIssues)
 		r.Post("/save", postSave)
 		r.Get("/save/{key}", pollSave)
-		r.Get("/bounties/leaderboard", getBountiesLeaderboard)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -1018,7 +1018,7 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = "http://localhost:5005"
+	user["url"] = host
 
 	return user
 }
