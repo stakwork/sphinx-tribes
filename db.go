@@ -798,9 +798,8 @@ func (db database) getBountiesLeaderboard() []LeaderData {
 	db.db.Raw(`SELECT item->'assignee'->>'owner_pubkey' as owner_pubkey, COUNT(item->'assignee'->>'owner_pubkey') as total_bounties_completed, item->>'price' as total_sats_earned from people  p, LATERAL jsonb_array_elements(p.extras->'wanted') r (item) where extras
 	#> '{wanted}' is not null GROUP BY r.item;`).Find(&ms)
 
-	for key, val := range ms {
+	for _, val := range ms {
 		var newLeader = make(map[string]interface{})
-		fmt.Println(key, val)
 		found, index := getLeaderData(users, val.Owner_pubkey)
 
 		if found == -1 {
