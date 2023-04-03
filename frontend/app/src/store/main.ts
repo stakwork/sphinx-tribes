@@ -7,7 +7,7 @@ import { uiStore } from './ui';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
 
-export const queryLimit = 100;
+export const queryLimit = 1000;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
