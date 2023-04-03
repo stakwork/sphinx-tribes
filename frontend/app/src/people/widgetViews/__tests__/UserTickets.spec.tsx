@@ -27,7 +27,7 @@ describe('UserTicketsView Component', () => {
     });
 
     nock(user.url);
-    test('display user assigned tickets', async () => {
+    test('display no assigned tickets when the api request fails, or user has no assigned tickets', async () => {
         const person = people[1];
 
         const mRes = jest.fn().mockResolvedValueOnce(userAssignedTickets);
@@ -37,14 +37,13 @@ describe('UserTicketsView Component', () => {
         jest.spyOn(routeData, 'useParams').mockReturnValue({ personPubKey: person.owner_pubkey });
         jest.spyOn(routeData, 'useRouteMatch').mockReturnValue({ "url": `/p/${person.owner_pubkey}/usertickets`, "path": "/p/:personPubkey/usertickets", "params": {}, "isExact": true });
 
-        const title = 'Trying this';
-
         (global as any).fetch = mockedFetch;
         const { getByTestId } = render(<UserTicketsView />);
 
         const div = await waitFor(() => getByTestId('test'));
 
-        // expect(div).toHaveTextContent(title);
+        expect(div).toHaveTextContent("No Assigned Tickets Yet");
         expect(mockedFetch).toBeCalledTimes(1);
     });
 });
+
