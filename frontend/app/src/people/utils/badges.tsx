@@ -60,7 +60,7 @@ function Badges(props) {
         memo: memo
       };
 
-      const token = await main.claimBadgeOnLiquid(body);
+      //const token = await main.claimBadgeOnLiquid(body);
       // refresh badges
       getBadges();
     } catch (e) {

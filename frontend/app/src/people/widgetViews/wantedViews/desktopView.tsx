@@ -34,6 +34,7 @@ function DesktopView(props: any) {
     saving,
     labels,
     isClosed,
+    onPanelClick,
     status,
     isCodingTask,
     show,
@@ -46,7 +47,7 @@ function DesktopView(props: any) {
   const color = colors['light'];
 
   return (
-    <div key={key}>
+    <div key={key} onClick={onPanelClick}>
       {paid && (
         <Img
           src={'/static/paid_ribbon.svg'}
@@ -125,10 +126,9 @@ function DesktopView(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${
-                        {
-                          ...assignee
-                        }.owner_pubkey
+                      `/p/${{
+                        ...assignee
+                      }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
