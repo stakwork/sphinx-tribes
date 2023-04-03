@@ -108,18 +108,20 @@ const Bounties = (props) => {
               <div className="UnassignedPersonalDetailContainer">
                 <EuiText className="ProfileText">Do your skills match?</EuiText>
                 <IconButton
-                  text={ui.meInfo?.owner_pubkey===person.owner_pubkey ? 'Assign User' : 'I can help'}
+                  text={
+                    ui.meInfo?.owner_pubkey === person.owner_pubkey ? 'Assign User' : 'I can help'
+                  }
                   onClick={(e) => {
                     if (ui.meInfo) {
-                      ui.meInfo?.owner_pubkey===person.owner_pubkey ?
-                      onPanelClick():
-                      showConnectModal();
+                      ui.meInfo?.owner_pubkey === person.owner_pubkey
+                        ? onPanelClick()
+                        : showConnectModal();
                       e.stopPropagation();
-                      } else {
-                        e.stopPropagation();
-                          showModal();
-                        }
-                      }}
+                    } else {
+                      e.stopPropagation();
+                      showModal();
+                    }
+                  }}
                   endingIcon={'arrow_forward'}
                   width={166}
                   height={48}
