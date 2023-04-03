@@ -782,3 +782,18 @@ func (db database) createLnUser(lnKey string) (Person, error) {
 	}
 	return p, nil
 }
+
+type Extras struct {
+	Owner_pubkey             string `json:"owner_pubkey"`
+	Total_bounties_completed uint   `json:"total_bounties_completed"`
+	Total_sats_earned        uint   `json:"total_sats_earned"`
+}
+
+func (db database) getBountiesLeaderboard() []Extras {
+	ms := []Extras{}
+
+	db.db.Raw(`SELECT item->'assignee'->>'owner_pubkey' as owner_pubkey, COUNT(item->'assignee'->>'owner_pubkey') as total_bounties_completed, item->>'price' as total_sats_earned from people  p, LATERAL jsonb_array_elements(p.extras->'wanted') r (item) where extras
+	#> '{wanted}' is not null GROUP BY r.item;`).Find(&ms)
+
+	return ms
+}

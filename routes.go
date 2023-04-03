@@ -93,6 +93,7 @@ func NewRouter() *http.Server {
 		r.Get("/github_issue/status/open", getOpenGithubIssues)
 		r.Post("/save", postSave)
 		r.Get("/save/{key}", pollSave)
+		r.Get("/bounties/leaderboard", getBountiesLeaderboard)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -1020,4 +1021,11 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["url"] = "http://localhost:5005"
 
 	return user
+}
+
+func getBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
+	leaderBoard := DB.getBountiesLeaderboard()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(leaderBoard)
 }

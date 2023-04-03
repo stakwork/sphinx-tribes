@@ -217,6 +217,14 @@ type ConnectionCodesShort struct {
 	DateCreated      *time.Time `json:"date_created"`
 }
 
+type BountiesLeaderBoard struct {
+	// UUID          string `json:"uuid"`
+	Owner_Pub_Key string `json:"owner_pubkey"`
+	// Count         uint8  `json:"count"`
+	// Total_Bounties_Completed string `json:"total_bounties"`
+	// Total_Sats_Earned        string `json:"total_sats"`
+}
+
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }
@@ -224,37 +232,6 @@ func (ConnectionCodes) TableName() string {
 func (ConnectionCodesShort) TableName() string {
 	return "connectioncodes"
 }
-
-/*
-GithubIssues
-stakwork/sphinx-relay/229: {
-	status: open
-	assignee: Evanfeenstra
-}
-*/
-
-/* loopbot:
-{
-	prefix:'/loopout',
-	price:0,
-	commands: [{
-		command: '*',
-		price: 0,
-		min_price: 250000,
-		max_price: 16777215,
-		price_index: 2,
-		admin_only: false
-	}]
-}
-*/
-
-/* btc bot:
-{
-	prefix:'/btc',
-	price:10,
-	commands: null
-}
-*/
 
 // PropertyMap ...
 type PropertyMap map[string]interface{}
