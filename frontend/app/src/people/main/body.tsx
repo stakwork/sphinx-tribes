@@ -28,10 +28,7 @@ function BodyComponent() {
   const people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
   const loadForwardFunc = () => loadMore(1);
   const loadBackwardFunc = () => loadMore(-1);
-  const { loadingBottom, handleScroll } = usePageScroll(
-    loadForwardFunc,
-    loadBackwardFunc
-  );
+  const { loadingBottom, handleScroll } = usePageScroll(loadForwardFunc, loadBackwardFunc);
 
   const toastsEl = (
     <EuiGlobalToastList

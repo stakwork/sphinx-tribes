@@ -7,7 +7,7 @@ import CodingMobile from './codingMobile';
 
 export default function CodingTask(props: any) {
   const { isMobile } = props;
-		/*	
+  /*	
 
   const { ticketUrl, repo, person, issue, assigneeInfo, isMobile } = props;
   const color = colors['light'];

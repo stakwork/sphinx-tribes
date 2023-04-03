@@ -8,22 +8,22 @@ import { widgetConfigs } from '../utils/constants';
 
 export default observer(NoResults);
 function NoResults(props) {
-    const { ui } = useStores();
+  const { ui } = useStores();
 
-    const tabs = widgetConfigs;
+  const tabs = widgetConfigs;
 
-    if (props.loading) {
-        return <PageLoadSpinner show={true} />;
-    } else {
-        return (
-            <NoneSpace
-                small
-                style={{
-                    margin: 'auto',
-                    marginTop: '25%'
-                }}
-                {...tabs['usertickets']?.noneSpace['noResult']}
-            />
-        )
-    }
+  if (props.loading) {
+    return <PageLoadSpinner show={true} />;
+  } else {
+    return (
+      <NoneSpace
+        small
+        style={{
+          margin: 'auto',
+          marginTop: '25%'
+        }}
+        {...tabs['usertickets']?.noneSpace['noResult']}
+      />
+    );
+  }
 }

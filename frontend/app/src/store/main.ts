@@ -541,7 +541,7 @@ export class MainStore {
       if (queryParams && queryParams.resetPage) {
         // Set person wanted to empty array to avoid wrong data
         this.setPersonWanteds([]);
-        
+
         this.peopleWanteds = ps;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
@@ -560,14 +560,13 @@ export class MainStore {
     }
   }
 
-
   personAssignedWanteds: PersonWanted[] = [];
 
   setPersonWanteds(wanteds: PersonWanted[]) {
     this.personAssignedWanteds = wanteds;
   }
 
-   async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+  async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
@@ -577,7 +576,7 @@ export class MainStore {
     try {
       let ps = await api.get(query);
       ps = this.decodeListJSON(ps);
-   
+
       navigator.clipboard.writeText(JSON.stringify(ps));
 
       this.setPersonWanteds(ps);
@@ -1102,7 +1101,7 @@ export interface PersonWanted {
   show?: boolean;
   assignee?: any;
   body: PersonWanted | any;
-  type?: string,
+  type?: string;
   price?: string;
 }
 
