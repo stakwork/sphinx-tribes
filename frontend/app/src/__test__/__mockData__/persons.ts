@@ -49,4 +49,4 @@ export const people: Person[] = [
   }
 ];
 
-export const person: Person = people[0]; 
+export const person: Person = people[0];
