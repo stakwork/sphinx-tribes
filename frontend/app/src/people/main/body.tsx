@@ -11,7 +11,6 @@ import Person from '../person';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import StartUpModal from '../utils/start_up_modal';
-import FirstTimeScreen from './firstTimeScreen';
 
 export default observer(BodyComponent);
 
@@ -26,10 +25,10 @@ function BodyComponent() {
   const { peoplePageNumber } = ui;
   const history = useHistory();
   const isMobile = useIsMobile();
-  let people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
+  const people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
   const loadForwardFunc = () => loadMore(1);
   const loadBackwardFunc = () => loadMore(-1);
-  const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
+  const { loadingBottom, handleScroll } = usePageScroll(
     loadForwardFunc,
     loadBackwardFunc
   );
