@@ -1029,7 +1029,7 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = "http://localhost:5005"
+	user["url"] = host
 
 	return user
 }
