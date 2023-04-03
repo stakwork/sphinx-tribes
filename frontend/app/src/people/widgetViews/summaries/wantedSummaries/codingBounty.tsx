@@ -6,7 +6,6 @@ import {
   Img,
   PaidStatusPopover,
   CreatorDescription,
-  Profile,
   BountyPriceContainer,
   BottomButtonContainer,
   UnassignedPersonProfile,
@@ -174,7 +173,7 @@ function MobileView(props: any) {
                 <CreatorDescription paid={paid} color={color}>
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
-                      <Profile>{nametag}</Profile>
+                      <div>{nametag}</div>
                       <div className="CreatorDescriptionExtraButton">
                         <ImageButton
                           buttonText={'Edit'}
@@ -687,7 +686,7 @@ function MobileView(props: any) {
           )}
           <CreatorDescription paid={paid} color={color}>
             <div className="DescriptionUpperContainerNormalView">
-              <Profile>{nametag}</Profile>
+              <div>{nametag}</div>
               <TitleBox color={color}>{titleString}</TitleBox>
               <LanguageContainer>
                 {dataValue &&

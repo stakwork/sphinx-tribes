@@ -142,8 +142,10 @@ const Name = styled.div<NameProps>`
   line-height: 16px;
   /* or 158% */
 
-  display: flex;
-  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 11vw;
 `;
 
 const Date = styled.div`

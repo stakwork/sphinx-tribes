@@ -1,13 +1,15 @@
 /* eslint-disable func-style */
 import React from 'react';
-import { Img, Assignee } from './style';
-import { colors } from '../../../../config/colors';
-import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../../helpers';
+//import { Img, Assignee } from './style';
+//import { colors } from '../../../../config/colors';
+//import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../../helpers';
 import CodingMobile from './codingMobile';
 
 export default function CodingTask(props: any) {
-  const { ticketUrl, repo, person, issue, assigneeInfo, isMobile } = props;
+  const { isMobile } = props;
+		/*	
 
+  const { ticketUrl, repo, person, issue, assigneeInfo, isMobile } = props;
   const color = colors['light'];
 
   const { status } = ticketUrl
@@ -23,6 +25,7 @@ export default function CodingTask(props: any) {
     el.click();
   }
 
+				
   if (assigneeInfo) {
     if (!isMobile) {
       assigneeLabel = (
@@ -82,7 +85,7 @@ export default function CodingTask(props: any) {
         </div>
       );
     }
-  }
+  }*/
 
   if (isMobile) {
     return <CodingMobile />;

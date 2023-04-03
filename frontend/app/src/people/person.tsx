@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { getHost } from '../config/host';
-import { colors } from '../config/colors';
 import { Button, Divider } from '../components/common/index';
 import ConnectCard from './utils/connectCard';
-import moment from 'moment';
 
 const host = getHost();
 
@@ -23,8 +21,6 @@ export default function Person(props: any) {
     owner_alias,
     owner_pubkey,
     unique_name,
-    updated,
-    last_login,
     squeeze,
     description
   } = props;

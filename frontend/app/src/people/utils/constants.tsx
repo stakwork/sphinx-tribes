@@ -112,6 +112,30 @@ const widgetConfigs = {
         sub: 'Looks like this person doesn’t need anything yet.'
       }
     }
+  },
+  usertickets: {
+    label: 'Assigned Tickets',
+    name: 'userwanted',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: [],
+    action: {
+      text: 'Add New Ticket',
+      icon: 'local_offer'
+    },
+    noneSpace: {
+      noResult: {
+        img: 'no_wanted2.png',
+        text: 'No Assigned Tickets Yet',
+        sub: 'Looks like this person doesn’t need anything yet.'
+      }
+    }
   }
 };
 
