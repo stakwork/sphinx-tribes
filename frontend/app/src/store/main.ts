@@ -539,6 +539,9 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
+        // Set person wanted to empty array to avoid wrong data
+        this.setPersonWanteds([]);
+
         this.peopleWanteds = ps;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
@@ -550,6 +553,34 @@ export class MainStore {
           queryParams
         );
       }
+      return ps;
+    } catch (e) {
+      console.log('fetch failed getPeopleWanteds: ', e);
+      return [];
+    }
+  }
+
+  personAssignedWanteds: PersonWanted[] = [];
+
+  setPersonWanteds(wanteds: PersonWanted[]) {
+    this.personAssignedWanteds = wanteds;
+  }
+
+  async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);
+
+      navigator.clipboard.writeText(JSON.stringify(ps));
+
+      this.setPersonWanteds(ps);
+
       return ps;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -1066,9 +1097,12 @@ export interface PersonWanted {
   person: PersonFlex;
   title?: string;
   description?: string;
-  created: number;
+  created?: number;
   show?: boolean;
-  body: PersonWanted;
+  assignee?: any;
+  body: PersonWanted | any;
+  type?: string;
+  price?: string;
 }
 
 export interface PersonOffer {

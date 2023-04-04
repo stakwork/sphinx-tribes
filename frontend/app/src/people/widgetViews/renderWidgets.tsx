@@ -13,8 +13,10 @@ import Badges from '../utils/badges';
 import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
 import { PostBounty } from './postBounty';
+import UserTickets from './userTicketsView';
 
 export default observer(RenderWidgets);
+
 function RenderWidgets({ widget }) {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
@@ -177,6 +179,8 @@ function RenderWidgets({ widget }) {
             <AboutView {...person} />
           </Panel>
         );
+      case 'usertickets':
+        return <UserTickets />;
       case 'offer':
         return wrapIt(<OfferView {...fullSelectedWidget} person={person} />);
       default:
