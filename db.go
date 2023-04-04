@@ -811,3 +811,52 @@ func (db database) createLnUser(lnKey string) (Person, error) {
 	}
 	return p, nil
 }
+
+type Extras struct {
+	Owner_pubkey             string `json:"owner_pubkey"`
+	Total_bounties_completed uint   `json:"total_bounties_completed"`
+	Total_sats_earned        uint   `json:"total_sats_earned"`
+}
+
+type LeaderData map[string]interface{}
+
+func (db database) getBountiesLeaderboard() []LeaderData {
+	ms := []Extras{}
+	var users = []LeaderData{}
+
+	db.db.Raw(`SELECT item->'assignee'->>'owner_pubkey' as owner_pubkey, COUNT(item->'assignee'->>'owner_pubkey') as total_bounties_completed, item->>'price' as total_sats_earned from people  p, LATERAL jsonb_array_elements(p.extras->'wanted') r (item) where extras
+	#> '{wanted}' is not null GROUP BY r.item;`).Find(&ms)
+
+	for _, val := range ms {
+		var newLeader = make(map[string]interface{})
+		found, index := getLeaderData(users, val.Owner_pubkey)
+
+		if found == -1 {
+			newLeader["owner_pubkey"] = val.Owner_pubkey
+			newLeader["total_bounties_completed"] = val.Total_bounties_completed
+			newLeader["total_sats_earned"] = val.Total_sats_earned
+
+			users = append(users, newLeader)
+		} else {
+			total_bounties := users[index]["total_bounties_completed"].(uint)
+			total_sats := users[index]["total_sats_earned"].(uint)
+
+			users[index]["total_bounties_completed"] = total_bounties + val.Total_bounties_completed
+			users[index]["total_sats_earned"] = total_sats + val.Total_sats_earned
+		}
+	}
+	return users
+}
+
+func getLeaderData(arr []LeaderData, key string) (int, int) {
+	found := -1
+	index := 0
+
+	for i, v := range arr {
+		if v["owner_pubkey"] == key {
+			found = 1
+			index = i
+		}
+	}
+	return found, index
+}

@@ -225,37 +225,6 @@ func (ConnectionCodesShort) TableName() string {
 	return "connectioncodes"
 }
 
-/*
-GithubIssues
-stakwork/sphinx-relay/229: {
-	status: open
-	assignee: Evanfeenstra
-}
-*/
-
-/* loopbot:
-{
-	prefix:'/loopout',
-	price:0,
-	commands: [{
-		command: '*',
-		price: 0,
-		min_price: 250000,
-		max_price: 16777215,
-		price_index: 2,
-		admin_only: false
-	}]
-}
-*/
-
-/* btc bot:
-{
-	prefix:'/btc',
-	price:10,
-	commands: null
-}
-*/
-
 // PropertyMap ...
 type PropertyMap map[string]interface{}
 
