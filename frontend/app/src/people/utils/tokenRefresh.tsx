@@ -22,6 +22,7 @@ function TokenRefresh() {
           ui.setSelectedPerson(0);
           ui.setSelectingPerson(0);
           setShow(true);
+
           // run this to reset state
           main.getPeople();
         }
