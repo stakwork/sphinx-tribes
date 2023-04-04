@@ -297,6 +297,7 @@ func getListedPosts(w http.ResponseWriter, r *http.Request) {
 
 func getListedWanteds(w http.ResponseWriter, r *http.Request) {
 	people, err := DB.getListedWanteds(r)
+	fmt.Println("Result 20 ==", people)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
