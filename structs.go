@@ -217,14 +217,6 @@ type ConnectionCodesShort struct {
 	DateCreated      *time.Time `json:"date_created"`
 }
 
-type BountiesLeaderBoard struct {
-	// UUID          string `json:"uuid"`
-	Owner_Pub_Key string `json:"owner_pubkey"`
-	// Count         uint8  `json:"count"`
-	// Total_Bounties_Completed string `json:"total_bounties"`
-	// Total_Sats_Earned        string `json:"total_sats"`
-}
-
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }
