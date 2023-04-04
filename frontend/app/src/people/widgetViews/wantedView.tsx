@@ -15,7 +15,6 @@ export default observer(WantedView);
 
 function WantedView(props: any) {
   const {
-    one_sentence_summary,
     title,
     description,
     priceMin,
@@ -35,7 +34,7 @@ function WantedView(props: any) {
     show = true,
     paid = false
   } = props;
-  const titleString = one_sentence_summary ?? title;
+  const titleString = title;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
