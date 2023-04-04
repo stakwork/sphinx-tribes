@@ -7,7 +7,7 @@ import { uiStore } from './ui';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
 
-export const queryLimit = 100;
+export const queryLimit = 1000;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -586,6 +586,34 @@ export class MainStore {
     }
   }
 
+  personAssignedWanteds: PersonWanted[] = [];
+
+  setPersonWanteds(wanteds: PersonWanted[]) {
+    this.personAssignedWanteds = wanteds;
+  }
+
+  async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);
+
+      navigator.clipboard.writeText(JSON.stringify(ps));
+
+      this.setPersonWanteds(ps);
+
+      return ps;
+    } catch (e) {
+      console.log('fetch failed getPeopleWanteds: ', e);
+      return [];
+    }
+  }
+
   @persist('list')
   peopleOffers: PersonOffer[] = [];
 
@@ -1095,9 +1123,12 @@ export interface PersonWanted {
   person: PersonFlex;
   title?: string;
   description?: string;
-  created: number;
+  created?: number;
   show?: boolean;
-  body: PersonWanted;
+  assignee?: any;
+  body: PersonWanted | any;
+  type?: string;
+  price?: string;
 }
 
 export interface PersonOffer {

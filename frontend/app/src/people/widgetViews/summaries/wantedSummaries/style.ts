@@ -172,10 +172,6 @@ export const CreatorDescription = styled.div<styleProps>`
   }
 `;
 
-export const Profile = styled.div`
-  // padding-top: 48px;
-`;
-
 export const TitleBox = styled.div<colorProps>`
   margin-top: 24px;
   font-family: 'Barlow';

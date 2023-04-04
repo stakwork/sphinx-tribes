@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -411,6 +412,22 @@ func makeExtrasListQuery(columnName string) string {
 		END`
 }
 
+func makePersonExtrasListQuery(columnName string) string {
+	// this is safe because columnName is not provided by the user, its hard-coded in db.go
+	return `SELECT 		
+	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
+	arr.item_object as body
+	FROM people,
+	jsonb_array_elements(extras->'` + columnName + `') with ordinality 
+	arr(item_object, position)
+	WHERE arr.item_object->'assignee'->>'owner_pubkey' = ? 
+	AND LOWER(arr.item_object->>'title') LIKE ?
+	AND CASE
+			WHEN arr.item_object->>'show' = 'false' THEN false
+			ELSE true
+		END`
+}
+
 func addNewerThanXDaysToExtrasRawQuery(query string, days int) string {
 	secondsInDay := 86400
 	newerThan := secondsInDay * days
@@ -450,12 +467,19 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 }
 
 func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
-
+	pubkey := chi.URLParam(r, "pubkey")
 	ms := []PeopleExtra{}
+
+	var rawQuery string
+	var result *gorm.DB
 	// set limit
 	offset, limit, sortBy, _, search := getPaginationParams(r)
 
-	rawQuery := makeExtrasListQuery("wanted")
+	if pubkey == "" {
+		rawQuery = makeExtrasListQuery("wanted")
+	} else {
+		rawQuery = makePersonExtrasListQuery("wanted")
+	}
 
 	// 3/1/2022 = 1646172712, we do this to disclude early test tickets
 	rawQuery = addNewerThanTimestampToExtrasRawQuery(rawQuery, 1646172712)
@@ -468,8 +492,13 @@ func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 	}
 
 	// sort by newest
-	result := db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-		rawQuery, "%"+search+"%").Find(&ms)
+	if pubkey == "" {
+		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
+			rawQuery, "%"+search+"%").Find(&ms)
+	} else {
+		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
+			rawQuery, pubkey, "%"+search+"%").Find(&ms)
+	}
 
 	return ms, result.Error
 }

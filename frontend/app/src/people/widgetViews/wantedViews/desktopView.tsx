@@ -12,9 +12,9 @@ import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
 
-export default observer(MobileView);
+export default observer(DesktopView);
 
-function MobileView(props: any) {
+function DesktopView(props: any) {
   const {
     description,
     priceMin,
@@ -34,6 +34,7 @@ function MobileView(props: any) {
     saving,
     labels,
     isClosed,
+    onPanelClick,
     status,
     isCodingTask,
     show,
@@ -46,7 +47,7 @@ function MobileView(props: any) {
   const color = colors['light'];
 
   return (
-    <div key={key}>
+    <div key={key} onClick={onPanelClick}>
       {paid && (
         <Img
           src={'/static/paid_ribbon.svg'}

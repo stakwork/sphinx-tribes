@@ -4,7 +4,7 @@ import Form from '../../components/form';
 import styled, { css } from 'styled-components';
 import { Button, IconButton } from '../../components/common';
 import moment from 'moment';
-import SummaryViewer from '../widgetViews/summaryViewer';
+import WantedSummary from '../widgetViews/summaries/wantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
@@ -205,9 +205,6 @@ function FocusedView(props: any) {
   }
 
   async function submitForm(body) {
-    if (config.name === 'wanted') {
-      body.title = body.one_sentence_summary ?? '';
-    }
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);
@@ -321,6 +318,16 @@ function FocusedView(props: any) {
 
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
+  function getExtras(): any {
+    if (main.personAssignedWanteds.length) {
+      return main.peopleWanteds[selectedIndex].body;
+    } else if (person?.extras && main.peopleWanteds) {
+      return person.extras[config?.name][selectedIndex];
+    }
+
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -417,12 +424,14 @@ function FocusedView(props: any) {
           {(isMobile || canEdit) && <div style={{ height: 60 }} />}
 
           {/* display item */}
-          <SummaryViewer
+          <WantedSummary
+            {...getExtras()}
             ReCallBounties={props?.ReCallBounties}
             formSubmit={submitForm}
             person={person}
             item={props?.item}
             personBody={props?.personBody}
+            item={getExtras()}
             config={config}
             fromBountyPage={fromBountyPage}
             extraModalFunction={props?.extraModalFunction}

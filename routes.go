@@ -77,6 +77,7 @@ func NewRouter() *http.Server {
 		r.Get("/people/search", getPeopleBySearch)
 		r.Get("/people/posts", getListedPosts)
 		r.Get("/people/wanteds", getListedWanteds)
+		r.Get("/people/wanteds/assigned/{pubkey}", getPersonAssignedWanteds)
 		r.Get("/people/wanteds/header", getWantedsHeader)
 		r.Get("/people/short", getPeopleShortList)
 		r.Get("/people/offers", getListedOffers)
@@ -297,7 +298,18 @@ func getListedPosts(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(people)
 	}
 }
+
 func getListedWanteds(w http.ResponseWriter, r *http.Request) {
+	people, err := DB.getListedWanteds(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
+}
+
+func getPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 	people, err := DB.getListedWanteds(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -1021,7 +1033,7 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = "http://localhost:5005"
+	user["url"] = host
 
 	return user
 }

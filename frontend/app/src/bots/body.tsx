@@ -275,7 +275,6 @@ function BotBody() {
                 small={false}
                 selected={ui.selectedBot === t.uuid}
                 select={() => {
-                  console.log('t', t);
                   selectBot(t[botSelectionAttribute]);
                 }}
               />

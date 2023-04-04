@@ -6,7 +6,6 @@ import {
   Img,
   PaidStatusPopover,
   CreatorDescription,
-  Profile,
   BountyPriceContainer,
   BottomButtonContainer,
   UnassignedPersonProfile,
@@ -89,7 +88,7 @@ function MobileView(props: any) {
   const { ui } = useStores();
 
   return (
-    <>
+    <div>
       {{ ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
@@ -174,7 +173,7 @@ function MobileView(props: any) {
                 <CreatorDescription paid={paid} color={color}>
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
-                      <Profile>{nametag}</Profile>
+                      <div>{nametag}</div>
                       <div className="CreatorDescriptionExtraButton">
                         <ImageButton
                           buttonText={'Edit'}
@@ -687,7 +686,7 @@ function MobileView(props: any) {
           )}
           <CreatorDescription paid={paid} color={color}>
             <div className="DescriptionUpperContainerNormalView">
-              <Profile>{nametag}</Profile>
+              <div>{nametag}</div>
               <TitleBox color={color}>{titleString}</TitleBox>
               <LanguageContainer>
                 {dataValue &&
@@ -948,6 +947,6 @@ function MobileView(props: any) {
           </AssigneeProfile>
         </NormalUser>
       )}
-    </>
+    </div>
   );
 }
