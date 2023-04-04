@@ -529,40 +529,44 @@ export class MainStore {
   async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams('people/wanteds', queryLimit, {
+    /*const query = this.appendQueryParams('people/wanteds', queryLimit, {
       ...queryParams,
       sortBy: 'created'
-    });
+    });*/
     const query2 = this.appendQueryParams('bounty/all', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
 
     try {
-      let ps = await api.get(query);
-      ps = this.decodeListJSON(ps);
+      /*let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);*/
 
-						let ps2 = await api.get(query2)
-						let ps3: any[] = []
-										for(let i = 0; i < ps2.length; i++){
-														let bounty = ps2[i]
-														console.log("FROM MAIN:", bounty)
-    const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
-      ...queryParams,
-      sortBy: 'created'
-    });
-    const query4 = this.appendQueryParams(`person/${bounty.OwnerID}`, queryLimit, {
-      ...queryParams,
-      sortBy: 'created'
-    });
-										let assigneeResponse = await api.get(query3)
-														let ownerResponse = await api.get(query4)
-														console.log(assigneeResponse, ownerResponse)
-								
-										ps3.push({ body: { ...bounty, assignee: assigneeResponse  }, person: { ...ownerResponse, wanteds: [] }})
+      let ps2 = await api.get(query2);
+      let ps3: any[] = [];
+      for (let i = 0; i < ps2.length; i++) {
+        let bounty = ps2[i];
+        let assigneeResponse;
+        console.log('FROM MAIN:', bounty);
+        if (bounty.assignee) {
+          const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
+            ...queryParams,
+            sortBy: 'created'
+          });
+          assigneeResponse = await api.get(query3);
+        }
+        const query4 = this.appendQueryParams(`person/${bounty.OwnerID}`, queryLimit, {
+          ...queryParams,
+          sortBy: 'created'
+        });
+        let ownerResponse = await api.get(query4);
+        console.log(ownerResponse);
 
-						}
-
+        ps3.push({
+          body: { ...bounty, assignee: assigneeResponse || '' },
+          person: { ...ownerResponse, wanteds: [] } || { wanteds: [] }
+        });
+      }
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
@@ -577,8 +581,8 @@ export class MainStore {
           queryParams
         );
       }
-						console.log("PS: ", ps )
-						console.log("PS3: ", ps3)
+      //console.log("PS: ", ps )
+      console.log('PS3: ', ps3);
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
