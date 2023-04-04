@@ -49,9 +49,11 @@ const UserTickets = () => {
         setIsLoading(false);
     }
 
-    function onPanelClick(i) {
+    function onPanelClick(body: any) {
+        const index = main.peopleWanteds.findIndex(want => want.body.created == body.created);
+
         history.push({
-            pathname: `${url}/${i}`
+            pathname: `${url}/${index}`
         });
     }
 
@@ -92,6 +94,7 @@ const UserTickets = () => {
             activeList.slice(0, currentItems).map((item, i) => {
                 const { person, body } = item;
 
+
                 // if this person has entries for this widget
                 return (
                     <Panel
@@ -102,7 +105,7 @@ const UserTickets = () => {
                             colors={color}
                             showName
                             onPanelClick={() => {
-                                onPanelClick(i);
+                                onPanelClick(body);
                             }}
                             person={person}
                             showModal={showModal}

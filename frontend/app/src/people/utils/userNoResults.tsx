@@ -19,8 +19,8 @@ function NoResults(props) {
             <NoneSpace
                 small
                 style={{
-                    margin: 'auto',
-                    marginTop: '25%'
+                    minWidth: '60vw',
+                    minHeight: '90vh',
                 }}
                 {...tabs['usertickets']?.noneSpace['noResult']}
             />

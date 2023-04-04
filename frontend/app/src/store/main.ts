@@ -535,12 +535,8 @@ export class MainStore {
     });
     try {
       let ps = await api.get(query);
-
-      //  console.log("PERSON D", ps);
-
+      
       ps = this.decodeListJSON(ps);
-
-      // console.log("PERSON DATA", ps);
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
