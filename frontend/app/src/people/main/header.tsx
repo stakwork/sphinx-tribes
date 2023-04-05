@@ -510,6 +510,7 @@ const MTab = styled.div<TagProps>`
 `;
 
 const LoggedInBtn = styled.div`
+  width: 130px;
   height: 40px;
   border-radius: 50%;
   margin-right: 20px;
