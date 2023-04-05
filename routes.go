@@ -161,7 +161,14 @@ func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 
 func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
-	feed, err := feeds.ParseFeed(url)
+
+	fulltext := false
+	fulltextparam := r.URL.Query().Get("fulltext")
+	if fulltextparam == "true" {
+		fulltext = true
+	}
+
+	feed, err := feeds.ParseFeed(url, fulltext)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
