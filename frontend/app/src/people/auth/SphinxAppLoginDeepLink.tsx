@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { QRCode } from "react-qr-svg";
-import { EuiLoadingSpinner } from "@elastic/eui";
-import styled from "styled-components";
-import api from "../../api";
-import { useStores } from "../../store";
-import type { MeInfo } from "../../store/ui";
-import { getHost } from "../../config/host";
+import React, { useState, useEffect } from 'react';
+import { QRCode } from 'react-qr-svg';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import styled from 'styled-components';
+import api from '../../api';
+import { useStores } from '../../store';
+import type { MeInfo } from '../../store/ui';
+import { getHost } from '../../config/host';
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
 }
 
-let interval
+let interval;
 
 export default function SphinxAppLoginDeeplink(props: any) {
   const { ui } = useStores();
-  const [challenge, setChallenge] = useState("");
-  const [ts, setTS] = useState("");
+  const [challenge, setChallenge] = useState('');
+  const [ts, setTS] = useState('');
 
   const qrString = makeQR(challenge, ts);
 
@@ -27,11 +27,11 @@ export default function SphinxAppLoginDeeplink(props: any) {
 
   useEffect(() => {
     if (challenge && ts) {
-      let el = document.createElement('a')
-      el.href = qrString
+      let el = document.createElement('a');
+      el.href = qrString;
       el.click();
     }
-  }, [challenge, ts])
+  }, [challenge, ts]);
 
   async function startPolling(challenge: string) {
     let i = 0;
@@ -41,20 +41,20 @@ export default function SphinxAppLoginDeeplink(props: any) {
         console.log(me);
         if (me && me.pubkey) {
           ui.setMeInfo(me);
-          setChallenge("");
-          if (props.onSuccess) props.onSuccess()
-          if (interval) clearInterval(interval)
+          setChallenge('');
+          if (props.onSuccess) props.onSuccess();
+          if (interval) clearInterval(interval);
         }
         i++;
         if (i > 100) {
-          if (interval) clearInterval(interval)
+          if (interval) clearInterval(interval);
         }
-      } catch (e) { }
-    }, 3000)
+      } catch (e) {}
+    }, 3000);
   }
 
   async function getChallenge() {
-    const res = await api.get("ask");
+    const res = await api.get('ask');
     if (res.challenge) {
       setChallenge(res.challenge);
       startPolling(res.challenge);
@@ -71,8 +71,7 @@ export default function SphinxAppLoginDeeplink(props: any) {
         <EuiLoadingSpinner size="xl" />
       </InnerWrap>
     </ConfirmWrap>
-  )
-
+  );
 }
 
 const ConfirmWrap = styled.div`
@@ -90,4 +89,3 @@ const InnerWrap = styled.div`
   flex-direction: column;
   width: 100%;
 `;
-
