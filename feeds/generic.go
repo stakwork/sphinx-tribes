@@ -13,7 +13,7 @@ const (
 	FeedTypeBlog    = 2
 )
 
-func ParseFeed(url string) (*Feed, error) {
+func ParseFeed(url string, fulltext bool) (*Feed, error) {
 
 	gen, bod, err := FindGenerator(url)
 	if err != nil {
@@ -48,7 +48,7 @@ func ParseFeed(url string) (*Feed, error) {
 		}
 		return f, nil
 	}
-	f, err := ParsePodcastFeed(url)
+	f, err := ParsePodcastFeed(url, fulltext)
 	if err != nil {
 		f, err = ParseSubstackFeed(url, bod) // this one is quite generic
 		if err != nil {
