@@ -16,6 +16,7 @@ function App() {
 
   useEffect(() => {
     mainStore.getUsdToSatsExchangeRate();
+    mainStore.getPeople();
 
     exchangeRateInterval = setInterval(() => {
       mainStore.getUsdToSatsExchangeRate();
