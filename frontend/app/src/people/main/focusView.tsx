@@ -429,7 +429,6 @@ function FocusedView(props: any) {
             ReCallBounties={props?.ReCallBounties}
             formSubmit={submitForm}
             person={person}
-            item={props?.item}
             personBody={props?.personBody}
             item={getExtras()}
             config={config}
