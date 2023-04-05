@@ -7,6 +7,7 @@ import IconButton from '../../components/common/icon_button';
 import { useIsMobile } from '../../hooks';
 import AuthQR from './authQR';
 import QR from '../utils/QR';
+import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 import { observer } from 'mobx-react-lite';
 
 export default observer(SignIn);
@@ -15,6 +16,7 @@ function SignIn(props: any) {
   const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
+				const [showSignIn, setShowSignIn] = useState(false)
 
   function redirect() {
     const el = document.createElement('a');
@@ -48,6 +50,10 @@ function SignIn(props: any) {
   return useObserver(() => {
     return (
       <div>
+						{showSignIn ? 
+										<Column>
+                    <SphinxAppLoginDeepLink />
+                </Column> :
         <>
           <Column>
             {isMobile && <Imgg src={'/static/sphinx.png'} />}
@@ -82,7 +88,7 @@ function SignIn(props: any) {
                 width={210}
                 style={{ marginTop: 20 }}
                 color={'primary'}
-                onClick={() => ui.setShowSignIn(true)}
+                onClick={() => setShowSignIn(true)}
                 hovercolor={'#5881F8'}
                 activecolor={'#5078F2'}
                 shadowcolor={'rgba(97, 138, 255, 0.5)'}
@@ -143,6 +149,7 @@ function SignIn(props: any) {
             />
           </Column>
         </>
+						}
       </div>
     );
   });
