@@ -547,7 +547,6 @@ export class MainStore {
       for (let i = 0; i < ps2.length; i++) {
         let bounty = ps2[i];
         let assigneeResponse;
-        console.log('FROM MAIN:', bounty);
         if (bounty.assignee) {
           const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
             ...queryParams,
@@ -560,7 +559,6 @@ export class MainStore {
           sortBy: 'created'
         });
         let ownerResponse = await api.get(query4);
-        console.log(ownerResponse);
 
         ps3.push({
           body: { ...bounty, assignee: assigneeResponse || '' },
@@ -829,6 +827,21 @@ export class MainStore {
       await this.getSelf(body);
     } catch (e) {
       console.log('Error saveProfile: ', e);
+    }
+  }
+
+  async saveBounty(body) {
+    if (!body) return; // avoid saving bad state
+    const info = uiStore.meInfo
+    try {
+      let request = 'bounty';
+      const response = api.post(request, body, {
+        'Content-Type': 'application/json',
+        'x-jwt': info?.jwt
+      });
+      console.log('POST BOUNTY RESPONSE:', response);
+    } catch (e) {
+      console.log(e);
     }
   }
 
