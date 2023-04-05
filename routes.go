@@ -12,7 +12,9 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/frontend"
+	"github.com/stakwork/sphinx-tribes/handlers"
 )
 
 // NewRouter creates a chi router
@@ -58,13 +60,13 @@ func NewRouter() *http.Server {
 
 		r.Get("/tribes_by_owner/{pubkey}", getTribesByOwner)
 		r.Post("/tribes", createOrEditTribe)
-		r.Post("/bots", createOrEditBot)
-		r.Get("/bots", getListedBots)
-		r.Get("/bots/owner/{pubkey}", getBotsByOwner)
-		r.Get("/bots/{uuid}", getBot)
+		r.Post("/bots", handlers.CreateOrEditBot)
+		r.Get("/bots", handlers.GetListedBots)
+		r.Get("/bots/owner/{pubkey}", handlers.GetBotsByOwner)
+		r.Get("/bots/{uuid}", handlers.GetBot)
 
-		r.Get("/bot/{name}", getBotByUniqueName)
-		r.Get("/search/bots/{query}", searchBots)
+		r.Get("/bot/{name}", handlers.GetBotByUniqueName)
+		r.Get("/search/bots/{query}", handlers.SearchBots)
 		r.Get("/podcast", getPodcast)
 		r.Get("/feed", getGenericFeed)
 		r.Get("/search_podcasts", searchPodcasts)
@@ -94,7 +96,7 @@ func NewRouter() *http.Server {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Use(PubKeyContext)
+		r.Use(auth.PubKeyContext)
 		r.Post("/channel", createChannel)
 		r.Post("/leaderboard/{tribe_uuid}", createLeaderBoard)
 		r.Put("/leaderboard/{tribe_uuid}", updateLeaderBoard)
@@ -103,11 +105,11 @@ func NewRouter() *http.Server {
 		r.Delete("/tribe/{uuid}", deleteTribe)
 		r.Put("/tribeactivity/{uuid}", putTribeActivity)
 		r.Put("/tribepreview/{uuid}", setTribePreview)
-		r.Delete("/bot/{uuid}", deleteBot)
+		r.Delete("/bot/{uuid}", handlers.DeleteBot)
 		r.Post("/person", createOrEditPerson)
 		r.Post("/verify/{challenge}", verify)
 		r.Post("/badges", addOrRemoveBadge)
-		r.Put("/bot", createOrEditBot)
+		r.Put("/bot", handlers.CreateOrEditBot)
 		r.Delete("/person/{id}", deletePerson)
 		r.Delete("/channel/{id}", deleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", deleteTicketByAdmin)

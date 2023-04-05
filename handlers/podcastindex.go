@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -7,10 +7,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/feeds"
 )
 
-func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
+func GetFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	client := &http.Client{}
 
 	url := ""
@@ -46,12 +47,13 @@ func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	}
 
 	feed := r.Feed
-	tribe := DB.getFirstTribeByFeedURL(r.Feed.URL)
+	tribe := db.DB.GetFirstTribeByFeedURL(r.Feed.URL)
 	feed.Value = feeds.AddedValue(r.Feed.Value, tribe.OwnerPubKey)
 
 	return &feed, nil
 }
-func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
+
+func GetEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	client := &http.Client{}
 
 	url := ""
@@ -89,7 +91,7 @@ func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	return r.Items, nil
 }
 
-func searchPodcastIndex(term string) ([]feeds.Podcast, error) {
+func SearchPodcastIndex(term string) ([]feeds.Podcast, error) {
 	client := &http.Client{}
 
 	url := feeds.PodcastIndexBaseURL + "search/byterm?q=" + term

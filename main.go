@@ -9,6 +9,9 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
+	"github.com/stakwork/sphinx-tribes/db"
 )
 
 func main() {
@@ -19,11 +22,11 @@ func main() {
 		fmt.Println("no .env file")
 	}
 
-	initDB()
+	db.InitDB()
 	initCache()
 	// Config has to be inited before JWT, if not it will lead to NO JWT error
-	initConfig()
-	initJwt()
+	config.InitConfig()
+	auth.InitJwt()
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {
