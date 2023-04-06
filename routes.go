@@ -82,6 +82,7 @@ func NewRouter() *http.Server {
 		r.Get("/people/short", getPeopleShortList)
 		r.Get("/people/offers", getListedOffers)
 		r.Get("/admin_pubkeys", getAdminPubkeys)
+		r.Get("/people/bounty/leaderboard", getBountiesLeaderboard)
 
 		r.Get("/ask", ask)
 		r.Get("/poll/{challenge}", poll)
@@ -166,7 +167,14 @@ func getAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 
 func getGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
-	feed, err := feeds.ParseFeed(url)
+
+	fulltext := false
+	fulltextparam := r.URL.Query().Get("fulltext")
+	if fulltextparam == "true" {
+		fulltext = true
+	}
+
+	feed, err := feeds.ParseFeed(url, fulltext)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -1036,4 +1044,11 @@ func returnUserMap(p Person) map[string]interface{} {
 	user["url"] = host
 
 	return user
+}
+
+func getBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
+	leaderBoard := DB.getBountiesLeaderboard()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(leaderBoard)
 }
