@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -54,10 +55,10 @@ func InitDB() {
 	// migrate table changes
 	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{}, &ConnectionCodes{})
 
-	people := DB.getAllPeople()
+	people := DB.GetAllPeople()
 	for _, p := range people {
 		if p.Uuid == "" {
-			DB.addUuidToPerson(p.ID, xid.New().String())
+			DB.AddUuidToPerson(p.ID, xid.New().String())
 		}
 	}
 
@@ -803,7 +804,7 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 	if db.GetLnUser(lnKey) == 0 {
 		p.OwnerPubKey = lnKey
 		p.OwnerAlias = lnKey
-		p.UniqueName, _ = personUniqueNameFromName(p.OwnerAlias)
+		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
 		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
@@ -813,4 +814,28 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 		db.db.Create(&p)
 	}
 	return p, nil
+}
+
+func PersonUniqueNameFromName(name string) (string, error) {
+	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		return "", err
+	}
+	path := reg.ReplaceAllString(pathOne, "")
+	n := 0
+	for {
+		uniquepath := path
+		if n > 0 {
+			uniquepath = path + strconv.Itoa(n)
+		}
+		existing := DB.GetPersonByUniqueName(uniquepath)
+		if existing.ID != 0 {
+			n = n + 1
+		} else {
+			path = uniquepath
+			break
+		}
+	}
+	return path, nil
 }

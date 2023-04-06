@@ -12,6 +12,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/handlers"
 )
 
 func main() {
@@ -30,8 +31,8 @@ func main() {
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {
-		go processTwitterConfirmationsLoop()
-		go processGithubIssuesLoop()
+		go handlers.ProcessTwitterConfirmationsLoop()
+		go handlers.ProcessGithubIssuesLoop()
 	}
 
 	run()
