@@ -16,6 +16,38 @@ function makeTorSaveURL(host: string, key: string) {
 export class MainStore {
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
+  bots: Bot[] = [];
+  myBots: Bot[] = [];
+  personAssignedWanteds: PersonWanted[] = [];
+
+  @persist('list')
+  people: Person[] = [];
+
+  @persist('list')
+  peoplePosts: PersonPost[] = [];
+
+  @persist('list')
+  peopleWanteds: PersonWanted[] = [];
+
+  @observable
+  lnauth: LnAuthData = { encode: '', k1: '' };
+
+  @persist('object')
+  @observable
+  lnToken: string = '';
+
+  @action setLnAuth(lnData: LnAuthData) {
+    this.lnauth = lnData;
+  }
+  @action setLnToken(token: string) {
+    this.lnToken = token;
+  }
+  setPeople(p: Person[]) {
+    this.people = p;
+  }
+  setPersonWanteds(wanteds: PersonWanted[]) {
+    this.personAssignedWanteds = wanteds;
+  }
 
   constructor() {
     makeAutoObservable(this);
@@ -54,8 +86,6 @@ export class MainStore {
     return ts;
   }
 
-  bots: Bot[] = [];
-  myBots: Bot[] = [];
 
   async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
     const query = this.appendQueryParams('bots', queryParams);
@@ -413,12 +443,7 @@ export class MainStore {
     return ps;
   }
 
-  @persist('list')
-  people: Person[] = [];
 
-  setPeople(p: Person[]) {
-    this.people = p;
-  }
 
   async getPeople(queryParams?: any): Promise<Person[]> {
     const params = { ...queryParams, search: uiStore.searchText };
@@ -475,8 +500,6 @@ export class MainStore {
     return li;
   }
 
-  @persist('list')
-  peoplePosts: PersonPost[] = [];
 
   async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
@@ -519,8 +542,6 @@ export class MainStore {
     return await api.get(query);
   }
 
-  @persist('list')
-  peopleWanteds: PersonWanted[] = [];
 
   setPeopleWanteds(wanteds: PersonWanted[]) {
     this.peopleWanteds = wanteds;
@@ -588,11 +609,7 @@ export class MainStore {
     }
   }
 
-  personAssignedWanteds: PersonWanted[] = [];
 
-  setPersonWanteds(wanteds: PersonWanted[]) {
-    this.personAssignedWanteds = wanteds;
-  }
 
   async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
@@ -830,16 +847,17 @@ export class MainStore {
     }
   }
 
-  async saveBounty(body) {
+  async saveBounty(body): Promise<void>{
     if (!body) return; // avoid saving bad state
     const info = uiStore.meInfo
     try {
-      let request = 'bounty';
-      const response = api.post(request, body, {
+      let request = `bounty?token=${info?.jwt}`;
+						console.log(request,body, info?.jwt)
+      const response = await api.post(request, body, {
         'Content-Type': 'application/json',
-        'x-jwt': info?.jwt
       });
       console.log('POST BOUNTY RESPONSE:', response);
+						return
     } catch (e) {
       console.log(e);
     }
@@ -1006,20 +1024,7 @@ export class MainStore {
     }
   }
 
-  @observable
-  lnauth: LnAuthData = { encode: '', k1: '' };
 
-  @action setLnAuth(lnData: LnAuthData) {
-    this.lnauth = lnData;
-  }
-
-  @persist('object')
-  @observable
-  lnToken: string = '';
-
-  @action setLnToken(token: string) {
-    this.lnToken = token;
-  }
 
   @action async getLnAuth(): Promise<any> {
     try {

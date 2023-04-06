@@ -192,7 +192,7 @@ function FocusedView(props: any) {
         }
 
         // body.description = description;
-        newBody.title = newBody.one_sentence_summary;
+        //newBody.title = newBody.title;
 
         // save repo to cookies for autofill in form
         ui.setLastGithubRepo(newBody.ticketUrl);
@@ -214,30 +214,23 @@ function FocusedView(props: any) {
       return;
     }
 
-    newBody = mergeFormWithMeData(newBody);
 
-    if (!newBody) return; // avoid saving bad state
+    if (!body) return; // avoid saving bad state
+
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
+					let newBody2 = body
+					body.assignee = ""
+					if(body?.assignee?.owner_pubkey){
+								newBody2.assignee = body.assignee.owner_pubkey
+					}
+					newBody2.title = body.one_sentence_summary
+					newBody2.one_sentence_summary = "" 
+					newBody2.ownerId = info.pubkey
 
-    const date = new Date();
-    const unixTimestamp = Math.floor(date.getTime() / 1000);
     setLoading(true);
     try {
-      const requestData =
-        config.name === 'about' || config.name === 'wanted'
-          ? {
-              ...newBody,
-              alert: undefined,
-              new_ticket_time: unixTimestamp,
-              extras: {
-                ...newBody?.extras,
-                alert: newBody.alert
-              }
-            }
-          : newBody;
-
-      await main.saveProfile(requestData);
+      await main.saveBounty(newBody2);
       closeModal();
     } catch (e) {
       console.log('e', e);
