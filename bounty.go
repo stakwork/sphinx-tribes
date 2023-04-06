@@ -17,8 +17,8 @@ func getAllBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	//ctx := r.Context()
+	//pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
 
 	bounty := Bounty{}
 	body, err := ioutil.ReadAll(r.Body)
@@ -32,7 +32,7 @@ func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	if pubKeyFromAuth == "" {
+	/*if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -43,7 +43,7 @@ func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("mismatched pubkey")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
-	}
+	}*/
 	bounty.Updated = &now
 	bounty.Created = time.Now().Unix()
 
@@ -69,6 +69,7 @@ func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
 
 	b, err := DB.createOrEditBounty(bounty)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
