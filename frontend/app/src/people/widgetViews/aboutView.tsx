@@ -166,6 +166,8 @@ export const AboutView = observer((props: any) => {
           </Grow>
         </>
       )}
+
+      <br />
     </Wrap>
   );
 });
@@ -213,6 +215,7 @@ const Wrap = styled.div`
   flex-direction: column;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
 `;
 const I = styled.div`
   display: flex;

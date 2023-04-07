@@ -25,12 +25,3 @@ const Sub = styled.div`
   display: flex;
   font-size: 12px;
 `;
-
-const Image = styled.div`
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 42px;
-  width: 70px;
-  margin-right: 5px;
-`;

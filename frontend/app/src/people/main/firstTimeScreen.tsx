@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStores } from '../../store';
 import styled from 'styled-components';
 import { Modal } from '../../components/common';

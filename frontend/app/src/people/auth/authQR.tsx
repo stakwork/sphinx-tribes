@@ -81,24 +81,3 @@ const ConfirmWrap = styled.div`
   height: 203px;
   position: relative;
 `;
-const InnerWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
-
-const QrWrap = styled.div`
-  padding: 8px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-`;
-
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
