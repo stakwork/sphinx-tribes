@@ -165,7 +165,7 @@ const BountyHeader = ({
                     />
                   </EuiPopOverCheckboxLeft>
                   <PopOverRightBox color={color}>
-                    <EuiText className="rightBoxHeading">Languages</EuiText>
+                    <EuiText className="rightBoxHeading">Tags</EuiText>
                     <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
                       <EuiCheckboxGroup
                         options={Coding_Languages}
@@ -311,7 +311,7 @@ const BountyHeader = ({
                   />
                 </EuiPopOverCheckboxLeft>
                 <PopOverRightBox color={color}>
-                  <EuiText className="rightBoxHeading">Languages</EuiText>
+                  <EuiText className="rightBoxHeading">Tags</EuiText>
                   <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
                     <EuiCheckboxGroup
                       options={Coding_Languages}
@@ -532,7 +532,7 @@ const FilterCount = styled.div<styledProps>`
 
 const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   width: 147px;
-  height: 304px;
+  height: 312px;
   padding: 15px 18px;
   border-right: 1px solid ${(p) => p.color && p.color.grayish.G700};
   user-select: none;
