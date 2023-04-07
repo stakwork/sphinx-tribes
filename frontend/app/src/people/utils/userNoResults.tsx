@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
 import { observer } from 'mobx-react-lite';
@@ -8,8 +7,6 @@ import { widgetConfigs } from '../utils/constants';
 
 export default observer(NoResults);
 function NoResults(props) {
-  const { ui } = useStores();
-
   const tabs = widgetConfigs;
 
   if (props.loading) {
