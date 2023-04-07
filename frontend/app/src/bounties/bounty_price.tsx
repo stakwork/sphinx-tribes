@@ -30,9 +30,7 @@ const BountyPrice = (props) => {
   useEffect(() => {
     let res;
     if (props.sessionLength) {
-      res = Session?.find((value: any) => {
-        return props?.sessionLength === value.label;
-      });
+      res = Session?.find((value: any) => props?.sessionLength === value.label);
     }
     setSession(res);
   }, [props]);

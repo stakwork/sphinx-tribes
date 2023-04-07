@@ -441,12 +441,10 @@ function BotBody() {
 
     initialValues.tags =
       initialValues.tags &&
-      initialValues.tags.map((o) => {
-        return {
-          value: o.value || o,
-          label: o.value || o
-        };
-      });
+      initialValues.tags.map((o) => ({
+        value: o.value || o,
+        label: o.value || o
+      }));
   }
 
   const botEditHeader = editThisBot?.secret && (

@@ -24,17 +24,15 @@ const Context = React.createContext({
   modals: modalsVisibilityStore
 });
 
-export const WithStores = ({ children }) => {
-  return (
-    <Context.Provider
-      value={{
-        ui: uiStore,
-        main: mainStore,
-        modals: modalsVisibilityStore
-      }}
-    >
-      {children}
-    </Context.Provider>
-  );
-};
+export const WithStores = ({ children }) => (
+  <Context.Provider
+    value={{
+      ui: uiStore,
+      main: mainStore,
+      modals: modalsVisibilityStore
+    }}
+  >
+    {children}
+  </Context.Provider>
+);
 export const useStores = () => React.useContext(Context);

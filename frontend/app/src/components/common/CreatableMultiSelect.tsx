@@ -9,15 +9,13 @@ export default function Sel(props: any) {
   const color = colors['light'];
 
   const opts =
-    colourOptions.map((o) => {
-      return {
-        value: o.value,
-        label: o.label,
-        color: o.color,
-        background: o.background,
-        border: o.border
-      };
-    }) || [];
+    colourOptions.map((o) => ({
+      value: o.value,
+      label: o.label,
+      color: o.color,
+      background: o.background,
+      border: o.border
+    })) || [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
@@ -37,30 +35,26 @@ export default function Sel(props: any) {
         className={'multi-select-input'}
         styles={{
           control: (styles) => ({ ...styles, backgroundColor: 'white' }),
-          option: (styles) => {
-            return {
-              ...styles,
-              backgroundColor: '#fff',
-              color: color.text2,
-              fontFamily: 'Barlow',
-              fontSize: '14px',
-              fontWeight: '500',
-              ':hover': {
-                background: color.light_blue200
-              }
-            };
-          },
-          multiValue: (styles, { data }: any) => {
-            return {
-              ...styles,
-              backgroundColor: data.background,
-              border: data.border,
-              color: data.color,
-              fontFamily: 'Barlow',
-              fontSize: '14px',
-              fontWeight: '500'
-            };
-          },
+          option: (styles) => ({
+            ...styles,
+            backgroundColor: '#fff',
+            color: color.text2,
+            fontFamily: 'Barlow',
+            fontSize: '14px',
+            fontWeight: '500',
+            ':hover': {
+              background: color.light_blue200
+            }
+          }),
+          multiValue: (styles, { data }: any) => ({
+            ...styles,
+            backgroundColor: data.background,
+            border: data.border,
+            color: data.color,
+            fontFamily: 'Barlow',
+            fontSize: '14px',
+            fontWeight: '500'
+          }),
           multiValueLabel: (styles, { data }: any) => ({
             ...styles,
             background: data.background,

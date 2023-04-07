@@ -450,9 +450,7 @@ export class MainStore {
   }
 
   @memo({
-    resolver: (...args: any[]) => {
-      return JSON.stringify({ args });
-    },
+    resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
   private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
@@ -510,9 +508,7 @@ export class MainStore {
   }
 
   @memo({
-    resolver: (...args: any[]) => {
-      return JSON.stringify({ args });
-    },
+    resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
   private async fetchPeoplePosts(query) {
