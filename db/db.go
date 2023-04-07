@@ -448,7 +448,7 @@ func addNotMineToExtrasRawQuery(query string, pubkey string) string {
 	return query + ` AND people.owner_pub_key != ` + pubkey + ` `
 }
 
-func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
+func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
 

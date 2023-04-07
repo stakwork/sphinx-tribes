@@ -14,6 +14,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 const liquidTestModeUrl = "TEST_ASSET_URL"
@@ -73,7 +74,7 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
 	if person.NewTicketTime != 0 {
-		go processAlerts(person)
+		go db.ProcessAlerts(person)
 	}
 
 	p, err := db.DB.CreateOrEditPerson(person)
@@ -195,7 +196,7 @@ func ProcessTwitterConfirmationsLoop() {
 				if ok2 {
 					username, _ := twitValue["value"].(string)
 					if username != "" {
-						pubkey, err := ConfirmIdentityTweet(username)
+						pubkey, err := utils.ConfirmIdentityTweet(username)
 						// fmt.Println("TWitter err", err)
 						if err == nil && pubkey != "" {
 							if p.OwnerPubKey == pubkey {
@@ -564,5 +565,33 @@ func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusBadRequest)
 	return
+}
 
+func GetPeopleShortList(w http.ResponseWriter, r *http.Request) {
+	var maxCount uint32 = 10000
+	people := db.DB.GetPeopleListShort(maxCount)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
+func GetPeopleBySearch(w http.ResponseWriter, r *http.Request) {
+	people := db.DB.GetPeopleBySearch(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
+func GetListedPeople(w http.ResponseWriter, r *http.Request) {
+	people := db.DB.GetListedPeople(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
+func GetListedPosts(w http.ResponseWriter, r *http.Request) {
+	people, err := db.DB.GetListedPosts(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
 }

@@ -9,11 +9,11 @@ import (
 )
 
 type LnEncodeData struct {
-	encode string
-	k1     string
+	Encode string
+	K1     string
 }
 
-func encodeLNURL() (LnEncodeData, error) {
+func EncodeLNURL() (LnEncodeData, error) {
 	k1 := generate32Bytes()
 	url := config.Host + "/" + "lnauth_login?tag=login&k1=" + k1 + "&action=login"
 
@@ -23,7 +23,7 @@ func encodeLNURL() (LnEncodeData, error) {
 		return LnEncodeData{}, err
 	}
 
-	return LnEncodeData{encode: encode, k1: k1}, nil
+	return LnEncodeData{Encode: encode, K1: k1}, nil
 }
 
 func generate32Bytes() string {

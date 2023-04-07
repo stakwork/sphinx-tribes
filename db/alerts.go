@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"bytes"
@@ -20,7 +20,7 @@ type Action struct {
 	BotId    string `json:"bot_id"`
 }
 
-func processAlerts(p Person) {
+func ProcessAlerts(p Person) {
 	// get the existing person's github_issues
 	// compare to see if there are new ones
 	// check the new ones for coding languages like "#Javascript"
@@ -86,7 +86,7 @@ func processAlerts(p Person) {
 	}
 
 	var err error
-	people, err := DB.getPeopleForNewTicket(languages)
+	people, err := DB.GetPeopleForNewTicket(languages)
 	if err != nil {
 		fmt.Println("Ticket alerts: DB query to get interested people failed", err)
 		return
