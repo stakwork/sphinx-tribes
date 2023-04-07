@@ -76,10 +76,11 @@ export function extractGithubIssueFromUrl(
   }
 }
 
-export const randomString = (l: number): string =>
-  Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte) =>
-    `0${(byte & 0xff).toString(16)}`.slice(-2)
-  ).join('');
+export const randomString = (l: number): string => {
+  return Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte) => {
+    return `0${(byte & 0xff).toString(16)}`.slice(-2);
+  }).join('');
+};
 
 export function sendToRedirect(url) {
   const el = document.createElement('a');

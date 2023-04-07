@@ -43,7 +43,12 @@ export default function WidgetList(props: any) {
 
   return (
     <Wrap>
-      <List>{props.values && props.values.map((v, i) => renderByType(v, i))}</List>
+      <List>
+        {props.values &&
+          props.values.map((v, i) => {
+            return renderByType(v, i);
+          })}
+      </List>
 
       {(!props.values || props.values.length < 1) && (
         <IWrap style={{ background: 'none' }}>List is empty</IWrap>

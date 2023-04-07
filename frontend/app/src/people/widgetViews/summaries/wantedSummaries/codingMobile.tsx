@@ -98,33 +98,35 @@ export default function MobileView(props: any) {
           }}
         >
           {labels?.length > 0 &&
-            labels?.map((x: any) => (
-              <>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    height: '22px',
-                    width: 'fit-content',
-                    backgroundColor: color.grayish.G1000,
-                    border: `1px solid ${color.grayish.G70}`,
-                    padding: '3px 10px',
-                    borderRadius: '20px',
-                    marginRight: '3px',
-                    boxShadow: `1px 1px ${color.grayish.G70}`
-                  }}
-                >
+            labels?.map((x: any) => {
+              return (
+                <>
                   <div
                     style={{
-                      fontSize: '10px',
-                      color: color.black300
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      height: '22px',
+                      width: 'fit-content',
+                      backgroundColor: color.grayish.G1000,
+                      border: `1px solid ${color.grayish.G70}`,
+                      padding: '3px 10px',
+                      borderRadius: '20px',
+                      marginRight: '3px',
+                      boxShadow: `1px 1px ${color.grayish.G70}`
                     }}
                   >
-                    {x.label}
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        color: color.black300
+                      }}
+                    >
+                      {x.label}
+                    </div>
                   </div>
-                </div>
-              </>
-            ))}
+                </>
+              );
+            })}
         </div>
 
         <div style={{ height: 10 }} />

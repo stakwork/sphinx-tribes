@@ -27,7 +27,7 @@ export default function SphinxAppLoginDeeplink(props: any) {
 
   useEffect(() => {
     if (challenge && ts) {
-      const el = document.createElement('a');
+      let el = document.createElement('a');
       el.href = qrString;
       el.click();
     }

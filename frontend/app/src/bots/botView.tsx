@@ -61,9 +61,9 @@ function BotView(props: any) {
         <div style={{ width: '100%' }}>
           <Divider style={{ marginBottom: 6 }} />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {tags.map((c, i) => (
-              <CodeBadge key={i}>{c}</CodeBadge>
-            ))}
+            {tags.map((c, i) => {
+              return <CodeBadge key={i}>{c}</CodeBadge>;
+            })}
           </GrowRow>
         </div>
       )}

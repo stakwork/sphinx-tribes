@@ -34,9 +34,9 @@ export default function GalleryViewer(props) {
       >
         {showAll ? (
           <div style={{ textAlign: 'center' }}>
-            {g.map((ga, i) => (
-              <BigImg big={big} src={ga} cover={cover} key={i} />
-            ))}
+            {g.map((ga, i) => {
+              return <BigImg big={big} src={ga} cover={cover} key={i} />;
+            })}
           </div>
         ) : (
           <>

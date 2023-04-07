@@ -26,9 +26,11 @@ const BountyDescription = (props: any) => {
   useEffect(() => {
     let res;
     if (props.codingLanguage.length > 0) {
-      res = LanguageObject?.filter((value) =>
-        props.codingLanguage?.find((val) => val.label === value.label)
-      );
+      res = LanguageObject?.filter((value) => {
+        return props.codingLanguage?.find((val) => {
+          return val.label === value.label;
+        });
+      });
     }
     setDataValue(res);
   }, [props.codingLanguage]);
@@ -93,17 +95,19 @@ const BountyDescription = (props: any) => {
           )}
           {dataValue &&
             dataValue?.length > 0 &&
-            dataValue?.map((lang: any, index) => (
-              <CodingLabels
-                key={index}
-                border={props.isPaid ? `1px solid ${color.grayish.G06}` : lang?.border}
-                LabelColor={props.isPaid ? color.grayish.G300 : lang?.color}
-                background={props.isPaid ? color.grayish.G800 : lang?.background}
-                color={color}
-              >
-                <EuiText className="LanguageText">{lang?.label}</EuiText>
-              </CodingLabels>
-            ))}
+            dataValue?.map((lang: any, index) => {
+              return (
+                <CodingLabels
+                  key={index}
+                  border={props.isPaid ? `1px solid ${color.grayish.G06}` : lang?.border}
+                  LabelColor={props.isPaid ? color.grayish.G300 : lang?.color}
+                  background={props.isPaid ? color.grayish.G800 : lang?.background}
+                  color={color}
+                >
+                  <EuiText className="LanguageText">{lang?.label}</EuiText>
+                </CodingLabels>
+              );
+            })}
         </LanguageContainer>
       </BountyDescriptionContainer>
     </>

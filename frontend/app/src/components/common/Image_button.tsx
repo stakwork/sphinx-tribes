@@ -2,55 +2,57 @@ import { EuiText } from '@elastic/eui';
 import React from 'react';
 import styled from 'styled-components';
 
-const ImageButton = (props) => (
-  <ButtonContainer
-    onClick={props?.buttonAction}
-    style={{
-      ...props.ButtonContainerStyle
-    }}
-  >
-    {props.leadingImageSrc && (
-      <div
-        className="leadingImageContainer"
-        style={{
-          ...props.leadingImageContainerStyle
-        }}
-      >
-        <img
-          className="buttonImage"
-          src={props.leadingImageSrc}
-          alt={''}
-          height={'14px'}
-          width={'14px'}
-        />
-      </div>
-    )}
-    <EuiText
-      className="ButtonText"
+const ImageButton = (props) => {
+  return (
+    <ButtonContainer
+      onClick={props?.buttonAction}
       style={{
-        ...props.buttonTextStyle
+        ...props.ButtonContainerStyle
       }}
     >
-      {props.buttonText}
-    </EuiText>
-    {props.endImageSrc && (
-      <div
-        className="ImageContainer"
+      {props.leadingImageSrc && (
+        <div
+          className="leadingImageContainer"
+          style={{
+            ...props.leadingImageContainerStyle
+          }}
+        >
+          <img
+            className="buttonImage"
+            src={props.leadingImageSrc}
+            alt={''}
+            height={'14px'}
+            width={'14px'}
+          />
+        </div>
+      )}
+      <EuiText
+        className="ButtonText"
         style={{
-          ...props.endingImageContainerStyle
+          ...props.buttonTextStyle
         }}
       >
-        <img
-          className="buttonImage"
-          src={props.endImageSrc}
-          alt={'button_end_icon'}
-          height={'12px'}
-          width={'12px'}
-        />
-      </div>
-    )}
-  </ButtonContainer>
-);
+        {props.buttonText}
+      </EuiText>
+      {props.endImageSrc && (
+        <div
+          className="ImageContainer"
+          style={{
+            ...props.endingImageContainerStyle
+          }}
+        >
+          <img
+            className="buttonImage"
+            src={props.endImageSrc}
+            alt={'button_end_icon'}
+            height={'12px'}
+            width={'12px'}
+          />
+        </div>
+      )}
+    </ButtonContainer>
+  );
+};
 
 export default ImageButton;
 

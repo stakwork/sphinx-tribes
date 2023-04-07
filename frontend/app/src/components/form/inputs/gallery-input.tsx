@@ -100,22 +100,24 @@ function GalleryInput({ value, handleChange }: Props) {
     <>
       <Wrapper>
         {picsrcArray &&
-          picsrcArray.map((v, i) => (
-            <ImageWrap key={i}>
-              <Close onClick={() => deleteImg(i)}>
-                <MaterialIcon icon={'close'} style={{ color: color.pureBlack, fontSize: 12 }} />
-              </Close>
-              <Sq>
-                <ImageCircle>
-                  <Image
-                    style={{
-                      backgroundImage: `url(${v})`
-                    }}
-                  />
-                </ImageCircle>
-              </Sq>
-            </ImageWrap>
-          ))}
+          picsrcArray.map((v, i) => {
+            return (
+              <ImageWrap key={i}>
+                <Close onClick={() => deleteImg(i)}>
+                  <MaterialIcon icon={'close'} style={{ color: color.pureBlack, fontSize: 12 }} />
+                </Close>
+                <Sq>
+                  <ImageCircle>
+                    <Image
+                      style={{
+                        backgroundImage: `url(${v})`
+                      }}
+                    />
+                  </ImageCircle>
+                </Sq>
+              </ImageWrap>
+            );
+          })}
       </Wrapper>
 
       <div style={{ marginTop: 5 }}>

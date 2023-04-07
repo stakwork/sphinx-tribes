@@ -25,7 +25,7 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/b/">
           <BotsBody />
         </Route>
-        <Route path="/p/" render={(props) => <People {...props} />} />
+        <Route path="/p/" render={(props) => <People {...props} />}></Route>
         <Route path="/tickets/">
           <TicketsPage />
         </Route>
@@ -40,9 +40,11 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   )
 };
 
-export const Pages = observer(({ mode }: { mode: AppMode }) => (
-  <>
-    {modeDispatchPages[mode]()}
-    <Modals />
-  </>
-));
+export const Pages = observer(({ mode }: { mode: AppMode }) => {
+  return (
+    <>
+      {modeDispatchPages[mode]()}
+      <Modals />
+    </>
+  );
+});

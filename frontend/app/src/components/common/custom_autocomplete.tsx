@@ -36,31 +36,33 @@ const AutoComplete = (props) => {
         }}
       />
       <div className="PeopleList">
-        {peopleData?.slice(0, 5)?.map((value, index) => (
-          <div className="People" key={index}>
-            <div className="PeopleDetailContainer">
-              <div className="ImageContainer">
-                <img
-                  src={value.img || '/static/person_placeholder.png'}
-                  alt={'user-image'}
-                  height={'100%'}
-                  width={'100%'}
-                />
+        {peopleData?.slice(0, 5)?.map((value, index) => {
+          return (
+            <div className="People" key={index}>
+              <div className="PeopleDetailContainer">
+                <div className="ImageContainer">
+                  <img
+                    src={value.img || '/static/person_placeholder.png'}
+                    alt={'user-image'}
+                    height={'100%'}
+                    width={'100%'}
+                  />
+                </div>
+                <EuiText className="PeopleName">{value.owner_alias}</EuiText>
               </div>
-              <EuiText className="PeopleName">{value.owner_alias}</EuiText>
+              <ImageButton
+                buttonText={'Assign'}
+                ButtonContainerStyle={{
+                  width: '74.58px',
+                  height: '32px'
+                }}
+                buttonAction={() => {
+                  props?.handleAssigneeDetails(value);
+                }}
+              />
             </div>
-            <ImageButton
-              buttonText={'Assign'}
-              ButtonContainerStyle={{
-                width: '74.58px',
-                height: '32px'
-              }}
-              buttonAction={() => {
-                props?.handleAssigneeDetails(value);
-              }}
-            />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </SearchOuterContainer>
   );

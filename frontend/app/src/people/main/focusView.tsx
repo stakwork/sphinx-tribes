@@ -61,15 +61,13 @@ function FocusedView(props: any) {
   }
 
   // get self on unmount if tor user
-  useEffect(
-    () =>
-      function cleanup() {
-        if (isTorSave) {
-          main.getSelf(null);
-        }
-      },
-    [main, isTorSave]
-  );
+  useEffect(() => {
+    return function cleanup() {
+      if (isTorSave) {
+        main.getSelf(null);
+      }
+    };
+  }, [main, isTorSave]);
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -265,7 +263,9 @@ function FocusedView(props: any) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        personInfo.extras?.wanted?.map((value) => moment(value?.estimated_completion_date)) || '';
+        personInfo.extras?.wanted?.map((value) => {
+          return moment(value?.estimated_completion_date);
+        }) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';

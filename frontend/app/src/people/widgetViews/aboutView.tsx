@@ -104,9 +104,9 @@ export const AboutView = observer((props: any) => {
         <>
           <Divider />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {coding_languages.map((c, i) => (
-              <CodeBadge key={i}>{c.label}</CodeBadge>
-            ))}
+            {coding_languages.map((c, i) => {
+              return <CodeBadge key={i}>{c.label}</CodeBadge>;
+            })}
           </GrowRow>
         </>
       )}
@@ -116,14 +116,16 @@ export const AboutView = observer((props: any) => {
           <Divider />
           <T style={{ height: 20 }}>My Repos</T>
           <Grow>
-            {repos.map((r, i) => (
-              <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
-                <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
-                <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
-                  {r?.label}
-                </a>
-              </ItemRow>
-            ))}
+            {repos.map((r, i) => {
+              return (
+                <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
+                  <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
+                  <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
+                    {r?.label}
+                  </a>
+                </ItemRow>
+              );
+            })}
           </Grow>
         </>
       )}
@@ -133,12 +135,14 @@ export const AboutView = observer((props: any) => {
           <Divider />
           <T style={{ height: 20 }}>My Tribes</T>
           <Grow>
-            {tribes.map((t, i) => (
-              <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
-                <Img src={t?.img || '/static/sphinx.png'} />
-                <div>{t?.name}</div>
-              </ItemRow>
-            ))}
+            {tribes.map((t, i) => {
+              return (
+                <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
+                  <Img src={t?.img || '/static/sphinx.png'} />
+                  <div>{t?.name}</div>
+                </ItemRow>
+              );
+            })}
           </Grow>
         </>
       )}

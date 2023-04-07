@@ -205,17 +205,19 @@ function MobileView(props: any) {
                     <LanguageContainer>
                       {dataValue &&
                         dataValue?.length > 0 &&
-                        dataValue?.map((lang: any, index) => (
-                          <CodingLabels
-                            key={index}
-                            styledColors={color}
-                            border={lang?.border}
-                            color={lang?.color}
-                            background={lang?.background}
-                          >
-                            <EuiText className="LanguageText">{lang?.label}</EuiText>
-                          </CodingLabels>
-                        ))}
+                        dataValue?.map((lang: any, index) => {
+                          return (
+                            <CodingLabels
+                              key={index}
+                              styledColors={color}
+                              border={lang?.border}
+                              color={lang?.color}
+                              background={lang?.background}
+                            >
+                              <EuiText className="LanguageText">{lang?.label}</EuiText>
+                            </CodingLabels>
+                          );
+                        })}
                     </LanguageContainer>
                   </div>
                   <DescriptionBox color={color}>
@@ -689,17 +691,19 @@ function MobileView(props: any) {
               <LanguageContainer>
                 {dataValue &&
                   dataValue?.length > 0 &&
-                  dataValue?.map((lang: any, index) => (
-                    <CodingLabels
-                      key={index}
-                      styledColors={color}
-                      border={lang?.border}
-                      color={lang?.color}
-                      background={lang?.background}
-                    >
-                      <EuiText className="LanguageText">{lang?.label}</EuiText>
-                    </CodingLabels>
-                  ))}
+                  dataValue?.map((lang: any, index) => {
+                    return (
+                      <CodingLabels
+                        key={index}
+                        styledColors={color}
+                        border={lang?.border}
+                        color={lang?.color}
+                        background={lang?.background}
+                      >
+                        <EuiText className="LanguageText">{lang?.label}</EuiText>
+                      </CodingLabels>
+                    );
+                  })}
               </LanguageContainer>
             </div>
             <DescriptionBox color={color}>

@@ -25,11 +25,14 @@ const badgeObjectStrValidator = Yup.object().shape({
 
 const nomValidator = Yup.number().required('Required');
 
-const GetValue = (arr: any) =>
-  arr.map((val) => ({
-    label: val,
-    value: val
-  }));
+const GetValue = (arr: any) => {
+  return arr.map((val) => {
+    return {
+      label: val,
+      value: val
+    };
+  });
+};
 
 const codingLanguages = GetValue(languages);
 const estimated_time = GetValue(estimation);

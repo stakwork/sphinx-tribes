@@ -37,28 +37,32 @@ function SearchableSelectInput({
           if (name === 'assignee' || name === 'recipient') {
             const p = await main.getPeopleByNameAliasPubkey(search);
             if (p && p.length) {
-              const newOpts = p.map((ot) => ({
-                owner_alias: ot.owner_alias,
-                owner_pubkey: ot.owner_pubkey,
-                img: ot.img,
-                value: ot.owner_pubkey,
-                label: `${ot.owner_alias} (${ot.unique_name})`
-              }));
+              const newOpts = p.map((ot) => {
+                return {
+                  owner_alias: ot.owner_alias,
+                  owner_pubkey: ot.owner_pubkey,
+                  img: ot.img,
+                  value: ot.owner_pubkey,
+                  label: `${ot.owner_alias} (${ot.unique_name})`
+                };
+              });
               setOptions(newOpts);
             }
           } else if (name === 'badge') {
             const { badgeList } = ui;
 
             if (badgeList && badgeList.length) {
-              const newOpts = badgeList.map((ot) => ({
-                img: ot.icon,
-                id: ot.id,
-                token: ot.token,
-                amount: ot.amount,
-                value: ot.asset,
-                asset: ot.asset,
-                label: `${ot.name} (${ot.amount}) `
-              }));
+              const newOpts = badgeList.map((ot) => {
+                return {
+                  img: ot.icon,
+                  id: ot.id,
+                  token: ot.token,
+                  amount: ot.amount,
+                  value: ot.asset,
+                  asset: ot.asset,
+                  label: `${ot.name} (${ot.amount}) `
+                };
+              });
               setOptions(newOpts);
             }
           }

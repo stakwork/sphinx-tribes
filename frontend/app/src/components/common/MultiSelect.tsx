@@ -8,10 +8,12 @@ export default function Sel(props: any) {
   const color = colors['light'];
 
   const opts =
-    options.map((o) => ({
-      value: o.value,
-      label: o.label
-    })) || [];
+    options.map((o) => {
+      return {
+        value: o.value,
+        label: o.label
+      };
+    }) || [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
