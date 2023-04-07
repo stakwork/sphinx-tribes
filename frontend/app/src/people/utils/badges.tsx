@@ -53,7 +53,7 @@ function Badges(props) {
   async function claimBadge() {
     setClaiming(true);
     try {
-						/*
+      /*
       const body: ClaimOnLiquid = {
         amount: badgeToPush.balance,
         to: liquidAddress,
