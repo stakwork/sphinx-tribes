@@ -1,14 +1,17 @@
 /* eslint-disable func-style */
-import React, { useCallback, useEffect, useState } from 'react';
-import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
+import React, { useCallback,useLayoutEffect, useRef, useEffect, useState } from 'react';
+import { ButtonRow, Pad, T, Y, P, D, B, Img,Wrap,  Assignee } from './wantedSummaries/style';
 import { useLocation } from 'react-router-dom';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
 import { sendBadgeSchema } from '../../../components/form/schema';
-import { extractGithubIssue, extractGithubIssueFromUrl } from '../../../helpers';
+import { extractGithubIssue, extractGithubIssueFromUrl, formatPrice } from '../../../helpers';
 import { useIsMobile } from '../../../hooks';
-import { Button } from '../../../components/common';
+import { Button, Divider, Paragraph, Title } from '../../../components/common';
+import GalleryViewer from '../../utils/galleryViewer';
+import FavoriteButton from '../../utils/favoriteButton';
+import { renderMarkdown } from '../../utils/renderMarkdown';
 import { useStores } from '../../../store';
 import { LanguageObject, awards } from '../../utils/language_label_style';
 import NameTag from '../../utils/nameTag';
@@ -28,6 +31,8 @@ function WantedSummary(props: any) {
   const {
     description,
     priceMin,
+					priceMax,
+					gallery,
     ticketUrl,
     person,
     created,
@@ -52,8 +57,12 @@ function WantedSummary(props: any) {
     formSubmit,
     title
   } = props;
+				console.log("PROPS", props)
+				const heart = <FavoriteButton />;
   const titleString = one_sentence_summary ?? title;
 
+				const imgRef: any = useRef(null);
+				const [envHeight, setEnvHeight] = useState('100%');
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
   const { peopleWanteds } = main;
@@ -381,6 +390,11 @@ function WantedSummary(props: any) {
     setSaving('');
   }
 
+				useLayoutEffect(() => {if (imgRef && imgRef.current) {
+								if (imgRef.current?.offsetHeight > 100) {setEnvHeight(imgRef.current?.offsetHeight);
+								}
+				}}, [imgRef]);
+
   //  if my own, show this option to show/hide
   const markPaidButton = (
     <Button
@@ -613,5 +627,87 @@ function WantedSummary(props: any) {
   if (type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request') {
     return renderCodingTask();
   }
-  return <div />;
+				if (isMobile) {
+    return (
+      <div style={{ padding: 20, overflow: 'auto' }} key={created}>
+        <Pad>
+          {nametag}
+
+          <T>{titleString || 'No title'}</T>
+          <Divider
+            style={{
+              marginTop: 22
+            }}
+          />
+          <Y>
+            <P color={color}>
+              {formatPrice(priceMin) || '0'} <B color={color}>SAT</B> - {formatPrice(priceMax)}{' '}
+              <B color={color}>SAT</B>
+            </P>
+            {heart}
+          </Y>
+          <Divider style={{ marginBottom: 22 }} />
+
+          <D color={color}>{renderMarkdown(description)}</D>
+          <GalleryViewer
+            gallery={gallery}
+            showAll={true}
+            selectable={false}
+            wrap={false}
+            big={true}
+          />
+        </Pad>
+      </div>
+    );
+  }
+
+				console.log("we get here?")
+  return (
+    <div
+      key={created}
+      style={{
+        paddingTop: gallery && '40px'
+      }}
+    >
+      <Wrap color={color}>
+        <div>
+          <GalleryViewer
+            innerRef={imgRef}
+            style={{ width: 507, height: 'fit-content' }}
+            gallery={gallery}
+            showAll={false}
+            selectable={false}
+            wrap={false}
+            big={true}
+          />
+        </div>
+        <div
+          style={{
+            width: 316,
+            padding: '40px 20px',
+            overflowY: 'auto',
+            height: envHeight
+          }}
+        >
+          <Pad>
+            {nametag}
+
+            <Title>{titleString}</Title>
+
+            <Divider style={{ marginTop: 22 }} />
+            <Y>
+              <P color={color}>
+                {formatPrice(priceMin) || '0'} <B color={color}>SAT</B> -{' '}
+                {formatPrice(priceMax) || '0'} <B color={color}>SAT</B>
+              </P>
+              {heart}
+            </Y>
+            <Divider style={{ marginBottom: 22 }} />
+
+            <Paragraph>{renderMarkdown(description)}</Paragraph>
+          </Pad>
+        </div>
+      </Wrap>
+    </div>
+  );
 }
