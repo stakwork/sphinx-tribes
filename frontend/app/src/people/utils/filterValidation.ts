@@ -1,13 +1,13 @@
-export const bountyHeaderFilter = ({ Paid, Assigned, Opened }, bodyPaid, bodyAssignee) => {
+export const bountyHeaderFilter = ({ Paid, Assigned, Open }, bodyPaid, bodyAssignee) => {
   if (Paid) {
     if (Assigned) {
-      if (Opened) {
+      if (Open) {
         return true;
       } else {
         return bodyAssignee || bodyPaid;
       }
     } else {
-      if (Opened) {
+      if (Open) {
         return bodyPaid || !bodyAssignee;
       } else {
         return bodyPaid;
@@ -15,13 +15,13 @@ export const bountyHeaderFilter = ({ Paid, Assigned, Opened }, bodyPaid, bodyAss
     }
   } else {
     if (Assigned) {
-      if (Opened) {
+      if (Open) {
         return !bodyPaid;
       } else {
         return !bodyPaid && bodyAssignee;
       }
     } else {
-      if (Opened) {
+      if (Open) {
         return !bodyPaid && !bodyAssignee;
       } else {
         return true;

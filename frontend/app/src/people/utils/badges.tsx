@@ -4,7 +4,7 @@ import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
 import { Modal, Button, Divider, TextInput } from '../../components/common';
-import { ClaimOnLiquid } from '../../store/main';
+//import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { observer } from 'mobx-react-lite';
 
@@ -53,12 +53,13 @@ function Badges(props) {
   async function claimBadge() {
     setClaiming(true);
     try {
+      /*
       const body: ClaimOnLiquid = {
         amount: badgeToPush.balance,
         to: liquidAddress,
         asset: badgeToPush.id,
         memo: memo
-      };
+      };*/
 
       //const token = await main.claimBadgeOnLiquid(body);
       // refresh badges

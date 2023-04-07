@@ -13,7 +13,7 @@
     "build": "craco build",
     "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 89 --ext .ts --ext .tsx",
+    "lint": "eslint src --max-warnings 1332 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src"
   },
@@ -58,13 +58,36 @@
     "extends": [
       "react-app",
       "eslint:recommended",
-      "plugin:react/recommended"
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended"
     ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "root": true,
     "rules": {
+      "arrow-body-style": [
+        "warn",
+        "as-needed"
+      ],
+      "@typescript-eslint/typedef": [
+      "warn",
+      {
+        "parameter": true,
+        "arrowParameter": true
+      }
+    ],
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-inferrable-types": "warn",
+      "@typescript-eslint/no-empty-function": "warn",
+      "@typescript-eslint/no-empty-interface": "warn",
+      "@typescript-eslint/ban-types": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
       "react-hooks/rules-of-hooks": "warn",
       "react-hooks/exhaustive-deps": "warn",
-      "react/prop-types": "off",
-      "no-unused-vars": "off",
+      "react/prop-types": "warn",
+      "no-unused-vars": "warn",
       "no-extra-boolean-cast": "warn",
       "no-useless-escape": "warn",
       "no-prototype-builtins": "warn",
@@ -125,12 +148,14 @@
     "@types/react-dom": "^16.9.5",
     "@types/react-router-dom": "^5.1.8",
     "@types/styled-components": "^5.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
     "bootstrap": "^4.5.0",
-    "eslint": "^8.26.0",
+    "eslint": "^8.37.0",
     "eslint-plugin-react": "^7.31.10",
     "nock": "^13.3.0",
     "react-error-overlay": "6.0.9",
-    "typescript": "4.5.3"
+    "typescript": "^5.0.3"
   },
   "jest": {
     "transformIgnorePatterns": [
