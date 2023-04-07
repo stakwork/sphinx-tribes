@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { QRCode } from 'react-qr-svg';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
-import QR from '../utils/QR';
-import { observer } from 'mobx-react-lite';
 
-//TODO: mv to utils
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
@@ -16,10 +14,8 @@ function makeQR(challenge: string, ts: string) {
 
 let interval;
 
-export default observer(AuthQR);
-
-function AuthQR(props: any) {
-  const { ui, main } = useStores();
+export default function SphinxAppLoginDeeplink(props: any) {
+  const { ui } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
 
@@ -27,19 +23,24 @@ function AuthQR(props: any) {
 
   useEffect(() => {
     getChallenge();
-    return function cleanup() {
-      if (interval) clearInterval(interval);
-    };
   }, []);
+
+  useEffect(() => {
+    if (challenge && ts) {
+      let el = document.createElement('a');
+      el.href = qrString;
+      el.click();
+    }
+  }, [challenge, ts]);
 
   async function startPolling(challenge: string) {
     let i = 0;
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        if (me && me?.pubkey) {
+        console.log(me);
+        if (me && me.pubkey) {
           ui.setMeInfo(me);
-          await main.getSelf(me);
           setChallenge('');
           if (props.onSuccess) props.onSuccess();
           if (interval) clearInterval(interval);
@@ -51,6 +52,7 @@ function AuthQR(props: any) {
       } catch (e) {}
     }, 3000);
   }
+
   async function getChallenge() {
     const res = await api.get('ask');
     if (res.challenge) {
@@ -61,13 +63,13 @@ function AuthQR(props: any) {
       setTS(res.ts);
     }
   }
+
   return (
-    <ConfirmWrap style={{ ...props.style }}>
-      {challenge ? (
-        <QR size={203} style={{ width: 203 }} value={qrString} />
-      ) : (
+    <ConfirmWrap>
+      <InnerWrap>
+        <div style={{ marginBottom: 50 }}>Opening Sphinx...</div>
         <EuiLoadingSpinner size="xl" />
-      )}
+      </InnerWrap>
     </ConfirmWrap>
   );
 }
@@ -78,6 +80,12 @@ const ConfirmWrap = styled.div`
   justify-content: center;
   flex-direction: column;
   width: 100%;
-  height: 203px;
-  position: relative;
+  min-height: 250px;
+`;
+const InnerWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
 `;
