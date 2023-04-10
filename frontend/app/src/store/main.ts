@@ -1133,15 +1133,19 @@ export interface PersonPost {
 }
 
 export interface PersonWanted {
-  person: PersonFlex;
+				person?: any;
+				body?: any;
   title?: string;
   description?: string;
+  owner_id: string;
   created?: number;
   show?: boolean;
   assignee?: any;
-  body: PersonWanted | any;
+  wanted_type: string;
   type?: string;
   price?: string;
+				codingLanguage: string;
+				estimate_session_length: string;
 }
 
 export interface PersonOffer {

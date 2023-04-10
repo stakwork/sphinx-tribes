@@ -356,7 +356,9 @@ function FocusedView(props: any) {
 
   function getExtras(): any {
     console.log('Selected Index:', selectedIndex);
+if(selectedIndex !== 0){
     return main.peopleWanteds[selectedIndex - 1].body;
+}
 
     return null;
   }

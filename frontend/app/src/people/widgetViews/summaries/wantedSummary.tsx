@@ -501,9 +501,11 @@ function WantedSummary(props: WantedSummaryProps) {
   );
 
   function renderCodingTask() {
-    const { status } = ticketUrl
+	
+    /*const { status } = (ticketUrl && person != undefined)
       ? extractGithubIssueFromUrl(person, ticketUrl)
-      : extractGithubIssue(person, repo, issue);
+      : extractGithubIssue(person, repo, issue);*/
+			
 
     let assigneeLabel: any = null;
 
@@ -587,7 +589,7 @@ function WantedSummary(props: WantedSummaryProps) {
           nametag={nametag}
           assigneeLabel={assigneeLabel}
           actionButtons={actionButtons}
-          status={status}
+          //status={status}
           handleCopyUrl={handleCopy}
           isCopied={isCopied}
           titleString={titleString}
@@ -649,7 +651,7 @@ function WantedSummary(props: WantedSummaryProps) {
           assignee={assignee}
           loomEmbedUrl={loomEmbedUrl}
           titleString={titleString}
-          status={status}
+          //status={status}
           handleCopyUrl={handleCopyUrlProfilePage}
           isCopied={isCopied}
         />

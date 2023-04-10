@@ -13,12 +13,17 @@ import styled from 'styled-components';
 const config = widgetConfigs.wanted;
 
 export const Wanted = observer(() => {
-  const { ui } = useStores();
+  const { ui, main } = useStores();
   const { person, canEdit } = usePerson(ui.selectedPerson);
   const { path, url } = useRouteMatch();
   const history = useHistory();
 
-  const fullSelectedWidgets = person?.extras?.wanted;
+//console.log("Selected Person:", person)
+
+  const { peopleWanteds}  = main 
+  const fullSelectedWidgets = peopleWanteds.filter((wanted) => wanted.owner_id === person?.pubkey);
+
+console.log(peopleWanteds)
 
   if (!fullSelectedWidgets?.length) {
     return (
@@ -67,7 +72,10 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {fullSelectedWidgets.map((w, i) => (
+      {fullSelectedWidgets.map((w, i) => {
+			console.log("LOOKIE HERE: ", w.body.OwnerID, person)
+			if(w.body.OwnerID === person?.owner_pubkey){
+			return (
         <Panel
           key={w.created}
           isMobile={false}
@@ -77,9 +85,10 @@ export const Wanted = observer(() => {
             })
           }
         >
-          <WantedView {...w} person={person} />
+          <WantedView {...w.body} person={person} />
         </Panel>
-      ))}
+				
+      )}})}
     </Container>
   );
 });

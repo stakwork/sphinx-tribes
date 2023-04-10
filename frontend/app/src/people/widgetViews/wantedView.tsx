@@ -34,6 +34,7 @@ function WantedView(props: any) {
     show = true,
     paid = false
   } = props;
+				console.log("WantedView props:", props.body)
   const titleString = title;
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
