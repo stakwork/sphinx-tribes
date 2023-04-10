@@ -172,7 +172,7 @@ export interface MeInfo {
   twitter_confirmed?: boolean;
   extras: Extras;
   isSuperAdmin: boolean;
-				uuid: string;
+  uuid: string;
 }
 export const emptyMeData: MeData = {
   pubkey: '',
@@ -187,7 +187,7 @@ export const emptyMeData: MeData = {
   verification_signature: '',
   extras: {},
   isSuperAdmin: false,
-				uuid: ''
+  uuid: ''
 };
 export const emptyMeInfo: MeInfo = {
   pubkey: '',
@@ -202,7 +202,7 @@ export const emptyMeInfo: MeInfo = {
   verification_signature: '',
   extras: {},
   isSuperAdmin: false,
-				uuid: '' 
+  uuid: ''
 };
 
 export const uiStore = new UiStore();

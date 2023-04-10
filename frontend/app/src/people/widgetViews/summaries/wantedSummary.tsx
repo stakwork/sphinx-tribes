@@ -1,6 +1,6 @@
 /* eslint-disable func-style */
-import React, { useCallback,useLayoutEffect, useRef, useEffect, useState } from 'react';
-import { ButtonRow, Pad, T, Y, P, D, B, Img,Wrap,  Assignee } from './wantedSummaries/style';
+import React, { useCallback, useLayoutEffect, useRef, useEffect, useState } from 'react';
+import { ButtonRow, Pad, T, Y, P, D, B, Img, Wrap, Assignee } from './wantedSummaries/style';
 import { useLocation } from 'react-router-dom';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
@@ -26,13 +26,43 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
+interface WantedSummaryProps {
+  description: any;
+  priceMin: number;
+  priceMax: number;
+  gallery: any;
+  ticketUrl: string;
+  person: any;
+  created: number;
+  repo: string;
+  issue: string;
+  price: number;
+  type: string;
+  tribe: any;
+  paid: boolean;
+  badgeRecipient: any;
+  loomEmbedUrl: string;
+  codingLanguage: any;
+  estimate_session_length: any;
+  assignee: any;
+  fromBountyPage: boolean;
+  wanted_type: string;
+  one_sentence_summary: string;
+  github_description: string;
+  show: boolean;
+  setIsModalSideButton: any;
+  setIsExtraStyle: any;
+  formSubmit: any;
+  title: string;
+}
+
 export default observer(WantedSummary);
-function WantedSummary(props: any) {
+function WantedSummary(props: WantedSummaryProps) {
   const {
     description,
     priceMin,
-					priceMax,
-					gallery,
+    priceMax,
+    gallery,
     ticketUrl,
     person,
     created,
@@ -57,12 +87,12 @@ function WantedSummary(props: any) {
     formSubmit,
     title
   } = props;
-				console.log("PROPS", props)
-				const heart = <FavoriteButton />;
+  console.log('PROPS', props);
+  const heart = <FavoriteButton />;
   const titleString = one_sentence_summary ?? title;
 
-				const imgRef: any = useRef(null);
-				const [envHeight, setEnvHeight] = useState('100%');
+  const imgRef: any = useRef(null);
+  const [envHeight, setEnvHeight] = useState('100%');
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
   const { peopleWanteds } = main;
@@ -265,7 +295,7 @@ function WantedSummary(props: any) {
               body: clonedEx[targetIndex]
             };
           }
-								console.log("peopleWantedsClone:", peopleWantedsClone)
+          console.log('peopleWantedsClone:', peopleWantedsClone);
           main.setPeopleWanteds(peopleWantedsClone);
         }
       } catch (e) {
@@ -309,7 +339,7 @@ function WantedSummary(props: any) {
             };
           }
 
-								console.log("peopleWantedsClone:", peopleWantedsClone)
+          console.log('peopleWantedsClone:', peopleWantedsClone);
           main.setPeopleWanteds(peopleWantedsClone);
         }
       } catch (e) {
@@ -390,10 +420,13 @@ function WantedSummary(props: any) {
     setSaving('');
   }
 
-				useLayoutEffect(() => {if (imgRef && imgRef.current) {
-								if (imgRef.current?.offsetHeight > 100) {setEnvHeight(imgRef.current?.offsetHeight);
-								}
-				}}, [imgRef]);
+  useLayoutEffect(() => {
+    if (imgRef && imgRef.current) {
+      if (imgRef.current?.offsetHeight > 100) {
+        setEnvHeight(imgRef.current?.offsetHeight);
+      }
+    }
+  }, [imgRef]);
 
   //  if my own, show this option to show/hide
   const markPaidButton = (
@@ -627,7 +660,7 @@ function WantedSummary(props: any) {
   if (type === 'coding_task' || type === 'wanted_coding_task' || type === 'freelance_job_request') {
     return renderCodingTask();
   }
-				if (isMobile) {
+  if (isMobile) {
     return (
       <div style={{ padding: 20, overflow: 'auto' }} key={created}>
         <Pad>
@@ -661,7 +694,7 @@ function WantedSummary(props: any) {
     );
   }
 
-				console.log("we get here?")
+  console.log('we get here?');
   return (
     <div
       key={created}

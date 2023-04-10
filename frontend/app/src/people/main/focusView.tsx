@@ -214,19 +214,62 @@ function FocusedView(props: any) {
       return;
     }
 
+    newBody = mergeFormWithMeData(newBody);
+
+    if (!newBody) return; // avoid saving bad state
+    const info = ui.meInfo as any;
+    if (!info) return console.log('no meInfo');
+
+    const date = new Date();
+    const unixTimestamp = Math.floor(date.getTime() / 1000);
+    setLoading(true);
+    try {
+      const requestData =
+        config.name === 'about' || config.name === 'wanted'
+          ? {
+              ...newBody,
+              alert: undefined,
+              new_ticket_time: unixTimestamp,
+              extras: {
+                ...newBody?.extras,
+                alert: newBody.alert
+              }
+            }
+          : newBody;
+
+      await main.saveProfile(requestData);
+      closeModal();
+    } catch (e) {
+      console.log('e', e);
+    }
+    props.onSuccess();
+    setLoading(false);
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
+  }
+
+  async function submitBountyForm(body) {
+    //TODO: Reduce logic here  to only need to take in the body
+    let newBody = cloneDeep(body);
+    try {
+      newBody = await preSubmitFunctions(newBody);
+    } catch (e) {
+      console.log('e', e);
+      alert(e);
+      return;
+    }
 
     if (!body) return; // avoid saving bad state
 
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
-					let newBody2 = body
-					body.assignee = ""
-					if(body?.assignee?.owner_pubkey){
-								newBody2.assignee = body.assignee.owner_pubkey
-					}
-					newBody2.title = body.one_sentence_summary
-					newBody2.one_sentence_summary = "" 
-					newBody2.ownerId = info.pubkey
+    let newBody2 = body;
+    body.assignee = '';
+    if (body?.assignee?.owner_pubkey) {
+      newBody2.assignee = body.assignee.owner_pubkey;
+    }
+    newBody2.title = body.one_sentence_summary;
+    newBody2.one_sentence_summary = '';
+    newBody2.ownerId = info.pubkey;
 
     setLoading(true);
     try {
@@ -312,8 +355,8 @@ function FocusedView(props: any) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-					console.log("Selected Index:", selectedIndex)
-      return main.peopleWanteds[selectedIndex - 1].body;
+    console.log('Selected Index:', selectedIndex);
+    return main.peopleWanteds[selectedIndex - 1].body;
 
     return null;
   }
@@ -342,7 +385,8 @@ function FocusedView(props: any) {
                 if (skipEditLayer && goBack) goBack();
                 else setEditMode(false);
               }}
-              onSubmit={submitForm}
+              //using newDesign to tell if we're using create bounty
+              onSubmit={newDesign ? submitBountyForm : submitForm}
               scrollDiv={scrollDiv}
               schema={config && config.schema}
               initialValues={initialValues}
@@ -415,9 +459,9 @@ function FocusedView(props: any) {
 
           {/* display item */}
           <WantedSummary
-							{...getExtras()}
+            {...getExtras()}
             ReCallBounties={props?.ReCallBounties}
-            formSubmit={submitForm}
+            formSubmit={submitBountyForm}
             person={person}
             personBody={props?.personBody}
             config={config}

@@ -86,7 +86,6 @@ export class MainStore {
     return ts;
   }
 
-
   async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
     const query = this.appendQueryParams('bots', queryParams);
     const b = await api.get(query);
@@ -443,8 +442,6 @@ export class MainStore {
     return ps;
   }
 
-
-
   async getPeople(queryParams?: any): Promise<Person[]> {
     const params = { ...queryParams, search: uiStore.searchText };
     const ps = await this.fetchPeople(uiStore.searchText, queryParams);
@@ -500,7 +497,6 @@ export class MainStore {
     return li;
   }
 
-
   async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
@@ -541,7 +537,6 @@ export class MainStore {
   private async fetchPeoplePosts(query) {
     return await api.get(query);
   }
-
 
   setPeopleWanteds(wanteds: PersonWanted[]) {
     this.peopleWanteds = wanteds;
@@ -608,8 +603,6 @@ export class MainStore {
       return [];
     }
   }
-
-
 
   async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
@@ -847,17 +840,17 @@ export class MainStore {
     }
   }
 
-  async saveBounty(body): Promise<void>{
+  async saveBounty(body): Promise<void> {
     if (!body) return; // avoid saving bad state
-    const info = uiStore.meInfo
+    const info = uiStore.meInfo;
     try {
       let request = `bounty?token=${info?.jwt}`;
-						console.log(request,body, info?.jwt)
+      console.log(request, body, info?.jwt);
       const response = await api.post(request, body, {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       });
       console.log('POST BOUNTY RESPONSE:', response);
-						return
+      return;
     } catch (e) {
       console.log(e);
     }
@@ -1023,8 +1016,6 @@ export class MainStore {
       return '';
     }
   }
-
-
 
   @action async getLnAuth(): Promise<any> {
     try {

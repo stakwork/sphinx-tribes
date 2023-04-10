@@ -17,7 +17,23 @@ import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
 import { formatPrice, satToUsd } from '../../../../helpers';
 
-export default function MobileView(props: any) {
+interface MobileViewProps {
+  description?: any;
+  ticketUrl?: string;
+  price?: number;
+  loomEmbedUrl?: string;
+  estimate_session_length?: string;
+  assignee?: any;
+  titleString?: string;
+  nametag?: any;
+  assigneeLabel?: string;
+  labels?: any;
+  actionButtons?: any;
+  status?: any;
+  handleCopyUrl?: any;
+  isCopied?: boolean;
+}
+export default function MobileView(props: MobileViewProps) {
   const {
     description,
     ticketUrl,
@@ -30,7 +46,9 @@ export default function MobileView(props: any) {
     assigneeLabel,
     labels,
     actionButtons,
-    status
+    status,
+    handleCopyUrl,
+    isCopied
   } = props;
   const color = colors['light'];
 
@@ -134,7 +152,7 @@ export default function MobileView(props: any) {
           <ViewGithub {...props} />
           <ViewTribe {...props} />
           <AddToFavorites {...props} />
-          <CopyLink {...props} />
+          {handleCopyUrl && <CopyLink isCopied={isCopied} handleCopyUrl={handleCopyUrl} />}
           <ShareOnTwitter {...props} />
         </ButtonRow>
 

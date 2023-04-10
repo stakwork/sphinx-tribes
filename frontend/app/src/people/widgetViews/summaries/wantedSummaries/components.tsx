@@ -52,7 +52,11 @@ export const ViewGithub = (props: any) => {
   return <></>;
 };
 
-export const CopyLink = (props: any) => {
+interface CopyLinkProps {
+  handleCopyUrl: any;
+  isCopied?: boolean;
+}
+export const CopyLink = (props: CopyLinkProps) => {
   const { isCopied, handleCopyUrl } = props;
 
   return (
