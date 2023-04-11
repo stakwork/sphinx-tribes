@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"context"
@@ -12,10 +12,12 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/go-github/v39/github"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/db"
 	"golang.org/x/oauth2"
 )
 
-func getGithubIssue(w http.ResponseWriter, r *http.Request) {
+func GetGithubIssue(w http.ResponseWriter, r *http.Request) {
 	owner := chi.URLParam(r, "owner")
 	repo := chi.URLParam(r, "repo")
 	issueString := chi.URLParam(r, "issue")
@@ -33,8 +35,8 @@ func getGithubIssue(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(issue)
 }
 
-func getOpenGithubIssues(w http.ResponseWriter, r *http.Request) {
-	issue_count, err := DB.getOpenGithubIssues(r)
+func GetOpenGithubIssues(w http.ResponseWriter, r *http.Request) {
+	issue_count, err := db.DB.GetOpenGithubIssues(r)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
@@ -53,17 +55,17 @@ func githubClient() *github.Client {
 	return gc
 }
 
-func GetRepoIssues(owner string, repo string) ([]GithubIssue, error) {
+func GetRepoIssues(owner string, repo string) ([]db.GithubIssue, error) {
 	client := githubClient()
 	issues, _, err := client.Issues.ListByRepo(context.Background(), owner, repo, nil)
-	ret := []GithubIssue{}
+	ret := []db.GithubIssue{}
 	if err == nil {
 		for _, iss := range issues {
 			assignee := ""
 			if iss.Assignee != nil {
 				assignee = *iss.Assignee.Login
 			}
-			ret = append(ret, GithubIssue{
+			ret = append(ret, db.GithubIssue{
 				Title:    *iss.Title,
 				Status:   *iss.State,
 				Assignee: assignee,
@@ -73,16 +75,16 @@ func GetRepoIssues(owner string, repo string) ([]GithubIssue, error) {
 	return ret, err
 }
 
-func GetIssue(owner string, repo string, id int) (GithubIssue, error) {
+func GetIssue(owner string, repo string, id int) (db.GithubIssue, error) {
 	client := githubClient()
 	iss, _, err := client.Issues.Get(context.Background(), owner, repo, id)
-	issue := GithubIssue{}
+	issue := db.GithubIssue{}
 	if err == nil && iss != nil {
 		assignee := ""
 		if iss.Assignee != nil {
 			assignee = *iss.Assignee.Login
 		}
-		issue = GithubIssue{
+		issue = db.GithubIssue{
 			Title:       *iss.Title,
 			Status:      *iss.State,
 			Assignee:    assignee,
@@ -103,7 +105,7 @@ func PubkeyForGithubUser(owner string) (string, error) {
 						// get the actual gist
 						gist, _, err := client.Gists.Get(context.Background(), *g.ID)
 						gistFile := gist.Files[k]
-						pubkey, err := VerifyArbitrary(*gistFile.Content, "Sphinx Verification")
+						pubkey, err := auth.VerifyArbitrary(*gistFile.Content, "Sphinx Verification")
 						if err != nil {
 							return "", err
 						}

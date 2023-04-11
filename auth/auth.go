@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/form3tech-oss/jwt-go"
+	"github.com/stakwork/sphinx-tribes/config"
 )
 
 var (
@@ -143,7 +144,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 func DecodeToken(token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		key := jwtKey
+		key := config.JwtKey
 		return []byte(key), nil
 	})
 
