@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -11,13 +11,15 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/db"
 )
 
-func createOrEditBot(w http.ResponseWriter, r *http.Request) {
+func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	bot := Bot{}
+	bot := db.Bot{}
 	body, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &bot)
@@ -34,7 +36,7 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	extractedPubkey, err := VerifyTribeUUID(bot.UUID, false)
+	extractedPubkey, err := auth.VerifyTribeUUID(bot.UUID, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -58,9 +60,9 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	bot.OwnerPubKey = extractedPubkey
 	bot.Updated = &now
-	bot.UniqueName, _ = botUniqueNameFromName(bot.Name)
+	bot.UniqueName, _ = BotUniqueNameFromName(bot.Name)
 
-	_, err = DB.createOrEditBot(bot)
+	_, err = db.DB.CreateOrEditBot(bot)
 	if err != nil {
 		fmt.Println("=> ERR createOrEditBot", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -71,34 +73,34 @@ func createOrEditBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
-func getListedBots(w http.ResponseWriter, r *http.Request) {
-	bots := DB.getListedBots(r)
+func GetListedBots(w http.ResponseWriter, r *http.Request) {
+	bots := db.DB.GetListedBots(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
-func getBot(w http.ResponseWriter, r *http.Request) {
+func GetBot(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	bot := DB.getBot(uuid)
+	bot := db.DB.GetBot(uuid)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bot)
 }
 
-func getBotByUniqueName(w http.ResponseWriter, r *http.Request) {
+func GetBotByUniqueName(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	bot := DB.getBotByUniqueName(name)
+	bot := db.DB.GetBotByUniqueName(name)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bot)
 }
 
-func getBotsByOwner(w http.ResponseWriter, r *http.Request) {
+func GetBotsByOwner(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "pubkey")
-	bots := DB.getBotsByOwner(name)
+	bots := db.DB.GetBotsByOwner(name)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
-func searchBots(w http.ResponseWriter, r *http.Request) {
+func SearchBots(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 	limitString := r.URL.Query().Get("limit")
 	offsetString := r.URL.Query().Get("offset")
@@ -108,14 +110,14 @@ func searchBots(w http.ResponseWriter, r *http.Request) {
 	if limit == 0 {
 		limit = 10
 	}
-	bots := DB.searchBots(query, limit, offset)
+	bots := db.DB.SearchBots(query, limit, offset)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
-func deleteBot(w http.ResponseWriter, r *http.Request) {
+func DeleteBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	uuid := chi.URLParam(r, "uuid")
 
@@ -124,7 +126,7 @@ func deleteBot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := VerifyTribeUUID(uuid, false)
+	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -137,7 +139,7 @@ func deleteBot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	DB.updateBot(uuid, map[string]interface{}{
+	db.DB.UpdateBot(uuid, map[string]interface{}{
 		"deleted": true,
 	})
 
@@ -145,7 +147,7 @@ func deleteBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func botUniqueNameFromName(name string) (string, error) {
+func BotUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
@@ -158,7 +160,7 @@ func botUniqueNameFromName(name string) (string, error) {
 		if n > 0 {
 			uniquepath = path + strconv.Itoa(n)
 		}
-		existing := DB.getBotByUniqueName(uniquepath)
+		existing := db.DB.GetBotByUniqueName(uniquepath)
 		if existing.UUID != "" {
 			n = n + 1
 		} else {
@@ -169,7 +171,7 @@ func botUniqueNameFromName(name string) (string, error) {
 	return path, nil
 }
 
-func tribeUniqueNameFromName(name string) (string, error) {
+func TribeUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
@@ -182,7 +184,7 @@ func tribeUniqueNameFromName(name string) (string, error) {
 		if n > 0 {
 			uniquepath = path + strconv.Itoa(n)
 		}
-		existing := DB.getTribeByUniqueName(uniquepath)
+		existing := db.DB.GetTribeByUniqueName(uniquepath)
 		if existing.UUID != "" {
 			n = n + 1
 		} else {
