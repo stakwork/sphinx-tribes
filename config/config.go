@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"math/rand"
@@ -6,23 +6,23 @@ import (
 	"time"
 )
 
-var host string
-var jwtKey string
+var Host string
+var JwtKey string
 
-func initConfig() {
-	host = os.Getenv("LN_SERVER_BASE_URL")
-	jwtKey = os.Getenv("LN_JWT_KEY")
+func InitConfig() {
+	Host = os.Getenv("LN_SERVER_BASE_URL")
+	JwtKey = os.Getenv("LN_JWT_KEY")
 
-	if host == "" {
-		host = "https://people.sphinx.chat"
+	if Host == "" {
+		Host = "https://people.sphinx.chat"
 	}
 
-	if jwtKey == "" {
-		jwtKey = generateRandomString()
+	if JwtKey == "" {
+		JwtKey = GenerateRandomString()
 	}
 }
 
-func generateRandomString() string {
+func GenerateRandomString() string {
 	const charset = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
