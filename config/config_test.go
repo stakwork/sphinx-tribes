@@ -1,15 +1,15 @@
-package main
+package config
 
 import "testing"
 
 func TestInitConfig(t *testing.T) {
-	initConfig()
+	InitConfig()
 
-	if host != "https://people.sphinx.chat" {
+	if Host != "https://people.sphinx.chat" {
 		t.Error("Could not load default host")
 	}
 
-	if jwtKey == "" {
+	if JwtKey == "" {
 		t.Error("Could not load random jwtKey")
 	}
 }

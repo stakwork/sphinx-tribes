@@ -1,11 +1,15 @@
-package main
+package auth
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stakwork/sphinx-tribes/config"
+)
 
 func TestInitJwt(t *testing.T) {
 
-	initConfig()
-	initJwt()
+	config.InitConfig()
+	InitJwt()
 
 	if TokenAuth == nil {
 		t.Error("Could not init JWT")
