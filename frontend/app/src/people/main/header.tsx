@@ -42,6 +42,11 @@ function Header() {
       path: '/tickets'
     },
     {
+      label: 'Leaderboard',
+      name: 'leaderboard',
+      path: '/leaderboard'
+    },
+    {
       label: 'Bots',
       name: 'bots',
       path: '/b'

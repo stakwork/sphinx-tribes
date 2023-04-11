@@ -150,9 +150,7 @@ function WantedSummary(props: any) {
           value: value?.owner_pubkey || '',
           label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
         },
-        codingLanguage: codingLanguage?.map((x) => {
-          return { ...x };
-        }),
+        codingLanguage: codingLanguage?.map((x) => ({ ...x })),
         estimate_session_length: estimate_session_length,
         show: show,
         type: type,
@@ -197,11 +195,9 @@ function WantedSummary(props: any) {
   useEffect(() => {
     let res;
     if (codingLanguage?.length > 0) {
-      res = LanguageObject?.filter((value) => {
-        return codingLanguage?.find((val) => {
-          return val.label === value.label;
-        });
-      });
+      res = LanguageObject?.filter((value) =>
+        codingLanguage?.find((val) => val.label === value.label)
+      );
     }
     setDataValue(res);
     setLabels(res);

@@ -1,6 +1,4 @@
 import { PeopleBody } from 'people/main';
 import React from 'react';
 
-export const PeoplePage = () => {
-  return <PeopleBody />;
-};
+export const PeoplePage = () => <PeopleBody />;

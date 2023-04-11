@@ -190,29 +190,27 @@ const BountyHeader = ({
               </EuiText>
               <div className="ImageOuterContainer">
                 {peopleList &&
-                  peopleList?.slice(0, 3).map((val, index) => {
-                    return (
-                      <DevelopersImageContainer
-                        color={color}
-                        key={index}
+                  peopleList?.slice(0, 3).map((val, index) => (
+                    <DevelopersImageContainer
+                      color={color}
+                      key={index}
+                      style={{
+                        zIndex: 3 - index,
+                        marginLeft: index > 0 ? '-14px' : '',
+                        objectFit: 'cover'
+                      }}
+                    >
+                      <img
+                        height={'23px'}
+                        width={'23px'}
+                        src={val?.img || '/static/person_placeholder.png'}
+                        alt={''}
                         style={{
-                          zIndex: 3 - index,
-                          marginLeft: index > 0 ? '-14px' : '',
-                          objectFit: 'cover'
+                          borderRadius: '50%'
                         }}
-                      >
-                        <img
-                          height={'23px'}
-                          width={'23px'}
-                          src={val?.img || '/static/person_placeholder.png'}
-                          alt={''}
-                          style={{
-                            borderRadius: '50%'
-                          }}
-                        />
-                      </DevelopersImageContainer>
-                    );
-                  })}
+                      />
+                    </DevelopersImageContainer>
+                  ))}
               </div>
               <EuiText
                 style={{
@@ -329,28 +327,26 @@ const BountyHeader = ({
             <PostBounty widget={selectedWidget} />
             <DevelopersContainerMobile>
               {peopleList &&
-                peopleList?.slice(0, 3).map((val, index) => {
-                  return (
-                    <DevelopersImageContainer
-                      key={index}
-                      color={color}
+                peopleList?.slice(0, 3).map((val, index) => (
+                  <DevelopersImageContainer
+                    key={index}
+                    color={color}
+                    style={{
+                      zIndex: 3 - index,
+                      marginLeft: index > 0 ? '-14px' : ''
+                    }}
+                  >
+                    <img
+                      height={'20px'}
+                      width={'20px'}
+                      src={val?.img || '/static/person_placeholder.png'}
+                      alt={''}
                       style={{
-                        zIndex: 3 - index,
-                        marginLeft: index > 0 ? '-14px' : ''
+                        borderRadius: '50%'
                       }}
-                    >
-                      <img
-                        height={'20px'}
-                        width={'20px'}
-                        src={val?.img || '/static/person_placeholder.png'}
-                        alt={''}
-                        style={{
-                          borderRadius: '50%'
-                        }}
-                      />
-                    </DevelopersImageContainer>
-                  );
-                })}
+                    />
+                  </DevelopersImageContainer>
+                ))}
               <EuiText
                 style={{
                   fontSize: '14px',
