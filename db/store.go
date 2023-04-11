@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"encoding/base64"
@@ -12,26 +12,27 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/patrickmn/go-cache"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"golang.org/x/crypto/blake2b"
 )
 
 // Store struct
-type Store struct {
-	cache *cache.Cache
+type StoreData struct {
+	Cache *cache.Cache
 }
 
 type LnStore struct {
-	k1     string
-	key    string
-	status bool
+	K1     string
+	Key    string
+	Status bool
 }
 
-var store Store
+var Store StoreData
 
-func initCache() {
+func InitCache() {
 	authTimeout := 120
-	store = Store{
-		cache: cache.New(
+	Store = StoreData{
+		Cache: cache.New(
 			time.Duration(authTimeout)*time.Second,
 			time.Duration(authTimeout*3)*time.Second,
 		),
@@ -39,20 +40,20 @@ func initCache() {
 }
 
 // SetCache
-func (s Store) SetCache(key string, value string) error {
-	s.cache.Set(key, value, cache.DefaultExpiration)
+func (s StoreData) SetCache(key string, value string) error {
+	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
 // DeleteCache
-func (s Store) DeleteCache(key string) error {
-	s.cache.Delete(key)
+func (s StoreData) DeleteCache(key string) error {
+	s.Cache.Delete(key)
 	return nil
 }
 
 // GetCache
-func (s Store) GetCache(key string) (string, error) {
-	value, found := s.cache.Get(key)
+func (s StoreData) GetCache(key string) (string, error) {
+	value, found := s.Cache.Get(key)
 	c, _ := value.(string)
 	if !found || c == "" {
 		return "", errors.New("not found")
@@ -61,14 +62,14 @@ func (s Store) GetCache(key string) (string, error) {
 }
 
 // SetCache
-func (s Store) SetLnCache(key string, value LnStore) error {
-	s.cache.Set(key, value, cache.DefaultExpiration)
+func (s StoreData) SetLnCache(key string, value LnStore) error {
+	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
 // GetCache
-func (s Store) GetLnCache(key string) (LnStore, error) {
-	value, found := s.cache.Get(key)
+func (s StoreData) GetLnCache(key string) (LnStore, error) {
+	value, found := s.Cache.Get(key)
 	c, _ := value.(LnStore)
 	if !found {
 		return LnStore{}, errors.New("not found")
@@ -76,12 +77,12 @@ func (s Store) GetLnCache(key string) (LnStore, error) {
 	return c, nil
 }
 
-func ask(w http.ResponseWriter, r *http.Request) {
+func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
 	h := blake2b.Sum256([]byte(ts))
 	challenge := base64.URLEncoding.EncodeToString(h[:])
 
-	store.SetCache(challenge, ts)
+	Store.SetCache(challenge, ts)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
@@ -105,12 +106,12 @@ type VerifyPayload struct {
 	Extras                map[string]interface{} `json:"extras"`
 }
 
-func verify(w http.ResponseWriter, r *http.Request) {
+func Verify(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	challenge := chi.URLParam(r, "challenge")
-	_, err := store.GetCache(challenge)
+	_, err := Store.GetCache(challenge)
 	if err != nil {
 		fmt.Println("challenge not found", err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -135,7 +136,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// set into the cache
-	store.SetCache(challenge, string(marshalled))
+	Store.SetCache(challenge, string(marshalled))
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{})
@@ -145,10 +146,10 @@ func verify(w http.ResponseWriter, r *http.Request) {
 curl localhost:5002/ask
 curl localhost:5002/poll/d5SYZNY5pQ7dXwHP-oXh2uSOPUEX0fUJOXI0_5-eOsg=
 */
-func poll(w http.ResponseWriter, r *http.Request) {
+func Poll(w http.ResponseWriter, r *http.Request) {
 
 	challenge := chi.URLParam(r, "challenge")
-	res, err := store.GetCache(challenge)
+	res, err := Store.GetCache(challenge)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -171,7 +172,7 @@ func poll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := DB.getPersonByPubkey(pld.Pubkey)
+	existing := DB.GetPersonByPubkey(pld.Pubkey)
 	if existing.ID > 0 {
 		pld.ID = existing.ID // add ID on if exists
 		pld.Description = existing.Description
@@ -187,7 +188,7 @@ func poll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// update LastLogin for user
-	DB.updatePerson(pld.ID, map[string]interface{}{
+	DB.UpdatePerson(pld.ID, map[string]interface{}{
 		"last_login": time.Now().Unix(),
 	})
 
@@ -204,7 +205,7 @@ type Save struct {
 	Method string `json:"method"`
 }
 
-func postSave(w http.ResponseWriter, r *http.Request) {
+func PostSave(w http.ResponseWriter, r *http.Request) {
 
 	save := Save{}
 	body, err := ioutil.ReadAll(r.Body)
@@ -223,7 +224,7 @@ func postSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	store.SetCache(save.Key, string(s))
+	Store.SetCache(save.Key, string(s))
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
@@ -231,10 +232,10 @@ func postSave(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func pollSave(w http.ResponseWriter, r *http.Request) {
+func PollSave(w http.ResponseWriter, r *http.Request) {
 
 	key := chi.URLParam(r, "key")
-	res, err := store.GetCache(key)
+	res, err := Store.GetCache(key)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
