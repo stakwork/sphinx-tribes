@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -7,22 +7,24 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 const liquidTestModeUrl = "TEST_ASSET_URL"
 
-func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
+func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	person := Person{}
+	person := db.Person{}
 	body, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &person)
@@ -47,14 +49,14 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := DB.getPersonByPubkey(pubKeyFromAuth)
+	existing := db.DB.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 { // new!
 		if person.ID != 0 { // cant try to "edit" if not exists already
 			fmt.Println("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		person.UniqueName, _ = personUniqueNameFromName(person.OwnerAlias)
+		person.UniqueName, _ = db.PersonUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
 	} else { // editing! needs ID
@@ -73,10 +75,10 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
 	if person.NewTicketTime != 0 {
-		go processAlerts(person)
+		go db.ProcessAlerts(person)
 	}
 
-	p, err := DB.createOrEditPerson(person)
+	p, err := db.DB.CreateOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -86,7 +88,7 @@ func createOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
-func personIsAdmin(pk string) bool {
+func PersonIsAdmin(pk string) bool {
 	adminPubkeys := os.Getenv("ADMIN_PUBKEYS")
 	if adminPubkeys == "" {
 		return false
@@ -100,9 +102,9 @@ func personIsAdmin(pk string) bool {
 	return false
 }
 
-func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
+func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	pubKey := chi.URLParam(r, "pubKey")
 	createdStr := chi.URLParam(r, "created")
 	created, err := strconv.ParseInt(createdStr, 10, 64)
@@ -121,18 +123,18 @@ func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	existing := DB.getPersonByPubkey(pubKeyFromAuth)
+	existing := db.DB.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 {
 		fmt.Println("Could not fetch admin details from db")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
-	} else if personIsAdmin(existing.OwnerPubKey) == false {
+	} else if PersonIsAdmin(existing.OwnerPubKey) == false {
 		fmt.Println("Only admin is allowed to delete tickets")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	person := DB.getPersonByPubkey(pubKey)
+	person := db.DB.GetPersonByPubkey(pubKey)
 	if person.ID == 0 {
 		fmt.Println("Could not fetch person from db")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -170,7 +172,7 @@ func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 		person.Extras["wanted"] = append(wanteds[:index], wanteds[index+1:]...)
 	}
 
-	_, err = DB.createOrEditPerson(person)
+	_, err = db.DB.CreateOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -181,12 +183,12 @@ func deleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func processTwitterConfirmationsLoop() {
+func ProcessTwitterConfirmationsLoop() {
 	twitterToken := os.Getenv("TWITTER_TOKEN")
 	if twitterToken == "" {
 		return
 	}
-	peeps := DB.getUnconfirmedTwitter()
+	peeps := db.DB.GetUnconfirmedTwitter()
 	for _, p := range peeps {
 		twitArray, ok := p.Extras["twitter"].([]interface{})
 		if ok {
@@ -195,11 +197,11 @@ func processTwitterConfirmationsLoop() {
 				if ok2 {
 					username, _ := twitValue["value"].(string)
 					if username != "" {
-						pubkey, err := ConfirmIdentityTweet(username)
+						pubkey, err := utils.ConfirmIdentityTweet(username)
 						// fmt.Println("TWitter err", err)
 						if err == nil && pubkey != "" {
 							if p.OwnerPubKey == pubkey {
-								DB.updateTwitterConfirmed(p.ID, true)
+								db.DB.UpdateTwitterConfirmed(p.ID, true)
 							}
 						}
 					}
@@ -208,11 +210,11 @@ func processTwitterConfirmationsLoop() {
 		}
 	}
 	time.Sleep(30 * time.Second)
-	processTwitterConfirmationsLoop()
+	ProcessTwitterConfirmationsLoop()
 }
 
-func processGithubIssuesLoop() {
-	peeps := DB.getListedPeople(nil)
+func ProcessGithubIssuesLoop() {
+	peeps := db.DB.GetListedPeople(nil)
 
 	for _, p := range peeps {
 		wanteds, ok := p.Extras["wanted"].([]interface{})
@@ -271,15 +273,15 @@ func processGithubIssuesLoop() {
 			}
 
 			// update with altered record
-			DB.updateGithubIssues(p.ID, clonedGithubIssues)
+			db.DB.UpdateGithubIssues(p.ID, clonedGithubIssues)
 		}
 	}
 	time.Sleep(1 * time.Minute)
-	processGithubIssuesLoop()
+	ProcessGithubIssuesLoop()
 }
 
 func processGithubConfirmationsLoop() {
-	peeps := DB.getUnconfirmedGithub()
+	peeps := db.DB.GetUnconfirmedGithub()
 	for _, p := range peeps {
 		gitArray, ok := p.Extras["twitter"].([]interface{})
 		if ok {
@@ -291,7 +293,7 @@ func processGithubConfirmationsLoop() {
 						pubkey, err := PubkeyForGithubUser(username)
 						if err == nil && pubkey != "" {
 							if p.OwnerPubKey == pubkey {
-								DB.updateGithubConfirmed(p.ID, true)
+								db.DB.UpdateGithubConfirmed(p.ID, true)
 							}
 						}
 					}
@@ -303,41 +305,17 @@ func processGithubConfirmationsLoop() {
 	processGithubConfirmationsLoop()
 }
 
-func personUniqueNameFromName(name string) (string, error) {
-	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
-	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
-	if err != nil {
-		return "", err
-	}
-	path := reg.ReplaceAllString(pathOne, "")
-	n := 0
-	for {
-		uniquepath := path
-		if n > 0 {
-			uniquepath = path + strconv.Itoa(n)
-		}
-		existing := DB.getPersonByUniqueName(uniquepath)
-		if existing.ID != 0 {
-			n = n + 1
-		} else {
-			path = uniquepath
-			break
-		}
-	}
-	return path, nil
-}
-
-func getPersonByPubkey(w http.ResponseWriter, r *http.Request) {
+func GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
-	person := DB.getPersonByPubkey(pubkey)
+	person := db.DB.GetPersonByPubkey(pubkey)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
 
-func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
+func GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	person := DB.getPersonByUuid(uuid)
-	assetBalanceData, err := getAssetByPubkey(person.OwnerPubKey)
+	person := db.DB.GetPersonByUuid(uuid)
+	assetBalanceData, err := GetAssetByPubkey(person.OwnerPubKey)
 
 	personResponse := make(map[string]interface{})
 	personResponse["id"] = person.ID
@@ -350,7 +328,6 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	personResponse["owner_route_hint"] = person.OwnerRouteHint
 	personResponse["owner_contact_key"] = person.OwnerContactKey
 	personResponse["price_to_meet"] = person.PriceToMeet
-	// personResponse["extras"] = person.Extras
 	personResponse["twitter_confirmed"] = person.TwitterConfirmed
 	personResponse["github_issues"] = person.GithubIssues
 	if err != nil {
@@ -370,10 +347,10 @@ func getPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(personResponse)
 }
 
-func getPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
+func GetPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	person := DB.getPersonByUuid(uuid)
-	assetList, err := getAssetList(person.OwnerPubKey)
+	person := db.DB.GetPersonByUuid(uuid)
+	assetList, err := GetAssetList(person.OwnerPubKey)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusServiceUnavailable)
@@ -384,16 +361,16 @@ func getPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(assetList)
 }
 
-func getPersonByGithubName(w http.ResponseWriter, r *http.Request) {
+func GetPersonByGithubName(w http.ResponseWriter, r *http.Request) {
 	github := chi.URLParam(r, "github")
-	person := DB.getPersonByGithubName(github)
+	person := db.DB.GetPersonByGithubName(github)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
 
-func deletePerson(w http.ResponseWriter, r *http.Request) {
+func DeletePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	idString := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idString)
@@ -409,7 +386,7 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := DB.getPerson(uint(id))
+	existing := db.DB.GetPerson(uint(id))
 	if existing.ID == 0 {
 		fmt.Println("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -421,7 +398,7 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	DB.updatePerson(uint(id), map[string]interface{}{
+	db.DB.UpdatePerson(uint(id), map[string]interface{}{
 		"deleted": true,
 	})
 
@@ -429,7 +406,7 @@ func deletePerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func getAssetByPubkey(pubkey string) ([]AssetBalanceData, error) {
+func GetAssetByPubkey(pubkey string) ([]db.AssetBalanceData, error) {
 	client := &http.Client{}
 	testMode, err := strconv.ParseBool(os.Getenv("TEST_MODE"))
 	if err != nil {
@@ -453,7 +430,7 @@ func getAssetByPubkey(pubkey string) ([]AssetBalanceData, error) {
 	}
 	defer resp.Body.Close()
 
-	var r AssetResponse
+	var r db.AssetResponse
 	body, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
@@ -466,7 +443,7 @@ func getAssetByPubkey(pubkey string) ([]AssetBalanceData, error) {
 	return balances, nil
 }
 
-func getAssetList(pubkey string) ([]AssetListData, error) {
+func GetAssetList(pubkey string) ([]db.AssetListData, error) {
 	client := &http.Client{}
 
 	url := os.Getenv("ASSET_LIST_URL")
@@ -486,7 +463,7 @@ func getAssetList(pubkey string) ([]AssetListData, error) {
 	}
 	defer resp.Body.Close()
 
-	var r []AssetListData
+	var r []db.AssetListData
 	body, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
@@ -497,11 +474,11 @@ func getAssetList(pubkey string) ([]AssetListData, error) {
 	return r, nil
 }
 
-func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
+func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	badgeCreationData := BadgeCreationData{}
+	badgeCreationData := db.BadgeCreationData{}
 	body, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &badgeCreationData)
@@ -535,7 +512,7 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := VerifyTribeUUID(badgeCreationData.TribeUUID, false)
+	extractedPubkey, err := auth.VerifyTribeUUID(badgeCreationData.TribeUUID, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -548,7 +525,7 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tribe := DB.getTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
+	tribe := db.DB.GetTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
 
 	if pubKeyFromAuth != tribe.OwnerPubKey {
 		fmt.Println(pubKeyFromAuth)
@@ -577,23 +554,51 @@ func addOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tribe.Badges = tribeBadges
-	updatedTribe := DB.updateTribe(tribe.UUID, map[string]interface{}{
+	updatedTribe := db.DB.UpdateTribe(tribe.UUID, map[string]interface{}{
 		"badges": tribeBadges,
 	})
 
 	if updatedTribe {
-		tribe = DB.getTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
+		tribe = db.DB.GetTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(tribe)
 	}
 	w.WriteHeader(http.StatusBadRequest)
 	return
-
 }
 
-func migrateBounties(w http.ResponseWriter, r *http.Request) {
-	peeps := DB.getAllPeople()
+func GetPeopleShortList(w http.ResponseWriter, r *http.Request) {
+	var maxCount uint32 = 10000
+	people := db.DB.GetPeopleListShort(maxCount)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
+func GetPeopleBySearch(w http.ResponseWriter, r *http.Request) {
+	people := db.DB.GetPeopleBySearch(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
+func GetListedPeople(w http.ResponseWriter, r *http.Request) {
+	people := db.DB.GetListedPeople(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(people)
+}
+
+func GetListedPosts(w http.ResponseWriter, r *http.Request) {
+	people, err := db.DB.GetListedPosts(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
+}
+
+func MigrateBounties(w http.ResponseWriter, r *http.Request) {
+	peeps := db.DB.GetAllPeople()
 
 	for indexPeep, peep := range peeps {
 		fmt.Println("peep: ", indexPeep)
@@ -609,7 +614,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("looping bounties: ", index)
 			migrateBounty := bounty.(map[string]interface{})
 
-			migrateBountyFinal := Bounty{}
+			migrateBountyFinal := db.Bounty{}
 			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
 
 			migrateBountyFinal.OwnerID = peep.OwnerPubKey
@@ -709,7 +714,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Deliverables = Deliverables
 			}
 
-			CodingLanguage, ok13 := migrateBounty["coding_language"].(PropertyMap)
+			CodingLanguage, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
 			if !ok13 {
 				migrateBountyFinal.CodingLanguage = ""
 			} else {
@@ -744,7 +749,7 @@ func migrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.EstimatedCompletionDate = EstimatedCompletionDate
 			}
 			fmt.Println("Bounty about to be added ")
-			DB.addBounty(migrateBountyFinal)
+			db.DB.AddBounty(migrateBountyFinal)
 			//Migrate the bounties here
 
 		}

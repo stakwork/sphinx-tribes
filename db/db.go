@@ -1,10 +1,11 @@
-package main
+package db
 
 import (
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +15,9 @@ import (
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
+
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 type database struct {
@@ -23,7 +27,7 @@ type database struct {
 // DB is the object
 var DB database
 
-func initDB() {
+func InitDB() {
 	dbURL := os.Getenv("DATABASE_URL")
 	fmt.Printf("db url : %v", dbURL)
 	if dbURL == "" {
@@ -51,10 +55,10 @@ func initDB() {
 	// migrate table changes
 	db.AutoMigrate(&Person{}, &Channel{}, &LeaderBoard{}, &ConnectionCodes{}, &Bounty{})
 
-	people := DB.getAllPeople()
+	people := DB.GetAllPeople()
 	for _, p := range people {
 		if p.Uuid == "" {
-			DB.addUuidToPerson(p.ID, xid.New().String())
+			DB.AddUuidToPerson(p.ID, xid.New().String())
 		}
 	}
 
@@ -87,7 +91,7 @@ var channelupdatables = []string{
 	"name", "deleted"}
 
 // check that update owner_pub_key does in fact throw error
-func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
+func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 	if m.OwnerPubKey == "" {
 		return Tribe{}, errors.New("no pub key")
 	}
@@ -122,7 +126,7 @@ func (db database) createOrEditTribe(m Tribe) (Tribe, error) {
 	return m, nil
 }
 
-func (db database) createChannel(c Channel) (Channel, error) {
+func (db database) CreateChannel(c Channel) (Channel, error) {
 
 	if c.Created == nil {
 		now := time.Now()
@@ -135,7 +139,7 @@ func (db database) createChannel(c Channel) (Channel, error) {
 }
 
 // check that update owner_pub_key does in fact throw error
-func (db database) createOrEditBot(b Bot) (Bot, error) {
+func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	if b.OwnerPubKey == "" {
 		return Bot{}, errors.New("no pub key")
 	}
@@ -171,7 +175,7 @@ func (db database) createOrEditBot(b Bot) (Bot, error) {
 }
 
 // check that update owner_pub_key does in fact throw error
-func (db database) createOrEditPerson(m Person) (Person, error) {
+func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.OwnerPubKey == "" {
 		return Person{}, errors.New("no pub key")
 	}
@@ -209,13 +213,13 @@ func (db database) createOrEditPerson(m Person) (Person, error) {
 	return m, nil
 }
 
-func (db database) getUnconfirmedTwitter() []Person {
+func (db database) GetUnconfirmedTwitter() []Person {
 	ms := []Person{}
 	db.db.Raw(`SELECT * FROM people where extras -> 'twitter' IS NOT NULL and twitter_confirmed = 'f';`).Find(&ms)
 	return ms
 }
 
-func (db database) updateTwitterConfirmed(id uint, confirmed bool) {
+func (db database) UpdateTwitterConfirmed(id uint, confirmed bool) {
 	if id == 0 {
 		return
 	}
@@ -224,7 +228,7 @@ func (db database) updateTwitterConfirmed(id uint, confirmed bool) {
 	})
 }
 
-func (db database) addUuidToPerson(id uint, uuid string) {
+func (db database) AddUuidToPerson(id uint, uuid string) {
 	if id == 0 {
 		return
 	}
@@ -233,13 +237,13 @@ func (db database) addUuidToPerson(id uint, uuid string) {
 	})
 }
 
-func (db database) getUnconfirmedGithub() []Person {
+func (db database) GetUnconfirmedGithub() []Person {
 	ms := []Person{}
 	db.db.Raw(`SELECT * FROM people where extras -> 'github' IS NOT NULL and github_confirmed = 'f';`).Find(&ms)
 	return ms
 }
 
-func (db database) updateGithubConfirmed(id uint, confirmed bool) {
+func (db database) UpdateGithubConfirmed(id uint, confirmed bool) {
 	if id == 0 {
 		return
 	}
@@ -248,13 +252,13 @@ func (db database) updateGithubConfirmed(id uint, confirmed bool) {
 	})
 }
 
-func (db database) updateGithubIssues(id uint, issues map[string]interface{}) {
+func (db database) UpdateGithubIssues(id uint, issues map[string]interface{}) {
 	db.db.Model(&Person{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"github_issues": issues,
 	})
 }
 
-func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
+func (db database) UpdateTribe(uuid string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
 	}
@@ -262,7 +266,7 @@ func (db database) updateTribe(uuid string, u map[string]interface{}) bool {
 	return true
 }
 
-func (db database) updateChannel(id uint, u map[string]interface{}) bool {
+func (db database) UpdateChannel(id uint, u map[string]interface{}) bool {
 	if id == 0 {
 		return false
 	}
@@ -270,7 +274,7 @@ func (db database) updateChannel(id uint, u map[string]interface{}) bool {
 	return true
 }
 
-func (db database) updatePerson(id uint, u map[string]interface{}) bool {
+func (db database) UpdatePerson(id uint, u map[string]interface{}) bool {
 	if id == 0 {
 		return false
 	}
@@ -278,7 +282,7 @@ func (db database) updatePerson(id uint, u map[string]interface{}) bool {
 	return true
 }
 
-func (db database) updateTribeUniqueName(uuid string, u string) {
+func (db database) UpdateTribeUniqueName(uuid string, u string) {
 	if uuid == "" {
 		return
 	}
@@ -291,7 +295,7 @@ type GithubOpenIssue struct {
 	Assignee string `json:"assignee"`
 }
 
-func (db database) getOpenGithubIssues(r *http.Request) (int64, error) {
+func (db database) GetOpenGithubIssues(r *http.Request) (int64, error) {
 	ms := []GithubOpenIssue{}
 
 	// set limit
@@ -309,11 +313,11 @@ func (db database) getOpenGithubIssues(r *http.Request) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
-func (db database) getListedTribes(r *http.Request) []Tribe {
+func (db database) GetListedTribes(r *http.Request) []Tribe {
 	ms := []Tribe{}
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
 	thequery := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(name) LIKE ?", "%"+search+"%")
 
@@ -329,33 +333,33 @@ func (db database) getListedTribes(r *http.Request) []Tribe {
 	return ms
 }
 
-func (db database) getTribesByOwner(pubkey string) []Tribe {
+func (db database) GetTribesByOwner(pubkey string) []Tribe {
 	ms := []Tribe{}
 	db.db.Where("owner_pub_key = ? AND (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)", pubkey).Find(&ms)
 	return ms
 }
 
-func (db database) getAllTribesByOwner(pubkey string) []Tribe {
+func (db database) GetAllTribesByOwner(pubkey string) []Tribe {
 	ms := []Tribe{}
 	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&ms)
 	return ms
 }
 
-func (db database) getChannelsByTribe(tribe_uuid string) []Channel {
+func (db database) GetChannelsByTribe(tribe_uuid string) []Channel {
 	ms := []Channel{}
 	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
 	return ms
 }
 
-func (db database) getChannel(id uint) Channel {
+func (db database) GetChannel(id uint) Channel {
 	ms := Channel{}
 	db.db.Where("id = ?  AND (deleted = 'f' OR deleted is null)", id).Find(&ms)
 	return ms
 }
 
-func (db database) getListedBots(r *http.Request) []Bot {
+func (db database) GetListedBots(r *http.Request) []Bot {
 	ms := []Bot{}
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
 	// db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(name) LIKE ?", "%"+search+"%").Find(&ms)
@@ -363,25 +367,25 @@ func (db database) getListedBots(r *http.Request) []Bot {
 	return ms
 }
 
-func (db database) getListedPeople(r *http.Request) []Person {
+func (db database) GetListedPeople(r *http.Request) []Person {
 	ms := []Person{}
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
 	// if search is empty, returns all
 	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Find(&ms)
 	return ms
 }
 
-func (db database) getAllPeople() []Person {
+func (db database) GetAllPeople() []Person {
 	ms := []Person{}
 	// if search is empty, returns all
 	db.db.Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
 }
 
-func (db database) getPeopleBySearch(r *http.Request) []Person {
+func (db database) GetPeopleBySearch(r *http.Request) []Person {
 	ms := []Person{}
-	offset, limit, sortBy, direction, search := getPaginationParams(r)
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
 	// if search is empty, returns all
 
@@ -444,17 +448,17 @@ func addNotMineToExtrasRawQuery(query string, pubkey string) string {
 	return query + ` AND people.owner_pub_key != ` + pubkey + ` `
 }
 
-func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
+func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
 
-	offset, limit, sortBy, _, search := getPaginationParams(r)
+	offset, limit, sortBy, _, search := utils.GetPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("post")
 
 	// if logged in, dont get mine
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth != "" {
 		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
 	}
@@ -466,44 +470,16 @@ func (db database) getListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) getListedWanteds(r *http.Request) ([]PeopleExtra, error) {
+func (db database) GetListedWanteds(r *http.Request) ([]Bounty, error) {
 	pubkey := chi.URLParam(r, "pubkey")
-	ms := []PeopleExtra{}
+	ms := []Bounty{}
 
-	var rawQuery string
-	var result *gorm.DB
-	// set limit
-	offset, limit, sortBy, _, search := getPaginationParams(r)
+	err := db.db.Raw(`SELECT * FROM bounty where assignee = '` + pubkey + `'`).Find(&ms).Error
 
-	if pubkey == "" {
-		rawQuery = makeExtrasListQuery("wanted")
-	} else {
-		rawQuery = makePersonExtrasListQuery("wanted")
-	}
-
-	// 3/1/2022 = 1646172712, we do this to disclude early test tickets
-	rawQuery = addNewerThanTimestampToExtrasRawQuery(rawQuery, 1646172712)
-
-	// if logged in, dont get mine
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
-	if pubKeyFromAuth != "" {
-		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
-	}
-
-	// sort by newest
-	if pubkey == "" {
-		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-			rawQuery, "%"+search+"%").Find(&ms)
-	} else {
-		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-			rawQuery, pubkey, "%"+search+"%").Find(&ms)
-	}
-
-	return ms, result.Error
+	return ms, err
 }
 
-func (db database) getPeopleForNewTicket(languages []interface{}) ([]Person, error) {
+func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
 	ms := []Person{}
 
 	query := "Select owner_pub_key, json_build_object('coding_languages',extras->'coding_languages') as extras from people" +
@@ -527,16 +503,16 @@ func (db database) getPeopleForNewTicket(languages []interface{}) ([]Person, err
 	return ms, err
 }
 
-func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
+func (db database) GetListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	ms := []PeopleExtra{}
 	// set limit
-	offset, limit, sortBy, _, search := getPaginationParams(r)
+	offset, limit, sortBy, _, search := utils.GetPaginationParams(r)
 
 	rawQuery := makeExtrasListQuery("offer")
 
 	// if logged in, dont get mine
 	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth != "" {
 		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
 	}
@@ -548,7 +524,7 @@ func (db database) getListedOffers(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) updateBot(uuid string, u map[string]interface{}) bool {
+func (db database) UpdateBot(uuid string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
 	}
@@ -556,52 +532,52 @@ func (db database) updateBot(uuid string, u map[string]interface{}) bool {
 	return true
 }
 
-func (db database) getAllTribes() []Tribe {
+func (db database) GetAllTribes() []Tribe {
 	ms := []Tribe{}
 	db.db.Where("(deleted = 'f' OR de leted is null)").Find(&ms)
 	return ms
 }
 
-func (db database) getTribesTotal() uint64 {
+func (db database) GetTribesTotal() uint64 {
 	var count uint64
 	db.db.Model(&Tribe{}).Where("deleted = 'false' OR deleted is null").Count(&count)
 	return count
 }
 
-func (db database) getTribeByIdAndPubkey(uuid string, pubkey string) Tribe {
+func (db database) GetTribeByIdAndPubkey(uuid string, pubkey string) Tribe {
 	m := Tribe{}
 	//db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null) AND owner_pubkey = ?", uuid, pubkey).Find(&m)
 	db.db.Where("uuid = ? AND owner_pub_key = ?", uuid, pubkey).Find(&m)
 	return m
 }
 
-func (db database) getTribe(uuid string) Tribe {
+func (db database) GetTribe(uuid string) Tribe {
 	m := Tribe{}
 	db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null)", uuid).Find(&m)
 	return m
 }
 
-func (db database) getPerson(id uint) Person {
+func (db database) GetPerson(id uint) Person {
 	m := Person{}
 	db.db.Where("id = ? AND (deleted = 'f' OR deleted is null)", id).Find(&m)
 	return m
 }
 
-func (db database) getPersonByPubkey(pubkey string) Person {
+func (db database) GetPersonByPubkey(pubkey string) Person {
 	m := Person{}
 	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
 
 	return m
 }
 
-func (db database) getPersonByUuid(uuid string) Person {
+func (db database) GetPersonByUuid(uuid string) Person {
 	m := Person{}
 	db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null)", uuid).Find(&m)
 
 	return m
 }
 
-func (db database) getPersonByGithubName(github_name string) Person {
+func (db database) GetPersonByGithubName(github_name string) Person {
 	m := Person{}
 
 	db.db.Raw(`SELECT 		
@@ -619,43 +595,43 @@ func (db database) getPersonByGithubName(github_name string) Person {
 	return m
 }
 
-func (db database) getFirstTribeByFeedURL(feedURL string) Tribe {
+func (db database) GetFirstTribeByFeedURL(feedURL string) Tribe {
 	m := Tribe{}
 	db.db.Where("feed_url = ? AND (deleted = 'f' OR deleted is null)", feedURL).First(&m)
 	return m
 }
 
-func (db database) getBot(uuid string) Bot {
+func (db database) GetBot(uuid string) Bot {
 	m := Bot{}
 	db.db.Where("uuid = ? AND (deleted = 'f' OR deleted is null)", uuid).Find(&m)
 	return m
 }
 
-func (db database) getTribeByUniqueName(un string) Tribe {
+func (db database) GetTribeByUniqueName(un string) Tribe {
 	m := Tribe{}
 	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
 	return m
 }
 
-func (db database) getBotsByOwner(pubkey string) []Bot {
+func (db database) GetBotsByOwner(pubkey string) []Bot {
 	bs := []Bot{}
 	db.db.Where("owner_pub_key = ?", pubkey).Find(&bs)
 	return bs
 }
 
-func (db database) getBotByUniqueName(un string) Bot {
+func (db database) GetBotByUniqueName(un string) Bot {
 	m := Bot{}
 	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
 	return m
 }
 
-func (db database) getPersonByUniqueName(un string) Person {
+func (db database) GetPersonByUniqueName(un string) Person {
 	m := Person{}
 	db.db.Where("unique_name = ? AND (deleted = 'f' OR deleted is null)", un).Find(&m)
 	return m
 }
 
-func (db database) searchTribes(s string) []Tribe {
+func (db database) SearchTribes(s string) []Tribe {
 	ms := []Tribe{}
 	if s == "" {
 		return ms
@@ -670,7 +646,7 @@ func (db database) searchTribes(s string) []Tribe {
 	return ms
 }
 
-func (db database) searchBots(s string, limit, offset int) []BotRes {
+func (db database) SearchBots(s string, limit, offset int) []BotRes {
 	ms := []BotRes{}
 	if s == "" {
 		return ms
@@ -688,7 +664,7 @@ func (db database) searchBots(s string, limit, offset int) []BotRes {
 	return ms
 }
 
-func (db database) searchPeople(s string, limit, offset int) []Person {
+func (db database) SearchPeople(s string, limit, offset int) []Person {
 	ms := []Person{}
 	if s == "" {
 		return ms
@@ -706,7 +682,7 @@ func (db database) searchPeople(s string, limit, offset int) []Person {
 	return ms
 }
 
-func (db database) createLeaderBoard(uuid string, leaderboards []LeaderBoard) ([]LeaderBoard, error) {
+func (db database) CreateLeaderBoard(uuid string, leaderboards []LeaderBoard) ([]LeaderBoard, error) {
 	m := LeaderBoard{}
 	db.db.Where("tribe_uuid = ?", uuid).Delete(&m)
 	for _, leaderboard := range leaderboards {
@@ -717,19 +693,19 @@ func (db database) createLeaderBoard(uuid string, leaderboards []LeaderBoard) ([
 
 }
 
-func (db database) getLeaderBoard(uuid string) []LeaderBoard {
+func (db database) GetLeaderBoard(uuid string) []LeaderBoard {
 	m := []LeaderBoard{}
 	db.db.Where("tribe_uuid = ?", uuid).Find(&m)
 	return m
 }
 
-func (db database) getLeaderBoardByUuidAndAlias(uuid string, alias string) LeaderBoard {
+func (db database) GetLeaderBoardByUuidAndAlias(uuid string, alias string) LeaderBoard {
 	m := LeaderBoard{}
 	db.db.Where("tribe_uuid = ? and alias = ?", uuid, alias).Find(&m)
 	return m
 }
 
-func (db database) updateLeaderBoard(uuid string, alias string, u map[string]interface{}) bool {
+func (db database) UpdateLeaderBoard(uuid string, alias string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false
 	}
@@ -737,13 +713,13 @@ func (db database) updateLeaderBoard(uuid string, alias string, u map[string]int
 	return true
 }
 
-func (db database) countDevelopers() uint64 {
+func (db database) CountDevelopers() uint64 {
 	var count uint64
 	db.db.Model(&Person{}).Where("deleted = 'f' OR deleted is null").Count(&count)
 	return count
 }
 
-func (db database) countBounties() uint64 {
+func (db database) CountBounties() uint64 {
 	var count struct {
 		Sum uint64 `db:"sum"`
 	}
@@ -752,7 +728,7 @@ func (db database) countBounties() uint64 {
 	return count.Sum
 }
 
-func (db database) getPeopleListShort(count uint32) *[]PersonInShort {
+func (db database) GetPeopleListShort(count uint32) *[]PersonInShort {
 	p := []PersonInShort{}
 	db.db.Raw(
 		`SELECT id, owner_pub_key, unique_name, img, uuid, owner_alias
@@ -764,13 +740,12 @@ func (db database) getPeopleListShort(count uint32) *[]PersonInShort {
 	return &p
 }
 
-func (db database) addBounty(b Bounty) (Bounty, error) {
-
+func (db database) AddBounty(b Bounty) (Bounty, error) {
 	db.db.Create(&b)
 	return b, nil
 }
 
-func (db database) createConnectionCode(c ConnectionCodes) (ConnectionCodes, error) {
+func (db database) CreateConnectionCode(c ConnectionCodes) (ConnectionCodes, error) {
 	if c.DateCreated == nil {
 		now := time.Now()
 		c.DateCreated = &now
@@ -779,7 +754,7 @@ func (db database) createConnectionCode(c ConnectionCodes) (ConnectionCodes, err
 	return c, nil
 }
 
-func (db database) getConnectionCode() ConnectionCodesShort {
+func (db database) GetConnectionCode() ConnectionCodesShort {
 	c := ConnectionCodesShort{}
 
 	db.db.Raw(`SELECT connection_string, date_created FROM connectioncodes WHERE is_used =? ORDER BY id DESC LIMIT 1`, false).Find(&c)
@@ -791,7 +766,7 @@ func (db database) getConnectionCode() ConnectionCodesShort {
 	return c
 }
 
-func (db database) getAllBounties() []Bounty {
+func (db database) GetAllBounties() []Bounty {
 	ms := []Bounty{}
 	// if search is empty, returns all
 	db.db.Find(&ms)
@@ -800,7 +775,7 @@ func (db database) getAllBounties() []Bounty {
 	return ms
 }
 
-func (db database) getLnUser(lnKey string) uint64 {
+func (db database) GetLnUser(lnKey string) uint64 {
 	var count uint64
 
 	db.db.Model(&Person{}).Where("owner_pub_key = ?", lnKey).Count(&count)
@@ -808,14 +783,14 @@ func (db database) getLnUser(lnKey string) uint64 {
 	return count
 }
 
-func (db database) createLnUser(lnKey string) (Person, error) {
+func (db database) CreateLnUser(lnKey string) (Person, error) {
 	now := time.Now()
 	p := Person{}
 
-	if db.getLnUser(lnKey) == 0 {
+	if db.GetLnUser(lnKey) == 0 {
 		p.OwnerPubKey = lnKey
 		p.OwnerAlias = lnKey
-		p.UniqueName, _ = personUniqueNameFromName(p.OwnerAlias)
+		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
 		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
@@ -827,7 +802,7 @@ func (db database) createLnUser(lnKey string) (Person, error) {
 	return p, nil
 }
 
-func (db database) createOrEditBounty(b Bounty) (Bounty, error) {
+func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 	if b.OwnerID == "" {
 		return Bounty{}, errors.New("no pub key")
 	}
@@ -846,6 +821,30 @@ func (db database) createOrEditBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
+func PersonUniqueNameFromName(name string) (string, error) {
+	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		return "", err
+	}
+	path := reg.ReplaceAllString(pathOne, "")
+	n := 0
+	for {
+		uniquepath := path
+		if n > 0 {
+			uniquepath = path + strconv.Itoa(n)
+		}
+		existing := DB.GetPersonByUniqueName(uniquepath)
+		if existing.ID != 0 {
+			n = n + 1
+		} else {
+			path = uniquepath
+			break
+		}
+	}
+	return path, nil
+}
+
 type Extras struct {
 	Owner_pubkey             string `json:"owner_pubkey"`
 	Total_bounties_completed uint   `json:"total_bounties_completed"`
@@ -854,7 +853,7 @@ type Extras struct {
 
 type LeaderData map[string]interface{}
 
-func (db database) getBountiesLeaderboard() []LeaderData {
+func (db database) GetBountiesLeaderboard() []LeaderData {
 	ms := []Extras{}
 	var users = []LeaderData{}
 
@@ -863,7 +862,7 @@ func (db database) getBountiesLeaderboard() []LeaderData {
 
 	for _, val := range ms {
 		var newLeader = make(map[string]interface{})
-		found, index := getLeaderData(users, val.Owner_pubkey)
+		found, index := GetLeaderData(users, val.Owner_pubkey)
 
 		if found == -1 {
 			newLeader["owner_pubkey"] = val.Owner_pubkey
@@ -882,7 +881,7 @@ func (db database) getBountiesLeaderboard() []LeaderData {
 	return users
 }
 
-func getLeaderData(arr []LeaderData, key string) (int, int) {
+func GetLeaderData(arr []LeaderData, key string) (int, int) {
 	found := -1
 	index := 0
 

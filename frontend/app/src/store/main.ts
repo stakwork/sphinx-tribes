@@ -612,11 +612,20 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps = await api.get(query);
-      ps = this.decodeListJSON(ps);
+			let ps: any = []
+      let psBody = await api.get(query);
+      //ps = this.decodeListJSON(ps);
+			for(let i = 0; i < psBody.length; i++){
+			let psPerson
+			if(pubkey){
+				psPerson = await this.getPersonByPubkey(pubkey)
+			}
+			ps.push({body: psBody[i], person: psPerson})
+			}
 
       navigator.clipboard.writeText(JSON.stringify(ps));
 
+      console.log(ps)
       this.setPersonWanteds(ps);
 
       return ps;

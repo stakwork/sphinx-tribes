@@ -30,7 +30,7 @@ export const PersonPage = observer(() => {
     <Content>
       {!isMobile && (
         <div className="desktop">
-          {!canEdit && <PeopleList />}
+          <PeopleList />
           <UserInfo setShowSupport={setShowSupport} />
           <TabsPages />
         </div>

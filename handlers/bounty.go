@@ -1,26 +1,27 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/stakwork/sphinx-tribes/db"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
-func getAllBounties(w http.ResponseWriter, r *http.Request) {
+func GetAllBounties(w http.ResponseWriter, r *http.Request) {
 
-	bounties := DB.getAllBounties()
+	bounties := db.DB.GetAllBounties()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bounties)
 
 }
 
-func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
+func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	//ctx := r.Context()
 	//pubKeyFromAuth, _ := ctx.Value(ContextKey).(string)
 
-	bounty := Bounty{}
+	bounty := db.Bounty{}
 	body, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &bounty)
@@ -67,7 +68,7 @@ func createOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		bounty.Tribe = "None"
 	}
 
-	b, err := DB.createOrEditBounty(bounty)
+	b, err := db.DB.CreateOrEditBounty(bounty)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
