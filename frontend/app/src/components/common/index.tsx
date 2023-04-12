@@ -12,6 +12,8 @@ import TextInput from './TextInput';
 import SearchableSelect from './SearchableSelect';
 import { Portal } from './Portal';
 
+export { PriceOuterContainer } from './PriceOuterContainer';
+
 export {
   SearchableSelect,
   TextInput,

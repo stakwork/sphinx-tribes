@@ -117,15 +117,12 @@ export const coding_languages = [
 
 export const status = ['Open', 'Assigned', 'Paid'];
 
-export const GetValue = (arr: any) => {
-  return arr.map((val) => {
-    return {
-      id: val,
-      label: val,
-      value: val
-    };
-  });
-};
+export const GetValue = (arr: any) =>
+  arr.map((val) => ({
+    id: val,
+    label: val,
+    value: val
+  }));
 
 export const awards = [
   {
