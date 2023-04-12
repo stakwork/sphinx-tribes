@@ -43,6 +43,7 @@ func NewRouter() *http.Server {
 		r.Get("/search_youtube", handlers.SearchYoutube)
 		r.Get("/youtube_videos", handlers.YoutubeVideosForChannel)
 		r.Get("/admin_pubkeys", handlers.GetAdminPubkeys)
+		r.Get("/people/bounty/leaderboard", handlers.GetBountiesLeaderboard)
 
 		r.Get("/ask", db.Ask)
 		r.Get("/poll/{challenge}", db.Poll)
