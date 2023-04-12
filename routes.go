@@ -22,10 +22,7 @@ import (
 func NewRouter() *http.Server {
 	r := initChi()
 
-	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("pong")
-	})
+	r.Get("/ping", frontend.PingRoute)
 
 	r.Group(func(r chi.Router) {
 		r.Get("/", frontend.IndexRoute)
