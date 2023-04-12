@@ -1,11 +1,19 @@
 import { EuiStat, EuiTextColor } from '@elastic/eui';
-import { colors } from 'config';
+import { colors, mobileBreakpoint } from 'config';
 import { DollarConverter } from 'helpers';
 import React from 'react';
 import styled from 'styled-components';
 
-export const Summary = ({ sats, bounties, className=""  }: { sats: number; bounties: number ; className? : string}) => (
-  <SummaryContainer className={className} >
+export const Summary = ({
+  sats,
+  bounties,
+  className = ''
+}: {
+  sats: number;
+  bounties: number;
+  className?: string;
+}) => (
+  <SummaryContainer className={className}>
     <EuiStat
       className="stats"
       title={`${DollarConverter(sats)}`}
@@ -35,7 +43,7 @@ const SummaryContainer = styled.div`
     border: 1px solid ${colors.light.borderGreen1};
     border-radius: 0.5rem;
   }
-  @media (max-width: 900px) {
+  @media (${mobileBreakpoint}) {
     flex-direction: row;
   }
 `;

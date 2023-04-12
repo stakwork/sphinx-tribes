@@ -85,12 +85,12 @@ const BountyHeader = ({
           <BountyHeaderDesk>
             <B>
               <PostBounty widget={selectedWidget} />
-              <IconButton 
+              <IconButton
                 width={150}
                 height={isMobile ? 36 : 48}
                 text="Leaderboard"
                 onClick={() => {
-                  history.push('/leaderboard')
+                  history.push('/leaderboard');
                 }}
                 style={{
                   marginLeft: '10px'
@@ -339,18 +339,18 @@ const BountyHeader = ({
           </LargeActionContainer>
           <ShortActionContainer>
             <PostBounty widget={selectedWidget} />
-            <IconButton 
-                width={150}
-                height={isMobile ? 36 : 48}
-                text="Leaderboard"
-                onClick={() => {
-                  history.push('/leaderboard')
-                }}
-                style={{
-                  marginLeft: '10px',
-                  marginRight: 'auto'
-                }}
-              />
+            <IconButton
+              width={150}
+              height={isMobile ? 36 : 48}
+              text="Leaderboard"
+              onClick={() => {
+                history.push('/leaderboard');
+              }}
+              style={{
+                marginLeft: '10px',
+                marginRight: 'auto'
+              }}
+            />
             <DevelopersContainerMobile>
               {peopleList &&
                 peopleList?.slice(0, 3).map((val, index) => (

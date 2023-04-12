@@ -1,5 +1,5 @@
 import { EuiLoadingSpinner } from '@elastic/eui';
-import { colors } from 'config';
+import { colors, mobileBreakpoint } from 'config';
 import { LeaerboardItem } from 'leaderboard/LeaderboardItem';
 import { Summary } from 'leaderboard/Summary';
 import { Top3 } from 'leaderboard/Top3';
@@ -26,7 +26,7 @@ export const LeaderboardPage = observer(() => {
       <div className="inner">
         {leaderboard.total && (
           <Summary
-            className='summary'
+            className="summary"
             bounties={leaderboard.total?.total_bounties_completed}
             sats={leaderboard.total?.total_sats_earned}
           />
@@ -61,10 +61,10 @@ const Container = styled.div`
   & .summary {
     position: absolute;
     right: 0;
-    top:0;
+    top: 0;
   }
 
-  @media (max-width: 900px) {
+  @media (${mobileBreakpoint}) {
     height: calc(100% - 2rem);
     padding: 1rem;
     & > .inner {
@@ -72,13 +72,11 @@ const Container = styled.div`
       min-width: 300px;
     }
     & .summary {
-    position: relative;
-    right: 0;
-    top:0;
+      position: relative;
+      right: 0;
+      top: 0;
+    }
   }
-  }
-
-  
 `;
 
 const LoaderContainer = styled.div`
