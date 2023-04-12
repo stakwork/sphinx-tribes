@@ -18,7 +18,7 @@ jobs:
       - run: go install github.com/gobuffalo/packr/v2/packr2
       - name: build and push automatic fixes
         run: |
-          cd ./frontend/app && npm i --legacy-peer-deps && npm i --dev-only && CI=false npm run build && cd .. && packr2 
+          cd ./frontend/app && npm i --legacy-peer-deps && CI=false npm run build && cd .. && packr2 
           cd app && npm run prettier
           git config user.name 'Github Actions'
           git config user.email github-actions@github.com
