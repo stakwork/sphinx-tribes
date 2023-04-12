@@ -1,4 +1,4 @@
-package main
+package utils
 
 // https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/master/User-Tweet-Timeline/user_tweets.js
 
@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/imroc/req"
+	"github.com/stakwork/sphinx-tribes/auth"
 )
 
 func ConfirmIdentityTweet(username string) (string, error) {
@@ -20,7 +21,7 @@ func ConfirmIdentityTweet(username string) (string, error) {
 		return "", err
 	}
 	// fmt.Println("tok", token)
-	pubkey, err := VerifyArbitrary(token, "Sphinx Verification")
+	pubkey, err := auth.VerifyArbitrary(token, "Sphinx Verification")
 	return pubkey, err
 }
 

@@ -1,11 +1,11 @@
-package main
+package utils
 
 import (
 	"net/http"
 	"strconv"
 )
 
-func getPaginationParams(r *http.Request) (int, int, string, string, string) {
+func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
 
 	// there are cases when the request is not passed in
 	if r == nil {
@@ -47,7 +47,7 @@ func getPaginationParams(r *http.Request) (int, int, string, string, string) {
 	return offset, intLimit, sortBy, direction, search
 }
 
-func buildSearchQuery(key string, term string) (string, string) {
+func BuildSearchQuery(key string, term string) (string, string) {
 	arg1 := key + " LIKE ?"
 	arg2 := "%" + term + "%"
 	return arg1, arg2
