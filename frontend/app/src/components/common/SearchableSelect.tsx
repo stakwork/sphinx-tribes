@@ -6,13 +6,11 @@ export default function SearchableSelect(props: any) {
   const { options, onChange, onInputChange, value, style, loading } = props;
 
   const opts =
-    options.map((o) => {
-      return {
-        ...o,
-        value: o.value,
-        label: o.label
-      };
-    }) || [];
+    options.map((o) => ({
+      ...o,
+      value: o.value,
+      label: o.label
+    })) || [];
 
   return (
     <div style={{ position: 'relative', ...style }}>

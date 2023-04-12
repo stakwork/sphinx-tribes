@@ -1,7 +1,8 @@
+import { mobileWidht } from 'config';
 import { useState, useEffect } from 'react';
 
 function getIsMobile() {
-  return window.innerWidth < 900;
+  return window.innerWidth < mobileWidht;
 }
 
 const screenWidthOffset = 36;
