@@ -45,9 +45,14 @@ func NewRouter() *http.Server {
 		r.Get("/p/manifest.json", frontend.ManifestRoute)
 		r.Get("/p/favicon.ico", frontend.FaviconRoute)
 		r.Get("/p/{pubkey}", frontend.IndexRoute)
+		r.Get("/p/{pubkey}/offer", frontend.IndexRoute)
+		r.Get("/p/{pubkey}/badges", frontend.IndexRoute)
+		r.Get("/p/{pubkey}/wanted", frontend.IndexRoute)
+		r.Get("/p/{pubkey}/usertickets", frontend.IndexRoute)
 		r.Get("/p", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
 		r.Get("/tickets", frontend.IndexRoute)
+		r.Get("/leaderboard", frontend.IndexRoute)
 	})
 
 	r.Group(func(r chi.Router) {
