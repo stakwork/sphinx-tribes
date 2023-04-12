@@ -460,12 +460,13 @@ export class MainStore {
       uiStore.setPeoplePageNumber(1);
     } else {
       // all other cases, merge
-      this.people = this.doPageListMerger(
+      this.people = ps;
+      /*this.people = this.doPageListMerger(
         this.people,
         ps,
         (n) => uiStore.setPeoplePageNumber(n),
         params
-      );
+      );*/
     }
 
     return ps;

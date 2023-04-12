@@ -35,7 +35,8 @@ export const PeopleList = observer(() => {
     history.replace(`/p/${pubkey}`);
   }
 
-  const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
+  const people: any = main.people 
+				console.log(people)
 
   const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
     () => loadMorePeople(1),

@@ -8,7 +8,7 @@ export const usePerson = (id) => {
   let person: Person | undefined;
 
   if (main.personAssignedWanteds.length) {
-    const pubkey = main.personAssignedWanteds[0].body?.assignee.owner_pubkey;
+    const pubkey = main.personAssignedWanteds[0].body?.assignee;
     person = (main.people || []).find((f) => f.owner_pubkey === pubkey);
   } else {
     person = (main.people || []).find((f) => f.id === id);

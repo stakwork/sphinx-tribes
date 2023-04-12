@@ -125,11 +125,12 @@ function Header() {
     })();
   }, []);
 
+
   function goToEditSelf() {
     if (ui.meInfo?.id) {
-      history.push(`/p/${ui.meInfo.owner_pubkey}`);
       ui.setSelectedPerson(ui.meInfo.id);
       ui.setSelectingPerson(ui.meInfo.id);
+      history.push(`/p/${ui.meInfo.owner_pubkey}`);
     }
   }
 

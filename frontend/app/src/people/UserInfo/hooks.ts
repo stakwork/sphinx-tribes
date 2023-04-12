@@ -14,6 +14,7 @@ export const useUserInfo = () => {
   const history = useHistory();
   const personId = ui.selectedPerson;
   const { canEdit, person } = usePerson(Number(personId));
+				console.log(personId)
   const { img, owner_alias, owner_pubkey } = person || {};
 
   function goBack() {

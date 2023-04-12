@@ -5,8 +5,8 @@ import { widgetConfigs } from 'people/utils/constants';
 import NoneSpace from 'people/utils/noneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/wantedView';
-import React from 'react';
-import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
 
@@ -17,13 +17,30 @@ export const Wanted = observer(() => {
   const { person, canEdit } = usePerson(ui.selectedPerson);
   const { path, url } = useRouteMatch();
   const history = useHistory();
+  const { personPubkey } = useParams<{ personPubkey: string }>();
 
-//console.log("Selected Person:", person)
+  const [loading, setIsLoading] = useState<boolean>(false);
+
+
 
   const { peopleWanteds}  = main 
-  const fullSelectedWidgets = peopleWanteds.filter((wanted) => wanted.owner_id === person?.pubkey);
+  const fullSelectedWidgets = peopleWanteds.filter((wanted) => wanted.body.OwnerID === personPubkey);
+  
+  async function getUserTickets() {
+    setIsLoading(true);
+		console.log(peopleWanteds)
 
-console.log(peopleWanteds)
+    const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
+
+
+    setIsLoading(false);
+  }
+
+
+  useEffect(() => {
+    getUserTickets();
+  }, []);
+
 
   if (!fullSelectedWidgets?.length) {
     return (
