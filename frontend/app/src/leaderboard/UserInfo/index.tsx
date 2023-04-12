@@ -27,7 +27,7 @@ export const UserInfo = observer(({ id }: { id: string }) => {
   return (
     <UserItemContainer>
       <EuiAvatar
-        size="xl"
+        size="l"
         name={person.owner_alias}
         imageUrl={person.img || '/static/person_placeholder.png'}
       />
@@ -37,13 +37,6 @@ export const UserInfo = observer(({ id }: { id: string }) => {
             {person.owner_alias}
             <MaterialIcon className="icon" icon="link" />
           </Link>
-        </EuiText>
-        <EuiText
-          onClick={() => setShowQR(true)}
-          className="connectBtn"
-          color={colors.light.grayish.G400}
-        >
-          Connect
         </EuiText>
       </div>
 
@@ -72,14 +65,6 @@ const UserItemContainer = styled.div`
       .icon {
         transform: rotate(0deg) scale(1);
       }
-    }
-  }
-  & .connectBtn {
-    font-size: 1rem;
-    line-height: 1.2rem;
-    cursor: pointer;
-    &:hover {
-      text-decoration: underline;
     }
   }
 

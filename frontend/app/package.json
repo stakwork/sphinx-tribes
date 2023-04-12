@@ -72,12 +72,12 @@
         "as-needed"
       ],
       "@typescript-eslint/typedef": [
-      "warn",
-      {
-        "parameter": true,
-        "arrowParameter": true
-      }
-    ],
+        "warn",
+        {
+          "parameter": true,
+          "arrowParameter": true
+        }
+      ],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "warn",
       "@typescript-eslint/no-empty-function": "warn",

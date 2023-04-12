@@ -36,11 +36,12 @@ export class LeaderboardStore {
   get sortedBySats() {
     return orderBy(this.leaders, 'total_sats_earned', 'desc');
   }
-  get sortedByCount() {
-    return orderBy(this.leaders, ['total_bounties_completed']);
+
+  get top3() {
+    return this.sortedBySats.slice(0, 3)
   }
-  get sortedByCountAndSats() {
-    return orderBy(this.leaders, ['total_bounties_completed', 'total_sats_earned']);
+  get others() {
+    return this.sortedBySats.slice(3)
   }
 }
 

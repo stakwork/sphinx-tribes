@@ -25,9 +25,6 @@ export const LeaerboardItem = ({
     </EuiText>
     <UserInfo id={owner_pubkey} />
     <div className="userSummary">
-      {/* <div className="bounties">
-         Completed: {total_bounties_completed}
-        </div> */}
       <div className="sats">
         <PriceOuterContainer
           price_Text_Color={color.primaryColor.P300}
@@ -40,25 +37,22 @@ export const LeaerboardItem = ({
             <EuiText className="Price_SAT_Text">SAT</EuiText>
           </div>
         </PriceOuterContainer>
-
-        <EuiText color={color.grayish.G200} className="USD_Price">
-          {DollarConverter(satToUsd(total_sats_earned))} <span className="currency">USD</span>
-        </EuiText>
       </div>
     </div>
   </ItemContainer>
 );
 
 const ItemContainer = styled.div`
+  --position-gutter: 3rem;
   position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
+  padding: 0.5rem;
+  margin-left: var(--position-gutter);
   background-color: ${colors.light.pureWhite};
-  border-radius: 1rem;
-  overflow: hidden;
+  border-radius: 0.5rem;
   border: 1px solid transparent;
   transition-property: border box-shadow;
   transition-timing-function: ease;
@@ -81,5 +75,11 @@ const ItemContainer = styled.div`
     .currency {
       font-size: 0.8em;
     }
+  }
+
+  & .position {
+    position: absolute;
+    left: calc(-1 * var(--position-gutter));
+    font-weight: 500;
   }
 `;

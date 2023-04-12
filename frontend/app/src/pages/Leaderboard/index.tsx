@@ -2,6 +2,7 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import { colors } from 'config';
 import { LeaerboardItem } from 'leaderboard/LeaderboardItem';
 import { Summary } from 'leaderboard/Summary';
+import { Top3 } from 'leaderboard/Top3';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useStores } from 'store';
@@ -25,12 +26,14 @@ export const LeaderboardPage = observer(() => {
       <div className="inner">
         {leaderboard.total && (
           <Summary
+            className='summary'
             bounties={leaderboard.total?.total_bounties_completed}
             sats={leaderboard.total?.total_sats_earned}
           />
         )}
-        {leaderboard?.sortedBySats.map((item, index) => (
-          <LeaerboardItem position={index + 1} key={item.owner_pubkey} {...item} />
+        <Top3 />
+        {leaderboard?.others.map((item, index) => (
+          <LeaerboardItem position={index + 4} key={item.owner_pubkey} {...item} />
         ))}
       </div>
     </Container>
@@ -46,12 +49,19 @@ const Container = styled.div`
   justify-content: center;
   min-width: 400px;
   & > .inner {
+    position: relative;
     margin: auto;
     max-width: 60%;
     min-width: 800px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  & .summary {
+    position: absolute;
+    right: 0;
+    top:0;
   }
 
   @media (max-width: 900px) {
@@ -61,7 +71,14 @@ const Container = styled.div`
       max-width: 100%;
       min-width: 300px;
     }
+    & .summary {
+    position: relative;
+    right: 0;
+    top:0;
   }
+  }
+
+  
 `;
 
 const LoaderContainer = styled.div`

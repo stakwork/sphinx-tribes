@@ -11,6 +11,8 @@ import { PostBounty } from './postBounty';
 import { filterCount } from '../utils/ExtraFunctions';
 import { GetValue, coding_languages, status } from '../utils/language_label_style';
 import { observer } from 'mobx-react-lite';
+import IconButton from 'components/common/icon_button';
+import { useHistory } from 'react-router-dom';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
@@ -31,6 +33,7 @@ const BountyHeader = ({
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [filterCountNumber, setFilterCountNumber] = useState<number>(0);
+  const history = useHistory();
 
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
@@ -82,6 +85,17 @@ const BountyHeader = ({
           <BountyHeaderDesk>
             <B>
               <PostBounty widget={selectedWidget} />
+              <IconButton 
+                width={150}
+                height={isMobile ? 36 : 48}
+                text="Leaderboard"
+                onClick={() => {
+                  history.push('/leaderboard')
+                }}
+                style={{
+                  marginLeft: '10px'
+                }}
+              />
               <SearchBar
                 name="search"
                 type="search"
@@ -325,6 +339,18 @@ const BountyHeader = ({
           </LargeActionContainer>
           <ShortActionContainer>
             <PostBounty widget={selectedWidget} />
+            <IconButton 
+                width={150}
+                height={isMobile ? 36 : 48}
+                text="Leaderboard"
+                onClick={() => {
+                  history.push('/leaderboard')
+                }}
+                style={{
+                  marginLeft: '10px',
+                  marginRight: 'auto'
+                }}
+              />
             <DevelopersContainerMobile>
               {peopleList &&
                 peopleList?.slice(0, 3).map((val, index) => (

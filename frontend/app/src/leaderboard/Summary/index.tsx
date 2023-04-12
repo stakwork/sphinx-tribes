@@ -1,37 +1,41 @@
-import { EuiStat, EuiText, EuiTextColor } from '@elastic/eui';
+import { EuiStat, EuiTextColor } from '@elastic/eui';
 import { colors } from 'config';
-import { DollarConverter, satToUsd } from 'helpers';
+import { DollarConverter } from 'helpers';
 import React from 'react';
 import styled from 'styled-components';
 
-export const Summary = ({ sats, bounties }: { sats: number; bounties: number }) => (
-  <SummaryContainer>
+export const Summary = ({ sats, bounties, className=""  }: { sats: number; bounties: number ; className? : string}) => (
+  <SummaryContainer className={className} >
     <EuiStat
       className="stats"
       title={`${DollarConverter(sats)}`}
       titleSize="s"
       titleColor={colors.light.black500}
-      description={<EuiTextColor color={colors.light.black500}>SATS</EuiTextColor>}
+      description={<EuiTextColor color={colors.light.black500}>Total sats earned</EuiTextColor>}
     />
     <EuiStat
-      title={DollarConverter(satToUsd(sats))}
+      title={bounties}
       className="stats"
       titleSize="s"
       titleColor={colors.light.black500}
-      description={<EuiTextColor color={colors.light.black500}>USD</EuiTextColor>}
+      description={<EuiTextColor color={colors.light.black500}>Total tasks completed</EuiTextColor>}
     />
   </SummaryContainer>
 );
 
 const SummaryContainer = styled.div`
   display: flex;
-  align-items: center;
-  gap: 2rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
   margin: auto;
   & .stats {
     background-color: ${colors.light.background};
     padding: 1rem 1rem 0 1rem;
     border: 1px solid ${colors.light.borderGreen1};
     border-radius: 0.5rem;
+  }
+  @media (max-width: 900px) {
+    flex-direction: row;
   }
 `;
