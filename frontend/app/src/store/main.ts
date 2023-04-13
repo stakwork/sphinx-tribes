@@ -473,9 +473,7 @@ export class MainStore {
   }
 
   @memo({
-    resolver: (...args: any[]) => {
-      return JSON.stringify({ args });
-    },
+    resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
   private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
@@ -530,9 +528,7 @@ export class MainStore {
   }
 
   @memo({
-    resolver: (...args: any[]) => {
-      return JSON.stringify({ args });
-    },
+    resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
   private async fetchPeoplePosts(query) {
@@ -692,6 +688,7 @@ export class MainStore {
     return l;
   }
 
+  @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
     return p;
@@ -1025,6 +1022,21 @@ export class MainStore {
     } catch (e) {
       return '';
     }
+  }
+
+  @observable
+  lnauth: LnAuthData = { encode: '', k1: '' };
+
+  @action setLnAuth(lnData: LnAuthData) {
+    this.lnauth = lnData;
+  }
+
+  @persist('object')
+  @observable
+  lnToken = '';
+
+  @action setLnToken(token: string) {
+    this.lnToken = token;
   }
 
   @action async getLnAuth(): Promise<any> {

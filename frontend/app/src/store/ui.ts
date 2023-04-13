@@ -4,9 +4,7 @@ import { Extras } from '../components/form/inputs/widgets/interfaces';
 import tags from '../tribes/tags';
 
 const tagLabels = Object.keys(tags);
-const initialTags = tagLabels.map((label) => {
-  return { label } as EuiSelectableOption;
-});
+const initialTags = tagLabels.map((label) => ({ label } as EuiSelectableOption));
 
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;
 
@@ -16,7 +14,7 @@ export interface EuiSelectableOption {
 }
 
 class UiStore {
-  ready: boolean = false;
+  ready = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -31,66 +29,66 @@ class UiStore {
     this.tags = t;
   }
 
-  searchText: string = '';
+  searchText = '';
   setSearchText(s: string) {
     this.searchText = s.toLowerCase();
   }
 
-  usdToSatsExchangeRate: number = 0;
+  usdToSatsExchangeRate = 0;
   setUsdToSatsExchangeRate(n: number) {
     this.usdToSatsExchangeRate = n;
   }
 
-  editMe: boolean = false;
+  editMe = false;
   setEditMe(b: boolean) {
     this.editMe = b;
   }
 
-  peoplePageNumber: number = 1;
+  peoplePageNumber = 1;
   setPeoplePageNumber(n: number) {
     this.peoplePageNumber = n;
   }
 
-  peoplePostsPageNumber: number = 1;
+  peoplePostsPageNumber = 1;
   setPeoplePostsPageNumber(n: number) {
     this.peoplePostsPageNumber = n;
   }
 
-  peopleWantedsPageNumber: number = 1;
+  peopleWantedsPageNumber = 1;
   setPeopleWantedsPageNumber(n: number) {
     this.peopleWantedsPageNumber = n;
   }
 
-  peopleOffersPageNumber: number = 1;
+  peopleOffersPageNumber = 1;
   setPeopleOffersPageNumber(n: number) {
     this.peopleOffersPageNumber = n;
   }
 
-  tribesPageNumber: number = 1;
+  tribesPageNumber = 1;
   setTribesPageNumber(n: number) {
     this.tribesPageNumber = n;
   }
 
-  selectedPerson: number = 0;
+  selectedPerson = 0;
   setSelectedPerson(n: number) {
     this.selectedPerson = n;
   }
 
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
-  selectingPerson: number = 0;
+  selectingPerson = 0;
   setSelectingPerson(n: number) {
     this.selectingPerson = n;
   }
 
-  selectedBot: string = '';
+  selectedBot = '';
   setSelectedBot(n: string) {
     this.selectedBot = n;
   }
 
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
-  selectingBot: string = '';
+  selectingBot = '';
   setSelectingBot(n: string) {
     this.selectingBot = n;
   }
@@ -100,17 +98,17 @@ class UiStore {
     this.toasts = n;
   }
 
-  personViewOpenTab: string = '';
+  personViewOpenTab = '';
   setPersonViewOpenTab(s: string) {
     this.personViewOpenTab = s;
   }
 
-  lastGithubRepo: string = '';
+  lastGithubRepo = '';
   setLastGithubRepo(s: string) {
     this.lastGithubRepo = s;
   }
 
-  torFormBodyQR: string = '';
+  torFormBodyQR = '';
   setTorFormBodyQR(s: string) {
     this.torFormBodyQR = s;
   }
@@ -125,7 +123,7 @@ class UiStore {
     this.badgeList = a;
   }
 
-  language: string = '';
+  language = '';
   setLanguage(s: string) {
     this.language = s;
   }
@@ -140,12 +138,12 @@ class UiStore {
     this.meInfo = t;
   }
 
-  @persist('object') connection_string: string = '';
+  @persist('object') connection_string = '';
   setConnectionString(code: string) {
     this.connection_string = code;
   }
 
-  showSignIn: boolean = false;
+  showSignIn = false;
   setShowSignIn(b: boolean) {
     this.showSignIn = b;
   }

@@ -8,43 +8,41 @@ export default function Select(props: any) {
   const { options, onChange, value, style, selectStyle, handleActive, testId } = props;
 
   const opts =
-    options.map((o) => {
-      return {
-        value: o.value,
-        inputDisplay: o.label,
-        dropdownDisplay: (
-          <>
-            <p
+    options.map((o) => ({
+      value: o.value,
+      inputDisplay: o.label,
+      dropdownDisplay: (
+        <>
+          <p
+            style={{
+              color: color.text2,
+              fontSize: '14px',
+              paddingLeft: '0px',
+              margin: 0,
+              fontFamily: 'Barlow',
+              fontWeight: '500',
+              lineHeight: '32px',
+              letterSpacing: '0.01em'
+            }}
+          >
+            {o.label}
+          </p>
+          {o.description && (
+            <EuiText
+              size="s"
+              color="subdued"
               style={{
-                color: color.text2,
-                fontSize: '14px',
-                paddingLeft: '0px',
+                padding: 0,
                 margin: 0,
-                fontFamily: 'Barlow',
-                fontWeight: '500',
-                lineHeight: '32px',
-                letterSpacing: '0.01em'
+                fontSize: '12px'
               }}
             >
-              {o.label}
-            </p>
-            {o.description && (
-              <EuiText
-                size="s"
-                color="subdued"
-                style={{
-                  padding: 0,
-                  margin: 0,
-                  fontSize: '12px'
-                }}
-              >
-                <p className="euiTextColor--subdued">{o.description}</p>
-              </EuiText>
-            )}
-          </>
-        )
-      };
-    }) || [];
+              <p className="euiTextColor--subdued">{o.description}</p>
+            </EuiText>
+          )}
+        </>
+      )
+    })) || [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
