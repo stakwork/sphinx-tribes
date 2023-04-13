@@ -63,18 +63,6 @@ function Header() {
     }
   }
 
-  function urlRedirect(directPathname) {
-    // if route not supported, redirect
-    let pass = false;
-    const path = directPathname || location.pathname;
-    tabs.forEach((t) => {
-      if (path.includes(t.path)) pass = true;
-    });
-    if (!pass) {
-      history.push('/p');
-    }
-  }
-
   const showSignIn = () => {
     if (isMobile) {
       ui.setShowSignIn(true);
@@ -118,7 +106,6 @@ function Header() {
           // update self on reload
           await main.getSelf(null);
         }
-        urlRedirect(path);
       } catch (e) {
         console.log('e', e);
       }
