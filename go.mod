@@ -12,6 +12,7 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/go-chi/jwtauth v1.2.0
+	github.com/go-test/deep v1.1.0 // indirect
 	github.com/gobuffalo/logger v1.0.4 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/gofrs/uuid v4.0.0+incompatible
