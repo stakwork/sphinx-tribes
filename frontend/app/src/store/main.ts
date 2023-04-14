@@ -1024,20 +1024,6 @@ export class MainStore {
     }
   }
 
-  @observable
-  lnauth: LnAuthData = { encode: '', k1: '' };
-
-  @action setLnAuth(lnData: LnAuthData) {
-    this.lnauth = lnData;
-  }
-
-  @persist('object')
-  @observable
-  lnToken = '';
-
-  @action setLnToken(token: string) {
-    this.lnToken = token;
-  }
 
   @action async getLnAuth(): Promise<any> {
     try {
