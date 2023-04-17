@@ -1,4 +1,5 @@
 import { Person } from "store/main";
+import { MeData } from "store/ui";
 
 export interface AuthProps  {
     style?: React.CSSProperties;
@@ -58,4 +59,11 @@ export interface BadgesProps {
     person?: Person;
     txid?: string;
     color?: string;
+}
+
+export interface ConnectCardProps {
+    person: Person | MeData | undefined;
+    dismiss: () => void;
+    modalStyle: React.CSSProperties;
+    visible: boolean;
 }
