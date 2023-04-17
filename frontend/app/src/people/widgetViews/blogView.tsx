@@ -13,14 +13,7 @@ export default function BlogView(props: BlogPost) {
       <Time>{moment(created).format('l') || 'No title'} </Time>
       <M>{markdown || 'No markdown'} </M>
 
-      {showImages && (
-        <Gallery>
-          {gallery &&
-            gallery.map((g, i) => {
-              return <Img key={i} src={g} />;
-            })}
-        </Gallery>
-      )}
+      {showImages && <Gallery>{gallery && gallery.map((g, i) => <Img key={i} src={g} />)}</Gallery>}
     </Wrap>
   );
 }

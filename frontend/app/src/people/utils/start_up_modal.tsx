@@ -23,227 +23,216 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
     }
   }
 
-  const StepOne = () => {
-    return (
-      <>
-        <ModalContainer>
-          <img
-            src={
-              dataObject === 'getWork'
-                ? '/static/create_profile_blue.gif'
-                : '/static/create_profile_green.gif'
-            }
-            height={'274px'}
-            alt=""
-          />
-        </ModalContainer>
-        <ButtonContainer>
-          <DirectionWrap style={{ justifyContent: 'space-around' }}>
-            <IconButton
-              text={'I have Sphinx'}
-              width={150}
-              height={48}
-              style={{ marginTop: '20px' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                closeModal();
-                ui.setShowSignIn(true);
-              }}
-              textStyle={{
-                fontSize: '15px',
-                fontWeight: '500'
-              }}
-              iconStyle={{
-                top: '14px'
-              }}
-              color={buttonColor}
-            />
-
-            <IconButton
-              text={'Get Sphinx'}
-              width={150}
-              height={48}
-              style={{ marginTop: '20px', textDecoration: 'none' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setStep(step + 1);
-              }}
-              textStyle={{
-                fontSize: '15px',
-                fontWeight: '500'
-              }}
-              iconStyle={{
-                top: '14px'
-              }}
-              color={buttonColor}
-            />
-          </DirectionWrap>
-        </ButtonContainer>
-      </>
-    );
-  };
-
-  const StepTwo = () => {
-    return (
-      <>
-        <ModalContainer>
-          {connection_string ? (
-            <QrContainer>
-              <QR size={200} value={ui.connection_string} />
-              <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
-            </QrContainer>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <p style={{ textAlign: 'center' }}>Download App</p>
-              <AndroidIosButtonConatiner>
-                <IconButton
-                  text={'Android'}
-                  width={100}
-                  height={48}
-                  style={{ marginTop: '20px', textDecoration: 'none' }}
-                  onClick={() =>
-                    window.open(
-                      'https://play.google.com/store/apps/details?id=chat.sphinx',
-                      '_blank'
-                    )
-                  }
-                  textStyle={{
-                    fontSize: '15px',
-                    fontWeight: '500'
-                  }}
-                  iconStyle={{
-                    top: '14px'
-                  }}
-                  color={buttonColor}
-                />
-                <IconButton
-                  text={'IOS'}
-                  width={100}
-                  height={48}
-                  style={{ marginTop: '20px', textDecoration: 'none' }}
-                  onClick={() =>
-                    window.open('https://testflight.apple.com/join/QoaCkJn6', '_blank')
-                  }
-                  textStyle={{
-                    fontSize: '15px',
-                    fontWeight: '500'
-                  }}
-                  iconStyle={{
-                    top: '14px'
-                  }}
-                  color={buttonColor}
-                />
-              </AndroidIosButtonConatiner>
-            </div>
-          )}
-        </ModalContainer>
-        <ButtonContainer>
+  const StepOne = () => (
+    <>
+      <ModalContainer>
+        <img
+          src={
+            dataObject === 'getWork'
+              ? '/static/create_profile_blue.gif'
+              : '/static/create_profile_green.gif'
+          }
+          height={'274px'}
+          alt=""
+        />
+      </ModalContainer>
+      <ButtonContainer>
+        <DirectionWrap style={{ justifyContent: 'space-around' }}>
           <IconButton
-            text={'Reveal Connection Code'}
-            endingIcon={'key'}
-            width={250}
+            text={'I have Sphinx'}
+            width={150}
             height={48}
-            style={{ marginTop: 20 }}
-            hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
-            activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
-            shadowcolor={
-              buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
-            }
-            onClick={() => getConnectionCode()}
+            style={{ marginTop: '20px' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              closeModal();
+              ui.setShowSignIn(true);
+            }}
+            textStyle={{
+              fontSize: '15px',
+              fontWeight: '500'
+            }}
+            iconStyle={{
+              top: '14px'
+            }}
             color={buttonColor}
           />
-          <DirectionWrap>
-            <IconButton
-              text={'Back'}
-              width={210}
-              height={48}
-              buttonType={'text'}
-              style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setStep(step - 1);
-              }}
-              textStyle={{
-                fontSize: '15px',
-                fontWeight: '500',
-                color: '#5F6368'
-              }}
-              iconStyle={{
-                top: '14px'
-              }}
-              color={buttonColor}
-            />
-            <IconButton
-              text={'Sign in'}
-              width={210}
-              height={48}
-              buttonType={'text'}
-              style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setStep(3);
-              }}
-              textStyle={{
-                fontSize: '15px',
-                fontWeight: '500',
-                color: '#5F6368'
-              }}
-              iconStyle={{
-                top: '14px'
-              }}
-              color={buttonColor}
-            />
-          </DirectionWrap>
-        </ButtonContainer>
-      </>
-    );
-  };
 
-  const StepThree = () => {
-    return (
+          <IconButton
+            text={'Get Sphinx'}
+            width={150}
+            height={48}
+            style={{ marginTop: '20px', textDecoration: 'none' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setStep(step + 1);
+            }}
+            textStyle={{
+              fontSize: '15px',
+              fontWeight: '500'
+            }}
+            iconStyle={{
+              top: '14px'
+            }}
+            color={buttonColor}
+          />
+        </DirectionWrap>
+      </ButtonContainer>
+    </>
+  );
+
+  const StepTwo = () => (
+    <>
+      <ModalContainer>
+        {connection_string ? (
+          <QrContainer>
+            <QR size={200} value={ui.connection_string} />
+            <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
+          </QrContainer>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <p style={{ textAlign: 'center' }}>Download App</p>
+            <AndroidIosButtonConatiner>
+              <IconButton
+                text={'Android'}
+                width={100}
+                height={48}
+                style={{ marginTop: '20px', textDecoration: 'none' }}
+                onClick={() =>
+                  window.open('https://play.google.com/store/apps/details?id=chat.sphinx', '_blank')
+                }
+                textStyle={{
+                  fontSize: '15px',
+                  fontWeight: '500'
+                }}
+                iconStyle={{
+                  top: '14px'
+                }}
+                color={buttonColor}
+              />
+              <IconButton
+                text={'IOS'}
+                width={100}
+                height={48}
+                style={{ marginTop: '20px', textDecoration: 'none' }}
+                onClick={() => window.open('https://testflight.apple.com/join/QoaCkJn6', '_blank')}
+                textStyle={{
+                  fontSize: '15px',
+                  fontWeight: '500'
+                }}
+                iconStyle={{
+                  top: '14px'
+                }}
+                color={buttonColor}
+              />
+            </AndroidIosButtonConatiner>
+          </div>
+        )}
+      </ModalContainer>
       <ButtonContainer>
         <IconButton
-          text={'Sign in'}
-          endingIcon={'arrow_forward'}
-          width={210}
+          text={'Reveal Connection Code'}
+          endingIcon={'key'}
+          width={250}
           height={48}
-          style={{ marginTop: 0 }}
+          style={{ marginTop: 20 }}
           hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
           activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
           shadowcolor={
             buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
           }
-          onClick={(e) => {
-            e.stopPropagation();
-            closeModal();
-            ui.setShowSignIn(true);
-          }}
+          onClick={() => getConnectionCode()}
           color={buttonColor}
         />
-
-        <IconButton
-          text={'Back'}
-          width={210}
-          height={48}
-          buttonType={'text'}
-          style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setStep(step - 1);
-          }}
-          textStyle={{
-            fontSize: '15px',
-            fontWeight: '500',
-            color: '#5F6368'
-          }}
-          iconStyle={{
-            top: '14px'
-          }}
-          color={buttonColor}
-        />
+        <DirectionWrap>
+          <IconButton
+            text={'Back'}
+            width={210}
+            height={48}
+            buttonType={'text'}
+            style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setStep(step - 1);
+            }}
+            textStyle={{
+              fontSize: '15px',
+              fontWeight: '500',
+              color: '#5F6368'
+            }}
+            iconStyle={{
+              top: '14px'
+            }}
+            color={buttonColor}
+          />
+          <IconButton
+            text={'Sign in'}
+            width={210}
+            height={48}
+            buttonType={'text'}
+            style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setStep(3);
+            }}
+            textStyle={{
+              fontSize: '15px',
+              fontWeight: '500',
+              color: '#5F6368'
+            }}
+            iconStyle={{
+              top: '14px'
+            }}
+            color={buttonColor}
+          />
+        </DirectionWrap>
       </ButtonContainer>
-    );
-  };
+    </>
+  );
+
+  const StepThree = () => (
+    <ButtonContainer>
+      <IconButton
+        text={'Sign in'}
+        endingIcon={'arrow_forward'}
+        width={210}
+        height={48}
+        style={{ marginTop: 0 }}
+        hovercolor={buttonColor === 'primary' ? '#5881F8' : '#3CBE88'}
+        activecolor={buttonColor === 'primary' ? '#5078F2' : '#2FB379'}
+        shadowcolor={
+          buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
+        }
+        onClick={(e) => {
+          e.stopPropagation();
+          closeModal();
+          ui.setShowSignIn(true);
+        }}
+        color={buttonColor}
+      />
+
+      <IconButton
+        text={'Back'}
+        width={210}
+        height={48}
+        buttonType={'text'}
+        style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setStep(step - 1);
+        }}
+        textStyle={{
+          fontSize: '15px',
+          fontWeight: '500',
+          color: '#5F6368'
+        }}
+        iconStyle={{
+          top: '14px'
+        }}
+        color={buttonColor}
+      />
+    </ButtonContainer>
+  );
 
   return (
     <>

@@ -189,29 +189,27 @@ export default function FocusedWidget(props: any) {
       {/* single widgets will only show these fields */}
       {!showingList && (
         <>
-          {item.fields.map((e, i) => {
-            return (
-              <Input
-                {...e}
-                key={e.name}
-                value={newState && newState[e.name]}
-                error={newErrors && newErrors[e.name]}
-                initialValues={initialValues}
-                handleChange={(c: any) => {
-                  const f = getFieldToUpdate(e);
-                  setFieldValue(f, c);
-                }}
-                handleBlur={() => {
-                  const f = getFieldToUpdate(e);
-                  setFieldTouched(f, false);
-                }}
-                handleFocus={() => {
-                  const f = getFieldToUpdate(e);
-                  setFieldTouched(f, true);
-                }}
-              />
-            );
-          })}
+          {item.fields.map((e, i) => (
+            <Input
+              {...e}
+              key={e.name}
+              value={newState && newState[e.name]}
+              error={newErrors && newErrors[e.name]}
+              initialValues={initialValues}
+              handleChange={(c: any) => {
+                const f = getFieldToUpdate(e);
+                setFieldValue(f, c);
+              }}
+              handleBlur={() => {
+                const f = getFieldToUpdate(e);
+                setFieldTouched(f, false);
+              }}
+              handleFocus={() => {
+                const f = getFieldToUpdate(e);
+                setFieldTouched(f, true);
+              }}
+            />
+          ))}
           <Nav style={{ marginTop: 20 }}>
             <EuiButton onClick={() => cancel(false)} style={{ fontSize: 12, fontWeight: 600 }}>
               Cancel

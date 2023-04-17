@@ -450,9 +450,7 @@ export class MainStore {
   }
 
   @memo({
-    resolver: (...args: any[]) => {
-      return JSON.stringify({ args });
-    },
+    resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
   private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
@@ -510,9 +508,7 @@ export class MainStore {
   }
 
   @memo({
-    resolver: (...args: any[]) => {
-      return JSON.stringify({ args });
-    },
+    resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
   private async fetchPeoplePosts(query) {
@@ -644,6 +640,7 @@ export class MainStore {
     return l;
   }
 
+  @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
     return p;
@@ -972,7 +969,7 @@ export class MainStore {
 
   @persist('object')
   @observable
-  lnToken: string = '';
+  lnToken = '';
 
   @action setLnToken(token: string) {
     this.lnToken = token;

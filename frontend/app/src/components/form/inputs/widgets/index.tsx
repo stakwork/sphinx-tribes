@@ -31,21 +31,19 @@ export default function Widgets(props: any) {
       >
         <Center>
           <InnerWrap>
-            {props.extras.map((e, i) => {
-              return (
-                <Widget
-                  parentName={props.name}
-                  setFieldValue={props.setFieldValue}
-                  values={props.values}
-                  key={i}
-                  {...e}
-                  setSelected={(e) => {
-                    props.setDisableFormButtons(true);
-                    setSelected(e);
-                  }}
-                />
-              );
-            })}
+            {props.extras.map((e, i) => (
+              <Widget
+                parentName={props.name}
+                setFieldValue={props.setFieldValue}
+                values={props.values}
+                key={i}
+                {...e}
+                setSelected={(e) => {
+                  props.setDisableFormButtons(true);
+                  setSelected(e);
+                }}
+              />
+            ))}
           </InnerWrap>
         </Center>
       </FadeLeft>
