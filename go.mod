@@ -32,6 +32,7 @@ require (
 	golang.org/x/crypto v0.7.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.112.0
+	gorm.io/driver/postgres v1.5.0 // indirect
 )
 
 replace google.golang.org/api => google.golang.org/api v0.63.0
