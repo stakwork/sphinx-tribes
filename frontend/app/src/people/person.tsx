@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { getHost } from '../config/host';
 import { Button, Divider } from '../components/common/index';
 import ConnectCard from './utils/connectCard';
+import { PersonProps } from 'intefaces/people';
 
 const host = getHost();
 
@@ -10,7 +11,7 @@ function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-export default function Person(props: any) {
+export default function Person(props: PersonProps) {
   const {
     hideActions,
     small,

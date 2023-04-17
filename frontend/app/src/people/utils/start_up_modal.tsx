@@ -7,8 +7,9 @@ import { useStores } from '../../store';
 import QR from './QR';
 import api from '../../api';
 import { observer } from 'mobx-react-lite';
+import { StartUpModalProps } from 'intefaces/people';
 
-const StartUpModal = ({ closeModal, dataObject, buttonColor }) => {
+const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps) => {
   const { ui, main } = useStores();
   const [step, setStep] = useState(1);
   const [connection_string, setConnectionString] = useState('');

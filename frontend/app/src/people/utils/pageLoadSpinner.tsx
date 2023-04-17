@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { EuiLoadingSpinner } from '@elastic/eui';
+import { PageLoadProps } from 'intefaces/people';
 
-export default function PageLoadSpinner(props) {
+export default function PageLoadSpinner(props: PageLoadProps) {
   if (props.noAnimate) {
     return (
       <BottomLoadmoreWrap show={props.show} style={props.style}>
@@ -21,6 +22,7 @@ export default function PageLoadSpinner(props) {
 interface LoadmoreWrapProps {
   show: boolean;
 }
+
 export const LoadmoreWrap = styled.div<LoadmoreWrapProps>`
   position: relative;
   text-align: center;

@@ -4,8 +4,9 @@ import BountyDescription from '../../bounties/bounty_description';
 import BountyPrice from '../../bounties/bounty_price';
 import BountyProfileView from '../../bounties/bounty_profile_view';
 import { colors } from '../../config/colors';
+import { PaidBountiesProps } from 'intefaces/people';
 
-const PaidBounty = (props) => {
+const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];
   return (
     <BountyContainer
