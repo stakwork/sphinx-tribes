@@ -7,6 +7,7 @@ import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
 import QR from '../utils/QR';
 import { observer } from 'mobx-react-lite';
+import { AuthProps } from 'intefaces/people';
 
 //TODO: mv to utils
 const host = getHost();
@@ -18,7 +19,7 @@ let interval;
 
 export default observer(AuthQR);
 
-function AuthQR(props: any) {
+function AuthQR(props: AuthProps) {
   const { ui, main } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
@@ -48,7 +49,7 @@ function AuthQR(props: any) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
   async function getChallenge() {

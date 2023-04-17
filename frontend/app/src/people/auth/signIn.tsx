@@ -9,10 +9,11 @@ import AuthQR from './authQR';
 import QR from '../utils/QR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 import { observer } from 'mobx-react-lite';
+import { AuthProps } from 'intefaces/people';
 
 export default observer(SignIn);
 
-function SignIn(props: any) {
+function SignIn(props: AuthProps) {
   const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
