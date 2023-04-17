@@ -3,11 +3,14 @@ package db
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 )
+
+var now = time.Now()
 
 var code = ConnectionCodes{
 	ID:               1,
