@@ -5,8 +5,9 @@ import { useUserInfo } from './hooks';
 import { Head, Img, Name, RowWrap } from './styles';
 import { HeaderMobile } from './MobileHeader';
 import ConnectCard from 'people/utils/connectCard';
+import { UserInfoProps } from 'intefaces/people';
 
-export const UserInfoMobileView = observer(({ setShowSupport }: any) => {
+export const UserInfoMobileView = observer(({ setShowSupport }: UserInfoProps) => {
   const { canEdit, goBack, userImg, owner_alias, logout, qrString, onEdit, person } = useUserInfo();
   const [showQR, setShowQR] = useState(false);
   return (

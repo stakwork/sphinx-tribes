@@ -30,3 +30,32 @@ export interface FocusViewProps {
     style?: React.CSSProperties;
     setIsExtraStyle?: any;
 }
+
+export interface PeopleMobileeHeaderProps {
+    goBack: () => void;
+    canEdit: boolean; 
+    logout: () => void;
+    onEdit: () => void;
+}
+
+export interface UserInfoProps {
+    setShowSupport: (boolean) => void
+}
+
+export interface BountiesProps {
+    assignee: Person;
+    price: number;
+    sessionLength: string;
+    priceMin: number;
+    priceMax: number;
+    codingLanguage: string | string[];
+    title: string;
+    person: Person;
+    onPanelClick: () => void;
+}
+
+export interface BadgesProps {
+    person?: Person;
+    txid?: string;
+    color?: string;
+}

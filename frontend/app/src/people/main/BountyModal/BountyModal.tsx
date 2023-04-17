@@ -8,7 +8,7 @@ import FocusedView from '../focusView';
 import { BountyModalProps } from 'intefaces/people';
 
 const config = widgetConfigs.wanted;
-export const BountyModal: React.FC<BountyModalProps> = ({ basePath }) => {
+export const BountyModal = ({ basePath }: BountyModalProps) => {
   const history = useHistory();
   const { wantedId } = useParams<{ wantedId: string }>();
 

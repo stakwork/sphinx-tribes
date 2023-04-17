@@ -7,10 +7,11 @@ import { Modal, Button, Divider, TextInput } from '../../components/common';
 //import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { observer } from 'mobx-react-lite';
+import { BadgesProps } from 'intefaces/people';
 
 export default observer(Badges);
 
-function Badges(props) {
+function Badges(props: BadgesProps) {
   const { main, ui } = useStores();
   const { badgeList, meInfo } = ui || {};
 
@@ -385,7 +386,7 @@ function Badges(props) {
   );
 }
 
-function BadgeStatus(props: any) {
+function BadgeStatus(props: BadgesProps) {
   const { txid } = props;
 
   return (
@@ -418,7 +419,7 @@ interface BProps {
   readonly isMobile?: boolean;
 }
 
-function Flag(props) {
+function Flag(props: BadgesProps) {
   return (
     <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_3736_56289)">
