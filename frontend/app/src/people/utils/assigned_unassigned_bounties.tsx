@@ -10,7 +10,7 @@ import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
-import { BountiesProps } from 'intefaces/people';
+import { BountiesProps } from 'intefarces/people';
 
 const Bounties = (props: BountiesProps) => {
   const {

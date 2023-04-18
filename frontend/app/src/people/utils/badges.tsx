@@ -7,7 +7,7 @@ import { Modal, Button, Divider, TextInput } from '../../components/common';
 //import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { observer } from 'mobx-react-lite';
-import { BadgesProps } from 'intefaces/people';
+import { BadgesProps } from 'intefarces/people';
 
 export default observer(Badges);
 

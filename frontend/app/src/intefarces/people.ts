@@ -53,6 +53,10 @@ export interface BountiesProps {
     title: string;
     person: Person;
     onPanelClick: () => void;
+    created?: number;
+    ticketUrl?: string;
+    loomEmbedUrl?: string;
+    description?: any;
 }
 
 export interface BadgesProps {
@@ -64,16 +68,19 @@ export interface BadgesProps {
 export interface ConnectCardProps {
     person: Person | MeData | undefined;
     dismiss: () => void;
-    modalStyle: React.CSSProperties;
+    modalStyle?: React.CSSProperties;
     visible: boolean;
 }
 
 export interface LoomViewProps {
     loomEmbedUrl: string;
     onChange: (string) => void;
-    readOnly: boolean;
+    readOnly?: boolean;
     style: React.CSSProperties;
     setIsVideo: (any) => void;
+    name?: string;
+    onBlur?: () => void;
+    onFocus?: () => void;
 }
 
 export interface NameTagProps {
@@ -94,11 +101,11 @@ export interface NoneSpaceProps {
     style: React.CSSProperties;
     img: string;
     text: string;
-    sub: string;
+    sub?: string;
     buttonText1?: string;
     buttonText?: string;
     buttonText2?: string;
-    Button?: JSX.Element;
+    Button?: JSX.Element | boolean;
     buttonIcon?: string;
     small?: boolean;
     action?: () => void;
@@ -131,6 +138,7 @@ export interface QRProps {
     type?: string;
     size: number;
     value: string;
+    style?: React.CSSProperties;
 }
 
 export interface QRBarProps {
@@ -166,4 +174,94 @@ export interface PersonProps extends Person {
     unique_name: string;
     squeeze: boolean;
     description: string;
+}
+
+export interface GithubStatusPillProps {
+    status?: string;
+    assignee: Person; 
+    style?: React.CSSProperties;
+}
+
+export interface WantedSummaryProps {
+    description: any;
+    priceMin: number;
+    ticketUrl: string;
+    person: any;
+    created?: number | undefined;
+    repo: string;
+    issue: string;
+    price: Number;
+    type: string;
+    tribe: string;
+    paid: string;
+    badgeRecipient: string;
+    loomEmbedUrl: string;
+    codingLanguage: {[key: string]: any};
+    estimate_session_length: string;
+    assignee: Person;
+    fromBountyPage: string;
+    wanted_type: string;
+    one_sentence_summary: string;
+    github_description: string;
+    show: boolean;
+    setIsModalSideButton: (any) => void;
+    setIsExtraStyle: (any) => void;
+    formSubmit: (any) => void;
+    title: string;
+}
+
+export interface CodingBountiesProps {
+    deliverables?: string;
+    description: any;
+    ticketUrl: string;
+    assignee: Person;
+    titleString: string;
+    nametag: JSX.Element;
+    labels?: {[key: string]: any};
+    person: Person;
+    setIsPaidStatusPopOver?:  (boolean) => void;
+    creatorStep: number;
+    paid: string;
+    tribe: string;
+    saving?: string;
+    isPaidStatusPopOver: boolean;
+    isPaidStatusBadgeInfo: boolean;
+    awardDetails: any;
+    isAssigned: boolean;
+    dataValue: {[key: string]: any};
+    assigneeValue: boolean;
+    assignedPerson: Person
+    changeAssignedPerson: () => void;
+    sendToRedirect: (string) => void;
+    handleCopyUrl: () => void;
+    isCopied: boolean;
+    setExtrasPropertyAndSave: (string, boolean) => void;
+    setIsModalSideButton: (boolean) => void;
+    replitLink: string;
+    assigneeHandlerOpen: () => void;
+    setCreatorStep: (number) => void;
+    setIsExtraStyle: (any) => void;
+    awards: {[key: string]: any};
+    setExtrasPropertyAndSaveMultiple: (string, any) => void;
+    handleAssigneeDetails: (any) =>  void;
+    peopleList: Person[];
+    setIsPaidStatusBadgeInfo: (any) => void
+    bountyPrice: number;
+    selectedAward: string;
+    handleAwards: (any) => void;
+    repo: string;
+    issue: string;
+    isMarkPaidSaved: boolean;
+    setAwardDetails: (any) => void;
+    setBountyPrice: (any) => void;
+    owner_idURL: string;
+    createdURL: string;
+    editAction?: boolean;
+    deletingState?: boolean;
+    deleteAction?: boolean;
+    priceMin?: number;
+    priceMax?: number;
+    price?: Number;
+    estimate_session_length?: string;
+    extraModalFunction?: () => void;
 }

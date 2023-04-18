@@ -6,7 +6,7 @@ import { useHistory } from 'react-router';
 import { useIsMobile } from '../../hooks';
 import { colors } from '../../config/colors';
 import { observer } from 'mobx-react-lite';
-import { NameTagProps } from 'intefaces/people';
+import { NameTagProps } from 'intefarces/people';
 
 export default observer(NameTag);
 

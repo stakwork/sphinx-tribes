@@ -33,9 +33,10 @@ import ButtonSet from '../../../../bounties/bountyModal_button_set';
 import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { observer } from 'mobx-react-lite';
+import { CodingBountiesProps } from 'intefarces/people';
 
 export default observer(MobileView);
-function MobileView(props: any) {
+function MobileView(props: CodingBountiesProps) {
   const {
     deliverables,
     description,
@@ -97,7 +98,7 @@ function MobileView(props: any) {
           {creatorStep === 0 && (
             <Creator
               onClick={() => {
-                setIsPaidStatusPopOver(false);
+                if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(false);
               }}
             >
               <>
@@ -350,9 +351,8 @@ function MobileView(props: any) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                          labels && labels.map((x: any) => x.label)
-                        },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                          },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -620,7 +620,7 @@ function MobileView(props: any) {
                       setIsModalSideButton(true);
                     }, 3000);
                     setTimeout(() => {
-                      setIsPaidStatusPopOver(true);
+                      if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);
                     }, 4000);
                     setTimeout(() => {
                       if (awardDetails?.name !== '') {
@@ -774,9 +774,8 @@ function MobileView(props: any) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -847,9 +846,8 @@ function MobileView(props: any) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -926,9 +924,8 @@ function MobileView(props: any) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}

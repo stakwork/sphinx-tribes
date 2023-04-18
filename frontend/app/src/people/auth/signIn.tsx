@@ -9,7 +9,7 @@ import AuthQR from './authQR';
 import QR from '../utils/QR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 import { observer } from 'mobx-react-lite';
-import { AuthProps } from 'intefaces/people';
+import { AuthProps } from 'intefarces/people';
 
 export default observer(SignIn);
 

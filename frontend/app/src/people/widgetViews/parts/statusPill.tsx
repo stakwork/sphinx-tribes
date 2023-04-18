@@ -1,7 +1,8 @@
+import { GithubStatusPillProps } from 'intefarces/people';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-export default function GithubStatusPill(props: any) {
+export default function GithubStatusPill(props: GithubStatusPillProps) {
   const { status, assignee, style } = props;
 
   const [assigneText, setAssigneText] = useState('');
@@ -13,8 +14,8 @@ export default function GithubStatusPill(props: any) {
       assignee && !assignee?.owner_alias
         ? 'Not assigned'
         : isOpen
-        ? 'Assigned to '
-        : 'Completed by ';
+          ? 'Assigned to '
+          : 'Completed by ';
     setAssigneText(assignedText);
   }, [isOpen, assignee]);
 

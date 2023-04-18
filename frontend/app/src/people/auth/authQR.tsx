@@ -7,7 +7,7 @@ import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
 import QR from '../utils/QR';
 import { observer } from 'mobx-react-lite';
-import { AuthProps } from 'intefaces/people';
+import { AuthProps } from 'intefarces/people';
 
 //TODO: mv to utils
 const host = getHost();

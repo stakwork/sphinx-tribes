@@ -5,7 +5,7 @@ import { useUserInfo } from './hooks';
 import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
 import ConnectCard from 'people/utils/connectCard';
 import { observer } from 'mobx-react-lite';
-import { UserInfoProps } from 'intefaces/people';
+import { UserInfoProps } from 'intefarces/people';
 
 export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) => {
   const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();
