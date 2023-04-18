@@ -89,11 +89,13 @@ export interface NameTagProps {
     img: string;
     created: number;
     id: number;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
     widget: any;
-    iconSize: number;
-    textSize: number;
-    isPaid: boolean;
+    iconSize?: number;
+    textSize?: number;
+    isPaid?: boolean;
+    ticketUrl?: string;
+    loomEmbedUrl?: string;
 }
 
 export interface NoneSpaceProps {
@@ -264,4 +266,56 @@ export interface CodingBountiesProps {
     price?: Number;
     estimate_session_length?: string;
     extraModalFunction?: () => void;
+}
+
+export interface CodingViewProps {
+    paid?: string;
+    titleString?: string;
+    labels?: {[key: string]: any};
+    price?: Number;
+    description?: string;
+    envHeight?: string;
+    estimate_session_length?: string;
+    loomEmbedUrl?: string;
+    ticketUrl?: string;
+    assignee: Person;
+    assigneeLabel?: {[key: string]: any};
+    nametag?: JSX.Element;
+    actionButtons?: boolean | JSX.Element;
+    status?: string;
+    handleCopyUrl?: () => void;
+    isCopied?: boolean;
+    tribe?: string;
+}
+
+export interface AddToFavoritesProps {
+    tribe: string | undefined;
+}
+
+export interface WantedViewsProps {
+    description: string;
+    priceMin: number;
+    priceMax: number;
+    price: number;
+    person: Person;
+    created: number;
+    ticketUrl?: string;
+    gallery: any;
+    assignee: Person;
+    estimate_session_length: string;
+    loomEmbedUrl: string;
+    showModal: () => void;
+    setDeletePayload: (boolean) => void;
+    key: string;
+    setExtrasPropertyAndSave: (any) => void;
+    saving: string;
+    labels: [{[key: string]: string}];
+    isClosed: boolean;
+    onPanelClick: () => void;
+    status: string;
+    isCodingTask: boolean;
+    show: string;
+    paid: boolean;
+    isMine: boolean;
+    titleString: string;
 }

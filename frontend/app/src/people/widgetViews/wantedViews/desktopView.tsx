@@ -11,10 +11,11 @@ import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
+import { WantedViewsProps } from 'intefarces/people';
 
 export default observer(DesktopView);
 
-function DesktopView(props: any) {
+function DesktopView(props: WantedViewsProps) {
   const {
     description,
     priceMin,
@@ -126,10 +127,9 @@ function DesktopView(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${
-                        {
-                          ...assignee
-                        }.owner_pubkey
+                      `/p/${{
+                        ...assignee
+                      }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
