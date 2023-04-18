@@ -1,3 +1,6 @@
+import { EuiCheckboxGroupIdToSelectedMap } from "@elastic/eui/src/components/form/checkbox/checkbox_group";
+import { Extras } from "components/form/inputs/widgets/interfaces";
+import { Widget } from "people/main/types";
 import { Person } from "store/main";
 import { MeData } from "store/ui";
 
@@ -44,7 +47,7 @@ export interface UserInfoProps {
 }
 
 export interface BountiesProps {
-    assignee: Person;
+    assignee?: Person;
     price: number;
     sessionLength: string;
     priceMin: number;
@@ -180,7 +183,7 @@ export interface PersonProps extends Person {
 
 export interface GithubStatusPillProps {
     status?: string;
-    assignee: Person; 
+    assignee?: Person; 
     style?: React.CSSProperties;
 }
 
@@ -296,26 +299,81 @@ export interface WantedViewsProps {
     description: string;
     priceMin: number;
     priceMax: number;
-    price: number;
-    person: Person;
-    created: number;
+    price?: number;
+    person: any;
+    created?: number;
     ticketUrl?: string;
-    gallery: any;
-    assignee: Person;
-    estimate_session_length: string;
-    loomEmbedUrl: string;
-    showModal: () => void;
-    setDeletePayload: (boolean) => void;
-    key: string;
-    setExtrasPropertyAndSave: (any) => void;
-    saving: string;
-    labels: [{[key: string]: string}];
-    isClosed: boolean;
+    gallery?: any;
+    assignee?: Person;
+    estimate_session_length?: string;
+    loomEmbedUrl?: string;
+    showModal?: () => void;
+    setDeletePayload?: (boolean) => void;
+    key?: string;
+    setExtrasPropertyAndSave?: (any) => void;
+    saving?: string | boolean;
+    labels?: [{[key: string]: string}] | never[];
+    isClosed?: boolean;
     onPanelClick: () => void;
-    status: string;
-    isCodingTask: boolean;
-    show: string;
-    paid: boolean;
-    isMine: boolean;
-    titleString: string;
+    status?: string;
+    isCodingTask?: boolean;
+    show?: string | boolean;
+    paid?: boolean;
+    isMine?: boolean;
+    titleString?: string;
+}
+
+export interface WantedViews2Props extends WantedViewsProps {
+    one_sentence_summary?: string;
+    title?: string;
+    issue?: string;
+    repo?: string;
+    type?: string;
+    codingLanguage?: any;
+    fromBountyPage?: boolean;
+}
+
+export interface AboutViewProps {
+    price_to_meet?: number;
+    extras?: Extras;
+    twitter_confirmed?: boolean;
+    owner_pubkey?: string;
+    description?: string;
+    canEdit?: boolean;
+}
+
+export interface BlogViewProps {
+    title: string; 
+    markdown: string; 
+    gallery: string;
+    created: number;
+}
+
+export interface BountyHeaderProps {
+  selectedWidget: Widget;
+  scrollValue: boolean;
+  onChangeStatus: (number) => void;
+  onChangeLanguage: (number) => void;
+  checkboxIdToSelectedMap: EuiCheckboxGroupIdToSelectedMap;
+  checkboxIdToSelectedMapLanguage: EuiCheckboxGroupIdToSelectedMap;
+}
+
+export interface DeleteTicketModalProps {
+    closeModal: () => void;
+    confirmDelete: () => void;
+}
+
+export interface OfferViewProps {
+    gallery: [{[key: string]: string}];
+    title: string;
+    description: any;
+    price: number;
+    person: Person; 
+    created: number;
+    type: string;
+    content: string;
+}
+
+export interface RenderWidgetsProps {
+    widget: any;
 }

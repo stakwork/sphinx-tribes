@@ -36,7 +36,7 @@ const Bounties = (props: BountiesProps) => {
   const { ui } = useStores();
   return (
     <>
-      {{ ...assignee }.owner_alias ? (
+      {assignee ? { ...assignee }.owner_alias ? (
         <BountyContainer
           onClick={onPanelClick}
           assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
@@ -77,7 +77,7 @@ const Bounties = (props: BountiesProps) => {
             />
           </div>
         </BountyContainer>
-      ) : (
+      ) : <></> : (
         <BountyContainer color={color}>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
             <div style={{ display: 'flex', flexDirection: 'row' }} onClick={onPanelClick}>

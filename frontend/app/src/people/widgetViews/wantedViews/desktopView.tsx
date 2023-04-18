@@ -158,7 +158,7 @@ function DesktopView(props: WantedViewsProps) {
               flexWrap: 'wrap'
             }}
           >
-            {labels.length > 0 ? (
+            {labels && labels.length > 0 ? (
               labels.map((x: any) => (
                 <>
                   <div
@@ -285,7 +285,7 @@ function DesktopView(props: WantedViewsProps) {
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setExtrasPropertyAndSave('show');
+                      if (setExtrasPropertyAndSave) setExtrasPropertyAndSave('show');
                     }}
                   />
                 )
@@ -321,8 +321,8 @@ function DesktopView(props: WantedViewsProps) {
               <EuiButtonIcon
                 onClick={(e) => {
                   e.stopPropagation();
-                  showModal();
-                  setDeletePayload({
+                  if (showModal) showModal();
+                  if (setDeletePayload) setDeletePayload({
                     created: created,
                     host: getHost(),
                     pubkey: person.owner_pubkey

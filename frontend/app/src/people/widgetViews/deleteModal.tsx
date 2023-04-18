@@ -1,8 +1,9 @@
 import { EuiButton, EuiButtonEmpty, EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
+import { DeleteTicketModalProps } from 'intefarces/people';
 import React from 'react';
 import styled from 'styled-components';
 
-const DeleteTicketModal = ({ closeModal, confirmDelete }) => (
+const DeleteTicketModal = ({ closeModal, confirmDelete }: DeleteTicketModalProps) => (
   <>
     <EuiOverlayMask>
       <EuiModal

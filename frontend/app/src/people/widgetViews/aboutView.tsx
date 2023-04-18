@@ -5,8 +5,9 @@ import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
+import { AboutViewProps } from 'intefarces/people';
 
-export const AboutView = observer((props: any) => {
+export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
   const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =

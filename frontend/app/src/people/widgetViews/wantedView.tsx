@@ -10,10 +10,11 @@ import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
 import DesktopView from './wantedViews/desktopView';
 import { observer } from 'mobx-react-lite';
+import { WantedViews2Props } from 'intefarces/people';
 
 export default observer(WantedView);
 
-function WantedView(props: any) {
+function WantedView(props: WantedViews2Props) {
   const {
     one_sentence_summary,
     title,
@@ -35,7 +36,7 @@ function WantedView(props: any) {
     show = true,
     paid = false
   } = props;
-  const titleString = one_sentence_summary ?? title;
+  const titleString = one_sentence_summary ?? title ?? '';
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
@@ -52,7 +53,7 @@ function WantedView(props: any) {
         const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
           'wanted',
           propertyName,
-          created,
+          created || 0,
           !targetProperty
         );
 
@@ -94,7 +95,7 @@ function WantedView(props: any) {
   function renderTickets() {
     const { status } = ticketUrl
       ? extractGithubIssueFromUrl(person, ticketUrl)
-      : extractGithubIssue(person, repo, issue);
+      : extractGithubIssue(person, repo ?? '', issue ?? '');
 
     const isClosed = status === 'closed' || paid ? true : false;
 
@@ -108,7 +109,7 @@ function WantedView(props: any) {
           {...props}
           labels={labels}
           key={ticketUrl}
-          saving={saving}
+          saving={saving ?? false}
           setExtrasPropertyAndSave={setExtrasPropertyAndSave}
           isClosed={isClosed}
           isCodingTask={isCodingTask}
@@ -129,7 +130,7 @@ function WantedView(props: any) {
               <PaidBounty
                 {...person}
                 onPanelClick={onPanelClick}
-                assignee={assignee}
+                assignee={assignee ?? []}
                 created={created}
                 ticketUrl={ticketUrl}
                 loomEmbedUrl={loomEmbedUrl}
@@ -137,7 +138,7 @@ function WantedView(props: any) {
                 codingLanguage={labels}
                 priceMin={priceMin}
                 priceMax={priceMax}
-                price={price}
+                price={price ?? 0}
                 sessionLength={estimate_session_length}
                 description={description}
               />
@@ -155,8 +156,8 @@ function WantedView(props: any) {
                 codingLanguage={labels}
                 priceMin={priceMin}
                 priceMax={priceMax}
-                price={price}
-                sessionLength={estimate_session_length}
+                price={price ?? 0}
+                sessionLength={estimate_session_length || ''}
                 description={description}
               />
             </BountyBox>
