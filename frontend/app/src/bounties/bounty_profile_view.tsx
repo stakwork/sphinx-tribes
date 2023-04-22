@@ -3,8 +3,9 @@ import MaterialIcon from '@material/react-material-icon';
 import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../config/colors';
+import { BountiesProfileProps } from 'interfaces/bounties';
 
-const BountyProfileView = (props) => {
+const BountyProfileView = (props: BountiesProfileProps) => {
   const color = colors['light'];
   return (
     <>
@@ -25,8 +26,8 @@ const BountyProfileView = (props) => {
             src={
               { ...props.assignee }.owner_alias
                 ? {
-                    ...props.assignee
-                  }.img || '/static/person_placeholder.png'
+                  ...props.assignee
+                }.img || '/static/person_placeholder.png'
                 : '/static/default_profile_image.svg'
             }
             alt={'assigned_person'}
@@ -54,10 +55,9 @@ const BountyProfileView = (props) => {
               if (props.isNameClickable && { ...props.assignee }.owner_alias) {
                 e.stopPropagation();
                 window.open(
-                  `/p/${
-                    {
-                      ...props.assignee
-                    }.owner_pubkey
+                  `/p/${{
+                    ...props.assignee
+                  }.owner_pubkey
                   }?widget=wanted`,
                   '_blank'
                 );
@@ -76,10 +76,9 @@ const BountyProfileView = (props) => {
                 if ({ ...props.assignee }.owner_alias) {
                   e.stopPropagation();
                   window.open(
-                    `/p/${
-                      {
-                        ...props.assignee
-                      }.owner_pubkey
+                    `/p/${{
+                      ...props.assignee
+                    }.owner_pubkey
                     }?widget=wanted`,
                     '_blank'
                   );

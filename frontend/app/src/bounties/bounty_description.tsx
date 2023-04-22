@@ -4,8 +4,9 @@ import styled from 'styled-components';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
+import { BountiesDescriptionProps } from 'interfaces/bounties';
 
-const BountyDescription = (props: any) => {
+const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
   const [replitLink, setReplitLink] = useState('');
@@ -123,7 +124,7 @@ interface bounty_description_props {
   isPaid?: any;
   color?: any;
 }
-interface replit_image_props {}
+interface replit_image_props { }
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;

@@ -10,12 +10,13 @@ import styled from 'styled-components';
 
 type Props = LeaderItem & {
   position: number;
+  owner_pubkey: string;
+  total_sats_earned: number;
 };
 
 const color = colors.light;
 export const LeaerboardItem = ({
   owner_pubkey,
-  total_bounties_completed,
   total_sats_earned,
   position
 }: Props) => (
