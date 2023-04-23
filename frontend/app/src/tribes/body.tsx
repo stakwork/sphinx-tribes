@@ -197,8 +197,7 @@ function BodyComponent() {
             }}
             onChange={(e) => {
               ui.setSearchText(e);
-            }}
-          />
+            }} />
         </div>
       </div>
       <Column className="main-wrap">

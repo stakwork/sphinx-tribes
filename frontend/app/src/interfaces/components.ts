@@ -1,23 +1,23 @@
 export interface FadeLeftProps {
     drift: number;
     isMounted: boolean;
-    dismountCallback: () => void;
+    dismountCallback?: () => void;
     style: React.CSSProperties;
     children?: JSX.Element;
     alwaysRender?: boolean;
     noFadeOnInit?: boolean;
     direction: string;
     withOverlay: boolean;
-    overlayClick: () => void;
+    overlayClick?: () => void;
     noFade?: boolean;
     speed?: number;
-    close: () => void; 
+    close?: () => void; 
 }
 
 export interface ButtonProps {
     iconStyle?: React.CSSProperties;
     id?: string;
-    color: string;
+    color?: string;
     leadingIcon?: string;
     endingIcon?: string;
     style?: React.CSSProperties;
@@ -27,9 +27,9 @@ export interface ButtonProps {
     icon?: string;
     onClick?: (any) => void;
     wideButton?: boolean;
-    text: string;
-    iconSize?: string;
-    imgSize?: string;
+    text?: string;
+    iconSize?: number | string;
+    imgSize?: number | string;
     imgStyle?: React.CSSProperties;
     leadingImgUrl?: string;
     ButtonTextStyle?: React.CSSProperties;
@@ -48,6 +48,12 @@ export interface SelProps {
     value: string;
     style: React.CSSProperties;
     setIsTop: (any) => void;
+    options?: [{[key: string]: string}]
+    onInputChange?: () => void;
+    loading?: boolean;
+    selectStyle: React.CSSProperties;
+    handleActive: (any) => VideoColorSpace;
+    testId?: string;
 }
 
 export interface AutoCompleteProps {
@@ -67,12 +73,53 @@ export interface IconButtonProps extends ButtonProps {
 
 export interface ImageButtonProps extends ButtonProps {
     buttonAction: () => void;
-    size: number;
-    ButtonContainerStyle: React.CSSProperties;
-    leadingImageContainerStyle: React.CSSProperties;
-    leadingImageSrc: string;
-    endImageSrc: string;
+    size?: number;
+    ButtonContainerStyle?: React.CSSProperties;
+    leadingImageContainerStyle?: React.CSSProperties;
+    leadingImageSrc?: string;
+    endImageSrc?: string;
     buttonText: string;
-    buttonTextStyle: React.CSSProperties;
-    endingImageContainerStyle: React.CSSProperties;
+    buttonTextStyle?: React.CSSProperties;
+    endingImageContainerStyle?: React.CSSProperties;
+}
+
+export interface ModalProps {
+    visible?: boolean;
+    fill?: boolean;
+    overlayClick?: () => void;
+    dismountCallback?: () => void;
+    children?: JSX.Element;
+    close?: () => void;
+    style?: React.CSSProperties;
+    hideOverlay?: boolean;
+    envStyle?: React.CSSProperties;
+    nextArrow?: () => void;
+    prevArrow?: () => void;
+    nextArrowNew?: () => void;
+    prevArrowNew?: () => void;
+    bigClose?: () => void;
+    bigCloseImage?: () => void;
+    bigCloseImageStyle?: React.CSSProperties;
+}
+
+export interface SearchTextInputProps {
+    small?: boolean;
+    onChange: (any) => void;
+    iconStyle?: React.CSSProperties;
+    style: React.CSSProperties;
+    name?: string;
+    type?: string;
+    placeholder?: string;
+    value?: string;
+}
+
+export interface TextInputProps {
+    label: string;
+    value: string;
+    onChange: (any) => void;
+    handleBlur: () => void;
+    handleFocus: () => void;
+    readOnly?: boolean;
+    prepend?: string;
+    style?: React.CSSProperties;
 }

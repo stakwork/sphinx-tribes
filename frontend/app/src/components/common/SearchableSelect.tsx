@@ -1,16 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
+import { SelProps } from 'interfaces/components';
 
-export default function SearchableSelect(props: any) {
+export default function SearchableSelect(props: SelProps) {
   const { options, onChange, onInputChange, value, style, loading } = props;
 
   const opts =
-    options.map((o) => ({
-      ...o,
-      value: o.value,
-      label: o.label
-    })) || [];
+    options ?
+      options.map((o) => ({
+        ...o,
+        value: o.value,
+        label: o.label
+      })) : [];
 
   return (
     <div style={{ position: 'relative', ...style }}>

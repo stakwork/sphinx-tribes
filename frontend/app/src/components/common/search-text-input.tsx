@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
+import { SearchTextInputProps } from 'interfaces/components';
 
 export default observer(SearchTextInput);
-function SearchTextInput(props: any) {
+function SearchTextInput(props: SearchTextInputProps) {
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
   const [expand, setExpand] = useState(ui.searchText ? true : false);

@@ -2,16 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
 import { colors } from '../../config/colors';
+import { SelProps } from 'interfaces/components';
 
-export default function Sel(props: any) {
+export default function Sel(props: SelProps) {
   const { options, onChange, value, style } = props;
   const color = colors['light'];
 
   const opts =
-    options.map((o) => ({
-      value: o.value,
-      label: o.label
-    })) || [];
+    options ?
+      options.map((o) => ({
+        value: o.value,
+        label: o.label
+      })) : [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
@@ -32,7 +34,7 @@ interface styledProps {
   color?: any;
 }
 
-const S = styled(Select)<styledProps>`
+const S = styled(Select) <styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p) => p.color && p.color.grayish.G750};
 color: ${(p) => p.color && p.color.pureBlack};
