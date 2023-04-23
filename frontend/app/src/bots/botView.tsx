@@ -8,10 +8,11 @@ import Bot from './bot';
 import BotBar from './utils/botBar';
 import { useHistory } from 'react-router';
 import { observer } from 'mobx-react-lite';
+import { BotViewProps } from 'interfaces/bots';
 
 export default observer(BotView);
 
-function BotView(props: any) {
+function BotView(props: BotViewProps) {
   const { botUniqueName, selectBot, loading, goBack } = props;
 
   const { main } = useStores();

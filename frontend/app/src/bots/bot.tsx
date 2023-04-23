@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Divider } from '../components/common/index';
+import { BotProps } from 'interfaces/bots';
 
-export default function Bot(props: any) {
+export default function Bot(props: BotProps) {
   const { name, hideActions, small, id, img, description, selected, select, unique_name } = props;
 
   const defaultPic = '/static/bot_placeholder.png';
