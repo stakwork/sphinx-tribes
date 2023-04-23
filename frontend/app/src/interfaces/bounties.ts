@@ -6,26 +6,26 @@ export interface BountiesDescriptionProps {
     codingLanguage: [{[key: string]: string}];
     isPaid: boolean;
     title: string;
-    style?: CSSProperties
+    style?: React.CSSProperties
 } 
 
 export interface BountiesPriceProps {
     sessionLength: boolean;
     priceMin: number;
     price: number;
-    style?: CSSProperties
+    style?: React.CSSProperties
     priceMax?: number;
 }
 
 export interface BountiesProfileProps {
-    UserProfileContainerStyle?: CSSProperties;
-    UserImageStyle?: CSSProperties;
-    userInfoStyle?: CSSProperties;
-    statusStyle?: CSSProperties;
+    UserProfileContainerStyle?: React.CSSProperties;
+    UserImageStyle?: React.CSSProperties;
+    userInfoStyle?: React.CSSProperties;
+    statusStyle?: React.CSSProperties;
     assignee: Person;
     isNameClickable?: boolean;
     status: string;
-    NameContainerStyle?: CSSProperties;
+    NameContainerStyle?: React.CSSProperties;
     canViewProfile?: boolean;
     statusStyles?: {
         width: string; 

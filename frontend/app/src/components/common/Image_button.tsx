@@ -1,8 +1,9 @@
 import { EuiText } from '@elastic/eui';
+import { ImageButtonProps } from 'interfaces/components';
 import React from 'react';
 import styled from 'styled-components';
 
-const ImageButton = (props) => (
+const ImageButton = (props: ImageButtonProps) => (
   <ButtonContainer
     onClick={props?.buttonAction}
     style={{

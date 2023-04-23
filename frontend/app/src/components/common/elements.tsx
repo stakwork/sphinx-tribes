@@ -1,16 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function Title(props: any) {
+function Title(props: { children: JSX.Element }) {
   return <T {...props}>{props.children}</T>;
 }
-function Date(props: any) {
+function Date(props: { children: JSX.Element }) {
   return <D {...props}>{props.children}</D>;
 }
-function Paragraph(props: any) {
+function Paragraph(props: { children: JSX.Element }) {
   return <P {...props}>{props.children}</P>;
 }
-function Link(props: any) {
+function Link(props: { children: JSX.Element }) {
   return <L {...props}>{props.children}</L>;
 }
 

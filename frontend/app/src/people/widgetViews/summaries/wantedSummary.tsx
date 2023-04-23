@@ -405,8 +405,7 @@ function WantedSummary(props: any) {
         if (!badgeRecipient) {
           setShowBadgeAwardDialog(true);
         }
-      }}
-    />
+      }} />
   );
 
   const actionButtons = isMine && (

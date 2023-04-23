@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
+import { IconButtonProps } from 'interfaces/components';
 
 function hexToRgba(hex: string, opacity = 1) {
   try {
@@ -13,10 +14,10 @@ function hexToRgba(hex: string, opacity = 1) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     const rgb = result
       ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
-        }
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      }
       : null;
 
     return rgb ? `rgba(${rgb?.r}, ${rgb?.g}, ${rgb?.b}, ${opacity})` : undefined;
@@ -25,7 +26,7 @@ function hexToRgba(hex: string, opacity = 1) {
   }
 }
 
-export default function IconButton(props: any) {
+export default function IconButton(props: IconButtonProps) {
   const { iconStyle, id, color = 'primary' } = props;
 
   const colors = {
@@ -132,9 +133,9 @@ export default function IconButton(props: any) {
         paddingRight: props.leadingIcon && 10,
         ...props.style
       }}
-      hovercolor={props.hoverColor ?? hexToRgba(colors[color].background, 0.8)}
-      activecolor={props.activeColor}
-      shadowcolor={props.shadowColor}
+      hovercolor={props.hovercolor ?? hexToRgba(colors[color].background, 0.8)}
+      activecolor={props.activecolor}
+      shadowcolor={props.shadowcolor}
       disabled={props.disabled}
       onClick={props.onClick}
     >
@@ -214,7 +215,7 @@ interface ButtonHoverProps {
   shadowcolor?: string;
 }
 
-const B = styled(EuiButton)<ButtonHoverProps>`
+const B = styled(EuiButton) <ButtonHoverProps>`
   position: relative;
   border-radius: 100px;
   height: 36px;

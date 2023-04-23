@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { commonColors } from 'config/commonColors';
+import { ButtonProps } from 'interfaces/components';
 
-export default function Button(props: any) {
+export default function Button(props: ButtonProps) {
   const { iconStyle, id } = props;
 
   return (

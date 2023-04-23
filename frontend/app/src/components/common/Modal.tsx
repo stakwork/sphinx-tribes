@@ -28,10 +28,10 @@ export default function Modal(props: any) {
   const color = colors['light'];
   const fillStyle = fill
     ? {
-        height: '100%',
-        width: '100%',
-        borderRadius: 0
-      }
+      height: '100%',
+      width: '100%',
+      borderRadius: 0
+    }
     : {};
 
   return (
@@ -56,8 +56,7 @@ export default function Modal(props: any) {
           alignItems: 'center',
           justifyContent: 'center',
           overflowY: 'auto'
-        }}
-      >
+        }}   >
         <Env
           role="alertdialog"
           aria-modal={true}

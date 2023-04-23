@@ -3,8 +3,9 @@ import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { colourOptions } from '../../people/utils/language_label_style';
+import { SelProps } from 'interfaces/components';
 
-export default function Sel(props: any) {
+export default function Sel(props: SelProps) {
   const { onChange, value, style, setIsTop } = props;
   const color = colors['light'];
 
@@ -80,7 +81,7 @@ interface styledProps {
   color?: any;
 }
 
-const S = styled(CreatableSelect)<styledProps>`
+const S = styled(CreatableSelect) <styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p) => p.color && p.color.grayish.G750};
 color: ${(p) => p.color && p.color.pureBlack};

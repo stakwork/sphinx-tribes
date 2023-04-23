@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export default function Divider(props: any) {
+export default function Divider(props: { style: React.CSSProperties }) {
   return <D style={{ ...props.style }} />;
 }
 
