@@ -1,16 +1,17 @@
+import { ElementProps } from 'interfaces/components';
 import React from 'react';
 import styled from 'styled-components';
 
-function Title(props: { children: JSX.Element }) {
+function Title(props: ElementProps) {
   return <T {...props}>{props.children}</T>;
 }
-function Date(props: { children: JSX.Element }) {
+function Date(props: ElementProps) {
   return <D {...props}>{props.children}</D>;
 }
-function Paragraph(props: { children: JSX.Element }) {
+function Paragraph(props: ElementProps) {
   return <P {...props}>{props.children}</P>;
 }
-function Link(props: { children: JSX.Element }) {
+function Link(props: ElementProps) {
   return <L {...props}>{props.children}</L>;
 }
 

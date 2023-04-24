@@ -55,16 +55,16 @@ export default function Select(props: SelProps) {
           ...selectStyle
         }}
         onFocus={() => {
-          handleActive(true);
+          if (handleActive) handleActive(true);
         }}
         onBlur={() => {
-          handleActive(false);
+          if (handleActive) handleActive(false);
         }}
         options={opts}
         valueOfSelected={value}
         onChange={(value) => {
           onChange(value);
-          handleActive(false);
+          if (handleActive) handleActive(false);
         }}
         itemLayoutAlign="top"
       />

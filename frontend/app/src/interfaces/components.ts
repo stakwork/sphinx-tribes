@@ -1,13 +1,13 @@
 export interface FadeLeftProps {
-    drift: number;
+    drift?: number;
     isMounted: boolean;
     dismountCallback?: () => void;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
     children?: JSX.Element;
     alwaysRender?: boolean;
     noFadeOnInit?: boolean;
-    direction: string;
-    withOverlay: boolean;
+    direction?: string;
+    withOverlay?: boolean;
     overlayClick?: () => void;
     noFade?: boolean;
     speed?: number;
@@ -22,8 +22,8 @@ export interface ButtonProps {
     endingIcon?: string;
     style?: React.CSSProperties;
     disabled?: boolean;
-    height?: number;
-    width?: number;
+    height?: string | number;
+    width?: string | number;
     icon?: string;
     onClick?: (any) => void;
     wideButton?: boolean;
@@ -46,14 +46,16 @@ export interface ButtonProps {
 export interface SelProps {
     onChange: (any) => void;
     value: string;
-    style: React.CSSProperties;
-    setIsTop: (any) => void;
-    options?: [{[key: string]: string}]
-    onInputChange?: () => void;
+    style?: React.CSSProperties;
+    setIsTop?: (any) => void;
+    options: any;
+    onInputChange?: (any) => void;
     loading?: boolean;
     selectStyle: React.CSSProperties;
-    handleActive: (any) => VideoColorSpace;
+    handleActive?: (any) => any;
     testId?: string;
+    writeMode?: boolean;
+    name?: string;
 }
 
 export interface AutoCompleteProps {
@@ -62,8 +64,8 @@ export interface AutoCompleteProps {
 }
 
 export interface IconButtonProps extends ButtonProps {
-    iconStyle: React.CSSProperties;
-    color: string;
+    iconStyle?: React.CSSProperties;
+    color?: string;
     buttonType?: string;
     leadingImgStyle?: React.CSSProperties;
     endingImgStyle?: React.CSSProperties;
@@ -72,7 +74,7 @@ export interface IconButtonProps extends ButtonProps {
 }
 
 export interface ImageButtonProps extends ButtonProps {
-    buttonAction: () => void;
+    buttonAction?: (any) => void;
     size?: number;
     ButtonContainerStyle?: React.CSSProperties;
     leadingImageContainerStyle?: React.CSSProperties;
@@ -84,11 +86,11 @@ export interface ImageButtonProps extends ButtonProps {
 }
 
 export interface ModalProps {
-    visible?: boolean;
+    visible?: any;
     fill?: boolean;
     overlayClick?: () => void;
     dismountCallback?: () => void;
-    children?: JSX.Element;
+    children?: JSX.Element | JSX.Element[];
     close?: () => void;
     style?: React.CSSProperties;
     hideOverlay?: boolean;
@@ -117,9 +119,15 @@ export interface TextInputProps {
     label: string;
     value: string;
     onChange: (any) => void;
-    handleBlur: () => void;
-    handleFocus: () => void;
+    handleBlur?: () => void;
+    handleFocus?: () => void;
     readOnly?: boolean;
     prepend?: string;
     style?: React.CSSProperties;
+}
+
+export interface ElementProps {
+    style?: React.CSSProperties;
+    children: JSX.Element | JSX.Element[] | string;
+    onClick?: (any) => void;
 }

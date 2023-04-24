@@ -126,10 +126,9 @@ function DesktopView(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${
-                        {
-                          ...assignee
-                        }.owner_pubkey
+                      `/p/${{
+                        ...assignee
+                      }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
@@ -269,7 +268,7 @@ function DesktopView(props: any) {
                 isMine && (
                   <Button
                     icon={show ? 'visibility' : 'visibility_off'}
-                    disable={saving}
+                    disabled={saving}
                     submitting={saving}
                     iconStyle={{
                       color: color.grayish.G300,

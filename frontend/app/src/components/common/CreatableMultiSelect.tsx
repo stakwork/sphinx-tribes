@@ -28,10 +28,10 @@ export default function Sel(props: SelProps) {
         value={value}
         onChange={(value) => onChange(value)}
         onBlur={() => {
-          setIsTop(false);
+          if (setIsTop) setIsTop(false);
         }}
         onFocus={() => {
-          setIsTop(true);
+          if (setIsTop) setIsTop(true);
         }}
         className={'multi-select-input'}
         styles={{

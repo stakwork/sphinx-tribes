@@ -12,7 +12,7 @@ export default function Button(props: ButtonProps) {
     <B
       id={id}
       style={{
-        ...commonColors[props.color],
+        ...commonColors[props.color ? props.color : 'primary'],
         padding: props.icon && '0 0 0 15px',
         position: 'relative',
         opacity: props.disabled ? 0.7 : 1,

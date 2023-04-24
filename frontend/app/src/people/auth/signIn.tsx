@@ -145,8 +145,7 @@ function SignIn(props: any) {
                 color: '#000',
                 fontSize: '16px',
                 fontWeight: '600'
-              }}
-            />
+              }} />
           </Column>
         </>
       )}
