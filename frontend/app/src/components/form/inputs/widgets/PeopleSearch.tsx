@@ -11,10 +11,11 @@ import {
 } from '../../../../people/utils/language_label_style';
 import { SvgMask } from '../../../../people/utils/svgMask';
 import ImageButton from '../../../common/Image_button';
+import { InvitePeopleSearchProps } from './interfaces';
 
 const codingLanguages = GetValue(coding_languages);
 
-const InvitePeopleSearch = (props) => {
+const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const color = colors['light'];
   const [searchValue, setSearchValue] = useState<string>('');
   const [peopleData, setPeopleData] = useState<any>(props?.peopleList);
@@ -45,8 +46,8 @@ const InvitePeopleSearch = (props) => {
       (Object.keys(checkboxIdToSelectedMap).every((key) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
         : props?.peopleList?.filter(({ extras }) =>
-            extras?.coding_languages?.some(({ value }) => checkboxIdToSelectedMap[value] ?? false)
-          )
+          extras?.coding_languages?.some(({ value }) => checkboxIdToSelectedMap[value] ?? false)
+        )
       )?.filter((x) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
     );
   }, [checkboxIdToSelectedMap, searchValue]);

@@ -22,9 +22,10 @@ import {
   Wrap
 } from './style';
 import { FormField, validator } from './utils';
+import { FormProps } from 'interfaces/form';
 
 export default observer(Form);
-function Form(props: any) {
+function Form(props: FormProps) {
   const {
     buttonsOnBottom,
     wrapStyle,
@@ -263,8 +264,8 @@ function Form(props: any) {
                           style={
                             item.name === 'github_description' && !values.ticketUrl
                               ? {
-                                  display: 'none'
-                                }
+                                display: 'none'
+                              }
                               : undefined
                           }
                         />
@@ -304,8 +305,8 @@ function Form(props: any) {
                           style={
                             item.name === 'github_description' && !values.ticketUrl
                               ? {
-                                  display: 'none'
-                                }
+                                display: 'none'
+                              }
                               : undefined
                           }
                         />
@@ -459,8 +460,8 @@ function Form(props: any) {
                               style={
                                 item.name === 'github_description' && !values.ticketUrl
                                   ? {
-                                      display: 'none'
-                                    }
+                                    display: 'none'
+                                  }
                                   : undefined
                               }
                             />
@@ -508,8 +509,8 @@ function Form(props: any) {
                               style={
                                 item.type === 'loom' && values.ticketUrl
                                   ? {
-                                      marginTop: '55px'
-                                    }
+                                    marginTop: '55px'
+                                  }
                                   : undefined
                               }
                             />
@@ -625,8 +626,8 @@ function Form(props: any) {
                       style={
                         item.name === 'github_description' && !values.ticketUrl
                           ? {
-                              display: 'none'
-                            }
+                            display: 'none'
+                          }
                           : undefined
                       }
                     />

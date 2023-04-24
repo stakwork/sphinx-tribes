@@ -72,3 +72,42 @@ export interface Extras {
   supportme?: SupportMe;
   liquid?: SingleValueExtra[];
 }
+
+export interface FocusedWidgetProps {
+    name: string;
+    values: any[];
+    errors: any[];
+    initialValues: any;
+    setFieldTouched: (string, boolean) => void;
+    setFieldValue: (string, any) => void;
+    item: any;
+    setShowFocused: (boolean) => void;
+    setDisableFormButtons: (boolean) => void;
+}
+
+export interface InvitePeopleSearchProps {
+  peopleList: any;
+  handleChange: (any) => void;
+  setAssigneefunction: (string) => void;
+  newDesign: boolean;
+  isProvidingHandler: boolean;
+  handleAssigneeDetails: (any) => void;
+}
+
+export interface WidgetProps {
+  values: any;
+  name: string;
+  parentName: string;
+  setFieldValue: (string, any) => void;
+  setSelected: (any) => void;
+  label: string;
+  single: string;
+  icon?: string;
+}
+
+export interface WidgetListProps {
+  setSelected: (any, i: number) => void;
+  deleteItem: (any, i: number) => void;
+  schema: any;
+  values: {[key: string]: any};
+}
