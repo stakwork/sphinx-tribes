@@ -247,17 +247,19 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                   onClick={(e) => {
                     handler('', value.owner_alias);
                     setInviteNameId(0);
-                    props?.handleChange({
-                      owner_alias: '',
-                      owner_pubkey: '',
-                      img: '',
-                      value: '',
-                      label: ''
-                    });
+                    if (props?.handleChange)
+                      props?.handleChange({
+                        owner_alias: '',
+                        owner_pubkey: '',
+                        img: '',
+                        value: '',
+                        label: ''
+                      });
                     if (searchValue === '') {
                       setSearchValue('');
                     }
-                    props.setAssigneefunction('');
+                    if (props.setAssigneefunction)
+                      props.setAssigneefunction('');
                   }}
                 >
                   <EuiText className="nextText">{props.newDesign ? 'Unassign' : 'Invited'}</EuiText>
@@ -276,19 +278,21 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                     } else {
                       handler('', value.owner_alias);
                       setInviteNameId(value.id);
-                      props?.handleChange({
-                        owner_alias: value.owner_alias,
-                        owner_pubkey: value.owner_pubkey,
-                        img: value.img,
-                        value: value.owner_pubkey,
-                        label: `${value.owner_alias} (${value.owner_alias
-                          .toLowerCase()
-                          .replace(' ', '')})`
-                      });
+                      if (props.handleChange)
+                        props?.handleChange({
+                          owner_alias: value.owner_alias,
+                          owner_pubkey: value.owner_pubkey,
+                          img: value.img,
+                          value: value.owner_pubkey,
+                          label: `${value.owner_alias} (${value.owner_alias
+                            .toLowerCase()
+                            .replace(' ', '')})`
+                        });
                       if (searchValue === '') {
                         setSearchValue('');
                       }
-                      props.setAssigneefunction(value.owner_alias);
+                      if (props.setAssigneefunction)
+                        props.setAssigneefunction(value.owner_alias);
                     }
                   }}
                 />

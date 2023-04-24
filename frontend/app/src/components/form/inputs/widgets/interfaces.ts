@@ -87,9 +87,9 @@ export interface FocusedWidgetProps {
 
 export interface InvitePeopleSearchProps {
   peopleList: any;
-  handleChange: (any) => void;
-  setAssigneefunction: (string) => void;
-  newDesign: boolean;
+  handleChange?: (any) => void;
+  setAssigneefunction?: (string) => void;
+  newDesign?: boolean;
   isProvidingHandler: boolean;
   handleAssigneeDetails: (any) => void;
 }

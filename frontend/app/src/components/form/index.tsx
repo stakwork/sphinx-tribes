@@ -683,7 +683,7 @@ function Form(props: FormProps) {
                       <IconButton
                         disabled={disableFormButtons || props.loading}
                         onClick={() => {
-                          props.delete();
+                          if (props.delete) props.delete();
                         }}
                         icon={'delete'}
                         loading={props.loading}
