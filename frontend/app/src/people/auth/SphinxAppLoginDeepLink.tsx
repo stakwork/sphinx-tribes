@@ -6,7 +6,7 @@ import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
-import { AuthProps } from 'intefarces/people';
+import { AuthProps } from 'interfaces/people';
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {

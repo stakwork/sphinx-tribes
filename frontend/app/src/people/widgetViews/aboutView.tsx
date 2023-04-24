@@ -5,7 +5,7 @@ import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
-import { AboutViewProps } from 'intefarces/people';
+import { AboutViewProps } from 'interfaces/people';
 
 export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();

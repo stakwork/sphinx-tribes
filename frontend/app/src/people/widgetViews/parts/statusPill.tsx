@@ -1,4 +1,4 @@
-import { GithubStatusPillProps } from 'intefarces/people';
+import { GithubStatusPillProps } from 'interfaces/people';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 

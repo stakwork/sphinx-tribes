@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import MaterialIcon from '@material/react-material-icon';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { QRBarProps } from 'intefarces/people';
+import { QRBarProps } from 'interfaces/people';
 
 export default function QrBar(props: QRBarProps) {
   const { value, simple } = props;

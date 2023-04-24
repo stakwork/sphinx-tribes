@@ -10,7 +10,7 @@ import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
 import DesktopView from './wantedViews/desktopView';
 import { observer } from 'mobx-react-lite';
-import { WantedViews2Props } from 'intefarces/people';
+import { WantedViews2Props } from 'interfaces/people';
 
 export default observer(WantedView);
 

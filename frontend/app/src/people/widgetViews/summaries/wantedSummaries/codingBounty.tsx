@@ -33,7 +33,7 @@ import ButtonSet from '../../../../bounties/bountyModal_button_set';
 import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { observer } from 'mobx-react-lite';
-import { CodingBountiesProps } from 'intefarces/people';
+import { CodingBountiesProps } from 'interfaces/people';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {

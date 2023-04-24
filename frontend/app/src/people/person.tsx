@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { getHost } from '../config/host';
 import { Button, Divider } from '../components/common/index';
 import ConnectCard from './utils/connectCard';
-import { PersonProps } from 'intefarces/people';
+import { PersonProps } from 'interfaces/people';
 
 const host = getHost();
 

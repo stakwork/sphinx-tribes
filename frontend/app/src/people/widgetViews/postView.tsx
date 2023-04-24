@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Link, Paragraph, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
-import { OfferViewProps } from 'intefarces/people';
+import { OfferViewProps } from 'interfaces/people';
 
 export default function PostView(props: OfferViewProps) {
   const { title, content, created, gallery, person } = props;

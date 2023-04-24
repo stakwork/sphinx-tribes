@@ -4,7 +4,7 @@ import { Button, IconButton } from '../../components/common';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { EuiText } from '@elastic/eui';
-import { LoomViewProps } from 'intefarces/people';
+import { LoomViewProps } from 'interfaces/people';
 
 const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';
 

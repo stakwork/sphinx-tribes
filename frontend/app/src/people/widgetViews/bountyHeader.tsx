@@ -13,7 +13,7 @@ import { GetValue, coding_languages, status } from '../utils/language_label_styl
 import { observer } from 'mobx-react-lite';
 import IconButton from 'components/common/icon_button';
 import { useHistory } from 'react-router-dom';
-import { BountyHeaderProps } from 'intefarces/people';
+import { BountyHeaderProps } from 'interfaces/people';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);

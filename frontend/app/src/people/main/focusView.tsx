@@ -10,7 +10,7 @@ import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
-import { FocusViewProps } from 'intefarces/people';
+import { FocusViewProps } from 'interfaces/people';
 
 // this is where we see others posts (etc) and edit our own
 export default observer(FocusedView);

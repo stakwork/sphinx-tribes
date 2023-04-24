@@ -1,5 +1,5 @@
 import { EuiButton, EuiButtonEmpty, EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
-import { DeleteTicketModalProps } from 'intefarces/people';
+import { DeleteTicketModalProps } from 'interfaces/people';
 import React from 'react';
 import styled from 'styled-components';
 
