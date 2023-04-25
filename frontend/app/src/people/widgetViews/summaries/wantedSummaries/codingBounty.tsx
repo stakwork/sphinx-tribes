@@ -350,8 +350,9 @@ function MobileView(props: any) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                          },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                          labels && labels.map((x: any) => x.label)
+                        },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -773,8 +774,9 @@ function MobileView(props: any) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                      labels && labels.map((x: any) => x.label)
+                    },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -845,8 +847,9 @@ function MobileView(props: any) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                      labels && labels.map((x: any) => x.label)
+                    },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -923,8 +926,9 @@ function MobileView(props: any) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                      labels && labels.map((x: any) => x.label)
+                    },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}

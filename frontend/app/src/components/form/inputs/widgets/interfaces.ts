@@ -74,15 +74,15 @@ export interface Extras {
 }
 
 export interface FocusedWidgetProps {
-    name: string;
-    values: any[];
-    errors: any[];
-    initialValues: any;
-    setFieldTouched: (string, boolean) => void;
-    setFieldValue: (string, any) => void;
-    item: any;
-    setShowFocused: (boolean) => void;
-    setDisableFormButtons: (boolean) => void;
+  name: string;
+  values: any[];
+  errors: any[];
+  initialValues: any;
+  setFieldTouched: (string, boolean) => void;
+  setFieldValue: (string, any) => void;
+  item: any;
+  setShowFocused: (boolean) => void;
+  setDisableFormButtons: (boolean) => void;
 }
 
 export interface InvitePeopleSearchProps {
@@ -109,5 +109,5 @@ export interface WidgetListProps {
   setSelected: (any, i: number) => void;
   deleteItem: (any, i: number) => void;
   schema: any;
-  values: {[key: string]: any};
+  values: { [key: string]: any };
 }

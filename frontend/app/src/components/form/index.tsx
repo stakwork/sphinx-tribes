@@ -264,8 +264,8 @@ function Form(props: FormProps) {
                           style={
                             item.name === 'github_description' && !values.ticketUrl
                               ? {
-                                display: 'none'
-                              }
+                                  display: 'none'
+                                }
                               : undefined
                           }
                         />
@@ -305,8 +305,8 @@ function Form(props: FormProps) {
                           style={
                             item.name === 'github_description' && !values.ticketUrl
                               ? {
-                                display: 'none'
-                              }
+                                  display: 'none'
+                                }
                               : undefined
                           }
                         />
@@ -460,8 +460,8 @@ function Form(props: FormProps) {
                               style={
                                 item.name === 'github_description' && !values.ticketUrl
                                   ? {
-                                    display: 'none'
-                                  }
+                                      display: 'none'
+                                    }
                                   : undefined
                               }
                             />
@@ -509,8 +509,8 @@ function Form(props: FormProps) {
                               style={
                                 item.type === 'loom' && values.ticketUrl
                                   ? {
-                                    marginTop: '55px'
-                                  }
+                                      marginTop: '55px'
+                                    }
                                   : undefined
                               }
                             />
@@ -626,8 +626,8 @@ function Form(props: FormProps) {
                       style={
                         item.name === 'github_description' && !values.ticketUrl
                           ? {
-                            display: 'none'
-                          }
+                              display: 'none'
+                            }
                           : undefined
                       }
                     />

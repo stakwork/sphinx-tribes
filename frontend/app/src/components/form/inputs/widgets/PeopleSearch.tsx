@@ -46,8 +46,8 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
       (Object.keys(checkboxIdToSelectedMap).every((key) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
         : props?.peopleList?.filter(({ extras }) =>
-          extras?.coding_languages?.some(({ value }) => checkboxIdToSelectedMap[value] ?? false)
-        )
+            extras?.coding_languages?.some(({ value }) => checkboxIdToSelectedMap[value] ?? false)
+          )
       )?.filter((x) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
     );
   }, [checkboxIdToSelectedMap, searchValue]);
@@ -258,8 +258,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                     if (searchValue === '') {
                       setSearchValue('');
                     }
-                    if (props.setAssigneefunction)
-                      props.setAssigneefunction('');
+                    if (props.setAssigneefunction) props.setAssigneefunction('');
                   }}
                 >
                   <EuiText className="nextText">{props.newDesign ? 'Unassign' : 'Invited'}</EuiText>
@@ -291,8 +290,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                       if (searchValue === '') {
                         setSearchValue('');
                       }
-                      if (props.setAssigneefunction)
-                        props.setAssigneefunction(value.owner_alias);
+                      if (props.setAssigneefunction) props.setAssigneefunction(value.owner_alias);
                     }
                   }}
                 />
