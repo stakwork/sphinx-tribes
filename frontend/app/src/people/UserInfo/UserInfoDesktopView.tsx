@@ -63,7 +63,7 @@ export const UserInfoDesktopView = observer(({ setShowSupport }: any) => {
               padding: 0,
               background: '#ffffff',
               border: '1px solid #D0D5D8',
-              boxSizing: 'borderBox',
+              boxSizing: 'border-box',
               borderRadius: 4
             }}
             icon={'qr_code_2'}

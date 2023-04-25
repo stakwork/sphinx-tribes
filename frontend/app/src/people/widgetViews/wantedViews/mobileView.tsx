@@ -255,7 +255,7 @@ function MobileView(props: any) {
                   isMine && (
                     <Button
                       icon={show ? 'visibility' : 'visibility_off'}
-                      disable={saving}
+                      disabled={saving}
                       submitting={saving}
                       iconStyle={{
                         color: color.grayish.G20,
