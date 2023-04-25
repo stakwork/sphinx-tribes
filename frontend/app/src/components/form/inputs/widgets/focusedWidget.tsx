@@ -4,8 +4,10 @@ import Input from '../../../form/inputs/';
 import { EuiButton } from '@elastic/eui';
 import WidgetList from './widgetList';
 import MaterialIcon from '@material/react-material-icon';
+import { FocusedWidgetProps } from './interfaces';
 
-export default function FocusedWidget(props: any) {
+export default function FocusedWidget(props: FocusedWidgetProps
+) {
   const {
     name,
     values,
