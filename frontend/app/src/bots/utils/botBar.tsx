@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from '../../components/common';
-export default function BotBar(props: { value: string, simple?: any }) {
+export default function BotBar(props: { value: string }) {
   const { value } = props;
   const [toasts, setToasts]: any = useState([]);
 
