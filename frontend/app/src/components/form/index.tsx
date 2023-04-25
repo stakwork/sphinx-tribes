@@ -22,7 +22,7 @@ import {
   Wrap
 } from './style';
 import { FormField, validator } from './utils';
-import { FormProps } from 'interfaces/form';
+import { FormProps } from './interfaces';
 
 export default observer(Form);
 function Form(props: FormProps) {
