@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,6 +10,11 @@ import (
 )
 
 var appBox = packr.New("app", "./app/build")
+
+func PingRoute(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("pong")
+}
 
 // IndexRoute index.html
 func IndexRoute(w http.ResponseWriter, r *http.Request) {

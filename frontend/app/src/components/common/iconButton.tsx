@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { EuiButton } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from '../../config/colors';
+import { IconButtonProps } from 'components/interfaces';
 
-export default function IconButton(props: any) {
+export default function IconButton(props: IconButtonProps) {
   const color = colors['light'];
   const ButtonColors = {
     primary: {
@@ -27,7 +28,7 @@ export default function IconButton(props: any) {
     <B
       background={props.style && props.style.background}
       width={props.style && props.style.width}
-      style={{ ...ButtonColors[props.color], ...props.style }}
+      style={{ ...ButtonColors[props.color || 'primary'], ...props.style }}
       disabled={props.disabled}
       onClick={props.onClick}
     >

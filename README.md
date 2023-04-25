@@ -64,3 +64,9 @@ line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 ```
 
 - Build and run the Golang server
+
+### Run Test
+
+```
+    go test ./...
+```

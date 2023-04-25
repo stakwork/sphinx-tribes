@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
+import { IconButtonProps } from 'components/interfaces';
 
 function hexToRgba(hex: string, opacity = 1) {
   try {
@@ -25,7 +26,7 @@ function hexToRgba(hex: string, opacity = 1) {
   }
 }
 
-export default function IconButton(props: any) {
+export default function IconButton(props: IconButtonProps) {
   const { iconStyle, id, color = 'primary' } = props;
 
   const colors = {
@@ -132,9 +133,9 @@ export default function IconButton(props: any) {
         paddingRight: props.leadingIcon && 10,
         ...props.style
       }}
-      hovercolor={props.hoverColor ?? hexToRgba(colors[color].background, 0.8)}
-      activecolor={props.activeColor}
-      shadowcolor={props.shadowColor}
+      hovercolor={props.hovercolor ?? hexToRgba(colors[color].background, 0.8)}
+      activecolor={props.activecolor}
+      shadowcolor={props.shadowcolor}
       disabled={props.disabled}
       onClick={props.onClick}
     >

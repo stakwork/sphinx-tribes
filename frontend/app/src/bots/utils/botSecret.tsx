@@ -4,10 +4,11 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from '../../components/common';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
+import { BotSecretProps } from 'bots/interfaces';
 
 export default observer(BotSecret);
 
-function BotSecret(props: any) {
+function BotSecret(props: BotSecretProps) {
   const { ui } = useStores();
   const { meInfo } = ui || {};
   const { id, secret, name, full } = props;

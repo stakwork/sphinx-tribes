@@ -2,16 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
 import { colors } from '../../config/colors';
+import { SelProps } from 'components/interfaces';
 
-export default function Sel(props: any) {
+export default function Sel(props: SelProps) {
   const { options, onChange, value, style } = props;
   const color = colors['light'];
 
-  const opts =
-    options.map((o) => ({
-      value: o.value,
-      label: o.label
-    })) || [];
+  const opts = options
+    ? options.map((o) => ({
+        value: o.value,
+        label: o.label
+      }))
+    : [];
 
   return (
     <div style={{ position: 'relative', ...style }}>

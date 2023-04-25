@@ -39,7 +39,6 @@ export const ViewGithub = (props: any) => {
         color={'white'}
         endingIcon={'launch'}
         iconSize={14}
-        xw
         style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
         onClick={() => {
           const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;

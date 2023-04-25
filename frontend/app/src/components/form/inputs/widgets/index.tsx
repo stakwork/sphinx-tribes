@@ -28,6 +28,8 @@ export default function Widgets(props: any) {
         isMounted={!selected}
         style={{ maxWidth: 500 }}
         dismountCallback={() => setShowFocused(true)}
+        drift={0}
+        withOverlay={false}
       >
         <Center>
           <InnerWrap>

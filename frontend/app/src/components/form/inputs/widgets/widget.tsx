@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import MaterialIcon from '@material/react-material-icon';
+import { WidgetProps } from './interfaces';
 
-export default function Widget(props: any) {
+export default function Widget(props: WidgetProps) {
   // highlight if state has any of these
 
   const { values, name, parentName, setFieldValue } = props;

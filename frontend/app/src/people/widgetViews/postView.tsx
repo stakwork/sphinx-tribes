@@ -16,7 +16,7 @@ export default function PostView(props: OfferViewProps) {
   return (
     <Wrap style={{ maxHeight: expand ? '' : 472 }}>
       <Pad>
-        <Title>{title} </Title>
+        <Title>{title}</Title>
         <NameTag {...person} created={created} widget={'post'} />
         {/* // : <Date>{created && moment.unix(created).format('LLL')} </Date>} */}
         <Paragraph
@@ -26,7 +26,7 @@ export default function PostView(props: OfferViewProps) {
             overflow: 'hidden'
           }}
         >
-          <ReactMarkdown>{content}</ReactMarkdown>{' '}
+          <ReactMarkdown>{content}</ReactMarkdown>
         </Paragraph>
 
         {isLong && (

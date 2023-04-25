@@ -1,9 +1,10 @@
+import { FadeLeftProps } from 'components/interfaces';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export default function FadeLeft(props) {
+export default function FadeLeft(props: FadeLeftProps) {
   const {
     drift,
     isMounted,

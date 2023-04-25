@@ -22,9 +22,10 @@ import {
   Wrap
 } from './style';
 import { FormField, validator } from './utils';
+import { FormProps } from './interfaces';
 
 export default observer(Form);
-function Form(props: any) {
+function Form(props: FormProps) {
   const {
     buttonsOnBottom,
     wrapStyle,
@@ -682,7 +683,7 @@ function Form(props: any) {
                       <IconButton
                         disabled={disableFormButtons || props.loading}
                         onClick={() => {
-                          props.delete();
+                          if (props.delete) props.delete();
                         }}
                         icon={'delete'}
                         loading={props.loading}
