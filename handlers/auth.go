@@ -77,7 +77,7 @@ func GetLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 		json.NewEncoder(w).Encode("Could not generate LNURL AUTH")
 	}
 
-	db.Store.SetLnCache(encodeData.K1, db.LnStore{encodeData.K1, "", false})
+	db.Store.SetLnCache(encodeData.K1, db.LnStore{K1: encodeData.K1, Key: "", Status: false})
 
 	responseData["k1"] = encodeData.K1
 	responseData["encode"] = encodeData.Encode
@@ -133,7 +133,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		db.DB.CreateLnUser(userKey)
 
 		// Set store data to true
-		db.Store.SetLnCache(k1, db.LnStore{k1, userKey, true})
+		db.Store.SetLnCache(k1, db.LnStore{K1: k1, Key: userKey, Status: true})
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)

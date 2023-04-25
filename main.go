@@ -13,6 +13,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
+	"github.com/stakwork/sphinx-tribes/routes"
 )
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 // Start the MQTT plugin
 func run() {
 
-	router := NewRouter()
+	router := routes.NewRouter()
 
 	shutdownSignal := make(chan os.Signal)
 	signal.Notify(shutdownSignal, syscall.SIGINT, syscall.SIGTERM)
