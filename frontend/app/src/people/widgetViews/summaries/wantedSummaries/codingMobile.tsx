@@ -16,7 +16,7 @@ import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
 import { formatPrice, satToUsd } from '../../../../helpers';
-import { CodingViewProps } from 'interfaces/people';
+import { CodingViewProps } from 'people/interfaces';
 
 export default function MobileView(props: CodingViewProps) {
   const {

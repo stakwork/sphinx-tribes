@@ -17,7 +17,7 @@ import CodingBounty from './wantedSummaries/codingBounty';
 import CodingDesktop from './wantedSummaries/codingDesktop';
 import { sendToRedirect } from '../../../helpers';
 import { observer } from 'mobx-react-lite';
-import { WantedSummaryProps } from 'interfaces/people';
+import { WantedSummaryProps } from '../../interfaces';
 
 function useQuery() {
   const { search } = useLocation();

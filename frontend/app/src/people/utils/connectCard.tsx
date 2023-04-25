@@ -5,7 +5,7 @@ import QR from './QR';
 import QrBar from './QrBar';
 import { makeConnectQR } from '../../helpers';
 import { colors } from '../../config/colors';
-import { ConnectCardProps } from 'interfaces/people';
+import { ConnectCardProps } from 'people/interfaces';
 
 export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];

@@ -1,5 +1,5 @@
 import { Button, IconButton } from 'components/common';
-import { PeopleMobileeHeaderProps } from 'interfaces/people';
+import { PeopleMobileeHeaderProps } from 'people/interfaces';
 import React from 'react';
 
 export const HeaderMobile = ({ goBack, canEdit, logout, onEdit }: PeopleMobileeHeaderProps) => (

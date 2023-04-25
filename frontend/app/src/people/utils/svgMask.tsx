@@ -1,4 +1,4 @@
-import { SvgMaskProps } from 'interfaces/people';
+import { SvgMaskProps } from 'people/interfaces';
 import React from 'react';
 
 export const SvgMask = (props: SvgMaskProps) => (

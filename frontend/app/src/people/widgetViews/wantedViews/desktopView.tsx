@@ -11,7 +11,7 @@ import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
-import { WantedViewsProps } from 'interfaces/people';
+import { WantedViewsProps } from 'people/interfaces';
 
 export default observer(DesktopView);
 

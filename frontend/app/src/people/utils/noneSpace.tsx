@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { Button } from '../../components/common';
-import { NoneSpaceProps } from 'interfaces/people';
+import { NoneSpaceProps } from 'people/interfaces';
 
 export default function NoneSpace(props: NoneSpaceProps) {
   const color = colors['light'];

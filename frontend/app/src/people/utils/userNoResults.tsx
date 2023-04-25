@@ -4,7 +4,7 @@ import PageLoadSpinner from './pageLoadSpinner';
 import { observer } from 'mobx-react-lite';
 import NoneSpace from './noneSpace';
 import { widgetConfigs } from '../utils/constants';
-import { NoResultProps } from 'interfaces/people';
+import { NoResultProps } from 'people/interfaces';
 
 export default observer(NoResults);
 function NoResults(props: NoResultProps) {

@@ -14,7 +14,7 @@ import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
 import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
-import { RenderWidgetsProps } from 'interfaces/people';
+import { RenderWidgetsProps } from 'people/interfaces';
 
 export default observer(RenderWidgets);
 

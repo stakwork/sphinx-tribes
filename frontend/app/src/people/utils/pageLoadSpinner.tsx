@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { EuiLoadingSpinner } from '@elastic/eui';
-import { PageLoadProps } from 'interfaces/people';
+import { PageLoadProps } from 'people/interfaces';
 
 export default function PageLoadSpinner(props: PageLoadProps) {
   if (props.noAnimate) {

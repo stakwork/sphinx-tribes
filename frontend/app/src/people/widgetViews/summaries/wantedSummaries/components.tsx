@@ -3,7 +3,6 @@ import React from 'react';
 import FavoriteButton from '../../../utils/favoriteButton';
 import { Button } from '../../../../components/common';
 import { sendToRedirect } from '../../../../helpers';
-import { AddToFavoritesProps } from 'interfaces/people';
 
 export const Heart = () => <FavoriteButton />;
 

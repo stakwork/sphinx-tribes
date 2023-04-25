@@ -1,8 +1,8 @@
-import { EuiCheckboxGroupIdToSelectedMap } from "@elastic/eui/src/components/form/checkbox/checkbox_group";
-import { Extras } from "components/form/inputs/widgets/interfaces";
-import { Widget } from "people/main/types";
-import { Person } from "store/main";
-import { MeData } from "store/ui";
+import React from "react";
+import { Extras } from "../components/form/inputs/widgets/interfaces";
+import { Widget } from "./main/types";
+import { Person } from "../store/main";
+import { MeData } from "../store/ui";
 
 export interface AuthProps  {
     style?: React.CSSProperties;
@@ -76,11 +76,11 @@ export interface ConnectCardProps {
 }
 
 export interface LoomViewProps {
-    loomEmbedUrl: string;
-    onChange: (string) => void;
+    loomEmbedUrl?: string;
+    onChange?: (string) => void;
     readOnly?: boolean;
     style: React.CSSProperties;
-    setIsVideo: (any) => void;
+    setIsVideo?: (any) => void;
     name?: string;
     onBlur?: () => void;
     onFocus?: () => void;
@@ -354,8 +354,8 @@ export interface BountyHeaderProps {
   scrollValue: boolean;
   onChangeStatus: (number) => void;
   onChangeLanguage: (number) => void;
-  checkboxIdToSelectedMap: EuiCheckboxGroupIdToSelectedMap;
-  checkboxIdToSelectedMapLanguage: EuiCheckboxGroupIdToSelectedMap;
+  checkboxIdToSelectedMap: any;
+  checkboxIdToSelectedMapLanguage: any;
 }
 
 export interface DeleteTicketModalProps {
