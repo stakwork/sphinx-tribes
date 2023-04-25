@@ -718,7 +718,8 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'description',
     label: 'Description',
-    type: 'textarea'
+    type: 'textarea',
+    validator: strValidator
   },
   {
     name: 'price',
@@ -747,7 +748,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'estimate_session_length',
-    label: 'Estimate Seesion Length',
+    label: 'Estimate Session Length',
     type: 'select',
     options: estimated_time
   },
