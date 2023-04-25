@@ -1,4 +1,4 @@
-import { FadeLeftProps } from 'interfaces/components';
+import { FadeLeftProps } from 'components/interfaces';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 

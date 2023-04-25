@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import { IconButtonProps } from 'interfaces/components';
+import { IconButtonProps } from 'components/interfaces';
 
 function hexToRgba(hex: string, opacity = 1) {
   try {

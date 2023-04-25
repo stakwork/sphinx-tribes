@@ -8,7 +8,7 @@ import Bot from './bot';
 import BotBar from './utils/botBar';
 import { useHistory } from 'react-router';
 import { observer } from 'mobx-react-lite';
-import { BotViewProps } from 'interfaces/bots';
+import { BotViewProps } from './interfaces';
 
 export default observer(BotView);
 

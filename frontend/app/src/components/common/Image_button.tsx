@@ -1,5 +1,5 @@
 import { EuiText } from '@elastic/eui';
-import { ImageButtonProps } from 'interfaces/components';
+import { ImageButtonProps } from 'components/interfaces';
 import React from 'react';
 import styled from 'styled-components';
 

@@ -4,7 +4,7 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from '../../components/common';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
-import { BotSecretProps } from 'interfaces/bots';
+import { BotSecretProps } from 'bots/interfaces';
 
 export default observer(BotSecret);
 

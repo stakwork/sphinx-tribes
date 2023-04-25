@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { FieldEnv, FieldText } from '../form/inputs/index';
-import { TextInputProps } from 'interfaces/components';
+import { TextInputProps } from 'components/interfaces';
 
 export default function TextInput({
   label,

@@ -3,7 +3,7 @@ import MaterialIcon from '@material/react-material-icon';
 import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../config/colors';
-import { BountiesProfileProps } from 'interfaces/bounties';
+import { BountiesProfileProps } from './interfaces';
 
 const BountyProfileView = (props: BountiesProfileProps) => {
   const color = colors['light'];

@@ -1,4 +1,4 @@
-import { ElementProps } from 'interfaces/components';
+import { ElementProps } from 'components/interfaces';
 import React from 'react';
 import styled from 'styled-components';
 

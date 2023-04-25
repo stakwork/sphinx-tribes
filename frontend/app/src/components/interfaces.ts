@@ -71,6 +71,10 @@ export interface IconButtonProps extends ButtonProps {
     endingImgStyle?: React.CSSProperties;
     leadingImg?: string;
     endingImg?: string;
+    style?: React.CSSProperties | any;
+    size?: string | number;
+    onClick?: (any) => void;
+    disabled?: boolean; 
 }
 
 export interface ImageButtonProps extends ButtonProps {

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiSuperSelect, EuiText } from '@elastic/eui';
 import { colors } from '../../config/colors';
-import { SelProps } from 'interfaces/components';
+import { SelProps } from 'components/interfaces';
 
 export default function Select(props: SelProps) {
   const color = colors['light'];

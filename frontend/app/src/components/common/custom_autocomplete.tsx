@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import ImageButton from './Image_button';
-import { AutoCompleteProps } from 'interfaces/components';
+import { AutoCompleteProps } from 'components/interfaces';
 
 const AutoComplete = (props: AutoCompleteProps) => {
   const color = colors['light'];

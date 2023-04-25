@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
-import { SearchTextInputProps } from 'interfaces/components';
+import { SearchTextInputProps } from 'components/interfaces';
 
 export default observer(SearchTextInput);
 function SearchTextInput(props: SearchTextInputProps) {

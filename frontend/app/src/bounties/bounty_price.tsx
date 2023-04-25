@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { colors } from '../config/colors';
 import { DollarConverter, satToUsd } from '../helpers';
 import { PriceOuterContainer } from 'components/common';
-import { BountiesPriceProps } from 'interfaces/bounties';
+import { BountiesPriceProps } from './interfaces';
 
 const Session = [
   {
