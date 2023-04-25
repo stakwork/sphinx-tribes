@@ -81,7 +81,7 @@ interface styledProps {
   color?: any;
 }
 
-const S = styled(CreatableSelect) <styledProps>`
+const S = styled(CreatableSelect)<styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p) => p.color && p.color.grayish.G750};
 color: ${(p) => p.color && p.color.pureBlack};

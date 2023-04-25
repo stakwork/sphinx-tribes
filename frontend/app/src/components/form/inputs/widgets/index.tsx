@@ -27,7 +27,10 @@ export default function Widgets(props: any) {
       <FadeLeft
         isMounted={!selected}
         style={{ maxWidth: 500 }}
-        dismountCallback={() => setShowFocused(true)} drift={0} withOverlay={false}      >
+        dismountCallback={() => setShowFocused(true)}
+        drift={0}
+        withOverlay={false}
+      >
         <Center>
           <InnerWrap>
             {props.extras.map((e, i) => (

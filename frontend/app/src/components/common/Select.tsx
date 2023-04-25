@@ -8,9 +8,8 @@ export default function Select(props: SelProps) {
   const color = colors['light'];
   const { options, onChange, value, style, selectStyle, handleActive, testId } = props;
 
-  const opts =
-    options ?
-      options.map((o) => ({
+  const opts = options
+    ? options.map((o) => ({
         value: o.value,
         inputDisplay: o.label,
         dropdownDisplay: (
@@ -44,7 +43,8 @@ export default function Select(props: SelProps) {
             )}
           </>
         )
-      })) : [];
+      }))
+    : [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
@@ -76,7 +76,7 @@ interface styleProps {
   color?: any;
 }
 
-const S = styled(EuiSuperSelect as any) <styleProps>`
+const S = styled(EuiSuperSelect as any)<styleProps>`
   background: ${(p) => p?.color && p.color.pureWhite};
   border: 1px solid ${(p) => p?.color && p?.color.grayish.G750};
   color: ${(p) => p?.color && p?.color.pureBlack};

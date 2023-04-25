@@ -126,9 +126,10 @@ function DesktopView(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${{
-                        ...assignee
-                      }.owner_pubkey
+                      `/p/${
+                        {
+                          ...assignee
+                        }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );

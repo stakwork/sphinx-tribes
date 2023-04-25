@@ -41,7 +41,8 @@ export default function CreatableMultiSelectInput({
               handleChange(e);
               setIsTop(true);
             }}
-            setIsTop={setIsTop} />
+            setIsTop={setIsTop}
+          />
           {error && (
             <E color={color}>
               <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />

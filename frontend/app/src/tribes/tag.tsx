@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import tags from './tags';
 
-export default function T(props: { type: string, iconOnly?: boolean }) {
+export default function T(props: { type: string; iconOnly?: boolean }) {
   const { type } = props;
   if (!tags[type]) return <></>;
   const Icon = tags[type].icon;
