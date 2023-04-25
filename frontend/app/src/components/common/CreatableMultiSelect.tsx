@@ -3,8 +3,9 @@ import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { colourOptions } from '../../people/utils/language_label_style';
+import { SelProps } from 'components/interfaces';
 
-export default function Sel(props: any) {
+export default function Sel(props: SelProps) {
   const { onChange, value, style, setIsTop } = props;
   const color = colors['light'];
 
@@ -27,10 +28,10 @@ export default function Sel(props: any) {
         value={value}
         onChange={(value) => onChange(value)}
         onBlur={() => {
-          setIsTop(false);
+          if (setIsTop) setIsTop(false);
         }}
         onFocus={() => {
-          setIsTop(true);
+          if (setIsTop) setIsTop(true);
         }}
         className={'multi-select-input'}
         styles={{

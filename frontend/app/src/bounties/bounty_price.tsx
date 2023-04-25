@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { colors } from '../config/colors';
 import { DollarConverter, satToUsd } from '../helpers';
 import { PriceOuterContainer } from 'components/common';
+import { BountiesPriceProps } from './interfaces';
 
 const Session = [
   {
@@ -24,7 +25,7 @@ const Session = [
   }
 ];
 
-const BountyPrice = (props) => {
+const BountyPrice = (props: BountiesPriceProps) => {
   const color = colors['light'];
   const [session, setSession] = useState<any>();
 
