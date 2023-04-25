@@ -6,8 +6,7 @@ import WidgetList from './widgetList';
 import MaterialIcon from '@material/react-material-icon';
 import { FocusedWidgetProps } from './interfaces';
 
-export default function FocusedWidget(props: FocusedWidgetProps
-) {
+export default function FocusedWidget(props: FocusedWidgetProps) {
   const {
     name,
     values,

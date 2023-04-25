@@ -1,19 +1,19 @@
 export interface FormProps {
-    buttonsOnBottom?: React.CSSProperties | any;
-    wrapStyle?: React.CSSProperties,
-    smallForm?: boolean,
-    readOnly?: boolean,
-    scrollDiv?: any;
-    initialValues?: any;
-    formRef?: any;
-    schema: any;
-    paged?: boolean;
-    onSubmit: (v: any) => Promise<void> | void;
-    isFirstTimeScreen?: boolean;
-    newDesign?: string;
-    extraHTML?: JSX.Element | JSX.Element[] | any;
-    close?: () => void;
-    loading?: boolean;
-    delete?: () => void;
-    submitText?: string;
+  buttonsOnBottom?: React.CSSProperties | any;
+  wrapStyle?: React.CSSProperties;
+  smallForm?: boolean;
+  readOnly?: boolean;
+  scrollDiv?: any;
+  initialValues?: any;
+  formRef?: any;
+  schema: any;
+  paged?: boolean;
+  onSubmit: (v: any) => Promise<void> | void;
+  isFirstTimeScreen?: boolean;
+  newDesign?: string;
+  extraHTML?: JSX.Element | JSX.Element[] | any;
+  close?: () => void;
+  loading?: boolean;
+  delete?: () => void;
+  submitText?: string;
 }
