@@ -3,7 +3,7 @@ import { Route, Switch, useRouteMatch, BrowserRouter } from 'react-router-dom';
 import { PeoplePage } from './PeoplePage';
 import { PersonPage } from './PersonPage';
 
-export const People = (props: any) => {
+export const People = () => {
   const { path } = useRouteMatch();
   return (
     <BrowserRouter>
