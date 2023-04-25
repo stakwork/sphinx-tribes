@@ -114,7 +114,15 @@ function Header() {
 
   function goToEditSelf() {
     if (ui.meInfo?.id) {
+      const {location} = window;
+      const {href} = location
+
+      if (href.includes("/p"))
+      {
+      window.open(`/p/${ui.meInfo.owner_pubkey}`);
+      }else{
       history.push(`/p/${ui.meInfo.owner_pubkey}`);
+      }
       ui.setSelectedPerson(ui.meInfo.id);
       ui.setSelectingPerson(ui.meInfo.id);
     }
