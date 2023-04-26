@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export default function TwitterView(props) {
+export default function TwitterView(props: { handle: string }) {
   return (
     <Wrap>
       <Icon source={`/static/twitter.png`} />

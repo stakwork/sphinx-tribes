@@ -14,10 +14,11 @@ import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
 import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
+import { RenderWidgetsProps } from 'people/interfaces';
 
 export default observer(RenderWidgets);
 
-function RenderWidgets({ widget }) {
+function RenderWidgets({ widget }: RenderWidgetsProps) {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
   const personId = ui.selectedPerson;
@@ -95,15 +96,15 @@ function RenderWidgets({ widget }) {
 
       const panelStyles = isMobile
         ? {
-            minHeight: 132
-          }
+          minHeight: 132
+        }
         : {
-            maxWidth: 291,
-            minWidth: 291,
-            marginRight: 20,
-            marginBottom: 20,
-            minHeight: 472
-          };
+          maxWidth: 291,
+          minWidth: 291,
+          marginRight: 20,
+          marginBottom: 20,
+          minHeight: 472
+        };
 
       fullSelectedWidget &&
         fullSelectedWidget.forEach((s, i) => {
@@ -115,9 +116,9 @@ function RenderWidgets({ widget }) {
           const conditionalStyles =
             !isMobile && s?.paid
               ? {
-                  border: '1px solid #dde1e5',
-                  boxShadow: 'none'
-                }
+                border: '1px solid #dde1e5',
+                boxShadow: 'none'
+              }
               : {};
 
           elementArray.push(

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { setup, isSupported } from '@loomhq/record-sdk';
 import { Button, IconButton } from '../../components/common';
+import { LoomViewProps } from 'people/interfaces';
 
 const PUBLIC_APP_ID = 'ded90c8e-92ed-496d-bfe3-f742d7fa9785';
 
 const BUTTON_ID = 'loom-record-sdk-button';
 
-export default function LoomViewerRecorder(props) {
+export default function LoomViewerRecorder(props: LoomViewProps) {
   const { loomEmbedUrl, onChange, readOnly, style } = props;
   const [videoUrl, setVideoUrl] = useState(loomEmbedUrl || '');
 

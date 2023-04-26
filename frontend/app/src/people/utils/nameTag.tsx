@@ -6,10 +6,11 @@ import { useHistory } from 'react-router';
 import { useIsMobile } from '../../hooks';
 import { colors } from '../../config/colors';
 import { observer } from 'mobx-react-lite';
+import { NameTagProps } from 'people/interfaces';
 
 export default observer(NameTag);
 
-function NameTag(props) {
+function NameTag(props: NameTagProps) {
   const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =
     props;
   const { ui } = useStores();

@@ -1,7 +1,8 @@
 import { Button, IconButton } from 'components/common';
+import { PeopleMobileeHeaderProps } from 'people/interfaces';
 import React from 'react';
 
-export const HeaderMobile = ({ goBack, canEdit, logout, onEdit }) => (
+export const HeaderMobile = ({ goBack, canEdit, logout, onEdit }: PeopleMobileeHeaderProps) => (
   <div
     style={{
       position: 'absolute',

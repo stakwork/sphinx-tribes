@@ -31,8 +31,7 @@ export const EditUserDesktopView = observer(() => {
         selectedIndex={0}
         config={formConfig}
         onSuccess={closeHandler}
-        goBack={closeHandler}
-      />
+        goBack={closeHandler} />
     </Modal>
   );
 });

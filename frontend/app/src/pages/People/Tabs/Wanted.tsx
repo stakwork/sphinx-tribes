@@ -77,7 +77,10 @@ export const Wanted = observer(() => {
             })
           }
         >
-          <WantedView {...w} person={person} />
+          <WantedView
+            onPanelClick={() => { }}
+            {...w}
+            person={person} />
         </Panel>
       ))}
     </Container>

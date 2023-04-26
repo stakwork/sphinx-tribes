@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import MaterialIcon from '@material/react-material-icon';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { QRBarProps } from 'people/interfaces';
 
-export default function QrBar(props: any) {
+export default function QrBar(props: QRBarProps) {
   const { value, simple } = props;
   const [toasts, setToasts]: any = useState([]);
 
@@ -69,7 +70,7 @@ export default function QrBar(props: any) {
           cursor: 'pointer',
           letterSpacing: '0.3px'
         }}
-        // onClick={() => copyToClipboard(value)}
+      // onClick={() => copyToClipboard(value)}
       >
         COPY
       </Copy>

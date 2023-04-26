@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { colors } from '../../config/colors';
 
-export function renderMarkdown(markdown) {
+export function renderMarkdown(markdown: any) {
   const color = colors['light'];
   return (
     <ReactMarkdown

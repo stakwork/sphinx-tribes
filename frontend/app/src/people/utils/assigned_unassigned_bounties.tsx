@@ -10,8 +10,9 @@ import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
+import { BountiesProps } from 'people/interfaces';
 
-const Bounties = (props) => {
+const Bounties = (props: BountiesProps) => {
   const {
     assignee,
     price,
@@ -35,7 +36,7 @@ const Bounties = (props) => {
   const { ui } = useStores();
   return (
     <>
-      {{ ...assignee }.owner_alias ? (
+      {assignee ? { ...assignee }.owner_alias ? (
         <BountyContainer
           onClick={onPanelClick}
           assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
@@ -76,7 +77,7 @@ const Bounties = (props) => {
             />
           </div>
         </BountyContainer>
-      ) : (
+      ) : <></> : (
         <BountyContainer color={color}>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
             <div style={{ display: 'flex', flexDirection: 'row' }} onClick={onPanelClick}>
