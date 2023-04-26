@@ -1044,7 +1044,7 @@ func payBounty(w http.ResponseWriter, r *http.Request) {
 
 func (c *http.Client) Post(url string, bodyType string, body io.Reader) (resp *http.Response, err error) {
 	req, err := http.NewRequest("POST", url, body)
-	authToken := "HckupDZ2xZ2YC18SNVuH"
+	authToken := "add own authtoken"
 	if err != nil {
 		return nil, err
 	}
