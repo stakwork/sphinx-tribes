@@ -322,7 +322,7 @@ func GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	personResponse["owner_alias"] = person.OwnerAlias
 	personResponse["unique_name"] = person.UniqueName
 	personResponse["description"] = person.Description
-	personResponse["tags"] = person.Tags
+	// personResponse["tags"] = person.Tags
 	personResponse["img"] = person.Img
 	personResponse["owner_route_hint"] = person.OwnerRouteHint
 	personResponse["owner_contact_key"] = person.OwnerContactKey

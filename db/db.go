@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/utils"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type database struct {
@@ -30,6 +30,7 @@ var DB database
 func InitDB() {
 	dbURL := os.Getenv("DATABASE_URL")
 	fmt.Printf("db url : %v", dbURL)
+
 	if dbURL == "" {
 		rdsHost := os.Getenv("RDS_HOSTNAME")
 		rdsPort := os.Getenv("RDS_PORT")
@@ -38,12 +39,18 @@ func InitDB() {
 		rdsPassword := os.Getenv("RDS_PASSWORD")
 		dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", rdsUsername, rdsPassword, rdsHost, rdsPort, rdsDbName)
 	}
+
 	if dbURL == "" {
 		panic("DB env vars not found")
 	}
+
 	var err error
-	db, err := gorm.Open("postgres", dbURL)
-	db.LogMode(true)
+
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dbURL,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
+
 	if err != nil {
 		panic(err)
 	}
@@ -566,8 +573,8 @@ func (db database) GetAllTribes() []Tribe {
 	return ms
 }
 
-func (db database) GetTribesTotal() uint64 {
-	var count uint64
+func (db database) GetTribesTotal() int64 {
+	var count int64
 	db.db.Model(&Tribe{}).Where("deleted = 'false' OR deleted is null").Count(&count)
 	return count
 }
@@ -741,8 +748,8 @@ func (db database) UpdateLeaderBoard(uuid string, alias string, u map[string]int
 	return true
 }
 
-func (db database) CountDevelopers() uint64 {
-	var count uint64
+func (db database) CountDevelopers() int64 {
+	var count int64
 	db.db.Model(&Person{}).Where("deleted = 'f' OR deleted is null").Count(&count)
 	return count
 }
@@ -789,8 +796,8 @@ func (db database) GetConnectionCode() ConnectionCodesShort {
 	return c
 }
 
-func (db database) GetLnUser(lnKey string) uint64 {
-	var count uint64
+func (db database) GetLnUser(lnKey string) int64 {
+	var count int64
 
 	db.db.Model(&Person{}).Where("owner_pub_key = ?", lnKey).Count(&count)
 
@@ -806,7 +813,7 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 		p.OwnerAlias = lnKey
 		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
-		p.Tags = pq.StringArray{}
+		p.Tags = []string{}
 		p.Uuid = xid.New().String()
 		p.Extras = map[string]interface{}{}
 		p.GithubIssues = map[string]interface{}{}

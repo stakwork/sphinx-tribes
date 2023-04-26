@@ -108,7 +108,7 @@ type Person struct {
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
 	Description      string         `json:"description"`
-	Tags             pq.StringArray `json:"tags"`
+	Tags             pq.StringArray `gorm:"type:text[]" json:"tags"`
 	Img              string         `json:"img"`
 	Created          *time.Time     `json:"created"`
 	Updated          *time.Time     `json:"updated"`

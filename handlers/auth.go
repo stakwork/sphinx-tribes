@@ -195,7 +195,7 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["contact_key"] = p.OwnerContactKey
 	user["img"] = p.Img
 	user["description"] = p.Description
-	user["tags"] = p.Tags
+	// user["tags"] = p.Tags
 	user["unique_name"] = p.UniqueName
 	user["pubkey"] = p.OwnerPubKey
 	user["extras"] = p.Extras
