@@ -11,10 +11,11 @@ import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
+import { WantedViewsProps } from 'people/interfaces';
 
 export default observer(DesktopView);
 
-function DesktopView(props: any) {
+function DesktopView(props: WantedViewsProps) {
   const {
     description,
     priceMin,
@@ -126,10 +127,9 @@ function DesktopView(props: any) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${
-                        {
-                          ...assignee
-                        }.owner_pubkey
+                      `/p/${{
+                        ...assignee
+                      }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
@@ -158,7 +158,7 @@ function DesktopView(props: any) {
               flexWrap: 'wrap'
             }}
           >
-            {labels.length > 0 ? (
+            {labels && labels.length > 0 ? (
               labels.map((x: any) => (
                 <>
                   <div
@@ -285,7 +285,7 @@ function DesktopView(props: any) {
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setExtrasPropertyAndSave('show');
+                      if (setExtrasPropertyAndSave) setExtrasPropertyAndSave('show');
                     }}
                   />
                 )
@@ -321,8 +321,8 @@ function DesktopView(props: any) {
               <EuiButtonIcon
                 onClick={(e) => {
                   e.stopPropagation();
-                  showModal();
-                  setDeletePayload({
+                  if (showModal) showModal();
+                  if (setDeletePayload) setDeletePayload({
                     created: created,
                     host: getHost(),
                     pubkey: person.owner_pubkey

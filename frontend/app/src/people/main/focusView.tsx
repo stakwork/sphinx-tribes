@@ -10,11 +10,12 @@ import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
+import { FocusViewProps } from 'people/interfaces';
 
 // this is where we see others posts (etc) and edit our own
 export default observer(FocusedView);
 
-function FocusedView(props: any) {
+function FocusedView(props: FocusViewProps) {
   const {
     goBack,
     config,
@@ -158,12 +159,13 @@ function FocusedView(props: any) {
       await main.saveProfile(body);
       await main.getPeople();
       closeModal();
-      props?.deleteExtraFunction();
+
+      if (props?.deleteExtraFunction) props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
     setDeleting(false);
-    if (!isNotHttps(ui?.meInfo?.url)) props.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
@@ -229,14 +231,14 @@ function FocusedView(props: any) {
       const requestData =
         config.name === 'about' || config.name === 'wanted'
           ? {
-              ...newBody,
-              alert: undefined,
-              new_ticket_time: unixTimestamp,
-              extras: {
-                ...newBody?.extras,
-                alert: newBody.alert
-              }
+            ...newBody,
+            alert: undefined,
+            new_ticket_time: unixTimestamp,
+            extras: {
+              ...newBody?.extras,
+              alert: newBody.alert
             }
+          }
           : newBody;
 
       await main.saveProfile(requestData);
@@ -244,9 +246,9 @@ function FocusedView(props: any) {
     } catch (e) {
       console.log('e', e);
     }
-    props.onSuccess();
+    if (props?.onSuccess) props.onSuccess();
     setLoading(false);
-    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties) props?.ReCallBounties();
   }
 
   const initialValues: any = {};
@@ -359,8 +361,8 @@ function FocusedView(props: any) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
@@ -498,7 +500,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;

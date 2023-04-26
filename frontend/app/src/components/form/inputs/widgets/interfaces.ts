@@ -71,6 +71,12 @@ export interface Extras {
   wanted?: Wanted[];
   supportme?: SupportMe;
   liquid?: SingleValueExtra[];
+  github?: [{[key: string]: string}];
+  coding_languages?: [{[key: string]: string}];
+  tribes?: [{[key: string]: string}];
+  repos?: [{[key: string]: string}];
+  lightning?: [{[key: string]: string}];
+  amboss?: [{[key: string]: string}];
 }
 
 export interface FocusedWidgetProps {

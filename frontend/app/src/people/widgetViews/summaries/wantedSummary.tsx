@@ -17,6 +17,7 @@ import CodingBounty from './wantedSummaries/codingBounty';
 import CodingDesktop from './wantedSummaries/codingDesktop';
 import { sendToRedirect } from '../../../helpers';
 import { observer } from 'mobx-react-lite';
+import { WantedSummaryProps } from '../../interfaces';
 
 function useQuery() {
   const { search } = useLocation();
@@ -24,7 +25,7 @@ function useQuery() {
 }
 
 export default observer(WantedSummary);
-function WantedSummary(props: any) {
+function WantedSummary(props: WantedSummaryProps) {
   const {
     description,
     priceMin,
@@ -226,7 +227,7 @@ function WantedSummary(props: any) {
         const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
           'wanted',
           propertyName,
-          created,
+          created ?? 0,
           value
         );
 
@@ -269,7 +270,7 @@ function WantedSummary(props: any) {
         const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(
           dataObject,
           'wanted',
-          created
+          created ?? 0
         );
 
         // saved? ok update in wanted list if found

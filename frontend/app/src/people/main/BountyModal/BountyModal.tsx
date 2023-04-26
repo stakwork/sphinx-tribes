@@ -5,9 +5,10 @@ import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import FocusedView from '../focusView';
+import { BountyModalProps } from 'people/interfaces';
 
 const config = widgetConfigs.wanted;
-export const BountyModal = ({ basePath }) => {
+export const BountyModal = ({ basePath }: BountyModalProps) => {
   const history = useHistory();
   const { wantedId } = useParams<{ wantedId: string }>();
 
