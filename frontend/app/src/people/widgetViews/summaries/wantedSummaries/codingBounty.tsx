@@ -21,7 +21,7 @@ import {
   AwardBottomContainer
 } from './style';
 import { EuiText, EuiFieldText } from '@elastic/eui';
-import { Divider, Modal } from '../../../../components/common';
+import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
 import { satToUsd } from '../../../../helpers';
@@ -762,6 +762,7 @@ function MobileView(props: CodingBountiesProps) {
                       margin: 0
                     }}
                   />
+                  {{ ...person }?.owner_alias === ui.meInfo?.owner_alias ? (<Button style={{ marginTop: '10px' }} text="Pay Bounty" />) : <></>}
                 </BountyPriceContainer>
                 <ButtonSet
                   showGithubBtn={!!ticketUrl}
