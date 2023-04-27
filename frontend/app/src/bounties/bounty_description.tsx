@@ -5,6 +5,7 @@ import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
 import { BountiesDescriptionProps } from './interfaces';
+import { isString } from 'lodash';
 
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
@@ -28,7 +29,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
     let res;
     if (props.codingLanguage.length > 0) {
       res = LanguageObject?.filter((value) =>
-        props.codingLanguage?.find((val) => val.label === value.label)
+        !isString(props.codingLanguage) ? props.codingLanguage?.find((val) => val.label === value.label) : props.codingLanguage
       );
     }
     setDataValue(res);
@@ -124,7 +125,7 @@ interface bounty_description_props {
   isPaid?: any;
   color?: any;
 }
-interface replit_image_props {}
+interface replit_image_props { }
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;

@@ -78,6 +78,7 @@ export const Wanted = observer(() => {
           }
         >
           <WantedView
+            titleString={""}
             onPanelClick={() => { }}
             {...w}
             person={person} />

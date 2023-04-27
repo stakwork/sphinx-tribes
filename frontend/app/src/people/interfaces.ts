@@ -52,7 +52,7 @@ export interface BountiesProps {
     sessionLength: string;
     priceMin: number;
     priceMax: number;
-    codingLanguage: string | string[];
+    codingLanguage: string | [{[key: string]: string}];
     title: string;
     person: Person;
     onPanelClick: () => void;
@@ -87,13 +87,13 @@ export interface LoomViewProps {
 }
 
 export interface NameTagProps {
-    owner_alias: string;
-    owner_pubkey: string;
-    img: string;
-    created: number;
-    id: number;
+    owner_alias?: string;
+    owner_pubkey?: string;
+    img?: string;
+    created?: number;
+    id?: number;
     style?: React.CSSProperties;
-    widget: any;
+    widget?: any;
     iconSize?: number;
     textSize?: number;
     isPaid?: boolean;
@@ -131,11 +131,11 @@ export interface NoResultProps {
 export interface PaidBountiesProps {
     onPanelClick: () => void;
     title: string;
-    codingLanguage: string | string[];
+    codingLanguage: string | [{[key: string]: string}];
     priceMax: number;
     priceMin: number;
     price: number;
-    sessionLength: number;
+    sessionLength: string | boolean;
     assignee: Person;
 }
 
@@ -195,7 +195,7 @@ export interface WantedSummaryProps {
     created?: number | undefined;
     repo: string;
     issue: string;
-    price: Number;
+    price: number;
     type: string;
     tribe: string;
     paid: string;
@@ -261,21 +261,21 @@ export interface CodingBountiesProps {
     setBountyPrice: (any) => void;
     owner_idURL: string;
     createdURL: string;
-    editAction?: boolean;
+    editAction?: (any) => void;
     deletingState?: boolean;
-    deleteAction?: boolean;
+    deleteAction?: (any) => void;
     priceMin?: number;
     priceMax?: number;
-    price?: Number;
+    price?: number;
     estimate_session_length?: string;
     extraModalFunction?: () => void;
 }
 
 export interface CodingViewProps {
     paid?: string;
-    titleString?: string;
+    titleString: string | JSX.Element | JSX.Element[];
     labels?: {[key: string]: any};
-    price?: Number;
+    price?: number;
     description?: string;
     envHeight?: string;
     estimate_session_length?: string;
@@ -311,7 +311,7 @@ export interface WantedViewsProps {
     setDeletePayload?: (boolean) => void;
     key?: string;
     setExtrasPropertyAndSave?: (any) => void;
-    saving?: string | boolean;
+    saving?: boolean;
     labels?: [{[key: string]: string}] | never[];
     isClosed?: boolean;
     onPanelClick: () => void;
@@ -320,7 +320,7 @@ export interface WantedViewsProps {
     show?: string | boolean;
     paid?: boolean;
     isMine?: boolean;
-    titleString?: string;
+    titleString: string | JSX.Element | JSX.Element[];
 }
 
 export interface WantedViews2Props extends WantedViewsProps {
