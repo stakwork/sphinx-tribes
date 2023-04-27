@@ -217,6 +217,20 @@ type ConnectionCodesShort struct {
 	DateCreated      *time.Time `json:"date_created"`
 }
 
+type InvoiceRequest struct {
+	Amount int    `json:"amount"`
+	Memo   string `json:"memo"`
+}
+
+type Invoice struct {
+	Invoice string `json:"invoice"`
+}
+
+type InvoiceResponse struct {
+	Succcess bool    `json:"success"`
+	Response Invoice `json:"response"`
+}
+
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }

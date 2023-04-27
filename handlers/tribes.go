@@ -1,14 +1,17 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -421,4 +424,53 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
+	invoice := db.InvoiceRequest{}
+	body, err := ioutil.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, invoice.Amount, invoice.Memo)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	body, err = ioutil.ReadAll(res.Body)
+
+	// Unmarshal result
+	invoiceRes := db.InvoiceResponse{}
+	err = json.Unmarshal(body, &invoiceRes)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceRes)
 }

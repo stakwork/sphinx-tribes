@@ -8,10 +8,14 @@ import (
 
 var Host string
 var JwtKey string
+var RelayUrl string
+var RelayAuthKey string
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
+	RelayUrl = os.Getenv("RELAY_URL")
+	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
 
 	if Host == "" {
 		Host = "https://people.sphinx.chat"
