@@ -231,6 +231,40 @@ type InvoiceResponse struct {
 	Response Invoice `json:"response"`
 }
 
+type InvoiceData struct {
+	Route_hints       []string               `json:"route_hints"`
+	Htlcs             []string               `json:"htlcs"`
+	Features          map[string]interface{} `json:"features"`
+	Amp_invoice_state map[string]interface{} `json:"amp_invoice_state"`
+	Memo              string                 `json:"memo"`
+	R_preimage        map[string]interface{} `json:"r_preimage"`
+	R_hash            map[string]interface{} `json:"r_hash"`
+	Value             string                 `json:"value"`
+	Settled           bool                   `json:"settled"`
+	Creation_date     string                 `json:"creation_date"`
+	Settle_date       string                 `json:"settle_date"`
+	Payment_request   string                 `json:"payment_request"`
+	Description_hash  map[string]interface{} `json:"description_hash"`
+	Expiry            string                 `json:"expiry"`
+	Fallback_addr     string                 `json:"fallback_addr"`
+	Cltv_expiry       string                 `json:"cltv_expiry"`
+	Private           bool                   `json:"private"`
+	Add_index         string                 `json:"add_index"`
+	Settle_index      string                 `json:"settle_index"`
+	Amt_paid          string                 `json:"amt_paid"`
+	Amt_paid_sat      string                 `json:"amt_paid_sat"`
+	Amt_paid_msat     string                 `json:"amt_paid_msat"`
+	State             string                 `json:"state"`
+	Value_msat        string                 `json:"value_msat"`
+	Is_keysend        bool                   `json:"is_keysend"`
+	Payment_addr      map[string]interface{} `json:"payment_addr"`
+	Is_amp            bool                   `json:"is_amp"`
+}
+
+type InvoiceList struct {
+	Invoices []InvoiceData `json:"invoices"`
+}
+
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }

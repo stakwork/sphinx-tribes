@@ -447,7 +447,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	jsonBody := []byte(bodyData)
 
 	client := &http.Client{}
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest(http.MethodGet, url, bytes.NewBuffer(jsonBody))
 
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
@@ -473,4 +473,51 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
+}
+
+func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
+	payment_request := chi.URLParam(r, "payment_request")
+
+	if payment_request == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+
+	// Unmarshal result
+	invoiceRes := db.InvoiceList{}
+	err = json.Unmarshal(body, &invoiceRes)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
+	var invoiceState bool
+
+	for _, v := range invoiceRes.Invoices {
+		if v.Payment_request == payment_request {
+			invoiceState = v.Settled
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceState)
 }
