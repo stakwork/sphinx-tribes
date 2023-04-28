@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AssigneeProfile,
   Creator,
@@ -88,9 +88,28 @@ function MobileView(props: CodingBountiesProps) {
   const color = colors['light'];
 
   const { ui, main } = useStores();
+  const [pollCount, setPollCount] = useState(0);
 
   async function getLnInvoice() {
     await main.getLnInvoice(props?.price || 0, '');
+    await pollLnInvoice(pollCount);
+  }
+
+  async function pollLnInvoice(count: number) {
+    if (main.lnInvoice) {
+      const data = await main.getLnInvoiceStatus(main.lnInvoice);
+      setPollCount(count);
+
+      const pollTimeout = setTimeout(() => {
+        pollLnInvoice(count + 1);
+        setPollCount(count + 1);
+      }, 2000);
+
+      if (count >= 10 || data) {
+        clearTimeout(pollTimeout);
+        setPollCount(0);
+      }
+    }
   }
 
   return (
@@ -847,7 +866,7 @@ function MobileView(props: CodingBountiesProps) {
                       )
                       : <></>
                   }
-                  {!main.lnInvoice && { ...person }?.owner_alias === ui.meInfo?.owner_alias
+                  {!main.lnInvoiceStatus && !main.lnInvoice
                     ?
                     (<Button onClick={getLnInvoice} style={{ marginTop: '30px' }} text="Pay Bounty" />)
                     : <></>}

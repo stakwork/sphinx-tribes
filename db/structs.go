@@ -265,6 +265,11 @@ type InvoiceList struct {
 	Invoices []InvoiceData `json:"invoices"`
 }
 
+type InvoiceStatus struct {
+	Payment_request string `json:"payment_request"`
+	Status          bool   `json:"Status"`
+}
+
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }

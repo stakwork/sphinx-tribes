@@ -442,12 +442,14 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
+	// amount, _ := strconv.ParseInt(invoice.Amount, 10, 0)
+
 	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, invoice.Amount, invoice.Memo)
 
 	jsonBody := []byte(bodyData)
 
 	client := &http.Client{}
-	req, _ := http.NewRequest(http.MethodGet, url, bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
@@ -518,6 +520,16 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	invoiceData := db.InvoiceStatus{
+		Status:          invoiceState,
+		Payment_request: payment_request,
+	}
+
+	invoiceResult := make(map[string]interface{})
+
+	invoiceResult["status"] = invoiceData.Status
+	invoiceResult["payment_request"] = invoiceData.Payment_request
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(invoiceState)
+	json.NewEncoder(w).Encode(invoiceResult)
 }
