@@ -218,7 +218,7 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount int    `json:"amount"`
+	Amount string `json:"amount"`
 	Memo   string `json:"memo"`
 }
 

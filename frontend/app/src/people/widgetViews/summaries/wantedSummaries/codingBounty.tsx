@@ -34,6 +34,7 @@ import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
+import QR from 'people/utils/QR';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -86,7 +87,11 @@ function MobileView(props: CodingBountiesProps) {
   } = props;
   const color = colors['light'];
 
-  const { ui } = useStores();
+  const { ui, main } = useStores();
+
+  async function getLnInvoice() {
+    await main.getLnInvoice(props?.price || 0, '');
+  }
 
   return (
     <div>
@@ -762,7 +767,6 @@ function MobileView(props: CodingBountiesProps) {
                       margin: 0
                     }}
                   />
-                  {{ ...person }?.owner_alias === ui.meInfo?.owner_alias ? (<Button style={{ marginTop: '10px' }} text="Pay Bounty" />) : <></>}
                 </BountyPriceContainer>
                 <ButtonSet
                   showGithubBtn={!!ticketUrl}
@@ -835,6 +839,18 @@ function MobileView(props: CodingBountiesProps) {
                       margin: 0
                     }}
                   />
+                  {
+                    main.lnInvoice ?
+                      (<div style={{ marginTop: "30px" }}>
+                        <QR size={220} value={main.lnInvoice} />
+                      </div>
+                      )
+                      : <></>
+                  }
+                  {!main.lnInvoice && { ...person }?.owner_alias === ui.meInfo?.owner_alias
+                    ?
+                    (<Button onClick={getLnInvoice} style={{ marginTop: '30px' }} text="Pay Bounty" />)
+                    : <></>}
                 </BountyPriceContainer>
                 <ButtonSet
                   showGithubBtn={!!ticketUrl}

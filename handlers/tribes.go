@@ -442,7 +442,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
-	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, invoice.Amount, invoice.Memo)
+	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, invoice.Amount, invoice.Memo)
 
 	jsonBody := []byte(bodyData)
 

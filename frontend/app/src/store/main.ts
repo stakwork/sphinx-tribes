@@ -1000,7 +1000,28 @@ export class MainStore {
       return { k1: '', status: false };
     }
   }
+
+  @observable
+  lnInvoice: string = '';
+
+  @action setLnInvoice(invoiceResponse: LnInvoice) {
+    this.lnInvoice = invoiceResponse.response.invoice;
+  }
+
+  @action async getLnInvoice(amount: number, memo: string): Promise<LnInvoice> {
+    try {
+      const data = await api.post('invoices', {amount, memo}, {
+      'Content-Type': 'application/json' });
+      if (data.success) {
+        this.setLnInvoice(data);
+      }
+      return data;
+    } catch (e) {
+      return { success: false, response: {invoice : ''} };
+    }
+  }
 }
+
 
 export const mainStore = new MainStore();
 
@@ -1131,4 +1152,11 @@ export interface ClaimOnLiquid {
 export interface LnAuthData {
   encode: string;
   k1: string;
+}
+
+export interface LnInvoice {
+  success: boolean;
+  response: {
+    invoice: string;
+  }
 }
