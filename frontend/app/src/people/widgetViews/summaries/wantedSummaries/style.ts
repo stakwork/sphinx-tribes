@@ -652,3 +652,24 @@ export const PaidStatusPopover = styled.div<colorProps>`
     }
   }
 `;
+
+export const CountDownTimerWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+  width: 220px
+`;
+
+export const CountDownText = styled.p`
+  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+`;
+
+export const CountDownTimer = styled.p`
+  font-size: 2rem;
+  padding: 0px;
+  font-weight: bolder;
+`;

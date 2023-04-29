@@ -37,7 +37,7 @@
     "mobx-persist": "^0.4.1",
     "mobx-persist-store": "^1.1.3",
     "mobx-react-lite": "^3.4.3",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-dropzone": "^11.3.2",

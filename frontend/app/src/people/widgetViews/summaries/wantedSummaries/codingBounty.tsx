@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AssigneeProfile,
   Creator,
@@ -18,7 +18,10 @@ import {
   TitleBox,
   CodingLabels,
   AutoCompleteContainer,
-  AwardBottomContainer
+  AwardBottomContainer,
+  CountDownTimer,
+  CountDownTimerWrap,
+  CountDownText
 } from './style';
 import { EuiText, EuiFieldText } from '@elastic/eui';
 import { Button, Divider, Modal } from '../../../../components/common';
@@ -35,6 +38,7 @@ import InvitePeopleSearch from '../../../../components/form/inputs/widgets/Peopl
 import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
 import QR from 'people/utils/QR';
+import moment from 'moment';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -87,8 +91,26 @@ function MobileView(props: CodingBountiesProps) {
   } = props;
   const color = colors['light'];
 
+  const [timeLimit, setTimeLimit] = useState(new Date(moment().add(2, "minutes").format().toString()));
+
+  const calculateTimeLeft = () => {
+    const difference = new Date(timeLimit).getTime() - new Date().getTime();
+
+    let timeLeft: any = {};
+
+    if (difference > 0) {
+      timeLeft = {
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+
+    return timeLeft;
+  };
+
   const { ui, main } = useStores();
   const [pollCount, setPollCount] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   async function getLnInvoice() {
     await main.getLnInvoice(props?.price || 0, '');
@@ -105,12 +127,18 @@ function MobileView(props: CodingBountiesProps) {
         setPollCount(count + 1);
       }, 2000);
 
-      if (count >= 10 || data) {
+      if (count >= 29 || data) {
         clearTimeout(pollTimeout);
         setPollCount(0);
       }
     }
   }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+  }, [timeLeft]);
 
   return (
     <div>
@@ -861,22 +889,35 @@ function MobileView(props: CodingBountiesProps) {
                   {
                     main.lnInvoice ?
                       (<div style={{ marginTop: "30px" }}>
-                        <QR size={220} value={main.lnInvoice} />
+                        {timeLeft.seconds ?
+                          <>
+                            <CountDownTimerWrap>
+                              <CountDownText>Invoice expires in 2 minutes</CountDownText>
+                              <CountDownTimer>{timeLeft.minutes}:{timeLeft.seconds}</CountDownTimer>
+                            </CountDownTimerWrap>
+
+                            <QR size={220} value={main.lnInvoice} />
+                          </>
+                          : null}
                       </div>
                       )
                       : <></>
                   }
                   {!main.lnInvoiceStatus && !main.lnInvoice
                     ?
-                    (<Button
-                      iconSize={14}
-                      width={220}
-                      height={48}
-                      onClick={getLnInvoice}
-                      style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                      text="Pay Bounty"
-                      ButtonTextStyle={{ padding: 0 }}
-                    />)
+                    (
+                      <>
+                        <Button
+                          iconSize={14}
+                          width={220}
+                          height={48}
+                          onClick={getLnInvoice}
+                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                          text="Pay Bounty"
+                          ButtonTextStyle={{ padding: 0 }}
+                        /></>
+                    )
+
                     : <></>}
                 </BountyPriceContainer>
                 <ButtonSet
