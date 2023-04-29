@@ -868,7 +868,15 @@ function MobileView(props: CodingBountiesProps) {
                   }
                   {!main.lnInvoiceStatus && !main.lnInvoice
                     ?
-                    (<Button onClick={getLnInvoice} style={{ marginTop: '30px' }} text="Pay Bounty" />)
+                    (<Button
+                      iconSize={14}
+                      width={220}
+                      height={48}
+                      onClick={getLnInvoice}
+                      style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                      text="Pay Bounty"
+                      ButtonTextStyle={{ padding: 0 }}
+                    />)
                     : <></>}
                 </BountyPriceContainer>
                 <ButtonSet
