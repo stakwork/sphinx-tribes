@@ -19,9 +19,6 @@ import {
   CodingLabels,
   AutoCompleteContainer,
   AwardBottomContainer,
-  CountDownTimer,
-  CountDownTimerWrap,
-  CountDownText
 } from './style';
 import { EuiText, EuiFieldText } from '@elastic/eui';
 import { Button, Divider, Modal } from '../../../../components/common';
@@ -37,8 +34,8 @@ import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
-import QR from 'people/utils/QR';
 import moment from 'moment';
+import Invoice from './invoice';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -87,30 +84,13 @@ function MobileView(props: CodingBountiesProps) {
     setAwardDetails,
     setBountyPrice,
     owner_idURL,
-    createdURL
+    createdURL,
   } = props;
   const color = colors['light'];
 
-  const [timeLimit, setTimeLimit] = useState(new Date(moment().add(2, "minutes").format().toString()));
-
-  const calculateTimeLeft = () => {
-    const difference = new Date(timeLimit).getTime() - new Date().getTime();
-
-    let timeLeft: any = {};
-
-    if (difference > 0) {
-      timeLeft = {
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
-
-    return timeLeft;
-  };
 
   const { ui, main } = useStores();
   const [pollCount, setPollCount] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   async function getLnInvoice() {
     await main.getLnInvoice(props?.price || 0, '');
@@ -119,7 +99,11 @@ function MobileView(props: CodingBountiesProps) {
 
   async function pollLnInvoice(count: number) {
     if (main.lnInvoice) {
-      const data = await main.getLnInvoiceStatus(main.lnInvoice);
+      const data = await main.getLnInvoiceStatus(
+        main.lnInvoice,
+        assignee.owner_pubkey,
+        props?.price?.toString() || "0"
+      );
       setPollCount(count);
 
       const pollTimeout = setTimeout(() => {
@@ -133,12 +117,6 @@ function MobileView(props: CodingBountiesProps) {
       }
     }
   }
-
-  useEffect(() => {
-    setTimeout(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-  }, [timeLeft]);
 
   return (
     <div>
@@ -887,23 +865,16 @@ function MobileView(props: CodingBountiesProps) {
                     }}
                   />
                   {
-                    main.lnInvoice ?
-                      (<div style={{ marginTop: "30px" }}>
-                        {timeLeft.seconds ?
-                          <>
-                            <CountDownTimerWrap>
-                              <CountDownText>Invoice expires in 2 minutes</CountDownText>
-                              <CountDownTimer>{timeLeft.minutes}:{timeLeft.seconds}</CountDownTimer>
-                            </CountDownTimerWrap>
-
-                            <QR size={220} value={main.lnInvoice} />
-                          </>
-                          : null}
-                      </div>
+                    main.lnInvoice && pollCount < 30 ?
+                      (
+                        <Invoice
+                          startDate={new Date(moment().add(1, "minutes").format().toString())}
+                          count={pollCount}
+                        />
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus && !main.lnInvoice
+                  {!main.lnInvoiceStatus && !main.lnInvoice && { ...person }?.owner_alias === ui.meInfo?.owner_alias
                     ?
                     (
                       <>

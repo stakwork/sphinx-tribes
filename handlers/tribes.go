@@ -442,8 +442,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
-	// amount, _ := strconv.ParseInt(invoice.Amount, 10, 0)
-
 	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, invoice.Amount, invoice.Memo)
 
 	jsonBody := []byte(bodyData)
@@ -479,6 +477,8 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	payment_request := chi.URLParam(r, "payment_request")
+	pub_key := chi.URLParam(r, "user_pub_key")
+	amount := chi.URLParam(r, "amount")
 
 	if payment_request == "" {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -523,6 +523,29 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	invoiceData := db.InvoiceStatus{
 		Status:          invoiceState,
 		Payment_request: payment_request,
+	}
+
+	// If Paid successfully, make keysend payment to user
+	if invoiceState {
+		url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+		bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, amount, pub_key)
+
+		jsonBody := []byte(bodyData)
+
+		client := &http.Client{}
+		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+		req.Header.Set("x-user-token", config.RelayAuthKey)
+		req.Header.Set("Content-Type", "application/json")
+		res, _ := client.Do(req)
+
+		if err != nil {
+			log.Printf("Request Failed: %s", err)
+			return
+		}
+
+		defer res.Body.Close()
 	}
 
 	invoiceResult := make(map[string]interface{})

@@ -270,6 +270,11 @@ type InvoiceStatus struct {
 	Status          bool   `json:"Status"`
 }
 
+type KeysendPayment struct {
+	Amount          string `json:"amount"`
+	Destination_key string `json:"destination_key"`
+}
+
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }

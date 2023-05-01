@@ -1028,11 +1028,11 @@ export class MainStore {
     }
   }
 
-  @action async getLnInvoiceStatus(payment_req: string): Promise<boolean> {
+  @action async getLnInvoiceStatus(payment_req: string, pubkey: string,  amount: string): Promise<boolean> {
     try {
-      const data = await api.get(`invoices/${payment_req}`, {
+      const data = await api.get(`invoices/${payment_req}/${pubkey}/${amount}`, {
       'Content-Type': 'application/json' });
-      
+
       if (data.status) {
         this.setLnInvoiceStatus(data.status);
       }
