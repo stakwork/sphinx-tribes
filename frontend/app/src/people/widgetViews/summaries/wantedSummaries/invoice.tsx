@@ -3,7 +3,7 @@ import { CountDownText, CountDownTimer, CountDownTimerWrap } from './style';
 import { useStores } from '../../../../store';
 import QR from 'people/utils/QR';
 
-export default function Invoice(props: { startDate: Date, count: number }) {
+export default function Invoice(props: { startDate: Date, count: number, dataStatus: boolean }) {
     const [timeLimit] = useState(props.startDate);
 
     const calculateTimeLeft = () => {
@@ -38,7 +38,7 @@ export default function Invoice(props: { startDate: Date, count: number }) {
 
     return (
         <div style={{ marginTop: "30px" }}>
-            {timeLeft.seconds ?
+            {timeLeft.seconds && !props.dataStatus ?
                 <>
                     <CountDownTimerWrap>
                         <CountDownText>Invoice expires in a minute</CountDownText>

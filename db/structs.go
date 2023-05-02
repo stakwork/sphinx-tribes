@@ -233,7 +233,7 @@ type InvoiceResponse struct {
 
 type InvoiceData struct {
 	Route_hints       []string               `json:"route_hints"`
-	Htlcs             []string               `json:"htlcs"`
+	Htlcs             []interface{}          `json:"htlcs"`
 	Features          map[string]interface{} `json:"features"`
 	Amp_invoice_state map[string]interface{} `json:"amp_invoice_state"`
 	Memo              string                 `json:"memo"`
@@ -273,6 +273,16 @@ type InvoiceStatus struct {
 type KeysendPayment struct {
 	Amount          string `json:"amount"`
 	Destination_key string `json:"destination_key"`
+}
+
+type KeysendSuccess struct {
+	Success  bool        `json:"success"`
+	Response PropertyMap `json:"response"`
+}
+
+type KeysendError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
 }
 
 func (ConnectionCodes) TableName() string {

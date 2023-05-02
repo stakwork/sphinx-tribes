@@ -88,9 +88,9 @@ function MobileView(props: CodingBountiesProps) {
   } = props;
   const color = colors['light'];
 
-
   const { ui, main } = useStores();
   const [pollCount, setPollCount] = useState(0);
+  const [dataStatus, setDataStatus] = useState<boolean>(false);
 
   async function getLnInvoice() {
     await main.getLnInvoice(props?.price || 0, '');
@@ -99,11 +99,15 @@ function MobileView(props: CodingBountiesProps) {
 
   async function pollLnInvoice(count: number) {
     if (main.lnInvoice) {
+      // console.log("Invoice ====", main.lnInvoice)
       const data = await main.getLnInvoiceStatus(
         main.lnInvoice,
         assignee.owner_pubkey,
         props?.price?.toString() || "0"
       );
+
+      setDataStatus(data);
+
       setPollCount(count);
 
       const pollTimeout = setTimeout(() => {
@@ -112,6 +116,7 @@ function MobileView(props: CodingBountiesProps) {
       }, 2000);
 
       if (count >= 29 || data) {
+        // console.log("Data ====", data);
         clearTimeout(pollTimeout);
         setPollCount(0);
       }
@@ -870,11 +875,12 @@ function MobileView(props: CodingBountiesProps) {
                         <Invoice
                           startDate={new Date(moment().add(1, "minutes").format().toString())}
                           count={pollCount}
+                          dataStatus={dataStatus}
                         />
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus && !main.lnInvoice && { ...person }?.owner_alias === ui.meInfo?.owner_alias
+                  {!main.lnInvoiceStatus
                     ?
                     (
                       <>

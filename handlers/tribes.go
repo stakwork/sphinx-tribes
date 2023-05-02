@@ -527,7 +527,7 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 
 	// If Paid successfully, make keysend payment to user
 	if invoiceState {
-		url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+		url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
 		bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, amount, pub_key)
 
@@ -546,6 +546,27 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 		}
 
 		defer res.Body.Close()
+
+		body, err = ioutil.ReadAll(res.Body)
+
+		if res.StatusCode == 200 {
+			// Unmarshal result
+			keysendRes := db.KeysendSuccess{}
+			err = json.Unmarshal(body, &keysendRes)
+
+			// Todo update wanted paid status
+			// fmt.Println("Paid Keysend Successfully == ")
+		} else {
+			// Unmarshal result
+			keysendError := db.KeysendError{}
+			err = json.Unmarshal(body, &keysendError)
+			log.Printf("Keysend Payment to %s Failed, with Error: %s", pub_key, keysendError.Error)
+		}
+
+		if err != nil {
+			log.Printf("Reading body failed: %s", err)
+			return
+		}
 	}
 
 	invoiceResult := make(map[string]interface{})
