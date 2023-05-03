@@ -127,9 +127,10 @@ function DesktopView(props: WantedViewsProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${{
-                        ...assignee
-                      }.owner_pubkey
+                      `/p/${
+                        {
+                          ...assignee
+                        }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
@@ -322,11 +323,12 @@ function DesktopView(props: WantedViewsProps) {
                 onClick={(e) => {
                   e.stopPropagation();
                   if (showModal) showModal();
-                  if (setDeletePayload) setDeletePayload({
-                    created: created,
-                    host: getHost(),
-                    pubkey: person.owner_pubkey
-                  });
+                  if (setDeletePayload)
+                    setDeletePayload({
+                      created: created,
+                      host: getHost(),
+                      pubkey: person.owner_pubkey
+                    });
                 }}
                 iconType="trash"
                 aria-label="Next"

@@ -12,7 +12,7 @@ export default function ConnectCard(props: ConnectCardProps) {
   const { visible } = props;
   const { person } = props;
 
-  const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : "";
+  const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
 
   return (
     <div onClick={(e) => e.stopPropagation()}>

@@ -40,7 +40,8 @@ function WantedView(props: WantedViews2Props) {
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
-  const [labels, setLabels] = useState([]);
+
+  const [labels, setLabels] = useState([] as unknown as [{ [key: string]: string }]);
   const { peopleWanteds } = main;
   const color = colors['light'];
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
@@ -159,6 +160,7 @@ function WantedView(props: WantedViews2Props) {
                 price={price ?? 0}
                 sessionLength={estimate_session_length || ''}
                 description={description}
+                isPaid={paid}
               />
             </BountyBox>
           )}
