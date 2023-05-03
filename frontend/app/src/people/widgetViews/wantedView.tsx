@@ -159,6 +159,7 @@ function WantedView(props: WantedViews2Props) {
                 price={price ?? 0}
                 sessionLength={estimate_session_length || ''}
                 description={description}
+                isPaid={paid}
               />
             </BountyBox>
           )}

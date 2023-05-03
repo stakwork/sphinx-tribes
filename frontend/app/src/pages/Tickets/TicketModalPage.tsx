@@ -46,7 +46,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       (f) => f.created === connectPerson?.body?.created
     );
 
-    setPublicFocusIndex(itemIndex);
+    setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
 
     setConnectPersonBody(connectPerson?.person);
