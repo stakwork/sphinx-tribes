@@ -103,6 +103,7 @@ function MobileView(props: CodingBountiesProps) {
       const data = await main.getLnInvoiceStatus(
         main.lnInvoice,
         assignee.owner_pubkey,
+        person.owner_pubkey,
         props?.price?.toString() || "0"
       );
 
@@ -880,7 +881,7 @@ function MobileView(props: CodingBountiesProps) {
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus
+                  {!main.lnInvoiceStatus && { ...person }?.owner_alias === ui.meInfo?.owner_alias
                     ?
                     (
                       <>

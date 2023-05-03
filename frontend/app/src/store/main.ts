@@ -812,6 +812,7 @@ export class MainStore {
     }
 
     if (this.lnToken) {
+      console.log("LN TOKNEN ===", this.lnToken)
       const response = await fetch(`${URL}/${path}`, {
         method: method,
         body: JSON.stringify({
@@ -891,7 +892,6 @@ export class MainStore {
     extrasName: string,
     created: number
   ): Promise<any> {
-    alert('In set extras 2');
     if (uiStore.meInfo) {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
@@ -1028,9 +1028,13 @@ export class MainStore {
     }
   }
 
-  @action async getLnInvoiceStatus(payment_req: string, pubkey: string,  amount: string): Promise<boolean> {
+  @action async getLnInvoiceStatus(
+    payment_req: string, 
+    pubkey: string, 
+    owner_key: string, 
+    amount: string): Promise<boolean> {
     try {
-      const data = await api.get(`invoices/${payment_req}/${pubkey}/${amount}`, {
+      const data = await api.get(`invoices/${payment_req}/${pubkey}/${owner_key}/${amount}`, {
       'Content-Type': 'application/json' });
 
       if (data.status) {

@@ -478,6 +478,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	payment_request := chi.URLParam(r, "payment_request")
 	pub_key := chi.URLParam(r, "user_pub_key")
+	owner_key := chi.URLParam(r, "owner_key")
 	amount := chi.URLParam(r, "amount")
 
 	if payment_request == "" {
@@ -555,7 +556,7 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 			err = json.Unmarshal(body, &keysendRes)
 
 			// Todo update wanted paid status
-			// fmt.Println("Paid Keysend Successfully == ")
+			db.DB.SetBountyToPaid(owner_key)
 		} else {
 			// Unmarshal result
 			keysendError := db.KeysendError{}

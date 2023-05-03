@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	gormjsonb "github.com/dariubs/gorm-jsonb"
 	"github.com/lib/pq"
 )
 
@@ -108,7 +109,7 @@ type Person struct {
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
 	Description      string         `json:"description"`
-	Tags             pq.StringArray `gorm:"type:text[]" json:"tags"`
+	Tags             pq.StringArray `gorm:"type:text[]" json:"tags" null`
 	Img              string         `json:"img"`
 	Created          *time.Time     `json:"created"`
 	Updated          *time.Time     `json:"updated"`
@@ -294,7 +295,7 @@ func (ConnectionCodesShort) TableName() string {
 }
 
 // PropertyMap ...
-type PropertyMap map[string]interface{}
+type PropertyMap gormjsonb.JSONB
 
 // Value ...
 func (p PropertyMap) Value() (driver.Value, error) {

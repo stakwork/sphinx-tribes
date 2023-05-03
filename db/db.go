@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 
@@ -813,10 +814,8 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 		p.OwnerAlias = lnKey
 		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
-		p.Tags = []string{}
+		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
-		p.Extras = map[string]interface{}{}
-		p.GithubIssues = map[string]interface{}{}
 
 		db.db.Create(&p)
 	}
@@ -881,6 +880,14 @@ func (db database) GetBountiesLeaderboard() []LeaderData {
 		}
 	}
 	return users
+}
+
+func (db database) SetBountyToPaid(owner_key string) bool {
+	db.db.Raw(`
+	UPDATE people SET extras = jsonb_set(extras, '{wanted, 0}', '"paid"' , to_jsonb(true), true) 
+	WHERE owner_pub_key = '` + owner_key + "'")
+
+	return true
 }
 
 func GetLeaderData(arr []LeaderData, key string) (int, int) {

@@ -8,6 +8,7 @@ require (
 	github.com/btcsuite/btcd v0.23.3 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1
+	github.com/dariubs/gorm-jsonb v0.1.5 // indirect
 	github.com/fiatjaf/go-lnurl v1.12.1
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
