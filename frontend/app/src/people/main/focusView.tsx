@@ -231,14 +231,14 @@ function FocusedView(props: FocusViewProps) {
       const requestData =
         config.name === 'about' || config.name === 'wanted'
           ? {
-            ...newBody,
-            alert: undefined,
-            new_ticket_time: unixTimestamp,
-            extras: {
-              ...newBody?.extras,
-              alert: newBody.alert
+              ...newBody,
+              alert: undefined,
+              new_ticket_time: unixTimestamp,
+              extras: {
+                ...newBody?.extras,
+                alert: newBody.alert
+              }
             }
-          }
           : newBody;
 
       await main.saveProfile(requestData);
@@ -248,7 +248,8 @@ function FocusedView(props: FocusViewProps) {
     }
     if (props?.onSuccess) props.onSuccess();
     setLoading(false);
-    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties) props?.ReCallBounties();
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties)
+      props?.ReCallBounties();
   }
 
   const initialValues: any = {};
@@ -361,8 +362,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />
@@ -500,7 +501,7 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: '#5a606c',
-  trackBackgroundColor: 'rgba(0,0,0,0)'
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
 `;

@@ -7,12 +7,18 @@ export interface BountiesDescriptionProps {
   isPaid: boolean;
   title: string;
   style?: React.CSSProperties;
+  owner_alias: string;
+  widget?: any;
+  id: number;
+  owner_pubkey: string;
+  img: string;
+  created: number;
 }
 
 export interface BountiesPriceProps {
-  sessionLength: boolean;
+  sessionLength?: string;
   priceMin: number;
-  price: number;
+  price: Number;
   style?: React.CSSProperties;
   priceMax?: number;
 }
