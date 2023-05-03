@@ -39,7 +39,16 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
       <BountyDescriptionContainer style={{ ...props.style }}>
         <Header>
           <div className="NameContainer">
-            <NameTag {...props} iconSize={32} isPaid={props?.isPaid} />
+            <NameTag
+              {...props}
+              iconSize={32}
+              owner_pubkey={props.owner_pubkey}
+              img={props.img}
+              id={props.id}
+              widget={props.widget}
+              owner_alias={props.owner_alias}
+              isPaid={props?.isPaid}
+            />
           </div>
         </Header>
         <Description isPaid={props?.isPaid} color={color}>
