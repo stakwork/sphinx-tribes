@@ -517,6 +517,7 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var invoiceState bool
+	var bountyPaid bool
 
 	for _, v := range invoiceRes.Invoices {
 		if v.Payment_request == payment_request {
@@ -596,6 +597,8 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 				db.DB.UpdatePerson(p.ID, map[string]interface{}{
 					"extras": b,
 				})
+
+				bountyPaid = true
 			}
 		} else {
 			// Unmarshal result
@@ -614,6 +617,7 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 
 	invoiceResult["status"] = invoiceData.Status
 	invoiceResult["payment_request"] = invoiceData.Payment_request
+	invoiceResult["bounty_paid"] = bountyPaid
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceResult)

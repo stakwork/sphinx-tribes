@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   AssigneeProfile,
   Creator,
@@ -36,6 +36,7 @@ import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
 import moment from 'moment';
 import Invoice from './invoice';
+import { boolean } from 'yup';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -91,7 +92,12 @@ function MobileView(props: CodingBountiesProps) {
 
   const { ui, main } = useStores();
   const [pollCount, setPollCount] = useState(0);
-  const [dataStatus, setDataStatus] = useState<boolean>(false);
+  const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean, bountyPaid: boolean }>({
+    invoiceStatus: false,
+    bountyPaid: false
+  });
+
+  const invoicePaid = paid || invoiceData.bountyPaid ? true : false;
 
   async function getLnInvoice() {
     await main.getLnInvoice(props?.price || 0, '');
@@ -108,7 +114,7 @@ function MobileView(props: CodingBountiesProps) {
         created
       );
 
-      setDataStatus(data);
+      setInvoiceData(data);
 
       setPollCount(count);
 
@@ -117,8 +123,7 @@ function MobileView(props: CodingBountiesProps) {
         setPollCount(count + 1);
       }, 2000);
 
-      if (count >= 29 || data) {
-        // console.log("Data ====", data);
+      if (count >= 29 || data.invoiceStatus) {
         clearTimeout(pollTimeout);
         setPollCount(0);
       }
@@ -139,7 +144,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             >
               <>
-                {paid && (
+                {invoicePaid && (
                   <Img
                     src={'/static/paid_ribbon.svg'}
                     style={{
@@ -152,7 +157,7 @@ function MobileView(props: CodingBountiesProps) {
                     }}
                   />
                 )}
-                {paid && (
+                {invoicePaid && (
                   <>
                     <PaidStatusPopover
                       color={color}
@@ -208,7 +213,7 @@ function MobileView(props: CodingBountiesProps) {
                   </>
                 )}
 
-                <CreatorDescription paid={paid} color={color}>
+                <CreatorDescription paid={invoicePaid.toString()} color={color}>
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
@@ -287,12 +292,12 @@ function MobileView(props: CodingBountiesProps) {
                       <div className="BountyProfileOuterContainerCreatorView">
                         <BountyProfileView
                           assignee={!assignedPerson ? assignee : assignedPerson}
-                          status={paid ? 'completed' : 'assigned'}
+                          status={invoicePaid ? 'completed' : 'assigned'}
                           canViewProfile={false}
                           statusStyle={{
                             width: '66px',
                             height: '16px',
-                            background: paid ? color.statusCompleted : color.statusAssigned
+                            background: invoicePaid ? color.statusCompleted : color.statusAssigned
                           }}
                           UserProfileContainerStyle={{
                             height: 48,
@@ -319,7 +324,7 @@ function MobileView(props: CodingBountiesProps) {
                             marginLeft: '12px'
                           }}
                         />
-                        {!paid && (
+                        {!invoicePaid && (
                           <div
                             className="AssigneeCloseButtonContainer"
                             onClick={() => {
@@ -402,7 +407,7 @@ function MobileView(props: CodingBountiesProps) {
                     />
                   </div>
                   <BottomButtonContainer>
-                    {paid ? (
+                    {invoicePaid ? (
                       <IconButton
                         width={220}
                         height={48}
@@ -425,7 +430,7 @@ function MobileView(props: CodingBountiesProps) {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setExtrasPropertyAndSave('paid', !paid);
+                          setExtrasPropertyAndSave('paid', !invoicePaid);
                           setIsModalSideButton(true);
                         }}
                       />
@@ -647,7 +652,7 @@ function MobileView(props: CodingBountiesProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     setExtrasPropertyAndSaveMultiple('paid', {
-                      paid: !paid,
+                      paid: !invoicePaid,
                       price: bountyPrice,
                       award: awardDetails.name
                     });
@@ -706,7 +711,7 @@ function MobileView(props: CodingBountiesProps) {
          * normal user view
          */
         <NormalUser>
-          {paid && (
+          {invoicePaid && (
             <Img
               src={'/static/paid_ribbon.svg'}
               style={{
@@ -719,7 +724,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             />
           )}
-          <CreatorDescription paid={paid} color={color}>
+          <CreatorDescription paid={invoicePaid.toString()} color={color}>
             <div className="DescriptionUpperContainerNormalView">
               <div>{nametag}</div>
               <TitleBox color={color}>{titleString}</TitleBox>
@@ -751,7 +756,7 @@ function MobileView(props: CodingBountiesProps) {
           </CreatorDescription>
 
           <AssigneeProfile color={color}>
-            {paid ? (
+            {invoicePaid ? (
               <>
                 <BountyProfileView
                   assignee={assignee}
@@ -877,12 +882,12 @@ function MobileView(props: CodingBountiesProps) {
                         <Invoice
                           startDate={new Date(moment().add(1, "minutes").format().toString())}
                           count={pollCount}
-                          dataStatus={dataStatus}
+                          dataStatus={invoiceData.invoiceStatus}
                         />
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus && { ...person }?.owner_alias === ui.meInfo?.owner_alias
+                  {!main.lnInvoiceStatus
                     ?
                     (
                       <>

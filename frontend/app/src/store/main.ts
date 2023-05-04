@@ -1034,7 +1034,7 @@ export class MainStore {
     owner_key: string, 
     amount: string,
     created?: number
-    ): Promise<boolean> {
+    ): Promise<{invoiceStatus:  boolean, bountyPaid: boolean}> {
     try {
       const data = await api.get(`invoices/${payment_req}/${pubkey}/${owner_key}/${amount}/${created}`, {
       'Content-Type': 'application/json' });
@@ -1042,9 +1042,9 @@ export class MainStore {
       if (data.status) {
         this.setLnInvoiceStatus(data.status);
       }
-      return data.status;
+      return {invoiceStatus: data.status, bountyPaid: data.bounty_paid} ;
     } catch (e) {
-      return false;
+      return {invoiceStatus: false, bountyPaid: false};
     }
   }
 }
