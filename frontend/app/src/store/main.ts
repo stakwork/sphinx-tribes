@@ -1032,9 +1032,11 @@ export class MainStore {
     payment_req: string, 
     pubkey: string, 
     owner_key: string, 
-    amount: string): Promise<boolean> {
+    amount: string,
+    created?: number
+    ): Promise<boolean> {
     try {
-      const data = await api.get(`invoices/${payment_req}/${pubkey}/${owner_key}/${amount}`, {
+      const data = await api.get(`invoices/${payment_req}/${pubkey}/${owner_key}/${amount}/${created}`, {
       'Content-Type': 'application/json' });
 
       if (data.status) {

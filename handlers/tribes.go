@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -480,6 +482,7 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	pub_key := chi.URLParam(r, "user_pub_key")
 	owner_key := chi.URLParam(r, "owner_key")
 	amount := chi.URLParam(r, "amount")
+	date := chi.URLParam(r, "created")
 
 	if payment_request == "" {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -566,19 +569,29 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 					continue // next wanted
 				}
 
-				w["paid"] = true
+				created, ok3 := w["created"].(float64)
+				createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
+				createdString := createdArr[0]
+				createdInt, _ := strconv.ParseInt(createdString, 10, 32)
+
+				dateInt, _ := strconv.ParseInt(date, 10, 32)
+
+				if !ok3 {
+					continue
+				}
+
+				if createdInt == dateInt {
+					w["paid"] = true
+				}
 			}
 
 			p.Extras["wanted"] = wanteds
-
 			b := new(bytes.Buffer)
 			decodeErr := json.NewEncoder(b).Encode(p.Extras)
 
 			if decodeErr != nil {
 				log.Printf("Could not encode extras json data")
 			} else {
-				fmt.Println("JSON DATA ==", b)
-
 				// update LastLogin for user
 				db.DB.UpdatePerson(p.ID, map[string]interface{}{
 					"extras": b,

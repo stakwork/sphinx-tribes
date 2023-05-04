@@ -85,6 +85,7 @@ function MobileView(props: CodingBountiesProps) {
     setBountyPrice,
     owner_idURL,
     createdURL,
+    created
   } = props;
   const color = colors['light'];
 
@@ -99,12 +100,12 @@ function MobileView(props: CodingBountiesProps) {
 
   async function pollLnInvoice(count: number) {
     if (main.lnInvoice) {
-      console.log("Invoice ====", main.lnInvoice)
       const data = await main.getLnInvoiceStatus(
         main.lnInvoice,
         assignee.owner_pubkey,
         person.owner_pubkey,
-        props?.price?.toString() || "0"
+        props?.price?.toString() || "0",
+        created
       );
 
       setDataStatus(data);
@@ -881,7 +882,7 @@ function MobileView(props: CodingBountiesProps) {
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus
+                  {!main.lnInvoiceStatus && { ...person }?.owner_alias === ui.meInfo?.owner_alias
                     ?
                     (
                       <>

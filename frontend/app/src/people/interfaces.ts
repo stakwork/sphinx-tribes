@@ -229,6 +229,7 @@ export interface CodingBountiesProps {
     description: any;
     ticketUrl: string;
     assignee: Person;
+    created?: number;
     titleString: string;
     nametag: JSX.Element;
     labels?: {[key: string]: any};
