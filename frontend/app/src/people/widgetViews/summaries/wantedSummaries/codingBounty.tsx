@@ -887,7 +887,7 @@ function MobileView(props: CodingBountiesProps) {
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus
+                  {!main.lnInvoiceStatus && { ...person }?.owner_alias === ui.meInfo?.owner_alias
                     ?
                     (
                       <>
