@@ -557,6 +557,33 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 
 			// Todo update wanted paid status
 			db.DB.SetBountyToPaid(owner_key)
+			var p = db.DB.GetPersonByPubkey(owner_key)
+			wanteds, _ := p.Extras["wanted"].([]interface{})
+
+			for _, wanted := range wanteds {
+				w, ok2 := wanted.(map[string]interface{})
+				if !ok2 {
+					continue // next wanted
+				}
+
+				w["paid"] = true
+			}
+
+			p.Extras["wanted"] = wanteds
+
+			b := new(bytes.Buffer)
+			decodeErr := json.NewEncoder(b).Encode(p.Extras)
+
+			if decodeErr != nil {
+				log.Printf("Could not encode extras json data")
+			} else {
+				fmt.Println("JSON DATA ==", b)
+
+				// update LastLogin for user
+				db.DB.UpdatePerson(p.ID, map[string]interface{}{
+					"extras": b,
+				})
+			}
 		} else {
 			// Unmarshal result
 			keysendError := db.KeysendError{}

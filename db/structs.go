@@ -6,7 +6,6 @@ import (
 	"errors"
 	"time"
 
-	gormjsonb "github.com/dariubs/gorm-jsonb"
 	"github.com/lib/pq"
 )
 
@@ -295,7 +294,7 @@ func (ConnectionCodesShort) TableName() string {
 }
 
 // PropertyMap ...
-type PropertyMap gormjsonb.JSONB
+type PropertyMap map[string]interface{}
 
 // Value ...
 func (p PropertyMap) Value() (driver.Value, error) {
