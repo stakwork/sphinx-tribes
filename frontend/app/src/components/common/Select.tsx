@@ -2,14 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiSuperSelect, EuiText } from '@elastic/eui';
 import { colors } from '../../config/colors';
+import { SelProps } from 'components/interfaces';
 
-export default function Select(props: any) {
+export default function Select(props: SelProps) {
   const color = colors['light'];
   const { options, onChange, value, style, selectStyle, handleActive, testId } = props;
 
-  const opts =
-    options.map((o) => {
-      return {
+  const opts = options
+    ? options.map((o) => ({
         value: o.value,
         inputDisplay: o.label,
         dropdownDisplay: (
@@ -43,8 +43,8 @@ export default function Select(props: any) {
             )}
           </>
         )
-      };
-    }) || [];
+      }))
+    : [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
@@ -55,16 +55,16 @@ export default function Select(props: any) {
           ...selectStyle
         }}
         onFocus={() => {
-          handleActive(true);
+          if (handleActive) handleActive(true);
         }}
         onBlur={() => {
-          handleActive(false);
+          if (handleActive) handleActive(false);
         }}
         options={opts}
         valueOfSelected={value}
         onChange={(value) => {
           onChange(value);
-          handleActive(false);
+          if (handleActive) handleActive(false);
         }}
         itemLayoutAlign="top"
       />

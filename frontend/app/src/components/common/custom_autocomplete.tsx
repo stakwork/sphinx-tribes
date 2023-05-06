@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import ImageButton from './Image_button';
+import { AutoCompleteProps } from 'components/interfaces';
 
-const AutoComplete = (props) => {
+const AutoComplete = (props: AutoCompleteProps) => {
   const color = colors['light'];
   const [searchValue, setSearchValue] = useState<string>('');
   const [peopleData, setPeopleData] = useState<any>(props.peopleList);
@@ -36,33 +37,31 @@ const AutoComplete = (props) => {
         }}
       />
       <div className="PeopleList">
-        {peopleData?.slice(0, 5)?.map((value, index) => {
-          return (
-            <div className="People" key={index}>
-              <div className="PeopleDetailContainer">
-                <div className="ImageContainer">
-                  <img
-                    src={value.img || '/static/person_placeholder.png'}
-                    alt={'user-image'}
-                    height={'100%'}
-                    width={'100%'}
-                  />
-                </div>
-                <EuiText className="PeopleName">{value.owner_alias}</EuiText>
+        {peopleData?.slice(0, 5)?.map((value, index) => (
+          <div className="People" key={index}>
+            <div className="PeopleDetailContainer">
+              <div className="ImageContainer">
+                <img
+                  src={value.img || '/static/person_placeholder.png'}
+                  alt={'user-image'}
+                  height={'100%'}
+                  width={'100%'}
+                />
               </div>
-              <ImageButton
-                buttonText={'Assign'}
-                ButtonContainerStyle={{
-                  width: '74.58px',
-                  height: '32px'
-                }}
-                buttonAction={() => {
-                  props?.handleAssigneeDetails(value);
-                }}
-              />
+              <EuiText className="PeopleName">{value.owner_alias}</EuiText>
             </div>
-          );
-        })}
+            <ImageButton
+              buttonText={'Assign'}
+              ButtonContainerStyle={{
+                width: '74.58px',
+                height: '32px'
+              }}
+              buttonAction={() => {
+                props?.handleAssigneeDetails(value);
+              }}
+            />
+          </div>
+        ))}
       </div>
     </SearchOuterContainer>
   );

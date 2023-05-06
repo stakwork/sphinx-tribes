@@ -5,8 +5,9 @@ import { useIsMobile } from '../../hooks';
 import { Divider, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
+import { OfferViewProps } from 'people/interfaces';
 
-export default function OfferView(props: any) {
+export default function OfferView(props: OfferViewProps) {
   const { gallery, title, description, price, person, created, type } = props;
   const isMobile = useIsMobile();
 

@@ -5,6 +5,7 @@ import { create } from 'mobx-persist';
 import { appEnv } from '../config/env';
 import { modalsVisibilityStore } from './modals';
 import { configure } from 'mobx';
+import { leaderboardStore } from 'leaderboard';
 
 (() => {
   if (appEnv.isTests) {
@@ -21,20 +22,20 @@ configure({});
 const Context = React.createContext({
   ui: uiStore,
   main: mainStore,
-  modals: modalsVisibilityStore
+  modals: modalsVisibilityStore,
+  leaderboard: leaderboardStore
 });
 
-export const WithStores = ({ children }) => {
-  return (
-    <Context.Provider
-      value={{
-        ui: uiStore,
-        main: mainStore,
-        modals: modalsVisibilityStore
-      }}
-    >
-      {children}
-    </Context.Provider>
-  );
-};
+export const WithStores = ({ children }) => (
+  <Context.Provider
+    value={{
+      ui: uiStore,
+      main: mainStore,
+      modals: modalsVisibilityStore,
+      leaderboard: leaderboardStore
+    }}
+  >
+    {children}
+  </Context.Provider>
+);
 export const useStores = () => React.useContext(Context);

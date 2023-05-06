@@ -11,10 +11,11 @@ import {
 } from '../../../../people/utils/language_label_style';
 import { SvgMask } from '../../../../people/utils/svgMask';
 import ImageButton from '../../../common/Image_button';
+import { InvitePeopleSearchProps } from './interfaces';
 
 const codingLanguages = GetValue(coding_languages);
 
-const InvitePeopleSearch = (props) => {
+const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const color = colors['light'];
   const [searchValue, setSearchValue] = useState<string>('');
   const [peopleData, setPeopleData] = useState<any>(props?.peopleList);
@@ -217,36 +218,36 @@ const InvitePeopleSearch = (props) => {
 
       <div className="OuterContainer">
         <div className="PeopleList">
-          {peopleData?.slice(0, initialPeopleCount)?.map((value) => {
-            return (
-              <div className="People" key={value.id}>
-                <div className="PeopleDetailContainer">
-                  <div className="ImageContainer">
-                    <img
-                      src={value.img || '/static/person_placeholder.png'}
-                      alt={'user-image'}
-                      height={'100%'}
-                      width={'100%'}
-                      style={{
-                        opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
-                      }}
-                    />
-                  </div>
-                  <EuiText
-                    className="PeopleName"
+          {peopleData?.slice(0, initialPeopleCount)?.map((value) => (
+            <div className="People" key={value.id}>
+              <div className="PeopleDetailContainer">
+                <div className="ImageContainer">
+                  <img
+                    src={value.img || '/static/person_placeholder.png'}
+                    alt={'user-image'}
+                    height={'100%'}
+                    width={'100%'}
                     style={{
                       opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
                     }}
-                  >
-                    {value.owner_alias}
-                  </EuiText>
+                  />
                 </div>
-                {inviteNameId === value?.id ? (
-                  <InvitedButton
-                    color={color}
-                    onClick={(e) => {
-                      handler('', value.owner_alias);
-                      setInviteNameId(0);
+                <EuiText
+                  className="PeopleName"
+                  style={{
+                    opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
+                  }}
+                >
+                  {value.owner_alias}
+                </EuiText>
+              </div>
+              {inviteNameId === value?.id ? (
+                <InvitedButton
+                  color={color}
+                  onClick={(e) => {
+                    handler('', value.owner_alias);
+                    setInviteNameId(0);
+                    if (props?.handleChange)
                       props?.handleChange({
                         owner_alias: '',
                         owner_pubkey: '',
@@ -254,30 +255,29 @@ const InvitePeopleSearch = (props) => {
                         value: '',
                         label: ''
                       });
-                      if (searchValue === '') {
-                        setSearchValue('');
-                      }
-                      props.setAssigneefunction('');
-                    }}
-                  >
-                    <EuiText className="nextText">
-                      {props.newDesign ? 'Unassign' : 'Invited'}
-                    </EuiText>
-                  </InvitedButton>
-                ) : (
-                  <ImageButton
-                    buttonText={props.newDesign ? 'Assign' : 'Invite'}
-                    ButtonContainerStyle={{
-                      width: '86px',
-                      height: '30px',
-                      background: `${color.grayish.G600}`
-                    }}
-                    buttonAction={(e) => {
-                      if (props.isProvidingHandler) {
-                        props.handleAssigneeDetails(value);
-                      } else {
-                        handler('', value.owner_alias);
-                        setInviteNameId(value.id);
+                    if (searchValue === '') {
+                      setSearchValue('');
+                    }
+                    if (props.setAssigneefunction) props.setAssigneefunction('');
+                  }}
+                >
+                  <EuiText className="nextText">{props.newDesign ? 'Unassign' : 'Invited'}</EuiText>
+                </InvitedButton>
+              ) : (
+                <ImageButton
+                  buttonText={props.newDesign ? 'Assign' : 'Invite'}
+                  ButtonContainerStyle={{
+                    width: '86px',
+                    height: '30px',
+                    background: `${color.grayish.G600}`
+                  }}
+                  buttonAction={(e) => {
+                    if (props.isProvidingHandler) {
+                      props.handleAssigneeDetails(value);
+                    } else {
+                      handler('', value.owner_alias);
+                      setInviteNameId(value.id);
+                      if (props.handleChange)
                         props?.handleChange({
                           owner_alias: value.owner_alias,
                           owner_pubkey: value.owner_pubkey,
@@ -287,17 +287,16 @@ const InvitePeopleSearch = (props) => {
                             .toLowerCase()
                             .replace(' ', '')})`
                         });
-                        if (searchValue === '') {
-                          setSearchValue('');
-                        }
-                        props.setAssigneefunction(value.owner_alias);
+                      if (searchValue === '') {
+                        setSearchValue('');
                       }
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
+                      if (props.setAssigneefunction) props.setAssigneefunction(value.owner_alias);
+                    }
+                  }}
+                />
+              )}
+            </div>
+          ))}
           {peopleData && peopleData.length > initialPeopleCount && (
             <LoaderContainer ref={ref}>
               <EuiLoadingSpinner size="l" />

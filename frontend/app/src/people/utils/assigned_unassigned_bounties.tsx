@@ -10,8 +10,9 @@ import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
+import { BountiesProps } from 'people/interfaces';
 
-const Bounties = (props) => {
+const Bounties = (props: BountiesProps) => {
   const {
     assignee,
     price,
@@ -21,7 +22,9 @@ const Bounties = (props) => {
     codingLanguage,
     title,
     person,
-    onPanelClick
+    onPanelClick,
+    widget,
+    created
   } = props;
 
   const color = colors['light'];
@@ -35,47 +38,52 @@ const Bounties = (props) => {
   const { ui } = useStores();
   return (
     <>
-      {{ ...assignee }.owner_alias ? (
-        <BountyContainer
-          onClick={onPanelClick}
-          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
-          color={color}
-          style={{
-            backgroundPositionY: '-2px'
-          }}
-        >
-          <div className="BountyDescriptionContainer">
-            <BountyDescription
-              {...person}
-              {...props}
-              title={title}
-              codingLanguage={codingLanguage}
-            />
-          </div>
-          <div className="BountyPriceContainer">
-            <BountyPrice
-              priceMin={priceMin}
-              priceMax={priceMax}
-              price={price}
-              sessionLength={sessionLength}
-              style={{
-                minWidth: '213px',
-                maxWidth: '213px',
-                borderRight: `1px solid ${color.primaryColor.P200}`
-              }}
-            />
-            <BountyProfileView
-              assignee={assignee}
-              status={'ASSIGNED'}
-              canViewProfile={true}
-              statusStyle={{
-                width: '55px',
-                height: '16px',
-                background: color.statusAssigned
-              }}
-            />
-          </div>
-        </BountyContainer>
+      {assignee ? (
+        { ...assignee }.owner_alias ? (
+          <BountyContainer
+            onClick={onPanelClick}
+            assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
+            color={color}
+            style={{
+              backgroundPositionY: '-2px'
+            }}
+          >
+            <div className="BountyDescriptionContainer">
+              <BountyDescription
+                {...person}
+                {...props}
+                title={title}
+                codingLanguage={codingLanguage}
+                created={created}
+              />
+            </div>
+            <div className="BountyPriceContainer">
+              <BountyPrice
+                priceMin={priceMin}
+                priceMax={priceMax}
+                price={price}
+                sessionLength={sessionLength}
+                style={{
+                  minWidth: '213px',
+                  maxWidth: '213px',
+                  borderRight: `1px solid ${color.primaryColor.P200}`
+                }}
+              />
+              <BountyProfileView
+                assignee={assignee}
+                status={'ASSIGNED'}
+                canViewProfile={true}
+                statusStyle={{
+                  width: '55px',
+                  height: '16px',
+                  background: color.statusAssigned
+                }}
+              />
+            </div>
+          </BountyContainer>
+        ) : (
+          <></>
+        )
       ) : (
         <BountyContainer color={color}>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
@@ -85,6 +93,8 @@ const Bounties = (props) => {
                 {...props}
                 title={title}
                 codingLanguage={codingLanguage}
+                widget={widget}
+                created={created}
               />
               <BountyPrice
                 priceMin={priceMin}

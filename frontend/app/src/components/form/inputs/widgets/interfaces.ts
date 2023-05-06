@@ -42,7 +42,7 @@ export interface Wanted {
   gallery?: [string];
   description: string;
   url?: string;
-  created?: number;
+  created: number;
   show?: boolean;
 }
 
@@ -71,4 +71,49 @@ export interface Extras {
   wanted?: Wanted[];
   supportme?: SupportMe;
   liquid?: SingleValueExtra[];
+  github?: [{ [key: string]: string }];
+  coding_languages?: [{ [key: string]: string }];
+  tribes?: [{ [key: string]: string }];
+  repos?: [{ [key: string]: string }];
+  lightning?: [{ [key: string]: string }];
+  amboss?: [{ [key: string]: string }];
+}
+
+export interface FocusedWidgetProps {
+  name: string;
+  values: any[];
+  errors: any[];
+  initialValues: any;
+  setFieldTouched: (string, boolean) => void;
+  setFieldValue: (string, any) => void;
+  item: any;
+  setShowFocused: (boolean) => void;
+  setDisableFormButtons: (boolean) => void;
+}
+
+export interface InvitePeopleSearchProps {
+  peopleList: any;
+  handleChange?: (any) => void;
+  setAssigneefunction?: (string) => void;
+  newDesign?: boolean;
+  isProvidingHandler: boolean;
+  handleAssigneeDetails: (any) => void;
+}
+
+export interface WidgetProps {
+  values: any;
+  name: string;
+  parentName: string;
+  setFieldValue: (string, any) => void;
+  setSelected: (any) => void;
+  label: string;
+  single: string;
+  icon?: string;
+}
+
+export interface WidgetListProps {
+  setSelected: (any, i: number) => void;
+  deleteItem: (any, i: number) => void;
+  schema: any;
+  values: { [key: string]: any };
 }

@@ -34,9 +34,10 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     };
   }, [location.search]);
 
-  const publicFocusPerson = useMemo(() => {
-    return main.people.find(({ owner_pubkey }) => owner_pubkey === search.owner_id);
-  }, [main.people, search.owner_id]);
+  const publicFocusPerson = useMemo(
+    () => main.people.find(({ owner_pubkey }) => owner_pubkey === search.owner_id),
+    [main.people, search.owner_id]
+  );
 
   useEffect(() => {
     const activeIndex = (main.peopleWanteds ?? []).findIndex(findPerson(search));
@@ -45,7 +46,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       (f) => f.created === connectPerson?.body?.created
     );
 
-    setPublicFocusIndex(itemIndex);
+    setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
 
     setConnectPersonBody(connectPerson?.person);

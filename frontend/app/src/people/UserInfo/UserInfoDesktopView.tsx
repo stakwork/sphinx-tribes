@@ -5,8 +5,9 @@ import { useUserInfo } from './hooks';
 import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
 import ConnectCard from 'people/utils/connectCard';
 import { observer } from 'mobx-react-lite';
+import { UserInfoProps } from 'people/interfaces';
 
-export const UserInfoDesktopView = observer(({ setShowSupport }: any) => {
+export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) => {
   const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();
   const [showQR, setShowQR] = useState(false);
   return (
@@ -63,7 +64,7 @@ export const UserInfoDesktopView = observer(({ setShowSupport }: any) => {
               padding: 0,
               background: '#ffffff',
               border: '1px solid #D0D5D8',
-              boxSizing: 'borderBox',
+              boxSizing: 'border-box',
               borderRadius: 4
             }}
             icon={'qr_code_2'}

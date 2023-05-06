@@ -14,10 +14,11 @@ import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
 import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
+import { RenderWidgetsProps } from 'people/interfaces';
 
 export default observer(RenderWidgets);
 
-function RenderWidgets({ widget }) {
+function RenderWidgets({ widget }: RenderWidgetsProps) {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
   const personId = ui.selectedPerson;

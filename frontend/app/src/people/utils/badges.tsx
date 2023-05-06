@@ -7,10 +7,11 @@ import { Modal, Button, Divider, TextInput } from '../../components/common';
 //import { ClaimOnLiquid } from '../../store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { observer } from 'mobx-react-lite';
+import { BadgesProps } from 'people/interfaces';
 
 export default observer(Badges);
 
-function Badges(props) {
+function Badges(props: BadgesProps) {
   const { main, ui } = useStores();
   const { badgeList, meInfo } = ui || {};
 
@@ -274,70 +275,68 @@ function Badges(props) {
             style={{ marginBottom: 20 }}
           />
 
-          {selectedBadge.deck?.map((badge, i) => {
-            return (
-              <BWrap
-                key={`${i}badges`}
-                isMobile={isMobile}
-                style={{ height: 'auto', minHeight: 'auto', cursor: 'default' }}
+          {selectedBadge.deck?.map((badge, i) => (
+            <BWrap
+              key={`${i}badges`}
+              isMobile={isMobile}
+              style={{ height: 'auto', minHeight: 'auto', cursor: 'default' }}
+            >
+              <SmallImg src={`${selectedBadge?.icon}`} isMobile={isMobile} />
+              <div
+                style={{
+                  width: '100%',
+                  minWidth: 160,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center'
+                }}
               >
-                <SmallImg src={`${selectedBadge?.icon}`} isMobile={isMobile} />
-                <div
-                  style={{
-                    width: '100%',
-                    minWidth: 160,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <T isMobile={isMobile}>
-                    {selectedBadge?.name}{' '}
-                    {selectedBadge?.balance > 1 && `(${selectedBadge?.balance})`}
-                  </T>
-                  {selectedBadge?.counter && (
-                    <D>
-                      <Counter>
-                        {selectedBadge?.counter} / {selectedBadge?.amount}
-                      </Counter>
-                    </D>
-                  )}
+                <T isMobile={isMobile}>
+                  {selectedBadge?.name}{' '}
+                  {selectedBadge?.balance > 1 && `(${selectedBadge?.balance})`}
+                </T>
+                {selectedBadge?.counter && (
+                  <D>
+                    <Counter>
+                      {selectedBadge?.counter} / {selectedBadge?.amount}
+                    </Counter>
+                  </D>
+                )}
 
-                  <div style={{ marginTop: 20, width: '100%' }}>
-                    {thisIsMe ? (
-                      <div
+                <div style={{ marginTop: 20, width: '100%' }}>
+                  {thisIsMe ? (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        width: '100%',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <Divider />
+                      <Button
                         style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          width: '100%',
-                          textAlign: 'center'
+                          margin: 0,
+                          marginTop: 2,
+                          padding: 0,
+                          minHeight: 40,
+                          border: 'none'
                         }}
-                      >
-                        <Divider />
-                        <Button
-                          style={{
-                            margin: 0,
-                            marginTop: 2,
-                            padding: 0,
-                            minHeight: 40,
-                            border: 'none'
-                          }}
-                          color="link"
-                          text="Claim on Liquid"
-                          onClick={() => setBadgeToPush(badge)}
-                        />
-                      </div>
-                    ) : (
-                      <Status>
-                        <StatusText>{'Off-chain'}</StatusText>
-                      </Status>
-                    )}
-                  </div>
+                        color="link"
+                        text="Claim on Liquid"
+                        onClick={() => setBadgeToPush(badge)}
+                      />
+                    </div>
+                  ) : (
+                    <Status>
+                      <StatusText>{'Off-chain'}</StatusText>
+                    </Status>
+                  )}
                 </div>
-              </BWrap>
-            );
-          })}
+              </div>
+            </BWrap>
+          ))}
         </div>
       ) : (
         topLevelBadges
@@ -387,7 +386,7 @@ function Badges(props) {
   );
 }
 
-function BadgeStatus(props: any) {
+function BadgeStatus(props: BadgesProps) {
   const { txid } = props;
 
   return (
@@ -420,7 +419,7 @@ interface BProps {
   readonly isMobile?: boolean;
 }
 
-function Flag(props) {
+function Flag(props: BadgesProps) {
   return (
     <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_3736_56289)">

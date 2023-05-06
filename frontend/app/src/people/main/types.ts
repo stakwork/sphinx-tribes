@@ -7,5 +7,7 @@ export type Widget =
   | 'about'
   | 'twitter'
   | 'supportme'
-  | 'blog';
+  | 'blog'
+  | 'badges'
+  | 'usertickets';
 export type PeopleBodyProps = { selectedWidget: Widget };

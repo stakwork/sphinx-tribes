@@ -10,11 +10,12 @@ import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
+import { FocusViewProps } from 'people/interfaces';
 
 // this is where we see others posts (etc) and edit our own
 export default observer(FocusedView);
 
-function FocusedView(props: any) {
+function FocusedView(props: FocusViewProps) {
   const {
     goBack,
     config,
@@ -61,13 +62,15 @@ function FocusedView(props: any) {
   }
 
   // get self on unmount if tor user
-  useEffect(() => {
-    return function cleanup() {
-      if (isTorSave) {
-        main.getSelf(null);
-      }
-    };
-  }, [main, isTorSave]);
+  useEffect(
+    () =>
+      function cleanup() {
+        if (isTorSave) {
+          main.getSelf(null);
+        }
+      },
+    [main, isTorSave]
+  );
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -156,12 +159,13 @@ function FocusedView(props: any) {
       await main.saveProfile(body);
       await main.getPeople();
       closeModal();
-      props?.deleteExtraFunction();
+
+      if (props?.deleteExtraFunction) props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
     setDeleting(false);
-    if (!isNotHttps(ui?.meInfo?.url)) props.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
@@ -242,9 +246,10 @@ function FocusedView(props: any) {
     } catch (e) {
       console.log('e', e);
     }
-    props.onSuccess();
+    if (props?.onSuccess) props.onSuccess();
     setLoading(false);
-    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url)) props?.ReCallBounties();
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties)
+      props?.ReCallBounties();
   }
 
   const initialValues: any = {};
@@ -263,9 +268,7 @@ function FocusedView(props: any) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        personInfo.extras?.wanted?.map((value) => {
-          return moment(value?.estimated_completion_date);
-        }) || '';
+        personInfo.extras?.wanted?.map((value) => moment(value?.estimated_completion_date)) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -322,7 +325,7 @@ function FocusedView(props: any) {
     if (main.personAssignedWanteds.length) {
       return main.peopleWanteds[selectedIndex].body;
     } else if (person?.extras && main.peopleWanteds) {
-      return person.extras[config?.name][selectedIndex];
+      return main.peopleWanteds[selectedIndex].body;
     }
 
     return null;

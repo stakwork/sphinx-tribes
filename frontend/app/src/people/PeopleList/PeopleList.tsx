@@ -15,6 +15,7 @@ export const PeopleList = observer(() => {
   const { peoplePageNumber } = ui || {};
   const history = useHistory();
   const personId = ui.selectedPerson;
+
   async function loadMorePeople(direction) {
     let newPage = peoplePageNumber + direction;
     if (newPage < 1) {

@@ -4,6 +4,7 @@ import { Button, IconButton } from '../../components/common';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { EuiText } from '@elastic/eui';
+import { LoomViewProps } from 'people/interfaces';
 
 const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';
 
@@ -11,7 +12,7 @@ const PUBLIC_APP_ID = 'ded90c8e-92ed-496d-bfe3-f742d7fa9785';
 
 const BUTTON_ID = 'loom-record-sdk-button';
 
-export default function LoomViewerRecorderNew(props) {
+export default function LoomViewerRecorderNew(props: LoomViewProps) {
   const { loomEmbedUrl, onChange, readOnly, style, setIsVideo } = props;
   const [videoUrl, setVideoUrl] = useState(loomEmbedUrl || '');
   const color = colors['light'];
@@ -39,7 +40,7 @@ export default function LoomViewerRecorderNew(props) {
 
       sdkButton.on('insert-click', async (video) => {
         setVideoUrl(video.embedUrl);
-        setIsVideo(true);
+        if (setIsVideo) setIsVideo(true);
         if (onChange) onChange(video.embedUrl);
       });
     }
@@ -98,7 +99,7 @@ export default function LoomViewerRecorderNew(props) {
             <RemoveButtonContainer
               onClick={() => {
                 setVideoUrl('');
-                setIsVideo('');
+                if (setIsVideo) setIsVideo('');
                 if (onChange) onChange('');
               }}
               color={color}

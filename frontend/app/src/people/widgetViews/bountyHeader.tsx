@@ -11,6 +11,9 @@ import { PostBounty } from './postBounty';
 import { filterCount } from '../utils/ExtraFunctions';
 import { GetValue, coding_languages, status } from '../utils/language_label_style';
 import { observer } from 'mobx-react-lite';
+import IconButton from 'components/common/icon_button';
+import { useHistory } from 'react-router-dom';
+import { BountyHeaderProps } from 'people/interfaces';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
@@ -22,7 +25,7 @@ const BountyHeader = ({
   onChangeLanguage,
   checkboxIdToSelectedMap,
   checkboxIdToSelectedMapLanguage
-}) => {
+}: BountyHeaderProps) => {
   const color = colors['light'];
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
@@ -31,6 +34,7 @@ const BountyHeader = ({
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [filterCountNumber, setFilterCountNumber] = useState<number>(0);
+  const history = useHistory();
 
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
@@ -82,6 +86,17 @@ const BountyHeader = ({
           <BountyHeaderDesk>
             <B>
               <PostBounty widget={selectedWidget} />
+              <IconButton
+                width={150}
+                height={isMobile ? 36 : 48}
+                text="Leaderboard"
+                onClick={() => {
+                  history.push('/leaderboard');
+                }}
+                style={{
+                  marginLeft: '10px'
+                }}
+              />
               <SearchBar
                 name="search"
                 type="search"
@@ -165,7 +180,7 @@ const BountyHeader = ({
                     />
                   </EuiPopOverCheckboxLeft>
                   <PopOverRightBox color={color}>
-                    <EuiText className="rightBoxHeading">Languages</EuiText>
+                    <EuiText className="rightBoxHeading">Tags</EuiText>
                     <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
                       <EuiCheckboxGroup
                         options={Coding_Languages}
@@ -190,29 +205,27 @@ const BountyHeader = ({
               </EuiText>
               <div className="ImageOuterContainer">
                 {peopleList &&
-                  peopleList?.slice(0, 3).map((val, index) => {
-                    return (
-                      <DevelopersImageContainer
-                        color={color}
-                        key={index}
+                  peopleList?.slice(0, 3).map((val, index) => (
+                    <DevelopersImageContainer
+                      color={color}
+                      key={index}
+                      style={{
+                        zIndex: 3 - index,
+                        marginLeft: index > 0 ? '-14px' : '',
+                        objectFit: 'cover'
+                      }}
+                    >
+                      <img
+                        height={'23px'}
+                        width={'23px'}
+                        src={val?.img || '/static/person_placeholder.png'}
+                        alt={''}
                         style={{
-                          zIndex: 3 - index,
-                          marginLeft: index > 0 ? '-14px' : '',
-                          objectFit: 'cover'
+                          borderRadius: '50%'
                         }}
-                      >
-                        <img
-                          height={'23px'}
-                          width={'23px'}
-                          src={val?.img || '/static/person_placeholder.png'}
-                          alt={''}
-                          style={{
-                            borderRadius: '50%'
-                          }}
-                        />
-                      </DevelopersImageContainer>
-                    );
-                  })}
+                      />
+                    </DevelopersImageContainer>
+                  ))}
               </div>
               <EuiText
                 style={{
@@ -311,7 +324,7 @@ const BountyHeader = ({
                   />
                 </EuiPopOverCheckboxLeft>
                 <PopOverRightBox color={color}>
-                  <EuiText className="rightBoxHeading">Languages</EuiText>
+                  <EuiText className="rightBoxHeading">Tags</EuiText>
                   <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
                     <EuiCheckboxGroup
                       options={Coding_Languages}
@@ -327,30 +340,40 @@ const BountyHeader = ({
           </LargeActionContainer>
           <ShortActionContainer>
             <PostBounty widget={selectedWidget} />
+            <IconButton
+              width={150}
+              height={isMobile ? 36 : 48}
+              text="Leaderboard"
+              onClick={() => {
+                history.push('/leaderboard');
+              }}
+              style={{
+                marginLeft: '10px',
+                marginRight: 'auto'
+              }}
+            />
             <DevelopersContainerMobile>
               {peopleList &&
-                peopleList?.slice(0, 3).map((val, index) => {
-                  return (
-                    <DevelopersImageContainer
-                      key={index}
-                      color={color}
+                peopleList?.slice(0, 3).map((val, index) => (
+                  <DevelopersImageContainer
+                    key={index}
+                    color={color}
+                    style={{
+                      zIndex: 3 - index,
+                      marginLeft: index > 0 ? '-14px' : ''
+                    }}
+                  >
+                    <img
+                      height={'20px'}
+                      width={'20px'}
+                      src={val?.img || '/static/person_placeholder.png'}
+                      alt={''}
                       style={{
-                        zIndex: 3 - index,
-                        marginLeft: index > 0 ? '-14px' : ''
+                        borderRadius: '50%'
                       }}
-                    >
-                      <img
-                        height={'20px'}
-                        width={'20px'}
-                        src={val?.img || '/static/person_placeholder.png'}
-                        alt={''}
-                        style={{
-                          borderRadius: '50%'
-                        }}
-                      />
-                    </DevelopersImageContainer>
-                  );
-                })}
+                    />
+                  </DevelopersImageContainer>
+                ))}
               <EuiText
                 style={{
                   fontSize: '14px',
@@ -532,7 +555,7 @@ const FilterCount = styled.div<styledProps>`
 
 const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   width: 147px;
-  height: 304px;
+  height: 312px;
   padding: 15px 18px;
   border-right: 1px solid ${(p) => p.color && p.color.grayish.G700};
   user-select: none;

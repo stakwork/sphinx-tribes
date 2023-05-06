@@ -2,9 +2,32 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
+import { IconButtonProps } from 'components/interfaces';
 
-export default function IconButton(props: any) {
-  const { iconStyle, id } = props;
+function hexToRgba(hex: string, opacity = 1) {
+  try {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    const rgb = result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        }
+      : null;
+
+    return rgb ? `rgba(${rgb?.r}, ${rgb?.g}, ${rgb?.b}, ${opacity})` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export default function IconButton(props: IconButtonProps) {
+  const { iconStyle, id, color = 'primary' } = props;
 
   const colors = {
     primary: {
@@ -63,7 +86,7 @@ export default function IconButton(props: any) {
       color: '#fff',
       border: 'none'
     }
-  };
+  } as const;
 
   return props.buttonType && props.buttonType === 'text' ? (
     <T
@@ -101,7 +124,7 @@ export default function IconButton(props: any) {
     <B
       id={id}
       style={{
-        ...colors[props.color],
+        ...colors[color],
         padding: props.icon && '0 0 0 15px',
         position: 'relative',
         opacity: props.disabled ? 0.7 : 1,
@@ -110,9 +133,9 @@ export default function IconButton(props: any) {
         paddingRight: props.leadingIcon && 10,
         ...props.style
       }}
-      hovercolor={props.hoverColor}
-      activecolor={props.activeColor}
-      shadowcolor={props.shadowColor}
+      hovercolor={props.hovercolor ?? hexToRgba(colors[color].background, 0.8)}
+      activecolor={props.activecolor}
+      shadowcolor={props.shadowcolor}
       disabled={props.disabled}
       onClick={props.onClick}
     >
@@ -212,7 +235,7 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   box-shadow: ${(p) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
 
   &:hover {
-    background: ${(p) => (p.hovercolor ? p.hovercolor : 'none')} !important;
+    background: ${(p) => (p.hovercolor ? p.hovercolor : undefined)} !important;
     transform: none !important;
     text-decoration: none !important;
   }

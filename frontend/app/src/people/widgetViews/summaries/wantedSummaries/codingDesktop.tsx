@@ -9,8 +9,9 @@ import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
 import { formatPrice, satToUsd } from '../../../../helpers';
+import { CodingViewProps } from 'people/interfaces';
 
-export default function DesktopView(props: any) {
+export default function DesktopView(props: CodingViewProps) {
   const {
     paid,
     titleString,
@@ -140,35 +141,33 @@ export default function DesktopView(props: any) {
               }}
             >
               {labels?.length > 0 &&
-                labels?.map((x: any) => {
-                  return (
-                    <>
+                labels?.map((x: any) => (
+                  <>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        height: '22px',
+                        minWidth: 'fit-content',
+                        backgroundColor: color.grayish.G1000,
+                        border: `1px solid ${color.grayish.G70}`,
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        marginRight: '3px',
+                        boxShadow: `1px 1px ${color.grayish.G70}`
+                      }}
+                    >
                       <div
                         style={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          height: '22px',
-                          minWidth: 'fit-content',
-                          backgroundColor: color.grayish.G1000,
-                          border: `1px solid ${color.grayish.G70}`,
-                          padding: '3px 10px',
-                          borderRadius: '20px',
-                          marginRight: '3px',
-                          boxShadow: `1px 1px ${color.grayish.G70}`
+                          fontSize: '10px',
+                          color: color.black300
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: '10px',
-                            color: color.black300
-                          }}
-                        >
-                          {x.label}
-                        </div>
+                        {x.label}
                       </div>
-                    </>
-                  );
-                })}
+                    </div>
+                  </>
+                ))}
             </div>
           </SectionPad>
           <Divider />

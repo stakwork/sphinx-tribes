@@ -1,7 +1,8 @@
+import { GithubStatusPillProps } from 'people/interfaces';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-export default function GithubStatusPill(props: any) {
+export default function GithubStatusPill(props: GithubStatusPillProps) {
   const { status, assignee, style } = props;
 
   const [assigneText, setAssigneText] = useState('');

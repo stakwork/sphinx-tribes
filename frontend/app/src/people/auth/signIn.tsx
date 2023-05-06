@@ -9,10 +9,11 @@ import AuthQR from './authQR';
 import QR from '../utils/QR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 import { observer } from 'mobx-react-lite';
+import { AuthProps } from 'people/interfaces';
 
 export default observer(SignIn);
 
-function SignIn(props: any) {
+function SignIn(props: AuthProps) {
   const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
@@ -47,113 +48,111 @@ function SignIn(props: any) {
     }
   }
 
-  return useObserver(() => {
-    return (
-      <div>
-        {showSignIn ? (
+  return useObserver(() => (
+    <div>
+      {showSignIn ? (
+        <Column>
+          <SphinxAppLoginDeepLink />
+        </Column>
+      ) : (
+        <>
           <Column>
-            <SphinxAppLoginDeepLink />
-          </Column>
-        ) : (
-          <>
-            <Column>
-              {isMobile && <Imgg src={'/static/sphinx.png'} />}
+            {isMobile && <Imgg src={'/static/sphinx.png'} />}
 
-              <Name>Welcome</Name>
+            <Name>Welcome</Name>
 
-              <Description>
-                {page === 'lnurl'
-                  ? 'Scan the QR code, to login with your LNURL auth enabled wallet.'
-                  : 'Use Sphinx to login and create or edit your profile.'}
-              </Description>
+            <Description>
+              {page === 'lnurl'
+                ? 'Scan the QR code, to login with your LNURL auth enabled wallet.'
+                : 'Use Sphinx to login and create or edit your profile.'}
+            </Description>
 
-              {page === 'lnurl' ? (
-                <QR value={main.lnauth.encode} size={200} />
-              ) : (
-                !isMobile && (
-                  <AuthQR
-                    onSuccess={() => {
-                      if (props.onSuccess) props.onSuccess();
-                      main.getPeople({ resetPage: true });
-                    }}
-                    style={{ marginBottom: 20 }}
-                  />
-                )
-              )}
-
-              {page !== 'lnurl' && (
-                <IconButton
-                  text={'Login with Sphinx'}
-                  height={48}
-                  endingIcon={'exit_to_app'}
-                  width={210}
-                  style={{ marginTop: 20 }}
-                  color={'primary'}
-                  onClick={() => setShowSignIn(true)}
-                  hovercolor={'#5881F8'}
-                  activecolor={'#5078F2'}
-                  shadowcolor={'rgba(97, 138, 255, 0.5)'}
+            {page === 'lnurl' ? (
+              <QR value={main.lnauth.encode} size={200} />
+            ) : (
+              !isMobile && (
+                <AuthQR
+                  onSuccess={() => {
+                    if (props.onSuccess) props.onSuccess();
+                    main.getPeople({ resetPage: true });
+                  }}
+                  style={{ marginBottom: 20 }}
                 />
-              )}
+              )
+            )}
 
-              {page === 'lnurl' ? (
+            {page !== 'lnurl' && (
+              <IconButton
+                text={'Login with Sphinx'}
+                height={48}
+                endingIcon={'exit_to_app'}
+                width={210}
+                style={{ marginTop: 20 }}
+                color={'primary'}
+                onClick={() => setShowSignIn(true)}
+                hovercolor={'#5881F8'}
+                activecolor={'#5078F2'}
+                shadowcolor={'rgba(97, 138, 255, 0.5)'}
+              />
+            )}
+
+            {page === 'lnurl' ? (
+              <IconButton
+                text={'Back'}
+                height={48}
+                endingIcon={'login'}
+                width={210}
+                style={{ marginTop: 20 }}
+                color={'primary'}
+                onClick={() => setPage('sphinx')}
+                hovercolor={'#5881F8'}
+                activecolor={'#5078F2'}
+                shadowcolor={'rgba(97, 138, 255, 0.5)'}
+              />
+            ) : (
+              !isMobile && (
                 <IconButton
-                  text={'Back'}
+                  text={'Login with LNAUTH'}
                   height={48}
                   endingIcon={'login'}
                   width={210}
                   style={{ marginTop: 20 }}
                   color={'primary'}
-                  onClick={() => setPage('sphinx')}
+                  onClick={() => {
+                    setPage('lnurl');
+                    pollLnurl();
+                  }}
                   hovercolor={'#5881F8'}
                   activecolor={'#5078F2'}
                   shadowcolor={'rgba(97, 138, 255, 0.5)'}
                 />
-              ) : (
-                !isMobile && (
-                  <IconButton
-                    text={'Login with LNAUTH'}
-                    height={48}
-                    endingIcon={'login'}
-                    width={210}
-                    style={{ marginTop: 20 }}
-                    color={'primary'}
-                    onClick={() => {
-                      setPage('lnurl');
-                      pollLnurl();
-                    }}
-                    hovercolor={'#5881F8'}
-                    activecolor={'#5078F2'}
-                    shadowcolor={'rgba(97, 138, 255, 0.5)'}
-                  />
-                )
-              )}
-            </Column>
-            <Divider />
-            <Column style={{ paddingTop: 0 }}>
-              <Description>I don't have Sphinx!</Description>
-              <IconButton
-                text={'Get Sphinx'}
-                endingIcon={'launch'}
-                width={210}
-                height={48}
-                buttonType={'text'}
-                style={{ color: '#83878b', marginTop: '10px', border: '1px solid #83878b' }}
-                onClick={() => redirect()}
-                hovercolor={'#fff'}
-                activecolor={'#fff'}
-                textStyle={{
-                  color: '#000',
-                  fontSize: '16px',
-                  fontWeight: '600'
-                }}
-              />
-            </Column>
-          </>
-        )}
-      </div>
-    );
-  });
+              )
+            )}
+          </Column>
+          <Divider />
+          <Column style={{ paddingTop: 0 }}>
+            <Description>I don't have Sphinx!</Description>
+            <IconButton
+              text={'Get Sphinx'}
+              endingIcon={'launch'}
+              width={210}
+              height={48}
+              buttonType={'text'}
+              style={{ color: '#83878b', marginTop: '10px', border: '1px solid #83878b' }}
+              onClick={() => redirect()}
+              hovercolor={'#fff'}
+              activecolor={'#fff'}
+              textStyle={{
+                color: '#000',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}
+            />
+          </Column>
+        </>
+      )}
+    </div>
+  ));
 }
 
 interface ImageProps {

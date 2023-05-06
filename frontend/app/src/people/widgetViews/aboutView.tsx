@@ -5,8 +5,9 @@ import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
+import { AboutViewProps } from 'people/interfaces';
 
-export const AboutView = observer((props: any) => {
+export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
   const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
@@ -104,9 +105,9 @@ export const AboutView = observer((props: any) => {
         <>
           <Divider />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {coding_languages.map((c, i) => {
-              return <CodeBadge key={i}>{c.label}</CodeBadge>;
-            })}
+            {coding_languages.map((c, i) => (
+              <CodeBadge key={i}>{c.label}</CodeBadge>
+            ))}
           </GrowRow>
         </>
       )}
@@ -116,16 +117,14 @@ export const AboutView = observer((props: any) => {
           <Divider />
           <T style={{ height: 20 }}>My Repos</T>
           <Grow>
-            {repos.map((r, i) => {
-              return (
-                <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
-                  <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
-                  <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
-                    {r?.label}
-                  </a>
-                </ItemRow>
-              );
-            })}
+            {repos.map((r, i) => (
+              <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
+                <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
+                <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
+                  {r?.label}
+                </a>
+              </ItemRow>
+            ))}
           </Grow>
         </>
       )}
@@ -135,14 +134,12 @@ export const AboutView = observer((props: any) => {
           <Divider />
           <T style={{ height: 20 }}>My Tribes</T>
           <Grow>
-            {tribes.map((t, i) => {
-              return (
-                <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
-                  <Img src={t?.img || '/static/sphinx.png'} />
-                  <div>{t?.name}</div>
-                </ItemRow>
-              );
-            })}
+            {tribes.map((t, i) => (
+              <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
+                <Img src={t?.img || '/static/sphinx.png'} />
+                <div>{t?.name}</div>
+              </ItemRow>
+            ))}
           </Grow>
         </>
       )}
@@ -166,6 +163,8 @@ export const AboutView = observer((props: any) => {
           </Grow>
         </>
       )}
+
+      <br />
     </Wrap>
   );
 });
@@ -213,6 +212,7 @@ const Wrap = styled.div`
   flex-direction: column;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
 `;
 const I = styled.div`
   display: flex;

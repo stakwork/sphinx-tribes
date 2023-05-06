@@ -6,6 +6,7 @@ import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
+import { AuthProps } from 'people/interfaces';
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
@@ -14,7 +15,7 @@ function makeQR(challenge: string, ts: string) {
 
 let interval;
 
-export default function SphinxAppLoginDeeplink(props: any) {
+export default function SphinxAppLoginDeeplink(props: AuthProps) {
   const { ui } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
@@ -27,7 +28,7 @@ export default function SphinxAppLoginDeeplink(props: any) {
 
   useEffect(() => {
     if (challenge && ts) {
-      let el = document.createElement('a');
+      const el = document.createElement('a');
       el.href = qrString;
       el.click();
     }

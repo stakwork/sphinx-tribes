@@ -13,6 +13,7 @@ import { Modals } from './Modals';
 import { People } from './People';
 import { TicketsPage } from './Tickets';
 import { observer } from 'mobx-react-lite';
+import { LeaderboardPage } from './Leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
@@ -25,9 +26,12 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/b/">
           <BotsBody />
         </Route>
-        <Route path="/p/" render={(props) => <People {...props} />}></Route>
+        <Route path="/p/" render={() => <People />} />
         <Route path="/tickets/">
           <TicketsPage />
+        </Route>
+        <Route path="/leaderboard">
+          <LeaderboardPage />
         </Route>
       </Switch>
     </MainLayout>
@@ -40,11 +44,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   )
 };
 
-export const Pages = observer(({ mode }: { mode: AppMode }) => {
-  return (
-    <>
-      {modeDispatchPages[mode]()}
-      <Modals />
-    </>
-  );
-});
+export const Pages = observer(({ mode }: { mode: AppMode }) => (
+  <>
+    {modeDispatchPages[mode]()}
+    <Modals />
+  </>
+));

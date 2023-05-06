@@ -33,9 +33,10 @@ import ButtonSet from '../../../../bounties/bountyModal_button_set';
 import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { observer } from 'mobx-react-lite';
+import { CodingBountiesProps } from '../../../interfaces';
 
 export default observer(MobileView);
-function MobileView(props: any) {
+function MobileView(props: CodingBountiesProps) {
   const {
     deliverables,
     description,
@@ -97,7 +98,7 @@ function MobileView(props: any) {
           {creatorStep === 0 && (
             <Creator
               onClick={() => {
-                setIsPaidStatusPopOver(false);
+                if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(false);
               }}
             >
               <>
@@ -205,19 +206,17 @@ function MobileView(props: any) {
                     <LanguageContainer>
                       {dataValue &&
                         dataValue?.length > 0 &&
-                        dataValue?.map((lang: any, index) => {
-                          return (
-                            <CodingLabels
-                              key={index}
-                              styledColors={color}
-                              border={lang?.border}
-                              color={lang?.color}
-                              background={lang?.background}
-                            >
-                              <EuiText className="LanguageText">{lang?.label}</EuiText>
-                            </CodingLabels>
-                          );
-                        })}
+                        dataValue?.map((lang: any, index) => (
+                          <CodingLabels
+                            key={index}
+                            styledColors={color}
+                            border={lang?.border}
+                            color={lang?.color}
+                            background={lang?.background}
+                          >
+                            <EuiText className="LanguageText">{lang?.label}</EuiText>
+                          </CodingLabels>
+                        ))}
                     </LanguageContainer>
                   </div>
                   <DescriptionBox color={color}>
@@ -622,7 +621,7 @@ function MobileView(props: any) {
                       setIsModalSideButton(true);
                     }, 3000);
                     setTimeout(() => {
-                      setIsPaidStatusPopOver(true);
+                      if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);
                     }, 4000);
                     setTimeout(() => {
                       if (awardDetails?.name !== '') {
@@ -691,19 +690,17 @@ function MobileView(props: any) {
               <LanguageContainer>
                 {dataValue &&
                   dataValue?.length > 0 &&
-                  dataValue?.map((lang: any, index) => {
-                    return (
-                      <CodingLabels
-                        key={index}
-                        styledColors={color}
-                        border={lang?.border}
-                        color={lang?.color}
-                        background={lang?.background}
-                      >
-                        <EuiText className="LanguageText">{lang?.label}</EuiText>
-                      </CodingLabels>
-                    );
-                  })}
+                  dataValue?.map((lang: any, index) => (
+                    <CodingLabels
+                      key={index}
+                      styledColors={color}
+                      border={lang?.border}
+                      color={lang?.color}
+                      background={lang?.background}
+                    >
+                      <EuiText className="LanguageText">{lang?.label}</EuiText>
+                    </CodingLabels>
+                  ))}
               </LanguageContainer>
             </div>
             <DescriptionBox color={color}>
@@ -912,7 +909,7 @@ function MobileView(props: any) {
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
                     price={props?.price}
-                    sessionLength={props?.estimate_session_length}
+                    sessionLength={props.estimate_session_length}
                     style={{
                       padding: 0,
                       margin: 0

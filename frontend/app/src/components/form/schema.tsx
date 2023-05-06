@@ -25,14 +25,11 @@ const badgeObjectStrValidator = Yup.object().shape({
 
 const nomValidator = Yup.number().required('Required');
 
-const GetValue = (arr: any) => {
-  return arr.map((val) => {
-    return {
-      label: val,
-      value: val
-    };
-  });
-};
+const GetValue = (arr: any) =>
+  arr.map((val) => ({
+    label: val,
+    value: val
+  }));
 
 const codingLanguages = GetValue(languages);
 const estimated_time = GetValue(estimation);
@@ -721,7 +718,8 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'description',
     label: 'Description',
-    type: 'textarea'
+    type: 'textarea',
+    validator: strValidator
   },
   {
     name: 'price',
@@ -750,7 +748,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'estimate_session_length',
-    label: 'Estimate Seesion Length',
+    label: 'Estimate Session Length',
     type: 'select',
     options: estimated_time
   },

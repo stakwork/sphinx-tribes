@@ -3,21 +3,20 @@ import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { colourOptions } from '../../people/utils/language_label_style';
+import { SelProps } from 'components/interfaces';
 
-export default function Sel(props: any) {
+export default function Sel(props: SelProps) {
   const { onChange, value, style, setIsTop } = props;
   const color = colors['light'];
 
   const opts =
-    colourOptions.map((o) => {
-      return {
-        value: o.value,
-        label: o.label,
-        color: o.color,
-        background: o.background,
-        border: o.border
-      };
-    }) || [];
+    colourOptions.map((o) => ({
+      value: o.value,
+      label: o.label,
+      color: o.color,
+      background: o.background,
+      border: o.border
+    })) || [];
 
   return (
     <div style={{ position: 'relative', ...style }}>
@@ -29,38 +28,34 @@ export default function Sel(props: any) {
         value={value}
         onChange={(value) => onChange(value)}
         onBlur={() => {
-          setIsTop(false);
+          if (setIsTop) setIsTop(false);
         }}
         onFocus={() => {
-          setIsTop(true);
+          if (setIsTop) setIsTop(true);
         }}
         className={'multi-select-input'}
         styles={{
           control: (styles) => ({ ...styles, backgroundColor: 'white' }),
-          option: (styles) => {
-            return {
-              ...styles,
-              backgroundColor: '#fff',
-              color: color.text2,
-              fontFamily: 'Barlow',
-              fontSize: '14px',
-              fontWeight: '500',
-              ':hover': {
-                background: color.light_blue200
-              }
-            };
-          },
-          multiValue: (styles, { data }: any) => {
-            return {
-              ...styles,
-              backgroundColor: data.background,
-              border: data.border,
-              color: data.color,
-              fontFamily: 'Barlow',
-              fontSize: '14px',
-              fontWeight: '500'
-            };
-          },
+          option: (styles) => ({
+            ...styles,
+            backgroundColor: '#fff',
+            color: color.text2,
+            fontFamily: 'Barlow',
+            fontSize: '14px',
+            fontWeight: '500',
+            ':hover': {
+              background: color.light_blue200
+            }
+          }),
+          multiValue: (styles, { data }: any) => ({
+            ...styles,
+            backgroundColor: data.background,
+            border: data.border,
+            color: data.color,
+            fontFamily: 'Barlow',
+            fontSize: '14px',
+            fontWeight: '500'
+          }),
           multiValueLabel: (styles, { data }: any) => ({
             ...styles,
             background: data.background,
