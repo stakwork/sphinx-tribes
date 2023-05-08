@@ -66,11 +66,9 @@ function MobileView(props: CodingBountiesProps) {
     handleCopyUrl,
     isCopied,
     setExtrasPropertyAndSave,
-    setIsModalSideButton,
     replitLink,
     assigneeHandlerOpen,
     setCreatorStep,
-    setIsExtraStyle,
     awards,
     setExtrasPropertyAndSaveMultiple,
     handleAssigneeDetails,
@@ -128,6 +126,7 @@ function MobileView(props: CodingBountiesProps) {
       if (count >= 29 || data.invoiceStatus) {
         clearTimeout(pollTimeout);
         setPollCount(0);
+        main.setLnInvoice("");
       }
     }
   }
@@ -331,7 +330,6 @@ function MobileView(props: CodingBountiesProps) {
                             className="AssigneeCloseButtonContainer"
                             onClick={() => {
                               changeAssignedPerson();
-                              setIsModalSideButton(false);
                             }}
                           >
                             <img
@@ -433,7 +431,7 @@ function MobileView(props: CodingBountiesProps) {
                         onClick={(e) => {
                           e.stopPropagation();
                           setExtrasPropertyAndSave('paid', !invoicePaid);
-                          setIsModalSideButton(true);
+                          // setIsModalSideButton(true);
                         }}
                       />
                     ) : (
@@ -460,10 +458,7 @@ function MobileView(props: CodingBountiesProps) {
                         shadowcolor={color.button_primary.shadow}
                         onClick={(e) => {
                           e.stopPropagation();
-                          // setExtrasPropertyAndSave('paid', !paid);
                           setCreatorStep(1);
-                          setIsModalSideButton(false);
-                          setIsExtraStyle(true);
                         }}
                       />
                     )}
@@ -479,8 +474,6 @@ function MobileView(props: CodingBountiesProps) {
                 className="TopHeader"
                 onClick={() => {
                   setCreatorStep(0);
-                  setIsModalSideButton(true);
-                  setIsExtraStyle(false);
                 }}
               >
                 <div className="imageContainer">
@@ -562,10 +555,7 @@ function MobileView(props: CodingBountiesProps) {
                   shadowcolor={color.button_secondary.shadow}
                   onClick={(e) => {
                     e.stopPropagation();
-                    // setExtrasPropertyAndSave('paid', !paid);
-                    // setExtrasPropertyAndSave('price', bountyPrice);
                     setCreatorStep(2);
-                    setIsExtraStyle(false);
                   }}
                 />
               </div>
@@ -578,7 +568,6 @@ function MobileView(props: CodingBountiesProps) {
                   className="headerTop"
                   onClick={() => {
                     setCreatorStep(1);
-                    setIsExtraStyle(true);
                   }}
                 >
                   <div className="imageContainer">
@@ -661,7 +650,6 @@ function MobileView(props: CodingBountiesProps) {
 
                     setTimeout(() => {
                       setCreatorStep(0);
-                      setIsModalSideButton(true);
                     }, 3000);
                     setTimeout(() => {
                       if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);

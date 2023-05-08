@@ -812,7 +812,6 @@ export class MainStore {
     }
 
     if (this.lnToken) {
-      console.log("LN TOKNEN ===", this.lnToken)
       const response = await fetch(`${URL}/${path}`, {
         method: method,
         body: JSON.stringify({
@@ -1004,8 +1003,8 @@ export class MainStore {
   @observable
   lnInvoice: string = '';
 
-  @action setLnInvoice(invoiceResponse: LnInvoice) {
-    this.lnInvoice = invoiceResponse.response.invoice;
+  @action setLnInvoice(invoice: string ) {
+    this.lnInvoice = invoice;
   }
    
   @observable
@@ -1032,7 +1031,7 @@ export class MainStore {
       }, {
       'Content-Type': 'application/json' });
       if (data.success) {
-        this.setLnInvoice(data);
+        this.setLnInvoice(data.response.invoice);
       }
       return data;
     } catch (e) {
