@@ -7,39 +7,41 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // Tribe struct
 type Tribe struct {
-	UUID            string         `json:"uuid"`
-	OwnerPubKey     string         `json:"owner_pubkey"`
-	OwnerAlias      string         `json:"owner_alias"`
-	GroupKey        string         `json:"group_key"`
-	Name            string         `json:"name"`
-	UniqueName      string         `json:"unique_name"`
-	Description     string         `json:"description"`
-	Tags            pq.StringArray `json:"tags"`
-	Img             string         `json:"img"`
-	PriceToJoin     int64          `json:"price_to_join"`
-	PricePerMessage int64          `json:"price_per_message"`
-	EscrowAmount    int64          `json:"escrow_amount"`
-	EscrowMillis    int64          `json:"escrow_millis"`
-	Created         *time.Time     `json:"created"`
-	Updated         *time.Time     `json:"updated"`
-	MemberCount     uint64         `json:"member_count"`
-	Unlisted        bool           `json:"unlisted"`
-	Private         bool           `json:"private"`
-	Deleted         bool           `json:"deleted"`
-	AppURL          string         `json:"app_url"`
-	FeedURL         string         `json:"feed_url"`
-	FeedType        uint64         `json:"feed_type"`
-	LastActive      int64          `json:"last_active"`
-	Bots            string         `json:"bots"`
-	OwnerRouteHint  string         `json:"owner_route_hint"`
-	Pin             string         `json:"pin"`
-	Preview         string         `json:"preview"`
-	ProfileFilters  string         `json:"profile_filters"` // "twitter,github"
-	Badges          pq.StringArray `json:"badges"`
+	UUID            string      `json:"uuid"`
+	OwnerPubKey     string      `json:"owner_pubkey"`
+	OwnerAlias      string      `json:"owner_alias"`
+	GroupKey        string      `json:"group_key"`
+	Name            string      `json:"name"`
+	UniqueName      string      `json:"unique_name"`
+	Description     string      `json:"description"`
+	Tags            StringArray `json:"tags"`
+	Img             string      `json:"img"`
+	PriceToJoin     int64       `json:"price_to_join"`
+	PricePerMessage int64       `json:"price_per_message"`
+	EscrowAmount    int64       `json:"escrow_amount"`
+	EscrowMillis    int64       `json:"escrow_millis"`
+	Created         *time.Time  `json:"created"`
+	Updated         *time.Time  `json:"updated"`
+	MemberCount     uint64      `json:"member_count"`
+	Unlisted        bool        `json:"unlisted"`
+	Private         bool        `json:"private"`
+	Deleted         bool        `json:"deleted"`
+	AppURL          string      `json:"app_url"`
+	FeedURL         string      `json:"feed_url"`
+	FeedType        uint64      `json:"feed_type"`
+	LastActive      int64       `json:"last_active"`
+	Bots            string      `json:"bots"`
+	OwnerRouteHint  string      `json:"owner_route_hint"`
+	Pin             string      `json:"pin"`
+	Preview         string      `json:"preview"`
+	ProfileFilters  string      `json:"profile_filters"` // "twitter,github"
+	Badges          StringArray `json:"badges"`
 }
 
 // Bot struct
@@ -122,6 +124,20 @@ type Person struct {
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
+}
+
+type GormDataTypeInterface interface {
+	GormDataType() string
+}
+
+type GormDBDataTypeInterface interface {
+	GormDBDataType(*gorm.DB, *schema.Field) string
+}
+
+type StringArray pq.StringArray
+
+func (StringArray) GormDataType() string {
+	return "text[]"
 }
 
 type PersonInShort struct {
