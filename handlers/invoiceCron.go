@@ -23,10 +23,9 @@ func hello(name string) {
 
 func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
+	s.Every(1).Seconds().Do(func() {
+		invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
 
-	invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
-
-	s.Every(2).Seconds().Do(func() {
 		if invoiceCount > 0 {
 			url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
