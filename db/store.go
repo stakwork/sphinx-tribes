@@ -77,6 +77,22 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 	return c, nil
 }
 
+// SetCache
+func (s StoreData) SetInvoiceCache(key string, value InvoiceData) error {
+	s.Cache.Set(key, value, cache.DefaultExpiration)
+	return nil
+}
+
+// GetCache
+func (s StoreData) GetInvoiceCache(key string) (InvoiceData, error) {
+	value, found := s.Cache.Get(key)
+	c, _ := value.(InvoiceData)
+	if !found {
+		return InvoiceData{}, errors.New("not found")
+	}
+	return c, nil
+}
+
 func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
 	h := blake2b.Sum256([]byte(ts))
