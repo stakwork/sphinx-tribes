@@ -1015,9 +1015,21 @@ export class MainStore {
     this.lnInvoiceStatus = status;
   }
 
-  @action async getLnInvoice(amount: number, memo: string): Promise<LnInvoice> {
+  @action async getLnInvoice(body: {
+    amount: number, 
+    memo: string,
+    owner_pubkey: string,
+    user_pubkey: string,
+    created: string
+  } ): Promise<LnInvoice> {
     try {
-      const data = await api.post('invoices', {amount, memo}, {
+      const data = await api.post('invoices', {
+        amount: body.amount, 
+        memo: body.memo,
+        owner_pubkey: body.owner_pubkey,
+        user_pubkey: body.user_pubkey,
+        created: body.created
+      }, {
       'Content-Type': 'application/json' });
       if (data.success) {
         this.setLnInvoice(data);
@@ -1029,14 +1041,10 @@ export class MainStore {
   }
 
   @action async getLnInvoiceStatus(
-    payment_req: string, 
-    pubkey: string, 
-    owner_key: string, 
-    amount: string,
-    created?: number
+    payment_req: string,  
     ): Promise<{invoiceStatus:  boolean, bountyPaid: boolean}> {
     try {
-      const data = await api.get(`invoices/${payment_req}/${pubkey}/${owner_key}/${amount}/${created}`, {
+      const data = await api.get(`invoices/${payment_req}`, {
       'Content-Type': 'application/json' });
 
       if (data.status) {

@@ -100,7 +100,13 @@ function MobileView(props: CodingBountiesProps) {
   const invoicePaid = paid || invoiceData.bountyPaid ? true : false;
 
   async function getLnInvoice() {
-    await main.getLnInvoice(props?.price || 0, '');
+    await main.getLnInvoice({
+      amount: props?.price || 0,
+      memo: '',
+      owner_pubkey: person.owner_pubkey,
+      user_pubkey: assignee.owner_pubkey,
+      created: created ? created?.toString() : '',
+    });
     await pollLnInvoice(pollCount);
   }
 
@@ -108,10 +114,6 @@ function MobileView(props: CodingBountiesProps) {
     if (main.lnInvoice) {
       const data = await main.getLnInvoiceStatus(
         main.lnInvoice,
-        assignee.owner_pubkey,
-        person.owner_pubkey,
-        props?.price?.toString() || "0",
-        created
       );
 
       setInvoiceData(data);
@@ -887,7 +889,7 @@ function MobileView(props: CodingBountiesProps) {
                       )
                       : <></>
                   }
-                  {!main.lnInvoiceStatus && { ...person }?.owner_alias === ui.meInfo?.owner_alias
+                  {!main.lnInvoiceStatus
                     ?
                     (
                       <>

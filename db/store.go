@@ -78,17 +78,33 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 }
 
 // SetCache
-func (s StoreData) SetInvoiceCache(key string, value InvoiceData) error {
+func (s StoreData) SetInvoiceCache(key string, value InvoiceStoreData) error {
 	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
 // GetCache
-func (s StoreData) GetInvoiceCache(key string) (InvoiceData, error) {
+func (s StoreData) GetInvoiceCache(key string) (InvoiceStoreData, error) {
 	value, found := s.Cache.Get(key)
-	c, _ := value.(InvoiceData)
+	c, _ := value.(InvoiceStoreData)
 	if !found {
-		return InvoiceData{}, errors.New("not found")
+		return InvoiceStoreData{}, errors.New("not found")
+	}
+	return c, nil
+}
+
+// SetInvoiceCount
+func (s StoreData) SetInvoiceCount(key string, value uint) error {
+	s.Cache.Set(key, value, cache.DefaultExpiration)
+	return nil
+}
+
+// GetCache
+func (s StoreData) GetInvoiceCount(key string) (uint, error) {
+	value, found := s.Cache.Get(key)
+	c, _ := value.(uint)
+	if !found {
+		return 0, errors.New("not found")
 	}
 	return c, nil
 }

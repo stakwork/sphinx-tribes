@@ -218,8 +218,11 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount string `json:"amount"`
-	Memo   string `json:"memo"`
+	Amount       string `json:"amount"`
+	Memo         string `json:"memo"`
+	Owner_pubkey string `json:"owner_pubkey"`
+	User_pubkey  string `json:"user_pubkey"`
+	Created      string `json:"created"`
 }
 
 type Invoice struct {
@@ -229,6 +232,14 @@ type Invoice struct {
 type InvoiceResponse struct {
 	Succcess bool    `json:"success"`
 	Response Invoice `json:"response"`
+}
+
+type InvoiceStoreData struct {
+	Invoice      string `json:"invoice"`
+	Owner_pubkey string `json:"owner_pubkey"`
+	User_pubkey  string `json:"user_pubkey"`
+	Amount       string `json:"amount"`
+	Created      string `json:"created"`
 }
 
 type InvoiceData struct {

@@ -10,6 +10,7 @@ var Host string
 var JwtKey string
 var RelayUrl string
 var RelayAuthKey string
+var InvoiceCount = "INCOUNT"
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")

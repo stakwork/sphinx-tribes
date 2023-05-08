@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -442,9 +440,15 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	pub_key := invoice.User_pubkey
+	owner_key := invoice.Owner_pubkey
+	amount := invoice.Amount
+	date := invoice.Created
+	memo := invoice.Memo
+
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
-	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, invoice.Amount, invoice.Memo)
+	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
 
 	jsonBody := []byte(bodyData)
 
@@ -466,12 +470,31 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	// Unmarshal result
 	invoiceRes := db.InvoiceResponse{}
+
 	err = json.Unmarshal(body, &invoiceRes)
 
 	if err != nil {
 		log.Printf("Reading body failed: %s", err)
 		return
 	}
+
+	// save the invoice to store
+	db.Store.SetInvoiceCache(invoiceRes.Response.Invoice, db.InvoiceStoreData{
+		Amount:       amount,
+		Created:      date,
+		Invoice:      invoiceRes.Response.Invoice,
+		Owner_pubkey: owner_key,
+		User_pubkey:  pub_key,
+	})
+
+	invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
+	totalCount := invoiceCount + 1
+
+	/**
+	  Set the invoice count to avoid making a request
+	  when there is no invoice in store
+	*/
+	db.Store.SetInvoiceCount(config.InvoiceCount, totalCount)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
@@ -479,138 +502,33 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	payment_request := chi.URLParam(r, "payment_request")
-	pub_key := chi.URLParam(r, "user_pub_key")
-	owner_key := chi.URLParam(r, "owner_key")
-	amount := chi.URLParam(r, "amount")
-	date := chi.URLParam(r, "created")
 
 	if payment_request == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
-
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-
-	req.Header.Set("x-user-token", config.RelayAuthKey)
-	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
-
-	if err != nil {
-		log.Printf("Request Failed: %s", err)
-		return
-	}
-
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-
-	// Unmarshal result
-	invoiceRes := db.InvoiceList{}
-	err = json.Unmarshal(body, &invoiceRes)
-
-	if err != nil {
-		log.Printf("Reading body failed: %s", err)
-		return
-	}
-
 	var invoiceState bool
 	var bountyPaid bool
 
-	for _, v := range invoiceRes.Invoices {
-		if v.Payment_request == payment_request {
-			invoiceState = v.Settled
-		}
+	/**
+	if invoice is still in the store
+	It means the invoice has not been paid
+	else it has been paid
+	*/
+	invoice, _ := db.Store.GetInvoiceCache(payment_request)
+
+	if invoice.Amount != "" {
+		invoiceState = false
+		bountyPaid = false
+	} else {
+		invoiceState = true
+		bountyPaid = true
 	}
 
 	invoiceData := db.InvoiceStatus{
 		Status:          invoiceState,
 		Payment_request: payment_request,
-	}
-
-	// If Paid successfully, make keysend payment to user
-	if invoiceState {
-		url := fmt.Sprintf("%s/payment", config.RelayUrl)
-
-		bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, amount, pub_key)
-
-		jsonBody := []byte(bodyData)
-
-		client := &http.Client{}
-		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-		req.Header.Set("x-user-token", config.RelayAuthKey)
-		req.Header.Set("Content-Type", "application/json")
-		res, _ := client.Do(req)
-
-		if err != nil {
-			log.Printf("Request Failed: %s", err)
-			return
-		}
-
-		defer res.Body.Close()
-
-		body, err = ioutil.ReadAll(res.Body)
-
-		if res.StatusCode == 200 {
-			// Unmarshal result
-			keysendRes := db.KeysendSuccess{}
-			err = json.Unmarshal(body, &keysendRes)
-
-			// Todo update wanted paid status
-			db.DB.SetBountyToPaid(owner_key)
-			var p = db.DB.GetPersonByPubkey(owner_key)
-			wanteds, _ := p.Extras["wanted"].([]interface{})
-
-			for _, wanted := range wanteds {
-				w, ok2 := wanted.(map[string]interface{})
-				if !ok2 {
-					continue // next wanted
-				}
-
-				created, ok3 := w["created"].(float64)
-				createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
-				createdString := createdArr[0]
-				createdInt, _ := strconv.ParseInt(createdString, 10, 32)
-
-				dateInt, _ := strconv.ParseInt(date, 10, 32)
-
-				if !ok3 {
-					continue
-				}
-
-				if createdInt == dateInt {
-					w["paid"] = true
-				}
-			}
-
-			p.Extras["wanted"] = wanteds
-			b := new(bytes.Buffer)
-			decodeErr := json.NewEncoder(b).Encode(p.Extras)
-
-			if decodeErr != nil {
-				log.Printf("Could not encode extras json data")
-			} else {
-				// update LastLogin for user
-				db.DB.UpdatePerson(p.ID, map[string]interface{}{
-					"extras": b,
-				})
-
-				bountyPaid = true
-			}
-		} else {
-			// Unmarshal result
-			keysendError := db.KeysendError{}
-			err = json.Unmarshal(body, &keysendError)
-			log.Printf("Keysend Payment to %s Failed, with Error: %s", pub_key, keysendError.Error)
-		}
-
-		if err != nil {
-			log.Printf("Reading body failed: %s", err)
-			return
-		}
 	}
 
 	invoiceResult := make(map[string]interface{})

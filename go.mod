@@ -13,6 +13,7 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/go-chi/jwtauth v1.2.0
+	github.com/go-co-op/gocron v1.25.0 // indirect
 	github.com/gobuffalo/logger v1.0.4 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/google/go-cmp v0.5.8 // indirect
