@@ -7,7 +7,7 @@ interface colorProps {
 }
 
 interface styleProps extends colorProps {
-  paid?: string;
+  paid?: boolean;
 }
 
 export const Wrap = styled.div<colorProps>`

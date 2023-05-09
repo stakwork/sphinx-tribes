@@ -214,7 +214,7 @@ function MobileView(props: CodingBountiesProps) {
                   </>
                 )}
 
-                <CreatorDescription paid={invoicePaid.toString()} color={color}>
+                <CreatorDescription paid={invoicePaid} color={color}>
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
@@ -714,7 +714,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             />
           )}
-          <CreatorDescription paid={invoicePaid.toString()} color={color}>
+          <CreatorDescription paid={invoicePaid} color={color}>
             <div className="DescriptionUpperContainerNormalView">
               <div>{nametag}</div>
               <TitleBox color={color}>{titleString}</TitleBox>
