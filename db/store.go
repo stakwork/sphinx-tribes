@@ -16,7 +16,6 @@ import (
 	"golang.org/x/crypto/blake2b"
 )
 
-// Store struct
 type StoreData struct {
 	Cache *cache.Cache
 }
@@ -39,19 +38,16 @@ func InitCache() {
 	}
 }
 
-// SetCache
 func (s StoreData) SetCache(key string, value string) error {
 	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
-// DeleteCache
 func (s StoreData) DeleteCache(key string) error {
 	s.Cache.Delete(key)
 	return nil
 }
 
-// GetCache
 func (s StoreData) GetCache(key string) (string, error) {
 	value, found := s.Cache.Get(key)
 	c, _ := value.(string)
@@ -61,13 +57,11 @@ func (s StoreData) GetCache(key string) (string, error) {
 	return c, nil
 }
 
-// SetCache
 func (s StoreData) SetLnCache(key string, value LnStore) error {
 	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
-// GetCache
 func (s StoreData) GetLnCache(key string) (LnStore, error) {
 	value, found := s.Cache.Get(key)
 	c, _ := value.(LnStore)
@@ -77,13 +71,11 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 	return c, nil
 }
 
-// SetCache
 func (s StoreData) SetInvoiceCache(key string, value InvoiceStoreData) error {
 	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
-// GetCache
 func (s StoreData) GetInvoiceCache(key string) (InvoiceStoreData, error) {
 	value, found := s.Cache.Get(key)
 	c, _ := value.(InvoiceStoreData)
@@ -93,13 +85,11 @@ func (s StoreData) GetInvoiceCache(key string) (InvoiceStoreData, error) {
 	return c, nil
 }
 
-// SetInvoiceCount
 func (s StoreData) SetInvoiceCount(key string, value uint) error {
 	s.Cache.Set(key, value, cache.DefaultExpiration)
 	return nil
 }
 
-// GetCache
 func (s StoreData) GetInvoiceCount(key string) (uint, error) {
 	value, found := s.Cache.Get(key)
 	c, _ := value.(uint)
@@ -174,10 +164,6 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{})
 }
 
-/*
-curl localhost:5002/ask
-curl localhost:5002/poll/d5SYZNY5pQ7dXwHP-oXh2uSOPUEX0fUJOXI0_5-eOsg=
-*/
 func Poll(w http.ResponseWriter, r *http.Request) {
 
 	challenge := chi.URLParam(r, "challenge")
