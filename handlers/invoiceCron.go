@@ -85,7 +85,6 @@ func InitInvoiceCron() {
 							keysendRes := db.KeysendSuccess{}
 							err = json.Unmarshal(body, &keysendRes)
 
-							db.DB.SetBountyToPaid(storeInvoice.Owner_pubkey)
 							var p = db.DB.GetPersonByPubkey(storeInvoice.Owner_pubkey)
 
 							wanteds, _ := p.Extras["wanted"].([]interface{})

@@ -882,14 +882,6 @@ func (db database) GetBountiesLeaderboard() []LeaderData {
 	return users
 }
 
-func (db database) SetBountyToPaid(owner_key string) bool {
-	db.db.Raw(`
-	UPDATE people SET extras = jsonb_set(extras, '{wanted, 0}', '"paid"' , to_jsonb(true), true) 
-	WHERE owner_pub_key = '` + owner_key + "'")
-
-	return true
-}
-
 func GetLeaderData(arr []LeaderData, key string) (int, int) {
 	found := -1
 	index := 0
