@@ -87,29 +87,6 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Could not encode extras json data")
 	}
 
-	// var person1 db.PersonInsert = db.PersonInsert{
-	// 	ID:               person.ID,
-	// 	Uuid:             person.Uuid,
-	// 	OwnerPubKey:      person.OwnerPubKey,
-	// 	OwnerAlias:       person.OwnerAlias,
-	// 	UniqueName:       person.UniqueName,
-	// 	Description:      person.Description,
-	// 	Tags:             person.Tags,
-	// 	Img:              person.Img,
-	// 	Created:          person.Created,
-	// 	Updated:          person.Updated,
-	// 	Unlisted:         person.Unlisted,
-	// 	Deleted:          person.Deleted,
-	// 	LastLogin:        person.LastLogin,
-	// 	OwnerRouteHint:   person.OwnerRouteHint,
-	// 	OwnerContactKey:  person.OwnerContactKey,
-	// 	PriceToMeet:      person.PriceToMeet,
-	// 	TwitterConfirmed: person.TwitterConfirmed,
-	// 	GithubIssues:     person.GithubIssues,
-	// 	NewTicketTime:    person.NewTicketTime,
-	// 	Extras:           b,
-	// }
-
 	p, err := db.DB.CreateOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -211,28 +188,6 @@ func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Could not encode extras json data")
 	}
 
-	// var person1 db.PersonInsert = db.PersonInsert{
-	// 	ID:               person.ID,
-	// 	Uuid:             person.Uuid,
-	// 	OwnerPubKey:      person.OwnerPubKey,
-	// 	OwnerAlias:       person.OwnerAlias,
-	// 	UniqueName:       person.UniqueName,
-	// 	Description:      person.Description,
-	// 	Tags:             person.Tags,
-	// 	Img:              person.Img,
-	// 	Created:          person.Created,
-	// 	Updated:          person.Updated,
-	// 	Unlisted:         person.Unlisted,
-	// 	Deleted:          person.Deleted,
-	// 	LastLogin:        person.LastLogin,
-	// 	OwnerRouteHint:   person.OwnerRouteHint,
-	// 	OwnerContactKey:  person.OwnerContactKey,
-	// 	PriceToMeet:      person.PriceToMeet,
-	// 	TwitterConfirmed: person.TwitterConfirmed,
-	// 	GithubIssues:     person.GithubIssues,
-	// 	NewTicketTime:    person.NewTicketTime,
-	// 	Extras:           b,
-	// }
 	_, err = db.DB.CreateOrEditPerson(person)
 
 	if err != nil {
