@@ -497,6 +497,7 @@ const MTab = styled.div<TagProps>`
 `;
 
 const LoggedInBtn = styled.div`
+  max-width: 130px;
   height: 40px;
   border-radius: 50%;
   margin-right: 20px;
@@ -584,7 +585,7 @@ const LoginBtn = styled.div`
 `;
 
 const Alias = styled.span`
-  width: 180px;
+  max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
