@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
@@ -325,8 +326,10 @@ type PropertyMap map[string]interface{}
 
 // Value ...
 func (p PropertyMap) Value() (driver.Value, error) {
-	j, err := json.Marshal(p)
-	return j, err
+	b := new(bytes.Buffer)
+	err := json.NewEncoder(b).Encode(p)
+
+	return b, err
 }
 
 // Scan ...

@@ -209,15 +209,19 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.GithubIssues == nil {
 		m.GithubIssues = map[string]interface{}{}
 	}
-	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
-		fmt.Println(err)
-		return Person{}, err
+
+	if err := db.db.Model(&m).Where("id = ?", m.ID).UpdateColumns(m).Error; err != nil {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
+			db.db.Create(&m)
+		}
 	}
+
 	db.db.Exec(`UPDATE people SET tsv =
   	setweight(to_tsvector(owner_alias), 'A') ||
 	setweight(to_tsvector(description), 'B') ||
 	setweight(array_to_tsvector(tags), 'C')
 	WHERE id = '` + strconv.Itoa(int(m.ID)) + "'")
+
 	return m, nil
 }
 

@@ -381,6 +381,30 @@ function MobileView(props: CodingBountiesProps) {
                         margin: 0
                       }}
                     />
+
+                    {
+                      main.lnInvoice && pollCount < 30 &&
+                      (
+                        <Invoice
+                          startDate={new Date(moment().add(1, "minutes").format().toString())}
+                          count={pollCount}
+                          dataStatus={invoiceData.invoiceStatus}
+                        />
+                      )
+                    }
+                    {!main.lnInvoiceStatus &&
+                      (
+                        <Button
+                          iconSize={14}
+                          width={220}
+                          height={48}
+                          onClick={getLnInvoice}
+                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                          text="Pay Bounty"
+                          ButtonTextStyle={{ padding: 0 }}
+                        />
+                      )
+                    }
                   </BountyPriceContainer>
                   <div className="buttonSet">
                     <ButtonSet
@@ -866,33 +890,6 @@ function MobileView(props: CodingBountiesProps) {
                       margin: 0
                     }}
                   />
-                  {
-                    main.lnInvoice && pollCount < 30 ?
-                      (
-                        <Invoice
-                          startDate={new Date(moment().add(1, "minutes").format().toString())}
-                          count={pollCount}
-                          dataStatus={invoiceData.invoiceStatus}
-                        />
-                      )
-                      : <></>
-                  }
-                  {!main.lnInvoiceStatus
-                    ?
-                    (
-                      <>
-                        <Button
-                          iconSize={14}
-                          width={220}
-                          height={48}
-                          onClick={getLnInvoice}
-                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                          text="Pay Bounty"
-                          ButtonTextStyle={{ padding: 0 }}
-                        /></>
-                    )
-
-                    : <></>}
                 </BountyPriceContainer>
                 <ButtonSet
                   showGithubBtn={!!ticketUrl}
