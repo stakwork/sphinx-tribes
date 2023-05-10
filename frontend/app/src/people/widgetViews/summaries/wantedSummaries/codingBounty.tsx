@@ -36,7 +36,6 @@ import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
 import moment from 'moment';
 import Invoice from './invoice';
-import { boolean } from 'yup';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -95,7 +94,7 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid: false
   });
 
-  const invoicePaid = paid || invoiceData.bountyPaid;
+  const bountyPaid = paid || invoiceData.bountyPaid;
 
   async function getLnInvoice() {
     await main.getLnInvoice({
@@ -145,7 +144,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             >
               <>
-                {invoicePaid && (
+                {bountyPaid && (
                   <Img
                     src={'/static/paid_ribbon.svg'}
                     style={{
@@ -158,7 +157,7 @@ function MobileView(props: CodingBountiesProps) {
                     }}
                   />
                 )}
-                {invoicePaid && (
+                {bountyPaid && (
                   <>
                     <PaidStatusPopover
                       color={color}
@@ -214,7 +213,7 @@ function MobileView(props: CodingBountiesProps) {
                   </>
                 )}
 
-                <CreatorDescription paid={invoicePaid} color={color}>
+                <CreatorDescription paid={bountyPaid} color={color}>
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
@@ -293,12 +292,12 @@ function MobileView(props: CodingBountiesProps) {
                       <div className="BountyProfileOuterContainerCreatorView">
                         <BountyProfileView
                           assignee={!assignedPerson ? assignee : assignedPerson}
-                          status={invoicePaid ? 'completed' : 'assigned'}
+                          status={bountyPaid ? 'completed' : 'assigned'}
                           canViewProfile={false}
                           statusStyle={{
                             width: '66px',
                             height: '16px',
-                            background: invoicePaid ? color.statusCompleted : color.statusAssigned
+                            background: bountyPaid ? color.statusCompleted : color.statusAssigned
                           }}
                           UserProfileContainerStyle={{
                             height: 48,
@@ -325,7 +324,7 @@ function MobileView(props: CodingBountiesProps) {
                             marginLeft: '12px'
                           }}
                         />
-                        {!invoicePaid && (
+                        {!bountyPaid && (
                           <div
                             className="AssigneeCloseButtonContainer"
                             onClick={() => {
@@ -431,7 +430,7 @@ function MobileView(props: CodingBountiesProps) {
                     />
                   </div>
                   <BottomButtonContainer>
-                    {invoicePaid ? (
+                    {bountyPaid ? (
                       <IconButton
                         width={220}
                         height={48}
@@ -454,8 +453,7 @@ function MobileView(props: CodingBountiesProps) {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setExtrasPropertyAndSave('paid', !invoicePaid);
-                          // setIsModalSideButton(true);
+                          setExtrasPropertyAndSave('paid', !bountyPaid);
                         }}
                       />
                     ) : (
@@ -667,7 +665,7 @@ function MobileView(props: CodingBountiesProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     setExtrasPropertyAndSaveMultiple('paid', {
-                      paid: !invoicePaid,
+                      paid: !bountyPaid,
                       price: bountyPrice,
                       award: awardDetails.name
                     });
@@ -725,7 +723,7 @@ function MobileView(props: CodingBountiesProps) {
          * normal user view
          */
         <NormalUser>
-          {invoicePaid && (
+          {bountyPaid && (
             <Img
               src={'/static/paid_ribbon.svg'}
               style={{
@@ -738,7 +736,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             />
           )}
-          <CreatorDescription paid={invoicePaid} color={color}>
+          <CreatorDescription paid={bountyPaid} color={color}>
             <div className="DescriptionUpperContainerNormalView">
               <div>{nametag}</div>
               <TitleBox color={color}>{titleString}</TitleBox>
@@ -770,7 +768,7 @@ function MobileView(props: CodingBountiesProps) {
           </CreatorDescription>
 
           <AssigneeProfile color={color}>
-            {invoicePaid ? (
+            {bountyPaid ? (
               <>
                 <BountyProfileView
                   assignee={assignee}
