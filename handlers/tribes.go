@@ -558,10 +558,10 @@ func DeleteInvoiceFromCache(w http.ResponseWriter, r *http.Request) {
 	err = db.Store.DeleteCache(invoice.Invoice)
 
 	if err != nil {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(true)
-	} else {
 		w.WriteHeader(http.StatusExpectationFailed)
 		json.NewEncoder(w).Encode(false)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(true)
 	}
 }
