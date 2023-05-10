@@ -207,7 +207,7 @@ export interface WantedSummaryProps {
     price: number;
     type: string;
     tribe: string;
-    paid: string;
+    paid: boolean;
     badgeRecipient: string;
     loomEmbedUrl: string;
     codingLanguage: {[key: string]: any};
@@ -236,7 +236,7 @@ export interface CodingBountiesProps {
     person: Person;
     setIsPaidStatusPopOver?:  (boolean) => void;
     creatorStep: number;
-    paid: string;
+    paid: boolean;
     tribe: string;
     saving?: string;
     isPaidStatusPopOver: boolean;
@@ -282,7 +282,7 @@ export interface CodingBountiesProps {
 }
 
 export interface CodingViewProps {
-  paid?: string;
+  paid?: boolean;
   titleString: string;
   labels?: { [key: string]: any };
   price?: Number;

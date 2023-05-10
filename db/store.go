@@ -80,7 +80,7 @@ func (s StoreData) GetInvoiceCache(key string) (InvoiceStoreData, error) {
 	value, found := s.Cache.Get(key)
 	c, _ := value.(InvoiceStoreData)
 	if !found {
-		return InvoiceStoreData{}, errors.New("not found")
+		return InvoiceStoreData{}, errors.New("Invoice Cache not found")
 	}
 	return c, nil
 }
@@ -94,7 +94,7 @@ func (s StoreData) GetInvoiceCount(key string) (uint, error) {
 	value, found := s.Cache.Get(key)
 	c, _ := value.(uint)
 	if !found {
-		return 0, errors.New("not found")
+		return 0, errors.New("Invoice count cache not found")
 	}
 	return c, nil
 }

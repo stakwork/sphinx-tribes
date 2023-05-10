@@ -95,7 +95,7 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid: false
   });
 
-  const invoicePaid = paid || invoiceData.bountyPaid ? true : false;
+  const invoicePaid = paid || invoiceData.bountyPaid;
 
   async function getLnInvoice() {
     await main.getLnInvoice({
