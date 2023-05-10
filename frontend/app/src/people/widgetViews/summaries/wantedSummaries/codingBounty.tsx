@@ -125,7 +125,7 @@ function MobileView(props: CodingBountiesProps) {
       if (count >= 29 || data.invoiceStatus) {
         clearTimeout(pollTimeout);
         setPollCount(0);
-        main.setLnInvoice("");
+        main.deleteLnInvoice(main.lnInvoice);
       }
     }
   }
@@ -391,7 +391,12 @@ function MobileView(props: CodingBountiesProps) {
                         />
                       )
                     }
-                    {!main.lnInvoiceStatus &&
+                    {/**
+                     * LNURL AUTH users alias are their public keys
+                     * which make them so long
+                     * A non LNAUTh user alias is shorter
+                     */}
+                    {!main.lnInvoiceStatus && assignee.owner_alias.length < 30 &&
                       (
                         <Button
                           iconSize={14}

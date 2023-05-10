@@ -540,3 +540,28 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceResult)
 }
+
+func DeleteInvoiceFromCache(w http.ResponseWriter, r *http.Request) {
+	invoice := db.Invoice{}
+	body, err := ioutil.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	err = db.Store.DeleteCache(invoice.Invoice)
+
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(true)
+	} else {
+		w.WriteHeader(http.StatusExpectationFailed)
+		json.NewEncoder(w).Encode(false)
+	}
+}
