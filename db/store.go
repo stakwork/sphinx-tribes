@@ -72,7 +72,8 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 }
 
 func (s StoreData) SetInvoiceCache(key string, value InvoiceStoreData) error {
-	s.Cache.Set(key, value, cache.DefaultExpiration)
+	// The invoice should expire every 2 minutes
+	s.Cache.Set(key, value, 2*time.Minute)
 	return nil
 }
 

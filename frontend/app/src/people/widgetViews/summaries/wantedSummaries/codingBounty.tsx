@@ -125,7 +125,7 @@ function MobileView(props: CodingBountiesProps) {
       if (count >= 29 || data.invoiceStatus) {
         clearTimeout(pollTimeout);
         setPollCount(0);
-        main.deleteLnInvoice(main.lnInvoice);
+        main.setLnInvoice('');
       }
     }
   }

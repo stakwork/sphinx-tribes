@@ -118,7 +118,6 @@ func InitInvoiceCron() {
 							if decodeErr != nil {
 								log.Printf("Could not encode extras json data")
 							} else {
-								// update LastLogin for user
 								db.DB.UpdatePerson(p.ID, map[string]interface{}{
 									"extras": b,
 								})

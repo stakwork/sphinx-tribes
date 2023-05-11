@@ -1054,23 +1054,6 @@ export class MainStore {
       return {invoiceStatus: false, bountyPaid: false};
     }
   }
-
-  @action async deleteLnInvoice(
-    payment_req: string,  
-    ): Promise<boolean> {
-   try {
-      const data = await api.post('invoices/delete', {
-        invoice: payment_req
-      }, {
-      'Content-Type': 'application/json' });
-      if (data.success) {
-        this.setLnInvoice('');
-      }
-      return data;
-    } catch (e) {
-      return false;
-    }
-  }
 }
 
 
