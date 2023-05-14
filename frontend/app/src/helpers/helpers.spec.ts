@@ -2,10 +2,12 @@ import {
   extractGithubIssueFromUrl,
   extractRepoAndIssueFromIssueUrl,
   randomString,
-  satToUsd
+  satToUsd,
+  calculateTimeLeft
 } from './helpers';
 import { uiStore } from '../store/ui';
 import crypto from 'crypto';
+import moment from 'moment';
 
 beforeAll(() => {
   uiStore.setUsdToSatsExchangeRate(10);
@@ -91,6 +93,14 @@ describe('testing helpers', () => {
       const str1 = randomString(2);
       const str2 = randomString(2);
       expect(str1).not.toBe(str2);
+    });
+  });
+  describe('calculateTimeLeft', () => {
+    test('time remaining', () => {
+      const timeLimit = new Date(moment().add(2, "minutes").format().toString());
+      const {minutes, seconds} = calculateTimeLeft(timeLimit);
+      expect(minutes).toBe(1);
+      expect(seconds).toBe(59);
     });
   });
 });

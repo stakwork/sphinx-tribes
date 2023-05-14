@@ -124,6 +124,7 @@ func PollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
+
 	k1 := r.URL.Query().Get("k1")
 
 	responseMsg := make(map[string]string)

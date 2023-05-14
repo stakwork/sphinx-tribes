@@ -14,7 +14,7 @@ import { AuthProps } from 'people/interfaces';
 export default observer(SignIn);
 
 function SignIn(props: AuthProps) {
-  const { main, ui } = useStores();
+  const { main } = useStores();
   const [page, setPage] = useState('sphinx');
   const [pollCount, setPollCount] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -32,16 +32,17 @@ function SignIn(props: AuthProps) {
     main.getLnAuth();
   }, []);
 
-  async function pollLnurl() {
+  async function pollLnurl(count: number) {
     if (main.lnauth.k1) {
       const data = await main.getLnAuthPoll();
-      setPollCount(pollCount + 1);
+      setPollCount(count);
 
       const pollTimeout = setTimeout(() => {
-        pollLnurl();
-      }, 1000);
+        pollLnurl(count + 1);
+        setPollCount(count + 1);
+      }, 1500);
 
-      if (pollCount >= 10 || data.status) {
+      if (count >= 10 || data.status) {
         clearTimeout(pollTimeout);
         setPollCount(0);
       }
@@ -120,7 +121,7 @@ function SignIn(props: AuthProps) {
                   color={'primary'}
                   onClick={() => {
                     setPage('lnurl');
-                    pollLnurl();
+                    pollLnurl(pollCount);
                   }}
                   hovercolor={'#5881F8'}
                   activecolor={'#5078F2'}

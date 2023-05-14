@@ -5,7 +5,7 @@ interface styledProps {
   show?: boolean;
 }
 interface WrapProps {
-  newDesign?: boolean;
+  newDesign?: string | boolean;
 }
 
 export const Wrap = styled.div<WrapProps>`

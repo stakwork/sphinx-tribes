@@ -1,14 +1,17 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -421,4 +424,119 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(true)
+}
+
+func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
+	invoice := db.InvoiceRequest{}
+	body, err := ioutil.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	pub_key := invoice.User_pubkey
+	owner_key := invoice.Owner_pubkey
+	amount := invoice.Amount
+	date := invoice.Created
+	memo := invoice.Memo
+
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	body, err = ioutil.ReadAll(res.Body)
+
+	// Unmarshal result
+	invoiceRes := db.InvoiceResponse{}
+
+	err = json.Unmarshal(body, &invoiceRes)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
+	// save the invoice to store
+	db.Store.SetInvoiceCache(invoiceRes.Response.Invoice, db.InvoiceStoreData{
+		Amount:       amount,
+		Created:      date,
+		Invoice:      invoiceRes.Response.Invoice,
+		Owner_pubkey: owner_key,
+		User_pubkey:  pub_key,
+	})
+
+	invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
+	totalCount := invoiceCount + 1
+
+	/**
+	  Set the invoice count to avoid making a request
+	  when there is no invoice in store
+	*/
+	db.Store.SetInvoiceCount(config.InvoiceCount, totalCount)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceRes)
+}
+
+func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
+	payment_request := chi.URLParam(r, "payment_request")
+
+	if payment_request == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	var invoiceState bool
+	var bountyPaid bool
+
+	/**
+	if invoice is still in the store
+	It means the invoice has not been paid
+	else it has been paid
+	*/
+	invoice, _ := db.Store.GetInvoiceCache(payment_request)
+
+	if invoice.Amount != "" {
+		invoiceState = false
+		bountyPaid = false
+	} else {
+		invoiceState = true
+		bountyPaid = true
+	}
+
+	invoiceData := db.InvoiceStatus{
+		Status:          invoiceState,
+		Payment_request: payment_request,
+	}
+
+	invoiceResult := make(map[string]interface{})
+
+	invoiceResult["status"] = invoiceData.Status
+	invoiceResult["payment_request"] = invoiceData.Payment_request
+	invoiceResult["bounty_paid"] = bountyPaid
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceResult)
 }

@@ -29,7 +29,7 @@ func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
 	var ret struct {
-		DeveloperCount uint64              `json:"developer_count"`
+		DeveloperCount int64               `json:"developer_count"`
 		BountiesCount  uint64              `json:"bounties_count"`
 		People         *[]db.PersonInShort `json:"people"`
 	}

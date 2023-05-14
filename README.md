@@ -70,3 +70,12 @@ line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 ```
     go test ./...
 ```
+
+### Enable Relay
+
+If you would like to enable Relay for invoice creation and keysend payment add the relay env key and values to the .env file
+
+```
+    RELAY_URL=
+    RELAY_AUTH_KEY=
+```
