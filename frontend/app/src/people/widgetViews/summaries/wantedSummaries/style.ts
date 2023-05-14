@@ -659,7 +659,7 @@ export const CountDownTimerWrap = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 5px;
-  width: 220px
+  width: 220px;
 `;
 
 export const CountDownText = styled.p`
@@ -689,5 +689,5 @@ export const InvoiceWrap = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 220px
-`
+  width: 220px;
+`;

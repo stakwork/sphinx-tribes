@@ -71,14 +71,14 @@ class UiStore {
 
   selectedPerson = 0;
   setSelectedPerson(n: number | undefined) {
-    if(n) this.selectedPerson = n;
+    if (n) this.selectedPerson = n;
   }
 
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
   selectingPerson = 0;
   setSelectingPerson(n: number | undefined) {
-    if(n) this.selectingPerson = n;
+    if (n) this.selectingPerson = n;
   }
 
   selectedBot = '';

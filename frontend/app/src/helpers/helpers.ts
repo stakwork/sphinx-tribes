@@ -88,15 +88,15 @@ export function sendToRedirect(url) {
   el.click();
 }
 
-  export const calculateTimeLeft = (timeLimit: Date): {minutes: number, seconds: number} => {
-    const difference = new Date(timeLimit).getTime() - new Date().getTime();
+export const calculateTimeLeft = (timeLimit: Date): { minutes: number; seconds: number } => {
+  const difference = new Date(timeLimit).getTime() - new Date().getTime();
 
-    let timeLeft: any = {};
+  let timeLeft: any = {};
 
-    if (difference > 0) {
-      timeLeft = {
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
+  if (difference > 0) {
+    timeLeft = {
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60)
     };
   }
 
