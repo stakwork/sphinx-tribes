@@ -10,7 +10,7 @@ export interface FormProps {
   paged?: boolean;
   onSubmit: (v: any) => Promise<void> | void;
   isFirstTimeScreen?: boolean;
-  newDesign?: boolean;
+  newDesign?: string | boolean;
   extraHTML?: JSX.Element | JSX.Element[] | any;
   close?: () => void;
   loading?: boolean;

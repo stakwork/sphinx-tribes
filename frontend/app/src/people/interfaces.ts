@@ -47,7 +47,6 @@ export interface UserInfoProps {
 }
 
 export interface BountiesProps {
-  assignee?: Person;
   price: number;
   sessionLength: string;
   priceMin: number;
@@ -56,12 +55,13 @@ export interface BountiesProps {
   title: string;
   person: Person;
   onPanelClick: () => void;
-  created: number;
+  created?: number;
   ticketUrl?: string;
   loomEmbedUrl?: string;
   description?: any;
   isPaid: boolean;
   widget?: any;
+  assignee?: Person
 }
 
 export interface BadgesProps {
@@ -92,7 +92,7 @@ export interface NameTagProps {
   owner_alias: string;
   owner_pubkey: string;
   img: string;
-  created: number;
+  created?: number;
   id: number;
   style?: React.CSSProperties;
   widget: any;
@@ -197,91 +197,92 @@ export interface GithubStatusPillProps {
 }
 
 export interface WantedSummaryProps {
-  description: any;
-  priceMin: number;
-  ticketUrl: string;
-  person: any;
-  created?: number | undefined;
-  repo: string;
-  issue: string;
-  price: Number;
-  type: string;
-  tribe: string;
-  paid: string;
-  badgeRecipient: string;
-  loomEmbedUrl: string;
-  codingLanguage: { [key: string]: any };
-  estimate_session_length: string;
-  assignee: Person;
-  fromBountyPage: string;
-  wanted_type: string;
-  one_sentence_summary: string;
-  github_description: string;
-  show: boolean;
-  setIsModalSideButton: (any) => void;
-  setIsExtraStyle: (any) => void;
-  formSubmit: (any) => void;
-  title: string;
+    description: any;
+    priceMin: number;
+    ticketUrl: string;
+    person: any;
+    created?: number | undefined;
+    repo: string;
+    issue: string;
+    price: number;
+    type: string;
+    tribe: string;
+    paid: boolean;
+    badgeRecipient: string;
+    loomEmbedUrl: string;
+    codingLanguage: {[key: string]: any};
+    estimate_session_length: string;
+    assignee: Person;
+    fromBountyPage: string;
+    wanted_type: string;
+    one_sentence_summary: string;
+    github_description: string;
+    show: boolean;
+    setIsModalSideButton: (any) => void;
+    setIsExtraStyle: (any) => void;
+    formSubmit: (any) => void;
+    title: string;
 }
 
 export interface CodingBountiesProps {
-  deliverables?: string;
-  description: any;
-  ticketUrl: string;
-  assignee: Person;
-  titleString: string;
-  nametag: JSX.Element;
-  labels?: { [key: string]: any };
-  person: Person;
-  setIsPaidStatusPopOver?: (boolean) => void;
-  creatorStep: number;
-  paid: string;
-  tribe: string;
-  saving?: string;
-  isPaidStatusPopOver: boolean;
-  isPaidStatusBadgeInfo: boolean;
-  awardDetails: any;
-  isAssigned: boolean;
-  dataValue: { [key: string]: any };
-  assigneeValue: boolean;
-  assignedPerson: Person;
-  changeAssignedPerson: () => void;
-  sendToRedirect: (string) => void;
-  handleCopyUrl: () => void;
-  isCopied: boolean;
-  setExtrasPropertyAndSave: (string, boolean) => void;
-  setIsModalSideButton: (boolean) => void;
-  replitLink: string;
-  assigneeHandlerOpen: () => void;
-  setCreatorStep: (number) => void;
-  setIsExtraStyle: (any) => void;
-  awards: { [key: string]: any };
-  setExtrasPropertyAndSaveMultiple: (string, any) => void;
-  handleAssigneeDetails: (any) => void;
-  peopleList: Person[];
-  setIsPaidStatusBadgeInfo: (any) => void;
-  bountyPrice: number;
-  selectedAward: string;
-  handleAwards: (any) => void;
-  repo: string;
-  issue: string;
-  isMarkPaidSaved: boolean;
-  setAwardDetails: (any) => void;
-  setBountyPrice: (any) => void;
-  owner_idURL: string;
-  createdURL: string;
-  editAction?: (any: any) => void;
-  deletingState?: boolean;
-  deleteAction?: (any: any) => void;
-  priceMin: number;
-  priceMax?: number;
-  price: Number;
-  estimate_session_length?: string;
-  extraModalFunction?: () => void;
+    deliverables?: string;
+    description: any;
+    ticketUrl: string;
+    assignee: Person;
+    created?: number;
+    titleString: string;
+    nametag: JSX.Element;
+    labels?: {[key: string]: any};
+    person: Person;
+    setIsPaidStatusPopOver?:  (boolean) => void;
+    creatorStep: number;
+    paid: boolean;
+    tribe: string;
+    saving?: string;
+    isPaidStatusPopOver: boolean;
+    isPaidStatusBadgeInfo: boolean;
+    awardDetails: any;
+    isAssigned: boolean;
+    dataValue: {[key: string]: any};
+    assigneeValue: boolean;
+    assignedPerson: Person
+    changeAssignedPerson: () => void;
+    sendToRedirect: (string) => void;
+    handleCopyUrl: () => void;
+    isCopied: boolean;
+    setExtrasPropertyAndSave: (string, boolean) => void;
+    setIsModalSideButton: (boolean) => void;
+    replitLink: string;
+    assigneeHandlerOpen: () => void;
+    setCreatorStep: (number) => void;
+    setIsExtraStyle: (any) => void;
+    awards: {[key: string]: any};
+    setExtrasPropertyAndSaveMultiple: (string, any) => void;
+    handleAssigneeDetails: (any) =>  void;
+    peopleList: Person[];
+    setIsPaidStatusBadgeInfo: (any) => void
+    bountyPrice: number;
+    selectedAward: string;
+    handleAwards: (any) => void;
+    repo: string;
+    issue: string;
+    isMarkPaidSaved: boolean;
+    setAwardDetails: (any) => void;
+    setBountyPrice: (any) => void;
+    owner_idURL: string;
+    createdURL: string;
+    editAction?: (any) => void;
+    deletingState?: boolean;
+    deleteAction?: (any) => void;
+    priceMin?: number;
+    priceMax?: number;
+    price?: number;
+    estimate_session_length?: string;
+    extraModalFunction?: () => void;
 }
 
 export interface CodingViewProps {
-  paid?: string;
+  paid?: boolean;
   titleString: string;
   labels?: { [key: string]: any };
   price?: Number;
@@ -305,31 +306,31 @@ export interface AddToFavoritesProps {
 }
 
 export interface WantedViewsProps {
-  description: string;
-  priceMin: number;
-  priceMax: number;
-  price?: number;
-  person: any;
-  created: number;
-  ticketUrl?: string;
-  gallery?: any;
-  assignee?: Person;
-  estimate_session_length?: string;
-  loomEmbedUrl?: string;
-  showModal?: () => void;
-  setDeletePayload?: (boolean) => void;
-  key?: string;
-  setExtrasPropertyAndSave?: (any) => void;
-  saving?: boolean;
-  labels?: [{ [key: string]: string }] | never[];
-  isClosed?: boolean;
-  onPanelClick: () => void;
-  status?: string;
-  isCodingTask?: boolean;
-  show?: string | boolean;
-  paid?: boolean;
-  isMine?: boolean;
-  titleString: any;
+    description: string;
+    priceMin: number;
+    priceMax: number;
+    price?: number;
+    person: any;
+    created?: number;
+    ticketUrl?: string;
+    gallery?: any;
+    assignee?: Person;
+    estimate_session_length?: string;
+    loomEmbedUrl?: string;
+    showModal?: () => void;
+    setDeletePayload?: (boolean) => void;
+    key?: string;
+    setExtrasPropertyAndSave?: (any) => void;
+    saving?: boolean;
+    labels?: [{[key: string]: string}] | never[];
+    isClosed?: boolean;
+    onPanelClick: () => void;
+    status?: string;
+    isCodingTask?: boolean;
+    show?: string | boolean;
+    paid?: boolean;
+    isMine?: boolean;
+    titleString: string | JSX.Element | JSX.Element[];
 }
 
 export interface WantedViews2Props extends WantedViewsProps {

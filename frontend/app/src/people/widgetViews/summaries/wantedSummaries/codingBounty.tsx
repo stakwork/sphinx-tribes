@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AssigneeProfile,
   Creator,
@@ -18,10 +18,10 @@ import {
   TitleBox,
   CodingLabels,
   AutoCompleteContainer,
-  AwardBottomContainer
+  AwardBottomContainer,
 } from './style';
 import { EuiText, EuiFieldText } from '@elastic/eui';
-import { Divider, Modal } from '../../../../components/common';
+import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
 import { satToUsd } from '../../../../helpers';
@@ -34,6 +34,8 @@ import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
+import moment from 'moment';
+import Invoice from './invoice';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -63,11 +65,9 @@ function MobileView(props: CodingBountiesProps) {
     handleCopyUrl,
     isCopied,
     setExtrasPropertyAndSave,
-    setIsModalSideButton,
     replitLink,
     assigneeHandlerOpen,
     setCreatorStep,
-    setIsExtraStyle,
     awards,
     setExtrasPropertyAndSaveMultiple,
     handleAssigneeDetails,
@@ -82,11 +82,53 @@ function MobileView(props: CodingBountiesProps) {
     setAwardDetails,
     setBountyPrice,
     owner_idURL,
-    createdURL
+    createdURL,
+    created
   } = props;
   const color = colors['light'];
 
-  const { ui } = useStores();
+  const { ui, main } = useStores();
+  const [pollCount, setPollCount] = useState(0);
+  const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean, bountyPaid: boolean }>({
+    invoiceStatus: false,
+    bountyPaid: false
+  });
+
+  const bountyPaid = paid || invoiceData.bountyPaid;
+
+  async function getLnInvoice() {
+    await main.getLnInvoice({
+      amount: props?.price || 0,
+      memo: '',
+      owner_pubkey: person.owner_pubkey,
+      user_pubkey: assignee.owner_pubkey,
+      created: created ? created?.toString() : '',
+    });
+    await pollLnInvoice(pollCount);
+  }
+
+  async function pollLnInvoice(count: number) {
+    if (main.lnInvoice) {
+      const data = await main.getLnInvoiceStatus(
+        main.lnInvoice,
+      );
+
+      setInvoiceData(data);
+
+      setPollCount(count);
+
+      const pollTimeout = setTimeout(() => {
+        pollLnInvoice(count + 1);
+        setPollCount(count + 1);
+      }, 2000);
+
+      if (count >= 29 || data.invoiceStatus) {
+        clearTimeout(pollTimeout);
+        setPollCount(0);
+        main.setLnInvoice('');
+      }
+    }
+  }
 
   return (
     <div>
@@ -102,7 +144,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             >
               <>
-                {paid && (
+                {bountyPaid && (
                   <Img
                     src={'/static/paid_ribbon.svg'}
                     style={{
@@ -115,7 +157,7 @@ function MobileView(props: CodingBountiesProps) {
                     }}
                   />
                 )}
-                {paid && (
+                {bountyPaid && (
                   <>
                     <PaidStatusPopover
                       color={color}
@@ -171,7 +213,7 @@ function MobileView(props: CodingBountiesProps) {
                   </>
                 )}
 
-                <CreatorDescription paid={paid} color={color}>
+                <CreatorDescription paid={bountyPaid} color={color}>
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
@@ -250,12 +292,12 @@ function MobileView(props: CodingBountiesProps) {
                       <div className="BountyProfileOuterContainerCreatorView">
                         <BountyProfileView
                           assignee={!assignedPerson ? assignee : assignedPerson}
-                          status={paid ? 'completed' : 'assigned'}
+                          status={bountyPaid ? 'completed' : 'assigned'}
                           canViewProfile={false}
                           statusStyle={{
                             width: '66px',
                             height: '16px',
-                            background: paid ? color.statusCompleted : color.statusAssigned
+                            background: bountyPaid ? color.statusCompleted : color.statusAssigned
                           }}
                           UserProfileContainerStyle={{
                             height: 48,
@@ -282,12 +324,11 @@ function MobileView(props: CodingBountiesProps) {
                             marginLeft: '12px'
                           }}
                         />
-                        {!paid && (
+                        {!bountyPaid && (
                           <div
                             className="AssigneeCloseButtonContainer"
                             onClick={() => {
                               changeAssignedPerson();
-                              setIsModalSideButton(false);
                             }}
                           >
                             <img
@@ -339,6 +380,35 @@ function MobileView(props: CodingBountiesProps) {
                         margin: 0
                       }}
                     />
+
+                    {
+                      main.lnInvoice && pollCount < 30 &&
+                      (
+                        <Invoice
+                          startDate={new Date(moment().add(1, "minutes").format().toString())}
+                          count={pollCount}
+                          dataStatus={invoiceData.invoiceStatus}
+                        />
+                      )
+                    }
+                    {/**
+                     * LNURL AUTH users alias are their public keys
+                     * which make them so long
+                     * A non LNAUTh user alias is shorter
+                     */}
+                    {!main.lnInvoiceStatus && assignee.owner_alias.length < 30 &&
+                      (
+                        <Button
+                          iconSize={14}
+                          width={220}
+                          height={48}
+                          onClick={getLnInvoice}
+                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                          text="Pay Bounty"
+                          ButtonTextStyle={{ padding: 0 }}
+                        />
+                      )
+                    }
                   </BountyPriceContainer>
                   <div className="buttonSet">
                     <ButtonSet
@@ -351,9 +421,8 @@ function MobileView(props: CodingBountiesProps) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                          labels && labels.map((x: any) => x.label)
-                        },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                          },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -366,7 +435,7 @@ function MobileView(props: CodingBountiesProps) {
                     />
                   </div>
                   <BottomButtonContainer>
-                    {paid ? (
+                    {bountyPaid ? (
                       <IconButton
                         width={220}
                         height={48}
@@ -389,8 +458,7 @@ function MobileView(props: CodingBountiesProps) {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setExtrasPropertyAndSave('paid', !paid);
-                          setIsModalSideButton(true);
+                          setExtrasPropertyAndSave('paid', !bountyPaid);
                         }}
                       />
                     ) : (
@@ -417,10 +485,7 @@ function MobileView(props: CodingBountiesProps) {
                         shadowcolor={color.button_primary.shadow}
                         onClick={(e) => {
                           e.stopPropagation();
-                          // setExtrasPropertyAndSave('paid', !paid);
                           setCreatorStep(1);
-                          setIsModalSideButton(false);
-                          setIsExtraStyle(true);
                         }}
                       />
                     )}
@@ -436,8 +501,6 @@ function MobileView(props: CodingBountiesProps) {
                 className="TopHeader"
                 onClick={() => {
                   setCreatorStep(0);
-                  setIsModalSideButton(true);
-                  setIsExtraStyle(false);
                 }}
               >
                 <div className="imageContainer">
@@ -519,10 +582,7 @@ function MobileView(props: CodingBountiesProps) {
                   shadowcolor={color.button_secondary.shadow}
                   onClick={(e) => {
                     e.stopPropagation();
-                    // setExtrasPropertyAndSave('paid', !paid);
-                    // setExtrasPropertyAndSave('price', bountyPrice);
                     setCreatorStep(2);
-                    setIsExtraStyle(false);
                   }}
                 />
               </div>
@@ -535,7 +595,6 @@ function MobileView(props: CodingBountiesProps) {
                   className="headerTop"
                   onClick={() => {
                     setCreatorStep(1);
-                    setIsExtraStyle(true);
                   }}
                 >
                   <div className="imageContainer">
@@ -611,14 +670,13 @@ function MobileView(props: CodingBountiesProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     setExtrasPropertyAndSaveMultiple('paid', {
-                      paid: !paid,
+                      paid: !bountyPaid,
                       price: bountyPrice,
                       award: awardDetails.name
                     });
 
                     setTimeout(() => {
                       setCreatorStep(0);
-                      setIsModalSideButton(true);
                     }, 3000);
                     setTimeout(() => {
                       if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);
@@ -670,7 +728,7 @@ function MobileView(props: CodingBountiesProps) {
          * normal user view
          */
         <NormalUser>
-          {paid && (
+          {bountyPaid && (
             <Img
               src={'/static/paid_ribbon.svg'}
               style={{
@@ -683,7 +741,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             />
           )}
-          <CreatorDescription paid={paid} color={color}>
+          <CreatorDescription paid={bountyPaid} color={color}>
             <div className="DescriptionUpperContainerNormalView">
               <div>{nametag}</div>
               <TitleBox color={color}>{titleString}</TitleBox>
@@ -715,7 +773,7 @@ function MobileView(props: CodingBountiesProps) {
           </CreatorDescription>
 
           <AssigneeProfile color={color}>
-            {paid ? (
+            {bountyPaid ? (
               <>
                 <BountyProfileView
                   assignee={assignee}
@@ -775,9 +833,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -848,9 +905,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -927,9 +983,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}

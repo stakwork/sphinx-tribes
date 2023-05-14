@@ -2,9 +2,9 @@ import { Person } from 'store/main';
 import { CSSProperties } from 'styled-components';
 
 export interface BountiesDescriptionProps {
-  description: any;
-  codingLanguage: [{ [key: string]: string }];
-  isPaid: boolean;
+  description?: any;
+  codingLanguage: [{ [key: string]: string }] | string;
+  isPaid?: boolean;
   title: string;
   style?: React.CSSProperties;
   owner_alias: string;
@@ -12,13 +12,13 @@ export interface BountiesDescriptionProps {
   id: number;
   owner_pubkey: string;
   img: string;
-  created: number;
+  created?: number;
 }
 
 export interface BountiesPriceProps {
-  sessionLength?: string;
-  priceMin: number;
-  price: Number;
+  sessionLength?: boolean | string;
+  priceMin?: number;
+  price?: number;
   style?: React.CSSProperties;
   priceMax?: number;
 }

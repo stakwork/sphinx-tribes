@@ -891,7 +891,6 @@ export class MainStore {
     extrasName: string,
     created: number
   ): Promise<any> {
-    alert('In set extras 2');
     if (uiStore.meInfo) {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
@@ -1000,7 +999,64 @@ export class MainStore {
       return { k1: '', status: false };
     }
   }
+
+  @observable
+  lnInvoice: string = '';
+
+  @action setLnInvoice(invoice: string ) {
+    this.lnInvoice = invoice;
+  }
+   
+  @observable
+  lnInvoiceStatus: boolean = false;
+
+  @action setLnInvoiceStatus(status: boolean) {
+    this.lnInvoiceStatus = status;
+  }
+
+  @action async getLnInvoice(body: {
+    amount: number, 
+    memo: string,
+    owner_pubkey: string,
+    user_pubkey: string,
+    created: string
+  } ): Promise<LnInvoice> {
+    try {
+      const data = await api.post('invoices', {
+        amount: body.amount, 
+        memo: body.memo,
+        owner_pubkey: body.owner_pubkey,
+        user_pubkey: body.user_pubkey,
+        created: body.created
+      }, {
+      'Content-Type': 'application/json' });
+      if (data.success) {
+        this.setLnInvoice(data.response.invoice);
+      }
+      return data;
+    } catch (e) {
+      return { success: false, response: {invoice : ''} };
+    }
+  }
+
+  @action async getLnInvoiceStatus(
+    payment_req: string,  
+    ): Promise<{invoiceStatus:  boolean, bountyPaid: boolean}> {
+    try {
+      const data = await api.get(`invoices/${payment_req}`, {
+      'Content-Type': 'application/json' });
+
+      if (data.status) {
+        this.setLnInvoiceStatus(data.status);
+      }
+      return {invoiceStatus: data.status, bountyPaid: data.bounty_paid} ;
+    } catch (e) {
+      return {invoiceStatus: false, bountyPaid: false};
+    }
+  }
 }
+
+
 
 export const mainStore = new MainStore();
 
@@ -1131,4 +1187,11 @@ export interface ClaimOnLiquid {
 export interface LnAuthData {
   encode: string;
   k1: string;
+}
+
+export interface LnInvoice {
+  success: boolean;
+  response: {
+    invoice: string;
+  }
 }
