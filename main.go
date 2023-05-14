@@ -29,6 +29,7 @@ func main() {
 	// Config has to be inited before JWT, if not it will lead to NO JWT error
 	config.InitConfig()
 	auth.InitJwt()
+	handlers.InitInvoiceCron()
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {

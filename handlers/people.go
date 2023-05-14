@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -73,8 +75,16 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 
 	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
+
 	if person.NewTicketTime != 0 {
 		go db.ProcessAlerts(person)
+	}
+
+	b := new(bytes.Buffer)
+	decodeErr := json.NewEncoder(b).Encode(person.Extras)
+
+	if decodeErr != nil {
+		log.Printf("Could not encode extras json data")
 	}
 
 	p, err := db.DB.CreateOrEditPerson(person)
@@ -171,7 +181,15 @@ func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 		person.Extras["wanted"] = append(wanteds[:index], wanteds[index+1:]...)
 	}
 
+	b := new(bytes.Buffer)
+	decodeErr := json.NewEncoder(b).Encode(person.Extras)
+
+	if decodeErr != nil {
+		log.Printf("Could not encode extras json data")
+	}
+
 	_, err = db.DB.CreateOrEditPerson(person)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -179,7 +197,6 @@ func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	return
-
 }
 
 func ProcessTwitterConfirmationsLoop() {

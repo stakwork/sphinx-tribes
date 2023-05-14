@@ -1,45 +1,48 @@
 package db
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"time"
 
 	"github.com/lib/pq"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // Tribe struct
 type Tribe struct {
-	UUID            string         `json:"uuid"`
-	OwnerPubKey     string         `json:"owner_pubkey"`
-	OwnerAlias      string         `json:"owner_alias"`
-	GroupKey        string         `json:"group_key"`
-	Name            string         `json:"name"`
-	UniqueName      string         `json:"unique_name"`
-	Description     string         `json:"description"`
-	Tags            pq.StringArray `json:"tags"`
-	Img             string         `json:"img"`
-	PriceToJoin     int64          `json:"price_to_join"`
-	PricePerMessage int64          `json:"price_per_message"`
-	EscrowAmount    int64          `json:"escrow_amount"`
-	EscrowMillis    int64          `json:"escrow_millis"`
-	Created         *time.Time     `json:"created"`
-	Updated         *time.Time     `json:"updated"`
-	MemberCount     uint64         `json:"member_count"`
-	Unlisted        bool           `json:"unlisted"`
-	Private         bool           `json:"private"`
-	Deleted         bool           `json:"deleted"`
-	AppURL          string         `json:"app_url"`
-	FeedURL         string         `json:"feed_url"`
-	FeedType        uint64         `json:"feed_type"`
-	LastActive      int64          `json:"last_active"`
-	Bots            string         `json:"bots"`
-	OwnerRouteHint  string         `json:"owner_route_hint"`
-	Pin             string         `json:"pin"`
-	Preview         string         `json:"preview"`
-	ProfileFilters  string         `json:"profile_filters"` // "twitter,github"
-	Badges          pq.StringArray `json:"badges"`
+	UUID            string      `json:"uuid"`
+	OwnerPubKey     string      `json:"owner_pubkey"`
+	OwnerAlias      string      `json:"owner_alias"`
+	GroupKey        string      `json:"group_key"`
+	Name            string      `json:"name"`
+	UniqueName      string      `json:"unique_name"`
+	Description     string      `json:"description"`
+	Tags            StringArray `json:"tags"`
+	Img             string      `json:"img"`
+	PriceToJoin     int64       `json:"price_to_join"`
+	PricePerMessage int64       `json:"price_per_message"`
+	EscrowAmount    int64       `json:"escrow_amount"`
+	EscrowMillis    int64       `json:"escrow_millis"`
+	Created         *time.Time  `json:"created"`
+	Updated         *time.Time  `json:"updated"`
+	MemberCount     uint64      `json:"member_count"`
+	Unlisted        bool        `json:"unlisted"`
+	Private         bool        `json:"private"`
+	Deleted         bool        `json:"deleted"`
+	AppURL          string      `json:"app_url"`
+	FeedURL         string      `json:"feed_url"`
+	FeedType        uint64      `json:"feed_type"`
+	LastActive      int64       `json:"last_active"`
+	Bots            string      `json:"bots"`
+	OwnerRouteHint  string      `json:"owner_route_hint"`
+	Pin             string      `json:"pin"`
+	Preview         string      `json:"preview"`
+	ProfileFilters  string      `json:"profile_filters"` // "twitter,github"
+	Badges          StringArray `json:"badges"`
 }
 
 // Bot struct
@@ -108,7 +111,7 @@ type Person struct {
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
 	Description      string         `json:"description"`
-	Tags             pq.StringArray `json:"tags"`
+	Tags             pq.StringArray `gorm:"type:text[]" json:"tags" null`
 	Img              string         `json:"img"`
 	Created          *time.Time     `json:"created"`
 	Updated          *time.Time     `json:"updated"`
@@ -122,6 +125,20 @@ type Person struct {
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
+}
+
+type GormDataTypeInterface interface {
+	GormDataType() string
+}
+
+type GormDBDataTypeInterface interface {
+	GormDBDataType(*gorm.DB, *schema.Field) string
+}
+
+type StringArray pq.StringArray
+
+func (StringArray) GormDataType() string {
+	return "text[]"
 }
 
 type PersonInShort struct {
@@ -217,6 +234,85 @@ type ConnectionCodesShort struct {
 	DateCreated      *time.Time `json:"date_created"`
 }
 
+type InvoiceRequest struct {
+	Amount       string `json:"amount"`
+	Memo         string `json:"memo"`
+	Owner_pubkey string `json:"owner_pubkey"`
+	User_pubkey  string `json:"user_pubkey"`
+	Created      string `json:"created"`
+}
+
+type Invoice struct {
+	Invoice string `json:"invoice"`
+}
+
+type InvoiceResponse struct {
+	Succcess bool    `json:"success"`
+	Response Invoice `json:"response"`
+}
+
+type InvoiceStoreData struct {
+	Invoice      string `json:"invoice"`
+	Owner_pubkey string `json:"owner_pubkey"`
+	User_pubkey  string `json:"user_pubkey"`
+	Amount       string `json:"amount"`
+	Created      string `json:"created"`
+}
+
+type InvoiceData struct {
+	Route_hints       []string               `json:"route_hints"`
+	Htlcs             []interface{}          `json:"htlcs"`
+	Features          map[string]interface{} `json:"features"`
+	Amp_invoice_state map[string]interface{} `json:"amp_invoice_state"`
+	Memo              string                 `json:"memo"`
+	R_preimage        map[string]interface{} `json:"r_preimage"`
+	R_hash            map[string]interface{} `json:"r_hash"`
+	Value             string                 `json:"value"`
+	Settled           bool                   `json:"settled"`
+	Creation_date     string                 `json:"creation_date"`
+	Settle_date       string                 `json:"settle_date"`
+	Payment_request   string                 `json:"payment_request"`
+	Description_hash  map[string]interface{} `json:"description_hash"`
+	Expiry            string                 `json:"expiry"`
+	Fallback_addr     string                 `json:"fallback_addr"`
+	Cltv_expiry       string                 `json:"cltv_expiry"`
+	Private           bool                   `json:"private"`
+	Add_index         string                 `json:"add_index"`
+	Settle_index      string                 `json:"settle_index"`
+	Amt_paid          string                 `json:"amt_paid"`
+	Amt_paid_sat      string                 `json:"amt_paid_sat"`
+	Amt_paid_msat     string                 `json:"amt_paid_msat"`
+	State             string                 `json:"state"`
+	Value_msat        string                 `json:"value_msat"`
+	Is_keysend        bool                   `json:"is_keysend"`
+	Payment_addr      map[string]interface{} `json:"payment_addr"`
+	Is_amp            bool                   `json:"is_amp"`
+}
+
+type InvoiceList struct {
+	Invoices []InvoiceData `json:"invoices"`
+}
+
+type InvoiceStatus struct {
+	Payment_request string `json:"payment_request"`
+	Status          bool   `json:"Status"`
+}
+
+type KeysendPayment struct {
+	Amount          string `json:"amount"`
+	Destination_key string `json:"destination_key"`
+}
+
+type KeysendSuccess struct {
+	Success  bool        `json:"success"`
+	Response PropertyMap `json:"response"`
+}
+
+type KeysendError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
 func (ConnectionCodes) TableName() string {
 	return "connectioncodes"
 }
@@ -230,8 +326,10 @@ type PropertyMap map[string]interface{}
 
 // Value ...
 func (p PropertyMap) Value() (driver.Value, error) {
-	j, err := json.Marshal(p)
-	return j, err
+	b := new(bytes.Buffer)
+	err := json.NewEncoder(b).Encode(p)
+
+	return b, err
 }
 
 // Scan ...
