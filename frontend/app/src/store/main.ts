@@ -1003,10 +1003,10 @@ export class MainStore {
   @observable
   lnInvoice: string = '';
 
-  @action setLnInvoice(invoice: string ) {
+  @action setLnInvoice(invoice: string) {
     this.lnInvoice = invoice;
   }
-   
+
   @observable
   lnInvoiceStatus: boolean = false;
 
@@ -1015,48 +1015,52 @@ export class MainStore {
   }
 
   @action async getLnInvoice(body: {
-    amount: number, 
-    memo: string,
-    owner_pubkey: string,
-    user_pubkey: string,
-    created: string
-  } ): Promise<LnInvoice> {
+    amount: number;
+    memo: string;
+    owner_pubkey: string;
+    user_pubkey: string;
+    created: string;
+  }): Promise<LnInvoice> {
     try {
-      const data = await api.post('invoices', {
-        amount: body.amount, 
-        memo: body.memo,
-        owner_pubkey: body.owner_pubkey,
-        user_pubkey: body.user_pubkey,
-        created: body.created
-      }, {
-      'Content-Type': 'application/json' });
+      const data = await api.post(
+        'invoices',
+        {
+          amount: body.amount,
+          memo: body.memo,
+          owner_pubkey: body.owner_pubkey,
+          user_pubkey: body.user_pubkey,
+          created: body.created
+        },
+        {
+          'Content-Type': 'application/json'
+        }
+      );
       if (data.success) {
         this.setLnInvoice(data.response.invoice);
       }
       return data;
     } catch (e) {
-      return { success: false, response: {invoice : ''} };
+      return { success: false, response: { invoice: '' } };
     }
   }
 
   @action async getLnInvoiceStatus(
-    payment_req: string,  
-    ): Promise<{invoiceStatus:  boolean, bountyPaid: boolean}> {
+    payment_req: string
+  ): Promise<{ invoiceStatus: boolean; bountyPaid: boolean }> {
     try {
       const data = await api.get(`invoices/${payment_req}`, {
-      'Content-Type': 'application/json' });
+        'Content-Type': 'application/json'
+      });
 
       if (data.status) {
         this.setLnInvoiceStatus(data.status);
       }
-      return {invoiceStatus: data.status, bountyPaid: data.bounty_paid} ;
+      return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
     } catch (e) {
-      return {invoiceStatus: false, bountyPaid: false};
+      return { invoiceStatus: false, bountyPaid: false };
     }
   }
 }
-
-
 
 export const mainStore = new MainStore();
 
@@ -1193,5 +1197,5 @@ export interface LnInvoice {
   success: boolean;
   response: {
     invoice: string;
-  }
+  };
 }

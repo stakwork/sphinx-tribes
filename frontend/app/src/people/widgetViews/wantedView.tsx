@@ -40,7 +40,7 @@ function WantedView(props: WantedViews2Props) {
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
-  const [labels, setLabels] = useState<[{ [key: string]: string; }]>([{}]);
+  const [labels, setLabels] = useState<[{ [key: string]: string }]>([{}]);
   const { peopleWanteds } = main;
   const color = colors['light'];
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;

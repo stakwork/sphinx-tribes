@@ -29,7 +29,9 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
     let res;
     if (props.codingLanguage.length > 0) {
       res = LanguageObject?.filter((value) =>
-        !isString(props.codingLanguage) ? props.codingLanguage?.find((val) => val.label === value.label) : props.codingLanguage
+        !isString(props.codingLanguage)
+          ? props.codingLanguage?.find((val) => val.label === value.label)
+          : props.codingLanguage
       );
     }
     setDataValue(res);
@@ -134,7 +136,7 @@ interface bounty_description_props {
   isPaid?: any;
   color?: any;
 }
-interface replit_image_props { }
+interface replit_image_props {}
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;
