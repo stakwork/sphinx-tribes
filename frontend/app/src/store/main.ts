@@ -1025,7 +1025,7 @@ export class MainStore {
       const data = await api.post(
         'invoices',
         {
-          amount: body.amount,
+          amount: body.amount.toString(),
           memo: body.memo,
           owner_pubkey: body.owner_pubkey,
           user_pubkey: body.user_pubkey,

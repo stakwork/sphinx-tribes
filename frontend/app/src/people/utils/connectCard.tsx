@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import QR from './QR';
 import QrBar from './QrBar';
+import AssignBounty from './assignBounty';
 import { makeConnectQR } from '../../helpers';
 import { colors } from '../../config/colors';
 import { ConnectCardProps } from 'people/interfaces';
+import { useStores } from 'store';
 
 export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];
   const { visible } = props;
   const { person } = props;
+  const { ui } = useStores();
+
+  const [openAssignModal, setAssignModal] = useState<boolean>(false);
+  const closeAssignModal = () => setAssignModal(false);
+  const showAssignModal = () => setAssignModal(true);
 
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
 
@@ -49,6 +56,7 @@ export default function ConnectCard(props: ConnectCardProps) {
               imgSize={27}
               height={48}
               width={'100%'}
+              onClick={showAssignModal}
             />
 
             <a href={qrString}>
@@ -69,6 +77,12 @@ export default function ConnectCard(props: ConnectCardProps) {
           <div className="bottomText">Scan or paste in Sphinx</div>
         </ModalBottomText>
       </Modal>
+      <AssignBounty
+        dismiss={() => closeAssignModal()}
+        modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+        person={ui.meInfo}
+        visible={openAssignModal}
+      />
     </div>
   );
 }
