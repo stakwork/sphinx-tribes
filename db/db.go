@@ -429,7 +429,8 @@ func makeExtrasListQuery(columnName string) string {
 	AND CASE
 			WHEN arr.item_object->>'show' = 'false' THEN false
 			ELSE true
-		END`
+		END
+	`
 }
 
 func makePersonExtrasListQuery(columnName string) string {

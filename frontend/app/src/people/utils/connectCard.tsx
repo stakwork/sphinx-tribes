@@ -41,6 +41,16 @@ export default function ConnectCard(props: ConnectCardProps) {
 
             <QrBar value={person?.owner_pubkey} simple style={{ marginTop: 11 }} />
 
+            <Button
+              text={'Assign to self'}
+              color={'primary'}
+              style={{ paddingLeft: 25, margin: '12px 0 10px' }}
+              img={'sphinx_white.png'}
+              imgSize={27}
+              height={48}
+              width={'100%'}
+            />
+
             <a href={qrString}>
               <Button
                 text={'Connect with Sphinx'}
@@ -80,6 +90,10 @@ const ImgWrap = styled.div`
 `;
 const B = styled.span`
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 `;
 const W = styled.div<styledProps>`
   display: flex;
