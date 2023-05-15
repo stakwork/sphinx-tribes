@@ -307,8 +307,12 @@ type GithubOpenIssue struct {
 	Assignee string `json:"assignee"`
 }
 
+type GithubOpenIssueCount struct {
+	Count int64 `json:"count"`
+}
+
 func (db database) GetOpenGithubIssues(r *http.Request) (int64, error) {
-	ms := []GithubOpenIssue{}
+	ms := []GithubOpenIssueCount{}
 
 	// set limit
 	result := db.db.Raw(
