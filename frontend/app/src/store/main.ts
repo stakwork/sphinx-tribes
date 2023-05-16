@@ -6,6 +6,7 @@ import { randomString } from '../helpers';
 import { uiStore } from './ui';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
+import { type } from 'os';
 
 export const queryLimit = 1000;
 
@@ -1020,6 +1021,7 @@ export class MainStore {
     owner_pubkey: string;
     user_pubkey: string;
     created: string;
+    type: "KEYSEND" | "ASSIGN";
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1029,7 +1031,8 @@ export class MainStore {
           memo: body.memo,
           owner_pubkey: body.owner_pubkey,
           user_pubkey: body.user_pubkey,
-          created: body.created
+          created: body.created,
+          type: body.type
         },
         {
           'Content-Type': 'application/json'

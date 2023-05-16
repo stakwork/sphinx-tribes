@@ -445,19 +445,9 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	amount := invoice.Amount
 	date := invoice.Created
 	memo := invoice.Memo
+	invoiceType := invoice.Type
 
-	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
-
-	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
-
-	jsonBody := []byte(bodyData)
-
-	client := &http.Client{}
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-	req.Header.Set("x-user-token", config.RelayAuthKey)
-	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
+	res, _ := makeInvoiceRequest(amount, memo)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
@@ -485,6 +475,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		Invoice:      invoiceRes.Response.Invoice,
 		Owner_pubkey: owner_key,
 		User_pubkey:  pub_key,
+		Type:         invoiceType,
 	})
 
 	invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
@@ -539,4 +530,21 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceResult)
+}
+
+func makeInvoiceRequest(amount string, memo string) (*http.Response, error) {
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	return res, err
 }

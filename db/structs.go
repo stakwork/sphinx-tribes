@@ -240,6 +240,7 @@ type InvoiceRequest struct {
 	Owner_pubkey string `json:"owner_pubkey"`
 	User_pubkey  string `json:"user_pubkey"`
 	Created      string `json:"created"`
+	Type         string `json:"type"`
 }
 
 type Invoice struct {
@@ -257,6 +258,7 @@ type InvoiceStoreData struct {
 	User_pubkey  string `json:"user_pubkey"`
 	Amount       string `json:"amount"`
 	Created      string `json:"created"`
+	Type         string `json:"type"`
 }
 
 type InvoiceData struct {
