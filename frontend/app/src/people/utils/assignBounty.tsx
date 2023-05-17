@@ -6,6 +6,7 @@ import QrBar from './QrBar';
 import { colors } from '../../config/colors';
 import { ConnectCardProps } from 'people/interfaces';
 import { useStores } from 'store';
+import { EuiGlobalToastList } from '@elastic/eui';
 
 export default function AssignBounty(props: ConnectCardProps) {
     const color = colors['light'];
@@ -15,6 +16,20 @@ export default function AssignBounty(props: ConnectCardProps) {
     const [bountyHours, setBountyHours] = useState(1);
     const [bountyInvoice, setBountyInvoice] = useState<string>("");
 
+    const [toasts, setToasts]: any = useState([]);
+
+    function addToast() {
+        setToasts([
+            {
+                id: '1',
+                title: 'Assigned bounty'
+            }
+        ]);
+    }
+
+    function removeToast() {
+        setToasts([]);
+    }
 
     const generateInvoice = async () => {
         const data = await main.getLnInvoice({
@@ -80,6 +95,7 @@ export default function AssignBounty(props: ConnectCardProps) {
                     <div className="bottomText">Pay the invoice to assign to your self</div>
                 </ModalBottomText>
             </Modal>
+            <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={1000} />
         </div>
     );
 }
