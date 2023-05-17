@@ -26,8 +26,8 @@ const BountyProfileView = (props: BountiesProfileProps) => {
             src={
               { ...props.assignee }.owner_alias
                 ? {
-                    ...props.assignee
-                  }.img || '/static/person_placeholder.png'
+                  ...props.assignee
+                }.img || '/static/person_placeholder.png'
                 : '/static/default_profile_image.svg'
             }
             alt={'assigned_person'}
@@ -55,10 +55,9 @@ const BountyProfileView = (props: BountiesProfileProps) => {
               if (props.isNameClickable && { ...props.assignee }.owner_alias) {
                 e.stopPropagation();
                 window.open(
-                  `/p/${
-                    {
-                      ...props.assignee
-                    }.owner_pubkey
+                  `/p/${{
+                    ...props.assignee
+                  }.owner_pubkey
                   }?widget=wanted`,
                   '_blank'
                 );
@@ -77,10 +76,9 @@ const BountyProfileView = (props: BountiesProfileProps) => {
                 if ({ ...props.assignee }.owner_alias) {
                   e.stopPropagation();
                   window.open(
-                    `/p/${
-                      {
-                        ...props.assignee
-                      }.owner_pubkey
+                    `/p/${{
+                      ...props.assignee
+                    }.owner_pubkey
                     }?widget=wanted`,
                     '_blank'
                   );
@@ -169,6 +167,7 @@ const NameContainer = styled.div<BountyProfileViewProps>`
     overflow: hidden;
     font-size: 17px;
     font-weight: 600;
+    width: 150px;
     text-overflow: ellipsis;
     color: ${(p) => p.name_text_color};
   }

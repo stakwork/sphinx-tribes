@@ -145,11 +145,13 @@ func InitInvoiceCron() {
 								return
 							}
 						} else {
+							fmt.Println("Assigned Invoice ===", storeInvoice.User_pubkey, storeInvoice.Created)
 							var p = db.DB.GetPersonByPubkey(storeInvoice.Owner_pubkey)
 
 							wanteds, _ := p.Extras["wanted"].([]interface{})
 
 							for _, wanted := range wanteds {
+								fmt.Println("In wanteds ===", wanted)
 								w, ok2 := wanted.(map[string]interface{})
 								if !ok2 {
 									continue // next wanted
@@ -176,6 +178,8 @@ func InitInvoiceCron() {
 									assignee["value"] = user.OwnerPubKey
 									assignee["owner_pubkey"] = user.OwnerPubKey
 									assignee["owner_alias"] = user.OwnerAlias
+
+									fmt.Println("Assignee ===", assignee)
 
 									w["assignee"] = assignee
 								}
