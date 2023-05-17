@@ -145,7 +145,6 @@ func InitInvoiceCron() {
 								return
 							}
 						} else {
-							// TODO FOR assigning user to bounty
 							var p = db.DB.GetPersonByPubkey(storeInvoice.Owner_pubkey)
 
 							wanteds, _ := p.Extras["wanted"].([]interface{})
@@ -168,7 +167,17 @@ func InitInvoiceCron() {
 								}
 
 								if createdInt == dateInt {
-									w["paid"] = true
+									var user = db.DB.GetPersonByPubkey(storeInvoice.User_pubkey)
+
+									var assignee = make(map[string]interface{})
+
+									assignee["img"] = user.Img
+									assignee["label"] = user.OwnerAlias
+									assignee["value"] = user.OwnerPubKey
+									assignee["owner_pubkey"] = user.OwnerPubKey
+									assignee["owner_alias"] = user.OwnerAlias
+
+									w["assignee"] = assignee
 								}
 							}
 
