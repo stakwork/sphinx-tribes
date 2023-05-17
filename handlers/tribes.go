@@ -478,23 +478,19 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// save the invoice to store
-	db.Store.SetInvoiceCache(invoiceRes.Response.Invoice, db.InvoiceStoreData{
+	var invoiceCache, _ = db.Store.GetInvoiceCache()
+	var invoiceData = db.InvoiceStoreData{
 		Amount:       amount,
 		Created:      date,
 		Invoice:      invoiceRes.Response.Invoice,
 		Owner_pubkey: owner_key,
 		User_pubkey:  pub_key,
-	})
+	}
 
-	invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
-	totalCount := invoiceCount + 1
+	var invoiceList = append(invoiceCache, invoiceData)
 
-	/**
-	  Set the invoice count to avoid making a request
-	  when there is no invoice in store
-	*/
-	db.Store.SetInvoiceCount(config.InvoiceCount, totalCount)
+	// save the invoice to store
+	db.Store.SetInvoiceCache(invoiceList)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
@@ -512,15 +508,24 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	var bountyPaid bool
 
 	/**
-	if invoice is still in the store
-	It means the invoice has not been paid
-	else it has been paid
+	  if invoice is still in the store
+	  It means the invoice has not been paid
+	  else it has been paid
 	*/
-	invoice, _ := db.Store.GetInvoiceCache(payment_request)
+	invoiceList, _ := db.Store.GetInvoiceCache()
+	invoiceLength := len(invoiceList)
 
-	if invoice.Amount != "" {
-		invoiceState = false
-		bountyPaid = false
+	if invoiceLength > 0 {
+
+		for _, invoice := range invoiceList {
+			if invoice.Invoice == payment_request {
+				invoiceState = false
+				bountyPaid = false
+			} else {
+				invoiceState = true
+				bountyPaid = true
+			}
+		}
 	} else {
 		invoiceState = true
 		bountyPaid = true
