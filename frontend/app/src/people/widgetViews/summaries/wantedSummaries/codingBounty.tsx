@@ -391,7 +391,7 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so long
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!main.lnInvoiceStatus && assignee.owner_alias.length < 30 && (
+                    {!main.lnInvoiceStatus && !main.lnInvoice && assignee.owner_alias.length < 30 && (
                       <Button
                         iconSize={14}
                         width={220}
