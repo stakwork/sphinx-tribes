@@ -9,8 +9,8 @@ import { useStores } from 'store';
 
 export default function AssignBounty(props: ConnectCardProps) {
     const color = colors['light'];
-    const { visible } = props;
-    const { main } = useStores();
+    const { visible, person, created } = props;
+    const { main, ui } = useStores();
 
     const [bountyHours, setBountyHours] = useState(1);
     const [bountyInvoice, setBountyInvoice] = useState<string>("");
@@ -19,9 +19,9 @@ export default function AssignBounty(props: ConnectCardProps) {
     const generateInvoice = async () => {
         const data = await main.getLnInvoice({
             amount: 200 * bountyHours, memo: "",
-            owner_pubkey: '',
-            user_pubkey: '',
-            created: '',
+            owner_pubkey: person?.owner_pubkey ?? '',
+            user_pubkey: ui.meInfo?.owner_pubkey ?? '',
+            created: created.toString(),
             type: 'ASSIGN'
         })
 

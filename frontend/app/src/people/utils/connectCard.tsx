@@ -7,13 +7,10 @@ import AssignBounty from './assignBounty';
 import { makeConnectQR } from '../../helpers';
 import { colors } from '../../config/colors';
 import { ConnectCardProps } from 'people/interfaces';
-import { useStores } from 'store';
 
 export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];
-  const { visible } = props;
-  const { person } = props;
-  const { ui } = useStores();
+  const { visible, created, person } = props;
 
   const [openAssignModal, setAssignModal] = useState<boolean>(false);
   const closeAssignModal = () => setAssignModal(false);
@@ -80,9 +77,8 @@ export default function ConnectCard(props: ConnectCardProps) {
       <AssignBounty
         dismiss={() => closeAssignModal()}
         modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-        person={ui.meInfo}
-        visible={openAssignModal}
-      />
+        person={person}
+        visible={openAssignModal} created={created} />
     </div>
   );
 }

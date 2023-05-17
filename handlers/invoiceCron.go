@@ -57,7 +57,6 @@ func InitInvoiceCron() {
 						If the invoice is settled and still in store
 						make keysend payment
 						*/
-
 						if storeInvoice.Type == "KEYSEND" {
 
 							url := fmt.Sprintf("%s/payment", config.RelayUrl)
@@ -147,6 +146,53 @@ func InitInvoiceCron() {
 							}
 						} else {
 							// TODO FOR assigning user to bounty
+							var p = db.DB.GetPersonByPubkey(storeInvoice.Owner_pubkey)
+
+							wanteds, _ := p.Extras["wanted"].([]interface{})
+
+							for _, wanted := range wanteds {
+								w, ok2 := wanted.(map[string]interface{})
+								if !ok2 {
+									continue // next wanted
+								}
+
+								created, ok3 := w["created"].(float64)
+								createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
+								createdString := createdArr[0]
+								createdInt, _ := strconv.ParseInt(createdString, 10, 32)
+
+								dateInt, _ := strconv.ParseInt(storeInvoice.Created, 10, 32)
+
+								if !ok3 {
+									continue
+								}
+
+								if createdInt == dateInt {
+									w["paid"] = true
+								}
+							}
+
+							p.Extras["wanted"] = wanteds
+							b := new(bytes.Buffer)
+							decodeErr := json.NewEncoder(b).Encode(p.Extras)
+
+							if decodeErr != nil {
+								log.Printf("Could not encode extras json data")
+							} else {
+								db.DB.UpdatePerson(p.ID, map[string]interface{}{
+									"extras": b,
+								})
+
+								// Delete the invoice from store
+								db.Store.DeleteCache(storeInvoice.Invoice)
+
+								invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
+
+								if invoiceCount > 0 {
+									// reduce the invoice count
+									db.Store.SetInvoiceCount(config.InvoiceCount, invoiceCount-1)
+								}
+							}
 						}
 					}
 				}

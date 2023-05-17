@@ -75,6 +75,7 @@ export interface ConnectCardProps {
   dismiss: () => void;
   modalStyle?: React.CSSProperties;
   visible: boolean;
+  created: number
 }
 
 export interface LoomViewProps {
