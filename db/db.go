@@ -456,6 +456,10 @@ func addNewerThanTimestampToExtrasRawQuery(query string, timestamp int) string {
 	return query + ` AND CAST(arr.item_object->>'created' AS INT) > ` + t
 }
 
+func addOrderToExtrasRawQuery(query string) string {
+	return query + `ORDER BY cast(arr.item_object->>'created' as integer) DESC`
+}
+
 func addNotMineToExtrasRawQuery(query string, pubkey string) string {
 	return query + ` AND people.owner_pub_key != ` + pubkey + ` `
 }
@@ -499,6 +503,9 @@ func (db database) GetListedWanteds(r *http.Request) ([]PeopleExtra, error) {
 
 	// 3/1/2022 = 1646172712, we do this to disclude early test tickets
 	rawQuery = addNewerThanTimestampToExtrasRawQuery(rawQuery, 1646172712)
+
+	// Order the wanted in descending order by created date
+	rawQuery = addOrderToExtrasRawQuery(rawQuery)
 
 	// if logged in, dont get mine
 	ctx := r.Context()
