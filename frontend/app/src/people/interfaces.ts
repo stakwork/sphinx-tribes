@@ -280,6 +280,8 @@ export interface CodingBountiesProps {
   price?: number;
   estimate_session_length?: string;
   extraModalFunction?: () => void;
+  commitment_fee?: string;
+  assigned_hours?: string;
 }
 
 export interface CodingViewProps {

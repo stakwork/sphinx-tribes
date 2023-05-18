@@ -103,7 +103,9 @@ function MobileView(props: CodingBountiesProps) {
       owner_pubkey: person.owner_pubkey,
       user_pubkey: assignee.owner_pubkey,
       created: created ? created?.toString() : '',
-      type: 'KEYSEND'
+      type: 'KEYSEND',
+      assigned_hours: 0,
+      commitment_fee: 0,
     });
 
     await pollLnInvoice(pollCount);

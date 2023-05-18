@@ -42,7 +42,9 @@ export default function AssignBounty(props: ConnectCardProps) {
             owner_pubkey: person?.owner_pubkey ?? '',
             user_pubkey: ui.meInfo?.owner_pubkey ?? '',
             created: created ? created.toString() : '',
-            type: 'ASSIGN'
+            type: 'ASSIGN',
+            assigned_hours: bountyHours,
+            commitment_fee: bountyHours * 200,
         })
 
         setBountyInvoice(data.response.invoice);

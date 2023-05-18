@@ -235,12 +235,14 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount       string `json:"amount"`
-	Memo         string `json:"memo"`
-	Owner_pubkey string `json:"owner_pubkey"`
-	User_pubkey  string `json:"user_pubkey"`
-	Created      string `json:"created"`
-	Type         string `json:"type"`
+	Amount         string `json:"amount"`
+	Memo           string `json:"memo"`
+	Owner_pubkey   string `json:"owner_pubkey"`
+	User_pubkey    string `json:"user_pubkey"`
+	Created        string `json:"created"`
+	Type           string `json:"type"`
+	Assigned_hours string `json:"assigned_hours"`
+	Commitment_fee string `json:"commitment_fee"`
 }
 
 type Invoice struct {
@@ -253,12 +255,14 @@ type InvoiceResponse struct {
 }
 
 type InvoiceStoreData struct {
-	Invoice      string `json:"invoice"`
-	Owner_pubkey string `json:"owner_pubkey"`
-	User_pubkey  string `json:"user_pubkey"`
-	Amount       string `json:"amount"`
-	Created      string `json:"created"`
-	Type         string `json:"type"`
+	Invoice        string `json:"invoice"`
+	Owner_pubkey   string `json:"owner_pubkey"`
+	User_pubkey    string `json:"user_pubkey"`
+	Amount         string `json:"amount"`
+	Created        string `json:"created"`
+	Type           string `json:"type"`
+	Assigned_hours string `json:"assigned_hours"`
+	Commitment_fee string `json:"commitment_fee"`
 }
 
 type InvoiceData struct {

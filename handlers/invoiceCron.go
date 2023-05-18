@@ -178,8 +178,8 @@ func InitInvoiceCron() {
 									assignee["value"] = user.OwnerPubKey
 									assignee["owner_pubkey"] = user.OwnerPubKey
 									assignee["owner_alias"] = user.OwnerAlias
-
-									fmt.Println("Assignee ===", assignee)
+									assignee["commitment_fee"] = storeInvoice.Commitment_fee
+									assignee["assigned_hours"] = storeInvoice.Assigned_hours
 
 									w["assignee"] = assignee
 								}

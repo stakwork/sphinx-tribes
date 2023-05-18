@@ -446,6 +446,8 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	date := invoice.Created
 	memo := invoice.Memo
 	invoiceType := invoice.Type
+	assigedHours := invoice.Assigned_hours
+	commitmentFee := invoice.Commitment_fee
 
 	res, _ := makeInvoiceRequest(amount, memo)
 
@@ -470,12 +472,14 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	// save the invoice to store
 	db.Store.SetInvoiceCache(invoiceRes.Response.Invoice, db.InvoiceStoreData{
-		Amount:       amount,
-		Created:      date,
-		Invoice:      invoiceRes.Response.Invoice,
-		Owner_pubkey: owner_key,
-		User_pubkey:  pub_key,
-		Type:         invoiceType,
+		Amount:         amount,
+		Created:        date,
+		Invoice:        invoiceRes.Response.Invoice,
+		Owner_pubkey:   owner_key,
+		User_pubkey:    pub_key,
+		Type:           invoiceType,
+		Assigned_hours: assigedHours,
+		Commitment_fee: commitmentFee,
 	})
 
 	invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)

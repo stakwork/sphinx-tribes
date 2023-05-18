@@ -1022,6 +1022,8 @@ export class MainStore {
     user_pubkey: string;
     created: string;
     type: "KEYSEND" | "ASSIGN";
+    assigned_hours: number,
+    commitment_fee: number,
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1032,7 +1034,9 @@ export class MainStore {
           owner_pubkey: body.owner_pubkey,
           user_pubkey: body.user_pubkey,
           created: body.created,
-          type: body.type
+          type: body.type,
+          assigned_hours: body.assigned_hours,
+          commitment_fee: body.commitment_fee
         },
         {
           'Content-Type': 'application/json'
