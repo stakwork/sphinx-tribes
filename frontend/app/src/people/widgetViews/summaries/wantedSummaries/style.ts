@@ -674,16 +674,6 @@ export const CountDownTimer = styled.p`
   font-weight: bolder;
 `;
 
-export const CopyInvoiceBtn = styled.button`
-  cursor: pointer;
-  margin: 0;
-  border: 0;
-  color: #000000;
-  padding: 10px 20px;
-  outline: 0;
-  margin-top: 15px;
-`;
-
 export const InvoiceWrap = styled.div`
   display: flex;
   flex-direction: column;

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  CopyInvoiceBtn,
   CountDownText,
   CountDownTimer,
   CountDownTimerWrap,
@@ -9,6 +8,7 @@ import {
 import { useStores } from '../../../../store';
 import QR from 'people/utils/QR';
 import { calculateTimeLeft } from '../../../../helpers';
+import QrBar from 'people/utils/QrBar';
 
 export default function Invoice(props: { startDate: Date; count: number; dataStatus: boolean }) {
   const [timeLimit] = useState(props.startDate);
@@ -42,8 +42,8 @@ export default function Invoice(props: { startDate: Date; count: number; dataSta
           </CountDownTimerWrap>
 
           <QR size={220} value={main.lnInvoice} />
+          <QrBar value={main.lnInvoice} simple style={{ marginTop: 11 }} />
 
-          <CopyInvoiceBtn onClick={copyInvoice}>Copy invoice</CopyInvoiceBtn>
         </InvoiceWrap>
       ) : null}
     </div>

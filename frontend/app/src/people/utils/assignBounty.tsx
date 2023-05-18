@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
-import QR from './QR';
-import QrBar from './QrBar';
 import { colors } from '../../config/colors';
 import { ConnectCardProps } from 'people/interfaces';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
+import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
+import moment from 'moment';
 
 export default function AssignBounty(props: ConnectCardProps) {
     const color = colors['light'];
@@ -15,6 +15,11 @@ export default function AssignBounty(props: ConnectCardProps) {
 
     const [bountyHours, setBountyHours] = useState(1);
     const [bountyInvoice, setBountyInvoice] = useState<string>("");
+    const [pollCount, setPollCount] = useState(0);
+    const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean; bountyPaid: boolean }>({
+        invoiceStatus: false,
+        bountyPaid: false
+    });
 
     const [toasts, setToasts]: any = useState([]);
 
@@ -22,7 +27,7 @@ export default function AssignBounty(props: ConnectCardProps) {
         setToasts([
             {
                 id: '1',
-                title: 'Assigned bounty'
+                title: 'Bounty has been assigned'
             }
         ]);
     }
@@ -41,6 +46,38 @@ export default function AssignBounty(props: ConnectCardProps) {
         })
 
         setBountyInvoice(data.response.invoice);
+
+        await pollLnInvoice(pollCount);
+    }
+
+    async function pollLnInvoice(count: number) {
+        if (main.lnInvoice) {
+            const data = await main.getLnInvoiceStatus(main.lnInvoice);
+
+            setInvoiceData(data);
+
+            setPollCount(count);
+
+            const pollTimeout = setTimeout(() => {
+                pollLnInvoice(count + 1);
+                setPollCount(count + 1);
+            }, 2000);
+
+            if (data.invoiceStatus) {
+                clearTimeout(pollTimeout);
+                setPollCount(0);
+                main.setLnInvoice('');
+
+                // display a toast
+                addToast();
+            }
+
+            if (count >= 29) {
+                clearTimeout(pollTimeout);
+                setPollCount(0);
+                main.setLnInvoice('');
+            }
+        }
     }
 
     return (
@@ -61,15 +98,16 @@ export default function AssignBounty(props: ConnectCardProps) {
 
 
                         {
-                            bountyInvoice && (
-                                <>
-                                    <QR value={bountyInvoice} size={210} />
-                                    <QrBar value={bountyInvoice} simple style={{ marginTop: 11 }} />
-                                </>
+                            bountyInvoice && ui.meInfo?.owner_pubkey && (
+                                <Invoice
+                                    startDate={new Date(moment().add(1, 'minutes').format().toString())}
+                                    count={pollCount}
+                                    dataStatus={invoiceData.invoiceStatus}
+                                />
                             )
                         }
 
-                        {!bountyInvoice && (
+                        {!bountyInvoice && ui.meInfo?.owner_pubkey && (
                             <>
                                 <InvoiceForm>
                                     <InvoiceLabel>Number Of Hours</InvoiceLabel>
