@@ -681,3 +681,9 @@ export const InvoiceWrap = styled.div`
   justify-content: center;
   width: 220px;
 `;
+
+export const QrWrap = styled.div`
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+`;

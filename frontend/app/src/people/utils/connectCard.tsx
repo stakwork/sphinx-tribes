@@ -78,7 +78,9 @@ export default function ConnectCard(props: ConnectCardProps) {
         dismiss={() => closeAssignModal()}
         modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
         person={person}
-        visible={openAssignModal} created={created} />
+        visible={openAssignModal}
+        created={created}
+      />
     </div>
   );
 }

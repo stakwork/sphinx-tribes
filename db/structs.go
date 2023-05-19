@@ -241,8 +241,8 @@ type InvoiceRequest struct {
 	User_pubkey    string `json:"user_pubkey"`
 	Created        string `json:"created"`
 	Type           string `json:"type"`
-	Assigned_hours string `json:"assigned_hours"`
-	Commitment_fee string `json:"commitment_fee"`
+	Assigned_hours uint   `json:"assigned_hours"`
+	Commitment_fee uint   `json:"commitment_fee"`
 }
 
 type Invoice struct {
@@ -261,8 +261,8 @@ type InvoiceStoreData struct {
 	Amount         string `json:"amount"`
 	Created        string `json:"created"`
 	Type           string `json:"type"`
-	Assigned_hours string `json:"assigned_hours"`
-	Commitment_fee string `json:"commitment_fee"`
+	Assigned_hours uint   `json:"assigned_hours"`
+	Commitment_fee uint   `json:"commitment_fee"`
 }
 
 type InvoiceData struct {

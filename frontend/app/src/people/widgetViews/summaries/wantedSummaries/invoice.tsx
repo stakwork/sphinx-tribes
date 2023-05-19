@@ -3,14 +3,21 @@ import {
   CountDownText,
   CountDownTimer,
   CountDownTimerWrap,
-  InvoiceWrap
+  InvoiceWrap,
+  QrWrap
 } from './style';
 import { useStores } from '../../../../store';
 import QR from 'people/utils/QR';
 import { calculateTimeLeft } from '../../../../helpers';
 import QrBar from 'people/utils/QrBar';
+import { invoicePollTarget } from 'config';
 
-export default function Invoice(props: { startDate: Date; count: number; dataStatus: boolean }) {
+export default function Invoice(props: {
+  startDate: Date;
+  count: number;
+  dataStatus: boolean;
+  pollMinutes: number;
+}) {
   const [timeLimit] = useState(props.startDate);
 
   const { main } = useStores();
@@ -21,18 +28,14 @@ export default function Invoice(props: { startDate: Date; count: number; dataSta
       setTimeLeft(calculateTimeLeft(timeLimit));
     }, 1000);
 
-    if (props.count > 29) {
+    if (props.count > (invoicePollTarget * props.pollMinutes)) {
       clearTimeout(invoiceTimeout);
     }
   }, [timeLeft, props.count]);
 
-  const copyInvoice = () => {
-    navigator.clipboard.writeText(main.lnInvoice);
-  };
-
   return (
     <div style={{ marginTop: '30px' }}>
-      {timeLeft.seconds && !props.dataStatus ? (
+      {timeLeft.seconds || timeLeft.minutes && !props.dataStatus ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
             <CountDownText>Invoice expires in a minute</CountDownText>
@@ -41,9 +44,10 @@ export default function Invoice(props: { startDate: Date; count: number; dataSta
             </CountDownTimer>
           </CountDownTimerWrap>
 
-          <QR size={220} value={main.lnInvoice} />
-          <QrBar value={main.lnInvoice} simple style={{ marginTop: 11 }} />
-
+          <QrWrap>
+            <QR size={220} value={main.lnInvoice} />
+            <QrBar value={main.lnInvoice} simple style={{ marginTop: 11 }} />
+          </QrWrap>
         </InvoiceWrap>
       ) : null}
     </div>

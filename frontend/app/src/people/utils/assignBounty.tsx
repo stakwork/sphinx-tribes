@@ -7,6 +7,7 @@ import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
+import { invoicePollTarget } from 'config';
 
 export default function AssignBounty(props: ConnectCardProps) {
     const color = colors['light'];
@@ -14,12 +15,13 @@ export default function AssignBounty(props: ConnectCardProps) {
     const { main, ui } = useStores();
 
     const [bountyHours, setBountyHours] = useState(1);
-    const [bountyInvoice, setBountyInvoice] = useState<string>("");
     const [pollCount, setPollCount] = useState(0);
     const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean; bountyPaid: boolean }>({
         invoiceStatus: false,
         bountyPaid: false
     });
+
+    const pollMinutes = 2;
 
     const [toasts, setToasts]: any = useState([]);
 
@@ -47,8 +49,6 @@ export default function AssignBounty(props: ConnectCardProps) {
             commitment_fee: bountyHours * 200,
         })
 
-        setBountyInvoice(data.response.invoice);
-
         await pollLnInvoice(pollCount);
     }
 
@@ -72,12 +72,18 @@ export default function AssignBounty(props: ConnectCardProps) {
 
                 // display a toast
                 addToast();
+                // close modal
+                props.dismiss();
+                // get new wanted list
+                main.getPeopleWanteds();
             }
 
-            if (count >= 29) {
+            if (count >= (invoicePollTarget * pollMinutes)) {
+                // close modal
+                props.dismiss();
+                main.setLnInvoice('');
                 clearTimeout(pollTimeout);
                 setPollCount(0);
-                main.setLnInvoice('');
             }
         }
     }
@@ -97,19 +103,18 @@ export default function AssignBounty(props: ConnectCardProps) {
                     >
                         <N color={color}>Asign bounty to your self</N>
                         <B>Each hour cost 200 sats</B>
-
-
                         {
-                            bountyInvoice && ui.meInfo?.owner_pubkey && (
+                            main.lnInvoice && ui.meInfo?.owner_pubkey && (
                                 <Invoice
-                                    startDate={new Date(moment().add(1, 'minutes').format().toString())}
+                                    startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
                                     count={pollCount}
                                     dataStatus={invoiceData.invoiceStatus}
+                                    pollMinutes={pollMinutes}
                                 />
                             )
                         }
 
-                        {!bountyInvoice && ui.meInfo?.owner_pubkey && (
+                        {!main.lnInvoice && ui.meInfo?.owner_pubkey && (
                             <>
                                 <InvoiceForm>
                                     <InvoiceLabel>Number Of Hours</InvoiceLabel>
@@ -135,7 +140,7 @@ export default function AssignBounty(props: ConnectCardProps) {
                     <div className="bottomText">Pay the invoice to assign to your self</div>
                 </ModalBottomText>
             </Modal>
-            <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={1000} />
+            <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={3000} />
         </div>
     );
 }

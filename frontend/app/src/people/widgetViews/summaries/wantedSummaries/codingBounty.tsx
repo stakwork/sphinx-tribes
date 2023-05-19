@@ -36,6 +36,7 @@ import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
 import moment from 'moment';
 import Invoice from './invoice';
+import { invoicePollTarget } from 'config';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -96,6 +97,8 @@ function MobileView(props: CodingBountiesProps) {
 
   const bountyPaid = paid || invoiceData.bountyPaid;
 
+  const pollMinutes = 1;
+
   async function getLnInvoice() {
     await main.getLnInvoice({
       amount: props?.price || 0,
@@ -124,7 +127,7 @@ function MobileView(props: CodingBountiesProps) {
         setPollCount(count + 1);
       }, 2000);
 
-      if (count >= 29 || data.invoiceStatus) {
+      if (count >= (invoicePollTarget * pollMinutes) || data.invoiceStatus) {
         clearTimeout(pollTimeout);
         setPollCount(0);
         main.setLnInvoice('');
@@ -385,9 +388,10 @@ function MobileView(props: CodingBountiesProps) {
 
                     {main.lnInvoice && pollCount < 30 && (
                       <Invoice
-                        startDate={new Date(moment().add(1, 'minutes').format().toString())}
+                        startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
                         count={pollCount}
                         dataStatus={invoiceData.invoiceStatus}
+                        pollMinutes={pollMinutes}
                       />
                     )}
                     {/**
