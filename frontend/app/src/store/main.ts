@@ -1026,6 +1026,7 @@ export class MainStore {
     commitment_fee?: number,
     bounty_expires?: string,
   }): Promise<LnInvoice> {
+    console.log("Bounty EXpires", body.bounty_expires);
     try {
       const data = await api.post(
         'invoices',

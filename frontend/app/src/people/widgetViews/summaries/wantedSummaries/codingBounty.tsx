@@ -99,8 +99,8 @@ function MobileView(props: CodingBountiesProps) {
 
   const pollMinutes = 1;
 
-  // console.log("GET DATE ===", assignee.bounty_expires, assignee.commitment_fee)
 
+  // console.log("GET DATE ===", assignee.bounty_expires, assignee.commitment_fee)
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
     const price = assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;

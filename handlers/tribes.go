@@ -450,6 +450,8 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	commitmentFee := invoice.Commitment_fee
 	bountyExpires := invoice.Bounty_expires
 
+	fmt.Println("Bounty Expires ===", bountyExpires)
+
 	res, _ := makeInvoiceRequest(amount, memo)
 
 	if err != nil {
