@@ -1022,8 +1022,9 @@ export class MainStore {
     user_pubkey: string;
     created: string;
     type: "KEYSEND" | "ASSIGN";
-    assigned_hours: number,
-    commitment_fee: number,
+    assigned_hours?: number,
+    commitment_fee?: number,
+    bounty_expires?: string,
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1036,7 +1037,8 @@ export class MainStore {
           created: body.created,
           type: body.type,
           assigned_hours: body.assigned_hours,
-          commitment_fee: body.commitment_fee
+          commitment_fee: body.commitment_fee,
+          bounty_expires: body.bounty_expires,
         },
         {
           'Content-Type': 'application/json'
@@ -1127,6 +1129,9 @@ export interface Person {
   verification_signature: string;
   extras: Extras;
   hide?: boolean;
+  commitment_fee?: number;
+  assigned_hours?: number;
+  bounty_expires?: number;
 }
 
 export interface PersonFlex {

@@ -100,15 +100,16 @@ function MobileView(props: CodingBountiesProps) {
   const pollMinutes = 1;
 
   async function getLnInvoice() {
+    // If the bounty has a commitment fee, add the fee to the user payment
+    const price = assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
+
     await main.getLnInvoice({
-      amount: props?.price || 0,
+      amount: price || 0,
       memo: '',
       owner_pubkey: person.owner_pubkey,
       user_pubkey: assignee.owner_pubkey,
       created: created ? created?.toString() : '',
       type: 'KEYSEND',
-      assigned_hours: 0,
-      commitment_fee: 0,
     });
 
     await pollLnInvoice(pollCount);

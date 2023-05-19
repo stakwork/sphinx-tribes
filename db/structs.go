@@ -241,8 +241,9 @@ type InvoiceRequest struct {
 	User_pubkey    string `json:"user_pubkey"`
 	Created        string `json:"created"`
 	Type           string `json:"type"`
-	Assigned_hours uint   `json:"assigned_hours"`
-	Commitment_fee uint   `json:"commitment_fee"`
+	Assigned_hours uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires string `json:"bounty_expires,omitempty"`
 }
 
 type Invoice struct {
@@ -261,8 +262,9 @@ type InvoiceStoreData struct {
 	Amount         string `json:"amount"`
 	Created        string `json:"created"`
 	Type           string `json:"type"`
-	Assigned_hours uint   `json:"assigned_hours"`
-	Commitment_fee uint   `json:"commitment_fee"`
+	Assigned_hours uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires string `json:"bounty_expires,omitempty"`
 }
 
 type InvoiceData struct {
