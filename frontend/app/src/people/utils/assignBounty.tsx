@@ -74,8 +74,9 @@ export default function AssignBounty(props: ConnectCardProps) {
                 addToast();
                 // close modal
                 props.dismiss();
+                if (props.dismissConnectModal) props.dismissConnectModal();
                 // get new wanted list
-                main.getPeopleWanteds();
+                main.getPeopleWanteds({ page: 1, resetPage: true });
             }
 
             if (count >= (invoicePollTarget * pollMinutes)) {

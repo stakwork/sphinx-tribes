@@ -80,6 +80,7 @@ export default function ConnectCard(props: ConnectCardProps) {
         person={person}
         visible={openAssignModal}
         created={created}
+        dismissConnectModal={props.dismiss}
       />
     </div>
   );
