@@ -180,6 +180,7 @@ func InitInvoiceCron() {
 									assignee["owner_alias"] = user.OwnerAlias
 									assignee["commitment_fee"] = storeInvoice.Commitment_fee
 									assignee["assigned_hours"] = storeInvoice.Assigned_hours
+									assignee["bounty_expires"] = storeInvoice.Bounty_expires
 
 									w["assignee"] = assignee
 								}
