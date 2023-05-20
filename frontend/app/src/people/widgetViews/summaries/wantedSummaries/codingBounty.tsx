@@ -18,7 +18,8 @@ import {
   TitleBox,
   CodingLabels,
   AutoCompleteContainer,
-  AwardBottomContainer
+  AwardBottomContainer,
+  BountyTime
 } from './style';
 import { EuiText, EuiFieldText } from '@elastic/eui';
 import { Button, Divider, Modal } from '../../../../components/common';
@@ -37,6 +38,7 @@ import { CodingBountiesProps } from '../../../interfaces';
 import moment from 'moment';
 import Invoice from './invoice';
 import { invoicePollTarget } from 'config';
+import { calculateTimeLeft } from 'helpers';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -100,6 +102,8 @@ function MobileView(props: CodingBountiesProps) {
   const pollMinutes = 1;
 
   const bountyExpired = !assignee?.bounty_expires ? false : Date.now() > new Date(assignee.bounty_expires).getTime();
+
+  const bountyTimeLeft = calculateTimeLeft(new Date(assignee?.bounty_expires ?? ''), 'days');
 
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
@@ -415,26 +419,32 @@ function MobileView(props: CodingBountiesProps) {
                      * A non LNAUTh user alias is shorter
                      */}
                     {!bountyExpired && !main.lnInvoiceStatus && assignee.owner_alias.length < 30 && (
-                      <Button
-                        iconSize={14}
-                        width={220}
-                        height={48}
-                        onClick={getLnInvoice}
-                        style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                        text="Pay Bounty"
-                        ButtonTextStyle={{ padding: 0 }}
-                      />
+                      <>
+                        <BountyTime>Bounty time remains: Days {bountyTimeLeft.days} Hrs {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs {bountyTimeLeft.seconds}</BountyTime>
+                        <Button
+                          iconSize={14}
+                          width={220}
+                          height={48}
+                          onClick={getLnInvoice}
+                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                          text="Pay Bounty"
+                          ButtonTextStyle={{ padding: 0 }}
+                        />
+                      </>
                     )}
                     {bountyExpired && (
-                      <Button
-                        iconSize={14}
-                        width={220}
-                        height={48}
-                        onClick={removeBountyAssignee}
-                        style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                        text="Remove Assignee"
-                        ButtonTextStyle={{ padding: 0 }}
-                      />
+                      <>
+                        <BountyTime>Bounty Commitment sats has expired</BountyTime>
+                        <Button
+                          iconSize={14}
+                          width={220}
+                          height={48}
+                          onClick={removeBountyAssignee}
+                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                          text="Remove Assignee"
+                          ButtonTextStyle={{ padding: 0 }}
+                        />
+                      </>
                     )}
                   </BountyPriceContainer>
                   <div className="buttonSet">
@@ -1025,7 +1035,8 @@ function MobileView(props: CodingBountiesProps) {
             )}
           </AssigneeProfile>
         </NormalUser>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }

@@ -687,3 +687,11 @@ export const QrWrap = styled.div`
   text-align: center;
   width: 100%;
 `;
+
+export const BountyTime = styled.p`
+  font-size: 0.9rem;
+  padding: 5px 0px;
+  text-align: center;
+  width: 220px;
+  margin: 15px 0px;
+`;
