@@ -267,6 +267,11 @@ type InvoiceStoreData struct {
 	Bounty_expires string `json:"bounty_expires,omitempty"`
 }
 
+type DeleteBountyAssignee struct {
+	Owner_pubkey string `json:"owner_pubkey"`
+	Created      string `json:"created"`
+}
+
 type InvoiceData struct {
 	Route_hints       []string               `json:"route_hints"`
 	Htlcs             []interface{}          `json:"htlcs"`

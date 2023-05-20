@@ -1026,7 +1026,6 @@ export class MainStore {
     commitment_fee?: number,
     bounty_expires?: string,
   }): Promise<LnInvoice> {
-    console.log("Bounty EXpires", body.bounty_expires);
     try {
       const data = await api.post(
         'invoices',
@@ -1068,6 +1067,33 @@ export class MainStore {
       return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
     } catch (e) {
       return { invoiceStatus: false, bountyPaid: false };
+    }
+  }
+
+  @action async deleteBountyAssignee(body: {
+    owner_pubkey: string;
+    created: string;
+  }) : Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
+      const r: any = await fetch(`${URL}/bounty/assignee`, {
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
     }
   }
 }

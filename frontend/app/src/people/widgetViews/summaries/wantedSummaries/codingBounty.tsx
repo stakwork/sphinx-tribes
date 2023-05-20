@@ -99,8 +99,8 @@ function MobileView(props: CodingBountiesProps) {
 
   const pollMinutes = 1;
 
+  const bountyExpired = !assignee?.bounty_expires ? false : Date.now() > new Date(assignee.bounty_expires).getTime();
 
-  // console.log("GET DATE ===", assignee.bounty_expires, assignee.commitment_fee)
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
     const price = assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
@@ -115,6 +115,18 @@ function MobileView(props: CodingBountiesProps) {
     });
 
     await pollLnInvoice(pollCount);
+  }
+
+  async function removeBountyAssignee() {
+    const data = await main.deleteBountyAssignee({
+      owner_pubkey: person.owner_pubkey,
+      created: created ? created?.toString() : '',
+    });
+
+    if (data) {
+      // get new wanted list
+      main.getPeopleWanteds({ page: 1, resetPage: true });
+    }
   }
 
   async function pollLnInvoice(count: number) {
@@ -402,7 +414,7 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so long
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!main.lnInvoiceStatus && assignee.owner_alias.length < 30 && (
+                    {!bountyExpired && !main.lnInvoiceStatus && assignee.owner_alias.length < 30 && (
                       <Button
                         iconSize={14}
                         width={220}
@@ -410,6 +422,17 @@ function MobileView(props: CodingBountiesProps) {
                         onClick={getLnInvoice}
                         style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
                         text="Pay Bounty"
+                        ButtonTextStyle={{ padding: 0 }}
+                      />
+                    )}
+                    {bountyExpired && (
+                      <Button
+                        iconSize={14}
+                        width={220}
+                        height={48}
+                        onClick={removeBountyAssignee}
+                        style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                        text="Remove Assignee"
                         ButtonTextStyle={{ padding: 0 }}
                       />
                     )}
