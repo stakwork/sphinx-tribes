@@ -21,11 +21,11 @@ export default function Invoice(props: {
   const [timeLimit] = useState(props.startDate);
 
   const { main } = useStores();
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(timeLimit));
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(timeLimit, 'minutes'));
 
   useEffect(() => {
     const invoiceTimeout = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft(timeLimit));
+      setTimeLeft(calculateTimeLeft(timeLimit, 'minutes'));
     }, 1000);
 
     if (props.count > (invoicePollTarget * props.pollMinutes)) {
