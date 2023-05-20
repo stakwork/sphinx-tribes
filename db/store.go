@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/patrickmn/go-cache"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"golang.org/x/crypto/blake2b"
 )
 
@@ -71,31 +72,17 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 	return c, nil
 }
 
-func (s StoreData) SetInvoiceCache(key string, value InvoiceStoreData) error {
+func (s StoreData) SetInvoiceCache(value []InvoiceStoreData) error {
 	// The invoice should expire every 2 minutes
-	s.Cache.Set(key, value, 2*time.Minute)
+	s.Cache.Set(config.InvoiceList, value, 6*time.Minute)
 	return nil
 }
 
-func (s StoreData) GetInvoiceCache(key string) (InvoiceStoreData, error) {
-	value, found := s.Cache.Get(key)
-	c, _ := value.(InvoiceStoreData)
+func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
+	value, found := s.Cache.Get(config.InvoiceList)
+	c, _ := value.([]InvoiceStoreData)
 	if !found {
-		return InvoiceStoreData{}, errors.New("Invoice Cache not found")
-	}
-	return c, nil
-}
-
-func (s StoreData) SetInvoiceCount(key string, value uint) error {
-	s.Cache.Set(key, value, cache.DefaultExpiration)
-	return nil
-}
-
-func (s StoreData) GetInvoiceCount(key string) (uint, error) {
-	value, found := s.Cache.Get(key)
-	c, _ := value.(uint)
-	if !found {
-		return 0, errors.New("Invoice count cache not found")
+		return []InvoiceStoreData{}, errors.New("Invoice Cache not found")
 	}
 	return c, nil
 }
