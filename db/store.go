@@ -13,7 +13,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/patrickmn/go-cache"
 	"github.com/stakwork/sphinx-tribes/auth"
-	"golang.org/x/crypto/blake2b"
 )
 
 type StoreData struct {
@@ -102,7 +101,8 @@ func (s StoreData) GetInvoiceCount(key string) (uint, error) {
 
 func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
-	h := blake2b.Sum256([]byte(ts))
+	h := []byte(ts)
+	// h := blake2b.Sum256([]byte(ts))
 	challenge := base64.URLEncoding.EncodeToString(h[:])
 
 	Store.SetCache(challenge, ts)
