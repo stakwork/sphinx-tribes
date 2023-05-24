@@ -88,11 +88,14 @@ export function sendToRedirect(url) {
   el.click();
 }
 
-export const calculateTimeLeft = (timeLimit: Date, type: 'minutes' | 'days'): { 
+export const calculateTimeLeft = (
+  timeLimit: Date,
+  type: 'minutes' | 'days'
+): {
   days?: number;
   hours?: number;
-  minutes: number; 
-  seconds: number 
+  minutes: number;
+  seconds: number;
 } => {
   const difference = new Date(timeLimit).getTime() - new Date().getTime();
 
@@ -104,7 +107,7 @@ export const calculateTimeLeft = (timeLimit: Date, type: 'minutes' | 'days'): {
       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
       hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
       minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-      seconds:  Math.floor((difference % (1000 * 60)) / 1000)
+      seconds: Math.floor((difference % (1000 * 60)) / 1000)
     };
   } else {
     timeLeft = {

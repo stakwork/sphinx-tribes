@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  CountDownText,
-  CountDownTimer,
-  CountDownTimerWrap,
-  InvoiceWrap,
-  QrWrap
-} from './style';
+import { CountDownText, CountDownTimer, CountDownTimerWrap, InvoiceWrap, QrWrap } from './style';
 import { useStores } from '../../../../store';
 import QR from 'people/utils/QR';
 import { calculateTimeLeft } from '../../../../helpers';
@@ -28,14 +22,14 @@ export default function Invoice(props: {
       setTimeLeft(calculateTimeLeft(timeLimit, 'minutes'));
     }, 1000);
 
-    if (props.count > (invoicePollTarget * props.pollMinutes)) {
+    if (props.count > invoicePollTarget * props.pollMinutes) {
       clearTimeout(invoiceTimeout);
     }
   }, [timeLeft, props.count]);
 
   return (
     <div style={{ marginTop: '30px' }}>
-      {timeLeft.seconds || timeLeft.minutes && !props.dataStatus ? (
+      {timeLeft.seconds || (timeLeft.minutes && !props.dataStatus) ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
             <CountDownText>Invoice expires in a minute</CountDownText>
