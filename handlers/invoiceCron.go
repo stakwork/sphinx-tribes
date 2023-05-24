@@ -126,7 +126,7 @@ func InitInvoiceCron() {
 										"extras": b,
 									})
 
-									// Delete the index from tje store array list and reset the store
+									// Delete the index from the store array list and reset the store
 									newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
 									db.Store.SetInvoiceCache(newInvoiceList)
 								}
@@ -191,6 +191,10 @@ func InitInvoiceCron() {
 								db.DB.UpdatePerson(p.ID, map[string]interface{}{
 									"extras": b,
 								})
+
+								// Delete the index from the store array list and reset the store
+								newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
+								db.Store.SetInvoiceCache(newInvoiceList)
 							}
 						}
 					}
