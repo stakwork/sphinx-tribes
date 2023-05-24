@@ -39,7 +39,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   }
 
   const generateInvoice = async () => {
-    const data = await main.getLnInvoice({
+    await main.getLnInvoice({
       amount: 200 * bountyHours,
       memo: '',
       owner_pubkey: person?.owner_pubkey ?? '',
@@ -81,7 +81,7 @@ export default function AssignBounty(props: ConnectCardProps) {
         main.getPeopleWanteds({ page: 1, resetPage: true });
       }
 
-      if (count >= invoicePollTarget * pollMinutes) {
+      if (count >= invoicePollTarget) {
         // close modal
         props.dismiss();
         main.setLnInvoice('');
