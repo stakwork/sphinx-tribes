@@ -320,10 +320,6 @@ type PropertyMap map[string]interface{}
 
 // Value ...
 func (p PropertyMap) Value() (driver.Value, error) {
-	if len(p) == 0 {
-		p = make(map[string]interface{})
-	}
-
 	b := new(bytes.Buffer)
 	err := json.NewEncoder(b).Encode(p)
 	return b, err
