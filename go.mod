@@ -8,17 +8,15 @@ require (
 	github.com/btcsuite/btcd v0.23.3 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1
-	github.com/dariubs/gorm-jsonb v0.1.5 // indirect
 	github.com/fiatjaf/go-lnurl v1.12.1
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/go-chi/jwtauth v1.2.0
-	github.com/go-co-op/gocron v1.25.0 // indirect
+	github.com/go-co-op/gocron v1.25.0
 	github.com/gobuffalo/logger v1.0.4 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-github/v39 v39.2.0
-	github.com/googollee/go-socket.io v1.7.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/imroc/req v0.3.0
 	github.com/jackc/pgtype v1.14.0 // indirect

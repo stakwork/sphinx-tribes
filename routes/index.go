@@ -29,7 +29,6 @@ func NewRouter() *http.Server {
 	r.Mount("/person", PersonRoutes())
 	r.Mount("/connectioncodes", ConnectionCodesRoutes())
 	r.Mount("/github_issue", GithubIssuesRoutes())
-	r.Handle("/socket", handlers.InitSocket())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", handlers.GetFirstTribeByFeed)
