@@ -193,7 +193,7 @@ func CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := auth.VerifyTribeUUID(tribe.UUID, false)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("extract UUID error", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
