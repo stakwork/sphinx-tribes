@@ -23,6 +23,7 @@ func InitInvoiceCron() {
 		invoiceCount := len(invoiceList)
 
 		if invoiceCount > 0 {
+
 			for index, inv := range invoiceList {
 
 				url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, inv.Invoice)
@@ -60,33 +61,87 @@ func InitInvoiceCron() {
 						  make keysend payment
 						*/
 
-						url := fmt.Sprintf("%s/payment", config.RelayUrl)
+						if inv.Type == "KEYSEND" {
+							url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-						bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
+							bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
 
-						jsonBody := []byte(bodyData)
+							jsonBody := []byte(bodyData)
 
-						client := &http.Client{}
-						req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+							client := &http.Client{}
+							req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 
-						req.Header.Set("x-user-token", config.RelayAuthKey)
-						req.Header.Set("Content-Type", "application/json")
-						res, _ := client.Do(req)
+							req.Header.Set("x-user-token", config.RelayAuthKey)
+							req.Header.Set("Content-Type", "application/json")
+							res, _ := client.Do(req)
 
-						if err != nil {
-							log.Printf("Request Failed: %s", err)
-							return
-						}
+							if err != nil {
+								log.Printf("Request Failed: %s", err)
+								return
+							}
 
-						defer res.Body.Close()
+							defer res.Body.Close()
 
-						body, err = ioutil.ReadAll(res.Body)
+							body, err = ioutil.ReadAll(res.Body)
 
-						if res.StatusCode == 200 {
-							// Unmarshal result
-							keysendRes := db.KeysendSuccess{}
-							err = json.Unmarshal(body, &keysendRes)
+							if res.StatusCode == 200 {
+								// Unmarshal result
+								keysendRes := db.KeysendSuccess{}
+								err = json.Unmarshal(body, &keysendRes)
 
+								var p = db.DB.GetPersonByPubkey(inv.Owner_pubkey)
+
+								wanteds, _ := p.Extras["wanted"].([]interface{})
+
+								for _, wanted := range wanteds {
+									w, ok2 := wanted.(map[string]interface{})
+									if !ok2 {
+										continue // next wanted
+									}
+
+									created, ok3 := w["created"].(float64)
+									createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
+									createdString := createdArr[0]
+									createdInt, _ := strconv.ParseInt(createdString, 10, 32)
+
+									dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
+
+									if !ok3 {
+										continue
+									}
+
+									if createdInt == dateInt {
+										w["paid"] = true
+									}
+								}
+
+								p.Extras["wanted"] = wanteds
+								b := new(bytes.Buffer)
+								decodeErr := json.NewEncoder(b).Encode(p.Extras)
+
+								if decodeErr != nil {
+									log.Printf("Could not encode extras json data")
+								} else {
+									db.DB.UpdatePerson(p.ID, map[string]interface{}{
+										"extras": b,
+									})
+
+									// Delete the index from tje store array list and reset the store
+									newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
+									db.Store.SetInvoiceCache(newInvoiceList)
+								}
+							} else {
+								// Unmarshal result
+								keysendError := db.KeysendError{}
+								err = json.Unmarshal(body, &keysendError)
+								log.Printf("Keysend Payment to %s Failed, with Error: %s", inv.User_pubkey, keysendError.Error)
+							}
+
+							if err != nil {
+								log.Printf("Reading body failed: %s", err)
+								return
+							}
+						} else {
 							var p = db.DB.GetPersonByPubkey(inv.Owner_pubkey)
 
 							wanteds, _ := p.Extras["wanted"].([]interface{})
@@ -109,7 +164,20 @@ func InitInvoiceCron() {
 								}
 
 								if createdInt == dateInt {
-									w["paid"] = true
+									var user = db.DB.GetPersonByPubkey(inv.User_pubkey)
+
+									var assignee = make(map[string]interface{})
+
+									assignee["img"] = user.Img
+									assignee["label"] = user.OwnerAlias
+									assignee["value"] = user.OwnerPubKey
+									assignee["owner_pubkey"] = user.OwnerPubKey
+									assignee["owner_alias"] = user.OwnerAlias
+									assignee["commitment_fee"] = inv.Commitment_fee
+									assignee["assigned_hours"] = inv.Assigned_hours
+									assignee["bounty_expires"] = inv.Bounty_expires
+
+									w["assignee"] = assignee
 								}
 							}
 
@@ -123,26 +191,11 @@ func InitInvoiceCron() {
 								db.DB.UpdatePerson(p.ID, map[string]interface{}{
 									"extras": b,
 								})
-
-								// Delete the index from tje store array list and reset the store
-								newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
-								db.Store.SetInvoiceCache(newInvoiceList)
 							}
-						} else {
-							// Unmarshal result
-							keysendError := db.KeysendError{}
-							err = json.Unmarshal(body, &keysendError)
-							log.Printf("Keysend Payment to %s Failed, with Error: %s", inv.User_pubkey, keysendError.Error)
-						}
-
-						if err != nil {
-							log.Printf("Reading body failed: %s", err)
-							return
 						}
 					}
 				}
 			}
-
 		}
 	})
 
