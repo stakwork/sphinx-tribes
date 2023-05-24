@@ -1021,10 +1021,10 @@ export class MainStore {
     owner_pubkey: string;
     user_pubkey: string;
     created: string;
-    type: "KEYSEND" | "ASSIGN";
-    assigned_hours?: number,
-    commitment_fee?: number,
-    bounty_expires?: string,
+    type: 'KEYSEND' | 'ASSIGN';
+    assigned_hours?: number;
+    commitment_fee?: number;
+    bounty_expires?: string;
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1038,7 +1038,7 @@ export class MainStore {
           type: body.type,
           assigned_hours: body.assigned_hours,
           commitment_fee: body.commitment_fee,
-          bounty_expires: body.bounty_expires,
+          bounty_expires: body.bounty_expires
         },
         {
           'Content-Type': 'application/json'
@@ -1073,7 +1073,7 @@ export class MainStore {
   @action async deleteBountyAssignee(body: {
     owner_pubkey: string;
     created: string;
-  }) : Promise<any> {
+  }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;

@@ -101,13 +101,16 @@ function MobileView(props: CodingBountiesProps) {
 
   const pollMinutes = 1;
 
-  const bountyExpired = !assignee?.bounty_expires ? false : Date.now() > new Date(assignee.bounty_expires).getTime();
+  const bountyExpired = !assignee?.bounty_expires
+    ? false
+    : Date.now() > new Date(assignee.bounty_expires).getTime();
 
   const bountyTimeLeft = calculateTimeLeft(new Date(assignee?.bounty_expires ?? ''), 'days');
 
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
-    const price = assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
+    const price =
+      assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
 
     await main.getLnInvoice({
       amount: price || 0,
@@ -115,7 +118,7 @@ function MobileView(props: CodingBountiesProps) {
       owner_pubkey: person.owner_pubkey,
       user_pubkey: assignee.owner_pubkey,
       created: created ? created?.toString() : '',
-      type: 'KEYSEND',
+      type: 'KEYSEND'
     });
 
     await pollLnInvoice(pollCount);
@@ -124,7 +127,7 @@ function MobileView(props: CodingBountiesProps) {
   async function removeBountyAssignee() {
     const data = await main.deleteBountyAssignee({
       owner_pubkey: person.owner_pubkey,
-      created: created ? created?.toString() : '',
+      created: created ? created?.toString() : ''
     });
 
     if (data) {
@@ -146,7 +149,7 @@ function MobileView(props: CodingBountiesProps) {
         setPollCount(count + 1);
       }, 2000);
 
-      if (count >= (invoicePollTarget * pollMinutes) || data.invoiceStatus) {
+      if (count >= invoicePollTarget * pollMinutes || data.invoiceStatus) {
         clearTimeout(pollTimeout);
         setPollCount(0);
         main.setLnInvoice('');
@@ -407,7 +410,9 @@ function MobileView(props: CodingBountiesProps) {
 
                     {main.lnInvoice && pollCount < 30 && (
                       <Invoice
-                        startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
+                        startDate={
+                          new Date(moment().add(pollMinutes, 'minutes').format().toString())
+                        }
                         count={pollCount}
                         dataStatus={invoiceData.invoiceStatus}
                         pollMinutes={pollMinutes}
@@ -418,20 +423,26 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so long
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!bountyExpired && !main.lnInvoiceStatus && assignee.owner_alias.length < 30 && (
-                      <>
-                        <BountyTime>Bounty time remains: Days {bountyTimeLeft.days} Hrs {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs {bountyTimeLeft.seconds}</BountyTime>
-                        <Button
-                          iconSize={14}
-                          width={220}
-                          height={48}
-                          onClick={getLnInvoice}
-                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                          text="Pay Bounty"
-                          ButtonTextStyle={{ padding: 0 }}
-                        />
-                      </>
-                    )}
+                    {!bountyExpired &&
+                      !main.lnInvoiceStatus &&
+                      assignee.owner_alias.length < 30 && (
+                        <>
+                          <BountyTime>
+                            Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
+                            {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs{' '}
+                            {bountyTimeLeft.seconds}
+                          </BountyTime>
+                          <Button
+                            iconSize={14}
+                            width={220}
+                            height={48}
+                            onClick={getLnInvoice}
+                            style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                            text="Pay Bounty"
+                            ButtonTextStyle={{ padding: 0 }}
+                          />
+                        </>
+                      )}
                     {bountyExpired && (
                       <>
                         <BountyTime>Bounty Commitment sats has expired</BountyTime>
@@ -458,8 +469,9 @@ function MobileView(props: CodingBountiesProps) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                          },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                          labels && labels.map((x: any) => x.label)
+                        },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -870,8 +882,9 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                      labels && labels.map((x: any) => x.label)
+                    },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -942,8 +955,9 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                      labels && labels.map((x: any) => x.label)
+                    },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1020,8 +1034,9 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
-                      },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
+                      labels && labels.map((x: any) => x.label)
+                    },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1035,8 +1050,7 @@ function MobileView(props: CodingBountiesProps) {
             )}
           </AssigneeProfile>
         </NormalUser>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 }
