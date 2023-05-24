@@ -88,12 +88,25 @@ export function sendToRedirect(url) {
   el.click();
 }
 
-export const calculateTimeLeft = (timeLimit: Date): { minutes: number; seconds: number } => {
+export const calculateTimeLeft = (timeLimit: Date, type: 'minutes' | 'days'): { 
+  days?: number;
+  hours?: number;
+  minutes: number; 
+  seconds: number 
+} => {
   const difference = new Date(timeLimit).getTime() - new Date().getTime();
 
   let timeLeft: any = {};
 
-  if (difference > 0) {
+  if (difference > 0 && type === 'days') {
+    timeLeft = {
+      // Time calculations for days, hours, minutes and seconds
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds:  Math.floor((difference % (1000 * 60)) / 1000)
+    };
+  } else {
     timeLeft = {
       minutes: Math.floor((difference / 1000 / 60) % 60),
       seconds: Math.floor((difference / 1000) % 60)

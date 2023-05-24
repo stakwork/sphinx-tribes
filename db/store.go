@@ -86,20 +86,6 @@ func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
 	return c, nil
 }
 
-func (s StoreData) SetInvoiceCount(key string, value uint) error {
-	s.Cache.Set(key, value, cache.DefaultExpiration)
-	return nil
-}
-
-func (s StoreData) GetInvoiceCount(key string) (uint, error) {
-	value, found := s.Cache.Get(key)
-	c, _ := value.(uint)
-	if !found {
-		return 0, errors.New("Invoice count cache not found")
-	}
-	return c, nil
-}
-
 func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
 	h := []byte(ts)

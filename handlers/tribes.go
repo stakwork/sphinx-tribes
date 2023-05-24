@@ -545,3 +545,20 @@ func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceResult)
 }
+
+func makeInvoiceRequest(amount string, memo string) (*http.Response, error) {
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	return res, err
+}
