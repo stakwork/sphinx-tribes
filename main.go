@@ -9,10 +9,14 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
+	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/handlers"
+	"github.com/stakwork/sphinx-tribes/routes"
 )
 
 func main() {
-
 	var err error
 
 	err = godotenv.Load()
@@ -20,13 +24,17 @@ func main() {
 		fmt.Println("no .env file")
 	}
 
-	initDB()
-	initCache()
+	db.InitDB()
+	db.InitCache()
+	// Config has to be inited before JWT, if not it will lead to NO JWT error
+	config.InitConfig()
+	auth.InitJwt()
+	handlers.InitInvoiceCron()
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {
-		go processTwitterConfirmationsLoop()
-		go processGithubIssuesLoop()
+		go handlers.ProcessTwitterConfirmationsLoop()
+		go handlers.ProcessGithubIssuesLoop()
 	}
 
 	run()
@@ -35,7 +43,7 @@ func main() {
 // Start the MQTT plugin
 func run() {
 
-	router := NewRouter()
+	router := routes.NewRouter()
 
 	shutdownSignal := make(chan os.Signal)
 	signal.Notify(shutdownSignal, syscall.SIGINT, syscall.SIGTERM)

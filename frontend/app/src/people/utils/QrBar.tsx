@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button, Divider } from '../../sphinxUI';
 import MaterialIcon from '@material/react-material-icon';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { QRBarProps } from 'people/interfaces';
 
-export default function QrBar(props: any) {
+export default function QrBar(props: QRBarProps) {
   const { value, simple } = props;
   const [toasts, setToasts]: any = useState([]);
 

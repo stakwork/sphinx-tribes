@@ -1,16 +1,18 @@
 import { EuiText } from '@elastic/eui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
-import BountyDescription from '../../sphinxUI/bounty_description';
-import BountyPrice from '../../sphinxUI/bounty_price';
-import BountyProfileView from '../../sphinxUI/bounty_profile_view';
-import IconButton from '../../sphinxUI/icon_button';
+import { colors } from '../../config/colors';
+import BountyDescription from '../../bounties/bounty_description';
+import BountyPrice from '../../bounties/bounty_price';
+import BountyProfileView from '../../bounties/bounty_profile_view';
+import IconButton from '../../components/common/icon_button';
 import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
+import { observer } from 'mobx-react-lite';
+import { BountiesProps } from 'people/interfaces';
 
-const Bounties = (props) => {
+const Bounties = (props: BountiesProps) => {
   const {
     assignee,
     price,
@@ -20,7 +22,9 @@ const Bounties = (props) => {
     codingLanguage,
     title,
     person,
-    onPanelClick
+    onPanelClick,
+    widget,
+    created
   } = props;
 
   const color = colors['light'];
@@ -34,47 +38,52 @@ const Bounties = (props) => {
   const { ui } = useStores();
   return (
     <>
-      {{ ...assignee }.owner_alias ? (
-        <BountyContainer
-          onClick={onPanelClick}
-          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
-          color={color}
-          style={{
-            backgroundPositionY: '-2px'
-          }}
-        >
-          <div className="BountyDescriptionContainer">
-            <BountyDescription
-              {...person}
-              {...props}
-              title={title}
-              codingLanguage={codingLanguage}
-            />
-          </div>
-          <div className="BountyPriceContainer">
-            <BountyPrice
-              priceMin={priceMin}
-              priceMax={priceMax}
-              price={price}
-              sessionLength={sessionLength}
-              style={{
-                minWidth: '213px',
-                maxWidth: '213px',
-                borderRight: `1px solid ${color.primaryColor.P200}`
-              }}
-            />
-            <BountyProfileView
-              assignee={assignee}
-              status={'ASSIGNED'}
-              canViewProfile={true}
-              statusStyle={{
-                width: '55px',
-                height: '16px',
-                background: color.statusAssigned
-              }}
-            />
-          </div>
-        </BountyContainer>
+      {assignee ? (
+        { ...assignee }.owner_alias ? (
+          <BountyContainer
+            onClick={onPanelClick}
+            assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
+            color={color}
+            style={{
+              backgroundPositionY: '-2px'
+            }}
+          >
+            <div className="BountyDescriptionContainer">
+              <BountyDescription
+                {...person}
+                {...props}
+                title={title}
+                codingLanguage={codingLanguage}
+                created={created}
+              />
+            </div>
+            <div className="BountyPriceContainer">
+              <BountyPrice
+                priceMin={priceMin}
+                priceMax={priceMax}
+                price={price}
+                sessionLength={sessionLength}
+                style={{
+                  minWidth: '213px',
+                  maxWidth: '213px',
+                  borderRight: `1px solid ${color.primaryColor.P200}`
+                }}
+              />
+              <BountyProfileView
+                assignee={assignee}
+                status={'ASSIGNED'}
+                canViewProfile={true}
+                statusStyle={{
+                  width: '55px',
+                  height: '16px',
+                  background: color.statusAssigned
+                }}
+              />
+            </div>
+          </BountyContainer>
+        ) : (
+          <></>
+        )
       ) : (
         <BountyContainer color={color}>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
@@ -84,6 +93,8 @@ const Bounties = (props) => {
                 {...props}
                 title={title}
                 codingLanguage={codingLanguage}
+                widget={widget}
+                created={created}
               />
               <BountyPrice
                 priceMin={priceMin}
@@ -107,24 +118,28 @@ const Bounties = (props) => {
               <div className="UnassignedPersonalDetailContainer">
                 <EuiText className="ProfileText">Do your skills match?</EuiText>
                 <IconButton
-                  text={'I can help'}
-                  endingIcon={'arrow_forward'}
-                  width={166}
-                  height={48}
-                  style={{ marginTop: 20 }}
+                  text={
+                    ui.meInfo?.owner_pubkey === person.owner_pubkey ? 'Assign User' : 'I can help'
+                  }
                   onClick={(e) => {
                     if (ui.meInfo) {
-                      showConnectModal();
+                      ui.meInfo?.owner_pubkey === person.owner_pubkey
+                        ? onPanelClick()
+                        : showConnectModal();
                       e.stopPropagation();
                     } else {
                       e.stopPropagation();
                       showModal();
                     }
                   }}
+                  endingIcon={'arrow_forward'}
+                  width={166}
+                  height={48}
+                  style={{ marginTop: 20 }}
                   color="primary"
-                  hoverColor={color.button_secondary.hover}
-                  activeColor={color.button_secondary.active}
-                  shadowColor={color.button_secondary.shadow}
+                  hovercolor={color.button_secondary.hover}
+                  activecolor={color.button_secondary.active}
+                  shadowcolor={color.button_secondary.shadow}
                   iconSize={'16px'}
                   iconStyle={{
                     top: '17px',
@@ -155,7 +170,7 @@ const Bounties = (props) => {
   );
 };
 
-export default Bounties;
+export default observer(Bounties);
 
 interface containerProps {
   unAssignedBackgroundImage?: string;

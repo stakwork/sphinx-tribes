@@ -68,13 +68,13 @@ func PodcastIndexHeaders() map[string]string {
 	}
 }
 
-func ParsePodcastFeed(url string) (*Feed, error) {
-	pod, err := PodcastFeed(url)
+func ParsePodcastFeed(url string, fulltext bool) (*Feed, error) {
+	pod, err := PodcastFeed(url, fulltext)
 	fmt.Println("GOT A POD!", pod)
 	if err != nil || pod == nil {
 		return nil, err
 	}
-	eps, err := PodcastEpisodes(url)
+	eps, err := PodcastEpisodes(url, fulltext)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func ParsePodcastFeed(url string) (*Feed, error) {
 	return &feed, nil
 }
 
-func PodcastFeed(url string) (*Podcast, error) {
+func PodcastFeed(url string, fulltext bool) (*Podcast, error) {
 	client := &http.Client{}
 
 	if url == "" {
@@ -94,6 +94,9 @@ func PodcastFeed(url string) (*Podcast, error) {
 	}
 
 	requrl := PodcastIndexBaseURL + "podcasts/byfeedurl?url=" + url
+	if fulltext {
+		requrl = requrl + "&fulltext=true"
+	}
 	req, err := http.NewRequest("GET", requrl, nil)
 
 	headers := PodcastIndexHeaders()
@@ -119,12 +122,15 @@ func PodcastFeed(url string) (*Podcast, error) {
 	return &r.Feed, nil
 }
 
-func PodcastEpisodes(url string) ([]Episode, error) {
+func PodcastEpisodes(url string, fulltext bool) ([]Episode, error) {
 	client := &http.Client{}
-
-	requrl := PodcastIndexBaseURL + "episodes/byfeedurl?url=" + url
 	if url == "" {
 		return nil, errors.New("no url or id supplied")
+	}
+
+	requrl := PodcastIndexBaseURL + "episodes/byfeedurl?url=" + url
+	if fulltext {
+		requrl = requrl + "&fulltext=true"
 	}
 
 	req, err := http.NewRequest("GET", requrl, nil)

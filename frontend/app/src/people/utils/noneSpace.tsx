@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
-import { Button } from '../../sphinxUI';
+import { colors } from '../../config/colors';
+import { Button } from '../../components/common';
+import { NoneSpaceProps } from 'people/interfaces';
 
-export default function NoneSpace(props) {
+export default function NoneSpace(props: NoneSpaceProps) {
   const color = colors['light'];
   if (props.banner) {
     return (
@@ -18,14 +19,14 @@ export default function NoneSpace(props) {
         <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} color={color} />
 
         <div style={{ marginLeft: 20, padding: 20 }}>
-          <H small={props.small} style={{ paddingLeft: 0 }} color={color}>
+          <H small={props?.small || false} style={{ paddingLeft: 0 }} color={color}>
             {props.text}
           </H>
           <C style={{ paddingLeft: 0 }} color={color}>
             {props.sub}
           </C>
-
-          {props.buttonText && (
+          {props.Button && <div style={{ marginTop: 20 }}>{props.Button}</div>}
+          {!props.Button && props.buttonText && (
             <Button
               text={props.buttonText}
               endingIcon={props.buttonIcon}
@@ -51,14 +52,15 @@ export default function NoneSpace(props) {
       <Icon src={`/static/${props.img}`} color={color} />
 
       <>
-        <H small={props.small} color={color}>
+        <H small={props?.small || false} color={color}>
           {props.text}
         </H>
         <C color={color}>{props.sub}</C>
       </>
 
       <div style={{ height: 200 }}>
-        {props.buttonText && (
+        <div style={{ marginTop: 20 }}>{props.Button}</div>
+        {!props.Button && props.buttonText && (
           <Button
             text={props.buttonText}
             leadingIcon={props.buttonIcon}

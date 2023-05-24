@@ -4,24 +4,15 @@ import moment from 'moment';
 import { useStores } from '../../store';
 import { useHistory } from 'react-router';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
+import { observer } from 'mobx-react-lite';
+import { NameTagProps } from 'people/interfaces';
 
-export default function NameTag(props) {
-  const {
-    owner_alias,
-    owner_pubkey,
-    img,
-    created,
-    unique_name,
-    id,
-    style,
-    widget,
-    iconSize,
-    textSize,
-    ticketUrl,
-    loomEmbedUrl,
-    isPaid
-  } = props;
+export default observer(NameTag);
+
+function NameTag(props: NameTagProps) {
+  const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =
+    props;
   const { ui } = useStores();
   const color = colors['light'];
 
@@ -29,19 +20,19 @@ export default function NameTag(props) {
 
   const isMobile = useIsMobile();
 
-  const isSelected = ui.selectedPerson == id ? true : false;
+  const isSelected = ui.selectedPerson === id ? true : false;
 
   function selectPerson(e) {
     // don't select if already selected
     if (isSelected) return;
     e.stopPropagation();
-    console.log('selectPerson', id, unique_name);
+
     ui.setPersonViewOpenTab(widget || '');
     ui.setSelectedPerson(id);
     ui.setSelectingPerson(id);
+
     if (owner_pubkey) {
       history.push(`/p/${owner_pubkey}`);
-      // window.history.pushState({}, 'Sphinx Tribes', '/p/' + unique_name);
     }
   }
 
@@ -152,8 +143,10 @@ const Name = styled.div<NameProps>`
   line-height: 16px;
   /* or 158% */
 
-  display: flex;
-  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 11vw;
 `;
 
 const Date = styled.div`

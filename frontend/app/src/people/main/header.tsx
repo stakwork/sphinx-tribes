@@ -1,30 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { useIsMobile } from '../../hooks';
-import { colors } from '../../colors';
-// import { languageOptions } from '../../localization';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
-import { Modal, Button } from '../../sphinxUI';
+import { Modal, Button } from '../../components/common';
 
 import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
-import Select from 'react-select';
-import IconButton from '../../sphinxUI/icon_button';
+import IconButton from '../../components/common/icon_button';
+import { observer } from 'mobx-react-lite';
+import { PostModal } from '../widgetViews/postBounty/PostModal';
+import StartUpModal from '../utils/start_up_modal';
 
-export default function Header() {
+export default observer(Header);
+
+function Header() {
   const { main, ui } = useStores();
   const location = useLocation();
   const history = useHistory();
   const isMobile = useIsMobile();
-
-  const { language } = ui;
-
-  const c = colors['light'];
+  const [isOpenPostModal, setIsOpenPostModal] = useState(false);
+  const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
 
   const tabs = [
     {
@@ -53,9 +52,7 @@ export default function Header() {
 
   async function testChallenge(chal: string) {
     try {
-      console.log('testChallenge', chal);
       const me: any = await api.get(`poll/${chal}`);
-      console.log('poll succeeded', me);
       if (me && me.pubkey) {
         ui.setMeInfo(me);
         ui.setShowSignIn(false);
@@ -66,18 +63,21 @@ export default function Header() {
     }
   }
 
-  function urlRedirect(directPathname) {
-    // if route not supported, redirect
-    let pass = false;
-    const path = directPathname || location.pathname;
-    tabs.forEach((t) => {
-      if (path.includes(t.path)) pass = true;
-    });
-    if (!pass) {
-      console.log('force fix');
-      history.push('/p');
+  const showSignIn = () => {
+    if (isMobile) {
+      ui.setShowSignIn(true);
+      return;
     }
-  }
+    setIsOpenStartupModal(true);
+  };
+
+  const clickHandler = () => {
+    if (ui.meInfo && ui.meInfo?.owner_alias) {
+      setIsOpenPostModal(true);
+    } else {
+      showSignIn();
+    }
+  };
 
   useEffect(() => {
     const path = location.pathname;
@@ -89,19 +89,15 @@ export default function Header() {
 
   useEffect(() => {
     (async () => {
-      console.log('header deeplink load');
       try {
         const urlObject = new URL(window.location.href);
         let path = location.pathname;
         const params = urlObject.searchParams;
         const chal = params.get('challenge');
 
-        console.log('chal', chal);
-
         if (chal) {
           // fix url path if "/p" is not included, add challenge to proper url path
           if (!path.includes('/p')) {
-            console.log('fix path!');
             path = `/p?challenge=${chal}`;
             history.push(path);
           }
@@ -110,7 +106,6 @@ export default function Header() {
           // update self on reload
           await main.getSelf(null);
         }
-        urlRedirect(path);
       } catch (e) {
         console.log('e', e);
       }
@@ -145,13 +140,15 @@ export default function Header() {
               </EuiHeaderSection>
 
               <Corner>
-                <a href={'https://sphinx.chat/'} target="_blank" rel="noreferrer">
-                  <Button
-                    text={'Get Sphinx'}
-                    color="transparent"
-                    style={{ marginRight: 14, width: 85 }}
-                  />
-                </a>
+                <Button
+                  text={'Get Sphinx'}
+                  color="transparent"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    clickHandler();
+                  }}
+                  style={{ marginRight: 14, width: 98 }}
+                />
 
                 {ui.meInfo ? (
                   <Imgg
@@ -169,7 +166,6 @@ export default function Header() {
                 ) : (
                   <Button
                     icon={'account_circle'}
-                    // text={'Sign in'}
                     style={{ minWidth: 38, width: 38, marginRight: 10, height: 37 }}
                     color="primary"
                     onClick={() => ui.setShowSignIn(true)}
@@ -201,13 +197,6 @@ export default function Header() {
         </EuiHeader>
       );
     }
-
-    // const locOptions = languageOptions.map(lo => {
-    //     return {
-    //         value: lo,
-    //         label: lo
-    //     }
-    // })
 
     // desktop version
     return (
@@ -255,9 +244,33 @@ export default function Header() {
           </Row>
 
           <Corner>
-            <GetSphinxsBtn href={'https://sphinx.chat/'} target="_blank">
+            <GetSphinxsBtn
+              onClick={(e) => {
+                e.preventDefault();
+                clickHandler();
+              }}
+            >
               Get Sphinx
             </GetSphinxsBtn>
+            <PostModal
+              isOpen={isOpenPostModal}
+              onClose={() => setIsOpenPostModal(false)}
+              widget={'wanted'}
+              onSucces={() => {
+                history.goBack();
+                window.location.reload();
+              }}
+              onGoBack={() => {
+                history.goBack();
+              }}
+            />
+            {isOpenStartUpModel && (
+              <StartUpModal
+                closeModal={() => setIsOpenStartupModal(false)}
+                dataObject={'createWork'}
+                buttonColor={'success'}
+              />
+            )}
             {ui.meInfo ? (
               <LoggedInBtn
                 onClick={() => {
@@ -265,7 +278,7 @@ export default function Header() {
                 }}
               >
                 <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
-                {ui.meInfo?.owner_alias}
+                <Alias> {ui.meInfo?.owner_alias}</Alias>
               </LoggedInBtn>
             ) : (
               <LoginBtn onClick={() => ui.setShowSignIn(true)}>
@@ -279,92 +292,90 @@ export default function Header() {
     );
   }
 
-  return useObserver(() => {
-    return (
-      <>
-        {renderHeader()}
+  return (
+    <>
+      {renderHeader()}
 
-        {/* you wanna login modal  */}
-        <Modal
-          visible={ui.showSignIn}
-          close={() => ui.setShowSignIn(false)}
-          overlayClick={() => ui.setShowSignIn(false)}
-        >
-          <SignIn
-            onSuccess={() => {
-              ui.setShowSignIn(false);
-              setShowWelcome(true);
-              // if page is not /p, go to /p (people)
-              const path = location.pathname;
-              if (!path.includes('/p')) history.push('/p');
-            }}
-          />
-        </Modal>
+      {/* you wanna login modal  */}
+      <Modal
+        visible={ui.showSignIn}
+        close={() => ui.setShowSignIn(false)}
+        overlayClick={() => ui.setShowSignIn(false)}
+      >
+        <SignIn
+          onSuccess={() => {
+            ui.setShowSignIn(false);
+            setShowWelcome(true);
+            // if page is not /p, go to /p (people)
+            const path = location.pathname;
+            if (!path.includes('/p')) history.push('/p');
+          }}
+        />
+      </Modal>
 
-        {/* you logged in modal  */}
-        <Modal visible={ui.meInfo && showWelcome ? true : false}>
-          <div>
-            <Column>
-              <Imgg
-                style={{ height: 128, width: 128, marginBottom: 40 }}
-                src={ui.meInfo?.img || '/static/person_placeholder.png'}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '110px',
-                  right: '85px'
-                }}
-              >
-                <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
+      {/* you logged in modal  */}
+      <Modal visible={ui.meInfo && showWelcome ? true : false}>
+        <div>
+          <Column>
+            <Imgg
+              style={{ height: 128, width: 128, marginBottom: 40 }}
+              src={ui.meInfo?.img || '/static/person_placeholder.png'}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: '110px',
+                right: '85px'
+              }}
+            >
+              <img height={'32px'} width={'32px'} src="/static/badges/verfied_mark.png" alt="" />
+            </div>
+
+            <T>
+              <div style={{ lineHeight: '26px' }}>
+                Welcome <Name>{ui.meInfo?.owner_alias}</Name>
               </div>
+            </T>
 
-              <T>
-                <div style={{ lineHeight: '26px' }}>
-                  Welcome <Name>{ui.meInfo?.owner_alias}</Name>
-                </div>
-              </T>
+            <Welcome>
+              Your profile is now public. Connect with other people, join tribes and listen your
+              favorite podcast!
+            </Welcome>
 
-              <Welcome>
-                Your profile is now public. Connect with other people, join tribes and listen your
-                favorite podcast!
-              </Welcome>
+            <IconButton
+              text={'Continue'}
+              endingIcon={'arrow_forward'}
+              height={48}
+              width={'100%'}
+              color={'primary'}
+              onClick={() => {
+                // switch from welcome modal to edit modal
+                setShowWelcome(false);
+                goToEditSelf();
+              }}
+              hovercolor={'#5881F8'}
+              activecolor={'#5078F2'}
+              shadowcolor={'rgba(97, 138, 255, 0.5)'}
+            />
+          </Column>
+        </div>
+      </Modal>
 
-              <IconButton
-                text={'Continue'}
-                endingIcon={'arrow_forward'}
-                height={48}
-                width={'100%'}
-                color={'primary'}
-                onClick={() => {
-                  // switch from welcome modal to edit modal
-                  setShowWelcome(false);
-                  goToEditSelf();
-                }}
-                hoverColor={'#5881F8'}
-                activeColor={'#5078F2'}
-                shadowColor={'rgba(97, 138, 255, 0.5)'}
-              />
-            </Column>
-          </div>
-        </Modal>
-
-        <Modal
-          visible={ui?.torFormBodyQR}
-          close={() => {
+      <Modal
+        visible={ui?.torFormBodyQR}
+        close={() => {
+          ui.setTorFormBodyQR('');
+        }}
+      >
+        <TorSaveQR
+          url={ui?.torFormBodyQR}
+          goBack={() => {
             ui.setTorFormBodyQR('');
           }}
-        >
-          <TorSaveQR
-            url={ui?.torFormBodyQR}
-            goBack={() => {
-              ui.setTorFormBodyQR('');
-            }}
-          />
-        </Modal>
-      </>
-    );
-  });
+        />
+      </Modal>
+    </>
+  );
 }
 
 const Row = styled.div`
@@ -486,6 +497,7 @@ const MTab = styled.div<TagProps>`
 `;
 
 const LoggedInBtn = styled.div`
+  max-width: 130px;
   height: 40px;
   border-radius: 50%;
   margin-right: 20px;
@@ -518,17 +530,17 @@ const LoggedInBtn = styled.div`
   }
 `;
 
-const GetSphinxsBtn = styled.a`
+const GetSphinxsBtn = styled.button`
   display: flex;
   flex: 1 0 auto;
   background: #618aff;
-  box-shadow: 0px 2px 10px rgba(97, 138, 255, 0.5);
   padding: 0 28px;
   height: 40px;
   align-items: center;
   justify-content: center;
   margin-right: 20px;
   border-radius: 32px;
+  border: none;
   font-weight: 600;
   font-size: 14px;
   line-height: 19px;
@@ -572,22 +584,9 @@ const LoginBtn = styled.div`
   }
 `;
 
-// const LanguageSelector = styled(Select)`
-// min-width:150px;
-// margin-right:20px;
-// color:#fff !important;
-
-// div {
-//     background:#1a242e !important;
-//     border:none;
-// }
-
-// div.div.div {
-//     color:#fff !important;
-// }
-
-// #react-select-2-input {
-//     color:#fff !important;
-// }
-// }
-// `;
+const Alias = styled.span`
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;

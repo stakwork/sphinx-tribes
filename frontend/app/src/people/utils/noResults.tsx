@@ -2,8 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
+import { observer } from 'mobx-react-lite';
 
-export default function NoResults(props) {
+export default observer(NoResults);
+function NoResults() {
   const { ui } = useStores();
   const { searchText } = ui || {};
 

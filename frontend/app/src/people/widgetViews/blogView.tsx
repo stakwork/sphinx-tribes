@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BlogPost } from '../../form/inputs/widgets/interfaces';
+import { BlogPost } from '../../components/form/inputs/widgets/interfaces';
 import moment from 'moment';
 
 export default function BlogView(props: BlogPost) {
@@ -13,14 +13,7 @@ export default function BlogView(props: BlogPost) {
       <Time>{moment(created).format('l') || 'No title'} </Time>
       <M>{markdown || 'No markdown'} </M>
 
-      {showImages && (
-        <Gallery>
-          {gallery &&
-            gallery.map((g, i) => {
-              return <Img key={i} src={g} />;
-            })}
-        </Gallery>
-      )}
+      {showImages && <Gallery>{gallery && gallery.map((g, i) => <Img key={i} src={g} />)}</Gallery>}
     </Wrap>
   );
 }

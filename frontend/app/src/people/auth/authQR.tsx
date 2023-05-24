@@ -4,9 +4,12 @@ import styled from 'styled-components';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
-import { getHost } from '../../host';
+import { getHost } from '../../config/host';
 import QR from '../utils/QR';
+import { observer } from 'mobx-react-lite';
+import { AuthProps } from 'people/interfaces';
 
+//TODO: mv to utils
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
@@ -14,7 +17,9 @@ function makeQR(challenge: string, ts: string) {
 
 let interval;
 
-export default function AuthQR(props: any) {
+export default observer(AuthQR);
+
+function AuthQR(props: AuthProps) {
   const { ui, main } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
@@ -33,7 +38,6 @@ export default function AuthQR(props: any) {
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        console.log(me);
         if (me && me?.pubkey) {
           ui.setMeInfo(me);
           await main.getSelf(me);
@@ -60,15 +64,11 @@ export default function AuthQR(props: any) {
   }
   return (
     <ConfirmWrap style={{ ...props.style }}>
-      {/* <InnerWrap>
-                <QrWrap> */}
       {challenge ? (
         <QR size={203} style={{ width: 203 }} value={qrString} />
       ) : (
         <EuiLoadingSpinner size="xl" />
       )}
-      {/* </QrWrap>
-            </InnerWrap> */}
     </ConfirmWrap>
   );
 }
@@ -82,24 +82,3 @@ const ConfirmWrap = styled.div`
   height: 203px;
   position: relative;
 `;
-const InnerWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
-
-const QrWrap = styled.div`
-  padding: 8px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-`;
-
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

@@ -1,20 +1,22 @@
-/* eslint-disable func-style */
 import React, { useEffect, useState, useRef } from 'react';
 import { useStores } from '../../store';
-import { useObserver } from 'mobx-react-lite';
-import Form from '../../form';
+import Form from '../../components/form';
 import styled, { css } from 'styled-components';
-import { Button, IconButton } from '../../sphinxUI';
+import { Button, IconButton } from '../../components/common';
 import moment from 'moment';
-import SummaryViewer from '../widgetViews/summaryViewer';
+import WantedSummary from '../widgetViews/summaries/wantedSummary';
 import { useIsMobile } from '../../hooks';
-import { dynamicSchemasByType } from '../../form/schema';
+import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
+import { cloneDeep } from 'lodash';
+import { observer } from 'mobx-react-lite';
+import { FocusViewProps } from 'people/interfaces';
 
 // this is where we see others posts (etc) and edit our own
-export default function FocusedView(props: any) {
+export default observer(FocusedView);
+
+function FocusedView(props: FocusViewProps) {
   const {
-    onSuccess,
     goBack,
     config,
     selectedIndex,
@@ -37,33 +39,38 @@ export default function FocusedView(props: any) {
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
   const [editable, setEditable] = useState<boolean>(!canEdit);
-  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
 
   const isMobile = useIsMobile();
 
-  // console.log({ ...person });
+  const isTorSave = canEdit && main.isTorSave();
 
-  const torSave = canEdit && ui?.meInfo?.url?.includes('.onion');
+  function isNotHttps(url: string | undefined) {
+    if (main.isTorSave() || url?.startsWith('http://')) {
+      return true;
+    }
+    return false;
+  }
 
-  function closeModal(override) {
+  function closeModal() {
     if (!manualGoBackOnly) {
-      console.log('close modal');
       ui.setEditMe(false);
       if (props.goBack) props.goBack();
     }
   }
 
   // get self on unmount if tor user
-  useEffect(() => {
-    return function cleanup() {
-      if (torSave) {
-        main.getSelf(null);
-      }
-    };
-  }, []);
+  useEffect(
+    () =>
+      function cleanup() {
+        if (isTorSave) {
+          main.getSelf(null);
+        }
+      },
+    [main, isTorSave]
+  );
 
   function mergeFormWithMeData(v) {
     let fullMeData: any = null;
@@ -151,66 +158,69 @@ export default function FocusedView(props: any) {
     try {
       await main.saveProfile(body);
       await main.getPeople();
-      closeModal(true);
-      props?.deleteExtraFunction();
+      closeModal();
+
+      if (props?.deleteExtraFunction) props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
     setDeleting(false);
-    props.ReCallBounties();
+    if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
   async function preSubmitFunctions(body) {
-    // if github repo
+    const newBody = cloneDeep(body);
 
+    // if github repo
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
-        body.type === 'wanted_coding_task' ||
-        body.type === 'coding_task' ||
-        body.type === 'freelance_job_request'
+        newBody.ticketUrl &&
+        (newBody.type === 'wanted_coding_task' ||
+          newBody.type === 'coding_task' ||
+          newBody.type === 'freelance_job_request')
       ) {
-        const { repo, issue } = extractRepoAndIssueFromIssueUrl(body.ticketUrl);
+        const { repo, issue } = extractRepoAndIssueFromIssueUrl(newBody.ticketUrl);
         const splitString = repo.split('/');
-        const ownerName = splitString[0];
-        const repoName = splitString[1];
+        const [ownerName, repoName] = splitString;
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
 
         if (!res) {
           throw githubError;
         }
-        const { description, title } = res;
-        console.log(description, { ...body });
-        if (body.github_description) {
-          body.description = description;
+
+        const { description } = res;
+
+        if (newBody.github_description) {
+          newBody.description = description;
         }
+
         // body.description = description;
-        body.title = body.one_sentence_summary;
+        newBody.title = newBody.one_sentence_summary;
 
         // save repo to cookies for autofill in form
-        ui.setLastGithubRepo(body.ticketUrl);
+        ui.setLastGithubRepo(newBody.ticketUrl);
       }
     } catch (e) {
       throw githubError;
     }
 
-    return body;
+    return newBody;
   }
 
   async function submitForm(body) {
-    console.log('START SUBMIT FORM', body);
-
+    let newBody = cloneDeep(body);
     try {
-      body = await preSubmitFunctions(body);
+      newBody = await preSubmitFunctions(newBody);
     } catch (e) {
       console.log('e', e);
       alert(e);
       return;
     }
 
-    body = mergeFormWithMeData(body);
+    newBody = mergeFormWithMeData(newBody);
 
-    if (!body) return; // avoid saving bad state
+    if (!newBody) return; // avoid saving bad state
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
 
@@ -218,223 +228,228 @@ export default function FocusedView(props: any) {
     const unixTimestamp = Math.floor(date.getTime() / 1000);
     setLoading(true);
     try {
-      const newBody = {
-        ...body,
-        alert: undefined,
-        new_ticket_time: unixTimestamp,
-        extras: {
-          ...body?.extras,
-          alert: body.alert
-        }
-      };
+      const requestData =
+        config.name === 'about' || config.name === 'wanted'
+          ? {
+              ...newBody,
+              alert: undefined,
+              new_ticket_time: unixTimestamp,
+              extras: {
+                ...newBody?.extras,
+                alert: newBody.alert
+              }
+            }
+          : newBody;
 
-      await main.saveProfile(
-        config.name === 'about' || config.name === 'wanted' ? { ...newBody } : body
-      );
-      closeModal(true);
+      await main.saveProfile(requestData);
+      closeModal();
     } catch (e) {
       console.log('e', e);
     }
+    if (props?.onSuccess) props.onSuccess();
     setLoading(false);
-    props?.ReCallBounties();
+    if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties)
+      props?.ReCallBounties();
   }
 
-  return useObserver(() => {
-    // let initialValues: MeData = emptyMeInfo;
-    const initialValues: any = {};
+  const initialValues: any = {};
 
-    const personInfo = canEdit ? ui.meInfo : person;
+  const personInfo = canEdit ? ui.meInfo : person;
 
-    // // console.log({...personInfo}.extras.wanted.map((value) => value.estimated_completion_date));
-    // personInfo?.extras?.wanted?.map((value: any) => {
-    //   console.log(typeof new Date({ ...value }?.estimated_completion_date));
-    // });
-    // set initials here
-    if (personInfo) {
-      if (config && config.name === 'about') {
-        initialValues.id = personInfo.id || 0;
-        initialValues.pubkey = personInfo.pubkey;
-        initialValues.alert = personInfo.extras?.alert || false;
-        initialValues.owner_alias = personInfo.owner_alias || '';
-        initialValues.img = personInfo.img || '';
-        initialValues.price_to_meet = personInfo.price_to_meet || 0;
-        initialValues.description = personInfo.description || '';
-        initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-        initialValues.estimated_completion_date =
-          personInfo.extras?.wanted?.map((value) => {
-            return moment(value?.estimated_completion_date);
-          }) || '';
-        // below are extras,
-        initialValues.twitter =
-          (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
-        initialValues.github =
-          (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
-        initialValues.facebook =
-          (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
-        // extras with multiple items
-        initialValues.coding_languages = personInfo.extras?.coding_languages || [];
-        initialValues.tribes = personInfo.extras?.tribes || [];
-        initialValues.repos = personInfo.extras?.repos || [];
-        initialValues.lightning =
-          (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
-        initialValues.amboss =
-          (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
-      } else {
-        // if there is a selected index, fill in values
-        if (selectedIndex > -1) {
-          const extras = { ...personInfo.extras };
-          const sel =
-            extras[config.name] &&
-            extras[config.name].length > selectedIndex - 1 &&
-            extras[config.name][selectedIndex];
+  // set initials here
+  if (personInfo) {
+    if (config && config.name === 'about') {
+      initialValues.id = personInfo.id || 0;
+      initialValues.pubkey = personInfo.pubkey;
+      initialValues.alert = personInfo.extras?.alert || false;
+      initialValues.owner_alias = personInfo.owner_alias || '';
+      initialValues.img = personInfo.img || '';
+      initialValues.price_to_meet = personInfo.price_to_meet || 0;
+      initialValues.description = personInfo.description || '';
+      initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
+      initialValues.estimated_completion_date =
+        personInfo.extras?.wanted?.map((value) => moment(value?.estimated_completion_date)) || '';
+      // below are extras,
+      initialValues.twitter =
+        (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
+      initialValues.email = (personInfo.extras?.email && personInfo.extras?.email[0]?.value) || '';
+      initialValues.github =
+        (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
+      initialValues.facebook =
+        (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
+      // extras with multiple items
+      initialValues.coding_languages = personInfo.extras?.coding_languages || [];
+      initialValues.tribes = personInfo.extras?.tribes || [];
+      initialValues.repos = personInfo.extras?.repos || [];
+      initialValues.lightning =
+        (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
+      initialValues.amboss =
+        (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
+    } else {
+      // if there is a selected index, fill in values
+      if (selectedIndex > -1) {
+        const extras = { ...personInfo.extras };
+        const sel =
+          extras[config.name] &&
+          extras[config.name].length > selectedIndex - 1 &&
+          extras[config.name][selectedIndex];
 
-          if (sel) {
-            // if dynamic, find right schema
-            const dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
-            if (dynamicSchema) {
-              if (sel.type) {
-                const thisDynamicSchema = dynamicSchemasByType[sel.type];
-                thisDynamicSchema?.forEach((s) => {
-                  initialValues[s.name] = sel[s.name];
-                });
-              } else {
-                // use default schema
-                dynamicSchema?.defaultSchema?.forEach((s) => {
-                  initialValues[s.name] = sel[s.name];
-                });
-              }
+        if (sel) {
+          // if dynamic, find right schema
+          const dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
+          if (dynamicSchema) {
+            if (sel.type) {
+              const thisDynamicSchema = dynamicSchemasByType[sel.type];
+              thisDynamicSchema?.forEach((s) => {
+                initialValues[s.name] = sel[s.name];
+              });
             } else {
-              config?.schema?.forEach((s) => {
+              // use default schema
+              dynamicSchema?.defaultSchema?.forEach((s) => {
                 initialValues[s.name] = sel[s.name];
               });
             }
+          } else {
+            config?.schema?.forEach((s) => {
+              initialValues[s.name] = sel[s.name];
+            });
           }
         }
       }
     }
+  }
 
-    const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
+  const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
-    return (
-      <div
-        style={{
-          ...props?.style,
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        {editMode ? (
-          <B ref={scrollDiv} hide={false}>
-            {formHeader && formHeader}
-            {ui.meInfo && (
-              <Form
-                newDesign={newDesign}
-                buttonsOnBottom={buttonsOnBottom}
-                isFirstTimeScreen={isFirstTimeScreen}
-                readOnly={editable}
-                formRef={formRef}
-                submitText={config && config.submitText}
-                loading={loading}
-                close={() => {
-                  if (skipEditLayer && goBack) goBack();
-                  else setEditMode(false);
-                }}
-                onSubmit={submitForm}
-                scrollDiv={scrollDiv}
-                schema={config && config.schema}
-                initialValues={initialValues}
-                extraHTML={
-                  ui.meInfo.verification_signature
-                    ? {
-                        twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                      }
-                    : {}
-                }
-              />
-            )}
-          </B>
-        ) : (
-          <>
-            {(isMobile || canEdit) && (
-              <BWrap
-                style={{
-                  ...noShadow
-                }}
-              >
-                {goBack ? (
-                  <IconButton
-                    icon="arrow_back"
-                    onClick={() => {
-                      if (goBack) goBack();
-                    }}
+  function getExtras(): any {
+    if (main.personAssignedWanteds.length) {
+      return main.peopleWanteds[selectedIndex].body;
+    } else if (person?.extras && main.peopleWanteds) {
+      return main.peopleWanteds[selectedIndex].body;
+    }
+
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        ...props?.style,
+        width: '100%',
+        height: '100%'
+      }}
+    >
+      {editMode ? (
+        <B ref={scrollDiv} hide={false}>
+          {formHeader && formHeader}
+          {ui.meInfo && (
+            <Form
+              newDesign={newDesign}
+              buttonsOnBottom={buttonsOnBottom}
+              isFirstTimeScreen={isFirstTimeScreen}
+              readOnly={editable}
+              formRef={formRef}
+              submitText={config && config.submitText}
+              loading={loading}
+              close={() => {
+                if (skipEditLayer && goBack) goBack();
+                else setEditMode(false);
+              }}
+              onSubmit={submitForm}
+              scrollDiv={scrollDiv}
+              schema={config && config.schema}
+              initialValues={initialValues}
+              extraHTML={
+                ui.meInfo.verification_signature
+                  ? {
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
+                  : {}
+              }
+            />
+          )}
+        </B>
+      ) : (
+        <>
+          {(isMobile || canEdit) && (
+            <BWrap
+              style={{
+                ...noShadow
+              }}
+            >
+              {goBack ? (
+                <IconButton
+                  icon="arrow_back"
+                  onClick={() => {
+                    if (goBack) goBack();
+                  }}
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600
+                  }}
+                />
+              ) : (
+                <div />
+              )}
+              {canEdit ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Button
+                    onClick={() => setEditMode(true)}
+                    color={'widget'}
+                    leadingIcon={'edit'}
+                    iconSize={18}
+                    width={100}
+                    text={'Edit'}
+                  />
+                  <Button
+                    onClick={() => deleteIt()}
+                    color={'white'}
+                    loading={deleting}
+                    leadingIcon={'delete_outline'}
+                    text={'Delete'}
                     style={{
-                      fontSize: 12,
-                      fontWeight: 600
+                      marginLeft: 10
                     }}
                   />
-                ) : (
-                  <div />
-                )}
-                {canEdit ? (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Button
-                      onClick={() => setEditMode(true)}
-                      color={'widget'}
-                      leadingIcon={'edit'}
-                      iconSize={18}
-                      width={100}
-                      text={'Edit'}
-                    />
-                    <Button
-                      onClick={() => deleteIt()}
-                      color={'white'}
-                      loading={deleting}
-                      leadingIcon={'delete_outline'}
-                      text={'Delete'}
-                      style={{
-                        marginLeft: 10
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div />
-                )}
-              </BWrap>
-            )}
+                </div>
+              ) : (
+                <div />
+              )}
+            </BWrap>
+          )}
 
-            {(isMobile || canEdit) && <div style={{ height: 60 }} />}
+          {(isMobile || canEdit) && <div style={{ height: 60 }} />}
 
-            {/* display item */}
-            <SummaryViewer
-              ReCallBounties={props?.ReCallBounties}
-              formSubmit={submitForm}
-              person={person}
-              personBody={props?.personBody}
-              item={person?.extras && person.extras[config?.name][selectedIndex]}
-              config={config}
-              fromBountyPage={fromBountyPage}
-              extraModalFunction={props?.extraModalFunction}
-              deleteAction={deleteIt}
-              deletingState={deleting}
-              editAction={() => {
-                setEditable(false);
-                setEditMode(true);
-                // props?.deleteExtraFunction();
-              }}
-              setIsModalSideButton={setIsModalSideButton}
-              setIsExtraStyle={props?.setIsExtraStyle}
-            />
-          </>
-        )}
-      </div>
-    );
-  });
+          {/* display item */}
+          <WantedSummary
+            {...getExtras()}
+            ReCallBounties={props?.ReCallBounties}
+            formSubmit={submitForm}
+            person={person}
+            personBody={props?.personBody}
+            item={getExtras()}
+            config={config}
+            fromBountyPage={fromBountyPage}
+            extraModalFunction={props?.extraModalFunction}
+            deleteAction={deleteIt}
+            deletingState={deleting}
+            editAction={() => {
+              setEditable(false);
+              setEditMode(true);
+            }}
+            setIsModalSideButton={setIsModalSideButton}
+            setIsExtraStyle={props?.setIsExtraStyle}
+          />
+        </>
+      )}
+    </div>
+  );
 }
 
 const BWrap = styled.div`
@@ -446,6 +461,7 @@ const BWrap = styled.div`
   min-height: 42px;
   position: absolute;
   left: 0px;
+  border-bottom: 1px solid rgb(221, 225, 229);
   background: #ffffff;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
   z-index: 100;

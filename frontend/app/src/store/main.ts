@@ -1,26 +1,29 @@
-import { observable, action } from 'mobx';
-// import { persist } from "mobx-persist";
+import { makeAutoObservable, observable, action } from 'mobx';
 import api from '../api';
-import { Extras } from '../form/inputs/widgets/interfaces';
-import { getHostIncludingDockerHosts } from '../host';
-import { uiStore } from './ui';
+import { Extras } from '../components/form/inputs/widgets/interfaces';
+import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
-export const queryLimit = 100;
+import { uiStore } from './ui';
+import memo from 'memo-decorator';
+import { persist } from 'mobx-persist';
+
+export const queryLimit = 1000;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
 }
 
 export class MainStore {
-  // @persist("list")
-  @observable
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
 
-  @action async getTribes(queryParams?: any): Promise<Tribe[]> {
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  async getTribes(queryParams?: any): Promise<Tribe[]> {
     let ta = [...uiStore.tags];
 
-    console.log('getTribes');
     //make tags string for querys
     ta = ta.filter((f) => f.checked);
     let tags = '';
@@ -54,9 +57,7 @@ export class MainStore {
   bots: Bot[] = [];
   myBots: Bot[] = [];
 
-  @action async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
-    console.log('get bots');
-
+  async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
     const query = this.appendQueryParams('bots', queryParams);
     const b = await api.get(query);
 
@@ -70,23 +71,6 @@ export class MainStore {
         }
       });
     }
-
-    // b = [{
-    //   name: 'welcome',
-    //   unique_name: 'welcome',
-    //   label: 'Welcome',
-    //   description: 'my first bot bot'
-    // }, {
-    //   name: 'btc',
-    //   unique_name: 'btc',
-    //   label: 'BTC',
-    //   description: 'my first bot bot'
-    // }, {
-    //   name: 'bet',
-    //   unique_name: 'bet',
-    //   label: 'Bet',
-    //   description: 'my first bot botmy first bot botmy first bot botmy first bot bot'
-    // },]
 
     const hideBots = ['pleaseprovidedocumentation', 'example'];
 
@@ -126,7 +110,7 @@ export class MainStore {
     return b;
   }
 
-  @action async getMyBots(): Promise<any> {
+  async getMyBots(): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
@@ -134,11 +118,9 @@ export class MainStore {
       let relayB: any = await this.fetchFromRelay('bots');
 
       relayB = await relayB.json();
-      console.log('got bots from relay', relayB);
       const relayMyBots = relayB?.response?.bots || [];
 
       // merge tribe server stuff
-      console.log('get bots');
       const tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
@@ -154,33 +136,36 @@ export class MainStore {
 
       return mergedBots;
     } catch (e) {
-      console.log('ok');
+      console.log('Error getMyBots', e);
     }
   }
 
-  @action async fetchFromRelay(path): Promise<any> {
+  async fetchFromRelay(path): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
     const r: any = await fetch(`${URL}/${path}`, {
       method: 'GET',
+      mode: 'cors',
       headers: {
         'x-jwt': info.jwt,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
       }
     });
 
     return r;
   }
 
-  @action async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
+  async getTribesByOwner(pubkey: string): Promise<Tribe[]> {
     const ts = await api.get(`tribes_by_owner/${pubkey}?all=true`);
     this.ownerTribes = ts;
     return ts;
   }
 
-  @action async getTribeByUn(un: string): Promise<Tribe> {
+  async getTribeByUn(un: string): Promise<Tribe> {
     const t = await api.get(`tribe_by_un/${un}`);
     // put got on top
     // if already exists, delete
@@ -194,76 +179,69 @@ export class MainStore {
     return t;
   }
 
-  @action async getSingleTribeByUn(un: string): Promise<Tribe> {
+  async getSingleTribeByUn(un: string): Promise<Tribe> {
     const t = await api.get(`tribe_by_un/${un}`);
     return t;
   }
 
-  @action async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
+  async getGithubIssueData(owner: string, repo: string, issue: string): Promise<any> {
     const data = await api.get(`github_issue/${owner}/${repo}/${issue}`);
     const { title, description, assignee, status } = data && data;
-
-    console.log('got github issue', data);
 
     // if no title, the github issue isnt real
     if (!title && !status && !description && !assignee) return null;
     return data;
   }
 
-  @action async getOpenGithubIssues(): Promise<any> {
+  async getOpenGithubIssues(): Promise<any> {
     try {
       const openIssues = await api.get(`github_issue/status/open`);
-      console.log('got openIssues', openIssues);
       if (openIssues) {
         uiStore.setOpenGithubIssues(openIssues);
       }
       return openIssues;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error getOpenGithubIssues: ', e);
     }
   }
 
-  @action isTorSave() {
+  isTorSave() {
     let result = false;
     if (uiStore?.meInfo?.url?.includes('.onion')) result = true;
     return result;
   }
 
-  @action async makeBot(payload: any): Promise<any> {
+  async makeBot(payload: any): Promise<any> {
     const [r, error] = await this.doCallToRelay('POST', `bot`, payload);
     if (error) throw error;
     if (!r) return; // tor user will return here
 
     const b = await r.json();
-    console.log('made bot', b);
 
-    const mybots = await this.getMyBots();
-    console.log('got my bots', mybots);
+    // const mybots = await this.getMyBots();
 
     return b?.response;
   }
 
-  @action async updateBot(payload: any): Promise<any> {
+  async updateBot(payload: any): Promise<any> {
     const [r, error] = await this.doCallToRelay('PUT', `bot`, payload);
     if (error) throw error;
     if (!r) return; // tor user will return here
-    console.log('updated bot', r);
     return r;
   }
 
-  @action async deleteBot(id: string): Promise<any> {
+  async deleteBot(id: string): Promise<any> {
     try {
       const [r, error] = await this.doCallToRelay('DELETE', `bot/${id}`, null);
       if (error) throw error;
       if (!r) return; // tor user will return here
-      console.log('deleted from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!');
+      console.log('Error deleteBot: ', e);
     }
   }
 
-  @action async awardBadge(
+  async awardBadge(
     userPubkey: string,
     badgeName: string,
     badgeIcon: string,
@@ -302,7 +280,7 @@ export class MainStore {
       });
 
       const j = await res0.json();
-      const tt = j.token || '';
+      const tt = j.token || this.lnToken || '';
 
       // 3. first create the badge
       const res1 = await fetch(`${URL}/issue?token=${tt}`, {
@@ -333,15 +311,15 @@ export class MainStore {
 
       return transferredBadge;
     } catch (e) {
-      console.log('ok');
+      console.log('Error awardBadge: ', e);
     }
   }
 
-  @action async getBadgeList(): Promise<any> {
+  async getBadgeList(): Promise<any> {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
-      const l = await fetch(`${URL}/list`, {
+      const l = await fetch(`${URL}/list?limit=100000`, {
         method: 'GET'
       });
 
@@ -350,15 +328,15 @@ export class MainStore {
       uiStore.setBadgeList(badgelist);
       return badgelist;
     } catch (e) {
-      console.log('ok');
+      console.log('Error getBadgeList: ', e);
     }
   }
 
-  @action async getBalances(pubkey: any): Promise<any> {
+  async getBalances(pubkey: any): Promise<any> {
     try {
       const URL = 'https://liquid.sphinx.chat';
 
-      const b = await fetch(`${URL}/balances?pubkey=${pubkey}`, {
+      const b = await fetch(`${URL}/balances?pubkey=${pubkey}&limit=100000`, {
         method: 'GET'
       });
 
@@ -366,18 +344,18 @@ export class MainStore {
 
       return balances;
     } catch (e) {
-      console.log('ok');
+      console.log('Error getBalances: ', e);
     }
   }
 
-  @action async postToCache(payload: any): Promise<void> {
+  async postToCache(payload: any): Promise<void> {
     await api.post('save', payload, {
       'Content-Type': 'application/json'
     });
     return;
   }
 
-  @action async getTorSaveURL(method: string, path: string, body: any): Promise<string> {
+  async getTorSaveURL(method: string, path: string, body: any): Promise<string> {
     const key = randomString(15);
     const gotHost = getHostIncludingDockerHosts();
 
@@ -400,13 +378,13 @@ export class MainStore {
       });
       torSaveURL = makeTorSaveURL(gotHost, key);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error postToCache getTorSaveURL: ', e);
     }
 
     return torSaveURL;
   }
 
-  @action appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
+  appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
     let query = path;
     if (queryParams) {
       queryParams.limit = limit;
@@ -425,7 +403,7 @@ export class MainStore {
     return query;
   }
 
-  @action async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
+  async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
     const smallQueryLimit = 4;
     const query = this.appendQueryParams('people/search', smallQueryLimit, {
       search: alias,
@@ -435,19 +413,16 @@ export class MainStore {
     return ps;
   }
 
-  // @persist("list")
-  @observable
+  @persist('list')
   people: Person[] = [];
 
-  @action async getPeople(queryParams?: any): Promise<Person[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
+  setPeople(p: Person[]) {
+    this.people = p;
+  }
 
-    const query = this.appendQueryParams('people', queryLimit, {
-      ...queryParams,
-      sortBy: 'last_login'
-    });
-
-    const ps = await api.get(query);
+  async getPeople(queryParams?: any): Promise<Person[]> {
+    const params = { ...queryParams, search: uiStore.searchText };
+    const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
       const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
@@ -458,7 +433,7 @@ export class MainStore {
     }
 
     // for search always reset page
-    if (queryParams && queryParams.resetPage) {
+    if (params && params.resetPage) {
       this.people = ps;
       uiStore.setPeoplePageNumber(1);
     } else {
@@ -467,14 +442,28 @@ export class MainStore {
         this.people,
         ps,
         (n) => uiStore.setPeoplePageNumber(n),
-        queryParams
+        params
       );
     }
 
     return ps;
   }
 
-  @action decodeListJSON(li: any): Promise<any[]> {
+  @memo({
+    resolver: (...args: any[]) => JSON.stringify({ args }),
+    cache: new Map()
+  })
+  private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
+    const params = { ...queryParams, search };
+    const query = this.appendQueryParams('people', queryLimit, {
+      ...params,
+      sortBy: 'last_login'
+    });
+    const ps = await api.get(query);
+    return ps;
+  }
+
+  decodeListJSON(li: any): Promise<any[]> {
     if (li?.length) {
       li.forEach((o, i) => {
         li[i].body = JSON.parse(o.body);
@@ -484,12 +473,10 @@ export class MainStore {
     return li;
   }
 
-  // @persist("list")
-  @observable
+  @persist('list')
   peoplePosts: PersonPost[] = [];
 
-  @action async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
-    // console.log('queryParams', queryParams)
+  async getPeoplePosts(queryParams?: any): Promise<PersonPost[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/posts', queryLimit, {
@@ -497,7 +484,7 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps = await api.get(query);
+      let ps = await this.fetchPeoplePosts(query);
       ps = this.decodeListJSON(ps);
 
       // for search always reset page
@@ -515,20 +502,27 @@ export class MainStore {
       }
       return ps;
     } catch (e) {
-      console.log('fetch failed', e);
+      console.log('fetch failed getPeoplePosts: ', e);
       return [];
     }
   }
 
-  // @persist("list")
-  @observable
+  @memo({
+    resolver: (...args: any[]) => JSON.stringify({ args }),
+    cache: new Map()
+  })
+  private async fetchPeoplePosts(query) {
+    return await api.get(query);
+  }
+
+  @persist('list')
   peopleWanteds: PersonWanted[] = [];
 
-  @action setPeopleWanteds(wanteds: PersonWanted[]) {
+  setPeopleWanteds(wanteds: PersonWanted[]) {
     this.peopleWanteds = wanteds;
   }
 
-  @action async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
+  async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/wanteds', queryLimit, {
@@ -541,6 +535,9 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
+        // Set person wanted to empty array to avoid wrong data
+        this.setPersonWanteds([]);
+
         this.peopleWanteds = ps;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
@@ -554,17 +551,43 @@ export class MainStore {
       }
       return ps;
     } catch (e) {
-      console.log('fetch failed', e);
+      console.log('fetch failed getPeopleWanteds: ', e);
       return [];
     }
   }
 
-  // @persist("list")
-  @observable
+  personAssignedWanteds: PersonWanted[] = [];
+
+  setPersonWanteds(wanteds: PersonWanted[]) {
+    this.personAssignedWanteds = wanteds;
+  }
+
+  async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
+    try {
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);
+
+      navigator.clipboard.writeText(JSON.stringify(ps));
+
+      this.setPersonWanteds(ps);
+
+      return ps;
+    } catch (e) {
+      console.log('fetch failed getPeopleWanteds: ', e);
+      return [];
+    }
+  }
+
+  @persist('list')
   peopleOffers: PersonOffer[] = [];
 
-  @action async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
-    // console.log('queryParams', queryParams)
+  async getPeopleOffers(queryParams?: any): Promise<PersonOffer[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams('people/offers', queryLimit, {
@@ -591,17 +614,12 @@ export class MainStore {
 
       return ps;
     } catch (e) {
-      console.log('fetch failed', e);
+      console.log('fetch failed getPeopleOffers: ', e);
       return [];
     }
   }
 
-  @action doPageListMerger(
-    currentList: any[],
-    newList: any[],
-    setPage: Function,
-    queryParams?: any
-  ) {
+  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
@@ -622,22 +640,20 @@ export class MainStore {
     return l;
   }
 
-  @action async getPersonByPubkey(pubkey: string): Promise<Person> {
+  @memo()
+  async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
-    // console.log('p', p)
     return p;
   }
 
-  @action async getPersonByGithubName(github: string): Promise<Person> {
+  async getPersonByGithubName(github: string): Promise<Person> {
     const p = await api.get(`person/githubname/${github}`);
-    console.log('getPersonByGithubName', p);
     return p;
   }
 
   // this method merges the relay self data with the db self data, they each hold different data
 
-  @action async getSelf(me: any) {
-    console.log('getSelf');
+  async getSelf(me: any) {
     const self = me || uiStore.meInfo;
     if (self) {
       const p = await api.get(`person/${self.owner_pubkey}`);
@@ -659,53 +675,54 @@ export class MainStore {
 
       const isSuperAdmin = await getSuperAdmin();
       const updateSelf = { ...self, ...p, isSuperAdmin: isSuperAdmin };
-      console.log('updateSelf', updateSelf);
       uiStore.setMeInfo(updateSelf);
     }
   }
 
-  @action async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+  async claimBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
     try {
       const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
-      console.log('code from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!', e);
+      console.log('Error claimBadgeOnLiquid: ', e);
     }
   }
 
-  @action async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
+  async sendBadgeOnLiquid(body: ClaimOnLiquid): Promise<any> {
     try {
       const [r, error] = await this.doCallToRelay('POST', 'claim_on_liquid', body);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
-      console.log('code from relay', r);
       return r;
     } catch (e) {
-      console.log('failed!', e);
+      console.log('Error sendBadgeOnLiquid: ', e);
     }
   }
 
-  @action async refreshJwt() {
+  async refreshJwt() {
     try {
       if (!uiStore.meInfo) return null;
 
       const res: any = await this.fetchFromRelay('refresh_jwt');
       const j = await res.json();
 
+      if (this.lnToken) {
+        this.lnToken = j.jwt;
+        return j;
+      }
       return j.response;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error refreshJwt: ', e);
       // could not refresh jwt, logout!
       return null;
     }
   }
 
-  @action async getUsdToSatsExchangeRate() {
+  async getUsdToSatsExchangeRate() {
     try {
       // get rate for 1 USD
       const res: any = await fetch('https://blockchain.info/tobtc?currency=USD&value=1', {
@@ -716,21 +733,23 @@ export class MainStore {
       const satoshisInABitcoin = 0.00000001;
       const exchangeRate = j / satoshisInABitcoin;
 
-      console.log('update exchange rate', exchangeRate);
       uiStore.setUsdToSatsExchangeRate(exchangeRate);
 
       return exchangeRate;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error getUsdToSatsExchangeRate: ', e);
       // could not refresh jwt, logout!
       return null;
     }
   }
 
-  @action async deleteProfile() {
+  async deleteProfile() {
     try {
       const info = uiStore.meInfo;
-      const [r, error] = await this.doCallToRelay('DELETE', 'profile', info);
+      let request = 'profile';
+      if (this.lnToken) request = `person/${info?.id}`;
+
+      const [r, error] = await this.doCallToRelay('DELETE', request, info);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
@@ -741,19 +760,21 @@ export class MainStore {
       const j = await r.json();
       return j;
     } catch (e) {
-      console.log('e', e);
+      console.log('Error deleteProfile: ', e);
       // could not delete profile!
       return null;
     }
   }
 
-  @action async saveProfile(body) {
-    console.log('SUBMIT FORM', body);
+  async saveProfile(body) {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      const [r, error] = await this.doCallToRelay('POST', 'profile', body);
+      let request = 'profile';
+      if (this.lnToken) request = 'person';
+
+      const [r, error] = await this.doCallToRelay('POST', request, body);
       if (error) throw error;
       if (!r) return; // tor user will return here
 
@@ -774,56 +795,70 @@ export class MainStore {
 
       await this.getSelf(body);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error saveProfile: ', e);
     }
   }
 
   // this method is used whenever changing data from the frontend,
   // forks between tor users and non-tor
-  @action async doCallToRelay(method: string, path: string, body: any): Promise<any> {
-    let response: Response;
+  async doCallToRelay(method: string, path: string, body: any): Promise<any> {
     let error: any = null;
 
     const info = uiStore.meInfo as any;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     if (!info) {
       error = new Error('Youre not logged in');
       return [null, error];
     }
 
-    // fork between tor users and not
-    if (this.isTorSave()) {
-      this.submitFormViaApp(method, path, body);
-      return [null, null];
-    }
+    if (this.lnToken) {
+      const response = await fetch(`${URL}/${path}`, {
+        method: method,
+        body: JSON.stringify({
+          ...body
+        }),
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
 
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-
-    response = await fetch(`${URL}/${path}`, {
-      method: method,
-      body: JSON.stringify({
-        // use docker host (tribes.sphinx), because relay will post to it
-        host: getHostIncludingDockerHosts(),
-        ...body
-      }),
-      headers: {
-        'x-jwt': info.jwt,
-        'Content-Type': 'application/json'
+      return [response, error];
+    } else {
+      // fork between tor users non authentiacted and not
+      if (this.isTorSave() || info.url.startsWith('http://')) {
+        this.submitFormViaApp(method, path, body);
+        return [null, null];
       }
-    });
 
-    return [response, error];
+      const response = await fetch(`${URL}/${path}`, {
+        method: method,
+        body: JSON.stringify({
+          // use docker host (tribes.sphinx), because relay will post to it
+          host: getHostIncludingDockerHosts(),
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return [response, error];
+    }
   }
 
-  @action async submitFormViaApp(method: string, path: string, body: any) {
+  async submitFormViaApp(method: string, path: string, body: any) {
     try {
       const torSaveURL = await this.getTorSaveURL(method, path, body);
       uiStore.setTorFormBodyQR(torSaveURL);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error submitFormViaApp: ', e);
     }
   }
 
-  @action async setExtrasPropertyAndSave(
+  async setExtrasPropertyAndSave(
     extrasName: string,
     propertyName: string,
     created: number,
@@ -842,7 +877,7 @@ export class MainStore {
           await this.saveProfile(clonedMeInfo);
           return [clonedEx, targetIndex];
         } catch (e) {
-          console.log('e', e);
+          console.log('Error setExtrasPropertyAndSave', e);
         }
       }
 
@@ -851,7 +886,7 @@ export class MainStore {
   }
 
   // function to update many value in wanted array of object
-  @action async setExtrasMultipleProperty(
+  async setExtrasMultipleProperty(
     dataObject: object,
     extrasName: string,
     created: number
@@ -869,7 +904,7 @@ export class MainStore {
           await this.saveProfile(clonedMeInfo);
           return [clonedEx, targetIndex];
         } catch (e) {
-          console.log('e', e);
+          console.log('Error setExtrasMultipleProperty', e);
         }
       }
 
@@ -877,15 +912,13 @@ export class MainStore {
     }
   }
 
-  @action async deleteFavorite() {
+  async deleteFavorite() {
     const body: any = {};
-    console.log('SUBMIT FORM', body);
 
-    // console.log('mergeFormWithMeData', body);
     if (!body) return; // avoid saving bad state
 
     const info = uiStore.meInfo as any;
-    if (!info) return console.log('no meInfo');
+    if (!info) return;
     try {
       const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
       const r = await fetch(`${URL}/profile`, {
@@ -913,7 +946,118 @@ export class MainStore {
         }
       ]);
     } catch (e) {
-      console.log('e', e);
+      console.log('Error deleteFavorite', e);
+    }
+  }
+
+  async getBountyHeaderData() {
+    try {
+      const data = await api.get('people/wanteds/header');
+      return data;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  @observable
+  lnauth: LnAuthData = { encode: '', k1: '' };
+
+  @action setLnAuth(lnData: LnAuthData) {
+    this.lnauth = lnData;
+  }
+
+  @persist('object')
+  @observable
+  lnToken = '';
+
+  @action setLnToken(token: string) {
+    this.lnToken = token;
+  }
+
+  @action async getLnAuth(): Promise<any> {
+    try {
+      const data = await api.get('lnauth');
+      this.setLnAuth(data);
+      return data;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
+    try {
+      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
+      if (data.status) {
+        uiStore.setShowSignIn(false);
+
+        this.setLnAuth({ encode: '', k1: '' });
+        this.setLnToken(data.jwt);
+        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
+      }
+      return data;
+    } catch (e) {
+      return { k1: '', status: false };
+    }
+  }
+
+  @observable
+  lnInvoice: string = '';
+
+  @action setLnInvoice(invoice: string) {
+    this.lnInvoice = invoice;
+  }
+
+  @observable
+  lnInvoiceStatus: boolean = false;
+
+  @action setLnInvoiceStatus(status: boolean) {
+    this.lnInvoiceStatus = status;
+  }
+
+  @action async getLnInvoice(body: {
+    amount: number;
+    memo: string;
+    owner_pubkey: string;
+    user_pubkey: string;
+    created: string;
+  }): Promise<LnInvoice> {
+    try {
+      const data = await api.post(
+        'invoices',
+        {
+          amount: body.amount,
+          memo: body.memo,
+          owner_pubkey: body.owner_pubkey,
+          user_pubkey: body.user_pubkey,
+          created: body.created
+        },
+        {
+          'Content-Type': 'application/json'
+        }
+      );
+      if (data.success) {
+        this.setLnInvoice(data.response.invoice);
+      }
+      return data;
+    } catch (e) {
+      return { success: false, response: { invoice: '' } };
+    }
+  }
+
+  @action async getLnInvoiceStatus(
+    payment_req: string
+  ): Promise<{ invoiceStatus: boolean; bountyPaid: boolean }> {
+    try {
+      const data = await api.get(`invoices/${payment_req}`, {
+        'Content-Type': 'application/json'
+      });
+
+      if (data.status) {
+        this.setLnInvoiceStatus(data.status);
+      }
+      return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
+    } catch (e) {
+      return { invoiceStatus: false, bountyPaid: false };
     }
   }
 }
@@ -1010,9 +1154,12 @@ export interface PersonWanted {
   person: PersonFlex;
   title?: string;
   description?: string;
-  created: number;
+  created?: number;
   show?: boolean;
-  body: PersonWanted;
+  assignee?: any;
+  body: PersonWanted | any;
+  type?: string;
+  price?: string;
 }
 
 export interface PersonOffer {
@@ -1039,4 +1186,16 @@ export interface ClaimOnLiquid {
   to: string;
   amount?: number;
   memo: string;
+}
+
+export interface LnAuthData {
+  encode: string;
+  k1: string;
+}
+
+export interface LnInvoice {
+  success: boolean;
+  response: {
+    invoice: string;
+  };
 }

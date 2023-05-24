@@ -28,15 +28,16 @@ To run tribes frontend locally, use these ports:
 - people: `yarn start:people:docker` (localhost:23007)
 
 ### Run frontend locally against people.sphinx.chat
+
 If you would like to run just the frontend do the following
 
-line 77 in `frontend/app/src/App.tsx` change `'localhost:3000': Mode.TRIBES` -> `'localhost:3000': Mode.COMMUNITY`
+line 10 in `frontend/app/src/config/ModeDispatcher.tsx` change `'localhost:3000': Mode.TRIBES` -> `'localhost:3000': Mode.COMMUNITY`
 
-in `frontend/app/src/host.ts` return `"people.sphinx.chat"`
+line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 
 ### Run Golang backemd
 
-- Create a .env file and populate the env file with these variables
+- Create a .env file and populate the env file with thgitese variables
 
 ```
     TEST_MODE=true
@@ -45,8 +46,8 @@ in `frontend/app/src/host.ts` return `"people.sphinx.chat"`
     TEST_ASSET_URL= // Test asset URL
 ```
 
-- Build the application by running ``` go build . ```
-- Run the application with ``` ./sphinx-tribes ```
+- Build the application by running `go build .`
+- Run the application with `./sphinx-tribes`
 
 ### Run Golang backend with local database
 
@@ -56,11 +57,25 @@ in `frontend/app/src/host.ts` return `"people.sphinx.chat"`
 
 ```
     RDS_HOSTNAME =
-    RDS_PORT = 
-    RDS_DB_NAME = 
+    RDS_PORT =
+    RDS_DB_NAME =
     RDS_USERNAME =
     RDS_PASSWORD =
 ```
+
 - Build and run the Golang server
 
+### Run Test
 
+```
+    go test ./...
+```
+
+### Enable Relay
+
+If you would like to enable Relay for invoice creation and keysend payment add the relay env key and values to the .env file
+
+```
+    RELAY_URL=
+    RELAY_AUTH_KEY=
+```

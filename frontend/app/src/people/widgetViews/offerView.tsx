@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Offer } from '../../form/inputs/widgets/interfaces';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
+import { Divider, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
-import { Divider, Title } from '../../sphinxUI';
 import NameTag from '../utils/nameTag';
+import { OfferViewProps } from 'people/interfaces';
 
-export default function OfferView(props: any) {
+export default function OfferView(props: OfferViewProps) {
   const { gallery, title, description, price, person, created, type } = props;
   const isMobile = useIsMobile();
 

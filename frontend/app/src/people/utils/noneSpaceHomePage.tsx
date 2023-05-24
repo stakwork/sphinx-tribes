@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button } from '../../sphinxUI';
-import IconButton from '../../sphinxUI/icon_button';
+import IconButton from '../../components/common/icon_button';
+import { NoneSpaceProps } from 'people/interfaces';
 
-export default function NoneSpaceHomePage(props) {
+export default function NoneSpaceHomePage(props: NoneSpaceProps) {
   if (props.banner) {
     return (
       <div
@@ -32,9 +32,9 @@ export default function NoneSpaceHomePage(props) {
               style={{ marginTop: 20 }}
               onClick={props.action1}
               color="primary"
-              hoverColor={'#5881F8'}
-              activeColor={'#5078F2'}
-              shadowColor={'rgba(97, 138, 255, 0.5)'}
+              hovercolor={'#5881F8'}
+              activecolor={'#5078F2'}
+              shadowcolor={'rgba(97, 138, 255, 0.5)'}
               iconStyle={{
                 top: '13px',
                 right: '14px'
@@ -51,9 +51,9 @@ export default function NoneSpaceHomePage(props) {
               style={{ marginTop: 20, marginLeft: 10 }}
               onClick={props.action2}
               color="success"
-              hoverColor={'#3CBE88'}
-              activeColor={'#2FB379'}
-              shadowColor={'rgba(73, 201, 152, 0.5)'}
+              hovercolor={'#3CBE88'}
+              activecolor={'#2FB379'}
+              shadowcolor={'rgba(73, 201, 152, 0.5)'}
             />
           )}
         </ButtonContainer>
@@ -94,9 +94,9 @@ export default function NoneSpaceHomePage(props) {
             style={{ marginTop: 40 }}
             onClick={props.action1}
             color="primary"
-            hoverColor={'#5881F8'}
-            activeColor={'#5078F2'}
-            shadowColor={'rgba(97, 138, 255, 0.5)'}
+            hovercolor={'#5881F8'}
+            activecolor={'#5078F2'}
+            shadowcolor={'rgba(97, 138, 255, 0.5)'}
           />
         )}
         {props.buttonText2 && (
@@ -108,31 +108,15 @@ export default function NoneSpaceHomePage(props) {
             style={{ marginTop: 20 }}
             onClick={props.action2}
             color="success"
-            hoverColor={'#5881F8'}
-            activeColor={'#5078F2'}
-            shadowColor={'rgba(97, 138, 255, 0.5)'}
+            hovercolor={'#5881F8'}
+            activecolor={'#5078F2'}
+            shadowcolor={'rgba(97, 138, 255, 0.5)'}
           />
         )}
       </ButtonContainerMobile>
     </div>
   );
 }
-
-interface IconProps {
-  src: string;
-}
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
-  width: 160px;
-  height: 160px;
-  margin-right: 10px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  border-radius: 5px;
-  overflow: hidden;
-`;
 
 const H = styled.div`
   margin-top: 10px;

@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colors } from '../../colors';
-import BountyDescription from '../../sphinxUI/bounty_description';
-import BountyPrice from '../../sphinxUI/bounty_price';
-import BountyProfileView from '../../sphinxUI/bounty_profile_view';
+import BountyDescription from '../../bounties/bounty_description';
+import BountyPrice from '../../bounties/bounty_price';
+import BountyProfileView from '../../bounties/bounty_profile_view';
+import { colors } from '../../config/colors';
+import { PaidBountiesProps } from 'people/interfaces';
 
-const PaidBounty = (props) => {
+const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];
   return (
     <BountyContainer
@@ -69,7 +70,7 @@ const BountyContainer = styled.div<PaidBountyProps>`
   flex-direction: row;
   width: 100%;
   font-family: Barlow;
-  height: 100% !important;
+  height: 160px !important;
   background: ${(p) => p.Bounty_Container_Background};
   border: 2px solid ${(p) => p.color.grayish.G950};
   border-radius: 10px;

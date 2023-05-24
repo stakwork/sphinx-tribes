@@ -1,23 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, Modal } from '../../sphinxUI';
+import { Button, Modal } from '../../components/common';
 import QR from './QR';
 import QrBar from './QrBar';
 import { makeConnectQR } from '../../helpers';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
+import { ConnectCardProps } from 'people/interfaces';
 
-export default function ConnectCard(props) {
+export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];
   const { visible } = props;
   const { person } = props;
 
-  const qrString = makeConnectQR(person?.owner_pubkey);
+  const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <Modal
         style={props.modalStyle}
-        overlayClick={(e: React.SyntheticEvent) => {
+        overlayClick={() => {
           props.dismiss();
         }}
         visible={visible}

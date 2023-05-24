@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useStores } from '../store';
 
-import { Button, Divider, IconButton } from '../sphinxUI';
+import { Button, Divider, IconButton } from '../components/common';
 import { useIsMobile } from '../hooks';
 import Bot from './bot';
 import BotBar from './utils/botBar';
 import { useHistory } from 'react-router';
+import { observer } from 'mobx-react-lite';
+import { BotViewProps } from './interfaces';
 
-export default function BotView(props: any) {
+export default observer(BotView);
+
+function BotView(props: BotViewProps) {
   const { botUniqueName, selectBot, loading, goBack } = props;
 
   const { main } = useStores();
@@ -58,9 +62,9 @@ export default function BotView(props: any) {
         <div style={{ width: '100%' }}>
           <Divider style={{ marginBottom: 6 }} />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {tags.map((c, i) => {
-              return <CodeBadge key={i}>{c}</CodeBadge>;
-            })}
+            {tags.map((c, i) => (
+              <CodeBadge key={i}>{c}</CodeBadge>
+            ))}
           </GrowRow>
         </div>
       )}

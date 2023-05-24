@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Divider } from '../../sphinxUI';
+import { Divider } from '../../components/common';
 import QrBar from '../utils/QrBar';
-import ReactMarkdown from 'react-markdown';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { renderMarkdown } from '../utils/renderMarkdown';
+import { observer } from 'mobx-react-lite';
+import { AboutViewProps } from 'people/interfaces';
 
-export default function AboutView(props: any) {
+export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
-  const { twitter, github, coding_languages, tribes, repos, lightning, amboss } = extras || {};
+  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
+    extras || {};
+
   let tag = '';
   let githubTag = '';
   let lightningAddress = '';
   let ambossAddress = '';
+  let emailAddress = '';
 
   let { description } = props;
 
@@ -26,6 +30,7 @@ export default function AboutView(props: any) {
   if (github && github[0] && github[0].value) githubTag = github[0].value;
   if (lightning && lightning[0] && lightning[0].value) lightningAddress = lightning[0].value;
   if (amboss && amboss[0] && amboss[0].value) ambossAddress = amboss[0].value;
+  if (email && email[0] && email[0].value) emailAddress = email[0].value;
 
   const descriptionIsLong = description && description.length && description.length > 120;
 
@@ -56,7 +61,6 @@ export default function AboutView(props: any) {
         <>
           <Divider />
           <Row>
-            {/* <T>For Normies</T> */}
             <I>
               <div style={{ width: 4 }} />
               <Icon source={`/static/twitter2.png`} />
@@ -66,6 +70,19 @@ export default function AboutView(props: any) {
               ) : (
                 <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
               )}
+            </I>
+          </Row>
+        </>
+      )}
+
+      {emailAddress && (
+        <>
+          <Divider />
+          <Row>
+            <I>
+              <div style={{ width: 4 }} />
+              <Icon source={`/static/email.png`} />
+              <Tag>{emailAddress}</Tag>
             </I>
           </Row>
         </>
@@ -88,9 +105,9 @@ export default function AboutView(props: any) {
         <>
           <Divider />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {coding_languages.map((c, i) => {
-              return <CodeBadge key={i}>{c.label}</CodeBadge>;
-            })}
+            {coding_languages.map((c, i) => (
+              <CodeBadge key={i}>{c.label}</CodeBadge>
+            ))}
           </GrowRow>
         </>
       )}
@@ -100,16 +117,14 @@ export default function AboutView(props: any) {
           <Divider />
           <T style={{ height: 20 }}>My Repos</T>
           <Grow>
-            {repos.map((r, i) => {
-              return (
-                <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
-                  <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
-                  <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
-                    {r?.label}
-                  </a>
-                </ItemRow>
-              );
-            })}
+            {repos.map((r, i) => (
+              <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
+                <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
+                <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
+                  {r?.label}
+                </a>
+              </ItemRow>
+            ))}
           </Grow>
         </>
       )}
@@ -119,14 +134,12 @@ export default function AboutView(props: any) {
           <Divider />
           <T style={{ height: 20 }}>My Tribes</T>
           <Grow>
-            {tribes.map((t, i) => {
-              return (
-                <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
-                  <Img src={t?.img || '/static/sphinx.png'} />
-                  <div>{t?.name}</div>
-                </ItemRow>
-              );
-            })}
+            {tribes.map((t, i) => (
+              <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
+                <Img src={t?.img || '/static/sphinx.png'} />
+                <div>{t?.name}</div>
+              </ItemRow>
+            ))}
           </Grow>
         </>
       )}
@@ -150,9 +163,12 @@ export default function AboutView(props: any) {
           </Grow>
         </>
       )}
+
+      <br />
     </Wrap>
   );
-}
+});
+
 const Badge = styled.div`
 display:flex;
 justify-content:center;
@@ -196,6 +212,7 @@ const Wrap = styled.div`
   flex-direction: column;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
 `;
 const I = styled.div`
   display: flex;

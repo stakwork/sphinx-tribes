@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import FadeLeft from '../../animated/fadeLeft';
-import { IconButton } from '../../sphinxUI';
+import { IconButton } from '../../components/common';
 
 export default function GalleryViewer(props) {
-  const { gallery, wrap, selectable, big, showAll, style, cover } = props;
+  const { gallery, wrap, big, showAll, style, cover } = props;
   const [selectedImage, setSelectedImage] = useState(0);
   const g = gallery;
 
@@ -35,9 +34,9 @@ export default function GalleryViewer(props) {
       >
         {showAll ? (
           <div style={{ textAlign: 'center' }}>
-            {g.map((ga, i) => {
-              return <BigImg big={big} src={ga} cover={cover} key={i} />;
-            })}
+            {g.map((ga, i) => (
+              <BigImg big={big} src={ga} cover={cover} key={i} />
+            ))}
           </div>
         ) : (
           <>
@@ -63,12 +62,6 @@ export default function GalleryViewer(props) {
             </Label>
           </>
         )}
-
-        {/* <FadeLeft isMounted={selectedImage}>
-                <BigEnv onClick={() => setSelectedImage('')}>
-                    <BigImg src={selectedImage} />
-                </BigEnv>
-            </FadeLeft> */}
       </Gallery>
     </>
   );

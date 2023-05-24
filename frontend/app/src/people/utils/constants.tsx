@@ -1,14 +1,12 @@
 import {
   aboutSchema,
-  postSchema,
   wantedSchema,
-  meSchema,
   offerSchema,
   offerSkillSchema,
   offerOtherSchema,
   wantedCodingTaskSchema,
   wantedOtherSchema
-} from '../../form/schema';
+} from '../../components/form/schema';
 
 const MAX_UPLOAD_SIZE = 10194304; //10MB
 
@@ -28,7 +26,6 @@ const widgetConfigs = {
   badges: {
     label: 'Badges',
     name: 'badges',
-    // hideOnMainPage: true,
     single: true,
     skipEditLayer: true,
     action: {
@@ -41,43 +38,15 @@ const widgetConfigs = {
         text: 'No Badges',
         sub: 'Click here to learn about badges',
         buttonText: 'Add to Portfolio',
-        // buttonText: 'Sell something',
         buttonIcon: 'work'
       },
       otherUser: {
         img: '',
         text: 'No Badges',
-        // text: 'No Offers Yet',
         sub: "Looks like this person doesn't have any Badges yet."
-        // sub: 'Looks like this person is not selling anything yet.'
       }
     }
   },
-  // post: {
-  //     label: 'Blog',
-  //     name: 'post',
-  //     submitText: 'Post',
-  //     schema: postSchema,
-  //     action: {
-  //         text: 'Create a Post',
-  //         icon: 'add',
-  //         info: "What's on your mind?",
-  //         infoIcon: 'chat_bubble_outline'
-  //     },
-  //     noneSpace: {
-  //         me: {
-  //             img: 'no_posts.png',
-  //             text: 'What’s on your mind?',
-  //             buttonText: 'Create a post',
-  //             buttonIcon: 'add'
-  //         },
-  //         otherUser: {
-  //             img: 'no_posts2.png',
-  //             text: 'No Posts Yet',
-  //             sub: 'Looks like this person hasn’t posted anything yet.'
-  //         }
-  //     }
-  // },
   offer: {
     label: 'Portfolio',
     name: 'offer',
@@ -113,6 +82,7 @@ const widgetConfigs = {
       }
     }
   },
+  // TODO: REMOVE
   wanted: {
     label: 'Tickets',
     name: 'wanted',
@@ -139,6 +109,30 @@ const widgetConfigs = {
       otherUser: {
         img: 'no_wanted2.png',
         text: 'No Tickets Yet',
+        sub: 'Looks like this person doesn’t need anything yet.'
+      }
+    }
+  },
+  usertickets: {
+    label: 'Assigned Tickets',
+    name: 'userwanted',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: [],
+    action: {
+      text: 'Add New Ticket',
+      icon: 'local_offer'
+    },
+    noneSpace: {
+      noResult: {
+        img: 'no_wanted2.png',
+        text: 'No Assigned Tickets Yet',
         sub: 'Looks like this person doesn’t need anything yet.'
       }
     }
@@ -177,46 +171,10 @@ const formDropdownOptions = {
 };
 
 const badges = {
-  // '1k': {
-  //     title: '1k',
-  //     src: '1K.svg',
-  // },
-  // 'admin': {
-  //     title: 'Admin',
-  //     src: 'Admin.svg',
-  // },
-  // 'conversationStarter': {
-  //     title: 'Conversation Starter',
-  //     src: 'ConversationStarter.svg',
-  // },
-  // 'developer': {
-  //     title: 'Developer',
-  //     src: 'Developer.svg',
-  // },
   earlyMember: {
     title: 'Early Adopter',
     src: 'EarlyMember.svg'
   }
-  // 'groupExpert': {
-  //     title: 'Group Expert',
-  //     src: 'GroupExpert.svg',
-  // },
-  // 'moderator': {
-  //     title: 'Moderator',
-  //     src: 'Moderator.svg',
-  // },
-  // 'newMember': {
-  //     title: 'New Member',
-  //     src: 'NewMember.svg',
-  // },
-  // 'vip': {
-  //     title: 'VIP',
-  //     src: 'VIP.svg',
-  // },
-  // 'whale': {
-  //     title: 'Whale',
-  //     src: 'Whale.svg',
-  // }
 };
 
 export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions, badges };

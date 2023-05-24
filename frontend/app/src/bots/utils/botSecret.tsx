@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Button } from '../../sphinxUI';
+import { Button } from '../../components/common';
 import { useStores } from '../../store';
-export default function BotSecret(props: any) {
+import { observer } from 'mobx-react-lite';
+import { BotSecretProps } from 'bots/interfaces';
+
+export default observer(BotSecret);
+
+function BotSecret(props: BotSecretProps) {
   const { ui } = useStores();
   const { meInfo } = ui || {};
   const { id, secret, name, full } = props;

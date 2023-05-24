@@ -1,19 +1,12 @@
-import React, { useState } from 'react';
-import { useStores } from '../../store';
-import MaterialIcon from '@material/react-material-icon';
 import { EuiLoadingSpinner } from '@elastic/eui';
+import MaterialIcon from '@material/react-material-icon';
+import React, { useState } from 'react';
 
-export default function Heart(props) {
-  const { main } = useStores();
+export default function Heart() {
   const [loading, setLoading] = useState(false);
   const selected = false;
-  function clickIt(e) {
+  function clickIt() {
     setLoading(true);
-    // if (selected) {
-    //     main.deleteFavorite()
-    // } else {
-    //     main.addFavorite()
-    // }
     setLoading(false);
   }
 

@@ -1,86 +1,59 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { useObserver } from 'mobx-react-lite';
-import { Button, Divider, Modal } from '../sphinxUI/index';
 
-export default function Bot(props: any) {
-  const {
-    name,
-    hideActions,
-    small,
-    id,
-    img,
-    tags,
-    description,
-    selected,
-    select,
-    created,
-    owner_alias,
-    owner_pubkey,
-    unique_name,
-    price_to_meet,
-    extras,
-    twitter_confirmed
-  } = props;
+import { Divider } from '../components/common/index';
+import { BotProps } from './interfaces';
+
+export default function Bot(props: BotProps) {
+  const { name, hideActions, small, id, img, description, selected, select, unique_name } = props;
 
   const defaultPic = '/static/bot_placeholder.png';
   const mediumPic = img;
 
-  return useObserver(() => {
-    function renderBotCard() {
-      if (small) {
-        return (
-          <Wrap
-            onClick={() => select(id, unique_name)}
-            style={{
-              background: selected ? '#F2F3F5' : '#fff'
-            }}
-          >
-            <div>
-              <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
-            </div>
-            <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
-              <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
-              <Description>{description}</Description>
-              {!hideActions && (
-                <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div />
-                  <div style={{ height: 30 }} />
-                </Row>
-              )}
-              <Divider style={{ marginTop: 20 }} />
-            </R>
-          </Wrap>
-        );
-      }
-      // desktop mode
+  function renderBotCard() {
+    if (small) {
       return (
-        <DWrap onClick={() => select(id, unique_name)}>
+        <Wrap
+          onClick={() => select(id, unique_name)}
+          style={{
+            background: selected ? '#F2F3F5' : '#fff'
+          }}
+        >
           <div>
-            <Img
-              style={{ height: 210, width: '100%', borderRadius: 0 }}
-              src={mediumPic || defaultPic}
-            />
-            <div style={{ padding: 10 }}>
-              <DTitle>{name}</DTitle>
-              <DDescription>{description}</DDescription>
-            </div>
+            <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
           </div>
-        </DWrap>
+          <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
+            <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
+            <Description>{description}</Description>
+            {!hideActions && (
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <div />
+                <div style={{ height: 30 }} />
+              </Row>
+            )}
+            <Divider style={{ marginTop: 20 }} />
+          </R>
+        </Wrap>
       );
     }
-
+    // desktop mode
     return (
-      <>
-        {renderBotCard()}
-
-        {/* <ConnectCard
-                    dismiss={() => setShowQR(false)}
-                    modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-                    person={props} visible={showQR} /> */}
-      </>
+      <DWrap onClick={() => select(id, unique_name)}>
+        <div>
+          <Img
+            style={{ height: 210, width: '100%', borderRadius: 0 }}
+            src={mediumPic || defaultPic}
+          />
+          <div style={{ padding: 10 }}>
+            <DTitle>{name}</DTitle>
+            <DDescription>{description}</DDescription>
+          </div>
+        </div>
+      </DWrap>
     );
-  });
+  }
+
+  return <>{renderBotCard()}</>;
 }
 
 const Wrap = styled.div`

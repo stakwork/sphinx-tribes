@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { colors } from '../../colors';
+import { colors } from '../../config/colors';
 
-export function renderMarkdown(markdown) {
+export function renderMarkdown(markdown: any) {
   const color = colors['light'];
   return (
     <ReactMarkdown
@@ -12,7 +12,7 @@ export function renderMarkdown(markdown) {
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
       components={{
-        code({ node, inline, className, children, ...props }) {
+        code({ className, children, ...props }) {
           return (
             <code className={className} {...props}>
               {children}
@@ -22,6 +22,7 @@ export function renderMarkdown(markdown) {
         img({ className, ...props }) {
           return (
             <img
+              alt={'Markodown image'}
               className={className}
               style={{
                 width: '100%',

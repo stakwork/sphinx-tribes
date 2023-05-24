@@ -1,12 +1,10 @@
-import { observable, action } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import { persist } from 'mobx-persist';
+import { Extras } from '../components/form/inputs/widgets/interfaces';
 import tags from '../tribes/tags';
-import { Extras } from '../form/inputs/widgets/interfaces';
 
 const tagLabels = Object.keys(tags);
-const initialTags = tagLabels.map((label) => {
-  return <EuiSelectableOption>{ label };
-});
+const initialTags = tagLabels.map((label) => ({ label } as EuiSelectableOption));
 
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;
 
@@ -16,117 +14,122 @@ export interface EuiSelectableOption {
 }
 
 class UiStore {
-  @observable ready: boolean = false;
-  @action setReady(ready: boolean) {
+  ready = false;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  setReady(ready: boolean) {
     this.ready = ready;
   }
 
-  @observable tags: EuiSelectableOption[] = initialTags;
-  @action setTags(t: EuiSelectableOption[]) {
+  tags: EuiSelectableOption[] = initialTags;
+  setTags(t: EuiSelectableOption[]) {
     this.tags = t;
   }
 
-  @observable searchText: string = '';
-  @action setSearchText(s: string) {
+  searchText = '';
+  setSearchText(s: string) {
     this.searchText = s.toLowerCase();
   }
 
-  @observable usdToSatsExchangeRate: number = 0;
-  @action setUsdToSatsExchangeRate(n: number) {
+  usdToSatsExchangeRate = 0;
+  setUsdToSatsExchangeRate(n: number) {
     this.usdToSatsExchangeRate = n;
   }
 
-  @observable editMe: boolean = false;
-  @action setEditMe(b: boolean) {
+  editMe = false;
+  setEditMe(b: boolean) {
     this.editMe = b;
   }
 
-  @observable peoplePageNumber: number = 1;
-  @action setPeoplePageNumber(n: number) {
+  peoplePageNumber = 1;
+  setPeoplePageNumber(n: number) {
     this.peoplePageNumber = n;
   }
 
-  @observable peoplePostsPageNumber: number = 1;
-  @action setPeoplePostsPageNumber(n: number) {
+  peoplePostsPageNumber = 1;
+  setPeoplePostsPageNumber(n: number) {
     this.peoplePostsPageNumber = n;
   }
 
-  @observable peopleWantedsPageNumber: number = 1;
-  @action setPeopleWantedsPageNumber(n: number) {
+  peopleWantedsPageNumber = 1;
+  setPeopleWantedsPageNumber(n: number) {
     this.peopleWantedsPageNumber = n;
   }
 
-  @observable peopleOffersPageNumber: number = 1;
-  @action setPeopleOffersPageNumber(n: number) {
+  peopleOffersPageNumber = 1;
+  setPeopleOffersPageNumber(n: number) {
     this.peopleOffersPageNumber = n;
   }
 
-  @observable tribesPageNumber: number = 1;
-  @action setTribesPageNumber(n: number) {
+  tribesPageNumber = 1;
+  setTribesPageNumber(n: number) {
     this.tribesPageNumber = n;
   }
 
-  @observable selectedPerson: number = 0;
-  @action setSelectedPerson(n: number) {
-    this.selectedPerson = n;
+  selectedPerson = 0;
+  setSelectedPerson(n: number | undefined) {
+    if (n) this.selectedPerson = n;
   }
 
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
-  @observable selectingPerson: number = 0;
-  @action setSelectingPerson(n: number) {
-    this.selectingPerson = n;
+  selectingPerson = 0;
+  setSelectingPerson(n: number | undefined) {
+    if (n) this.selectingPerson = n;
   }
 
-  @observable selectedBot: string = '';
-  @action setSelectedBot(n: string) {
+  selectedBot = '';
+  setSelectedBot(n: string) {
     this.selectedBot = n;
   }
 
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
-  @observable selectingBot: string = '';
-  @action setSelectingBot(n: string) {
+  selectingBot = '';
+  setSelectingBot(n: string) {
     this.selectingBot = n;
   }
 
-  @observable toasts: any = [];
-  @action setToasts(n: any) {
+  toasts: any = [];
+  setToasts(n: any) {
     this.toasts = n;
   }
 
-  @observable personViewOpenTab: string = '';
-  @action setPersonViewOpenTab(s: string) {
+  personViewOpenTab = '';
+  setPersonViewOpenTab(s: string) {
     this.personViewOpenTab = s;
   }
 
-  @observable lastGithubRepo: string = '';
-  @action setLastGithubRepo(s: string) {
+  lastGithubRepo = '';
+  setLastGithubRepo(s: string) {
     this.lastGithubRepo = s;
   }
 
-  @observable torFormBodyQR: string = '';
-  @action setTorFormBodyQR(s: string) {
+  torFormBodyQR = '';
+  setTorFormBodyQR(s: string) {
     this.torFormBodyQR = s;
   }
 
-  @observable openGithubIssues: any = [];
-  @action setOpenGithubIssues(a: any) {
+  openGithubIssues: any = [];
+  setOpenGithubIssues(a: any) {
     this.openGithubIssues = a;
   }
 
-  @observable badgeList: any = [];
-  @action setBadgeList(a: any) {
+  badgeList: any = [];
+  setBadgeList(a: any) {
     this.badgeList = a;
   }
 
-  @observable language: string = '';
-  @action setLanguage(s: string) {
+  language = '';
+  setLanguage(s: string) {
     this.language = s;
   }
 
-  @persist('object') @observable meInfo: MeData = null;
-  @action setMeInfo(t: MeData) {
+  @persist('object') meInfo: MeData = null;
+  setMeInfo(t: MeData) {
     if (t) {
       if (t.photo_url && !t.img) t.img = t.photo_url;
       if (!t.owner_alias) t.owner_alias = t.alias;
@@ -135,8 +138,13 @@ class UiStore {
     this.meInfo = t;
   }
 
-  @observable showSignIn: boolean = false;
-  @action setShowSignIn(b: boolean) {
+  @persist('object') connection_string = '';
+  setConnectionString(code: string) {
+    this.connection_string = code;
+  }
+
+  showSignIn = false;
+  setShowSignIn(b: boolean) {
     this.showSignIn = b;
   }
 }
