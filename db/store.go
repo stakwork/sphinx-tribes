@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/patrickmn/go-cache"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 )
 
 type StoreData struct {
@@ -70,17 +71,17 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 	return c, nil
 }
 
-func (s StoreData) SetInvoiceCache(key string, value InvoiceStoreData) error {
+func (s StoreData) SetInvoiceCache(value []InvoiceStoreData) error {
 	// The invoice should expire every 2 minutes
-	s.Cache.Set(key, value, 2*time.Minute)
+	s.Cache.Set(config.InvoiceList, value, 6*time.Minute)
 	return nil
 }
 
-func (s StoreData) GetInvoiceCache(key string) (InvoiceStoreData, error) {
-	value, found := s.Cache.Get(key)
-	c, _ := value.(InvoiceStoreData)
+func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
+	value, found := s.Cache.Get(config.InvoiceList)
+	c, _ := value.([]InvoiceStoreData)
 	if !found {
-		return InvoiceStoreData{}, errors.New("Invoice Cache not found")
+		return []InvoiceStoreData{}, errors.New("Invoice Cache not found")
 	}
 	return c, nil
 }

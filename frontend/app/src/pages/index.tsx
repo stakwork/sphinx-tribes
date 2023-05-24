@@ -33,6 +33,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/leaderboard">
           <LeaderboardPage />
         </Route>
+        <Route path="*">
+          <Body />
+        </Route>
       </Switch>
     </MainLayout>
   ),

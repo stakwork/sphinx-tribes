@@ -19,48 +19,50 @@ import (
 func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(1).Seconds().Do(func() {
-		invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
+		invoiceList, _ := db.Store.GetInvoiceCache()
+		invoiceCount := len(invoiceList)
 
 		if invoiceCount > 0 {
-			url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+			for index, inv := range invoiceList {
 
-			client := &http.Client{}
-			req, err := http.NewRequest(http.MethodGet, url, nil)
+				url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, inv.Invoice)
 
-			req.Header.Set("x-user-token", config.RelayAuthKey)
-			req.Header.Set("Content-Type", "application/json")
-			res, _ := client.Do(req)
+				client := &http.Client{}
+				req, err := http.NewRequest(http.MethodGet, url, nil)
 
-			if err != nil {
-				log.Printf("Request Failed: %s", err)
-				return
-			}
+				req.Header.Set("x-user-token", config.RelayAuthKey)
+				req.Header.Set("Content-Type", "application/json")
+				res, _ := client.Do(req)
 
-			defer res.Body.Close()
+				if err != nil {
+					log.Printf("Request Failed: %s", err)
+					return
+				}
 
-			body, err := ioutil.ReadAll(res.Body)
+				defer res.Body.Close()
 
-			// Unmarshal result
-			invoiceRes := db.InvoiceList{}
-			err = json.Unmarshal(body, &invoiceRes)
+				body, err := ioutil.ReadAll(res.Body)
 
-			if err != nil {
-				log.Printf("Reading body failed: %s", err)
-				return
-			}
+				// Unmarshal result
+				invoiceRes := db.InvoiceResult{}
 
-			for _, v := range invoiceRes.Invoices {
-				if v.Settled {
-					storeInvoice, _ := db.Store.GetInvoiceCache(v.Payment_request)
-					if storeInvoice.Invoice == v.Payment_request {
+				err = json.Unmarshal(body, &invoiceRes)
+
+				if err != nil {
+					log.Printf("Reading body failed: %s", err)
+					return
+				}
+
+				if invoiceRes.Response.Settled {
+					if inv.Invoice == invoiceRes.Response.Payment_request {
 						/**
-						If the invoice is settled and still in store
-						make keysend payment
+						  If the invoice is settled and still in store
+						  make keysend payment
 						*/
 
 						url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-						bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, storeInvoice.Amount, storeInvoice.User_pubkey)
+						bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
 
 						jsonBody := []byte(bodyData)
 
@@ -85,7 +87,7 @@ func InitInvoiceCron() {
 							keysendRes := db.KeysendSuccess{}
 							err = json.Unmarshal(body, &keysendRes)
 
-							var p = db.DB.GetPersonByPubkey(storeInvoice.Owner_pubkey)
+							var p = db.DB.GetPersonByPubkey(inv.Owner_pubkey)
 
 							wanteds, _ := p.Extras["wanted"].([]interface{})
 
@@ -100,7 +102,7 @@ func InitInvoiceCron() {
 								createdString := createdArr[0]
 								createdInt, _ := strconv.ParseInt(createdString, 10, 32)
 
-								dateInt, _ := strconv.ParseInt(storeInvoice.Created, 10, 32)
+								dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
 
 								if !ok3 {
 									continue
@@ -122,21 +124,15 @@ func InitInvoiceCron() {
 									"extras": b,
 								})
 
-								// Delete the invoice from store
-								db.Store.DeleteCache(storeInvoice.Invoice)
-
-								invoiceCount, _ := db.Store.GetInvoiceCount(config.InvoiceCount)
-
-								if invoiceCount > 0 {
-									// reduce the invoice count
-									db.Store.SetInvoiceCount(config.InvoiceCount, invoiceCount-1)
-								}
+								// Delete the index from tje store array list and reset the store
+								newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
+								db.Store.SetInvoiceCache(newInvoiceList)
 							}
 						} else {
 							// Unmarshal result
 							keysendError := db.KeysendError{}
 							err = json.Unmarshal(body, &keysendError)
-							log.Printf("Keysend Payment to %s Failed, with Error: %s", storeInvoice.User_pubkey, keysendError.Error)
+							log.Printf("Keysend Payment to %s Failed, with Error: %s", inv.User_pubkey, keysendError.Error)
 						}
 
 						if err != nil {
