@@ -70,7 +70,6 @@ export default function QrBar(props: QRBarProps) {
           cursor: 'pointer',
           letterSpacing: '0.3px'
         }}
-        // onClick={() => copyToClipboard(value)}
       >
         COPY
       </Copy>

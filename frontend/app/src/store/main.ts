@@ -6,6 +6,7 @@ import { randomString } from '../helpers';
 import { uiStore } from './ui';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
+import { type } from 'os';
 
 export const queryLimit = 1000;
 
@@ -1020,16 +1021,24 @@ export class MainStore {
     owner_pubkey: string;
     user_pubkey: string;
     created: string;
+    type: "KEYSEND" | "ASSIGN";
+    assigned_hours?: number,
+    commitment_fee?: number,
+    bounty_expires?: string,
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
         'invoices',
         {
-          amount: body.amount,
+          amount: body.amount.toString(),
           memo: body.memo,
           owner_pubkey: body.owner_pubkey,
           user_pubkey: body.user_pubkey,
-          created: body.created
+          created: body.created,
+          type: body.type,
+          assigned_hours: body.assigned_hours,
+          commitment_fee: body.commitment_fee,
+          bounty_expires: body.bounty_expires,
         },
         {
           'Content-Type': 'application/json'
@@ -1058,6 +1067,33 @@ export class MainStore {
       return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
     } catch (e) {
       return { invoiceStatus: false, bountyPaid: false };
+    }
+  }
+
+  @action async deleteBountyAssignee(body: {
+    owner_pubkey: string;
+    created: string;
+  }) : Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
+      const r: any = await fetch(`${URL}/bounty/assignee`, {
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
     }
   }
 }
@@ -1120,6 +1156,9 @@ export interface Person {
   verification_signature: string;
   extras: Extras;
   hide?: boolean;
+  commitment_fee?: number;
+  assigned_hours?: number;
+  bounty_expires?: number;
 }
 
 export interface PersonFlex {

@@ -98,9 +98,17 @@ describe('testing helpers', () => {
   describe('calculateTimeLeft', () => {
     test('time remaining', () => {
       const timeLimit = new Date(moment().add(2, 'minutes').format().toString());
-      const { minutes, seconds } = calculateTimeLeft(timeLimit);
+      const { minutes, seconds } = calculateTimeLeft(timeLimit, 'minutes');
       expect(minutes).toBe(1);
       expect(seconds).toBe(59);
+    });
+    test('Calculate days remaining', () => {
+      const timeLimit = new Date(moment().add(2, 'days').format().toString());
+      const {days, hours, minutes, seconds } = calculateTimeLeft(timeLimit, 'days');
+      expect(minutes).toBe(59);
+      expect(seconds).toBe(59);
+      expect(days).toBe(1);
+      expect(hours).toBe(23);
     });
   });
 });

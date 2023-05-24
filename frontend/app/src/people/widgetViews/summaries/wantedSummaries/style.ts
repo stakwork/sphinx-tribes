@@ -674,20 +674,24 @@ export const CountDownTimer = styled.p`
   font-weight: bolder;
 `;
 
-export const CopyInvoiceBtn = styled.button`
-  cursor: pointer;
-  margin: 0;
-  border: 0;
-  color: #000000;
-  padding: 10px 20px;
-  outline: 0;
-  margin-top: 15px;
-`;
-
 export const InvoiceWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 220px;
+`;
+
+export const QrWrap = styled.div`
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+`;
+
+export const BountyTime = styled.p`
+  font-size: 0.9rem;
+  padding: 5px 0px;
+  text-align: center;
+  width: 220px;
+  margin: 15px 0px;
 `;
