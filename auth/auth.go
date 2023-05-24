@@ -45,7 +45,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 			return
 		}
 
-		isJwt := strings.Contains(token, ".")
+		isJwt := strings.Contains(token, ".") && !strings.HasPrefix(token, ".")
 
 		if isJwt {
 			claims, err := DecodeToken(token)
