@@ -47,33 +47,33 @@ type Tribe struct {
 
 // Bot struct
 type Bot struct {
-	UUID           string         `json:"uuid"`
-	OwnerPubKey    string         `json:"owner_pubkey"`
-	OwnerAlias     string         `json:"owner_alias"`
-	Name           string         `json:"name"`
-	UniqueName     string         `json:"unique_name"`
-	Description    string         `json:"description"`
-	Tags           pq.StringArray `json:"tags"`
-	Img            string         `json:"img"`
-	PricePerUse    int64          `json:"price_per_use"`
-	Created        *time.Time     `json:"created"`
-	Updated        *time.Time     `json:"updated"`
-	Unlisted       bool           `json:"unlisted"`
-	Deleted        bool           `json:"deleted"`
-	MemberCount    uint64         `json:"member_count"`
-	OwnerRouteHint string         `json:"owner_route_hint"`
+	UUID           string      `json:"uuid"`
+	OwnerPubKey    string      `json:"owner_pubkey"`
+	OwnerAlias     string      `json:"owner_alias"`
+	Name           string      `json:"name"`
+	UniqueName     string      `json:"unique_name"`
+	Description    string      `json:"description"`
+	Tags           StringArray `json:"tags"`
+	Img            string      `json:"img"`
+	PricePerUse    int64       `json:"price_per_use"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+	Unlisted       bool        `json:"unlisted"`
+	Deleted        bool        `json:"deleted"`
+	MemberCount    uint64      `json:"member_count"`
+	OwnerRouteHint string      `json:"owner_route_hint"`
 }
 
 // Bot struct
 type BotRes struct {
-	UUID        string         `json:"uuid"`
-	OwnerPubKey string         `json:"owner_pubkey"`
-	Name        string         `json:"name"`
-	UniqueName  string         `json:"unique_name"`
-	Description string         `json:"description"`
-	Tags        pq.StringArray `json:"tags"`
-	Img         string         `json:"img"`
-	PricePerUse int64          `json:"price_per_use"`
+	UUID        string      `json:"uuid"`
+	OwnerPubKey string      `json:"owner_pubkey"`
+	Name        string      `json:"name"`
+	UniqueName  string      `json:"unique_name"`
+	Description string      `json:"description"`
+	Tags        StringArray `json:"tags"`
+	Img         string      `json:"img"`
+	PricePerUse int64       `json:"price_per_use"`
 }
 
 // for bot pricing info
@@ -105,26 +105,26 @@ func (PersonInShort) TableName() string {
 
 // Person struct
 type Person struct {
-	ID               uint           `json:"id"`
-	Uuid             string         `json:"uuid"`
-	OwnerPubKey      string         `json:"owner_pubkey"`
-	OwnerAlias       string         `json:"owner_alias"`
-	UniqueName       string         `json:"unique_name"`
-	Description      string         `json:"description"`
-	Tags             pq.StringArray `gorm:"type:text[]" json:"tags" null`
-	Img              string         `json:"img"`
-	Created          *time.Time     `json:"created"`
-	Updated          *time.Time     `json:"updated"`
-	Unlisted         bool           `json:"unlisted"`
-	Deleted          bool           `json:"deleted"`
-	LastLogin        int64          `json:"last_login"`
-	OwnerRouteHint   string         `json:"owner_route_hint"`
-	OwnerContactKey  string         `json:"owner_contact_key"`
-	PriceToMeet      int64          `json:"price_to_meet"`
-	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
-	TwitterConfirmed bool           `json:"twitter_confirmed"`
-	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
-	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
+	ID               uint        `json:"id"`
+	Uuid             string      `json:"uuid"`
+	OwnerPubKey      string      `json:"owner_pubkey"`
+	OwnerAlias       string      `json:"owner_alias"`
+	UniqueName       string      `json:"unique_name"`
+	Description      string      `json:"description"`
+	Tags             StringArray `gorm:"type:text[]" json:"tags" null`
+	Img              string      `json:"img"`
+	Created          *time.Time  `json:"created"`
+	Updated          *time.Time  `json:"updated"`
+	Unlisted         bool        `json:"unlisted"`
+	Deleted          bool        `json:"deleted"`
+	LastLogin        int64       `json:"last_login"`
+	OwnerRouteHint   string      `json:"owner_route_hint"`
+	OwnerContactKey  string      `json:"owner_contact_key"`
+	PriceToMeet      int64       `json:"price_to_meet"`
+	Extras           PropertyMap `json:"extras", type: jsonb not null default '{}'::jsonb`
+	TwitterConfirmed bool        `json:"twitter_confirmed"`
+	GithubIssues     PropertyMap `json:"github_issues", type: jsonb not null default '{}'::jsonb`
+	NewTicketTime    int64       `json:"new_ticket_time", gorm: "-:all"`
 }
 
 type GormDataTypeInterface interface {
@@ -237,11 +237,15 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount       string `json:"amount"`
-	Memo         string `json:"memo"`
-	Owner_pubkey string `json:"owner_pubkey"`
-	User_pubkey  string `json:"user_pubkey"`
-	Created      string `json:"created"`
+	Amount         string `json:"amount"`
+	Memo           string `json:"memo"`
+	Owner_pubkey   string `json:"owner_pubkey"`
+	User_pubkey    string `json:"user_pubkey"`
+	Created        string `json:"created"`
+	Type           string `json:"type"`
+	Assigned_hours uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires string `json:"bounty_expires,omitempty"`
 }
 
 type Invoice struct {
@@ -254,11 +258,15 @@ type InvoiceResponse struct {
 }
 
 type InvoiceStoreData struct {
-	Invoice      string `json:"invoice"`
-	Owner_pubkey string `json:"owner_pubkey"`
-	User_pubkey  string `json:"user_pubkey"`
-	Amount       string `json:"amount"`
-	Created      string `json:"created"`
+	Invoice        string `json:"invoice"`
+	Owner_pubkey   string `json:"owner_pubkey"`
+	User_pubkey    string `json:"user_pubkey"`
+	Amount         string `json:"amount"`
+	Created        string `json:"created"`
+	Type           string `json:"type"`
+	Assigned_hours uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires string `json:"bounty_expires,omitempty"`
 }
 
 type InvoiceStatus struct {
@@ -277,6 +285,11 @@ type InvoiceCheckResponse struct {
 	Payment_hash    string `json:"payment_hash"`
 	Preimage        string `json:"preimage"`
 	Amount          uint   `json:"amount"`
+}
+
+type DeleteBountyAssignee struct {
+	Owner_pubkey string `json:"owner_pubkey"`
+	Created      string `json:"created"`
 }
 
 type KeysendPayment struct {
