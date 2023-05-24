@@ -8,7 +8,6 @@ import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
 import { mainStore } from './store/main';
 import history from 'config/history';
-import { socket } from 'config/socket';
 
 let exchangeRateInterval: any = null;
 
