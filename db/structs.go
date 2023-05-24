@@ -21,7 +21,7 @@ type Tribe struct {
 	Name            string      `json:"name"`
 	UniqueName      string      `json:"unique_name"`
 	Description     string      `json:"description"`
-	Tags            StringArray `json:"tags"`
+	Tags            StringArray `gorm:"type:text[]" json:"tags"`
 	Img             string      `json:"img"`
 	PriceToJoin     int64       `json:"price_to_join"`
 	PricePerMessage int64       `json:"price_per_message"`
@@ -42,7 +42,7 @@ type Tribe struct {
 	Pin             string      `json:"pin"`
 	Preview         string      `json:"preview"`
 	ProfileFilters  string      `json:"profile_filters"` // "twitter,github"
-	Badges          StringArray `json:"badges"`
+	Badges          StringArray `gorm:"type:text[]" json:"badges"`
 }
 
 // Bot struct
@@ -138,7 +138,13 @@ type GormDBDataTypeInterface interface {
 type StringArray pq.StringArray
 
 func (StringArray) GormDataType() string {
-	return "text[]"
+	return `gorm:"type:text[]"`
+}
+
+func (p StringArray) Value() (driver.Value, error) {
+	b := pq.StringArray(p)
+
+	return b, nil
 }
 
 type PersonInShort struct {
@@ -152,10 +158,6 @@ type PersonInShort struct {
 
 // Github struct
 type GithubIssue struct {
-	// ID          uint `json:"id"`
-	// PersonID    uint `json:"person_id"`
-	// Person      Person
-	// URL         string `json:"url"` // this will function as id
 	Title       string `json:"title"`
 	Status      string `json:"status"`
 	Assignee    string `json:"assignee"`
