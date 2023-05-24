@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 
@@ -829,8 +830,10 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 		p.OwnerAlias = lnKey
 		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
-		p.Tags = StringArray{}
+		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
+		p.Extras = make(map[string]interface{})
+		p.GithubIssues = make(map[string]interface{})
 
 		db.db.Create(&p)
 	}
