@@ -20,6 +20,10 @@ Authentication is handled by [sphinx-auth](https://github.com/stakwork/sphinx-au
 
 docker build --no-cache -t sphinx-tribes .
 
+docker tag sphinx-tribes sphinxlightning/sphinx-tribes:x
+
+docker push sphinxlightning/sphinx-tribes:x
+
 ### run against sphinx-stack
 
 To run tribes frontend locally, use these ports:
