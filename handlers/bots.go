@@ -52,12 +52,6 @@ func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// existing := DB.getTribe(tribe.UUID)
-	// if existing.UUID != "" {
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	return
-	// }
-
 	bot.OwnerPubKey = extractedPubkey
 	bot.Updated = &now
 	bot.UniqueName, _ = BotUniqueNameFromName(bot.Name)
