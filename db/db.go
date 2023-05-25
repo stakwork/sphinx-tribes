@@ -122,10 +122,11 @@ func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 	if m.Badges == nil {
 		m.Badges = []string{}
 	}
-	if err := db.db.Set("gorm:insert_option", onConflict).Create(&m).Error; err != nil {
-		fmt.Println(">>>>>>>>> == ", err)
-		return Tribe{}, err
+
+	if db.db.Model(&m).Where("uuid = ?", m.UUID).Updates(&m).RowsAffected == 0 {
+		db.db.Create(&m)
 	}
+
 	db.db.Exec(`UPDATE tribes SET tsv =
   	setweight(to_tsvector(name), 'A') ||
 	setweight(to_tsvector(description), 'B') ||
@@ -170,10 +171,11 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	if b.Tags == nil {
 		b.Tags = []string{}
 	}
-	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
-		fmt.Println(err)
-		return Bot{}, err
+
+	if db.db.Model(&b).Where("uuid = ?", b.UUID).Updates(&b).RowsAffected == 0 {
+		db.db.Create(&b)
 	}
+
 	db.db.Exec(`UPDATE bots SET tsv =
   	setweight(to_tsvector(name), 'A') ||
 	setweight(to_tsvector(description), 'B') ||
@@ -210,10 +212,8 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 		m.GithubIssues = map[string]interface{}{}
 	}
 
-	if err := db.db.Model(&m).Where("id = ?", m.ID).UpdateColumns(m).Error; err != nil {
-		if err.Error() == gorm.ErrRecordNotFound.Error() {
-			db.db.Create(&m)
-		}
+	if db.db.Model(&m).Where("id = ?", m.ID).Updates(&m).RowsAffected == 0 {
+		db.db.Create(&m)
 	}
 
 	db.db.Exec(`UPDATE people SET tsv =

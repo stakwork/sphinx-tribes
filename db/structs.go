@@ -53,7 +53,7 @@ type Bot struct {
 	Name           string         `json:"name"`
 	UniqueName     string         `json:"unique_name"`
 	Description    string         `json:"description"`
-	Tags           pq.StringArray `json:"tags"`
+	Tags           pq.StringArray `gorm:"type:text[]" json:"tags"`
 	Img            string         `json:"img"`
 	PricePerUse    int64          `json:"price_per_use"`
 	Created        *time.Time     `json:"created"`
