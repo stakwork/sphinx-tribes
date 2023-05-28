@@ -1,40 +1,38 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 
-	socketio "github.com/googollee/go-socket.io"
+	"github.com/gorilla/websocket"
 )
 
-func InitSocket() *socketio.Server {
-	server := socketio.NewServer(nil)
+var upgrader = websocket.Upgrader{}
 
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		fmt.Println("connected:", s.ID())
-		return nil
-	})
+func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade failed: ", err)
+		return
+	}
 
-	server.OnEvent("/", "msg", func(s socketio.Conn, msg string) {
-		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
-	})
+	conn.WriteJSON("hello This")
 
-	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println("meet error:", e)
-	})
+	defer conn.Close()
 
-	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		fmt.Println("closed", reason)
-	})
-
-	go func() {
-		if err := server.Serve(); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
+	for {
+		mt, message, err := conn.ReadMessage()
+		if err != nil {
+			log.Println("read failed:", err)
+			break
 		}
-	}()
-	defer server.Close()
 
-	return server
+		message = []byte("Hello Now ======")
+		err = conn.WriteMessage(mt, message)
+		if err != nil {
+			log.Println("write failed:", err)
+			break
+		}
+
+	}
 }

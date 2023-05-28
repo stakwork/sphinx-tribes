@@ -6,4 +6,4 @@ const URL =
     ? `https://${getHost()}/socket.io/`
     : `http://${getHost()}/socket.io/`;
 
-export const socket = io(URL);
+export const socket = io('ws://localhost:9999', { transports: ['websocket'] });

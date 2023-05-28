@@ -29,7 +29,6 @@ func NewRouter() *http.Server {
 	r.Mount("/person", PersonRoutes())
 	r.Mount("/connectioncodes", ConnectionCodesRoutes())
 	r.Mount("/github_issue", GithubIssuesRoutes())
-	// r.Handle("/socket.io/", handlers.InitSocket())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", handlers.GetFirstTribeByFeed)
@@ -49,6 +48,7 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", db.Poll)
 		r.Post("/save", db.PostSave)
 		r.Get("/save/{key}", db.PollSave)
+		r.Get("/websocket", handlers.HandleWebSocket)
 	})
 
 	r.Group(func(r chi.Router) {
