@@ -626,7 +626,7 @@ func (db database) GetPerson(id uint) Person {
 
 func (db database) GetPersonByPubkey(pubkey string) Person {
 	m := Person{}
-	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
+	db.db.Where("owner_pub_key = ? AND (deleted = 'false' OR deleted is null)", pubkey).Find(&m)
 
 	return m
 }
