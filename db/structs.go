@@ -121,10 +121,10 @@ type Person struct {
 	OwnerRouteHint   string         `json:"owner_route_hint"`
 	OwnerContactKey  string         `json:"owner_contact_key"`
 	PriceToMeet      int64          `json:"price_to_meet"`
-	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
+	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
+	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
-	NewTicketTime    int64          `json:"new_ticket_time"`
 }
 
 type GormDataTypeInterface interface {
