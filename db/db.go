@@ -214,6 +214,12 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.GithubIssues == nil {
 		m.GithubIssues = map[string]interface{}{}
 	}
+	if m.PriceToMeet == 0 {
+		updatePriceToMeet := make(map[string]interface{})
+		updatePriceToMeet["price_to_meet"] = 0
+
+		db.db.Model(&m).Where("id = ?", m.ID).UpdateColumns(&updatePriceToMeet)
+	}
 
 	if db.db.Model(&m).Where("id = ?", m.ID).Updates(&m).RowsAffected == 0 {
 		db.db.Create(&m)
