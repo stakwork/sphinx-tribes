@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -22,6 +23,10 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		mt, message, err := conn.ReadMessage()
+
+		input := string(message)
+		fmt.Println("Message ==", input)
+
 		if err != nil {
 			log.Println("read failed:", err)
 			break

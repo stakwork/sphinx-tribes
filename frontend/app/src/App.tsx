@@ -8,6 +8,7 @@ import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
 import { mainStore } from './store/main';
 import history from 'config/history';
+import { socket } from 'config/socket';
 
 let exchangeRateInterval: any = null;
 
@@ -15,6 +16,10 @@ function App() {
   // get usd/sat exchange rate every 100 second;
 
   useEffect(() => {
+
+    socket.onmessage = (data) => {
+      console.log("Socket MEssage ==", data)
+    };
 
     mainStore.getUsdToSatsExchangeRate();
 

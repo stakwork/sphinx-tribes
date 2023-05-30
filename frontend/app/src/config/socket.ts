@@ -1,9 +1,8 @@
-import { io } from 'socket.io-client';
 import { getHost } from './host';
 
 const URL =
   process.env.NODE_ENV === 'production'
-    ? `https://${getHost()}/socket.io/`
-    : `http://${getHost()}/socket.io/`;
+    ? `wss://${getHost()}/websocket`
+    : `ws://127.0.0.1:5005/websocket`;
 
-export const socket = io('ws://localhost:9999', { transports: ['websocket'] });
+export const socket = new WebSocket(URL);
