@@ -9,6 +9,7 @@ import (
 )
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+var Socket *websocket.Conn
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -17,27 +18,18 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn.WriteJSON("hello This")
-
+	Socket = conn
 	defer conn.Close()
 
 	for {
-		mt, message, err := conn.ReadMessage()
-
+		_, message, err := conn.ReadMessage()
 		input := string(message)
-		fmt.Println("Message ==", input)
+
+		fmt.Println("Websocket message ==", input)
 
 		if err != nil {
 			log.Println("read failed:", err)
 			break
 		}
-
-		message = []byte("Hello Now ======")
-		err = conn.WriteMessage(mt, message)
-		if err != nil {
-			log.Println("write failed:", err)
-			break
-		}
-
 	}
 }

@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
 
     socket.onmessage = (data) => {
-      console.log("Socket MEssage ==", data)
+      console.log("Socket MEssage ==", data.data)
     };
 
     mainStore.getUsdToSatsExchangeRate();

@@ -18,6 +18,8 @@ import (
 
 func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
+	msg := make(map[string]interface{})
+
 	s.Every(1).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetInvoiceCache()
 		invoiceCount := len(invoiceList)
@@ -60,6 +62,10 @@ func InitInvoiceCron() {
 						  If the invoice is settled and still in store
 						  make keysend payment
 						*/
+						msg["msg"] = "invoice_success"
+						msg["invoice"] = inv.Invoice
+
+						Socket.WriteJSON(msg)
 
 						if inv.Type == "KEYSEND" {
 							url := fmt.Sprintf("%s/payment", config.RelayUrl)
@@ -129,12 +135,22 @@ func InitInvoiceCron() {
 									// Delete the index from the store array list and reset the store
 									newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
 									db.Store.SetInvoiceCache(newInvoiceList)
+
+									msg["msg"] = "keysend_success"
+									msg["invoice"] = inv.Invoice
+
+									Socket.WriteJSON(msg)
 								}
 							} else {
 								// Unmarshal result
 								keysendError := db.KeysendError{}
 								err = json.Unmarshal(body, &keysendError)
 								log.Printf("Keysend Payment to %s Failed, with Error: %s", inv.User_pubkey, keysendError.Error)
+
+								msg["msg"] = "keysend_error"
+								msg["invoice"] = inv.Invoice
+
+								Socket.WriteJSON(msg)
 							}
 
 							if err != nil {
@@ -195,6 +211,12 @@ func InitInvoiceCron() {
 								// Delete the index from the store array list and reset the store
 								newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
 								db.Store.SetInvoiceCache(newInvoiceList)
+
+								msg := make(map[string]interface{})
+								msg["msg"] = "assigned_ticket"
+								msg["invoice"] = inv.Invoice
+
+								Socket.WriteJSON(msg)
 							}
 						}
 					}
