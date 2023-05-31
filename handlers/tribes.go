@@ -445,6 +445,9 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	amount := invoice.Amount
 	date := invoice.Created
 	memo := invoice.Memo
+	invoiceType := invoice.Type
+	assigedHours := invoice.Assigned_hours
+	commitmentFee := invoice.Commitment_fee
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
@@ -480,11 +483,14 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	var invoiceCache, _ = db.Store.GetInvoiceCache()
 	var invoiceData = db.InvoiceStoreData{
-		Amount:       amount,
-		Created:      date,
-		Invoice:      invoiceRes.Response.Invoice,
-		Owner_pubkey: owner_key,
-		User_pubkey:  pub_key,
+		Amount:         amount,
+		Created:        date,
+		Invoice:        invoiceRes.Response.Invoice,
+		Owner_pubkey:   owner_key,
+		User_pubkey:    pub_key,
+		Type:           invoiceType,
+		Assigned_hours: assigedHours,
+		Commitment_fee: commitmentFee,
 	}
 
 	var invoiceList = append(invoiceCache, invoiceData)

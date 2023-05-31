@@ -12,6 +12,7 @@ export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];
   const { visible, created, person } = props;
 
+
   const [openAssignModal, setAssignModal] = useState<boolean>(false);
   const closeAssignModal = () => setAssignModal(false);
   const showAssignModal = () => setAssignModal(true);

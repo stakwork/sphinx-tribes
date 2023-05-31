@@ -299,7 +299,9 @@ func (db database) UpdatePerson(id uint, u map[string]interface{}) bool {
 	if id == 0 {
 		return false
 	}
+
 	db.db.Model(&Person{}).Where("id = ?", id).Updates(u)
+
 	return true
 }
 
