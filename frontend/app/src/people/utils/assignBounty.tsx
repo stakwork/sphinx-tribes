@@ -39,6 +39,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   }
 
   const generateInvoice = async () => {
+    console.log("Created ==", created);
     await main.getLnInvoice({
       amount: 200 * bountyHours,
       memo: '',
@@ -51,45 +52,6 @@ export default function AssignBounty(props: ConnectCardProps) {
       bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
     });
   };
-
-  async function pollLnInvoice(count: number) {
-    if (main.lnInvoice) {
-      const data = await main.getLnInvoiceStatus(main.lnInvoice);
-
-      setInvoiceData(data);
-
-      setPollCount(count);
-
-      const pollTimeout = setTimeout(() => {
-        pollLnInvoice(count + 1);
-        setPollCount(count + 1);
-      }, 2000);
-
-      if (data.invoiceStatus) {
-        clearTimeout(pollTimeout);
-        setPollCount(0);
-        main.setLnInvoice('');
-
-        // display a toast
-        addToast();
-
-        // close modal
-        props.dismiss();
-
-        if (props.dismissConnectModal)
-          props.dismissConnectModal()
-        // get new wanted list
-        main.getPeopleWanteds({ page: 1, resetPage: true });
-      }
-
-      if (count >= invoicePollTarget) {
-        // close modal
-        main.setLnInvoice('');
-        clearTimeout(pollTimeout);
-        setPollCount(0);
-      }
-    }
-  }
 
   const onHandle = (data: any) => {
     const res = JSON.parse(data.data);
@@ -114,7 +76,7 @@ export default function AssignBounty(props: ConnectCardProps) {
 
   useEffect(() => {
     socket.addEventListener('message', (data) => onMessage(data))
-  }, [])
+  }, [socket])
 
   return (
     <div onClick={(e) => e.stopPropagation()}>

@@ -29,7 +29,7 @@ export default function Invoice(props: {
 
   return (
     <div style={{ marginTop: '30px' }}>
-      {timeLeft.seconds >= 0 || (timeLeft.minutes >= 0 && !props.dataStatus) ? (
+      {timeLeft.seconds >= 0 || (timeLeft.minutes >= 0) ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
             <CountDownText>Invoice expires in a minute</CountDownText>
