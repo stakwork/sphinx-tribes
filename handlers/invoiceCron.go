@@ -184,6 +184,8 @@ func InitInvoiceCron() {
 
 									var assignee = make(map[string]interface{})
 
+									fmt.Println("Invoice ===", inv)
+
 									assignee["img"] = user.Img
 									assignee["label"] = user.OwnerAlias
 									assignee["value"] = user.OwnerPubKey

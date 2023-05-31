@@ -10,9 +10,14 @@ import (
 )
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
-	if config.Host == "https://people.sphinx.chat" && r.Host != "people.sphinx.chat" || r.Host != "people-test.sphinx.chat" {
-		return false
+	if config.Host == "https://people.sphinx.chat" {
+		if r.Host != "people.sphinx.chat" && r.Host != "people-test.sphinx.chat" {
+			return false
+		} else {
+			return true
+		}
 	}
+
 	return true
 }}
 var Socket *websocket.Conn

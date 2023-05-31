@@ -8,9 +8,7 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
 import { invoicePollTarget } from 'config';
-import { SOCKET_MSG } from 'config/socketHook';
-import useSocket from 'config/socketHook';
-import { mainStore } from 'store/main';
+import { socket, SOCKET_MSG } from 'config/socket';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
@@ -27,8 +25,6 @@ export default function AssignBounty(props: ConnectCardProps) {
   const pollMinutes = 2;
 
   const [toasts, setToasts]: any = useState([]);
-  const [socket] = useSocket();
-
   const addToast = () => {
     setToasts([
       {
@@ -54,8 +50,6 @@ export default function AssignBounty(props: ConnectCardProps) {
       commitment_fee: bountyHours * 200,
       bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
     });
-
-    // await pollLnInvoice(pollCount + 1)
   };
 
   async function pollLnInvoice(count: number) {
@@ -78,6 +72,12 @@ export default function AssignBounty(props: ConnectCardProps) {
 
         // display a toast
         addToast();
+
+        // close modal
+        props.dismiss();
+
+        if (props.dismissConnectModal)
+          props.dismissConnectModal()
         // get new wanted list
         main.getPeopleWanteds({ page: 1, resetPage: true });
       }
@@ -91,21 +91,30 @@ export default function AssignBounty(props: ConnectCardProps) {
     }
   }
 
-  if (socket) socket.addEventListener("message", (data: any) => {
+  const onHandle = (data: any) => {
     const res = JSON.parse(data.data);
     if (res.msg ===
       SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
+
       addToast();
 
       // close modal
       props.dismiss();
+
       if (props.dismissConnectModal)
         props.dismissConnectModal()
 
       // get new wanted list
       main.getPeopleWanteds({ page: 1, resetPage: true });
+      main.setLnInvoice('');
     }
-  })
+  }
+
+  const onMessage = (data: any) => onHandle(data);
+
+  useEffect(() => {
+    socket.addEventListener('message', (data) => onMessage(data))
+  }, [])
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
