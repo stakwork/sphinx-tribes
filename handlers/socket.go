@@ -6,9 +6,15 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/stakwork/sphinx-tribes/config"
 )
 
-var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
+	if config.Host == "https://people.sphinx.chat" && r.Host != "people.sphinx.chat" || r.Host != "people-test.sphinx.chat" {
+		return false
+	}
+	return true
+}}
 var Socket *websocket.Conn
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {

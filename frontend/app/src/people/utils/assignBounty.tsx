@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import { colors } from '../../config/colors';
@@ -8,10 +8,13 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
 import { invoicePollTarget } from 'config';
+import { SOCKET_MSG } from 'config/socketHook';
+import useSocket from 'config/socketHook';
+import { mainStore } from 'store/main';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
-  const { visible, person, created } = props;
+  const { person, created, visible } = props;
   const { main, ui } = useStores();
 
   const [bountyHours, setBountyHours] = useState(1);
@@ -24,8 +27,9 @@ export default function AssignBounty(props: ConnectCardProps) {
   const pollMinutes = 2;
 
   const [toasts, setToasts]: any = useState([]);
+  const [socket] = useSocket();
 
-  function addToast() {
+  const addToast = () => {
     setToasts([
       {
         id: '1',
@@ -34,7 +38,7 @@ export default function AssignBounty(props: ConnectCardProps) {
     ]);
   }
 
-  function removeToast() {
+  const removeToast = () => {
     setToasts([]);
   }
 
@@ -51,7 +55,7 @@ export default function AssignBounty(props: ConnectCardProps) {
       bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
     });
 
-    await pollLnInvoice(pollCount);
+    // await pollLnInvoice(pollCount + 1)
   };
 
   async function pollLnInvoice(count: number) {
@@ -74,16 +78,12 @@ export default function AssignBounty(props: ConnectCardProps) {
 
         // display a toast
         addToast();
-        // close modal
-        props.dismiss();
-        if (props.dismissConnectModal) props.dismissConnectModal();
         // get new wanted list
         main.getPeopleWanteds({ page: 1, resetPage: true });
       }
 
       if (count >= invoicePollTarget) {
         // close modal
-        props.dismiss();
         main.setLnInvoice('');
         clearTimeout(pollTimeout);
         setPollCount(0);
@@ -91,13 +91,27 @@ export default function AssignBounty(props: ConnectCardProps) {
     }
   }
 
+  if (socket) socket.addEventListener("message", (data: any) => {
+    const res = JSON.parse(data.data);
+    if (res.msg ===
+      SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
+      addToast();
+
+      // close modal
+      props.dismiss();
+      if (props.dismissConnectModal)
+        props.dismissConnectModal()
+
+      // get new wanted list
+      main.getPeopleWanteds({ page: 1, resetPage: true });
+    }
+  })
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <Modal
         style={props.modalStyle}
-        overlayClick={() => {
-          props.dismiss();
-        }}
+        overlayClick={() => props.dismiss()}
         visible={visible}
       >
         <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>

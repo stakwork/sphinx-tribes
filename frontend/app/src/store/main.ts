@@ -1096,6 +1096,7 @@ export class MainStore {
       return false;
     }
   }
+  ß
 }
 
 export const mainStore = new MainStore();
