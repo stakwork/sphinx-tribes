@@ -213,7 +213,7 @@ func InitInvoiceCron() {
 								db.Store.SetInvoiceCache(newInvoiceList)
 
 								msg := make(map[string]interface{})
-								msg["msg"] = "assigned_ticket"
+								msg["msg"] = "assign_success"
 								msg["invoice"] = inv.Invoice
 
 								Socket.WriteJSON(msg)
