@@ -5,7 +5,7 @@ export const URL =
     ? `wss://${getHost()}/websocket`
     : `ws://127.0.0.1:5005/websocket`;
 
-export const socket = new WebSocket(URL);
+// export const socket = new WebSocket(URL);
 
 export const SOCKET_MSG = {
    keysend_error: 'keysend_error',
