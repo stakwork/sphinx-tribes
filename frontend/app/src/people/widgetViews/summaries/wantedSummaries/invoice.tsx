@@ -9,7 +9,7 @@ import { invoicePollTarget } from 'config';
 export default function Invoice(props: {
   startDate: Date;
   count: number;
-  dataStatus: boolean;
+  dataStatus?: boolean;
   pollMinutes: number;
 }) {
   const [timeLimit] = useState(props.startDate);

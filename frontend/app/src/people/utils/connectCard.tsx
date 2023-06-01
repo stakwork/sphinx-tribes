@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import QR from './QR';
@@ -16,6 +16,7 @@ export default function ConnectCard(props: ConnectCardProps) {
   const [openAssignModal, setAssignModal] = useState<boolean>(false);
   const closeAssignModal = () => setAssignModal(false);
   const showAssignModal = () => setAssignModal(true);
+
 
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
 

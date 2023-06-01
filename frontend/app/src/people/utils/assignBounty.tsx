@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import { colors } from '../../config/colors';
@@ -17,10 +17,9 @@ export default function AssignBounty(props: ConnectCardProps) {
 
   const [bountyHours, setBountyHours] = useState(1);
   const [pollCount, setPollCount] = useState(0);
-  const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean; bountyPaid: boolean }>({
-    invoiceStatus: false,
-    bountyPaid: false
-  });
+  const [lnInvoice, setLnInvoice] = useState('');
+  const paid = useRef(false);
+  const sock = useRef(socket);
 
   const pollMinutes = 2;
 
@@ -39,8 +38,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   }
 
   const generateInvoice = async () => {
-    console.log("Created ==", created);
-    await main.getLnInvoice({
+    const data = await main.getLnInvoice({
       amount: 200 * bountyHours,
       memo: '',
       owner_pubkey: person?.owner_pubkey ?? '',
@@ -51,20 +49,20 @@ export default function AssignBounty(props: ConnectCardProps) {
       commitment_fee: bountyHours * 200,
       bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
     });
+
+    setLnInvoice(data.response.invoice);
   };
 
-  const onHandle = (data: any) => {
+  const onHandle = (data: any, props: any) => {
     const res = JSON.parse(data.data);
     if (res.msg ===
       SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
 
-      addToast();
-
-      // close modal
       props.dismiss();
+      if (props.dismissConnectModal) props.dismissConnectModal();
 
-      if (props.dismissConnectModal)
-        props.dismissConnectModal()
+      setLnInvoice('');
+      paid.current = !paid.current;
 
       // get new wanted list
       main.getPeopleWanteds({ page: 1, resetPage: true });
@@ -72,11 +70,30 @@ export default function AssignBounty(props: ConnectCardProps) {
     }
   }
 
-  const onMessage = (data: any) => onHandle(data);
-
   useEffect(() => {
-    socket.addEventListener('message', (data) => onMessage(data))
-  }, [socket])
+    socket.addEventListener('message', (data) => {
+      console.log("Props =")
+      onHandle(data, props)
+    })
+  }, [])
+
+  // useLayoutEffect(() => {
+  //   return () => {
+  //     if (socket.OPEN) {
+  //       socket.close()
+  //     }
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   if (paid.current) {
+  //     addToast();
+  //     paid.current = !paid.current
+  //   }
+  // }, [lnInvoice])
+
+
+
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -91,16 +108,15 @@ export default function AssignBounty(props: ConnectCardProps) {
           >
             <N color={color}>Asign bounty to your self</N>
             <B>Each hour cost 200 sats</B>
-            {main.lnInvoice && ui.meInfo?.owner_pubkey && (
+            {lnInvoice && ui.meInfo?.owner_pubkey && (
               <Invoice
                 startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
                 count={pollCount}
-                dataStatus={invoiceData.invoiceStatus}
                 pollMinutes={pollMinutes}
               />
             )}
 
-            {!main.lnInvoice && ui.meInfo?.owner_pubkey && (
+            {!lnInvoice && ui.meInfo?.owner_pubkey && (
               <>
                 <InvoiceForm>
                   <InvoiceLabel>Number Of Hours</InvoiceLabel>
