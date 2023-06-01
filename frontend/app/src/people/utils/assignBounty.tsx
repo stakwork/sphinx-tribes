@@ -8,7 +8,7 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
 import { invoicePollTarget } from 'config';
-import { socket, SOCKET_MSG } from 'config/socket';
+import { SOCKET_MSG, URL } from 'config/socket';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
@@ -19,7 +19,6 @@ export default function AssignBounty(props: ConnectCardProps) {
   const [pollCount, setPollCount] = useState(0);
   const [lnInvoice, setLnInvoice] = useState('');
   const paid = useRef(false);
-  const sock = useRef(socket);
 
   const pollMinutes = 2;
 
@@ -71,10 +70,13 @@ export default function AssignBounty(props: ConnectCardProps) {
   }
 
   useEffect(() => {
+    let socket = new WebSocket(URL);
+
     socket.addEventListener('message', (data) => {
       console.log("Props =")
       onHandle(data, props)
     })
+
   }, [])
 
   // useLayoutEffect(() => {
