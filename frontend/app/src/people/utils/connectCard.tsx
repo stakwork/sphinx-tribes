@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import QR from './QR';
@@ -11,7 +11,6 @@ import { ConnectCardProps } from 'people/interfaces';
 export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];
   const { visible, created, person } = props;
-
 
   const [openAssignModal, setAssignModal] = useState<boolean>(false);
   const closeAssignModal = () => setAssignModal(false);
@@ -75,15 +74,15 @@ export default function ConnectCard(props: ConnectCardProps) {
           <img src="/static/scan_qr.svg" alt="scan" />
           <div className="bottomText">Scan or paste in Sphinx</div>
         </ModalBottomText>
+        {openAssignModal ? (<AssignBounty
+          dismiss={() => closeAssignModal()}
+          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+          person={person}
+          visible={openAssignModal}
+          created={created}
+          dismissConnectModal={props.dismiss}
+        />) : <></>}
       </Modal>
-      <AssignBounty
-        dismiss={() => closeAssignModal()}
-        modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-        person={person}
-        visible={openAssignModal}
-        created={created}
-        dismissConnectModal={props.dismiss}
-      />
     </div>
   );
 }
