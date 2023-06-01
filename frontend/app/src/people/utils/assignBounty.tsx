@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import { colors } from '../../config/colors';
@@ -7,8 +7,7 @@ import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
-import { invoicePollTarget } from 'config';
-import { SOCKET_MSG, URL } from 'config/socket';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
@@ -18,11 +17,11 @@ export default function AssignBounty(props: ConnectCardProps) {
   const [bountyHours, setBountyHours] = useState(1);
   const [pollCount, setPollCount] = useState(0);
   const [lnInvoice, setLnInvoice] = useState('');
-  const paid = useRef(false);
 
   const pollMinutes = 2;
 
   const [toasts, setToasts]: any = useState([]);
+
   const addToast = () => {
     setToasts([
       {
@@ -52,50 +51,41 @@ export default function AssignBounty(props: ConnectCardProps) {
     setLnInvoice(data.response.invoice);
   };
 
-  const onHandle = (data: any, props: any) => {
-    const res = JSON.parse(data.data);
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+
     if (res.msg ===
       SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
 
-      props.dismiss();
-      if (props.dismissConnectModal) props.dismissConnectModal();
-
+      addToast();
       setLnInvoice('');
-      paid.current = !paid.current;
 
       // get new wanted list
       main.getPeopleWanteds({ page: 1, resetPage: true });
       main.setLnInvoice('');
+
+      props.dismiss();
+      if (props.dismissConnectModal) props.dismissConnectModal();
     }
+
   }
 
   useEffect(() => {
-    let socket = new WebSocket(URL);
+    const socket: WebSocket = createSocketInstance();
 
-    socket.addEventListener('message', (data) => {
-      console.log("Props =")
-      onHandle(data, props)
-    })
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
 
-  }, [])
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event)
+    };
 
-  // useLayoutEffect(() => {
-  //   return () => {
-  //     if (socket.OPEN) {
-  //       socket.close()
-  //     }
-  //   }
-  // }, []);
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
 
-  // useEffect(() => {
-  //   if (paid.current) {
-  //     addToast();
-  //     paid.current = !paid.current
-  //   }
-  // }, [lnInvoice])
-
-
-
+  }, []);
 
   return (
     <div onClick={(e) => e.stopPropagation()}>

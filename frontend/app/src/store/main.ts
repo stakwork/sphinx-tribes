@@ -6,7 +6,6 @@ import { randomString } from '../helpers';
 import { uiStore } from './ui';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
-import { type } from 'os';
 
 export const queryLimit = 1000;
 
@@ -1096,7 +1095,6 @@ export class MainStore {
       return false;
     }
   }
-  ß
 }
 
 export const mainStore = new MainStore();
