@@ -133,8 +133,7 @@ func InitInvoiceCron() {
 									})
 
 									// Delete the index from the store array list and reset the store
-									newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
-									db.Store.SetInvoiceCache(newInvoiceList)
+									updateInvoiceCache(invoiceList, index)
 
 									msg["msg"] = "keysend_success"
 									msg["invoice"] = inv.Invoice
@@ -151,6 +150,8 @@ func InitInvoiceCron() {
 								msg["invoice"] = inv.Invoice
 
 								Socket.WriteJSON(msg)
+
+								updateInvoiceCache(invoiceList, index)
 							}
 
 							if err != nil {
@@ -209,8 +210,7 @@ func InitInvoiceCron() {
 								})
 
 								// Delete the index from the store array list and reset the store
-								newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
-								db.Store.SetInvoiceCache(newInvoiceList)
+								updateInvoiceCache(invoiceList, index)
 
 								msg := make(map[string]interface{})
 								msg["msg"] = "assign_success"
@@ -226,4 +226,9 @@ func InitInvoiceCron() {
 	})
 
 	s.StartAsync()
+}
+
+func updateInvoiceCache(invoiceList []db.InvoiceStoreData, index int) {
+	newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
+	db.Store.SetInvoiceCache(newInvoiceList)
 }
