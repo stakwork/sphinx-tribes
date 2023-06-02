@@ -425,7 +425,7 @@ function MobileView(props: CodingBountiesProps) {
                      */}
                     {!bountyExpired &&
                       !main.lnInvoiceStatus &&
-                      assignee.owner_alias.length < 30 && (
+                      assignee?.owner_alias?.length < 30 && (
                         <>
                           <BountyTime>
                             Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
