@@ -984,22 +984,6 @@ export class MainStore {
     }
   }
 
-  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
-    try {
-      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
-      if (data.status) {
-        uiStore.setShowSignIn(false);
-
-        this.setLnAuth({ encode: '', k1: '' });
-        this.setLnToken(data.jwt);
-        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
-      }
-      return data;
-    } catch (e) {
-      return { k1: '', status: false };
-    }
-  }
-
   @observable
   lnInvoice: string = '';
 
