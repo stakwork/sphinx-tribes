@@ -10,13 +10,13 @@ import QR from '../utils/QR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 import { observer } from 'mobx-react-lite';
 import { AuthProps } from 'people/interfaces';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 
 export default observer(SignIn);
 
 function SignIn(props: AuthProps) {
-  const { main } = useStores();
+  const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
-  const [pollCount, setPollCount] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
 
   function redirect() {
@@ -32,22 +32,36 @@ function SignIn(props: AuthProps) {
     main.getLnAuth();
   }, []);
 
-  async function pollLnurl(count: number) {
-    if (main.lnauth.k1) {
-      const data = await main.getLnAuthPoll();
-      setPollCount(count);
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+    if (res.msg ===
+      SOCKET_MSG.lnauth_success && res.k1 === main.lnauth.k1) {
+      if (res.status) {
+        ui.setShowSignIn(false);
 
-      const pollTimeout = setTimeout(() => {
-        pollLnurl(count + 1);
-        setPollCount(count + 1);
-      }, 1500);
-
-      if (count >= 10 || data.status) {
-        clearTimeout(pollTimeout);
-        setPollCount(0);
+        main.setLnAuth({ encode: '', k1: '' });
+        main.setLnToken(res.jwt);
+        ui.setMeInfo({ ...res.user, jwt: res.jwt });
       }
     }
   }
+
+  useEffect(() => {
+    const socket: WebSocket = createSocketInstance();
+
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event)
+    };
+
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
+
+  }, []);
 
   return useObserver(() => (
     <div>
@@ -121,7 +135,6 @@ function SignIn(props: AuthProps) {
                   color={'primary'}
                   onClick={() => {
                     setPage('lnurl');
-                    pollLnurl(pollCount);
                   }}
                   hovercolor={'#5881F8'}
                   activecolor={'#5078F2'}
