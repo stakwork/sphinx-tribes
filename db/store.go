@@ -86,6 +86,21 @@ func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
 	return c, nil
 }
 
+func (s StoreData) SetSocketConnections(value []WebsocketConnections) error {
+	// The invoice should expire every 2 minutes
+	s.Cache.Set(config.SocketConnections, value, 6*time.Minute)
+	return nil
+}
+
+func (s StoreData) GetSocketConnections() ([]WebsocketConnections, error) {
+	value, found := s.Cache.Get(config.SocketConnections)
+	c, _ := value.([]WebsocketConnections)
+	if !found {
+		return []WebsocketConnections{}, errors.New("Invoice Cache not found")
+	}
+	return c, nil
+}
+
 func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
 	h := []byte(ts)
