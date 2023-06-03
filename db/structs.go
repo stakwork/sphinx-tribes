@@ -7,6 +7,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -305,6 +306,11 @@ type KeysendSuccess struct {
 type KeysendError struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
+}
+
+type WebsocketConnections struct {
+	Client *websocket.Conn `json:"websocket"`
+	Host   string          `json:"host"`
 }
 
 func (ConnectionCodes) TableName() string {
