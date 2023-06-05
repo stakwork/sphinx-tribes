@@ -7,7 +7,10 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/stakwork/sphinx-tribes/config"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
+
+var WebsocketPool = NewPool()
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -33,14 +36,15 @@ func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 }
 
 func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("WebSocket Endpoint Hit")
+	websocketToken := utils.GetRandomToken(40)
+
 	conn, err := Upgrade(w, r)
 	if err != nil {
 		fmt.Fprintf(w, "%+v\n", err)
 	}
 
 	client := &Client{
-		Host: r.Host,
+		Host: websocketToken,
 		Conn: conn,
 		Pool: pool,
 	}

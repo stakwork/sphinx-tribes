@@ -449,6 +449,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	assigedHours := invoice.Assigned_hours
 	commitmentFee := invoice.Commitment_fee
 	bountyExpires := invoice.Bounty_expires
+	websocketToken := invoice.Websocket_token
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
@@ -482,14 +483,14 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Tribes Host ===", r.Host)
 	var invoiceCache, _ = db.Store.GetInvoiceCache()
+
 	var invoiceData = db.InvoiceStoreData{
 		Amount:         amount,
 		Created:        date,
 		Invoice:        invoiceRes.Response.Invoice,
 		Owner_pubkey:   owner_key,
-		Host:           r.Host,
+		Host:           websocketToken,
 		User_pubkey:    pub_key,
 		Type:           invoiceType,
 		Assigned_hours: assigedHours,

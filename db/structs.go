@@ -238,15 +238,16 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount         string `json:"amount"`
-	Memo           string `json:"memo"`
-	Owner_pubkey   string `json:"owner_pubkey"`
-	User_pubkey    string `json:"user_pubkey"`
-	Created        string `json:"created"`
-	Type           string `json:"type"`
-	Assigned_hours uint   `json:"assigned_hours,omitempty"`
-	Commitment_fee uint   `json:"commitment_fee,omitempty"`
-	Bounty_expires string `json:"bounty_expires,omitempty"`
+	Amount          string `json:"amount"`
+	Memo            string `json:"memo"`
+	Owner_pubkey    string `json:"owner_pubkey"`
+	User_pubkey     string `json:"user_pubkey"`
+	Created         string `json:"created"`
+	Type            string `json:"type"`
+	Assigned_hours  uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee  uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires  string `json:"bounty_expires,omitempty"`
+	Websocket_token string `json:"websocket_token,omitempty"`
 }
 
 type Invoice struct {
@@ -312,11 +313,6 @@ type KeysendError struct {
 type Client struct {
 	Host string
 	Conn *websocket.Conn
-}
-
-type Message struct {
-	Type int    `json:"type"`
-	Body string `json:"body"`
 }
 
 func (ConnectionCodes) TableName() string {

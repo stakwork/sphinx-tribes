@@ -52,7 +52,13 @@ export default function AssignBounty(props: ConnectCardProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-    if (res.msg ===
+    if (res.msg === SOCKET_MSG.user_connect) {
+      let user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        ui.setMeInfo(user);
+      }
+    } else if (res.msg ===
       SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
 
       addToast();
@@ -66,7 +72,6 @@ export default function AssignBounty(props: ConnectCardProps) {
       props.dismiss();
       if (props.dismissConnectModal) props.dismissConnectModal();
     }
-
   }
 
   useEffect(() => {

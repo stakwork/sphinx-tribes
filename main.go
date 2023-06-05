@@ -14,6 +14,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/routes"
+	"github.com/stakwork/sphinx-tribes/websocket"
 )
 
 func main() {
@@ -30,6 +31,9 @@ func main() {
 	config.InitConfig()
 	auth.InitJwt()
 	handlers.InitInvoiceCron()
+
+	// Start websocket pool
+	go websocket.WebsocketPool.Start()
 
 	skipLoops := os.Getenv("SKIP_LOOPS")
 	if skipLoops != "true" {

@@ -168,7 +168,14 @@ function MobileView(props: CodingBountiesProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-    if (res.msg ===
+    if (res.msg === SOCKET_MSG.user_connect) {
+      let user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        ui.setMeInfo(user);
+      }
+    }
+    else if (res.msg ===
       SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.invoice_success);
       setLnInvoice('');

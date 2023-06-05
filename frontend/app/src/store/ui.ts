@@ -170,7 +170,9 @@ export interface MeInfo {
   twitter_confirmed?: boolean;
   extras: Extras;
   isSuperAdmin: boolean;
+  websocketToken?: string
 }
+
 export const emptyMeData: MeData = {
   pubkey: '',
   alias: '',
@@ -185,6 +187,7 @@ export const emptyMeData: MeData = {
   extras: {},
   isSuperAdmin: false
 };
+
 export const emptyMeInfo: MeInfo = {
   pubkey: '',
   alias: '',

@@ -34,7 +34,13 @@ function SignIn(props: AuthProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-    if (res.msg ===
+    if (res.msg === SOCKET_MSG.user_connect) {
+      let user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        ui.setMeInfo(user);
+      }
+    } else if (res.msg ===
       SOCKET_MSG.lnauth_success && res.k1 === main.lnauth.k1) {
       if (res.status) {
         ui.setShowSignIn(false);
@@ -48,7 +54,6 @@ function SignIn(props: AuthProps) {
 
   useEffect(() => {
     const socket: WebSocket = createSocketInstance();
-
     socket.onopen = () => {
       console.log('Socket connected');
     };

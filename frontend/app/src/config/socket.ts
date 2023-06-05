@@ -1,3 +1,4 @@
+import { uiStore } from 'store/ui';
 import { getHost } from './host';
 
 export const URL =
@@ -10,7 +11,8 @@ export const SOCKET_MSG = {
    keysend_success: 'keysend_success',
    invoice_success: 'invoice_success',
    assign_success: 'assign_success',
-   lnauth_success: 'lnauth_success'
+   lnauth_success: 'lnauth_success',
+   user_connect: 'user_connect'
 };
 
 let socket: WebSocket | null = null;

@@ -30,22 +30,15 @@ func (pool *Pool) Start() {
 				Client: client,
 				Status: true,
 			}
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
-			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Body: "New User Joined..."})
+			fmt.Println("Size of Websocket Connection Pool: ", len(pool.Clients))
 			db.Store.SetSocketConnections(db.Client{
 				Host: client.Host,
 				Conn: client.Conn,
 			})
-			db.Store.SetSocketConnections(db.Client{
-				Host: "c058-102-88-63-132.eu.ngrok.io",
-				Conn: client.Conn,
-			})
-			db.Store.SetSocketConnections(db.Client{
-				Host: "localhost:5005",
-				Conn: client.Conn,
-			})
+			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Msg: "user_connect", Body: client.Host})
 			break
 		case client := <-pool.Unregister:
+			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected..."})
 			delete(pool.Clients, client.Host)
 			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
 			break

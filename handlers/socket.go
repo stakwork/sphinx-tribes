@@ -7,9 +7,6 @@ import (
 )
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-
-	pool := websocket.NewPool()
-	go pool.Start()
-
+	pool := websocket.WebsocketPool
 	websocket.ServeWs(pool, w, r)
 }

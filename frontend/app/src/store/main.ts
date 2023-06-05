@@ -1014,7 +1014,8 @@ export class MainStore {
           type: body.type,
           assigned_hours: body.assigned_hours,
           commitment_fee: body.commitment_fee,
-          bounty_expires: body.bounty_expires
+          bounty_expires: body.bounty_expires,
+          websocket_token: uiStore.meInfo?.websocketToken
         },
         {
           'Content-Type': 'application/json'

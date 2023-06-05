@@ -21,6 +21,7 @@ type ClientData struct {
 
 type Message struct {
 	Type int    `json:"type"`
+	Msg  string `json:"msg"`
 	Body string `json:"body"`
 }
 
