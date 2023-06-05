@@ -1007,13 +1007,6 @@ export class MainStore {
     this.lnInvoice = invoice;
   }
 
-  @observable
-  lnInvoiceStatus: boolean = false;
-
-  @action setLnInvoiceStatus(status: boolean) {
-    this.lnInvoiceStatus = status;
-  }
-
   @action async getLnInvoice(body: {
     amount: number;
     memo: string;
@@ -1049,23 +1042,6 @@ export class MainStore {
       return data;
     } catch (e) {
       return { success: false, response: { invoice: '' } };
-    }
-  }
-
-  @action async getLnInvoiceStatus(
-    payment_req: string
-  ): Promise<{ invoiceStatus: boolean; bountyPaid: boolean }> {
-    try {
-      const data = await api.get(`invoices/${payment_req}`, {
-        'Content-Type': 'application/json'
-      });
-
-      if (data.status) {
-        this.setLnInvoiceStatus(data.status);
-      }
-      return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
-    } catch (e) {
-      return { invoiceStatus: false, bountyPaid: false };
     }
   }
 

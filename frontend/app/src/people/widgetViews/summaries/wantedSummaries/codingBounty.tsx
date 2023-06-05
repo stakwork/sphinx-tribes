@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AssigneeProfile,
   Creator,
@@ -21,7 +21,7 @@ import {
   AwardBottomContainer,
   BountyTime
 } from './style';
-import { EuiText, EuiFieldText } from '@elastic/eui';
+import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
@@ -37,8 +37,8 @@ import { observer } from 'mobx-react-lite';
 import { CodingBountiesProps } from '../../../interfaces';
 import moment from 'moment';
 import Invoice from './invoice';
-import { invoicePollTarget } from 'config';
 import { calculateTimeLeft } from 'helpers';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -91,28 +91,58 @@ function MobileView(props: CodingBountiesProps) {
   const color = colors['light'];
 
   const { ui, main } = useStores();
-  const [pollCount, setPollCount] = useState(0);
-  const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean; bountyPaid: boolean }>({
-    invoiceStatus: false,
-    bountyPaid: false
-  });
+  const [invoiceStatus, setInvoiceStatus] = useState(false);
+  const [lnInvoice, setLnInvoice] = useState('');
+  const [toasts, setToasts]: any = useState([]);
 
-  const bountyPaid = paid || invoiceData.bountyPaid;
-
+  const bountyPaid = paid || invoiceStatus;
   const pollMinutes = 1;
 
   const bountyExpired = !assignee?.bounty_expires
     ? false
     : Date.now() > new Date(assignee.bounty_expires).getTime();
-
   const bountyTimeLeft = calculateTimeLeft(new Date(assignee?.bounty_expires ?? ''), 'days');
+
+  const addToast = (type: string) => {
+    switch (type) {
+      case SOCKET_MSG.invoice_success: {
+        return setToasts([
+          {
+            id: '1',
+            title: 'Invoice has been paid'
+          }
+        ]);
+      }
+      case SOCKET_MSG.keysend_error: {
+        return setToasts([
+          {
+            id: '2',
+            title: 'Keysend payment failed',
+            toastLifeTimeMs: 10000
+          }
+        ]);
+      }
+      case SOCKET_MSG.keysend_success: {
+        return setToasts([
+          {
+            id: '3',
+            title: 'Successful keysend payment'
+          }
+        ]);
+      }
+    }
+  }
+
+  const removeToast = () => {
+    setToasts([]);
+  }
 
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
     const price =
       assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
 
-    await main.getLnInvoice({
+    const data = await main.getLnInvoice({
       amount: price || 0,
       memo: '',
       owner_pubkey: person.owner_pubkey,
@@ -121,7 +151,7 @@ function MobileView(props: CodingBountiesProps) {
       type: 'KEYSEND'
     });
 
-    await pollLnInvoice(pollCount);
+    setLnInvoice(data.response.invoice);
   }
 
   async function removeBountyAssignee() {
@@ -136,26 +166,38 @@ function MobileView(props: CodingBountiesProps) {
     }
   }
 
-  async function pollLnInvoice(count: number) {
-    if (main.lnInvoice) {
-      const data = await main.getLnInvoiceStatus(main.lnInvoice);
-
-      setInvoiceData(data);
-
-      setPollCount(count);
-
-      const pollTimeout = setTimeout(() => {
-        pollLnInvoice(count + 1);
-        setPollCount(count + 1);
-      }, 2000);
-
-      if (count >= invoicePollTarget * pollMinutes || data.invoiceStatus) {
-        clearTimeout(pollTimeout);
-        setPollCount(0);
-        main.setLnInvoice('');
-      }
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+    if (res.msg ===
+      SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
+      addToast(SOCKET_MSG.invoice_success);
+      setLnInvoice('');
+      setInvoiceStatus(true);
+    } else if (res.msg ===
+      SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
+      addToast(SOCKET_MSG.keysend_success);
+    } else if (res.msg ===
+      SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
+      addToast(SOCKET_MSG.keysend_error);
     }
   }
+
+  useEffect(() => {
+    const socket: WebSocket = createSocketInstance();
+
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event)
+    };
+
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
+
+  }, []);
 
   return (
     <div>
@@ -408,14 +450,14 @@ function MobileView(props: CodingBountiesProps) {
                       }}
                     />
 
-                    {main.lnInvoice && pollCount < 30 && (
+                    {lnInvoice && !invoiceStatus && (
                       <Invoice
                         startDate={
                           new Date(moment().add(pollMinutes, 'minutes').format().toString())
                         }
-                        count={pollCount}
-                        dataStatus={invoiceData.invoiceStatus}
-                        pollMinutes={pollMinutes}
+                        invoiceStatus={invoiceStatus}
+                        invoiceTime={pollMinutes}
+                        lnInvoice={lnInvoice}
                       />
                     )}
                     {/**
@@ -424,7 +466,7 @@ function MobileView(props: CodingBountiesProps) {
                      * A non LNAUTh user alias is shorter
                      */}
                     {!bountyExpired &&
-                      !main.lnInvoiceStatus &&
+                      !invoiceStatus &&
                       assignee?.owner_alias?.length < 30 && (
                         <>
                           <BountyTime>
@@ -469,9 +511,8 @@ function MobileView(props: CodingBountiesProps) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                          labels && labels.map((x: any) => x.label)
-                        },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                          },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -882,9 +923,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -955,9 +995,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1034,9 +1073,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1051,6 +1089,7 @@ function MobileView(props: CodingBountiesProps) {
           </AssigneeProfile>
         </NormalUser>
       )}
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </div>
   );
 }

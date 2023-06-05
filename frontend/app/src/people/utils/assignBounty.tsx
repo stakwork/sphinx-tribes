@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import { colors } from '../../config/colors';
@@ -15,8 +15,8 @@ export default function AssignBounty(props: ConnectCardProps) {
   const { main, ui } = useStores();
 
   const [bountyHours, setBountyHours] = useState(1);
-  const [pollCount, setPollCount] = useState(0);
   const [lnInvoice, setLnInvoice] = useState('');
+  const [invoiceStatus, setInvoiceStatus] = useState(false);
 
   const pollMinutes = 2;
 
@@ -30,7 +30,6 @@ export default function AssignBounty(props: ConnectCardProps) {
       }
     ]);
   }
-
   const removeToast = () => {
     setToasts([]);
   }
@@ -53,16 +52,16 @@ export default function AssignBounty(props: ConnectCardProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-
     if (res.msg ===
       SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
 
       addToast();
       setLnInvoice('');
+      setInvoiceStatus(true);
+      main.setLnInvoice('')
 
       // get new wanted list
       main.getPeopleWanteds({ page: 1, resetPage: true });
-      main.setLnInvoice('');
 
       props.dismiss();
       if (props.dismissConnectModal) props.dismissConnectModal();
@@ -103,8 +102,9 @@ export default function AssignBounty(props: ConnectCardProps) {
             {lnInvoice && ui.meInfo?.owner_pubkey && (
               <Invoice
                 startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
-                count={pollCount}
-                pollMinutes={pollMinutes}
+                invoiceStatus={invoiceStatus}
+                lnInvoice={lnInvoice}
+                invoiceTime={pollMinutes}
               />
             )}
 

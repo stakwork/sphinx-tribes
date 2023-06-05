@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { CountDownText, CountDownTimer, CountDownTimerWrap, InvoiceWrap, QrWrap } from './style';
-import { useStores } from '../../../../store';
 import QR from 'people/utils/QR';
 import { calculateTimeLeft } from '../../../../helpers';
 import QrBar from 'people/utils/QrBar';
-import { invoicePollTarget } from 'config';
 
 export default function Invoice(props: {
   startDate: Date;
-  count: number;
-  dataStatus?: boolean;
-  pollMinutes: number;
+  invoiceStatus: boolean;
+  lnInvoice: string;
+  invoiceTime: number;
 }) {
-  const [timeLimit] = useState(props.startDate);
 
-  const { main } = useStores();
+  const [timeLimit] = useState(props.startDate);
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(timeLimit, 'minutes'));
 
   useEffect(() => {
@@ -22,25 +19,25 @@ export default function Invoice(props: {
       setTimeLeft(calculateTimeLeft(timeLimit, 'minutes'));
     }, 1000);
 
-    if (props.count > invoicePollTarget * props.pollMinutes) {
+    if (props.invoiceStatus) {
       clearTimeout(invoiceTimeout);
     }
-  }, [timeLeft, props.count]);
+  }, [timeLeft]);
 
   return (
     <div style={{ marginTop: '30px' }}>
       {timeLeft.seconds >= 0 || (timeLeft.minutes >= 0) ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
-            <CountDownText>Invoice expires in a minute</CountDownText>
+            <CountDownText>Invoice expires in {props.invoiceTime} minute</CountDownText>
             <CountDownTimer>
               {timeLeft.minutes}:{timeLeft.seconds}
             </CountDownTimer>
           </CountDownTimerWrap>
 
           <QrWrap>
-            <QR size={220} value={main.lnInvoice} />
-            <QrBar value={main.lnInvoice} simple style={{ marginTop: 11 }} />
+            <QR size={220} value={props.lnInvoice} />
+            <QrBar value={props.lnInvoice} simple style={{ marginTop: 11 }} />
           </QrWrap>
         </InvoiceWrap>
       ) : null}
