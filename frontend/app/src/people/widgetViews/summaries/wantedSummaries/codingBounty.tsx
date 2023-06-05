@@ -168,14 +168,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      let user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    }
-    else if (res.msg ===
+    if (res.msg ===
       SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.invoice_success);
       setLnInvoice('');
@@ -472,9 +465,21 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so long
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!bountyExpired &&
+                    {!assignee?.bounty_expires &&
+                      !assignee?.commitment_fee &&
+                      !bountyPaid && (<Button
+                        iconSize={14}
+                        width={220}
+                        height={48}
+                        onClick={getLnInvoice}
+                        style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                        text="Pay Bounty"
+                        ButtonTextStyle={{ padding: 0 }}
+                      />)}
+                    {assignee?.bounty_expires &&
+                      !bountyExpired &&
                       !invoiceStatus &&
-                      assignee?.owner_alias?.length < 30 && (
+                      assignee.owner_alias.length < 30 && (
                         <>
                           <BountyTime>
                             Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
