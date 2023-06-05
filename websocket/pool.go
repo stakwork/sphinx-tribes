@@ -26,7 +26,6 @@ func (pool *Pool) Start() {
 	for {
 		select {
 		case client := <-pool.Register:
-			fmt.Print("Host ===", client.Host)
 			pool.Clients[client.Host] = &ClientData{
 				Client: client,
 				Status: true,
