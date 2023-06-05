@@ -264,6 +264,7 @@ type InvoiceStoreData struct {
 	User_pubkey    string `json:"user_pubkey"`
 	Amount         string `json:"amount"`
 	Created        string `json:"created"`
+	Host           string `json:"host,omitempty"`
 	Type           string `json:"type"`
 	Assigned_hours uint   `json:"assigned_hours,omitempty"`
 	Commitment_fee uint   `json:"commitment_fee,omitempty"`
@@ -308,9 +309,14 @@ type KeysendError struct {
 	Error   string `json:"error"`
 }
 
-type WebsocketConnections struct {
-	Client *websocket.Conn `json:"websocket"`
-	Host   string          `json:"host"`
+type Client struct {
+	Host string
+	Conn *websocket.Conn
+}
+
+type Message struct {
+	Type int    `json:"type"`
+	Body string `json:"body"`
 }
 
 func (ConnectionCodes) TableName() string {

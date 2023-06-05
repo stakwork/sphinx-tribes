@@ -11,7 +11,6 @@ var JwtKey string
 var RelayUrl string
 var RelayAuthKey string
 var InvoiceList = "INVOICELIST"
-var SocketConnections = "SOCKETCONNECTIONS"
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")

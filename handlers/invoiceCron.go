@@ -65,7 +65,10 @@ func InitInvoiceCron() {
 						msg["msg"] = "invoice_success"
 						msg["invoice"] = inv.Invoice
 
-						Socket.WriteJSON(msg)
+						socket, err := db.Store.GetSocketConnections(inv.Host)
+						if err == nil {
+							socket.Conn.WriteJSON(msg)
+						}
 
 						if inv.Type == "KEYSEND" {
 							url := fmt.Sprintf("%s/payment", config.RelayUrl)
@@ -138,7 +141,10 @@ func InitInvoiceCron() {
 									msg["msg"] = "keysend_success"
 									msg["invoice"] = inv.Invoice
 
-									Socket.WriteJSON(msg)
+									socket, err := db.Store.GetSocketConnections(inv.Host)
+									if err == nil {
+										socket.Conn.WriteJSON(msg)
+									}
 								}
 							} else {
 								// Unmarshal result
@@ -149,7 +155,11 @@ func InitInvoiceCron() {
 								msg["msg"] = "keysend_error"
 								msg["invoice"] = inv.Invoice
 
-								Socket.WriteJSON(msg)
+								socket, err := db.Store.GetSocketConnections(inv.Host)
+
+								if err == nil {
+									socket.Conn.WriteJSON(msg)
+								}
 
 								updateInvoiceCache(invoiceList, index)
 							}
@@ -216,7 +226,10 @@ func InitInvoiceCron() {
 								msg["msg"] = "assign_success"
 								msg["invoice"] = inv.Invoice
 
-								Socket.WriteJSON(msg)
+								socket, err := db.Store.GetSocketConnections(inv.Host)
+								if err == nil {
+									socket.Conn.WriteJSON(msg)
+								}
 							}
 						}
 					}

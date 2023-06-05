@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/auth"
-	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -121,7 +120,14 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		socketMsg["jwt"] = tokenString
 		socketMsg["user"] = user
 		socketMsg["msg"] = "lnauth_success"
-		Socket.WriteJSON(socketMsg)
+
+		socket, err := db.Store.GetSocketConnections(r.Host)
+
+		if err == nil {
+			socket.Conn.WriteJSON(socketMsg)
+		} else {
+			fmt.Println("Socket Error", err)
+		}
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)
@@ -190,7 +196,7 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = config.Host
+	user["url"] = "http://localhost:5005"
 
 	return user
 }

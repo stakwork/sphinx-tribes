@@ -482,12 +482,14 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Tribes Host ===", r.Host)
 	var invoiceCache, _ = db.Store.GetInvoiceCache()
 	var invoiceData = db.InvoiceStoreData{
 		Amount:         amount,
 		Created:        date,
 		Invoice:        invoiceRes.Response.Invoice,
 		Owner_pubkey:   owner_key,
+		Host:           r.Host,
 		User_pubkey:    pub_key,
 		Type:           invoiceType,
 		Assigned_hours: assigedHours,
