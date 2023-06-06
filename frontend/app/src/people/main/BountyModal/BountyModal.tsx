@@ -48,7 +48,8 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
     <Modal
       visible={true}
       style={{
-        height: '100%'
+        minHeight: '100%',
+        height: 'auto'
       }}
       envStyle={{
         marginTop: 0,
