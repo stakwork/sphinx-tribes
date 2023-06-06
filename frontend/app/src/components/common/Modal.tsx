@@ -29,10 +29,11 @@ export default function Modal(props: ModalProps) {
   const color = colors['light'];
   const fillStyle = fill
     ? {
-        height: '100%',
-        width: '100%',
-        borderRadius: 0
-      }
+      minHeight: '100%',
+      height: 'auto',
+      width: '100%',
+      borderRadius: 0
+    }
     : {};
 
   return (
