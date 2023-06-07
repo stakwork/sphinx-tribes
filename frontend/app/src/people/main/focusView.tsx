@@ -166,6 +166,7 @@ function FocusedView(props: FocusViewProps) {
     }
     setDeleting(false);
     if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
+    await window.location.reload();
   }
 
   async function preSubmitFunctions(body) {
