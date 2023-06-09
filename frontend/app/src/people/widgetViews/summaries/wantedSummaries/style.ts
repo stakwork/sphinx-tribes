@@ -196,6 +196,19 @@ export const DescriptionBox = styled.div<colorProps>`
   font-size: 15px;
   line-height: 25px;
   color: ${(p) => p?.color && p.color.black500};
+  .loomContainer{
+    margin-top: 23px;
+  }
+   .loomHeading {
+      font-family: 'Barlow';
+      font-style: normal;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 25px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: ${(p) => p?.color && p.color.black500};
+    }
   .deliverablesContainer {
     margin-top: 23px;
     .deliverablesHeading {
