@@ -88,7 +88,7 @@ function MobileView(props: CodingBountiesProps) {
     owner_idURL,
     createdURL,
     created,
-    loomEmbedUrl,
+    loomEmbedUrl
   } = props;
   const color = colors['light'];
 
@@ -820,13 +820,18 @@ function MobileView(props: CodingBountiesProps) {
                   <EuiText className="deliverablesDesc">{deliverables}</EuiText>
                 </div>
               ) : null}
-              {loomEmbedUrl&&
-               <><div className="loomContainer">
-                </div><EuiText className="loomHeading">Video</EuiText>
-                <LoomViewerRecorder readOnly style={{ marginTop: 10 }} loomEmbedUrl={loomEmbedUrl} /></>
-              }
+              {loomEmbedUrl && (
+                <>
+                  <div className="loomContainer"></div>
+                  <EuiText className="loomHeading">Video</EuiText>
+                  <LoomViewerRecorder
+                    readOnly
+                    style={{ marginTop: 10 }}
+                    loomEmbedUrl={loomEmbedUrl}
+                  />
+                </>
+              )}
             </DescriptionBox>
-         
           </CreatorDescription>
 
           <AssigneeProfile color={color}>
