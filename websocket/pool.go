@@ -31,11 +31,15 @@ func (pool *Pool) Start() {
 				Status: true,
 			}
 			fmt.Println("Size of Websocket Connection Pool: ", len(pool.Clients))
-			db.Store.SetSocketConnections(db.Client{
+			err := db.Store.SetSocketConnections(db.Client{
 				Host: client.Host,
 				Conn: client.Conn,
 			})
-			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Msg: "user_connect", Body: client.Host})
+			if err == nil {
+				pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Msg: "user_connect", Body: client.Host})
+			} else {
+				fmt.Println("Websocket pool client save error")
+			}
 			break
 		case client := <-pool.Unregister:
 			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected..."})

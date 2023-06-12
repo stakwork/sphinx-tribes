@@ -1,4 +1,3 @@
-import { uiStore } from 'store/ui';
 import { getHost } from './host';
 
 export const URL =

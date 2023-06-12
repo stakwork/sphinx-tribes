@@ -21,6 +21,7 @@ export default function ConnectCard(props: ConnectCardProps) {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
+      {openAssignModal && (<></>)}
       <Modal
         style={props.modalStyle}
         overlayClick={() => {
@@ -74,14 +75,16 @@ export default function ConnectCard(props: ConnectCardProps) {
           <img src="/static/scan_qr.svg" alt="scan" />
           <div className="bottomText">Scan or paste in Sphinx</div>
         </ModalBottomText>
-        {openAssignModal ? (<AssignBounty
-          dismiss={() => closeAssignModal()}
-          modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-          person={person}
-          visible={openAssignModal}
-          created={created}
-          dismissConnectModal={props.dismiss}
-        />) : <></>}
+        <>
+          {openAssignModal && ((<AssignBounty
+            dismiss={() => closeAssignModal()}
+            modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+            person={person}
+            visible={openAssignModal}
+            created={created}
+            dismissConnectModal={props.dismiss}
+          />))}
+        </>
       </Modal>
     </div>
   );
