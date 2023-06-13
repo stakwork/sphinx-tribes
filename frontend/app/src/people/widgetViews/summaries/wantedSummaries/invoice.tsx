@@ -10,7 +10,6 @@ export default function Invoice(props: {
   lnInvoice: string;
   invoiceTime: number;
 }) {
-
   const [timeLimit] = useState(props.startDate);
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(timeLimit, 'minutes'));
 
@@ -26,7 +25,7 @@ export default function Invoice(props: {
 
   return (
     <div style={{ marginTop: '30px' }}>
-      {timeLeft.seconds >= 0 || (timeLeft.minutes >= 0) ? (
+      {timeLeft.seconds >= 0 || timeLeft.minutes >= 0 ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
             <CountDownText>Invoice expires in {props.invoiceTime} minute</CountDownText>

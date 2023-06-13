@@ -16,12 +16,11 @@ export default function ConnectCard(props: ConnectCardProps) {
   const closeAssignModal = () => setAssignModal(false);
   const showAssignModal = () => setAssignModal(true);
 
-
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      {openAssignModal && (<></>)}
+      {openAssignModal && <></>}
       <Modal
         style={props.modalStyle}
         overlayClick={() => {
@@ -76,14 +75,16 @@ export default function ConnectCard(props: ConnectCardProps) {
           <div className="bottomText">Scan or paste in Sphinx</div>
         </ModalBottomText>
         <>
-          {openAssignModal && ((<AssignBounty
-            dismiss={() => closeAssignModal()}
-            modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-            person={person}
-            visible={openAssignModal}
-            created={created}
-            dismissConnectModal={props.dismiss}
-          />))}
+          {openAssignModal && (
+            <AssignBounty
+              dismiss={() => closeAssignModal()}
+              modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
+              person={person}
+              visible={openAssignModal}
+              created={created}
+              dismissConnectModal={props.dismiss}
+            />
+          )}
         </>
       </Modal>
     </div>
