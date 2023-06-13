@@ -40,8 +40,7 @@ function SignIn(props: AuthProps) {
         user.websocketToken = res.body;
         ui.setMeInfo(user);
       }
-    } else if (res.msg ===
-      SOCKET_MSG.lnauth_success && res.k1 === main.lnauth.k1) {
+    } else if (res.msg === SOCKET_MSG.lnauth_success && res.k1 === main.lnauth.k1) {
       if (res.status) {
         ui.setShowSignIn(false);
 
@@ -50,7 +49,7 @@ function SignIn(props: AuthProps) {
         ui.setMeInfo({ ...res.user, jwt: res.jwt });
       }
     }
-  }
+  };
 
   useEffect(() => {
     const socket: WebSocket = createSocketInstance();
@@ -59,13 +58,12 @@ function SignIn(props: AuthProps) {
     };
 
     socket.onmessage = (event: MessageEvent) => {
-      onHandle(event)
+      onHandle(event);
     };
 
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-
   }, []);
 
   return useObserver(() => (

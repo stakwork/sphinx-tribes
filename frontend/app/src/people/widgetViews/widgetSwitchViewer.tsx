@@ -28,16 +28,16 @@ function WidgetSwitchViewer(props) {
 
   const panelStyles = isMobile
     ? {
-      minHeight: 132
-    }
+        minHeight: 132
+      }
     : {
-      minWidth: '1100px',
-      maxWidth: '1100px',
-      marginBottom: 16,
-      borderRadius: '10px',
-      display: 'flex',
-      justifyContent: 'center'
-    };
+        minWidth: '1100px',
+        maxWidth: '1100px',
+        marginBottom: 16,
+        borderRadius: '10px',
+        display: 'flex',
+        justifyContent: 'center'
+      };
 
   const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
@@ -106,9 +106,9 @@ function WidgetSwitchViewer(props) {
         const { person, body } = item;
         const conditionalStyles = body?.paid
           ? {
-            border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
-            boxShadow: 'none'
-          }
+              border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
+              boxShadow: 'none'
+            }
           : {};
 
         // if this person has entries for this widget

@@ -29,10 +29,10 @@ export default function AssignBounty(props: ConnectCardProps) {
         title: 'Bounty has been assigned'
       }
     ]);
-  }
+  };
   const removeToast = () => {
     setToasts([]);
-  }
+  };
 
   const generateInvoice = async () => {
     const data = await main.getLnInvoice({
@@ -58,13 +58,11 @@ export default function AssignBounty(props: ConnectCardProps) {
         user.websocketToken = res.body;
         ui.setMeInfo(user);
       }
-    } else if (res.msg ===
-      SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
-
+    } else if (res.msg === SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
       addToast();
       setLnInvoice('');
       setInvoiceStatus(true);
-      main.setLnInvoice('')
+      main.setLnInvoice('');
 
       // get new wanted list
       main.getPeopleWanteds({ page: 1, resetPage: true });
@@ -72,7 +70,7 @@ export default function AssignBounty(props: ConnectCardProps) {
       props.dismiss();
       if (props.dismissConnectModal) props.dismissConnectModal();
     }
-  }
+  };
 
   useEffect(() => {
     const socket: WebSocket = createSocketInstance();
@@ -82,22 +80,17 @@ export default function AssignBounty(props: ConnectCardProps) {
     };
 
     socket.onmessage = (event: MessageEvent) => {
-      onHandle(event)
+      onHandle(event);
     };
 
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-
   }, []);
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <Modal
-        style={props.modalStyle}
-        overlayClick={() => props.dismiss()}
-        visible={visible}
-      >
+      <Modal style={props.modalStyle} overlayClick={() => props.dismiss()} visible={visible}>
         <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
           <div
             style={{ textAlign: 'center', width: '100%', overflow: 'hidden', padding: '0 50px' }}
