@@ -22,7 +22,6 @@ export const AddToFavorites = (props: any) => {
           marginBottom: 20,
           paddingLeft: 5
         }}
-        onClick={() => {}}
       />
     );
   }
