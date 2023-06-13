@@ -4,6 +4,9 @@ go 1.2
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/ambelovsky/go-structs v1.1.0 // indirect
+	github.com/ambelovsky/gosf v0.0.0-20201109201340-237aea4d6109
+	github.com/ambelovsky/gosf-socketio v0.0.0-20220810204405-0f97832ec7af // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/btcsuite/btcd v0.23.3 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0
@@ -17,7 +20,6 @@ require (
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-github/v39 v39.2.0
-	github.com/googollee/go-socket.io v1.7.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/imroc/req v0.3.0
 	github.com/jackc/pgtype v1.14.0 // indirect
@@ -30,7 +32,7 @@ require (
 	github.com/rs/xid v1.4.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/crypto v0.7.0
+	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.112.0
 	gorm.io/driver/postgres v1.5.0
