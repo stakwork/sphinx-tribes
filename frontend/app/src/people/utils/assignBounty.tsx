@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Modal } from '../../components/common';
 import { colors } from '../../config/colors';
@@ -7,25 +7,22 @@ import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
-import { invoicePollTarget } from 'config';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
-  const { visible, person, created } = props;
+  const { person, created, visible } = props;
   const { main, ui } = useStores();
 
   const [bountyHours, setBountyHours] = useState(1);
-  const [pollCount, setPollCount] = useState(0);
-  const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean; bountyPaid: boolean }>({
-    invoiceStatus: false,
-    bountyPaid: false
-  });
+  const [lnInvoice, setLnInvoice] = useState('');
+  const [invoiceStatus, setInvoiceStatus] = useState(false);
 
   const pollMinutes = 2;
 
   const [toasts, setToasts]: any = useState([]);
 
-  function addToast() {
+  const addToast = () => {
     setToasts([
       {
         id: '1',
@@ -33,13 +30,12 @@ export default function AssignBounty(props: ConnectCardProps) {
       }
     ]);
   }
-
-  function removeToast() {
+  const removeToast = () => {
     setToasts([]);
   }
 
   const generateInvoice = async () => {
-    await main.getLnInvoice({
+    const data = await main.getLnInvoice({
       amount: 200 * bountyHours,
       memo: '',
       owner_pubkey: person?.owner_pubkey ?? '',
@@ -51,53 +47,55 @@ export default function AssignBounty(props: ConnectCardProps) {
       bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
     });
 
-    await pollLnInvoice(pollCount);
+    setLnInvoice(data.response.invoice);
   };
 
-  async function pollLnInvoice(count: number) {
-    if (main.lnInvoice) {
-      const data = await main.getLnInvoiceStatus(main.lnInvoice);
-
-      setInvoiceData(data);
-
-      setPollCount(count);
-
-      const pollTimeout = setTimeout(() => {
-        pollLnInvoice(count + 1);
-        setPollCount(count + 1);
-      }, 2000);
-
-      if (data.invoiceStatus) {
-        clearTimeout(pollTimeout);
-        setPollCount(0);
-        main.setLnInvoice('');
-
-        // display a toast
-        addToast();
-        // close modal
-        props.dismiss();
-        if (props.dismissConnectModal) props.dismissConnectModal();
-        // get new wanted list
-        main.getPeopleWanteds({ page: 1, resetPage: true });
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+    if (res.msg === SOCKET_MSG.user_connect) {
+      let user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        ui.setMeInfo(user);
       }
+    } else if (res.msg ===
+      SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
 
-      if (count >= invoicePollTarget) {
-        // close modal
-        props.dismiss();
-        main.setLnInvoice('');
-        clearTimeout(pollTimeout);
-        setPollCount(0);
-      }
+      addToast();
+      setLnInvoice('');
+      setInvoiceStatus(true);
+      main.setLnInvoice('')
+
+      // get new wanted list
+      main.getPeopleWanteds({ page: 1, resetPage: true });
+
+      props.dismiss();
+      if (props.dismissConnectModal) props.dismissConnectModal();
     }
   }
+
+  useEffect(() => {
+    const socket: WebSocket = createSocketInstance();
+
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event)
+    };
+
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
+
+  }, []);
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <Modal
         style={props.modalStyle}
-        overlayClick={() => {
-          props.dismiss();
-        }}
+        overlayClick={() => props.dismiss()}
         visible={visible}
       >
         <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
@@ -106,16 +104,16 @@ export default function AssignBounty(props: ConnectCardProps) {
           >
             <N color={color}>Asign bounty to your self</N>
             <B>Each hour cost 200 sats</B>
-            {main.lnInvoice && ui.meInfo?.owner_pubkey && (
+            {lnInvoice && ui.meInfo?.owner_pubkey && (
               <Invoice
                 startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
-                count={pollCount}
-                dataStatus={invoiceData.invoiceStatus}
-                pollMinutes={pollMinutes}
+                invoiceStatus={invoiceStatus}
+                lnInvoice={lnInvoice}
+                invoiceTime={pollMinutes}
               />
             )}
 
-            {!main.lnInvoice && ui.meInfo?.owner_pubkey && (
+            {!lnInvoice && ui.meInfo?.owner_pubkey && (
               <>
                 <InvoiceForm>
                   <InvoiceLabel>Number Of Hours</InvoiceLabel>
