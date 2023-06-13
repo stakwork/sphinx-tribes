@@ -22,7 +22,7 @@ function NameTag(props: NameTagProps) {
 
   const isSelected = ui.selectedPerson === id ? true : false;
 
-  function selectPerson(e) {
+  function selectPerson(e: any) {
     // don't select if already selected
     if (isSelected) return;
     e.stopPropagation();

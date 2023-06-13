@@ -12,14 +12,14 @@ export function renderMarkdown(markdown: any) {
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
       components={{
-        code({ className, children, ...props }) {
+        code({ className, children, ...props }: any) {
           return (
             <code className={className} {...props}>
               {children}
             </code>
           );
         },
-        img({ className, ...props }) {
+        img({ className, ...props }: any) {
           return (
             <img
               alt={'Markodown image'}

@@ -72,7 +72,7 @@ function Badges(props: BadgesProps) {
     setClaiming(false);
   }
 
-  function redirectToBlockstream(txId) {
+  function redirectToBlockstream(txId: string) {
     const el = document.createElement('a');
     el.target = '_blank';
     el.href = `https://blockstream.info/liquid/tx/${txId}`;

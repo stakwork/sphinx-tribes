@@ -45,7 +45,7 @@ function BodyComponent() {
     }
   }
 
-  async function loadMore(direction) {
+  async function loadMore(direction: number) {
     if (tagsPop) return;
 
     const currentPage = tribesPageNumber;

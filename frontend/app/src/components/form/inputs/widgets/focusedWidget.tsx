@@ -53,7 +53,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     }
   }, [selectedIndex]);
 
-  function cancel(dismount) {
+  function cancel(dismount: any) {
     // new widget cancelled, revert form state
     let returnState = prevState;
     if (!single && selectedIndex < 0) {
@@ -104,7 +104,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     setSelectedIndex(0);
   }
 
-  function startEdit(obj, i) {
+  function startEdit(obj: any, i: any) {
     const cloneformState = getFormState();
     setPrevState(cloneformState);
     const formState = [...cloneformState];
@@ -116,7 +116,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     setSelectedIndex(index);
   }
 
-  function deleteItem(obj, i) {
+  function deleteItem(obj: any, i: any) {
     const formState = (values[name] && [...values[name][item.name]]) || [];
     let index = i;
     if (obj.id) {
@@ -127,7 +127,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     setFieldValue(`${name}.${item.name}`, formState);
   }
 
-  function getInitialValueByType(type) {
+  function getInitialValueByType(type: any) {
     let value: any = '';
     if (type === 'number') value = 0;
     if (type === 'gallery') value = [];
@@ -146,7 +146,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     return result;
   }
 
-  function getFieldToUpdate(e) {
+  function getFieldToUpdate(e: any) {
     let valueToUpdate = `${name}.${item.name}.${e.name}`;
     if (!single) {
       valueToUpdate = `${name}.${item.name}[${selectedIndex}].${e.name}`;

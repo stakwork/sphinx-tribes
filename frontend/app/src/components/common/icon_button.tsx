@@ -4,10 +4,10 @@ import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { IconButtonProps } from 'components/interfaces';
 
-function hexToRgba(hex: string, opacity = 1) {
+function hexToRgba(hex: string, opacity: number = 1) {
   try {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+    hex = hex.replace(shorthandRegex, function (m: any, r: any, g: any, b: any) {
       return r + r + g + g + b + b;
     });
 

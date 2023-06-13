@@ -16,7 +16,7 @@ import { observer } from 'mobx-react-lite';
 
 export default observer(WidgetSwitchViewer);
 
-function WidgetSwitchViewer(props) {
+function WidgetSwitchViewer(props: any) {
   const color = colors['light'];
   const { main } = useStores();
   const isMobile = useIsMobile();

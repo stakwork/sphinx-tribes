@@ -140,7 +140,7 @@ export class MainStore {
     }
   }
 
-  async fetchFromRelay(path): Promise<any> {
+  async fetchFromRelay(path: string): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
@@ -511,7 +511,7 @@ export class MainStore {
     resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
-  private async fetchPeoplePosts(query) {
+  private async fetchPeoplePosts(query: string) {
     return await api.get(query);
   }
 
@@ -766,7 +766,7 @@ export class MainStore {
     }
   }
 
-  async saveProfile(body) {
+  async saveProfile(body: any) {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
