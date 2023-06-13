@@ -76,7 +76,7 @@ function BodyComponent() {
     loadBackwardFunc
   );
 
-  async function loadMore(direction) {
+  async function loadMore(direction: number) {
     let currentPage = 1;
     currentPage = peopleWantedsPageNumber;
     let newPage = currentPage + direction;

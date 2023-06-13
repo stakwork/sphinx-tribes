@@ -52,7 +52,7 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
     }
   }
 
-  async function dropzoneUpload(files: File[], fileRejections) {
+  async function dropzoneUpload(files: File[], fileRejections: any) {
     if (fileRejections.length) {
       fileRejections.forEach((file) => {
         file.errors.forEach((err) => {

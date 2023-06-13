@@ -74,10 +74,11 @@
         "as-needed"
       ],
       "@typescript-eslint/typedef": [
-        "warn",
+        "error",
         {
           "parameter": true,
-          "arrowParameter": true
+          "arrowParameter": false,
+					"memberVariableDeclaration": false
         }
       ],
       "@typescript-eslint/no-explicit-any": "off",
@@ -90,6 +91,7 @@
       "react-hooks/exhaustive-deps": "warn",
       "react/prop-types": "warn",
       "no-unused-vars": "warn",
+			"no-var": "error",
       "no-extra-boolean-cast": "warn",
       "no-useless-escape": "warn",
       "no-prototype-builtins": "warn",

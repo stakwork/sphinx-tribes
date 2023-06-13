@@ -9,7 +9,7 @@ export default function Widget(props: WidgetProps) {
   const { values, name, parentName, setFieldValue } = props;
   const state = values.extras && values.extras[name];
 
-  function objectOrArrayHasLength(mystate) {
+  function objectOrArrayHasLength(mystate: any) {
     let v = 0;
     if (mystate) {
       if (Array.isArray(mystate)) {

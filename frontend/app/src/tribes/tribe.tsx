@@ -33,7 +33,7 @@ export default function Tribe({
   const lastActiveM = last_active ? moment(last_active * 1000) : moment().subtract(1, 'months');
   const lastActive = lastActiveM.format('MMM D HH:mm');
 
-  function copyString(e, text: any) {
+  function copyString(e: any, text: any) {
     e.stopPropagation();
     navigator.clipboard.writeText(text);
     setCopied(true);
