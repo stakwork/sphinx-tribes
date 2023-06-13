@@ -25,7 +25,6 @@ export default function SelectInput({
       <FieldEnv
         color={color}
         label={labeltext}
-        onClick={() => {}}
         className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
       >
         <R>
