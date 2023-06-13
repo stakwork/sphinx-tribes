@@ -6,7 +6,6 @@ import { randomString } from '../helpers';
 import { uiStore } from './ui';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
-import { type } from 'os';
 
 export const queryLimit = 1000;
 
@@ -985,34 +984,11 @@ export class MainStore {
     }
   }
 
-  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
-    try {
-      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
-      if (data.status) {
-        uiStore.setShowSignIn(false);
-
-        this.setLnAuth({ encode: '', k1: '' });
-        this.setLnToken(data.jwt);
-        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
-      }
-      return data;
-    } catch (e) {
-      return { k1: '', status: false };
-    }
-  }
-
   @observable
   lnInvoice: string = '';
 
   @action setLnInvoice(invoice: string) {
     this.lnInvoice = invoice;
-  }
-
-  @observable
-  lnInvoiceStatus: boolean = false;
-
-  @action setLnInvoiceStatus(status: boolean) {
-    this.lnInvoiceStatus = status;
   }
 
   @action async getLnInvoice(body: {
@@ -1038,7 +1014,8 @@ export class MainStore {
           type: body.type,
           assigned_hours: body.assigned_hours,
           commitment_fee: body.commitment_fee,
-          bounty_expires: body.bounty_expires
+          bounty_expires: body.bounty_expires,
+          websocket_token: uiStore.meInfo?.websocketToken
         },
         {
           'Content-Type': 'application/json'
@@ -1050,23 +1027,6 @@ export class MainStore {
       return data;
     } catch (e) {
       return { success: false, response: { invoice: '' } };
-    }
-  }
-
-  @action async getLnInvoiceStatus(
-    payment_req: string
-  ): Promise<{ invoiceStatus: boolean; bountyPaid: boolean }> {
-    try {
-      const data = await api.get(`invoices/${payment_req}`, {
-        'Content-Type': 'application/json'
-      });
-
-      if (data.status) {
-        this.setLnInvoiceStatus(data.status);
-      }
-      return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
-    } catch (e) {
-      return { invoiceStatus: false, bountyPaid: false };
     }
   }
 

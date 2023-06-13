@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
@@ -92,7 +92,7 @@ function WantedView(props: WantedViews2Props) {
     }
   }, [codingLanguage]);
 
-  function renderTickets() {
+  const renderTickets = () => {
     const { status } = ticketUrl
       ? extractGithubIssueFromUrl(person, ticketUrl)
       : extractGithubIssue(person, repo ?? '', issue ?? '');
@@ -182,7 +182,7 @@ function WantedView(props: WantedViews2Props) {
         titleString={titleString}
       />
     );
-  }
+  };
 
   return renderTickets();
 }

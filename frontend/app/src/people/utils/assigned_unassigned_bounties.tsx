@@ -161,7 +161,7 @@ const Bounties = (props: BountiesProps) => {
         modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
         person={person}
         visible={openConnectModal}
-        created={created ?? 0}
+        created={created}
       />
     </>
   );

@@ -86,6 +86,21 @@ func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
 	return c, nil
 }
 
+func (s StoreData) SetSocketConnections(value Client) error {
+	// The websocket in cache should not expire unless when deleted
+	s.Cache.Set(value.Host, value, cache.NoExpiration)
+	return nil
+}
+
+func (s StoreData) GetSocketConnections(host string) (Client, error) {
+	value, found := s.Cache.Get(host)
+	c, _ := value.(Client)
+	if !found {
+		return Client{}, errors.New("Socket Cache not found")
+	}
+	return c, nil
+}
+
 func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
 	h := []byte(ts)

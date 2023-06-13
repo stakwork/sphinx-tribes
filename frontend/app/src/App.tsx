@@ -24,6 +24,7 @@ function App() {
     return function cleanup() {
       clearInterval(exchangeRateInterval);
     };
+
   }, []);
 
   return (

@@ -35,4 +35,3 @@ export const help_wanted_coding_task_schema = [
 
 export const help_wanted_other_schema = ['Troubleshooting', 'Debugging', 'Tutoring'];
 
-export const invoicePollTarget = 29;
