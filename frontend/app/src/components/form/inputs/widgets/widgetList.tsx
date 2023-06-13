@@ -7,8 +7,8 @@ import { EuiButtonIcon } from '@elastic/eui';
 import { WidgetListProps } from './interfaces';
 
 export default function WidgetList(props: WidgetListProps) {
-  function renderByType(v, i) {
-    function wrap(child) {
+  function renderByType(v: any, i: any) {
+    function wrap(child: any) {
       return (
         <IWrap
           style={{ cursor: 'pointer' }}

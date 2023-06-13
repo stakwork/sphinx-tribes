@@ -59,7 +59,7 @@ function BodyComponent() {
     history.push(`/p/${pubkey}`);
   }
 
-  async function loadMore(direction) {
+  async function loadMore(direction: number) {
     let currentPage = 1;
     currentPage = peoplePageNumber;
 

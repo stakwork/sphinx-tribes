@@ -87,7 +87,7 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
       (widgetSchemas && widgetSchemas.find((f) => f.name === selectedWidget)) || {};
     const { single } = widgetSchema;
 
-    function wrapIt(child) {
+    function wrapIt(child: any) {
       if (single) {
         return <Panel isMobile={isMobile}>{child}</Panel>;
       }

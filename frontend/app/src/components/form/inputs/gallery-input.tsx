@@ -46,7 +46,7 @@ function GalleryInput({ value, handleChange }: Props) {
     }
   }
 
-  async function dropzoneUpload(files: File[], fileRejections) {
+  async function dropzoneUpload(files: File[], fileRejections: any) {
     if (fileRejections.length) {
       fileRejections.forEach((file) => {
         file.errors.forEach((err) => {
@@ -74,7 +74,7 @@ function GalleryInput({ value, handleChange }: Props) {
     reader.readAsDataURL(file);
   }
 
-  async function addImg(img) {
+  async function addImg(img: any) {
     const picsClone = [...picsrcArray];
     picsClone.push(img);
     handleChange(picsClone);
@@ -84,7 +84,7 @@ function GalleryInput({ value, handleChange }: Props) {
   //     setNewPicsArray([...newPicsArray, base64Img])
   // }
 
-  async function deleteImg(index) {
+  async function deleteImg(index: any) {
     const picsClone = [...picsrcArray];
     picsClone.splice(index, 1);
     handleChange(picsClone);

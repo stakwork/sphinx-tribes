@@ -72,7 +72,7 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  function mergeFormWithMeData(v) {
+  function mergeFormWithMeData(v: any) {
     let fullMeData: any = null;
 
     if (ui.meInfo) {
@@ -168,7 +168,7 @@ function FocusedView(props: FocusViewProps) {
     if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
-  async function preSubmitFunctions(body) {
+  async function preSubmitFunctions(body: any) {
     const newBody = cloneDeep(body);
 
     // if github repo
@@ -208,7 +208,7 @@ function FocusedView(props: FocusViewProps) {
     return newBody;
   }
 
-  async function submitForm(body) {
+  async function submitForm(body: any) {
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);

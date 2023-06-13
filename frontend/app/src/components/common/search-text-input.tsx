@@ -75,7 +75,7 @@ function SearchTextInput(props: SearchTextInputProps) {
 
 let debounceValue = '';
 let inDebounce;
-function debounce(func, delay) {
+function debounce(func: any, delay: any) {
   clearTimeout(inDebounce);
   inDebounce = setTimeout(() => {
     func();

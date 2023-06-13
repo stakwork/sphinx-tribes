@@ -1,11 +1,11 @@
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export function formatPrice(amount) {
+export function formatPrice(amount: number) {
   return amount;
 }
 
-export function satToUsd(amount) {
+export function satToUsd(amount: number) {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);
@@ -81,7 +81,7 @@ export const randomString = (l: number): string =>
     `0${(byte & 0xff).toString(16)}`.slice(-2)
   ).join('');
 
-export function sendToRedirect(url) {
+export function sendToRedirect(url: string) {
   const el = document.createElement('a');
   el.href = url;
   el.target = '_blank';

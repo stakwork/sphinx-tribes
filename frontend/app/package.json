@@ -13,7 +13,7 @@
     "build": "craco build",
     "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 1036 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx",
+    "lint": "eslint src --max-warnings 970 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
     "prepare": "cd ../.. && husky install frontend/app/.husky"
@@ -77,7 +77,9 @@
         "warn",
         {
           "parameter": true,
-          "arrowParameter": true
+					"objectDestructuring": false,
+          "arrowParameter": true,
+					"memberVariableDeclaration": false
         }
       ],
       "@typescript-eslint/no-explicit-any": "off",
@@ -90,6 +92,7 @@
       "react-hooks/exhaustive-deps": "warn",
       "react/prop-types": "warn",
       "no-unused-vars": "warn",
+			"no-var": "error",
       "no-extra-boolean-cast": "warn",
       "no-useless-escape": "warn",
       "no-prototype-builtins": "warn",

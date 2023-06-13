@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { IconButton } from '../../components/common';
 
-export default function GalleryViewer(props) {
+export default function GalleryViewer(props: any) {
   const { gallery, wrap, big, showAll, style, cover } = props;
   const [selectedImage, setSelectedImage] = useState(0);
   const g = gallery;
@@ -12,14 +12,14 @@ export default function GalleryViewer(props) {
 
   const showNav = g.length > 1;
 
-  function next(e) {
+  function next(e: any) {
     e.stopPropagation();
     const nextindex = selectedImage + 1;
     if (g[nextindex]) setSelectedImage(nextindex);
     else setSelectedImage(0);
   }
 
-  function prev(e) {
+  function prev(e: any) {
     e.stopPropagation();
     const previndex = selectedImage - 1;
     if (g[previndex]) setSelectedImage(previndex);
