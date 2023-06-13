@@ -136,7 +136,6 @@ interface bounty_description_props {
   isPaid?: any;
   color?: any;
 }
-interface replit_image_props {}
 
 const BountyDescriptionContainer = styled.div<bounty_description_props>`
   display: flex;
