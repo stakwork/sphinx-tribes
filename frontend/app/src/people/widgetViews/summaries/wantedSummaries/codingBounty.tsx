@@ -39,6 +39,7 @@ import moment from 'moment';
 import Invoice from './invoice';
 import { calculateTimeLeft } from 'helpers';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import LoomViewerRecorder from '../../../../people/utils/loomViewerRecorder';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -86,7 +87,8 @@ function MobileView(props: CodingBountiesProps) {
     setBountyPrice,
     owner_idURL,
     createdURL,
-    created
+    created,
+    loomEmbedUrl
   } = props;
   const color = colors['light'];
 
@@ -871,6 +873,17 @@ function MobileView(props: CodingBountiesProps) {
                   <EuiText className="deliverablesDesc">{deliverables}</EuiText>
                 </div>
               ) : null}
+              {loomEmbedUrl && (
+                <>
+                  <div className="loomContainer"></div>
+                  <EuiText className="loomHeading">Video</EuiText>
+                  <LoomViewerRecorder
+                    readOnly
+                    style={{ marginTop: 10 }}
+                    loomEmbedUrl={loomEmbedUrl}
+                  />
+                </>
+              )}
             </DescriptionBox>
           </CreatorDescription>
 

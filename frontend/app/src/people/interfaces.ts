@@ -280,6 +280,7 @@ export interface CodingBountiesProps {
   priceMax?: number;
   price?: number;
   estimate_session_length?: string;
+  loomEmbedUrl?: string;
   extraModalFunction?: () => void;
 }
 
@@ -287,7 +288,7 @@ export interface CodingViewProps {
   paid?: boolean;
   titleString: string;
   labels?: { [key: string]: any };
-  price?: Number;
+  price?: number;
   description?: string;
   envHeight?: string;
   estimate_session_length?: string;
