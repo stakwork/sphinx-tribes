@@ -7,6 +7,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -237,15 +238,16 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount         string `json:"amount"`
-	Memo           string `json:"memo"`
-	Owner_pubkey   string `json:"owner_pubkey"`
-	User_pubkey    string `json:"user_pubkey"`
-	Created        string `json:"created"`
-	Type           string `json:"type"`
-	Assigned_hours uint   `json:"assigned_hours,omitempty"`
-	Commitment_fee uint   `json:"commitment_fee,omitempty"`
-	Bounty_expires string `json:"bounty_expires,omitempty"`
+	Amount          string `json:"amount"`
+	Memo            string `json:"memo"`
+	Owner_pubkey    string `json:"owner_pubkey"`
+	User_pubkey     string `json:"user_pubkey"`
+	Created         string `json:"created"`
+	Type            string `json:"type"`
+	Assigned_hours  uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee  uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires  string `json:"bounty_expires,omitempty"`
+	Websocket_token string `json:"websocket_token,omitempty"`
 }
 
 type Invoice struct {
@@ -263,6 +265,7 @@ type InvoiceStoreData struct {
 	User_pubkey    string `json:"user_pubkey"`
 	Amount         string `json:"amount"`
 	Created        string `json:"created"`
+	Host           string `json:"host,omitempty"`
 	Type           string `json:"type"`
 	Assigned_hours uint   `json:"assigned_hours,omitempty"`
 	Commitment_fee uint   `json:"commitment_fee,omitempty"`
@@ -305,6 +308,11 @@ type KeysendSuccess struct {
 type KeysendError struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
+}
+
+type Client struct {
+	Host string
+	Conn *websocket.Conn
 }
 
 func (ConnectionCodes) TableName() string {
