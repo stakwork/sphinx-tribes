@@ -15,7 +15,8 @@
     "eject": "craco eject",
     "lint": "eslint src --max-warnings 1037 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
-    "prettier": "npx prettier --config .prettierrc.json -w ./src"
+    "prettier": "npx prettier --config .prettierrc.json -w ./src",
+    "prepare": "husky install"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",
@@ -155,6 +156,7 @@
     "eslint": "^8.37.0",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-react": "^7.31.10",
+    "husky": "^8.0.3",
     "nock": "^13.3.0",
     "react-error-overlay": "6.0.9",
     "typescript": "^5.0.3"
