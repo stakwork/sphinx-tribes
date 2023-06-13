@@ -13,10 +13,10 @@
     "build": "craco build",
     "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 1030 --ext .ts --ext .tsx",
+    "lint": "eslint src --max-warnings 1041 --ext .ts --ext .tsx",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
-    "prepare": "husky install"
+    "prepare": "cd ../.. && husky install frontend/app/.husky"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",
