@@ -49,7 +49,7 @@ function BodyComponent() {
     })();
   }, [main]);
 
-  const onChangeStatus = (optionId) => {
+  const onChangeStatus = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
       ...{
@@ -59,7 +59,7 @@ function BodyComponent() {
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
   };
 
-  const onChangeLanguage = (optionId) => {
+  const onChangeLanguage = (optionId: any) => {
     const newCheckboxIdToSelectedMapLanguage = {
       ...checkboxIdToSelectedMapLanguage,
       ...{
@@ -88,7 +88,7 @@ function BodyComponent() {
     }
   }
 
-  const onPanelClick = (person, item) => {
+  const onPanelClick = (person: any, item: number) => {
     history.replace({
       pathname: history?.location?.pathname,
       search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
@@ -165,7 +165,7 @@ function BodyComponent() {
   }
   return (
     <Body
-      onScroll={(e) => {
+      onScroll={(e: any) => {
         setScrollValue(e?.currentTarget?.scrollTop >= 20);
         handleScroll(e);
       }}

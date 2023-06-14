@@ -45,7 +45,7 @@ function NameTag(props: NameTagProps) {
     return (
       <Wrap
         isSelected={isSelected}
-        onClick={(e) => {
+        onClick={(e: any) => {
           selectPerson(e);
         }}
         style={style}
@@ -99,7 +99,7 @@ function NameTag(props: NameTagProps) {
           <Name
             textSize={textSize}
             color={isPaid ? color.grayish.G300 : color.pureBlack}
-            onClick={(e) => {
+            onClick={(e: any) => {
               selectPerson(e);
             }}
           >
@@ -123,23 +123,23 @@ interface NameProps {
 }
 
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
-  height: ${(p) => (p.iconSize ? `${p.iconSize}px` : '16px')};
-  width: ${(p) => (p.iconSize ? `${p.iconSize}px` : '16px')};
+  height: ${(p: any) => (p.iconSize ? `${p.iconSize}px` : '16px')};
+  width: ${(p: any) => (p.iconSize ? `${p.iconSize}px` : '16px')};
   border-radius: 50%;
   position: relative;
-  opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
-  filter: ${(p) => p.isPaid && 'grayscale(100%)'};
+  opacity: ${(p: any) => (p.isPaid ? 0.3 : 1)};
+  filter: ${(p: any) => p.isPaid && 'grayscale(100%)'};
 `;
 
 const Name = styled.div<NameProps>`
   font-family: Barlow;
   font-style: normal;
   font-weight: normal;
-  font-size: ${(p) => (p.textSize ? `${p.textSize}px` : '13px')};
-  color: ${(p) => p.color};
+  font-size: ${(p: any) => (p.textSize ? `${p.textSize}px` : '13px')};
+  color: ${(p: any) => p.color};
   line-height: 16px;
   /* or 158% */
 
@@ -166,11 +166,11 @@ interface WrapProps {
 const Wrap = styled.div<WrapProps>`
   display: flex;
   align-items: center;
-  cursor: ${(p) => !p.isSelected && 'pointer'};
+  cursor: ${(p: any) => !p.isSelected && 'pointer'};
   width: fit-content;
   margin-bottom: 10px;
   color: #8e969c;
   // &:hover {
-  //   color: ${(p) => !p.isSelected && '#618AFF'};
+  //   color: ${(p: any) => !p.isSelected && '#618AFF'};
   // }
 `;

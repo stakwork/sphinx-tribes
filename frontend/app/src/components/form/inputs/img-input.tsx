@@ -54,8 +54,8 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
 
   async function dropzoneUpload(files: File[], fileRejections: any) {
     if (fileRejections.length) {
-      fileRejections.forEach((file) => {
-        file.errors.forEach((err) => {
+      fileRejections.forEach((file: any) => {
+        file.errors.forEach((err: any) => {
           if (err.code === 'file-too-large') {
             setShowError(`Error: ${err.message}`);
           }
@@ -89,7 +89,7 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
   return (
     <ImageWrap>
       <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
-        {({ getRootProps, getInputProps, isDragActive, open }) => (
+        {({ getRootProps, getInputProps, isDragActive, open }: any) => (
           <DropzoneStuff>
             {imageIcon ? (
               <DottedCircle isDragActive={isDragActive} style={addedStyle} color={color}>
@@ -216,7 +216,7 @@ const DottedCircle = styled.div<DottedCircleProps>`
   width: 120px;
   border-radius: 50%;
   border-style: dashed;
-  border-color: ${(p) => (p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`)};
+  border-color: ${(p: any) => (p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`)};
   border-width: thin;
   cursor: pointer;
 `;

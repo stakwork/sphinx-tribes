@@ -31,7 +31,7 @@ function SearchTextInput(props: SearchTextInputProps) {
           if (!ui.searchText) setExpand(false);
         }}
         value={searchValue}
-        onChange={(e) => {
+        onChange={(e: any) => {
           setSearchValue(e.target.value);
           debounceValue = e.target.value;
           debounce(doDelayedValueUpdate, 300);

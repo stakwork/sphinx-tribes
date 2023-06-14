@@ -19,7 +19,7 @@ export default function ConnectCard(props: ConnectCardProps) {
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div onClick={(e: any) => e.stopPropagation()}>
       {openAssignModal && <></>}
       <Modal
         style={props.modalStyle}
@@ -117,7 +117,7 @@ const W = styled.div<styledProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${(p) => p?.color && p?.color.pureWhite};
+  background: ${(p: any) => p?.color && p?.color.pureWhite};
   width: 90px;
   height: 90px;
   border-radius: 80px;
@@ -129,7 +129,7 @@ const N = styled.div<styledProps>`
   font-size: 17px;
   line-height: 26px;
   text-align: center;
-  color: ${(p) => p?.color && p?.color.grayish.G100};
+  color: ${(p: any) => p?.color && p?.color.grayish.G100};
 `;
 
 const D = styled.div<styledProps>`
@@ -138,7 +138,7 @@ const D = styled.div<styledProps>`
   font-size: 20px;
   line-height: 26px;
   text-align: center;
-  color: ${(p) => p?.color && p?.color.grayish.G10};
+  color: ${(p: any) => p?.color && p?.color.grayish.G10};
   margin-bottom: 20px;
 `;
 
@@ -147,7 +147,7 @@ interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
+  background-image: ${(p: any) => `url(${p.src})`};
   width: 80px;
   height: 80px;
   background-position: center; /* Center the image */
@@ -166,6 +166,6 @@ const ModalBottomText = styled.div<styledProps>`
   justify-content: center;
   .bottomText {
     margin-left: 12px;
-    color: ${(p) => p?.color && p?.color.pureWhite};
+    color: ${(p: any) => p?.color && p?.color.pureWhite};
   }
 `;

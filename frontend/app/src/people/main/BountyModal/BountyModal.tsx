@@ -17,7 +17,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
 
   const wantedLength = person?.extras ? person?.extras.wanted?.length : 0;
 
-  const changeWanted = (step) => {
+  const changeWanted = (step: any) => {
     if (!wantedLength) return;
     const currentStep = Number(wantedId);
     const newStep = currentStep + step;

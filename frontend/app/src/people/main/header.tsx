@@ -58,7 +58,7 @@ function Header() {
         ui.setShowSignIn(false);
         setShowWelcome(true);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
   }
@@ -106,7 +106,7 @@ function Header() {
           // update self on reload
           await main.getSelf(null);
         }
-      } catch (e) {
+      } catch (e: any) {
         console.log('e', e);
       }
     })();
@@ -143,7 +143,7 @@ function Header() {
                 <Button
                   text={'Get Sphinx'}
                   color="transparent"
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.preventDefault();
                     clickHandler();
                   }}
@@ -176,7 +176,7 @@ function Header() {
 
             <MTabs>
               {tabs &&
-                tabs.map((t, i) => {
+                tabs.map((t: any, i: number) => {
                   const { label } = t;
                   const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
@@ -224,7 +224,7 @@ function Header() {
 
             <Tabs>
               {tabs &&
-                tabs.map((t, i) => {
+                tabs.map((t: any, i: number) => {
                   const { label } = t;
                   const selected = location.pathname.split('/')[1] === t.path.split('/')[1];
 
@@ -245,7 +245,7 @@ function Header() {
 
           <Corner>
             <GetSphinxsBtn
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.preventDefault();
                 clickHandler();
               }}
@@ -397,7 +397,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 37px;
@@ -437,7 +437,7 @@ const Column = styled.div`
   padding: 25px;
 `;
 const Imgg = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   width: 90px;
@@ -463,14 +463,14 @@ const Tab = styled.div<TagProps>`
   display: flex;
   margin-right: 50px;
   padding: 0 8px;
-  color: ${(p) => (p.selected ? '#fff' : '#6B7A8D')};
+  color: ${(p: any) => (p.selected ? '#fff' : '#6B7A8D')};
   cursor: pointer;
   font-weight: 500;
   font-size: 15px;
   line-height: 19px;
   height: 100%;
   align-items: center;
-  border-bottom: ${(p) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
+  border-bottom: ${(p: any) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
 
   &:hover {
     color: #909baa;
@@ -485,7 +485,7 @@ const Tab = styled.div<TagProps>`
 const MTab = styled.div<TagProps>`
   display: flex;
   margin: 25px 5px 0;
-  color: ${(p) => (p.selected ? '#fff' : '#ffffff99')};
+  color: ${(p: any) => (p.selected ? '#fff' : '#ffffff99')};
   cursor: pointer;
   height: 30px;
   min-width: 65px;
@@ -493,7 +493,7 @@ const MTab = styled.div<TagProps>`
   font-size: 15px;
   line-height: 19px;
   justify-content: center;
-  border-bottom: ${(p) => (p.selected ? '3px solid #618AFF' : 'none')};
+  border-bottom: ${(p: any) => (p.selected ? '3px solid #618AFF' : 'none')};
 `;
 
 const LoggedInBtn = styled.div`

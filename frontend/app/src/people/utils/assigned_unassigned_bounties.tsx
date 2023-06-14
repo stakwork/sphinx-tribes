@@ -117,7 +117,7 @@ const Bounties = (props: BountiesProps) => {
                   text={
                     ui.meInfo?.owner_pubkey === person.owner_pubkey ? 'Assign User' : 'I can help'
                   }
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     if (ui.meInfo) {
                       ui.meInfo?.owner_pubkey === person.owner_pubkey
                         ? onPanelClick()
@@ -184,10 +184,10 @@ const BountyContainer = styled.div<containerProps>`
   font-family: Barlow;
   height: 160px;
   background: transparent;
-  background: ${(p) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
+  background: ${(p: any) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
   background-repeat: no-repeat;
   background-size: cover;
-  border: ${(p) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
+  border: ${(p: any) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
   border-radius: 10px;
   .BountyDescriptionContainer {
     min-width: 553px;
@@ -200,8 +200,8 @@ const BountyContainer = styled.div<containerProps>`
   }
 
   :hover {
-    border: ${(p) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
-    border-radius: ${(p) => (p.assignedBackgroundImage ? '10px' : '')};
+    border: ${(p: any) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
+    border-radius: ${(p: any) => (p.assignedBackgroundImage ? '10px' : '')};
   }
 `;
 
@@ -211,7 +211,7 @@ const DescriptionPriceContainer = styled.div<containerProps>`
   width: 758px;
   min-height: 160px !important;
   height: 100%;
-  background: ${(p) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
+  background: ${(p: any) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
   background-repeat: no-repeat;
   background-size: cover;
 
@@ -253,7 +253,7 @@ const UnassignedPersonProfile = styled.div<containerProps>`
     font-size: 15px;
     font-weight: 500;
     font-family: Barlow;
-    color: ${(p) => (p.grayish_G200 ? p.grayish_G200 : '')};
+    color: ${(p: any) => (p.grayish_G200 ? p.grayish_G200 : '')};
     margin-bottom: -13px;
     line-height: 18px;
     display: flex;

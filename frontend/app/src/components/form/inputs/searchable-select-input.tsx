@@ -37,7 +37,7 @@ function SearchableSelectInput({
           if (name === 'assignee' || name === 'recipient') {
             const p = await main.getPeopleByNameAliasPubkey(search);
             if (p && p.length) {
-              const newOpts = p.map((ot) => ({
+              const newOpts = p.map((ot: any) => ({
                 owner_alias: ot.owner_alias,
                 owner_pubkey: ot.owner_pubkey,
                 img: ot.img,
@@ -50,7 +50,7 @@ function SearchableSelectInput({
             const { badgeList } = ui;
 
             if (badgeList && badgeList.length) {
-              const newOpts = badgeList.map((ot) => ({
+              const newOpts = badgeList.map((ot: any) => ({
                 img: ot.icon,
                 id: ot.id,
                 token: ot.token,
@@ -86,11 +86,11 @@ function SearchableSelectInput({
             options={opts}
             value={value}
             loading={loading}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleChange(e);
               setIsBorder(false);
             }}
-            onInputChange={(e) => {
+            onInputChange={(e: any) => {
               if (e) setSearch(e);
             }}
           />
@@ -129,7 +129,7 @@ display: flex;
 height: 100 %;
 justify - content: center;
 align - items: center;
-color: ${(p) => p?.color && p?.color.blue3};
+color: ${(p: any) => p?.color && p?.color.blue3};
 pointer - events: none;
 user - select: none;
 `;

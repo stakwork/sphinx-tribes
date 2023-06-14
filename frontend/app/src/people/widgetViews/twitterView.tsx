@@ -20,7 +20,7 @@ interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 20px;
   height: 20px;
   margin-right: 5px;

@@ -62,7 +62,7 @@ export default function DesktopView(props: CodingViewProps) {
               {assigneeLabel}
               {ticketUrl && (
                 <GithubIcon
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(ticketUrl, '_blank');
                   }}
@@ -72,7 +72,7 @@ export default function DesktopView(props: CodingViewProps) {
               )}
               {loomEmbedUrl && (
                 <LoomIcon
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(loomEmbedUrl, '_blank');
                   }}

@@ -20,7 +20,7 @@ export default function LoomVideoInputNew({
     <LoomVideoContainer color={color} isVideo={isVideo} style={style}>
       <LoomViewerRecorderNew
         name="loomVideo"
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleChange(e);
         }}
         loomEmbedUrl={value}
@@ -44,7 +44,7 @@ const LoomVideoContainer = styled.div<styleProps>`
   height: 175px;
   left: 698px;
   top: 313px;
-  background: ${(p) => !p.isVideo && "url('/static/loom_video_outer_border.svg')"};
+	background: ${(p: any) => !p.isVideo && "url('/static/loom_video_outer_border.svg')"};
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -58,7 +58,7 @@ const LoomVideoContainer = styled.div<styleProps>`
     display: flex;
     align-items: center;
     text-align: center;
-    color: ${(p) => p.color && p.color.grayish.G300};
+		color: ${(p: any) => p.color && p.color.grayish.G300};
     margin-top: 6px;
   }
 `;

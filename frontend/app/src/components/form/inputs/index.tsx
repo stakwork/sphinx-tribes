@@ -85,9 +85,9 @@ interface styledProps {
 }
 
 const FieldWrap = styled.div<styledProps>`
-  color: ${(p) => p?.color && p.color.pureBlack} !important;
-  background-color: ${(p) => p?.color && p.color.pureWhite} !important;
-  background: ${(p) => p?.color && p.color.pureWhite} !important;
+  color: ${(p: any) => p?.color && p.color.pureBlack} !important;
+  background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
+  background: ${(p: any) => p?.color && p.color.pureWhite} !important;
 `;
 
 export const Note = styled.div<styledProps>`
@@ -95,7 +95,7 @@ export const Note = styled.div<styledProps>`
   padding-left: 10px;
   flex-wrap: wrap;
   font-size: 12px;
-  color: ${(p) => p?.color && p.color.grayish.G60A};
+  color: ${(p: any) => p?.color && p.color.grayish.G60A};
   margin-bottom: 16px;
   margin-top: -6px;
   max-width: 400px;
@@ -113,33 +113,33 @@ interface fieldEnvProps {
 }
 
 export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
-  border: ${(p) =>
+  border: ${(p: any) =>
     p.border === 'bottom'
       ? ''
       : p?.isTop
       ? `1px solid ${p?.color && p.color.pureWhite}`
       : `1px solid ${p?.color && p.color.grayish.G600}`};
-  border-bottom: ${(p) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
+  border-bottom: ${(p: any) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
   box-sizing: border-box;
-  border-radius: ${(p) => (p.border === 'bottom' ? '0px' : '4px')};
+  border-radius: ${(p: any) => (p.border === 'bottom' ? '0px' : '4px')};
   box-shadow: none !important;
   max-width: 900px;
-  min-height: ${(p) => (p?.isTextField ? '40' : '')};
-  max-height: ${(p) => (p?.isTextField ? '40' : '')};
+  min-height: ${(p: any) => (p?.isTextField ? '40' : '')};
+  max-height: ${(p: any) => (p?.isTextField ? '40' : '')};
   margin-bottom: 24px;
-  border: ${(p) => p?.isFill && `1px solid ${p?.color && p.color.grayish.G600}`};
+  border: ${(p: any) => p?.isFill && `1px solid ${p?.color && p.color.grayish.G600}`};
   .euiFormRow__labelWrapper {
     margin-bottom: -20px;
-    margin-top: ${(p) => (p?.isTextField ? '12px' : '10px')};
+    margin-top: ${(p: any) => (p?.isTextField ? '12px' : '10px')};
     padding-left: 16px;
-    height: ${(p) => (p?.isTextField ? '6px' : '14px')};
+    height: ${(p: any) => (p?.isTextField ? '6px' : '14px')};
     position: relative;
     label {
-      color: ${(p) => p?.color && p.color.grayish.G300} !important;
-      background: ${(p) => p?.color && p.color.pureWhite};
+      color: ${(p: any) => p?.color && p.color.grayish.G300} !important;
+      background: ${(p: any) => p?.color && p.color.pureWhite};
       z-index: 10;
-      position: ${(p) => p?.isTop && 'absolute'};
-      top: ${(p) => p?.isTop && '-20px'} !important;
+      position: ${(p: any) => p?.isTop && 'absolute'};
+      top: ${(p: any) => p?.isTop && '-20px'} !important;
       font-family: Barlow;
       font-style: normal;
       font-weight: 500;
@@ -150,32 +150,32 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   }
 `;
 export const FieldText = styled(EuiFieldText)<styledProps>`
-background-color: ${(p) => p?.color && p.color.pureWhite} !important;
+background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
 max-width:900px;
-background:${(p) => p?.color && p.color.pureWhite} !important;
-color:${(p) => (p.readOnly ? `${p.color.grayish.G60A}` : `${p.color.pureBlack}`)} !important;
+background:${(p: any) => p?.color && p.color.pureWhite} !important;
+color:${(p: any) => (p.readOnly ? `${p.color.grayish.G60A}` : `${p.color.pureBlack}`)} !important;
 box-shadow: none !important;
-height: ${(p) => (p?.isTextField ? '12px' : '')}  ;
-margin-top: ${(p) => (p?.isTextField ? '2px' : '')}; 
+height: ${(p: any) => (p?.isTextField ? '12px' : '')}  ;
+margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')}; 
 
 .euiFormRow__labelWrapper .euiFormControlLayout--group{
-    background-color:${(p) => p?.color && p.color.pureWhite} !important;
-    background:${(p) => p?.color && p.color.pureWhite} !important;
+    background-color:${(p: any) => p?.color && p.color.pureWhite} !important;
+    background:${(p: any) => p?.color && p.color.pureWhite} !important;
     box-shadow:none !important;
 }
 
 .euiFormRow__fieldWrapper .euiFormControlLayout {
-    background-color:${(p) => p?.color && p.color.pureWhite} !important;
-    background:${(p) => p?.color && p.color.pureWhite} !important;
+    background-color:${(p: any) => p?.color && p.color.pureWhite} !important;
+    background:${(p: any) => p?.color && p.color.pureWhite} !important;
     box-shadow:none !important;
     
 }
 
 .euiFormLabel euiFormControlLayout__prepend{
-    background-color:${(p) => p?.color && p.color.pureWhite} !important;
-    background:${(p) => p?.color && p.color.pureWhite} !important;
+    background-color:${(p: any) => p?.color && p.color.pureWhite} !important;
+    background:${(p: any) => p?.color && p.color.pureWhite} !important;
     box-shadow:none !important;
-    color: ${(p) => p?.color && p.color.grayish.G71} !important;s
+    color: ${(p: any) => p?.color && p.color.grayish.G71} !important;s
     display:none !important;
     line-height: 1rem;
 }
@@ -191,14 +191,14 @@ margin-top: ${(p) => (p?.isTextField ? '2px' : '')};
 
 `;
 export const FieldTextArea = styled(EuiTextArea)<styledProps>`
-  // min-height: ${(p) => p?.height && p.height} !important;
-  // max-height: ${(p) => p?.width && p.height} !important;
-  width: ${(p) => p?.color && p.color.width};
-  background-color: ${(p) => p?.color && p.color.pureWhite} !important;
-  background: ${(p) => p?.color && p.color.pureWhite} !important;
+  // min-height: ${(p: any) => p?.height && p.height} !important;
+  // max-height: ${(p: any) => p?.width && p.height} !important;
+  width: ${(p: any) => p?.color && p.color.width};
+  background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
+  background: ${(p: any) => p?.color && p.color.pureWhite} !important;
   max-width: 900px;
-  color: ${(p) => p?.color && p.color.pureBlack} !important;
+  color: ${(p: any) => p?.color && p.color.pureBlack} !important;
   box-shadow: none !important;
-  // border-bottom: ${(p) => p?.color && `1px solid ${p.color.grayish.G600}`};
+  // border-bottom: ${(p: any) => p?.color && `1px solid ${p.color.grayish.G600}`};
   line-height: 17.6px;
 `;

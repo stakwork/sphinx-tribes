@@ -44,7 +44,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
             width={150}
             height={48}
             style={{ marginTop: '20px' }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               closeModal();
               ui.setShowSignIn(true);
@@ -64,7 +64,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
             width={150}
             height={48}
             style={{ marginTop: '20px', textDecoration: 'none' }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               setStep(step + 1);
             }}
@@ -152,7 +152,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
             height={48}
             buttonType={'text'}
             style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               setStep(step - 1);
             }}
@@ -172,7 +172,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
             height={48}
             buttonType={'text'}
             style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               setStep(3);
             }}
@@ -204,7 +204,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
         shadowcolor={
           buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
         }
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.stopPropagation();
           closeModal();
           ui.setShowSignIn(true);
@@ -218,7 +218,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
         height={48}
         buttonType={'text'}
         style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.stopPropagation();
           setStep(step - 1);
         }}
@@ -239,7 +239,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
     <>
       <EuiOverlayMask>
         <EuiModal
-          onClose={(e) => {
+          onClose={(e: any) => {
             e?.stopPropagation();
             closeModal();
           }}

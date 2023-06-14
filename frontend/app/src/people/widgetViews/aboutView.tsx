@@ -105,7 +105,7 @@ export const AboutView = observer((props: AboutViewProps) => {
         <>
           <Divider />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {coding_languages.map((c, i) => (
+            {coding_languages.map((c: any, i: number) => (
               <CodeBadge key={i}>{c.label}</CodeBadge>
             ))}
           </GrowRow>
@@ -117,7 +117,7 @@ export const AboutView = observer((props: AboutViewProps) => {
           <Divider />
           <T style={{ height: 20 }}>My Repos</T>
           <Grow>
-            {repos.map((r, i) => (
+            {repos.map((r: any, i: number) => (
               <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
                 <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
                 <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
@@ -134,7 +134,7 @@ export const AboutView = observer((props: AboutViewProps) => {
           <Divider />
           <T style={{ height: 20 }}>My Tribes</T>
           <Grow>
-            {tribes.map((t, i) => (
+            {tribes.map((t: any, i: number) => (
               <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
                 <Img src={t?.img || '/static/sphinx.png'} />
                 <div>{t?.name}</div>
@@ -353,7 +353,7 @@ interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 16px;
   height: 13px;
   margin-right: 8px;
@@ -368,7 +368,7 @@ interface ImageProps {
   readonly src?: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   position: relative;

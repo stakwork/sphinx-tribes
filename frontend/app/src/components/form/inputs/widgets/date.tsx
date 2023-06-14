@@ -10,7 +10,7 @@ function Date({ label, value, handleChange }: any) {
   const [startDate, setStartDate] = useState(moment(value) ?? moment());
   const [isBorder, setIsBorder] = useState<boolean>(false);
 
-  const handleChangeDate = (date) => {
+  const handleChangeDate = (date: any) => {
     setStartDate(date);
     handleChange(date.toISOString());
   };
@@ -21,7 +21,7 @@ function Date({ label, value, handleChange }: any) {
         selectsEnd={true}
         selectsStart={true}
         selected={startDate}
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleChangeDate(e);
         }}
         onFocus={() => {
@@ -42,7 +42,7 @@ interface datePickerProps {
 
 // @ts-ignore
 const DataPicker = styled(EuiDatePicker)<datePickerProps>`
-  border: 1px solid ${(p) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
+  border: 1px solid ${(p: any) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
   :focus {
     background-image: none;
   }

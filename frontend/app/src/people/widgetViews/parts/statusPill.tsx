@@ -39,7 +39,7 @@ const Pill = styled.div<PillProps>`
   align-items: center;
   font-size: 12px;
   font-weight: 300;
-  background: ${(p) => (p.isOpen ? '#49C998' : '#8256D0')};
+	background: ${(p: any) => (p.isOpen ? '#49C998' : '#8256D0')};
   border-radius: 30px;
   border: 1px solid transparent;
   text-transform: capitalize;

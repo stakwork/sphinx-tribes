@@ -7,7 +7,7 @@ export default function SearchableSelect(props: SelProps) {
   const { options, onChange, onInputChange, value, style, loading } = props;
 
   const opts = options
-    ? options.map((o) => ({
+    ? options.map((o: any) => ({
         ...o,
         value: o.value,
         label: o.label

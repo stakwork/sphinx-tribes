@@ -112,7 +112,7 @@ export default function Tribe({
                   <div className="lighter-color">{price_per_message || 0}</div>
                 </div>
                 <div className="section-separator" />
-                <a onClick={(e) => e.stopPropagation()} href={qrString} className="btn join-btn">
+                <a onClick={(e: any) => e.stopPropagation()} href={qrString} className="btn join-btn">
                   <img
                     style={{ width: 13, height: 13, marginRight: 8 }}
                     src="/static/launch-24px.svg"
@@ -135,7 +135,7 @@ export default function Tribe({
                 )}
                 <div className="below-qr">
                   <a
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e: any) => e.stopPropagation()}
                     href={`https://${preview}?tribe=${uuid}`}
                     target={'_blank'}
                     className={`preview-btn ${!preview ? 'btn-disabled' : ''}`}
@@ -143,7 +143,7 @@ export default function Tribe({
                   >
                     Preview
                   </a>
-                  <button className="copy-btn" onClick={(e) => copyString(e, qrString)}>
+                  <button className="copy-btn" onClick={(e: any) => copyString(e, qrString)}>
                     {copied ? 'Copied!' : 'Copy Link'}
                   </button>
                 </div>
@@ -173,7 +173,7 @@ const Content = styled.div<ContentProps>`
   &:hover h3 {
     color: white;
   }
-  ${(p) =>
+  ${(p: any) =>
     p.selected
       ? `
     & h5{
@@ -222,7 +222,7 @@ const Description = styled.h5<DescriptionProps>`
   align-self: start;
   font-size: 10px;
   text-align: left;
-  ${(p) =>
+  ${(p: any) =>
     p.oneLine &&
     `
 		max-width: 100%;
@@ -235,7 +235,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 90px;

@@ -48,8 +48,8 @@ function GalleryInput({ value, handleChange }: Props) {
 
   async function dropzoneUpload(files: File[], fileRejections: any) {
     if (fileRejections.length) {
-      fileRejections.forEach((file) => {
-        file.errors.forEach((err) => {
+      fileRejections.forEach((file: any) => {
+        file.errors.forEach((err: any) => {
           if (err.code === 'file-too-large') {
             setShowError(`Error: ${err.message}`);
           }
@@ -100,7 +100,7 @@ function GalleryInput({ value, handleChange }: Props) {
     <>
       <Wrapper>
         {picsrcArray &&
-          picsrcArray.map((v, i) => (
+          picsrcArray.map((v: any, i: number) => (
             <ImageWrap key={i}>
               <Close onClick={() => deleteImg(i)}>
                 <MaterialIcon icon={'close'} style={{ color: color.pureBlack, fontSize: 12 }} />
@@ -120,7 +120,7 @@ function GalleryInput({ value, handleChange }: Props) {
 
       <div style={{ marginTop: 5 }}>
         <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
-          {({ getRootProps, getInputProps, isDragActive, open }) => (
+          {({ getRootProps, getInputProps, isDragActive, open }: any) => (
             <DropzoneStuff>
               <div>
                 <input {...getInputProps()} />

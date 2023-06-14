@@ -51,7 +51,7 @@ const BountyProfileView = (props: BountiesProfileProps) => {
               cursor: props.isNameClickable ? 'pointer' : '',
               ...props.NameContainerStyle
             }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               if (props.isNameClickable && { ...props.assignee }.owner_alias) {
                 e.stopPropagation();
                 window.open(
@@ -73,7 +73,7 @@ const BountyProfileView = (props: BountiesProfileProps) => {
             <ViewProfileButton
               View_profile_text_color={color.grayish.G300}
               View_profile_icon_color={color.grayish.G300}
-              onClick={(e) => {
+              onClick={(e: any) => {
                 if ({ ...props.assignee }.owner_alias) {
                   e.stopPropagation();
                   window.open(
@@ -171,7 +171,7 @@ const NameContainer = styled.div<BountyProfileViewProps>`
     font-weight: 600;
     width: 150px;
     text-overflow: ellipsis;
-    color: ${(p) => p.name_text_color};
+    color: ${(p: any) => p.name_text_color};
   }
 `;
 
@@ -190,7 +190,7 @@ const ViewProfileButton = styled.div<BountyProfileViewProps>`
     line-height: 16px;
     display: flex;
     align-items: center;
-    color: ${(p) => p.View_profile_text_color};
+    color: ${(p: any) => p.View_profile_text_color};
   }
   .Icon_Container {
     display: flex;
@@ -200,7 +200,7 @@ const ViewProfileButton = styled.div<BountyProfileViewProps>`
     width: 24px;
   }
   .MaterialIcon {
-    color: ${(p) => p.View_profile_icon_color};
+    color: ${(p: any) => p.View_profile_icon_color};
     font-style: normal;
     font-weight: 400;
     font-size: 12px;

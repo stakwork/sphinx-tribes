@@ -17,7 +17,7 @@ export function satToUsd(amount: number) {
   return returnValue;
 }
 
-export const DollarConverter = (e) => {
+export const DollarConverter = (e: any) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');
   return dollarUSLocale.format(formatPrice(e)).split(',').join(' ');
 };
@@ -77,7 +77,7 @@ export function extractGithubIssueFromUrl(
 }
 
 export const randomString = (l: number): string =>
-  Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte) =>
+  Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte: any) =>
     `0${(byte & 0xff).toString(16)}`.slice(-2)
   ).join('');
 

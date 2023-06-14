@@ -28,9 +28,9 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
   useEffect(() => {
     let res;
     if (props.codingLanguage.length > 0) {
-      res = LanguageObject?.filter((value) =>
+      res = LanguageObject?.filter((value: any) =>
         !isString(props.codingLanguage)
-          ? props.codingLanguage?.find((val) => val.label === value.label)
+          ? props.codingLanguage?.find((val: any) => val.label === value.label)
           : props.codingLanguage
       );
     }
@@ -106,7 +106,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
           )}
           {dataValue &&
             dataValue?.length > 0 &&
-            dataValue?.map((lang: any, index) => (
+            dataValue?.map((lang: any, index: number) => (
               <CodingLabels
                 key={index}
                 border={props.isPaid ? `1px solid ${color.grayish.G06}` : lang?.border}
@@ -183,9 +183,9 @@ const Description = styled.div<bounty_description_props>`
     border-radius: 4px;
     overflow: hidden;
     margin-top: -13px;
-    border: 1px solid ${(p) => p?.color && p.color.grayish.G500};
-    opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
-    filter: ${(p) => p.isPaid && 'grayscale(100%)'};
+    border: 1px solid ${(p: any) => p?.color && p.color.grayish.G500};
+    opacity: ${(p: any) => (p.isPaid ? 0.3 : 1)};
+    filter: ${(p: any) => p.isPaid && 'grayscale(100%)'};
   }
 `;
 
@@ -198,9 +198,9 @@ const LanguageContainer = styled.div`
 
 const CodingLabels = styled.div<codingLangProps>`
   padding: 0px 8px;
-  border: ${(p) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
-  color: ${(p) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
-  background: ${(p) => (p.background ? p?.background : `${p.color.pureWhite}`)};
+  border: ${(p: any) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
+  color: ${(p: any) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
+  background: ${(p: any) => (p.background ? p?.background : `${p.color.pureWhite}`)};
   border-radius: 4px;
   overflow: hidden;
   max-height: 22.75px;

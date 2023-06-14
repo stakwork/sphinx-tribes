@@ -164,7 +164,7 @@ const SessionContainer = styled.div<PriceContainerProps>`
   .Session_Text {
     font-size: 13px;
     font-weight: 700;
-    color: ${(p) => (p.session_text_color ? p.session_text_color : '')};
+		color: ${(p: any) => (p.session_text_color ? p.session_text_color : '')};
     font-family: Barlow;
   }
   .EST_Text {

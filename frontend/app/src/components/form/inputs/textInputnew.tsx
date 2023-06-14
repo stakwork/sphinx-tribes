@@ -24,7 +24,7 @@ export default function TextInputNew({
           placeholder=" "
           value={value || ''}
           readOnly={readOnly || false}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e: any) => handleChange(e.target.value)}
         />
         <label>{label}</label>
       </div>
@@ -42,12 +42,12 @@ const TextContainer = styled.div<styledProps>`
     position: relative;
     padding-top: 13px;
     font-size: 13px;
-    color: ${(p) => p?.color && p?.color.grayish.G300};
+    color: ${(p: any) => p?.color && p?.color.grayish.G300};
     font-family: Barlow;
   }
 
   .label-float input {
-    border: 1px solid ${(p) => p?.color && p?.color.grayish.G600};
+    border: 1px solid ${(p: any) => p?.color && p?.color.grayish.G600};
     border-radius: 4px;
     outline: none;
     min-width: 290px;
@@ -61,11 +61,11 @@ const TextContainer = styled.div<styledProps>`
   }
 
   .label-float input:focus {
-    border: 1px solid ${(p) => p?.color && p?.color.blue2};
+    border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
   }
 
   .label-float input::placeholder {
-    color: ${(p) => p?.color && p?.color.grayish.G300};
+    color: ${(p: any) => p?.color && p?.color.grayish.G300};
   }
 
   .label-float label {
@@ -94,6 +94,6 @@ const TextContainer = styled.div<styledProps>`
   .label-float input:not(:placeholder-shown) + label {
     font-size: 13px;
     top: 0;
-    color: ${(p) => p?.color && p?.color.grayish.G300};
+    color: ${(p: any) => p?.color && p?.color.grayish.G300};
   }
 `;

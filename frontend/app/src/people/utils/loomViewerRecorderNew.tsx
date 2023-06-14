@@ -38,7 +38,7 @@ export default function LoomViewerRecorderNew(props: LoomViewProps) {
 
       const sdkButton = configureButton({ element: button });
 
-      sdkButton.on('insert-click', async (video) => {
+      sdkButton.on('insert-click', async (video: any) => {
         setVideoUrl(video.embedUrl);
         if (setIsVideo) setIsVideo(true);
         if (onChange) onChange(video.embedUrl);

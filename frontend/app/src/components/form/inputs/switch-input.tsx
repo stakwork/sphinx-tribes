@@ -32,7 +32,7 @@ export default function SwitchInput({
           className="switcher"
           label=""
           checked={value}
-          onChange={(e) => {
+          onChange={(e: any) => {
             handleChange(e.target.checked);
           }}
           onBlur={handleBlur}
@@ -59,7 +59,7 @@ interface styledProps {
 }
 
 const ExtraText = styled.div<styledProps>`
-  color: ${(p) => p?.color && p?.color.grayish.G760};
+  color: ${(p: any) => p?.color && p?.color.grayish.G760};
   padding: 10px 10px 25px 10px;
   max-width: calc(100% - 20px);
   word-break: break-all;

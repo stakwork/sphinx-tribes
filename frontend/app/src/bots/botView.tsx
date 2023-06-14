@@ -20,13 +20,13 @@ function BotView(props: BotViewProps) {
   const history = useHistory();
 
   const bot: any =
-    main.bots && main.bots.length && main.bots.find((f) => f.unique_name === botUniqueName);
+    main.bots && main.bots.length && main.bots.find((f: any) => f.unique_name === botUniqueName);
 
   const { name, unique_name, description, img, owner_pubkey, owner_alias, tags, price_per_use } =
     bot || {};
 
   // FOR BOT VIEW
-  const bots: any = main.bots && main.bots.length && main.bots.filter((f) => !f.hide);
+  const bots: any = main.bots && main.bots.length && main.bots.filter((f: any) => !f.hide);
 
   const isMobile = useIsMobile();
 
@@ -62,7 +62,7 @@ function BotView(props: BotViewProps) {
         <div style={{ width: '100%' }}>
           <Divider style={{ marginBottom: 6 }} />
           <GrowRow style={{ paddingBottom: 0 }}>
-            {tags.map((c, i) => (
+            {tags.map((c: any, i: number) => (
               <CodeBadge key={i}>{c}</CodeBadge>
             ))}
           </GrowRow>
@@ -125,7 +125,7 @@ function BotView(props: BotViewProps) {
           </DBack>
 
           <div style={{ width: '100%', overflowY: 'auto' }}>
-            {bots.map((t) => (
+            {bots.map((t: any) => (
               <Bot
                 {...t}
                 key={t.uuid}
@@ -280,7 +280,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   width: 150px;
