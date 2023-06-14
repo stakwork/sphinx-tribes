@@ -39,19 +39,19 @@ export default function NumberInput({
             name="first"
             value={value}
             type="number"
-            onChange={(e) => {
+            onChange={(e: any) => {
               // dont allow zero or negative numbers
               if (parseInt(e.target.value) < 0) return;
               handleChange(e.target.value);
             }}
-            onBlur={(e) => {
+            onBlur={(e: any) => {
               // enter 0 on blur if no value
               if (value === '') handleChange(0);
               if (value === '0') handleChange(0);
               handleBlur(e);
               setActive(false);
             }}
-            onFocus={(e) => {
+            onFocus={(e: any) => {
               // remove 0 on focus
               if (value === 0) handleChange('');
               handleFocus(e);
@@ -77,15 +77,15 @@ interface styledProps {
 
 const OuterContainer = styled.div<styledProps>`
   .euiFormRow_active {
-    border: 1px solid ${(p) => p.color && p.color.blue2};
+    border: 1px solid ${(p: any) => p.color && p.color.blue2};
     .euiFormRow__labelWrapper {
       margin-bottom: 0px;
       margin-top: -9px;
       padding-left: 10px;
       height: 14px;
       label {
-        color: ${(p) => p.color && p.color.grayish.G300} !important;
-        background: ${(p) => p.color && p.color.pureWhite};
+        color: ${(p: any) => p.color && p.color.grayish.G300} !important;
+        background: ${(p: any) => p.color && p.color.pureWhite};
         z-index: 10;
       }
     }
@@ -97,8 +97,8 @@ const OuterContainer = styled.div<styledProps>`
       padding-left: 10px;
       height: 14px;
       label {
-        color: ${(p) => p.color && p.color.grayish.G300} !important;
-        background: ${(p) => p.color && p.color.pureWhite};
+        color: ${(p: any) => p.color && p.color.grayish.G300} !important;
+        background: ${(p: any) => p.color && p.color.pureWhite};
         z-index: 10;
       }
     }
@@ -108,7 +108,7 @@ const OuterContainer = styled.div<styledProps>`
 const ExtraText = styled.div<styledProps>`
   padding: 0px 10px 5px;
   margin: -5px 0 10px;
-  color: ${(p) => p.color && p.color.red3};
+  color: ${(p: any) => p.color && p.color.red3};
   font-style: italic;
   max-width: calc(100% - 20px);
   word-break: break;
@@ -122,7 +122,7 @@ const E = styled.div<styledProps>`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: ${(p) => p.color && p.color.blue3};
+  color: ${(p: any) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

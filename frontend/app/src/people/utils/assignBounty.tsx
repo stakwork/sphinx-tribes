@@ -89,7 +89,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   }, []);
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div onClick={(e: any) => e.stopPropagation()}>
       <Modal style={props.modalStyle} overlayClick={() => props.dismiss()} visible={visible}>
         <div style={{ textAlign: 'center', paddingTop: 59, width: 310 }}>
           <div
@@ -113,7 +113,7 @@ export default function AssignBounty(props: ConnectCardProps) {
                   <InvoiceInput
                     type="number"
                     value={bountyHours}
-                    onChange={(e) => setBountyHours(Number(e.target.value))}
+                    onChange={(e: any) => setBountyHours(Number(e.target.value))}
                   />
                 </InvoiceForm>
                 <Button
@@ -157,7 +157,7 @@ const N = styled.div<styledProps>`
   line-height: 26px;
   text-align: center;
   margin-bottom: 10px;
-  color: ${(p) => p?.color && p?.color.grayish.G100};
+  color: ${(p: any) => p?.color && p?.color.grayish.G100};
 `;
 const ModalBottomText = styled.div<styledProps>`
   position: absolute;
@@ -168,7 +168,7 @@ const ModalBottomText = styled.div<styledProps>`
   justify-content: center;
   .bottomText {
     margin-left: 12px;
-    color: ${(p) => p?.color && p?.color.pureWhite};
+    color: ${(p: any) => p?.color && p?.color.pureWhite};
   }
 `;
 const InvoiceForm = styled.div`

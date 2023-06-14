@@ -36,7 +36,7 @@ export const PeopleList = observer(() => {
     history.replace(`/p/${pubkey}`);
   }
 
-  const people: any = (main.people && main.people.filter((f) => !f.hide)) || [];
+  const people: any = (main.people && main.people.filter((f: any) => !f.hide)) || [];
 
   const { loadingTop, loadingBottom, handleScroll } = usePageScroll(
     () => loadMorePeople(1),
@@ -60,7 +60,7 @@ export const PeopleList = observer(() => {
             border: '1px solid #DDE1E5',
             background: '#fff'
           }}
-          onChange={(e) => {
+          onChange={(e: any) => {
             ui.setSearchText(e);
           }}
         />
@@ -72,7 +72,7 @@ export const PeopleList = observer(() => {
       >
         <PageLoadSpinner show={loadingTop} />;
         {people?.length ? (
-          people.map((t, i) => (
+          people.map((t: any, i: number) => (
             <Person
               key={`${t.id}_${i}`}
               {...t}

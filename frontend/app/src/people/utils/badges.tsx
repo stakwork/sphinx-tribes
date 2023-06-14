@@ -82,14 +82,14 @@ function Badges(props: BadgesProps) {
   // console.log('balancesTxns', balancesTxns)
   // metadata should be json to support badge details
 
-  const topLevelBadges = balancesTxns?.balances?.map((b, i) => {
-    const badgeDetails = badgeList?.find((f) => f.id === b.asset_id);
+  const topLevelBadges = balancesTxns?.balances?.map((b: any, i: number) => {
+    const badgeDetails = badgeList?.find((f: any) => f.id === b.asset_id);
     // if early adopter badge
     let counter = '';
-    const theseTxType = balancesTxns?.txs?.find((f) => f.asset_id === b.asset_id);
+    const theseTxType = balancesTxns?.txs?.find((f: any) => f.asset_id === b.asset_id);
     const metadata = theseTxType?.metadata;
     const liquidTxId =
-      balancesTxns?.txs?.find((f) => f.asset_id === b.asset_id && f.txid)?.txid || '';
+      balancesTxns?.txs?.find((f: any) => f.asset_id === b.asset_id && f.txid)?.txid || '';
     let flagColor = '#41c292';
 
     if (metadata && !isNaN(parseInt(metadata))) {
@@ -114,7 +114,7 @@ function Badges(props: BadgesProps) {
       txid: liquidTxId,
       counter,
       metadata,
-      deck: balancesTxns?.txs?.filter((f) => f.asset_id === b.asset_id) || []
+      deck: balancesTxns?.txs?.filter((f: any) => f.asset_id === b.asset_id) || []
     };
 
     // console.log('packedBadge', packedBadge)
@@ -275,7 +275,7 @@ function Badges(props: BadgesProps) {
             style={{ marginBottom: 20 }}
           />
 
-          {selectedBadge.deck?.map((badge, i) => (
+          {selectedBadge.deck?.map((badge: any, i: number) => (
             <BWrap
               key={`${i}badges`}
               isMobile={isMobile}
@@ -362,14 +362,14 @@ function Badges(props: BadgesProps) {
               style={{ width: 240 }}
               label={'Liquid Address'}
               value={liquidAddress}
-              onChange={(e) => setLiquidAddress(e)}
+              onChange={(e: any) => setLiquidAddress(e)}
             />
 
             <TextInput
               style={{ width: 240 }}
               label={'Memo (optional)'}
               value={memo}
-              onChange={(e) => setMemo(e)}
+              onChange={(e: any) => setMemo(e)}
             />
 
             <Button
@@ -464,7 +464,7 @@ function Flag(props: BadgesProps) {
 
 const Wrap = styled.div<BProps>`
   display: flex;
-  flex-wrap: ${(p) => (p.isMobile ? '' : 'wrap')};
+  flex-wrap: ${(p: any) => (p.isMobile ? '' : 'wrap')};
   width: 100%;
   overflow-x: hidden;
 `;
@@ -472,32 +472,32 @@ const Wrap = styled.div<BProps>`
 const BWrap = styled.div<BProps>`
   display: flex;
   // cursor:pointer;
-  flex-direction: ${(p) => (p.isMobile ? 'row' : 'column')};
+  flex-direction: ${(p: any) => (p.isMobile ? 'row' : 'column')};
   position: relative;
-  width: ${(p) => (p.isMobile ? '100%' : '192px')};
-  min-width: ${(p) => (p.isMobile ? '100%' : '192px')};
-  height: ${(p) => (p.isMobile ? '' : '272px')};
-  min-height: ${(p) => (p.isMobile ? '' : '272px')};
-  max-width: ${(p) => (p.isMobile ? '100%' : '192px')};
+  width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
+  min-width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
+  height: ${(p: any) => (p.isMobile ? '' : '272px')};
+  min-height: ${(p: any) => (p.isMobile ? '' : '272px')};
+  max-width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
   align-items: center;
-  padding: ${(p) => (p.isMobile ? '10px' : '20px 10px 10px')};
+  padding: ${(p: any) => (p.isMobile ? '10px' : '20px 10px 10px')};
   background: #fff;
   margin-bottom: 10px;
   border-radius: 4px;
   box-shadow: 0px 1px 2px rgb(0 0 0 / 15%);
 
-  width: ${(p) => (p.isMobile ? '100%' : 'auto')};
-  margin-right: ${(p) => (p.isMobile ? '0px' : '20px')};
+  width: ${(p: any) => (p.isMobile ? '100%' : 'auto')};
+  margin-right: ${(p: any) => (p.isMobile ? '0px' : '20px')};
 `;
 const T = styled.div<BProps>`
   font-size: 15px;
   width: 100%;
-  text-align: ${(p) => (p.isMobile ? 'left' : 'center')};
+  text-align: ${(p: any) => (p.isMobile ? 'left' : 'center')};
 
   font-family: Roboto;
   font-style: normal;
   font-weight: 600;
-  font-size: ${(p) => (p.isMobile ? '20px' : '15px')};
+  font-size: ${(p: any) => (p.isMobile ? '20px' : '15px')};
   line-height: 20px;
   /* or 133% */
 
@@ -507,9 +507,9 @@ const T = styled.div<BProps>`
 `;
 const S = styled.div<BProps>`
   font-size: 15px;
-  margin-left: ${(p) => (p.isMobile ? '15px' : '10px')};
+  margin-left: ${(p: any) => (p.isMobile ? '15px' : '10px')};
   width: 100%;
-  text-align: ${(p) => (p.isMobile ? '' : 'center')};
+  text-align: ${(p: any) => (p.isMobile ? '' : 'center')};
 
   font-family: Roboto;
   font-style: normal;
@@ -572,18 +572,18 @@ interface ImageProps {
 }
 const Img = styled.div<ImageProps>`
   position: relative;
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   position: relative;
-  min-width: ${(p) => (p.isMobile ? '108px' : '132px')};
-  width: ${(p) => (p.isMobile ? '108px' : '132px')};
-  min-height: ${(p) => (p.isMobile ? '108px' : '132px')};
-  height: ${(p) => (p.isMobile ? '108px' : '132px')};
-  margin: ${(p) => (p.isMobile ? '24px' : '0px 20px 20px')};
+  min-width: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  width: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  min-height: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  height: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  margin: ${(p: any) => (p.isMobile ? '24px' : '0px 20px 20px')};
 `;
 const SmallImg = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   position: relative;

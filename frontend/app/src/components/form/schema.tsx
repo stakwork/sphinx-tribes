@@ -26,7 +26,7 @@ const badgeObjectStrValidator = Yup.object().shape({
 const nomValidator = Yup.number().required('Required');
 
 const GetValue = (arr: any) =>
-  arr.map((val) => ({
+  arr.map((val: any) => ({
     label: val,
     value: val
   }));
@@ -95,7 +95,7 @@ export const meSchema: FormField[] = [
         Yup.object()
           .shape({
             title: strValidator,
-            priceMin: Yup.number().when('priceMax', (pricemax) =>
+            priceMin: Yup.number().when('priceMax', (pricemax: number) =>
               Yup.number().max(pricemax, `Must be less than max`)
             )
           })

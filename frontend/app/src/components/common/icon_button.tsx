@@ -232,16 +232,16 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   text-transform: none !important;
   transform: none !important;
   text-decoration: none !important;
-  box-shadow: ${(p) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
+  box-shadow: ${(p: any) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
 
   &:hover {
-    background: ${(p) => (p.hovercolor ? p.hovercolor : undefined)} !important;
+		background: ${(p: any) => (p.hovercolor ? p.hovercolor : undefined)} !important;
     transform: none !important;
     text-decoration: none !important;
   }
 
   &:active {
-    background: ${(p) => (p.activecolor ? p.activecolor : 'none')} !important;
+		background: ${(p: any) => (p.activecolor ? p.activecolor : 'none')} !important;
     transform: none !important;
     text-decoration: none !important;
   }

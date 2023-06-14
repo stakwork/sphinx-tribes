@@ -59,7 +59,7 @@ function WantedView(props: WantedViews2Props) {
 
         // saved? ok update in wanted list if found
         const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
@@ -87,7 +87,7 @@ function WantedView(props: WantedViews2Props) {
 
   useEffect(() => {
     if (codingLanguage) {
-      const values = codingLanguage.map((value) => ({ ...value }));
+      const values = codingLanguage.map((value: any) => ({ ...value }));
       setLabels(values);
     }
   }, [codingLanguage]);
@@ -195,6 +195,6 @@ const BountyBox = styled.div<styledProps>`
   min-height: 160px;
   max-height: 160px;
   width: 1100px;
-  box-shadow: 0px 1px 6px ${(p) => p?.color && p?.color.black100};
+  box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
   border: none;
 `;

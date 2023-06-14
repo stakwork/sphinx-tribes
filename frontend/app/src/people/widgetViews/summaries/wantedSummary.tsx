@@ -101,7 +101,7 @@ function WantedSummary(props: WantedSummaryProps) {
     };
   }, [isPaidStatusPopOver]);
 
-  const handleAwards = (optionId) => {
+  const handleAwards = (optionId: any) => {
     setSelectedAward(optionId);
   };
 
@@ -112,7 +112,7 @@ function WantedSummary(props: WantedSummaryProps) {
   const [labels, setLabels] = useState([]);
   const [assigneeValue, setAssigneeValue] = useState(false);
 
-  const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue) => !assigneeValue);
+  const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue: any) => !assigneeValue);
 
   useEffect(() => {
     if (assignee?.owner_alias) {
@@ -132,7 +132,7 @@ function WantedSummary(props: WantedSummaryProps) {
   }, []);
 
   const handleAssigneeDetails = useCallback(
-    (value) => {
+    (value: any) => {
       setIsAssigned(true);
       setAssignedPerson(value);
       assigneeHandlerOpen();
@@ -151,7 +151,7 @@ function WantedSummary(props: WantedSummaryProps) {
           value: value?.owner_pubkey || '',
           label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
         },
-        codingLanguage: codingLanguage?.map((x) => ({ ...x })),
+							codingLanguage: codingLanguage?.map((x: any) => ({ ...x })),
         estimate_session_length: estimate_session_length,
         show: show,
         type: type,
@@ -196,8 +196,8 @@ function WantedSummary(props: WantedSummaryProps) {
   useEffect(() => {
     let res;
     if (codingLanguage?.length > 0) {
-      res = LanguageObject?.filter((value) =>
-        codingLanguage?.find((val) => val.label === value.label)
+      res = LanguageObject?.filter((value: any) =>
+        codingLanguage?.find((val: any) => val.label === value.label)
       );
     }
     setDataValue(res);
@@ -215,7 +215,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   useEffect(() => {
     if (codingLanguage) {
-      const values = codingLanguage.map((value) => ({ ...value }));
+      const values = codingLanguage.map((value: any) => ({ ...value }));
       setLabels(values);
     }
   }, [codingLanguage]);
@@ -233,7 +233,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
         // saved? ok update in wanted list if found
         const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
@@ -275,7 +275,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
         // saved? ok update in wanted list if found
         const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
@@ -385,7 +385,7 @@ function WantedSummary(props: WantedSummaryProps) {
       endingIcon={'paid'}
       text={paid ? 'Mark Unpaid' : 'Mark Paid'}
       loading={saving === 'paid'}
-      onClick={(e) => {
+      onClick={(e: any) => {
         e.stopPropagation();
         setExtrasPropertyAndSave('paid', !paid);
       }}
@@ -401,7 +401,7 @@ function WantedSummary(props: WantedSummaryProps) {
       text={badgeRecipient ? 'Badge Awarded' : 'Award Badge'}
       disabled={badgeRecipient ? true : false}
       loading={saving === 'badgeRecipient'}
-      onClick={(e) => {
+      onClick={(e: any) => {
         e.stopPropagation();
         if (!badgeRecipient) {
           setShowBadgeAwardDialog(true);
@@ -420,7 +420,7 @@ function WantedSummary(props: WantedSummaryProps) {
             buttonsOnBottom
             wrapStyle={{ padding: 0, margin: 0, maxWidth: '100%' }}
             close={() => setShowBadgeAwardDialog(false)}
-            onSubmit={(e) => {
+            onSubmit={(e: any) => {
               sendBadge(e);
             }}
             submitText={'Send Badge'}

@@ -51,12 +51,12 @@ interface BProps {
   width: string;
 }
 const B = styled(EuiButton)<BProps>`
-  background: ${(p) => (p.background ? p.background : '#ffffff00')} !important;
+  background: ${(p: any) => (p.background ? p.background : '#ffffff00')} !important;
   position: relative;
   width: fit-content !important;
-  min-width: ${(p) => (p.width ? p.width : 'fit-content')};
-  max-width: ${(p) => (p.width ? p.width : 'fit-content')};
-  width: ${(p) => (p.width ? p.width : '30px')};
+  min-width: ${(p: any) => (p.width ? p.width : 'fit-content')};
+  max-width: ${(p: any) => (p.width ? p.width : 'fit-content')};
+  width: ${(p: any) => (p.width ? p.width : '30px')};
   font-weight: bold;
   border: none;
   display: flex;

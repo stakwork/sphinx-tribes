@@ -25,7 +25,7 @@ export default function CheckBox({
         id="hi"
         label=""
         checked={value}
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleChange(e.target.checked);
         }}
         onBlur={handleBlur}

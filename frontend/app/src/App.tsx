@@ -29,7 +29,7 @@ function App() {
   return (
     <WithStores>
       <Router history={history}>
-        <ModeDispatcher>{(mode) => <Pages mode={mode} />}</ModeDispatcher>
+        <ModeDispatcher>{(mode: any) => <Pages mode={mode} />}</ModeDispatcher>
       </Router>
     </WithStores>
   );

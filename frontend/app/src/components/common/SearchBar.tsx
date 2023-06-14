@@ -59,7 +59,7 @@ function SearchBar({
           if (!ui.searchText) setExpand(false);
         }}
         value={searchValue}
-        onChange={(e) => {
+        onChange={(e: any) => {
           setSearchValue(e.target.value);
           debounceValue = e.target.value;
           debounce(doDelayedValueUpdate, 300);
@@ -123,8 +123,8 @@ interface InputProps {
 
 const Container = styled.div<InputProps>`
   .SearchText {
-    background: ${(p) => p.color && p.color.grayish.G600} !important;
-    border: ${(p) => (p.border ? p.border : `1px solid ${p.color.pureBlack}`)};
+    background: ${(p: any) => p.color && p.color.grayish.G600} !important;
+    border: ${(p: any) => (p.border ? p.border : `1px solid ${p.color.pureBlack}`)};
     box-sizing: border-box;
     border-radius: 200px;
     padding-left: 20px;
@@ -137,7 +137,7 @@ const Container = styled.div<InputProps>`
     height: 35px;
     transition: all 0.4s;
     &::placeholder {
-      color: ${(p) => (p.TextColor ? p.TextColor : `${p.color.grayish.G65}`)};
+      color: ${(p: any) => (p.TextColor ? p.TextColor : `${p.color.grayish.G65}`)};
       font-family: 'Barlow';
       font-style: normal;
       font-weight: 400;
@@ -145,43 +145,43 @@ const Container = styled.div<InputProps>`
       line-height: 19px;
     }
     &:focus {
-      border: ${(p) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
+      border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
       outline: none;
-      caret-color: ${(p) => p.color && p.color.light_blue100};
+      caret-color: ${(p: any) => p.color && p.color.light_blue100};
       &::placeholder {
-        color: ${(p) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
+        color: ${(p: any) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
       }
     }
     &:focus-within {
-      background: ${(p) => p.color && p.color.grayish.G950} !important;
+      background: ${(p: any) => p.color && p.color.grayish.G950} !important;
     }
   }
 
   .SearchIcon {
-    color: ${(p) => (p.iconColor ? p.iconColor : `${p.color.pureBlack}`)};
+    color: ${(p: any) => (p.iconColor ? p.iconColor : `${p.color.pureBlack}`)};
   }
 
   &:hover {
     .SearchIcon {
-      color: ${(p) => p.iconColorHover ?? p.color.pureBlack};
+      color: ${(p: any) => p.iconColorHover ?? p.color.pureBlack};
     }
     .SearchText {
-      border: ${(p) => (p.borderHover ? p.borderHover : `1px solid ${p.color.pureBlack}`)};
+      border: ${(p: any) => (p.borderHover ? p.borderHover : `1px solid ${p.color.pureBlack}`)};
       &:focus {
-        border: ${(p) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
+        border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
         outline: none;
-        caret-color: ${(p) => p.color && p.color.light_blue100};
+        caret-color: ${(p: any) => p.color && p.color.light_blue100};
       }
       &::placeholder {
-        color: ${(p) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
+        color: ${(p: any) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
       }
     }
   }
   &:active {
     .SearchText {
-      border: ${(p) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
+      border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
       outline: none;
-      caret-color: ${(p) => p.color && p.color.light_blue100};
+      caret-color: ${(p: any) => p.color && p.color.light_blue100};
     }
   }
 `;

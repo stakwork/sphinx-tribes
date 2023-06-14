@@ -91,11 +91,11 @@ const OuterContainer = styled.div<styledProps>`
   justify-content: center;
   align-items: center;
   height: 100%;
-  background: ${(p) => p?.color && p.color.background100};
+  background: ${(p: any) => p?.color && p.color.background100};
 `;
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
+  background-image: ${(p: any) => `url(${p.src})`};
   width: 160px;
   height: 160px;
   margin-right: 10px;
@@ -119,14 +119,14 @@ const H = styled.div<HProps>`
   display: flex;
   align-items: center;
   text-align: center;
-  color: ${(p) => p?.color && p.color.grayish.G05};
+  color: ${(p: any) => p?.color && p.color.grayish.G05};
   padding: 0 10px;
   max-width: 350px;
   letter-spacing: 0px;
-  color: ${(p) => p?.color && p.color.grayish.G07};
+  color: ${(p: any) => p?.color && p.color.grayish.G07};
   font-weight: 700;
-  font-size: ${(p) => (p.small ? '22px' : '30px')};
-  line-height: ${(p) => (p.small ? '26px' : '40px')};
+  font-size: ${(p: any) => (p.small ? '22px' : '30px')};
+  line-height: ${(p: any) => (p.small ? '26px' : '40px')};
 `;
 
 const C = styled.div<styledProps>`
@@ -138,14 +138,14 @@ const C = styled.div<styledProps>`
   line-height: 26px;
   letter-spacing: 0em;
   text-align: center;
-  color: ${(p) => p?.color && p.color.grayish.G100};
+  color: ${(p: any) => p?.color && p.color.grayish.G100};
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
   font-size: 15px;
   line-height: 18px;
   text-align: center;
-  color: ${(p) => p?.color && p.color.grayish.G50};
+  color: ${(p: any) => p?.color && p.color.grayish.G50};
   padding: 0 10px;
   max-width: 350px;
   padding: 0 65px;

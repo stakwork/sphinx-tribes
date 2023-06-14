@@ -2,7 +2,7 @@ import { FadeLeftProps } from 'components/interfaces';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: any) => new Promise((resolve: any) => setTimeout(resolve, ms));
 
 export default function FadeLeft(props: FadeLeftProps) {
   const {
@@ -33,7 +33,7 @@ export default function FadeLeft(props: FadeLeftProps) {
   }, [drift]);
 
   const doAnimation = useCallback(
-    (value) => {
+    (value: any) => {
       if (value === 1) {
         open();
       } else {
@@ -81,7 +81,7 @@ export default function FadeLeft(props: FadeLeftProps) {
       <Overlay style={{ ...style, background: '#000000cc', opacity: !noFade ? opacity : 1 }}>
         <Fader
           id="sphinx-top-level-overlay"
-          onClick={(e) => {
+          onClick={(e: any) => {
             let elString: any = e.target;
             elString = elString.outerHTML;
             // close if clicking the overlay

@@ -4,7 +4,7 @@ import { Extras } from '../components/form/inputs/widgets/interfaces';
 import tags from '../tribes/tags';
 
 const tagLabels = Object.keys(tags);
-const initialTags = tagLabels.map((label) => ({ label } as EuiSelectableOption));
+const initialTags = tagLabels.map((label: any) => ({ label } as EuiSelectableOption));
 
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;
 

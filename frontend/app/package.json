@@ -13,7 +13,7 @@
     "build": "craco build",
     "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 970 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx",
+    "lint": "eslint src --max-warnings 138 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
     "prepare": "cd ../.. && husky install frontend/app/.husky"
@@ -74,7 +74,7 @@
         "as-needed"
       ],
       "@typescript-eslint/typedef": [
-        "warn",
+        "error",
         {
           "parameter": true,
 					"objectDestructuring": false,

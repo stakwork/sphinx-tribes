@@ -12,7 +12,7 @@ export default function SupportMeView(props: SupportMe) {
       <M>{description || 'No description'} </M>
       <U>{url || 'No link'}</U>
 
-      {showImages && <Gallery>{gallery && gallery.map((g, i) => <Img key={i} src={g} />)}</Gallery>}
+      {showImages && <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>}
     </Wrap>
   );
 }
@@ -47,7 +47,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 80px;

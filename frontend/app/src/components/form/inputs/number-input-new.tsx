@@ -39,7 +39,7 @@ export default function NumberInputNew({
             setIsError(true);
           }
         }}
-        onChange={(e) => {
+        onChange={(e: any) => {
           if (!isNaN(Number(e.target.value))) {
             handleChange(e.target.value);
             setTextValue(e.target.value);
@@ -81,8 +81,8 @@ const InputOuterBox = styled.div<styledProps>`
     height: 40px;
     width: 292px;
     font-size: 14px;
-    color: ${(p) => p.color && p.color.pureBlack};
-    border: 1px solid ${(p) => p.borderColor && p.borderColor};
+    color: ${(p: any) => p.color && p.color.pureBlack};
+    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
     border-radius: 4px;
     outline: none;
     padding-left: 16px;
@@ -92,10 +92,10 @@ const InputOuterBox = styled.div<styledProps>`
     letter-spacing: 0.01em;
 
     :active {
-      border: 1px solid ${(p) => p.color && p.color.blue2} !important;
+      border: 1px solid ${(p: any) => p.color && p.color.blue2} !important;
     }
     :focus-visible {
-      border: 1px solid ${(p) => p.color && p.color.blue2} !important;
+      border: 1px solid ${(p: any) => p.color && p.color.blue2} !important;
     }
   }
   .USD {
@@ -106,8 +106,8 @@ const InputOuterBox = styled.div<styledProps>`
     line-height: 35px;
     display: flex;
     align-items: center;
-    color: ${(p) => p.color && p.color.grayish.G300};
-    border: 3px solid ${(p) => p.color && p.color.pureWhite};
+    color: ${(p: any) => p.color && p.color.grayish.G300};
+    border: 3px solid ${(p: any) => p.color && p.color.pureWhite};
     margin-left: 16px;
   }
 `;

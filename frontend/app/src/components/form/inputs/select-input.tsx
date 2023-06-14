@@ -42,7 +42,7 @@ export default function SelectInput({
             options={options}
             value={value}
             handleActive={setActive}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleChange(e);
               setActive(false);
             }}
@@ -82,7 +82,7 @@ const E = styled.div<styledProps>`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: ${(p) => p?.color && p?.color.blue3};
+  color: ${(p: any) => p?.color && p?.color.blue3};
   pointer-events: none;
   user-select: none;
 `;
@@ -92,7 +92,7 @@ const R = styled.div`
 `;
 
 const OuterContainer = styled.div<styledProps>`
-  box-shadow: 0px 1px 2px ${(p) => p.color && p.color.black100} !important ;
+  box-shadow: 0px 1px 2px ${(p: any) => p.color && p.color.black100} !important ;
 
   .euiFormRow_filed {
     position: relative;
@@ -103,8 +103,8 @@ const OuterContainer = styled.div<styledProps>`
       height: 14px;
       transition: all 0.4s;      
       label {
-        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
-        background: ${(p) => p?.color && p?.color.pureWhite};
+        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p: any) => p?.color && p?.color.pureWhite};
         z-index: 10;
         font-family: 'Barlow';
         font-size: 12px;
@@ -117,10 +117,10 @@ const OuterContainer = styled.div<styledProps>`
   }
   .euiFormRow_active {
     padding: 1px 0;
-    border: 1px solid ${(p) => p?.color && p?.color.blue2};
+    border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
     }
   }
   .euiFormControlLayoutCustomIcon{
-    color: ${(p) => p.color && p.color.text2_4} 
+    color: ${(p: any) => p.color && p.color.text2_4} 
   }
 `;

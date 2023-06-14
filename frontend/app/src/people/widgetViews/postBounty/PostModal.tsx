@@ -18,13 +18,13 @@ export interface PostModalProps {
   onGoBack?: () => void;
 }
 export const PostModal: FC<PostModalProps> = observer(
-  ({ isOpen, onClose, widget, onGoBack, onSucces }) => {
+  ({ isOpen, onClose, widget, onGoBack, onSucces }: any) => {
     const { main, ui } = useStores();
     const isMobile = useIsMobile();
     const [focusIndex, setFocusIndex] = useState(-1);
     const history = useHistory();
 
-    const person: any = (main.people ?? []).find((f) => f.id === ui.selectedPerson);
+    const person: any = (main.people ?? []).find((f: any) => f.id === ui.selectedPerson);
     const { id } = person || {};
     const canEdit = id === ui.meInfo?.id;
     const config = widgetConfigs[widget];

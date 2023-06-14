@@ -10,7 +10,7 @@ export default function Sel(props: SelProps) {
   const color = colors['light'];
 
   const opts =
-    colourOptions.map((o) => ({
+    colourOptions.map((o: any) => ({
       value: o.value,
       label: o.label,
       color: o.color,
@@ -26,7 +26,7 @@ export default function Sel(props: SelProps) {
         isMulti
         options={opts}
         value={value}
-        onChange={(value) => onChange(value)}
+        onChange={(value: any) => onChange(value)}
         onBlur={() => {
           if (setIsTop) setIsTop(false);
         }}
@@ -35,8 +35,8 @@ export default function Sel(props: SelProps) {
         }}
         className={'multi-select-input'}
         styles={{
-          control: (styles) => ({ ...styles, backgroundColor: 'white' }),
-          option: (styles) => ({
+								control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
+          option: (styles: any) => ({
             ...styles,
             backgroundColor: '#fff',
             color: color.text2,
@@ -47,7 +47,7 @@ export default function Sel(props: SelProps) {
               background: color.light_blue200
             }
           }),
-          multiValue: (styles, { data }: any) => ({
+												multiValue: (styles: any, { data }: any) => ({
             ...styles,
             backgroundColor: data.background,
             border: data.border,
@@ -56,13 +56,13 @@ export default function Sel(props: SelProps) {
             fontSize: '14px',
             fontWeight: '500'
           }),
-          multiValueLabel: (styles, { data }: any) => ({
+												multiValueLabel: (styles: any, { data }: any) => ({
             ...styles,
             background: data.background,
             color: data.color,
             border: data.border
           }),
-          multiValueRemove: (styles, { data }: any) => ({
+												multiValueRemove: (styles: any, { data }: any) => ({
             ...styles,
             color: data.color,
             backgroundColor: data.background,
@@ -83,8 +83,8 @@ interface styledProps {
 
 const S = styled(CreatableSelect)<styledProps>`
 background:#ffffff00;
-border: 1px solid ${(p) => p.color && p.color.grayish.G750};
-color: ${(p) => p.color && p.color.pureBlack};
+border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
+color: ${(p: any) => p.color && p.color.pureBlack};
 box-sizing: border-box;
 box-shadow:none;
 border: none !important;
@@ -129,8 +129,8 @@ div {
 }
 
 button {
-    background: ${(p) => p.color && p.color.pureWhite} !important;
-    background-color: ${(p) => p.color && p.color.pureWhite} !important;
+    background: ${(p: any) => p.color && p.color.pureWhite} !important;
+    background-color: ${(p: any) => p.color && p.color.pureWhite} !important;
 }
 }
 `;

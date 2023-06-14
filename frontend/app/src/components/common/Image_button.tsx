@@ -65,7 +65,7 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: ${(p) => p?.topMargin};
+  margin-top: ${(p: any) => p?.topMargin};
   background: #ffffff;
   border: 1px solid #dde1e5;
   border-radius: 30px;

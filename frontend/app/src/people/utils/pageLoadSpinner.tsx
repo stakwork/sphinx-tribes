@@ -32,10 +32,10 @@ export const LoadmoreWrap = styled.div<LoadmoreWrapProps>`
   transition: all 0.2s;
   display: flex;
   justify-content: center;
-  height: ${(p) => (p.show ? '50px' : '0px')};
-  opacity: ${(p) => (p.show ? '1' : '0')};
+  height: ${(p: any) => (p.show ? '50px' : '0px')};
+  opacity: ${(p: any) => (p.show ? '1' : '0')};
   overflow: hidden;
-  visibility: ${(p) => (p.show ? 'visible' : 'hidden')};
+  visibility: ${(p: any) => (p.show ? 'visible' : 'hidden')};
 `;
 export const BottomLoadmoreWrap = styled.div<LoadmoreWrapProps>`
   position: relative;
@@ -43,5 +43,5 @@ export const BottomLoadmoreWrap = styled.div<LoadmoreWrapProps>`
   width: 100%;
   min-width: 100%;
   height: 50px;
-  visibility: ${(p) => (p.show ? 'visible' : 'hidden')};
+  visibility: ${(p: any) => (p.show ? 'visible' : 'hidden')};
 `;

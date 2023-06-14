@@ -53,12 +53,12 @@ export default function TextAreaInput({
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
-            onChange={(e) => handleChange(e.target.value)}
-            onBlur={(e) => {
+            onChange={(e: any) => handleChange(e.target.value)}
+            onBlur={(e: any) => {
               handleBlur(e);
               setActive(false);
             }}
-            onFocus={(e) => {
+            onFocus={(e: any) => {
               handleFocus(e);
               setActive(true);
             }}
@@ -87,15 +87,15 @@ interface styledProps {
 
 const OuterContainer = styled.div<styledProps>`
   .euiFormRow_active {
-    border: 1px solid ${(p) => p?.color && p?.color.blue2};
+    border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
     .euiFormRow__labelWrapper {
       margin-bottom: 0px;
       margin-top: -9px;
       padding-left: 10px;
       height: 14px;
       label {
-        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
-        background: ${(p) => p?.color && p?.color.pureWhite};
+        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p: any) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
@@ -107,8 +107,8 @@ const OuterContainer = styled.div<styledProps>`
       padding-left: 10px;
       height: 14px;
       label {
-        color: ${(p) => p?.color && p?.color.grayish.G300} !important;
-        background: ${(p) => p?.color && p?.color.pureWhite};
+        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p: any) => p?.color && p?.color.pureWhite};
         z-index: 10;
       }
     }
@@ -116,7 +116,7 @@ const OuterContainer = styled.div<styledProps>`
 `;
 
 const ExtraText = styled.div<styledProps>`
-  color: ${(p) => p?.color && p?.color.grayish.G760};
+  color: ${(p: any) => p?.color && p?.color.grayish.G760};
   padding: 10px 10px 25px 10px;
   max-width: calc(100% - 20px);
   word-break: break-all;
@@ -130,7 +130,7 @@ const E = styled.div<styledProps>`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${(p) => p?.color && p?.color.blue3};
+  color: ${(p: any) => p?.color && p?.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

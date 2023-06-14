@@ -34,7 +34,7 @@ export default function GalleryViewer(props: any) {
       >
         {showAll ? (
           <div style={{ textAlign: 'center' }}>
-            {g.map((ga, i) => (
+            {g.map((ga: any, i: number) => (
               <BigImg big={big} src={ga} cover={cover} key={i} />
             ))}
           </div>
@@ -131,21 +131,21 @@ interface ImageProps {
   cover?: boolean;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-repeat: no-repeat;
-  background-size: ${(p) => (p.cover ? 'cover' : 'contain')};
-  height: ${(p) => (p.big ? '372px' : '132px')};
-  width: ${(p) => (p.big ? '100%' : '132px')};
+  background-size: ${(p: any) => (p.cover ? 'cover' : 'contain')};
+  height: ${(p: any) => (p.big ? '372px' : '132px')};
+  width: ${(p: any) => (p.big ? '100%' : '132px')};
   position: relative;
 `;
 
 const BigImg = styled.img<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   // background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: ${(p) => (p.cover ? 'cover' : 'contain')};
+  background-size: ${(p: any) => (p.cover ? 'cover' : 'contain')};
   max-width: 100%;
   height: auto;
   margin-bottom: 5px;

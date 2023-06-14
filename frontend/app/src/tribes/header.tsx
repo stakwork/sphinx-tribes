@@ -12,7 +12,7 @@ function Header() {
   useEffect(() => {
     if (window.location.host === 'podcasts.sphinx.chat') {
       ui.setTags(
-        ui.tags.map((t) => {
+        ui.tags.map((t: any) => {
           if (t.label === 'Podcast') return { ...t, checked: 'on' };
           return t;
         })

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { useEffect } from 'react';
 
 async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
 
 export default function Widgets(props: any) {
@@ -33,14 +33,14 @@ export default function Widgets(props: any) {
       >
         <Center>
           <InnerWrap>
-            {props.extras.map((e, i) => (
+            {props.extras.map((e: any, i: number) => (
               <Widget
                 parentName={props.name}
                 setFieldValue={props.setFieldValue}
                 values={props.values}
                 key={i}
                 {...e}
-                setSelected={(e) => {
+                setSelected={(e: any) => {
                   props.setDisableFormButtons(true);
                   setSelected(e);
                 }}

@@ -9,7 +9,7 @@ export default function Sel(props: SelProps) {
   const color = colors['light'];
 
   const opts = options
-    ? options.map((o) => ({
+    ? options.map((o: any) => ({
         value: o.value,
         label: o.label
       }))
@@ -23,7 +23,7 @@ export default function Sel(props: SelProps) {
         isMulti
         options={opts}
         value={value}
-        onChange={(value) => onChange(value)}
+        onChange={(value: any) => onChange(value)}
         className={'multi-select-input'}
       />
     </div>
@@ -36,8 +36,8 @@ interface styledProps {
 
 const S = styled(Select)<styledProps>`
 background:#ffffff00;
-border: 1px solid ${(p) => p.color && p.color.grayish.G750};
-color: ${(p) => p.color && p.color.pureBlack};
+border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
+color: ${(p: any) => p.color && p.color.pureBlack};
 box-sizing: border-box;
 box-shadow:none;
 border: none !important;
@@ -82,8 +82,8 @@ div {
 }
 
 button {
-    background: ${(p) => p.color && p.color.pureWhite} !important;
-    background-color: ${(p) => p.color && p.color.pureWhite} !important;
+    background: ${(p: any) => p.color && p.color.pureWhite} !important;
+    background-color: ${(p: any) => p.color && p.color.pureWhite} !important;
 }
 }
 `;

@@ -82,7 +82,7 @@ function FocusedView(props: FocusViewProps) {
       if (!fullMeData.extras) fullMeData.extras = {};
       // if about
       if (config.name === 'about') {
-        config?.schema?.forEach((s) => {
+        config?.schema?.forEach((s: any) => {
           if (s.widget && fullMeData.extras) {
             // this allows the link widgets to be edited as a part of about me,
             // when really they are stored as extras
@@ -92,9 +92,9 @@ function FocusedView(props: FocusViewProps) {
               const submitTribes: any = [];
 
               v[s.name] &&
-                v[s.name].forEach((t) => {
+                v[s.name].forEach((t: any) => {
                   const fullTribeInfo =
-                    ownerTribes && ownerTribes?.find((f) => f.unique_name === t.value);
+                    ownerTribes && ownerTribes?.find((f: any) => f.unique_name === t.value);
 
                   // disclude sensitive details
                   if (fullTribeInfo)
@@ -268,7 +268,7 @@ function FocusedView(props: FocusViewProps) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        personInfo.extras?.wanted?.map((value) => moment(value?.estimated_completion_date)) || '';
+        personInfo.extras?.wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -296,21 +296,21 @@ function FocusedView(props: FocusViewProps) {
 
         if (sel) {
           // if dynamic, find right schema
-          const dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
+          const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
           if (dynamicSchema) {
             if (sel.type) {
               const thisDynamicSchema = dynamicSchemasByType[sel.type];
-              thisDynamicSchema?.forEach((s) => {
+              thisDynamicSchema?.forEach((s: any) => {
                 initialValues[s.name] = sel[s.name];
               });
             } else {
               // use default schema
-              dynamicSchema?.defaultSchema?.forEach((s) => {
+              dynamicSchema?.defaultSchema?.forEach((s: any) => {
                 initialValues[s.name] = sel[s.name];
               });
             }
           } else {
-            config?.schema?.forEach((s) => {
+            config?.schema?.forEach((s: any) => {
               initialValues[s.name] = sel[s.name];
             });
           }
@@ -467,7 +467,7 @@ const BWrap = styled.div`
   z-index: 100;
 `;
 
-const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }) => css`
+const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }: any) => css`
                 scrollbar-color: ${thumbColor} ${trackBackgroundColor}; // Firefox support
                 scrollbar-width: thin;
 
@@ -494,8 +494,8 @@ interface BProps {
   hide: boolean;
 }
 const B = styled.div<BProps>`
-  display: ${(p) => (p.hide ? 'none' : 'flex')};
-  justify-content: ${(p) => (p.hide ? 'none' : 'center')};
+  display: ${(p: any) => (p.hide ? 'none' : 'flex')};
+  justify-content: ${(p: any) => (p.hide ? 'none' : 'center')};
   height: 100%;
   width: 100%;
   overflow-y: auto;
