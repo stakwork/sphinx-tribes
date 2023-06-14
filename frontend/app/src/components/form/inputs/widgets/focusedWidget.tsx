@@ -92,7 +92,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     if (single) setFieldTouched(item.name, true);
 
     const obj = {};
-    item.fields.forEach((o) => {
+    item.fields.forEach((o: any) => {
       let val: any = '';
       if (o.type === 'number') val = 0;
       obj[o.name] = val;
@@ -111,7 +111,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
 
     let index = i;
     if (obj.id) {
-      index = formState && formState.findIndex((f) => f.id === obj.id);
+      index = formState && formState.findIndex((f: any) => f.id === obj.id);
     }
     setSelectedIndex(index);
   }
@@ -120,7 +120,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     const formState = (values[name] && [...values[name][item.name]]) || [];
     let index = i;
     if (obj.id) {
-      index = formState && formState.findIndex((f) => f.id === obj.id);
+      index = formState && formState.findIndex((f: any) => f.id === obj.id);
     }
 
     formState.splice(index, 1);
@@ -190,7 +190,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
       {/* single widgets will only show these fields */}
       {!showingList && (
         <>
-          {item.fields.map((e, i) => (
+          {item.fields.map((e: any, i: number) => (
             <Input
               {...e}
               key={e.name}
@@ -264,7 +264,7 @@ export interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 30px;
   height: 30px;
   background-position: center; /* Center the image */

@@ -32,7 +32,7 @@ export const LeaderboardPage = observer(() => {
           />
         )}
         <Top3 />
-        {leaderboard?.others.map((item, index) => (
+        {leaderboard?.others.map((item: any, index: number) => (
           <LeaerboardItem position={index + 4} key={item.owner_pubkey} {...item} />
         ))}
       </div>

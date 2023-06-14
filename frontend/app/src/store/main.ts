@@ -25,10 +25,10 @@ export class MainStore {
     let ta = [...uiStore.tags];
 
     //make tags string for querys
-    ta = ta.filter((f) => f.checked);
+    ta = ta.filter((f: any) => f.checked);
     let tags = '';
     if (ta && ta.length) {
-      ta.forEach((o, i) => {
+      ta.forEach((o: any, i: any) => {
         tags += o.label;
         if (ta.length - 1 !== i) {
           tags += ',';
@@ -47,7 +47,7 @@ export class MainStore {
     this.tribes = this.doPageListMerger(
       this.tribes,
       ts,
-      (n) => uiStore.setTribesPageNumber(n),
+      (n: any) => uiStore.setTribesPageNumber(n),
       queryParams
     );
 
@@ -76,7 +76,7 @@ export class MainStore {
 
     // hide test bots and set images
     b &&
-      b.forEach((bb, i) => {
+      b.forEach((bb: any, i: any) => {
         if (bb.unique_name === 'btc') {
           // bb.img = "/static/bots_bitcoin.png";
           b.splice(i, 1);
@@ -124,8 +124,8 @@ export class MainStore {
       const tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
-      const mergedBots = relayMyBots.map((b) => {
-        const thisBot = tribeServerBots.find((f) => f.uuid === b.uuid);
+      const mergedBots = relayMyBots.map((b: any) => {
+        const thisBot = tribeServerBots.find((f: any) => f.uuid === b.uuid);
         return {
           ...b,
           ...thisBot
@@ -170,7 +170,7 @@ export class MainStore {
     // put got on top
     // if already exists, delete
     const tribesClone = [...this.tribes];
-    const dupIndex = tribesClone.findIndex((f) => f.uuid === t.uuid);
+    const dupIndex = tribesClone.findIndex((f: any) => f.uuid === t.uuid);
     if (dupIndex > -1) {
       tribesClone.splice(dupIndex, 1);
     }
@@ -390,7 +390,7 @@ export class MainStore {
       queryParams.limit = limit;
       query += '?';
       const { length } = Object.keys(queryParams);
-      Object.keys(queryParams).forEach((k, i) => {
+      Object.keys(queryParams).forEach((k: string, i: number) => {
         query += `${k}=${queryParams[k]}`;
 
         // add & if not last param
@@ -425,7 +425,7 @@ export class MainStore {
     const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
-      const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
+      const index = ps.findIndex((f: any) => f.id === uiStore.meInfo?.id);
       if (index > -1) {
         // add 'hide' property to me in people list
         ps[index].hide = true;
@@ -441,7 +441,7 @@ export class MainStore {
       this.people = this.doPageListMerger(
         this.people,
         ps,
-        (n) => uiStore.setPeoplePageNumber(n),
+        (n: any) => uiStore.setPeoplePageNumber(n),
         params
       );
     }
@@ -465,7 +465,7 @@ export class MainStore {
 
   decodeListJSON(li: any): Promise<any[]> {
     if (li?.length) {
-      li.forEach((o, i) => {
+      li.forEach((o: any, i: any) => {
         li[i].body = JSON.parse(o.body);
         li[i].person = JSON.parse(o.person);
       });
@@ -496,7 +496,7 @@ export class MainStore {
         this.peoplePosts = this.doPageListMerger(
           this.peoplePosts,
           ps,
-          (n) => uiStore.setPeoplePostsPageNumber(n),
+          (n: any) => uiStore.setPeoplePostsPageNumber(n),
           queryParams
         );
       }
@@ -545,7 +545,7 @@ export class MainStore {
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps,
-          (n) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams
         );
       }
@@ -607,7 +607,7 @@ export class MainStore {
         this.peopleOffers = this.doPageListMerger(
           this.peopleOffers,
           ps,
-          (n) => uiStore.setPeopleOffersPageNumber(n),
+          (n: any) => uiStore.setPeopleOffersPageNumber(n),
           queryParams
         );
       }
@@ -664,7 +664,7 @@ export class MainStore {
           const response = await api.get(`admin_pubkeys`);
           const admin_keys = response?.pubkeys;
           if (admin_keys !== null) {
-            return !!admin_keys.find((value) => value === self.owner_pubkey);
+            return !!admin_keys.find((value: any) => value === self.owner_pubkey);
           } else {
             return false;
           }
@@ -868,7 +868,7 @@ export class MainStore {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
       const clonedEx: any = clonedExtras && clonedExtras[extrasName];
-      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+      const targetIndex = clonedEx?.findIndex((f: any) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {
@@ -895,7 +895,7 @@ export class MainStore {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
       const clonedEx: any = clonedExtras && clonedExtras[extrasName];
-      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+      const targetIndex = clonedEx?.findIndex((f: any) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {

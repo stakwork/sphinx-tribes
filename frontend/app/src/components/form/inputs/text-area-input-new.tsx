@@ -37,7 +37,7 @@ export default function TextAreaInputNew({
             setIsError(true);
           }
         }}
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleChange(e.target.value);
           setTextValue(e.target.value);
         }}
@@ -78,8 +78,8 @@ const InputOuterBox = styled.div<styledProps>`
   .inputText {
     width: 292px;
     font-size: 14px;
-    color: ${(p) => p.color && p.color.pureBlack};
-    border: 1px solid ${(p) => p.borderColor && p.borderColor};
+    color: ${(p: any) => p.color && p.color.pureBlack};
+    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
     border-radius: 4px;
     outline: none;
     padding-left: 16px;
@@ -89,10 +89,10 @@ const InputOuterBox = styled.div<styledProps>`
     font-weight: 500;
     letter-spacing: 0.01em;
     :active {
-      border: 1px solid ${(p) => p.color.blue2 && p.color.blue2} !important;
+      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
     }
     :focus-visible {
-      border: 1px solid ${(p) => p.color.blue2 && p.color.blue2} !important;
+      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
     }
   }
 `;

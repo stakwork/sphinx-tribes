@@ -19,13 +19,13 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
   const color = colors['light'];
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: any) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [labels, setLabels] = useState<any>([]);
   const [data, setData] = useState<any>([]);
 
-  const onChange = (optionId) => {
+  const onChange = (optionId: any) => {
     let trueCount = 0;
     for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
       if (value) {
@@ -45,7 +45,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
   };
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x) => checkboxIdToSelectedMap[x.label]));
+    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
   }, [checkboxIdToSelectedMap]);
 
   return (
@@ -107,7 +107,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
           <EuiCheckboxGroup
             options={codingLanguages}
             idToSelectedMap={checkboxIdToSelectedMap}
-            onChange={(id) => {
+            onChange={(id: any) => {
               onChange(id);
               setData([...data, { value: id, label: id }]);
               handleChange(data);
@@ -122,7 +122,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
       >
         {!isPopoverOpen &&
           labels &&
-          labels?.map((x, index) => (
+          labels?.map((x: any, index: number) => (
             <Label
               key={x.label}
               value={x}
@@ -171,15 +171,15 @@ const EuiPopOverCheckbox = styled.div<styledProps>`
     .euiCheckboxGroup__item {
       .euiCheckbox__square {
         top: 5px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G500};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
         border-radius: 2px;
       }
       .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p) => p?.color && p?.color?.pureWhite} no-repeat center;
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
       }
       .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p) => p?.color && p?.color?.blue1};
-        background: ${(p) => p?.color && p?.color?.blue1} no-repeat center;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
         background-image: url('static/checkboxImage.svg');
       }
       .euiCheckbox__label {
@@ -188,10 +188,10 @@ const EuiPopOverCheckbox = styled.div<styledProps>`
         font-weight: 500;
         font-size: 13px;
         line-height: 16px;
-        color: ${(p) => p?.color && p?.color?.grayish.G50};
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
       }
       input.euiCheckbox__input:checked ~ label {
-        color: ${(p) => p?.color && p?.color?.blue1};
+        color: ${(p: any) => p?.color && p?.color?.blue1};
       }
     }
   }
@@ -212,8 +212,8 @@ const Label = styled.div<labelProps>`
   align-items: center;
   justify-content: space-between;
   text-align: center;
-  border: ${(p) => p?.value && p?.value.border};
-  background: ${(p) => p?.value && p?.value.background};
+  border: ${(p: any) => p?.value && p?.value.border};
+  background: ${(p: any) => p?.value && p?.value.background};
   margin-right: 4px;
   border-radius: 4px;
   padding: 2px 6px;
@@ -224,6 +224,6 @@ const Label = styled.div<labelProps>`
     font-weight: 500;
     font-size: 13px;
     line-height: 16px;
-    color: ${(p) => p?.value && p?.value.color};
+    color: ${(p: any) => p?.value && p?.value.color};
   }
 `;

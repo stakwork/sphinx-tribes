@@ -58,7 +58,7 @@ function BotBody() {
     // is mybot
     if (isMyBots) {
       const botSource = isMyBots ? main.myBots : main.bots;
-      const thisBot = botSource.find((f) => f[botSelectionAttribute] === attr);
+      const thisBot = botSource.find((f: any) => f[botSelectionAttribute] === attr);
       setEditThisBot(thisBot);
       setShowCreate(true);
     } else {
@@ -69,7 +69,7 @@ function BotBody() {
   }
 
   async function createOrSaveBot(v: any) {
-    v.tags = v.tags && v.tags.map((t) => t.value);
+    v.tags = v.tags && v.tags.map((t: any) => t.value);
     v.price_per_use = parseInt(v.price_per_use);
 
     const isEdit = v.id ? true : false;
@@ -89,7 +89,7 @@ function BotBody() {
           setEditThisBot(b);
         }
         setShowCreate(false);
-      } catch (e) {
+      } catch (e: any) {
         console.log('e', e);
         alert('Bot could not be saved.');
       }
@@ -103,7 +103,7 @@ function BotBody() {
       if (r) {
         addToast(editThisBot.name);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log('e', e);
     }
 
@@ -157,7 +157,7 @@ function BotBody() {
 
   if (!isMyBots) {
     // hide bots if not looking at your own
-    bots = (bots && bots.filter((f) => !f.hide)) || [];
+    bots = (bots && bots.filter((f: any) => !f.hide)) || [];
   }
 
   if (loading) {
@@ -168,7 +168,7 @@ function BotBody() {
     );
   }
 
-  const widgetLabel = selectedWidget && tabs.find((f) => f.name === selectedWidget);
+  const widgetLabel = selectedWidget && tabs.find((f: any) => f.name === selectedWidget);
 
   function renderDesktop() {
     return (
@@ -208,7 +208,7 @@ function BotBody() {
 
             <Tabs>
               {tabs &&
-                tabs.map((t, i) => {
+                tabs.map((t: any, i: number) => {
                   const { label } = t;
                   const selected = selectedWidget === t.name;
 
@@ -249,7 +249,7 @@ function BotBody() {
                 background: c.grayish.G400,
                 marginLeft: 20
               }}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 ui.setSearchText(e);
               }}
             />
@@ -268,7 +268,7 @@ function BotBody() {
               padding: 20
             }}
           >
-            {bots.map((t) => (
+            {bots.map((t: any) => (
               <Bot
                 {...t}
                 key={t.uuid}
@@ -302,7 +302,7 @@ function BotBody() {
             goBack={() => ui.setSelectingBot('')}
             botUniqueName={ui.selectedBot}
             loading={loading}
-            selectBot={(b) => selectBot(b[botSelectionAttribute])}
+            selectBot={(b: any) => selectBot(b[botSelectionAttribute])}
             botView={true}
           />
         </FadeLeft>
@@ -355,7 +355,7 @@ function BotBody() {
                   }}
                 >
                   {tabs &&
-                    tabs.map((t, i) => {
+                    tabs.map((t: any, i: number) => {
                       const { label } = t;
                       const selected = selectedWidget === t.name;
 
@@ -364,7 +364,7 @@ function BotBody() {
                           key={i}
                           style={{ borderRadius: 0, margin: 0 }}
                           selected={selected}
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation();
                             setShowDropdown(false);
                             setSelectedWidget(t.name);
@@ -386,7 +386,7 @@ function BotBody() {
             placeholder="Search"
             value={ui.searchText}
             style={{ width: 164, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
-            onChange={(e) => {
+            onChange={(e: any) => {
               console.log('handleChange', e);
               ui.setSearchText(e);
             }}
@@ -401,7 +401,7 @@ function BotBody() {
           onClick={() => setShowBotCreator(true)}
         />
         <div style={{ width: '100%' }}>
-          {bots.map((t) => (
+          {bots.map((t: any) => (
             <Bot
               {...t}
               key={t.id}
@@ -423,7 +423,7 @@ function BotBody() {
             goBack={() => ui.setSelectingBot('')}
             botUniqueName={ui.selectedBot}
             loading={loading}
-            selectBot={(b) => selectBot(b[botSelectionAttribute])}
+            selectBot={(b: any) => selectBot(b[botSelectionAttribute])}
             botView={true}
           />
         </FadeLeft>
@@ -441,7 +441,7 @@ function BotBody() {
 
     initialValues.tags =
       initialValues.tags &&
-      initialValues.tags.map((o) => ({
+      initialValues.tags.map((o: any) => ({
         value: o.value || o,
         label: o.value || o
       }));
@@ -606,15 +606,15 @@ const Tab = styled.div<TagProps>`
   padding: 10px 25px;
   margin-right: 35px;
   height: 42px;
-  color: ${(p) => (p.selected ? '#5D8FDD' : '#5F6368')};
+  color: ${(p: any) => (p.selected ? '#5D8FDD' : '#5F6368')};
   border: 2px solid #5f636800;
-  border-color: ${(p) => (p.selected ? '#CDE0FF' : '#5F636800')};
-  // border-bottom: ${(p) => p.selected && '4px solid #618AFF'};
+  border-color: ${(p: any) => (p.selected ? '#CDE0FF' : '#5F636800')};
+  // border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
   cursor: pointer;
   font-weight: 400;
   font-size: 15px;
   line-height: 19px;
-  background: ${(p) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
+  background: ${(p: any) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
   border-radius: 25px;
 `;
 const Link = styled.div`
@@ -632,7 +632,7 @@ interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
+  background-image: ${(p: any) => `url(${p.src})`};
   width: 220px;
   height: 220px;
   margin: 30px;

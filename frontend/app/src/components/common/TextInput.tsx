@@ -24,7 +24,7 @@ export default function TextInput({
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e: any) => onChange(e.target.value)}
             onBlur={handleBlur}
             onFocus={handleFocus}
             prepend={prepend}

@@ -315,7 +315,7 @@ function MobileView(props: CodingBountiesProps) {
                     <LanguageContainer>
                       {dataValue &&
                         dataValue?.length > 0 &&
-                        dataValue?.map((lang: any, index) => (
+                        dataValue?.map((lang: any, index: number) => (
                           <CodingLabels
                             key={index}
                             styledColors={color}
@@ -557,7 +557,7 @@ function MobileView(props: CodingBountiesProps) {
                           fontFamily: 'Barlow',
                           marginLeft: '30px'
                         }}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.stopPropagation();
                           setExtrasPropertyAndSave('paid', !bountyPaid);
                         }}
@@ -584,7 +584,7 @@ function MobileView(props: CodingBountiesProps) {
                         hovercolor={color.button_primary.hover}
                         activecolor={color.button_primary.active}
                         shadowcolor={color.button_primary.shadow}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.stopPropagation();
                           setCreatorStep(1);
                         }}
@@ -658,7 +658,7 @@ function MobileView(props: CodingBountiesProps) {
                     className="InputContainerTextField"
                     type={'number'}
                     value={bountyPrice}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       setBountyPrice(e.target.value);
                     }}
                   />
@@ -681,7 +681,7 @@ function MobileView(props: CodingBountiesProps) {
                   hovercolor={color.button_secondary.hover}
                   activecolor={color.button_secondary.active}
                   shadowcolor={color.button_secondary.shadow}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     setCreatorStep(2);
                   }}
@@ -711,7 +711,7 @@ function MobileView(props: CodingBountiesProps) {
                 <EuiText className="headerText">Award Badge</EuiText>
               </div>
               <div className="AwardContainer">
-                {awards?.map((award, index) => (
+                {awards?.map((award: any, index: number) => (
                   <div
                     className="RadioImageContainer"
                     key={index}
@@ -768,7 +768,7 @@ function MobileView(props: CodingBountiesProps) {
                   hovercolor={color.button_primary.hover}
                   activecolor={color.button_primary.active}
                   shadowcolor={color.button_primary.shadow}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     setExtrasPropertyAndSaveMultiple('paid', {
                       paid: !bountyPaid,
@@ -816,7 +816,7 @@ function MobileView(props: CodingBountiesProps) {
                 <InvitePeopleSearch
                   peopleList={peopleList}
                   isProvidingHandler={true}
-                  handleAssigneeDetails={(value) => {
+                  handleAssigneeDetails={(value: any) => {
                     handleAssigneeDetails(value);
                   }}
                 />
@@ -849,7 +849,7 @@ function MobileView(props: CodingBountiesProps) {
               <LanguageContainer>
                 {dataValue &&
                   dataValue?.length > 0 &&
-                  dataValue?.map((lang: any, index) => (
+                  dataValue?.map((lang: any, index: number) => (
                     <CodingLabels
                       key={index}
                       styledColors={color}

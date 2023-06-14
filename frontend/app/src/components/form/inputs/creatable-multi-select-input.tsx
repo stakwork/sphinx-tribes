@@ -36,7 +36,7 @@ export default function CreatableMultiSelectInput({
             options={options}
             writeMode={type === 'multiselectwrite'}
             value={value}
-            onChange={(e) => {
+            onChange={(e: any) => {
               console.log('onChange', e);
               handleChange(e);
               setIsTop(true);
@@ -78,7 +78,7 @@ display: flex;
 height: 100 %;
 justify - content: center;
 align - items: center;
-color: ${(p) => p?.color && p.color.blue3};
+color: ${(p: any) => p?.color && p.color.blue3};
 pointer - events: none;
 user - select: none;
 `;

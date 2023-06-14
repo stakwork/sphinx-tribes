@@ -9,7 +9,7 @@ export default function Select(props: SelProps) {
   const { options, onChange, value, style, selectStyle, handleActive, testId } = props;
 
   const opts = options
-    ? options.map((o) => ({
+    ? options.map((o: any) => ({
         value: o.value,
         inputDisplay: o.label,
         dropdownDisplay: (
@@ -62,7 +62,7 @@ export default function Select(props: SelProps) {
         }}
         options={opts}
         valueOfSelected={value}
-        onChange={(value) => {
+        onChange={(value: any) => {
           onChange(value);
           if (handleActive) handleActive(false);
         }}
@@ -77,22 +77,22 @@ interface styleProps {
 }
 
 const S = styled(EuiSuperSelect as any)<styleProps>`
-  background: ${(p) => p?.color && p.color.pureWhite};
-  border: 1px solid ${(p) => p?.color && p?.color.grayish.G750};
-  color: ${(p) => p?.color && p?.color.pureBlack};
+  background: ${(p: any) => p?.color && p.color.pureWhite};
+  border: 1px solid ${(p: any) => p?.color && p?.color.grayish.G750};
+  color: ${(p: any) => p?.color && p?.color.pureBlack};
   box-sizing: border-box;
   box-shadow: none;
   padding-left: 16px;
   user-select: none;
   .euiSuperSelectControl.euiSuperSelect--isOpen__button {
-    background: ${(p) => p?.color && p?.color.pureWhite} !important;
-    background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
+    background: ${(p: any) => p?.color && p?.color.pureWhite} !important;
+    background-color: ${(p: any) => p?.color && p?.color.pureWhite} !important;
   }
   .euiPanel {
-    background: ${(p) => p?.color && p?.color.pureWhite};
+    background: ${(p: any) => p?.color && p?.color.pureWhite};
   }
   . button {
-    background: ${(p) => p?.color && p?.color.pureWhite} !important;
-    background-color: ${(p) => p?.color && p?.color.pureWhite} !important;
+    background: ${(p: any) => p?.color && p?.color.pureWhite} !important;
+    background-color: ${(p: any) => p?.color && p?.color.pureWhite} !important;
   }
 `;

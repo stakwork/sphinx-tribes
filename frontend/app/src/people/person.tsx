@@ -67,7 +67,7 @@ export default function Person(props: PersonProps) {
                           leadingIcon={'open_in_new'}
                           iconSize={16}
                           style={{ marginTop: 12 }}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e: any) => e.stopPropagation()}
                         />
                       </a>
                     </>
@@ -109,7 +109,7 @@ export default function Person(props: PersonProps) {
                   endingIcon={'open_in_new'}
                   style={{ fontSize: 13, fontWeight: 500 }}
                   iconSize={16}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     setShowQR(true);
                     e.stopPropagation();
                   }}
@@ -155,7 +155,7 @@ interface DWarpProps {
 const DWrap = styled.div<DWarpProps>`
   cursor: pointer;
   height: 350px;
-  width: ${(p) => (p.squeeze ? '200px' : '210px')};
+  width: ${(p: any) => (p.squeeze ? '200px' : '210px')};
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -211,10 +211,10 @@ const Description = styled.div<DescriptionProps>`
   overflow: hidden;
   margin-bottom: 10px;
   font-weight: 400;
-  max-width: ${(p) => (p.isMobile ? '200px' : 'auto')};
+  max-width: ${(p: any) => (p.isMobile ? '200px' : 'auto')};
 
   display: -webkit-box;
-  -webkit-line-clamp: ${(p) => (p.lineRows ? p.lineRows : 1)};
+  -webkit-line-clamp: ${(p: any) => (p.lineRows ? p.lineRows : 1)};
   -webkit-box-orient: vertical;
 `;
 
@@ -238,7 +238,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 96px;

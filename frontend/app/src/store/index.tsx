@@ -26,7 +26,7 @@ const Context = React.createContext({
   leaderboard: leaderboardStore
 });
 
-export const WithStores = ({ children }) => (
+export const WithStores = ({ children }: any) => (
   <Context.Provider
     value={{
       ui: uiStore,

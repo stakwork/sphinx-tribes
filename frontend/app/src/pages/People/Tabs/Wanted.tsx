@@ -67,7 +67,7 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {fullSelectedWidgets.map((w, i) => (
+      {fullSelectedWidgets.map((w: any, i: number) => (
         <Panel
           key={w.created}
           isMobile={false}
@@ -103,6 +103,6 @@ const Panel = styled.div<PanelProps>`
   background: #ffffff;
   color: #000000;
   padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
 `;

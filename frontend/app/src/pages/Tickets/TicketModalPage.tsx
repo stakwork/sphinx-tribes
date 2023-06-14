@@ -10,7 +10,7 @@ import { useStores } from 'store';
 
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
-const findPerson = (search) => (item) => {
+const findPerson = (search: any) => (item: any) => {
   const { person, body } = item;
   return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
 };
@@ -35,7 +35,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   }, [location.search]);
 
   const publicFocusPerson = useMemo(
-    () => main.people.find(({ owner_pubkey }) => owner_pubkey === search.owner_id),
+    () => main.people.find(({ owner_pubkey }: any) => owner_pubkey === search.owner_id),
     [main.people, search.owner_id]
   );
 
@@ -43,7 +43,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     const activeIndex = (main.peopleWanteds ?? []).findIndex(findPerson(search));
     const connectPerson = (main.peopleWanteds ?? [])[activeIndex];
     const itemIndex = (connectPerson?.person as any)?.wanted?.findIndex(
-      (f) => f.created === connectPerson?.body?.created
+      (f: any) => f.created === connectPerson?.body?.created
     );
 
     setPublicFocusIndex(activeIndex);

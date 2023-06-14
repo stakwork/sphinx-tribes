@@ -52,7 +52,7 @@ export default function MobileView(props: CodingViewProps) {
           {assigneeLabel}
           {ticketUrl && (
             <GithubIconMobile
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 window.open(ticketUrl, '_blank');
               }}
@@ -62,7 +62,7 @@ export default function MobileView(props: CodingViewProps) {
           )}
           {loomEmbedUrl && (
             <LoomIconMobile
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 window.open(loomEmbedUrl, '_blank');
               }}

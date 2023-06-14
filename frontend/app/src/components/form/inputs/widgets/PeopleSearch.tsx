@@ -24,7 +24,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [labels, setLabels] = useState<any>([]);
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
-  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
 
   const { ref, inView } = useInView({
@@ -41,27 +41,27 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   }, [inView, initialPeopleCount]);
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x) => checkboxIdToSelectedMap[x.label]));
+    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
     setPeopleData(
-      (Object.keys(checkboxIdToSelectedMap).every((key) => !checkboxIdToSelectedMap[key])
+      (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
-        : props?.peopleList?.filter(({ extras }) =>
-            extras?.coding_languages?.some(({ value }) => checkboxIdToSelectedMap[value] ?? false)
+        : props?.peopleList?.filter(({ extras }: any) =>
+            extras?.coding_languages?.some(({ value }: any) => checkboxIdToSelectedMap[value] ?? false)
           )
-      )?.filter((x) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
+      )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
     );
   }, [checkboxIdToSelectedMap, searchValue]);
 
   useEffect(() => {
     if (
       searchValue === '' &&
-      Object.keys(checkboxIdToSelectedMap).every((key) => !checkboxIdToSelectedMap[key])
+      Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
     ) {
       setPeopleData(props?.peopleList);
     }
   }, [searchValue, props, checkboxIdToSelectedMap]);
 
-  const handler = useCallback((e, value) => {
+  const handler = useCallback((e: any, value: any) => {
     if (value === '') {
       setSearchValue(e.target.value);
     } else {
@@ -69,7 +69,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
     }
   }, []);
 
-  const onChange = (optionId) => {
+  const onChange = (optionId: any) => {
     let trueCount = 0;
     for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
       if (value) {
@@ -95,7 +95,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
           <input
             value={searchValue}
             className="SearchInput"
-            onChange={(e) => {
+            onChange={(e: any) => {
               handler(e, '');
             }}
             placeholder={'Type to search ...'}
@@ -174,7 +174,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
             <EuiCheckboxGroup
               options={codingLanguages}
               idToSelectedMap={checkboxIdToSelectedMap}
-              onChange={(id) => {
+              onChange={(id: any) => {
                 onChange(id);
               }}
             />
@@ -189,7 +189,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
       >
         {!isPopoverOpen &&
           labels.length > 0 &&
-          labels?.map((x, index) => (
+          labels?.map((x: any, index: number) => (
             <Label
               key={x.label}
               value={x}
@@ -218,7 +218,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
 
       <div className="OuterContainer">
         <div className="PeopleList">
-          {peopleData?.slice(0, initialPeopleCount)?.map((value) => (
+          {peopleData?.slice(0, initialPeopleCount)?.map((value: any) => (
             <div className="People" key={value.id}>
               <div className="PeopleDetailContainer">
                 <div className="ImageContainer">
@@ -244,7 +244,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
               {inviteNameId === value?.id ? (
                 <InvitedButton
                   color={color}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     handler('', value.owner_alias);
                     setInviteNameId(0);
                     if (props?.handleChange)
@@ -271,7 +271,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                     height: '30px',
                     background: `${color.grayish.G600}`
                   }}
-                  buttonAction={(e) => {
+                  buttonAction={(e: any) => {
                     if (props.isProvidingHandler) {
                       props.handleAssigneeDetails(value);
                     } else {
@@ -329,7 +329,7 @@ const SearchOuterContainer = styled.div<styledProps>`
   max-height: 256x;
   min-width: 292px;
   max-width: 292px;
-  background: ${(p) => p?.color && p?.color?.pureWhite};
+  background: ${(p: any) => p?.color && p?.color?.pureWhite};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -343,14 +343,14 @@ const SearchOuterContainer = styled.div<styledProps>`
     .SearchContainer {
       position: relative;
       .SearchInput {
-        background: ${(p) => p?.color && p?.color?.pureWhite};
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
+        background: ${(p: any) => p?.color && p?.color?.pureWhite};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G600};
         border-radius: 4px;
         width: 177px;
         height: 40px;
         outline: none;
         overflow: hidden;
-        caret-color: ${(p) => p?.color && p?.color?.textBlue1};
+        caret-color: ${(p: any) => p?.color && p?.color?.textBlue1};
         padding: 0px 32px 0px 18px;
         margin-right: 11px;
         font-family: Roboto !important;
@@ -359,18 +359,18 @@ const SearchOuterContainer = styled.div<styledProps>`
         line-height: 35px;
 
         :focus-visible {
-          background: ${(p) => p?.color && p?.color?.pureWhite};
-          border: 1px solid ${(p) => p?.color && p?.color?.blue2};
+          background: ${(p: any) => p?.color && p?.color?.pureWhite};
+          border: 1px solid ${(p: any) => p?.color && p?.color?.blue2};
           outline: none;
           .SearchText {
             outline: none;
-            background: ${(p) => p?.color && p?.color?.pureWhite};
-            border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
+            background: ${(p: any) => p?.color && p?.color?.pureWhite};
+            border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G600};
             outline: none;
           }
         }
         ::placeholder {
-          color: ${(p) => p?.color && p?.color?.grayish.G300};
+          color: ${(p: any) => p?.color && p?.color?.grayish.G300};
           font-family: 'Roboto';
           font-style: normal;
           font-weight: 400;
@@ -403,7 +403,7 @@ const SearchOuterContainer = styled.div<styledProps>`
       .SkillSetContainer {
         height: 40px;
         width: 103px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G600};
         border-radius: 4px;
         display: flex;
         justify-content: center;
@@ -416,11 +416,11 @@ const SearchOuterContainer = styled.div<styledProps>`
 
   .OuterContainer {
     width: 412px;
-    background: ${(p) => p?.color && p.color.grayish.G950};
-    box-shadow: inset 0px 2px 8px ${(p) => p?.color && p.color.black100};
+    background: ${(p: any) => p?.color && p.color.grayish.G950};
+    box-shadow: inset 0px 2px 8px ${(p: any) => p?.color && p.color.black100};
     .PeopleList {
-      background: ${(p) => p?.color && p?.color?.grayish.G950};
-      box-shadow: inset 0px 2px 8px ${(p) => p?.color && p.color.black100};
+      background: ${(p: any) => p?.color && p?.color?.grayish.G950};
+      box-shadow: inset 0px 2px 8px ${(p: any) => p?.color && p.color.black100};
       width: 400px;
       padding: 0 49px 16px;
       min-height: 256px;
@@ -454,7 +454,7 @@ const SearchOuterContainer = styled.div<styledProps>`
             font-weight: 500;
             font-size: 13px;
             line-height: 16px;
-            color: ${(p) => p?.color && p?.color?.grayish.G10};
+            color: ${(p: any) => p?.color && p?.color?.grayish.G10};
             margin-left: 10px;
           }
         }
@@ -468,7 +468,7 @@ const SearchOuterContainer = styled.div<styledProps>`
           font-family: Barlow;
           font-size: 16px;
           font-weight: 600;
-          color: ${(p) => p?.color && p?.color?.grayish.G50};
+          color: ${(p: any) => p?.color && p?.color?.grayish.G50};
           word-spacing: 0.08em;
         }
       }
@@ -489,15 +489,15 @@ const EuiPopOverCheckbox = styled.div<styledProps>`
     .euiCheckboxGroup__item {
       .euiCheckbox__square {
         top: 5px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G500};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
         border-radius: 2px;
       }
       .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p) => p?.color && p?.color?.pureWhite} no-repeat center;
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
       }
       .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p) => p?.color && p?.color?.blue1};
-        background: ${(p) => p?.color && p?.color?.blue1} no-repeat center;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
         background-image: url('static/checkboxImage.svg');
       }
       .euiCheckbox__label {
@@ -506,10 +506,10 @@ const EuiPopOverCheckbox = styled.div<styledProps>`
         font-weight: 500;
         font-size: 13px;
         line-height: 16px;
-        color: ${(p) => p?.color && p?.color?.grayish.G50};
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
       }
       input.euiCheckbox__input:checked ~ label {
-        color: ${(p) => p?.color && p?.color?.blue1};
+        color: ${(p: any) => p?.color && p?.color?.blue1};
       }
     }
   }
@@ -530,8 +530,8 @@ const Label = styled.div<labelProps>`
   align-items: center;
   justify-content: space-between;
   text-align: center;
-  border: ${(p) => p?.value && p?.value.border};
-  background: ${(p) => p?.value && p?.value.background};
+  border: ${(p: any) => p?.value && p?.value.border};
+  background: ${(p: any) => p?.value && p?.value.background};
   margin-right: 4px;
   border-radius: 4px;
   padding: 2px 6px;
@@ -542,7 +542,7 @@ const Label = styled.div<labelProps>`
     font-weight: 500;
     font-size: 13px;
     line-height: 16px;
-    color: ${(p) => p?.value && p?.value.color};
+    color: ${(p: any) => p?.value && p?.value.color};
   }
 `;
 
@@ -553,15 +553,15 @@ const InvitedButton = styled.div<styledProps>`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  background: ${(p) => p.color && p.color.button_secondary.main};
-  box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
+  background: ${(p: any) => p.color && p.color.button_secondary.main};
+  box-shadow: 0px 2px 10px ${(p: any) => p.color && p.color.button_secondary.shadow};
   border-radius: 32px;
-  color: ${(p) => p.color && p.color.pureWhite};
+  color: ${(p: any) => p.color && p.color.pureWhite};
   :hover {
-    background: ${(p) => p.color && p.color.button_secondary.hover};
+    background: ${(p: any) => p.color && p.color.button_secondary.hover};
   }
   :active {
-    background: ${(p) => p.color && p.color.button_secondary.active};
+    background: ${(p: any) => p.color && p.color.button_secondary.active};
   }
   .nextText {
     font-family: Barlow;

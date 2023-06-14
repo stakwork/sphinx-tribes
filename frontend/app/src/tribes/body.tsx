@@ -33,7 +33,7 @@ function BodyComponent() {
 
   const isMobile = useIsMobile();
 
-  const selectedTags = tagOptions.filter((t) => t.checked === 'on');
+  const selectedTags = tagOptions.filter((t: any) => t.checked === 'on');
   const showTagCount = selectedTags.length > 0 ? true : false;
 
   function selectTribe(uuid: string, unique_name: string) {
@@ -103,8 +103,8 @@ function BodyComponent() {
   }
 
   // if NSFW not selected, filter out NSFW
-  if (!selectedTags.find((f) => f.label === 'NSFW')) {
-    tribes = tribes.filter((f) => !f.tags.includes('NSFW'));
+  if (!selectedTags.find((f: any) => f.label === 'NSFW')) {
+    tribes = tribes.filter((f: any) => !f.tags.includes('NSFW'));
   }
 
   const button = (
@@ -112,7 +112,7 @@ function BodyComponent() {
       iconType="arrowDown"
       iconSide="right"
       size="s"
-      onClick={(e) => {
+      onClick={(e: any) => {
         e.stopPropagation();
         setTagsPop(!tagsPop);
       }}
@@ -143,7 +143,7 @@ function BodyComponent() {
             <EuiSelectable
               searchable
               options={tagOptions}
-              renderOption={(option, searchValue) => (
+              renderOption={(option: any, searchValue: any) => (
                 <div
                   style={{
                     display: 'flex',
@@ -165,14 +165,14 @@ function BodyComponent() {
                 </div>
               )}
               listProps={{ rowHeight: 30 }} // showIcons:false
-              onChange={(opts) => {
+              onChange={(opts: any) => {
                 if (!loadingList) {
                   setTagOptions(opts);
                   ui.setTags(opts);
                 }
               }}
             >
-              {(list, search) => (
+              {(list: any, search: any) => (
                 <div style={{ width: 220 }}>
                   {search}
                   {list}
@@ -195,7 +195,7 @@ function BodyComponent() {
               border: 'none',
               marginLeft: 20
             }}
-            onChange={(e) => {
+            onChange={(e: any) => {
               ui.setSearchText(e);
             }}
           />
@@ -206,7 +206,7 @@ function BodyComponent() {
         <EuiFormFieldset style={{ width: '100%', paddingBottom: 0 }} className="container">
           <div style={{ justifyContent: 'center' }} className="row">
             {tribes.length ? (
-              tribes.map((t) => (
+              tribes.map((t: any) => (
                 <Tribe {...t} key={t.uuid} selected={selected === t.uuid} select={selectTribe} />
               ))
             ) : (

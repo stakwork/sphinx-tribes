@@ -41,7 +41,7 @@ export const PostBounty: FC<Props> = observer(
       color: 'primary'
     },
     ...modalProps
-  }) => {
+  }: any) => {
     const { ui } = useStores();
     const [isOpenPostModal, setIsOpenPostModal] = useState(false);
     const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);

@@ -191,7 +191,7 @@ interface IconProps {
 }
 
 const Img = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
+  background-image: ${(p: any) => `url(${p.src})`};
   width: 80px;
   height: 80px;
   background-position: center; /* Center the image */

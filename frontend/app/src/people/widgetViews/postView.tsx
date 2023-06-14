@@ -32,7 +32,7 @@ export default function PostView(props: OfferViewProps) {
         {isLong && (
           <Link
             style={{ textAlign: 'right', width: '100%' }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               setExpand(!expand);
             }}

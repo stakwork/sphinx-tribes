@@ -36,7 +36,7 @@ const BountyHeader = ({
   const [filterCountNumber, setFilterCountNumber] = useState<number>(0);
   const history = useHistory();
 
-  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: any) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
   useEffect(() => {
     // eslint-disable-next-line func-style
@@ -110,7 +110,7 @@ const BountyHeader = ({
                   fontFamily: 'Barlow',
                   color: color.text2
                 }}
-                onChange={(e) => {
+                onChange={(e: any) => {
                   ui.setSearchText(e);
                 }}
                 iconStyle={{
@@ -174,7 +174,7 @@ const BountyHeader = ({
                     <EuiCheckboxGroup
                       options={Status}
                       idToSelectedMap={checkboxIdToSelectedMap}
-                      onChange={(id) => {
+                      onChange={(id: any) => {
                         onChangeStatus(id);
                       }}
                     />
@@ -185,7 +185,7 @@ const BountyHeader = ({
                       <EuiCheckboxGroup
                         options={Coding_Languages}
                         idToSelectedMap={checkboxIdToSelectedMapLanguage}
-                        onChange={(id) => {
+                        onChange={(id: any) => {
                           onChangeLanguage(id);
                         }}
                       />
@@ -205,7 +205,7 @@ const BountyHeader = ({
               </EuiText>
               <div className="ImageOuterContainer">
                 {peopleList &&
-                  peopleList?.slice(0, 3).map((val, index) => (
+                  peopleList?.slice(0, 3).map((val: any, index: number) => (
                     <DevelopersImageContainer
                       color={color}
                       key={index}
@@ -254,7 +254,7 @@ const BountyHeader = ({
                 background: 'transparent',
                 fontFamily: 'Barlow'
               }}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 ui.setSearchText(e);
               }}
               iconStyle={{
@@ -318,7 +318,7 @@ const BountyHeader = ({
                   <EuiCheckboxGroup
                     options={Status}
                     idToSelectedMap={checkboxIdToSelectedMap}
-                    onChange={(id) => {
+                    onChange={(id: any) => {
                       onChangeStatus(id);
                     }}
                   />
@@ -329,7 +329,7 @@ const BountyHeader = ({
                     <EuiCheckboxGroup
                       options={Coding_Languages}
                       idToSelectedMap={checkboxIdToSelectedMapLanguage}
-                      onChange={(id) => {
+                      onChange={(id: any) => {
                         onChangeLanguage(id);
                       }}
                     />
@@ -354,7 +354,7 @@ const BountyHeader = ({
             />
             <DevelopersContainerMobile>
               {peopleList &&
-                peopleList?.slice(0, 3).map((val, index) => (
+                peopleList?.slice(0, 3).map((val: any, index: number) => (
                   <DevelopersImageContainer
                     key={index}
                     color={color}
@@ -427,7 +427,7 @@ const D = styled.div<styledProps>`
     display: flex;
     flex-direction: row;
     align-items: center;
-    color: ${(p) => p.color && p.color.grayish.G200};
+    color: ${(p: any) => p.color && p.color.grayish.G200};
     padding: 0 10px;
   }
 `;
@@ -436,7 +436,7 @@ const DevelopersImageContainer = styled.div<styledProps>`
   height: 28px;
   width: 28px;
   border-radius: 50%;
-  background: ${(p) => p.color && p.color.pureWhite};
+  background: ${(p: any) => p.color && p.color.pureWhite};
   overflow: hidden;
   position: static;
   display: flex;
@@ -487,7 +487,7 @@ const FilterContainer = styled.div<styledProps>`
     height: 48px;
     width: 36px;
     .materialIconImage {
-      color: ${(p) => p.color && p.color.grayish.G200};
+      color: ${(p: any) => p.color && p.color.grayish.G200};
       cursor: pointer;
       font-size: 18px;
       margin-top: 4px;
@@ -501,32 +501,32 @@ const FilterContainer = styled.div<styledProps>`
     line-height: 19px;
     display: flex;
     align-items: center;
-    color: ${(p) => p.color && p.color.grayish.G200};
+    color: ${(p: any) => p.color && p.color.grayish.G200};
   }
   &:hover {
     .filterImageContainer {
       .materialIconImage {
-        color: ${(p) => p.color && p.color.grayish.G50} !important;
+        color: ${(p: any) => p.color && p.color.grayish.G50} !important;
         cursor: pointer;
         font-size: 18px;
         margin-top: 4px;
       }
     }
     .filterText {
-      color: ${(p) => p.color && p.color.grayish.G50};
+      color: ${(p: any) => p.color && p.color.grayish.G50};
     }
   }
   &:active {
     .filterImageContainer {
       .materialIconImage {
-        color: ${(p) => p.color && p.color.grayish.G10} !important;
+        color: ${(p: any) => p.color && p.color.grayish.G10} !important;
         cursor: pointer;
         font-size: 18px;
         margin-top: 4px;
       }
     }
     .filterText {
-      color: ${(p) => p.color && p.color.grayish.G10};
+      color: ${(p: any) => p.color && p.color.grayish.G10};
     }
   }
 `;
@@ -540,7 +540,7 @@ const FilterCount = styled.div<styledProps>`
   justify-content: center;
   align-items: center;
   margin-top: -5px;
-  background: ${(p) => p?.color && p.color.blue1};
+  background: ${(p: any) => p?.color && p.color.blue1};
   .filterCountText {
     font-family: 'Barlow';
     font-style: normal;
@@ -549,7 +549,7 @@ const FilterCount = styled.div<styledProps>`
     display: flex;
     align-items: center;
     text-align: center;
-    color: ${(p) => p.color && p.color.pureWhite};
+    color: ${(p: any) => p.color && p.color.pureWhite};
   }
 `;
 
@@ -557,7 +557,7 @@ const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   width: 147px;
   height: 312px;
   padding: 15px 18px;
-  border-right: 1px solid ${(p) => p.color && p.color.grayish.G700};
+  border-right: 1px solid ${(p: any) => p.color && p.color.grayish.G700};
   user-select: none;
   .leftBoxHeading {
     font-family: Barlow;
@@ -566,7 +566,7 @@ const EuiPopOverCheckboxLeft = styled.div<styledProps>`
     font-size: 12px;
     line-height: 32px;
     text-transform: uppercase;
-    color: ${(p) => p.color && p.color.grayish.G100};
+    color: ${(p: any) => p.color && p.color.grayish.G100};
     margin-bottom: 10px;
   }
 
@@ -578,15 +578,15 @@ const EuiPopOverCheckboxLeft = styled.div<styledProps>`
     .euiCheckboxGroup__item {
       .euiCheckbox__square {
         top: 5px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G500};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
         border-radius: 2px;
       }
       .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p) => p?.color && p?.color?.pureWhite} no-repeat center;
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
       }
       .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p) => p?.color && p?.color?.blue1};
-        background: ${(p) => p?.color && p?.color?.blue1} no-repeat center;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
         background-image: url('static/checkboxImage.svg');
       }
       .euiCheckbox__label {
@@ -595,13 +595,13 @@ const EuiPopOverCheckboxLeft = styled.div<styledProps>`
         font-weight: 500;
         font-size: 13px;
         line-height: 16px;
-        color: ${(p) => p?.color && p?.color?.grayish.G50};
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
         &:hover {
-          color: ${(p) => p?.color && p?.color?.grayish.G05};
+          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
         }
       }
       input.euiCheckbox__input:checked ~ label {
-        color: ${(p) => p?.color && p?.color?.blue1};
+        color: ${(p: any) => p?.color && p?.color?.blue1};
       }
     }
   }
@@ -619,7 +619,7 @@ const PopOverRightBox = styled.div<styledProps>`
     font-size: 12px;
     line-height: 32px;
     text-transform: uppercase;
-    color: ${(p) => p.color && p.color.grayish.G100};
+    color: ${(p: any) => p.color && p.color.grayish.G100};
   }
 `;
 
@@ -637,15 +637,15 @@ const EuiPopOverCheckboxRight = styled.div<styledProps>`
     .euiCheckboxGroup__item {
       .euiCheckbox__square {
         top: 5px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G500};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
         border-radius: 2px;
       }
       .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p) => p?.color && p?.color?.pureWhite} no-repeat center;
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
       }
       .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p) => p?.color && p?.color?.blue1};
-        background: ${(p) => p?.color && p?.color?.blue1} no-repeat center;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
         background-image: url('static/checkboxImage.svg');
       }
       .euiCheckbox__label {
@@ -654,13 +654,13 @@ const EuiPopOverCheckboxRight = styled.div<styledProps>`
         font-weight: 500;
         font-size: 13px;
         line-height: 16px;
-        color: ${(p) => p?.color && p?.color?.grayish.G50};
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
         &:hover {
-          color: ${(p) => p?.color && p?.color?.grayish.G05};
+          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
         }
       }
       input.euiCheckbox__input:checked ~ label {
-        color: ${(p) => p?.color && p?.color?.blue1};
+        color: ${(p: any) => p?.color && p?.color?.blue1};
       }
     }
   }

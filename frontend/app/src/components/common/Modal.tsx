@@ -103,7 +103,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   iconStyle={{ color: color.pureWhite }}
                   icon={'chevron_left'}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     prevArrow();
                   }}
@@ -117,7 +117,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   icon={'chevron_right'}
                   iconStyle={{ color: color.pureWhite }}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     nextArrow();
                   }}
@@ -132,7 +132,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   iconStyle={{ color: color.pureWhite }}
                   icon={'chevron_left'}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     prevArrowNew();
                   }}
@@ -146,7 +146,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   icon={'chevron_right'}
                   iconStyle={{ color: color.pureWhite }}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     nextArrowNew();
                   }}
@@ -211,7 +211,7 @@ const CircL = styled.div<styledProps>`
   justify-content: center;
   width: 62px;
   height: 88px;
-  background: ${(p) => p.color && p.color.black150};
+  background: ${(p: any) => p.color && p.color.black150};
   border-radius: 10px 0px 0px 10px;
   cursor: pointer;
 `;
@@ -222,7 +222,7 @@ const CircR = styled.div<styledProps>`
   justify-content: center;
   width: 62px;
   height: 88px;
-  background: ${(p) => p.color && p.color.black150};
+  background: ${(p: any) => p.color && p.color.black150};
   border-radius: 0px 10px 10px 0px;
   cursor: pointer;
 `;
@@ -233,7 +233,7 @@ const Circ = styled.div<styledProps>`
   justify-content: center;
   width: 65px;
   height: 65px;
-  background: ${(p) => p.color && p.color.grayish.G60};
+  background: ${(p: any) => p.color && p.color.grayish.G60};
   border-radius: 50px;
   cursor: pointer;
 `;
@@ -259,6 +259,6 @@ const Env = styled.div<styledProps>`
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  background: ${(p) => p.color && p.color.pureWhite};
+  background: ${(p: any) => p.color && p.color.pureWhite};
   position: relative;
 `;

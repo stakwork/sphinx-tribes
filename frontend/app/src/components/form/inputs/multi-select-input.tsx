@@ -29,7 +29,7 @@ export default function MultiSelectInput({
             options={options}
             writeMode={type === 'multiselectwrite'}
             value={value}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleChange(e);
             }}
           />
@@ -68,7 +68,7 @@ const E = styled.div<styledProps>`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: ${(p) => p.color && p.color.blue3};
+	color: ${(p: any) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

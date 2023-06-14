@@ -72,7 +72,7 @@ export const PersonPage = observer(() => {
   );
 });
 
-const getHtml = (owner_pubkey, img) => `
+const getHtml = (owner_pubkey: string, img: string) => `
 <sphinx-widget pubkey=${owner_pubkey}
   amount="500"
   title="Support Me"
@@ -106,6 +106,6 @@ const Panel = styled.div<PanelProps>`
   background: #ffffff;
   color: #000000;
   padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
 `;

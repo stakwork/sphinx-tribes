@@ -9,7 +9,7 @@ export default function LoomVideoInput({ value, handleChange, handleBlur, handle
     <>
       <LoomViewerRecorder
         name="loomVideo"
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleChange(e);
         }}
         loomEmbedUrl={value}

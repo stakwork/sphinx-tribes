@@ -53,7 +53,7 @@ function WidgetSwitchViewer(props: any) {
     offer: peopleOffers
   };
 
-  const activeList = [...listSource[selectedWidget]].filter(({ body }) => {
+  const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
     return (
       bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
@@ -61,12 +61,12 @@ function WidgetSwitchViewer(props: any) {
     );
   });
 
-  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
+  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f: any) => f.dynamicSchemas);
   // if dynamic schema, get all those fields
   if (foundDynamicSchema) {
     const dynamicFields: any = [];
-    foundDynamicSchema.dynamicSchemas?.forEach((ds) => {
-      ds.forEach((f) => {
+    foundDynamicSchema.dynamicSchemas?.forEach((ds: any) => {
+      ds.forEach((f: any) => {
         if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
       });
     });
@@ -102,7 +102,7 @@ function WidgetSwitchViewer(props: any) {
 
   const listItems =
     activeList && activeList.length ? (
-      activeList.slice(0, currentItems).map((item, i) => {
+      activeList.slice(0, currentItems).map((item: any, i: number) => {
         const { person, body } = item;
         const conditionalStyles = body?.paid
           ? {
@@ -204,12 +204,12 @@ interface PanelProps {
 
 const Panel = styled.div<PanelProps>`
   margin-top: 4px;
-  background: ${(p) => p.color && p.color.pureWhite};
-  color: ${(p) => p.color && p.color.pureBlack};
+	background: ${(p: any) => p.color && p.color.pureWhite};
+	color: ${(p: any) => p.color && p.color.pureBlack};
   padding: 20px;
-  border-bottom: ${(p) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
+  border-bottom: ${(p: any) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
   :hover {
-    box-shadow: ${(p) => (p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none')} !important;
+    box-shadow: ${(p: any) => (p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none')} !important;
   }
   :active {
     box-shadow: none !important;
@@ -227,10 +227,10 @@ const LoadMoreContainer = styled.div<PanelProps>`
     display: flex;
     justify-content: center;
     align-items: center;
-    color: ${(p) => p.color && p.color.grayish.G10};
-    border: 1px solid ${(p) => p.color && p.color.grayish.G600};
+		color: ${(p: any) => p.color && p.color.grayish.G10};
+		border: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
     border-radius: 30px;
-    background: ${(p) => p.color && p.color.pureWhite};
+		background: ${(p: any) => p.color && p.color.pureWhite};
     font-family: 'Barlow';
     font-style: normal;
     font-weight: 500;
@@ -239,10 +239,10 @@ const LoadMoreContainer = styled.div<PanelProps>`
     cursor: pointer;
     user-select: none;
     :hover {
-      border: 1px solid ${(p) => p.color && p.color.grayish.G300};
+			border: 1px solid ${(p: any) => p.color && p.color.grayish.G300};
     }
     :active {
-      border: 1px solid ${(p) => p.color && p.color.grayish.G100};
+			border: 1px solid ${(p: any) => p.color && p.color.grayish.G100};
     }
   }
 `;

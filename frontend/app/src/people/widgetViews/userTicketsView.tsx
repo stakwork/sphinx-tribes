@@ -31,7 +31,7 @@ const UserTickets = () => {
     checkboxIdToSelectedMap
   };
 
-  const activeList = userTickets.filter(({ body }) => {
+  const activeList = userTickets.filter(({ body }: any) => {
     const value = { ...body };
     return (
       bountyHeaderFilter(data.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
@@ -89,7 +89,7 @@ const UserTickets = () => {
 
   const listItems =
     activeList && activeList.length ? (
-      activeList.slice(0, currentItems).map((item, i) => {
+      activeList.slice(0, currentItems).map((item: any, i: number) => {
         const { person, body } = item;
 
         // if this person has entries for this widget
@@ -156,6 +156,6 @@ const Panel = styled.div<PanelProps>`
   background: #ffffff;
   color: #000000;
   padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
 `;

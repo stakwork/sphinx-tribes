@@ -130,7 +130,7 @@ function MobileView(props: any) {
                   }}
                 />
                 <span
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(
                       `/p/${
@@ -269,7 +269,7 @@ function MobileView(props: any) {
                         padding: 0,
                         background: `${color.pureWhite}`
                       }}
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation();
                         setExtrasPropertyAndSave('show');
                       }}
@@ -279,7 +279,7 @@ function MobileView(props: any) {
               </div>
               {ui?.meInfo?.isSuperAdmin && (
                 <EuiButtonIcon
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     showModal();
                     setDeletePayload({

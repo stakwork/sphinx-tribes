@@ -42,7 +42,7 @@ export default function Widget(props: WidgetProps) {
               color: '#1d1e24',
               cursor: props.single && 'pointer'
             }}
-            onClick={(e) => {
+            onClick={(e: any) => {
               if (props.single) {
                 e.stopPropagation();
                 //delete state
@@ -94,7 +94,7 @@ export interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 70px;
   height: 70px;
   margin-top: 10px;

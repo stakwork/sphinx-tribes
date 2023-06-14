@@ -25,7 +25,7 @@ function BodyComponent() {
   const { peoplePageNumber } = ui;
   const history = useHistory();
   const isMobile = useIsMobile();
-  const people = useFuse(main.people, ['owner_alias']).filter((f) => !f.hide) || [];
+  const people = useFuse(main.people, ['owner_alias']).filter((f: any) => !f.hide) || [];
   const loadForwardFunc = () => loadMore(1);
   const loadBackwardFunc = () => loadMore(-1);
   const { loadingBottom, handleScroll } = usePageScroll(loadForwardFunc, loadBackwardFunc);
@@ -67,7 +67,7 @@ function BodyComponent() {
     if (newPage < 1) newPage = 1;
     try {
       await main.getPeople({ page: newPage });
-    } catch (e) {
+    } catch (e: any) {
       console.log('load failed', e);
     }
   }
@@ -83,7 +83,7 @@ function BodyComponent() {
   return (
     <Body
       isMobile={isMobile}
-      onScroll={(e) => {
+      onScroll={(e: any) => {
         handleScroll(e);
       }}
     >
@@ -100,13 +100,13 @@ function BodyComponent() {
             border: `1px solid ${color.grayish.G600}`,
             background: color.grayish.G600
           }}
-          onChange={(e) => {
+          onChange={(e: any) => {
             ui.setSearchText(e);
           }}
         />
       </div>
       <div className="content">
-        {(people ?? []).map((t) => (
+        {(people ?? []).map((t: any) => (
           <Person
             {...t}
             key={t.id}
@@ -130,8 +130,8 @@ function BodyComponent() {
 
 const Body = styled.div<{ isMobile: boolean }>`
   flex: 1;
-  height: ${(p) => (p.isMobile ? 'calc(100% - 105px)' : 'calc(100% - 65px)')};
-  background: ${(p) => (p.isMobile ? undefined : color.grayish.G950)};
+  height: ${(p: any) => (p.isMobile ? 'calc(100% - 105px)' : 'calc(100% - 65px)')};
+  background: ${(p: any) => (p.isMobile ? undefined : color.grayish.G950)};
   width: 100%;
   overflow: auto;
   display: flex;

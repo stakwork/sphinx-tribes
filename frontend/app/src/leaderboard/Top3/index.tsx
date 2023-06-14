@@ -15,7 +15,7 @@ export const Top3 = () => {
   const { leaderboard } = useStores();
   return (
     <Top3Container>
-      {leaderboard.top3.map((item, index) => (
+      {leaderboard.top3.map((item: any, index: number) => (
         <Item place={index + 1} key={item.owner_pubkey} {...item} />
       ))}
     </Top3Container>
@@ -96,6 +96,6 @@ const colorsDispatcher = {
 const Podium = styled.div<{ place: number }>`
   --height: 300px;
   width: 100%;
-  height: ${(p) => `calc(var(--height) / ${p.place * 1.5})`};
-  background-color: ${(p) => colorsDispatcher[p.place]};
+	height: ${(p: any) => `calc(var(--height) / ${p.place * 1.5})`};
+  background-color: ${(p: any) => colorsDispatcher[p.place]};
 `;
