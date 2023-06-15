@@ -31,30 +31,30 @@ export const DWrap = styled.div<WrapProps>`
   font-weight: 500;
   font-size: 17px;
   line-height: 23px;
-	color: ${(p: any) => p?.color && p?.color.grayish.G10} !important;
+  color: ${(p: any) => p?.color && p?.color.grayish.G10} !important;
   letter-spacing: 0px;
   justify-content: space-between;
-	opacity: ${(p: any) => (p.isClosed ? '0.5' : '1')};
-	filter: ${(p: any) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
+  opacity: ${(p: any) => (p.isClosed ? '0.5' : '1')};
+  filter: ${(p: any) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
 `;
 
 export const Wrap = styled.div<WrapProps>`
   display: flex;
   justify-content: flex-start;
-	opacity: ${(p: any) => (p.isClosed ? '0.5' : '1')};
-	filter: ${(p: any) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
+  opacity: ${(p: any) => (p.isClosed ? '0.5' : '1')};
+  filter: ${(p: any) => (p.isClosed ? 'grayscale(1)' : 'grayscale(0)')};
 `;
 
 export const B = styled.span<styledProps>`
   font-size: 14px;
   font-weight: bold;
-	color: ${(p: any) => p?.color && p?.color.grayish.G10};
+  color: ${(p: any) => p?.color && p?.color.grayish.G10};
 `;
 
 export const P = styled.div<styledProps>`
   font-weight: regular;
   font-size: 14px;
-	color: ${(p: any) => p?.color && p?.color.grayish.G100};
+  color: ${(p: any) => p?.color && p?.color.grayish.G100};
 `;
 
 export const Body = styled.div<styledProps>`
@@ -64,7 +64,7 @@ export const Body = styled.div<styledProps>`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-	color: ${(p: any) => p?.color && p?.color.grayish.G05};
+  color: ${(p: any) => p?.color && p?.color.grayish.G05};
   overflow: hidden;
   min-height: 132px;
 `;
@@ -82,7 +82,7 @@ export const DescriptionCodeTask = styled.div<styledProps>`
   font-weight: normal;
   font-size: 13px;
   line-height: 20px;
-	color: ${(p: any) => p?.color && p?.color.grayish.G50};
+  color: ${(p: any) => p?.color && p?.color.grayish.G50};
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

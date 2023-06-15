@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { EuiDatePicker } from '@elastic/eui';
 import React, { memo, useState } from 'react';
-import { FieldEnv } from '..';
 import styled from 'styled-components';
+import { FieldEnv } from '..';
 import { colors } from '../../../../config/colors';
 
 function Date({ label, value, handleChange }: any) {

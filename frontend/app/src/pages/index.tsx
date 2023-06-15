@@ -3,6 +3,7 @@ import React from 'react';
 import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 import BotsBody from '../bots/body';
 import PeopleHeader from '../people/main/header';
 import TokenRefresh from '../people/utils/tokenRefresh';
@@ -12,7 +13,6 @@ import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
 import { People } from './People';
 import { TicketsPage } from './Tickets';
-import { observer } from 'mobx-react-lite';
 import { LeaderboardPage } from './Leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {

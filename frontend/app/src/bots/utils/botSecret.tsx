@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Button } from '../../components/common';
-import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
 import { BotSecretProps } from 'bots/interfaces';
+import { Button } from '../../components/common';
+import { useStores } from '../../store';
 
 export default observer(BotSecret);
 

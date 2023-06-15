@@ -1,4 +1,8 @@
-export const bountyHeaderFilter = ({ Paid, Assigned, Open }: any, bodyPaid: any, bodyAssignee: any) => {
+export const bountyHeaderFilter = (
+  { Paid, Assigned, Open }: any,
+  bodyPaid: any,
+  bodyAssignee: any
+) => {
   if (Paid) {
     if (Assigned) {
       if (Open) {

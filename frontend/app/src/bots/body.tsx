@@ -1,21 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import MaterialIcon from '@material/react-material-icon';
+import { EuiGlobalToastList } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
 import NoneSpace from '../people/utils/noneSpace';
 import { Button, Modal, SearchTextInput, Divider } from '../components/common';
 import { useStores } from '../store';
-import { EuiLoadingSpinner } from '@elastic/eui';
 import { useFuse, useScroll } from '../hooks';
 import { colors } from '../config/colors';
 import FadeLeft from '../components/animated/fadeLeft';
 import { useIsMobile } from '../hooks';
-import Bot from './bot';
 import Form from '../components/form';
 import { botSchema } from '../components/form/schema';
-import MaterialIcon from '@material/react-material-icon';
+import Bot from './bot';
 import BotView from './botView';
 import BotSecret from './utils/botSecret';
-import { EuiGlobalToastList } from '@elastic/eui';
-import { observer } from 'mobx-react-lite';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse;

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
-import { colors } from '../../config/colors';
 import { SelProps } from 'components/interfaces';
+import { colors } from '../../config/colors';
 
 export default function Sel(props: SelProps) {
   const { options, onChange, value, style } = props;

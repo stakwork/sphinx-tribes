@@ -2,12 +2,12 @@ import { EuiModal, EuiOverlayMask } from '@elastic/eui';
 import { useState } from 'react';
 import React from 'react';
 import styled from 'styled-components';
-import IconButton from '../../components/common/icon_button';
-import { useStores } from '../../store';
-import QR from './QR';
-import api from '../../api';
 import { observer } from 'mobx-react-lite';
 import { StartUpModalProps } from 'people/interfaces';
+import IconButton from '../../components/common/icon_button';
+import { useStores } from '../../store';
+import api from '../../api';
+import QR from './QR';
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps) => {
   const { ui, main } = useStores();

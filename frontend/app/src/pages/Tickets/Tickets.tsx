@@ -6,11 +6,11 @@ import WidgetSwitchViewer from 'people/widgetViews/widgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import { colors } from '../../config/colors';
 import { useIsMobile, usePageScroll } from '../../hooks';
 import { useStores } from '../../store';
 
-import { observer } from 'mobx-react-lite';
 // avoid hook within callback warning by renaming hooks
 
 const getPageScroll = usePageScroll;

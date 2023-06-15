@@ -1,11 +1,11 @@
 import { makeAutoObservable, observable, action } from 'mobx';
+import memo from 'memo-decorator';
+import { persist } from 'mobx-persist';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
 import { uiStore } from './ui';
-import memo from 'memo-decorator';
-import { persist } from 'mobx-persist';
 
 export const queryLimit = 1000;
 
@@ -13,6 +13,144 @@ function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
 }
 
+export interface Tribe {
+  uuid: string;
+  name: string;
+  unique_name: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
+  last_active: number;
+  matchCount?: number; // for tag search
+}
+
+export interface Bot {
+  id?: number;
+  uuid: string;
+  name: string;
+  owner_pubkey: string;
+  unique_name: string;
+  price_per_use: number;
+  created: string;
+  updated: string;
+  unlisted: boolean;
+  deleted: boolean;
+  owner_route_hint: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
+  hide?: boolean;
+}
+
+export interface Person {
+  id: number;
+  unique_name: string;
+  owner_pubkey: string;
+  owner_alias: string;
+  description: string;
+  img: string;
+  tags: string[];
+  pubkey: string;
+  photo_url: string;
+  alias: string;
+  route_hint: string;
+  contact_key: string;
+  price_to_meet: number;
+  last_login?: number;
+  url: string;
+  verification_signature: string;
+  extras: Extras;
+  hide?: boolean;
+  commitment_fee?: number;
+  assigned_hours?: number;
+  bounty_expires?: number;
+}
+
+export interface PersonFlex {
+  id?: number;
+  unique_name?: string;
+  owner_pubkey?: string;
+  owner_alias?: string;
+  description?: string;
+  img?: string;
+  tags?: string[];
+  pubkey?: string;
+  photo_url?: string;
+  alias?: string;
+  route_hint?: string;
+  contact_key?: string;
+  last_login?: number;
+  price_to_meet?: number;
+  url?: string;
+  verification_signature?: string;
+  extras?: Extras;
+  hide?: boolean;
+}
+
+export interface PersonPost {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created: number;
+}
+
+export interface PersonWanted {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created?: number;
+  show?: boolean;
+  assignee?: any;
+  body: PersonWanted | any;
+  type?: string;
+  price?: string;
+}
+
+export interface PersonOffer {
+  person: PersonFlex;
+  title: string;
+  description: string;
+  created: number;
+}
+
+export interface Jwt {
+  jwt: string;
+}
+
+export interface QueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  direction?: string;
+  search?: string;
+}
+
+export interface ClaimOnLiquid {
+  asset: number;
+  to: string;
+  amount?: number;
+  memo: string;
+}
+
+export interface LnAuthData {
+  encode: string;
+  k1: string;
+}
+
+export interface LnInvoice {
+  success: boolean;
+  response: {
+    invoice: string;
+  };
+}
 export class MainStore {
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
@@ -985,7 +1123,7 @@ export class MainStore {
   }
 
   @observable
-  lnInvoice: string = '';
+  lnInvoice = '';
 
   @action setLnInvoice(invoice: string) {
     this.lnInvoice = invoice;
@@ -1060,141 +1198,3 @@ export class MainStore {
 
 export const mainStore = new MainStore();
 
-export interface Tribe {
-  uuid: string;
-  name: string;
-  unique_name: string;
-  owner: string;
-  pubkey: string; // group encryption key
-  price: number;
-  img: string;
-  tags: string[];
-  description: string;
-  member_count: number;
-  last_active: number;
-  matchCount?: number; // for tag search
-}
-
-export interface Bot {
-  id?: number;
-  uuid: string;
-  name: string;
-  owner_pubkey: string;
-  unique_name: string;
-  price_per_use: number;
-  created: string;
-  updated: string;
-  unlisted: boolean;
-  deleted: boolean;
-  owner_route_hint: string;
-  owner: string;
-  pubkey: string; // group encryption key
-  price: number;
-  img: string;
-  tags: string[];
-  description: string;
-  member_count: number;
-  hide?: boolean;
-}
-
-export interface Person {
-  id: number;
-  unique_name: string;
-  owner_pubkey: string;
-  owner_alias: string;
-  description: string;
-  img: string;
-  tags: string[];
-  pubkey: string;
-  photo_url: string;
-  alias: string;
-  route_hint: string;
-  contact_key: string;
-  price_to_meet: number;
-  last_login?: number;
-  url: string;
-  verification_signature: string;
-  extras: Extras;
-  hide?: boolean;
-  commitment_fee?: number;
-  assigned_hours?: number;
-  bounty_expires?: number;
-}
-
-export interface PersonFlex {
-  id?: number;
-  unique_name?: string;
-  owner_pubkey?: string;
-  owner_alias?: string;
-  description?: string;
-  img?: string;
-  tags?: string[];
-  pubkey?: string;
-  photo_url?: string;
-  alias?: string;
-  route_hint?: string;
-  contact_key?: string;
-  last_login?: number;
-  price_to_meet?: number;
-  url?: string;
-  verification_signature?: string;
-  extras?: Extras;
-  hide?: boolean;
-}
-
-export interface PersonPost {
-  person: PersonFlex;
-  title?: string;
-  description?: string;
-  created: number;
-}
-
-export interface PersonWanted {
-  person: PersonFlex;
-  title?: string;
-  description?: string;
-  created?: number;
-  show?: boolean;
-  assignee?: any;
-  body: PersonWanted | any;
-  type?: string;
-  price?: string;
-}
-
-export interface PersonOffer {
-  person: PersonFlex;
-  title: string;
-  description: string;
-  created: number;
-}
-
-export interface Jwt {
-  jwt: string;
-}
-
-export interface QueryParams {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  direction?: string;
-  search?: string;
-}
-
-export interface ClaimOnLiquid {
-  asset: number;
-  to: string;
-  amount?: number;
-  memo: string;
-}
-
-export interface LnAuthData {
-  encode: string;
-  k1: string;
-}
-
-export interface LnInvoice {
-  success: boolean;
-  response: {
-    invoice: string;
-  };
-}

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
-import { colors } from '../../../config/colors';
 
 export default function TextInput({
   error,

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import { Widget } from './main/types';
 import { Person } from '../store/main';
 import { MeData } from '../store/ui';
+import { Widget } from './main/types';
 
 export interface AuthProps {
   style?: React.CSSProperties;

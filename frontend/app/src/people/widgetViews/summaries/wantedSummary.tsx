@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
-import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
 import { useLocation } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
@@ -12,12 +12,12 @@ import { Button } from '../../../components/common';
 import { useStores } from '../../../store';
 import { LanguageObject, awards } from '../../utils/language_label_style';
 import NameTag from '../../utils/nameTag';
+import { sendToRedirect } from '../../../helpers';
+import { WantedSummaryProps } from '../../interfaces';
 import CodingMobile from './wantedSummaries/codingMobile';
 import CodingBounty from './wantedSummaries/codingBounty';
 import CodingDesktop from './wantedSummaries/codingDesktop';
-import { sendToRedirect } from '../../../helpers';
-import { observer } from 'mobx-react-lite';
-import { WantedSummaryProps } from '../../interfaces';
+import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
 
 function useQuery() {
   const { search } = useLocation();
@@ -151,7 +151,7 @@ function WantedSummary(props: WantedSummaryProps) {
           value: value?.owner_pubkey || '',
           label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
         },
-							codingLanguage: codingLanguage?.map((x: any) => ({ ...x })),
+        codingLanguage: codingLanguage?.map((x: any) => ({ ...x })),
         estimate_session_length: estimate_session_length,
         show: show,
         type: type,

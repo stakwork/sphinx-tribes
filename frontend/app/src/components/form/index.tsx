@@ -180,7 +180,9 @@ function Form(props: FormProps) {
     (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || [];
 
   // inject owner tribes
-  const tribesSelectorIndex = schema?.findIndex((f: any) => f.name === 'tribe' || f.name === 'tribes');
+  const tribesSelectorIndex = schema?.findIndex(
+    (f: any) => f.name === 'tribe' || f.name === 'tribes'
+  );
   if (tribesSelectorIndex > -1) {
     // give "none" option
     schema[tribesSelectorIndex].options = [{ value: 'none', label: 'None' }];
@@ -207,7 +209,9 @@ function Form(props: FormProps) {
           ? values.github_description || !!values.description
           : !!values.description;
 
-        const valid = schemaData.required.every((key: string) => (key === '' ? true : values?.[key]));
+        const valid = schemaData.required.every((key: string) =>
+          key === '' ? true : values?.[key]
+        );
 
         const isBtnDisabled = !valid || (stepTracker === 3 && !isDescriptionValid);
 

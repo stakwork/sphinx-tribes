@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
+import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { FieldEnv, FieldTextArea, Note } from './index';
-import { colors } from '../../../config/colors';
 
 const StyleOnText = {
   Description: {

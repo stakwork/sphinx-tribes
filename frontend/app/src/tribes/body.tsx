@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useStores } from '../store';
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
@@ -9,15 +8,16 @@ import {
   EuiButton,
   EuiHighlight
 } from '@elastic/eui';
-import Tribe from './tribe';
+import { observer } from 'mobx-react-lite';
+import { useStores } from '../store';
 import { useIsMobile, usePageScroll } from '../hooks';
 import { SearchTextInput } from '../components/common';
-import Tag from './tag';
-import tags from './tags';
 import NoResults from '../people/utils/noResults';
 import PageLoadSpinner from '../people/utils/pageLoadSpinner';
 import { colors } from '../config/colors';
-import { observer } from 'mobx-react-lite';
+import tags from './tags';
+import Tag from './tag';
+import Tribe from './tribe';
 
 export default observer(BodyComponent);
 

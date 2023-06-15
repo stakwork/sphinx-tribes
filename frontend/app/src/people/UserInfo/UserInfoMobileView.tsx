@@ -1,11 +1,11 @@
 import { Button } from 'components/common';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
+import { UserInfoProps } from 'people/interfaces';
+import ConnectCard from 'people/utils/connectCard';
 import { useUserInfo } from './hooks';
 import { Head, Img, Name, RowWrap } from './styles';
 import { HeaderMobile } from './MobileHeader';
-import { UserInfoProps } from 'people/interfaces';
-import ConnectCard from 'people/utils/connectCard';
 
 export const UserInfoMobileView = observer(({ setShowSupport }: UserInfoProps) => {
   const { canEdit, goBack, userImg, owner_alias, logout, qrString, onEdit, person } = useUserInfo();

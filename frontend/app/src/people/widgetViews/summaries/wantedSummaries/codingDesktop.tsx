@@ -1,15 +1,15 @@
 /* eslint-disable func-style */
 import React from 'react';
-import { ButtonRow, Y, P, B, Img, Wrap, SectionPad, LoomIcon, GithubIcon } from './style';
-import { AddToFavorites, CopyLink, ShareOnTwitter, ViewTribe, ViewGithub } from './components';
+import { EuiText } from '@elastic/eui';
+import { CodingViewProps } from 'people/interfaces';
 import { Divider, Paragraph, Title } from '../../../../components/common';
 import GithubStatusPill from '../../parts/statusPill';
-import { EuiText } from '@elastic/eui';
 import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/renderMarkdown';
 import { formatPrice, satToUsd } from '../../../../helpers';
-import { CodingViewProps } from 'people/interfaces';
+import { AddToFavorites, CopyLink, ShareOnTwitter, ViewTribe, ViewGithub } from './components';
+import { ButtonRow, Y, P, B, Img, Wrap, SectionPad, LoomIcon, GithubIcon } from './style';
 
 export default function DesktopView(props: CodingViewProps) {
   const {

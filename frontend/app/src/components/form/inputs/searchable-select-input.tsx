@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
-import type { Props } from './propsType';
-import { FieldEnv, Note } from './index';
+import { observer } from 'mobx-react-lite';
 import { SearchableSelect } from '../../common';
 import { useStores } from '../../../store';
 import { colors } from '../../../config/colors';
-import { observer } from 'mobx-react-lite';
+import type { Props } from './propsType';
+import { FieldEnv, Note } from './index';
 
 export default observer(SearchableSelectInput);
 function SearchableSelectInput({

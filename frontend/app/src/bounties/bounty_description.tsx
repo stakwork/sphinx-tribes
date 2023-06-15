@@ -1,11 +1,11 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { isString } from 'lodash';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
 import { BountiesDescriptionProps } from './interfaces';
-import { isString } from 'lodash';
 
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];

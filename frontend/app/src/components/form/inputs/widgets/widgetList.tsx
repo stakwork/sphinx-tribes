@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { EuiButtonIcon } from '@elastic/eui';
 import Blog from './listItems/blog';
 import Offer from './listItems/offer';
 import Wanted from './listItems/wanted';
-import { EuiButtonIcon } from '@elastic/eui';
 import { WidgetListProps } from './interfaces';
 
 export default function WidgetList(props: WidgetListProps) {

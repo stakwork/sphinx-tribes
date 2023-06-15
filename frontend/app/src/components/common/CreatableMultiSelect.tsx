@@ -1,9 +1,9 @@
 import React from 'react';
 import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
+import { SelProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
 import { colourOptions } from '../../people/utils/language_label_style';
-import { SelProps } from 'components/interfaces';
 
 export default function Sel(props: SelProps) {
   const { onChange, value, style, setIsTop } = props;
@@ -35,7 +35,7 @@ export default function Sel(props: SelProps) {
         }}
         className={'multi-select-input'}
         styles={{
-								control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
+          control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
           option: (styles: any) => ({
             ...styles,
             backgroundColor: '#fff',
@@ -47,7 +47,7 @@ export default function Sel(props: SelProps) {
               background: color.light_blue200
             }
           }),
-												multiValue: (styles: any, { data }: any) => ({
+          multiValue: (styles: any, { data }: any) => ({
             ...styles,
             backgroundColor: data.background,
             border: data.border,
@@ -56,13 +56,13 @@ export default function Sel(props: SelProps) {
             fontSize: '14px',
             fontWeight: '500'
           }),
-												multiValueLabel: (styles: any, { data }: any) => ({
+          multiValueLabel: (styles: any, { data }: any) => ({
             ...styles,
             background: data.background,
             color: data.color,
             border: data.border
           }),
-												multiValueRemove: (styles: any, { data }: any) => ({
+          multiValueRemove: (styles: any, { data }: any) => ({
             ...styles,
             color: data.color,
             backgroundColor: data.background,

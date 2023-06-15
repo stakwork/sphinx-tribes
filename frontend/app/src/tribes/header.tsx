@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { useStores } from '../store';
 
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
+import { useStores } from '../store';
 
 export default observer(Header);
 

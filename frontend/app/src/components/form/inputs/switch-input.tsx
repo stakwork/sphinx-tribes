@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { EuiSwitch, EuiText } from '@elastic/eui';
+import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { Note } from './index';
-import { colors } from '../../../config/colors';
 
 export default function SwitchInput({
   label,

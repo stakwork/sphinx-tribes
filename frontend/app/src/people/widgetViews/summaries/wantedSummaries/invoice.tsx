@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { CountDownText, CountDownTimer, CountDownTimerWrap, InvoiceWrap, QrWrap } from './style';
 import QR from 'people/utils/QR';
-import { calculateTimeLeft } from '../../../../helpers';
 import QrBar from 'people/utils/QrBar';
+import { calculateTimeLeft } from '../../../../helpers';
+import { CountDownText, CountDownTimer, CountDownTimerWrap, InvoiceWrap, QrWrap } from './style';
 
 export default function Invoice(props: {
   startDate: Date;

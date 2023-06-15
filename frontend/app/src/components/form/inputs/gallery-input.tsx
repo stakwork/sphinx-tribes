@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
-import type { Props } from './propsType';
-import { useStores } from '../../../store';
 import MaterialIcon from '@material/react-material-icon';
+import { observer } from 'mobx-react-lite';
+import { useStores } from '../../../store';
 
 import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { colors } from '../../../config/colors';
-import { observer } from 'mobx-react-lite';
+import type { Props } from './propsType';
 
 export default observer(GalleryInput);
 

@@ -18,7 +18,7 @@ export const Wrap = styled.div<colorProps>`
   font-style: normal;
   font-weight: 500;
   font-size: 24px;
-	color: ${(p: any) => p?.color && p.color.grayish.G10};
+  color: ${(p: any) => p?.color && p.color.grayish.G10};
   justify-content: space-between;
 `;
 
@@ -49,7 +49,7 @@ export const T = styled.div`
 export const B = styled.span<colorProps>`
   font-size: 15px;
   font-weight: bold;
-	color: ${(p: any) => p?.color && p.color.grayish.G10};
+  color: ${(p: any) => p?.color && p.color.grayish.G10};
 `;
 
 export const P = styled.div<colorProps>`
