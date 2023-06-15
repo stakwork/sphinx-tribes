@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import { PaidBountiesProps } from 'people/interfaces';
 import BountyDescription from '../../bounties/bounty_description';
 import BountyPrice from '../../bounties/bounty_price';
 import BountyProfileView from '../../bounties/bounty_profile_view';
 import { colors } from '../../config/colors';
-import { PaidBountiesProps } from 'people/interfaces';
 
 const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];

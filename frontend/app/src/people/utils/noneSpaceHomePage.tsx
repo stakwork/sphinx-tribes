@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import IconButton from '../../components/common/icon_button';
 import { NoneSpaceProps } from 'people/interfaces';
+import IconButton from '../../components/common/icon_button';
 
 export default function NoneSpaceHomePage(props: NoneSpaceProps) {
   if (props.banner) {

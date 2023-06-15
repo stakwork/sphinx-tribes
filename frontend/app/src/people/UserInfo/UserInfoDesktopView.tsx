@@ -1,11 +1,11 @@
 import { Button, IconButton } from 'components/common';
 import { AboutView } from 'people/widgetViews/aboutView';
 import React, { useState } from 'react';
-import { useUserInfo } from './hooks';
-import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
 import ConnectCard from 'people/utils/connectCard';
 import { observer } from 'mobx-react-lite';
 import { UserInfoProps } from 'people/interfaces';
+import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
+import { useUserInfo } from './hooks';
 
 export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) => {
   const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();

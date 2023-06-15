@@ -77,11 +77,15 @@
         "error",
         {
           "parameter": true,
-					"objectDestructuring": false,
+          "objectDestructuring": false,
           "arrowParameter": true,
-					"memberVariableDeclaration": false
+          "memberVariableDeclaration": false
         }
       ],
+     "no-use-before-define": "error",
+     "import/order": "error",
+     "camelcase": "off",
+     "comma-dangle": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "warn",
       "@typescript-eslint/no-empty-function": "error",
@@ -92,13 +96,14 @@
       "react-hooks/exhaustive-deps": "warn",
       "react/prop-types": "warn",
       "no-unused-vars": "warn",
-			"no-var": "error",
+      "no-var": "warn",
       "no-extra-boolean-cast": "warn",
       "no-useless-escape": "warn",
       "no-prototype-builtins": "warn",
       "no-empty-pattern": "warn",
       "no-empty": "warn",
-      "no-unreachable": "warn",
+      "no-multiple-empty-lines": "error",
+      "no-unreachable": "error",
       "no-useless-catch": "warn",
       "react/jsx-closing-bracket-location": [
         "warn",
@@ -111,8 +116,13 @@
       ],
       "prefer-const": "warn",
       "no-const-assign": "warn",
-      "no-var": "warn",
-      "prefer-destructuring": "warn",
+      "prefer-destructuring": [
+        "error",
+        {
+          "object": true,
+          "array": false
+        }
+      ],
       "prefer-template": "warn",
       "func-style": "off",
       "react/self-closing-comp": "warn",
@@ -157,6 +167,7 @@
     "@typescript-eslint/parser": "^5.57.1",
     "bootstrap": "^4.5.0",
     "eslint": "^8.37.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-react": "^7.31.10",
     "husky": "^8.0.3",

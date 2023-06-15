@@ -1,6 +1,8 @@
 /* eslint-disable func-style */
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { WantedViews2Props } from 'people/interfaces';
 import { useIsMobile } from '../../hooks';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import { useStores } from '../../store';
@@ -9,8 +11,6 @@ import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
 import DesktopView from './wantedViews/desktopView';
-import { observer } from 'mobx-react-lite';
-import { WantedViews2Props } from 'people/interfaces';
 
 export default observer(WantedView);
 

@@ -1,7 +1,8 @@
 /* eslint-disable func-style */
 import React from 'react';
-import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from './style';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
+import { WantedViewsProps } from 'people/interfaces';
 import GithubStatusPill from '../parts/statusPill';
 import { colors } from '../../../config/colors';
 import NameTag from '../../utils/nameTag';
@@ -10,8 +11,7 @@ import { formatPrice, satToUsd } from '../../../helpers';
 import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
-import { observer } from 'mobx-react-lite';
-import { WantedViewsProps } from 'people/interfaces';
+import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from './style';
 
 export default observer(DesktopView);
 

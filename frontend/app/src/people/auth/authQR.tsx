@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { AuthProps } from 'people/interfaces';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
 import QR from '../utils/QR';
-import { observer } from 'mobx-react-lite';
-import { AuthProps } from 'people/interfaces';
 
 //TODO: mv to utils
 const host = getHost();

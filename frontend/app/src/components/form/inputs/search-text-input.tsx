@@ -46,7 +46,7 @@ interface styledProps {
 
 const Text = styled.input<styledProps>`
   background: ${(p: any) => p.color && p.color.grayish.G71A};
-	border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
+  border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
   box-sizing: border-box;
   border-radius: 21px;
   padding-left: 20px;
@@ -66,7 +66,7 @@ const E = styled.div<styledProps>`
   height: 100%;
   justify-content: center;
   align-items: center;
-	color: ${(p: any) => p.color && p.color.blue3};
+  color: ${(p: any) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
-import { observer } from 'mobx-react-lite';
 
 export default observer(NoResults);
 function NoResults() {

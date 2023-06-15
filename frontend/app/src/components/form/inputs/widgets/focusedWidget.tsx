@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Input from '../../../form/inputs/';
 import { EuiButton } from '@elastic/eui';
-import WidgetList from './widgetList';
 import MaterialIcon from '@material/react-material-icon';
+import Input from '../../../form/inputs/';
+import WidgetList from './widgetList';
 import { FocusedWidgetProps } from './interfaces';
 
 export default function FocusedWidget(props: FocusedWidgetProps) {

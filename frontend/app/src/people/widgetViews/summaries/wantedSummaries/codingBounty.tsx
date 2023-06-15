@@ -1,5 +1,24 @@
 /* eslint-disable func-style */
 import React, { useEffect, useState } from 'react';
+import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
+import moment from 'moment';
+import { calculateTimeLeft } from 'helpers';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { Button, Divider, Modal } from '../../../../components/common';
+import { colors } from '../../../../config/colors';
+import { renderMarkdown } from '../../../utils/renderMarkdown';
+import { satToUsd } from '../../../../helpers';
+import { useStores } from '../../../../store';
+import IconButton from '../../../../components/common/icon_button';
+import ImageButton from '../../../../components/common/Image_button';
+import BountyProfileView from '../../../../bounties/bounty_profile_view';
+import ButtonSet from '../../../../bounties/bountyModal_button_set';
+import BountyPrice from '../../../../bounties/bounty_price';
+import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
+import { CodingBountiesProps } from '../../../interfaces';
+import LoomViewerRecorder from '../../../../people/utils/loomViewerRecorder';
+import Invoice from './invoice';
 import {
   AssigneeProfile,
   Creator,
@@ -21,25 +40,6 @@ import {
   AwardBottomContainer,
   BountyTime
 } from './style';
-import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
-import { Button, Divider, Modal } from '../../../../components/common';
-import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
-import { satToUsd } from '../../../../helpers';
-import { useStores } from '../../../../store';
-import IconButton from '../../../../components/common/icon_button';
-import ImageButton from '../../../../components/common/Image_button';
-import BountyProfileView from '../../../../bounties/bounty_profile_view';
-import ButtonSet from '../../../../bounties/bountyModal_button_set';
-import BountyPrice from '../../../../bounties/bounty_price';
-import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
-import { observer } from 'mobx-react-lite';
-import { CodingBountiesProps } from '../../../interfaces';
-import moment from 'moment';
-import Invoice from './invoice';
-import { calculateTimeLeft } from 'helpers';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
-import LoomViewerRecorder from '../../../../people/utils/loomViewerRecorder';
 
 export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
@@ -872,7 +872,7 @@ function MobileView(props: CodingBountiesProps) {
               ) : null}
               {loomEmbedUrl && (
                 <>
-                  <div className="loomContainer"></div>
+                  <div className="loomContainer" />
                   <EuiText className="loomHeading">Video</EuiText>
                   <LoomViewerRecorder
                     readOnly

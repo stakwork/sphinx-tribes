@@ -1,9 +1,9 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { PriceOuterContainer } from 'components/common';
 import { colors } from '../config/colors';
 import { DollarConverter, satToUsd } from '../helpers';
-import { PriceOuterContainer } from 'components/common';
 import { BountiesPriceProps } from './interfaces';
 
 const Session = [
@@ -164,7 +164,7 @@ const SessionContainer = styled.div<PriceContainerProps>`
   .Session_Text {
     font-size: 13px;
     font-weight: 700;
-		color: ${(p: any) => (p.session_text_color ? p.session_text_color : '')};
+    color: ${(p: any) => (p.session_text_color ? p.session_text_color : '')};
     font-family: Barlow;
   }
   .EST_Text {

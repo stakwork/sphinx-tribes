@@ -96,6 +96,6 @@ const colorsDispatcher = {
 const Podium = styled.div<{ place: number }>`
   --height: 300px;
   width: 100%;
-	height: ${(p: any) => `calc(var(--height) / ${p.place * 1.5})`};
+  height: ${(p: any) => `calc(var(--height) / ${p.place * 1.5})`};
   background-color: ${(p: any) => colorsDispatcher[p.place]};
 `;

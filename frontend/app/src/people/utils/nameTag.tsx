@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
-import { useStores } from '../../store';
 import { useHistory } from 'react-router';
-import { useIsMobile } from '../../hooks';
-import { colors } from '../../config/colors';
 import { observer } from 'mobx-react-lite';
 import { NameTagProps } from 'people/interfaces';
+import { useStores } from '../../store';
+import { useIsMobile } from '../../hooks';
+import { colors } from '../../config/colors';
 
 export default observer(NameTag);
 

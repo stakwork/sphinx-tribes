@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
-import type { Props } from './propsType';
-import { FieldEnv, Note } from './index';
 import { MultiSelect } from '../../common';
 import { colors } from '../../../config/colors';
+import type { Props } from './propsType';
+import { FieldEnv, Note } from './index';
 
 export default function MultiSelectInput({
   error,
@@ -68,7 +68,7 @@ const E = styled.div<styledProps>`
   height: 100%;
   justify-content: center;
   align-items: center;
-	color: ${(p: any) => p.color && p.color.blue3};
+  color: ${(p: any) => p.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;

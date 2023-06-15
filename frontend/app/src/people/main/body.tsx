@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';
+import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui';
 import { SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
@@ -10,7 +11,6 @@ import Person from '../person';
 import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import StartUpModal from '../utils/start_up_modal';
-import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui';
 
 export default observer(BodyComponent);
 

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Modal } from '../../components/common';
-import { colors } from '../../config/colors';
 import { ConnectCardProps } from 'people/interfaces';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
-import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import moment from 'moment';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
+import { colors } from '../../config/colors';
+import { Button, Modal } from '../../components/common';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
@@ -53,7 +53,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
     if (res.msg === SOCKET_MSG.user_connect) {
-      let user = ui.meInfo;
+      const user = ui.meInfo;
       if (user) {
         user.websocketToken = res.body;
         ui.setMeInfo(user);

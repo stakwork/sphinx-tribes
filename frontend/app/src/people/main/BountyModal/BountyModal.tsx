@@ -4,8 +4,8 @@ import { widgetConfigs } from 'people/utils/constants';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
-import FocusedView from '../focusView';
 import { BountyModalProps } from 'people/interfaces';
+import FocusedView from '../focusView';
 
 const config = widgetConfigs.wanted;
 export const BountyModal = ({ basePath }: BountyModalProps) => {

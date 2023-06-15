@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import type { Props } from './propsType';
 import { colors } from '../../../config/colors';
+import type { Props } from './propsType';
 
 export default function TextInputNew({
   error,

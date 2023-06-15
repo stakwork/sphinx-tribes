@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
-import type { Props } from './propsType';
-import { FieldEnv, Note } from './index';
 import { CreatableMultiSelect } from '../../common';
 import { colors } from '../../../config/colors';
+import type { Props } from './propsType';
+import { FieldEnv, Note } from './index';
 
 export default function CreatableMultiSelectInput({
   error,
