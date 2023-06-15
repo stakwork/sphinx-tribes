@@ -7,8 +7,8 @@ import { useHistory } from 'react-router-dom';
 import { useStores } from 'store';
 import { queryLimit } from 'store/main';
 import styled from 'styled-components';
-import Person from '../person';
 import { observer } from 'mobx-react-lite';
+import Person from '../person';
 
 export const PeopleList = observer(() => {
   const { main, ui } = useStores();

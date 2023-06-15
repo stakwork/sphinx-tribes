@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useStores } from '../../store';
 import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
-import { useIsMobile } from '../../hooks';
 import { useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
+import { observer } from 'mobx-react-lite';
+import { useStores } from '../../store';
+import { useIsMobile } from '../../hooks';
 import { Modal, Button } from '../../components/common';
 
 import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 import IconButton from '../../components/common/icon_button';
-import { observer } from 'mobx-react-lite';
 import { PostModal } from '../widgetViews/postBounty/PostModal';
 import StartUpModal from '../utils/start_up_modal';
 

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Divider } from '../../components/common';
-import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
-import { renderMarkdown } from '../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
 import { AboutViewProps } from 'people/interfaces';
+import { Divider } from '../../components/common';
+import QrBar from '../utils/QrBar';
+import { renderMarkdown } from '../utils/renderMarkdown';
 
 export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();

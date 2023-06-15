@@ -118,7 +118,7 @@ export const TabsPages = observer(() => {
 
 const Container = styled.div<{ isMobile: boolean }>`
   flex-grow: 1;
-	margin: ${(p: any) => (p.isMobile ? '0 -20px' : '0')};
+  margin: ${(p: any) => (p.isMobile ? '0 -20px' : '0')};
 `;
 
 const Tabs = styled.div`
@@ -138,7 +138,7 @@ const Tab = styled.div<TagProps>`
   display: flex;
   padding: 10px;
   margin-right: 25px;
-	color: ${(p: any) => (p.selected ? '#292C33' : '#8E969C')};
+  color: ${(p: any) => (p.selected ? '#292C33' : '#8E969C')};
   border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
   cursor: hover;
   font-weight: 500;

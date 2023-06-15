@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Widget from './widget';
-import FocusedWidget from './focusedWidget';
-import FadeLeft from '../../../animated/fadeLeft';
 import styled from 'styled-components';
 import { useEffect } from 'react';
+import FadeLeft from '../../../animated/fadeLeft';
+import Widget from './widget';
+import FocusedWidget from './focusedWidget';
 
 async function sleep(ms: number) {
   return new Promise((resolve: any) => setTimeout(resolve, ms));

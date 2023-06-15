@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import type { Props } from './propsType';
-import { FieldEnv, FieldText, Note } from './index';
 import { satToUsd } from '../../../helpers';
 import { colors } from '../../../config/colors';
+import type { Props } from './propsType';
+import { FieldEnv, FieldText, Note } from './index';
 
 export default function NumberInput({
   name,

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { QRCode } from 'react-qr-svg';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
+import { AuthProps } from 'people/interfaces';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
-import { AuthProps } from 'people/interfaces';
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {

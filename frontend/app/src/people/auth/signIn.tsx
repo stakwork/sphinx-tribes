@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useObserver } from 'mobx-react-lite';
-import { useStores } from '../../store';
 import styled from 'styled-components';
-import { Divider } from '../../components/common';
-import IconButton from '../../components/common/icon_button';
-import { useIsMobile } from '../../hooks';
-import AuthQR from './authQR';
-import QR from '../utils/QR';
-import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 import { observer } from 'mobx-react-lite';
 import { AuthProps } from 'people/interfaces';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { useStores } from '../../store';
+import { Divider } from '../../components/common';
+import IconButton from '../../components/common/icon_button';
+import { useIsMobile } from '../../hooks';
+import QR from '../utils/QR';
+import AuthQR from './authQR';
+import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 
 export default observer(SignIn);
 
@@ -35,7 +35,7 @@ function SignIn(props: AuthProps) {
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
     if (res.msg === SOCKET_MSG.user_connect) {
-      let user = ui.meInfo;
+      const user = ui.meInfo;
       if (user) {
         user.websocketToken = res.body;
         ui.setMeInfo(user);

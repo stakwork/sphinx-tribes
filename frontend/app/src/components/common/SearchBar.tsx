@@ -1,9 +1,20 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { CSSProperties, ComponentProps, useState } from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
-import { observer } from 'mobx-react-lite';
+
+interface InputProps {
+  border?: string;
+  borderHover?: string;
+  borderActive?: string;
+  TextColor?: string;
+  TextColorHover?: string;
+  iconColor?: string;
+  iconColorHover?: string;
+  color?: any;
+}
 
 type SearchTextInputProps = ComponentProps<'input'> &
   InputProps & {
@@ -108,17 +119,6 @@ function debounce(func: any, delay: any) {
   inDebounce = setTimeout(() => {
     func();
   }, delay);
-}
-
-interface InputProps {
-  border?: string;
-  borderHover?: string;
-  borderActive?: string;
-  TextColor?: string;
-  TextColorHover?: string;
-  iconColor?: string;
-  iconColorHover?: string;
-  color?: any;
 }
 
 const Container = styled.div<InputProps>`

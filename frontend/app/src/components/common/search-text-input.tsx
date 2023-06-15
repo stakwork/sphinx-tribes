@@ -1,9 +1,9 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
 import { SearchTextInputProps } from 'components/interfaces';
+import { useStores } from '../../store';
 
 export default observer(SearchTextInput);
 function SearchTextInput(props: SearchTextInputProps) {

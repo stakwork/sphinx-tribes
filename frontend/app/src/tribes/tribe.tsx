@@ -112,7 +112,11 @@ export default function Tribe({
                   <div className="lighter-color">{price_per_message || 0}</div>
                 </div>
                 <div className="section-separator" />
-                <a onClick={(e: any) => e.stopPropagation()} href={qrString} className="btn join-btn">
+                <a
+                  onClick={(e: any) => e.stopPropagation()}
+                  href={qrString}
+                  className="btn join-btn"
+                >
                   <img
                     style={{ width: 13, height: 13, marginRight: 8 }}
                     src="/static/launch-24px.svg"

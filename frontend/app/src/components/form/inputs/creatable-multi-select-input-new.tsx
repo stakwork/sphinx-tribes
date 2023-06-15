@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
-import type { Props } from './propsType';
 import { colors } from '../../../config/colors';
 import ImageButton from '../../common/Image_button';
 import {
@@ -10,6 +9,7 @@ import {
   LanguageObject
 } from '../../../people/utils/language_label_style';
 import { SvgMask } from '../../../people/utils/svgMask';
+import type { Props } from './propsType';
 
 const codingLanguages = GetValue(coding_languages);
 

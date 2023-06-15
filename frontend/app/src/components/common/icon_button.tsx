@@ -4,7 +4,7 @@ import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { IconButtonProps } from 'components/interfaces';
 
-function hexToRgba(hex: string, opacity: number = 1) {
+function hexToRgba(hex: string, opacity: any = 1) {
   try {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, function (m: any, r: any, g: any, b: any) {
@@ -235,13 +235,13 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   box-shadow: ${(p: any) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
 
   &:hover {
-		background: ${(p: any) => (p.hovercolor ? p.hovercolor : undefined)} !important;
+    background: ${(p: any) => (p.hovercolor ? p.hovercolor : undefined)} !important;
     transform: none !important;
     text-decoration: none !important;
   }
 
   &:active {
-		background: ${(p: any) => (p.activecolor ? p.activecolor : 'none')} !important;
+    background: ${(p: any) => (p.activecolor ? p.activecolor : 'none')} !important;
     transform: none !important;
     text-decoration: none !important;
   }

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
 import avatarIcon from '../../../public/static/profile_avatar.svg';
 import backgroundIcon from '../../../public/static/background_icon.svg';
 
-import type { Props } from './propsType';
-import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from '../../../store';
 import { Button, Modal } from '../../common';
 import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
-import { Note } from './index';
 import { colors } from '../../../config/colors';
-import { observer } from 'mobx-react-lite';
+import type { Props } from './propsType';
+import { Note } from './index';
 
 export default observer(ImageInput);
 
@@ -216,7 +216,8 @@ const DottedCircle = styled.div<DottedCircleProps>`
   width: 120px;
   border-radius: 50%;
   border-style: dashed;
-  border-color: ${(p: any) => (p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`)};
+  border-color: ${(p: any) =>
+    p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`};
   border-width: thin;
   cursor: pointer;
 `;

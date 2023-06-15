@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import { FormField } from './utils';
 import {
   languages,
   estimation,
@@ -7,6 +6,7 @@ import {
   help_wanted_coding_task_schema,
   help_wanted_other_schema
 } from '../../config/bounties';
+import { FormField } from './utils';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();

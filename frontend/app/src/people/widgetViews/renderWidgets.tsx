@@ -1,20 +1,19 @@
 /* eslint-disable func-style */
 import React from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { RenderWidgetsProps } from 'people/interfaces';
 import { useStores } from '../../store';
 
-import { AboutView } from './aboutView';
-import OfferView from './offerView';
-
-import { observer } from 'mobx-react-lite';
 import { meSchema } from '../../components/form/schema';
 import { useIsMobile } from '../../hooks';
 import Badges from '../utils/badges';
 import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
+import OfferView from './offerView';
+import { AboutView } from './aboutView';
 import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
-import { RenderWidgetsProps } from 'people/interfaces';
 
 export default observer(RenderWidgets);
 
@@ -23,7 +22,8 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
   const { meInfo } = ui || {};
   const personId = ui.selectedPerson;
 
-  let person: any = main.people && main.people.length && main.people.find((f: any) => f.id === personId);
+  let person: any =
+    main.people && main.people.length && main.people.find((f: any) => f.id === personId);
 
   // if i select myself, fill person with meInfo
   if (personId === ui.meInfo?.id) {

@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
+import styled, { css } from 'styled-components';
+import moment from 'moment';
+import { cloneDeep } from 'lodash';
+import { observer } from 'mobx-react-lite';
+import { FocusViewProps } from 'people/interfaces';
 import { useStores } from '../../store';
 import Form from '../../components/form';
-import styled, { css } from 'styled-components';
 import { Button, IconButton } from '../../components/common';
-import moment from 'moment';
 import WantedSummary from '../widgetViews/summaries/wantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
-import { cloneDeep } from 'lodash';
-import { observer } from 'mobx-react-lite';
-import { FocusViewProps } from 'people/interfaces';
 
 // this is where we see others posts (etc) and edit our own
 export default observer(FocusedView);
@@ -268,7 +268,8 @@ function FocusedView(props: FocusViewProps) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        personInfo.extras?.wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
+        personInfo.extras?.wanted?.map((value: any) => moment(value?.estimated_completion_date)) ||
+        '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';

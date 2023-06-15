@@ -12,7 +12,9 @@ export default function SupportMeView(props: SupportMe) {
       <M>{description || 'No description'} </M>
       <U>{url || 'No link'}</U>
 
-      {showImages && <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>}
+      {showImages && (
+        <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>
+      )}
     </Wrap>
   );
 }

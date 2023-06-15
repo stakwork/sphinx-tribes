@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import OfferView from '../widgetViews/offerView';
 import WantedView from '../widgetViews/wantedView';
 import PostView from '../widgetViews/postView';
-import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
 import { uiStore } from '../../store/ui';
-import DeleteTicketModal from './deleteModal';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
-import { observer } from 'mobx-react-lite';
+import DeleteTicketModal from './deleteModal';
 
 export default observer(WidgetSwitchViewer);
 
@@ -61,7 +61,9 @@ function WidgetSwitchViewer(props: any) {
     );
   });
 
-  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f: any) => f.dynamicSchemas);
+  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(
+    (f: any) => f.dynamicSchemas
+  );
   // if dynamic schema, get all those fields
   if (foundDynamicSchema) {
     const dynamicFields: any = [];
@@ -204,12 +206,13 @@ interface PanelProps {
 
 const Panel = styled.div<PanelProps>`
   margin-top: 4px;
-	background: ${(p: any) => p.color && p.color.pureWhite};
-	color: ${(p: any) => p.color && p.color.pureBlack};
+  background: ${(p: any) => p.color && p.color.pureWhite};
+  color: ${(p: any) => p.color && p.color.pureBlack};
   padding: 20px;
   border-bottom: ${(p: any) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
   :hover {
-    box-shadow: ${(p: any) => (p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none')} !important;
+    box-shadow: ${(p: any) =>
+      p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
   }
   :active {
     box-shadow: none !important;
@@ -227,10 +230,10 @@ const LoadMoreContainer = styled.div<PanelProps>`
     display: flex;
     justify-content: center;
     align-items: center;
-		color: ${(p: any) => p.color && p.color.grayish.G10};
-		border: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
+    color: ${(p: any) => p.color && p.color.grayish.G10};
+    border: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
     border-radius: 30px;
-		background: ${(p: any) => p.color && p.color.pureWhite};
+    background: ${(p: any) => p.color && p.color.pureWhite};
     font-family: 'Barlow';
     font-style: normal;
     font-weight: 500;
@@ -239,10 +242,10 @@ const LoadMoreContainer = styled.div<PanelProps>`
     cursor: pointer;
     user-select: none;
     :hover {
-			border: 1px solid ${(p: any) => p.color && p.color.grayish.G300};
+      border: 1px solid ${(p: any) => p.color && p.color.grayish.G300};
     }
     :active {
-			border: 1px solid ${(p: any) => p.color && p.color.grayish.G100};
+      border: 1px solid ${(p: any) => p.color && p.color.grayish.G100};
     }
   }
 `;

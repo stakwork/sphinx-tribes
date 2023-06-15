@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Props } from './propsType';
 import { colors } from '../../../config/colors';
+import { Props } from './propsType';
 
 export default function TextInputNew({
   error,
