@@ -159,8 +159,13 @@ function BotBody() {
 
   const loadBots = useCallback(async () => {
     setLoading(true);
+
+					let un = '';
     if (window.location.pathname.startsWith('/b/')) {
+      un = window.location.pathname.substr(3);
     }
+
+    const ps = await main.getBots(un, null);
 
     await main.getMyBots();
     setLoading(false);
