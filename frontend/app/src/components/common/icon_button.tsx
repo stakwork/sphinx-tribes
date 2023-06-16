@@ -4,6 +4,78 @@ import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { IconButtonProps } from 'components/interfaces';
 
+interface ButtonHoverProps {
+  hovercolor?: string;
+  activecolor?: string;
+  shadowcolor?: string;
+}
+
+const B = styled(EuiButton)<ButtonHoverProps>`
+  position: relative;
+  border-radius: 100px;
+  height: 36px;
+  font-weight: bold;
+  border: none;
+  font-weight: 500;
+  font-size: 15px;
+  font-family: Barlow;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  box-shadow: none !important;
+  text-transform: none !important;
+  transform: none !important;
+  text-decoration: none !important;
+  box-shadow: ${(p: any) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
+
+  &:hover {
+    background: ${(p: any) => (p.hovercolor ? p.hovercolor : undefined)} !important;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+
+  &:active {
+    background: ${(p: any) => (p.activecolor ? p.activecolor : 'none')} !important;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+`;
+
+const T = styled(EuiButton)`
+  position: relative;
+  border-radius: 100px;
+  height: 36px;
+  border: none;
+
+  font-weight: 500;
+  font-size: 15px;
+  font-family: Barlow;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  box-shadow: none !important;
+  text-transform: none !important;
+  transform: none !important;
+  text-decoration: none !important;
+
+  &.textButton {
+    background: transparent;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+  &.textButton:hover {
+    background: transparent;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+  &.textButton:focus {
+    background: transparent !important;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+`;
 function hexToRgba(hex: string, opacity: any = 1) {
   try {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -209,75 +281,3 @@ export default function IconButton(props: IconButtonProps) {
   );
 }
 
-interface ButtonHoverProps {
-  hovercolor?: string;
-  activecolor?: string;
-  shadowcolor?: string;
-}
-
-const B = styled(EuiButton)<ButtonHoverProps>`
-  position: relative;
-  border-radius: 100px;
-  height: 36px;
-  font-weight: bold;
-  border: none;
-  font-weight: 500;
-  font-size: 15px;
-  font-family: Barlow;
-  line-height: 18px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  box-shadow: none !important;
-  text-transform: none !important;
-  transform: none !important;
-  text-decoration: none !important;
-  box-shadow: ${(p: any) => (p.shadowcolor ? `0px 2px 10px ${p.shadowcolor}` : 'none')} !important;
-
-  &:hover {
-    background: ${(p: any) => (p.hovercolor ? p.hovercolor : undefined)} !important;
-    transform: none !important;
-    text-decoration: none !important;
-  }
-
-  &:active {
-    background: ${(p: any) => (p.activecolor ? p.activecolor : 'none')} !important;
-    transform: none !important;
-    text-decoration: none !important;
-  }
-`;
-
-const T = styled(EuiButton)`
-  position: relative;
-  border-radius: 100px;
-  height: 36px;
-  border: none;
-
-  font-weight: 500;
-  font-size: 15px;
-  font-family: Barlow;
-  line-height: 18px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  box-shadow: none !important;
-  text-transform: none !important;
-  transform: none !important;
-  text-decoration: none !important;
-
-  &.textButton {
-    background: transparent;
-    transform: none !important;
-    text-decoration: none !important;
-  }
-  &.textButton:hover {
-    background: transparent;
-    transform: none !important;
-    text-decoration: none !important;
-  }
-  &.textButton:focus {
-    background: transparent !important;
-    transform: none !important;
-    text-decoration: none !important;
-  }
-`;

@@ -6,6 +6,64 @@ import { colors } from '../config/colors';
 import { DollarConverter, satToUsd } from '../helpers';
 import { BountiesPriceProps } from './interfaces';
 
+interface PriceContainerProps {
+  price_Text_Color?: string;
+  priceBackground?: string;
+  session_text_color?: string;
+}
+
+const PriceContainer = styled.div<PriceContainerProps>`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px 24px;
+  color: #909baa;
+  padding-top: 41px;
+  .PriceStaticTextContainer {
+    width: 28px;
+    height: 33px;
+    display: flex;
+    align-items: center;
+  }
+  .PriceStaticText {
+    font-family: Barlow;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+  }
+`;
+
+const USDContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 34px;
+  .USD_Price {
+    font-size: 13px;
+    font-weight: 500;
+  }
+`;
+
+const SessionContainer = styled.div<PriceContainerProps>`
+  height: 28px;
+  .Session_Text {
+    font-size: 13px;
+    font-weight: 700;
+    color: ${(p: any) => (p.session_text_color ? p.session_text_color : '')};
+    font-family: Barlow;
+  }
+  .EST_Text {
+    font-weight: 400;
+    font-family: Barlow;
+  }
+  .EST_Value {
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14.06px;
+  }
+`;
 const Session = [
   {
     label: 'Less than 1 hour',
@@ -119,62 +177,3 @@ const BountyPrice = (props: BountiesPriceProps) => {
 };
 
 export default BountyPrice;
-
-interface PriceContainerProps {
-  price_Text_Color?: string;
-  priceBackground?: string;
-  session_text_color?: string;
-}
-
-const PriceContainer = styled.div<PriceContainerProps>`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0px 24px;
-  color: #909baa;
-  padding-top: 41px;
-  .PriceStaticTextContainer {
-    width: 28px;
-    height: 33px;
-    display: flex;
-    align-items: center;
-  }
-  .PriceStaticText {
-    font-family: Barlow;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 17px;
-  }
-`;
-
-const USDContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-left: 34px;
-  .USD_Price {
-    font-size: 13px;
-    font-weight: 500;
-  }
-`;
-
-const SessionContainer = styled.div<PriceContainerProps>`
-  height: 28px;
-  .Session_Text {
-    font-size: 13px;
-    font-weight: 700;
-    color: ${(p: any) => (p.session_text_color ? p.session_text_color : '')};
-    font-family: Barlow;
-  }
-  .EST_Text {
-    font-weight: 400;
-    font-family: Barlow;
-  }
-  .EST_Value {
-    font-family: Roboto;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 14.06px;
-  }
-`;

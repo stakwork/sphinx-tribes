@@ -8,38 +8,6 @@ import React, { useEffect } from 'react';
 import { useStores } from 'store';
 import styled from 'styled-components';
 
-export const LeaderboardPage = observer(() => {
-  const { leaderboard } = useStores();
-  useEffect(() => {
-    leaderboard.fetchLeaders();
-  }, [leaderboard]);
-
-  if (leaderboard.isLoading) {
-    return (
-      <LoaderContainer>
-        <EuiLoadingSpinner size="xl" />
-      </LoaderContainer>
-    );
-  }
-  return (
-    <Container>
-      <div className="inner">
-        {leaderboard.total && (
-          <Summary
-            className="summary"
-            bounties={leaderboard.total?.total_bounties_completed}
-            sats={leaderboard.total?.total_sats_earned}
-          />
-        )}
-        <Top3 />
-        {leaderboard?.others.map((item: any, index: number) => (
-          <LeaerboardItem position={index + 4} key={item.owner_pubkey} {...item} />
-        ))}
-      </div>
-    </Container>
-  );
-});
-
 const Container = styled.div`
   height: calc(100% - 4rem);
   padding: 2rem;
@@ -86,3 +54,35 @@ const LoaderContainer = styled.div`
   width: 100%;
   height: 100%;
 `;
+
+export const LeaderboardPage = observer(() => {
+  const { leaderboard } = useStores();
+  useEffect(() => {
+    leaderboard.fetchLeaders();
+  }, [leaderboard]);
+
+  if (leaderboard.isLoading) {
+    return (
+      <LoaderContainer>
+        <EuiLoadingSpinner size="xl" />
+      </LoaderContainer>
+    );
+  }
+  return (
+    <Container>
+      <div className="inner">
+        {leaderboard.total && (
+          <Summary
+            className="summary"
+            bounties={leaderboard.total?.total_bounties_completed}
+            sats={leaderboard.total?.total_sats_earned}
+          />
+        )}
+        <Top3 />
+        {leaderboard?.others.map((item: any, index: number) => (
+          <LeaerboardItem position={index + 4} key={item.owner_pubkey} {...item} />
+        ))}
+      </div>
+    </Container>
+  );
+});

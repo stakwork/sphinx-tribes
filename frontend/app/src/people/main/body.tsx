@@ -12,9 +12,38 @@ import NoResults from '../utils/noResults';
 import PageLoadSpinner from '../utils/pageLoadSpinner';
 import StartUpModal from '../utils/start_up_modal';
 
-export default observer(BodyComponent);
-
 const color = colors['light'];
+const Body = styled.div<{ isMobile: boolean }>`
+  flex: 1;
+  height: ${(p: any) => (p.isMobile ? 'calc(100% - 105px)' : 'calc(100% - 65px)')};
+  background: ${(p: any) => (p.isMobile ? undefined : color.grayish.G950)};
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  & > .header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 0;
+  }
+  & > .content {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0px 20px 20px 20px;
+  }
+`;
+
+export const Spacer = styled.div`
+  display: flex;
+  min-height: 10px;
+  min-width: 100%;
+  height: 10px;
+  width: 100%;
+`;
 
 function BodyComponent() {
   const { main, ui } = useStores();
@@ -26,6 +55,18 @@ function BodyComponent() {
   const history = useHistory();
   const isMobile = useIsMobile();
   const people = useFuse(main.people, ['owner_alias']).filter((f: any) => !f.hide) || [];
+  async function loadMore(direction: number) {
+    let currentPage = 1;
+    currentPage = peoplePageNumber;
+
+    let newPage = currentPage + direction;
+    if (newPage < 1) newPage = 1;
+    try {
+      await main.getPeople({ page: newPage });
+    } catch (e: any) {
+      console.log('load failed', e);
+    }
+  }
   const loadForwardFunc = () => loadMore(1);
   const loadBackwardFunc = () => loadMore(-1);
   const { loadingBottom, handleScroll } = usePageScroll(loadForwardFunc, loadBackwardFunc);
@@ -57,19 +98,6 @@ function BodyComponent() {
     ui.setSelectingPerson(id);
 
     history.push(`/p/${pubkey}`);
-  }
-
-  async function loadMore(direction: number) {
-    let currentPage = 1;
-    currentPage = peoplePageNumber;
-
-    let newPage = currentPage + direction;
-    if (newPage < 1) newPage = 1;
-    try {
-      await main.getPeople({ page: newPage });
-    } catch (e: any) {
-      console.log('load failed', e);
-    }
   }
 
   if (loading) {
@@ -128,34 +156,4 @@ function BodyComponent() {
   );
 }
 
-const Body = styled.div<{ isMobile: boolean }>`
-  flex: 1;
-  height: ${(p: any) => (p.isMobile ? 'calc(100% - 105px)' : 'calc(100% - 65px)')};
-  background: ${(p: any) => (p.isMobile ? undefined : color.grayish.G950)};
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  & > .header {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px 0;
-  }
-  & > .content {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    height: 100%;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding: 0px 20px 20px 20px;
-  }
-`;
-
-export const Spacer = styled.div`
-  display: flex;
-  min-height: 10px;
-  min-width: 100%;
-  height: 10px;
-  width: 100%;
-`;
+export default observer(BodyComponent);

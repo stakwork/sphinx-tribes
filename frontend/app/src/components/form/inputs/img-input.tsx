@@ -13,7 +13,56 @@ import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { Note } from './index';
 
-export default observer(ImageInput);
+const DropzoneStuff = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+`;
+const Image = styled.div`
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+`;
+
+
+const ImageWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
+export interface DottedCircleProps {
+  isDragActive: boolean;
+  color?: any;
+}
+const DottedCircle = styled.div<DottedCircleProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  width: 120px;
+  border-radius: 50%;
+  border-style: dashed;
+  border-color: ${(p: any) =>
+    p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`};
+  border-width: thin;
+  cursor: pointer;
+`;
+
+const ImageCircle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  position: relative;
+`;
 
 function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Props) {
   const color = colors['light'];
@@ -89,7 +138,7 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
   return (
     <ImageWrap>
       <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
-        {({ getRootProps, getInputProps, isDragActive, open }: any) => (
+        {({ getRootProps, getInputProps, isDragActive }: any) => (
           <DropzoneStuff>
             {imageIcon ? (
               <DottedCircle isDragActive={isDragActive} style={addedStyle} color={color}>
@@ -174,69 +223,4 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
   );
 }
 
-const DropzoneStuff = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-`;
-const Image = styled.div`
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-`;
-
-const ImageSq = styled.div`
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 100px;
-  width: 100px;
-`;
-
-const ImageWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-`;
-export interface DottedCircleProps {
-  isDragActive: boolean;
-  color?: any;
-}
-const DottedCircle = styled.div<DottedCircleProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 120px;
-  width: 120px;
-  border-radius: 50%;
-  border-style: dashed;
-  border-color: ${(p: any) =>
-    p.isDragActive ? `${p?.color.pureWhite}` : `${p?.color.border_image}`};
-  border-width: thin;
-  cursor: pointer;
-`;
-
-const ImageCircle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-  position: relative;
-`;
-
-const ImageSquare = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-  width: 100px;
-  position: relative;
-`;
+export default observer(ImageInput);

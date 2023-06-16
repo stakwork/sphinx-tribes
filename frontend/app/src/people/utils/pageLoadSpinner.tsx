@@ -3,22 +3,6 @@ import styled from 'styled-components';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { PageLoadProps } from 'people/interfaces';
 
-export default function PageLoadSpinner(props: PageLoadProps) {
-  if (props.noAnimate) {
-    return (
-      <BottomLoadmoreWrap show={props.show} style={props.style}>
-        <EuiLoadingSpinner size="l" style={{ marginLeft: -10, padding: 10 }} />
-      </BottomLoadmoreWrap>
-    );
-  }
-
-  return (
-    <LoadmoreWrap show={props.show} style={props.style}>
-      <EuiLoadingSpinner size="l" style={{ marginLeft: -10, padding: 10 }} />
-    </LoadmoreWrap>
-  );
-}
-
 interface LoadmoreWrapProps {
   show: boolean;
 }
@@ -45,3 +29,19 @@ export const BottomLoadmoreWrap = styled.div<LoadmoreWrapProps>`
   height: 50px;
   visibility: ${(p: any) => (p.show ? 'visible' : 'hidden')};
 `;
+
+export default function PageLoadSpinner(props: PageLoadProps) {
+  if (props.noAnimate) {
+    return (
+      <BottomLoadmoreWrap show={props.show} style={props.style}>
+        <EuiLoadingSpinner size="l" style={{ marginLeft: -10, padding: 10 }} />
+      </BottomLoadmoreWrap>
+    );
+  }
+
+  return (
+    <LoadmoreWrap show={props.show} style={props.style}>
+      <EuiLoadingSpinner size="l" style={{ marginLeft: -10, padding: 10 }} />
+    </LoadmoreWrap>
+  );
+}

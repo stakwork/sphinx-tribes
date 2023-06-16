@@ -13,311 +13,6 @@ import { SvgMask } from '../../../../people/utils/svgMask';
 import ImageButton from '../../../common/Image_button';
 import { InvitePeopleSearchProps } from './interfaces';
 
-const codingLanguages = GetValue(coding_languages);
-
-const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
-  const color = colors['light'];
-  const [searchValue, setSearchValue] = useState<string>('');
-  const [peopleData, setPeopleData] = useState<any>(props?.peopleList);
-  const [inviteNameId, setInviteNameId] = useState<number>(0);
-  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [labels, setLabels] = useState<any>([]);
-  const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
-  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
-  const closePopover = () => setIsPopoverOpen(false);
-
-  const { ref, inView } = useInView({
-    triggerOnce: false,
-    threshold: 0
-  });
-
-  useEffect(() => {
-    if (inView) {
-      setTimeout(() => {
-        setInitialPeopleCount(initialPeopleCount + 10);
-      }, 2000);
-    }
-  }, [inView, initialPeopleCount]);
-
-  useEffect(() => {
-    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
-    setPeopleData(
-      (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
-        ? props?.peopleList
-        : props?.peopleList?.filter(({ extras }: any) =>
-            extras?.coding_languages?.some(
-              ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-            )
-          )
-      )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
-    );
-  }, [checkboxIdToSelectedMap, searchValue]);
-
-  useEffect(() => {
-    if (
-      searchValue === '' &&
-      Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
-    ) {
-      setPeopleData(props?.peopleList);
-    }
-  }, [searchValue, props, checkboxIdToSelectedMap]);
-
-  const handler = useCallback((e: any, value: any) => {
-    if (value === '') {
-      setSearchValue(e.target.value);
-    } else {
-      setSearchValue(value);
-    }
-  }, []);
-
-  const onChange = (optionId: any) => {
-    let trueCount = 0;
-    for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
-      if (value) {
-        trueCount += 1;
-      }
-    }
-    if (!(!checkboxIdToSelectedMap[optionId] && trueCount >= 4)) {
-      const newCheckboxIdToSelectedMap = {
-        ...checkboxIdToSelectedMap,
-        ...{
-          [optionId]: !checkboxIdToSelectedMap[optionId]
-        }
-      };
-
-      setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
-    }
-  };
-
-  return (
-    <SearchOuterContainer color={color}>
-      <div className="SearchSkillContainer">
-        <div className="SearchContainer">
-          <input
-            value={searchValue}
-            className="SearchInput"
-            onChange={(e: any) => {
-              handler(e, '');
-            }}
-            placeholder={'Type to search ...'}
-            style={{
-              background: color.pureWhite,
-              color: color.text1,
-              fontFamily: 'Barlow'
-            }}
-          />
-          {searchValue !== '' && (
-            <div
-              className="ImageContainer"
-              onClick={() => {
-                setSearchValue('');
-              }}
-            >
-              <img
-                className="crossImage"
-                src="/static/search_cross.svg"
-                alt="cross_icon"
-                height={'12px'}
-                width={'12px'}
-              />
-            </div>
-          )}
-        </div>
-
-        <EuiPopover
-          className="EuiPopOver"
-          anchorPosition="downRight"
-          panelStyle={{
-            marginTop: '-9px',
-            boxShadow: 'none !important',
-            borderRadius: '6px 0px 6px 6px',
-            backgroundImage: "url('/static/panel_bg.svg')",
-            backgroundRepeat: 'no-repeat',
-            outline: 'none',
-            border: 'none'
-          }}
-          button={
-            <ImageButton
-              buttonText={'Skills'}
-              ButtonContainerStyle={{
-                width: '102px',
-                height: '40px',
-                border: !isPopoverOpen ? '' : `1px solid ${color?.blue1}`,
-                borderBottom: !isPopoverOpen ? '' : `1px solid ${color?.grayish.G700}`,
-                borderRadius: !isPopoverOpen ? '4px' : '4px 4px 0px 0px',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                paddingLeft: '18px',
-                marginRight: '1px',
-                marginTop: isPopoverOpen ? '0.9px' : '0px'
-              }}
-              endImageSrc={'/static/Skill_drop_down.svg'}
-              endingImageContainerStyle={{
-                left: 60,
-                top: -2
-              }}
-              buttonTextStyle={{
-                color: !isPopoverOpen ? `${color.grayish.G300}` : `${color.black500}`,
-                textAlign: 'center',
-                fontSize: '13px',
-                fontWeight: '400',
-                fontFamily: 'Roboto'
-              }}
-              buttonAction={() => {
-                onButtonClick();
-              }}
-            />
-          }
-          isOpen={isPopoverOpen}
-          closePopover={closePopover}
-        >
-          <EuiPopOverCheckbox className="CheckboxOuter" color={color}>
-            <EuiCheckboxGroup
-              options={codingLanguages}
-              idToSelectedMap={checkboxIdToSelectedMap}
-              onChange={(id: any) => {
-                onChange(id);
-              }}
-            />
-          </EuiPopOverCheckbox>
-        </EuiPopover>
-      </div>
-
-      <LabelsContainer
-        style={{
-          padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
-        }}
-      >
-        {!isPopoverOpen &&
-          labels.length > 0 &&
-          labels?.map((x: any, index: number) => (
-            <Label
-              key={x.label}
-              value={x}
-              onClick={() => {
-                onChange(x.label);
-              }}
-              style={{
-                margin: 4
-              }}
-            >
-              <EuiText className="labelText">{x.label}</EuiText>
-              <SvgMask
-                src={'/static/label_cross.svg'}
-                bgcolor={x.color}
-                height={'23px'}
-                width={'16px'}
-                size={'8px'}
-                svgStyle={{
-                  marginLeft: '2px',
-                  marginTop: '1px'
-                }}
-              />
-            </Label>
-          ))}
-      </LabelsContainer>
-
-      <div className="OuterContainer">
-        <div className="PeopleList">
-          {peopleData?.slice(0, initialPeopleCount)?.map((value: any) => (
-            <div className="People" key={value.id}>
-              <div className="PeopleDetailContainer">
-                <div className="ImageContainer">
-                  <img
-                    src={value.img || '/static/person_placeholder.png'}
-                    alt={'user-image'}
-                    height={'100%'}
-                    width={'100%'}
-                    style={{
-                      opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
-                    }}
-                  />
-                </div>
-                <EuiText
-                  className="PeopleName"
-                  style={{
-                    opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
-                  }}
-                >
-                  {value.owner_alias}
-                </EuiText>
-              </div>
-              {inviteNameId === value?.id ? (
-                <InvitedButton
-                  color={color}
-                  onClick={(e: any) => {
-                    handler('', value.owner_alias);
-                    setInviteNameId(0);
-                    if (props?.handleChange)
-                      props?.handleChange({
-                        owner_alias: '',
-                        owner_pubkey: '',
-                        img: '',
-                        value: '',
-                        label: ''
-                      });
-                    if (searchValue === '') {
-                      setSearchValue('');
-                    }
-                    if (props.setAssigneefunction) props.setAssigneefunction('');
-                  }}
-                >
-                  <EuiText className="nextText">{props.newDesign ? 'Unassign' : 'Invited'}</EuiText>
-                </InvitedButton>
-              ) : (
-                <ImageButton
-                  buttonText={props.newDesign ? 'Assign' : 'Invite'}
-                  ButtonContainerStyle={{
-                    width: '86px',
-                    height: '30px',
-                    background: `${color.grayish.G600}`
-                  }}
-                  buttonAction={(e: any) => {
-                    if (props.isProvidingHandler) {
-                      props.handleAssigneeDetails(value);
-                    } else {
-                      handler('', value.owner_alias);
-                      setInviteNameId(value.id);
-                      if (props.handleChange)
-                        props?.handleChange({
-                          owner_alias: value.owner_alias,
-                          owner_pubkey: value.owner_pubkey,
-                          img: value.img,
-                          value: value.owner_pubkey,
-                          label: `${value.owner_alias} (${value.owner_alias
-                            .toLowerCase()
-                            .replace(' ', '')})`
-                        });
-                      if (searchValue === '') {
-                        setSearchValue('');
-                      }
-                      if (props.setAssigneefunction) props.setAssigneefunction(value.owner_alias);
-                    }
-                  }}
-                />
-              )}
-            </div>
-          ))}
-          {peopleData && peopleData.length > initialPeopleCount && (
-            <LoaderContainer ref={ref}>
-              <EuiLoadingSpinner size="l" />
-            </LoaderContainer>
-          )}
-
-          {peopleData?.length === 0 && (
-            <div className="no_result_container">
-              <EuiText className="no_result_text">No Result Found</EuiText>
-            </div>
-          )}
-        </div>
-      </div>
-    </SearchOuterContainer>
-  );
-};
-
-export default InvitePeopleSearch;
-
 interface styledProps {
   color?: any;
 }
@@ -583,3 +278,307 @@ const LoaderContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
+const codingLanguages = GetValue(coding_languages);
+
+const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
+  const color = colors['light'];
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [peopleData, setPeopleData] = useState<any>(props?.peopleList);
+  const [inviteNameId, setInviteNameId] = useState<number>(0);
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [labels, setLabels] = useState<any>([]);
+  const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
+  const closePopover = () => setIsPopoverOpen(false);
+
+  const { ref, inView } = useInView({
+    triggerOnce: false,
+    threshold: 0
+  });
+
+  useEffect(() => {
+    if (inView) {
+      setTimeout(() => {
+        setInitialPeopleCount(initialPeopleCount + 10);
+      }, 2000);
+    }
+  }, [inView, initialPeopleCount]);
+
+  useEffect(() => {
+    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+    setPeopleData(
+      (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
+        ? props?.peopleList
+        : props?.peopleList?.filter(({ extras }: any) =>
+            extras?.coding_languages?.some(
+              ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+            )
+          )
+      )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
+    );
+  }, [checkboxIdToSelectedMap, searchValue]);
+
+  useEffect(() => {
+    if (
+      searchValue === '' &&
+      Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
+    ) {
+      setPeopleData(props?.peopleList);
+    }
+  }, [searchValue, props, checkboxIdToSelectedMap]);
+
+  const handler = useCallback((e: any, value: any) => {
+    if (value === '') {
+      setSearchValue(e.target.value);
+    } else {
+      setSearchValue(value);
+    }
+  }, []);
+
+  const onChange = (optionId: any) => {
+    let trueCount = 0;
+    for (const [, value] of Object.entries(checkboxIdToSelectedMap)) {
+      if (value) {
+        trueCount += 1;
+      }
+    }
+    if (!(!checkboxIdToSelectedMap[optionId] && trueCount >= 4)) {
+      const newCheckboxIdToSelectedMap = {
+        ...checkboxIdToSelectedMap,
+        ...{
+          [optionId]: !checkboxIdToSelectedMap[optionId]
+        }
+      };
+
+      setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+    }
+  };
+
+  return (
+    <SearchOuterContainer color={color}>
+      <div className="SearchSkillContainer">
+        <div className="SearchContainer">
+          <input
+            value={searchValue}
+            className="SearchInput"
+            onChange={(e: any) => {
+              handler(e, '');
+            }}
+            placeholder={'Type to search ...'}
+            style={{
+              background: color.pureWhite,
+              color: color.text1,
+              fontFamily: 'Barlow'
+            }}
+          />
+          {searchValue !== '' && (
+            <div
+              className="ImageContainer"
+              onClick={() => {
+                setSearchValue('');
+              }}
+            >
+              <img
+                className="crossImage"
+                src="/static/search_cross.svg"
+                alt="cross_icon"
+                height={'12px'}
+                width={'12px'}
+              />
+            </div>
+          )}
+        </div>
+
+        <EuiPopover
+          className="EuiPopOver"
+          anchorPosition="downRight"
+          panelStyle={{
+            marginTop: '-9px',
+            boxShadow: 'none !important',
+            borderRadius: '6px 0px 6px 6px',
+            backgroundImage: "url('/static/panel_bg.svg')",
+            backgroundRepeat: 'no-repeat',
+            outline: 'none',
+            border: 'none'
+          }}
+          button={
+            <ImageButton
+              buttonText={'Skills'}
+              ButtonContainerStyle={{
+                width: '102px',
+                height: '40px',
+                border: !isPopoverOpen ? '' : `1px solid ${color?.blue1}`,
+                borderBottom: !isPopoverOpen ? '' : `1px solid ${color?.grayish.G700}`,
+                borderRadius: !isPopoverOpen ? '4px' : '4px 4px 0px 0px',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                paddingLeft: '18px',
+                marginRight: '1px',
+                marginTop: isPopoverOpen ? '0.9px' : '0px'
+              }}
+              endImageSrc={'/static/Skill_drop_down.svg'}
+              endingImageContainerStyle={{
+                left: 60,
+                top: -2
+              }}
+              buttonTextStyle={{
+                color: !isPopoverOpen ? `${color.grayish.G300}` : `${color.black500}`,
+                textAlign: 'center',
+                fontSize: '13px',
+                fontWeight: '400',
+                fontFamily: 'Roboto'
+              }}
+              buttonAction={() => {
+                onButtonClick();
+              }}
+            />
+          }
+          isOpen={isPopoverOpen}
+          closePopover={closePopover}
+        >
+          <EuiPopOverCheckbox className="CheckboxOuter" color={color}>
+            <EuiCheckboxGroup
+              options={codingLanguages}
+              idToSelectedMap={checkboxIdToSelectedMap}
+              onChange={(id: any) => {
+                onChange(id);
+              }}
+            />
+          </EuiPopOverCheckbox>
+        </EuiPopover>
+      </div>
+
+      <LabelsContainer
+        style={{
+          padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
+        }}
+      >
+        {!isPopoverOpen &&
+          labels.length > 0 &&
+          labels?.map((x: any) => (
+            <Label
+              key={x.label}
+              value={x}
+              onClick={() => {
+                onChange(x.label);
+              }}
+              style={{
+                margin: 4
+              }}
+            >
+              <EuiText className="labelText">{x.label}</EuiText>
+              <SvgMask
+                src={'/static/label_cross.svg'}
+                bgcolor={x.color}
+                height={'23px'}
+                width={'16px'}
+                size={'8px'}
+                svgStyle={{
+                  marginLeft: '2px',
+                  marginTop: '1px'
+                }}
+              />
+            </Label>
+          ))}
+      </LabelsContainer>
+
+      <div className="OuterContainer">
+        <div className="PeopleList">
+          {peopleData?.slice(0, initialPeopleCount)?.map((value: any) => (
+            <div className="People" key={value.id}>
+              <div className="PeopleDetailContainer">
+                <div className="ImageContainer">
+                  <img
+                    src={value.img || '/static/person_placeholder.png'}
+                    alt={'user-image'}
+                    height={'100%'}
+                    width={'100%'}
+                    style={{
+                      opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
+                    }}
+                  />
+                </div>
+                <EuiText
+                  className="PeopleName"
+                  style={{
+                    opacity: inviteNameId && inviteNameId !== value?.id ? '0.5' : ''
+                  }}
+                >
+                  {value.owner_alias}
+                </EuiText>
+              </div>
+              {inviteNameId === value?.id ? (
+                <InvitedButton
+                  color={color}
+                  onClick={() => {
+                    handler('', value.owner_alias);
+                    setInviteNameId(0);
+                    if (props?.handleChange)
+                      props?.handleChange({
+                        owner_alias: '',
+                        owner_pubkey: '',
+                        img: '',
+                        value: '',
+                        label: ''
+                      });
+                    if (searchValue === '') {
+                      setSearchValue('');
+                    }
+                    if (props.setAssigneefunction) props.setAssigneefunction('');
+                  }}
+                >
+                  <EuiText className="nextText">{props.newDesign ? 'Unassign' : 'Invited'}</EuiText>
+                </InvitedButton>
+              ) : (
+                <ImageButton
+                  buttonText={props.newDesign ? 'Assign' : 'Invite'}
+                  ButtonContainerStyle={{
+                    width: '86px',
+                    height: '30px',
+                    background: `${color.grayish.G600}`
+                  }}
+                  buttonAction={() => {
+                    if (props.isProvidingHandler) {
+                      props.handleAssigneeDetails(value);
+                    } else {
+                      handler('', value.owner_alias);
+                      setInviteNameId(value.id);
+                      if (props.handleChange)
+                        props?.handleChange({
+                          owner_alias: value.owner_alias,
+                          owner_pubkey: value.owner_pubkey,
+                          img: value.img,
+                          value: value.owner_pubkey,
+                          label: `${value.owner_alias} (${value.owner_alias
+                            .toLowerCase()
+                            .replace(' ', '')})`
+                        });
+                      if (searchValue === '') {
+                        setSearchValue('');
+                      }
+                      if (props.setAssigneefunction) props.setAssigneefunction(value.owner_alias);
+                    }
+                  }}
+                />
+              )}
+            </div>
+          ))}
+          {peopleData && peopleData.length > initialPeopleCount && (
+            <LoaderContainer ref={ref}>
+              <EuiLoadingSpinner size="l" />
+            </LoaderContainer>
+          )}
+
+          {peopleData?.length === 0 && (
+            <div className="no_result_container">
+              <EuiText className="no_result_text">No Result Found</EuiText>
+            </div>
+          )}
+        </div>
+      </div>
+    </SearchOuterContainer>
+  );
+};
+
+export default InvitePeopleSearch;

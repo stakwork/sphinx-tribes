@@ -172,7 +172,6 @@ class UiStore {
   }
 }
 
-
 export const emptyMeData: MeData = {
   pubkey: '',
   alias: '',

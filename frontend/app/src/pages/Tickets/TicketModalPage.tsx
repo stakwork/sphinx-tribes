@@ -42,9 +42,6 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   useEffect(() => {
     const activeIndex = (main.peopleWanteds ?? []).findIndex(findPerson(search));
     const connectPerson = (main.peopleWanteds ?? [])[activeIndex];
-    const itemIndex = (connectPerson?.person as any)?.wanted?.findIndex(
-      (f: any) => f.created === connectPerson?.body?.created
-    );
 
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);

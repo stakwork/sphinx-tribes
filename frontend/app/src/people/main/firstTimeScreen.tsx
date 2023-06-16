@@ -5,6 +5,29 @@ import { Modal } from '../../components/common';
 import { firstScreenSchema } from '../../components/form/schema';
 import FocusedView from './focusView';
 
+const B = styled.div`
+  font-weight: bold;
+`;
+
+const Title = styled.div`
+  font-size: 24px;
+  font-style: normal;
+
+  line-height: 30px;
+  letter-spacing: 0em;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const SubTitle = styled.div`
+  font-family: Roboto;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0em;
+  text-align: center;
+`;
 // this is where we see others posts (etc) and edit our own
 export default function FirstTimeScreen() {
   const { ui, main } = useStores();
@@ -59,27 +82,3 @@ export default function FirstTimeScreen() {
     </Modal>
   );
 }
-
-const B = styled.div`
-  font-weight: bold;
-`;
-
-const Title = styled.div`
-  font-size: 24px;
-  font-style: normal;
-
-  line-height: 30px;
-  letter-spacing: 0em;
-  text-align: center;
-  margin-bottom: 20px;
-`;
-
-const SubTitle = styled.div`
-  font-family: Roboto;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0em;
-  text-align: center;
-`;

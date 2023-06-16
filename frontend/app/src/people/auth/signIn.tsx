@@ -12,7 +12,55 @@ import QR from '../utils/QR';
 import AuthQR from './authQR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 
-export default observer(SignIn);
+interface ImageProps {
+  readonly src: string;
+}
+
+const Name = styled.div`
+  font-style: normal;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 19px;
+  font-family: Barlow;
+  /* or 73% */
+
+  text-align: center;
+
+  /* Text 2 */
+
+  color: #292c33;
+`;
+
+const Description = styled.div`
+  font-size: 17px;
+  line-height: 20px;
+  text-align: center;
+  margin: 20px 0;
+  font-family: Barlow;
+
+  /* Main bottom icons */
+
+  color: #5f6368;
+`;
+
+const Column = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+`;
+const Imgg = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  margin-bottom: 20px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  position: relative;
+`;
 
 function SignIn(props: AuthProps) {
   const { main, ui } = useStores();
@@ -172,52 +220,4 @@ function SignIn(props: AuthProps) {
   ));
 }
 
-interface ImageProps {
-  readonly src: string;
-}
-
-const Name = styled.div`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 26px;
-  line-height: 19px;
-  font-family: Barlow;
-  /* or 73% */
-
-  text-align: center;
-
-  /* Text 2 */
-
-  color: #292c33;
-`;
-
-const Description = styled.div`
-  font-size: 17px;
-  line-height: 20px;
-  text-align: center;
-  margin: 20px 0;
-  font-family: Barlow;
-
-  /* Main bottom icons */
-
-  color: #5f6368;
-`;
-
-const Column = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 25px;
-`;
-const Imgg = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  margin-bottom: 20px;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  position: relative;
-`;
+export default observer(SignIn);

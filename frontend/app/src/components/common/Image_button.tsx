@@ -3,58 +3,6 @@ import { ImageButtonProps } from 'components/interfaces';
 import React from 'react';
 import styled from 'styled-components';
 
-const ImageButton = (props: ImageButtonProps) => (
-  <ButtonContainer
-    onClick={props?.buttonAction}
-    style={{
-      ...props.ButtonContainerStyle
-    }}
-  >
-    {props.leadingImageSrc && (
-      <div
-        className="leadingImageContainer"
-        style={{
-          ...props.leadingImageContainerStyle
-        }}
-      >
-        <img
-          className="buttonImage"
-          src={props.leadingImageSrc}
-          alt={''}
-          height={'14px'}
-          width={'14px'}
-        />
-      </div>
-    )}
-    <EuiText
-      className="ButtonText"
-      style={{
-        ...props.buttonTextStyle
-      }}
-    >
-      {props.buttonText}
-    </EuiText>
-    {props.endImageSrc && (
-      <div
-        className="ImageContainer"
-        style={{
-          ...props.endingImageContainerStyle
-        }}
-      >
-        <img
-          className="buttonImage"
-          src={props.endImageSrc}
-          alt={'button_end_icon'}
-          height={'12px'}
-          width={'12px'}
-        />
-      </div>
-    )}
-  </ButtonContainer>
-);
-
-export default ImageButton;
-
 interface ButtonContainerProps {
   topMargin?: string;
 }
@@ -111,3 +59,55 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
     color: #5f6368;
   }
 `;
+const ImageButton = (props: ImageButtonProps) => (
+  <ButtonContainer
+    onClick={props?.buttonAction}
+    style={{
+      ...props.ButtonContainerStyle
+    }}
+  >
+    {props.leadingImageSrc && (
+      <div
+        className="leadingImageContainer"
+        style={{
+          ...props.leadingImageContainerStyle
+        }}
+      >
+        <img
+          className="buttonImage"
+          src={props.leadingImageSrc}
+          alt={''}
+          height={'14px'}
+          width={'14px'}
+        />
+      </div>
+    )}
+    <EuiText
+      className="ButtonText"
+      style={{
+        ...props.buttonTextStyle
+      }}
+    >
+      {props.buttonText}
+    </EuiText>
+    {props.endImageSrc && (
+      <div
+        className="ImageContainer"
+        style={{
+          ...props.endingImageContainerStyle
+        }}
+      >
+        <img
+          className="buttonImage"
+          src={props.endImageSrc}
+          alt={'button_end_icon'}
+          height={'12px'}
+          width={'12px'}
+        />
+      </div>
+    )}
+  </ButtonContainer>
+);
+
+export default ImageButton;
+

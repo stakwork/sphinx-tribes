@@ -21,7 +21,96 @@ import BotSecret from './utils/botSecret';
 const getFuse = useFuse;
 const getScroll = useScroll;
 
-export default observer(BotBody);
+const BotText = styled.div`
+  width: 259px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 24px;
+  /* or 160% */
+
+  text-align: center;
+
+  color: #3c3f41;
+
+  margin-bottom: 30px;
+`;
+
+const Body = styled.div`
+  flex: 1;
+  height: calc(100% - 105px);
+  padding-bottom: 80px;
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+`;
+const Label = styled.div`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 26px;
+  line-height: 40px;
+  /* or 154% */
+
+  display: flex;
+  align-items: center;
+
+  /* Text 2 */
+
+  color: #3c3f41;
+`;
+
+const Tabs = styled.div`
+  display: flex;
+`;
+
+interface TagProps {
+  selected: boolean;
+}
+const Tab = styled.div<TagProps>`
+  display: flex;
+  padding: 10px 25px;
+  margin-right: 35px;
+  height: 42px;
+  color: ${(p: any) => (p.selected ? '#5D8FDD' : '#5F6368')};
+  border: 2px solid #5f636800;
+  border-color: ${(p: any) => (p.selected ? '#CDE0FF' : '#5F636800')};
+  // border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 19px;
+  background: ${(p: any) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
+  border-radius: 25px;
+`;
+const Link = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 6px;
+  color: #618aff;
+  cursor: pointer;
+  position: relative;
+`;
+
+interface IconProps {
+  src: string;
+}
+
+const Icon = styled.div<IconProps>`
+  background-image: ${(p: any) => `url(${p.src})`};
+  width: 220px;
+  height: 220px;
+  margin: 30px;
+  margin-bottom: 0px;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+  // border-radius:5px;
+  overflow: hidden;
+`;
 
 function BotBody() {
   const { main, ui } = useStores();
@@ -68,6 +157,14 @@ function BotBody() {
     }
   }
 
+  const loadBots = useCallback(async () => {
+    setLoading(true);
+    if (window.location.pathname.startsWith('/b/')) {
+    }
+
+    await main.getMyBots();
+    setLoading(false);
+  }, [main]);
   async function createOrSaveBot(v: any) {
     v.tags = v.tags && v.tags.map((t: any) => t.value);
     v.price_per_use = parseInt(v.price_per_use);
@@ -112,17 +209,6 @@ function BotBody() {
     loadBots();
   }
 
-  const loadBots = useCallback(async () => {
-    setLoading(true);
-    let un = '';
-    if (window.location.pathname.startsWith('/b/')) {
-      un = window.location.pathname.substr(3);
-    }
-
-    const ps = await main.getBots(un, null);
-    await main.getMyBots();
-    setLoading(false);
-  }, [main]);
 
   useEffect(() => {
     loadBots();
@@ -553,93 +639,4 @@ function BotBody() {
   );
 }
 
-const BotText = styled.div`
-  width: 259px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 24px;
-  /* or 160% */
-
-  text-align: center;
-
-  color: #3c3f41;
-
-  margin-bottom: 30px;
-`;
-
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  padding-bottom: 80px;
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-const Label = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 26px;
-  line-height: 40px;
-  /* or 154% */
-
-  display: flex;
-  align-items: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-`;
-
-const Tabs = styled.div`
-  display: flex;
-`;
-
-interface TagProps {
-  selected: boolean;
-}
-const Tab = styled.div<TagProps>`
-  display: flex;
-  padding: 10px 25px;
-  margin-right: 35px;
-  height: 42px;
-  color: ${(p: any) => (p.selected ? '#5D8FDD' : '#5F6368')};
-  border: 2px solid #5f636800;
-  border-color: ${(p: any) => (p.selected ? '#CDE0FF' : '#5F636800')};
-  // border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
-  cursor: pointer;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 19px;
-  background: ${(p: any) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
-  border-radius: 25px;
-`;
-const Link = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 6px;
-  color: #618aff;
-  cursor: pointer;
-  position: relative;
-`;
-
-interface IconProps {
-  src: string;
-}
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p: any) => `url(${p.src})`};
-  width: 220px;
-  height: 220px;
-  margin: 30px;
-  margin-bottom: 0px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  // border-radius:5px;
-  overflow: hidden;
-`;
+export default observer(BotBody);

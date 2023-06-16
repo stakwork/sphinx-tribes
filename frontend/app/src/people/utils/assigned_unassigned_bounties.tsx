@@ -12,6 +12,97 @@ import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
 import StartUpModal from './start_up_modal';
 
+interface containerProps {
+  unAssignedBackgroundImage?: string;
+  assignedBackgroundImage?: string;
+  unassigned_border?: string;
+  grayish_G200?: string;
+  color?: any;
+}
+
+const BountyContainer = styled.div<containerProps>`
+  display: flex;
+  flex-direction: row;
+  width: 1100px !important;
+  font-family: Barlow;
+  height: 160px;
+  background: transparent;
+  background: ${(p: any) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: ${(p: any) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
+  border-radius: 10px;
+  .BountyDescriptionContainer {
+    min-width: 553px;
+    max-width: 553px;
+  }
+  .BountyPriceContainer {
+    display: flex;
+    flex-direction: row;
+    width: 545px;
+  }
+
+  :hover {
+    border: ${(p: any) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
+    border-radius: ${(p: any) => (p.assignedBackgroundImage ? '10px' : '')};
+  }
+`;
+
+const DescriptionPriceContainer = styled.div<containerProps>`
+  display: flex;
+  flex-direction: row;
+  width: 758px;
+  min-height: 160px !important;
+  height: 100%;
+  background: ${(p: any) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  :hover {
+    background: url('static/unassigned_bounty_hover_bg.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  :active {
+    background: url('static/unassigned_bounty_active_bg.svg');
+  }
+`;
+
+const UnassignedPersonProfile = styled.div<containerProps>`
+  min-width: 336px;
+  min-height: 160px;
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+  border-radius: 10px;
+  display: flex;
+  padding-top: 32px;
+  padding-left: 37px;
+  .UnassignedPersonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    margin-top: 5px;
+  }
+  .UnassignedPersonalDetailContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 25px;
+    margin-bottom: 2px;
+  }
+  .ProfileText {
+    font-size: 15px;
+    font-weight: 500;
+    font-family: Barlow;
+    color: ${(p: any) => (p.grayish_G200 ? p.grayish_G200 : '')};
+    margin-bottom: -13px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+  }
+`;
 const Bounties = (props: BountiesProps) => {
   const {
     assignee,
@@ -168,95 +259,3 @@ const Bounties = (props: BountiesProps) => {
 };
 
 export default observer(Bounties);
-
-interface containerProps {
-  unAssignedBackgroundImage?: string;
-  assignedBackgroundImage?: string;
-  unassigned_border?: string;
-  grayish_G200?: string;
-  color?: any;
-}
-
-const BountyContainer = styled.div<containerProps>`
-  display: flex;
-  flex-direction: row;
-  width: 1100px !important;
-  font-family: Barlow;
-  height: 160px;
-  background: transparent;
-  background: ${(p: any) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
-  background-repeat: no-repeat;
-  background-size: cover;
-  border: ${(p: any) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
-  border-radius: 10px;
-  .BountyDescriptionContainer {
-    min-width: 553px;
-    max-width: 553px;
-  }
-  .BountyPriceContainer {
-    display: flex;
-    flex-direction: row;
-    width: 545px;
-  }
-
-  :hover {
-    border: ${(p: any) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
-    border-radius: ${(p: any) => (p.assignedBackgroundImage ? '10px' : '')};
-  }
-`;
-
-const DescriptionPriceContainer = styled.div<containerProps>`
-  display: flex;
-  flex-direction: row;
-  width: 758px;
-  min-height: 160px !important;
-  height: 100%;
-  background: ${(p: any) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  :hover {
-    background: url('static/unassigned_bounty_hover_bg.svg');
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-  :active {
-    background: url('static/unassigned_bounty_active_bg.svg');
-  }
-`;
-
-const UnassignedPersonProfile = styled.div<containerProps>`
-  min-width: 336px;
-  min-height: 160px;
-  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
-  border-radius: 10px;
-  display: flex;
-  padding-top: 32px;
-  padding-left: 37px;
-  .UnassignedPersonContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80px;
-    width: 80px;
-    border-radius: 50%;
-    margin-top: 5px;
-  }
-  .UnassignedPersonalDetailContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-left: 25px;
-    margin-bottom: 2px;
-  }
-  .ProfileText {
-    font-size: 15px;
-    font-weight: 500;
-    font-family: Barlow;
-    color: ${(p: any) => (p.grayish_G200 ? p.grayish_G200 : '')};
-    margin-bottom: -13px;
-    line-height: 18px;
-    display: flex;
-    align-items: center;
-  }
-`;

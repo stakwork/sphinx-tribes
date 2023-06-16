@@ -7,70 +7,6 @@ import { Divider, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
 
-export default function OfferView(props: OfferViewProps) {
-  const { gallery, title, description, price, person, created, type } = props;
-  const isMobile = useIsMobile();
-
-  const showPrice = !(type === 'offer_skill' || type === 'offer_other');
-
-  if (isMobile) {
-    return (
-      <Wrap>
-        <GalleryViewer
-          cover
-          gallery={gallery}
-          selectable={false}
-          wrap={false}
-          big={false}
-          showAll={false}
-        />
-
-        <Body>
-          <T>{title || 'No title'}</T>
-          <D>{description || 'No description'}</D>
-          {showPrice && (
-            <P>
-              {formatPrice(price)} <B>SAT ({satToUsd(price)})</B>{' '}
-            </P>
-          )}
-        </Body>
-      </Wrap>
-    );
-  }
-
-  return (
-    <DWrap>
-      <GalleryViewer
-        cover
-        showAll={false}
-        big={true}
-        wrap={false}
-        selectable={true}
-        gallery={gallery}
-        style={{ maxHeight: 276, overflow: 'hidden' }}
-      />
-      <div>
-        <Pad style={{ padding: 20, height: gallery ? '' : 411 }}>
-          <NameTag {...person} created={created} widget={'offer'} />
-          <DT>{title}</DT>
-          <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
-        </Pad>
-
-        {showPrice && (
-          <>
-            <Divider style={{ margin: 0 }} />
-
-            <Pad style={{ padding: 20 }}>
-              <P style={{ fontSize: 17 }}>
-                {formatPrice(price)} <B>SAT ({satToUsd(price)})</B>{' '}
-              </P>
-            </Pad>
-          </>
-        )}
-      </div>
-    </DWrap>
-  );
-}
 const Wrap = styled.div`
   display: flex;
   justify-content: flex-start;
@@ -172,3 +108,67 @@ const Pad = styled.div`
   display: flex;
   flex-direction: column;
 `;
+export default function OfferView(props: OfferViewProps) {
+  const { gallery, title, description, price, person, created, type } = props;
+  const isMobile = useIsMobile();
+
+  const showPrice = !(type === 'offer_skill' || type === 'offer_other');
+
+  if (isMobile) {
+    return (
+      <Wrap>
+        <GalleryViewer
+          cover
+          gallery={gallery}
+          selectable={false}
+          wrap={false}
+          big={false}
+          showAll={false}
+        />
+
+        <Body>
+          <T>{title || 'No title'}</T>
+          <D>{description || 'No description'}</D>
+          {showPrice && (
+            <P>
+              {formatPrice(price)} <B>SAT ({satToUsd(price)})</B>{' '}
+            </P>
+          )}
+        </Body>
+      </Wrap>
+    );
+  }
+
+  return (
+    <DWrap>
+      <GalleryViewer
+        cover
+        showAll={false}
+        big={true}
+        wrap={false}
+        selectable={true}
+        gallery={gallery}
+        style={{ maxHeight: 276, overflow: 'hidden' }}
+      />
+      <div>
+        <Pad style={{ padding: 20, height: gallery ? '' : 411 }}>
+          <NameTag {...person} created={created} widget={'offer'} />
+          <DT>{title}</DT>
+          <DD style={{ maxHeight: gallery ? 40 : '' }}>{description}</DD>
+        </Pad>
+
+        {showPrice && (
+          <>
+            <Divider style={{ margin: 0 }} />
+
+            <Pad style={{ padding: 20 }}>
+              <P style={{ fontSize: 17 }}>
+                {formatPrice(price)} <B>SAT ({satToUsd(price)})</B>{' '}
+              </P>
+            </Pad>
+          </>
+        )}
+      </div>
+    </DWrap>
+  );
+}

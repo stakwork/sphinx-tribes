@@ -24,7 +24,6 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default observer(WantedSummary);
 function WantedSummary(props: WantedSummaryProps) {
   const {
     description,
@@ -610,3 +609,4 @@ function WantedSummary(props: WantedSummaryProps) {
   }
   return <div />;
 }
+export default observer(WantedSummary);

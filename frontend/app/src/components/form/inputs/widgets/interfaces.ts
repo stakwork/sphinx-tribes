@@ -71,7 +71,6 @@ export interface FormState {
   extras?: Extras;
 }
 
-
 export interface Post {
   title: string;
   content: string;

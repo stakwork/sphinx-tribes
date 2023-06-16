@@ -3,6 +3,35 @@ import styled from 'styled-components';
 import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 
+interface styledProps {
+  color?: any;
+  borderColor?: string;
+}
+
+const InputOuterBox = styled.div<styledProps>`
+  position: relative;
+  margin-bottom: 0px;
+  .inputText {
+    width: 292px;
+    font-size: 14px;
+    color: ${(p: any) => p.color && p.color.pureBlack};
+    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
+    border-radius: 4px;
+    outline: none;
+    padding-left: 16px;
+    padding-top: 16px;
+    resize: none;
+    color: #3c3f41;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    :active {
+      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
+    }
+    :focus-visible {
+      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
+    }
+  }
+`;
 export default function TextAreaInputNew({
   error,
   label,
@@ -66,33 +95,3 @@ export default function TextAreaInputNew({
     </InputOuterBox>
   );
 }
-
-interface styledProps {
-  color?: any;
-  borderColor?: string;
-}
-
-const InputOuterBox = styled.div<styledProps>`
-  position: relative;
-  margin-bottom: 0px;
-  .inputText {
-    width: 292px;
-    font-size: 14px;
-    color: ${(p: any) => p.color && p.color.pureBlack};
-    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
-    border-radius: 4px;
-    outline: none;
-    padding-left: 16px;
-    padding-top: 16px;
-    resize: none;
-    color: #3c3f41;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    :active {
-      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
-    }
-    :focus-visible {
-      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
-    }
-  }
-`;

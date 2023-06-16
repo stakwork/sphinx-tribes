@@ -9,6 +9,50 @@ import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
 import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
 
+interface styledProps {
+  color?: any;
+}
+
+const B = styled.small`
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+`;
+const N = styled.div<styledProps>`
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 26px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: ${(p: any) => p?.color && p?.color.grayish.G100};
+`;
+const ModalBottomText = styled.div<styledProps>`
+  position: absolute;
+  bottom: -36px;
+  width: 310;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  .bottomText {
+    margin-left: 12px;
+    color: ${(p: any) => p?.color && p?.color.pureWhite};
+  }
+`;
+const InvoiceForm = styled.div`
+  margin: 10px 0px;
+  text-align: left;
+`;
+const InvoiceLabel = styled.label`
+  font-size: 0.9rem;
+  font-weight: bold;
+`;
+const InvoiceInput = styled.input`
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 0.5px solid black;
+`;
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
   const { person, created, visible } = props;
@@ -139,48 +183,3 @@ export default function AssignBounty(props: ConnectCardProps) {
     </div>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-
-const B = styled.small`
-  font-weight: bold;
-  display: block;
-  margin-bottom: 10px;
-`;
-const N = styled.div<styledProps>`
-  font-family: Barlow;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 17px;
-  line-height: 26px;
-  text-align: center;
-  margin-bottom: 10px;
-  color: ${(p: any) => p?.color && p?.color.grayish.G100};
-`;
-const ModalBottomText = styled.div<styledProps>`
-  position: absolute;
-  bottom: -36px;
-  width: 310;
-  background-color: transparent;
-  display: flex;
-  justify-content: center;
-  .bottomText {
-    margin-left: 12px;
-    color: ${(p: any) => p?.color && p?.color.pureWhite};
-  }
-`;
-const InvoiceForm = styled.div`
-  margin: 10px 0px;
-  text-align: left;
-`;
-const InvoiceLabel = styled.label`
-  font-size: 0.9rem;
-  font-weight: bold;
-`;
-const InvoiceInput = styled.input`
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 0.5px solid black;
-`;

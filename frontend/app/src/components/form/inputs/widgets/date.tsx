@@ -5,6 +5,18 @@ import styled from 'styled-components';
 import { FieldEnv } from '..';
 import { colors } from '../../../../config/colors';
 
+interface datePickerProps {
+  border?: boolean;
+  color?: any;
+}
+
+// @ts-ignore
+const DataPicker = styled(EuiDatePicker)<datePickerProps>`
+  border: 1px solid ${(p: any) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
+  :focus {
+    background-image: none;
+  }
+`;
 function Date({ label, value, handleChange }: any) {
   const color = colors['light'];
   const [startDate, setStartDate] = useState(moment(value) ?? moment());
@@ -34,16 +46,3 @@ function Date({ label, value, handleChange }: any) {
   );
 }
 export default memo(Date);
-
-interface datePickerProps {
-  border?: boolean;
-  color?: any;
-}
-
-// @ts-ignore
-const DataPicker = styled(EuiDatePicker)<datePickerProps>`
-  border: 1px solid ${(p: any) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
-  :focus {
-    background-image: none;
-  }
-`;

@@ -19,7 +19,25 @@ import tags from './tags';
 import Tag from './tag';
 import Tribe from './tribe';
 
-export default observer(BodyComponent);
+const Body = styled.div`
+  flex: 1;
+  height: calc(100vh - 60px);
+  // padding-bottom:80px;
+  width: 100%;
+  overflow: auto;
+  background: ${colors.dark.tribesBackground};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  // max-width:900px;
+  width: 100%;
+`;
 
 function BodyComponent() {
   const { main, ui } = useStores();
@@ -219,23 +237,4 @@ function BodyComponent() {
     </Body>
   );
 }
-
-const Body = styled.div`
-  flex: 1;
-  height: calc(100vh - 60px);
-  // padding-bottom:80px;
-  width: 100%;
-  overflow: auto;
-  background: ${colors.dark.tribesBackground};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
-  // max-width:900px;
-  width: 100%;
-`;
+export default observer(BodyComponent);

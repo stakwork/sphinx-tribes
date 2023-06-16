@@ -9,6 +9,43 @@ import { useStores } from 'store';
 import styled from 'styled-components';
 import { TabsPages } from './Tabs';
 
+const getHtml = (owner_pubkey: string, img: string) => `
+<sphinx-widget pubkey=${owner_pubkey}
+  amount="500"
+  title="Support Me"
+  subtitle="Because I'm awesome"
+  buttonlabel="Donate"
+  defaultinterval="weekly"
+  imgurl="${img || 'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'}"
+  ></sphinx-widget>`;
+
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  color: #000000;
+  background: #f0f1f3;
+  .desktop {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+`;
+interface PanelProps {
+  isMobile: boolean;
+}
+
+const Panel = styled.div<PanelProps>`
+  position: relative;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
 export const PersonPage = observer(() => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
@@ -71,41 +108,3 @@ export const PersonPage = observer(() => {
     </Content>
   );
 });
-
-const getHtml = (owner_pubkey: string, img: string) => `
-<sphinx-widget pubkey=${owner_pubkey}
-  amount="500"
-  title="Support Me"
-  subtitle="Because I'm awesome"
-  buttonlabel="Donate"
-  defaultinterval="weekly"
-  imgurl="${img || 'https://i.scdn.co/image/28747994a80c78bc2824c2561d101db405926a37'}"
-  ></sphinx-widget>`;
-
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  color: #000000;
-  background: #f0f1f3;
-  .desktop {
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 100%;
-  }
-`;
-interface PanelProps {
-  isMobile: boolean;
-}
-
-const Panel = styled.div<PanelProps>`
-  position: relative;
-  background: #ffffff;
-  color: #000000;
-  padding: 20px;
-  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;

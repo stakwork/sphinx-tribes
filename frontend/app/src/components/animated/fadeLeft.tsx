@@ -4,6 +4,14 @@ import styled from 'styled-components';
 
 const sleep = (ms: any) => new Promise((resolve: any) => setTimeout(resolve, ms));
 
+const Fader = styled.div`
+  transition: all 0.2s;
+`;
+const Overlay = styled.div`
+  transition: all 0.2s;
+  width: 100%;
+  height: 100%;
+`;
 export default function FadeLeft(props: FadeLeftProps) {
   const {
     drift,
@@ -111,11 +119,3 @@ export default function FadeLeft(props: FadeLeftProps) {
   );
 }
 
-const Fader = styled.div`
-  transition: all 0.2s;
-`;
-const Overlay = styled.div`
-  transition: all 0.2s;
-  width: 100%;
-  height: 100%;
-`;

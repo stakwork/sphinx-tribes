@@ -9,6 +9,59 @@ import { queryLimit } from 'store/main';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import Person from '../person';
+const PeopleScroller = styled.div`
+  overflow-y: overlay !important;
+  width: 100%;
+  height: 100%;
+`;
+
+const DBack = styled.div`
+  min-height: 64px;
+  height: 64px;
+  display: flex;
+  padding-right: 10px;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+  z-index: 0;
+`;
+
+const PeopleListContainer = styled.div`
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  width: 265px;
+  overflow-y: overlay !important;
+
+  * {
+    scrollbar-width: 6px;
+    scrollbar-color: rgba(176, 183, 188, 0.25);
+  }
+
+  /* Works on Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(176, 183, 188, 0.25);
+    background: rgba(176, 183, 188, 0.25);
+    width: 6px;
+    border-radius: 10px;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-track-piece:start {
+    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
+  }
+
+  ::-webkit-scrollbar-track-piece:end {
+    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
+  }
+`;
 
 export const PeopleList = observer(() => {
   const { main, ui } = useStores();
@@ -97,57 +150,3 @@ export const PeopleList = observer(() => {
     </PeopleListContainer>
   );
 });
-
-const PeopleScroller = styled.div`
-  overflow-y: overlay !important;
-  width: 100%;
-  height: 100%;
-`;
-
-const DBack = styled.div`
-  min-height: 64px;
-  height: 64px;
-  display: flex;
-  padding-right: 10px;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
-  z-index: 0;
-`;
-
-const PeopleListContainer = styled.div`
-  position: relative;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  width: 265px;
-  overflow-y: overlay !important;
-
-  * {
-    scrollbar-width: 6px;
-    scrollbar-color: rgba(176, 183, 188, 0.25);
-  }
-
-  /* Works on Chrome, Edge, and Safari */
-  *::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: rgba(176, 183, 188, 0.25);
-    background: rgba(176, 183, 188, 0.25);
-    width: 6px;
-    border-radius: 10px;
-    background-clip: padding-box;
-  }
-
-  ::-webkit-scrollbar-track-piece:start {
-    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
-  }
-
-  ::-webkit-scrollbar-track-piece:end {
-    background: transparent url('images/backgrounds/scrollbar.png') repeat-y !important;
-  }
-`;

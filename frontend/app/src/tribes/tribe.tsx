@@ -6,6 +6,95 @@ import styled from 'styled-components';
 import { getHostIncludingDockerHosts } from '../config/host';
 import Tag from './tag';
 
+interface ContentProps {
+  selected: boolean;
+}
+interface DescriptionProps {
+  oneLine: boolean;
+}
+interface ImageProps {
+  readonly src: string;
+}
+const Content = styled.div<ContentProps>`
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  max-width: 100%;
+  & h3 {
+    color: #fff;
+  }
+  &:hover h3 {
+    color: white;
+  }
+  ${(p: any) =>
+    p.selected
+      ? `
+    & h5{
+      color:#cacaca;
+    }
+  `
+      : `
+    & h5{
+      color:#aaa;
+    }
+    &:hover h5{
+      color:#bebebe;
+    }
+  `}
+`;
+const QRWrap = styled.div`
+  background: white;
+  padding: 5px;
+`;
+const Left = styled.div`
+  height: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const Title = styled.h3`
+  margin-right: 12px;
+  font-size: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-height: 24px;
+`;
+const Description = styled.h5<DescriptionProps>`
+  font-weight: normal;
+  line-height: 20px;
+  align-self: start;
+  font-size: 10px;
+  text-align: left;
+  ${(p: any) =>
+    p.oneLine &&
+    `
+		max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow:hidden;
+  `}
+`;
+const Img = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  height: 90px;
+  width: 90px;
+  border-radius: 5px;
+  position: relative;
+`;
+const Tokens = styled.div`
+  display: flex !important;
+  align-content: start;
+`;
+
 function makeQR(uuid: string) {
   return `sphinx.chat://?action=tribe&uuid=${uuid}&host=${getHostIncludingDockerHosts()}`;
 }
@@ -163,92 +252,3 @@ export default function Tribe({
     </EuiCard>
   );
 }
-interface ContentProps {
-  selected: boolean;
-}
-const Content = styled.div<ContentProps>`
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  max-width: 100%;
-  & h3 {
-    color: #fff;
-  }
-  &:hover h3 {
-    color: white;
-  }
-  ${(p: any) =>
-    p.selected
-      ? `
-    & h5{
-      color:#cacaca;
-    }
-  `
-      : `
-    & h5{
-      color:#aaa;
-    }
-    &:hover h5{
-      color:#bebebe;
-    }
-  `}
-`;
-const QRWrap = styled.div`
-  background: white;
-  padding: 5px;
-`;
-const Left = styled.div`
-  height: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
-const Title = styled.h3`
-  margin-right: 12px;
-  font-size: 22px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  min-height: 24px;
-`;
-interface DescriptionProps {
-  oneLine: boolean;
-}
-const Description = styled.h5<DescriptionProps>`
-  font-weight: normal;
-  line-height: 20px;
-  align-self: start;
-  font-size: 10px;
-  text-align: left;
-  ${(p: any) =>
-    p.oneLine &&
-    `
-		max-width: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow:hidden;
-  `}
-`;
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  height: 90px;
-  width: 90px;
-  border-radius: 5px;
-  position: relative;
-`;
-
-const Tokens = styled.div`
-  display: flex !important;
-  align-content: start;
-`;

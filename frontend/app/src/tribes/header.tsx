@@ -4,8 +4,6 @@ import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import { useStores } from '../store';
 
-export default observer(Header);
-
 function Header() {
   const { ui } = useStores();
 
@@ -30,3 +28,4 @@ function Header() {
     </EuiHeader>
   );
 }
+export default observer(Header);

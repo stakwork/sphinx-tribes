@@ -11,6 +11,28 @@ import { useStores } from 'store';
 import styled from 'styled-components';
 
 const config = widgetConfigs.wanted;
+const Container = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  flex: 1 1 100%;
+`;
+
+interface PanelProps {
+  isMobile: boolean;
+}
+const Panel = styled.div<PanelProps>`
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  max-width: 300px;
+  flex: 1 1 auto;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
 
 export const Wanted = observer(() => {
   const { ui } = useStores();
@@ -83,26 +105,3 @@ export const Wanted = observer(() => {
     </Container>
   );
 });
-
-const Container = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  gap: 1rem;
-  flex: 1 1 100%;
-`;
-
-interface PanelProps {
-  isMobile: boolean;
-}
-const Panel = styled.div<PanelProps>`
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  max-width: 300px;
-  flex: 1 1 auto;
-  background: #ffffff;
-  color: #000000;
-  padding: 20px;
-  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;
