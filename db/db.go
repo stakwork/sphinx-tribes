@@ -65,6 +65,7 @@ func InitDB() {
 	db.AutoMigrate(&Channel{})
 	db.AutoMigrate(&LeaderBoard{})
 	db.AutoMigrate(&ConnectionCodes{})
+	db.AutoMigrate(&Bounty{})
 
 	people := DB.GetAllPeople()
 	for _, p := range people {
@@ -500,44 +501,46 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) GetListedWanteds(r *http.Request) ([]PeopleExtra, error) {
+func (db database) GetListedWanteds(r *http.Request) ([]Bounty, error) {
 	pubkey := chi.URLParam(r, "pubkey")
-	ms := []PeopleExtra{}
+	ms := []Bounty{}
 
-	var rawQuery string
-	var result *gorm.DB
-	// set limit
-	offset, limit, sortBy, _, search := utils.GetPaginationParams(r)
+	err := db.db.Raw(`SELECT * FROM bounty where assignee = '` + pubkey + `'`).Find(&ms).Error
 
-	if pubkey == "" {
-		rawQuery = makeExtrasListQuery("wanted")
-	} else {
-		rawQuery = makePersonExtrasListQuery("wanted")
+	return ms, err
+}
+
+func (db database) AddBounty(b Bounty) (Bounty, error) {
+	db.db.Create(&b)
+	return b, nil
+}
+
+func (db database) GetAllBounties() []Bounty {
+	ms := []Bounty{}
+	// if search is empty, returns all
+	db.db.Find(&ms)
+	fmt.Printf("getAllBounties %v", ms)
+
+	return ms
+}
+
+func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
+	if b.OwnerID == "" {
+		return Bounty{}, errors.New("no pub key")
 	}
-
-	// 3/1/2022 = 1646172712, we do this to disclude early test tickets
-	rawQuery = addNewerThanTimestampToExtrasRawQuery(rawQuery, 1646172712)
-
-	// Order the wanted in descending order by created date
-	rawQuery = addOrderToExtrasRawQuery(rawQuery)
-
-	// if logged in, dont get mine
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	if pubKeyFromAuth != "" {
-		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
+	/*onConflict := "ON CONFLICT (id) DO UPDATE SET"
+	for i, u := range peopleupdatables {
+		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
+		if i < len(peopleupdatables)-1 {
+			onConflict = onConflict + ","
+		}
 	}
-
-	// sort by newest
-	if pubkey == "" {
-		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-			rawQuery, "%"+search+"%").Find(&ms)
-	} else {
-		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-			rawQuery, pubkey, "%"+search+"%").Find(&ms)
-	}
-
-	return ms, result.Error
+	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
+		fmt.Println(err)
+		return Bounty{}, err
+	}*/
+	db.db.Create(&b)
+	return b, nil
 }
 
 func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
