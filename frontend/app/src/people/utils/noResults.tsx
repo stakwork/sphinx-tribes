@@ -4,7 +4,27 @@ import { observer } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import PageLoadSpinner from './pageLoadSpinner';
 
-export default observer(NoResults);
+const H = styled.div`
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 37px;
+  letter-spacing: 0.1em;
+  text-align: center;
+
+  font-family: Roboto;
+  font-style: normal;
+  line-height: 26px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  /* Primary Text 1 */
+
+  color: #292c33;
+  letter-spacing: 0px;
+  color: rgb(60, 63, 65);
+`;
 function NoResults() {
   const { ui } = useStores();
   const { searchText } = ui || {};
@@ -29,24 +49,4 @@ function NoResults() {
   }
 }
 
-const H = styled.div`
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 37px;
-  letter-spacing: 0.1em;
-  text-align: center;
-
-  font-family: Roboto;
-  font-style: normal;
-  line-height: 26px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-
-  /* Primary Text 1 */
-
-  color: #292c33;
-  letter-spacing: 0px;
-  color: rgb(60, 63, 65);
-`;
+export default observer(NoResults);

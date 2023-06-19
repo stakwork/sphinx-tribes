@@ -10,7 +10,52 @@ import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
 import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 
-export default observer(GalleryInput);
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+const DropzoneStuff = styled.div``;
+const Image = styled.div`
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 105px;
+  width: 105px;
+`;
+const Close = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  height: 20px;
+  width: 20px;
+  background: white;
+  border-radius: 50%;
+  z-index: 10;
+  cursor: pointer;
+`;
+const ImageWrap = styled.div`
+  display: flex;
+  margin: 2px;
+  position: relative;
+`;
+const Sq = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: thin;
+`;
+
+const ImageCircle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+`;
 
 function GalleryInput({ value, handleChange }: Props) {
   const color = colors['light'];
@@ -18,6 +63,11 @@ function GalleryInput({ value, handleChange }: Props) {
   const [uploading, setUploading] = useState(false);
   const [showError, setShowError] = useState('');
   const picsrcArray = value || [];
+  async function addImg(img: any) {
+    const picsClone = [...picsrcArray];
+    picsClone.push(img);
+    handleChange(picsClone);
+  }
 
   async function uploadBase64Pic(img_base64: string, img_type: string) {
     try {
@@ -74,27 +124,11 @@ function GalleryInput({ value, handleChange }: Props) {
     reader.readAsDataURL(file);
   }
 
-  async function addImg(img: any) {
-    const picsClone = [...picsrcArray];
-    picsClone.push(img);
-    handleChange(picsClone);
-  }
-
-  // async function addNewImg(base64Img) {
-  //     setNewPicsArray([...newPicsArray, base64Img])
-  // }
-
   async function deleteImg(index: any) {
     const picsClone = [...picsrcArray];
     picsClone.splice(index, 1);
     handleChange(picsClone);
   }
-
-  // async function deleteNewImg(index) {
-  //     let newPicsClone = [...newPicsArray]
-  //     newPicsClone.splice(index, 1)
-  //     setNewPicsArray(newPicsClone)
-  // }
 
   return (
     <>
@@ -120,7 +154,7 @@ function GalleryInput({ value, handleChange }: Props) {
 
       <div style={{ marginTop: 5 }}>
         <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
-          {({ getRootProps, getInputProps, isDragActive, open }: any) => (
+          {({ getRootProps, getInputProps  }: any) => (
             <DropzoneStuff>
               <div>
                 <input {...getInputProps()} />
@@ -160,49 +194,4 @@ function GalleryInput({ value, handleChange }: Props) {
   );
 }
 
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const DropzoneStuff = styled.div``;
-const Image = styled.div`
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 105px;
-  width: 105px;
-`;
-const Close = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  height: 20px;
-  width: 20px;
-  background: white;
-  border-radius: 50%;
-  z-index: 10;
-  cursor: pointer;
-`;
-const ImageWrap = styled.div`
-  display: flex;
-  margin: 2px;
-  position: relative;
-`;
-const Sq = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-width: thin;
-`;
-
-const ImageCircle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-`;
+export default observer(GalleryInput);

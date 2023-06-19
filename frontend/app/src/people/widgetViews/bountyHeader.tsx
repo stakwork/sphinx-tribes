@@ -18,6 +18,278 @@ import { PostBounty } from './postBounty';
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
 
+interface styledProps {
+  color?: any;
+}
+
+const BountyHeaderDesk = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 1100px;
+  max-width: 1100px;
+`;
+
+const B = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
+const D = styled.div<styledProps>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .DText {
+    font-size: 16px;
+    font-family: Barlow;
+    font-weight: 500;
+  }
+  .ImageOuterContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: ${(p: any) => p.color && p.color.grayish.G200};
+    padding: 0 10px;
+  }
+`;
+
+const DevelopersImageContainer = styled.div<styledProps>`
+  height: 28px;
+  width: 28px;
+  border-radius: 50%;
+  background: ${(p: any) => p.color && p.color.pureWhite};
+  overflow: hidden;
+  position: static;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BountyHeaderMobile = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px;
+`;
+
+const ShortActionContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const DevelopersContainerMobile = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const LargeActionContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const FilterContainer = styled.div<styledProps>`
+  width: 78px;
+  height: 48px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-left: 19px;
+  cursor: pointer;
+  user-select: none;
+  .filterImageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    width: 36px;
+    .materialIconImage {
+      color: ${(p: any) => p.color && p.color.grayish.G200};
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+  }
+  .filterText {
+    font-family: Barlow;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    color: ${(p: any) => p.color && p.color.grayish.G200};
+  }
+  &:hover {
+    .filterImageContainer {
+      .materialIconImage {
+        color: ${(p: any) => p.color && p.color.grayish.G50} !important;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 4px;
+      }
+    }
+    .filterText {
+      color: ${(p: any) => p.color && p.color.grayish.G50};
+    }
+  }
+  &:active {
+    .filterImageContainer {
+      .materialIconImage {
+        color: ${(p: any) => p.color && p.color.grayish.G10} !important;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 4px;
+      }
+    }
+    .filterText {
+      color: ${(p: any) => p.color && p.color.grayish.G10};
+    }
+  }
+`;
+
+const FilterCount = styled.div<styledProps>`
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  margin-left: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  background: ${(p: any) => p?.color && p.color.blue1};
+  .filterCountText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: ${(p: any) => p.color && p.color.pureWhite};
+  }
+`;
+
+const EuiPopOverCheckboxLeft = styled.div<styledProps>`
+  width: 147px;
+  height: 312px;
+  padding: 15px 18px;
+  border-right: 1px solid ${(p: any) => p.color && p.color.grayish.G700};
+  user-select: none;
+  .leftBoxHeading {
+    font-family: Barlow;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 32px;
+    text-transform: uppercase;
+    color: ${(p: any) => p.color && p.color.grayish.G100};
+    margin-bottom: 10px;
+  }
+
+  &.CheckboxOuter > div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    .euiCheckboxGroup__item {
+      .euiCheckbox__square {
+        top: 5px;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
+        border-radius: 2px;
+      }
+      .euiCheckbox__input + .euiCheckbox__square {
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
+      }
+      .euiCheckbox__input:checked + .euiCheckbox__square {
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
+        background-image: url('static/checkboxImage.svg');
+      }
+      .euiCheckbox__label {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 16px;
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
+        &:hover {
+          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
+        }
+      }
+      input.euiCheckbox__input:checked ~ label {
+        color: ${(p: any) => p?.color && p?.color?.blue1};
+      }
+    }
+  }
+`;
+
+const PopOverRightBox = styled.div<styledProps>`
+  display: flex;
+  flex-direction: column;
+  max-height: 304px;
+  padding: 15px 0px 20px 21px;
+  .rightBoxHeading {
+    font-family: Barlow;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 32px;
+    text-transform: uppercase;
+    color: ${(p: any) => p.color && p.color.grayish.G100};
+  }
+`;
+
+const EuiPopOverCheckboxRight = styled.div<styledProps>`
+  min-width: 285px;
+  max-width: 285px;
+  height: 240px;
+  user-select: none;
+
+  &.CheckboxOuter > div {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    .euiCheckboxGroup__item {
+      .euiCheckbox__square {
+        top: 5px;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
+        border-radius: 2px;
+      }
+      .euiCheckbox__input + .euiCheckbox__square {
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
+      }
+      .euiCheckbox__input:checked + .euiCheckbox__square {
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
+        background-image: url('static/checkboxImage.svg');
+      }
+      .euiCheckbox__label {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 16px;
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
+        &:hover {
+          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
+        }
+      }
+      input.euiCheckbox__input:checked ~ label {
+        color: ${(p: any) => p?.color && p?.color?.blue1};
+      }
+    }
+  }
+`;
+
 const BountyHeader = ({
   selectedWidget,
   scrollValue,
@@ -393,275 +665,3 @@ const BountyHeader = ({
 };
 
 export default observer(BountyHeader);
-
-interface styledProps {
-  color?: any;
-}
-
-const BountyHeaderDesk = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 1100px;
-  max-width: 1100px;
-`;
-
-const B = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-`;
-
-const D = styled.div<styledProps>`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  .DText {
-    font-size: 16px;
-    font-family: Barlow;
-    font-weight: 500;
-  }
-  .ImageOuterContainer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    color: ${(p: any) => p.color && p.color.grayish.G200};
-    padding: 0 10px;
-  }
-`;
-
-const DevelopersImageContainer = styled.div<styledProps>`
-  height: 28px;
-  width: 28px;
-  border-radius: 50%;
-  background: ${(p: any) => p.color && p.color.pureWhite};
-  overflow: hidden;
-  position: static;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const BountyHeaderMobile = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 10px 16px;
-`;
-
-const ShortActionContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const DevelopersContainerMobile = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const LargeActionContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const FilterContainer = styled.div<styledProps>`
-  width: 78px;
-  height: 48px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin-left: 19px;
-  cursor: pointer;
-  user-select: none;
-  .filterImageContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 48px;
-    width: 36px;
-    .materialIconImage {
-      color: ${(p: any) => p.color && p.color.grayish.G200};
-      cursor: pointer;
-      font-size: 18px;
-      margin-top: 4px;
-    }
-  }
-  .filterText {
-    font-family: Barlow;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 19px;
-    display: flex;
-    align-items: center;
-    color: ${(p: any) => p.color && p.color.grayish.G200};
-  }
-  &:hover {
-    .filterImageContainer {
-      .materialIconImage {
-        color: ${(p: any) => p.color && p.color.grayish.G50} !important;
-        cursor: pointer;
-        font-size: 18px;
-        margin-top: 4px;
-      }
-    }
-    .filterText {
-      color: ${(p: any) => p.color && p.color.grayish.G50};
-    }
-  }
-  &:active {
-    .filterImageContainer {
-      .materialIconImage {
-        color: ${(p: any) => p.color && p.color.grayish.G10} !important;
-        cursor: pointer;
-        font-size: 18px;
-        margin-top: 4px;
-      }
-    }
-    .filterText {
-      color: ${(p: any) => p.color && p.color.grayish.G10};
-    }
-  }
-`;
-
-const FilterCount = styled.div<styledProps>`
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  margin-left: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: -5px;
-  background: ${(p: any) => p?.color && p.color.blue1};
-  .filterCountText {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: ${(p: any) => p.color && p.color.pureWhite};
-  }
-`;
-
-const EuiPopOverCheckboxLeft = styled.div<styledProps>`
-  width: 147px;
-  height: 312px;
-  padding: 15px 18px;
-  border-right: 1px solid ${(p: any) => p.color && p.color.grayish.G700};
-  user-select: none;
-  .leftBoxHeading {
-    font-family: Barlow;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 32px;
-    text-transform: uppercase;
-    color: ${(p: any) => p.color && p.color.grayish.G100};
-    margin-bottom: 10px;
-  }
-
-  &.CheckboxOuter > div {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-
-    .euiCheckboxGroup__item {
-      .euiCheckbox__square {
-        top: 5px;
-        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
-        border-radius: 2px;
-      }
-      .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
-      }
-      .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
-        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
-        background-image: url('static/checkboxImage.svg');
-      }
-      .euiCheckbox__label {
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 16px;
-        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
-        &:hover {
-          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
-        }
-      }
-      input.euiCheckbox__input:checked ~ label {
-        color: ${(p: any) => p?.color && p?.color?.blue1};
-      }
-    }
-  }
-`;
-
-const PopOverRightBox = styled.div<styledProps>`
-  display: flex;
-  flex-direction: column;
-  max-height: 304px;
-  padding: 15px 0px 20px 21px;
-  .rightBoxHeading {
-    font-family: Barlow;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 32px;
-    text-transform: uppercase;
-    color: ${(p: any) => p.color && p.color.grayish.G100};
-  }
-`;
-
-const EuiPopOverCheckboxRight = styled.div<styledProps>`
-  min-width: 285px;
-  max-width: 285px;
-  height: 240px;
-  user-select: none;
-
-  &.CheckboxOuter > div {
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-content: center;
-    .euiCheckboxGroup__item {
-      .euiCheckbox__square {
-        top: 5px;
-        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
-        border-radius: 2px;
-      }
-      .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
-      }
-      .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
-        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
-        background-image: url('static/checkboxImage.svg');
-      }
-      .euiCheckbox__label {
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 16px;
-        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
-        &:hover {
-          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
-        }
-      }
-      input.euiCheckbox__input:checked ~ label {
-        color: ${(p: any) => p?.color && p?.color?.blue1};
-      }
-    }
-  }
-`;

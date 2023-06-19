@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { WantedViews2Props } from 'people/interfaces';
@@ -12,7 +12,17 @@ import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
 import DesktopView from './wantedViews/desktopView';
 
-export default observer(WantedView);
+interface styledProps {
+  color?: any;
+}
+
+const BountyBox = styled.div<styledProps>`
+  min-height: 160px;
+  max-height: 160px;
+  width: 1100px;
+  box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
+  border: none;
+`;
 
 function WantedView(props: WantedViews2Props) {
   const {
@@ -187,14 +197,4 @@ function WantedView(props: WantedViews2Props) {
   return renderTickets();
 }
 
-interface styledProps {
-  color?: any;
-}
-
-const BountyBox = styled.div<styledProps>`
-  min-height: 160px;
-  max-height: 160px;
-  width: 1100px;
-  box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
-  border: none;
-`;
+export default observer(WantedView);

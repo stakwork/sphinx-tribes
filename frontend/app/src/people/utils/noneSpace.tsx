@@ -4,78 +4,6 @@ import { NoneSpaceProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
 import { Button } from '../../components/common';
 
-export default function NoneSpace(props: NoneSpaceProps) {
-  const color = colors['light'];
-  if (props.banner) {
-    return (
-      <OuterContainer
-        style={{
-          padding: 40,
-          width: '100%',
-          ...props.style
-        }}
-        color={color}
-      >
-        <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} color={color} />
-
-        <div style={{ marginLeft: 20, padding: 20 }}>
-          <H small={props?.small || false} style={{ paddingLeft: 0 }} color={color}>
-            {props.text}
-          </H>
-          <C style={{ paddingLeft: 0 }} color={color}>
-            {props.sub}
-          </C>
-          {props.Button && <div style={{ marginTop: 20 }}>{props.Button}</div>}
-          {!props.Button && props.buttonText && (
-            <Button
-              text={props.buttonText}
-              endingIcon={props.buttonIcon}
-              width={210}
-              height={48}
-              style={{ marginTop: 20 }}
-              onClick={props.action}
-              color="primary"
-            />
-          )}
-        </div>
-      </OuterContainer>
-    );
-  }
-
-  return (
-    <OuterContainer
-      style={{
-        ...props.style
-      }}
-      color={color}
-    >
-      <Icon src={`/static/${props.img}`} color={color} />
-
-      <>
-        <H small={props?.small || false} color={color}>
-          {props.text}
-        </H>
-        <C color={color}>{props.sub}</C>
-      </>
-
-      <div style={{ height: 200 }}>
-        <div style={{ marginTop: 20 }}>{props.Button}</div>
-        {!props.Button && props.buttonText && (
-          <Button
-            text={props.buttonText}
-            leadingIcon={props.buttonIcon}
-            width={210}
-            height={48}
-            style={{ marginTop: 40 }}
-            onClick={props.action}
-            color="primary"
-          />
-        )}
-      </div>
-    </OuterContainer>
-  );
-}
-
 interface IconProps {
   src: string;
   color?: any;
@@ -150,3 +78,75 @@ const C = styled.div<styledProps>`
   max-width: 350px;
   padding: 0 65px;
 `;
+
+export default function NoneSpace(props: NoneSpaceProps) {
+  const color = colors['light'];
+  if (props.banner) {
+    return (
+      <OuterContainer
+        style={{
+          padding: 40,
+          width: '100%',
+          ...props.style
+        }}
+        color={color}
+      >
+        <Icon src={`/static/${props.img}`} style={{ width: 180, height: 180 }} color={color} />
+
+        <div style={{ marginLeft: 20, padding: 20 }}>
+          <H small={props?.small || false} style={{ paddingLeft: 0 }} color={color}>
+            {props.text}
+          </H>
+          <C style={{ paddingLeft: 0 }} color={color}>
+            {props.sub}
+          </C>
+          {props.Button && <div style={{ marginTop: 20 }}>{props.Button}</div>}
+          {!props.Button && props.buttonText && (
+            <Button
+              text={props.buttonText}
+              endingIcon={props.buttonIcon}
+              width={210}
+              height={48}
+              style={{ marginTop: 20 }}
+              onClick={props.action}
+              color="primary"
+            />
+          )}
+        </div>
+      </OuterContainer>
+    );
+  }
+
+  return (
+    <OuterContainer
+      style={{
+        ...props.style
+      }}
+      color={color}
+    >
+      <Icon src={`/static/${props.img}`} color={color} />
+
+      <>
+        <H small={props?.small || false} color={color}>
+          {props.text}
+        </H>
+        <C color={color}>{props.sub}</C>
+      </>
+
+      <div style={{ height: 200 }}>
+        <div style={{ marginTop: 20 }}>{props.Button}</div>
+        {!props.Button && props.buttonText && (
+          <Button
+            text={props.buttonText}
+            leadingIcon={props.buttonIcon}
+            width={210}
+            height={48}
+            style={{ marginTop: 40 }}
+            onClick={props.action}
+            color="primary"
+          />
+        )}
+      </div>
+    </OuterContainer>
+  );
+}

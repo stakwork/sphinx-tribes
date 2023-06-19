@@ -6,63 +6,6 @@ import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { FieldEnv, Note } from './index';
 
-export default function SelectInput({
-  error,
-  note,
-  label,
-  options,
-  value,
-  handleChange,
-  extraHTML,
-  testId
-}: Props) {
-  let labeltext = label;
-  const color = colors['light'];
-  if (error) labeltext = `${labeltext} (${error})`;
-  const [active, setActive] = useState<boolean>(false);
-  return (
-    <OuterContainer color={color}>
-      <FieldEnv
-        color={color}
-        label={labeltext}
-        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
-      >
-        <R>
-          <Select
-            testId={testId}
-            name={'first'}
-            selectStyle={{
-              border: 'none',
-              fontFamily: 'Barlow',
-              fontWeight: '500',
-              fontSize: '14px',
-              color: '#3C3F41',
-              letterSpacing: '0.01em'
-            }}
-            options={options}
-            value={value}
-            handleActive={setActive}
-            onChange={(e: any) => {
-              handleChange(e);
-              setActive(false);
-            }}
-          />
-          {error && (
-            <E color={color}>
-              <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
-            </E>
-          )}
-        </R>
-      </FieldEnv>
-      {note && <Note color={color}>*{note}</Note>}
-      <ExtraText
-        style={{ display: value && extraHTML ? 'block' : 'none' }}
-        dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
-      />
-    </OuterContainer>
-  );
-}
-
 interface styledProps {
   color?: any;
 }
@@ -124,3 +67,59 @@ const OuterContainer = styled.div<styledProps>`
     color: ${(p: any) => p.color && p.color.text2_4} 
   }
 `;
+export default function SelectInput({
+  error,
+  note,
+  label,
+  options,
+  value,
+  handleChange,
+  extraHTML,
+  testId
+}: Props) {
+  let labeltext = label;
+  const color = colors['light'];
+  if (error) labeltext = `${labeltext} (${error})`;
+  const [active, setActive] = useState<boolean>(false);
+  return (
+    <OuterContainer color={color}>
+      <FieldEnv
+        color={color}
+        label={labeltext}
+        className={value ? 'euiFormRow_filed' : active ? 'euiFormRow_active' : ''}
+      >
+        <R>
+          <Select
+            testId={testId}
+            name={'first'}
+            selectStyle={{
+              border: 'none',
+              fontFamily: 'Barlow',
+              fontWeight: '500',
+              fontSize: '14px',
+              color: '#3C3F41',
+              letterSpacing: '0.01em'
+            }}
+            options={options}
+            value={value}
+            handleActive={setActive}
+            onChange={(e: any) => {
+              handleChange(e);
+              setActive(false);
+            }}
+          />
+          {error && (
+            <E color={color}>
+              <EuiIcon type="alert" size="m" style={{ width: 20, height: 20 }} />
+            </E>
+          )}
+        </R>
+      </FieldEnv>
+      {note && <Note color={color}>*{note}</Note>}
+      <ExtraText
+        style={{ display: value && extraHTML ? 'block' : 'none' }}
+        dangerouslySetInnerHTML={{ __html: extraHTML || '' }}
+      />
+    </OuterContainer>
+  );
+}

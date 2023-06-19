@@ -2,71 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { IconButton } from '../../components/common';
 
-export default function GalleryViewer(props: any) {
-  const { gallery, wrap, big, showAll, style, cover } = props;
-  const [selectedImage, setSelectedImage] = useState(0);
-  const g = gallery;
-
-  if (!g || !g.length) return <div />;
-  //<Square big={big} />
-
-  const showNav = g.length > 1;
-
-  function next(e: any) {
-    e.stopPropagation();
-    const nextindex = selectedImage + 1;
-    if (g[nextindex]) setSelectedImage(nextindex);
-    else setSelectedImage(0);
-  }
-
-  function prev(e: any) {
-    e.stopPropagation();
-    const previndex = selectedImage - 1;
-    if (g[previndex]) setSelectedImage(previndex);
-    else setSelectedImage(g.length - 1);
-  }
-
-  return (
-    <>
-      <Gallery
-        style={{ width: big || wrap ? '100%' : 'fit-content', ...style }}
-        ref={props.innerRef}
-      >
-        {showAll ? (
-          <div style={{ textAlign: 'center' }}>
-            {g.map((ga: any, i: number) => (
-              <BigImg big={big} src={ga} cover={cover} key={i} />
-            ))}
-          </div>
-        ) : (
-          <>
-            <Img big={big} src={g[selectedImage]} cover={cover} />
-            {showNav && (
-              <L>
-                <Circ>
-                  <IconButton iconStyle={{ color: '#000' }} icon={'chevron_left'} onClick={prev} />
-                </Circ>
-              </L>
-            )}
-
-            {showNav && (
-              <R>
-                <Circ>
-                  <IconButton icon={'chevron_right'} iconStyle={{ color: '#000' }} onClick={next} />
-                </Circ>
-              </R>
-            )}
-
-            <Label>
-              {selectedImage + 1} / {g.length}
-            </Label>
-          </>
-        )}
-      </Gallery>
-    </>
-  );
-}
-
 const Gallery = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -150,3 +85,68 @@ const BigImg = styled.img<ImageProps>`
   height: auto;
   margin-bottom: 5px;
 `;
+
+export default function GalleryViewer(props: any) {
+  const { gallery, wrap, big, showAll, style, cover } = props;
+  const [selectedImage, setSelectedImage] = useState(0);
+  const g = gallery;
+
+  if (!g || !g.length) return <div />;
+  //<Square big={big} />
+
+  const showNav = g.length > 1;
+
+  function next(e: any) {
+    e.stopPropagation();
+    const nextindex = selectedImage + 1;
+    if (g[nextindex]) setSelectedImage(nextindex);
+    else setSelectedImage(0);
+  }
+
+  function prev(e: any) {
+    e.stopPropagation();
+    const previndex = selectedImage - 1;
+    if (g[previndex]) setSelectedImage(previndex);
+    else setSelectedImage(g.length - 1);
+  }
+
+  return (
+    <>
+      <Gallery
+        style={{ width: big || wrap ? '100%' : 'fit-content', ...style }}
+        ref={props.innerRef}
+      >
+        {showAll ? (
+          <div style={{ textAlign: 'center' }}>
+            {g.map((ga: any, i: number) => (
+              <BigImg big={big} src={ga} cover={cover} key={i} />
+            ))}
+          </div>
+        ) : (
+          <>
+            <Img big={big} src={g[selectedImage]} cover={cover} />
+            {showNav && (
+              <L>
+                <Circ>
+                  <IconButton iconStyle={{ color: '#000' }} icon={'chevron_left'} onClick={prev} />
+                </Circ>
+              </L>
+            )}
+
+            {showNav && (
+              <R>
+                <Circ>
+                  <IconButton icon={'chevron_right'} iconStyle={{ color: '#000' }} onClick={next} />
+                </Circ>
+              </R>
+            )}
+
+            <Label>
+              {selectedImage + 1} / {g.length}
+            </Label>
+          </>
+        )}
+      </Gallery>
+    </>
+  );
+}

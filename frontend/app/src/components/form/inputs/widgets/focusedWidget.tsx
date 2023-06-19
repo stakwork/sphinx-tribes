@@ -6,6 +6,39 @@ import Input from '../../../form/inputs/';
 import WidgetList from './widgetList';
 import { FocusedWidgetProps } from './interfaces';
 
+const Wrap = styled.div`
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-evenly;
+`;
+
+const Nav = styled.div`
+  color: #fff;
+  display: flex;
+  align-content: center;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+  margin-top: 2px;
+  height: 42px;
+  min-height: 42px;
+`;
+
+export interface IconProps {
+  source: string;
+}
+
+const Icon = styled.div<IconProps>`
+  background-image: ${(p: any) => `url(${p.source})`};
+  width: 30px;
+  height: 30px;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+  border-radius: 5px;
+  overflow: hidden;
+`;
 export default function FocusedWidget(props: FocusedWidgetProps) {
   const {
     name,
@@ -39,6 +72,35 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     };
   }, []);
 
+  function getFieldToUpdate(e: any) {
+    let valueToUpdate = `${name}.${item.name}.${e.name}`;
+    if (!single) {
+      valueToUpdate = `${name}.${item.name}[${selectedIndex}].${e.name}`;
+    }
+    return valueToUpdate;
+  }
+
+  function getInitialValueByType(type: any) {
+    let value: any = '';
+    if (type === 'number') value = 0;
+    if (type === 'gallery') value = [];
+    console.log('getInitialValueByType', value);
+    return value;
+  }
+
+  function thereAreErrors() {
+    let result = false;
+
+    if (newErrors && Array.isArray(newErrors) && newErrors.length) {
+      result = true;
+    } else if (newErrors && Object.keys(newErrors).length) {
+      result = true;
+    }
+    return result;
+  }
+  function getFormState() {
+    return (values[name] && values[name][item.name]) || [];
+  }
   useEffect(() => {
     // in order to
     if (single) {
@@ -78,10 +140,6 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
       setSelectedIndex(-1);
       setPrevState(getFormState());
     }
-  }
-
-  function getFormState() {
-    return (values[name] && values[name][item.name]) || [];
   }
 
   function startCreate() {
@@ -127,33 +185,6 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     setFieldValue(`${name}.${item.name}`, formState);
   }
 
-  function getInitialValueByType(type: any) {
-    let value: any = '';
-    if (type === 'number') value = 0;
-    if (type === 'gallery') value = [];
-    console.log('getInitialValueByType', value);
-    return value;
-  }
-
-  function thereAreErrors() {
-    let result = false;
-
-    if (newErrors && Array.isArray(newErrors) && newErrors.length) {
-      result = true;
-    } else if (newErrors && Object.keys(newErrors).length) {
-      result = true;
-    }
-    return result;
-  }
-
-  function getFieldToUpdate(e: any) {
-    let valueToUpdate = `${name}.${item.name}.${e.name}`;
-    if (!single) {
-      valueToUpdate = `${name}.${item.name}[${selectedIndex}].${e.name}`;
-    }
-    return valueToUpdate;
-  }
-
   const showingList = single ? false : selectedIndex > -1 ? false : true;
 
   const widgetHeader = (
@@ -190,7 +221,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
       {/* single widgets will only show these fields */}
       {!showingList && (
         <>
-          {item.fields.map((e: any, i: number) => (
+          {item.fields.map((e: any) => (
             <Input
               {...e}
               key={e.name}
@@ -239,37 +270,3 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     </Wrap>
   );
 }
-
-const Wrap = styled.div`
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: space-evenly;
-`;
-
-const Nav = styled.div`
-  color: #fff;
-  display: flex;
-  align-content: center;
-  justify-content: space-evenly;
-  margin-bottom: 20px;
-  margin-top: 2px;
-  height: 42px;
-  min-height: 42px;
-`;
-
-export interface IconProps {
-  source: string;
-}
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p: any) => `url(${p.source})`};
-  width: 30px;
-  height: 30px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  border-radius: 5px;
-  overflow: hidden;
-`;

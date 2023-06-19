@@ -4,32 +4,6 @@ import Select from 'react-select';
 import { SelProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
 
-export default function Sel(props: SelProps) {
-  const { options, onChange, value, style } = props;
-  const color = colors['light'];
-
-  const opts = options
-    ? options.map((o: any) => ({
-        value: o.value,
-        label: o.label
-      }))
-    : [];
-
-  return (
-    <div style={{ position: 'relative', ...style }}>
-      <S
-        color={color}
-        closeMenuOnSelect={false}
-        isMulti
-        options={opts}
-        value={value}
-        onChange={(value: any) => onChange(value)}
-        className={'multi-select-input'}
-      />
-    </div>
-  );
-}
-
 interface styledProps {
   color?: any;
 }
@@ -87,3 +61,29 @@ button {
 }
 }
 `;
+export default function Sel(props: SelProps) {
+  const { options, onChange, value, style } = props;
+  const color = colors['light'];
+
+  const opts = options
+    ? options.map((o: any) => ({
+        value: o.value,
+        label: o.label
+      }))
+    : [];
+
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      <S
+        color={color}
+        closeMenuOnSelect={false}
+        isMulti
+        options={opts}
+        value={value}
+        onChange={(value: any) => onChange(value)}
+        className={'multi-select-input'}
+      />
+    </div>
+  );
+}
+

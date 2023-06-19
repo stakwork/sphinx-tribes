@@ -1,6 +1,6 @@
 export const filterCount = (filterValues: any) => {
   let count = 0;
-  for (const [_key, value] of Object.entries(filterValues)) {
+  for (const [, value] of Object.entries(filterValues)) {
     if (value) {
       count += 1;
     }

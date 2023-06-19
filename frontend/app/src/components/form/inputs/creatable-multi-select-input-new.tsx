@@ -11,6 +11,81 @@ import {
 import { SvgMask } from '../../../people/utils/svgMask';
 import type { Props } from './propsType';
 
+interface styledProps {
+  color?: any;
+}
+interface labelProps {
+  value?: any;
+}
+
+const EuiPopOverCheckbox = styled.div<styledProps>`
+  height: 180px;
+  padding: 10px 0px 0px 20px;
+  margin-right: 3px;
+  overflow-y: scroll;
+  &.CheckboxOuter > div {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    .euiCheckboxGroup__item {
+      .euiCheckbox__square {
+        top: 5px;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
+        border-radius: 2px;
+      }
+      .euiCheckbox__input + .euiCheckbox__square {
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
+      }
+      .euiCheckbox__input:checked + .euiCheckbox__square {
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
+        background-image: url('static/checkboxImage.svg');
+      }
+      .euiCheckbox__label {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 16px;
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
+      }
+      input.euiCheckbox__input:checked ~ label {
+        color: ${(p: any) => p?.color && p?.color?.blue1};
+      }
+    }
+  }
+`;
+
+const LabelsContainer = styled.div<labelProps>`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  min-height: 24px;
+  width: 100%;
+`;
+
+const Label = styled.div<labelProps>`
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  border: ${(p: any) => p?.value && p?.value.border};
+  background: ${(p: any) => p?.value && p?.value.background};
+  margin-right: 4px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  .labelText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    color: ${(p: any) => p?.value && p?.value.color};
+  }
+`;
 const codingLanguages = GetValue(coding_languages);
 
 export default function CreatableMultiSelectInputNew({ error, label, handleChange }: Props) {
@@ -27,7 +102,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
 
   const onChange = (optionId: any) => {
     let trueCount = 0;
-    for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
+    for (const [, value] of Object.entries(checkboxIdToSelectedMap)) {
       if (value) {
         trueCount += 1;
       }
@@ -122,7 +197,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
       >
         {!isPopoverOpen &&
           labels &&
-          labels?.map((x: any, index: number) => (
+          labels?.map((x: any) => (
             <Label
               key={x.label}
               value={x}
@@ -151,79 +226,3 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
     </div>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-interface labelProps {
-  value?: any;
-}
-
-const EuiPopOverCheckbox = styled.div<styledProps>`
-  height: 180px;
-  padding: 10px 0px 0px 20px;
-  margin-right: 3px;
-  overflow-y: scroll;
-  &.CheckboxOuter > div {
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    .euiCheckboxGroup__item {
-      .euiCheckbox__square {
-        top: 5px;
-        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
-        border-radius: 2px;
-      }
-      .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
-      }
-      .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
-        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
-        background-image: url('static/checkboxImage.svg');
-      }
-      .euiCheckbox__label {
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 16px;
-        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
-      }
-      input.euiCheckbox__input:checked ~ label {
-        color: ${(p: any) => p?.color && p?.color?.blue1};
-      }
-    }
-  }
-`;
-
-const LabelsContainer = styled.div<labelProps>`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  min-height: 24px;
-  width: 100%;
-`;
-
-const Label = styled.div<labelProps>`
-  height: 23px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-align: center;
-  border: ${(p: any) => p?.value && p?.value.border};
-  background: ${(p: any) => p?.value && p?.value.background};
-  margin-right: 4px;
-  border-radius: 4px;
-  padding: 2px 6px;
-  cursor: pointer;
-  .labelText {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 16px;
-    color: ${(p: any) => p?.value && p?.value.color};
-  }
-`;

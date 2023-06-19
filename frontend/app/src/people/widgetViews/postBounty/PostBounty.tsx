@@ -8,6 +8,19 @@ import { useStores } from '../../../store';
 import StartUpModal from '../../utils/start_up_modal';
 import { PostModal, PostModalProps } from './PostModal';
 
+const color = colors['light'];
+const StyledIconButton = styled(IconButton)`
+  color: ${color.pureWhite};
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+`;
+
+const iconStyle = {
+  fontSize: '16px',
+  fontWeight: 400
+};
+
 interface Props extends Omit<PostModalProps, 'onClose' | 'isOpen'> {
   title?: string;
   buttonProps?: {
@@ -16,8 +29,6 @@ interface Props extends Omit<PostModalProps, 'onClose' | 'isOpen'> {
     color?: 'primary' | 'secondary';
   };
 }
-
-const color = colors['light'];
 
 const mapBtnColorProps = {
   primary: {
@@ -103,15 +114,3 @@ export const PostBounty: FC<Props> = observer(
     );
   }
 );
-
-const StyledIconButton = styled(IconButton)`
-  color: ${color.pureWhite};
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-`;
-
-const iconStyle = {
-  fontSize: '16px',
-  fontWeight: 400
-};

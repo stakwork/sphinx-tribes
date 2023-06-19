@@ -15,7 +15,218 @@ import IconButton from '../../components/common/icon_button';
 import { PostModal } from '../widgetViews/postBounty/PostModal';
 import StartUpModal from '../utils/start_up_modal';
 
-export default observer(Header);
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+const Corner = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const T = styled.div`
+  display: flex;
+  font-size: 26px;
+  line-height: 19px;
+`;
+
+interface ImageProps {
+  readonly src: string;
+}
+const Img = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  height: 37px;
+  width: 232px;
+
+  position: relative;
+`;
+
+const Name = styled.span`
+  font-style: normal;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 19px;
+  /* or 73% */
+
+  /* Text 2 */
+
+  color: #292c33;
+`;
+const Welcome = styled.div`
+  font-size: 15px;
+  line-height: 24px;
+  margin: 20px 0 50px;
+  text-align: center;
+
+  /* Text 2 */
+
+  color: #3c3f41;
+`;
+
+const Column = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+`;
+const Imgg = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  margin-left: 20px;
+  height: 100%;
+`;
+
+const MTabs = styled.div`
+  display: flex;
+  margin: 0 20px;
+  justify-content: space-around;
+`;
+interface TagProps {
+  selected: boolean;
+}
+const Tab = styled.div<TagProps>`
+  display: flex;
+  margin-right: 50px;
+  padding: 0 8px;
+  color: ${(p: any) => (p.selected ? '#fff' : '#6B7A8D')};
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 19px;
+  height: 100%;
+  align-items: center;
+  border-bottom: ${(p: any) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
+
+  &:hover {
+    color: #909baa;
+  }
+
+  &:active {
+    color: #fff;
+    border-color: transparent;
+  }
+`;
+
+const MTab = styled.div<TagProps>`
+  display: flex;
+  margin: 25px 5px 0;
+  color: ${(p: any) => (p.selected ? '#fff' : '#ffffff99')};
+  cursor: pointer;
+  height: 30px;
+  min-width: 65px;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 19px;
+  justify-content: center;
+  border-bottom: ${(p: any) => (p.selected ? '3px solid #618AFF' : 'none')};
+`;
+
+const LoggedInBtn = styled.div`
+  max-width: 130px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+  padding: 0 24px 0 50px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  ${Imgg} {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.13);
+    ${Imgg} {
+      height: 34px;
+      width: 34px;
+      left: 3px;
+    }
+  }
+`;
+
+const GetSphinxsBtn = styled.button`
+  display: flex;
+  flex: 1 0 auto;
+  background: #618aff;
+  padding: 0 28px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  border-radius: 32px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+  color: #ffffff;
+  font-family: Barlow;
+
+  &:hover {
+    background: #5881f8;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &:active {
+    background: #5078f2;
+    box-shadow: none;
+  }
+`;
+
+const LoginBtn = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  width: 120px;
+  align-items: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+  cursor: pointer;
+  margin-left: 18px;
+  span {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    color: #a3c1ff;
+  }
+
+  &:active {
+    color: #82b4ff;
+  }
+`;
+
+const Alias = styled.span`
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
 function Header() {
   const { main, ui } = useStores();
@@ -378,215 +589,4 @@ function Header() {
   );
 }
 
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-`;
-const Corner = styled.div`
-  display: flex;
-  align-items: center;
-`;
-const T = styled.div`
-  display: flex;
-  font-size: 26px;
-  line-height: 19px;
-`;
-
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  height: 37px;
-  width: 232px;
-
-  position: relative;
-`;
-
-const Name = styled.span`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 26px;
-  line-height: 19px;
-  /* or 73% */
-
-  /* Text 2 */
-
-  color: #292c33;
-`;
-const Welcome = styled.div`
-  font-size: 15px;
-  line-height: 24px;
-  margin: 20px 0 50px;
-  text-align: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-`;
-
-const Column = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 25px;
-`;
-const Imgg = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-`;
-
-const Tabs = styled.div`
-  display: flex;
-  margin-left: 20px;
-  height: 100%;
-`;
-
-const MTabs = styled.div`
-  display: flex;
-  margin: 0 20px;
-  justify-content: space-around;
-`;
-interface TagProps {
-  selected: boolean;
-}
-const Tab = styled.div<TagProps>`
-  display: flex;
-  margin-right: 50px;
-  padding: 0 8px;
-  color: ${(p: any) => (p.selected ? '#fff' : '#6B7A8D')};
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 19px;
-  height: 100%;
-  align-items: center;
-  border-bottom: ${(p: any) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
-
-  &:hover {
-    color: #909baa;
-  }
-
-  &:active {
-    color: #fff;
-    border-color: transparent;
-  }
-`;
-
-const MTab = styled.div<TagProps>`
-  display: flex;
-  margin: 25px 5px 0;
-  color: ${(p: any) => (p.selected ? '#fff' : '#ffffff99')};
-  cursor: pointer;
-  height: 30px;
-  min-width: 65px;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 19px;
-  justify-content: center;
-  border-bottom: ${(p: any) => (p.selected ? '3px solid #618AFF' : 'none')};
-`;
-
-const LoggedInBtn = styled.div`
-  max-width: 130px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 20px;
-  border-radius: 32px;
-  background: rgba(255, 255, 255, 0.07);
-  white-space: nowrap;
-  padding: 0 24px 0 50px;
-  display: flex;
-  align-items: center;
-  position: relative;
-
-  ${Imgg} {
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    left: 0;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  &:active {
-    background: rgba(255, 255, 255, 0.13);
-    ${Imgg} {
-      height: 34px;
-      width: 34px;
-      left: 3px;
-    }
-  }
-`;
-
-const GetSphinxsBtn = styled.button`
-  display: flex;
-  flex: 1 0 auto;
-  background: #618aff;
-  padding: 0 28px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  margin-right: 20px;
-  border-radius: 32px;
-  border: none;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 19px;
-  color: #ffffff;
-  font-family: Barlow;
-
-  &:hover {
-    background: #5881f8;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  &:active {
-    background: #5078f2;
-    box-shadow: none;
-  }
-`;
-
-const LoginBtn = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
-  width: 120px;
-  align-items: center;
-  cursor: pointer;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 17px;
-  cursor: pointer;
-  margin-left: 18px;
-  span {
-    margin-right: 8px;
-  }
-
-  &:hover {
-    color: #a3c1ff;
-  }
-
-  &:active {
-    color: #82b4ff;
-  }
-`;
-
-const Alias = styled.span`
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
+export default observer(Header);

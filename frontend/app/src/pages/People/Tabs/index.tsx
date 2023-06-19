@@ -7,6 +7,54 @@ import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-rou
 import { useStores } from 'store';
 import styled from 'styled-components';
 import { Wanted } from './Wanted';
+const Container = styled.div<{ isMobile: boolean }>`
+  flex-grow: 1;
+  margin: ${(p: any) => (p.isMobile ? '0 -20px' : '0')};
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  overflow-x: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`;
+interface TagProps {
+  selected: boolean;
+}
+
+const Tab = styled.div<TagProps>`
+  display: flex;
+  padding: 10px;
+  margin-right: 25px;
+  color: ${(p: any) => (p.selected ? '#292C33' : '#8E969C')};
+  border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
+  cursor: hover;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 19px;
+  cursor: pointer;
+`;
+
+const Counter = styled.div`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 11px;
+  line-height: 19px;
+  margin-bottom: -3px;
+  /* or 173% */
+  margin-left: 8px;
+
+  display: flex;
+  align-items: center;
+
+  /* Placeholder Text */
+
+  color: #b0b7bc;
+`;
 
 const tabs = widgetConfigs;
 export const TabsPages = observer(() => {
@@ -115,52 +163,3 @@ export const TabsPages = observer(() => {
     </Container>
   );
 });
-
-const Container = styled.div<{ isMobile: boolean }>`
-  flex-grow: 1;
-  margin: ${(p: any) => (p.isMobile ? '0 -20px' : '0')};
-`;
-
-const Tabs = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  overflow-x: auto;
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`;
-interface TagProps {
-  selected: boolean;
-}
-
-const Tab = styled.div<TagProps>`
-  display: flex;
-  padding: 10px;
-  margin-right: 25px;
-  color: ${(p: any) => (p.selected ? '#292C33' : '#8E969C')};
-  border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
-  cursor: hover;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 19px;
-  cursor: pointer;
-`;
-
-const Counter = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 11px;
-  line-height: 19px;
-  margin-bottom: -3px;
-  /* or 173% */
-  margin-left: 8px;
-
-  display: flex;
-  align-items: center;
-
-  /* Placeholder Text */
-
-  color: #b0b7bc;
-`;

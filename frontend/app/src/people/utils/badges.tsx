@@ -7,9 +7,213 @@ import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import { Modal, Button, Divider, TextInput } from '../../components/common';
 import PageLoadSpinner from './pageLoadSpinner';
-//import { ClaimOnLiquid } from '../../store/main';
 
-export default observer(Badges);
+interface BProps {
+  readonly isMobile?: boolean;
+}
+const Wrap = styled.div<BProps>`
+  display: flex;
+  flex-wrap: ${(p: any) => (p.isMobile ? '' : 'wrap')};
+  width: 100%;
+  overflow-x: hidden;
+`;
+
+const BWrap = styled.div<BProps>`
+  display: flex;
+  // cursor:pointer;
+  flex-direction: ${(p: any) => (p.isMobile ? 'row' : 'column')};
+  position: relative;
+  width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
+  min-width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
+  height: ${(p: any) => (p.isMobile ? '' : '272px')};
+  min-height: ${(p: any) => (p.isMobile ? '' : '272px')};
+  max-width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
+  align-items: center;
+  padding: ${(p: any) => (p.isMobile ? '10px' : '20px 10px 10px')};
+  background: #fff;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 2px rgb(0 0 0 / 15%);
+
+  width: ${(p: any) => (p.isMobile ? '100%' : 'auto')};
+  margin-right: ${(p: any) => (p.isMobile ? '0px' : '20px')};
+`;
+const T = styled.div<BProps>`
+  font-size: 15px;
+  width: 100%;
+  text-align: ${(p: any) => (p.isMobile ? 'left' : 'center')};
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 600;
+  font-size: ${(p: any) => (p.isMobile ? '20px' : '15px')};
+  line-height: 20px;
+  /* or 133% */
+
+  /* Primary Text 1 */
+
+  color: #292c33;
+`;
+const S = styled.div<BProps>`
+  font-size: 15px;
+  margin-left: ${(p: any) => (p.isMobile ? '15px' : '10px')};
+  width: 100%;
+  text-align: ${(p: any) => (p.isMobile ? '' : 'center')};
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 15px;
+  /* or 133% */
+
+  text-align: center;
+
+  /* Primary Text 1 */
+
+  color: #5f6368;
+`;
+const D = styled.div`
+  width: 100%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  line-height: 30px;
+  /* or 400% */
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  /* Text 2 */
+
+  color: #3c3f41;
+`;
+
+const Status = styled.div`
+  margin: 15px 20px 25px;
+  // width:100%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+`;
+const StatusText = styled.div`
+                        display:flex;
+                        justify-content:center;
+                        align-items:center;
+                        // height:26px;
+                        color:#B0B7BC;
+                        font-size: 10px;
+                        padding 0 10px;
+                        cursor: pointer;
+                        
+                        &:hover{
+                            color:#618AFF99;
+                        }
+                        `;
+const Counter = styled.div``;
+
+interface ImageProps {
+  readonly src?: string;
+  readonly isMobile?: boolean;
+}
+const Img = styled.div<ImageProps>`
+  position: relative;
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  min-width: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  width: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  min-height: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  height: ${(p: any) => (p.isMobile ? '108px' : '132px')};
+  margin: ${(p: any) => (p.isMobile ? '24px' : '0px 20px 20px')};
+`;
+const SmallImg = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  min-width: 90px;
+  width: 90px;
+  min-height: 90px;
+  height: 90px;
+  margin: 10px 30px;
+`;
+
+function Flag(props: BadgesProps) {
+  return (
+    <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g filter="url(#filter0_d_3736_56289)">
+        <path d="M4 27V3H26V27L15 24.3333L4 27Z" fill={props.color} />
+      </g>
+      <defs>
+        <filter
+          id="filter0_d_3736_56289"
+          x="0"
+          y="0"
+          width="30"
+          height="32"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="1" />
+          <feGaussianBlur stdDeviation="2" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0.286275 0 0 0 0 0.788235 0 0 0 0 0.596078 0 0 0 0.5 0"
+          />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3736_56289" />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect1_dropShadow_3736_56289"
+            result="shape"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
+function BadgeStatus(props: BadgesProps) {
+  const { txid } = props;
+
+  return (
+    <div>
+      <StatusText>
+        {txid ? (
+          <>
+            <MaterialIcon icon="link" style={{ fontSize: 13 }} />
+            <div style={{ marginLeft: 5, fontWeight: 500 }}>ON-CHAIN</div>
+          </>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              fontSize: 11,
+              alignItems: 'center',
+              color: '#618AFF',
+              letterSpacing: '0.3px'
+            }}
+          >
+            OFF-CHAIN
+          </div>
+        )}
+      </StatusText>
+    </div>
+  );
+}
 
 function Badges(props: BadgesProps) {
   const { main, ui } = useStores();
@@ -386,210 +590,4 @@ function Badges(props: BadgesProps) {
   );
 }
 
-function BadgeStatus(props: BadgesProps) {
-  const { txid } = props;
-
-  return (
-    <div>
-      <StatusText>
-        {txid ? (
-          <>
-            <MaterialIcon icon="link" style={{ fontSize: 13 }} />
-            <div style={{ marginLeft: 5, fontWeight: 500 }}>ON-CHAIN</div>
-          </>
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              fontSize: 11,
-              alignItems: 'center',
-              color: '#618AFF',
-              letterSpacing: '0.3px'
-            }}
-          >
-            OFF-CHAIN
-          </div>
-        )}
-      </StatusText>
-    </div>
-  );
-}
-
-interface BProps {
-  readonly isMobile?: boolean;
-}
-
-function Flag(props: BadgesProps) {
-  return (
-    <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g filter="url(#filter0_d_3736_56289)">
-        <path d="M4 27V3H26V27L15 24.3333L4 27Z" fill={props.color} />
-      </g>
-      <defs>
-        <filter
-          id="filter0_d_3736_56289"
-          x="0"
-          y="0"
-          width="30"
-          height="32"
-          filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
-        >
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="1" />
-          <feGaussianBlur stdDeviation="2" />
-          <feComposite in2="hardAlpha" operator="out" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0.286275 0 0 0 0 0.788235 0 0 0 0 0.596078 0 0 0 0.5 0"
-          />
-          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3736_56289" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="effect1_dropShadow_3736_56289"
-            result="shape"
-          />
-        </filter>
-      </defs>
-    </svg>
-  );
-}
-
-const Wrap = styled.div<BProps>`
-  display: flex;
-  flex-wrap: ${(p: any) => (p.isMobile ? '' : 'wrap')};
-  width: 100%;
-  overflow-x: hidden;
-`;
-
-const BWrap = styled.div<BProps>`
-  display: flex;
-  // cursor:pointer;
-  flex-direction: ${(p: any) => (p.isMobile ? 'row' : 'column')};
-  position: relative;
-  width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
-  min-width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
-  height: ${(p: any) => (p.isMobile ? '' : '272px')};
-  min-height: ${(p: any) => (p.isMobile ? '' : '272px')};
-  max-width: ${(p: any) => (p.isMobile ? '100%' : '192px')};
-  align-items: center;
-  padding: ${(p: any) => (p.isMobile ? '10px' : '20px 10px 10px')};
-  background: #fff;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  box-shadow: 0px 1px 2px rgb(0 0 0 / 15%);
-
-  width: ${(p: any) => (p.isMobile ? '100%' : 'auto')};
-  margin-right: ${(p: any) => (p.isMobile ? '0px' : '20px')};
-`;
-const T = styled.div<BProps>`
-  font-size: 15px;
-  width: 100%;
-  text-align: ${(p: any) => (p.isMobile ? 'left' : 'center')};
-
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 600;
-  font-size: ${(p: any) => (p.isMobile ? '20px' : '15px')};
-  line-height: 20px;
-  /* or 133% */
-
-  /* Primary Text 1 */
-
-  color: #292c33;
-`;
-const S = styled.div<BProps>`
-  font-size: 15px;
-  margin-left: ${(p: any) => (p.isMobile ? '15px' : '10px')};
-  width: 100%;
-  text-align: ${(p: any) => (p.isMobile ? '' : 'center')};
-
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 15px;
-  /* or 133% */
-
-  text-align: center;
-
-  /* Primary Text 1 */
-
-  color: #5f6368;
-`;
-const D = styled.div`
-  width: 100%;
-  font-size: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  line-height: 30px;
-  /* or 400% */
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-`;
-
-const Status = styled.div`
-  margin: 15px 20px 25px;
-  // width:100%;
-  font-size: 12px;
-  display: flex;
-  justify-content: center;
-`;
-const StatusText = styled.div`
-                        display:flex;
-                        justify-content:center;
-                        align-items:center;
-                        // height:26px;
-                        color:#B0B7BC;
-                        font-size: 10px;
-                        padding 0 10px;
-                        cursor: pointer;
-                        
-                        &:hover{
-                            color:#618AFF99;
-                        }
-                        `;
-const Counter = styled.div``;
-
-interface ImageProps {
-  readonly src?: string;
-  readonly isMobile?: boolean;
-}
-const Img = styled.div<ImageProps>`
-  position: relative;
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  position: relative;
-  min-width: ${(p: any) => (p.isMobile ? '108px' : '132px')};
-  width: ${(p: any) => (p.isMobile ? '108px' : '132px')};
-  min-height: ${(p: any) => (p.isMobile ? '108px' : '132px')};
-  height: ${(p: any) => (p.isMobile ? '108px' : '132px')};
-  margin: ${(p: any) => (p.isMobile ? '24px' : '0px 20px 20px')};
-`;
-const SmallImg = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  position: relative;
-  min-width: 90px;
-  width: 90px;
-  min-height: 90px;
-  height: 90px;
-  margin: 10px 30px;
-`;
+export default observer(Badges);

@@ -5,6 +5,20 @@ import FadeLeft from '../../../animated/fadeLeft';
 import Widget from './widget';
 import FocusedWidget from './focusedWidget';
 
+const Wrap = styled.div``;
+const Center = styled.div`
+  display: flex;
+  flex: 1;
+  align-content: center;
+  justify-content: center;
+`;
+const InnerWrap = styled.div`
+  display: flex;
+  align-content: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  max-width: 310px;
+`;
 async function sleep(ms: number) {
   return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
@@ -13,15 +27,15 @@ export default function Widgets(props: any) {
   const [selected, setSelected] = useState(null);
   const [showFocused, setShowFocused] = useState(false);
 
-  useEffect(() => {
-    doDelayedScrollTop();
-  }, [selected, showFocused]);
-
   async function doDelayedScrollTop() {
     // we do this so there is no jumping with the animation
     await sleep(140);
     if (props.scrollToTop) props.scrollToTop();
   }
+  useEffect(() => {
+    doDelayedScrollTop();
+  }, [selected, showFocused]);
+
   return (
     <Wrap>
       <FadeLeft
@@ -58,18 +72,3 @@ export default function Widgets(props: any) {
     </Wrap>
   );
 }
-
-const Wrap = styled.div``;
-const Center = styled.div`
-  display: flex;
-  flex: 1;
-  align-content: center;
-  justify-content: center;
-`;
-const InnerWrap = styled.div`
-  display: flex;
-  align-content: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  max-width: 310px;
-`;

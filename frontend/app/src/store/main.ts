@@ -1197,4 +1197,3 @@ export class MainStore {
 }
 
 export const mainStore = new MainStore();
-

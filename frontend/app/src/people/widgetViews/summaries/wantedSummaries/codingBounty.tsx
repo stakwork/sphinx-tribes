@@ -41,7 +41,6 @@ import {
   BountyTime
 } from './style';
 
-export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
   const {
     deliverables,
@@ -1118,3 +1117,4 @@ function MobileView(props: CodingBountiesProps) {
     </div>
   );
 }
+export default observer(MobileView);

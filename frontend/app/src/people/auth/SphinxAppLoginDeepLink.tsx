@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { QRCode } from 'react-qr-svg';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
 import { AuthProps } from 'people/interfaces';
@@ -7,6 +6,22 @@ import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
+
+const ConfirmWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  min-height: 250px;
+`;
+const InnerWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+`;
 
 const host = getHost();
 function makeQR(challenge: string, ts: string) {
@@ -21,19 +36,6 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
   const [ts, setTS] = useState('');
 
   const qrString = makeQR(challenge, ts);
-
-  useEffect(() => {
-    getChallenge();
-  }, []);
-
-  useEffect(() => {
-    if (challenge && ts) {
-      const el = document.createElement('a');
-      el.href = qrString;
-      el.click();
-    }
-  }, [challenge, ts]);
-
   async function startPolling(challenge: string) {
     let i = 0;
     interval = setInterval(async () => {
@@ -53,7 +55,6 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
       } catch (e) {}
     }, 3000);
   }
-
   async function getChallenge() {
     const res = await api.get('ask');
     if (res.challenge) {
@@ -65,6 +66,18 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
     }
   }
 
+  useEffect(() => {
+    getChallenge();
+  }, []);
+
+  useEffect(() => {
+    if (challenge && ts) {
+      const el = document.createElement('a');
+      el.href = qrString;
+      el.click();
+    }
+  }, [challenge, ts]);
+
   return (
     <ConfirmWrap>
       <InnerWrap>
@@ -74,19 +87,3 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
     </ConfirmWrap>
   );
 }
-
-const ConfirmWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  min-height: 250px;
-`;
-const InnerWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-`;

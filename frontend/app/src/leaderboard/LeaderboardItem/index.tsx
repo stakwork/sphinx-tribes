@@ -1,43 +1,12 @@
 import { EuiText } from '@elastic/eui';
 import { PriceOuterContainer } from 'components/common';
 import { colors } from 'config';
-import { DollarConverter, satToUsd } from 'helpers';
+import { DollarConverter } from 'helpers';
 import { UserInfo } from 'leaderboard/UserInfo';
 import { LeaderItem } from 'leaderboard/store';
 
 import React from 'react';
 import styled from 'styled-components';
-
-type Props = LeaderItem & {
-  position: number;
-  owner_pubkey: string;
-  total_sats_earned: number;
-};
-
-const color = colors.light;
-export const LeaerboardItem = ({ owner_pubkey, total_sats_earned, position }: Props) => (
-  <ItemContainer>
-    <EuiText color={colors.light.text2} className="position">
-      #{position}
-    </EuiText>
-    <UserInfo id={owner_pubkey} />
-    <div className="userSummary">
-      <div className="sats">
-        <PriceOuterContainer
-          price_Text_Color={color.primaryColor.P300}
-          priceBackground={color.primaryColor.P100}
-        >
-          <div className="Price_inner_Container">
-            <EuiText className="Price_Dynamic_Text">{DollarConverter(total_sats_earned)}</EuiText>
-          </div>
-          <div className="Price_SAT_Container">
-            <EuiText className="Price_SAT_Text">SAT</EuiText>
-          </div>
-        </PriceOuterContainer>
-      </div>
-    </div>
-  </ItemContainer>
-);
 
 const ItemContainer = styled.div`
   --position-gutter: 3rem;
@@ -80,3 +49,34 @@ const ItemContainer = styled.div`
     font-weight: 500;
   }
 `;
+
+type Props = LeaderItem & {
+  position: number;
+  owner_pubkey: string;
+  total_sats_earned: number;
+};
+
+const color = colors.light;
+export const LeaerboardItem = ({ owner_pubkey, total_sats_earned, position }: Props) => (
+  <ItemContainer>
+    <EuiText color={colors.light.text2} className="position">
+      #{position}
+    </EuiText>
+    <UserInfo id={owner_pubkey} />
+    <div className="userSummary">
+      <div className="sats">
+        <PriceOuterContainer
+          price_Text_Color={color.primaryColor.P300}
+          priceBackground={color.primaryColor.P100}
+        >
+          <div className="Price_inner_Container">
+            <EuiText className="Price_Dynamic_Text">{DollarConverter(total_sats_earned)}</EuiText>
+          </div>
+          <div className="Price_SAT_Container">
+            <EuiText className="Price_SAT_Text">SAT</EuiText>
+          </div>
+        </PriceOuterContainer>
+      </div>
+    </div>
+  </ItemContainer>
+);

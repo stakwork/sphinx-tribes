@@ -8,6 +8,34 @@ import { Link } from 'react-router-dom';
 import { useStores } from 'store';
 import { Person } from 'store/main';
 import styled from 'styled-components';
+const UserItemContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  & .name {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 20px;
+    font-weight: 600;
+    color: rgb(60, 63, 65);
+    text-decoration: none;
+    .icon {
+      transition: transform 0.2s ease;
+      transform: rotate(45deg) scale(0.75);
+    }
+    &:hover {
+      .icon {
+        transform: rotate(0deg) scale(1);
+      }
+    }
+  }
+
+  & .viewProfile {
+    color: ${colors.light.text2};
+    display: flex;
+  }
+`;
 
 export const UserInfo = observer(({ id }: { id: string }) => {
   const { main } = useStores();
@@ -44,32 +72,3 @@ export const UserInfo = observer(({ id }: { id: string }) => {
     </UserItemContainer>
   );
 });
-
-const UserItemContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  & .name {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 20px;
-    font-weight: 600;
-    color: rgb(60, 63, 65);
-    text-decoration: none;
-    .icon {
-      transition: transform 0.2s ease;
-      transform: rotate(45deg) scale(0.75);
-    }
-    &:hover {
-      .icon {
-        transform: rotate(0deg) scale(1);
-      }
-    }
-  }
-
-  & .viewProfile {
-    color: ${colors.light.text2};
-    display: flex;
-  }
-`;

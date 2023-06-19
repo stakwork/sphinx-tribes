@@ -5,35 +5,6 @@ import { colors } from '../../../config/colors';
 import LoomViewerRecorderNew from '../../../people/utils/loomViewerRecorderNew';
 import type { Props } from './propsType';
 
-export default function LoomVideoInputNew({
-  value,
-  handleChange,
-  handleBlur,
-  handleFocus,
-  style = {}
-}: Props) {
-  const color = colors['light'];
-
-  const [isVideo, setIsVideo] = useState<boolean>(false);
-
-  return (
-    <LoomVideoContainer color={color} isVideo={isVideo} style={style}>
-      <LoomViewerRecorderNew
-        name="loomVideo"
-        onChange={(e: any) => {
-          handleChange(e);
-        }}
-        loomEmbedUrl={value}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        setIsVideo={setIsVideo}
-        style={{ marginTop: 59 }}
-      />
-      {!isVideo && <EuiText className="optionalText">Optional</EuiText>}
-    </LoomVideoContainer>
-  );
-}
-
 interface styleProps {
   color?: any;
   isVideo?: boolean;
@@ -62,3 +33,31 @@ const LoomVideoContainer = styled.div<styleProps>`
     margin-top: 6px;
   }
 `;
+export default function LoomVideoInputNew({
+  value,
+  handleChange,
+  handleBlur,
+  handleFocus,
+  style = {}
+}: Props) {
+  const color = colors['light'];
+
+  const [isVideo, setIsVideo] = useState<boolean>(false);
+
+  return (
+    <LoomVideoContainer color={color} isVideo={isVideo} style={style}>
+      <LoomViewerRecorderNew
+        name="loomVideo"
+        onChange={(e: any) => {
+          handleChange(e);
+        }}
+        loomEmbedUrl={value}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        setIsVideo={setIsVideo}
+        style={{ marginTop: 59 }}
+      />
+      {!isVideo && <EuiText className="optionalText">Optional</EuiText>}
+    </LoomVideoContainer>
+  );
+}

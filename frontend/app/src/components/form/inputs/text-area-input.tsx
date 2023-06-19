@@ -16,6 +16,62 @@ const StyleOnText = {
   }
 };
 
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
+  .euiFormRow_active {
+    border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p: any) => p?.color && p?.color.pureWhite};
+        z-index: 10;
+      }
+    }
+  }
+  .euiFormRow_filed {
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
+        background: ${(p: any) => p?.color && p?.color.pureWhite};
+        z-index: 10;
+      }
+    }
+  }
+`;
+
+const ExtraText = styled.div<styledProps>`
+  color: ${(p: any) => p?.color && p?.color.grayish.G760};
+  padding: 10px 10px 25px 10px;
+  max-width: calc(100% - 20px);
+  word-break: break-all;
+  font-size: 14px;
+`;
+
+const E = styled.div<styledProps>`
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${(p: any) => p?.color && p?.color.blue3};
+  pointer-events: none;
+  user-select: none;
+`;
+const R = styled.div`
+  position: relative;
+`;
 export default function TextAreaInput({
   error,
   note,
@@ -80,60 +136,3 @@ export default function TextAreaInput({
     </OuterContainer>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-
-const OuterContainer = styled.div<styledProps>`
-  .euiFormRow_active {
-    border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
-    .euiFormRow__labelWrapper {
-      margin-bottom: 0px;
-      margin-top: -9px;
-      padding-left: 10px;
-      height: 14px;
-      label {
-        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
-        background: ${(p: any) => p?.color && p?.color.pureWhite};
-        z-index: 10;
-      }
-    }
-  }
-  .euiFormRow_filed {
-    .euiFormRow__labelWrapper {
-      margin-bottom: 0px;
-      margin-top: -9px;
-      padding-left: 10px;
-      height: 14px;
-      label {
-        color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
-        background: ${(p: any) => p?.color && p?.color.pureWhite};
-        z-index: 10;
-      }
-    }
-  }
-`;
-
-const ExtraText = styled.div<styledProps>`
-  color: ${(p: any) => p?.color && p?.color.grayish.G760};
-  padding: 10px 10px 25px 10px;
-  max-width: calc(100% - 20px);
-  word-break: break-all;
-  font-size: 14px;
-`;
-
-const E = styled.div<styledProps>`
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: ${(p: any) => p?.color && p?.color.blue3};
-  pointer-events: none;
-  user-select: none;
-`;
-const R = styled.div`
-  position: relative;
-`;

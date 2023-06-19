@@ -24,7 +24,6 @@ import {
 import { FormField, validator } from './utils';
 import { FormProps } from './interfaces';
 
-export default observer(Form);
 function Form(props: FormProps) {
   const {
     buttonsOnBottom,
@@ -115,6 +114,12 @@ function Form(props: FormProps) {
   // this useEffect triggers when the dynamic schema name is updated
   // checks if there are autofill fields that we can pull from local storage
 
+  function reloadForm() {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 20);
+  }
   useEffect(() => {
     const formRef = props.formRef?.current;
     const vals = formRef && formRef.values;
@@ -146,12 +151,6 @@ function Form(props: FormProps) {
     scrollToTop();
   }, [scrollToTop]);
 
-  function reloadForm() {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 20);
-  }
 
   if (props.paged) {
     props.schema?.forEach((s: any) => {
@@ -772,3 +771,4 @@ function Form(props: FormProps) {
     </Formik>
   );
 }
+export default observer(Form);

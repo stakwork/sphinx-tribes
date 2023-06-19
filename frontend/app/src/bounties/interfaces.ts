@@ -1,5 +1,4 @@
 import { Person } from 'store/main';
-import { CSSProperties } from 'styled-components';
 
 export interface BountiesDescriptionProps {
   description?: any;

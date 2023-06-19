@@ -10,7 +10,139 @@ import Bot from './bot';
 import BotBar from './utils/botBar';
 import { BotViewProps } from './interfaces';
 
-export default observer(BotView);
+const BotList = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  width: 265px;
+`;
+
+const DBack = styled.div`
+  height: 64px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.07);
+  z-index: 2;
+`;
+
+const Panel = styled.div`
+  position: relative;
+  background: #ffffff;
+  color: #000000;
+  margin-bottom: 10px;
+  padding: 20px;
+  box-shadow: 0px 0px 3px rgb(0 0 0 / 29%);
+`;
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  color: #000000;
+  background: #fff;
+`;
+
+const Head = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+
+const Name = styled.div`
+  width: 100%;
+
+  text-align: center;
+
+  color: #3c3f41;
+  margin: 30px 0;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 28px;
+  text-align: center;
+  color: #3c3f41;
+`;
+
+const Sleeve = styled.div``;
+
+const Value = styled.div`
+  font-weight: bold;
+  color: #3c3f41;
+`;
+
+const RowWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  min-height: 48px;
+  align-items: center;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 48px;
+  width: 100%;
+  color: #8e969c;
+`;
+
+interface ImageProps {
+  readonly src: string;
+}
+const Img = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  width: 150px;
+  height: 150px;
+  border-radius: 16px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+`;
+
+const GrowRow = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  min-height: 48px;
+  padding: 10px 0;
+  align-items: center;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 48px;
+  /* identical to box height, or 320% */
+
+  display: flex;
+  align-items: center;
+
+  /* Secondary Text 4 */
+
+  color: #8e969c;
+`;
+
+const CodeBadge = styled.div`
+display:flex;
+justify-content:center;
+align-items:center;
+margin-right:10px;
+height:26px;
+color:#5078F2;
+background: #DCEDFE;
+border-radius: 32px;
+font-weight: bold;
+font-size: 12px;
+line-height: 13px;
+padding 0 10px;
+margin-bottom:10px;
+`;
 
 function BotView(props: BotViewProps) {
   const { botUniqueName, selectBot, loading, goBack } = props;
@@ -191,141 +323,4 @@ function BotView(props: BotViewProps) {
   return <Content>{isMobile ? renderMobileView() : renderDesktopView()}</Content>;
 }
 
-const BotList = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  width: 265px;
-`;
-
-const Link = styled.div`
-  color: #5078f2;
-  cursor: pointer;
-`;
-
-const DBack = styled.div`
-  height: 64px;
-  min-height: 64px;
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.07);
-  z-index: 2;
-`;
-
-const Panel = styled.div`
-  position: relative;
-  background: #ffffff;
-  color: #000000;
-  margin-bottom: 10px;
-  padding: 20px;
-  box-shadow: 0px 0px 3px rgb(0 0 0 / 29%);
-`;
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  color: #000000;
-  background: #fff;
-`;
-
-const Head = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-`;
-
-const Name = styled.div`
-  width: 100%;
-
-  text-align: center;
-
-  color: #3c3f41;
-  margin: 30px 0;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 28px;
-  text-align: center;
-  color: #3c3f41;
-`;
-
-const Sleeve = styled.div``;
-
-const Value = styled.div`
-  font-weight: bold;
-  color: #3c3f41;
-`;
-
-const RowWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  min-height: 48px;
-  align-items: center;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 48px;
-  width: 100%;
-  color: #8e969c;
-`;
-
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  width: 150px;
-  height: 150px;
-  border-radius: 16px;
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-`;
-
-const GrowRow = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  min-height: 48px;
-  padding: 10px 0;
-  align-items: center;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 48px;
-  /* identical to box height, or 320% */
-
-  display: flex;
-  align-items: center;
-
-  /* Secondary Text 4 */
-
-  color: #8e969c;
-`;
-
-const CodeBadge = styled.div`
-display:flex;
-justify-content:center;
-align-items:center;
-margin-right:10px;
-height:26px;
-color:#5078F2;
-background: #DCEDFE;
-border-radius: 32px;
-font-weight: bold;
-font-size: 12px;
-line-height: 13px;
-padding 0 10px;
-margin-bottom:10px;
-`;
+export default observer(BotView);

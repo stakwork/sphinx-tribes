@@ -12,9 +12,34 @@ import { useIsMobile, usePageScroll } from '../../hooks';
 import { useStores } from '../../store';
 
 // avoid hook within callback warning by renaming hooks
+const Body = styled.div`
+  flex: 1;
+  height: calc(100% - 105px);
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Backdrop = styled.div`
+  position: fixed;
+  z-index: 1;
+  background: rgba(0, 0, 0, 70%);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+`;
+
+export const Spacer = styled.div`
+  display: flex;
+  min-height: 10px;
+  min-width: 100%;
+  height: 10px;
+  width: 100%;
+`;
 
 const getPageScroll = usePageScroll;
-export default observer(BodyComponent);
 
 function BodyComponent() {
   const { main, ui } = useStores();
@@ -69,13 +94,6 @@ function BodyComponent() {
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
   };
 
-  const loadForwardFunc = () => loadMore(1);
-  const loadBackwardFunc = () => loadMore(-1);
-  const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
-    loadForwardFunc,
-    loadBackwardFunc
-  );
-
   async function loadMore(direction: number) {
     let currentPage = 1;
     currentPage = peopleWantedsPageNumber;
@@ -87,6 +105,12 @@ function BodyComponent() {
       console.log('load failed', e);
     }
   }
+  const loadForwardFunc = () => loadMore(1);
+  const loadBackwardFunc = () => loadMore(-1);
+  const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
+    loadForwardFunc,
+    loadBackwardFunc
+  );
 
   const onPanelClick = (person: any, item: number) => {
     history.replace({
@@ -228,29 +252,4 @@ function BodyComponent() {
   );
 }
 
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Backdrop = styled.div`
-  position: fixed;
-  z-index: 1;
-  background: rgba(0, 0, 0, 70%);
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-export const Spacer = styled.div`
-  display: flex;
-  min-height: 10px;
-  min-width: 100%;
-  height: 10px;
-  width: 100%;
-`;
+export default observer(BodyComponent);
