@@ -310,6 +310,12 @@ type KeysendError struct {
 	Error   string `json:"error"`
 }
 
+type LnHost struct {
+	Msg  string `json:"msg"`
+	Host string `json:"host"`
+	K1   string `json:"k1"`
+}
+
 type Bounty struct {
 	ID                      uint       `json:"id"`
 	OwnerID                 string     `json:owner_id"`

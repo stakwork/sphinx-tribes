@@ -121,7 +121,8 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		socketMsg["user"] = user
 		socketMsg["msg"] = "lnauth_success"
 
-		socket, err := db.Store.GetSocketConnections(r.Host)
+		socket, err := db.Store.GetSocketConnections(k1)
+		fmt.Println("Host ===", k1, socket)
 
 		if err == nil {
 			socket.Conn.WriteJSON(socketMsg)

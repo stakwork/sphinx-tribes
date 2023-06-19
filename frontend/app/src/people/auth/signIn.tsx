@@ -80,10 +80,15 @@ function SignIn(props: AuthProps) {
     main.getLnAuth();
   }, []);
 
-  const onHandle = (event: any) => {
+  const onHandle = (event: any, socket: WebSocket) => {
     const res = JSON.parse(event.data);
     if (res.msg === SOCKET_MSG.user_connect) {
       const user = ui.meInfo;
+      socket.send(JSON.stringify({
+        msg: "use_k1",
+        host: res.body,
+        k1: main.lnauth.k1
+      }))
       if (user) {
         user.websocketToken = res.body;
         ui.setMeInfo(user);
@@ -100,19 +105,21 @@ function SignIn(props: AuthProps) {
   };
 
   useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
-    socket.onopen = () => {
-      console.log('Socket connected');
-    };
+    if (main.lnauth.encode) {
+      const socket: WebSocket = createSocketInstance();
+      socket.onopen = () => {
+        console.log('Socket connected');
+      };
 
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
+      socket.onmessage = (event: MessageEvent) => {
+        onHandle(event, socket);
+      };
 
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
+      socket.onclose = () => {
+        console.log('Socket disconnected');
+      };
+    }
+  }, [main.lnauth]);
 
   return useObserver(() => (
     <div>
