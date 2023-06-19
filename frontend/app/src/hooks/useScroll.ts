@@ -19,7 +19,7 @@ export function useScroll() {
   return { handleScroll, n, loadingMore };
 }
 
-export function usePageScroll(goForward, goBackwards) {
+export function usePageScroll(goForward: any, goBackwards: any) {
   const [loadingBottom, setLoadingBottom] = useState(false);
 
   async function handleScroll(e: any) {

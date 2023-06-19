@@ -1,206 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useHistory } from 'react-router';
+import { observer } from 'mobx-react-lite';
 import { useStores } from '../store';
 
 import { Button, Divider, IconButton } from '../components/common';
 import { useIsMobile } from '../hooks';
 import Bot from './bot';
 import BotBar from './utils/botBar';
-import { useHistory } from 'react-router';
-import { observer } from 'mobx-react-lite';
 import { BotViewProps } from './interfaces';
-
-export default observer(BotView);
-
-function BotView(props: BotViewProps) {
-  const { botUniqueName, selectBot, loading, goBack } = props;
-
-  const { main } = useStores();
-
-  const history = useHistory();
-
-  const bot: any =
-    main.bots && main.bots.length && main.bots.find((f) => f.unique_name === botUniqueName);
-
-  const { name, unique_name, description, img, owner_pubkey, owner_alias, tags, price_per_use } =
-    bot || {};
-
-  // FOR BOT VIEW
-  const bots: any = main.bots && main.bots.length && main.bots.filter((f) => !f.hide);
-
-  const isMobile = useIsMobile();
-
-  if (loading) return <div>Loading...</div>;
-
-  const head = (
-    <Head>
-      {!isMobile && <div style={{ height: 35 }} />}
-      <Img src={img || '/static/bot_placeholder.png'} />
-      <RowWrap>
-        <Name>{name}</Name>
-      </RowWrap>
-      <RowWrap style={{ marginBottom: 40 }}>
-        <BotBar value={unique_name} />
-      </RowWrap>
-
-      <RowWrap>
-        <div>Price per use</div>
-        <Value>{price_per_use}</Value>
-      </RowWrap>
-      <Divider />
-      <RowWrap>
-        <div>Creator</div>
-        <Value
-          style={{ cursor: 'pointer', color: '#5078F2' }}
-          onClick={() => history.push(`/p/${owner_pubkey}`)}
-        >
-          {owner_alias || ''}
-        </Value>
-      </RowWrap>
-
-      {tags && tags.length > 0 && (
-        <div style={{ width: '100%' }}>
-          <Divider style={{ marginBottom: 6 }} />
-          <GrowRow style={{ paddingBottom: 0 }}>
-            {tags.map((c, i) => (
-              <CodeBadge key={i}>{c}</CodeBadge>
-            ))}
-          </GrowRow>
-        </div>
-      )}
-    </Head>
-  );
-
-  function renderMobileView() {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          overflow: 'auto',
-          height: '100%'
-        }}
-      >
-        <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              left: 0,
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%',
-              padding: '0 20px'
-            }}
-          >
-            <IconButton onClick={goBack} icon="arrow_back" />
-            <div />
-          </div>
-
-          {/* profile photo */}
-          {head}
-        </Panel>
-
-        <Sleeve style={{ padding: 20 }}>
-          {description}
-          <div style={{ height: 60 }} />
-        </Sleeve>
-      </div>
-    );
-  }
-
-  function renderDesktopView() {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        <BotList>
-          <DBack>
-            <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
-          </DBack>
-
-          <div style={{ width: '100%', overflowY: 'auto' }}>
-            {bots.map((t) => (
-              <Bot
-                {...t}
-                key={t.uuid}
-                selected={botUniqueName === t.unique_name}
-                hideActions={true}
-                small={true}
-                select={() => selectBot(t)}
-              />
-            ))}
-          </div>
-        </BotList>
-
-        <div
-          style={{
-            width: 364,
-            minWidth: 364,
-            overflowY: 'auto',
-            position: 'relative',
-            background: '#ffffff',
-            color: '#000000',
-            padding: 40,
-            height: '100%',
-            borderLeft: '1px solid #F2F3F5',
-            borderRight: '1px solid #F2F3F5',
-            boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
-          }}
-        >
-          {/* profile photo */}
-          {head}
-          {/* Here's where the details go */}
-        </div>
-
-        <div
-          style={{
-            width: 'calc(100% - 628px)',
-            minWidth: 250
-          }}
-        >
-          <div
-            style={{
-              padding: 62,
-              height: 'calc(100% - 63px)',
-              overflowY: 'auto',
-              position: 'relative'
-            }}
-          >
-            <Sleeve
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap'
-              }}
-            >
-              {description}
-            </Sleeve>
-            <div style={{ height: 60 }} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return <Content>{isMobile ? renderMobileView() : renderDesktopView()}</Content>;
-}
 
 const BotList = styled.div`
   display: flex;
   flex-direction: column;
   background: #ffffff;
   width: 265px;
-`;
-
-const Link = styled.div`
-  color: #5078f2;
-  cursor: pointer;
 `;
 
 const DBack = styled.div`
@@ -280,7 +94,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   width: 150px;
@@ -329,3 +143,184 @@ line-height: 13px;
 padding 0 10px;
 margin-bottom:10px;
 `;
+
+function BotView(props: BotViewProps) {
+  const { botUniqueName, selectBot, loading, goBack } = props;
+
+  const { main } = useStores();
+
+  const history = useHistory();
+
+  const bot: any =
+    main.bots && main.bots.length && main.bots.find((f: any) => f.unique_name === botUniqueName);
+
+  const { name, unique_name, description, img, owner_pubkey, owner_alias, tags, price_per_use } =
+    bot || {};
+
+  // FOR BOT VIEW
+  const bots: any = main.bots && main.bots.length && main.bots.filter((f: any) => !f.hide);
+
+  const isMobile = useIsMobile();
+
+  if (loading) return <div>Loading...</div>;
+
+  const head = (
+    <Head>
+      {!isMobile && <div style={{ height: 35 }} />}
+      <Img src={img || '/static/bot_placeholder.png'} />
+      <RowWrap>
+        <Name>{name}</Name>
+      </RowWrap>
+      <RowWrap style={{ marginBottom: 40 }}>
+        <BotBar value={unique_name} />
+      </RowWrap>
+
+      <RowWrap>
+        <div>Price per use</div>
+        <Value>{price_per_use}</Value>
+      </RowWrap>
+      <Divider />
+      <RowWrap>
+        <div>Creator</div>
+        <Value
+          style={{ cursor: 'pointer', color: '#5078F2' }}
+          onClick={() => history.push(`/p/${owner_pubkey}`)}
+        >
+          {owner_alias || ''}
+        </Value>
+      </RowWrap>
+
+      {tags && tags.length > 0 && (
+        <div style={{ width: '100%' }}>
+          <Divider style={{ marginBottom: 6 }} />
+          <GrowRow style={{ paddingBottom: 0 }}>
+            {tags.map((c: any, i: number) => (
+              <CodeBadge key={i}>{c}</CodeBadge>
+            ))}
+          </GrowRow>
+        </div>
+      )}
+    </Head>
+  );
+
+  function renderMobileView() {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          overflow: 'auto',
+          height: '100%'
+        }}
+      >
+        <Panel style={{ paddingBottom: 0, paddingTop: 80 }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: 20,
+              left: 0,
+              display: 'flex',
+              justifyContent: 'space-between',
+              width: '100%',
+              padding: '0 20px'
+            }}
+          >
+            <IconButton onClick={goBack} icon="arrow_back" />
+            <div />
+          </div>
+
+          {/* profile photo */}
+          {head}
+        </Panel>
+
+        <Sleeve style={{ padding: 20 }}>
+          {description}
+          <div style={{ height: 60 }} />
+        </Sleeve>
+      </div>
+    );
+  }
+
+  function renderDesktopView() {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          width: '100%',
+          height: '100%'
+        }}
+      >
+        <BotList>
+          <DBack>
+            <Button color="clear" leadingIcon="arrow_back" text="Back" onClick={goBack} />
+          </DBack>
+
+          <div style={{ width: '100%', overflowY: 'auto' }}>
+            {bots.map((t: any) => (
+              <Bot
+                {...t}
+                key={t.uuid}
+                selected={botUniqueName === t.unique_name}
+                hideActions={true}
+                small={true}
+                select={() => selectBot(t)}
+              />
+            ))}
+          </div>
+        </BotList>
+
+        <div
+          style={{
+            width: 364,
+            minWidth: 364,
+            overflowY: 'auto',
+            position: 'relative',
+            background: '#ffffff',
+            color: '#000000',
+            padding: 40,
+            height: '100%',
+            borderLeft: '1px solid #F2F3F5',
+            borderRight: '1px solid #F2F3F5',
+            boxShadow: '1px 0px 6px -2px rgba(0, 0, 0, 0.07)'
+          }}
+        >
+          {/* profile photo */}
+          {head}
+          {/* Here's where the details go */}
+        </div>
+
+        <div
+          style={{
+            width: 'calc(100% - 628px)',
+            minWidth: 250
+          }}
+        >
+          <div
+            style={{
+              padding: 62,
+              height: 'calc(100% - 63px)',
+              overflowY: 'auto',
+              position: 'relative'
+            }}
+          >
+            <Sleeve
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap'
+              }}
+            >
+              {description}
+            </Sleeve>
+            <div style={{ height: 60 }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <Content>{isMobile ? renderMobileView() : renderDesktopView()}</Content>;
+}
+
+export default observer(BotView);

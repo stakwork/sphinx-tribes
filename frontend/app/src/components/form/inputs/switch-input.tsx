@@ -1,10 +1,38 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { EuiSwitch, EuiText } from '@elastic/eui';
+import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { Note } from './index';
-import { colors } from '../../../config/colors';
 
+interface styledProps {
+  color?: any;
+}
+
+const ExtraText = styled.div<styledProps>`
+  color: ${(p: any) => p?.color && p?.color.grayish.G760};
+  padding: 10px 10px 25px 10px;
+  max-width: calc(100% - 20px);
+  word-break: break-all;
+  font-size: 14px;
+`;
+
+const Container = styled.div<styledProps>`
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  .Label {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 35px;
+    display: flex;
+    align-items: center;
+    color: #292c33;
+    margin-right: 4px;
+  }
+`;
 export default function SwitchInput({
   label,
   note,
@@ -32,7 +60,7 @@ export default function SwitchInput({
           className="switcher"
           label=""
           checked={value}
-          onChange={(e) => {
+          onChange={(e: any) => {
             handleChange(e.target.checked);
           }}
           onBlur={handleBlur}
@@ -53,32 +81,3 @@ export default function SwitchInput({
     </>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-
-const ExtraText = styled.div<styledProps>`
-  color: ${(p) => p?.color && p?.color.grayish.G760};
-  padding: 10px 10px 25px 10px;
-  max-width: calc(100% - 20px);
-  word-break: break-all;
-  font-size: 14px;
-`;
-
-const Container = styled.div<styledProps>`
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  .Label {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 35px;
-    display: flex;
-    align-items: center;
-    color: #292c33;
-    margin-right: 4px;
-  }
-`;

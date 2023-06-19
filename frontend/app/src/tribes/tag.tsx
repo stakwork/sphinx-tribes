@@ -2,21 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import tags from './tags';
 
-export default function T(props: { type: string; iconOnly?: boolean }) {
-  const { type } = props;
-  if (!tags[type]) return <></>;
-  const Icon = tags[type].icon;
-  const { color } = tags[type];
-  return (
-    <Wrap className="tag-wrapper">
-      <IconWrap style={{ borderColor: color, background: `${color}22` }}>
-        <Icon height="8" width="8" />
-      </IconWrap>
-      {!props.iconOnly && <Name style={{ color: '#556171' }}>{type}</Name>}
-    </Wrap>
-  );
-}
-
 const Wrap = styled.div`
   display: flex;
   align-items: center;
@@ -36,3 +21,18 @@ const IconWrap = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
+export default function T(props: { type: string; iconOnly?: boolean }) {
+  const { type } = props;
+  if (!tags[type]) return <></>;
+  const Icon = tags[type].icon;
+  const { color } = tags[type];
+  return (
+    <Wrap className="tag-wrapper">
+      <IconWrap style={{ borderColor: color, background: `${color}22` }}>
+        <Icon height="8" width="8" />
+      </IconWrap>
+      {!props.iconOnly && <Name style={{ color: '#556171' }}>{type}</Name>}
+    </Wrap>
+  );
+}

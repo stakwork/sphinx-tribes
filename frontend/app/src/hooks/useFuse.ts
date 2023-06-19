@@ -12,25 +12,25 @@ const fuseOptions = {
   minMatchCharLength: 1
 };
 
-export function useFuse(array, keys: string[] = []) {
+export function useFuse(array: any, keys: string[] = []) {
   const { ui } = useStores();
   let theArray = array;
 
   if (ui.searchText) {
     const fuse = new Fuse(array, { ...fuseOptions, keys });
     const res = fuse.search(ui.searchText);
-    theArray = res.map((r) => r.item);
+    theArray = res.map((r: any) => r.item);
   }
 
   return theArray;
 }
 
-export function useLocalFuse(searchText, array, keys: string[] = []) {
+export function useLocalFuse(searchText: string, array: any, keys: string[] = []) {
   let theArray = array;
   if (searchText) {
     const fuse = new Fuse(array, { ...fuseOptions, keys });
     const res = fuse.search(searchText);
-    theArray = res.map((r) => r.item);
+    theArray = res.map((r: any) => r.item);
   }
   return theArray;
 }

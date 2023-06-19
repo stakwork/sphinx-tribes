@@ -2,21 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { SupportMe } from '../../components/form/inputs/widgets/interfaces';
 
-export default function SupportMeView(props: SupportMe) {
-  const { gallery, description, url } = props;
-
-  const showImages = gallery && gallery.length;
-  return (
-    <Wrap>
-      <T>Support Me</T>
-      <M>{description || 'No description'} </M>
-      <U>{url || 'No link'}</U>
-
-      {showImages && <Gallery>{gallery && gallery.map((g, i) => <Img key={i} src={g} />)}</Gallery>}
-    </Wrap>
-  );
-}
-
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -47,7 +32,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 80px;
@@ -55,3 +40,20 @@ const Img = styled.div<ImageProps>`
   border-radius: 5px;
   position: relative;
 `;
+
+export default function SupportMeView(props: SupportMe) {
+  const { gallery, description, url } = props;
+
+  const showImages = gallery && gallery.length;
+  return (
+    <Wrap>
+      <T>Support Me</T>
+      <M>{description || 'No description'} </M>
+      <U>{url || 'No link'}</U>
+
+      {showImages && (
+        <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>
+      )}
+    </Wrap>
+  );
+}

@@ -3,15 +3,38 @@ import { persist } from 'mobx-persist';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import tags from '../tribes/tags';
 
-const tagLabels = Object.keys(tags);
-const initialTags = tagLabels.map((label) => ({ label } as EuiSelectableOption));
-
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;
-
 export interface EuiSelectableOption {
   label: string;
   checked?: EuiSelectableOptionCheckedType;
 }
+
+const tagLabels = Object.keys(tags);
+const initialTags = tagLabels.map((label: any) => ({ label } as EuiSelectableOption));
+
+export interface MeInfo {
+  id?: number;
+  pubkey: string;
+  owner_pubkey?: string;
+  photo_url: string;
+  alias: string;
+  img?: string;
+  owner_alias?: string;
+  github_issues?: any[];
+  route_hint: string;
+  contact_key: string;
+  price_to_meet: number;
+  jwt: string;
+  url: string;
+  description: string;
+  verification_signature: string;
+  twitter_confirmed?: boolean;
+  extras: Extras;
+  isSuperAdmin: boolean;
+  websocketToken?: string;
+}
+
+export type MeData = MeInfo | null;
 
 class UiStore {
   ready = false;
@@ -149,28 +172,6 @@ class UiStore {
   }
 }
 
-export type MeData = MeInfo | null;
-
-export interface MeInfo {
-  id?: number;
-  pubkey: string;
-  owner_pubkey?: string;
-  photo_url: string;
-  alias: string;
-  img?: string;
-  owner_alias?: string;
-  github_issues?: any[];
-  route_hint: string;
-  contact_key: string;
-  price_to_meet: number;
-  jwt: string;
-  url: string;
-  description: string;
-  verification_signature: string;
-  twitter_confirmed?: boolean;
-  extras: Extras;
-  isSuperAdmin: boolean;
-}
 export const emptyMeData: MeData = {
   pubkey: '',
   alias: '',
@@ -185,6 +186,7 @@ export const emptyMeData: MeData = {
   extras: {},
   isSuperAdmin: false
 };
+
 export const emptyMeInfo: MeInfo = {
   pubkey: '',
   alias: '',

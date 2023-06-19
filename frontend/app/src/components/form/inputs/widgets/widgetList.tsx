@@ -1,57 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import { EuiButtonIcon } from '@elastic/eui';
 import Blog from './listItems/blog';
 import Offer from './listItems/offer';
 import Wanted from './listItems/wanted';
-import { EuiButtonIcon } from '@elastic/eui';
 import { WidgetListProps } from './interfaces';
-
-export default function WidgetList(props: WidgetListProps) {
-  function renderByType(v, i) {
-    function wrap(child) {
-      return (
-        <IWrap
-          style={{ cursor: 'pointer' }}
-          key={`${i}listItem`}
-          onClick={() => props.setSelected(v, i)}
-        >
-          {child}
-          <Eraser>
-            <EuiButtonIcon
-              onClick={(e) => {
-                e.stopPropagation();
-                props.deleteItem(v, i);
-              }}
-              iconType="trash"
-              aria-label="delete"
-            />
-          </Eraser>
-        </IWrap>
-      );
-    }
-
-    switch (props.schema.class) {
-      case 'blog':
-        return wrap(<Blog {...v} />);
-      case 'offer':
-        return wrap(<Offer {...v} />);
-      case 'wanted':
-        return wrap(<Wanted {...v} />);
-      default:
-        return <></>;
-    }
-  }
-
-  return (
-    <Wrap>
-      <List>{props.values && props.values.map((v, i) => renderByType(v, i))}</List>
-
-      {(!props.values || props.values.length < 1) && (
-        <IWrap style={{ background: 'none' }}>List is empty</IWrap>
-      )}
-    </Wrap>
-  );
-}
 
 export interface IconProps {
   source: string;
@@ -95,3 +48,49 @@ const IWrap = styled.div`
 const Eraser = styled.div`
   cursor: pointer;
 `;
+export default function WidgetList(props: WidgetListProps) {
+  function renderByType(v: any, i: any) {
+    function wrap(child: any) {
+      return (
+        <IWrap
+          style={{ cursor: 'pointer' }}
+          key={`${i}listItem`}
+          onClick={() => props.setSelected(v, i)}
+        >
+          {child}
+          <Eraser>
+            <EuiButtonIcon
+              onClick={(e: any) => {
+                e.stopPropagation();
+                props.deleteItem(v, i);
+              }}
+              iconType="trash"
+              aria-label="delete"
+            />
+          </Eraser>
+        </IWrap>
+      );
+    }
+
+    switch (props.schema.class) {
+      case 'blog':
+        return wrap(<Blog {...v} />);
+      case 'offer':
+        return wrap(<Offer {...v} />);
+      case 'wanted':
+        return wrap(<Wanted {...v} />);
+      default:
+        return <></>;
+    }
+  }
+
+  return (
+    <Wrap>
+      <List>{props.values && props.values.map((v: any, i: number) => renderByType(v, i))}</List>
+
+      {(!props.values || props.values.length < 1) && (
+        <IWrap style={{ background: 'none' }}>List is empty</IWrap>
+      )}
+    </Wrap>
+  );
+}

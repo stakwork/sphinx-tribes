@@ -1,173 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Divider } from '../../components/common';
-import QrBar from '../utils/QrBar';
 import { useHistory } from 'react-router-dom';
-import { renderMarkdown } from '../utils/renderMarkdown';
 import { observer } from 'mobx-react-lite';
 import { AboutViewProps } from 'people/interfaces';
-
-export const AboutView = observer((props: AboutViewProps) => {
-  const history = useHistory();
-  const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
-  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
-    extras || {};
-
-  let tag = '';
-  let githubTag = '';
-  let lightningAddress = '';
-  let ambossAddress = '';
-  let emailAddress = '';
-
-  let { description } = props;
-
-  // backend is adding 'description' to empty descriptions, short term fix
-  if (description === 'description') description = '';
-
-  const [expand, setExpand] = useState(false);
-
-  if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value;
-  if (github && github[0] && github[0].value) githubTag = github[0].value;
-  if (lightning && lightning[0] && lightning[0].value) lightningAddress = lightning[0].value;
-  if (amboss && amboss[0] && amboss[0].value) ambossAddress = amboss[0].value;
-  if (email && email[0] && email[0].value) emailAddress = email[0].value;
-
-  const descriptionIsLong = description && description.length && description.length > 120;
-
-  return (
-    <Wrap>
-      <D>
-        {expand ? (
-          <DExpand>{renderMarkdown(description)}</DExpand>
-        ) : (
-          <DCollapsed>{renderMarkdown(description)}</DCollapsed>
-        )}
-        {descriptionIsLong && (
-          <SM onClick={() => setExpand(!expand)}>SHOW {expand ? 'LESS' : 'MORE'}</SM>
-        )}
-      </D>
-
-      <Divider />
-      <Row>
-        <div>Price to Connect:</div>
-        <div style={{ fontWeight: 'bold', color: '#000' }}>{price_to_meet}</div>
-      </Row>
-
-      <Divider />
-
-      <QrBar value={owner_pubkey} />
-
-      {tag && (
-        <>
-          <Divider />
-          <Row>
-            <I>
-              <div style={{ width: 4 }} />
-              <Icon source={`/static/twitter2.png`} />
-              <Tag>@{tag}</Tag>
-              {twitter_confirmed ? (
-                <Badge>VERIFIED</Badge>
-              ) : (
-                <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
-              )}
-            </I>
-          </Row>
-        </>
-      )}
-
-      {emailAddress && (
-        <>
-          <Divider />
-          <Row>
-            <I>
-              <div style={{ width: 4 }} />
-              <Icon source={`/static/email.png`} />
-              <Tag>{emailAddress}</Tag>
-            </I>
-          </Row>
-        </>
-      )}
-
-      {githubTag && (
-        <>
-          <Divider />
-
-          <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
-            <Img src={'/static/github_logo.png'} />
-            <a href={`https://github.com/${githubTag}`} target="_blank" rel="noreferrer">
-              {githubTag}
-            </a>
-          </Row>
-        </>
-      )}
-
-      {coding_languages && coding_languages.length > 0 && (
-        <>
-          <Divider />
-          <GrowRow style={{ paddingBottom: 0 }}>
-            {coding_languages.map((c, i) => (
-              <CodeBadge key={i}>{c.label}</CodeBadge>
-            ))}
-          </GrowRow>
-        </>
-      )}
-
-      {repos && repos.length > 0 && (
-        <>
-          <Divider />
-          <T style={{ height: 20 }}>My Repos</T>
-          <Grow>
-            {repos.map((r, i) => (
-              <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
-                <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
-                <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
-                  {r?.label}
-                </a>
-              </ItemRow>
-            ))}
-          </Grow>
-        </>
-      )}
-
-      {tribes && tribes.length > 0 && (
-        <>
-          <Divider />
-          <T style={{ height: 20 }}>My Tribes</T>
-          <Grow>
-            {tribes.map((t, i) => (
-              <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
-                <Img src={t?.img || '/static/sphinx.png'} />
-                <div>{t?.name}</div>
-              </ItemRow>
-            ))}
-          </Grow>
-        </>
-      )}
-
-      {lightningAddress && (
-        <>
-          <Divider />
-          <T style={{ height: 20 }}>Lightning Address</T>
-          <Grow>
-            <ItemRow style={{ width: 'fit-content' }}>{lightningAddress}</ItemRow>
-          </Grow>
-        </>
-      )}
-
-      {ambossAddress && (
-        <>
-          <Divider />
-          <T style={{ height: 20 }}>Amboss Address</T>
-          <Grow>
-            <ItemRow style={{ width: 'fit-content' }}>{ambossAddress}</ItemRow>
-          </Grow>
-        </>
-      )}
-
-      <br />
-    </Wrap>
-  );
-});
+import { Divider } from '../../components/common';
+import QrBar from '../utils/QrBar';
+import { renderMarkdown } from '../utils/renderMarkdown';
 
 const Badge = styled.div`
 display:flex;
@@ -353,7 +191,7 @@ interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 16px;
   height: 13px;
   margin-right: 8px;
@@ -368,7 +206,7 @@ interface ImageProps {
   readonly src?: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   position: relative;
@@ -378,3 +216,164 @@ const Img = styled.div<ImageProps>`
   margin-right: 10px;
   border-radius: 5px;
 `;
+export const AboutView = observer((props: AboutViewProps) => {
+  const history = useHistory();
+  const { price_to_meet, extras, twitter_confirmed, owner_pubkey } = props;
+  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
+    extras || {};
+
+  let tag = '';
+  let githubTag = '';
+  let lightningAddress = '';
+  let ambossAddress = '';
+  let emailAddress = '';
+
+  let { description } = props;
+
+  // backend is adding 'description' to empty descriptions, short term fix
+  if (description === 'description') description = '';
+
+  const [expand, setExpand] = useState(false);
+
+  if (twitter && twitter[0] && twitter[0].value) tag = twitter[0].value;
+  if (github && github[0] && github[0].value) githubTag = github[0].value;
+  if (lightning && lightning[0] && lightning[0].value) lightningAddress = lightning[0].value;
+  if (amboss && amboss[0] && amboss[0].value) ambossAddress = amboss[0].value;
+  if (email && email[0] && email[0].value) emailAddress = email[0].value;
+
+  const descriptionIsLong = description && description.length && description.length > 120;
+
+  return (
+    <Wrap>
+      <D>
+        {expand ? (
+          <DExpand>{renderMarkdown(description)}</DExpand>
+        ) : (
+          <DCollapsed>{renderMarkdown(description)}</DCollapsed>
+        )}
+        {descriptionIsLong && (
+          <SM onClick={() => setExpand(!expand)}>SHOW {expand ? 'LESS' : 'MORE'}</SM>
+        )}
+      </D>
+
+      <Divider />
+      <Row>
+        <div>Price to Connect:</div>
+        <div style={{ fontWeight: 'bold', color: '#000' }}>{price_to_meet}</div>
+      </Row>
+
+      <Divider />
+
+      {owner_pubkey && (<QrBar value={owner_pubkey} />)}
+
+      {tag && (
+        <>
+          <Divider />
+          <Row>
+            <I>
+              <div style={{ width: 4 }} />
+              <Icon source={`/static/twitter2.png`} />
+              <Tag>@{tag}</Tag>
+              {twitter_confirmed ? (
+                <Badge>VERIFIED</Badge>
+              ) : (
+                <Badge style={{ background: '#b0b7bc' }}>PENDING</Badge>
+              )}
+            </I>
+          </Row>
+        </>
+      )}
+
+      {emailAddress && (
+        <>
+          <Divider />
+          <Row>
+            <I>
+              <div style={{ width: 4 }} />
+              <Icon source={`/static/email.png`} />
+              <Tag>{emailAddress}</Tag>
+            </I>
+          </Row>
+        </>
+      )}
+
+      {githubTag && (
+        <>
+          <Divider />
+
+          <Row style={{ justifyContent: 'flex-start', fontSize: 14 }}>
+            <Img src={'/static/github_logo.png'} />
+            <a href={`https://github.com/${githubTag}`} target="_blank" rel="noreferrer">
+              {githubTag}
+            </a>
+          </Row>
+        </>
+      )}
+
+      {coding_languages && coding_languages.length > 0 && (
+        <>
+          <Divider />
+          <GrowRow style={{ paddingBottom: 0 }}>
+            {coding_languages.map((c: any, i: number) => (
+              <CodeBadge key={i}>{c.label}</CodeBadge>
+            ))}
+          </GrowRow>
+        </>
+      )}
+
+      {repos && repos.length > 0 && (
+        <>
+          <Divider />
+          <T style={{ height: 20 }}>My Repos</T>
+          <Grow>
+            {repos.map((r: any, i: number) => (
+              <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
+                <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
+                <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
+                  {r?.label}
+                </a>
+              </ItemRow>
+            ))}
+          </Grow>
+        </>
+      )}
+
+      {tribes && tribes.length > 0 && (
+        <>
+          <Divider />
+          <T style={{ height: 20 }}>My Tribes</T>
+          <Grow>
+            {tribes.map((t: any, i: number) => (
+              <ItemRow key={`${i}mytribe`} onClick={() => history.push(`/t/${t?.unique_name}`)}>
+                <Img src={t?.img || '/static/sphinx.png'} />
+                <div>{t?.name}</div>
+              </ItemRow>
+            ))}
+          </Grow>
+        </>
+      )}
+
+      {lightningAddress && (
+        <>
+          <Divider />
+          <T style={{ height: 20 }}>Lightning Address</T>
+          <Grow>
+            <ItemRow style={{ width: 'fit-content' }}>{lightningAddress}</ItemRow>
+          </Grow>
+        </>
+      )}
+
+      {ambossAddress && (
+        <>
+          <Divider />
+          <T style={{ height: 20 }}>Amboss Address</T>
+          <Grow>
+            <ItemRow style={{ width: 'fit-content' }}>{ambossAddress}</ItemRow>
+          </Grow>
+        </>
+      )}
+
+      <br />
+    </Wrap>
+  );
+});

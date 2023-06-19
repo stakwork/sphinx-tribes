@@ -3,59 +3,6 @@ import styled from 'styled-components';
 import MaterialIcon from '@material/react-material-icon';
 import { WidgetProps } from './interfaces';
 
-export default function Widget(props: WidgetProps) {
-  // highlight if state has any of these
-
-  const { values, name, parentName, setFieldValue } = props;
-  const state = values.extras && values.extras[name];
-
-  function objectOrArrayHasLength(mystate) {
-    let v = 0;
-    if (mystate) {
-      if (Array.isArray(mystate)) {
-        v = mystate.length;
-      } else {
-        v = Object.keys(mystate).length;
-      }
-    }
-    return v > 0;
-  }
-
-  function deleteSingleWidget() {
-    setFieldValue(`${parentName}.${name}`, undefined);
-  }
-
-  const highlight = objectOrArrayHasLength(state);
-
-  return (
-    <Wrap onClick={() => props.setSelected(props)}>
-      <Icon source={`/static/${props.icon || 'sphinx'}.png`} />
-
-      <Title>{props.label}</Title>
-
-      {highlight && (
-        <Dot>
-          <MaterialIcon
-            icon={props.single ? 'close' : 'settings'}
-            style={{
-              fontSize: 20,
-              color: '#1d1e24',
-              cursor: props.single && 'pointer'
-            }}
-            onClick={(e) => {
-              if (props.single) {
-                e.stopPropagation();
-                //delete state
-                deleteSingleWidget();
-              }
-            }}
-          />
-        </Dot>
-      )}
-    </Wrap>
-  );
-}
-
 const Dot = styled.div`
   color: #1d1e24;
   position: absolute;
@@ -94,7 +41,7 @@ export interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 70px;
   height: 70px;
   margin-top: 10px;
@@ -104,3 +51,55 @@ const Icon = styled.div<IconProps>`
   border-radius: 5px;
   overflow: hidden;
 `;
+export default function Widget(props: WidgetProps) {
+  // highlight if state has any of these
+
+  const { values, name, parentName, setFieldValue } = props;
+  const state = values.extras && values.extras[name];
+
+  function objectOrArrayHasLength(mystate: any) {
+    let v = 0;
+    if (mystate) {
+      if (Array.isArray(mystate)) {
+        v = mystate.length;
+      } else {
+        v = Object.keys(mystate).length;
+      }
+    }
+    return v > 0;
+  }
+
+  function deleteSingleWidget() {
+    setFieldValue(`${parentName}.${name}`, undefined);
+  }
+
+  const highlight = objectOrArrayHasLength(state);
+
+  return (
+    <Wrap onClick={() => props.setSelected(props)}>
+      <Icon source={`/static/${props.icon || 'sphinx'}.png`} />
+
+      <Title>{props.label}</Title>
+
+      {highlight && (
+        <Dot>
+          <MaterialIcon
+            icon={props.single ? 'close' : 'settings'}
+            style={{
+              fontSize: 20,
+              color: '#1d1e24',
+              cursor: props.single && 'pointer'
+            }}
+            onClick={(e: any) => {
+              if (props.single) {
+                e.stopPropagation();
+                //delete state
+                deleteSingleWidget();
+              }
+            }}
+          />
+        </Dot>
+      )}
+    </Wrap>
+  );
+}

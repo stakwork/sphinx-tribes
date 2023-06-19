@@ -1,27 +1,116 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import MaterialIcon from '@material/react-material-icon';
+import { EuiGlobalToastList } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
 import NoneSpace from '../people/utils/noneSpace';
 import { Button, Modal, SearchTextInput, Divider } from '../components/common';
 import { useStores } from '../store';
-import { EuiLoadingSpinner } from '@elastic/eui';
 import { useFuse, useScroll } from '../hooks';
 import { colors } from '../config/colors';
 import FadeLeft from '../components/animated/fadeLeft';
 import { useIsMobile } from '../hooks';
-import Bot from './bot';
 import Form from '../components/form';
 import { botSchema } from '../components/form/schema';
-import MaterialIcon from '@material/react-material-icon';
+import Bot from './bot';
 import BotView from './botView';
 import BotSecret from './utils/botSecret';
-import { EuiGlobalToastList } from '@elastic/eui';
-import { observer } from 'mobx-react-lite';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse;
 const getScroll = useScroll;
 
-export default observer(BotBody);
+const BotText = styled.div`
+  width: 259px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 24px;
+  /* or 160% */
+
+  text-align: center;
+
+  color: #3c3f41;
+
+  margin-bottom: 30px;
+`;
+
+const Body = styled.div`
+  flex: 1;
+  height: calc(100% - 105px);
+  padding-bottom: 80px;
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+`;
+const Label = styled.div`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 26px;
+  line-height: 40px;
+  /* or 154% */
+
+  display: flex;
+  align-items: center;
+
+  /* Text 2 */
+
+  color: #3c3f41;
+`;
+
+const Tabs = styled.div`
+  display: flex;
+`;
+
+interface TagProps {
+  selected: boolean;
+}
+const Tab = styled.div<TagProps>`
+  display: flex;
+  padding: 10px 25px;
+  margin-right: 35px;
+  height: 42px;
+  color: ${(p: any) => (p.selected ? '#5D8FDD' : '#5F6368')};
+  border: 2px solid #5f636800;
+  border-color: ${(p: any) => (p.selected ? '#CDE0FF' : '#5F636800')};
+  // border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 19px;
+  background: ${(p: any) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
+  border-radius: 25px;
+`;
+const Link = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 6px;
+  color: #618aff;
+  cursor: pointer;
+  position: relative;
+`;
+
+interface IconProps {
+  src: string;
+}
+
+const Icon = styled.div<IconProps>`
+  background-image: ${(p: any) => `url(${p.src})`};
+  width: 220px;
+  height: 220px;
+  margin: 30px;
+  margin-bottom: 0px;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+  // border-radius:5px;
+  overflow: hidden;
+`;
 
 function BotBody() {
   const { main, ui } = useStores();
@@ -58,7 +147,7 @@ function BotBody() {
     // is mybot
     if (isMyBots) {
       const botSource = isMyBots ? main.myBots : main.bots;
-      const thisBot = botSource.find((f) => f[botSelectionAttribute] === attr);
+      const thisBot = botSource.find((f: any) => f[botSelectionAttribute] === attr);
       setEditThisBot(thisBot);
       setShowCreate(true);
     } else {
@@ -68,8 +157,21 @@ function BotBody() {
     }
   }
 
+  const loadBots = useCallback(async () => {
+    setLoading(true);
+
+					let un = '';
+    if (window.location.pathname.startsWith('/b/')) {
+      un = window.location.pathname.substr(3);
+    }
+
+    const ps = await main.getBots(un, null);
+
+    await main.getMyBots();
+    setLoading(false);
+  }, [main]);
   async function createOrSaveBot(v: any) {
-    v.tags = v.tags && v.tags.map((t) => t.value);
+    v.tags = v.tags && v.tags.map((t: any) => t.value);
     v.price_per_use = parseInt(v.price_per_use);
 
     const isEdit = v.id ? true : false;
@@ -89,7 +191,7 @@ function BotBody() {
           setEditThisBot(b);
         }
         setShowCreate(false);
-      } catch (e) {
+      } catch (e: any) {
         console.log('e', e);
         alert('Bot could not be saved.');
       }
@@ -103,7 +205,7 @@ function BotBody() {
       if (r) {
         addToast(editThisBot.name);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log('e', e);
     }
 
@@ -112,17 +214,6 @@ function BotBody() {
     loadBots();
   }
 
-  const loadBots = useCallback(async () => {
-    setLoading(true);
-    let un = '';
-    if (window.location.pathname.startsWith('/b/')) {
-      un = window.location.pathname.substr(3);
-    }
-
-    const ps = await main.getBots(un, null);
-    await main.getMyBots();
-    setLoading(false);
-  }, [main]);
 
   useEffect(() => {
     loadBots();
@@ -157,7 +248,7 @@ function BotBody() {
 
   if (!isMyBots) {
     // hide bots if not looking at your own
-    bots = (bots && bots.filter((f) => !f.hide)) || [];
+    bots = (bots && bots.filter((f: any) => !f.hide)) || [];
   }
 
   if (loading) {
@@ -168,7 +259,7 @@ function BotBody() {
     );
   }
 
-  const widgetLabel = selectedWidget && tabs.find((f) => f.name === selectedWidget);
+  const widgetLabel = selectedWidget && tabs.find((f: any) => f.name === selectedWidget);
 
   function renderDesktop() {
     return (
@@ -208,7 +299,7 @@ function BotBody() {
 
             <Tabs>
               {tabs &&
-                tabs.map((t, i) => {
+                tabs.map((t: any, i: number) => {
                   const { label } = t;
                   const selected = selectedWidget === t.name;
 
@@ -249,7 +340,7 @@ function BotBody() {
                 background: c.grayish.G400,
                 marginLeft: 20
               }}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 ui.setSearchText(e);
               }}
             />
@@ -268,7 +359,7 @@ function BotBody() {
               padding: 20
             }}
           >
-            {bots.map((t) => (
+            {bots.map((t: any) => (
               <Bot
                 {...t}
                 key={t.uuid}
@@ -302,7 +393,7 @@ function BotBody() {
             goBack={() => ui.setSelectingBot('')}
             botUniqueName={ui.selectedBot}
             loading={loading}
-            selectBot={(b) => selectBot(b[botSelectionAttribute])}
+            selectBot={(b: any) => selectBot(b[botSelectionAttribute])}
             botView={true}
           />
         </FadeLeft>
@@ -355,7 +446,7 @@ function BotBody() {
                   }}
                 >
                   {tabs &&
-                    tabs.map((t, i) => {
+                    tabs.map((t: any, i: number) => {
                       const { label } = t;
                       const selected = selectedWidget === t.name;
 
@@ -364,7 +455,7 @@ function BotBody() {
                           key={i}
                           style={{ borderRadius: 0, margin: 0 }}
                           selected={selected}
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation();
                             setShowDropdown(false);
                             setSelectedWidget(t.name);
@@ -386,7 +477,7 @@ function BotBody() {
             placeholder="Search"
             value={ui.searchText}
             style={{ width: 164, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
-            onChange={(e) => {
+            onChange={(e: any) => {
               console.log('handleChange', e);
               ui.setSearchText(e);
             }}
@@ -401,7 +492,7 @@ function BotBody() {
           onClick={() => setShowBotCreator(true)}
         />
         <div style={{ width: '100%' }}>
-          {bots.map((t) => (
+          {bots.map((t: any) => (
             <Bot
               {...t}
               key={t.id}
@@ -423,7 +514,7 @@ function BotBody() {
             goBack={() => ui.setSelectingBot('')}
             botUniqueName={ui.selectedBot}
             loading={loading}
-            selectBot={(b) => selectBot(b[botSelectionAttribute])}
+            selectBot={(b: any) => selectBot(b[botSelectionAttribute])}
             botView={true}
           />
         </FadeLeft>
@@ -441,7 +532,7 @@ function BotBody() {
 
     initialValues.tags =
       initialValues.tags &&
-      initialValues.tags.map((o) => ({
+      initialValues.tags.map((o: any) => ({
         value: o.value || o,
         label: o.value || o
       }));
@@ -553,93 +644,4 @@ function BotBody() {
   );
 }
 
-const BotText = styled.div`
-  width: 259px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 24px;
-  /* or 160% */
-
-  text-align: center;
-
-  color: #3c3f41;
-
-  margin-bottom: 30px;
-`;
-
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  padding-bottom: 80px;
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-const Label = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 26px;
-  line-height: 40px;
-  /* or 154% */
-
-  display: flex;
-  align-items: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-`;
-
-const Tabs = styled.div`
-  display: flex;
-`;
-
-interface TagProps {
-  selected: boolean;
-}
-const Tab = styled.div<TagProps>`
-  display: flex;
-  padding: 10px 25px;
-  margin-right: 35px;
-  height: 42px;
-  color: ${(p) => (p.selected ? '#5D8FDD' : '#5F6368')};
-  border: 2px solid #5f636800;
-  border-color: ${(p) => (p.selected ? '#CDE0FF' : '#5F636800')};
-  // border-bottom: ${(p) => p.selected && '4px solid #618AFF'};
-  cursor: pointer;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 19px;
-  background: ${(p) => (p.selected ? '#DCEDFE' : '#3C3F4100')};
-  border-radius: 25px;
-`;
-const Link = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 6px;
-  color: #618aff;
-  cursor: pointer;
-  position: relative;
-`;
-
-interface IconProps {
-  src: string;
-}
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
-  width: 220px;
-  height: 220px;
-  margin: 30px;
-  margin-bottom: 0px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  // border-radius:5px;
-  overflow: hidden;
-`;
+export default observer(BotBody);

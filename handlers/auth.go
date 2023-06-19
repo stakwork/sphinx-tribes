@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/auth"
-	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -86,42 +85,6 @@ func GetLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(responseData)
 }
 
-func PollLnurlAuth(w http.ResponseWriter, r *http.Request) {
-	k1 := r.URL.Query().Get("k1")
-	responseData := make(map[string]interface{})
-
-	res, err := db.Store.GetLnCache(k1)
-
-	if err != nil {
-		responseData["k1"] = ""
-		responseData["status"] = false
-
-		fmt.Println("=> ERR polling LNURL AUTH", err)
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("LNURL auth data not found")
-	}
-
-	tokenString, err := auth.EncodeToken(res.Key)
-
-	if err != nil {
-		fmt.Println("error creating JWT")
-		w.WriteHeader(http.StatusNotAcceptable)
-		json.NewEncoder(w).Encode(err.Error())
-		return
-	}
-
-	person := db.DB.GetPersonByPubkey(res.Key)
-	user := returnUserMap(person)
-
-	responseData["k1"] = res.K1
-	responseData["status"] = res.Status
-	responseData["jwt"] = tokenString
-	responseData["user"] = user
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(responseData)
-}
-
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
 
@@ -135,6 +98,36 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 
 		// Set store data to true
 		db.Store.SetLnCache(k1, db.LnStore{K1: k1, Key: userKey, Status: true})
+
+		// Send socket message
+		tokenString, err := auth.EncodeToken(userKey)
+
+		if err != nil {
+			fmt.Println("error creating LNAUTH JWT")
+			w.WriteHeader(http.StatusNotAcceptable)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+
+		person := db.DB.GetPersonByPubkey(userKey)
+		user := returnUserMap(person)
+
+		socketMsg := make(map[string]interface{})
+
+		// Send socket message
+		socketMsg["k1"] = k1
+		socketMsg["status"] = true
+		socketMsg["jwt"] = tokenString
+		socketMsg["user"] = user
+		socketMsg["msg"] = "lnauth_success"
+
+		socket, err := db.Store.GetSocketConnections(r.Host)
+
+		if err == nil {
+			socket.Conn.WriteJSON(socketMsg)
+		} else {
+			fmt.Println("Socket Error", err)
+		}
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)
@@ -203,7 +196,7 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = config.Host
+	user["url"] = "http://localhost:5005"
 
 	return user
 }

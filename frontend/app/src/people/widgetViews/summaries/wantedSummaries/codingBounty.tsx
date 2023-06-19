@@ -1,5 +1,24 @@
 /* eslint-disable func-style */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
+import moment from 'moment';
+import { calculateTimeLeft } from 'helpers';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { Button, Divider, Modal } from '../../../../components/common';
+import { colors } from '../../../../config/colors';
+import { renderMarkdown } from '../../../utils/renderMarkdown';
+import { satToUsd } from '../../../../helpers';
+import { useStores } from '../../../../store';
+import IconButton from '../../../../components/common/icon_button';
+import ImageButton from '../../../../components/common/Image_button';
+import BountyProfileView from '../../../../bounties/bounty_profile_view';
+import ButtonSet from '../../../../bounties/bountyModal_button_set';
+import BountyPrice from '../../../../bounties/bounty_price';
+import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
+import { CodingBountiesProps } from '../../../interfaces';
+import LoomViewerRecorder from '../../../../people/utils/loomViewerRecorder';
+import Invoice from './invoice';
 import {
   AssigneeProfile,
   Creator,
@@ -21,26 +40,7 @@ import {
   AwardBottomContainer,
   BountyTime
 } from './style';
-import { EuiText, EuiFieldText } from '@elastic/eui';
-import { Button, Divider, Modal } from '../../../../components/common';
-import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
-import { satToUsd } from '../../../../helpers';
-import { useStores } from '../../../../store';
-import IconButton from '../../../../components/common/icon_button';
-import ImageButton from '../../../../components/common/Image_button';
-import BountyProfileView from '../../../../bounties/bounty_profile_view';
-import ButtonSet from '../../../../bounties/bountyModal_button_set';
-import BountyPrice from '../../../../bounties/bounty_price';
-import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
-import { observer } from 'mobx-react-lite';
-import { CodingBountiesProps } from '../../../interfaces';
-import moment from 'moment';
-import Invoice from './invoice';
-import { invoicePollTarget } from 'config';
-import { calculateTimeLeft } from 'helpers';
 
-export default observer(MobileView);
 function MobileView(props: CodingBountiesProps) {
   const {
     deliverables,
@@ -86,33 +86,64 @@ function MobileView(props: CodingBountiesProps) {
     setBountyPrice,
     owner_idURL,
     createdURL,
-    created
+    created,
+    loomEmbedUrl
   } = props;
   const color = colors['light'];
 
   const { ui, main } = useStores();
-  const [pollCount, setPollCount] = useState(0);
-  const [invoiceData, setInvoiceData] = useState<{ invoiceStatus: boolean; bountyPaid: boolean }>({
-    invoiceStatus: false,
-    bountyPaid: false
-  });
+  const [invoiceStatus, setInvoiceStatus] = useState(false);
+  const [lnInvoice, setLnInvoice] = useState('');
+  const [toasts, setToasts]: any = useState([]);
 
-  const bountyPaid = paid || invoiceData.bountyPaid;
-
+  const bountyPaid = paid || invoiceStatus;
   const pollMinutes = 1;
 
   const bountyExpired = !assignee?.bounty_expires
     ? false
     : Date.now() > new Date(assignee.bounty_expires).getTime();
-
   const bountyTimeLeft = calculateTimeLeft(new Date(assignee?.bounty_expires ?? ''), 'days');
+
+  const addToast = (type: string) => {
+    switch (type) {
+      case SOCKET_MSG.invoice_success: {
+        return setToasts([
+          {
+            id: '1',
+            title: 'Invoice has been paid'
+          }
+        ]);
+      }
+      case SOCKET_MSG.keysend_error: {
+        return setToasts([
+          {
+            id: '2',
+            title: 'Keysend payment failed',
+            toastLifeTimeMs: 10000
+          }
+        ]);
+      }
+      case SOCKET_MSG.keysend_success: {
+        return setToasts([
+          {
+            id: '3',
+            title: 'Successful keysend payment'
+          }
+        ]);
+      }
+    }
+  };
+
+  const removeToast = () => {
+    setToasts([]);
+  };
 
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
     const price =
       assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
 
-    await main.getLnInvoice({
+    const data = await main.getLnInvoice({
       amount: price || 0,
       memo: '',
       owner_pubkey: person.owner_pubkey,
@@ -121,7 +152,7 @@ function MobileView(props: CodingBountiesProps) {
       type: 'KEYSEND'
     });
 
-    await pollLnInvoice(pollCount);
+    setLnInvoice(data.response.invoice);
   }
 
   async function removeBountyAssignee() {
@@ -136,26 +167,34 @@ function MobileView(props: CodingBountiesProps) {
     }
   }
 
-  async function pollLnInvoice(count: number) {
-    if (main.lnInvoice) {
-      const data = await main.getLnInvoiceStatus(main.lnInvoice);
-
-      setInvoiceData(data);
-
-      setPollCount(count);
-
-      const pollTimeout = setTimeout(() => {
-        pollLnInvoice(count + 1);
-        setPollCount(count + 1);
-      }, 2000);
-
-      if (count >= invoicePollTarget * pollMinutes || data.invoiceStatus) {
-        clearTimeout(pollTimeout);
-        setPollCount(0);
-        main.setLnInvoice('');
-      }
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+    if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
+      addToast(SOCKET_MSG.invoice_success);
+      setLnInvoice('');
+      setInvoiceStatus(true);
+    } else if (res.msg === SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
+      addToast(SOCKET_MSG.keysend_success);
+    } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
+      addToast(SOCKET_MSG.keysend_error);
     }
-  }
+  };
+
+  useEffect(() => {
+    const socket: WebSocket = createSocketInstance();
+
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event);
+    };
+
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
+  }, []);
 
   return (
     <div>
@@ -275,7 +314,7 @@ function MobileView(props: CodingBountiesProps) {
                     <LanguageContainer>
                       {dataValue &&
                         dataValue?.length > 0 &&
-                        dataValue?.map((lang: any, index) => (
+                        dataValue?.map((lang: any, index: number) => (
                           <CodingLabels
                             key={index}
                             styledColors={color}
@@ -400,7 +439,7 @@ function MobileView(props: CodingBountiesProps) {
                     <BountyPrice
                       priceMin={props?.priceMin}
                       priceMax={props?.priceMax}
-                      price={props?.price}
+                      price={props?.price || 0}
                       sessionLength={props?.estimate_session_length}
                       style={{
                         padding: 0,
@@ -408,14 +447,14 @@ function MobileView(props: CodingBountiesProps) {
                       }}
                     />
 
-                    {main.lnInvoice && pollCount < 30 && (
+                    {lnInvoice && !invoiceStatus && (
                       <Invoice
                         startDate={
                           new Date(moment().add(pollMinutes, 'minutes').format().toString())
                         }
-                        count={pollCount}
-                        dataStatus={invoiceData.invoiceStatus}
-                        pollMinutes={pollMinutes}
+                        invoiceStatus={invoiceStatus}
+                        invoiceTime={pollMinutes}
+                        lnInvoice={lnInvoice}
                       />
                     )}
                     {/**
@@ -423,9 +462,21 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so long
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!bountyExpired &&
-                      !main.lnInvoiceStatus &&
-                      assignee?.owner_alias?.length < 30 && (
+                    {!assignee?.bounty_expires && !assignee?.commitment_fee && !bountyPaid && (
+                      <Button
+                        iconSize={14}
+                        width={220}
+                        height={48}
+                        onClick={getLnInvoice}
+                        style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                        text="Pay Bounty"
+                        ButtonTextStyle={{ padding: 0 }}
+                      />
+                    )}
+                    {assignee?.bounty_expires &&
+                      !bountyExpired &&
+                      !invoiceStatus &&
+                      assignee.owner_alias.length < 30 && (
                         <>
                           <BountyTime>
                             Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
@@ -469,9 +520,8 @@ function MobileView(props: CodingBountiesProps) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                          labels && labels.map((x: any) => x.label)
-                        },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                          },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -505,7 +555,7 @@ function MobileView(props: CodingBountiesProps) {
                           fontFamily: 'Barlow',
                           marginLeft: '30px'
                         }}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.stopPropagation();
                           setExtrasPropertyAndSave('paid', !bountyPaid);
                         }}
@@ -532,7 +582,7 @@ function MobileView(props: CodingBountiesProps) {
                         hovercolor={color.button_primary.hover}
                         activecolor={color.button_primary.active}
                         shadowcolor={color.button_primary.shadow}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.stopPropagation();
                           setCreatorStep(1);
                         }}
@@ -606,7 +656,7 @@ function MobileView(props: CodingBountiesProps) {
                     className="InputContainerTextField"
                     type={'number'}
                     value={bountyPrice}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       setBountyPrice(e.target.value);
                     }}
                   />
@@ -629,7 +679,7 @@ function MobileView(props: CodingBountiesProps) {
                   hovercolor={color.button_secondary.hover}
                   activecolor={color.button_secondary.active}
                   shadowcolor={color.button_secondary.shadow}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     setCreatorStep(2);
                   }}
@@ -659,7 +709,7 @@ function MobileView(props: CodingBountiesProps) {
                 <EuiText className="headerText">Award Badge</EuiText>
               </div>
               <div className="AwardContainer">
-                {awards?.map((award, index) => (
+                {awards?.map((award: any, index: number) => (
                   <div
                     className="RadioImageContainer"
                     key={index}
@@ -716,7 +766,7 @@ function MobileView(props: CodingBountiesProps) {
                   hovercolor={color.button_primary.hover}
                   activecolor={color.button_primary.active}
                   shadowcolor={color.button_primary.shadow}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     setExtrasPropertyAndSaveMultiple('paid', {
                       paid: !bountyPaid,
@@ -764,7 +814,7 @@ function MobileView(props: CodingBountiesProps) {
                 <InvitePeopleSearch
                   peopleList={peopleList}
                   isProvidingHandler={true}
-                  handleAssigneeDetails={(value) => {
+                  handleAssigneeDetails={(value: any) => {
                     handleAssigneeDetails(value);
                   }}
                 />
@@ -797,7 +847,7 @@ function MobileView(props: CodingBountiesProps) {
               <LanguageContainer>
                 {dataValue &&
                   dataValue?.length > 0 &&
-                  dataValue?.map((lang: any, index) => (
+                  dataValue?.map((lang: any, index: number) => (
                     <CodingLabels
                       key={index}
                       styledColors={color}
@@ -818,6 +868,17 @@ function MobileView(props: CodingBountiesProps) {
                   <EuiText className="deliverablesDesc">{deliverables}</EuiText>
                 </div>
               ) : null}
+              {loomEmbedUrl && (
+                <>
+                  <div className="loomContainer" />
+                  <EuiText className="loomHeading">Video</EuiText>
+                  <LoomViewerRecorder
+                    readOnly
+                    style={{ marginTop: 10 }}
+                    loomEmbedUrl={loomEmbedUrl}
+                  />
+                </>
+              )}
             </DescriptionBox>
           </CreatorDescription>
 
@@ -863,7 +924,7 @@ function MobileView(props: CodingBountiesProps) {
                   <BountyPrice
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
-                    price={props?.price}
+                    price={props?.price || 0}
                     sessionLength={props?.estimate_session_length}
                     style={{
                       padding: 0,
@@ -882,9 +943,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -936,7 +996,7 @@ function MobileView(props: CodingBountiesProps) {
                   <BountyPrice
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
-                    price={props?.price}
+                    price={props?.price || 0}
                     sessionLength={props?.estimate_session_length}
                     style={{
                       padding: 0,
@@ -955,9 +1015,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1015,7 +1074,7 @@ function MobileView(props: CodingBountiesProps) {
                   <BountyPrice
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
-                    price={props?.price}
+                    price={props?.price || 0}
                     sessionLength={props.estimate_session_length}
                     style={{
                       padding: 0,
@@ -1034,9 +1093,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1051,6 +1109,8 @@ function MobileView(props: CodingBountiesProps) {
           </AssigneeProfile>
         </NormalUser>
       )}
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </div>
   );
 }
+export default observer(MobileView);

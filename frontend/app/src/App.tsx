@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 /* eslint-disable func-style */
 import '@material/react-material-icon/dist/material-icon.css';
 import { Router } from 'react-router-dom';
+import history from 'config/history';
 import { WithStores } from './store';
 import './App.css';
 import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
 import { mainStore } from './store/main';
-import history from 'config/history';
 
 let exchangeRateInterval: any = null;
 
@@ -29,7 +29,7 @@ function App() {
   return (
     <WithStores>
       <Router history={history}>
-        <ModeDispatcher>{(mode) => <Pages mode={mode} />}</ModeDispatcher>
+        <ModeDispatcher>{(mode: any) => <Pages mode={mode} />}</ModeDispatcher>
       </Router>
     </WithStores>
   );

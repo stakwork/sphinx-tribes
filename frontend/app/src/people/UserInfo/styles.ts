@@ -47,7 +47,7 @@ interface ImageProps {
 }
 
 export const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   margin-bottom: 20px;

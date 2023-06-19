@@ -1,18 +1,5 @@
 import { getHost } from '../config/host';
 
-class API {
-  constructor() {
-    this.get = addMethod('GET');
-    this.post = addMethod('POST');
-    this.put = addMethod('PUT');
-    this.del = addMethod('DELETE');
-  }
-  get: Function;
-  post: Function;
-  put: Function;
-  del: Function;
-}
-
 function addMethod(m: string): Function {
   const host = getHost();
   const rootUrl =
@@ -65,5 +52,19 @@ function addMethod(m: string): Function {
   };
   return func;
 }
+
+class API {
+  constructor() {
+    this.get = addMethod('GET');
+    this.post = addMethod('POST');
+    this.put = addMethod('PUT');
+    this.del = addMethod('DELETE');
+  }
+  get: Function;
+  post: Function;
+  put: Function;
+  del: Function;
+}
+
 
 export default new API();

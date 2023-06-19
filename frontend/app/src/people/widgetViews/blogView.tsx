@@ -1,22 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BlogPost } from '../../components/form/inputs/widgets/interfaces';
 import moment from 'moment';
-
-export default function BlogView(props: BlogPost) {
-  const { title, markdown, gallery, created } = props;
-
-  const showImages = gallery && gallery.length;
-  return (
-    <Wrap>
-      <T>{title || 'No title'} </T>
-      <Time>{moment(created).format('l') || 'No title'} </Time>
-      <M>{markdown || 'No markdown'} </M>
-
-      {showImages && <Gallery>{gallery && gallery.map((g, i) => <Img key={i} src={g} />)}</Gallery>}
-    </Wrap>
-  );
-}
+import { BlogPost } from '../../components/form/inputs/widgets/interfaces';
 
 const Wrap = styled.div`
   display: flex;
@@ -55,7 +40,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 80px;
@@ -63,3 +48,20 @@ const Img = styled.div<ImageProps>`
   border-radius: 5px;
   position: relative;
 `;
+
+export default function BlogView(props: BlogPost) {
+  const { title, markdown, gallery, created } = props;
+
+  const showImages = gallery && gallery.length;
+  return (
+    <Wrap>
+      <T>{title || 'No title'} </T>
+      <Time>{moment(created).format('l') || 'No title'} </Time>
+      <M>{markdown || 'No markdown'} </M>
+
+      {showImages && (
+        <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>
+      )}
+    </Wrap>
+  );
+}

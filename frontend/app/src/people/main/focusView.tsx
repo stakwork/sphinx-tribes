@@ -1,20 +1,72 @@
 import React, { useEffect, useState, useRef } from 'react';
+import styled, { css } from 'styled-components';
+import moment from 'moment';
+import { cloneDeep } from 'lodash';
+import { observer } from 'mobx-react-lite';
+import { FocusViewProps } from 'people/interfaces';
 import { useStores } from '../../store';
 import Form from '../../components/form';
-import styled, { css } from 'styled-components';
 import { Button, IconButton } from '../../components/common';
-import moment from 'moment';
 import WantedSummary from '../widgetViews/summaries/wantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
-import { cloneDeep } from 'lodash';
-import { observer } from 'mobx-react-lite';
-import { FocusViewProps } from 'people/interfaces';
 
 // this is where we see others posts (etc) and edit our own
-export default observer(FocusedView);
 
+const BWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  min-height: 42px;
+  position: absolute;
+  left: 0px;
+  border-bottom: 1px solid rgb(221, 225, 229);
+  background: #ffffff;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
+  z-index: 100;
+`;
+
+const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }: any) => css`
+                scrollbar-color: ${thumbColor} ${trackBackgroundColor}; // Firefox support
+                scrollbar-width: thin;
+
+                &::-webkit-scrollbar {
+                    width: 6px;
+                height: 100%;
+  }
+
+                &::-webkit-scrollbar-thumb {
+                    background - color: ${thumbColor};
+                background-clip: content-box;
+                border-radius: 5px;
+                border: 1px solid ${trackBackgroundColor};
+  }
+
+                &::-webkit-scrollbar-corner,
+                &::-webkit-scrollbar-track {
+                    background - color: ${trackBackgroundColor};
+  }
+}
+
+                `;
+interface BProps {
+  hide: boolean;
+}
+const B = styled.div<BProps>`
+  display: ${(p: any) => (p.hide ? 'none' : 'flex')};
+  justify-content: ${(p: any) => (p.hide ? 'none' : 'center')};
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  ${EnvWithScrollBar({
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
+`;
 function FocusedView(props: FocusViewProps) {
   const {
     goBack,
@@ -72,7 +124,7 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  function mergeFormWithMeData(v) {
+  function mergeFormWithMeData(v: any) {
     let fullMeData: any = null;
 
     if (ui.meInfo) {
@@ -82,7 +134,7 @@ function FocusedView(props: FocusViewProps) {
       if (!fullMeData.extras) fullMeData.extras = {};
       // if about
       if (config.name === 'about') {
-        config?.schema?.forEach((s) => {
+        config?.schema?.forEach((s: any) => {
           if (s.widget && fullMeData.extras) {
             // this allows the link widgets to be edited as a part of about me,
             // when really they are stored as extras
@@ -92,9 +144,9 @@ function FocusedView(props: FocusViewProps) {
               const submitTribes: any = [];
 
               v[s.name] &&
-                v[s.name].forEach((t) => {
+                v[s.name].forEach((t: any) => {
                   const fullTribeInfo =
-                    ownerTribes && ownerTribes?.find((f) => f.unique_name === t.value);
+                    ownerTribes && ownerTribes?.find((f: any) => f.unique_name === t.value);
 
                   // disclude sensitive details
                   if (fullTribeInfo)
@@ -168,7 +220,7 @@ function FocusedView(props: FocusViewProps) {
     if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
-  async function preSubmitFunctions(body) {
+  async function preSubmitFunctions(body: any) {
     const newBody = cloneDeep(body);
 
     // if github repo
@@ -208,7 +260,7 @@ function FocusedView(props: FocusViewProps) {
     return newBody;
   }
 
-  async function submitForm(body) {
+  async function submitForm(body: any) {
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);
@@ -268,7 +320,8 @@ function FocusedView(props: FocusViewProps) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        personInfo.extras?.wanted?.map((value) => moment(value?.estimated_completion_date)) || '';
+        personInfo.extras?.wanted?.map((value: any) => moment(value?.estimated_completion_date)) ||
+        '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -296,21 +349,21 @@ function FocusedView(props: FocusViewProps) {
 
         if (sel) {
           // if dynamic, find right schema
-          const dynamicSchema = config?.schema?.find((f) => f.defaultSchema);
+          const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
           if (dynamicSchema) {
             if (sel.type) {
               const thisDynamicSchema = dynamicSchemasByType[sel.type];
-              thisDynamicSchema?.forEach((s) => {
+              thisDynamicSchema?.forEach((s: any) => {
                 initialValues[s.name] = sel[s.name];
               });
             } else {
               // use default schema
-              dynamicSchema?.defaultSchema?.forEach((s) => {
+              dynamicSchema?.defaultSchema?.forEach((s: any) => {
                 initialValues[s.name] = sel[s.name];
               });
             }
           } else {
-            config?.schema?.forEach((s) => {
+            config?.schema?.forEach((s: any) => {
               initialValues[s.name] = sel[s.name];
             });
           }
@@ -452,56 +505,4 @@ function FocusedView(props: FocusViewProps) {
   );
 }
 
-const BWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 10px;
-  min-height: 42px;
-  position: absolute;
-  left: 0px;
-  border-bottom: 1px solid rgb(221, 225, 229);
-  background: #ffffff;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
-  z-index: 100;
-`;
-
-const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }) => css`
-                scrollbar-color: ${thumbColor} ${trackBackgroundColor}; // Firefox support
-                scrollbar-width: thin;
-
-                &::-webkit-scrollbar {
-                    width: 6px;
-                height: 100%;
-  }
-
-                &::-webkit-scrollbar-thumb {
-                    background - color: ${thumbColor};
-                background-clip: content-box;
-                border-radius: 5px;
-                border: 1px solid ${trackBackgroundColor};
-  }
-
-                &::-webkit-scrollbar-corner,
-                &::-webkit-scrollbar-track {
-                    background - color: ${trackBackgroundColor};
-  }
-}
-
-                `;
-interface BProps {
-  hide: boolean;
-}
-const B = styled.div<BProps>`
-  display: ${(p) => (p.hide ? 'none' : 'flex')};
-  justify-content: ${(p) => (p.hide ? 'none' : 'center')};
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-  box-sizing: border-box;
-  ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
-`;
+export default observer(FocusedView);

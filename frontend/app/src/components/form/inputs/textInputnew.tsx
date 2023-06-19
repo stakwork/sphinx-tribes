@@ -1,53 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Props } from './propsType';
 import { colors } from '../../../config/colors';
-
-export default function TextInputNew({
-  error,
-  label,
-  value,
-  handleChange,
-  readOnly,
-  prepend
-}: Props) {
-  let labeltext = label;
-  const color = colors['light'];
-  if (error) labeltext = `${labeltext} (${error})`;
-
-  const padStyle = prepend ? { paddingLeft: 0 } : {};
-  return (
-    <TextContainer color={color}>
-      <div className="label-float">
-        <input
-          type="text"
-          placeholder=" "
-          value={value || ''}
-          readOnly={readOnly || false}
-          onChange={(e) => handleChange(e.target.value)}
-        />
-        <label>{label}</label>
-      </div>
-    </TextContainer>
-  );
-}
+import { Props } from './propsType';
 
 interface styledProps {
   color?: any;
 }
-
 const TextContainer = styled.div<styledProps>`
   margin-bottom: 13px;
   .label-float {
     position: relative;
     padding-top: 13px;
     font-size: 13px;
-    color: ${(p) => p?.color && p?.color.grayish.G300};
+    color: ${(p: any) => p?.color && p?.color.grayish.G300};
     font-family: Barlow;
   }
 
   .label-float input {
-    border: 1px solid ${(p) => p?.color && p?.color.grayish.G600};
+    border: 1px solid ${(p: any) => p?.color && p?.color.grayish.G600};
     border-radius: 4px;
     outline: none;
     min-width: 290px;
@@ -61,11 +31,11 @@ const TextContainer = styled.div<styledProps>`
   }
 
   .label-float input:focus {
-    border: 1px solid ${(p) => p?.color && p?.color.blue2};
+    border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
   }
 
   .label-float input::placeholder {
-    color: ${(p) => p?.color && p?.color.grayish.G300};
+    color: ${(p: any) => p?.color && p?.color.grayish.G300};
   }
 
   .label-float label {
@@ -94,6 +64,29 @@ const TextContainer = styled.div<styledProps>`
   .label-float input:not(:placeholder-shown) + label {
     font-size: 13px;
     top: 0;
-    color: ${(p) => p?.color && p?.color.grayish.G300};
+    color: ${(p: any) => p?.color && p?.color.grayish.G300};
   }
 `;
+export default function TextInputNew({
+  label,
+  value,
+  handleChange,
+  readOnly,
+}: Props) {
+  const color = colors['light'];
+  return (
+					<TextContainer color={color}>
+      <div className="label-float">
+        <input
+          type="text"
+          placeholder=" "
+          value={value || ''}
+          readOnly={readOnly || false}
+          onChange={(e: any) => handleChange(e.target.value)}
+        />
+        <label>{label}</label>
+      </div>
+     </TextContainer>
+  );
+}
+

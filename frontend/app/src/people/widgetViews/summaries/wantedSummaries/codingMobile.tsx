@@ -1,6 +1,13 @@
 /* eslint-disable func-style */
 import React from 'react';
-import { ButtonRow, Pad, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } from './style';
+import { EuiText } from '@elastic/eui';
+import { CodingViewProps } from 'people/interfaces';
+import GithubStatusPill from '../../parts/statusPill';
+import { Divider } from '../../../../components/common';
+import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
+import { colors } from '../../../../config/colors';
+import { renderMarkdown } from '../../../utils/renderMarkdown';
+import { formatPrice, satToUsd } from '../../../../helpers';
 import {
   Heart,
   AddToFavorites,
@@ -9,14 +16,7 @@ import {
   ViewTribe,
   ViewGithub
 } from './components';
-import GithubStatusPill from '../../parts/statusPill';
-import { EuiText } from '@elastic/eui';
-import { Divider } from '../../../../components/common';
-import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
-import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
-import { formatPrice, satToUsd } from '../../../../helpers';
-import { CodingViewProps } from 'people/interfaces';
+import { ButtonRow, Pad, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } from './style';
 
 export default function MobileView(props: CodingViewProps) {
   const {
@@ -52,7 +52,7 @@ export default function MobileView(props: CodingViewProps) {
           {assigneeLabel}
           {ticketUrl && (
             <GithubIconMobile
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 window.open(ticketUrl, '_blank');
               }}
@@ -62,7 +62,7 @@ export default function MobileView(props: CodingViewProps) {
           )}
           {loomEmbedUrl && (
             <LoomIconMobile
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 window.open(loomEmbedUrl, '_blank');
               }}
@@ -144,7 +144,7 @@ export default function MobileView(props: CodingViewProps) {
         <Divider />
         <Y>
           <P color={color}>
-            <B color={color}>{formatPrice(price)}</B> SAT / <B color={color}>{satToUsd(price)}</B>{' '}
+            <B color={color}>{formatPrice(price || 0)}</B> SAT / <B color={color}>{satToUsd(price || 0)}</B>{' '}
             USD
           </P>
           <Heart />

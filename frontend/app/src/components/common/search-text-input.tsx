@@ -1,11 +1,34 @@
 import MaterialIcon from '@material/react-material-icon';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
 import { SearchTextInputProps } from 'components/interfaces';
+import { useStores } from '../../store';
+let debounceValue = '';
+let inDebounce;
+function debounce(func: any, delay: any) {
+  clearTimeout(inDebounce);
+  inDebounce = setTimeout(() => {
+    func();
+  }, delay);
+}
 
-export default observer(SearchTextInput);
+const Text = styled.input`
+  background: #f2f3f580;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  border-radius: 21px;
+  padding-left: 20px;
+  padding-right: 10px;
+  // width:100%;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 14px;
+  height: 35px;
+  transition: all 0.4s;
+`;
+
 function SearchTextInput(props: SearchTextInputProps) {
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
@@ -31,7 +54,7 @@ function SearchTextInput(props: SearchTextInputProps) {
           if (!ui.searchText) setExpand(false);
         }}
         value={searchValue}
-        onChange={(e) => {
+        onChange={(e: any) => {
           setSearchValue(e.target.value);
           debounceValue = e.target.value;
           debounce(doDelayedValueUpdate, 300);
@@ -73,27 +96,4 @@ function SearchTextInput(props: SearchTextInputProps) {
   );
 }
 
-let debounceValue = '';
-let inDebounce;
-function debounce(func, delay) {
-  clearTimeout(inDebounce);
-  inDebounce = setTimeout(() => {
-    func();
-  }, delay);
-}
-
-const Text = styled.input`
-  background: #f2f3f580;
-  border: 1px solid #e0e0e0;
-  box-sizing: border-box;
-  border-radius: 21px;
-  padding-left: 20px;
-  padding-right: 10px;
-  // width:100%;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 12px;
-  line-height: 14px;
-  height: 35px;
-  transition: all 0.4s;
-`;
+export default observer(SearchTextInput);

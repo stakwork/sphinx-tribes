@@ -445,6 +445,11 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	amount := invoice.Amount
 	date := invoice.Created
 	memo := invoice.Memo
+	invoiceType := invoice.Type
+	assigedHours := invoice.Assigned_hours
+	commitmentFee := invoice.Commitment_fee
+	bountyExpires := invoice.Bounty_expires
+	websocketToken := invoice.Websocket_token
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
@@ -479,12 +484,18 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var invoiceCache, _ = db.Store.GetInvoiceCache()
+
 	var invoiceData = db.InvoiceStoreData{
-		Amount:       amount,
-		Created:      date,
-		Invoice:      invoiceRes.Response.Invoice,
-		Owner_pubkey: owner_key,
-		User_pubkey:  pub_key,
+		Amount:         amount,
+		Created:        date,
+		Invoice:        invoiceRes.Response.Invoice,
+		Owner_pubkey:   owner_key,
+		Host:           websocketToken,
+		User_pubkey:    pub_key,
+		Type:           invoiceType,
+		Assigned_hours: assigedHours,
+		Commitment_fee: commitmentFee,
+		Bounty_expires: bountyExpires,
 	}
 
 	var invoiceList = append(invoiceCache, invoiceData)
@@ -494,56 +505,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
-}
-
-func GetInvoiceStatus(w http.ResponseWriter, r *http.Request) {
-	payment_request := chi.URLParam(r, "payment_request")
-
-	if payment_request == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	var invoiceState bool
-	var bountyPaid bool
-
-	/**
-	  if invoice is still in the store
-	  It means the invoice has not been paid
-	  else it has been paid
-	*/
-	invoiceList, _ := db.Store.GetInvoiceCache()
-	invoiceLength := len(invoiceList)
-
-	if invoiceLength > 0 {
-
-		for _, invoice := range invoiceList {
-			if invoice.Invoice == payment_request {
-				invoiceState = false
-				bountyPaid = false
-			} else {
-				invoiceState = true
-				bountyPaid = true
-			}
-		}
-	} else {
-		invoiceState = true
-		bountyPaid = true
-	}
-
-	invoiceData := db.InvoiceStatus{
-		Status:          invoiceState,
-		Payment_request: payment_request,
-	}
-
-	invoiceResult := make(map[string]interface{})
-
-	invoiceResult["status"] = invoiceData.Status
-	invoiceResult["payment_request"] = invoiceData.Payment_request
-	invoiceResult["bounty_paid"] = bountyPaid
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(invoiceResult)
 }
 
 func makeInvoiceRequest(amount string, memo string) (*http.Response, error) {

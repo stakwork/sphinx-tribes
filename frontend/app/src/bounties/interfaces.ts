@@ -1,5 +1,4 @@
 import { Person } from 'store/main';
-import { CSSProperties } from 'styled-components';
 
 export interface BountiesDescriptionProps {
   description?: any;
@@ -18,7 +17,7 @@ export interface BountiesDescriptionProps {
 export interface BountiesPriceProps {
   sessionLength?: boolean | string;
   priceMin?: number;
-  price?: number;
+  price: number;
   style?: React.CSSProperties;
   priceMax?: number;
 }

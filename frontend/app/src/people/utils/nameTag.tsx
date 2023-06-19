@@ -1,14 +1,75 @@
 import React from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
-import { useStores } from '../../store';
 import { useHistory } from 'react-router';
-import { useIsMobile } from '../../hooks';
-import { colors } from '../../config/colors';
 import { observer } from 'mobx-react-lite';
 import { NameTagProps } from 'people/interfaces';
+import { useStores } from '../../store';
+import { useIsMobile } from '../../hooks';
+import { colors } from '../../config/colors';
 
-export default observer(NameTag);
+interface ImageProps {
+  readonly src: string;
+  iconSize?: number;
+  isPaid?: boolean;
+}
+interface NameProps {
+  textSize?: number;
+  color?: string;
+}
+
+const Img = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  height: ${(p: any) => (p.iconSize ? `${p.iconSize}px` : '16px')};
+  width: ${(p: any) => (p.iconSize ? `${p.iconSize}px` : '16px')};
+  border-radius: 50%;
+  position: relative;
+  opacity: ${(p: any) => (p.isPaid ? 0.3 : 1)};
+  filter: ${(p: any) => p.isPaid && 'grayscale(100%)'};
+`;
+
+const Name = styled.div<NameProps>`
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: normal;
+  font-size: ${(p: any) => (p.textSize ? `${p.textSize}px` : '13px')};
+  color: ${(p: any) => p.color};
+  line-height: 16px;
+  /* or 158% */
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 11vw;
+`;
+
+const Date = styled.div`
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+  line-height: 19px;
+  display: flex;
+  align-items: center;
+  color: #b0b7bc;
+`;
+interface WrapProps {
+  readonly isSelected: boolean;
+}
+
+const Wrap = styled.div<WrapProps>`
+  display: flex;
+  align-items: center;
+  cursor: ${(p: any) => !p.isSelected && 'pointer'};
+  width: fit-content;
+  margin-bottom: 10px;
+  color: #8e969c;
+  // &:hover {
+  //   color: ${(p: any) => !p.isSelected && '#618AFF'};
+  // }
+`;
 
 function NameTag(props: NameTagProps) {
   const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =
@@ -22,7 +83,7 @@ function NameTag(props: NameTagProps) {
 
   const isSelected = ui.selectedPerson === id ? true : false;
 
-  function selectPerson(e) {
+  function selectPerson(e: any) {
     // don't select if already selected
     if (isSelected) return;
     e.stopPropagation();
@@ -45,7 +106,7 @@ function NameTag(props: NameTagProps) {
     return (
       <Wrap
         isSelected={isSelected}
-        onClick={(e) => {
+        onClick={(e: any) => {
           selectPerson(e);
         }}
         style={style}
@@ -99,7 +160,7 @@ function NameTag(props: NameTagProps) {
           <Name
             textSize={textSize}
             color={isPaid ? color.grayish.G300 : color.pureBlack}
-            onClick={(e) => {
+            onClick={(e: any) => {
               selectPerson(e);
             }}
           >
@@ -111,66 +172,4 @@ function NameTag(props: NameTagProps) {
     </Wrap>
   );
 }
-
-interface ImageProps {
-  readonly src: string;
-  iconSize?: number;
-  isPaid?: boolean;
-}
-interface NameProps {
-  textSize?: number;
-  color?: string;
-}
-
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
-  background-position: center;
-  background-size: cover;
-  height: ${(p) => (p.iconSize ? `${p.iconSize}px` : '16px')};
-  width: ${(p) => (p.iconSize ? `${p.iconSize}px` : '16px')};
-  border-radius: 50%;
-  position: relative;
-  opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
-  filter: ${(p) => p.isPaid && 'grayscale(100%)'};
-`;
-
-const Name = styled.div<NameProps>`
-  font-family: Barlow;
-  font-style: normal;
-  font-weight: normal;
-  font-size: ${(p) => (p.textSize ? `${p.textSize}px` : '13px')};
-  color: ${(p) => p.color};
-  line-height: 16px;
-  /* or 158% */
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 11vw;
-`;
-
-const Date = styled.div`
-  font-family: Barlow;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 13px;
-  line-height: 19px;
-  display: flex;
-  align-items: center;
-  color: #b0b7bc;
-`;
-interface WrapProps {
-  readonly isSelected: boolean;
-}
-
-const Wrap = styled.div<WrapProps>`
-  display: flex;
-  align-items: center;
-  cursor: ${(p) => !p.isSelected && 'pointer'};
-  width: fit-content;
-  margin-bottom: 10px;
-  color: #8e969c;
-  // &:hover {
-  //   color: ${(p) => !p.isSelected && '#618AFF'};
-  // }
-`;
+export default observer(NameTag);

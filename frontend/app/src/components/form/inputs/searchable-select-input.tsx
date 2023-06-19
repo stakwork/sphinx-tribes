@@ -1,14 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
-import type { Props } from './propsType';
-import { FieldEnv, Note } from './index';
+import { observer } from 'mobx-react-lite';
 import { SearchableSelect } from '../../common';
 import { useStores } from '../../../store';
 import { colors } from '../../../config/colors';
-import { observer } from 'mobx-react-lite';
+import type { Props } from './propsType';
+import { FieldEnv, Note } from './index';
 
-export default observer(SearchableSelectInput);
+interface styledProps {
+  color?: any;
+}
+
+const ExtraText = styled.div`
+padding: 2px 10px 25px 10px;
+max - width: calc(100 % - 20px);
+word -break: break-all;
+font - size: 14px;
+`;
+
+const E = styled.div<styledProps>`
+position: absolute;
+right: 10px;
+top: 0px;
+display: flex;
+height: 100 %;
+justify - content: center;
+align - items: center;
+color: ${(p: any) => p?.color && p?.color.blue3};
+pointer - events: none;
+user - select: none;
+`;
+const R = styled.div`
+  position: relative;
+`;
 function SearchableSelectInput({
   error,
   note,
@@ -37,7 +62,7 @@ function SearchableSelectInput({
           if (name === 'assignee' || name === 'recipient') {
             const p = await main.getPeopleByNameAliasPubkey(search);
             if (p && p.length) {
-              const newOpts = p.map((ot) => ({
+              const newOpts = p.map((ot: any) => ({
                 owner_alias: ot.owner_alias,
                 owner_pubkey: ot.owner_pubkey,
                 img: ot.img,
@@ -50,7 +75,7 @@ function SearchableSelectInput({
             const { badgeList } = ui;
 
             if (badgeList && badgeList.length) {
-              const newOpts = badgeList.map((ot) => ({
+              const newOpts = badgeList.map((ot: any) => ({
                 img: ot.icon,
                 id: ot.id,
                 token: ot.token,
@@ -86,11 +111,11 @@ function SearchableSelectInput({
             options={opts}
             value={value}
             loading={loading}
-            onChange={(e) => {
+            onChange={(e: any) => {
               handleChange(e);
               setIsBorder(false);
             }}
-            onInputChange={(e) => {
+            onInputChange={(e: any) => {
               if (e) setSearch(e);
             }}
           />
@@ -110,29 +135,4 @@ function SearchableSelectInput({
   );
 }
 
-interface styledProps {
-  color?: any;
-}
-
-const ExtraText = styled.div`
-padding: 2px 10px 25px 10px;
-max - width: calc(100 % - 20px);
-word -break: break-all;
-font - size: 14px;
-`;
-
-const E = styled.div<styledProps>`
-position: absolute;
-right: 10px;
-top: 0px;
-display: flex;
-height: 100 %;
-justify - content: center;
-align - items: center;
-color: ${(p) => p?.color && p?.color.blue3};
-pointer - events: none;
-user - select: none;
-`;
-const R = styled.div`
-  position: relative;
-`;
+export default observer(SearchableSelectInput);

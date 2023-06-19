@@ -7,6 +7,54 @@ import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-rou
 import { useStores } from 'store';
 import styled from 'styled-components';
 import { Wanted } from './Wanted';
+const Container = styled.div<{ isMobile: boolean }>`
+  flex-grow: 1;
+  margin: ${(p: any) => (p.isMobile ? '0 -20px' : '0')};
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  overflow-x: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`;
+interface TagProps {
+  selected: boolean;
+}
+
+const Tab = styled.div<TagProps>`
+  display: flex;
+  padding: 10px;
+  margin-right: 25px;
+  color: ${(p: any) => (p.selected ? '#292C33' : '#8E969C')};
+  border-bottom: ${(p: any) => p.selected && '4px solid #618AFF'};
+  cursor: hover;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 19px;
+  cursor: pointer;
+`;
+
+const Counter = styled.div`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 11px;
+  line-height: 19px;
+  margin-bottom: -3px;
+  /* or 173% */
+  margin-left: 8px;
+
+  display: flex;
+  align-items: center;
+
+  /* Placeholder Text */
+
+  color: #b0b7bc;
+`;
 
 const tabs = widgetConfigs;
 export const TabsPages = observer(() => {
@@ -18,14 +66,14 @@ export const TabsPages = observer(() => {
   const personId = ui.selectedPerson;
   const { person, canEdit } = usePerson(personId);
 
-  const tabsNames = Object.keys(tabs).filter((name) => {
+  const tabsNames = Object.keys(tabs).filter((name: any) => {
     if (name === 'about' && !isMobile) {
       return false;
     }
     return true;
   });
   const changeTabHandler = useCallback(
-    (tabName) => {
+    (tabName: any) => {
       history.replace({
         pathname: `${url}/${tabName}`
       });
@@ -34,13 +82,13 @@ export const TabsPages = observer(() => {
   );
 
   useEffect(() => {
-    const tabSelected = tabsNames.some((name) => location.pathname.includes(name));
+    const tabSelected = tabsNames.some((name: any) => location.pathname.includes(name));
     if (!tabSelected) {
       changeTabHandler(tabsNames[0]);
     }
   }, [changeTabHandler, location.pathname, tabsNames]);
 
-  const fullSelectedWidget = (name) => person?.extras?.[name];
+  const fullSelectedWidget = (name: any) => person?.extras?.[name];
 
   return (
     <Container isMobile={isMobile}>
@@ -53,13 +101,13 @@ export const TabsPages = observer(() => {
         }}
       >
         {tabs &&
-          tabsNames.map((name, i) => {
+          tabsNames.map((name: any, i: number) => {
             const t = tabs[name];
             const { label } = t;
             const selected = location.pathname.includes(name);
             const hasExtras = !!person?.extras?.[name]?.length;
             const count: any = hasExtras
-              ? person.extras[name].filter((f) => {
+              ? person.extras[name].filter((f: any) => {
                   if ('show' in f) {
                     // show has a value
                     if (!f.show) return false;
@@ -85,7 +133,7 @@ export const TabsPages = observer(() => {
           })}
       </Tabs>
       <Switch>
-        {tabsNames.map((name) => (
+        {tabsNames.map((name: any) => (
           <Route key={name} path={`${path}${name}`}>
             <div
               style={{
@@ -115,52 +163,3 @@ export const TabsPages = observer(() => {
     </Container>
   );
 });
-
-const Container = styled.div<{ isMobile: boolean }>`
-  flex-grow: 1;
-  margin: ${(p) => (p.isMobile ? '0 -20px' : '0')};
-`;
-
-const Tabs = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  overflow-x: auto;
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`;
-interface TagProps {
-  selected: boolean;
-}
-
-const Tab = styled.div<TagProps>`
-  display: flex;
-  padding: 10px;
-  margin-right: 25px;
-  color: ${(p) => (p.selected ? '#292C33' : '#8E969C')};
-  border-bottom: ${(p) => p.selected && '4px solid #618AFF'};
-  cursor: hover;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 19px;
-  cursor: pointer;
-`;
-
-const Counter = styled.div`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 11px;
-  line-height: 19px;
-  margin-bottom: -3px;
-  /* or 173% */
-  margin-left: 8px;
-
-  display: flex;
-  align-items: center;
-
-  /* Placeholder Text */
-
-  color: #b0b7bc;
-`;

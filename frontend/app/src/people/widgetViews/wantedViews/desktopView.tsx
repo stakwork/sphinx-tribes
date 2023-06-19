@@ -1,7 +1,8 @@
 /* eslint-disable func-style */
 import React from 'react';
-import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from './style';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
+import { WantedViewsProps } from 'people/interfaces';
 import GithubStatusPill from '../parts/statusPill';
 import { colors } from '../../../config/colors';
 import NameTag from '../../utils/nameTag';
@@ -10,10 +11,7 @@ import { formatPrice, satToUsd } from '../../../helpers';
 import { Button, Divider } from '../../../components/common';
 import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
-import { observer } from 'mobx-react-lite';
-import { WantedViewsProps } from 'people/interfaces';
-
-export default observer(DesktopView);
+import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from './style';
 
 function DesktopView(props: WantedViewsProps) {
   const {
@@ -124,13 +122,12 @@ function DesktopView(props: WantedViewsProps) {
                   }}
                 />
                 <span
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${
-                        {
-                          ...assignee
-                        }.owner_pubkey
+                      `/p/${{
+                        ...assignee
+                      }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
@@ -211,7 +208,7 @@ function DesktopView(props: WantedViewsProps) {
                   flexWrap: 'wrap'
                 }}
               >
-                {gallery.map((val, index) => (
+                {gallery.map((val: any, index: number) => (
                   <div
                     key={index}
                     style={{
@@ -255,8 +252,8 @@ function DesktopView(props: WantedViewsProps) {
               </P>
             ) : (
               <P color={color}>
-                <B color={color}>{formatPrice(price)}</B> SAT /{' '}
-                <B color={color}>{satToUsd(price)}</B> USD
+                <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
+                <B color={color}>{satToUsd(price || 0)}</B> USD
               </P>
             )}
 
@@ -284,7 +281,7 @@ function DesktopView(props: WantedViewsProps) {
                       padding: 0,
                       background: `${color.pureWhite}`
                     }}
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       if (setExtrasPropertyAndSave) setExtrasPropertyAndSave('show');
                     }}
@@ -320,7 +317,7 @@ function DesktopView(props: WantedViewsProps) {
             </EuiText>
             {ui?.meInfo?.isSuperAdmin && (
               <EuiButtonIcon
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   if (showModal) showModal();
                   if (setDeletePayload)
@@ -345,3 +342,4 @@ function DesktopView(props: WantedViewsProps) {
     </div>
   );
 }
+export default observer(DesktopView);

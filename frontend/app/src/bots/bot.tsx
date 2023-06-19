@@ -3,59 +3,6 @@ import styled from 'styled-components';
 
 import { Divider } from '../components/common/index';
 import { BotProps } from './interfaces';
-
-export default function Bot(props: BotProps) {
-  const { name, hideActions, small, id, img, description, selected, select, unique_name } = props;
-
-  const defaultPic = '/static/bot_placeholder.png';
-  const mediumPic = img;
-
-  function renderBotCard() {
-    if (small) {
-      return (
-        <Wrap
-          onClick={() => select(id, unique_name)}
-          style={{
-            background: selected ? '#F2F3F5' : '#fff'
-          }}
-        >
-          <div>
-            <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
-          </div>
-          <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
-            <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
-            <Description>{description}</Description>
-            {!hideActions && (
-              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <div />
-                <div style={{ height: 30 }} />
-              </Row>
-            )}
-            <Divider style={{ marginTop: 20 }} />
-          </R>
-        </Wrap>
-      );
-    }
-    // desktop mode
-    return (
-      <DWrap onClick={() => select(id, unique_name)}>
-        <div>
-          <Img
-            style={{ height: 210, width: '100%', borderRadius: 0 }}
-            src={mediumPic || defaultPic}
-          />
-          <div style={{ padding: 10 }}>
-            <DTitle>{name}</DTitle>
-            <DDescription>{description}</DDescription>
-          </div>
-        </div>
-      </DWrap>
-    );
-  }
-
-  return <>{renderBotCard()}</>;
-}
-
 const Wrap = styled.div`
   cursor: pointer;
   padding: 25px;
@@ -142,7 +89,7 @@ interface ImageProps {
   readonly src: string;
 }
 const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   height: 96px;
@@ -150,3 +97,55 @@ const Img = styled.div<ImageProps>`
   position: relative;
   border-radius: 8px;
 `;
+
+export default function Bot(props: BotProps) {
+  const { name, hideActions, small, id, img, description, selected, select, unique_name } = props;
+
+  const defaultPic = '/static/bot_placeholder.png';
+  const mediumPic = img;
+
+  function renderBotCard() {
+    if (small) {
+      return (
+        <Wrap
+          onClick={() => select(id, unique_name)}
+          style={{
+            background: selected ? '#F2F3F5' : '#fff'
+          }}
+        >
+          <div>
+            <Img src={mediumPic || defaultPic} style={hideActions && { width: 56, height: 56 }} />
+          </div>
+          <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
+            <Title style={hideActions && { fontSize: 17 }}>{name}</Title>
+            <Description>{description}</Description>
+            {!hideActions && (
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <div />
+                <div style={{ height: 30 }} />
+              </Row>
+            )}
+            <Divider style={{ marginTop: 20 }} />
+          </R>
+        </Wrap>
+      );
+    }
+    // desktop mode
+    return (
+      <DWrap onClick={() => select(id, unique_name)}>
+        <div>
+          <Img
+            style={{ height: 210, width: '100%', borderRadius: 0 }}
+            src={mediumPic || defaultPic}
+          />
+          <div style={{ padding: 10 }}>
+            <DTitle>{name}</DTitle>
+            <DDescription>{description}</DDescription>
+          </div>
+        </div>
+      </DWrap>
+    );
+  }
+
+  return <>{renderBotCard()}</>;
+}

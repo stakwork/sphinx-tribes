@@ -4,8 +4,8 @@ import { widgetConfigs } from 'people/utils/constants';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
-import FocusedView from '../focusView';
 import { BountyModalProps } from 'people/interfaces';
+import FocusedView from '../focusView';
 
 const config = widgetConfigs.wanted;
 export const BountyModal = ({ basePath }: BountyModalProps) => {
@@ -17,7 +17,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
 
   const wantedLength = person?.extras ? person?.extras.wanted?.length : 0;
 
-  const changeWanted = (step) => {
+  const changeWanted = (step: any) => {
     if (!wantedLength) return;
     const currentStep = Number(wantedId);
     const newStep = currentStep + step;

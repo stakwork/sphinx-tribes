@@ -10,8 +10,8 @@ export const PriceOuterContainer = styled.div<PriceContainerProps>`
   align-items: center;
   height: 33px;
   min-width: 104px;
-  color: ${(p) => (p.price_Text_Color ? p.price_Text_Color : '')};
-  background: ${(p) => (p.priceBackground ? p.priceBackground : '')};
+  color: ${(p: any) => (p.price_Text_Color ? p.price_Text_Color : '')};
+  background: ${(p: any) => (p.priceBackground ? p.priceBackground : '')};
   border-radius: 2px;
   .Price_inner_Container {
     min-height: 33px;
