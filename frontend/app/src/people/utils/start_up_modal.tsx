@@ -9,6 +9,51 @@ import { useStores } from '../../store';
 import api from '../../api';
 import QR from './QR';
 
+const ModalContainer = styled.div`
+  max-height: 274px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 50px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const QrContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0;
+  overflow-y: hidden;
+`;
+
+const QRText = styled.p`
+  padding: 0px;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  width: 60%;
+  text-align: center;
+`;
+
+const DirectionWrap = styled.div`
+  padding: 0px;
+  display: flex;
+  width: 100%;
+`;
+
+const AndroidIosButtonConatiner = styled.div`
+  padding: 0px;
+  display: flex;
+  width: 100%;
+  margin-right: 20px;
+  justify-content: space-between;
+`;
 const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps) => {
   const { ui, main } = useStores();
   const [step, setStep] = useState(1);
@@ -263,49 +308,3 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
 };
 
 export default observer(StartUpModal);
-
-const ModalContainer = styled.div`
-  max-height: 274px;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 50px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const QrContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 0;
-  overflow-y: hidden;
-`;
-
-const QRText = styled.p`
-  padding: 0px;
-  margin-top: 15px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  width: 60%;
-  text-align: center;
-`;
-
-const DirectionWrap = styled.div`
-  padding: 0px;
-  display: flex;
-  width: 100%;
-`;
-
-const AndroidIosButtonConatiner = styled.div`
-  padding: 0px;
-  display: flex;
-  width: 100%;
-  margin-right: 20px;
-  justify-content: space-between;
-`;

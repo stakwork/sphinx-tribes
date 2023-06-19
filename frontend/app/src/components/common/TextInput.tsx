@@ -4,6 +4,15 @@ import { TextInputProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
 import { FieldEnv, FieldText } from '../form/inputs/index';
 
+const F = styled(FieldEnv)`
+  .euiFormLabel[for] {
+    cursor: default;
+  }
+`;
+
+const R = styled.div`
+  position: relative;
+`;
 export default function TextInput({
   label,
   value,
@@ -36,12 +45,3 @@ export default function TextInput({
   );
 }
 
-const F = styled(FieldEnv)`
-  .euiFormLabel[for] {
-    cursor: default;
-  }
-`;
-
-const R = styled.div`
-  position: relative;
-`;

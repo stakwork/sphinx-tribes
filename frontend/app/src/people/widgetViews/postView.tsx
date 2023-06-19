@@ -6,6 +6,26 @@ import { Link, Paragraph, Title } from '../../components/common';
 import GalleryViewer from '../utils/galleryViewer';
 import NameTag from '../utils/nameTag';
 
+const Wrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 472px;
+  min-width: 100%;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 20px;
+  color: #3c3f41;
+  justify-content: space-between;
+`;
+
+const Pad = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+`;
+
 export default function PostView(props: OfferViewProps) {
   const { title, content, created, gallery, person } = props;
   const isLong = content && content.length > 100;
@@ -53,23 +73,3 @@ export default function PostView(props: OfferViewProps) {
     </Wrap>
   );
 }
-
-const Wrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 472px;
-  min-width: 100%;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 20px;
-  color: #3c3f41;
-  justify-content: space-between;
-`;
-
-const Pad = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-`;

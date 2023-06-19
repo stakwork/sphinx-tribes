@@ -13,8 +13,6 @@ import { getHost } from '../../../config/host';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 import { Img, P, B, DT, DWrap, DescriptionCodeTask, Pad } from './style';
 
-export default observer(DesktopView);
-
 function DesktopView(props: WantedViewsProps) {
   const {
     description,
@@ -345,3 +343,4 @@ function DesktopView(props: WantedViewsProps) {
     </div>
   );
 }
+export default observer(DesktopView);

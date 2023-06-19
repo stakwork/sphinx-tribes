@@ -5,6 +5,14 @@ import { observer } from 'mobx-react-lite';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 
+let debounceValue = '';
+let inDebounce;
+function debounce(func: any, delay: any) {
+  clearTimeout(inDebounce);
+  inDebounce = setTimeout(() => {
+    func();
+  }, delay);
+}
 interface InputProps {
   border?: string;
   borderHover?: string;
@@ -16,13 +24,77 @@ interface InputProps {
   color?: any;
 }
 
+const Container = styled.div<InputProps>`
+  .SearchText {
+    background: ${(p: any) => p.color && p.color.grayish.G600} !important;
+    border: ${(p: any) => (p.border ? p.border : `1px solid ${p.color.pureBlack}`)};
+    box-sizing: border-box;
+    border-radius: 200px;
+    padding-left: 20px;
+    padding-right: 30px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: Barlow;
+    font-size: 16px;
+    line-height: 14px;
+    height: 35px;
+    transition: all 0.4s;
+    &::placeholder {
+      color: ${(p: any) => (p.TextColor ? p.TextColor : `${p.color.grayish.G65}`)};
+      font-family: 'Barlow';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 19px;
+    }
+    &:focus {
+      border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
+      outline: none;
+      caret-color: ${(p: any) => p.color && p.color.light_blue100};
+      &::placeholder {
+        color: ${(p: any) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
+      }
+    }
+    &:focus-within {
+      background: ${(p: any) => p.color && p.color.grayish.G950} !important;
+    }
+  }
+
+  .SearchIcon {
+    color: ${(p: any) => (p.iconColor ? p.iconColor : `${p.color.pureBlack}`)};
+  }
+
+  &:hover {
+    .SearchIcon {
+      color: ${(p: any) => p.iconColorHover ?? p.color.pureBlack};
+    }
+    .SearchText {
+      border: ${(p: any) => (p.borderHover ? p.borderHover : `1px solid ${p.color.pureBlack}`)};
+      &:focus {
+        border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
+        outline: none;
+        caret-color: ${(p: any) => p.color && p.color.light_blue100};
+      }
+      &::placeholder {
+        color: ${(p: any) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
+      }
+    }
+  }
+  &:active {
+    .SearchText {
+      border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
+      outline: none;
+      caret-color: ${(p: any) => p.color && p.color.light_blue100};
+    }
+  }
+`;
+
 type SearchTextInputProps = ComponentProps<'input'> &
   InputProps & {
     onChange: (v: string) => void;
     iconStyle?: CSSProperties;
   };
 
-export default observer(SearchBar);
 
 function SearchBar({
   border,
@@ -39,7 +111,7 @@ function SearchBar({
   const color = colors['light'];
   const { ui } = useStores();
   const [searchValue, setSearchValue] = useState(ui.searchText || '');
-  const [_, setExpand] = useState(ui.searchText ? true : false);
+  const [, setExpand] = useState(ui.searchText ? true : false);
 
   function doDelayedValueUpdate() {
     onChange(debounceValue);
@@ -111,77 +183,4 @@ function SearchBar({
     </Container>
   );
 }
-
-let debounceValue = '';
-let inDebounce;
-function debounce(func: any, delay: any) {
-  clearTimeout(inDebounce);
-  inDebounce = setTimeout(() => {
-    func();
-  }, delay);
-}
-
-const Container = styled.div<InputProps>`
-  .SearchText {
-    background: ${(p: any) => p.color && p.color.grayish.G600} !important;
-    border: ${(p: any) => (p.border ? p.border : `1px solid ${p.color.pureBlack}`)};
-    box-sizing: border-box;
-    border-radius: 200px;
-    padding-left: 20px;
-    padding-right: 30px;
-    font-style: normal;
-    font-weight: 500;
-    font-family: Barlow;
-    font-size: 16px;
-    line-height: 14px;
-    height: 35px;
-    transition: all 0.4s;
-    &::placeholder {
-      color: ${(p: any) => (p.TextColor ? p.TextColor : `${p.color.grayish.G65}`)};
-      font-family: 'Barlow';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 16px;
-      line-height: 19px;
-    }
-    &:focus {
-      border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
-      outline: none;
-      caret-color: ${(p: any) => p.color && p.color.light_blue100};
-      &::placeholder {
-        color: ${(p: any) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
-      }
-    }
-    &:focus-within {
-      background: ${(p: any) => p.color && p.color.grayish.G950} !important;
-    }
-  }
-
-  .SearchIcon {
-    color: ${(p: any) => (p.iconColor ? p.iconColor : `${p.color.pureBlack}`)};
-  }
-
-  &:hover {
-    .SearchIcon {
-      color: ${(p: any) => p.iconColorHover ?? p.color.pureBlack};
-    }
-    .SearchText {
-      border: ${(p: any) => (p.borderHover ? p.borderHover : `1px solid ${p.color.pureBlack}`)};
-      &:focus {
-        border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
-        outline: none;
-        caret-color: ${(p: any) => p.color && p.color.light_blue100};
-      }
-      &::placeholder {
-        color: ${(p: any) => (p.TextColorHover ? p.TextColorHover : `${p.color.grayish.G65}`)};
-      }
-    }
-  }
-  &:active {
-    .SearchText {
-      border: ${(p: any) => (p.borderActive ? p.borderActive : `1px solid ${p.color.pureBlack}`)};
-      outline: none;
-      caret-color: ${(p: any) => p.color && p.color.light_blue100};
-    }
-  }
-`;
+export default observer(SearchBar);

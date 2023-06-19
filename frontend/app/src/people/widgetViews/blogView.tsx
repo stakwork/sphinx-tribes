@@ -3,23 +3,6 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { BlogPost } from '../../components/form/inputs/widgets/interfaces';
 
-export default function BlogView(props: BlogPost) {
-  const { title, markdown, gallery, created } = props;
-
-  const showImages = gallery && gallery.length;
-  return (
-    <Wrap>
-      <T>{title || 'No title'} </T>
-      <Time>{moment(created).format('l') || 'No title'} </Time>
-      <M>{markdown || 'No markdown'} </M>
-
-      {showImages && (
-        <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>
-      )}
-    </Wrap>
-  );
-}
-
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -65,3 +48,20 @@ const Img = styled.div<ImageProps>`
   border-radius: 5px;
   position: relative;
 `;
+
+export default function BlogView(props: BlogPost) {
+  const { title, markdown, gallery, created } = props;
+
+  const showImages = gallery && gallery.length;
+  return (
+    <Wrap>
+      <T>{title || 'No title'} </T>
+      <Time>{moment(created).format('l') || 'No title'} </Time>
+      <M>{markdown || 'No markdown'} </M>
+
+      {showImages && (
+        <Gallery>{gallery && gallery.map((g: any, i: number) => <Img key={i} src={g} />)}</Gallery>
+      )}
+    </Wrap>
+  );
+}

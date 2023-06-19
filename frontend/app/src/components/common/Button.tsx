@@ -5,6 +5,38 @@ import MaterialIcon from '@material/react-material-icon';
 import { commonColors } from 'config/commonColors';
 import { ButtonProps } from 'components/interfaces';
 
+const B = styled(EuiButton)`
+  position: relative;
+  border-radius: 100px;
+  height: 36px;
+  font-weight: bold;
+  border: none;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  box-shadow: none !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  transform: none !important;
+`;
+
+interface IconProps {
+  src: string;
+}
+
+const Img = styled.div<IconProps>`
+  background-image: ${(p: any) => `url(${p.src})`};
+  width: 80px;
+  height: 80px;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+  border-radius: 80px;
+  overflow: hidden;
+`;
 export default function Button(props: ButtonProps) {
   const { iconStyle, id } = props;
 
@@ -168,35 +200,3 @@ export default function Button(props: ButtonProps) {
   );
 }
 
-const B = styled(EuiButton)`
-  position: relative;
-  border-radius: 100px;
-  height: 36px;
-  font-weight: bold;
-  border: none;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 18px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  box-shadow: none !important;
-  text-transform: none !important;
-  text-decoration: none !important;
-  transform: none !important;
-`;
-
-interface IconProps {
-  src: string;
-}
-
-const Img = styled.div<IconProps>`
-  background-image: ${(p: any) => `url(${p.src})`};
-  width: 80px;
-  height: 80px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: cover; /* Resize the background image to cover the entire container */
-  border-radius: 80px;
-  overflow: hidden;
-`;

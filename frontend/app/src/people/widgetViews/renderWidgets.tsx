@@ -15,7 +15,18 @@ import { AboutView } from './aboutView';
 import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
 
-export default observer(RenderWidgets);
+interface PanelProps {
+  isMobile: boolean;
+}
+
+const Panel = styled.div<PanelProps>`
+  position: relative;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
 
 function RenderWidgets({ widget }: RenderWidgetsProps) {
   const { main, ui } = useStores();
@@ -191,16 +202,4 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
 
   return renderWidgets();
 }
-
-interface PanelProps {
-  isMobile: boolean;
-}
-
-const Panel = styled.div<PanelProps>`
-  position: relative;
-  background: #ffffff;
-  color: #000000;
-  padding: 20px;
-  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;
+export default observer(RenderWidgets);

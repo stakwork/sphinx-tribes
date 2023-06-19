@@ -20,8 +20,6 @@ import {
   EyeDeleteTextContainerMobile
 } from './style';
 
-export default observer(MobileView);
-
 function MobileView(props: any) {
   const {
     priceMin,
@@ -304,3 +302,4 @@ function MobileView(props: any) {
     </div>
   );
 }
+export default observer(MobileView);

@@ -5,8 +5,6 @@ import { useStores } from '../../store';
 
 let timeout;
 
-export default observer(TokenRefresh);
-
 function TokenRefresh() {
   const { main, ui } = useStores();
   const [show, setShow] = useState(false);
@@ -47,3 +45,4 @@ function TokenRefresh() {
     </>
   );
 }
+export default observer(TokenRefresh);

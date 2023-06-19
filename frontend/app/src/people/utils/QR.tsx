@@ -5,6 +5,25 @@ import MaterialIcon from '@material/react-material-icon';
 import { QRProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
 
+interface ImageProps {
+  readonly src: string;
+}
+const Img = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  height: 55px;
+  width: 55px;
+  border-radius: 50%;
+`;
+
+const Icon = styled.div`
+  height: 55px;
+  width: 55px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+`;
 export default function QR(props: QRProps) {
   const { type } = props;
   const color = colors['light'];
@@ -63,23 +82,3 @@ export default function QR(props: QRProps) {
     </div>
   );
 }
-
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
-  background-position: center;
-  background-size: cover;
-  height: 55px;
-  width: 55px;
-  border-radius: 50%;
-`;
-
-const Icon = styled.div`
-  height: 55px;
-  width: 55px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-`;

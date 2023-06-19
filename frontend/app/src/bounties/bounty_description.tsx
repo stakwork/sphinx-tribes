@@ -7,6 +7,98 @@ import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
 import { BountiesDescriptionProps } from './interfaces';
 
+interface codingLangProps {
+  background?: string;
+  border?: string;
+  LabelColor?: string;
+  color?: any;
+}
+
+interface bounty_description_props {
+  isPaid?: any;
+  color?: any;
+}
+
+const BountyDescriptionContainer = styled.div<bounty_description_props>`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 519px;
+  max-width: 519px;
+  padding-left: 17px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-item: center;
+  height: 32px;
+  margin-top: 16px;
+  .NameContainer {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
+const Description = styled.div<bounty_description_props>`
+  display: flex;
+  flex-direction: row;
+  align-item: center;
+  justify-content: space-between;
+  .DescriptionContainer {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+  }
+  .DescriptionTitle {
+    font-size: 17px;
+    line-height: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+  .DescriptionImage {
+    height: 77px;
+    width: 130px;
+    margin-left: 17px;
+    margin-right: 18px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: -13px;
+    border: 1px solid ${(p: any) => p?.color && p.color.grayish.G500};
+    opacity: ${(p: any) => (p.isPaid ? 0.3 : 1)};
+    filter: ${(p: any) => p.isPaid && 'grayscale(100%)'};
+  }
+`;
+
+const LanguageContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 80%;
+  margin-top: 10px;
+`;
+
+const CodingLabels = styled.div<codingLangProps>`
+  padding: 0px 8px;
+  border: ${(p: any) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
+  color: ${(p: any) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
+  background: ${(p: any) => (p.background ? p?.background : `${p.color.pureWhite}`)};
+  border-radius: 4px;
+  overflow: hidden;
+  max-height: 22.75px;
+  min-height: 22.75px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 4px;
+  .LanguageText {
+    font-size: 13px;
+    fontweight: 500;
+    text-align: center;
+    font-family: Barlow;
+    line-height: 16px;
+  }
+`;
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
@@ -124,96 +216,3 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
 };
 
 export default BountyDescription;
-
-interface codingLangProps {
-  background?: string;
-  border?: string;
-  LabelColor?: string;
-  color?: any;
-}
-
-interface bounty_description_props {
-  isPaid?: any;
-  color?: any;
-}
-
-const BountyDescriptionContainer = styled.div<bounty_description_props>`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-width: 519px;
-  max-width: 519px;
-  padding-left: 17px;
-`;
-
-const Header = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-item: center;
-  height: 32px;
-  margin-top: 16px;
-  .NameContainer {
-    display: flex;
-    flex-direction: column;
-  }
-`;
-
-const Description = styled.div<bounty_description_props>`
-  display: flex;
-  flex-direction: row;
-  align-item: center;
-  justify-content: space-between;
-  .DescriptionContainer {
-    display: flex;
-    min-height: 64px;
-    align-items: center;
-  }
-  .DescriptionTitle {
-    font-size: 17px;
-    line-height: 20px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-  }
-  .DescriptionImage {
-    height: 77px;
-    width: 130px;
-    margin-left: 17px;
-    margin-right: 18px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: -13px;
-    border: 1px solid ${(p: any) => p?.color && p.color.grayish.G500};
-    opacity: ${(p: any) => (p.isPaid ? 0.3 : 1)};
-    filter: ${(p: any) => p.isPaid && 'grayscale(100%)'};
-  }
-`;
-
-const LanguageContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  width: 80%;
-  margin-top: 10px;
-`;
-
-const CodingLabels = styled.div<codingLangProps>`
-  padding: 0px 8px;
-  border: ${(p: any) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
-  color: ${(p: any) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
-  background: ${(p: any) => (p.background ? p?.background : `${p.color.pureWhite}`)};
-  border-radius: 4px;
-  overflow: hidden;
-  max-height: 22.75px;
-  min-height: 22.75px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-right: 4px;
-  .LanguageText {
-    font-size: 13px;
-    fontweight: 500;
-    text-align: center;
-    font-family: Barlow;
-    line-height: 16px;
-  }
-`;

@@ -4,6 +4,48 @@ import { colors } from '../../../config/colors';
 import { satToUsd } from '../../../helpers';
 import type { Props } from './propsType';
 
+interface styledProps {
+  color?: any;
+  borderColor?: string;
+}
+
+const InputOuterBox = styled.div<styledProps>`
+  position: relative;
+  margin-bottom: 16px;
+  .inputText {
+    height: 40px;
+    width: 292px;
+    font-size: 14px;
+    color: ${(p: any) => p.color && p.color.pureBlack};
+    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
+    border-radius: 4px;
+    outline: none;
+    padding-left: 16px;
+    font-family: 'Barlow';
+    font-weight: 500;
+    color: #3c3f41;
+    letter-spacing: 0.01em;
+
+    :active {
+      border: 1px solid ${(p: any) => p.color && p.color.blue2} !important;
+    }
+    :focus-visible {
+      border: 1px solid ${(p: any) => p.color && p.color.blue2} !important;
+    }
+  }
+  .USD {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 35px;
+    display: flex;
+    align-items: center;
+    color: ${(p: any) => p.color && p.color.grayish.G300};
+    border: 3px solid ${(p: any) => p.color && p.color.pureWhite};
+    margin-left: 16px;
+  }
+`;
 export default function NumberInputNew({
   error,
   label,
@@ -68,46 +110,3 @@ export default function NumberInputNew({
     </InputOuterBox>
   );
 }
-
-interface styledProps {
-  color?: any;
-  borderColor?: string;
-}
-
-const InputOuterBox = styled.div<styledProps>`
-  position: relative;
-  margin-bottom: 16px;
-  .inputText {
-    height: 40px;
-    width: 292px;
-    font-size: 14px;
-    color: ${(p: any) => p.color && p.color.pureBlack};
-    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
-    border-radius: 4px;
-    outline: none;
-    padding-left: 16px;
-    font-family: 'Barlow';
-    font-weight: 500;
-    color: #3c3f41;
-    letter-spacing: 0.01em;
-
-    :active {
-      border: 1px solid ${(p: any) => p.color && p.color.blue2} !important;
-    }
-    :focus-visible {
-      border: 1px solid ${(p: any) => p.color && p.color.blue2} !important;
-    }
-  }
-  .USD {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 35px;
-    display: flex;
-    align-items: center;
-    color: ${(p: any) => p.color && p.color.grayish.G300};
-    border: 3px solid ${(p: any) => p.color && p.color.pureWhite};
-    margin-left: 16px;
-  }
-`;

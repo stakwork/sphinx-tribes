@@ -6,11 +6,41 @@ import { LoomViewProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
 import { Button, IconButton } from '../../components/common';
 
-const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';
+//const PUBLIC_APP_DEVELOPMENT_ID = 'beec6b9b-d84c-44f4-ba70-f63f32f9e603';
 
 const PUBLIC_APP_ID = 'ded90c8e-92ed-496d-bfe3-f742d7fa9785';
 
 const BUTTON_ID = 'loom-record-sdk-button';
+
+interface styledProps {
+  color?: any;
+}
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const RemoveButtonContainer = styled.div<styledProps>`
+  position: absolute;
+  top: 160px;
+  right: 45px;
+  display: flex;
+  justify-content: flex-end;
+  align-item: center;
+  cursor: pointer;
+  .buttonText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 35px;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    color: #5f6368;
+  }
+`;
 
 export default function LoomViewerRecorderNew(props: LoomViewProps) {
   const { loomEmbedUrl, onChange, readOnly, style, setIsVideo } = props;
@@ -124,33 +154,3 @@ export default function LoomViewerRecorderNew(props: LoomViewProps) {
     </div>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-const RemoveButtonContainer = styled.div<styledProps>`
-  position: absolute;
-  top: 160px;
-  right: 45px;
-  display: flex;
-  justify-content: flex-end;
-  align-item: center;
-  cursor: pointer;
-  .buttonText {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 35px;
-    display: flex;
-    align-items: center;
-    text-align: right;
-    color: #5f6368;
-  }
-`;

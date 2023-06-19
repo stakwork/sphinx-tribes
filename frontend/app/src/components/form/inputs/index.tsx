@@ -23,60 +23,6 @@ import NumberInputNew from './number-input-new';
 import TextAreaInputNew from './text-area-input-new';
 import CreatableMultiSelectInputNew from './creatable-multi-select-input-new';
 
-export default function Input(props: any) {
-  const color = colors['light'];
-  function getInput() {
-    switch (props.type) {
-      case 'space':
-        return <div style={{ height: 10 }} />;
-      case 'text':
-        return props?.newDesign ? <TextInputNew {...props} /> : <TextInput {...props} />;
-      case 'textarea':
-        return props?.newDesign ? <TextAreaInputNew {...props} /> : <TextAreaInput {...props} />;
-      case 'search':
-        return <SearchTextInput {...props} />;
-      case 'img':
-        return <ImageInput {...props} />;
-      case 'imgcanvas':
-        return <ImageInput notProfilePic={true} {...props} />;
-      case 'gallery':
-        return <GalleryInput {...props} />;
-      case 'number':
-        return props?.newDesign ? <NumberInputNew {...props} /> : <NumberInput {...props} />;
-      case 'loom':
-        return props?.newDesign ? <LoomVideoInputNew {...props} /> : <LoomVideoInput {...props} />;
-      case 'switch':
-        return <SwitchInput {...props} />;
-      case 'select':
-        return <SelectInput {...props} />;
-      case 'searchableselect':
-        return props?.newDesign ? (
-          <InvitePeopleSearch {...props} />
-        ) : (
-          <SearchableSelectInput {...props} />
-        );
-      case 'multiselect':
-        return <MultiSelectInput {...props} />;
-      case 'creatablemultiselect':
-        return props?.newDesign ? (
-          <CreatableMultiSelectInputNew {...props} />
-        ) : (
-          <CreatableMultiSelectInput {...props} />
-        );
-      case 'widgets':
-        return <Widgets {...props} />;
-      case 'date':
-        return <Date {...props} />;
-      case 'hidden':
-        return <></>;
-      default:
-        return <></>;
-    }
-  }
-
-  return <FieldWrap color={color}>{getInput()}</FieldWrap>;
-}
-
 interface styledProps {
   color?: any;
   height?: any;
@@ -202,3 +148,57 @@ export const FieldTextArea = styled(EuiTextArea)<styledProps>`
   // border-bottom: ${(p: any) => p?.color && `1px solid ${p.color.grayish.G600}`};
   line-height: 17.6px;
 `;
+export default function Input(props: any) {
+  const color = colors['light'];
+  function getInput() {
+    switch (props.type) {
+      case 'space':
+        return <div style={{ height: 10 }} />;
+      case 'text':
+        return props?.newDesign ? <TextInputNew {...props} /> : <TextInput {...props} />;
+      case 'textarea':
+        return props?.newDesign ? <TextAreaInputNew {...props} /> : <TextAreaInput {...props} />;
+      case 'search':
+        return <SearchTextInput {...props} />;
+      case 'img':
+        return <ImageInput {...props} />;
+      case 'imgcanvas':
+        return <ImageInput notProfilePic={true} {...props} />;
+      case 'gallery':
+        return <GalleryInput {...props} />;
+      case 'number':
+        return props?.newDesign ? <NumberInputNew {...props} /> : <NumberInput {...props} />;
+      case 'loom':
+        return props?.newDesign ? <LoomVideoInputNew {...props} /> : <LoomVideoInput {...props} />;
+      case 'switch':
+        return <SwitchInput {...props} />;
+      case 'select':
+        return <SelectInput {...props} />;
+      case 'searchableselect':
+        return props?.newDesign ? (
+          <InvitePeopleSearch {...props} />
+        ) : (
+          <SearchableSelectInput {...props} />
+        );
+      case 'multiselect':
+        return <MultiSelectInput {...props} />;
+      case 'creatablemultiselect':
+        return props?.newDesign ? (
+          <CreatableMultiSelectInputNew {...props} />
+        ) : (
+          <CreatableMultiSelectInput {...props} />
+        );
+      case 'widgets':
+        return <Widgets {...props} />;
+      case 'date':
+        return <Date {...props} />;
+      case 'hidden':
+        return <></>;
+      default:
+        return <></>;
+    }
+  }
+
+  return <FieldWrap color={color}>{getInput()}</FieldWrap>;
+}
+
