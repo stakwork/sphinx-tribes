@@ -528,18 +528,10 @@ func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 	if b.OwnerID == "" {
 		return Bounty{}, errors.New("no pub key")
 	}
-	/*onConflict := "ON CONFLICT (id) DO UPDATE SET"
-	for i, u := range peopleupdatables {
-		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(peopleupdatables)-1 {
-			onConflict = onConflict + ","
-		}
+
+	if db.db.Model(&b).Where("id = ?", b.ID).Updates(&b).RowsAffected == 0 {
+		db.db.Create(&b)
 	}
-	if err := db.db.Set("gorm:insert_option", onConflict).Create(&b).Error; err != nil {
-		fmt.Println(err)
-		return Bounty{}, err
-	}*/
-	db.db.Create(&b)
 	return b, nil
 }
 
