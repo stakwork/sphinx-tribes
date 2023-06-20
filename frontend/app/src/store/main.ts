@@ -937,6 +937,35 @@ export class MainStore {
     }
   }
 
+   async saveBounty(body): Promise<void> {
+    const info = uiStore.meInfo as any;
+    if (!info && !body)  {
+      console.log('Youre not logged in');
+      return;
+    }
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+    try {
+      let request = `bounty?token=${info?.jwt}`;
+      console.log(request, body, info?.jwt);
+
+      const response = await fetch(`${URL}/${request}`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...body
+        }),
+        mode: 'cors',
+        headers: {
+          'x-jwt': info?.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('POST BOUNTY RESPONSE:', response);
+      return;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   // this method is used whenever changing data from the frontend,
   // forks between tor users and non-tor
   async doCallToRelay(method: string, path: string, body: any): Promise<any> {

@@ -63,9 +63,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -276,24 +276,18 @@ function FocusedView(props: FocusViewProps) {
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
 
-    const date = new Date();
-    const unixTimestamp = Math.floor(date.getTime() / 1000);
     setLoading(true);
     try {
-      const requestData =
-        config.name === 'about' || config.name === 'wanted'
-          ? {
-              ...newBody,
-              alert: undefined,
-              new_ticket_time: unixTimestamp,
-              extras: {
-                ...newBody?.extras,
-                alert: newBody.alert
-              }
-            }
-          : newBody;
+      let newBody2 = body;
+      body.assignee = "";
+      if (body?.assignee?.owner_pubkey) {
+        newBody2.assignee = body.assignee.owner_pubkey;
+      }
+      newBody2.title = body.one_sentence_summary;
+      newBody2.one_sentence_summary = "";
+      newBody2.ownerId = info.pubkey;
 
-      await main.saveProfile(requestData);
+      await main.saveBounty(newBody2);
       closeModal();
     } catch (e) {
       console.log('e', e);
@@ -415,8 +409,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />

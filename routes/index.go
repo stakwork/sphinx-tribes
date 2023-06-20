@@ -66,6 +66,9 @@ func NewRouter() *http.Server {
 		r.Delete("/channel/{id}", handlers.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Delete("/bounty/assignee", handlers.DeleteBountyAssignee)
+		r.Get("/migrate_bounties", handlers.MigrateBounties)
+		r.Get("/bounty/all", handlers.GetAllBounties)
+		r.Post("/bounty", handlers.CreateOrEditBounty)
 	})
 
 	r.Group(func(r chi.Router) {
