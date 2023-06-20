@@ -103,15 +103,19 @@ export interface PersonPost {
 }
 
 export interface PersonWanted {
-  person: PersonFlex;
+	person?: any;
+	body?: any;
   title?: string;
   description?: string;
+  owner_id: string;
   created?: number;
   show?: boolean;
   assignee?: any;
-  body: PersonWanted | any;
+  wanted_type: string;
   type?: string;
   price?: string;
+	codingLanguage: string;
+	estimate_session_length: string;
 }
 
 export interface PersonOffer {
@@ -662,32 +666,51 @@ export class MainStore {
 
   async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
-
-    const query = this.appendQueryParams('people/wanteds', queryLimit, {
+    const query2 = this.appendQueryParams('bounty/all', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
+
     try {
-      let ps = await api.get(query);
-      ps = this.decodeListJSON(ps);
+      let ps2 = await api.get(query2);
+      let ps3: any[] = [];
+      for (let i = 0; i < ps2.length; i++) {
+        let bounty = ps2[i];
+        let assigneeResponse;
+        if (bounty.assignee) {
+          const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
+            ...queryParams,
+            sortBy: 'created'
+          });
+          assigneeResponse = await api.get(query3);
+        }
+        const query4 = this.appendQueryParams(`person/${bounty.OwnerID}`, queryLimit, {
+          ...queryParams,
+          sortBy: 'created'
+        });
+        let ownerResponse = await api.get(query4);
+
+        ps3.push({
+          body: { ...bounty, assignee: assigneeResponse || '' },
+          person: { ...ownerResponse, wanteds: [] } || { wanteds: [] }
+        });
+      }
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        // Set person wanted to empty array to avoid wrong data
-        this.setPersonWanteds([]);
-
-        this.peopleWanteds = ps;
+        this.peopleWanteds = ps3;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
-          ps,
-          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          ps3,
+          (n) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams
         );
       }
-      return ps;
+      console.log('PS3: ', ps3);
+      return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
       return [];

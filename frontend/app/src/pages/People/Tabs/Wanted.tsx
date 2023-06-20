@@ -5,42 +5,32 @@ import { widgetConfigs } from 'people/utils/constants';
 import NoneSpace from 'people/utils/noneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/wantedView';
-import React from 'react';
-import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
-
 const config = widgetConfigs.wanted;
-const Container = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  gap: 1rem;
-  flex: 1 1 100%;
-`;
-
-interface PanelProps {
-  isMobile: boolean;
-}
-const Panel = styled.div<PanelProps>`
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  max-width: 300px;
-  flex: 1 1 auto;
-  background: #ffffff;
-  color: #000000;
-  padding: 20px;
-  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;
 
 export const Wanted = observer(() => {
-  const { ui } = useStores();
+  const { ui, main } = useStores();
   const { person, canEdit } = usePerson(ui.selectedPerson);
   const { path, url } = useRouteMatch();
   const history = useHistory();
+  const { personPubkey } = useParams<{ personPubkey: string }>();
+  const [loading, setIsLoading] = useState<boolean>(false);
+  const { peopleWanteds } = main
+  const fullSelectedWidgets = peopleWanteds.filter((wanted) => wanted.body.OwnerID === personPubkey);
 
-  const fullSelectedWidgets = person?.extras?.wanted;
+  async function getUserTickets() {
+    setIsLoading(true);
+    console.log(peopleWanteds)
+    const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
+    getUserTickets();
+  }, []);
 
   if (!fullSelectedWidgets?.length) {
     return (
@@ -89,19 +79,48 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {fullSelectedWidgets.map((w: any, i: number) => (
-        <Panel
-          key={w.created}
-          isMobile={false}
-          onClick={() =>
-            history.push({
-              pathname: `${url}/${i}`
-            })
-          }
-        >
-          <WantedView titleString={w.title} {...w} person={person} />
-        </Panel>
-      ))}
+      {fullSelectedWidgets.map((w, i) => {
+        console.log("LOOKIE HERE: ", w.body.OwnerID, person)
+        if (w.body.OwnerID === person?.owner_pubkey) {
+          return (
+            <Panel
+              key={w.created}
+              isMobile={false}
+              onClick={() =>
+                history.push({
+                  pathname: `${url}/${i}`
+                })
+              }
+            >
+              <WantedView {...w.body} person={person} />
+            </Panel>
+
+          )
+        }
+      })}
     </Container>
   );
 });
+
+const Container = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  flex: 1 1 100%;
+`;
+
+interface PanelProps {
+  isMobile: boolean;
+}
+const Panel = styled.div<PanelProps>`
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  max-width: 300px;
+  flex: 1 1 auto;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
