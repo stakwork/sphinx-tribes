@@ -83,7 +83,7 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 
 	// add socket to store with K1, so the LNURL return data can use it
 	db.Store.SetSocketConnections(db.Client{
-		Host: encodeData.K1[0:10],
+		Host: encodeData.K1[0:20],
 		Conn: socket.Conn,
 	})
 
@@ -129,11 +129,11 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		socketMsg["user"] = user
 		socketMsg["msg"] = "lnauth_success"
 
-		socket, err := db.Store.GetSocketConnections(k1[0:10])
+		socket, err := db.Store.GetSocketConnections(k1[0:20])
 
 		if err == nil {
 			socket.Conn.WriteJSON(socketMsg)
-			db.Store.DeleteCache(k1[0:10])
+			db.Store.DeleteCache(k1[0:20])
 		} else {
 			fmt.Println("Socket Error", err)
 		}
