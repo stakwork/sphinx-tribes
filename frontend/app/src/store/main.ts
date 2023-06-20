@@ -1114,7 +1114,7 @@ export class MainStore {
 
   @action async getLnAuth(): Promise<any> {
     try {
-      const data = await api.get('lnauth');
+      const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
       this.setLnAuth(data);
       return data;
     } catch (e) {

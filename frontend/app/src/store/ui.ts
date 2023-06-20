@@ -151,6 +151,11 @@ class UiStore {
     this.language = s;
   }
 
+  websocketToken: string = '';
+  setWebsocketToken(s: string) {
+    this.websocketToken = s;
+  }
+
   @persist('object') meInfo: MeData = null;
   setMeInfo(t: MeData) {
     if (t) {

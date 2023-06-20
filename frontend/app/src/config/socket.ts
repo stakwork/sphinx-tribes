@@ -11,8 +11,7 @@ export const SOCKET_MSG = {
   invoice_success: 'invoice_success',
   assign_success: 'assign_success',
   lnauth_success: 'lnauth_success',
-  user_connect: 'user_connect',
-  host_success: 'host_success'
+  user_connect: 'user_connect'
 };
 
 let socket: WebSocket | null = null;

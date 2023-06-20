@@ -44,17 +44,7 @@ func (c *Client) Read() {
 		err = json.Unmarshal(p, &socketMsg)
 		if err != nil {
 			fmt.Println("Message Decode Error", err, string(p))
-		} else {
-			fmt.Println("Socket K1 ==", socketMsg.K1)
-			db.Store.SetSocketConnections(db.Client{
-				Host: socketMsg.K1,
-				Conn: c.Conn,
-			})
-
-			socket, _ := db.Store.GetSocketConnections(socketMsg.K1)
-			fmt.Println("socket ===", socket)
 		}
-
 		message := Message{Type: messageType, Body: string(p)}
 
 		fmt.Printf("Message Received: %+v\n", message)
