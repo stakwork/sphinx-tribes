@@ -369,10 +369,10 @@ function FocusedView(props: FocusViewProps) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-    if (selectedIndex !== 0) {
-      return main.peopleWanteds[selectedIndex - 1].body;
+    if (selectedIndex >= 0) {
+      return main.peopleWanteds[selectedIndex].body;
     }
-    return null;
+    return null
   }
 
   return (
