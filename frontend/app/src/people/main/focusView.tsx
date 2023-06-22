@@ -91,6 +91,7 @@ function FocusedView(props: FocusViewProps) {
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
   const [editable, setEditable] = useState<boolean>(!canEdit);
+  const [initialValues, setInitialValues] = useState<any>(null);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
@@ -115,14 +116,17 @@ function FocusedView(props: FocusViewProps) {
 
   // get self on unmount if tor user
   useEffect(
-    () =>
+    () => {
+      setValues();
+
       function cleanup() {
         if (isTorSave) {
           main.getSelf(null);
         }
-      },
-    [main, isTorSave]
-  );
+      }
+
+      return () => cleanup()
+    }, [main, isTorSave]);
 
   function mergeFormWithMeData(v: any) {
     let fullMeData: any = null;
@@ -298,72 +302,85 @@ function FocusedView(props: FocusViewProps) {
       props?.ReCallBounties();
   }
 
-  const initialValues: any = {};
+  function setValues() {
+    let initialValues: any = {};
+    const personInfo = canEdit ? ui.meInfo : person;
 
-  const personInfo = canEdit ? ui.meInfo : person;
-
-  // set initials here
-  if (personInfo) {
-    if (config && config.name === 'about') {
-      initialValues.id = personInfo.id || 0;
-      initialValues.pubkey = personInfo.pubkey;
-      initialValues.alert = personInfo.extras?.alert || false;
-      initialValues.owner_alias = personInfo.owner_alias || '';
-      initialValues.img = personInfo.img || '';
-      initialValues.price_to_meet = personInfo.price_to_meet || 0;
-      initialValues.description = personInfo.description || '';
-      initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      initialValues.estimated_completion_date =
-        personInfo.extras?.wanted?.map((value: any) => moment(value?.estimated_completion_date)) ||
-        '';
-      // below are extras,
-      initialValues.twitter =
-        (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
-      initialValues.email = (personInfo.extras?.email && personInfo.extras?.email[0]?.value) || '';
-      initialValues.github =
-        (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
-      initialValues.facebook =
-        (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
-      // extras with multiple items
-      initialValues.coding_languages = personInfo.extras?.coding_languages || [];
-      initialValues.tribes = personInfo.extras?.tribes || [];
-      initialValues.repos = personInfo.extras?.repos || [];
-      initialValues.lightning =
-        (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
-      initialValues.amboss =
-        (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
-    } else {
-      // if there is a selected index, fill in values
-      if (selectedIndex > -1) {
-        const extras = { ...personInfo.extras };
-        const sel =
-          extras[config.name] &&
-          extras[config.name].length > selectedIndex - 1 &&
-          extras[config.name][selectedIndex];
-
-        if (sel) {
-          // if dynamic, find right schema
-          const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
-          if (dynamicSchema) {
-            if (sel.type) {
-              const thisDynamicSchema = dynamicSchemasByType[sel.type];
-              thisDynamicSchema?.forEach((s: any) => {
-                initialValues[s.name] = sel[s.name];
-              });
-            } else {
-              // use default schema
-              dynamicSchema?.defaultSchema?.forEach((s: any) => {
-                initialValues[s.name] = sel[s.name];
-              });
+    // set initials here
+    if (personInfo && selectedIndex >= 0) {
+      const wanted = main.peopleWanteds[selectedIndex].body;
+      if (config && config.name === 'about') {
+        initialValues.id = personInfo.id || 0;
+        initialValues.pubkey = personInfo.pubkey;
+        initialValues.alert = personInfo.extras?.alert || false;
+        initialValues.owner_alias = personInfo.owner_alias || '';
+        initialValues.img = personInfo.img || '';
+        initialValues.price_to_meet = personInfo.price_to_meet || 0;
+        initialValues.description = personInfo.description || '';
+        initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
+        initialValues.estimated_completion_date = moment(wanted?.estimated_completion_date) || '';
+        // below are extras,
+        initialValues.twitter =
+          (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
+        initialValues.email = (personInfo.extras?.email && personInfo.extras?.email[0]?.value) || '';
+        initialValues.github =
+          (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
+        initialValues.facebook =
+          (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
+        // extras with multiple items
+        initialValues.coding_languages = personInfo.extras?.coding_languages || [];
+        initialValues.tribes = personInfo.extras?.tribes || [];
+        initialValues.repos = personInfo.extras?.repos || [];
+        initialValues.lightning =
+          (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
+        initialValues.amboss =
+          (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
+      } else {
+        // if there is a selected index, fill in values
+        if (selectedIndex >= 0) {
+          const thisDynamicSchema = dynamicSchemasByType[wanted.type];
+          let newValues = thisDynamicSchema.map(s => {
+            return {
+              [s.name]: wanted[s.name]
             }
-          } else {
-            config?.schema?.forEach((s: any) => {
-              initialValues[s.name] = sel[s.name];
-            });
-          }
+          });
+
+          let valueMap = Object.assign({}, ...newValues);
+          initialValues = { ...initialValues, ...valueMap }
+          // initialValues['description'] = wanted['description'];
+
+          // const sel =
+          //   extras[config.name] &&
+          //   extras[config.name].length > selectedIndex &&
+          //   extras[config.name][selectedIndex];
+
+          // if (sel) {
+          //   // if dynamic, find right schema
+          //   const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
+          //   if (dynamicSchema) {
+          //     if (sel.type) {
+          //       const thisDynamicSchema = dynamicSchemasByType[sel.type];
+          //       thisDynamicSchema?.forEach((s: any) => {
+          //         initialValues[s.name] = sel[s.name];
+          //       });
+          //     } else {
+          //       // use default schema
+          //       dynamicSchema?.defaultSchema?.forEach((s: any) => {
+          //         initialValues[s.name] = sel[s.name];
+          //       });
+          //     }
+          //   } else {
+          //     config?.schema?.forEach((s: any) => {
+          //       initialValues[s.name] = sel[s.name];
+          //     });
+          //   }
+          // }
         }
       }
     }
+
+    initialValues[''] = "res"
+    setInitialValues(initialValues)
   }
 
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};

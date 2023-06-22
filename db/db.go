@@ -879,11 +879,10 @@ type Extras struct {
 type LeaderData map[string]interface{}
 
 func (db database) GetBountiesLeaderboard() []LeaderData {
-	ms := []Extras{}
+	ms := []BountyLeaderboard{}
 	var users = []LeaderData{}
 
-	db.db.Raw(`SELECT item->'assignee'->>'owner_pubkey' as owner_pubkey, COUNT(item->'assignee'->>'owner_pubkey') as total_bounties_completed, item->>'price' as total_sats_earned from people  p, LATERAL jsonb_array_elements(p.extras->'wanted') r (item) where extras
-	#> '{wanted}' is not null GROUP BY r.item;`).Find(&ms)
+	db.db.Raw(`SELECT assignee as owner_pubkey, COUNT(assignee) as total_bounties_completed, price as total_sats_earned From bounty GROUP BY assignee, price`).Find(&ms)
 
 	for _, val := range ms {
 		var newLeader = make(map[string]interface{})

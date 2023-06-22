@@ -80,7 +80,6 @@ export const Wanted = observer(() => {
         {canEdit && <PostBounty widget="wanted" />}
       </div>
       {fullSelectedWidgets.map((w, i) => {
-        console.log("LOOKIE HERE: ", w.body.OwnerID, person)
         if (w.body.OwnerID === person?.owner_pubkey) {
           return (
             <Panel

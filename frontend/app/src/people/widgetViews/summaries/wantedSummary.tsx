@@ -52,7 +52,7 @@ function WantedSummary(props: WantedSummaryProps) {
     formSubmit,
     title
   } = props;
-  const titleString = one_sentence_summary ?? title;
+  const titleString = one_sentence_summary || title || '';
 
   const isMobile = useIsMobile();
   const { main, ui } = useStores();

@@ -28,7 +28,7 @@ const Panel = styled.div<PanelProps>`
   border-bottom: ${(p: any) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
   :hover {
     box-shadow: ${(p: any) =>
-      p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
+    p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
   }
   :active {
     box-shadow: none !important;
@@ -78,16 +78,16 @@ function WidgetSwitchViewer(props: any) {
 
   const panelStyles = isMobile
     ? {
-        minHeight: 132
-      }
+      minHeight: 132
+    }
     : {
-        minWidth: '1100px',
-        maxWidth: '1100px',
-        marginBottom: 16,
-        borderRadius: '10px',
-        display: 'flex',
-        justifyContent: 'center'
-      };
+      minWidth: '1100px',
+      maxWidth: '1100px',
+      marginBottom: 16,
+      borderRadius: '10px',
+      display: 'flex',
+      justifyContent: 'center'
+    };
 
   const { peoplePosts, peopleWanteds, peopleOffers } = main;
 
@@ -156,11 +156,12 @@ function WidgetSwitchViewer(props: any) {
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
         const { person, body } = item;
+
         const conditionalStyles = body?.paid
           ? {
-              border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
-              boxShadow: 'none'
-            }
+            border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
+            boxShadow: 'none'
+          }
           : {};
 
         // if this person has entries for this widget

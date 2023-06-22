@@ -316,9 +316,15 @@ type LnHost struct {
 	K1   string `json:"k1"`
 }
 
+type BountyLeaderboard struct {
+	Owner_pubkey             string `json:"owner_pubkey"`
+	Total_bounties_completed uint   `json:"total_bounties_completed"`
+	Total_sats_earned        uint   `json:"total_sats_earned"`
+}
+
 type Bounty struct {
 	ID                      uint       `json:"id"`
-	OwnerID                 string     `json:owner_id"`
+	OwnerID                 string     `json:"owner_id"`
 	Paid                    bool       `json:"paid"`
 	Show                    bool       `json:"show"`
 	Type                    string     `json:"type"`
