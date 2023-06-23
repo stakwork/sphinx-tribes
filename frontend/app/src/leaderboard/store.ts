@@ -25,7 +25,7 @@ export class LeaderboardStore {
     try {
       const resp = (await api.get('people/bounty/leaderboard')) as LeaderItem[];
       this.total = resp[0];
-      this.leaders = resp;
+      this.leaders = resp.slice(1);
     } catch (e) {
       this.error = e;
     } finally {
