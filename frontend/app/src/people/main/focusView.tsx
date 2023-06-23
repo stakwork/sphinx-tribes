@@ -362,7 +362,11 @@ function FocusedView(props: FocusViewProps) {
 
   function getExtras(): any {
     if (selectedIndex >= 0) {
-      return main.peopleWanteds[selectedIndex].body;
+      if (main.peopleWanteds[selectedIndex]) {
+        return main.peopleWanteds[selectedIndex].body;
+      } else {
+        return null
+      }
     }
     return null
   }
