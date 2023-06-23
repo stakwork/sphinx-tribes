@@ -708,7 +708,7 @@ export class MainStore {
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
-          (n) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams
         );
       }
@@ -963,7 +963,7 @@ export class MainStore {
     }
   }
 
-   async saveBounty(body): Promise<void> {
+   async saveBounty(body: any): Promise<void> {
     const info = uiStore.meInfo as any;
     if (!info && !body)  {
       console.log('Youre not logged in');

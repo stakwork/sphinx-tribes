@@ -196,8 +196,6 @@ function Form(props: FormProps) {
       });
   }
 
-  const getFormField = () => { }
-
   return (
     <Formik
       initialValues={initValues || {}}
