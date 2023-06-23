@@ -150,7 +150,7 @@ export const FieldTextArea = styled(EuiTextArea) <styledProps>`
 `;
 export default function Input(props: any) {
   const color = colors['light'];
-  function GetInput() {
+  function getInput() {
     switch (props.type) {
       case 'space':
         return <div style={{ height: 10 }} />;
@@ -199,6 +199,6 @@ export default function Input(props: any) {
     }
   }
 
-  return <FieldWrap color={color}><GetInput /></FieldWrap>;
+  return <FieldWrap color={color}>{getInput()}</FieldWrap>;
 }
 

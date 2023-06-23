@@ -684,10 +684,12 @@ export class MainStore {
           });
           assigneeResponse = await api.get(query3);
         }
-        const query4 = this.appendQueryParams(`person/${bounty.OwnerID}`, queryLimit, {
+
+        const query4 = this.appendQueryParams(`person/${bounty.owner_id}`, queryLimit, {
           ...queryParams,
           sortBy: 'created'
         });
+
         let ownerResponse = await api.get(query4);
 
         ps3.push({
@@ -702,6 +704,7 @@ export class MainStore {
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
+        
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
@@ -969,7 +972,6 @@ export class MainStore {
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     try {
       let request = `bounty?token=${info?.jwt}`;
-      console.log(request, body, info?.jwt);
 
       const response = await fetch(`${URL}/${request}`, {
         method: "POST",
@@ -982,7 +984,36 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       });
-      console.log('POST BOUNTY RESPONSE:', response);
+      if(response.status) {
+        this.getPeopleWanteds({resetPage: true});
+      }
+      return;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async deleteBounty(created: number): Promise<void> {
+    const info = uiStore.meInfo as any;
+    if (!info)  {
+      console.log('Youre not logged in');
+      return;
+    }
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+    try {
+      let request = `bounty/${info?.jwt}/${created}`;
+
+      const response = await fetch(`${URL}/${request}`, {
+        method: "DELETE",
+        mode: 'cors',
+        headers: {
+          'x-jwt': info?.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      if(response.status) {
+        await this.getPeopleWanteds({resetPage: true});
+      }
       return;
     } catch (e) {
       console.log(e);

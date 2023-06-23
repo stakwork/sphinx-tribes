@@ -537,6 +537,12 @@ func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
+func (db database) DeleteBounty(pubkey string, created string) (Bounty, error) {
+	m := Bounty{}
+	db.db.Where("owner_id", pubkey).Where("created", created).Delete(&m)
+	return m, nil
+}
+
 func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
 	ms := []Person{}
 
