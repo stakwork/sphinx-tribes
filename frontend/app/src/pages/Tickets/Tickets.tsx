@@ -59,6 +59,7 @@ function BodyComponent() {
     main.getOpenGithubIssues();
     main.getBadgeList();
     main.getPeople();
+    main.getPeopleWanteds();
   }, [main]);
 
   useEffect(() => {
