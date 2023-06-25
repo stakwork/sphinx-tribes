@@ -339,7 +339,7 @@ type Bounty struct {
 	WantedType              string     `json:"wanted_type"`
 	Deliverables            string     `json:"deliverables"`
 	CodingLanguage          string     `json:"coding_language"`
-	GithuDescription        bool       `json:"github_description"`
+	GithubDescription       bool       `json:"github_description"`
 	OneSentenceSummary      string     `json:"one_sentence_summary"`
 	EstimatedSessionLength  string     `json:"estimated_session_length"`
 	EstimatedCompletionDate string     `json:"estimated_completion_date"`

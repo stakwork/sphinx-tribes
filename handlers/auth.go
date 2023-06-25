@@ -207,6 +207,5 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
 	user["url"] = config.Host
-
 	return user
 }

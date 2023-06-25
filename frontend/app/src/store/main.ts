@@ -973,6 +973,8 @@ export class MainStore {
     try {
       let request = `bounty?token=${info?.jwt}`;
 
+      console.log("Before request ==")
+
       const response = await fetch(`${URL}/${request}`, {
         method: "POST",
         body: JSON.stringify({
@@ -984,6 +986,7 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       });
+
       if(response.status) {
         this.getPeopleWanteds({resetPage: true});
       }

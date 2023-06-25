@@ -262,12 +262,9 @@ function FocusedView(props: FocusViewProps) {
       return;
     }
 
-    newBody = mergeFormWithMeData(newBody);
-
     if (!newBody) return; // avoid saving bad state
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
-
     setLoading(true);
     try {
       let newBody2 = body;
@@ -339,7 +336,7 @@ function FocusedView(props: FocusViewProps) {
               }
             }
             return {
-              [s.name]: wanted[s.name] || ''
+              [s.name]: wanted[s.name]
             }
           });
 

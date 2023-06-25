@@ -259,9 +259,9 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 
 			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
 			if !ok14 {
-				migrateBountyFinal.GithuDescription = false
+				migrateBountyFinal.GithubDescription = false
 			} else {
-				migrateBountyFinal.GithuDescription = GithuDescription
+				migrateBountyFinal.GithubDescription = GithuDescription
 			}
 
 			OneSentenceSummary, ok15 := migrateBounty["one_sentence_summary"].(string)
