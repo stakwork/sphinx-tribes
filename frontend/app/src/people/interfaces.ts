@@ -282,6 +282,8 @@ export interface CodingBountiesProps {
   estimate_session_length?: string;
   loomEmbedUrl?: string;
   extraModalFunction?: () => void;
+  commitment_fee?: number;
+  bounty_expires?: string;
 }
 
 export interface CodingViewProps {

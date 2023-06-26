@@ -87,7 +87,9 @@ function MobileView(props: CodingBountiesProps) {
     owner_idURL,
     createdURL,
     created,
-    loomEmbedUrl
+    loomEmbedUrl,
+    bounty_expires,
+    commitment_fee
   } = props;
   const color = colors['light'];
 
@@ -99,10 +101,10 @@ function MobileView(props: CodingBountiesProps) {
   const bountyPaid = paid || invoiceStatus;
   const pollMinutes = 1;
 
-  const bountyExpired = !assignee?.bounty_expires
+  const bountyExpired = !bounty_expires
     ? false
-    : Date.now() > new Date(assignee.bounty_expires).getTime();
-  const bountyTimeLeft = calculateTimeLeft(new Date(assignee?.bounty_expires ?? ''), 'days');
+    : Date.now() > new Date(bounty_expires || '').getTime();
+  const bountyTimeLeft = calculateTimeLeft(new Date(bounty_expires ?? ''), 'days');
 
   const addToast = (type: string) => {
     switch (type) {
@@ -141,7 +143,7 @@ function MobileView(props: CodingBountiesProps) {
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
     const price =
-      assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
+      commitment_fee && props.price ? commitment_fee + props.price : props?.price;
 
     const data = await main.getLnInvoice({
       amount: price || 0,

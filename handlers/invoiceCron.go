@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -25,9 +24,7 @@ func InitInvoiceCron() {
 		invoiceCount := len(invoiceList)
 
 		if invoiceCount > 0 {
-
 			for index, inv := range invoiceList {
-
 				url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, inv.Invoice)
 
 				client := &http.Client{}
@@ -98,53 +95,23 @@ func InitInvoiceCron() {
 								keysendRes := db.KeysendSuccess{}
 								err = json.Unmarshal(body, &keysendRes)
 
-								var p = db.DB.GetPersonByPubkey(inv.Owner_pubkey)
-
-								wanteds, _ := p.Extras["wanted"].([]interface{})
-
-								for _, wanted := range wanteds {
-									w, ok2 := wanted.(map[string]interface{})
-									if !ok2 {
-										continue // next wanted
-									}
-
-									created, ok3 := w["created"].(float64)
-									createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
-									createdString := createdArr[0]
-									createdInt, _ := strconv.ParseInt(createdString, 10, 32)
-
-									dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
-
-									if !ok3 {
-										continue
-									}
-
-									if createdInt == dateInt {
-										w["paid"] = true
-									}
+								dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
+								bounty, err := db.DB.GetBountyByCreated(uint(dateInt))
+								if err == nil {
+									bounty.Paid = true
 								}
 
-								p.Extras["wanted"] = wanteds
-								b := new(bytes.Buffer)
-								decodeErr := json.NewEncoder(b).Encode(p.Extras)
+								db.DB.UpdateBounty(bounty)
 
-								if decodeErr != nil {
-									log.Printf("Could not encode extras json data")
-								} else {
-									db.DB.UpdatePerson(p.ID, map[string]interface{}{
-										"extras": b,
-									})
+								// Delete the index from the store array list and reset the store
+								updateInvoiceCache(invoiceList, index)
 
-									// Delete the index from the store array list and reset the store
-									updateInvoiceCache(invoiceList, index)
+								msg["msg"] = "keysend_success"
+								msg["invoice"] = inv.Invoice
 
-									msg["msg"] = "keysend_success"
-									msg["invoice"] = inv.Invoice
-
-									socket, err := db.Store.GetSocketConnections(inv.Host)
-									if err == nil {
-										socket.Conn.WriteJSON(msg)
-									}
+								socket, err := db.Store.GetSocketConnections(inv.Host)
+								if err == nil {
+									socket.Conn.WriteJSON(msg)
 								}
 							} else {
 								// Unmarshal result
@@ -169,67 +136,27 @@ func InitInvoiceCron() {
 								return
 							}
 						} else {
-							var p = db.DB.GetPersonByPubkey(inv.Owner_pubkey)
-
-							wanteds, _ := p.Extras["wanted"].([]interface{})
-
-							for _, wanted := range wanteds {
-								w, ok2 := wanted.(map[string]interface{})
-								if !ok2 {
-									continue // next wanted
-								}
-
-								created, ok3 := w["created"].(float64)
-								createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
-								createdString := createdArr[0]
-								createdInt, _ := strconv.ParseInt(createdString, 10, 32)
-
-								dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
-
-								if !ok3 {
-									continue
-								}
-
-								if createdInt == dateInt {
-									var user = db.DB.GetPersonByPubkey(inv.User_pubkey)
-
-									var assignee = make(map[string]interface{})
-
-									assignee["img"] = user.Img
-									assignee["label"] = user.OwnerAlias
-									assignee["value"] = user.OwnerPubKey
-									assignee["owner_pubkey"] = user.OwnerPubKey
-									assignee["owner_alias"] = user.OwnerAlias
-									assignee["commitment_fee"] = inv.Commitment_fee
-									assignee["assigned_hours"] = inv.Assigned_hours
-									assignee["bounty_expires"] = inv.Bounty_expires
-
-									w["assignee"] = assignee
-								}
+							dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
+							bounty, err := db.DB.GetBountyByCreated(uint(dateInt))
+							if err == nil {
+								bounty.Paid = true
+								bounty.CommitmentFee = inv.Commitment_fee
+								bounty.AssignedHours = inv.Assigned_hours
+								bounty.BountyExpires = inv.Bounty_expires
 							}
 
-							p.Extras["wanted"] = wanteds
-							b := new(bytes.Buffer)
-							decodeErr := json.NewEncoder(b).Encode(p.Extras)
+							db.DB.UpdateBounty(bounty)
 
-							if decodeErr != nil {
-								log.Printf("Could not encode extras json data")
-							} else {
-								db.DB.UpdatePerson(p.ID, map[string]interface{}{
-									"extras": b,
-								})
+							// Delete the index from the store array list and reset the store
+							updateInvoiceCache(invoiceList, index)
 
-								// Delete the index from the store array list and reset the store
-								updateInvoiceCache(invoiceList, index)
+							msg := make(map[string]interface{})
+							msg["msg"] = "assign_success"
+							msg["invoice"] = inv.Invoice
 
-								msg := make(map[string]interface{})
-								msg["msg"] = "assign_success"
-								msg["invoice"] = inv.Invoice
-
-								socket, err := db.Store.GetSocketConnections(inv.Host)
-								if err == nil {
-									socket.Conn.WriteJSON(msg)
-								}
+							socket, err := db.Store.GetSocketConnections(inv.Host)
+							if err == nil {
+								socket.Conn.WriteJSON(msg)
 							}
 						}
 					}

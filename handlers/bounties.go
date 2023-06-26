@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,7 +8,6 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/db"
@@ -84,53 +82,29 @@ func DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
 	owner_key := invoice.Owner_pubkey
 	date := invoice.Created
 
-	var p = db.DB.GetPersonByPubkey(owner_key)
+	createdUint, _ := strconv.ParseUint(date, 10, 32)
+	b, err := db.DB.GetBountyByCreated(uint(createdUint))
 
-	wanteds, _ := p.Extras["wanted"].([]interface{})
+	if err == nil && b.OwnerID == owner_key {
+		b.Assignee = ""
+		b.AssignedHours = 0
+		b.CommitmentFee = 0
+		b.BountyExpires = ""
 
-	for _, wanted := range wanteds {
-		w, ok2 := wanted.(map[string]interface{})
-		if !ok2 {
-			continue
-		}
+		db.DB.UpdateBounty(b)
 
-		created, ok3 := w["created"].(float64)
-		createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
-		createdString := createdArr[0]
-		createdInt, _ := strconv.ParseInt(createdString, 10, 32)
-
-		dateInt, _ := strconv.ParseInt(date, 10, 32)
-
-		if !ok3 {
-			continue
-		}
-
-		if createdInt == dateInt {
-			delete(w, "assignee")
-		}
-	}
-	p.Extras["wanted"] = wanteds
-
-	b := new(bytes.Buffer)
-	decodeErr := json.NewEncoder(b).Encode(p.Extras)
-
-	if decodeErr != nil {
-		log.Printf("Could not encode extras json data")
+		deletedAssignee = true
+	} else {
+		log.Printf("Could not delete bounty assignee")
 
 		deletedAssignee = false
 
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(deletedAssignee)
-	} else {
-		db.DB.UpdatePerson(p.ID, map[string]interface{}{
-			"extras": b,
-		})
-
-		deletedAssignee = true
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(deletedAssignee)
 	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(deletedAssignee)
 }
 
 func MigrateBounties(w http.ResponseWriter, r *http.Request) {

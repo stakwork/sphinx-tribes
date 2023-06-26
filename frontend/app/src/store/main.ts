@@ -711,7 +711,6 @@ export class MainStore {
           queryParams
         );
       }
-      console.log('PS3: ', ps3);
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -802,7 +801,7 @@ export class MainStore {
 
     let set = new Set();
     const uniqueArray = l.filter((item: any) => {
-      if (!set.has(item.body.id)) {
+      if (item.body && item.body.id && !set.has(item.body.id)) {
         set.add(item.body.id);
         return true;
       }

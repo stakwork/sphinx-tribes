@@ -343,6 +343,9 @@ type Bounty struct {
 	OneSentenceSummary      string     `json:"one_sentence_summary"`
 	EstimatedSessionLength  string     `json:"estimated_session_length"`
 	EstimatedCompletionDate string     `json:"estimated_completion_date"`
+	AssignedHours           uint       `json:"assigned_hours"`
+	BountyExpires           string     `json:"bounty_expires"`
+	CommitmentFee           uint       `json:"commitment_fee"`
 	Updated                 *time.Time `json:"updated"`
 }
 

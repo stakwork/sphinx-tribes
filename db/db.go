@@ -543,6 +543,17 @@ func (db database) DeleteBounty(pubkey string, created string) (Bounty, error) {
 	return m, nil
 }
 
+func (db database) GetBountyByCreated(created uint) (Bounty, error) {
+	b := Bounty{}
+	err := db.db.Where("created", created).Find(&b).Error
+	return b, err
+}
+
+func (db database) UpdateBounty(b Bounty) (Bounty, error) {
+	db.db.Where("created", b.Created).Updates(&b)
+	return b, nil
+}
+
 func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
 	ms := []Person{}
 
