@@ -704,7 +704,6 @@ export class MainStore {
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
-        
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
@@ -801,7 +800,16 @@ export class MainStore {
     if (queryParams?.page) setPage(queryParams.page);
     const l = [...currentList, ...newList];
 
-    return l;
+    let set = new Set();
+    const uniqueArray = l.filter((item: any) => {
+      if (!set.has(item.body.id)) {
+        set.add(item.body.id);
+        return true;
+      }
+      return false;
+    }, set)
+
+    return uniqueArray;
   }
 
   @memo()
