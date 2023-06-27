@@ -116,6 +116,8 @@ export interface PersonWanted {
   price?: string;
 	codingLanguage: string;
 	estimate_session_length: string;
+  bounty_expires?: string;
+  commitment_fee?: number;
 }
 
 export interface PersonOffer {

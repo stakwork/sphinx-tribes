@@ -55,6 +55,7 @@ func InitInvoiceCron() {
 
 				if invoiceRes.Response.Settled {
 					if inv.Invoice == invoiceRes.Response.Payment_request {
+						fmt.Println("Invoice Settled")
 						/**
 						  If the invoice is settled and still in store
 						  make keysend payment
@@ -63,6 +64,7 @@ func InitInvoiceCron() {
 						msg["invoice"] = inv.Invoice
 
 						socket, err := db.Store.GetSocketConnections(inv.Host)
+
 						if err == nil {
 							socket.Conn.WriteJSON(msg)
 						}
@@ -138,8 +140,9 @@ func InitInvoiceCron() {
 						} else {
 							dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
 							bounty, err := db.DB.GetBountyByCreated(uint(dateInt))
+
 							if err == nil {
-								bounty.Paid = true
+								bounty.Assignee = inv.User_pubkey
 								bounty.CommitmentFee = inv.Commitment_fee
 								bounty.AssignedHours = inv.Assigned_hours
 								bounty.BountyExpires = inv.Bounty_expires

@@ -144,17 +144,18 @@ function MobileView(props: CodingBountiesProps) {
     // If the bounty has a commitment fee, add the fee to the user payment
     const price =
       commitment_fee && props.price ? commitment_fee + props.price : props?.price;
+    if (created && ui.meInfo?.websocketToken) {
+      const data = await main.getLnInvoice({
+        amount: price || 0,
+        memo: '',
+        owner_pubkey: person.owner_pubkey,
+        user_pubkey: assignee.owner_pubkey,
+        created: created ? created?.toString() : '',
+        type: 'KEYSEND'
+      });
 
-    const data = await main.getLnInvoice({
-      amount: price || 0,
-      memo: '',
-      owner_pubkey: person.owner_pubkey,
-      user_pubkey: assignee.owner_pubkey,
-      created: created ? created?.toString() : '',
-      type: 'KEYSEND'
-    });
-
-    setLnInvoice(data.response.invoice);
+      setLnInvoice(data.response.invoice);
+    }
   }
 
   async function removeBountyAssignee() {
@@ -171,7 +172,14 @@ function MobileView(props: CodingBountiesProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
+    if (res.msg === SOCKET_MSG.user_connect) {
+      const user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        console.log("Websocket Token ===", ui.websocketToken)
+        ui.setMeInfo(user);
+      }
+    } else if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.invoice_success);
       setLnInvoice('');
       setInvoiceStatus(true);
