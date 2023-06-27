@@ -219,7 +219,7 @@ function FocusedView(props: FocusViewProps) {
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
-        newBody.ticketUrl &&
+        newBody.ticket_url &&
         (newBody.type === 'wanted_coding_task' ||
           newBody.type === 'coding_task' ||
           newBody.type === 'freelance_job_request')
@@ -243,7 +243,7 @@ function FocusedView(props: FocusViewProps) {
         newBody.title = newBody.one_sentence_summary;
 
         // save repo to cookies for autofill in form
-        ui.setLastGithubRepo(newBody.ticketUrl);
+        ui.setLastGithubRepo(newBody.ticket_url);
       }
     } catch (e) {
       throw githubError;

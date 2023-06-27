@@ -13,6 +13,6 @@ export const userAssignedTickets: PersonWanted[] = [
       wanted_type: 'Desktop app',
       codingLanguage: "Typescript",
 				//	one_sentence_summary: 'Trying this',
-      estimate_session_length: 'More than 3 hours'
+      estimated_session_length: 'More than 3 hours'
   }
 ];

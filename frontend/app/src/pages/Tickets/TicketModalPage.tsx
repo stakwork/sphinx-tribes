@@ -10,6 +10,7 @@ import { useStores } from 'store';
 
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
+
 const findPerson = (search: any) => (item: any) => {
   const { person, body } = item;
   return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
@@ -21,6 +22,7 @@ type Props = {
 export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const location = useLocation();
   const { main, modals, ui } = useStores();
+
   const history = useHistory();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
   const [activeListIndex, setActiveListIndex] = useState<number>(0);

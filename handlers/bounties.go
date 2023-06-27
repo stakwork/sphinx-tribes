@@ -224,12 +224,12 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Deliverables = Deliverables
 			}
 
-			CodingLanguage, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
-			if !ok13 {
-				migrateBountyFinal.CodingLanguage = ""
-			} else {
-				migrateBountyFinal.CodingLanguage = CodingLanguage["value"].(string)
-			}
+			// CodingLanguage, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
+			// if !ok13 {
+			// 	migrateBountyFinal.CodingLanguage = pq.ByteaArray{}
+			// } else {
+			// 	migrateBountyFinal.CodingLanguage = CodingLanguage["value"].(pq.ByteaArray)
+			// }
 
 			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
 			if !ok14 {

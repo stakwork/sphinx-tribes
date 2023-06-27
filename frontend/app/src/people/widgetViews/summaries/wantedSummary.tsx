@@ -28,7 +28,7 @@ function WantedSummary(props: WantedSummaryProps) {
   const {
     description,
     priceMin,
-    ticketUrl,
+    ticket_url,
     person,
     created,
     repo,
@@ -39,8 +39,8 @@ function WantedSummary(props: WantedSummaryProps) {
     paid,
     badgeRecipient,
     loomEmbedUrl,
-    codingLanguage,
-    estimate_session_length,
+    coding_language,
+    estimated_session_length,
     assignee,
     fromBountyPage,
     wanted_type,
@@ -52,6 +52,7 @@ function WantedSummary(props: WantedSummaryProps) {
     formSubmit,
     title
   } = props;
+
   const titleString = one_sentence_summary || title || '';
 
   const isMobile = useIsMobile();
@@ -139,7 +140,7 @@ function WantedSummary(props: WantedSummaryProps) {
         title: titleString,
         wanted_type: wanted_type,
         one_sentence_summary: one_sentence_summary,
-        ticketUrl: ticketUrl,
+        ticketUrl: ticket_url,
         github_description: github_description,
         description: description,
         price: price,
@@ -150,8 +151,8 @@ function WantedSummary(props: WantedSummaryProps) {
           value: value?.owner_pubkey || '',
           label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
         },
-        codingLanguage: codingLanguage?.map((x: any) => ({ ...x })),
-        estimate_session_length: estimate_session_length,
+        coding_language: coding_language?.map((x: any) => ({ ...x })),
+        estimated_session_length: estimated_session_length,
         show: show,
         type: type,
         created: created
@@ -159,16 +160,16 @@ function WantedSummary(props: WantedSummaryProps) {
       formSubmit && formSubmit(newValue);
     },
     [
-      codingLanguage,
+      coding_language,
       created,
       description,
-      estimate_session_length,
+      estimated_session_length,
       formSubmit,
       github_description,
       one_sentence_summary,
       price,
       show,
-      ticketUrl,
+      ticket_url,
       titleString,
       type,
       wanted_type
@@ -194,14 +195,14 @@ function WantedSummary(props: WantedSummaryProps) {
 
   useEffect(() => {
     let res;
-    if (codingLanguage?.length > 0) {
+    if (coding_language?.length > 0) {
       res = LanguageObject?.filter((value: any) =>
-        codingLanguage?.find((val: any) => val.label === value.label)
+        coding_language?.find((val: any) => val.label === value.label)
       );
     }
     setDataValue(res);
     setLabels(res);
-  }, [codingLanguage]);
+  }, [coding_language]);
 
   const searchParams = useQuery();
 
@@ -213,11 +214,11 @@ function WantedSummary(props: WantedSummaryProps) {
   }, [owner_idURL, createdURL, searchParams]);
 
   useEffect(() => {
-    if (codingLanguage) {
-      const values = codingLanguage.map((value: any) => ({ ...value }));
+    if (coding_language) {
+      const values = coding_language.map((value: any) => ({ ...value }));
       setLabels(values);
     }
-  }, [codingLanguage]);
+  }, [coding_language]);
 
   async function setExtrasPropertyAndSave(propertyName: string, value: any) {
     if (peopleWanteds) {
@@ -356,7 +357,7 @@ function WantedSummary(props: WantedSummaryProps) {
         asset: badge.id,
         to: liquidAddress,
         amount: 1,
-        memo: props.ticketUrl
+        memo: props.ticket_url
       };
 
       const r = await main.sendBadgeOnLiquid(pack);
@@ -547,6 +548,7 @@ function WantedSummary(props: WantedSummaryProps) {
       return (
         <CodingBounty
           {...props}
+          person={person}
           awardDetails={awardDetails}
           setAwardDetails={setAwardDetails}
           isAssigned={isAssigned}

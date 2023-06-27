@@ -24,7 +24,7 @@ function DesktopView(props: WantedViewsProps) {
     ticketUrl,
     gallery,
     assignee,
-    estimate_session_length,
+    estimated_session_length,
     loomEmbedUrl,
     showModal,
     setDeletePayload,
@@ -305,14 +305,14 @@ function DesktopView(props: WantedViewsProps) {
                 fontWeight: '500'
               }}
             >
-              {estimate_session_length && 'Session:'}{' '}
+              {estimated_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: color.pureBlack
                 }}
               >
-                {estimate_session_length ?? ''}
+                {estimated_session_length ?? ''}
               </span>
             </EuiText>
             {ui?.meInfo?.isSuperAdmin && (

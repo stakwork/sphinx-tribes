@@ -323,29 +323,29 @@ type BountyLeaderboard struct {
 }
 
 type Bounty struct {
-	ID                      uint       `json:"id"`
-	OwnerID                 string     `json:"owner_id"`
-	Paid                    bool       `json:"paid"`
-	Show                    bool       `json:"show"`
-	Type                    string     `json:"type"`
-	Award                   string     `json:"award"`
-	Price                   string     `json:"price"`
-	Title                   string     `json:"title"`
-	Tribe                   string     `json:"tribe"`
-	Created                 int64      `json:"created"`
-	Assignee                string     `json:"assignee"`
-	TicketUrl               string     `json:"ticket_url"`
-	Description             string     `json:"description"`
-	WantedType              string     `json:"wanted_type"`
-	Deliverables            string     `json:"deliverables"`
-	CodingLanguage          string     `json:"coding_language"`
+	ID            uint   `json:"id"`
+	OwnerID       string `json:"owner_id"`
+	Paid          bool   `json:"paid"`
+	Show          bool   `json:"show"`
+	Type          string `json:"type"`
+	Award         string `json:"award"`
+	AssignedHours uint8  `json:"assigned_hours"`
+	BountyExpires string `json:"bounty_expires"`
+	CommitmentFee uint64 `json:"commitment_fee"`
+	Price         string `json:"price"`
+	Title         string `json:"title"`
+	Tribe         string `json:"tribe"`
+	Created       int64  `json:"created"`
+	Assignee      string `json:"assignee"`
+	TicketUrl     string `json:"ticket_url"`
+	Description   string `json:"description"`
+	WantedType    string `json:"wanted_type"`
+	Deliverables  string `json:"deliverables"`
+	//CodingLanguage          pq.ByteaArray `json:"coding_language", type: json not null default '{}'::json`
 	GithubDescription       bool       `json:"github_description"`
 	OneSentenceSummary      string     `json:"one_sentence_summary"`
 	EstimatedSessionLength  string     `json:"estimated_session_length"`
 	EstimatedCompletionDate string     `json:"estimated_completion_date"`
-	AssignedHours           uint       `json:"assigned_hours"`
-	BountyExpires           string     `json:"bounty_expires"`
-	CommitmentFee           uint       `json:"commitment_fee"`
 	Updated                 *time.Time `json:"updated"`
 }
 
@@ -369,6 +369,8 @@ func (ConnectionCodesShort) TableName() string {
 // PropertyMap ...
 type PropertyMap map[string]interface{}
 
+type PropertyMapArray []map[string]interface{}
+
 // Value ...
 func (p PropertyMap) Value() (driver.Value, error) {
 	b := new(bytes.Buffer)
@@ -389,6 +391,33 @@ func (p *PropertyMap) Scan(src interface{}) error {
 	}
 
 	*p, ok = i.(map[string]interface{})
+	if !ok {
+		return errors.New("type assertion .(map[string]interface{}) failed")
+	}
+
+	return nil
+}
+
+// Value ...
+func (p PropertyMapArray) Value() (driver.Value, error) {
+	b := new(bytes.Buffer)
+	err := json.NewEncoder(b).Encode(p)
+	return b, err
+}
+
+// Scan ...
+func (p *PropertyMapArray) Scan(src interface{}) error {
+	source, ok := src.([]byte)
+	if !ok {
+		return errors.New("type assertion .([]byte) failed")
+	}
+
+	var i interface{}
+	if err := json.Unmarshal(source, &i); err != nil {
+		return err
+	}
+
+	*p, ok = i.([]map[string]interface{})
 	if !ok {
 		return errors.New("type assertion .(map[string]interface{}) failed")
 	}

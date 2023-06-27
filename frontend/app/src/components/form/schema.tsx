@@ -811,6 +811,6 @@ export const dynamicSchemasByType = {
 // this object is used to autofill form fields if info is available in local storage
 export const dynamicSchemaAutofillFieldsByType = {
   freelance_job_request: {
-    ticketUrl: 'lastGithubRepo'
+    ticket_url: 'lastGithubRepo'
   }
 };

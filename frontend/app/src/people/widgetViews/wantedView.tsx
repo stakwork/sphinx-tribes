@@ -38,14 +38,15 @@ function WantedView(props: WantedViews2Props) {
     ticketUrl,
     repo,
     type,
-    codingLanguage,
+    coding_language,
     assignee,
-    estimate_session_length,
+    estimated_session_length,
     loomEmbedUrl,
     onPanelClick,
     show = true,
     paid = false
   } = props;
+
   const titleString = one_sentence_summary || title || '';
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -96,11 +97,11 @@ function WantedView(props: WantedViews2Props) {
   }
 
   useEffect(() => {
-    if (codingLanguage) {
-      const values = codingLanguage.map((value: any) => ({ ...value }));
+    if (coding_language) {
+      const values = coding_language.map((value: any) => ({ ...value }));
       setLabels(values);
     }
-  }, [codingLanguage]);
+  }, [coding_language]);
 
   const renderTickets = () => {
     const { status } = ticketUrl
@@ -149,7 +150,7 @@ function WantedView(props: WantedViews2Props) {
                 priceMin={priceMin}
                 priceMax={priceMax}
                 price={price ?? 0}
-                sessionLength={estimate_session_length}
+                sessionLength={estimated_session_length}
                 description={description}
               />
             </BountyBox>
@@ -167,7 +168,7 @@ function WantedView(props: WantedViews2Props) {
                 priceMin={priceMin}
                 priceMax={priceMax}
                 price={price ?? 0}
-                sessionLength={estimate_session_length || ''}
+                sessionLength={estimated_session_length || ''}
                 description={description}
                 isPaid={paid}
               />

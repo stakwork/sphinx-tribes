@@ -115,7 +115,7 @@ export interface PersonWanted {
   type?: string;
   price?: string;
 	codingLanguage: string;
-	estimate_session_length: string;
+	estimated_session_length: string;
   bounty_expires?: string;
   commitment_fee?: number;
 }
@@ -668,6 +668,7 @@ export class MainStore {
 
   async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
+
     const query2 = this.appendQueryParams('bounty/all', queryLimit, {
       ...queryParams,
       sortBy: 'created'
@@ -713,6 +714,7 @@ export class MainStore {
           queryParams
         );
       }
+      // console.log("Bounty p3 ===", ps3)
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -801,16 +803,16 @@ export class MainStore {
     if (queryParams?.page) setPage(queryParams.page);
     const l = [...currentList, ...newList];
 
-    let set = new Set();
-    const uniqueArray = l.filter((item: any) => {
-      if (item.body && item.body.id && !set.has(item.body.id)) {
-        set.add(item.body.id);
-        return true;
-      }
-      return false;
-    }, set)
+    // let set = new Set();
+    // const uniqueArray = l.filter((item: any) => {
+    //   if (item.body && item.body.id && !set.has(item.body.id)) {
+    //     set.add(item.body.id);
+    //     return true;
+    //   }
+    //   return false;
+    // }, set)
 
-    return uniqueArray;
+    return l;
   }
 
   @memo()
@@ -981,8 +983,6 @@ export class MainStore {
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     try {
       let request = `bounty?token=${info?.jwt}`;
-
-      console.log("Before request ==")
 
       const response = await fetch(`${URL}/${request}`, {
         method: "POST",

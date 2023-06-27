@@ -99,6 +99,7 @@ func InitInvoiceCron() {
 
 								dateInt, _ := strconv.ParseInt(inv.Created, 10, 32)
 								bounty, err := db.DB.GetBountyByCreated(uint(dateInt))
+
 								if err == nil {
 									bounty.Paid = true
 								}
@@ -143,8 +144,8 @@ func InitInvoiceCron() {
 
 							if err == nil {
 								bounty.Assignee = inv.User_pubkey
-								bounty.CommitmentFee = inv.Commitment_fee
-								bounty.AssignedHours = inv.Assigned_hours
+								bounty.CommitmentFee = uint64(inv.Commitment_fee)
+								bounty.AssignedHours = uint8(inv.Assigned_hours)
 								bounty.BountyExpires = inv.Bounty_expires
 							}
 

@@ -24,7 +24,7 @@ export default function MobileView(props: CodingViewProps) {
     ticketUrl,
     price,
     loomEmbedUrl,
-    estimate_session_length,
+    estimated_session_length,
     assignee,
     titleString,
     nametag,
@@ -79,14 +79,14 @@ export default function MobileView(props: CodingViewProps) {
             fontWeight: '500'
           }}
         >
-          {estimate_session_length && 'Session:'}{' '}
+          {estimated_session_length && 'Session:'}{' '}
           <span
             style={{
               fontWeight: '500',
               color: color.pureBlack
             }}
           >
-            {estimate_session_length ?? ''}
+            {estimated_session_length ?? ''}
           </span>
         </EuiText>
         <div

@@ -21,6 +21,7 @@ func GetAllBounties(w http.ResponseWriter, r *http.Request) {
 func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	bounty := db.Bounty{}
 	body, err := ioutil.ReadAll(r.Body)
+
 	r.Body.Close()
 	err = json.Unmarshal(body, &bounty)
 	if err != nil {
