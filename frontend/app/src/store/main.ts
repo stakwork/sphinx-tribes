@@ -711,10 +711,10 @@ export class MainStore {
           this.peopleWanteds,
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
-          queryParams
+          queryParams,
+          "wanted"
         );
       }
-      // console.log("Bounty p3 ===", ps3)
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -785,7 +785,7 @@ export class MainStore {
     }
   }
 
-  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
+  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any, type?: string) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
@@ -803,14 +803,17 @@ export class MainStore {
     if (queryParams?.page) setPage(queryParams.page);
     const l = [...currentList, ...newList];
 
-    // let set = new Set();
-    // const uniqueArray = l.filter((item: any) => {
-    //   if (item.body && item.body.id && !set.has(item.body.id)) {
-    //     set.add(item.body.id);
-    //     return true;
-    //   }
-    //   return false;
-    // }, set)
+    let set = new Set();
+    if(type ==="wanted") {
+      const uniqueArray = l.filter((item: any) => {
+        if (item.body && item.body.id && !set.has(item.body.id)) {
+          set.add(item.body.id);
+          return true;
+        }
+        return false;
+      }, set)
+      return uniqueArray
+    }
 
     return l;
   }
