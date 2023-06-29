@@ -520,7 +520,7 @@ func (db database) AddBounty(b Bounty) (Bounty, error) {
 func (db database) GetAllBounties() []Bounty {
 	ms := []Bounty{}
 	// if search is empty, returns all
-	db.db.Raw("SELECT * FROM bounty ORDER BY id DESC").Find(&ms)
+	db.db.Raw("SELECT * FROM bounty ORDER BY created DESC").Find(&ms)
 	fmt.Printf("getAllBounties %v", ms)
 
 	return ms

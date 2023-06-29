@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
-	"time"
 
 	"github.com/stakwork/sphinx-tribes/db"
 )
@@ -174,8 +173,7 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 			Created, ok7 := migrateBounty["created"].(float64)
 			CreatedInt64 := int64(Created)
 			if !ok7 {
-				now := time.Now().Unix()
-				migrateBountyFinal.Created = now
+				migrateBountyFinal.Created = 0
 			} else {
 				fmt.Println(reflect.TypeOf(CreatedInt64))
 				fmt.Println("Timestamp:", CreatedInt64)

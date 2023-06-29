@@ -50,6 +50,7 @@ func NewRouter() *http.Server {
 		r.Get("/save/{key}", db.PollSave)
 		r.Get("/websocket", handlers.HandleWebSocket)
 		r.Get("/bounty/all", handlers.GetAllBounties)
+		r.Get("/migrate_bounties", handlers.MigrateBounties)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -67,7 +68,6 @@ func NewRouter() *http.Server {
 		r.Delete("/channel/{id}", handlers.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Delete("/bounty/assignee", handlers.DeleteBountyAssignee)
-		r.Get("/migrate_bounties", handlers.MigrateBounties)
 		r.Post("/bounty", handlers.CreateOrEditBounty)
 		r.Delete("/bounty/{pubKey}/{created}", handlers.DeleteBounty)
 	})
