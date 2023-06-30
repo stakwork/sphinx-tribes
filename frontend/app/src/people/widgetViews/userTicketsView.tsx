@@ -54,7 +54,7 @@ const UserTickets = () => {
     checkboxIdToSelectedMap
   };
 
-  const activeList = userTickets.filter(({ body }: any) => {
+  const activeList = userTickets.filter((body: any) => {
     const value = { ...body };
     return (
       bountyHeaderFilter(data.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
@@ -113,11 +113,12 @@ const UserTickets = () => {
   const listItems =
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
-        const { person, body } = item;
+        let person = main.people.find((p: any) => p.owner_pubkey === item.assignee)
+        let body = item;
 
         // if this person has entries for this widget
         return (
-          <Panel isMobile={isMobile} key={person?.owner_pubkey + i + body?.created}>
+          <Panel isMobile={isMobile} key={i + body?.created}>
             <WantedView
               colors={color}
               showName

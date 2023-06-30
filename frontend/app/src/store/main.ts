@@ -677,6 +677,7 @@ export class MainStore {
     try {
       let ps2 = await api.get(query2);
       let ps3: any[] = [];
+
       for (let i = 0; i < ps2.length; i++) {
         let bounty = ps2[i];
         let assigneeResponse;
@@ -736,14 +737,11 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps = await api.get(query);
-      ps = this.decodeListJSON(ps);
+      let ps1 = await api.get(query);
 
-      navigator.clipboard.writeText(JSON.stringify(ps));
+      this.setPersonWanteds(ps1);
 
-      this.setPersonWanteds(ps);
-
-      return ps;
+      return ps1;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
       return [];

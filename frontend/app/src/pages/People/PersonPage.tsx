@@ -102,7 +102,7 @@ export const PersonPage = observer(() => {
         <>
           {person?.owner_pubkey && person?.img && (<div
             dangerouslySetInnerHTML={{
-              __html: getHtml(person.owner_pubkey, person.img)
+              __html: getHtml(person.owner_pubkey, person?.img)
             }}
           />)}
         </>

@@ -505,9 +505,13 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 
 func (db database) GetListedWanteds(r *http.Request) ([]Bounty, error) {
 	pubkey := chi.URLParam(r, "pubkey")
+
+	fmt.Println("Pubkey ===", pubkey)
 	ms := []Bounty{}
 
 	err := db.db.Raw(`SELECT * FROM bounty where assignee = '` + pubkey + `'`).Find(&ms).Error
+
+	fmt.Println("Bounty ===", ms)
 
 	return ms, err
 }
@@ -795,12 +799,9 @@ func (db database) CountDevelopers() int64 {
 }
 
 func (db database) CountBounties() uint64 {
-	var count struct {
-		Sum uint64 `db:"sum"`
-	}
-	db.db.Raw(`Select sum(jsonb_array_length(extras -> 'wanted')) from people where 
-                   people.deleted = 'f' OR people.deleted is null`).Scan(&count)
-	return count.Sum
+	var count uint64
+	db.db.Raw(`Select COUNT(*) from bounty`).Scan(&count)
+	return count
 }
 
 func (db database) GetPeopleListShort(count uint32) *[]PersonInShort {
