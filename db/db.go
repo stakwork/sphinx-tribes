@@ -521,10 +521,12 @@ func (db database) AddBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
-func (db database) GetAllBounties() []Bounty {
+func (db database) GetAllBounties(page uint, limit uint) []Bounty {
+	offset := (page - 1) * limit
+
 	ms := []Bounty{}
 	// if search is empty, returns all
-	db.db.Raw("SELECT * FROM bounty ORDER BY created DESC").Find(&ms)
+	db.db.Raw(`SELECT * FROM bounty ORDER BY created DESC LIMIT ? OFFSET ?`, limit, offset).Find(&ms)
 	fmt.Printf("getAllBounties %v", ms)
 
 	return ms
