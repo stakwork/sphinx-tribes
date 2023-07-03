@@ -18,21 +18,25 @@ func unix() string {
 	return strconv.Itoa(int(int32(time.Now().Unix())))
 }
 
+func EpisodeToGeneric(ep Episode) Item {
+	return Item{
+		Id:            strconv.Itoa(int(ep.ID)),
+		Link:          ep.Link,
+		Description:   ep.Description,
+		Title:         ep.Title,
+		ImageUrl:      ep.Image,
+		EnclosureURL:  ep.EnclosureURL,
+		EnclosureType: ep.EnclosureType,
+		Duration:      ep.EnclosureLength,
+		DatePublished: int64(ep.DatePublished),
+	}
+}
+
 func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 	items := []Item{}
 	// fmt.Println("P EPISODES", len(p.Episodes), p)
 	for _, ep := range p.Episodes {
-		items = append(items, Item{
-			Id:            strconv.Itoa(int(ep.ID)),
-			Link:          ep.Link,
-			Description:   ep.Description,
-			Title:         ep.Title,
-			ImageUrl:      ep.Image,
-			EnclosureURL:  ep.EnclosureURL,
-			EnclosureType: ep.EnclosureType,
-			Duration:      ep.EnclosureLength,
-			DatePublished: int64(ep.DatePublished),
-		})
+		items = append(items, EpisodeToGeneric(ep))
 	}
 	return Feed{
 		ID:          strconv.Itoa(int(p.ID)),
@@ -193,4 +197,40 @@ type Episode struct {
 	EnclosureLength int32  `json:"enclosureLength"`
 	Image           string `json:"image"`
 	Link            string `json:"link"`
+}
+
+func PodcastEpisodesByPerson(query string, fulltext bool) ([]Episode, error) {
+	client := &http.Client{}
+	if query == "" {
+		return nil, errors.New("no query supplied")
+	}
+
+	requrl := PodcastIndexBaseURL + "search/byperson?q=" + query
+	if fulltext {
+		requrl = requrl + "&fulltext=true"
+	}
+
+	req, err := http.NewRequest("GET", requrl, nil)
+
+	headers := PodcastIndexHeaders()
+	for k, v := range headers {
+		req.Header.Add(k, v)
+	}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("GET error:", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var r EpisodeResponse
+	body, err := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &r)
+	if err != nil {
+		fmt.Println("json unmarshall error", err)
+		return nil, err
+	}
+
+	return r.Items, nil
 }
