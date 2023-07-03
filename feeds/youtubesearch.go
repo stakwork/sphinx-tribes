@@ -137,6 +137,7 @@ func YoutubeVideoSearch(term string) ([]Item, error) {
 			Description:   r.Snippet.Description,
 			DatePublished: tp.Unix(),
 			ImageUrl:      thumb,
+			FeedId:        r.Snippet.ChannelId,
 		}
 		fs = append(fs, f)
 	}
