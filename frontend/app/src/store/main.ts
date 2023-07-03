@@ -5,9 +5,12 @@ import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
+import { getHost } from '../config/host';
 import { uiStore } from './ui';
 
 export const queryLimit = 100;
+
+const TribesURL = getHost().startsWith('localhost') ? `http://${getHost()}`: getHost().startsWith('http') ? getHost() : `https://${getHost()}`;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -983,11 +986,11 @@ export class MainStore {
       console.log('Youre not logged in');
       return;
     }
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+  
     try {
       let request = `bounty?token=${info?.jwt}`;
 
-      const response = await fetch(`${URL}/${request}`, {
+      const response = await fetch(`${TribesURL}/${request}`, {
         method: "POST",
         body: JSON.stringify({
           ...body
@@ -1014,11 +1017,10 @@ export class MainStore {
       console.log('Youre not logged in');
       return;
     }
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
     try {
       let request = `bounty/${info?.jwt}/${created}`;
-
-      const response = await fetch(`${URL}/${request}`, {
+      const response = await fetch(`${TribesURL}/${request}`, {
         method: "DELETE",
         mode: 'cors',
         headers: {
@@ -1273,9 +1275,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
-
-      const r: any = await fetch(`${URL}/bounty/assignee`, {
+      const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
         method: 'DELETE',
         mode: 'cors',
         body: JSON.stringify({
