@@ -130,6 +130,7 @@ type Item struct {
 	ThumbnailUrl  string `json:"thumbnailUrl"`
 	Link          string `json:"link"`
 	// for search
+	FeedId   string `json:"feedId"`
 	FeedType int    `json:"feedType"`
 	Url      string `json:"url"`
 }

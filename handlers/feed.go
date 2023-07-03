@@ -82,7 +82,7 @@ func SearchPodcastEpisodes(w http.ResponseWriter, r *http.Request) {
 
 	fs := []feeds.Item{}
 	for _, ep := range eps {
-		episode := feeds.EpisodeToGeneric(ep)
+		episode := feeds.EpisodeToGeneric(ep, true)
 		fs = append(fs, episode)
 	}
 

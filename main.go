@@ -14,8 +14,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/routes"
-
-	"github.com/stakwork/sphinx-tribes/feeds"
 )
 
 func main() {
@@ -25,10 +23,6 @@ func main() {
 	if err != nil {
 		fmt.Println("no .env file")
 	}
-
-	items, _ := feeds.YoutubeVideoSearch("hi")
-	fmt.Printf("ITEMS %+v\n", items)
-	return
 
 	db.InitDB()
 	db.InitCache()
