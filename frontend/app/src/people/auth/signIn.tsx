@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { AuthProps } from 'people/interfaces';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { TribesURL } from 'config';
 import { useStores } from '../../store';
 import { Divider } from '../../components/common';
 import IconButton from '../../components/common/icon_button';
@@ -141,8 +142,26 @@ function SignIn(props: AuthProps) {
             ) : (
               !isMobile && (
                 <AuthQR
-                  onSuccess={() => {
-                    if (props.onSuccess) props.onSuccess();
+                  onSuccess={async () => {
+                    if (props.onSuccess) {
+                      const user = ui.meInfo;
+                      if (user) {
+                        let request = 'token/uuid';
+                        const res = await fetch(`${TribesURL}/${request}`, {
+                          method: "POST",
+                          mode: 'cors',
+                          headers: {
+                            'relay_pubkey': ui.meInfo?.owner_pubkey || '',
+                            'relay_uuid': ui.meInfo?.uuid || ''
+                          }
+                        });
+                        let token = await res.json();
+                        main.setLnToken(token)
+                      }
+
+                      props.onSuccess();
+                    }
+
                     main.getPeople({ resetPage: true });
                   }}
                   style={{ marginBottom: 20 }}

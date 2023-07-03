@@ -5,12 +5,10 @@ import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
-import { getHost } from '../config/host';
+import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
 
 export const queryLimit = 100;
-
-const TribesURL = getHost().startsWith('localhost') ? `http://${getHost()}`: getHost().startsWith('http') ? getHost() : `https://${getHost()}`;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -677,8 +675,6 @@ export class MainStore {
       sortBy: 'created'
     });
 
-    console.log("Query ==", query2)
-
     try {
       let ps2 = await api.get(query2);
       let ps3: any[] = [];
@@ -986,10 +982,14 @@ export class MainStore {
       console.log('Youre not logged in');
       return;
     }
-  
+
+    if(!body.coding_language || !body.coding_language.length) {
+      // console.log("Coding Language ===", body.coding_language)
+      body.coding_language = [];
+    }
+   
     try {
       let request = `bounty?token=${info?.jwt}`;
-
       const response = await fetch(`${TribesURL}/${request}`, {
         method: "POST",
         body: JSON.stringify({

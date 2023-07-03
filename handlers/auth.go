@@ -65,6 +65,37 @@ func GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(connectionCode)
 }
 
+func GetTokenByUUID(w http.ResponseWriter, r *http.Request) {
+	uuid := r.Header.Get("relay_uuid")
+	pubkey := r.Header.Get("relay_pubkey")
+
+	if uuid == "" && pubkey == "" {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("Could not get user token")
+		return
+	}
+
+	user := db.DB.GetPersonByUuid(uuid)
+
+	if user.OwnerPubKey != pubkey {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("Wrong data")
+		return
+	}
+
+	tokenString, err := auth.EncodeToken(pubkey)
+
+	if err != nil {
+		fmt.Println("error creating JWT")
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tokenString)
+}
+
 func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	socketKey := r.URL.Query().Get("socketKey")
 	socket, _ := db.Store.GetSocketConnections(socketKey)

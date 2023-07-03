@@ -15,6 +15,7 @@ const initialTags = tagLabels.map((label: any) => ({ label } as EuiSelectableOpt
 export interface MeInfo {
   id?: number;
   pubkey: string;
+  uuid?: string;
   owner_pubkey?: string;
   photo_url: string;
   alias: string;

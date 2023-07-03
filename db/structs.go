@@ -54,7 +54,7 @@ type Bot struct {
 	Name           string         `json:"name"`
 	UniqueName     string         `json:"unique_name"`
 	Description    string         `json:"description"`
-	Tags           pq.StringArray `gorm:"type:text[]" json:"tags"`
+	Tags           pq.StringArray ` `
 	Img            string         `json:"img"`
 	PricePerUse    int64          `json:"price_per_use"`
 	Created        *time.Time     `json:"created"`
@@ -124,7 +124,7 @@ type Person struct {
 	PriceToMeet      int64          `json:"price_to_meet"`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
-	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
+	Extras           PropertyMap    `\x00`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 }
 
@@ -346,7 +346,7 @@ type Bounty struct {
 	EstimatedSessionLength  string     `json:"estimated_session_length"`
 	EstimatedCompletionDate string     `json:"estimated_completion_date"`
 	Updated                 *time.Time `json:"updated"`
-	CodingLanguage          JSONB      `json:"conding_language";type:jsonb;default:'[]';not null`
+	CodingLanguage          JSONB      `json:"coding_language", type:bytea not null default '[]'::bytea`
 }
 
 func (Bounty) TableName() string {

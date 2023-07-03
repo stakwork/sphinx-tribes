@@ -3,7 +3,7 @@ const externalDockerHosts = ['localhost:23007', 'localhost:23000'];
 
 export function getHost(): string {
   const host = window.location.host.includes('localhost') ? 'localhost:5002' : window.location.host;
-  return host
+  return host;
 }
 
 export function getHostIncludingDockerHosts() {
@@ -15,3 +15,5 @@ export function getHostIncludingDockerHosts() {
     return getHost();
   }
 }
+
+export const TribesURL = getHost().startsWith('localhost') ? `http://${getHost()}`: getHost().startsWith('http') ? getHost() : `https://${getHost()}`;
