@@ -72,9 +72,39 @@ func SearchPodcasts(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+func SearchPodcastEpisodes(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("q")
+	eps, err := feeds.PodcastEpisodesByPerson(q, false)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	fs := []feeds.Item{}
+	for _, ep := range eps {
+		episode := feeds.EpisodeToGeneric(ep)
+		fs = append(fs, episode)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(fs)
+}
+
 func SearchYoutube(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	fs, err := feeds.YoutubeSearch(q)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(fs)
+}
+
+func SearchYoutubeVideos(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query().Get("q")
+	fs, err := feeds.YoutubeVideoSearch(q)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
