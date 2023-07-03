@@ -997,7 +997,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': info?.jwt,
+          'x-jwt': this.lnToken || info?.jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1024,7 +1024,7 @@ export class MainStore {
         method: "DELETE",
         mode: 'cors',
         headers: {
-          'x-jwt': info?.jwt,
+          'x-jwt': this.lnToken || info?.jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1282,7 +1282,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': this.lnToken || info.jwt,
           'Content-Type': 'application/json'
         }
       });
