@@ -18,8 +18,8 @@ func unix() string {
 	return strconv.Itoa(int(int32(time.Now().Unix())))
 }
 
-func EpisodeToGeneric(ep Episode) Item {
-	return Item{
+func EpisodeToGeneric(ep Episode, includeFeedStuff bool) Item {
+	i := Item{
 		Id:            strconv.Itoa(int(ep.ID)),
 		Link:          ep.Link,
 		Description:   ep.Description,
@@ -30,13 +30,19 @@ func EpisodeToGeneric(ep Episode) Item {
 		Duration:      ep.EnclosureLength,
 		DatePublished: int64(ep.DatePublished),
 	}
+	if includeFeedStuff {
+		i.Url = ep.FeedUrl
+		i.FeedType = FeedTypePodcast
+		i.FeedId = strconv.Itoa(int(ep.FeedId))
+	}
+	return i
 }
 
 func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 	items := []Item{}
 	// fmt.Println("P EPISODES", len(p.Episodes), p)
 	for _, ep := range p.Episodes {
-		items = append(items, EpisodeToGeneric(ep))
+		items = append(items, EpisodeToGeneric(ep, false))
 	}
 	return Feed{
 		ID:          strconv.Itoa(int(p.ID)),
@@ -197,6 +203,9 @@ type Episode struct {
 	EnclosureLength int32  `json:"enclosureLength"`
 	Image           string `json:"image"`
 	Link            string `json:"link"`
+	// for search
+	FeedUrl string `json:"feedUrl"`
+	FeedId  int    `json:"feedId"`
 }
 
 func PodcastEpisodesByPerson(query string, fulltext bool) ([]Episode, error) {
