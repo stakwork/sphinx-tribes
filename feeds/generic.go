@@ -114,6 +114,7 @@ type Feed struct {
 	Language      string `json:"language"`
 	Items         []Item `json:"items"`
 	Value         *Value `json:"value"`
+	ItemId        string `json:"itemId"`
 }
 type Item struct {
 	Id            string `json:"id"`
@@ -128,6 +129,9 @@ type Item struct {
 	ImageUrl      string `json:"imageUrl"`
 	ThumbnailUrl  string `json:"thumbnailUrl"`
 	Link          string `json:"link"`
+	// for search
+	FeedType int    `json:"feedType"`
+	Url      string `json:"url"`
 }
 type Value struct {
 	Model        Model         `json:"model"`
