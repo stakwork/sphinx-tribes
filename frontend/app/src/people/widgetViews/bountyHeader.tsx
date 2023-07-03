@@ -385,6 +385,11 @@ const BountyHeader = ({
                 onChange={(e: any) => {
                   ui.setSearchText(e);
                 }}
+                onKeyUp={(e: any) => {
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                    main.getPeopleWanteds();
+                  }
+                }}
                 iconStyle={{
                   top: '13px'
                 }}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -14,13 +13,7 @@ import (
 )
 
 func GetAllBounties(w http.ResponseWriter, r *http.Request) {
-	pageStr := r.URL.Query().Get("page")
-	limitStr := r.URL.Query().Get("limit")
-
-	page, _ := strconv.ParseUint(pageStr, 10, 32)
-	limit, _ := strconv.ParseUint(limitStr, 10, 32)
-
-	bounties := db.DB.GetAllBounties(uint(page), uint(limit))
+	bounties := db.DB.GetAllBounties(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bounties)
 }

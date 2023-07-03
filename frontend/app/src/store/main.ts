@@ -7,7 +7,7 @@ import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
 import { uiStore } from './ui';
 
-export const queryLimit = 1000;
+export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -673,6 +673,8 @@ export class MainStore {
       ...queryParams,
       sortBy: 'created'
     });
+
+    console.log("Query ==", query2)
 
     try {
       let ps2 = await api.get(query2);

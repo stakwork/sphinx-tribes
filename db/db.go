@@ -521,13 +521,23 @@ func (db database) AddBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
-func (db database) GetAllBounties(page uint, limit uint) []Bounty {
-	offset := (page - 1) * limit
-
+func (db database) GetAllBounties(r *http.Request) []Bounty {
+	keys := r.URL.Query()
+	tags := keys.Get("tags") // this is a string of tags separated by commas
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
-	// if search is empty, returns all
-	db.db.Raw(`SELECT * FROM bounty ORDER BY created DESC LIMIT ? OFFSET ?`, limit, offset).Find(&ms)
-	fmt.Printf("getAllBounties %v", ms)
+
+	thequery := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("LOWER(title) LIKE ?", "%"+search+"%")
+
+	if tags != "" {
+		// pull out the tags and add them in here
+		t := strings.Split(tags, ",")
+		for _, s := range t {
+			thequery = thequery.Where("'" + s + "'" + " = any (tags)")
+		}
+	}
+
+	thequery.Find(&ms)
 
 	return ms
 }
