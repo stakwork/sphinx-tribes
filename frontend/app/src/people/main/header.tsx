@@ -12,7 +12,7 @@ import SignIn from '../auth/signIn';
 import api from '../../api';
 import TorSaveQR from '../utils/torSaveQR';
 import IconButton from '../../components/common/icon_button';
-import { PostModal } from '../widgetViews/postBounty/PostModal';
+import { PostModal } from '../widgetviews/postbounty/PostModal';
 import StartUpModal from '../utils/start_up_modal';
 
 const Row = styled.div`

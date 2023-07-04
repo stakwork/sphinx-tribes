@@ -5,7 +5,7 @@ import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import moment from 'moment';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
-import Invoice from '../widgetViews/summaries/wantedSummaries/invoice';
+import Invoice from '../widgetviews/summaries/wantedsummaries/invoice';
 import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
 
