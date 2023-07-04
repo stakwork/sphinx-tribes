@@ -11,9 +11,9 @@ import Body from '../tribes/body';
 import Header from '../tribes/header';
 import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
-import { People } from './People';
+import { People } from './people';
 import { TicketsPage } from './Tickets';
-import { LeaderboardPage } from './Leaderboard';
+import { LeaderboardPage } from './leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
