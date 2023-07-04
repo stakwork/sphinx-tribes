@@ -112,7 +112,7 @@ function BodyComponent() {
     loadBackwardFunc
   );
 
-  const onPanelClick = (person: any, item: number) => {
+  const onPanelClick = (person: any, item: any) => {
     history.replace({
       pathname: history?.location?.pathname,
       search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,

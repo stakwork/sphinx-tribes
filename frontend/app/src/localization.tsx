@@ -1,4 +1,4 @@
-const loc: { []: any } = {
+const loc: { [key: string]: any } = {
   English: {
     tribes: 'Tribes',
     people: 'People',

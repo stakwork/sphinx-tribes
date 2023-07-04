@@ -72,7 +72,7 @@ const UserTickets = () => {
     setIsLoading(false);
   }
 
-  function onPanelClick(i: string) {
+  function onPanelClick(i: number) {
     history.push({
       pathname: `${url}/${i}`
     });
