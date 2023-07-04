@@ -1,5 +1,5 @@
 import { Button, IconButton } from 'components/common';
-import { AboutView } from 'people/widgetViews/aboutView';
+import { AboutView } from 'people/widgetviews/aboutView';
 import React, { useState } from 'react';
 import ConnectCard from 'people/utils/connectCard';
 import { observer } from 'mobx-react-lite';

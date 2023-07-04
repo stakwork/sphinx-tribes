@@ -17,7 +17,7 @@ import ButtonSet from '../../../../bounties/bountyModal_button_set';
 import BountyPrice from '../../../../bounties/bounty_price';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { CodingBountiesProps } from '../../../interfaces';
-import LoomViewerRecorder from '../../../../people/utils/loomViewerRecorder';
+import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
 import Invoice from './invoice';
 import {
   AssigneeProfile,
@@ -520,9 +520,8 @@ function MobileView(props: CodingBountiesProps) {
                       copyURLAction={handleCopyUrl}
                       copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                       twitterAction={() => {
-                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                          labels && labels.map((x: any) => x.label)
-                        },sphinxchat`;
+                        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                          },sphinxchat`;
                         sendToRedirect(twitterLink);
                       }}
                       replitLink={replitLink}
@@ -944,9 +943,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1017,9 +1015,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}
@@ -1096,9 +1093,8 @@ function MobileView(props: CodingBountiesProps) {
                   copyURLAction={handleCopyUrl}
                   copyStatus={isCopied ? 'Copied' : 'Copy Link'}
                   twitterAction={() => {
-                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-                      labels && labels.map((x: any) => x.label)
-                    },sphinxchat`;
+                    const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${labels && labels.map((x: any) => x.label)
+                      },sphinxchat`;
                     sendToRedirect(twitterLink);
                   }}
                   replitLink={replitLink}

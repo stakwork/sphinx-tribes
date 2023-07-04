@@ -13,7 +13,7 @@ import { SearchBar } from '../../components/common/index';
 import { useStores } from '../../store';
 import { filterCount } from '../utils/ExtraFunctions';
 import { GetValue, coding_languages, status } from '../utils/language_label_style';
-import { PostBounty } from './postBounty';
+import { PostBounty } from './postbounty';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
