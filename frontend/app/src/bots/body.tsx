@@ -4,18 +4,18 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
-import NoneSpace from '../people/utils/noneSpace';
+import NoneSpace from '../people/utils/NoneSpace';
 import { Button, Modal, SearchTextInput, Divider } from '../components/common';
 import { useStores } from '../store';
 import { useFuse, useScroll } from '../hooks';
 import { colors } from '../config/colors';
-import FadeLeft from '../components/animated/fadeLeft';
+import FadeLeft from '../components/animated/FadeLeft';
 import { useIsMobile } from '../hooks';
 import Form from '../components/form';
 import { botSchema } from '../components/form/schema';
-import Bot from './bot';
-import BotView from './botView';
-import BotSecret from './utils/botSecret';
+import Bot from './Bot';
+import BotView from './BotView';
+import BotSecret from './utils/BotSecret';
 
 // avoid hook within callback warning by renaming hooks
 const getFuse = useFuse;
@@ -160,13 +160,12 @@ function BotBody() {
   const loadBots = useCallback(async () => {
     setLoading(true);
 
-					let un = '';
+    let un = '';
     if (window.location.pathname.startsWith('/b/')) {
       un = window.location.pathname.substr(3);
     }
 
-    const ps = await main.getBots(un, null);
-
+    await main.getBots(un, null);
     await main.getMyBots();
     setLoading(false);
   }, [main]);

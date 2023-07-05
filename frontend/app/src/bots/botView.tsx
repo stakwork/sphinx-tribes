@@ -6,8 +6,8 @@ import { useStores } from '../store';
 
 import { Button, Divider, IconButton } from '../components/common';
 import { useIsMobile } from '../hooks';
-import Bot from './bot';
-import BotBar from './utils/botBar';
+import Bot from './Bot';
+import BotBar from './utils/BotBar';
 import { BotViewProps } from './interfaces';
 
 const BotList = styled.div`

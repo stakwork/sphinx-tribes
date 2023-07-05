@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ModalProps } from 'components/interfaces';
-import FadeLeft from '../animated/fadeLeft';
+import FadeLeft from '../animated/FadeLeft';
 import { colors } from '../../config/colors';
 import { IconButton } from '.';
 import { Portal } from './index';
@@ -131,11 +131,11 @@ export default function Modal(props: ModalProps) {
   const color = colors['light'];
   const fillStyle = fill
     ? {
-        minHeight: '100%',
-        height: 'auto',
-        width: '100%',
-        borderRadius: 0
-      }
+      minHeight: '100%',
+      height: 'auto',
+      width: '100%',
+      borderRadius: 0
+    }
     : {};
 
   return (

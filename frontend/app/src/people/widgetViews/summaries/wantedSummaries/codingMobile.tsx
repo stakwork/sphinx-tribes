@@ -2,11 +2,11 @@
 import React from 'react';
 import { EuiText } from '@elastic/eui';
 import { CodingViewProps } from 'people/interfaces';
-import GithubStatusPill from '../../parts/statusPill';
+import GithubStatusPill from '../../parts/StatusPill';
 import { Divider } from '../../../../components/common';
-import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
+import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
 import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
+import { renderMarkdown } from '../../../utils/RenderMarkdown';
 import { formatPrice, satToUsd } from '../../../../helpers';
 import {
   Heart,
@@ -15,7 +15,7 @@ import {
   ShareOnTwitter,
   ViewTribe,
   ViewGithub
-} from './components';
+} from './Components';
 import { ButtonRow, Pad, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } from './style';
 
 export default function MobileView(props: CodingViewProps) {

@@ -2,7 +2,7 @@ import { Button } from 'components/common';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { UserInfoProps } from 'people/interfaces';
-import ConnectCard from 'people/utils/connectCard';
+import ConnectCard from 'people/utils/ConnectCard';
 import { useUserInfo } from './hooks';
 import { Head, Img, Name, RowWrap } from './styles';
 import { HeaderMobile } from './MobileHeader';

@@ -3,12 +3,12 @@ import React from 'react';
 import { EuiText } from '@elastic/eui';
 import { CodingViewProps } from 'people/interfaces';
 import { Divider, Paragraph, Title } from '../../../../components/common';
-import GithubStatusPill from '../../parts/statusPill';
-import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
+import GithubStatusPill from '../../parts/StatusPill';
+import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
 import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
+import { renderMarkdown } from '../../../utils/RenderMarkdown';
 import { formatPrice, satToUsd } from '../../../../helpers';
-import { AddToFavorites, CopyLink, ShareOnTwitter, ViewTribe, ViewGithub } from './components';
+import { AddToFavorites, CopyLink, ShareOnTwitter, ViewTribe, ViewGithub } from './Components';
 import { ButtonRow, Y, P, B, Img, Wrap, SectionPad, LoomIcon, GithubIcon } from './style';
 
 export default function DesktopView(props: CodingViewProps) {

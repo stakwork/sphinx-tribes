@@ -154,7 +154,7 @@ function GalleryInput({ value, handleChange }: Props) {
 
       <div style={{ marginTop: 5 }}>
         <Dropzone multiple={false} onDrop={dropzoneUpload} maxSize={MAX_UPLOAD_SIZE}>
-          {({ getRootProps, getInputProps  }: any) => (
+          {({ getRootProps, getInputProps }: any) => (
             <DropzoneStuff>
               <div>
                 <input {...getInputProps()} />

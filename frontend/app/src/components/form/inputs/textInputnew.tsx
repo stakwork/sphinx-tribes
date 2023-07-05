@@ -75,7 +75,7 @@ export default function TextInputNew({
 }: Props) {
   const color = colors['light'];
   return (
-					<TextContainer color={color}>
+    <TextContainer color={color}>
       <div className="label-float">
         <input
           type="text"
@@ -86,7 +86,7 @@ export default function TextInputNew({
         />
         <label>{label}</label>
       </div>
-     </TextContainer>
+    </TextContainer>
   );
 }
 

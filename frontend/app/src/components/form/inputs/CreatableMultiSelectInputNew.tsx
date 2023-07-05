@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import { colors } from '../../../config/colors';
-import ImageButton from '../../common/Image_button';
+import ImageButton from '../../common/ImageButton';
 import {
   coding_languages,
   GetValue,
   LanguageObject
-} from '../../../people/utils/language_label_style';
-import { SvgMask } from '../../../people/utils/svgMask';
+} from '../../../people/utils/languageLabelStyle';
+import { SvgMask } from '../../../people/utils/SvgMask';
 import type { Props } from './propsType';
 
 interface styledProps {

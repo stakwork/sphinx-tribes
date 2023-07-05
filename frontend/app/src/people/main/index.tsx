@@ -1,2 +1,2 @@
-export { default as PeopleBody } from './body';
-export { EditUserModal } from './EditUserModal';
+export { default as PeopleBody } from './Body';
+export { EditUserModal } from './editUserModal';

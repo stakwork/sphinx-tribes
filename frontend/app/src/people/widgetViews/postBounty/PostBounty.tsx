@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
-import IconButton from '../../../components/common/icon_button';
+import IconButton from '../../../components/common/IconButton2';
 import { useStores } from '../../../store';
-import StartUpModal from '../../utils/start_up_modal';
+import StartUpModal from '../../utils/StartUpModal';
 import { PostModal, PostModalProps } from './PostModal';
 
 const color = colors['light'];

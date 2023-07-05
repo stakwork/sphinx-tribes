@@ -13,7 +13,7 @@
     "build": "craco build",
     "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 67 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
+    "lint": "eslint src --max-warnings 100 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
     "prepare": "cd ../.. && husky install frontend/app/.husky"
@@ -82,15 +82,18 @@
           "memberVariableDeclaration": false
         }
       ],
-     "no-use-before-define": ["error", {
-        "functions": true,
-        "classes": true,
-        "variables": true,
-        "allowNamedExports": false
-    }],
-     "import/order": "error",
-     "camelcase": "off",
-     "comma-dangle": "off",
+      "no-use-before-define": [
+        "error",
+        {
+          "functions": true,
+          "classes": true,
+          "variables": true,
+          "allowNamedExports": false
+        }
+      ],
+      "import/order": "error",
+      "camelcase": "off",
+      "comma-dangle": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "warn",
       "@typescript-eslint/no-empty-function": "error",

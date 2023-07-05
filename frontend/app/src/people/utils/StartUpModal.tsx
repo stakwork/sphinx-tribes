@@ -4,7 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { StartUpModalProps } from 'people/interfaces';
-import IconButton from '../../components/common/icon_button';
+import IconButton from '../../components/common/IconButton2';
 import { useStores } from '../../store';
 import api from '../../api';
 import QR from './QR';

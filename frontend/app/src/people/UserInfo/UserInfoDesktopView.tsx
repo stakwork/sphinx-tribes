@@ -1,7 +1,7 @@
 import { Button, IconButton } from 'components/common';
-import { AboutView } from 'people/widgetviews/aboutView';
+import { AboutView } from 'people/widgetViews/AboutView';
 import React, { useState } from 'react';
-import ConnectCard from 'people/utils/connectCard';
+import ConnectCard from 'people/utils/ConnectCard';
 import { observer } from 'mobx-react-lite';
 import { UserInfoProps } from 'people/interfaces';
 import { AboutWrap, Head, Img, Name, RowWrap } from './styles';

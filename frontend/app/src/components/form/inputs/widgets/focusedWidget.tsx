@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { EuiButton } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import Input from '../../../form/inputs/';
-import WidgetList from './widgetList';
+import Input from '..';
+import WidgetList from './WidgetList';
 import { FocusedWidgetProps } from './interfaces';
 
 const Wrap = styled.div`

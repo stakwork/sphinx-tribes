@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { AboutViewProps } from 'people/interfaces';
 import { Divider } from '../../components/common';
 import QrBar from '../utils/QrBar';
-import { renderMarkdown } from '../utils/renderMarkdown';
+import { renderMarkdown } from '../utils/RenderMarkdown';
 
 const Badge = styled.div`
 display:flex;

@@ -7,13 +7,13 @@ import { useStores } from '../../store';
 
 import { meSchema } from '../../components/form/schema';
 import { useIsMobile } from '../../hooks';
-import Badges from '../utils/badges';
+import Badges from '../utils/Badges';
 import { widgetConfigs } from '../utils/constants';
-import NoneSpace from '../utils/noneSpace';
-import OfferView from './offerView';
-import { AboutView } from './aboutView';
-import { PostBounty } from './postbounty';
-import UserTickets from './userTicketsView';
+import NoneSpace from '../utils/NoneSpace';
+import OfferView from './OfferView';
+import { AboutView } from './AboutView';
+import { PostBounty } from './Postbounty';
+import UserTickets from './UserTicketsView';
 
 interface PanelProps {
   isMobile: boolean;

@@ -5,7 +5,7 @@ import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import { Modal } from '../../../components/common';
 import { useStores } from '../../../store';
-import FocusedView from '../../main/focusView';
+import FocusedView from '../../main/FocusView';
 import { Widget } from '../../main/types';
 import { widgetConfigs } from '../../utils/constants';
 

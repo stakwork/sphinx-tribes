@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Switch, useParams, useRouteMatch, Router } from 'react-router-dom';
 import { useStores } from 'store';
-import NoResults from 'people/utils/userNoResults';
+import NoResults from 'people/utils/UserNoResults';
 import { useIsMobile } from 'hooks';
-import { Spacer } from 'people/main/body';
+import { Spacer } from 'people/main/Body';
 import styled from 'styled-components';
-import { BountyModal } from 'people/main/BountyModal/BountyModal';
+import { BountyModal } from 'people/main/bountyModal/BountyModal';
 import { colors } from '../../config/colors';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
-import WantedView from './wantedView';
+import WantedView from './WantedView';
 import history from '../../config/history';
-import DeleteTicketModal from './deleteModal';
+import DeleteTicketModal from './DeleteModal';
 
 const Container = styled.div`
   display: flex;

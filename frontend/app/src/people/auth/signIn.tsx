@@ -6,10 +6,10 @@ import { AuthProps } from 'people/interfaces';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { useStores } from '../../store';
 import { Divider } from '../../components/common';
-import IconButton from '../../components/common/icon_button';
+import IconButton from '../../components/common/IconButton2';
 import { useIsMobile } from '../../hooks';
 import QR from '../utils/QR';
-import AuthQR from './authQR';
+import AuthQR from './AuthQR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 
 interface ImageProps {

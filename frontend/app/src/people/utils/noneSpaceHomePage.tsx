@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NoneSpaceProps } from 'people/interfaces';
-import IconButton from '../../components/common/icon_button';
+import IconButton from '../../components/common/IconButton2';
 
 const H = styled.div`
   margin-top: 10px;
