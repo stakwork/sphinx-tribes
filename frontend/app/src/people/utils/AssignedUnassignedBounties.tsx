@@ -4,13 +4,13 @@ import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { BountiesProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
-import BountyDescription from '../../bounties/bounty_description';
-import BountyPrice from '../../bounties/bounty_price';
-import BountyProfileView from '../../bounties/bounty_profile_view';
-import IconButton from '../../components/common/icon_button';
-import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
-import StartUpModal from './start_up_modal';
+import BountyDescription from '../../bounties/BountyDescription';
+import BountyPrice from '../../bounties/BountyPrice';
+import BountyProfileView from '../../bounties/BountyProfileView';
+import IconButton from '../../components/common/IconButton2';
+import ConnectCard from './ConnectCard';
+import StartUpModal from './StartUpModal';
 
 interface containerProps {
   unAssignedBackgroundImage?: string;

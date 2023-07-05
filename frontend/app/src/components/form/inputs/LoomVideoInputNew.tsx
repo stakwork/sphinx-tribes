@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiText } from '@elastic/eui';
 import { colors } from '../../../config/colors';
-import LoomViewerRecorderNew from '../../../people/utils/loomViewerRecorderNew';
+import LoomViewerRecorderNew from '../../../people/utils/LoomViewerRecorderNew';
 import type { Props } from './propsType';
 
 interface styleProps {

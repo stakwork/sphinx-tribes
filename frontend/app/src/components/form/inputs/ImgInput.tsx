@@ -129,8 +129,8 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
 
   const addedStyle = notProfilePic
     ? {
-        borderRadius: 0
-      }
+      borderRadius: 0
+    }
     : {};
 
   const defaultIcon = notProfilePic ? backgroundIcon : avatarIcon;
@@ -147,9 +147,8 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
                   {!uploading ? (
                     <Image
                       style={{
-                        backgroundImage: `url(${
-                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                        })`,
+                        backgroundImage: `url(${picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                          })`,
                         ...addedStyle
                       }}
                     />
@@ -187,9 +186,8 @@ function ImageInput({ note, value, handleChange, notProfilePic, imageIcon }: Pro
                   {!uploading ? (
                     <Image
                       style={{
-                        backgroundImage: `url(${
-                          picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
-                        })`,
+                        backgroundImage: `url(${picsrc ? picsrc : value ? value : uploading ? '' : defaultIcon
+                          })`,
                         ...addedStyle
                       }}
                     />

@@ -6,11 +6,11 @@ import { WantedViews2Props } from 'people/interfaces';
 import { useIsMobile } from '../../hooks';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import { useStores } from '../../store';
-import PaidBounty from '../utils/paidBounty';
-import Bounties from '../utils/assigned_unassigned_bounties';
+import PaidBounty from '../utils/PaidBounty';
+import Bounties from '../utils/AssignedUnassignedBounties';
 import { colors } from '../../config/colors';
-import MobileView from './wantedviews/mobileView';
-import DesktopView from './wantedviews/desktopView';
+import MobileView from './wantedViews/MobileView';
+import DesktopView from './wantedViews/DesktopView';
 
 interface styledProps {
   color?: any;

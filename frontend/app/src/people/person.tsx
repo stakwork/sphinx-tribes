@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { getHost } from '../config/host';
 import { Button, Divider } from '../components/common/index';
-import ConnectCard from './utils/connectCard';
+import ConnectCard from './utils/ConnectCard';
 import { PersonProps } from './interfaces';
 
 const Wrap = styled.div`

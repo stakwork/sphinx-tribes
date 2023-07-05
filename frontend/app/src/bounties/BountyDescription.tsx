@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isString } from 'lodash';
 import { colors } from '../config/colors';
-import { LanguageObject } from '../people/utils/language_label_style';
-import NameTag from '../people/utils/nameTag';
+import { LanguageObject } from '../people/utils/languageLabelStyle';
+import NameTag from '../people/utils/NameTag';
 import { BountiesDescriptionProps } from './interfaces';
 
 interface codingLangProps {
@@ -110,7 +110,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
       setReplitLink(
         props?.description.match(
-          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
         )
       );
       setDescriptionImage(found && found.length > 0 && found[0]);

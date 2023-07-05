@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useStores } from '../../store';
 import { Modal } from '../../components/common';
 import { firstScreenSchema } from '../../components/form/schema';
-import FocusedView from './focusView';
+import FocusedView from './FocusView';
 
 const B = styled.div`
   font-weight: bold;

@@ -93,7 +93,7 @@ function SearchableSelectInput({
         setLoading(false);
       }
     })();
-  }, [search]);
+  }, [search, main, name, ui]);
 
   return (
     <>

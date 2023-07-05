@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { EuiButtonIcon } from '@elastic/eui';
-import Blog from './listItems/blog';
-import Offer from './listItems/offer';
-import Wanted from './listItems/wanted';
+import Blog from './listItems/Blog';
+import Offer from './listItems/Offer';
+import Wanted from './listItems/Wanted';
 import { WidgetListProps } from './interfaces';
 
 export interface IconProps {

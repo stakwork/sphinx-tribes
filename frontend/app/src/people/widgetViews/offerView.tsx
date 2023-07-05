@@ -4,8 +4,8 @@ import { OfferViewProps } from 'people/interfaces';
 import { formatPrice, satToUsd } from '../../helpers';
 import { useIsMobile } from '../../hooks';
 import { Divider, Title } from '../../components/common';
-import GalleryViewer from '../utils/galleryViewer';
-import NameTag from '../utils/nameTag';
+import GalleryViewer from '../utils/GalleryViewer';
+import NameTag from '../utils/NameTag';
 
 const Wrap = styled.div`
   display: flex;

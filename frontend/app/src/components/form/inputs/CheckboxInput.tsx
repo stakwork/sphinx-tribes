@@ -16,7 +16,7 @@ export default function CheckBox({
   useEffect(() => {
     // if value not initiated, default value true
     if (name === 'show' && value === undefined) handleChange(true);
-  }, []);
+  }, [handleChange, name, value]);
 
   return (
     <>

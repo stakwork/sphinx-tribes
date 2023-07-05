@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ConnectCard from 'people/utils/connectCard';
+import ConnectCard from 'people/utils/ConnectCard';
 import { TicketModalPage } from './TicketModalPage';
 import Tickets from './Tickets';
 

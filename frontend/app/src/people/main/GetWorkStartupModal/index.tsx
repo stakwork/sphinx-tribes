@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import StartUpModal from 'people/utils/start_up_modal';
+import StartUpModal from 'people/utils/StartUpModal';
 import React from 'react';
 import { useStores } from 'store';
 
