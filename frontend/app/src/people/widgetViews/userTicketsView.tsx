@@ -6,10 +6,10 @@ import { useIsMobile } from 'hooks';
 import { Spacer } from 'people/main/Body';
 import styled from 'styled-components';
 import { BountyModal } from 'people/main/bountyModal/BountyModal';
+import history from '../../config/history';
 import { colors } from '../../config/colors';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import WantedView from './WantedView';
-import history from '../../config/history';
 import DeleteTicketModal from './DeleteModal';
 
 const Container = styled.div`

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
-import { widgetConfigs } from '../utils/constants';
+import { widgetConfigs } from '../utils/Constants';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';

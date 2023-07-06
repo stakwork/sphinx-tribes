@@ -8,7 +8,7 @@ import { useStores } from '../../store';
 import { meSchema } from '../../components/form/schema';
 import { useIsMobile } from '../../hooks';
 import Badges from '../utils/Badges';
-import { widgetConfigs } from '../utils/constants';
+import { widgetConfigs } from '../utils/Constants';
 import NoneSpace from '../utils/NoneSpace';
 import OfferView from './OfferView';
 import { AboutView } from './AboutView';

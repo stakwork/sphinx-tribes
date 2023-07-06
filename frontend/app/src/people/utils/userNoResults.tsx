@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { NoResultProps } from 'people/interfaces';
-import { widgetConfigs } from './constants';
+import { widgetConfigs } from './Constants';
 import PageLoadSpinner from './PageLoadSpinner';
 import NoneSpace from './NoneSpace';
 

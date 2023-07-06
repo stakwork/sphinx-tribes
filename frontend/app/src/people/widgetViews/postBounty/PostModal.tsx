@@ -7,7 +7,7 @@ import { Modal } from '../../../components/common';
 import { useStores } from '../../../store';
 import FocusedView from '../../main/FocusView';
 import { Widget } from '../../main/types';
-import { widgetConfigs } from '../../utils/constants';
+import { widgetConfigs } from '../../utils/Constants';
 
 const color = colors['light'];
 export interface PostModalProps {

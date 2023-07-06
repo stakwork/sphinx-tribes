@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../../api';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/BountyCreationConstant';
-import { formDropdownOptions } from '../../people/utils/constants';
+import { formDropdownOptions } from '../../people/utils/Constants';
 import { useStores } from '../../store';
 import { Button, Divider, IconButton, Modal } from '../common';
 import ImageButton from '../common/ImageButton';
