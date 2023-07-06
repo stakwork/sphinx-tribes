@@ -68,7 +68,6 @@ func NewRouter() *http.Server {
 		r.Delete("/channel/{id}", handlers.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Delete("/bounty/assignee", handlers.DeleteBountyAssignee)
-		r.Post("/bounty", handlers.CreateOrEditBounty)
 		r.Delete("/bounty/{pubKey}/{created}", handlers.DeleteBounty)
 	})
 
@@ -78,6 +77,7 @@ func NewRouter() *http.Server {
 		r.Get("/refresh_jwt", handlers.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
 		r.Post("/token/uuid", handlers.GetTokenByUUID)
+		r.Post("/bounty", handlers.CreateOrEditBounty)
 	})
 
 	PORT := os.Getenv("PORT")
