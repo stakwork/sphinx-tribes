@@ -83,3 +83,7 @@ If you would like to enable Relay for invoice creation and keysend payment add t
     RELAY_URL=
     RELAY_AUTH_KEY=
 ```
+
+### For Contributions
+
+Read the contribution doc [here](./Contribution.md)
