@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { useStores } from '../../../store';
 
 import { Button, Modal } from '../../common';
-import { MAX_UPLOAD_SIZE } from '../../../people/utils/constants';
+import { MAX_UPLOAD_SIZE } from '../../../people/utils/Constants';
 import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 

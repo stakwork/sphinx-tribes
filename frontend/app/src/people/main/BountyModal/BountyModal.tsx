@@ -1,6 +1,6 @@
 import { Modal } from 'components/common';
 import { usePerson } from 'hooks';
-import { widgetConfigs } from 'people/utils/constants';
+import { widgetConfigs } from 'people/utils/Constants';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
