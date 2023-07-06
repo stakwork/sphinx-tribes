@@ -12,7 +12,7 @@ import { widgetConfigs } from '../utils/Constants';
 import NoneSpace from '../utils/NoneSpace';
 import OfferView from './OfferView';
 import { AboutView } from './AboutView';
-import { PostBounty } from './Postbounty';
+import { PostBounty } from './postBounty';
 import UserTickets from './UserTicketsView';
 
 interface PanelProps {
