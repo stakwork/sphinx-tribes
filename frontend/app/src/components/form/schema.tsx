@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import { FormField } from './utils';
 import {
   languages,
   estimation,
@@ -7,6 +6,7 @@ import {
   help_wanted_coding_task_schema,
   help_wanted_other_schema
 } from '../../config/bounties';
+import { FormField } from './utils';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
@@ -26,7 +26,7 @@ const badgeObjectStrValidator = Yup.object().shape({
 const nomValidator = Yup.number().required('Required');
 
 const GetValue = (arr: any) =>
-  arr.map((val) => ({
+  arr.map((val: any) => ({
     label: val,
     value: val
   }));
@@ -95,7 +95,7 @@ export const meSchema: FormField[] = [
         Yup.object()
           .shape({
             title: strValidator,
-            priceMin: Yup.number().when('priceMax', (pricemax) =>
+            priceMin: Yup.number().when('priceMax', (pricemax: number) =>
               Yup.number().max(pricemax, `Must be less than max`)
             )
           })

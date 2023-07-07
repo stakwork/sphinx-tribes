@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useStores } from '../store';
 import {
   EuiFormFieldset,
   EuiLoadingSpinner,
@@ -9,17 +8,36 @@ import {
   EuiButton,
   EuiHighlight
 } from '@elastic/eui';
-import Tribe from './tribe';
+import { observer } from 'mobx-react-lite';
+import { useStores } from '../store';
 import { useIsMobile, usePageScroll } from '../hooks';
 import { SearchTextInput } from '../components/common';
-import Tag from './tag';
-import tags from './tags';
 import NoResults from '../people/utils/noResults';
 import PageLoadSpinner from '../people/utils/pageLoadSpinner';
 import { colors } from '../config/colors';
-import { observer } from 'mobx-react-lite';
+import tags from './tags';
+import Tag from './tag';
+import Tribe from './tribe';
 
-export default observer(BodyComponent);
+const Body = styled.div`
+  flex: 1;
+  height: calc(100vh - 60px);
+  // padding-bottom:80px;
+  width: 100%;
+  overflow: auto;
+  background: ${colors.dark.tribesBackground};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  // max-width:900px;
+  width: 100%;
+`;
 
 function BodyComponent() {
   const { main, ui } = useStores();
@@ -33,7 +51,7 @@ function BodyComponent() {
 
   const isMobile = useIsMobile();
 
-  const selectedTags = tagOptions.filter((t) => t.checked === 'on');
+  const selectedTags = tagOptions.filter((t: any) => t.checked === 'on');
   const showTagCount = selectedTags.length > 0 ? true : false;
 
   function selectTribe(uuid: string, unique_name: string) {
@@ -45,7 +63,7 @@ function BodyComponent() {
     }
   }
 
-  async function loadMore(direction) {
+  async function loadMore(direction: number) {
     if (tagsPop) return;
 
     const currentPage = tribesPageNumber;
@@ -103,8 +121,8 @@ function BodyComponent() {
   }
 
   // if NSFW not selected, filter out NSFW
-  if (!selectedTags.find((f) => f.label === 'NSFW')) {
-    tribes = tribes.filter((f) => !f.tags.includes('NSFW'));
+  if (!selectedTags.find((f: any) => f.label === 'NSFW')) {
+    tribes = tribes.filter((f: any) => !f.tags.includes('NSFW'));
   }
 
   const button = (
@@ -112,7 +130,7 @@ function BodyComponent() {
       iconType="arrowDown"
       iconSide="right"
       size="s"
-      onClick={(e) => {
+      onClick={(e: any) => {
         e.stopPropagation();
         setTagsPop(!tagsPop);
       }}
@@ -143,7 +161,7 @@ function BodyComponent() {
             <EuiSelectable
               searchable
               options={tagOptions}
-              renderOption={(option, searchValue) => (
+              renderOption={(option: any, searchValue: any) => (
                 <div
                   style={{
                     display: 'flex',
@@ -165,14 +183,14 @@ function BodyComponent() {
                 </div>
               )}
               listProps={{ rowHeight: 30 }} // showIcons:false
-              onChange={(opts) => {
+              onChange={(opts: any) => {
                 if (!loadingList) {
                   setTagOptions(opts);
                   ui.setTags(opts);
                 }
               }}
             >
-              {(list, search) => (
+              {(list: any, search: any) => (
                 <div style={{ width: 220 }}>
                   {search}
                   {list}
@@ -195,7 +213,7 @@ function BodyComponent() {
               border: 'none',
               marginLeft: 20
             }}
-            onChange={(e) => {
+            onChange={(e: any) => {
               ui.setSearchText(e);
             }}
           />
@@ -206,7 +224,7 @@ function BodyComponent() {
         <EuiFormFieldset style={{ width: '100%', paddingBottom: 0 }} className="container">
           <div style={{ justifyContent: 'center' }} className="row">
             {tribes.length ? (
-              tribes.map((t) => (
+              tribes.map((t: any) => (
                 <Tribe {...t} key={t.uuid} selected={selected === t.uuid} select={selectTribe} />
               ))
             ) : (
@@ -219,23 +237,4 @@ function BodyComponent() {
     </Body>
   );
 }
-
-const Body = styled.div`
-  flex: 1;
-  height: calc(100vh - 60px);
-  // padding-bottom:80px;
-  width: 100%;
-  overflow: auto;
-  background: ${colors.dark.tribesBackground};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
-  // max-width:900px;
-  width: 100%;
-`;
+export default observer(BodyComponent);

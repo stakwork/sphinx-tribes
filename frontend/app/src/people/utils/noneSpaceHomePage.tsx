@@ -1,8 +1,66 @@
 import React from 'react';
 import styled from 'styled-components';
-import IconButton from '../../components/common/icon_button';
 import { NoneSpaceProps } from 'people/interfaces';
+import IconButton from '../../components/common/icon_button';
 
+const H = styled.div`
+  margin-top: 10px;
+
+  font-family: Roboto;
+  font-style: normal;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  /* Primary Text 1 */
+
+  color: #292c33;
+  padding: 0 10px;
+  letter-spacing: 0px;
+  color: rgb(60, 63, 65);
+
+  font-weight: 700;
+`;
+
+const C = styled.div`
+  margin-top: 10px;
+  font-family: Roboto;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 26px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #8e969c;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+
+  /* Main bottom icons */
+
+  color: #5f6368;
+  padding: 0 10px;
+
+  max-width: 350px;
+  padding: 0 65px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+`;
+
+const ButtonContainerMobile = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 export default function NoneSpaceHomePage(props: NoneSpaceProps) {
   if (props.banner) {
     return (
@@ -117,62 +175,3 @@ export default function NoneSpaceHomePage(props: NoneSpaceProps) {
     </div>
   );
 }
-
-const H = styled.div`
-  margin-top: 10px;
-
-  font-family: Roboto;
-  font-style: normal;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  /* Primary Text 1 */
-
-  color: #292c33;
-  padding: 0 10px;
-  letter-spacing: 0px;
-  color: rgb(60, 63, 65);
-
-  font-weight: 700;
-`;
-
-const C = styled.div`
-  margin-top: 10px;
-  font-family: Roboto;
-  font-size: 22px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 26px;
-  letter-spacing: 0em;
-  text-align: center;
-  color: #8e969c;
-
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 18px;
-  text-align: center;
-
-  /* Main bottom icons */
-
-  color: #5f6368;
-  padding: 0 10px;
-
-  max-width: 350px;
-  padding: 0 65px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-`;
-
-const ButtonContainerMobile = styled.div`
-  display: flex;
-  flex-direction: column;
-`;

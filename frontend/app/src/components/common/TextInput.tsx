@@ -1,9 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
+import { TextInputProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
 import { FieldEnv, FieldText } from '../form/inputs/index';
-import { TextInputProps } from 'components/interfaces';
 
+const F = styled(FieldEnv)`
+  .euiFormLabel[for] {
+    cursor: default;
+  }
+`;
+
+const R = styled.div`
+  position: relative;
+`;
 export default function TextInput({
   label,
   value,
@@ -24,7 +33,7 @@ export default function TextInput({
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e: any) => onChange(e.target.value)}
             onBlur={handleBlur}
             onFocus={handleFocus}
             prepend={prepend}
@@ -36,12 +45,3 @@ export default function TextInput({
   );
 }
 
-const F = styled(FieldEnv)`
-  .euiFormLabel[for] {
-    cursor: default;
-  }
-`;
-
-const R = styled.div`
-  position: relative;
-`;

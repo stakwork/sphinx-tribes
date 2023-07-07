@@ -1,9 +1,9 @@
 import { Modal } from 'components/common';
 import React from 'react';
-import { useUserEdit } from './useEditUser';
-import FocusedView from '../focusView';
-import { formConfig } from './config';
 import { observer } from 'mobx-react-lite';
+import FocusedView from '../focusView';
+import { useUserEdit } from './useEditUser';
+import { formConfig } from './config';
 
 export const EditUserDesktopView = observer(() => {
   const { canEdit, closeHandler, person, modals } = useUserEdit();

@@ -1,9 +1,68 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../../../config/colors';
 import type { Props } from './propsType';
 import { FieldEnv, FieldText, Note } from './index';
-import { colors } from '../../../config/colors';
 
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
+  .euiFormRow_active {
+    border: 1px solid ${(p: any) => p.color && p.color.blue2};
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: ${(p: any) => p.color && p.color.grayish.G300} !important;
+        background: ${(p: any) => p.color && p.color.pureWhite};
+        z-index: 10;
+      }
+    }
+  }
+  .euiFormRow_filed {
+    .euiFormRow__labelWrapper {
+      margin-bottom: 0px;
+      margin-top: -9px;
+      padding-left: 10px;
+      height: 14px;
+      label {
+        color: ${(p: any) => p.color && p.color.grayish.G300} !important;
+        background: ${(p: any) => p.color && p.color.pureWhite};
+        z-index: 10;
+      }
+    }
+  }
+`;
+
+const ExtraText = styled.div<styledProps>`
+  padding: 0px 10px 5px;
+  margin: -5px 0 10px;
+  color: ${(p: any) => p.color && p.color.red3};
+  font-style: italic;
+  max-width: calc(100% - 20px);
+  word-break: break-all;
+  font-size: 14px;
+`;
+
+const E = styled.div<styledProps>`
+  position: absolute;
+  right: 10px;
+  top: 0px;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  color: ${(p: any) => p.color && p.color.blue3};
+  pointer-events: none;
+  user-select: none;
+`;
+const R = styled.div`
+  position: relative;
+`;
 export default function TextInput({
   error,
   note,
@@ -42,12 +101,12 @@ export default function TextInput({
             name={'first'}
             value={value || ''}
             readOnly={readOnly || false}
-            onChange={(e) => handleChange(e.target.value)}
-            onBlur={(e) => {
+            onChange={(e: any) => handleChange(e.target.value)}
+            onBlur={(e: any) => {
               handleBlur(e);
               setActive(false);
             }}
-            onFocus={(e) => {
+            onFocus={(e: any) => {
               handleFocus(e);
               setActive(true);
             }}
@@ -67,63 +126,3 @@ export default function TextInput({
     </OuterContainer>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-
-const OuterContainer = styled.div<styledProps>`
-  .euiFormRow_active {
-    border: 1px solid ${(p) => p.color && p.color.blue2};
-    .euiFormRow__labelWrapper {
-      margin-bottom: 0px;
-      margin-top: -9px;
-      padding-left: 10px;
-      height: 14px;
-      label {
-        color: ${(p) => p.color && p.color.grayish.G300} !important;
-        background: ${(p) => p.color && p.color.pureWhite};
-        z-index: 10;
-      }
-    }
-  }
-  .euiFormRow_filed {
-    .euiFormRow__labelWrapper {
-      margin-bottom: 0px;
-      margin-top: -9px;
-      padding-left: 10px;
-      height: 14px;
-      label {
-        color: ${(p) => p.color && p.color.grayish.G300} !important;
-        background: ${(p) => p.color && p.color.pureWhite};
-        z-index: 10;
-      }
-    }
-  }
-`;
-
-const ExtraText = styled.div<styledProps>`
-  padding: 0px 10px 5px;
-  margin: -5px 0 10px;
-  color: ${(p) => p.color && p.color.red3};
-  font-style: italic;
-  max-width: calc(100% - 20px);
-  word-break: break-all;
-  font-size: 14px;
-`;
-
-const E = styled.div<styledProps>`
-  position: absolute;
-  right: 10px;
-  top: 0px;
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-  color: ${(p) => p.color && p.color.blue3};
-  pointer-events: none;
-  user-select: none;
-`;
-const R = styled.div`
-  position: relative;
-`;

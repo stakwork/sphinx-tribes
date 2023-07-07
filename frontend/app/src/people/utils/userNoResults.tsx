@@ -1,12 +1,10 @@
 import React from 'react';
-import { useStores } from '../../store';
-import PageLoadSpinner from './pageLoadSpinner';
 import { observer } from 'mobx-react-lite';
-import NoneSpace from './noneSpace';
-import { widgetConfigs } from '../utils/constants';
 import { NoResultProps } from 'people/interfaces';
+import { widgetConfigs } from '../utils/constants';
+import PageLoadSpinner from './pageLoadSpinner';
+import NoneSpace from './noneSpace';
 
-export default observer(NoResults);
 function NoResults(props: NoResultProps) {
   const tabs = widgetConfigs;
 
@@ -25,3 +23,4 @@ function NoResults(props: NoResultProps) {
     );
   }
 }
+export default observer(NoResults);

@@ -50,6 +50,7 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", db.Poll)
 		r.Post("/save", db.PostSave)
 		r.Get("/save/{key}", db.PollSave)
+		r.Get("/websocket", handlers.HandleWebSocket)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -72,10 +73,8 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/lnauth_login", handlers.ReceiveLnAuthData)
 		r.Get("/lnauth", handlers.GetLnurlAuth)
-		r.Get("/lnauth_poll", handlers.PollLnurlAuth)
 		r.Get("/refresh_jwt", handlers.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
-		r.Get("/invoices/{payment_request}", handlers.GetInvoiceStatus)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -84,6 +83,7 @@ func NewRouter() *http.Server {
 	}
 
 	server := &http.Server{Addr: ":" + PORT, Handler: r}
+
 	go func() {
 		fmt.Println("Listening on port " + PORT)
 		if err := server.ListenAndServe(); err != nil {

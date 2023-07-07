@@ -1,15 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export default function TwitterView(props: { handle: string }) {
-  return (
-    <Wrap>
-      <Icon source={`/static/twitter.png`} />
-      <div>@{props.handle}</div>
-    </Wrap>
-  );
-}
-
 const Wrap = styled.div`
   display: flex;
   align-items: center;
@@ -20,7 +11,7 @@ interface IconProps {
 }
 
 const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
+  background-image: ${(p: any) => `url(${p.source})`};
   width: 20px;
   height: 20px;
   margin-right: 5px;
@@ -30,3 +21,12 @@ const Icon = styled.div<IconProps>`
   border-radius: 5px;
   overflow: hidden;
 `;
+
+export default function TwitterView(props: { handle: string }) {
+  return (
+    <Wrap>
+      <Icon source={`/static/twitter.png`} />
+      <div>@{props.handle}</div>
+    </Wrap>
+  );
+}

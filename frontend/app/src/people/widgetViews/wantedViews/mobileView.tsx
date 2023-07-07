@@ -1,5 +1,14 @@
 /* eslint-disable func-style */
 import React from 'react';
+import { EuiButtonIcon, EuiText } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
+import GithubStatusPill from '../parts/statusPill';
+import { colors } from '../../../config/colors';
+import NameTag from '../../utils/nameTag';
+import { useStores } from '../../../store';
+import { formatPrice, satToUsd } from '../../../helpers';
+import { Button } from '../../../components/common';
+import { getHost } from '../../../config/host';
 import {
   Img,
   EyeDeleteContainerMobile,
@@ -10,17 +19,6 @@ import {
   DT,
   EyeDeleteTextContainerMobile
 } from './style';
-import { EuiButtonIcon, EuiText } from '@elastic/eui';
-import GithubStatusPill from '../parts/statusPill';
-import { colors } from '../../../config/colors';
-import NameTag from '../../utils/nameTag';
-import { useStores } from '../../../store';
-import { formatPrice, satToUsd } from '../../../helpers';
-import { Button } from '../../../components/common';
-import { getHost } from '../../../config/host';
-import { observer } from 'mobx-react-lite';
-
-export default observer(MobileView);
 
 function MobileView(props: any) {
   const {
@@ -130,7 +128,7 @@ function MobileView(props: any) {
                   }}
                 />
                 <span
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(
                       `/p/${
@@ -269,7 +267,7 @@ function MobileView(props: any) {
                         padding: 0,
                         background: `${color.pureWhite}`
                       }}
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation();
                         setExtrasPropertyAndSave('show');
                       }}
@@ -279,7 +277,7 @@ function MobileView(props: any) {
               </div>
               {ui?.meInfo?.isSuperAdmin && (
                 <EuiButtonIcon
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     showModal();
                     setDeletePayload({
@@ -304,3 +302,4 @@ function MobileView(props: any) {
     </div>
   );
 }
+export default observer(MobileView);

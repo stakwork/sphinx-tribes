@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { setup, isSupported } from '@loomhq/record-sdk';
-import { Button, IconButton } from '../../components/common';
 import { LoomViewProps } from 'people/interfaces';
+import { Button, IconButton } from '../../components/common';
 
 const PUBLIC_APP_ID = 'ded90c8e-92ed-496d-bfe3-f742d7fa9785';
 
@@ -32,7 +32,7 @@ export default function LoomViewerRecorder(props: LoomViewProps) {
 
       const sdkButton = configureButton({ element: button });
 
-      sdkButton.on('insert-click', async (video) => {
+      sdkButton.on('insert-click', async (video: any) => {
         setVideoUrl(video.embedUrl);
         if (onChange) onChange(video.embedUrl);
       });

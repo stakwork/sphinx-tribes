@@ -1,11 +1,40 @@
 import React from 'react';
 import styled from 'styled-components';
+import { PaidBountiesProps } from 'people/interfaces';
 import BountyDescription from '../../bounties/bounty_description';
 import BountyPrice from '../../bounties/bounty_price';
 import BountyProfileView from '../../bounties/bounty_profile_view';
 import { colors } from '../../config/colors';
-import { PaidBountiesProps } from 'people/interfaces';
 
+interface PaidBountyProps {
+  Price_User_Container_Border?: string;
+  Bounty_Container_Background?: string;
+  color?: any;
+}
+
+const BountyContainer = styled.div<PaidBountyProps>`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  font-family: Barlow;
+  height: 160px !important;
+  background: ${(p: any) => p.Bounty_Container_Background};
+  border: 2px solid ${(p: any) => p.color.grayish.G950};
+  border-radius: 10px;
+  :hover {
+    border: 2px solid ${(p: any) => p.color && p.color.borderGreen2};
+    border-radius: 10px;
+  }
+`;
+
+const PriceUserContainer = styled.div<PaidBountyProps>`
+  display: flex;
+  flex-direction: row;
+  border: 2px solid ${(p: any) => p.Price_User_Container_Border};
+  border-radius: 10px;
+  width: 579px;
+  margin: -0.5px -1.1px;
+`;
 const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];
   return (
@@ -58,33 +87,3 @@ const PaidBounty = (props: PaidBountiesProps) => {
 };
 
 export default PaidBounty;
-
-interface PaidBountyProps {
-  Price_User_Container_Border?: string;
-  Bounty_Container_Background?: string;
-  color?: any;
-}
-
-const BountyContainer = styled.div<PaidBountyProps>`
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  font-family: Barlow;
-  height: 160px !important;
-  background: ${(p) => p.Bounty_Container_Background};
-  border: 2px solid ${(p) => p.color.grayish.G950};
-  border-radius: 10px;
-  :hover {
-    border: 2px solid ${(p) => p.color && p.color.borderGreen2};
-    border-radius: 10px;
-  }
-`;
-
-const PriceUserContainer = styled.div<PaidBountyProps>`
-  display: flex;
-  flex-direction: row;
-  border: 2px solid ${(p) => p.Price_User_Container_Border};
-  border-radius: 10px;
-  width: 579px;
-  margin: -0.5px -1.1px;
-`;

@@ -1,22 +1,72 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import OfferView from '../widgetViews/offerView';
 import WantedView from '../widgetViews/wantedView';
 import PostView from '../widgetViews/postView';
-import styled from 'styled-components';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/constants';
 import { Spacer } from '../main/body';
 import NoResults from '../utils/noResults';
 import { uiStore } from '../../store/ui';
-import DeleteTicketModal from './deleteModal';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
-import { observer } from 'mobx-react-lite';
+import DeleteTicketModal from './deleteModal';
 
-export default observer(WidgetSwitchViewer);
+interface PanelProps {
+  isMobile?: boolean;
+  color?: any;
+  isAssignee?: boolean;
+}
 
-function WidgetSwitchViewer(props) {
+const Panel = styled.div<PanelProps>`
+  margin-top: 4px;
+  background: ${(p: any) => p.color && p.color.pureWhite};
+  color: ${(p: any) => p.color && p.color.pureBlack};
+  padding: 20px;
+  border-bottom: ${(p: any) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
+  :hover {
+    box-shadow: ${(p: any) =>
+      p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
+  }
+  :active {
+    box-shadow: none !important;
+  }
+`;
+
+const LoadMoreContainer = styled.div<PanelProps>`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .LoadMoreButton {
+    width: 166px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: ${(p: any) => p.color && p.color.grayish.G10};
+    border: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
+    border-radius: 30px;
+    background: ${(p: any) => p.color && p.color.pureWhite};
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    cursor: pointer;
+    user-select: none;
+    :hover {
+      border: 1px solid ${(p: any) => p.color && p.color.grayish.G300};
+    }
+    :active {
+      border: 1px solid ${(p: any) => p.color && p.color.grayish.G100};
+    }
+  }
+`;
+
+function WidgetSwitchViewer(props: any) {
   const color = colors['light'];
   const { main } = useStores();
   const isMobile = useIsMobile();
@@ -53,7 +103,7 @@ function WidgetSwitchViewer(props) {
     offer: peopleOffers
   };
 
-  const activeList = [...listSource[selectedWidget]].filter(({ body }) => {
+  const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
     return (
       bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
@@ -61,12 +111,14 @@ function WidgetSwitchViewer(props) {
     );
   });
 
-  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find((f) => f.dynamicSchemas);
+  const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(
+    (f: any) => f.dynamicSchemas
+  );
   // if dynamic schema, get all those fields
   if (foundDynamicSchema) {
     const dynamicFields: any = [];
-    foundDynamicSchema.dynamicSchemas?.forEach((ds) => {
-      ds.forEach((f) => {
+    foundDynamicSchema.dynamicSchemas?.forEach((ds: any) => {
+      ds.forEach((f: any) => {
         if (!dynamicFields.includes(f.name)) dynamicFields.push(f.name);
       });
     });
@@ -102,7 +154,7 @@ function WidgetSwitchViewer(props) {
 
   const listItems =
     activeList && activeList.length ? (
-      activeList.slice(0, currentItems).map((item, i) => {
+      activeList.slice(0, currentItems).map((item: any, i: number) => {
         const { person, body } = item;
         const conditionalStyles = body?.paid
           ? {
@@ -195,54 +247,4 @@ function WidgetSwitchViewer(props) {
     </>
   );
 }
-
-interface PanelProps {
-  isMobile?: boolean;
-  color?: any;
-  isAssignee?: boolean;
-}
-
-const Panel = styled.div<PanelProps>`
-  margin-top: 4px;
-  background: ${(p) => p.color && p.color.pureWhite};
-  color: ${(p) => p.color && p.color.pureBlack};
-  padding: 20px;
-  border-bottom: ${(p) => (p.isMobile ? `2px solid ${p.color.grayish.G700}` : 'none')};
-  :hover {
-    box-shadow: ${(p) => (p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none')} !important;
-  }
-  :active {
-    box-shadow: none !important;
-  }
-`;
-
-const LoadMoreContainer = styled.div<PanelProps>`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .LoadMoreButton {
-    width: 166px;
-    height: 48px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: ${(p) => p.color && p.color.grayish.G10};
-    border: 1px solid ${(p) => p.color && p.color.grayish.G600};
-    border-radius: 30px;
-    background: ${(p) => p.color && p.color.pureWhite};
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 17px;
-    cursor: pointer;
-    user-select: none;
-    :hover {
-      border: 1px solid ${(p) => p.color && p.color.grayish.G300};
-    }
-    :active {
-      border: 1px solid ${(p) => p.color && p.color.grayish.G100};
-    }
-  }
-`;
+export default observer(WidgetSwitchViewer);

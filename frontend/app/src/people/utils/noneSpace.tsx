@@ -1,8 +1,83 @@
 import React from 'react';
 import styled from 'styled-components';
+import { NoneSpaceProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
 import { Button } from '../../components/common';
-import { NoneSpaceProps } from 'people/interfaces';
+
+interface IconProps {
+  src: string;
+  color?: any;
+}
+
+interface styledProps {
+  color?: any;
+}
+
+const OuterContainer = styled.div<styledProps>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: ${(p: any) => p?.color && p.color.background100};
+`;
+
+const Icon = styled.div<IconProps>`
+  background-image: ${(p: any) => `url(${p.src})`};
+  width: 160px;
+  height: 160px;
+  margin-right: 10px;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+  border-radius: 5px;
+  overflow: hidden;
+`;
+
+interface HProps {
+  small: boolean;
+  color?: any;
+}
+
+const H = styled.div<HProps>`
+  margin-top: 10px;
+
+  font-family: Roboto;
+  font-style: normal;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: ${(p: any) => p?.color && p.color.grayish.G05};
+  padding: 0 10px;
+  max-width: 350px;
+  letter-spacing: 0px;
+  color: ${(p: any) => p?.color && p.color.grayish.G07};
+  font-weight: 700;
+  font-size: ${(p: any) => (p.small ? '22px' : '30px')};
+  line-height: ${(p: any) => (p.small ? '26px' : '40px')};
+`;
+
+const C = styled.div<styledProps>`
+  margin-top: 10px;
+  font-family: Roboto;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 26px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: ${(p: any) => p?.color && p.color.grayish.G100};
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+  color: ${(p: any) => p?.color && p.color.grayish.G50};
+  padding: 0 10px;
+  max-width: 350px;
+  padding: 0 65px;
+`;
 
 export default function NoneSpace(props: NoneSpaceProps) {
   const color = colors['light'];
@@ -75,78 +150,3 @@ export default function NoneSpace(props: NoneSpaceProps) {
     </OuterContainer>
   );
 }
-
-interface IconProps {
-  src: string;
-  color?: any;
-}
-
-interface styledProps {
-  color?: any;
-}
-
-const OuterContainer = styled.div<styledProps>`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background: ${(p) => p?.color && p.color.background100};
-`;
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.src})`};
-  width: 160px;
-  height: 160px;
-  margin-right: 10px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  border-radius: 5px;
-  overflow: hidden;
-`;
-
-interface HProps {
-  small: boolean;
-  color?: any;
-}
-
-const H = styled.div<HProps>`
-  margin-top: 10px;
-
-  font-family: Roboto;
-  font-style: normal;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: ${(p) => p?.color && p.color.grayish.G05};
-  padding: 0 10px;
-  max-width: 350px;
-  letter-spacing: 0px;
-  color: ${(p) => p?.color && p.color.grayish.G07};
-  font-weight: 700;
-  font-size: ${(p) => (p.small ? '22px' : '30px')};
-  line-height: ${(p) => (p.small ? '26px' : '40px')};
-`;
-
-const C = styled.div<styledProps>`
-  margin-top: 10px;
-  font-family: Roboto;
-  font-size: 22px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 26px;
-  letter-spacing: 0em;
-  text-align: center;
-  color: ${(p) => p?.color && p.color.grayish.G100};
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 18px;
-  text-align: center;
-  color: ${(p) => p?.color && p.color.grayish.G50};
-  padding: 0 10px;
-  max-width: 350px;
-  padding: 0 65px;
-`;

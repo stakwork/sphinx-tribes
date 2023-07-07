@@ -1,22 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { useObserver } from 'mobx-react-lite';
-import { useStores } from '../../store';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { AuthProps } from 'people/interfaces';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { useStores } from '../../store';
 import { Divider } from '../../components/common';
 import IconButton from '../../components/common/icon_button';
 import { useIsMobile } from '../../hooks';
-import AuthQR from './authQR';
 import QR from '../utils/QR';
+import AuthQR from './authQR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
-import { observer } from 'mobx-react-lite';
-import { AuthProps } from 'people/interfaces';
 
-export default observer(SignIn);
+interface ImageProps {
+  readonly src: string;
+}
+
+const Name = styled.div`
+  font-style: normal;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 19px;
+  font-family: Barlow;
+  /* or 73% */
+
+  text-align: center;
+
+  /* Text 2 */
+
+  color: #292c33;
+`;
+
+const Description = styled.div`
+  font-size: 17px;
+  line-height: 20px;
+  text-align: center;
+  margin: 20px 0;
+  font-family: Barlow;
+
+  /* Main bottom icons */
+
+  color: #5f6368;
+`;
+
+const Column = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+`;
+const Imgg = styled.div<ImageProps>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  margin-bottom: 20px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  position: relative;
+`;
 
 function SignIn(props: AuthProps) {
-  const { main } = useStores();
+  const { main, ui } = useStores();
   const [page, setPage] = useState('sphinx');
-  const [pollCount, setPollCount] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
 
   function redirect() {
@@ -32,22 +80,39 @@ function SignIn(props: AuthProps) {
     main.getLnAuth();
   }, []);
 
-  async function pollLnurl(count: number) {
-    if (main.lnauth.k1) {
-      const data = await main.getLnAuthPoll();
-      setPollCount(count);
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+    if (res.msg === SOCKET_MSG.user_connect) {
+      const user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        ui.setMeInfo(user);
+      }
+    } else if (res.msg === SOCKET_MSG.lnauth_success && res.k1 === main.lnauth.k1) {
+      if (res.status) {
+        ui.setShowSignIn(false);
 
-      const pollTimeout = setTimeout(() => {
-        pollLnurl(count + 1);
-        setPollCount(count + 1);
-      }, 1500);
-
-      if (count >= 10 || data.status) {
-        clearTimeout(pollTimeout);
-        setPollCount(0);
+        main.setLnAuth({ encode: '', k1: '' });
+        main.setLnToken(res.jwt);
+        ui.setMeInfo({ ...res.user, jwt: res.jwt });
       }
     }
-  }
+  };
+
+  useEffect(() => {
+    const socket: WebSocket = createSocketInstance();
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event);
+    };
+
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
+  }, []);
 
   return useObserver(() => (
     <div>
@@ -121,7 +186,6 @@ function SignIn(props: AuthProps) {
                   color={'primary'}
                   onClick={() => {
                     setPage('lnurl');
-                    pollLnurl(pollCount);
                   }}
                   hovercolor={'#5881F8'}
                   activecolor={'#5078F2'}
@@ -156,52 +220,4 @@ function SignIn(props: AuthProps) {
   ));
 }
 
-interface ImageProps {
-  readonly src: string;
-}
-
-const Name = styled.div`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 26px;
-  line-height: 19px;
-  font-family: Barlow;
-  /* or 73% */
-
-  text-align: center;
-
-  /* Text 2 */
-
-  color: #292c33;
-`;
-
-const Description = styled.div`
-  font-size: 17px;
-  line-height: 20px;
-  text-align: center;
-  margin: 20px 0;
-  font-family: Barlow;
-
-  /* Main bottom icons */
-
-  color: #5f6368;
-`;
-
-const Column = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 25px;
-`;
-const Imgg = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
-  background-position: center;
-  background-size: cover;
-  margin-bottom: 20px;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  position: relative;
-`;
+export default observer(SignIn);

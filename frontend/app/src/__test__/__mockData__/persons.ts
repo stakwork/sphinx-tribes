@@ -1,4 +1,4 @@
-import { Person, PersonWanted } from '../../store/main';
+import { Person } from '../../store/main';
 
 export const people: Person[] = [
   {

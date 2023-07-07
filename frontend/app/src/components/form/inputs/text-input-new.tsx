@@ -1,8 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import type { Props } from './propsType';
 import { colors } from '../../../config/colors';
+import type { Props } from './propsType';
 
+interface styledProps {
+  color?: any;
+  borderColor?: string;
+}
+
+const InputOuterBox = styled.div<styledProps>`
+  position: relative;
+  margin-bottom: 32px;
+  .inputText {
+    height: 40px;
+    width: 292px;
+    font-size: 14px;
+    color: ${(p: any) => p.color && p.color.pureBlack};
+    border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
+    border-radius: 4px;
+    outline: none;
+    padding-left: 16px;
+    color: ${(p: any) => p.color && p.color.text2};
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    :active {
+      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
+    }
+    :focus-visible {
+      border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
+    }
+  }
+`;
 export default function TextInputNew({
   error,
   label,
@@ -38,7 +66,7 @@ export default function TextInputNew({
             setIsError(true);
           }
         }}
-        onChange={(e) => {
+        onChange={(e: any) => {
           handleChange(e.target.value);
           setTextValue(e.target.value);
         }}
@@ -64,32 +92,3 @@ export default function TextInputNew({
     </InputOuterBox>
   );
 }
-
-interface styledProps {
-  color?: any;
-  borderColor?: string;
-}
-
-const InputOuterBox = styled.div<styledProps>`
-  position: relative;
-  margin-bottom: 32px;
-  .inputText {
-    height: 40px;
-    width: 292px;
-    font-size: 14px;
-    color: ${(p) => p.color && p.color.pureBlack};
-    border: 1px solid ${(p) => p.borderColor && p.borderColor};
-    border-radius: 4px;
-    outline: none;
-    padding-left: 16px;
-    color: ${(p) => p.color && p.color.text2};
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    :active {
-      border: 1px solid ${(p) => p.color.blue2 && p.color.blue2} !important;
-    }
-    :focus-visible {
-      border: 1px solid ${(p) => p.color.blue2 && p.color.blue2} !important;
-    }
-  }
-`;

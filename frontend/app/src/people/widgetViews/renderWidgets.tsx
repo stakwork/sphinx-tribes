@@ -1,29 +1,40 @@
 /* eslint-disable func-style */
 import React from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { RenderWidgetsProps } from 'people/interfaces';
 import { useStores } from '../../store';
 
-import { AboutView } from './aboutView';
-import OfferView from './offerView';
-
-import { observer } from 'mobx-react-lite';
 import { meSchema } from '../../components/form/schema';
 import { useIsMobile } from '../../hooks';
 import Badges from '../utils/badges';
 import { widgetConfigs } from '../utils/constants';
 import NoneSpace from '../utils/noneSpace';
+import OfferView from './offerView';
+import { AboutView } from './aboutView';
 import { PostBounty } from './postBounty';
 import UserTickets from './userTicketsView';
-import { RenderWidgetsProps } from 'people/interfaces';
 
-export default observer(RenderWidgets);
+interface PanelProps {
+  isMobile: boolean;
+}
+
+const Panel = styled.div<PanelProps>`
+  position: relative;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+  box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
+  border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+`;
 
 function RenderWidgets({ widget }: RenderWidgetsProps) {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
   const personId = ui.selectedPerson;
 
-  let person: any = main.people && main.people.length && main.people.find((f) => f.id === personId);
+  let person: any =
+    main.people && main.people.length && main.people.find((f: any) => f.id === personId);
 
   // if i select myself, fill person with meInfo
   if (personId === ui.meInfo?.id) {
@@ -44,7 +55,7 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
 
   const selectedWidget = widget;
 
-  let widgetSchemas: any = meSchema.find((f) => f.name === 'extras');
+  let widgetSchemas: any = meSchema.find((f: any) => f.name === 'extras');
   if (widgetSchemas && widgetSchemas.extras) {
     widgetSchemas = widgetSchemas && widgetSchemas.extras;
   }
@@ -56,18 +67,18 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
   if (filteredExtras) {
     const emptyArrayKeys = [''];
 
-    Object.keys(filteredExtras).forEach((name) => {
+    Object.keys(filteredExtras).forEach((name: any) => {
       const p = extras && extras[name];
       if (Array.isArray(p) && !p.length) {
         emptyArrayKeys.push(name);
       }
-      const thisSchema = widgetSchemas && widgetSchemas.find((e) => e.name === name);
+      const thisSchema = widgetSchemas && widgetSchemas.find((e: any) => e.name === name);
       if (filteredExtras && thisSchema && thisSchema.single) {
         delete filteredExtras[name];
       }
     });
 
-    emptyArrayKeys.forEach((e) => {
+    emptyArrayKeys.forEach((e: any) => {
       if (filteredExtras && e) delete filteredExtras[e];
     });
   }
@@ -84,10 +95,10 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
     }
 
     const widgetSchema: any =
-      (widgetSchemas && widgetSchemas.find((f) => f.name === selectedWidget)) || {};
+      (widgetSchemas && widgetSchemas.find((f: any) => f.name === selectedWidget)) || {};
     const { single } = widgetSchema;
 
-    function wrapIt(child) {
+    function wrapIt(child: any) {
       if (single) {
         return <Panel isMobile={isMobile}>{child}</Panel>;
       }
@@ -107,7 +118,7 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
           };
 
       fullSelectedWidget &&
-        fullSelectedWidget.forEach((s, i) => {
+        fullSelectedWidget.forEach((s: any, i: number) => {
           if (!canEdit && 'show' in s && s.show === false) {
             // skip hidden items
             return;
@@ -191,16 +202,4 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
 
   return renderWidgets();
 }
-
-interface PanelProps {
-  isMobile: boolean;
-}
-
-const Panel = styled.div<PanelProps>`
-  position: relative;
-  background: #ffffff;
-  color: #000000;
-  padding: 20px;
-  box-shadow: ${(p) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
-  border-bottom: ${(p) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
-`;
+export default observer(RenderWidgets);

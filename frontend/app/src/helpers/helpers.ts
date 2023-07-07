@@ -1,11 +1,11 @@
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export function formatPrice(amount) {
+export function formatPrice(amount: number) {
   return amount;
 }
 
-export function satToUsd(amount) {
+export function satToUsd(amount: number) {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);
@@ -17,7 +17,7 @@ export function satToUsd(amount) {
   return returnValue;
 }
 
-export const DollarConverter = (e) => {
+export const DollarConverter = (e: any) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');
   return dollarUSLocale.format(formatPrice(e)).split(',').join(' ');
 };
@@ -77,11 +77,11 @@ export function extractGithubIssueFromUrl(
 }
 
 export const randomString = (l: number): string =>
-  Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte) =>
+  Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte: any) =>
     `0${(byte & 0xff).toString(16)}`.slice(-2)
   ).join('');
 
-export function sendToRedirect(url) {
+export function sendToRedirect(url: string) {
   const el = document.createElement('a');
   el.href = url;
   el.target = '_blank';

@@ -1,11 +1,11 @@
 import React from 'react';
-import { uiStore } from './ui';
-import { mainStore } from './main';
 import { create } from 'mobx-persist';
-import { appEnv } from '../config/env';
-import { modalsVisibilityStore } from './modals';
 import { configure } from 'mobx';
 import { leaderboardStore } from 'leaderboard';
+import { appEnv } from '../config/env';
+import { uiStore } from './ui';
+import { mainStore } from './main';
+import { modalsVisibilityStore } from './modals';
 
 (() => {
   if (appEnv.isTests) {
@@ -26,7 +26,7 @@ const Context = React.createContext({
   leaderboard: leaderboardStore
 });
 
-export const WithStores = ({ children }) => (
+export const WithStores = ({ children }: any) => (
   <Context.Provider
     value={{
       ui: uiStore,

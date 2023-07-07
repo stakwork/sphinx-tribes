@@ -2,34 +2,6 @@ import { GithubStatusPillProps } from 'people/interfaces';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-export default function GithubStatusPill(props: GithubStatusPillProps) {
-  const { status, assignee, style } = props;
-
-  const [assigneText, setAssigneText] = useState('');
-
-  const isOpen = status === 'open' || !status;
-
-  useEffect(() => {
-    const assignedText =
-      assignee && !assignee?.owner_alias
-        ? 'Not assigned'
-        : isOpen
-        ? 'Assigned to '
-        : 'Completed by ';
-    setAssigneText(assignedText);
-  }, [isOpen, assignee]);
-
-  return (
-    <div style={{ display: 'flex', ...style }}>
-      <Pill isOpen={isOpen}>
-        <div>{isOpen ? 'Open' : 'Closed'}</div>
-      </Pill>
-      <W>
-        <Assignee>{assigneText}</Assignee>
-      </W>
-    </div>
-  );
-}
 interface PillProps {
   readonly isOpen: boolean;
 }
@@ -39,7 +11,7 @@ const Pill = styled.div<PillProps>`
   align-items: center;
   font-size: 12px;
   font-weight: 300;
-  background: ${(p) => (p.isOpen ? '#49C998' : '#8256D0')};
+  background: ${(p: any) => (p.isOpen ? '#49C998' : '#8256D0')};
   border-radius: 30px;
   border: 1px solid transparent;
   text-transform: capitalize;
@@ -83,3 +55,31 @@ const W = styled.div`
   display: flex;
   align-items: center;
 `;
+export default function GithubStatusPill(props: GithubStatusPillProps) {
+  const { status, assignee, style } = props;
+
+  const [assigneText, setAssigneText] = useState('');
+
+  const isOpen = status === 'open' || !status;
+
+  useEffect(() => {
+    const assignedText =
+      assignee && !assignee?.owner_alias
+        ? 'Not assigned'
+        : isOpen
+        ? 'Assigned to '
+        : 'Completed by ';
+    setAssigneText(assignedText);
+  }, [isOpen, assignee]);
+
+  return (
+    <div style={{ display: 'flex', ...style }}>
+      <Pill isOpen={isOpen}>
+        <div>{isOpen ? 'Open' : 'Closed'}</div>
+      </Pill>
+      <W>
+        <Assignee>{assigneText}</Assignee>
+      </W>
+    </div>
+  );
+}

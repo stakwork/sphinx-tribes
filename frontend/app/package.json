@@ -13,9 +13,10 @@
     "build": "craco build",
     "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 1027 --ext .ts --ext .tsx",
+    "lint": "eslint src --max-warnings 67 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",
-    "prettier": "npx prettier --config .prettierrc.json -w ./src"
+    "prettier": "npx prettier --config .prettierrc.json -w ./src",
+    "prepare": "cd ../.. && husky install frontend/app/.husky"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",
@@ -73,28 +74,41 @@
         "as-needed"
       ],
       "@typescript-eslint/typedef": [
-        "warn",
+        "error",
         {
           "parameter": true,
-          "arrowParameter": true
+          "objectDestructuring": false,
+          "arrowParameter": true,
+          "memberVariableDeclaration": false
         }
       ],
+     "no-use-before-define": ["error", {
+        "functions": true,
+        "classes": true,
+        "variables": true,
+        "allowNamedExports": false
+    }],
+     "import/order": "error",
+     "camelcase": "off",
+     "comma-dangle": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "warn",
-      "@typescript-eslint/no-empty-function": "warn",
-      "@typescript-eslint/no-empty-interface": "warn",
+      "@typescript-eslint/no-empty-function": "error",
+      "@typescript-eslint/no-empty-interface": "error",
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",
       "react-hooks/rules-of-hooks": "warn",
       "react-hooks/exhaustive-deps": "warn",
       "react/prop-types": "warn",
       "no-unused-vars": "warn",
+      "no-var": "warn",
       "no-extra-boolean-cast": "warn",
       "no-useless-escape": "warn",
       "no-prototype-builtins": "warn",
       "no-empty-pattern": "warn",
       "no-empty": "warn",
-      "no-unreachable": "warn",
+      "no-multiple-empty-lines": "error",
+      "no-unreachable": "error",
       "no-useless-catch": "warn",
       "react/jsx-closing-bracket-location": [
         "warn",
@@ -107,8 +121,13 @@
       ],
       "prefer-const": "warn",
       "no-const-assign": "warn",
-      "no-var": "warn",
-      "prefer-destructuring": "warn",
+      "prefer-destructuring": [
+        "error",
+        {
+          "object": true,
+          "array": false
+        }
+      ],
       "prefer-template": "warn",
       "func-style": "off",
       "react/self-closing-comp": "warn",
@@ -153,8 +172,10 @@
     "@typescript-eslint/parser": "^5.57.1",
     "bootstrap": "^4.5.0",
     "eslint": "^8.37.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-react": "^7.31.10",
+    "husky": "^8.0.3",
     "nock": "^13.3.0",
     "react-error-overlay": "6.0.9",
     "typescript": "^5.0.3"

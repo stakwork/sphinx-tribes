@@ -6,15 +6,40 @@ import WidgetSwitchViewer from 'people/widgetViews/widgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import { colors } from '../../config/colors';
 import { useIsMobile, usePageScroll } from '../../hooks';
 import { useStores } from '../../store';
 
-import { observer } from 'mobx-react-lite';
 // avoid hook within callback warning by renaming hooks
+const Body = styled.div`
+  flex: 1;
+  height: calc(100% - 105px);
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Backdrop = styled.div`
+  position: fixed;
+  z-index: 1;
+  background: rgba(0, 0, 0, 70%);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+`;
+
+export const Spacer = styled.div`
+  display: flex;
+  min-height: 10px;
+  min-width: 100%;
+  height: 10px;
+  width: 100%;
+`;
 
 const getPageScroll = usePageScroll;
-export default observer(BodyComponent);
 
 function BodyComponent() {
   const { main, ui } = useStores();
@@ -49,7 +74,7 @@ function BodyComponent() {
     })();
   }, [main]);
 
-  const onChangeStatus = (optionId) => {
+  const onChangeStatus = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
       ...{
@@ -59,7 +84,7 @@ function BodyComponent() {
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
   };
 
-  const onChangeLanguage = (optionId) => {
+  const onChangeLanguage = (optionId: any) => {
     const newCheckboxIdToSelectedMapLanguage = {
       ...checkboxIdToSelectedMapLanguage,
       ...{
@@ -69,14 +94,7 @@ function BodyComponent() {
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
   };
 
-  const loadForwardFunc = () => loadMore(1);
-  const loadBackwardFunc = () => loadMore(-1);
-  const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
-    loadForwardFunc,
-    loadBackwardFunc
-  );
-
-  async function loadMore(direction) {
+  async function loadMore(direction: number) {
     let currentPage = 1;
     currentPage = peopleWantedsPageNumber;
     let newPage = currentPage + direction;
@@ -87,8 +105,14 @@ function BodyComponent() {
       console.log('load failed', e);
     }
   }
+  const loadForwardFunc = () => loadMore(1);
+  const loadBackwardFunc = () => loadMore(-1);
+  const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
+    loadForwardFunc,
+    loadBackwardFunc
+  );
 
-  const onPanelClick = (person, item) => {
+  const onPanelClick = (person: any, item: number) => {
     history.replace({
       pathname: history?.location?.pathname,
       search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
@@ -165,7 +189,7 @@ function BodyComponent() {
   }
   return (
     <Body
-      onScroll={(e) => {
+      onScroll={(e: any) => {
         setScrollValue(e?.currentTarget?.scrollTop >= 20);
         handleScroll(e);
       }}
@@ -228,29 +252,4 @@ function BodyComponent() {
   );
 }
 
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Backdrop = styled.div`
-  position: fixed;
-  z-index: 1;
-  background: rgba(0, 0, 0, 70%);
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-export const Spacer = styled.div`
-  display: flex;
-  min-height: 10px;
-  min-width: 100%;
-  height: 10px;
-  width: 100%;
-`;
+export default observer(BodyComponent);

@@ -1,11 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Input from '../../../form/inputs/';
 import { EuiButton } from '@elastic/eui';
-import WidgetList from './widgetList';
 import MaterialIcon from '@material/react-material-icon';
+import Input from '../../../form/inputs/';
+import WidgetList from './widgetList';
 import { FocusedWidgetProps } from './interfaces';
 
+const Wrap = styled.div`
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-evenly;
+`;
+
+const Nav = styled.div`
+  color: #fff;
+  display: flex;
+  align-content: center;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+  margin-top: 2px;
+  height: 42px;
+  min-height: 42px;
+`;
+
+export interface IconProps {
+  source: string;
+}
+
+const Icon = styled.div<IconProps>`
+  background-image: ${(p: any) => `url(${p.source})`};
+  width: 30px;
+  height: 30px;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+  border-radius: 5px;
+  overflow: hidden;
+`;
 export default function FocusedWidget(props: FocusedWidgetProps) {
   const {
     name,
@@ -39,6 +72,35 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     };
   }, []);
 
+  function getFieldToUpdate(e: any) {
+    let valueToUpdate = `${name}.${item.name}.${e.name}`;
+    if (!single) {
+      valueToUpdate = `${name}.${item.name}[${selectedIndex}].${e.name}`;
+    }
+    return valueToUpdate;
+  }
+
+  function getInitialValueByType(type: any) {
+    let value: any = '';
+    if (type === 'number') value = 0;
+    if (type === 'gallery') value = [];
+    console.log('getInitialValueByType', value);
+    return value;
+  }
+
+  function thereAreErrors() {
+    let result = false;
+
+    if (newErrors && Array.isArray(newErrors) && newErrors.length) {
+      result = true;
+    } else if (newErrors && Object.keys(newErrors).length) {
+      result = true;
+    }
+    return result;
+  }
+  function getFormState() {
+    return (values[name] && values[name][item.name]) || [];
+  }
   useEffect(() => {
     // in order to
     if (single) {
@@ -53,7 +115,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     }
   }, [selectedIndex]);
 
-  function cancel(dismount) {
+  function cancel(dismount: any) {
     // new widget cancelled, revert form state
     let returnState = prevState;
     if (!single && selectedIndex < 0) {
@@ -80,10 +142,6 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     }
   }
 
-  function getFormState() {
-    return (values[name] && values[name][item.name]) || [];
-  }
-
   function startCreate() {
     const cloneformState = getFormState();
     setPrevState(cloneformState);
@@ -92,7 +150,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     if (single) setFieldTouched(item.name, true);
 
     const obj = {};
-    item.fields.forEach((o) => {
+    item.fields.forEach((o: any) => {
       let val: any = '';
       if (o.type === 'number') val = 0;
       obj[o.name] = val;
@@ -104,54 +162,27 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     setSelectedIndex(0);
   }
 
-  function startEdit(obj, i) {
+  function startEdit(obj: any, i: any) {
     const cloneformState = getFormState();
     setPrevState(cloneformState);
     const formState = [...cloneformState];
 
     let index = i;
     if (obj.id) {
-      index = formState && formState.findIndex((f) => f.id === obj.id);
+      index = formState && formState.findIndex((f: any) => f.id === obj.id);
     }
     setSelectedIndex(index);
   }
 
-  function deleteItem(obj, i) {
+  function deleteItem(obj: any, i: any) {
     const formState = (values[name] && [...values[name][item.name]]) || [];
     let index = i;
     if (obj.id) {
-      index = formState && formState.findIndex((f) => f.id === obj.id);
+      index = formState && formState.findIndex((f: any) => f.id === obj.id);
     }
 
     formState.splice(index, 1);
     setFieldValue(`${name}.${item.name}`, formState);
-  }
-
-  function getInitialValueByType(type) {
-    let value: any = '';
-    if (type === 'number') value = 0;
-    if (type === 'gallery') value = [];
-    console.log('getInitialValueByType', value);
-    return value;
-  }
-
-  function thereAreErrors() {
-    let result = false;
-
-    if (newErrors && Array.isArray(newErrors) && newErrors.length) {
-      result = true;
-    } else if (newErrors && Object.keys(newErrors).length) {
-      result = true;
-    }
-    return result;
-  }
-
-  function getFieldToUpdate(e) {
-    let valueToUpdate = `${name}.${item.name}.${e.name}`;
-    if (!single) {
-      valueToUpdate = `${name}.${item.name}[${selectedIndex}].${e.name}`;
-    }
-    return valueToUpdate;
   }
 
   const showingList = single ? false : selectedIndex > -1 ? false : true;
@@ -190,7 +221,7 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
       {/* single widgets will only show these fields */}
       {!showingList && (
         <>
-          {item.fields.map((e, i) => (
+          {item.fields.map((e: any) => (
             <Input
               {...e}
               key={e.name}
@@ -239,37 +270,3 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     </Wrap>
   );
 }
-
-const Wrap = styled.div`
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: space-evenly;
-`;
-
-const Nav = styled.div`
-  color: #fff;
-  display: flex;
-  align-content: center;
-  justify-content: space-evenly;
-  margin-bottom: 20px;
-  margin-top: 2px;
-  height: 42px;
-  min-height: 42px;
-`;
-
-export interface IconProps {
-  source: string;
-}
-
-const Icon = styled.div<IconProps>`
-  background-image: ${(p) => `url(${p.source})`};
-  width: 30px;
-  height: 30px;
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: contain; /* Resize the background image to cover the entire container */
-  border-radius: 5px;
-  overflow: hidden;
-`;
