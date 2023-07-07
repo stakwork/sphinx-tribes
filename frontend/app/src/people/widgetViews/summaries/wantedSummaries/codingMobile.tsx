@@ -144,8 +144,8 @@ export default function MobileView(props: CodingViewProps) {
         <Divider />
         <Y>
           <P color={color}>
-            <B color={color}>{formatPrice(price || 0)}</B> SAT / <B color={color}>{satToUsd(price || 0)}</B>{' '}
-            USD
+            <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
+            <B color={color}>{satToUsd(price || 0)}</B> USD
           </P>
           <Heart />
         </Y>

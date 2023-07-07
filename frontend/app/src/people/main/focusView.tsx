@@ -63,9 +63,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: '#5a606c',
-  trackBackgroundColor: 'rgba(0,0,0,0)'
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -268,12 +268,12 @@ function FocusedView(props: FocusViewProps) {
     setLoading(true);
     try {
       let newBody2 = body;
-      body.assignee = "";
+      body.assignee = '';
       if (body?.assignee?.owner_pubkey) {
         newBody2.assignee = body.assignee.owner_pubkey;
       }
       newBody2.title = body.one_sentence_summary;
-      newBody2.one_sentence_summary = "";
+      newBody2.one_sentence_summary = '';
       newBody2.owner_id = info.pubkey;
 
       await main.saveBounty(newBody2);
@@ -303,7 +303,8 @@ function FocusedView(props: FocusViewProps) {
       initialValues.price_to_meet = personInfo.price_to_meet || 0;
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      initialValues.estimated_completion_date = wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
+      initialValues.estimated_completion_date =
+        wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -326,22 +327,22 @@ function FocusedView(props: FocusViewProps) {
         if (wanted.type) {
           const thisDynamicSchema = dynamicSchemasByType[wanted.type];
           let newValues = thisDynamicSchema.map((s: any) => {
-            if (s.name === "estimated_completion_date") {
+            if (s.name === 'estimated_completion_date') {
               return {
                 [s.name]: wanted['estimated_completion_date'] || new Date()
-              }
-            } else if (s.name === "one_sentence_summary") {
+              };
+            } else if (s.name === 'one_sentence_summary') {
               return {
                 [s.name]: wanted['one_sentence_summary'] || wanted['title']
-              }
+              };
             }
             return {
               [s.name]: wanted[s.name]
-            }
+            };
           });
 
           let valueMap = Object.assign({}, ...newValues);
-          initialValues = { ...initialValues, ...valueMap }
+          initialValues = { ...initialValues, ...valueMap };
         } else {
           const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
           dynamicSchema?.defaultSchema?.forEach((s: any) => {
@@ -359,10 +360,10 @@ function FocusedView(props: FocusViewProps) {
       if (main.peopleWanteds[selectedIndex]) {
         return main.peopleWanteds[selectedIndex].body;
       } else {
-        return null
+        return null;
       }
     }
-    return null
+    return null;
   }
 
   return (
@@ -396,8 +397,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />

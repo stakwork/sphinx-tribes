@@ -55,7 +55,6 @@ func InitInvoiceCron() {
 
 				if invoiceRes.Response.Settled {
 					if inv.Invoice == invoiceRes.Response.Payment_request {
-						fmt.Println("Invoice Settled")
 						/**
 						  If the invoice is settled and still in store
 						  make keysend payment

@@ -60,5 +60,4 @@ function Link(props: ElementProps) {
   return <L {...props}>{props.children}</L>;
 }
 
-
 export { Title, Date, Paragraph, Link };

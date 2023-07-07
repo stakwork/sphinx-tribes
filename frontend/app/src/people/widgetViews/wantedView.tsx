@@ -104,9 +104,11 @@ function WantedView(props: WantedViews2Props) {
   }, [coding_language]);
 
   const renderTickets = () => {
-    const { status } = ticketUrl ? ticketUrl
-      ? extractGithubIssueFromUrl(person, ticketUrl)
-      : extractGithubIssue(person, repo ?? '', issue ?? '') : "open";
+    const { status } = ticketUrl
+      ? ticketUrl
+        ? extractGithubIssueFromUrl(person, ticketUrl)
+        : extractGithubIssue(person, repo ?? '', issue ?? '')
+      : 'open';
 
     const isClosed = status === 'closed' || paid ? true : false;
 

@@ -89,7 +89,9 @@ export default function AssignBounty(props: ConnectCardProps) {
         type: 'ASSIGN',
         assigned_hours: bountyHours,
         commitment_fee: bountyHours * 200,
-        bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
+        bounty_expires: new Date(
+          moment().add(bountyHours, 'hours').format().toString()
+        ).toUTCString()
       });
 
       setLnInvoice(data.response.invoice);

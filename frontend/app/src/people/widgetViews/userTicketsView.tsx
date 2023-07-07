@@ -113,7 +113,7 @@ const UserTickets = () => {
   const listItems =
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
-        let person = main.people.find((p: any) => p.owner_pubkey === item.assignee)
+        let person = main.people.find((p: any) => p.owner_pubkey === item.assignee);
         let body = item;
 
         // if this person has entries for this widget

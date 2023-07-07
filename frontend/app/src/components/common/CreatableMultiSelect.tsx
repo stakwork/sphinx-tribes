@@ -133,4 +133,3 @@ export default function Sel(props: SelProps) {
     </div>
   );
 }
-

@@ -28,7 +28,6 @@ const Image = styled.div`
   border-radius: 50%;
 `;
 
-
 const ImageWrap = styled.div`
   display: flex;
   flex-direction: column;

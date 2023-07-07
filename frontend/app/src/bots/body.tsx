@@ -160,7 +160,7 @@ function BotBody() {
   const loadBots = useCallback(async () => {
     setLoading(true);
 
-					let un = '';
+    let un = '';
     if (window.location.pathname.startsWith('/b/')) {
       un = window.location.pathname.substr(3);
     }
@@ -213,7 +213,6 @@ function BotBody() {
     setShowCreate(false);
     loadBots();
   }
-
 
   useEffect(() => {
     loadBots();

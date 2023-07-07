@@ -123,7 +123,9 @@ export default function ConnectCard(props: ConnectCardProps) {
             <QR value={qrString} size={210} type={'connect'} />
 
             <>
-              {person?.owner_pubkey && (<QrBar value={person?.owner_pubkey} simple style={{ marginTop: 11 }} />)}
+              {person?.owner_pubkey && (
+                <QrBar value={person?.owner_pubkey} simple style={{ marginTop: 11 }} />
+              )}
             </>
             <Button
               text={'Assign to self'}

@@ -9,4 +9,3 @@ const D = styled.div`
 export default function Divider(props: { style?: React.CSSProperties }) {
   return <D style={{ ...props.style }} />;
 }
-

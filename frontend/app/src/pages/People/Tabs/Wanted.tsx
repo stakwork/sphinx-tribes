@@ -42,12 +42,14 @@ export const Wanted = observer(() => {
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const [loading, setIsLoading] = useState<boolean>(false);
-  const { peopleWanteds } = main
-  const fullSelectedWidgets = peopleWanteds.filter((wanted: PersonWanted) => wanted.body.OwnerID === personPubkey);
+  const { peopleWanteds } = main;
+  const fullSelectedWidgets = peopleWanteds.filter(
+    (wanted: PersonWanted) => wanted.body.OwnerID === personPubkey
+  );
 
   async function getUserTickets() {
     setIsLoading(true);
-    console.log(peopleWanteds)
+    console.log(peopleWanteds);
     const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
     setIsLoading(false);
   }
@@ -117,8 +119,7 @@ export const Wanted = observer(() => {
             >
               <WantedView {...w.body} person={person} />
             </Panel>
-
-          )
+          );
         }
       })}
     </Container>

@@ -104,8 +104,8 @@ export interface PersonPost {
 }
 
 export interface PersonWanted {
-	person?: any;
-	body?: any;
+  person?: any;
+  body?: any;
   title?: string;
   description?: string;
   owner_id: string;
@@ -115,8 +115,8 @@ export interface PersonWanted {
   wanted_type: string;
   type?: string;
   price?: string;
-	codingLanguage: string;
-	estimated_session_length: string;
+  codingLanguage: string;
+  estimated_session_length: string;
   bounty_expires?: string;
   commitment_fee?: number;
 }
@@ -714,7 +714,7 @@ export class MainStore {
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams,
-          "wanted"
+          'wanted'
         );
       }
       return ps3;
@@ -784,7 +784,13 @@ export class MainStore {
     }
   }
 
-  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any, type?: string) {
+  doPageListMerger(
+    currentList: any[],
+    newList: any[],
+    setPage: Function,
+    queryParams?: any,
+    type?: string
+  ) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
@@ -803,15 +809,15 @@ export class MainStore {
     const l = [...currentList, ...newList];
 
     let set = new Set();
-    if(type ==="wanted") {
+    if (type === 'wanted') {
       const uniqueArray = l.filter((item: any) => {
         if (item.body && item.body.id && !set.has(item.body.id)) {
           set.add(item.body.id);
           return true;
         }
         return false;
-      }, set)
-      return uniqueArray
+      }, set);
+      return uniqueArray;
     }
 
     return l;
@@ -976,34 +982,33 @@ export class MainStore {
     }
   }
 
-   async saveBounty(body: any): Promise<void> {
+  async saveBounty(body: any): Promise<void> {
     const info = uiStore.meInfo as any;
-    if (!info && !body)  {
+    if (!info && !body) {
       console.log('Youre not logged in');
       return;
     }
 
-    if(!body.coding_language || !body.coding_language.length) {
-      // console.log("Coding Language ===", body.coding_language)
+    if (!body.coding_language || !body.coding_language.length) {
       body.coding_language = [];
     }
-   
+
     try {
       let request = `bounty?token=${info?.jwt}`;
+      //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           ...body
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': this.lnToken || info?.jwt,
           'Content-Type': 'application/json'
         }
       });
 
-      if(response.status) {
-        this.getPeopleWanteds({resetPage: true});
+      if (response.status) {
+        this.getPeopleWanteds({ resetPage: true });
       }
       return;
     } catch (e) {
@@ -1013,23 +1018,23 @@ export class MainStore {
 
   async deleteBounty(created: number): Promise<void> {
     const info = uiStore.meInfo as any;
-    if (!info)  {
+    if (!info) {
       console.log('Youre not logged in');
       return;
     }
 
     try {
       let request = `bounty/${info?.jwt}/${created}`;
+      //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
-        method: "DELETE",
+        method: 'DELETE',
         mode: 'cors',
         headers: {
-          'x-jwt': this.lnToken || info?.jwt,
           'Content-Type': 'application/json'
         }
       });
-      if(response.status) {
-        await this.getPeopleWanteds({resetPage: true});
+      if (response.status) {
+        await this.getPeopleWanteds({ resetPage: true });
       }
       return;
     } catch (e) {
@@ -1275,6 +1280,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
+      //TODO: add authentication
       const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
         method: 'DELETE',
         mode: 'cors',
@@ -1282,7 +1288,6 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': this.lnToken || info.jwt,
           'Content-Type': 'application/json'
         }
       });

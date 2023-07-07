@@ -66,5 +66,4 @@ class API {
   del: Function;
 }
 
-
 export default new API();

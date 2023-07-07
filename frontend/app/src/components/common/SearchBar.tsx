@@ -95,7 +95,6 @@ type SearchTextInputProps = ComponentProps<'input'> &
     iconStyle?: CSSProperties;
   };
 
-
 function SearchBar({
   border,
   borderActive,

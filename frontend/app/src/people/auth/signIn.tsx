@@ -142,25 +142,8 @@ function SignIn(props: AuthProps) {
             ) : (
               !isMobile && (
                 <AuthQR
-                  onSuccess={async () => {
-                    if (props.onSuccess) {
-                      const user = ui.meInfo;
-                      if (user) {
-                        let request = 'token/uuid';
-                        const res = await fetch(`${TribesURL}/${request}`, {
-                          method: "POST",
-                          mode: 'cors',
-                          headers: {
-                            'relay_pubkey': ui.meInfo?.owner_pubkey || '',
-                            'relay_uuid': ui.meInfo?.uuid || ''
-                          }
-                        });
-                        let token = await res.json();
-                        main.setLnToken(token)
-                      }
-
-                      props.onSuccess();
-                    }
+                  onSuccess={() => {
+                    props.onSuccess();
 
                     main.getPeople({ resetPage: true });
                   }}

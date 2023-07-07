@@ -186,7 +186,6 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
               onChange(id);
               setData([...data, { value: id, label: id }]);
               handleChange(data);
-              // console.log("Data ===", data)
             }}
           />
         </EuiPopOverCheckbox>

@@ -67,15 +67,10 @@ const TextContainer = styled.div<styledProps>`
     color: ${(p: any) => p?.color && p?.color.grayish.G300};
   }
 `;
-export default function TextInputNew({
-  label,
-  value,
-  handleChange,
-  readOnly,
-}: Props) {
+export default function TextInputNew({ label, value, handleChange, readOnly }: Props) {
   const color = colors['light'];
   return (
-					<TextContainer color={color}>
+    <TextContainer color={color}>
       <div className="label-float">
         <input
           type="text"
@@ -86,7 +81,6 @@ export default function TextInputNew({
         />
         <label>{label}</label>
       </div>
-     </TextContainer>
+    </TextContainer>
   );
 }
-
