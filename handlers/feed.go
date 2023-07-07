@@ -52,33 +52,34 @@ func processYoutubeDownload(url string, feed feeds.Feed) {
 			}
 
 			type Vars struct {
-				youtube_content []string
+				YoutubeContent []string `json:"youtube_content"`
 			}
 
 			type Attributes struct {
-				vars Vars
+				Vars Vars `json:"vars"`
 			}
 
 			type SetVar struct {
-				attributes Attributes
+				Attributes Attributes `json:"attributes"`
 			}
 
 			type WorkflowParams struct {
-				set_var SetVar
+				SetVar SetVar `json:"set_var"`
 			}
 
 			workflows := WorkflowParams{
-				set_var: SetVar{
-					attributes: Attributes{
-						vars: Vars{youtube_content: data},
+				SetVar: SetVar{
+					Attributes: Attributes{
+						Vars: Vars{YoutubeContent: data},
 					},
 				},
 			}
 
+			buf, _ := json.Marshal(workflows)
 			body := map[string]interface{}{
 				"name":            "Sphinx Youtube Content Storage",
 				"workflow_id":     "11848",
-				"workflow_params": workflows,
+				"workflow_params": string(buf),
 			}
 
 			buf, err := json.Marshal(body)
@@ -98,7 +99,6 @@ func processYoutubeDownload(url string, feed feeds.Feed) {
 				fmt.Println("Youtube Download Request Error ===", err)
 			}
 			defer response.Body.Close()
-
 			res, err := ioutil.ReadAll(response.Body)
 			if err != nil {
 				fmt.Println("Youtube Download Request Error ==", err)
