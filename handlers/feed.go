@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -40,38 +41,67 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 
 func processYoutubeDownload(url string, feed feeds.Feed) {
 	if strings.Contains(url, "youtube") {
-		var data [][]string
+		var data []string
 		for z := 0; z < len(feed.Items); z++ {
 			i := feed.Items[z]
-			item := []string{i.Id, i.EnclosureURL}
-			data = append(data, item)
+			data = append(data, i.Link)
 		}
 
-		youtubeKey := fmt.Sprintf("Token token=%s", os.Getenv("YOUTUBE_KEY"))
+		stakworkKey := fmt.Sprintf("Token token=%s", os.Getenv("STAKWORK_KEY"))
 
-		fmt.Println("KEy ==", youtubeKey)
+		type Vars struct {
+			youtube_content []string
+		}
 
-		// buf, err := json.Marshal(data)
-		// if err != nil {
-		// 	fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
-		// 	return
-		// }
+		type Attributes struct {
+			vars Vars
+		}
 
-		// requestUrl := "https://jobs.stakwork.com/api/v1/projects"
+		type SetVar struct {
+			attributes Attributes
+		}
 
-		// request, err := http.NewRequest(http.MethodPost, requestUrl, bytes.NewBuffer(buf))
-		// request.Header.Set("Content-Type", "application/json")
-		// request.Header.Set("Authorization", youtubeKey)
+		type WorkflowParams struct {
+			set_var SetVar
+		}
 
-		// client := &http.Client{}
-		// response, err := client.Do(request)
-		// if err != nil {
-		// 	fmt.Println("Youtube request error", err)
-		// }
-		// defer response.Body.Close()
+		workflows := WorkflowParams{
+			set_var: SetVar{
+				attributes: Attributes{
+					vars: Vars{youtube_content: data},
+				},
+			},
+		}
 
-		// body, _ := ioutil.ReadAll(response.Body)
-		// fmt.Println("Youtube succces", body)
+		body := map[string]interface{}{
+			"name":            "Sphinx Youtube Content Storage",
+			"workflow_id":     "11848",
+			"workflow_params": workflows,
+		}
+
+		buf, err := json.Marshal(body)
+		if err != nil {
+			fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
+			return
+		}
+
+		requestUrl := "https://jobs.stakwork.com/api/v1/projects"
+		request, err := http.NewRequest(http.MethodPost, requestUrl, bytes.NewBuffer(buf))
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("Authorization", stakworkKey)
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+		if err != nil {
+			fmt.Println("Youtube Download Request Error ===", err)
+		}
+		defer response.Body.Close()
+
+		res, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println("Youtube Download Request Error ==", err)
+		}
+		fmt.Println("Youtube Download Succces ==", string(res))
 	}
 }
 
