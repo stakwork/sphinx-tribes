@@ -24,7 +24,6 @@ func GetListedWanteds(w http.ResponseWriter, r *http.Request) {
 
 func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 	people, err := db.DB.GetListedWanteds(r)
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)

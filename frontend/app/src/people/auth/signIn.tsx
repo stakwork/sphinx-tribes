@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { AuthProps } from 'people/interfaces';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
-import { TribesURL } from 'config';
 import { useStores } from '../../store';
 import { Divider } from '../../components/common';
 import IconButton from '../../components/common/icon_button';
@@ -142,8 +141,8 @@ function SignIn(props: AuthProps) {
             ) : (
               !isMobile && (
                 <AuthQR
-                  onSuccess={() => {
-                    props.onSuccess();
+                  onSuccess={async () => {
+                    if (props.onSuccess) props.onSuccess();
 
                     main.getPeople({ resetPage: true });
                   }}

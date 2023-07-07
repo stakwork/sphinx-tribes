@@ -989,7 +989,7 @@ export class MainStore {
       return;
     }
 
-    if (!body.coding_language || !body.coding_language.length) {
+    if(!body.coding_language || !body.coding_language.length) {
       body.coding_language = [];
     }
 
@@ -1003,6 +1003,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
+          'x-jwt': info?.jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1030,6 +1031,7 @@ export class MainStore {
         method: 'DELETE',
         mode: 'cors',
         headers: {
+          'x-jwt': info?.jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1288,6 +1290,7 @@ export class MainStore {
           ...body
         }),
         headers: {
+          'x-jwt': info.jwt,
           'Content-Type': 'application/json'
         }
       });
