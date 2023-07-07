@@ -214,6 +214,12 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.GithubIssues == nil {
 		m.GithubIssues = map[string]interface{}{}
 	}
+	if m.PriceToMeet == 0 {
+		updatePriceToMeet := make(map[string]interface{})
+		updatePriceToMeet["price_to_meet"] = 0
+
+		db.db.Model(&m).Where("id = ?", m.ID).UpdateColumns(&updatePriceToMeet)
+	}
 
 	if db.db.Model(&m).Where("id = ?", m.ID).Updates(&m).RowsAffected == 0 {
 		db.db.Create(&m)
@@ -293,7 +299,9 @@ func (db database) UpdatePerson(id uint, u map[string]interface{}) bool {
 	if id == 0 {
 		return false
 	}
+
 	db.db.Model(&Person{}).Where("id = ?", id).Updates(u)
+
 	return true
 }
 
@@ -620,7 +628,7 @@ func (db database) GetPerson(id uint) Person {
 
 func (db database) GetPersonByPubkey(pubkey string) Person {
 	m := Person{}
-	db.db.Where("owner_pub_key = ? AND (deleted = 'f' OR deleted is null)", pubkey).Find(&m)
+	db.db.Where("owner_pub_key = ? AND (deleted = 'false' OR deleted is null)", pubkey).Find(&m)
 
 	return m
 }
