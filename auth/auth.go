@@ -48,7 +48,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 		isJwt := strings.Contains(token, ".") && !strings.HasPrefix(token, ".")
 
 		if isJwt {
-			claims, err := DecodeToken(token)
+			claims, err := DecodeJwt(token)
 			if err != nil {
 				fmt.Println("Failed to parse JWT")
 				http.Error(w, http.StatusText(401), 401)
@@ -138,7 +138,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	return pubKeyHex, valid, nil
 }
 
-func DecodeToken(token string) (jwt.MapClaims, error) {
+func DecodeJwt(token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		key := config.JwtKey
@@ -148,7 +148,7 @@ func DecodeToken(token string) (jwt.MapClaims, error) {
 	return claims, err
 }
 
-func EncodeToken(pubkey string) (string, error) {
+func EncodeJwt(pubkey string) (string, error) {
 	exp := ExpireInHours(24 * 7)
 
 	claims := jwt.MapClaims{

@@ -40,7 +40,9 @@ func NewRouter() *http.Server {
 		r.Get("/podcast", handlers.GetPodcast)
 		r.Get("/feed", handlers.GetGenericFeed)
 		r.Get("/search_podcasts", handlers.SearchPodcasts)
+		r.Get("/search_podcast_episodes", handlers.SearchPodcastEpisodes)
 		r.Get("/search_youtube", handlers.SearchYoutube)
+		r.Get("/search_youtube_videos", handlers.SearchYoutubeVideos)
 		r.Get("/youtube_videos", handlers.YoutubeVideosForChannel)
 		r.Get("/admin_pubkeys", handlers.GetAdminPubkeys)
 
