@@ -13,6 +13,7 @@ import (
 
 func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
+
 	feed, err := feeds.ParseFeed(url, false)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -28,6 +29,13 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	feed.Value = feeds.AddedValue(feed.Value, tribe.OwnerPubKey)
+
+	var data [][]string
+	for z := 0; z < len(feed.Items); z++ {
+		i := feed.Items[z]
+		item := []string{i.Id, i.EnclosureURL}
+		data = append(data, item)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(feed)
