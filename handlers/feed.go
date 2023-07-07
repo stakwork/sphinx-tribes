@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -50,27 +49,29 @@ func processYoutubeDownload(url string, feed feeds.Feed) {
 
 		youtubeKey := fmt.Sprintf("Token token=%s", os.Getenv("YOUTUBE_KEY"))
 
-		buf, err := json.Marshal(data)
-		if err != nil {
-			fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
-			return
-		}
+		fmt.Println("KEy ==", youtubeKey)
 
-		requestUrl := "https://jobs.stakwork.com/api/v1/projects"
+		// buf, err := json.Marshal(data)
+		// if err != nil {
+		// 	fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
+		// 	return
+		// }
 
-		request, err := http.NewRequest(http.MethodPost, requestUrl, bytes.NewBuffer(buf))
-		request.Header.Set("Content-Type", "application/json")
-		request.Header.Set("Authorization", youtubeKey)
+		// requestUrl := "https://jobs.stakwork.com/api/v1/projects"
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			fmt.Println("Youtube request error", err)
-		}
-		defer response.Body.Close()
+		// request, err := http.NewRequest(http.MethodPost, requestUrl, bytes.NewBuffer(buf))
+		// request.Header.Set("Content-Type", "application/json")
+		// request.Header.Set("Authorization", youtubeKey)
 
-		body, _ := ioutil.ReadAll(response.Body)
-		fmt.Println("Youtube succces", body)
+		// client := &http.Client{}
+		// response, err := client.Do(request)
+		// if err != nil {
+		// 	fmt.Println("Youtube request error", err)
+		// }
+		// defer response.Body.Close()
+
+		// body, _ := ioutil.ReadAll(response.Body)
+		// fmt.Println("Youtube succces", body)
 	}
 }
 
