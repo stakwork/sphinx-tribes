@@ -101,7 +101,7 @@ func PollLnurlAuth(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("LNURL auth data not found")
 	}
 
-	tokenString, err := auth.EncodeToken(res.Key)
+	tokenString, err := auth.EncodeJwt(res.Key)
 
 	if err != nil {
 		fmt.Println("error creating JWT")
@@ -150,7 +150,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
 	responseData := make(map[string]interface{})
-	claims, err := auth.DecodeToken(token)
+	claims, err := auth.DecodeJwt(token)
 
 	if err != nil {
 		fmt.Println("Failed to parse JWT")
@@ -164,7 +164,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	if userCount > 0 {
 		// Generate a new token
-		tokenString, err := auth.EncodeToken(pubkey)
+		tokenString, err := auth.EncodeJwt(pubkey)
 
 		if err != nil {
 			fmt.Println("error creating  refresh JWT")
