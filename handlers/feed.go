@@ -75,11 +75,10 @@ func processYoutubeDownload(url string, feed feeds.Feed) {
 				},
 			}
 
-			buf, _ := json.Marshal(workflows)
 			body := map[string]interface{}{
 				"name":            "Sphinx Youtube Content Storage",
 				"workflow_id":     "11848",
-				"workflow_params": string(buf),
+				"workflow_params": workflows,
 			}
 
 			buf, err := json.Marshal(body)
