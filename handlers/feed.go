@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/feeds"
@@ -30,15 +33,45 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 
 	feed.Value = feeds.AddedValue(feed.Value, tribe.OwnerPubKey)
 
-	var data [][]string
-	for z := 0; z < len(feed.Items); z++ {
-		i := feed.Items[z]
-		item := []string{i.Id, i.EnclosureURL}
-		data = append(data, item)
-	}
+	processYoutubeDownload(url, *feed)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(feed)
+}
+
+func processYoutubeDownload(url string, feed feeds.Feed) {
+	if strings.Contains(url, "youtube") {
+		var data [][]string
+		for z := 0; z < len(feed.Items); z++ {
+			i := feed.Items[z]
+			item := []string{i.Id, i.EnclosureURL}
+			data = append(data, item)
+		}
+
+		youtubeKey := fmt.Sprintf("Token token=%s", os.Getenv("YOUTUBE_KEY"))
+
+		buf, err := json.Marshal(data)
+		if err != nil {
+			fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
+			return
+		}
+
+		requestUrl := "https://jobs.stakwork.com/api/v1/projects"
+
+		request, err := http.NewRequest(http.MethodPost, requestUrl, bytes.NewBuffer(buf))
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("Authorization", youtubeKey)
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+		if err != nil {
+			fmt.Println("Youtube request error", err)
+		}
+		defer response.Body.Close()
+
+		body, _ := ioutil.ReadAll(response.Body)
+		fmt.Println("Youtube succces", body)
+	}
 }
 
 func GetPodcast(w http.ResponseWriter, r *http.Request) {
