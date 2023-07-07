@@ -1,12 +1,11 @@
 import { makeAutoObservable, observable, action } from 'mobx';
+import memo from 'memo-decorator';
+import { persist } from 'mobx-persist';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
 import { uiStore } from './ui';
-import memo from 'memo-decorator';
-import { persist } from 'mobx-persist';
-import { type } from 'os';
 
 export const queryLimit = 1000;
 
@@ -14,6 +13,144 @@ function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
 }
 
+export interface Tribe {
+  uuid: string;
+  name: string;
+  unique_name: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
+  last_active: number;
+  matchCount?: number; // for tag search
+}
+
+export interface Bot {
+  id?: number;
+  uuid: string;
+  name: string;
+  owner_pubkey: string;
+  unique_name: string;
+  price_per_use: number;
+  created: string;
+  updated: string;
+  unlisted: boolean;
+  deleted: boolean;
+  owner_route_hint: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
+  hide?: boolean;
+}
+
+export interface Person {
+  id: number;
+  unique_name: string;
+  owner_pubkey: string;
+  owner_alias: string;
+  description: string;
+  img: string;
+  tags: string[];
+  pubkey: string;
+  photo_url: string;
+  alias: string;
+  route_hint: string;
+  contact_key: string;
+  price_to_meet: number;
+  last_login?: number;
+  url: string;
+  verification_signature: string;
+  extras: Extras;
+  hide?: boolean;
+  commitment_fee?: number;
+  assigned_hours?: number;
+  bounty_expires?: number;
+}
+
+export interface PersonFlex {
+  id?: number;
+  unique_name?: string;
+  owner_pubkey?: string;
+  owner_alias?: string;
+  description?: string;
+  img?: string;
+  tags?: string[];
+  pubkey?: string;
+  photo_url?: string;
+  alias?: string;
+  route_hint?: string;
+  contact_key?: string;
+  last_login?: number;
+  price_to_meet?: number;
+  url?: string;
+  verification_signature?: string;
+  extras?: Extras;
+  hide?: boolean;
+}
+
+export interface PersonPost {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created: number;
+}
+
+export interface PersonWanted {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created?: number;
+  show?: boolean;
+  assignee?: any;
+  body: PersonWanted | any;
+  type?: string;
+  price?: string;
+}
+
+export interface PersonOffer {
+  person: PersonFlex;
+  title: string;
+  description: string;
+  created: number;
+}
+
+export interface Jwt {
+  jwt: string;
+}
+
+export interface QueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  direction?: string;
+  search?: string;
+}
+
+export interface ClaimOnLiquid {
+  asset: number;
+  to: string;
+  amount?: number;
+  memo: string;
+}
+
+export interface LnAuthData {
+  encode: string;
+  k1: string;
+}
+
+export interface LnInvoice {
+  success: boolean;
+  response: {
+    invoice: string;
+  };
+}
 export class MainStore {
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
@@ -26,10 +163,10 @@ export class MainStore {
     let ta = [...uiStore.tags];
 
     //make tags string for querys
-    ta = ta.filter((f) => f.checked);
+    ta = ta.filter((f: any) => f.checked);
     let tags = '';
     if (ta && ta.length) {
-      ta.forEach((o, i) => {
+      ta.forEach((o: any, i: any) => {
         tags += o.label;
         if (ta.length - 1 !== i) {
           tags += ',';
@@ -48,7 +185,7 @@ export class MainStore {
     this.tribes = this.doPageListMerger(
       this.tribes,
       ts,
-      (n) => uiStore.setTribesPageNumber(n),
+      (n: any) => uiStore.setTribesPageNumber(n),
       queryParams
     );
 
@@ -77,7 +214,7 @@ export class MainStore {
 
     // hide test bots and set images
     b &&
-      b.forEach((bb, i) => {
+      b.forEach((bb: any, i: any) => {
         if (bb.unique_name === 'btc') {
           // bb.img = "/static/bots_bitcoin.png";
           b.splice(i, 1);
@@ -125,8 +262,8 @@ export class MainStore {
       const tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
-      const mergedBots = relayMyBots.map((b) => {
-        const thisBot = tribeServerBots.find((f) => f.uuid === b.uuid);
+      const mergedBots = relayMyBots.map((b: any) => {
+        const thisBot = tribeServerBots.find((f: any) => f.uuid === b.uuid);
         return {
           ...b,
           ...thisBot
@@ -141,7 +278,7 @@ export class MainStore {
     }
   }
 
-  async fetchFromRelay(path): Promise<any> {
+  async fetchFromRelay(path: string): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
@@ -171,7 +308,7 @@ export class MainStore {
     // put got on top
     // if already exists, delete
     const tribesClone = [...this.tribes];
-    const dupIndex = tribesClone.findIndex((f) => f.uuid === t.uuid);
+    const dupIndex = tribesClone.findIndex((f: any) => f.uuid === t.uuid);
     if (dupIndex > -1) {
       tribesClone.splice(dupIndex, 1);
     }
@@ -391,7 +528,7 @@ export class MainStore {
       queryParams.limit = limit;
       query += '?';
       const { length } = Object.keys(queryParams);
-      Object.keys(queryParams).forEach((k, i) => {
+      Object.keys(queryParams).forEach((k: string, i: number) => {
         query += `${k}=${queryParams[k]}`;
 
         // add & if not last param
@@ -426,7 +563,7 @@ export class MainStore {
     const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
-      const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
+      const index = ps.findIndex((f: any) => f.id === uiStore.meInfo?.id);
       if (index > -1) {
         // add 'hide' property to me in people list
         ps[index].hide = true;
@@ -442,7 +579,7 @@ export class MainStore {
       this.people = this.doPageListMerger(
         this.people,
         ps,
-        (n) => uiStore.setPeoplePageNumber(n),
+        (n: any) => uiStore.setPeoplePageNumber(n),
         params
       );
     }
@@ -466,7 +603,7 @@ export class MainStore {
 
   decodeListJSON(li: any): Promise<any[]> {
     if (li?.length) {
-      li.forEach((o, i) => {
+      li.forEach((o: any, i: any) => {
         li[i].body = JSON.parse(o.body);
         li[i].person = JSON.parse(o.person);
       });
@@ -497,7 +634,7 @@ export class MainStore {
         this.peoplePosts = this.doPageListMerger(
           this.peoplePosts,
           ps,
-          (n) => uiStore.setPeoplePostsPageNumber(n),
+          (n: any) => uiStore.setPeoplePostsPageNumber(n),
           queryParams
         );
       }
@@ -512,7 +649,7 @@ export class MainStore {
     resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
-  private async fetchPeoplePosts(query) {
+  private async fetchPeoplePosts(query: string) {
     return await api.get(query);
   }
 
@@ -546,7 +683,7 @@ export class MainStore {
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps,
-          (n) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams
         );
       }
@@ -608,7 +745,7 @@ export class MainStore {
         this.peopleOffers = this.doPageListMerger(
           this.peopleOffers,
           ps,
-          (n) => uiStore.setPeopleOffersPageNumber(n),
+          (n: any) => uiStore.setPeopleOffersPageNumber(n),
           queryParams
         );
       }
@@ -665,7 +802,7 @@ export class MainStore {
           const response = await api.get(`admin_pubkeys`);
           const admin_keys = response?.pubkeys;
           if (admin_keys !== null) {
-            return !!admin_keys.find((value) => value === self.owner_pubkey);
+            return !!admin_keys.find((value: any) => value === self.owner_pubkey);
           } else {
             return false;
           }
@@ -767,7 +904,7 @@ export class MainStore {
     }
   }
 
-  async saveProfile(body) {
+  async saveProfile(body: any) {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
@@ -869,7 +1006,7 @@ export class MainStore {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
       const clonedEx: any = clonedExtras && clonedExtras[extrasName];
-      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+      const targetIndex = clonedEx?.findIndex((f: any) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {
@@ -896,7 +1033,7 @@ export class MainStore {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
       const clonedEx: any = clonedExtras && clonedExtras[extrasName];
-      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+      const targetIndex = clonedEx?.findIndex((f: any) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {
@@ -985,34 +1122,11 @@ export class MainStore {
     }
   }
 
-  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
-    try {
-      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
-      if (data.status) {
-        uiStore.setShowSignIn(false);
-
-        this.setLnAuth({ encode: '', k1: '' });
-        this.setLnToken(data.jwt);
-        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
-      }
-      return data;
-    } catch (e) {
-      return { k1: '', status: false };
-    }
-  }
-
   @observable
-  lnInvoice: string = '';
+  lnInvoice = '';
 
   @action setLnInvoice(invoice: string) {
     this.lnInvoice = invoice;
-  }
-
-  @observable
-  lnInvoiceStatus: boolean = false;
-
-  @action setLnInvoiceStatus(status: boolean) {
-    this.lnInvoiceStatus = status;
   }
 
   @action async getLnInvoice(body: {
@@ -1038,7 +1152,8 @@ export class MainStore {
           type: body.type,
           assigned_hours: body.assigned_hours,
           commitment_fee: body.commitment_fee,
-          bounty_expires: body.bounty_expires
+          bounty_expires: body.bounty_expires,
+          websocket_token: uiStore.meInfo?.websocketToken
         },
         {
           'Content-Type': 'application/json'
@@ -1050,23 +1165,6 @@ export class MainStore {
       return data;
     } catch (e) {
       return { success: false, response: { invoice: '' } };
-    }
-  }
-
-  @action async getLnInvoiceStatus(
-    payment_req: string
-  ): Promise<{ invoiceStatus: boolean; bountyPaid: boolean }> {
-    try {
-      const data = await api.get(`invoices/${payment_req}`, {
-        'Content-Type': 'application/json'
-      });
-
-      if (data.status) {
-        this.setLnInvoiceStatus(data.status);
-      }
-      return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
-    } catch (e) {
-      return { invoiceStatus: false, bountyPaid: false };
     }
   }
 
@@ -1099,142 +1197,3 @@ export class MainStore {
 }
 
 export const mainStore = new MainStore();
-
-export interface Tribe {
-  uuid: string;
-  name: string;
-  unique_name: string;
-  owner: string;
-  pubkey: string; // group encryption key
-  price: number;
-  img: string;
-  tags: string[];
-  description: string;
-  member_count: number;
-  last_active: number;
-  matchCount?: number; // for tag search
-}
-
-export interface Bot {
-  id?: number;
-  uuid: string;
-  name: string;
-  owner_pubkey: string;
-  unique_name: string;
-  price_per_use: number;
-  created: string;
-  updated: string;
-  unlisted: boolean;
-  deleted: boolean;
-  owner_route_hint: string;
-  owner: string;
-  pubkey: string; // group encryption key
-  price: number;
-  img: string;
-  tags: string[];
-  description: string;
-  member_count: number;
-  hide?: boolean;
-}
-
-export interface Person {
-  id: number;
-  unique_name: string;
-  owner_pubkey: string;
-  owner_alias: string;
-  description: string;
-  img: string;
-  tags: string[];
-  pubkey: string;
-  photo_url: string;
-  alias: string;
-  route_hint: string;
-  contact_key: string;
-  price_to_meet: number;
-  last_login?: number;
-  url: string;
-  verification_signature: string;
-  extras: Extras;
-  hide?: boolean;
-  commitment_fee?: number;
-  assigned_hours?: number;
-  bounty_expires?: number;
-}
-
-export interface PersonFlex {
-  id?: number;
-  unique_name?: string;
-  owner_pubkey?: string;
-  owner_alias?: string;
-  description?: string;
-  img?: string;
-  tags?: string[];
-  pubkey?: string;
-  photo_url?: string;
-  alias?: string;
-  route_hint?: string;
-  contact_key?: string;
-  last_login?: number;
-  price_to_meet?: number;
-  url?: string;
-  verification_signature?: string;
-  extras?: Extras;
-  hide?: boolean;
-}
-
-export interface PersonPost {
-  person: PersonFlex;
-  title?: string;
-  description?: string;
-  created: number;
-}
-
-export interface PersonWanted {
-  person: PersonFlex;
-  title?: string;
-  description?: string;
-  created?: number;
-  show?: boolean;
-  assignee?: any;
-  body: PersonWanted | any;
-  type?: string;
-  price?: string;
-}
-
-export interface PersonOffer {
-  person: PersonFlex;
-  title: string;
-  description: string;
-  created: number;
-}
-
-export interface Jwt {
-  jwt: string;
-}
-
-export interface QueryParams {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  direction?: string;
-  search?: string;
-}
-
-export interface ClaimOnLiquid {
-  asset: number;
-  to: string;
-  amount?: number;
-  memo: string;
-}
-
-export interface LnAuthData {
-  encode: string;
-  k1: string;
-}
-
-export interface LnInvoice {
-  success: boolean;
-  response: {
-    invoice: string;
-  };
-}

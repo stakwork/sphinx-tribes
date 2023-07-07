@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import { Button, Modal } from '../../components/common';
 import { useStores } from '../../store';
-import { observer } from 'mobx-react-lite';
 
 let timeout;
-
-export default observer(TokenRefresh);
 
 function TokenRefresh() {
   const { main, ui } = useStores();
@@ -47,3 +45,4 @@ function TokenRefresh() {
     </>
   );
 }
+export default observer(TokenRefresh);

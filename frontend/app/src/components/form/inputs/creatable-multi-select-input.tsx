@@ -1,11 +1,37 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
-import type { Props } from './propsType';
-import { FieldEnv, Note } from './index';
 import { CreatableMultiSelect } from '../../common';
 import { colors } from '../../../config/colors';
+import type { Props } from './propsType';
+import { FieldEnv, Note } from './index';
 
+interface styledProps {
+  color?: any;
+}
+
+const ExtraText = styled.div`
+padding: 2px 10px 25px 10px;
+max - width: calc(100 % - 20px);
+word -break: break-all;
+font - size: 14px;
+`;
+
+const E = styled.div<styledProps>`
+position: absolute;
+right: 10px;
+top: 0px;
+display: flex;
+height: 100 %;
+justify - content: center;
+align - items: center;
+color: ${(p: any) => p?.color && p.color.blue3};
+pointer - events: none;
+user - select: none;
+`;
+const R = styled.div`
+  position: relative;
+`;
 export default function CreatableMultiSelectInput({
   error,
   note,
@@ -36,7 +62,7 @@ export default function CreatableMultiSelectInput({
             options={options}
             writeMode={type === 'multiselectwrite'}
             value={value}
-            onChange={(e) => {
+            onChange={(e: any) => {
               console.log('onChange', e);
               handleChange(e);
               setIsTop(true);
@@ -59,29 +85,3 @@ export default function CreatableMultiSelectInput({
   );
 }
 
-interface styledProps {
-  color?: any;
-}
-
-const ExtraText = styled.div`
-padding: 2px 10px 25px 10px;
-max - width: calc(100 % - 20px);
-word -break: break-all;
-font - size: 14px;
-`;
-
-const E = styled.div<styledProps>`
-position: absolute;
-right: 10px;
-top: 0px;
-display: flex;
-height: 100 %;
-justify - content: center;
-align - items: center;
-color: ${(p) => p?.color && p.color.blue3};
-pointer - events: none;
-user - select: none;
-`;
-const R = styled.div`
-  position: relative;
-`;

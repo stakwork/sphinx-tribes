@@ -1,12 +1,104 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { isString } from 'lodash';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/language_label_style';
 import NameTag from '../people/utils/nameTag';
 import { BountiesDescriptionProps } from './interfaces';
-import { isString } from 'lodash';
 
+interface codingLangProps {
+  background?: string;
+  border?: string;
+  LabelColor?: string;
+  color?: any;
+}
+
+interface bounty_description_props {
+  isPaid?: any;
+  color?: any;
+}
+
+const BountyDescriptionContainer = styled.div<bounty_description_props>`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 519px;
+  max-width: 519px;
+  padding-left: 17px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-item: center;
+  height: 32px;
+  margin-top: 16px;
+  .NameContainer {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
+const Description = styled.div<bounty_description_props>`
+  display: flex;
+  flex-direction: row;
+  align-item: center;
+  justify-content: space-between;
+  .DescriptionContainer {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+  }
+  .DescriptionTitle {
+    font-size: 17px;
+    line-height: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+  .DescriptionImage {
+    height: 77px;
+    width: 130px;
+    margin-left: 17px;
+    margin-right: 18px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: -13px;
+    border: 1px solid ${(p: any) => p?.color && p.color.grayish.G500};
+    opacity: ${(p: any) => (p.isPaid ? 0.3 : 1)};
+    filter: ${(p: any) => p.isPaid && 'grayscale(100%)'};
+  }
+`;
+
+const LanguageContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 80%;
+  margin-top: 10px;
+`;
+
+const CodingLabels = styled.div<codingLangProps>`
+  padding: 0px 8px;
+  border: ${(p: any) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
+  color: ${(p: any) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
+  background: ${(p: any) => (p.background ? p?.background : `${p.color.pureWhite}`)};
+  border-radius: 4px;
+  overflow: hidden;
+  max-height: 22.75px;
+  min-height: 22.75px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 4px;
+  .LanguageText {
+    font-size: 13px;
+    fontweight: 500;
+    text-align: center;
+    font-family: Barlow;
+    line-height: 16px;
+  }
+`;
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
@@ -28,9 +120,9 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
   useEffect(() => {
     let res;
     if (props.codingLanguage.length > 0) {
-      res = LanguageObject?.filter((value) =>
+      res = LanguageObject?.filter((value: any) =>
         !isString(props.codingLanguage)
-          ? props.codingLanguage?.find((val) => val.label === value.label)
+          ? props.codingLanguage?.find((val: any) => val.label === value.label)
           : props.codingLanguage
       );
     }
@@ -106,7 +198,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
           )}
           {dataValue &&
             dataValue?.length > 0 &&
-            dataValue?.map((lang: any, index) => (
+            dataValue?.map((lang: any, index: number) => (
               <CodingLabels
                 key={index}
                 border={props.isPaid ? `1px solid ${color.grayish.G06}` : lang?.border}
@@ -124,97 +216,3 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
 };
 
 export default BountyDescription;
-
-interface codingLangProps {
-  background?: string;
-  border?: string;
-  LabelColor?: string;
-  color?: any;
-}
-
-interface bounty_description_props {
-  isPaid?: any;
-  color?: any;
-}
-interface replit_image_props {}
-
-const BountyDescriptionContainer = styled.div<bounty_description_props>`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-width: 519px;
-  max-width: 519px;
-  padding-left: 17px;
-`;
-
-const Header = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-item: center;
-  height: 32px;
-  margin-top: 16px;
-  .NameContainer {
-    display: flex;
-    flex-direction: column;
-  }
-`;
-
-const Description = styled.div<bounty_description_props>`
-  display: flex;
-  flex-direction: row;
-  align-item: center;
-  justify-content: space-between;
-  .DescriptionContainer {
-    display: flex;
-    min-height: 64px;
-    align-items: center;
-  }
-  .DescriptionTitle {
-    font-size: 17px;
-    line-height: 20px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-  }
-  .DescriptionImage {
-    height: 77px;
-    width: 130px;
-    margin-left: 17px;
-    margin-right: 18px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: -13px;
-    border: 1px solid ${(p) => p?.color && p.color.grayish.G500};
-    opacity: ${(p) => (p.isPaid ? 0.3 : 1)};
-    filter: ${(p) => p.isPaid && 'grayscale(100%)'};
-  }
-`;
-
-const LanguageContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  width: 80%;
-  margin-top: 10px;
-`;
-
-const CodingLabels = styled.div<codingLangProps>`
-  padding: 0px 8px;
-  border: ${(p) => (p.border ? p?.border : `1px solid ${p.color.pureBlack}`)};
-  color: ${(p) => (p.LabelColor ? p?.LabelColor : `${p.color.pureBlack}`)};
-  background: ${(p) => (p.background ? p?.background : `${p.color.pureWhite}`)};
-  border-radius: 4px;
-  overflow: hidden;
-  max-height: 22.75px;
-  min-height: 22.75px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-right: 4px;
-  .LanguageText {
-    font-size: 13px;
-    fontweight: 500;
-    text-align: center;
-    font-family: Barlow;
-    line-height: 16px;
-  }
-`;

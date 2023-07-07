@@ -1,8 +1,8 @@
 import React from 'react';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import { Widget } from './main/types';
 import { Person } from '../store/main';
 import { MeData } from '../store/ui';
+import { Widget } from './main/types';
 
 export interface AuthProps {
   style?: React.CSSProperties;
@@ -280,6 +280,7 @@ export interface CodingBountiesProps {
   priceMax?: number;
   price?: number;
   estimate_session_length?: string;
+  loomEmbedUrl?: string;
   extraModalFunction?: () => void;
 }
 
@@ -287,7 +288,7 @@ export interface CodingViewProps {
   paid?: boolean;
   titleString: string;
   labels?: { [key: string]: any };
-  price?: Number;
+  price?: number;
   description?: string;
   envHeight?: string;
   estimate_session_length?: string;

@@ -10,17 +10,38 @@ import { Person } from 'store/main';
 import styled from 'styled-components';
 
 const color = colors.light;
+const ItemContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  & .name {
+    padding: 0 0.5rem;
+    font-size: 20px;
+    font-weight: 600;
+    color: rgb(60, 63, 65);
+    cursor: pointer;
+    text-decoration: none;
+  }
+`;
 
-export const Top3 = () => {
-  const { leaderboard } = useStores();
-  return (
-    <Top3Container>
-      {leaderboard.top3.map((item, index) => (
-        <Item place={index + 1} key={item.owner_pubkey} {...item} />
-      ))}
-    </Top3Container>
-  );
+const Top3Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+`;
+const colorsDispatcher = {
+  1: '#FFD700',
+  2: '#C0C0C0',
+  3: '#CD7F32'
 };
+const Podium = styled.div<{ place: number }>`
+  --height: 300px;
+  width: 100%;
+  height: ${(p: any) => `calc(var(--height) / ${p.place * 1.5})`};
+  background-color: ${(p: any) => colorsDispatcher[p.place]};
+`;
 
 type ItemProps = LeaderItem & {
   place: number;
@@ -67,35 +88,13 @@ const Item = ({ owner_pubkey, total_sats_earned, place }: ItemProps) => {
   );
 };
 
-const ItemContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  & .name {
-    padding: 0 0.5rem;
-    font-size: 20px;
-    font-weight: 600;
-    color: rgb(60, 63, 65);
-    cursor: pointer;
-    text-decoration: none;
-  }
-`;
-
-const Top3Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-end;
-`;
-const colorsDispatcher = {
-  1: '#FFD700',
-  2: '#C0C0C0',
-  3: '#CD7F32'
+export const Top3 = () => {
+  const { leaderboard } = useStores();
+  return (
+    <Top3Container>
+      {leaderboard.top3.map((item: any, index: number) => (
+        <Item place={index + 1} key={item.owner_pubkey} {...item} />
+      ))}
+    </Top3Container>
+  );
 };
-const Podium = styled.div<{ place: number }>`
-  --height: 300px;
-  width: 100%;
-  height: ${(p) => `calc(var(--height) / ${p.place * 1.5})`};
-  background-color: ${(p) => colorsDispatcher[p.place]};
-`;

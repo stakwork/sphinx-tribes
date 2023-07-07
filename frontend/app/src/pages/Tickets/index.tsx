@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import ConnectCard from 'people/utils/connectCard';
 import { TicketModalPage } from './TicketModalPage';
 import Tickets from './Tickets';
-import ConnectCard from 'people/utils/connectCard';
 
 export const TicketsPage = () => {
   const [connectPerson, setConnectPerson] = useState<any>(null);

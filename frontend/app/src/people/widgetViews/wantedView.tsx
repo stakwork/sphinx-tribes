@@ -1,6 +1,8 @@
 /* eslint-disable func-style */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { WantedViews2Props } from 'people/interfaces';
 import { useIsMobile } from '../../hooks';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import { useStores } from '../../store';
@@ -9,10 +11,18 @@ import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
 import MobileView from './wantedViews/mobileView';
 import DesktopView from './wantedViews/desktopView';
-import { observer } from 'mobx-react-lite';
-import { WantedViews2Props } from 'people/interfaces';
 
-export default observer(WantedView);
+interface styledProps {
+  color?: any;
+}
+
+const BountyBox = styled.div<styledProps>`
+  min-height: 160px;
+  max-height: 160px;
+  width: 1100px;
+  box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
+  border: none;
+`;
 
 function WantedView(props: WantedViews2Props) {
   const {
@@ -59,7 +69,7 @@ function WantedView(props: WantedViews2Props) {
 
         // saved? ok update in wanted list if found
         const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f) => {
+        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
@@ -87,12 +97,12 @@ function WantedView(props: WantedViews2Props) {
 
   useEffect(() => {
     if (codingLanguage) {
-      const values = codingLanguage.map((value) => ({ ...value }));
+      const values = codingLanguage.map((value: any) => ({ ...value }));
       setLabels(values);
     }
   }, [codingLanguage]);
 
-  function renderTickets() {
+  const renderTickets = () => {
     const { status } = ticketUrl
       ? extractGithubIssueFromUrl(person, ticketUrl)
       : extractGithubIssue(person, repo ?? '', issue ?? '');
@@ -182,19 +192,9 @@ function WantedView(props: WantedViews2Props) {
         titleString={titleString}
       />
     );
-  }
+  };
 
   return renderTickets();
 }
 
-interface styledProps {
-  color?: any;
-}
-
-const BountyBox = styled.div<styledProps>`
-  min-height: 160px;
-  max-height: 160px;
-  width: 1100px;
-  box-shadow: 0px 1px 6px ${(p) => p?.color && p?.color.black100};
-  border: none;
-`;
+export default observer(WantedView);

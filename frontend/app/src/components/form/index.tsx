@@ -24,7 +24,6 @@ import {
 import { FormField, validator } from './utils';
 import { FormProps } from './interfaces';
 
-export default observer(Form);
 function Form(props: FormProps) {
   const {
     buttonsOnBottom,
@@ -99,7 +98,7 @@ function Form(props: FormProps) {
   }, []);
 
   useEffect(() => {
-    const dSchema = props.schema?.find((f) => f.defaultSchema);
+    const dSchema = props.schema?.find((f: any) => f.defaultSchema);
     const type = initialValues?.type;
     if (dSchema && type) {
       const editSchema = dynamicSchemasByType[type];
@@ -115,12 +114,18 @@ function Form(props: FormProps) {
   // this useEffect triggers when the dynamic schema name is updated
   // checks if there are autofill fields that we can pull from local storage
 
+  function reloadForm() {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 20);
+  }
   useEffect(() => {
     const formRef = props.formRef?.current;
     const vals = formRef && formRef.values;
     if (vals) {
       if (dynamicSchemaAutofillFieldsByType[dynamicSchemaName]) {
-        Object.keys(dynamicSchemaAutofillFieldsByType[dynamicSchemaName]).forEach((k) => {
+        Object.keys(dynamicSchemaAutofillFieldsByType[dynamicSchemaName]).forEach((k: any) => {
           const localStorageKey = dynamicSchemaAutofillFieldsByType[dynamicSchemaName][k];
           const valueToAssign = ui[localStorageKey];
           // if no value exists already
@@ -146,20 +151,14 @@ function Form(props: FormProps) {
     scrollToTop();
   }, [scrollToTop]);
 
-  function reloadForm() {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 20);
-  }
 
   if (props.paged) {
-    props.schema?.forEach((s) => {
+    props.schema?.forEach((s: any) => {
       if (s.page > lastPage) lastPage = s.page;
     });
   }
 
-  let schema = props.paged ? props.schema?.filter((f) => f.page === page) : props.schema;
+  let schema = props.paged ? props.schema?.filter((f: any) => f.page === page) : props.schema;
 
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema;
@@ -174,19 +173,21 @@ function Form(props: FormProps) {
 
   const buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {};
 
-  const isAboutMeForm = schema?.find((f) => f.name === 'owner_alias') ? true : false;
+  const isAboutMeForm = schema?.find((f: any) => f.name === 'owner_alias') ? true : false;
 
   const dynamicFormOptions =
     (props.schema && props.schema[0] && formDropdownOptions[props.schema[0].dropdownOptions]) || [];
 
   // inject owner tribes
-  const tribesSelectorIndex = schema?.findIndex((f) => f.name === 'tribe' || f.name === 'tribes');
+  const tribesSelectorIndex = schema?.findIndex(
+    (f: any) => f.name === 'tribe' || f.name === 'tribes'
+  );
   if (tribesSelectorIndex > -1) {
     // give "none" option
     schema[tribesSelectorIndex].options = [{ value: 'none', label: 'None' }];
     // add tribes
     main.ownerTribes?.length &&
-      main.ownerTribes.forEach((ot) => {
+      main.ownerTribes.forEach((ot: any) => {
         schema[tribesSelectorIndex].options.push({
           ...ot,
           value: ot.unique_name,
@@ -202,12 +203,14 @@ function Form(props: FormProps) {
       innerRef={props.formRef}
       validationSchema={validator(schema)}
     >
-      {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }) => {
+      {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => {
         const isDescriptionValid = values.ticketUrl
           ? values.github_description || !!values.description
           : !!values.description;
 
-        const valid = schemaData.required.every((key) => (key === '' ? true : values?.[key]));
+        const valid = schemaData.required.every((key: string) =>
+          key === '' ? true : values?.[key]
+        );
 
         const isBtnDisabled = !valid || (stepTracker === 3 && !isDescriptionValid);
 
@@ -249,7 +252,7 @@ function Form(props: FormProps) {
                           handleChange={(e: any) => {
                             setFieldValue(item.name, e);
                           }}
-                          setFieldValue={(e, f) => {
+                          setFieldValue={(e: any, f: any) => {
                             setFieldValue(e, f);
                           }}
                           setFieldTouched={setFieldTouched}
@@ -291,7 +294,7 @@ function Form(props: FormProps) {
                           handleChange={(e: any) => {
                             setFieldValue(item.name, e);
                           }}
-                          setFieldValue={(e, f) => {
+                          setFieldValue={(e: any, f: any) => {
                             setFieldValue(e, f);
                           }}
                           setFieldTouched={setFieldTouched}
@@ -330,7 +333,7 @@ function Form(props: FormProps) {
 
                 {schemaData.step === 1 && dynamicSchema && (
                   <ChooseBountyContainer color={color}>
-                    {dynamicFormOptions?.map((v) => (
+                    {dynamicFormOptions?.map((v: any) => (
                       <BountyContainer
                         key={v.label}
                         color={color}
@@ -420,7 +423,7 @@ function Form(props: FormProps) {
                     <SchemaTagsContainer>
                       <div className="LeftSchema">
                         {schema
-                          .filter((item) => schemaData.schema.includes(item.name))
+                          .filter((item: any) => schemaData.schema.includes(item.name))
                           .map((item: FormField) => (
                             <Input
                               {...item}
@@ -441,7 +444,7 @@ function Form(props: FormProps) {
                               handleChange={(e: any) => {
                                 setFieldValue(item.name, e);
                               }}
-                              setFieldValue={(e, f) => {
+                              setFieldValue={(e: any, f: any) => {
                                 setFieldValue(e, f);
                               }}
                               setFieldTouched={setFieldTouched}
@@ -469,7 +472,7 @@ function Form(props: FormProps) {
                       </div>
                       <div className="RightSchema">
                         {schema
-                          .filter((item) => schemaData.schema2.includes(item.name))
+                          .filter((item: any) => schemaData.schema2.includes(item.name))
                           .map((item: FormField) => (
                             <Input
                               {...item}
@@ -490,7 +493,7 @@ function Form(props: FormProps) {
                               handleChange={(e: any) => {
                                 setFieldValue(item.name, e);
                               }}
-                              setFieldValue={(e, f) => {
+                              setFieldValue={(e: any, f: any) => {
                                 setFieldValue(e, f);
                               }}
                               setFieldTouched={setFieldTouched}
@@ -608,7 +611,7 @@ function Form(props: FormProps) {
                       handleChange={(e: any) => {
                         setFieldValue(item.name, e);
                       }}
-                      setFieldValue={(e, f) => {
+                      setFieldValue={(e: any, f: any) => {
                         setFieldValue(e, f);
                       }}
                       setFieldTouched={setFieldTouched}
@@ -768,3 +771,4 @@ function Form(props: FormProps) {
     </Formik>
   );
 }
+export default observer(Form);

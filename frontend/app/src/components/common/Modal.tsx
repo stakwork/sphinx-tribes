@@ -1,10 +1,112 @@
 import React from 'react';
 import styled from 'styled-components';
-import FadeLeft from '../animated/fadeLeft';
-import { IconButton } from '.';
-import { colors } from '../../config/colors';
-import { Portal } from './index';
 import { ModalProps } from 'components/interfaces';
+import FadeLeft from '../animated/fadeLeft';
+import { colors } from '../../config/colors';
+import { IconButton } from '.';
+import { Portal } from './index';
+
+interface styledProps {
+  color?: any;
+}
+
+const R = styled.div<styledProps>`
+  position: absolute;
+  right: -85px;
+  top: 0px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const L = styled.div<styledProps>`
+  position: absolute;
+  left: -85px;
+  top: 0px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RNew = styled.div<styledProps>`
+  position: absolute;
+  right: -63.9px;
+  top: 0px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LNew = styled.div<styledProps>`
+  position: absolute;
+  left: -62.9px;
+  top: 0px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CircL = styled.div<styledProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 88px;
+  background: ${(p: any) => p.color && p.color.black150};
+  border-radius: 10px 0px 0px 10px;
+  cursor: pointer;
+`;
+
+const CircR = styled.div<styledProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 88px;
+  background: ${(p: any) => p.color && p.color.black150};
+  border-radius: 0px 10px 10px 0px;
+  cursor: pointer;
+`;
+
+const Circ = styled.div<styledProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 65px;
+  background: ${(p: any) => p.color && p.color.grayish.G60};
+  border-radius: 50px;
+  cursor: pointer;
+`;
+
+const X = styled.div<styledProps>`
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  cursor: pointer;
+`;
+
+const BigX = styled.div<styledProps>`
+  position: absolute;
+  top: 20px;
+  right: -68px;
+  cursor: pointer;
+  z-index: 10;
+`;
+const Env = styled.div<styledProps>`
+  width: 312px;
+  min-height: 254px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: ${(p: any) => p.color && p.color.pureWhite};
+  position: relative;
+`;
 
 export default function Modal(props: ModalProps) {
   const {
@@ -29,7 +131,8 @@ export default function Modal(props: ModalProps) {
   const color = colors['light'];
   const fillStyle = fill
     ? {
-        height: '100%',
+        minHeight: '100%',
+        height: 'auto',
         width: '100%',
         borderRadius: 0
       }
@@ -102,7 +205,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   iconStyle={{ color: color.pureWhite }}
                   icon={'chevron_left'}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     prevArrow();
                   }}
@@ -116,7 +219,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   icon={'chevron_right'}
                   iconStyle={{ color: color.pureWhite }}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     nextArrow();
                   }}
@@ -131,7 +234,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   iconStyle={{ color: color.pureWhite }}
                   icon={'chevron_left'}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     prevArrowNew();
                   }}
@@ -145,7 +248,7 @@ export default function Modal(props: ModalProps) {
                 <IconButton
                   icon={'chevron_right'}
                   iconStyle={{ color: color.pureWhite }}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     nextArrowNew();
                   }}
@@ -159,105 +262,3 @@ export default function Modal(props: ModalProps) {
     </Portal>
   );
 }
-
-interface styledProps {
-  color?: any;
-}
-
-const R = styled.div<styledProps>`
-  position: absolute;
-  right: -85px;
-  top: 0px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const L = styled.div<styledProps>`
-  position: absolute;
-  left: -85px;
-  top: 0px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const RNew = styled.div<styledProps>`
-  position: absolute;
-  right: -63.9px;
-  top: 0px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const LNew = styled.div<styledProps>`
-  position: absolute;
-  left: -62.9px;
-  top: 0px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const CircL = styled.div<styledProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 62px;
-  height: 88px;
-  background: ${(p) => p.color && p.color.black150};
-  border-radius: 10px 0px 0px 10px;
-  cursor: pointer;
-`;
-
-const CircR = styled.div<styledProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 62px;
-  height: 88px;
-  background: ${(p) => p.color && p.color.black150};
-  border-radius: 0px 10px 10px 0px;
-  cursor: pointer;
-`;
-
-const Circ = styled.div<styledProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 65px;
-  height: 65px;
-  background: ${(p) => p.color && p.color.grayish.G60};
-  border-radius: 50px;
-  cursor: pointer;
-`;
-
-const X = styled.div<styledProps>`
-  position: absolute;
-  top: 5px;
-  right: 8px;
-  cursor: pointer;
-`;
-
-const BigX = styled.div<styledProps>`
-  position: absolute;
-  top: 20px;
-  right: -68px;
-  cursor: pointer;
-  z-index: 10;
-`;
-const Env = styled.div<styledProps>`
-  width: 312px;
-  min-height: 254px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  background: ${(p) => p.color && p.color.pureWhite};
-  position: relative;
-`;

@@ -1,12 +1,49 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Button } from '../../components/common';
-import { useStores } from '../../store';
 import { observer } from 'mobx-react-lite';
 import { BotSecretProps } from 'bots/interfaces';
+import { Button } from '../../components/common';
+import { useStores } from '../../store';
 
-export default observer(BotSecret);
+const Head = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+
+const Name = styled.div`
+  width: 100%;
+  font-style: normal;
+  font-weight: 500;
+  /* or 73% */
+
+  text-align: center;
+
+  /* Text 2 */
+
+  color: #3c3f41;
+  margin: 20px 0;
+
+  font-size: 24px;
+  line-height: 22px;
+`;
+
+const RowWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  min-height: 48px;
+  align-items: center;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 48px;
+  width: 100%;
+  color: #8e969c;
+`;
 
 function BotSecret(props: BotSecretProps) {
   const { ui } = useStores();
@@ -27,7 +64,7 @@ function BotSecret(props: BotSecretProps) {
     setToasts([]);
   }
 
-  function copyToClipboard(str) {
+  function copyToClipboard(str: string) {
     const el = document.createElement('textarea');
     el.value = str;
     document.body.appendChild(el);
@@ -92,57 +129,4 @@ function BotSecret(props: BotSecretProps) {
   );
 }
 
-const Head = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-`;
-
-const Name = styled.div`
-  width: 100%;
-  font-style: normal;
-  font-weight: 500;
-  /* or 73% */
-
-  text-align: center;
-
-  /* Text 2 */
-
-  color: #3c3f41;
-  margin: 20px 0;
-
-  font-size: 24px;
-  line-height: 22px;
-`;
-
-const RowWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  min-height: 48px;
-  align-items: center;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 48px;
-  width: 100%;
-  color: #8e969c;
-`;
-
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
-  background-position: center;
-  background-size: cover;
-  width: 150px;
-  height: 150px;
-  border-radius: 16px;
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-`;
+export default observer(BotSecret);

@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
-import { useStores } from '../store';
 
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
-
-export default observer(Header);
+import { useStores } from '../store';
 
 function Header() {
   const { ui } = useStores();
@@ -12,7 +10,7 @@ function Header() {
   useEffect(() => {
     if (window.location.host === 'podcasts.sphinx.chat') {
       ui.setTags(
-        ui.tags.map((t) => {
+        ui.tags.map((t: any) => {
           if (t.label === 'Podcast') return { ...t, checked: 'on' };
           return t;
         })
@@ -30,3 +28,4 @@ function Header() {
     </EuiHeader>
   );
 }
+export default observer(Header);

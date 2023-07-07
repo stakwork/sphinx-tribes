@@ -1,17 +1,108 @@
 import { EuiText } from '@elastic/eui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import { BountiesProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
 import BountyDescription from '../../bounties/bounty_description';
 import BountyPrice from '../../bounties/bounty_price';
 import BountyProfileView from '../../bounties/bounty_profile_view';
 import IconButton from '../../components/common/icon_button';
-import StartUpModal from './start_up_modal';
 import ConnectCard from '../utils/connectCard';
 import { useStores } from '../../store';
-import { observer } from 'mobx-react-lite';
-import { BountiesProps } from 'people/interfaces';
+import StartUpModal from './start_up_modal';
 
+interface containerProps {
+  unAssignedBackgroundImage?: string;
+  assignedBackgroundImage?: string;
+  unassigned_border?: string;
+  grayish_G200?: string;
+  color?: any;
+}
+
+const BountyContainer = styled.div<containerProps>`
+  display: flex;
+  flex-direction: row;
+  width: 1100px !important;
+  font-family: Barlow;
+  height: 160px;
+  background: transparent;
+  background: ${(p: any) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: ${(p: any) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
+  border-radius: 10px;
+  .BountyDescriptionContainer {
+    min-width: 553px;
+    max-width: 553px;
+  }
+  .BountyPriceContainer {
+    display: flex;
+    flex-direction: row;
+    width: 545px;
+  }
+
+  :hover {
+    border: ${(p: any) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
+    border-radius: ${(p: any) => (p.assignedBackgroundImage ? '10px' : '')};
+  }
+`;
+
+const DescriptionPriceContainer = styled.div<containerProps>`
+  display: flex;
+  flex-direction: row;
+  width: 758px;
+  min-height: 160px !important;
+  height: 100%;
+  background: ${(p: any) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  :hover {
+    background: url('static/unassigned_bounty_hover_bg.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  :active {
+    background: url('static/unassigned_bounty_active_bg.svg');
+  }
+`;
+
+const UnassignedPersonProfile = styled.div<containerProps>`
+  min-width: 336px;
+  min-height: 160px;
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+  border-radius: 10px;
+  display: flex;
+  padding-top: 32px;
+  padding-left: 37px;
+  .UnassignedPersonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    margin-top: 5px;
+  }
+  .UnassignedPersonalDetailContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 25px;
+    margin-bottom: 2px;
+  }
+  .ProfileText {
+    font-size: 15px;
+    font-weight: 500;
+    font-family: Barlow;
+    color: ${(p: any) => (p.grayish_G200 ? p.grayish_G200 : '')};
+    margin-bottom: -13px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+  }
+`;
 const Bounties = (props: BountiesProps) => {
   const {
     assignee,
@@ -38,52 +129,48 @@ const Bounties = (props: BountiesProps) => {
   const { ui } = useStores();
   return (
     <>
-      {assignee ? (
-        { ...assignee }.owner_alias ? (
-          <BountyContainer
-            onClick={onPanelClick}
-            assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
-            color={color}
-            style={{
-              backgroundPositionY: '-2px'
-            }}
-          >
-            <div className="BountyDescriptionContainer">
-              <BountyDescription
-                {...person}
-                {...props}
-                title={title}
-                codingLanguage={codingLanguage}
-                created={created}
-              />
-            </div>
-            <div className="BountyPriceContainer">
-              <BountyPrice
-                priceMin={priceMin}
-                priceMax={priceMax}
-                price={price}
-                sessionLength={sessionLength}
-                style={{
-                  minWidth: '213px',
-                  maxWidth: '213px',
-                  borderRight: `1px solid ${color.primaryColor.P200}`
-                }}
-              />
-              <BountyProfileView
-                assignee={assignee}
-                status={'ASSIGNED'}
-                canViewProfile={true}
-                statusStyle={{
-                  width: '55px',
-                  height: '16px',
-                  background: color.statusAssigned
-                }}
-              />
-            </div>
-          </BountyContainer>
-        ) : (
-          <></>
-        )
+      {!!assignee?.owner_pubkey && !!assignee?.owner_alias ? (
+        <BountyContainer
+          onClick={onPanelClick}
+          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
+          color={color}
+          style={{
+            backgroundPositionY: '-2px'
+          }}
+        >
+          <div className="BountyDescriptionContainer">
+            <BountyDescription
+              {...person}
+              {...props}
+              title={title}
+              codingLanguage={codingLanguage}
+              created={created}
+            />
+          </div>
+          <div className="BountyPriceContainer">
+            <BountyPrice
+              priceMin={priceMin}
+              priceMax={priceMax}
+              price={price}
+              sessionLength={sessionLength}
+              style={{
+                minWidth: '213px',
+                maxWidth: '213px',
+                borderRight: `1px solid ${color.primaryColor.P200}`
+              }}
+            />
+            <BountyProfileView
+              assignee={assignee}
+              status={'ASSIGNED'}
+              canViewProfile={true}
+              statusStyle={{
+                width: '55px',
+                height: '16px',
+                background: color.statusAssigned
+              }}
+            />
+          </div>
+        </BountyContainer>
       ) : (
         <BountyContainer color={color}>
           <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
@@ -121,7 +208,7 @@ const Bounties = (props: BountiesProps) => {
                   text={
                     ui.meInfo?.owner_pubkey === person.owner_pubkey ? 'Assign User' : 'I can help'
                   }
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     if (ui.meInfo) {
                       ui.meInfo?.owner_pubkey === person.owner_pubkey
                         ? onPanelClick()
@@ -165,102 +252,10 @@ const Bounties = (props: BountiesProps) => {
         modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
         person={person}
         visible={openConnectModal}
-        created={created ?? 0}
+        created={created}
       />
     </>
   );
 };
 
 export default observer(Bounties);
-
-interface containerProps {
-  unAssignedBackgroundImage?: string;
-  assignedBackgroundImage?: string;
-  unassigned_border?: string;
-  grayish_G200?: string;
-  color?: any;
-}
-
-const BountyContainer = styled.div<containerProps>`
-  display: flex;
-  flex-direction: row;
-  width: 1100px !important;
-  font-family: Barlow;
-  height: 160px;
-  background: transparent;
-  background: ${(p) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
-  background-repeat: no-repeat;
-  background-size: cover;
-  border: ${(p) => (p.assignedBackgroundImage ? `2px solid ${p.color.grayish.G950}` : '')};
-  border-radius: 10px;
-  .BountyDescriptionContainer {
-    min-width: 553px;
-    max-width: 553px;
-  }
-  .BountyPriceContainer {
-    display: flex;
-    flex-direction: row;
-    width: 545px;
-  }
-
-  :hover {
-    border: ${(p) => (p?.assignedBackgroundImage ? `2px solid ${p.color.borderGreen2}` : '')};
-    border-radius: ${(p) => (p.assignedBackgroundImage ? '10px' : '')};
-  }
-`;
-
-const DescriptionPriceContainer = styled.div<containerProps>`
-  display: flex;
-  flex-direction: row;
-  width: 758px;
-  min-height: 160px !important;
-  height: 100%;
-  background: ${(p) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  :hover {
-    background: url('static/unassigned_bounty_hover_bg.svg');
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-  :active {
-    background: url('static/unassigned_bounty_active_bg.svg');
-  }
-`;
-
-const UnassignedPersonProfile = styled.div<containerProps>`
-  min-width: 336px;
-  min-height: 160px;
-  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
-  border-radius: 10px;
-  display: flex;
-  padding-top: 32px;
-  padding-left: 37px;
-  .UnassignedPersonContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80px;
-    width: 80px;
-    border-radius: 50%;
-    margin-top: 5px;
-  }
-  .UnassignedPersonalDetailContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-left: 25px;
-    margin-bottom: 2px;
-  }
-  .ProfileText {
-    font-size: 15px;
-    font-weight: 500;
-    font-family: Barlow;
-    color: ${(p) => (p.grayish_G200 ? p.grayish_G200 : '')};
-    margin-bottom: -13px;
-    line-height: 18px;
-    display: flex;
-    align-items: center;
-  }
-`;
