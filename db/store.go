@@ -129,6 +129,7 @@ type VerifyPayload struct {
 	Description           string                 `json:"description"`
 	VerificationSignature string                 `json:"verification_signature"`
 	Extras                map[string]interface{} `json:"extras"`
+	TribeJWT              string                 `json:"tribe_jwt"`
 }
 
 func Verify(w http.ResponseWriter, r *http.Request) {
@@ -212,6 +213,9 @@ func Poll(w http.ResponseWriter, r *http.Request) {
 	DB.UpdatePerson(pld.ID, map[string]interface{}{
 		"last_login": time.Now().Unix(),
 	})
+
+	tribeJWT, _ := auth.EncodeJwt(pld.Pubkey)
+	pld.TribeJWT = tribeJWT
 
 	// store.DeleteChallenge(challenge)
 
