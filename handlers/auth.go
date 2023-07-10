@@ -101,7 +101,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		db.Store.SetLnCache(k1, db.LnStore{K1: k1, Key: userKey, Status: true})
 
 		// Send socket message
-		tokenString, err := auth.EncodeToken(userKey)
+		tokenString, err := auth.EncodeJwt(userKey)
 
 		if err != nil {
 			fmt.Println("error creating LNAUTH JWT")
@@ -144,7 +144,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
 	responseData := make(map[string]interface{})
-	claims, err := auth.DecodeToken(token)
+	claims, err := auth.DecodeJwt(token)
 
 	if err != nil {
 		fmt.Println("Failed to parse JWT")
@@ -158,7 +158,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	if userCount > 0 {
 		// Generate a new token
-		tokenString, err := auth.EncodeToken(pubkey)
+		tokenString, err := auth.EncodeJwt(pubkey)
 
 		if err != nil {
 			fmt.Println("error creating  refresh JWT")

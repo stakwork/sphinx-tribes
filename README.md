@@ -84,6 +84,16 @@ If you would like to enable Relay for invoice creation and keysend payment add t
     RELAY_AUTH_KEY=
 ```
 
+
 ### For Contributions
 
 Read the contribution doc [here](./Contribution.md)
+
+### Stakwork Youtube vidoes download for tribes feed
+
+If you would like to enable Stakwork jobs for Youtube videos download add the Stakwork env key and values to the .env file
+
+```
+    STAKWORK_KEY=
+```
+
