@@ -149,4 +149,3 @@ const AutoComplete = (props: AutoCompleteProps) => {
 };
 
 export default AutoComplete;
-

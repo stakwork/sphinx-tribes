@@ -10,7 +10,7 @@ interface ButtonHoverProps {
   shadowcolor?: string;
 }
 
-const B = styled(EuiButton) <ButtonHoverProps>`
+const B = styled(EuiButton)<ButtonHoverProps>`
   position: relative;
   border-radius: 100px;
   height: 36px;
@@ -86,10 +86,10 @@ function hexToRgba(hex: string, opacity: any = 1) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     const rgb = result
       ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      }
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        }
       : null;
 
     return rgb ? `rgba(${rgb?.r}, ${rgb?.g}, ${rgb?.b}, ${opacity})` : undefined;
@@ -280,4 +280,3 @@ export default function IconButton(props: IconButtonProps) {
     </B>
   );
 }
-

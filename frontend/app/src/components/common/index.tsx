@@ -1,7 +1,7 @@
 import SearchTextInput from './SearchTextInput';
 import SearchBar from './SearchBar';
 import Button from './Button';
-import IconButton from './IconButton';
+import IconButton from './IconButton2';
 import Modal from './Modal';
 import Divider from './Divider';
 import { Title, Date, Paragraph, Link } from './Elements';
