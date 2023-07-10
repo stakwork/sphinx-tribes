@@ -67,12 +67,7 @@ const TextContainer = styled.div<styledProps>`
     color: ${(p: any) => p?.color && p?.color.grayish.G300};
   }
 `;
-export default function TextInputNew({
-  label,
-  value,
-  handleChange,
-  readOnly,
-}: Props) {
+export default function TextInputNew({ label, value, handleChange, readOnly }: Props) {
   const color = colors['light'];
   return (
     <TextContainer color={color}>
@@ -89,4 +84,3 @@ export default function TextInputNew({
     </TextContainer>
   );
 }
-

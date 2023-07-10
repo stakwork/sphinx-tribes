@@ -110,4 +110,3 @@ const ImageButton = (props: ImageButtonProps) => (
 );
 
 export default ImageButton;
-

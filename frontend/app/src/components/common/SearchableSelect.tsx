@@ -57,30 +57,29 @@ button {
 }
 `;
 export default function SearchableSelect(props: SelProps) {
-    const { options, onChange, onInputChange, value, style, loading } = props;
+  const { options, onChange, onInputChange, value, style, loading } = props;
 
-    const opts = options
-        ? options.map((o: any) => ({
-            ...o,
-            value: o.value,
-            label: o.label
-        }))
-        : [];
+  const opts = options
+    ? options.map((o: any) => ({
+        ...o,
+        value: o.value,
+        label: o.label
+      }))
+    : [];
 
-    return (
-        <div style={{ position: 'relative', ...style }}>
-            <S
-                options={opts}
-                isLoading={loading}
-                placeholder={'Type to search...'}
-                isClearable={true}
-                isSearchable={true}
-                value={value}
-                onChange={onChange}
-                onInputChange={onInputChange}
-                className={'searchable-select-input'}
-            />
-        </div>
-    );
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      <S
+        options={opts}
+        isLoading={loading}
+        placeholder={'Type to search...'}
+        isClearable={true}
+        isSearchable={true}
+        value={value}
+        onChange={onChange}
+        onInputChange={onInputChange}
+        className={'searchable-select-input'}
+      />
+    </div>
+  );
 }
-

@@ -66,5 +66,4 @@ class API {
   del: (url: string, data?: any, incomingHeaders?: any) => any;
 }
 
-
 export default new API();
