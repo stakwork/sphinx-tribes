@@ -9,7 +9,7 @@ import { Divider } from '../../components/common';
 import IconButton from '../../components/common/icon_button';
 import { useIsMobile } from '../../hooks';
 import QR from '../utils/QR';
-import AuthQR from './authQR';
+import AuthQR from './AuthQR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 
 interface ImageProps {
