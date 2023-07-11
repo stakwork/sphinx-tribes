@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
-import { useStores } from '../../store';
-import { widgetConfigs } from '../utils/Constants';
+import { useIsMobile } from 'hooks/uiHooks';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
+import { useStores } from '../../store';
+import { widgetConfigs } from '../utils/Constants';
 import OfferView from './OfferView';
 import WantedView from './WantedView';
 import PostView from './PostView';

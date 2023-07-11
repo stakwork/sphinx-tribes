@@ -296,7 +296,7 @@ function Header() {
       ui.setSelectedPerson(0);
       ui.setSelectingPerson(0);
     }
-  }, [location.pathname]);
+  }, [location.pathname, ui]);
 
   useEffect(() => {
     (async () => {
