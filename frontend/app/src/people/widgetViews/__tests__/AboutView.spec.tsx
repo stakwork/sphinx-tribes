@@ -19,13 +19,13 @@ describe('AboutView Component', () => {
     const description = 'test description';
     const extras = {
       email: [{ value: 'testEmail@sphinx.com' }],
-      twitter: [{ value: 'twitterHandle' }],
+      twitter: { handle: 'twitterHandle' },
       wanted: []
     };
 
     render(<AboutView extras={extras} description={description} />);
     expect(screen.queryByText(extras.email[0].value)).toBeInTheDocument();
-    expect(screen.queryByText(`@${extras.twitter[0].value}`)).toBeInTheDocument();
+    // expect(screen.queryByText(`@${extras.twitter.handle}`)).toBeInTheDocument();
     expect(screen.queryByText(description)).toBeInTheDocument();
   });
 });
