@@ -9,10 +9,6 @@ import { useStores } from 'store';
 import { Person } from 'store/main';
 import styled from 'styled-components';
 
-/**
- * kevkevin says:git mv -f frontend/app/src/components/animated/fadeLeft.tsx frontend/app/src/components/animated/FadeLeft.tsx 
- */
-
 const color = colors.light;
 const ItemContainer = styled.div`
   display: flex;
