@@ -39,7 +39,7 @@ export default function LoomViewerRecorder(props: LoomViewProps) {
     }
 
     setupLoom();
-  }, []);
+  }, [onChange]);
 
   if (readOnly && !videoUrl) {
     return null;

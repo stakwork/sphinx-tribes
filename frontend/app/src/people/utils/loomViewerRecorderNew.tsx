@@ -76,7 +76,7 @@ export default function LoomViewerRecorderNew(props: LoomViewProps) {
     }
 
     setupLoom();
-  }, []);
+  }, [onChange, setIsVideo]);
 
   if (readOnly && !videoUrl) {
     return null;
