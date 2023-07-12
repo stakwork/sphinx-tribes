@@ -8,7 +8,8 @@ interface styledProps {
   color?: any;
 }
 
-const S = styled(Select)<styledProps>`
+// @ts-ignore
+const S = styled(Select) <styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
 color: ${(p: any) => p.color && p.color.pureBlack};
@@ -67,9 +68,9 @@ export default function Sel(props: SelProps) {
 
   const opts = options
     ? options.map((o: any) => ({
-        value: o.value,
-        label: o.label
-      }))
+      value: o.value,
+      label: o.label
+    }))
     : [];
 
   return (
@@ -86,4 +87,3 @@ export default function Sel(props: SelProps) {
     </div>
   );
 }
-

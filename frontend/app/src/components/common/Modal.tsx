@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ModalProps } from 'components/interfaces';
-import FadeLeft from '../animated/fadeLeft';
+import FadeLeft from '../animated/FadeLeft';
 import { colors } from '../../config/colors';
 import { IconButton } from '.';
 import { Portal } from './index';

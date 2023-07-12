@@ -3,13 +3,14 @@ import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { SelProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
-import { colourOptions } from '../../people/utils/language_label_style';
+import { colourOptions } from '../../people/utils/languageLabelStyle';
 
 interface styledProps {
   color?: any;
 }
 
-const S = styled(CreatableSelect)<styledProps>`
+// @ts-ignore
+const S = styled(CreatableSelect) <styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
 color: ${(p: any) => p.color && p.color.pureBlack};
@@ -133,4 +134,3 @@ export default function Sel(props: SelProps) {
     </div>
   );
 }
-

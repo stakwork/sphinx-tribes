@@ -1,7 +1,7 @@
 import { useIsMobile, usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import RenderWidgets from 'people/widgetViews/renderWidgets';
-import { widgetConfigs } from 'people/utils/constants';
+import RenderWidgets from 'people/widgetViews/RenderWidgets';
+import { widgetConfigs } from 'people/utils/Constants';
 import React, { useCallback, useEffect } from 'react';
 import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import { useStores } from 'store';

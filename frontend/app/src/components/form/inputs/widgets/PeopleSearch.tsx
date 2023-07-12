@@ -8,9 +8,9 @@ import {
   coding_languages,
   GetValue,
   LanguageObject
-} from '../../../../people/utils/language_label_style';
-import { SvgMask } from '../../../../people/utils/svgMask';
-import ImageButton from '../../../common/Image_button';
+} from '../../../../people/utils/languageLabelStyle';
+import { SvgMask } from '../../../../people/utils/SvgMask';
+import ImageButton from '../../../common/ImageButton';
 import { InvitePeopleSearchProps } from './interfaces';
 
 interface styledProps {
