@@ -33,7 +33,12 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 
 	feed.Value = feeds.AddedValue(feed.Value, tribe.OwnerPubKey)
 
-	processYoutubeDownload(url, *feed)
+	var data [][]string
+	for z := 0; z < len(feed.Items); z++ {
+		i := feed.Items[z]
+		item := []string{i.Id, i.EnclosureURL}
+		data = append(data, item)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(feed)
