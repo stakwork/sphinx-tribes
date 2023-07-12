@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffect } from 'react';
-import FadeLeft from '../../../animated/fadeLeft';
-import Widget from './widget';
-import FocusedWidget from './focusedWidget';
+import FadeLeft from '../../../animated/FadeLeft';
+import Widget from './Widget';
+import FocusedWidget from './FocusedWidget';
 
 const Wrap = styled.div``;
 const Center = styled.div`

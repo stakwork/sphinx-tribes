@@ -7,10 +7,10 @@ import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { TribesURL } from 'config';
 import { useStores } from '../../store';
 import { Divider } from '../../components/common';
-import IconButton from '../../components/common/icon_button';
+import IconButton from '../../components/common/IconButton2';
 import { useIsMobile } from '../../hooks';
 import QR from '../utils/QR';
-import AuthQR from './authQR';
+import AuthQR from './AuthQR';
 import SphinxAppLoginDeepLink from './SphinxAppLoginDeepLink';
 
 interface ImageProps {

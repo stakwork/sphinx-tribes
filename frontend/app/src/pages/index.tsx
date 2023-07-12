@@ -4,16 +4,16 @@ import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import BotsBody from '../bots/body';
-import PeopleHeader from '../people/main/header';
-import TokenRefresh from '../people/utils/tokenRefresh';
-import Body from '../tribes/body';
-import Header from '../tribes/header';
+import BotsBody from '../bots/Body';
+import PeopleHeader from '../people/main/Header';
+import TokenRefresh from '../people/utils/TokenRefresh';
+import Body from '../tribes/Body';
+import Header from '../tribes/Header';
 import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
-import { People } from './People';
-import { TicketsPage } from './Tickets';
-import { LeaderboardPage } from './Leaderboard';
+import { People } from './people';
+import { TicketsPage } from './tickets';
+import { LeaderboardPage } from './leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
