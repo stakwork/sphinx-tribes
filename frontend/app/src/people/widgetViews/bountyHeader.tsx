@@ -4,7 +4,7 @@ import MaterialIcon from '@material/react-material-icon';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
-import IconButton from 'components/common/icon_button';
+import IconButton from 'components/common/IconButton2';
 import { useHistory } from 'react-router-dom';
 import { BountyHeaderProps } from 'people/interfaces';
 import { colors } from '../../config/colors';
@@ -12,7 +12,7 @@ import { useIsMobile } from '../../hooks';
 import { SearchBar } from '../../components/common/index';
 import { useStores } from '../../store';
 import { filterCount } from '../utils/ExtraFunctions';
-import { GetValue, coding_languages, status } from '../utils/language_label_style';
+import { GetValue, coding_languages, status } from '../utils/languageLabelStyle';
 import { PostBounty } from './postBounty';
 
 const Status = GetValue(status);

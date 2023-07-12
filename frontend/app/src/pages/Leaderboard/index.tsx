@@ -1,8 +1,8 @@
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { colors, mobileBreakpoint } from 'config';
-import { LeaerboardItem } from 'leaderboard/LeaderboardItem';
-import { Summary } from 'leaderboard/Summary';
-import { Top3 } from 'leaderboard/Top3';
+import { LeaerboardItem } from 'leaderboard/leaderboardItem';
+import { Summary } from 'leaderboard/summary';
+import { Top3 } from 'leaderboard/top3';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useStores } from 'store';

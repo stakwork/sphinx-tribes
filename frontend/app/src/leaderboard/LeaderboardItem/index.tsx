@@ -2,7 +2,7 @@ import { EuiText } from '@elastic/eui';
 import { PriceOuterContainer } from 'components/common';
 import { colors } from 'config';
 import { DollarConverter } from 'helpers';
-import { UserInfo } from 'leaderboard/UserInfo';
+import { UserInfo } from 'leaderboard/userInfo';
 import { LeaderItem } from 'leaderboard/store';
 
 import React from 'react';

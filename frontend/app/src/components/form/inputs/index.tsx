@@ -2,26 +2,26 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui';
 import { colors } from '../../../config/colors';
-import TextInput from './text-input';
-import SearchTextInput from './search-text-input';
-import TextAreaInput from './text-area-input';
-import ImageInput from './img-input';
-import GalleryInput from './gallery-input';
-import NumberInput from './number-input';
+import TextInput from './TextInput';
+import SearchTextInput from './SearchTextInput';
+import TextAreaInput from './TextAreaInput';
+import ImageInput from './ImgInput';
+import GalleryInput from './GalleryInput';
+import NumberInput from './NumberInput';
 import Widgets from './widgets/index';
-import SwitchInput from './switch-input';
-import LoomVideoInput from './loom-video-input';
-import SelectInput from './select-input';
-import SearchableSelectInput from './searchable-select-input';
-import MultiSelectInput from './multi-select-input';
-import CreatableMultiSelectInput from './creatable-multi-select-input';
-import Date from './widgets/date';
+import SwitchInput from './SwitchInput';
+import LoomVideoInput from './LoomVideoInput';
+import SelectInput from './SelectInput';
+import SearchableSelectInput from './SearchableSelectInput';
+import MultiSelectInput from './MultiSelectInput';
+import CreatableMultiSelectInput from './CreatableMultiSelectInput';
+import Date from './widgets/Date';
 import InvitePeopleSearch from './widgets/PeopleSearch';
-import LoomVideoInputNew from './loom-video-input-new';
-import TextInputNew from './text-input-new';
-import NumberInputNew from './number-input-new';
-import TextAreaInputNew from './text-area-input-new';
-import CreatableMultiSelectInputNew from './creatable-multi-select-input-new';
+import LoomVideoInputNew from './LoomVideoInputNew';
+import TextInputNew from './TextInputNew2';
+import NumberInputNew from './NumberInputNew';
+import TextAreaInputNew from './TextAreaInputNew';
+import CreatableMultiSelectInputNew from './CreatableMultiSelectInputNew';
 
 interface styledProps {
   color?: any;
@@ -201,4 +201,3 @@ export default function Input(props: any) {
 
   return <FieldWrap color={color}>{getInput()}</FieldWrap>;
 }
-

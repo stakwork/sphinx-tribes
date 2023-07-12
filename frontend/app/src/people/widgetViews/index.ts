@@ -1,1 +1,1 @@
-export { default as RenderWidgets } from './renderWidgets';
+export { default as RenderWidgets } from './RenderWidgets';

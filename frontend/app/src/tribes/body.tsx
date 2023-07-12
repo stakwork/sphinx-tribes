@@ -12,12 +12,12 @@ import { observer } from 'mobx-react-lite';
 import { useStores } from '../store';
 import { useIsMobile, usePageScroll } from '../hooks';
 import { SearchTextInput } from '../components/common';
-import NoResults from '../people/utils/noResults';
-import PageLoadSpinner from '../people/utils/pageLoadSpinner';
+import NoResults from '../people/utils/NoResults';
+import PageLoadSpinner from '../people/utils/PageLoadSpinner';
 import { colors } from '../config/colors';
 import tags from './tags';
-import Tag from './tag';
-import Tribe from './tribe';
+import Tag from './Tag';
+import Tribe from './Tribe';
 
 const Body = styled.div`
   flex: 1;
