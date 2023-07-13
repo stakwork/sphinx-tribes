@@ -8,15 +8,15 @@ import BlogView from '../BlogView';
 import { blowViews } from '__test__/__mockData__/blogViews';
 
 beforeAll(() => {
-    nock.disableNetConnect();
-    setupStore();
-    mockUsehistory();
+  nock.disableNetConnect();
+  setupStore();
+  mockUsehistory();
 });
 
 // Todo : mock api request in usertickets page
 describe('BlogView Component', () => {
-    test('It showed display blog title', async () => {
-        render(<BlogView {...blowViews} />);
-        expect(screen.queryByText(blowViews.title)).toBeInTheDocument();
-    });
+  test('It showed display blog title', async () => {
+    render(<BlogView {...blowViews} />);
+    expect(screen.queryByText(blowViews.title)).toBeInTheDocument();
+  });
 });

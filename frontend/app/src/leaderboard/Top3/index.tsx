@@ -68,11 +68,14 @@ const Item = ({ owner_pubkey, total_sats_earned, place }: ItemProps) => {
       />
       <div>
         <EuiText textAlign="center" className="name">
-					{!!person?.owner_alias && <><Link className="name" to={`/p/${person.owner_pubkey}`}>
-            {person.owner_alias}
-								<MaterialIcon className="icon" icon="link" />
-
-          </Link></>}
+          {!!person?.owner_alias && (
+            <>
+              <Link className="name" to={`/p/${person.owner_pubkey}`}>
+                {person.owner_alias}
+                <MaterialIcon className="icon" icon="link" />
+              </Link>
+            </>
+          )}
         </EuiText>
         <PriceOuterContainer
           price_Text_Color={color.primaryColor.P300}

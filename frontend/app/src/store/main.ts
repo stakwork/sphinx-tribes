@@ -989,7 +989,7 @@ export class MainStore {
       return;
     }
 
-    if(!body.coding_language || !body.coding_language.length) {
+    if (!body.coding_language || !body.coding_language.length) {
       body.coding_language = [];
     }
 

@@ -93,8 +93,8 @@ const AutoComplete = (props: AutoCompleteProps) => {
 
   const handler = (e: any) => {
     setSearchValue(e.target.value);
-    const result = props?.peopleList.filter((x: any) =>
-      x?.owner_alias.toLowerCase()?.includes(e.target.value.toLowerCase())
+    const result = props?.peopleList.filter(
+      (x: any) => x?.owner_alias.toLowerCase()?.includes(e.target.value.toLowerCase())
     );
     setPeopleData(result);
   };

@@ -195,8 +195,8 @@ function WantedSummary(props: WantedSummaryProps) {
   useEffect(() => {
     let res;
     if (coding_language?.length > 0) {
-      res = LanguageObject?.filter((value: any) =>
-        coding_language?.find((val: any) => val.label === value.label)
+      res = LanguageObject?.filter(
+        (value: any) => coding_language?.find((val: any) => val.label === value.label)
       );
     }
     setDataValue(res);

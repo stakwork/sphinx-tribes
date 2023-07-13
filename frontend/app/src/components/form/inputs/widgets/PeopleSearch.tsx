@@ -310,10 +310,11 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
     setPeopleData(
       (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
-        : props?.peopleList?.filter(({ extras }: any) =>
-            extras?.coding_languages?.some(
-              ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-            )
+        : props?.peopleList?.filter(
+            ({ extras }: any) =>
+              extras?.coding_languages?.some(
+                ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+              )
           )
       )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
     );
