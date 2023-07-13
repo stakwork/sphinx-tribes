@@ -101,7 +101,7 @@ export interface NameTagProps {
   iconSize?: number;
   textSize?: number;
   isPaid?: boolean;
-  ticket_url?: string;
+  ticketUrl?: string;
   loomEmbedUrl?: string;
 }
 
@@ -159,7 +159,7 @@ export interface QRProps {
 
 export interface QRBarProps {
   simple?: boolean;
-  value: string;
+  value: string | undefined;
   style?: React.CSSProperties;
 }
 
@@ -201,7 +201,7 @@ export interface GithubStatusPillProps {
 export interface WantedSummaryProps {
   description: any;
   priceMin: number;
-  ticket_url: string;
+  ticketUrl: string;
   person: any;
   created?: number | undefined;
   repo: string;
@@ -212,8 +212,8 @@ export interface WantedSummaryProps {
   paid: boolean;
   badgeRecipient: string;
   loomEmbedUrl: string;
-  coding_language: { [key: string]: any };
-  estimated_session_length: string;
+  codingLanguage: { [key: string]: any };
+  estimate_session_length: string;
   assignee: Person;
   fromBountyPage: string;
   wanted_type: string;
@@ -229,7 +229,7 @@ export interface WantedSummaryProps {
 export interface CodingBountiesProps {
   deliverables?: string;
   description: any;
-  ticket_url: string;
+  ticketUrl: string;
   assignee: Person;
   created?: number;
   titleString: string;
@@ -279,11 +279,9 @@ export interface CodingBountiesProps {
   priceMin?: number;
   priceMax?: number;
   price?: number;
-  estimated_session_length?: string;
+  estimate_session_length?: string;
   loomEmbedUrl?: string;
   extraModalFunction?: () => void;
-  commitment_fee?: number;
-  bounty_expires?: string;
 }
 
 export interface CodingViewProps {
@@ -293,7 +291,7 @@ export interface CodingViewProps {
   price?: number;
   description?: string;
   envHeight?: string;
-  estimated_session_length?: string;
+  estimate_session_length?: string;
   loomEmbedUrl?: string;
   ticketUrl?: string;
   assignee: Person;
@@ -320,7 +318,7 @@ export interface WantedViewsProps {
   ticketUrl?: string;
   gallery?: any;
   assignee?: Person;
-  estimated_session_length?: string;
+  estimate_session_length?: string;
   loomEmbedUrl?: string;
   showModal?: () => void;
   setDeletePayload?: (boolean) => void;
@@ -336,8 +334,6 @@ export interface WantedViewsProps {
   paid?: boolean;
   isMine?: boolean;
   titleString: string | JSX.Element | JSX.Element[];
-  bounty_expires?: string;
-  commitment_fee?: number;
 }
 
 export interface WantedViews2Props extends WantedViewsProps {
@@ -346,7 +342,7 @@ export interface WantedViews2Props extends WantedViewsProps {
   issue?: string;
   repo?: string;
   type?: string;
-  coding_language?: any;
+  codingLanguage?: any;
   fromBountyPage?: boolean;
 }
 

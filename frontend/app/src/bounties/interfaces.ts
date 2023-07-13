@@ -17,7 +17,7 @@ export interface BountiesDescriptionProps {
 export interface BountiesPriceProps {
   sessionLength?: boolean | string;
   priceMin?: number;
-  price: number;
+  price?: number;
   style?: React.CSSProperties;
   priceMax?: number;
 }

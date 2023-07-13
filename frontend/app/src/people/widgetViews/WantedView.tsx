@@ -38,16 +38,15 @@ function WantedView(props: WantedViews2Props) {
     ticketUrl,
     repo,
     type,
-    coding_language,
+    codingLanguage,
     assignee,
-    estimated_session_length,
+    estimate_session_length,
     loomEmbedUrl,
     onPanelClick,
     show = true,
     paid = false
   } = props;
-
-  const titleString = one_sentence_summary || title || '';
+  const titleString = one_sentence_summary ?? title ?? '';
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
@@ -97,18 +96,16 @@ function WantedView(props: WantedViews2Props) {
   }
 
   useEffect(() => {
-    if (coding_language) {
-      const values = coding_language.map((value: any) => ({ ...value }));
+    if (codingLanguage) {
+      const values = codingLanguage.map((value: any) => ({ ...value }));
       setLabels(values);
     }
-  }, [coding_language]);
+  }, [codingLanguage]);
 
   const renderTickets = () => {
     const { status } = ticketUrl
-      ? ticketUrl
-        ? extractGithubIssueFromUrl(person, ticketUrl)
-        : extractGithubIssue(person, repo ?? '', issue ?? '')
-      : 'open';
+      ? extractGithubIssueFromUrl(person, ticketUrl)
+      : extractGithubIssue(person, repo ?? '', issue ?? '');
 
     const isClosed = status === 'closed' || paid ? true : false;
 
@@ -152,7 +149,7 @@ function WantedView(props: WantedViews2Props) {
                 priceMin={priceMin}
                 priceMax={priceMax}
                 price={price ?? 0}
-                sessionLength={estimated_session_length}
+                sessionLength={estimate_session_length}
                 description={description}
               />
             </BountyBox>
@@ -170,7 +167,7 @@ function WantedView(props: WantedViews2Props) {
                 priceMin={priceMin}
                 priceMax={priceMax}
                 price={price ?? 0}
-                sessionLength={estimated_session_length || ''}
+                sessionLength={estimate_session_length || ''}
                 description={description}
                 isPaid={paid}
               />

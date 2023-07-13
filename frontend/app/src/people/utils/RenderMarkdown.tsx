@@ -22,7 +22,7 @@ export function renderMarkdown(markdown: any) {
         img({ className, ...props }: any) {
           return (
             <img
-              alt={'Markodown'}
+              alt={'Markodown image'}
               className={className}
               style={{
                 width: '100%',

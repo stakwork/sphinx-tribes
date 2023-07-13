@@ -5,10 +5,9 @@ import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
-import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
 
-export const queryLimit = 100;
+export const queryLimit = 1000;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -104,21 +103,15 @@ export interface PersonPost {
 }
 
 export interface PersonWanted {
-  person?: any;
-  body?: any;
+  person: PersonFlex;
   title?: string;
   description?: string;
-  owner_id: string;
   created?: number;
   show?: boolean;
   assignee?: any;
-  wanted_type: string;
+  body: PersonWanted | any;
   type?: string;
   price?: string;
-  codingLanguage: string;
-  estimated_session_length: string;
-  bounty_expires?: string;
-  commitment_fee?: number;
 }
 
 export interface PersonOffer {
@@ -670,54 +663,31 @@ export class MainStore {
   async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query2 = this.appendQueryParams('bounty/all', queryLimit, {
+    const query = this.appendQueryParams('people/wanteds', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
-
     try {
-      const ps2 = await api.get(query2);
-      const ps3: any[] = [];
-
-      for (let i = 0; i < ps2.length; i++) {
-        const bounty = ps2[i];
-        let assigneeResponse;
-        if (bounty.assignee) {
-          const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
-            ...queryParams,
-            sortBy: 'created'
-          });
-          assigneeResponse = await api.get(query3);
-        }
-
-        const query4 = this.appendQueryParams(`person/${bounty.owner_id}`, queryLimit, {
-          ...queryParams,
-          sortBy: 'created'
-        });
-
-        const ownerResponse = await api.get(query4);
-
-        ps3.push({
-          body: { ...bounty, assignee: assigneeResponse || '' },
-          person: { ...ownerResponse, wanteds: [] } || { wanteds: [] }
-        });
-      }
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleWanteds = ps3;
+        // Set person wanted to empty array to avoid wrong data
+        this.setPersonWanteds([]);
+
+        this.peopleWanteds = ps;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
-          ps3,
+          ps,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
-          queryParams,
-          'wanted'
+          queryParams
         );
       }
-      return ps3;
+      return ps;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
       return [];
@@ -738,11 +708,14 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      const ps1 = await api.get(query);
+      let ps = await api.get(query);
+      ps = this.decodeListJSON(ps);
 
-      this.setPersonWanteds(ps1);
+      navigator.clipboard.writeText(JSON.stringify(ps));
 
-      return ps1;
+      this.setPersonWanteds(ps);
+
+      return ps;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
       return [];
@@ -784,13 +757,7 @@ export class MainStore {
     }
   }
 
-  doPageListMerger(
-    currentList: any[],
-    newList: any[],
-    setPage: Function,
-    queryParams?: any,
-    type?: string
-  ) {
+  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
@@ -807,18 +774,6 @@ export class MainStore {
 
     if (queryParams?.page) setPage(queryParams.page);
     const l = [...currentList, ...newList];
-
-    let set = new Set();
-    if (type === 'wanted') {
-      const uniqueArray = l.filter((item: any) => {
-        if (item.body && item.body.id && !set.has(item.body.id)) {
-          set.add(item.body.id);
-          return true;
-        }
-        return false;
-      }, set);
-      return uniqueArray;
-    }
 
     return l;
   }
@@ -979,68 +934,6 @@ export class MainStore {
       await this.getSelf(body);
     } catch (e) {
       console.log('Error saveProfile: ', e);
-    }
-  }
-
-  async saveBounty(body: any): Promise<void> {
-    const info = uiStore.meInfo as any;
-    if (!info && !body) {
-      console.log('Youre not logged in');
-      return;
-    }
-
-    if(!body.coding_language || !body.coding_language.length) {
-      body.coding_language = [];
-    }
-
-    try {
-      const request = `bounty?token=${info?.jwt}`;
-      //TODO: add some sort of authentication
-      const response = await fetch(`${TribesURL}/${request}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          ...body
-        }),
-        mode: 'cors',
-        headers: {
-          'x-jwt': info?.jwt,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.status) {
-        this.getPeopleWanteds({ resetPage: true });
-      }
-      return;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async deleteBounty(created: number): Promise<void> {
-    const info = uiStore.meInfo as any;
-    if (!info) {
-      console.log('Youre not logged in');
-      return;
-    }
-
-    try {
-      const request = `bounty/${info?.jwt}/${created}`;
-      //TODO: add some sort of authentication
-      const response = await fetch(`${TribesURL}/${request}`, {
-        method: 'DELETE',
-        mode: 'cors',
-        headers: {
-          'x-jwt': info?.jwt,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.status) {
-        await this.getPeopleWanteds({ resetPage: true });
-      }
-      return;
-    } catch (e) {
-      console.log(e);
     }
   }
 
@@ -1221,7 +1114,7 @@ export class MainStore {
 
   @action async getLnAuth(): Promise<any> {
     try {
-      const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
+      const data = await api.get('lnauth');
       this.setLnAuth(data);
       return data;
     } catch (e) {
@@ -1282,8 +1175,9 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      //TODO: add authentication
-      const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
+      const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
+      const r: any = await fetch(`${URL}/bounty/assignee`, {
         method: 'DELETE',
         mode: 'cors',
         body: JSON.stringify({

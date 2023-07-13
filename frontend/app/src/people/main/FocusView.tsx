@@ -197,14 +197,22 @@ function FocusedView(props: FocusViewProps) {
   }
 
   async function deleteIt() {
-    const bounty = main.peopleWanteds[selectedIndex];
+    let body: any = null;
+    body = { ...ui.meInfo };
+
+    // mutates
+    body.extras[config.name].splice(selectedIndex, 1);
+
+    const info = ui.meInfo as any;
+    if (!info) return console.log('no meInfo');
+
     setDeleting(true);
     try {
-      if (bounty.body.created) {
-        await main.deleteBounty(bounty.body.created);
-        closeModal();
-        if (props?.deleteExtraFunction) props?.deleteExtraFunction();
-      }
+      await main.saveProfile(body);
+      await main.getPeople();
+      closeModal();
+
+      if (props?.deleteExtraFunction) props?.deleteExtraFunction();
     } catch (e) {
       console.log('e', e);
     }
@@ -219,7 +227,7 @@ function FocusedView(props: FocusViewProps) {
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
       if (
-        newBody.ticket_url &&
+        newBody.ticketUrl &&
         (newBody.type === 'wanted_coding_task' ||
           newBody.type === 'coding_task' ||
           newBody.type === 'freelance_job_request')
@@ -243,7 +251,7 @@ function FocusedView(props: FocusViewProps) {
         newBody.title = newBody.one_sentence_summary;
 
         // save repo to cookies for autofill in form
-        ui.setLastGithubRepo(newBody.ticket_url);
+        ui.setLastGithubRepo(newBody.ticketUrl);
       }
     } catch (e) {
       throw githubError;
@@ -262,21 +270,30 @@ function FocusedView(props: FocusViewProps) {
       return;
     }
 
+    newBody = mergeFormWithMeData(newBody);
+
     if (!newBody) return; // avoid saving bad state
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
+
+    const date = new Date();
+    const unixTimestamp = Math.floor(date.getTime() / 1000);
     setLoading(true);
     try {
-      const newBody2 = body;
-      body.assignee = '';
-      if (body?.assignee?.owner_pubkey) {
-        newBody2.assignee = body.assignee.owner_pubkey;
-      }
-      newBody2.title = body.one_sentence_summary;
-      newBody2.one_sentence_summary = '';
-      newBody2.owner_id = info.pubkey;
+      const requestData =
+        config.name === 'about' || config.name === 'wanted'
+          ? {
+            ...newBody,
+            alert: undefined,
+            new_ticket_time: unixTimestamp,
+            extras: {
+              ...newBody?.extras,
+              alert: newBody.alert
+            }
+          }
+          : newBody;
 
-      await main.saveBounty(newBody2);
+      await main.saveProfile(requestData);
       closeModal();
     } catch (e) {
       console.log('e', e);
@@ -287,13 +304,12 @@ function FocusedView(props: FocusViewProps) {
       props?.ReCallBounties();
   }
 
-  let initialValues: any = {};
+  const initialValues: any = {};
 
   const personInfo = canEdit ? ui.meInfo : person;
 
   // set initials here
-  if (personInfo && selectedIndex >= 0) {
-    let wanted = main.peopleWanteds[selectedIndex].body;
+  if (personInfo) {
     if (config && config.name === 'about') {
       initialValues.id = personInfo.id || 0;
       initialValues.pubkey = personInfo.pubkey;
@@ -304,7 +320,8 @@ function FocusedView(props: FocusViewProps) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
+        personInfo.extras?.wanted?.map((value: any) => moment(value?.estimated_completion_date)) ||
+        '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -323,31 +340,33 @@ function FocusedView(props: FocusViewProps) {
         (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
     } else {
       // if there is a selected index, fill in values
-      if (selectedIndex >= 0) {
-        if (wanted.type) {
-          const thisDynamicSchema = dynamicSchemasByType[wanted.type];
-          const newValues = thisDynamicSchema.map((s: any) => {
-            if (s.name === 'estimated_completion_date') {
-              return {
-                [s.name]: wanted['estimated_completion_date'] || new Date()
-              };
-            } else if (s.name === 'one_sentence_summary') {
-              return {
-                [s.name]: wanted['one_sentence_summary'] || wanted['title']
-              };
-            }
-            return {
-              [s.name]: wanted[s.name]
-            };
-          });
+      if (selectedIndex > -1) {
+        const extras = { ...personInfo.extras };
+        const sel =
+          extras[config.name] &&
+          extras[config.name].length > selectedIndex - 1 &&
+          extras[config.name][selectedIndex];
 
-          const valueMap = Object.assign({}, ...newValues);
-          initialValues = { ...initialValues, ...valueMap };
-        } else {
+        if (sel) {
+          // if dynamic, find right schema
           const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
-          dynamicSchema?.defaultSchema?.forEach((s: any) => {
-            initialValues[s.name] = wanted[s.name];
-          });
+          if (dynamicSchema) {
+            if (sel.type) {
+              const thisDynamicSchema = dynamicSchemasByType[sel.type];
+              thisDynamicSchema?.forEach((s: any) => {
+                initialValues[s.name] = sel[s.name];
+              });
+            } else {
+              // use default schema
+              dynamicSchema?.defaultSchema?.forEach((s: any) => {
+                initialValues[s.name] = sel[s.name];
+              });
+            }
+          } else {
+            config?.schema?.forEach((s: any) => {
+              initialValues[s.name] = sel[s.name];
+            });
+          }
         }
       }
     }
@@ -356,13 +375,12 @@ function FocusedView(props: FocusViewProps) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-    if (selectedIndex >= 0) {
-      if (main.peopleWanteds[selectedIndex]) {
-        return main.peopleWanteds[selectedIndex].body;
-      } else {
-        return null;
-      }
+    if (main.personAssignedWanteds.length) {
+      return main.peopleWanteds[selectedIndex].body;
+    } else if (person?.extras && main.peopleWanteds) {
+      return main.peopleWanteds[selectedIndex].body;
     }
+
     return null;
   }
 
