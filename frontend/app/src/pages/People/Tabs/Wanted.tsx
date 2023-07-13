@@ -5,7 +5,7 @@ import { widgetConfigs } from 'people/utils/Constants';
 import NoneSpace from 'people/utils/NoneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/WantedView';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { PersonWanted } from 'store/main';
