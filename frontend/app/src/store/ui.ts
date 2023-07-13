@@ -10,7 +10,7 @@ export interface EuiSelectableOption {
 }
 
 const tagLabels = Object.keys(tags);
-const initialTags = tagLabels.map((label: any) => ({ label } as EuiSelectableOption));
+const initialTags = tagLabels.map((label: any) => ({ label }) as EuiSelectableOption);
 
 export interface MeInfo {
   id?: number;
