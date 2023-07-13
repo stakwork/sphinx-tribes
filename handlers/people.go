@@ -51,7 +51,6 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	}
 
 	existing := db.DB.GetPersonByPubkey(pubKeyFromAuth)
-	fmt.Println("Existing ===", existing)
 	if existing.ID == 0 { // new!
 		if person.ID != 0 { // cant try to "edit" if not exists already
 			fmt.Println("cant edit non existing")
