@@ -16,7 +16,7 @@ import { WantedSummaryProps } from '../../interfaces';
 import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
-import { ButtonRow, Img, Assignee } from './wantedsummaries/style';
+import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
 
 function useQuery() {
   const { search } = useLocation();

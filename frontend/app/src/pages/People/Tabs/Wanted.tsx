@@ -1,9 +1,9 @@
 import { usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import { BountyModal } from 'people/main/BountyModal';
+import { BountyModal } from 'people/main/bountyModal';
 import { widgetConfigs } from 'people/utils/Constants';
 import NoneSpace from 'people/utils/NoneSpace';
-import { PostBounty } from 'people/widgetViews/PostBounty';
+import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/WantedView';
 import React, { useState, useEffect } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
