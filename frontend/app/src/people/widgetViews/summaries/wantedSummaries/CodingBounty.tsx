@@ -45,7 +45,7 @@ function MobileView(props: CodingBountiesProps) {
   const {
     deliverables,
     description,
-    ticket_url,
+    ticketUrl,
     assignee,
     titleString,
     nametag,
@@ -87,9 +87,7 @@ function MobileView(props: CodingBountiesProps) {
     owner_idURL,
     createdURL,
     created,
-    loomEmbedUrl,
-    bounty_expires,
-    commitment_fee
+    loomEmbedUrl
   } = props;
   const color = colors['light'];
 
@@ -101,10 +99,10 @@ function MobileView(props: CodingBountiesProps) {
   const bountyPaid = paid || invoiceStatus;
   const pollMinutes = 1;
 
-  const bountyExpired = !bounty_expires
+  const bountyExpired = !assignee?.bounty_expires
     ? false
-    : Date.now() > new Date(bounty_expires || '').getTime();
-  const bountyTimeLeft = calculateTimeLeft(new Date(bounty_expires ?? ''), 'days');
+    : Date.now() > new Date(assignee.bounty_expires).getTime();
+  const bountyTimeLeft = calculateTimeLeft(new Date(assignee?.bounty_expires ?? ''), 'days');
 
   const addToast = (type: string) => {
     switch (type) {
@@ -142,19 +140,19 @@ function MobileView(props: CodingBountiesProps) {
 
   async function getLnInvoice() {
     // If the bounty has a commitment fee, add the fee to the user payment
-    const price = commitment_fee && props.price ? commitment_fee + props.price : props?.price;
-    if (created && ui.meInfo?.websocketToken) {
-      const data = await main.getLnInvoice({
-        amount: price || 0,
-        memo: '',
-        owner_pubkey: person.owner_pubkey,
-        user_pubkey: assignee.owner_pubkey,
-        created: created ? created?.toString() : '',
-        type: 'KEYSEND'
-      });
+    const price =
+      assignee.commitment_fee && props.price ? assignee.commitment_fee + props.price : props?.price;
 
-      setLnInvoice(data.response.invoice);
-    }
+    const data = await main.getLnInvoice({
+      amount: price || 0,
+      memo: '',
+      owner_pubkey: person.owner_pubkey,
+      user_pubkey: assignee.owner_pubkey,
+      created: created ? created?.toString() : '',
+      type: 'KEYSEND'
+    });
+
+    setLnInvoice(data.response.invoice);
   }
 
   async function removeBountyAssignee() {
@@ -171,13 +169,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
+    if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.invoice_success);
       setLnInvoice('');
       setInvoiceStatus(true);
@@ -206,9 +198,7 @@ function MobileView(props: CodingBountiesProps) {
 
   return (
     <div>
-      {{ ...person }?.owner_alias &&
-      ui.meInfo?.owner_alias &&
-      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+      {{ ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */
@@ -449,8 +439,8 @@ function MobileView(props: CodingBountiesProps) {
                     <BountyPrice
                       priceMin={props?.priceMin}
                       priceMax={props?.priceMax}
-                      price={props?.price || 0}
-                      sessionLength={props?.estimated_session_length}
+                      price={props?.price}
+                      sessionLength={props?.estimate_session_length}
                       style={{
                         padding: 0,
                         margin: 0
@@ -469,10 +459,21 @@ function MobileView(props: CodingBountiesProps) {
                     )}
                     {/**
                      * LNURL AUTH users alias are their public keys
-                     * which make them so longF
+                     * which make them so long
                      * A non LNAUTh user alias is shorter
                      */}
-                    {bounty_expires &&
+                    {!assignee?.bounty_expires && !assignee?.commitment_fee && !bountyPaid && (
+                      <Button
+                        iconSize={14}
+                        width={220}
+                        height={48}
+                        onClick={getLnInvoice}
+                        style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                        text="Pay Bounty"
+                        ButtonTextStyle={{ padding: 0 }}
+                      />
+                    )}
+                    {assignee?.bounty_expires &&
                       !bountyExpired &&
                       !invoiceStatus &&
                       assignee.owner_alias.length < 30 && (
@@ -511,8 +512,8 @@ function MobileView(props: CodingBountiesProps) {
                   <div className="buttonSet">
                     <ButtonSet
                       githubShareAction={() => {
-                        const repoUrl = ticket_url
-                          ? ticket_url
+                        const repoUrl = ticketUrl
+                          ? ticketUrl
                           : `https://github.com/${repo}/issues/${issue}`;
                         sendToRedirect(repoUrl);
                       }}
@@ -530,7 +531,7 @@ function MobileView(props: CodingBountiesProps) {
                         const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
                         sendToRedirect(profileUrl);
                       }}
-                      showGithubBtn={!!ticket_url}
+                      showGithubBtn={!!ticketUrl}
                     />
                   </div>
                   <BottomButtonContainer>
@@ -924,8 +925,8 @@ function MobileView(props: CodingBountiesProps) {
                   <BountyPrice
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
-                    price={props?.price || 0}
-                    sessionLength={props?.estimated_session_length}
+                    price={props?.price}
+                    sessionLength={props?.estimate_session_length}
                     style={{
                       padding: 0,
                       margin: 0
@@ -933,10 +934,10 @@ function MobileView(props: CodingBountiesProps) {
                   />
                 </BountyPriceContainer>
                 <ButtonSet
-                  showGithubBtn={!!ticket_url}
+                  showGithubBtn={!!ticketUrl}
                   githubShareAction={() => {
-                    const repoUrl = ticket_url
-                      ? ticket_url
+                    const repoUrl = ticketUrl
+                      ? ticketUrl
                       : `https://github.com/${repo}/issues/${issue}`;
                     sendToRedirect(repoUrl);
                   }}
@@ -997,8 +998,8 @@ function MobileView(props: CodingBountiesProps) {
                   <BountyPrice
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
-                    price={props?.price || 0}
-                    sessionLength={props?.estimated_session_length}
+                    price={props?.price}
+                    sessionLength={props?.estimate_session_length}
                     style={{
                       padding: 0,
                       margin: 0
@@ -1006,10 +1007,10 @@ function MobileView(props: CodingBountiesProps) {
                   />
                 </BountyPriceContainer>
                 <ButtonSet
-                  showGithubBtn={!!ticket_url}
+                  showGithubBtn={!!ticketUrl}
                   githubShareAction={() => {
-                    const repoUrl = ticket_url
-                      ? ticket_url
+                    const repoUrl = ticketUrl
+                      ? ticketUrl
                       : `https://github.com/${repo}/issues/${issue}`;
                     sendToRedirect(repoUrl);
                   }}
@@ -1076,8 +1077,8 @@ function MobileView(props: CodingBountiesProps) {
                   <BountyPrice
                     priceMin={props?.priceMin}
                     priceMax={props?.priceMax}
-                    price={props?.price || 0}
-                    sessionLength={props.estimated_session_length}
+                    price={props?.price}
+                    sessionLength={props.estimate_session_length}
                     style={{
                       padding: 0,
                       margin: 0
@@ -1085,10 +1086,10 @@ function MobileView(props: CodingBountiesProps) {
                   />
                 </BountyPriceContainer>
                 <ButtonSet
-                  showGithubBtn={!!ticket_url}
+                  showGithubBtn={!!ticketUrl}
                   githubShareAction={() => {
-                    const repoUrl = ticket_url
-                      ? ticket_url
+                    const repoUrl = ticketUrl
+                      ? ticketUrl
                       : `https://github.com/${repo}/issues/${issue}`;
                     sendToRedirect(repoUrl);
                   }}

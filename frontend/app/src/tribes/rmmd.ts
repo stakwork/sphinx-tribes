@@ -40,7 +40,7 @@ export default function rmmd(md: string) {
       .replace(/\[\^.+?\](: .*?$)?/g, '')
       .replace(/\s{0,2}\[.*?\]: .*?$/g, '')
       // Remove images
-      .replace(/!\[(.*?)\][\[\(].*?[\]\)]/g, options.useImgAltText ? '$1' : '')
+      .replace(/\!\[(.*?)\][\[\(].*?[\]\)]/g, options.useImgAltText ? '$1' : '')
       // Remove inline links
       .replace(/\[(.*?)\][\[\(].*?[\]\)]/g, '$1')
       // Remove blockquotes

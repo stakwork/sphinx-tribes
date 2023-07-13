@@ -54,7 +54,7 @@ type Bot struct {
 	Name           string         `json:"name"`
 	UniqueName     string         `json:"unique_name"`
 	Description    string         `json:"description"`
-	Tags           pq.StringArray ` `
+	Tags           pq.StringArray `gorm:"type:text[]" json:"tags"`
 	Img            string         `json:"img"`
 	PricePerUse    int64          `json:"price_per_use"`
 	Created        *time.Time     `json:"created"`
@@ -124,7 +124,7 @@ type Person struct {
 	PriceToMeet      int64          `json:"price_to_meet"`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
-	Extras           PropertyMap    `\x00`
+	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 }
 
@@ -310,49 +310,6 @@ type KeysendError struct {
 	Error   string `json:"error"`
 }
 
-type LnHost struct {
-	Msg  string `json:"msg"`
-	Host string `json:"host"`
-	K1   string `json:"k1"`
-}
-
-type BountyLeaderboard struct {
-	Owner_pubkey             string `json:"owner_pubkey"`
-	Total_bounties_completed uint   `json:"total_bounties_completed"`
-	Total_sats_earned        uint   `json:"total_sats_earned"`
-}
-
-type Bounty struct {
-	ID                      uint       `json:"id"`
-	OwnerID                 string     `json:"owner_id"`
-	Paid                    bool       `json:"paid"`
-	Show                    bool       `json:"show"`
-	Type                    string     `json:"type"`
-	Award                   string     `json:"award"`
-	AssignedHours           uint8      `json:"assigned_hours"`
-	BountyExpires           string     `json:"bounty_expires"`
-	CommitmentFee           uint64     `json:"commitment_fee"`
-	Price                   string     `json:"price"`
-	Title                   string     `json:"title"`
-	Tribe                   string     `json:"tribe"`
-	Created                 int64      `json:"created"`
-	Assignee                string     `json:"assignee"`
-	TicketUrl               string     `json:"ticket_url"`
-	Description             string     `json:"description"`
-	WantedType              string     `json:"wanted_type"`
-	Deliverables            string     `json:"deliverables"`
-	GithubDescription       bool       `json:"github_description"`
-	OneSentenceSummary      string     `json:"one_sentence_summary"`
-	EstimatedSessionLength  string     `json:"estimated_session_length"`
-	EstimatedCompletionDate string     `json:"estimated_completion_date"`
-	Updated                 *time.Time `json:"updated"`
-	CodingLanguage          JSONB      `json:"coding_language", type:bytea not null default '[]'::bytea`
-}
-
-func (Bounty) TableName() string {
-	return "bounty"
-}
-
 type Client struct {
 	Host string
 	Conn *websocket.Conn
@@ -392,21 +349,6 @@ func (p *PropertyMap) Scan(src interface{}) error {
 	if !ok {
 		return errors.New("type assertion .(map[string]interface{}) failed")
 	}
+
 	return nil
-}
-
-type JSONB []interface{}
-
-// Value Marshal
-func (a JSONB) Value() (driver.Value, error) {
-	return json.Marshal(a)
-}
-
-// Scan Unmarshal
-func (a *JSONB) Scan(value interface{}) error {
-	b, ok := value.([]byte)
-	if !ok {
-		return errors.New("type assertion to []byte failed")
-	}
-	return json.Unmarshal(b, &a)
 }

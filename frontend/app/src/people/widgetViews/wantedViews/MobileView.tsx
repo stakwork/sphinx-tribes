@@ -29,7 +29,7 @@ function MobileView(props: any) {
     created,
     ticketUrl,
     assignee,
-    estimated_session_length,
+    estimate_session_length,
     loomEmbedUrl,
     showModal,
     setDeletePayload,
@@ -160,14 +160,14 @@ function MobileView(props: any) {
               fontWeight: '500'
             }}
           >
-            {estimated_session_length && 'Session:'}{' '}
+            {estimate_session_length && 'Session:'}{' '}
             <span
               style={{
                 fontWeight: '500',
                 color: color.pureBlack
               }}
             >
-              {estimated_session_length ?? ''}
+              {estimate_session_length ?? ''}
             </span>
           </EuiText>
           <div

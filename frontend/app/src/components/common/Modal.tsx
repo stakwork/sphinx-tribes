@@ -131,11 +131,11 @@ export default function Modal(props: ModalProps) {
   const color = colors['light'];
   const fillStyle = fill
     ? {
-      minHeight: '100%',
-      height: 'auto',
-      width: '100%',
-      borderRadius: 0
-    }
+        minHeight: '100%',
+        height: 'auto',
+        width: '100%',
+        borderRadius: 0
+      }
     : {};
 
   return (
@@ -170,7 +170,7 @@ export default function Modal(props: ModalProps) {
         >
           {close && (
             <X color={color}>
-              <IconButton onClick={close} size={20} icon="close" color="transparent" />
+              <IconButton onClick={close} size={20} icon="close" />
             </X>
           )}
 

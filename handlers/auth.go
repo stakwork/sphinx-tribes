@@ -65,10 +65,7 @@ func GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(connectionCode)
 }
 
-func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
-	socketKey := r.URL.Query().Get("socketKey")
-	socket, _ := db.Store.GetSocketConnections(socketKey)
-
+func GetLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	encodeData, err := auth.EncodeLNURL()
 	responseData := make(map[string]string)
 
@@ -82,12 +79,6 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 
 	db.Store.SetLnCache(encodeData.K1, db.LnStore{K1: encodeData.K1, Key: "", Status: false})
 
-	// add socket to store with K1, so the LNURL return data can use it
-	db.Store.SetSocketConnections(db.Client{
-		Host: encodeData.K1[0:20],
-		Conn: socket.Conn,
-	})
-
 	responseData["k1"] = encodeData.K1
 	responseData["encode"] = encodeData.Encode
 
@@ -97,6 +88,7 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
+
 	k1 := r.URL.Query().Get("k1")
 
 	responseMsg := make(map[string]string)
@@ -130,11 +122,10 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		socketMsg["user"] = user
 		socketMsg["msg"] = "lnauth_success"
 
-		socket, err := db.Store.GetSocketConnections(k1[0:20])
+		socket, err := db.Store.GetSocketConnections(r.Host)
 
 		if err == nil {
 			socket.Conn.WriteJSON(socketMsg)
-			db.Store.DeleteCache(k1[0:20])
 		} else {
 			fmt.Println("Socket Error", err)
 		}
@@ -207,5 +198,6 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
 	user["url"] = config.Host
+
 	return user
 }
