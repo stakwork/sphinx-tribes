@@ -59,7 +59,6 @@ function BodyComponent() {
     main.getOpenGithubIssues();
     main.getBadgeList();
     main.getPeople();
-    main.getPeopleWanteds();
   }, [main]);
 
   useEffect(() => {
@@ -70,7 +69,6 @@ function BodyComponent() {
 
   useEffect(() => {
     (async () => {
-      await main.getPeople();
       await main.getPeopleWanteds({ page: 1, resetPage: true });
       setLoading(false);
     })();

@@ -24,7 +24,7 @@ function DesktopView(props: WantedViewsProps) {
     ticketUrl,
     gallery,
     assignee,
-    estimated_session_length,
+    estimate_session_length,
     loomEmbedUrl,
     showModal,
     setDeletePayload,
@@ -253,8 +253,8 @@ function DesktopView(props: WantedViewsProps) {
               </P>
             ) : (
               <P color={color}>
-                <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
-                <B color={color}>{satToUsd(price || 0)}</B> USD
+                <B color={color}>{formatPrice(price)}</B> SAT /{' '}
+                <B color={color}>{satToUsd(price)}</B> USD
               </P>
             )}
 
@@ -306,14 +306,14 @@ function DesktopView(props: WantedViewsProps) {
                 fontWeight: '500'
               }}
             >
-              {estimated_session_length && 'Session:'}{' '}
+              {estimate_session_length && 'Session:'}{' '}
               <span
                 style={{
                   fontWeight: '500',
                   color: color.pureBlack
                 }}
               >
-                {estimated_session_length ?? ''}
+                {estimate_session_length ?? ''}
               </span>
             </EuiText>
             {ui?.meInfo?.isSuperAdmin && (

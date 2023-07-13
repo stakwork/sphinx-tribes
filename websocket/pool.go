@@ -37,7 +37,6 @@ func (pool *Pool) Start() {
 			})
 			if err == nil {
 				pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Msg: "user_connect", Body: client.Host})
-				go client.Read()
 			} else {
 				fmt.Println("Websocket pool client save error")
 			}

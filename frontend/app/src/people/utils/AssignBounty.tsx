@@ -79,23 +79,19 @@ export default function AssignBounty(props: ConnectCardProps) {
   };
 
   const generateInvoice = async () => {
-    if (created && ui.meInfo?.websocketToken) {
-      const data = await main.getLnInvoice({
-        amount: 200 * bountyHours,
-        memo: '',
-        owner_pubkey: person?.owner_pubkey ?? '',
-        user_pubkey: ui.meInfo?.owner_pubkey ?? '',
-        created: created ? created.toString() : '',
-        type: 'ASSIGN',
-        assigned_hours: bountyHours,
-        commitment_fee: bountyHours * 200,
-        bounty_expires: new Date(
-          moment().add(bountyHours, 'hours').format().toString()
-        ).toUTCString()
-      });
+    const data = await main.getLnInvoice({
+      amount: 200 * bountyHours,
+      memo: '',
+      owner_pubkey: person?.owner_pubkey ?? '',
+      user_pubkey: ui.meInfo?.owner_pubkey ?? '',
+      created: created ? created.toString() : '',
+      type: 'ASSIGN',
+      assigned_hours: bountyHours,
+      commitment_fee: bountyHours * 200,
+      bounty_expires: new Date(moment().add(bountyHours, 'hours').format().toString()).toUTCString()
+    });
 
-      setLnInvoice(data.response.invoice);
-    }
+    setLnInvoice(data.response.invoice);
   };
 
   const onHandle = (event: any) => {

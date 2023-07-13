@@ -99,15 +99,11 @@ export const PersonPage = observer(() => {
           borderRadius: 0
         }}
       >
-        <>
-          {person?.owner_pubkey && person?.img && (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: getHtml(person.owner_pubkey, person?.img)
-              }}
-            />
-          )}
-        </>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: getHtml(person?.owner_pubkey, person?.img)
+          }}
+        />
       </Modal>
     </Content>
   );

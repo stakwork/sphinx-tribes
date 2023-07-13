@@ -264,7 +264,7 @@ export const AboutView = observer((props: AboutViewProps) => {
 
       <Divider />
 
-      {owner_pubkey && <QrBar value={owner_pubkey} />}
+      <QrBar value={owner_pubkey} />
 
       {tag && (
         <>
