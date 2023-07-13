@@ -117,7 +117,7 @@ export const coding_languages = [
 
 export const status = ['Open', 'Assigned', 'Paid'];
 
-export const GetValue = (arr: any) =>
+export const GetValue = (arr: string[]) =>
   arr.map((val: any) => ({
     id: val,
     label: val,

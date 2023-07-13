@@ -203,7 +203,7 @@ function Form(props: FormProps) {
       validationSchema={validator(schema)}
     >
       {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => {
-        const isDescriptionValid = values.ticketUrl
+        const isDescriptionValid = values.ticket_url
           ? values.github_description || !!values.description
           : !!values.description;
 
@@ -264,7 +264,7 @@ function Form(props: FormProps) {
                           borderType={'bottom'}
                           imageIcon={true}
                           style={
-                            item.name === 'github_description' && !values.ticketUrl
+                            item.name === 'github_description' && !values.ticket_url
                               ? {
                                   display: 'none'
                                 }
@@ -305,7 +305,7 @@ function Form(props: FormProps) {
                           }
                           borderType={'bottom'}
                           style={
-                            item.name === 'github_description' && !values.ticketUrl
+                            item.name === 'github_description' && !values.ticket_url
                               ? {
                                   display: 'none'
                                 }
@@ -460,7 +460,7 @@ function Form(props: FormProps) {
                                 (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                               }
                               style={
-                                item.name === 'github_description' && !values.ticketUrl
+                                item.name === 'github_description' && !values.ticket_url
                                   ? {
                                       display: 'none'
                                     }
@@ -509,7 +509,7 @@ function Form(props: FormProps) {
                                 (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                               }
                               style={
-                                item.type === 'loom' && values.ticketUrl
+                                item.type === 'loom' && values.ticket_url
                                   ? {
                                       marginTop: '55px'
                                     }
@@ -626,7 +626,7 @@ function Form(props: FormProps) {
                       setDisableFormButtons={setDisableFormButtons}
                       extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                       style={
-                        item.name === 'github_description' && !values.ticketUrl
+                        item.name === 'github_description' && !values.ticket_url
                           ? {
                               display: 'none'
                             }

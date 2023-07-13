@@ -84,7 +84,6 @@ If you would like to enable Relay for invoice creation and keysend payment add t
     RELAY_AUTH_KEY=
 ```
 
-
 ### For Contributions
 
 Read the contribution doc [here](./Contribution.md)
@@ -96,4 +95,3 @@ If you would like to enable Stakwork jobs for Youtube videos download add the St
 ```
     STAKWORK_KEY=
 ```
-

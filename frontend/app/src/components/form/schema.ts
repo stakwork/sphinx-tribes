@@ -12,7 +12,7 @@ const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
 const repoStrValidator = Yup.string()
   .trim()
-  .matches(/^[^\/]+\/[^\/]+$/, 'Incorrect format')
+  .matches(/^[^/]+\/[^/]+$/, 'Incorrect format')
   .required('Required');
 const repoArrayStrValidator = Yup.array().of(
   Yup.object().shape({
@@ -706,7 +706,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     validator: strValidator
   },
   {
-    name: 'ticketUrl',
+    name: 'ticket_url',
     label: 'Github Issue URL',
     type: 'text'
   },
@@ -734,7 +734,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: []
   },
   {
-    name: 'codingLanguage',
+    name: 'coding_language',
     label: 'Coding Language',
     type: 'creatablemultiselect',
     options: codingLanguages
@@ -747,7 +747,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     validator: strValidatorNotRequired
   },
   {
-    name: 'estimate_session_length',
+    name: 'estimated_session_length',
     label: 'Estimate Session Length',
     type: 'select',
     options: estimated_time
@@ -773,10 +773,14 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'loom',
     validator: strValidatorNotRequired
   },
-
   {
     name: 'type',
     label: 'Type',
+    type: 'hide'
+  },
+  {
+    name: 'id',
+    label: 'ID',
     type: 'hide'
   }
 ];
@@ -807,6 +811,6 @@ export const dynamicSchemasByType = {
 // this object is used to autofill form fields if info is available in local storage
 export const dynamicSchemaAutofillFieldsByType = {
   freelance_job_request: {
-    ticketUrl: 'lastGithubRepo'
+    ticket_url: 'lastGithubRepo'
   }
 };

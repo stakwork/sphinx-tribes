@@ -48,7 +48,5 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) {
 		Conn: conn,
 		Pool: pool,
 	}
-
 	pool.Register <- client
-	client.Read()
 }
