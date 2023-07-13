@@ -9,8 +9,8 @@ import { useStores } from '../../store';
 import PaidBounty from '../utils/paidBounty';
 import Bounties from '../utils/assigned_unassigned_bounties';
 import { colors } from '../../config/colors';
-import MobileView from './wantedViews/mobileView';
-import DesktopView from './wantedViews/desktopView';
+import MobileView from './wantedviews/mobileView';
+import DesktopView from './wantedviews/desktopView';
 
 interface styledProps {
   color?: any;

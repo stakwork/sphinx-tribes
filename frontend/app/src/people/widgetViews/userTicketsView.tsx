@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { BountyModal } from 'people/main/BountyModal/BountyModal';
 import { colors } from '../../config/colors';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
-import WantedView from '../widgetViews/wantedView';
+import WantedView from './wantedView';
 import history from '../../config/history';
 import DeleteTicketModal from './deleteModal';
 

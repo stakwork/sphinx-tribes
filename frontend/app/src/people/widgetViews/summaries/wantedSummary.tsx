@@ -14,10 +14,10 @@ import { LanguageObject, awards } from '../../utils/language_label_style';
 import NameTag from '../../utils/nameTag';
 import { sendToRedirect } from '../../../helpers';
 import { WantedSummaryProps } from '../../interfaces';
-import CodingMobile from './wantedSummaries/codingMobile';
-import CodingBounty from './wantedSummaries/codingBounty';
-import CodingDesktop from './wantedSummaries/codingDesktop';
-import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
+import CodingMobile from './wantedsummaries/CodingMobile';
+import CodingBounty from './wantedsummaries/CodingBounty';
+import CodingDesktop from './wantedsummaries/CodingDesktop';
+import { ButtonRow, Img, Assignee } from './wantedsummaries/style';
 
 function useQuery() {
   const { search } = useLocation();
