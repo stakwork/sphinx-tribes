@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
-import { TabsPages } from './tabs';
+import { TabsPages } from './Tabs';
 
 const getHtml = (owner_pubkey: string = '', img: string = '') => `
 <sphinx-widget pubkey=${owner_pubkey}

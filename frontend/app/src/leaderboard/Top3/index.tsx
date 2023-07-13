@@ -1,5 +1,6 @@
 import { EuiAvatar, EuiText } from '@elastic/eui';
 import { PriceOuterContainer } from 'components/common';
+import MaterialIcon from '@material/react-material-icon';
 import { colors } from 'config';
 import { DollarConverter } from 'helpers';
 import { LeaderItem } from 'leaderboard/store';
@@ -67,9 +68,11 @@ const Item = ({ owner_pubkey, total_sats_earned, place }: ItemProps) => {
       />
       <div>
         <EuiText textAlign="center" className="name">
-          <Link className="name" to={`/p/${person?.owner_pubkey ?? ''}`}>
-            {person?.owner_alias ?? ''}
-          </Link>
+					{!!person?.owner_alias && <><Link className="name" to={`/p/${person.owner_pubkey}`}>
+            {person.owner_alias}
+								<MaterialIcon className="icon" icon="link" />
+
+          </Link></>}
         </EuiText>
         <PriceOuterContainer
           price_Text_Color={color.primaryColor.P300}
