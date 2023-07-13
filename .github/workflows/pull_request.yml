@@ -30,3 +30,14 @@ jobs:
           go-version: 1.19
       - name: Go Test
         run: go test -v ./...
+   
+  build:
+    name: build Job
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn --cwd ./frontend/app install
+      - name: Eslint
+        run: yarn --cwd ./frontend/app run build
