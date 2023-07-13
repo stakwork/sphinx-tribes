@@ -65,6 +65,7 @@ func InitDB() {
 	db.AutoMigrate(&Channel{})
 	db.AutoMigrate(&LeaderBoard{})
 	db.AutoMigrate(&ConnectionCodes{})
+	db.AutoMigrate(&Bounty{})
 
 	people := DB.GetAllPeople()
 	for _, p := range people {
@@ -502,44 +503,71 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) GetListedWanteds(r *http.Request) ([]PeopleExtra, error) {
+func (db database) GetListedWanteds(r *http.Request) ([]Bounty, error) {
 	pubkey := chi.URLParam(r, "pubkey")
-	ms := []PeopleExtra{}
 
-	var rawQuery string
-	var result *gorm.DB
-	// set limit
-	offset, limit, sortBy, _, search := utils.GetPaginationParams(r)
+	fmt.Println("Pubkey ===", pubkey)
+	ms := []Bounty{}
 
-	if pubkey == "" {
-		rawQuery = makeExtrasListQuery("wanted")
-	} else {
-		rawQuery = makePersonExtrasListQuery("wanted")
+	err := db.db.Raw(`SELECT * FROM bounty where assignee = '` + pubkey + `'`).Find(&ms).Error
+
+	fmt.Println("Bounty ===", ms)
+
+	return ms, err
+}
+
+func (db database) AddBounty(b Bounty) (Bounty, error) {
+	db.db.Create(&b)
+	return b, nil
+}
+
+func (db database) GetAllBounties(r *http.Request) []Bounty {
+	keys := r.URL.Query()
+	tags := keys.Get("tags") // this is a string of tags separated by commas
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+	ms := []Bounty{}
+
+	thequery := db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("LOWER(title) LIKE ?", "%"+search+"%")
+
+	if tags != "" {
+		// pull out the tags and add them in here
+		t := strings.Split(tags, ",")
+		for _, s := range t {
+			thequery = thequery.Where("'" + s + "'" + " = any (tags)")
+		}
 	}
 
-	// 3/1/2022 = 1646172712, we do this to disclude early test tickets
-	rawQuery = addNewerThanTimestampToExtrasRawQuery(rawQuery, 1646172712)
+	thequery.Find(&ms)
 
-	// Order the wanted in descending order by created date
-	rawQuery = addOrderToExtrasRawQuery(rawQuery)
+	return ms
+}
 
-	// if logged in, dont get mine
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	if pubKeyFromAuth != "" {
-		rawQuery = addNotMineToExtrasRawQuery(rawQuery, pubKeyFromAuth)
+func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
+	if b.OwnerID == "" {
+		return Bounty{}, errors.New("no pub key")
 	}
 
-	// sort by newest
-	if pubkey == "" {
-		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-			rawQuery, "%"+search+"%").Find(&ms)
-	} else {
-		result = db.db.Offset(offset).Limit(limit).Order("arr.item_object->>'"+sortBy+"' DESC").Raw(
-			rawQuery, pubkey, "%"+search+"%").Find(&ms)
+	if db.db.Model(&b).Where("id = ?", b.ID).Updates(&b).RowsAffected == 0 {
+		db.db.Create(&b)
 	}
+	return b, nil
+}
 
-	return ms, result.Error
+func (db database) DeleteBounty(pubkey string, created string) (Bounty, error) {
+	m := Bounty{}
+	db.db.Where("owner_id", pubkey).Where("created", created).Delete(&m)
+	return m, nil
+}
+
+func (db database) GetBountyByCreated(created uint) (Bounty, error) {
+	b := Bounty{}
+	err := db.db.Where("created", created).Find(&b).Error
+	return b, err
+}
+
+func (db database) UpdateBounty(b Bounty) (Bounty, error) {
+	db.db.Where("created", b.Created).Updates(&b)
+	return b, nil
 }
 
 func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
@@ -783,12 +811,9 @@ func (db database) CountDevelopers() int64 {
 }
 
 func (db database) CountBounties() uint64 {
-	var count struct {
-		Sum uint64 `db:"sum"`
-	}
-	db.db.Raw(`Select sum(jsonb_array_length(extras -> 'wanted')) from people where 
-                   people.deleted = 'f' OR people.deleted is null`).Scan(&count)
-	return count.Sum
+	var count uint64
+	db.db.Raw(`Select COUNT(*) from bounty`).Scan(&count)
+	return count
 }
 
 func (db database) GetPeopleListShort(count uint32) *[]PersonInShort {
@@ -884,11 +909,10 @@ type Extras struct {
 type LeaderData map[string]interface{}
 
 func (db database) GetBountiesLeaderboard() []LeaderData {
-	ms := []Extras{}
+	ms := []BountyLeaderboard{}
 	var users = []LeaderData{}
 
-	db.db.Raw(`SELECT item->'assignee'->>'owner_pubkey' as owner_pubkey, COUNT(item->'assignee'->>'owner_pubkey') as total_bounties_completed, item->>'price' as total_sats_earned from people  p, LATERAL jsonb_array_elements(p.extras->'wanted') r (item) where extras
-	#> '{wanted}' is not null GROUP BY r.item;`).Find(&ms)
+	db.db.Raw(`SELECT assignee as owner_pubkey, COUNT(assignee) as total_bounties_completed, price as total_sats_earned From bounty GROUP BY assignee, price`).Find(&ms)
 
 	for _, val := range ms {
 		var newLeader = make(map[string]interface{})
