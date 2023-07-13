@@ -71,7 +71,7 @@ export default function QrBar(props: QRBarProps) {
     setToasts([]);
   }
 
-  function copyToClipboard(str: string = '') {
+  function copyToClipboard(str = '') {
     const el = document.createElement('textarea');
     el.value = str;
     document.body.appendChild(el);

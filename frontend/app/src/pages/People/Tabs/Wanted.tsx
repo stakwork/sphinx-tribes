@@ -1,7 +1,7 @@
 import { usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import { BountyModal } from 'people/main/BountyModal';
-import { widgetConfigs } from 'people/utils/constants';
+import { widgetConfigs } from 'people/utils/Constants';
 import NoneSpace from 'people/utils/NoneSpace';
 import { PostBounty } from 'people/widgetViews/PostBounty';
 import WantedView from 'people/widgetViews/WantedView';
