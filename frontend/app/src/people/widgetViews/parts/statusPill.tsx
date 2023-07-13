@@ -67,8 +67,8 @@ export default function GithubStatusPill(props: GithubStatusPillProps) {
       assignee && !assignee?.owner_alias
         ? 'Not assigned'
         : isOpen
-        ? 'Assigned to '
-        : 'Completed by ';
+          ? 'Assigned to '
+          : 'Completed by ';
     setAssigneText(assignedText);
   }, [isOpen, assignee]);
 

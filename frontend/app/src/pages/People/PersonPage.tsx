@@ -1,8 +1,8 @@
 import { Modal } from 'components/common';
 import { useIsMobile, usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import { PeopleList } from 'people/peoplelist';
-import { UserInfo } from 'people/userinfo';
+import { PeopleList } from 'people/peopleList';
+import { UserInfo } from 'people/userInfo';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStores } from 'store';

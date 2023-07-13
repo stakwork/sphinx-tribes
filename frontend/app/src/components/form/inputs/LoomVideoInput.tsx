@@ -1,5 +1,5 @@
 import React from 'react';
-import LoomViewerRecorder from '../../../people/utils/loomViewerRecorder';
+import LoomViewerRecorder from '../../../people/utils/LoomViewerRecorder';
 import type { Props } from './propsType';
 
 export default function LoomVideoInput({ value, handleChange, handleBlur, handleFocus }: Props) {

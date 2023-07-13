@@ -2,7 +2,7 @@ import { Modal } from 'components/common';
 import { colors } from 'config';
 import { useIsMobile } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import FocusedView from 'people/main/focusView';
+import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/constants';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';

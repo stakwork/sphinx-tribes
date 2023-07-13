@@ -7,10 +7,10 @@ import { SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
 import { useStores } from '../../store';
-import Person from '../person';
-import NoResults from '../utils/noResults';
-import PageLoadSpinner from '../utils/pageLoadSpinner';
-import StartUpModal from '../utils/start_up_modal';
+import Person from '../Person';
+import NoResults from '../utils/NoResults';
+import PageLoadSpinner from '../utils/PageLoadSpinner';
+import StartUpModal from '../utils/StartUpModal';
 
 const color = colors['light'];
 const Body = styled.div<{ isMobile: boolean }>`

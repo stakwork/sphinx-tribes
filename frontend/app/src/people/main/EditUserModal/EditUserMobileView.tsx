@@ -1,7 +1,7 @@
 import { Modal } from 'components/common';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import FocusedView from '../focusView';
+import FocusedView from '../FocusView';
 import { formConfig } from './config';
 import { useUserEdit } from './useEditUser';
 

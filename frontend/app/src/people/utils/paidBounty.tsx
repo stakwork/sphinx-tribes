@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PaidBountiesProps } from 'people/interfaces';
-import BountyDescription from '../../bounties/bounty_description';
-import BountyPrice from '../../bounties/bounty_price';
-import BountyProfileView from '../../bounties/bounty_profile_view';
+import BountyDescription from '../../bounties/BountyDescription';
+import BountyPrice from '../../bounties/BountyPrice';
+import BountyProfileView from '../../bounties/BountyProfileView';
 import { colors } from '../../config/colors';
 
 interface PaidBountyProps {

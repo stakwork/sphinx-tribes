@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AutoCompleteProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
-import ImageButton from './Image_button';
+import ImageButton from './ImageButton';
 
 interface styledProps {
   color?: any;
@@ -124,7 +124,7 @@ const AutoComplete = (props: AutoCompleteProps) => {
               <div className="ImageContainer">
                 <img
                   src={value.img || '/static/person_placeholder.png'}
-                  alt={'user-image'}
+                  alt={'user'}
                   height={'100%'}
                   width={'100%'}
                 />

@@ -4,11 +4,11 @@ import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../../api';
 import { colors } from '../../config/colors';
-import { BountyDetailsCreationData } from '../../people/utils/bountyCreation_constant';
+import { BountyDetailsCreationData } from '../../people/utils/BountyCreationConstant';
 import { formDropdownOptions } from '../../people/utils/constants';
 import { useStores } from '../../store';
 import { Button, Divider, IconButton, Modal } from '../common';
-import ImageButton from '../common/Image_button';
+import ImageButton from '../common/ImageButton';
 import Input from './inputs';
 import { dynamicSchemaAutofillFieldsByType, dynamicSchemasByType } from './schema';
 import {
@@ -129,7 +129,7 @@ function Form(props: FormProps) {
           const localStorageKey = dynamicSchemaAutofillFieldsByType[dynamicSchemaName][k];
           const valueToAssign = ui[localStorageKey];
           // if no value exists already
-          if (!vals[k] || vals[k] == undefined) {
+          if (!vals[k] || vals[k] === undefined) {
             if (valueToAssign) {
               setDynamicInitialValues({ ...initValues, [k]: valueToAssign });
               // re-render
@@ -266,8 +266,8 @@ function Form(props: FormProps) {
                           style={
                             item.name === 'github_description' && !values.ticket_url
                               ? {
-                                  display: 'none'
-                                }
+                                display: 'none'
+                              }
                               : undefined
                           }
                         />
@@ -307,8 +307,8 @@ function Form(props: FormProps) {
                           style={
                             item.name === 'github_description' && !values.ticket_url
                               ? {
-                                  display: 'none'
-                                }
+                                display: 'none'
+                              }
                               : undefined
                           }
                         />
@@ -462,8 +462,8 @@ function Form(props: FormProps) {
                               style={
                                 item.name === 'github_description' && !values.ticket_url
                                   ? {
-                                      display: 'none'
-                                    }
+                                    display: 'none'
+                                  }
                                   : undefined
                               }
                             />
@@ -511,8 +511,8 @@ function Form(props: FormProps) {
                               style={
                                 item.type === 'loom' && values.ticket_url
                                   ? {
-                                      marginTop: '55px'
-                                    }
+                                    marginTop: '55px'
+                                  }
                                   : undefined
                               }
                             />
@@ -628,8 +628,8 @@ function Form(props: FormProps) {
                       style={
                         item.name === 'github_description' && !values.ticket_url
                           ? {
-                              display: 'none'
-                            }
+                            display: 'none'
+                          }
                           : undefined
                       }
                     />

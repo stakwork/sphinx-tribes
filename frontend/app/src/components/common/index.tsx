@@ -1,10 +1,10 @@
-import SearchTextInput from './search-text-input';
+import SearchTextInput from './SearchTextInput';
 import SearchBar from './SearchBar';
 import Button from './Button';
-import IconButton from './iconButton';
+import IconButton from './IconButton';
 import Modal from './Modal';
 import Divider from './Divider';
-import { Title, Date, Paragraph, Link } from './elements';
+import { Title, Date, Paragraph, Link } from './Elements';
 import Select from './Select';
 import MultiSelect from './MultiSelect';
 import CreatableMultiSelect from './CreatableMultiSelect';

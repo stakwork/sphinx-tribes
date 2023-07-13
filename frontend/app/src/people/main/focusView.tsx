@@ -7,7 +7,7 @@ import { FocusViewProps } from 'people/interfaces';
 import { useStores } from '../../store';
 import Form from '../../components/form';
 import { Button, IconButton } from '../../components/common';
-import WantedSummary from '../widgetviews/summaries/WantedSummary';
+import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';

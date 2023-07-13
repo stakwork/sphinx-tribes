@@ -2,26 +2,26 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiFormRow, EuiTextArea, EuiFieldText } from '@elastic/eui';
 import { colors } from '../../../config/colors';
-import TextInput from './text-input';
-import SearchTextInput from './search-text-input';
-import TextAreaInput from './text-area-input';
-import ImageInput from './img-input';
-import GalleryInput from './gallery-input';
-import NumberInput from './number-input';
+import TextInput from './TextInput';
+import SearchTextInput from './SearchTextInput';
+import TextAreaInput from './TextAreaInput';
+import ImageInput from './ImgInput';
+import GalleryInput from './GalleryInput';
+import NumberInput from './NumberInput';
 import Widgets from './widgets/index';
-import SwitchInput from './switch-input';
-import LoomVideoInput from './loom-video-input';
-import SelectInput from './select-input';
-import SearchableSelectInput from './searchable-select-input';
-import MultiSelectInput from './multi-select-input';
-import CreatableMultiSelectInput from './creatable-multi-select-input';
-import Date from './widgets/date';
+import SwitchInput from './SwitchInput';
+import LoomVideoInput from './LoomVideoInput';
+import SelectInput from './SelectInput';
+import SearchableSelectInput from './SearchableSelectInput';
+import MultiSelectInput from './MultiSelectInput';
+import CreatableMultiSelectInput from './CreatableMultiSelectInput';
+import Date from './widgets/Date';
 import InvitePeopleSearch from './widgets/PeopleSearch';
-import LoomVideoInputNew from './loom-video-input-new';
-import TextInputNew from './text-input-new';
-import NumberInputNew from './number-input-new';
-import TextAreaInputNew from './text-area-input-new';
-import CreatableMultiSelectInputNew from './creatable-multi-select-input-new';
+import LoomVideoInputNew from './LoomVideoInputNew';
+import TextInputNew from './TextInputNew2';
+import NumberInputNew from './NumberInputNew';
+import TextAreaInputNew from './TextAreaInputNew';
+import CreatableMultiSelectInputNew from './CreatableMultiSelectInputNew';
 
 interface styledProps {
   color?: any;
@@ -58,13 +58,13 @@ interface fieldEnvProps {
   isTextField?: any;
 }
 
-export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
+export const FieldEnv = styled(EuiFormRow as any) <fieldEnvProps>`
   border: ${(p: any) =>
     p.border === 'bottom'
       ? ''
       : p?.isTop
-      ? `1px solid ${p?.color && p.color.pureWhite}`
-      : `1px solid ${p?.color && p.color.grayish.G600}`};
+        ? `1px solid ${p?.color && p.color.pureWhite}`
+        : `1px solid ${p?.color && p.color.grayish.G600}`};
   border-bottom: ${(p: any) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
   box-sizing: border-box;
   border-radius: ${(p: any) => (p.border === 'bottom' ? '0px' : '4px')};
@@ -95,7 +95,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
     }
   }
 `;
-export const FieldText = styled(EuiFieldText)<styledProps>`
+export const FieldText = styled(EuiFieldText) <styledProps>`
 background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
 max-width:900px;
 background:${(p: any) => p?.color && p.color.pureWhite} !important;
@@ -136,7 +136,7 @@ margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')};
 
 
 `;
-export const FieldTextArea = styled(EuiTextArea)<styledProps>`
+export const FieldTextArea = styled(EuiTextArea) <styledProps>`
   // min-height: ${(p: any) => p?.height && p.height} !important;
   // max-height: ${(p: any) => p?.width && p.height} !important;
   width: ${(p: any) => p?.color && p.color.width};

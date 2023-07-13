@@ -8,9 +8,9 @@ import {
   coding_languages,
   GetValue,
   LanguageObject
-} from '../../../../people/utils/language_label_style';
-import { SvgMask } from '../../../../people/utils/svgMask';
-import ImageButton from '../../../common/Image_button';
+} from '../../../../people/utils/languageLabelStyle';
+import { SvgMask } from '../../../../people/utils/SvgMask';
+import ImageButton from '../../../common/ImageButton';
 import { InvitePeopleSearchProps } from './interfaces';
 
 interface styledProps {
@@ -311,10 +311,10 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
       (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
         : props?.peopleList?.filter(({ extras }: any) =>
-            extras?.coding_languages?.some(
-              ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-            )
+          extras?.coding_languages?.some(
+            ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
           )
+        )
       )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
     );
   }, [checkboxIdToSelectedMap, searchValue]);

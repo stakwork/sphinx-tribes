@@ -7,18 +7,18 @@ import { calculateTimeLeft } from 'helpers';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
-import { renderMarkdown } from '../../../utils/renderMarkdown';
+import { renderMarkdown } from '../../../utils/RenderMarkdown';
 import { satToUsd } from '../../../../helpers';
 import { useStores } from '../../../../store';
-import IconButton from '../../../../components/common/icon_button';
-import ImageButton from '../../../../components/common/Image_button';
-import BountyProfileView from '../../../../bounties/bounty_profile_view';
-import ButtonSet from '../../../../bounties/bountyModal_button_set';
-import BountyPrice from '../../../../bounties/bounty_price';
+import IconButton from '../../../../components/common/IconButton2';
+import ImageButton from '../../../../components/common/ImageButton';
+import BountyProfileView from '../../../../bounties/BountyProfileView';
+import ButtonSet from '../../../../bounties/BountyModalButtonSet';
+import BountyPrice from '../../../../bounties/BountyPrice';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { CodingBountiesProps } from '../../../interfaces';
-import LoomViewerRecorder from '../../../utils/loomViewerRecorder';
-import Invoice from './invoice';
+import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
+import Invoice from './Invoice';
 import {
   AssigneeProfile,
   Creator,

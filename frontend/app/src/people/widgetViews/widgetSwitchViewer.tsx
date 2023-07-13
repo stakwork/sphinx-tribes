@@ -4,15 +4,15 @@ import { observer } from 'mobx-react-lite';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/constants';
-import { Spacer } from '../main/body';
-import NoResults from '../utils/noResults';
+import { Spacer } from '../main/Body';
+import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
-import OfferView from './offerView';
-import WantedView from './wantedView';
-import PostView from './postView';
-import DeleteTicketModal from './deleteModal';
+import OfferView from './OfferView';
+import WantedView from './WantedView';
+import PostView from './PostView';
+import DeleteTicketModal from './DeleteModal';
 
 interface PanelProps {
   isMobile?: boolean;

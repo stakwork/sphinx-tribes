@@ -8,12 +8,12 @@ import { useStores } from '../../store';
 import { useIsMobile } from '../../hooks';
 import { Modal, Button } from '../../components/common';
 
-import SignIn from '../auth/signIn';
+import SignIn from '../auth/SignIn';
 import api from '../../api';
-import TorSaveQR from '../utils/torSaveQR';
-import IconButton from '../../components/common/icon_button';
+import TorSaveQR from '../utils/TorSaveQR';
+import IconButton from '../../components/common/IconButton2';
 import { PostModal } from '../widgetviews/postbounty/PostModal';
-import StartUpModal from '../utils/start_up_modal';
+import StartUpModal from '../utils/StartUpModal';
 
 const Row = styled.div`
   display: flex;

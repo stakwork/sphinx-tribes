@@ -2,7 +2,7 @@ import { EuiAvatar, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from 'config';
 import { observer } from 'mobx-react-lite';
-import ConnectCard from 'people/utils/connectCard';
+import ConnectCard from 'people/utils/ConnectCard';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStores } from 'store';

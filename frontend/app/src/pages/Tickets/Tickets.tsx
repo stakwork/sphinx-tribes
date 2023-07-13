@@ -1,8 +1,8 @@
 import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
-import FirstTimeScreen from 'people/main/firstTimeScreen';
-import PageLoadSpinner from 'people/utils/pageLoadSpinner';
-import BountyHeader from 'people/widgetviews/bountyHeader';
-import WidgetSwitchViewer from 'people/widgetviews/widgetSwitchViewer';
+import FirstTimeScreen from 'people/main/FirstTimeScreen';
+import PageLoadSpinner from 'people/utils/PageLoadSpinner';
+import BountyHeader from 'people/widgetViews/BountyHeader';
+import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';

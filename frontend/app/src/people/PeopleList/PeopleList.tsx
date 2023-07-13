@@ -1,14 +1,14 @@
 import { Button, SearchTextInput } from 'components/common';
 import { usePageScroll } from 'hooks';
-import NoResults from 'people/utils/noResults';
-import PageLoadSpinner from 'people/utils/pageLoadSpinner';
+import NoResults from 'people/utils/NoResults';
+import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useStores } from 'store';
 import { queryLimit } from 'store/main';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
-import Person from '../person';
+import Person from '../Person';
 const PeopleScroller = styled.div`
   overflow-y: overlay !important;
   width: 100%;

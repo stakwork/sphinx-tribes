@@ -6,7 +6,7 @@ import { makeConnectQR } from '../../helpers';
 import { colors } from '../../config/colors';
 import QR from './QR';
 import QrBar from './QrBar';
-import AssignBounty from './assignBounty';
+import AssignBounty from './AssignBounty';
 
 interface styledProps {
   color?: any;

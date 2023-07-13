@@ -1,6 +1,6 @@
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { colors, mobileBreakpoint } from 'config';
-import { LeaerboardItem } from 'leaderboard/leaderboarditem';
+import { LeaerboardItem } from 'leaderboard/leaderboardItem';
 import { Summary } from 'leaderboard/summary';
 import { Top3 } from 'leaderboard/top3';
 import { observer } from 'mobx-react-lite';

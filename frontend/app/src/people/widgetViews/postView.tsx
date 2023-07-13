@@ -3,8 +3,8 @@ import ReactMarkdown from 'react-markdown';
 import styled from 'styled-components';
 import { OfferViewProps } from 'people/interfaces';
 import { Link, Paragraph, Title } from '../../components/common';
-import GalleryViewer from '../utils/galleryViewer';
-import NameTag from '../utils/nameTag';
+import GalleryViewer from '../utils/GalleryViewer';
+import NameTag from '../utils/NameTag';
 
 const Wrap = styled.div`
   display: flex;

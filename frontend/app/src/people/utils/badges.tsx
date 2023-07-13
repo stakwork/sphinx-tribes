@@ -6,7 +6,7 @@ import { BadgesProps } from 'people/interfaces';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 import { Modal, Button, Divider, TextInput } from '../../components/common';
-import PageLoadSpinner from './pageLoadSpinner';
+import PageLoadSpinner from './PageLoadSpinner';
 
 interface BProps {
   readonly isMobile?: boolean;
