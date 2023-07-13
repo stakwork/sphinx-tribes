@@ -267,7 +267,7 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      let newBody2 = body;
+      const newBody2 = body;
       body.assignee = '';
       if (body?.assignee?.owner_pubkey) {
         newBody2.assignee = body.assignee.owner_pubkey;
@@ -326,7 +326,7 @@ function FocusedView(props: FocusViewProps) {
       if (selectedIndex >= 0) {
         if (wanted.type) {
           const thisDynamicSchema = dynamicSchemasByType[wanted.type];
-          let newValues = thisDynamicSchema.map((s: any) => {
+          const newValues = thisDynamicSchema.map((s: any) => {
             if (s.name === 'estimated_completion_date') {
               return {
                 [s.name]: wanted['estimated_completion_date'] || new Date()
@@ -341,7 +341,7 @@ function FocusedView(props: FocusViewProps) {
             };
           });
 
-          let valueMap = Object.assign({}, ...newValues);
+          const valueMap = Object.assign({}, ...newValues);
           initialValues = { ...initialValues, ...valueMap };
         } else {
           const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);

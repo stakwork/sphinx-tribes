@@ -13,9 +13,9 @@ import { LanguageObject, awards } from '../../utils/languageLabelStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
 import { WantedSummaryProps } from '../../interfaces';
-import CodingMobile from './wantedsummaries/CodingMobile';
-import CodingBounty from './wantedsummaries/CodingBounty';
-import CodingDesktop from './wantedsummaries/CodingDesktop';
+import CodingMobile from './wantedSummaries/CodingMobile';
+import CodingBounty from './wantedSummaries/CodingBounty';
+import CodingDesktop from './wantedSummaries/CodingDesktop';
 import { ButtonRow, Img, Assignee } from './wantedsummaries/style';
 
 function useQuery() {

@@ -676,11 +676,11 @@ export class MainStore {
     });
 
     try {
-      let ps2 = await api.get(query2);
-      let ps3: any[] = [];
+      const ps2 = await api.get(query2);
+      const ps3: any[] = [];
 
       for (let i = 0; i < ps2.length; i++) {
-        let bounty = ps2[i];
+        const bounty = ps2[i];
         let assigneeResponse;
         if (bounty.assignee) {
           const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
@@ -695,7 +695,7 @@ export class MainStore {
           sortBy: 'created'
         });
 
-        let ownerResponse = await api.get(query4);
+        const ownerResponse = await api.get(query4);
 
         ps3.push({
           body: { ...bounty, assignee: assigneeResponse || '' },
@@ -738,7 +738,7 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps1 = await api.get(query);
+      const ps1 = await api.get(query);
 
       this.setPersonWanteds(ps1);
 
@@ -994,7 +994,7 @@ export class MainStore {
     }
 
     try {
-      let request = `bounty?token=${info?.jwt}`;
+      const request = `bounty?token=${info?.jwt}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'POST',
@@ -1025,7 +1025,7 @@ export class MainStore {
     }
 
     try {
-      let request = `bounty/${info?.jwt}/${created}`;
+      const request = `bounty/${info?.jwt}/${created}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'DELETE',
