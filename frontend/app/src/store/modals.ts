@@ -12,7 +12,6 @@ class ModalsVisibilityStore {
 
   startupModal = false;
   setStartupModal(v: boolean) {
-    console.log('teuaweawe');
     this.startupModal = v;
   }
 }

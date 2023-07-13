@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -33,13 +34,20 @@ func (c *Client) Read() {
 	}()
 
 	for {
+		var socketMsg db.LnHost
 		messageType, p, err := c.Conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
+
+		err = json.Unmarshal(p, &socketMsg)
+		if err != nil {
+			fmt.Println("Message Decode Error", err, string(p))
+		}
 		message := Message{Type: messageType, Body: string(p)}
-		c.Pool.Broadcast <- message
+
 		fmt.Printf("Message Received: %+v\n", message)
+		c.Pool.Broadcast <- message
 	}
 }

@@ -77,11 +77,14 @@ function SignIn(props: AuthProps) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    main.getLnAuth();
-  }, []);
+    if (ui.websocketToken) {
+      main.getLnAuth();
+    }
+  }, [ui.websocketToken]);
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
+    ui.setWebsocketToken(res.body);
     if (res.msg === SOCKET_MSG.user_connect) {
       const user = ui.meInfo;
       if (user) {
@@ -138,8 +141,9 @@ function SignIn(props: AuthProps) {
             ) : (
               !isMobile && (
                 <AuthQR
-                  onSuccess={() => {
+                  onSuccess={async () => {
                     if (props.onSuccess) props.onSuccess();
+
                     main.getPeople({ resetPage: true });
                   }}
                   style={{ marginBottom: 20 }}
