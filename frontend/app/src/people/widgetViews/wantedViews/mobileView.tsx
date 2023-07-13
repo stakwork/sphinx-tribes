@@ -131,9 +131,10 @@ function MobileView(props: any) {
                   onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${{
-                        ...assignee
-                      }.owner_pubkey
+                      `/p/${
+                        {
+                          ...assignee
+                        }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );

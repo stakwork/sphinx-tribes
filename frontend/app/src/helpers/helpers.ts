@@ -1,11 +1,11 @@
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export function formatPrice(amount = 0) {
+export function formatPrice(amount: number = 0) {
   return amount;
 }
 
-export function satToUsd(amount = 0) {
+export function satToUsd(amount: number = 0) {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);

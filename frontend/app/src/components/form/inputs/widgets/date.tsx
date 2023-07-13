@@ -11,7 +11,7 @@ interface datePickerProps {
 }
 
 // @ts-ignore
-const DataPicker = styled(EuiDatePicker) <datePickerProps>`
+const DataPicker = styled(EuiDatePicker)<datePickerProps>`
   border: 1px solid ${(p: any) => (p.border ? p?.color?.blue2 : p?.color?.grayish.G600)};
   :focus {
     background-image: none;
