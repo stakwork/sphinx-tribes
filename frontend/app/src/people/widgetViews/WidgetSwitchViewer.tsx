@@ -156,6 +156,7 @@ function WidgetSwitchViewer(props: any) {
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
         const { person, body } = item;
+
         const conditionalStyles = body?.paid
           ? {
             border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',

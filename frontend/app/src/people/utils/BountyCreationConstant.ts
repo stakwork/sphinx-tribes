@@ -20,8 +20,8 @@ export const BountyDetailsCreationData = {
     schemaName: 'Freelance Job Request',
     heading: 'Basic info',
     sub_heading: ' ',
-    schema: ['one_sentence_summary', 'ticketUrl'],
-    schema2: ['wanted_type', 'codingLanguage'],
+    schema: ['one_sentence_summary', 'ticket_url'],
+    schema2: ['wanted_type', 'coding_language'],
     required: ['one_sentence_summary', 'wanted_type'],
     outerContainerStyle: {
       minWidth: '712px',
@@ -52,7 +52,7 @@ export const BountyDetailsCreationData = {
     schemaName: 'Freelance Job Request',
     heading: 'Price and Estimate',
     sub_heading: ' ',
-    schema: ['price', 'estimate_session_length', 'estimated_completion_date'],
+    schema: ['price', 'estimated_session_length', 'estimated_completion_date'],
     schema2: ['tribe', 'deliverables', 'show'],
     required: ['price'],
     outerContainerStyle: {

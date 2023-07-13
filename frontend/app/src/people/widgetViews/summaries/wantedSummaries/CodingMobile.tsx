@@ -24,7 +24,7 @@ export default function MobileView(props: CodingViewProps) {
     ticketUrl,
     price,
     loomEmbedUrl,
-    estimate_session_length,
+    estimated_session_length,
     assignee,
     titleString,
     nametag,
@@ -79,14 +79,14 @@ export default function MobileView(props: CodingViewProps) {
             fontWeight: '500'
           }}
         >
-          {estimate_session_length && 'Session:'}{' '}
+          {estimated_session_length && 'Session:'}{' '}
           <span
             style={{
               fontWeight: '500',
               color: color.pureBlack
             }}
           >
-            {estimate_session_length ?? ''}
+            {estimated_session_length ?? ''}
           </span>
         </EuiText>
         <div
@@ -144,8 +144,8 @@ export default function MobileView(props: CodingViewProps) {
         <Divider />
         <Y>
           <P color={color}>
-            <B color={color}>{formatPrice(price)}</B> SAT / <B color={color}>{satToUsd(price)}</B>{' '}
-            USD
+            <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
+            <B color={color}>{satToUsd(price || 0)}</B> USD
           </P>
           <Heart />
         </Y>

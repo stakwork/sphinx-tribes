@@ -304,7 +304,7 @@ const BountyHeader = ({
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
   const [developerCount, setDeveloperCount] = useState<number>(0);
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const [filterCountNumber, setFilterCountNumber] = useState<number>(0);
   const history = useHistory();
 
@@ -384,6 +384,11 @@ const BountyHeader = ({
                 }}
                 onChange={(e: any) => {
                   ui.setSearchText(e);
+                }}
+                onKeyUp={(e: any) => {
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                    main.getPeopleWanteds();
+                  }
                 }}
                 iconStyle={{
                   top: '13px'
