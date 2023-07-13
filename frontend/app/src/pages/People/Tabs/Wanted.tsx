@@ -5,12 +5,13 @@ import { widgetConfigs } from 'people/utils/Constants';
 import NoneSpace from 'people/utils/NoneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/WantedView';
-import React from 'react';
-import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
+import { PersonWanted } from 'store/main';
 import styled from 'styled-components';
-
 const config = widgetConfigs.wanted;
+
 const Container = styled.div`
   display: flex;
   flex-flow: row wrap;
@@ -35,12 +36,23 @@ const Panel = styled.div<PanelProps>`
 `;
 
 export const Wanted = observer(() => {
-  const { ui } = useStores();
+  const { ui, main } = useStores();
   const { person, canEdit } = usePerson(ui.selectedPerson);
   const { path, url } = useRouteMatch();
   const history = useHistory();
+  const { personPubkey } = useParams<{ personPubkey: string }>();
+  const { peopleWanteds } = main;
+  const fullSelectedWidgets = peopleWanteds.filter(
+    (wanted: PersonWanted) => wanted.body.OwnerID === personPubkey
+  );
 
-  const fullSelectedWidgets = person?.extras?.wanted;
+  async function getUserTickets() {
+    await main.getPersonAssignedWanteds({}, personPubkey);
+  }
+
+  useEffect(() => {
+    getUserTickets();
+  }, []);
 
   if (!fullSelectedWidgets?.length) {
     return (
@@ -89,19 +101,23 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {fullSelectedWidgets.map((w: any, i: number) => (
-        <Panel
-          key={w.created}
-          isMobile={false}
-          onClick={() =>
-            history.push({
-              pathname: `${url}/${i}`
-            })
-          }
-        >
-          <WantedView titleString={w.title} {...w} person={person} />
-        </Panel>
-      ))}
+      {fullSelectedWidgets.map((w: any, i: any) => {
+        if (w.body.OwnerID === person?.owner_pubkey) {
+          return (
+            <Panel
+              key={w.created}
+              isMobile={false}
+              onClick={() =>
+                history.push({
+                  pathname: `${url}/${i}`
+                })
+              }
+            >
+              <WantedView {...w.body} person={person} />
+            </Panel>
+          );
+        }
+      })}
     </Container>
   );
 });

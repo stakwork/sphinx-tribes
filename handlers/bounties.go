@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
-	"strings"
 
 	"github.com/stakwork/sphinx-tribes/db"
 )
@@ -27,6 +26,7 @@ func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 	people, err := db.DB.GetListedWanteds(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(people)
@@ -82,51 +82,185 @@ func DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
 	owner_key := invoice.Owner_pubkey
 	date := invoice.Created
 
-	var p = db.DB.GetPersonByPubkey(owner_key)
+	createdUint, _ := strconv.ParseUint(date, 10, 32)
+	b, err := db.DB.GetBountyByCreated(uint(createdUint))
 
-	wanteds, _ := p.Extras["wanted"].([]interface{})
+	if err == nil && b.OwnerID == owner_key {
+		b.Assignee = ""
+		b.AssignedHours = 0
+		b.CommitmentFee = 0
+		b.BountyExpires = ""
 
-	for _, wanted := range wanteds {
-		w, ok2 := wanted.(map[string]interface{})
-		if !ok2 {
-			continue
-		}
+		db.DB.UpdateBounty(b)
 
-		created, ok3 := w["created"].(float64)
-		createdArr := strings.Split(fmt.Sprintf("%f", created), ".")
-		createdString := createdArr[0]
-		createdInt, _ := strconv.ParseInt(createdString, 10, 32)
-
-		dateInt, _ := strconv.ParseInt(date, 10, 32)
-
-		if !ok3 {
-			continue
-		}
-
-		if createdInt == dateInt {
-			delete(w, "assignee")
-		}
-	}
-	p.Extras["wanted"] = wanteds
-
-	b := new(bytes.Buffer)
-	decodeErr := json.NewEncoder(b).Encode(p.Extras)
-
-	if decodeErr != nil {
-		log.Printf("Could not encode extras json data")
+		deletedAssignee = true
+	} else {
+		log.Printf("Could not delete bounty assignee")
 
 		deletedAssignee = false
 
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(deletedAssignee)
-	} else {
-		db.DB.UpdatePerson(p.ID, map[string]interface{}{
-			"extras": b,
-		})
-
-		deletedAssignee = true
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(deletedAssignee)
 	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(deletedAssignee)
+}
+
+func MigrateBounties(w http.ResponseWriter, r *http.Request) {
+	peeps := db.DB.GetAllPeople()
+
+	for indexPeep, peep := range peeps {
+		fmt.Println("peep: ", indexPeep)
+		bounties, ok := peep.Extras["wanted"].([]interface{})
+
+		if !ok {
+			fmt.Println("Wanted not there")
+			continue
+		}
+
+		for index, bounty := range bounties {
+
+			fmt.Println("looping bounties: ", index)
+			migrateBounty := bounty.(map[string]interface{})
+
+			migrateBountyFinal := db.Bounty{}
+			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
+
+			migrateBountyFinal.OwnerID = peep.OwnerPubKey
+
+			Paid, ok1 := migrateBounty["paid"].(bool)
+			if !ok1 {
+				migrateBountyFinal.Paid = false
+			} else {
+				migrateBountyFinal.Paid = Paid
+			}
+
+			Show, ok2 := migrateBounty["show"].(bool)
+			if !ok2 {
+				migrateBountyFinal.Show = true
+			} else {
+				migrateBountyFinal.Show = Show
+			}
+
+			Type, ok3 := migrateBounty["type"].(string)
+			if !ok3 {
+				migrateBountyFinal.Type = ""
+			} else {
+				migrateBountyFinal.Type = Type
+			}
+
+			Award, ok4 := migrateBounty["award"].(string)
+			if !ok4 {
+				migrateBountyFinal.Award = ""
+			} else {
+				migrateBountyFinal.Award = Award
+			}
+
+			Price, ok5 := migrateBounty["price"].(string)
+			if !ok5 {
+				migrateBountyFinal.Price = "0"
+			} else {
+				migrateBountyFinal.Price = Price
+			}
+
+			Tribe, ok6 := migrateBounty["tribe"].(string)
+			if !ok6 {
+				migrateBountyFinal.Tribe = ""
+			} else {
+				migrateBountyFinal.Tribe = Tribe
+			}
+
+			Created, ok7 := migrateBounty["created"].(float64)
+			CreatedInt64 := int64(Created)
+			if !ok7 {
+				migrateBountyFinal.Created = 0
+			} else {
+				fmt.Println(reflect.TypeOf(CreatedInt64))
+				fmt.Println("Timestamp:", CreatedInt64)
+				migrateBountyFinal.Created = CreatedInt64
+			}
+
+			Assignee, ok8 := migrateBounty["assignee"].(map[string]interface{})
+			if !ok8 {
+				migrateBountyFinal.Assignee = ""
+			} else {
+				assigneePubkey := Assignee["owner_pubkey"].(string)
+				assigneeId := ""
+				for _, peep := range peeps {
+					if peep.OwnerPubKey == assigneePubkey {
+						assigneeId = peep.OwnerPubKey
+					}
+				}
+				migrateBountyFinal.Assignee = assigneeId
+			}
+
+			TicketUrl, ok9 := migrateBounty["ticketUrl"].(string)
+			if !ok9 {
+				migrateBountyFinal.TicketUrl = ""
+			} else {
+				migrateBountyFinal.TicketUrl = TicketUrl
+			}
+
+			Description, ok10 := migrateBounty["description"].(string)
+			if !ok10 {
+				migrateBountyFinal.Description = ""
+			} else {
+				migrateBountyFinal.Description = Description
+			}
+
+			WantedType, ok11 := migrateBounty["wanted_type"].(string)
+			if !ok11 {
+				migrateBountyFinal.WantedType = ""
+			} else {
+				migrateBountyFinal.WantedType = WantedType
+			}
+
+			Deliverables, ok12 := migrateBounty["deliverables"].(string)
+			if !ok12 {
+				migrateBountyFinal.Deliverables = ""
+			} else {
+				migrateBountyFinal.Deliverables = Deliverables
+			}
+
+			CodingLanguage, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
+			if !ok13 {
+				migrateBountyFinal.CodingLanguage = db.JSONB{}
+			} else {
+				migrateBountyFinal.CodingLanguage = CodingLanguage["value"].(db.JSONB)
+			}
+
+			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
+			if !ok14 {
+				migrateBountyFinal.GithubDescription = false
+			} else {
+				migrateBountyFinal.GithubDescription = GithuDescription
+			}
+
+			OneSentenceSummary, ok15 := migrateBounty["one_sentence_summary"].(string)
+			if !ok15 {
+				migrateBountyFinal.OneSentenceSummary = ""
+			} else {
+				migrateBountyFinal.OneSentenceSummary = OneSentenceSummary
+			}
+
+			EstimatedSessionLength, ok16 := migrateBounty["estimated_session_length"].(string)
+			if !ok16 {
+				migrateBountyFinal.EstimatedSessionLength = ""
+			} else {
+				migrateBountyFinal.EstimatedSessionLength = EstimatedSessionLength
+			}
+
+			EstimatedCompletionDate, ok17 := migrateBounty["estimated_completion_date"].(string)
+			if !ok17 {
+				migrateBountyFinal.EstimatedCompletionDate = ""
+			} else {
+				migrateBountyFinal.EstimatedCompletionDate = EstimatedCompletionDate
+			}
+			fmt.Println("Bounty about to be added ")
+			db.DB.AddBounty(migrateBountyFinal)
+			//Migrate the bounties here
+		}
+	}
+	return
 }

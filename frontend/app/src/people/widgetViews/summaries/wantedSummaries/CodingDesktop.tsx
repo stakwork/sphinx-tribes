@@ -19,7 +19,7 @@ export default function DesktopView(props: CodingViewProps) {
     price,
     description,
     envHeight,
-    estimate_session_length,
+    estimated_session_length,
     loomEmbedUrl,
     ticketUrl,
     assignee,
@@ -93,14 +93,14 @@ export default function DesktopView(props: CodingViewProps) {
                   fontWeight: '500'
                 }}
               >
-                {estimate_session_length && 'Session:'}{' '}
+                {estimated_session_length && 'Session:'}{' '}
                 <span
                   style={{
                     fontWeight: '500',
                     color: color.pureBlack
                   }}
                 >
-                  {estimate_session_length ?? ''}
+                  {estimated_session_length ?? ''}
                 </span>
               </EuiText>
             </div>
@@ -174,8 +174,8 @@ export default function DesktopView(props: CodingViewProps) {
           <SectionPad>
             <Y style={{ padding: 0 }}>
               <P color={color}>
-                <B color={color}>{formatPrice(price)}</B> SAT /{' '}
-                <B color={color}>{satToUsd(price)}</B> USD
+                <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
+                <B color={color}>{satToUsd(price || 0)}</B> USD
               </P>
             </Y>
           </SectionPad>

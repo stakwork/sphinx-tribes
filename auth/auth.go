@@ -49,7 +49,6 @@ func PubKeyContext(next http.Handler) http.Handler {
 
 		if isJwt {
 			claims, err := DecodeJwt(token)
-
 			if err != nil {
 				fmt.Println("Failed to parse JWT")
 				http.Error(w, http.StatusText(401), 401)

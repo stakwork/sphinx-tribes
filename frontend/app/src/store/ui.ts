@@ -15,6 +15,7 @@ const initialTags = tagLabels.map((label: any) => ({ label } as EuiSelectableOpt
 export interface MeInfo {
   id?: number;
   pubkey: string;
+  uuid?: string;
   owner_pubkey?: string;
   photo_url: string;
   alias: string;
@@ -149,6 +150,11 @@ class UiStore {
   language = '';
   setLanguage(s: string) {
     this.language = s;
+  }
+
+  websocketToken = '';
+  setWebsocketToken(s: string) {
+    this.websocketToken = s;
   }
 
   @persist('object') meInfo: MeData = null;
