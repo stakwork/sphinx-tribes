@@ -13,7 +13,6 @@ import { dynamicSchemasByType } from '../../components/form/schema';
 import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own
-
 const BWrap = styled.div`
   display: flex;
   justify-content: space-between;
