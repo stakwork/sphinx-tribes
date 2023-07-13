@@ -41,17 +41,13 @@ export const Wanted = observer(() => {
   const { path, url } = useRouteMatch();
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
-  const [loading, setIsLoading] = useState<boolean>(false);
   const { peopleWanteds } = main;
   const fullSelectedWidgets = peopleWanteds.filter(
     (wanted: PersonWanted) => wanted.body.OwnerID === personPubkey
   );
 
   async function getUserTickets() {
-    setIsLoading(true);
-    console.log(peopleWanteds);
-    const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
-    setIsLoading(false);
+    await main.getPersonAssignedWanteds({}, personPubkey);
   }
 
   useEffect(() => {

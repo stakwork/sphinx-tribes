@@ -152,7 +152,7 @@ class UiStore {
     this.language = s;
   }
 
-  websocketToken: string = '';
+  websocketToken = '';
   setWebsocketToken(s: string) {
     this.websocketToken = s;
   }
