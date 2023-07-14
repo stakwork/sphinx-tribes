@@ -24,7 +24,6 @@
     "@types/react": "17.0.30"
   },
   "dependencies": {
-    "@csstools/postcss-normalize-display-values": "^1.0.1",
     "@elastic/datemath": "^5.0.2",
     "@elastic/eui": "^64.0.4",
     "@loomhq/loom-embed": "^1.4.0",
