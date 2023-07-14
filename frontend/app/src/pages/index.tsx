@@ -11,7 +11,7 @@ import Body from '../tribes/Body';
 import Header from '../tribes/Header';
 import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
-import { People } from './people';
+import { People } from './People';
 import { TicketsPage } from './tickets';
 import { LeaderboardPage } from './leaderboard';
 
