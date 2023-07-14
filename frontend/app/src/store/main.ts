@@ -680,26 +680,17 @@ export class MainStore {
       const ps3: any[] = [];
 
       for (let i = 0; i < ps2.length; i++) {
-        const bounty = ps2[i];
-        let assigneeResponse;
+        const bounty = ps2[i].bounty;
+        let assignee;
+        let owner = ps2[i].owner;
+        
         if (bounty.assignee) {
-          const query3 = this.appendQueryParams(`person/${bounty.assignee}`, queryLimit, {
-            ...queryParams,
-            sortBy: 'created'
-          });
-          assigneeResponse = await api.get(query3);
+          assignee = ps2[i].assignee;
         }
 
-        const query4 = this.appendQueryParams(`person/${bounty.owner_id}`, queryLimit, {
-          ...queryParams,
-          sortBy: 'created'
-        });
-
-        const ownerResponse = await api.get(query4);
-
         ps3.push({
-          body: { ...bounty, assignee: assigneeResponse || '' },
-          person: { ...ownerResponse, wanteds: [] } || { wanteds: [] }
+          body: { ...bounty, assignee: assignee || '' },
+          person: { ...owner, wanteds: [] } || { wanteds: [] }
         });
       }
 
