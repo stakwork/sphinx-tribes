@@ -387,7 +387,7 @@ const BountyHeader = ({
                 }}
                 onKeyUp={(e: any) => {
                   if (e.key === 'Enter' || e.keyCode === 13) {
-                    main.getPeopleWanteds();
+                    main.getPeopleWanteds({ page: 1, resetPage: true });
                   }
                 }}
                 iconStyle={{

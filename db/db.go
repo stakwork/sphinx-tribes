@@ -523,18 +523,34 @@ func (db database) GetAllBounties(r *http.Request) []BountyData {
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 	ms := []BountyData{}
+	orderQuery := ""
+	limitQuery := ""
+	searchQuery := ""
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + "body." + sortBy + " " + direction
+	} else {
+		orderQuery = " ORDER BY " + "body." + sortBy + "" + "DESC"
+	}
+	if offset != 0 && limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	}
+	if search != "" {
+		searchQuery = fmt.Sprintf("WHERE LOWER(body.title) LIKE %s", "'%"+search+"%'")
+	}
 
-	thequery := db.db.Raw("SELECT body.*, body.id as bounty_id, body.description as bounty_description, body.created as bounty_created, body.updated as bounty_updated,  person.*, person.owner_alias as assignee_alias, person.id as assignee_id, person.description as assignee_description, person.created as assignee_created, person.updated as assignee_updated, owner.id as bounty_owner_id, owner.uuid as owner_uuid, owner.owner_pub_key as owner_key, owner.owner_alias as owner_alias, owner.description as owner_description, owner.price_to_meet as owner_price_to_meet, owner.unique_name as owner_unique_name, owner.tags as owner_tags, owner.img as owner_img, owner.created as owner_created, owner.updated as owner_updated, owner.last_login as owner_last_login, owner.owner_route_hint as owner_route_hint, owner.owner_contact_key as owner_contact_key FROM public.bounty AS body LEFT OUTER JOIN public.people AS person ON body.assignee = person.owner_pub_key LEFT OUTER JOIN public.people as owner ON body.owner_id = owner.owner_pub_key ORDER BY body.id DESC").Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("LOWER(title) LIKE ?", "%"+search+"%").Offset(offset).Limit(limit).Order(sortBy+" "+direction).Where("LOWER(title) LIKE ?", "%"+search+"%")
+	rawQuery := "SELECT body.*, body.id as bounty_id, body.description as bounty_description, body.created as bounty_created, body.updated as bounty_updated,  person.*, person.owner_alias as assignee_alias, person.id as assignee_id, person.description as assignee_description, person.created as assignee_created, person.updated as assignee_updated, owner.id as bounty_owner_id, owner.uuid as owner_uuid, owner.owner_pub_key as owner_key, owner.owner_alias as owner_alias, owner.description as owner_description, owner.price_to_meet as owner_price_to_meet, owner.unique_name as owner_unique_name, owner.tags as owner_tags, owner.img as owner_img, owner.created as owner_created, owner.updated as owner_updated, owner.last_login as owner_last_login, owner.owner_route_hint as owner_route_hint, owner.owner_contact_key as owner_contact_key FROM public.bounty AS body LEFT OUTER JOIN public.people AS person ON body.assignee = person.owner_pub_key LEFT OUTER JOIN public.people as owner ON body.owner_id = owner.owner_pub_key"
+
+	theQuery := db.db.Raw(rawQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery)
 
 	if tags != "" {
 		// pull out the tags and add them in here
 		t := strings.Split(tags, ",")
 		for _, s := range t {
-			thequery = thequery.Where("'" + s + "'" + " = any (tags)")
+			theQuery = theQuery.Where("'" + s + "'" + " = any (tags)")
 		}
 	}
 
-	thequery.Scan(&ms)
+	theQuery.Scan(&ms)
 
 	return ms
 }

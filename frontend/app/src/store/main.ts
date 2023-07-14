@@ -680,12 +680,12 @@ export class MainStore {
       const ps3: any[] = [];
 
       for (let i = 0; i < ps2.length; i++) {
-        const bounty = ps2[i].bounty;
+        const bounty = {...ps2[i].bounty}
         let assignee;
-        let owner = ps2[i].owner;
+        const owner = {...ps2[i].owner}
         
         if (bounty.assignee) {
-          assignee = ps2[i].assignee;
+          assignee = {...ps2[i].assignee}
         }
 
         ps3.push({
