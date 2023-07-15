@@ -12,7 +12,7 @@ import Header from '../tribes/Header';
 import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
 import { People } from './people';
-import { TicketsPage } from './tickects';
+import { TicketsPage } from './tickets';
 import { LeaderboardPage } from './leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
