@@ -47,6 +47,7 @@ const Podium = styled.div<{ place: number }>`
 type ItemProps = LeaderItem & {
   place: number;
 };
+
 const Item = ({ owner_pubkey, total_sats_earned, place }: ItemProps) => {
   const { main } = useStores();
   const [person, setPerson] = useState<Person>();
