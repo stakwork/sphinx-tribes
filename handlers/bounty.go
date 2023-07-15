@@ -13,9 +13,77 @@ import (
 )
 
 func GetAllBounties(w http.ResponseWriter, r *http.Request) {
+	var bountyResponse []db.BountyResponse
 	bounties := db.DB.GetAllBounties(r)
+
+	for i := 0; i < len(bounties); i++ {
+		bounty := bounties[i]
+		b := db.BountyResponse{
+			Bounty: db.Bounty{
+				ID:                      bounty.BountyId,
+				OwnerID:                 bounty.OwnerID,
+				Paid:                    bounty.Paid,
+				Show:                    bounty.Show,
+				Type:                    bounty.Type,
+				Award:                   bounty.Award,
+				AssignedHours:           bounty.AssignedHours,
+				BountyExpires:           bounty.BountyExpires,
+				CommitmentFee:           bounty.CommitmentFee,
+				Price:                   bounty.Price,
+				Title:                   bounty.Title,
+				Tribe:                   bounty.Tribe,
+				Created:                 bounty.BountyCreated,
+				Assignee:                bounty.Assignee,
+				TicketUrl:               bounty.TicketUrl,
+				Description:             bounty.BountyDescription,
+				WantedType:              bounty.WantedType,
+				Deliverables:            bounty.Deliverables,
+				GithubDescription:       bounty.GithubDescription,
+				OneSentenceSummary:      bounty.OneSentenceSummary,
+				EstimatedSessionLength:  bounty.EstimatedSessionLength,
+				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
+				Updated:                 bounty.BountyUpdated,
+				CodingLanguage:          bounty.CodingLanguage,
+			},
+			Assignee: db.Person{
+				ID:               bounty.AssigneeId,
+				Uuid:             bounty.Uuid,
+				OwnerPubKey:      bounty.OwnerPubKey,
+				OwnerAlias:       bounty.AssigneeAlias,
+				UniqueName:       bounty.UniqueName,
+				Description:      bounty.AssigneeDescription,
+				Tags:             bounty.Tags,
+				Img:              bounty.Img,
+				Created:          bounty.AssigneeCreated,
+				Updated:          bounty.AssigneeUpdated,
+				LastLogin:        bounty.LastLogin,
+				OwnerRouteHint:   bounty.OwnerRouteHint,
+				OwnerContactKey:  bounty.OwnerContactKey,
+				PriceToMeet:      bounty.PriceToMeet,
+				TwitterConfirmed: bounty.TwitterConfirmed,
+			},
+			Owner: db.Person{
+				ID:               bounty.BountyOwnerId,
+				Uuid:             bounty.OwnerUuid,
+				OwnerPubKey:      bounty.OwnerKey,
+				OwnerAlias:       bounty.OwnerAlias,
+				UniqueName:       bounty.OwnerUniqueName,
+				Description:      bounty.OwnerDescription,
+				Tags:             bounty.OwnerTags,
+				Img:              bounty.OwnerImg,
+				Created:          bounty.OwnerCreated,
+				Updated:          bounty.OwnerUpdated,
+				LastLogin:        bounty.OwnerLastLogin,
+				OwnerRouteHint:   bounty.OwnerRouteHint,
+				OwnerContactKey:  bounty.OwnerContactKey,
+				PriceToMeet:      bounty.OwnerPriceToMeet,
+				TwitterConfirmed: bounty.OwnerTwitterConfirmed,
+			},
+		}
+		bountyResponse = append(bountyResponse, b)
+	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bounties)
+	json.NewEncoder(w).Encode(bountyResponse)
 }
 
 func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
