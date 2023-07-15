@@ -4,9 +4,9 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useStores } from 'store';
 import styled from 'styled-components';
-import { LeaerboardItem } from '../../leaderboard/LeaderboardItem';
-import { Summary } from '../../leaderboard/Summary';
-import { Top3 } from '../../leaderboard/Top3';
+import { LeaerboardItem } from '../../leaderboard/leaderboardItem';
+import { Summary } from '../../leaderboard/summary';
+import { Top3 } from '../../leaderboard/top3';
 
 const Container = styled.div`
   height: calc(100% - 4rem);
