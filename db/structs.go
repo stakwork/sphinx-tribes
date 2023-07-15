@@ -124,7 +124,7 @@ type Person struct {
 	PriceToMeet      int64          `json:"price_to_meet"`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
-	Extras           PropertyMap    `\x00`
+	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 }
 
@@ -347,6 +347,41 @@ type Bounty struct {
 	EstimatedCompletionDate string     `json:"estimated_completion_date"`
 	Updated                 *time.Time `json:"updated"`
 	CodingLanguage          JSONB      `json:"coding_language", type:bytea not null default '[]'::bytea`
+}
+
+type BountyData struct {
+	Bounty
+	BountyId          uint       `json:"bounty_id"`
+	BountyCreated     int64      `json:"bounty_created"`
+	BountyUpdated     *time.Time `json:"bounty_updated"`
+	BountyDescription string     `json:"bounty_description"`
+	Person
+	AssigneeAlias         string         `json:"assignee_alias"`
+	AssigneeId            uint           `json:"assignee_id"`
+	AssigneeCreated       *time.Time     `json:"assignee_created"`
+	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
+	AssigneeDescription   string         `json:"assignee_description"`
+	BountyOwnerId         uint           `json:"bounty_owner_id"`
+	OwnerUuid             string         `json:"owner_uuid"`
+	OwnerKey              string         `json:"owner_key"`
+	OwnerAlias            string         `json:"owner_alias"`
+	OwnerUniqueName       string         `json:"owner_unique_name"`
+	OwnerDescription      string         `json:"owner_description"`
+	OwnerTags             pq.StringArray `gorm:"type:text[]" json:"owner_tags" null`
+	OwnerImg              string         `json:"owner_img"`
+	OwnerCreated          *time.Time     `json:"owner_created"`
+	OwnerUpdated          *time.Time     `json:"owner_updated"`
+	OwnerLastLogin        int64          `json:"owner_last_login"`
+	OwnerRouteHint        string         `json:"owner_route_hint"`
+	OwnerContactKey       string         `json:"owner_contact_key"`
+	OwnerPriceToMeet      int64          `json:"owner_price_to_meet"`
+	OwnerTwitterConfirmed bool           `json:"owner_twitter_confirmed"`
+}
+
+type BountyResponse struct {
+	Bounty   Bounty `json:"bounty"`
+	Assignee Person `json:"assignee"`
+	Owner    Person `json:"owner"`
 }
 
 func (Bounty) TableName() string {
