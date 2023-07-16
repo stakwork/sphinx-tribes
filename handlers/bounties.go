@@ -9,21 +9,16 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
-func GetListedWanteds(w http.ResponseWriter, r *http.Request) {
-	people, err := db.DB.GetListedWanteds(r)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	} else {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(people)
-	}
-}
-
 func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
-	people, err := db.DB.GetListedWanteds(r)
+	pubkey := chi.URLParam(r, "pubkey")
+	if pubkey == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	people, err := db.DB.GetListedWanteds(pubkey)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)

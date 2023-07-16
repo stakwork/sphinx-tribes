@@ -12,7 +12,6 @@ func PeopleRoutes() chi.Router {
 		r.Get("/", handlers.GetListedPeople)
 		r.Get("/search", handlers.GetPeopleBySearch)
 		r.Get("/posts", handlers.GetListedPosts)
-		r.Get("/wanteds", handlers.GetListedWanteds)
 		r.Get("/wanteds/assigned/{pubkey}", handlers.GetPersonAssignedWanteds)
 		r.Get("/wanteds/header", handlers.GetWantedsHeader)
 		r.Get("/short", handlers.GetPeopleShortList)

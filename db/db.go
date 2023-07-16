@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
@@ -503,12 +502,10 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) GetListedWanteds(r *http.Request) ([]Bounty, error) {
-	pubkey := chi.URLParam(r, "pubkey")
-
+func (db database) GetListedWanteds(pubkey string) ([]Bounty, error) {
 	ms := []Bounty{}
 
-	err := db.db.Raw(`SELECT * FROM bounty where assignee = '` + pubkey + `'`).Find(&ms).Error
+	err := db.db.Raw(`SELECT * FROM bounty WHERE assignee = '` + pubkey + `' ORDER BY id DESC`).Find(&ms).Error
 
 	return ms, err
 }
