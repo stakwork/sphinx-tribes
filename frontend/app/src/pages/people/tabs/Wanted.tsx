@@ -5,7 +5,7 @@ import { widgetConfigs } from 'people/utils/Constants';
 import NoneSpace from 'people/utils/NoneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/WantedView';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { PersonWanted } from 'store/main';
@@ -41,13 +41,11 @@ export const Wanted = observer(() => {
   const { path, url } = useRouteMatch();
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
-  const { peopleWanteds } = main;
-
-  const fullSelectedWidgets = peopleWanteds.filter(
-    (wanted: PersonWanted) => wanted.body.owner_id === personPubkey
-  );
+  const [createdBounties, setCreatedBounties] = useState<PersonWanted[]>([]);
 
   async function getUserTickets() {
+    const userBounties = await main.getPersonCreatedWanteds({}, personPubkey);
+    setCreatedBounties(userBounties)
     await main.getPersonAssignedWanteds({}, personPubkey);
   }
 
@@ -55,7 +53,7 @@ export const Wanted = observer(() => {
     getUserTickets();
   }, []);
 
-  if (!fullSelectedWidgets?.length) {
+  if (!createdBounties?.length) {
     return (
       <NoneSpace
         style={{
@@ -101,7 +99,7 @@ export const Wanted = observer(() => {
     >
       {canEdit && <PostBounty widget="wanted" />}
     </div>
-    {fullSelectedWidgets.map((w: any, i: any) => {
+    {createdBounties.map((w: any, i: any) => {
       if (w.body.owner_id === person?.owner_pubkey) {
         return (
           <Panel

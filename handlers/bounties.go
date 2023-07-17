@@ -28,21 +28,6 @@ func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	people, err := db.DB.GetCreatedBounties(pubkey)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
-	} else {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(people)
-	}
-}
-
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
 	var ret struct {
 		DeveloperCount int64               `json:"developer_count"`
