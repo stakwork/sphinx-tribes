@@ -18,7 +18,22 @@ func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
 	if pubkey == "" {
 		w.WriteHeader(http.StatusNotFound)
 	}
-	people, err := db.DB.GetListedWanteds(pubkey)
+	people, err := db.DB.GetAssignedBounties(pubkey)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(people)
+	}
+}
+
+func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
+	pubkey := chi.URLParam(r, "pubkey")
+	if pubkey == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	people, err := db.DB.GetCreatedBounties(pubkey)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)

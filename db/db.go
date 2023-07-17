@@ -502,10 +502,18 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) GetListedWanteds(pubkey string) ([]Bounty, error) {
+func (db database) GetAssignedBounties(pubkey string) ([]Bounty, error) {
 	ms := []Bounty{}
 
 	err := db.db.Raw(`SELECT * FROM bounty WHERE assignee = '` + pubkey + `' ORDER BY id DESC`).Find(&ms).Error
+
+	return ms, err
+}
+
+func (db database) GetCreatedBounties(pubkey string) ([]Bounty, error) {
+	ms := []Bounty{}
+
+	err := db.db.Raw(`SELECT * FROM bounty WHERE owner_id = '` + pubkey + `' ORDER BY id DESC`).Find(&ms).Error
 
 	return ms, err
 }

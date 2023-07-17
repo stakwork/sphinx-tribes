@@ -42,8 +42,9 @@ export const Wanted = observer(() => {
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const { peopleWanteds } = main;
+
   const fullSelectedWidgets = peopleWanteds.filter(
-    (wanted: PersonWanted) => wanted.body.OwnerID === personPubkey
+    (wanted: PersonWanted) => wanted.body.owner_id === personPubkey
   );
 
   async function getUserTickets() {
@@ -84,40 +85,38 @@ export const Wanted = observer(() => {
       />
     );
   }
-  return (
-    <Container>
-      <Switch>
-        <Route path={`${path}/:wantedId`}>
-          <BountyModal basePath={url} />
-        </Route>
-      </Switch>
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'flex-end',
-          paddingBottom: '16px'
-        }}
-      >
-        {canEdit && <PostBounty widget="wanted" />}
-      </div>
-      {fullSelectedWidgets.map((w: any, i: any) => {
-        if (w.body.OwnerID === person?.owner_pubkey) {
-          return (
-            <Panel
-              key={w.created}
-              isMobile={false}
-              onClick={() =>
-                history.push({
-                  pathname: `${url}/${i}`
-                })
-              }
-            >
-              <WantedView {...w.body} person={person} />
-            </Panel>
-          );
-        }
-      })}
-    </Container>
-  );
+  return (<Container>
+    <Switch>
+      <Route path={`${path}/:wantedId`}>
+        <BountyModal basePath={url} />
+      </Route>
+    </Switch>
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        paddingBottom: '16px'
+      }}
+    >
+      {canEdit && <PostBounty widget="wanted" />}
+    </div>
+    {fullSelectedWidgets.map((w: any, i: any) => {
+      if (w.body.owner_id === person?.owner_pubkey) {
+        return (
+          <Panel
+            key={w.created}
+            isMobile={false}
+            onClick={() =>
+              history.push({
+                pathname: `${url}/${i}`
+              })
+            }
+          >
+            <WantedView {...w.body} person={person} />
+          </Panel>
+        );
+      }
+    })}
+  </Container>)
 });
