@@ -13,8 +13,93 @@ import (
 )
 
 func GetAllBounties(w http.ResponseWriter, r *http.Request) {
-	var bountyResponse []db.BountyResponse
 	bounties := db.DB.GetAllBounties(r)
+	var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyResponse)
+}
+
+func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
+	pubkey := chi.URLParam(r, "pubkey")
+	if pubkey == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetCreatedBounties(pubkey)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
+func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
+	bounty := db.Bounty{}
+	body, err := ioutil.ReadAll(r.Body)
+
+	r.Body.Close()
+	err = json.Unmarshal(body, &bounty)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	now := time.Now()
+
+	bounty.Updated = &now
+	bounty.Created = time.Now().Unix()
+
+	if bounty.Type == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Type is a required field")
+		return
+	}
+	if bounty.Title == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Title is a required field")
+		return
+	}
+	if bounty.Description == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Description is a required field")
+		return
+	}
+	if bounty.Tribe == "" {
+		bounty.Tribe = "None"
+	}
+
+	b, err := db.DB.CreateOrEditBounty(bounty)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(b)
+}
+
+func DeleteBounty(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	created := chi.URLParam(r, "created")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	b, _ := db.DB.DeleteBounty(pubKeyFromAuth, created)
+	json.NewEncoder(w).Encode(b)
+}
+
+func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
+	var bountyResponse []db.BountyResponse
 
 	for i := 0; i < len(bounties); i++ {
 		bounty := bounties[i]
@@ -82,68 +167,6 @@ func GetAllBounties(w http.ResponseWriter, r *http.Request) {
 		}
 		bountyResponse = append(bountyResponse, b)
 	}
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bountyResponse)
-}
 
-func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
-	bounty := db.Bounty{}
-	body, err := ioutil.ReadAll(r.Body)
-
-	r.Body.Close()
-	err = json.Unmarshal(body, &bounty)
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusNotAcceptable)
-		return
-	}
-
-	now := time.Now()
-
-	bounty.Updated = &now
-	bounty.Created = time.Now().Unix()
-
-	if bounty.Type == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Type is a required field")
-		return
-	}
-	if bounty.Title == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Title is a required field")
-		return
-	}
-	if bounty.Description == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Description is a required field")
-		return
-	}
-	if bounty.Tribe == "" {
-		bounty.Tribe = "None"
-	}
-
-	b, err := db.DB.CreateOrEditBounty(bounty)
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(b)
-}
-
-func DeleteBounty(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	created := chi.URLParam(r, "created")
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	b, _ := db.DB.DeleteBounty(pubKeyFromAuth, created)
-	json.NewEncoder(w).Encode(b)
+	return bountyResponse
 }
