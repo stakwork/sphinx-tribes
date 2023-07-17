@@ -740,6 +740,39 @@ export class MainStore {
     }
   }
 
+  async getPersonCreatedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+
+    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
+    try {
+      const ps2 = await api.get(query);
+      const ps3: any[] = [];
+
+      for (let i = 0; i < ps2.length; i++) {
+        const bounty = { ...ps2[i].bounty };
+        let assignee;
+        const owner = { ...ps2[i].owner };
+
+        if (bounty.assignee) {
+          assignee = { ...ps2[i].assignee };
+        }
+
+        ps3.push({
+          body: { ...bounty, assignee: assignee || '' },
+          person: { ...owner, wanteds: [] } || { wanteds: [] }
+        });
+      }
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getCreatedWanteds: ', e);
+      return [];
+    }
+  }
+
   @persist('list')
   peopleOffers: PersonOffer[] = [];
 
