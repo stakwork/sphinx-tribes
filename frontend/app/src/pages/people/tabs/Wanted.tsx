@@ -45,7 +45,7 @@ export const Wanted = observer(() => {
 
   async function getUserTickets() {
     const userBounties = await main.getPersonCreatedWanteds({}, personPubkey);
-    setCreatedBounties(userBounties)
+    setCreatedBounties(userBounties);
     await main.getPersonAssignedWanteds({}, personPubkey);
   }
 
@@ -83,38 +83,40 @@ export const Wanted = observer(() => {
       />
     );
   }
-  return (<Container>
-    <Switch>
-      <Route path={`${path}/:wantedId`}>
-        <BountyModal basePath={url} />
-      </Route>
-    </Switch>
-    <div
-      style={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'flex-end',
-        paddingBottom: '16px'
-      }}
-    >
-      {canEdit && <PostBounty widget="wanted" />}
-    </div>
-    {createdBounties.map((w: any, i: any) => {
-      if (w.body.owner_id === person?.owner_pubkey) {
-        return (
-          <Panel
-            key={w.created}
-            isMobile={false}
-            onClick={() =>
-              history.push({
-                pathname: `${url}/${i}`
-              })
-            }
-          >
-            <WantedView {...w.body} person={person} />
-          </Panel>
-        );
-      }
-    })}
-  </Container>)
+  return (
+    <Container>
+      <Switch>
+        <Route path={`${path}/:wantedId`}>
+          <BountyModal basePath={url} />
+        </Route>
+      </Switch>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          paddingBottom: '16px'
+        }}
+      >
+        {canEdit && <PostBounty widget="wanted" />}
+      </div>
+      {createdBounties.map((w: any, i: any) => {
+        if (w.body.owner_id === person?.owner_pubkey) {
+          return (
+            <Panel
+              key={w.created}
+              isMobile={false}
+              onClick={() =>
+                history.push({
+                  pathname: `${url}/${i}`
+                })
+              }
+            >
+              <WantedView {...w.body} person={person} />
+            </Panel>
+          );
+        }
+      })}
+    </Container>
+  );
 });
