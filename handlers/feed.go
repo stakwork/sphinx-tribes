@@ -44,6 +44,36 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(feed)
 }
 
+func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
+	youtube_download := db.YoutubeDownload{}
+	body, err := ioutil.ReadAll(r.Body)
+
+	r.Body.Close()
+	err = json.Unmarshal(body, &youtube_download)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	for i := 0; i < len(youtube_download.YoutubeUrls); i++ {
+		url := youtube_download.YoutubeUrls[i]
+
+		feed, err := feeds.ParseFeed(url, false)
+		if err == nil {
+			processYoutubeDownload(url, *feed)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Youtube download processed successfully")
+}
+
 func processYoutubeDownload(url string, feed feeds.Feed) {
 	stakworkKey := fmt.Sprintf("Token token=%s", os.Getenv("STAKWORK_KEY"))
 	if stakworkKey == "" {
