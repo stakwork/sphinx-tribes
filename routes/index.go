@@ -39,6 +39,7 @@ func NewRouter() *http.Server {
 		r.Get("/search/bots/{query}", handlers.SearchBots)
 		r.Get("/podcast", handlers.GetPodcast)
 		r.Get("/feed", handlers.GetGenericFeed)
+		r.Post("/feed/download", handlers.DownloadYoutubeFeed)
 		r.Get("/search_podcasts", handlers.SearchPodcasts)
 		r.Get("/search_podcast_episodes", handlers.SearchPodcastEpisodes)
 		r.Get("/search_youtube", handlers.SearchYoutube)
