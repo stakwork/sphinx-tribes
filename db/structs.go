@@ -322,6 +322,10 @@ type BountyLeaderboard struct {
 	Total_sats_earned        uint   `json:"total_sats_earned"`
 }
 
+type YoutubeDownload struct {
+	YoutubeUrls []string `json:"youtube_urls"`
+}
+
 type Bounty struct {
 	ID                      uint       `json:"id"`
 	OwnerID                 string     `json:"owner_id"`
