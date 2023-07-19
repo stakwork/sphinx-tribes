@@ -38,7 +38,7 @@ function WantedSummary(props: WantedSummaryProps) {
     paid,
     badgeRecipient,
     loomEmbedUrl,
-    coding_language,
+    coding_languages,
     estimated_session_length,
     assignee,
     fromBountyPage,
@@ -150,7 +150,7 @@ function WantedSummary(props: WantedSummaryProps) {
           value: value?.owner_pubkey || '',
           label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
         },
-        coding_language: coding_language?.map((x: any) => ({ ...x })),
+        coding_language: coding_languages?.map((x: any) => ({ ...x })),
         estimated_session_length: estimated_session_length,
         show: show,
         type: type,
@@ -159,7 +159,7 @@ function WantedSummary(props: WantedSummaryProps) {
       formSubmit && formSubmit(newValue);
     },
     [
-      coding_language,
+      coding_languages,
       created,
       description,
       estimated_session_length,
@@ -194,14 +194,14 @@ function WantedSummary(props: WantedSummaryProps) {
 
   useEffect(() => {
     let res;
-    if (coding_language?.length > 0) {
+    if (coding_languages?.length > 0) {
       res = LanguageObject?.filter(
-        (value: any) => coding_language?.find((val: any) => val.label === value.label)
+        (value: any) => coding_languages?.find((val: any) => val.label === value.label)
       );
     }
     setDataValue(res);
     setLabels(res);
-  }, [coding_language]);
+  }, [coding_languages]);
 
   const searchParams = useQuery();
 
@@ -213,11 +213,11 @@ function WantedSummary(props: WantedSummaryProps) {
   }, [owner_idURL, createdURL, searchParams]);
 
   useEffect(() => {
-    if (coding_language) {
-      const values = coding_language.map((value: any) => ({ ...value }));
+    if (coding_languages) {
+      const values = coding_languages.map((value: any) => ({ ...value }));
       setLabels(values);
     }
-  }, [coding_language]);
+  }, [coding_languages]);
 
   async function setExtrasPropertyAndSave(propertyName: string, value: any) {
     if (peopleWanteds) {

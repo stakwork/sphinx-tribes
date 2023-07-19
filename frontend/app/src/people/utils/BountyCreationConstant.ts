@@ -21,7 +21,7 @@ export const BountyDetailsCreationData = {
     heading: 'Basic info',
     sub_heading: ' ',
     schema: ['one_sentence_summary', 'ticket_url'],
-    schema2: ['wanted_type', 'coding_language'],
+    schema2: ['wanted_type', 'coding_languages'],
     required: ['one_sentence_summary', 'wanted_type'],
     outerContainerStyle: {
       minWidth: '712px',

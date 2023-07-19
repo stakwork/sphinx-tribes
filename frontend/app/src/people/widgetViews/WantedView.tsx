@@ -38,7 +38,7 @@ function WantedView(props: WantedViews2Props) {
     ticketUrl,
     repo,
     type,
-    coding_language,
+    coding_languages,
     assignee,
     estimated_session_length,
     loomEmbedUrl,
@@ -97,11 +97,11 @@ function WantedView(props: WantedViews2Props) {
   }
 
   useEffect(() => {
-    if (coding_language) {
-      const values = coding_language.map((value: any) => ({ ...value }));
+    if (coding_languages) {
+      const values = coding_languages.map((value: any) => ({ ...value }));
       setLabels(values);
     }
-  }, [coding_language]);
+  }, [coding_languages]);
 
   const renderTickets = () => {
     const { status } = ticketUrl

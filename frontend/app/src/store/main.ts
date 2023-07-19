@@ -1013,8 +1013,8 @@ export class MainStore {
       return;
     }
 
-    if (!body.coding_language || !body.coding_language.length) {
-      body.coding_language = [];
+    if (!body.coding_languages || !body.coding_languages.length) {
+      body.coding_languages = [];
     }
 
     try {
