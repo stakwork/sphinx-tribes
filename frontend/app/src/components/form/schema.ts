@@ -734,7 +734,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: []
   },
   {
-    name: 'coding_language',
+    name: 'coding_languages',
     label: 'Coding Language',
     type: 'creatablemultiselect',
     options: codingLanguages

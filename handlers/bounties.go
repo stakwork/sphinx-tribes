@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
+	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -218,11 +219,11 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.Deliverables = Deliverables
 			}
 
-			CodingLanguage, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
+			CodingLanguages, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
 			if !ok13 {
-				migrateBountyFinal.CodingLanguage = db.JSONB{}
+				migrateBountyFinal.CodingLanguages = pq.StringArray{}
 			} else {
-				migrateBountyFinal.CodingLanguage = CodingLanguage["value"].(db.JSONB)
+				migrateBountyFinal.CodingLanguages = CodingLanguages["value"].(pq.StringArray)
 			}
 
 			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
