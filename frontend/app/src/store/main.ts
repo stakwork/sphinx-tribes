@@ -1019,7 +1019,7 @@ export class MainStore {
       let languages: string[] = [];
       body.coding_languages.forEach((lang: any) => {
         languages.push(lang.value);
-      })
+      });
 
       body.coding_languages = languages;
     }
