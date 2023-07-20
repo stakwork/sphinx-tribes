@@ -327,30 +327,30 @@ type YoutubeDownload struct {
 }
 
 type Bounty struct {
-	ID                      uint       `json:"id"`
-	OwnerID                 string     `json:"owner_id"`
-	Paid                    bool       `json:"paid"`
-	Show                    bool       `json:"show"`
-	Type                    string     `json:"type"`
-	Award                   string     `json:"award"`
-	AssignedHours           uint8      `json:"assigned_hours"`
-	BountyExpires           string     `json:"bounty_expires"`
-	CommitmentFee           uint64     `json:"commitment_fee"`
-	Price                   string     `json:"price"`
-	Title                   string     `json:"title"`
-	Tribe                   string     `json:"tribe"`
-	Created                 int64      `json:"created"`
-	Assignee                string     `json:"assignee"`
-	TicketUrl               string     `json:"ticket_url"`
-	Description             string     `json:"description"`
-	WantedType              string     `json:"wanted_type"`
-	Deliverables            string     `json:"deliverables"`
-	GithubDescription       bool       `json:"github_description"`
-	OneSentenceSummary      string     `json:"one_sentence_summary"`
-	EstimatedSessionLength  string     `json:"estimated_session_length"`
-	EstimatedCompletionDate string     `json:"estimated_completion_date"`
-	Updated                 *time.Time `json:"updated"`
-	CodingLanguage          JSONB      `json:"coding_language", type:bytea not null default '[]'::bytea`
+	ID                      uint           `json:"id"`
+	OwnerID                 string         `json:"owner_id"`
+	Paid                    bool           `json:"paid"`
+	Show                    bool           `json:"show"`
+	Type                    string         `json:"type"`
+	Award                   string         `json:"award"`
+	AssignedHours           uint8          `json:"assigned_hours"`
+	BountyExpires           string         `json:"bounty_expires"`
+	CommitmentFee           uint64         `json:"commitment_fee"`
+	Price                   string         `json:"price"`
+	Title                   string         `json:"title"`
+	Tribe                   string         `json:"tribe"`
+	Created                 int64          `json:"created"`
+	Assignee                string         `json:"assignee"`
+	TicketUrl               string         `json:"ticket_url"`
+	Description             string         `json:"description"`
+	WantedType              string         `json:"wanted_type"`
+	Deliverables            string         `json:"deliverables"`
+	GithubDescription       bool           `json:"github_description"`
+	OneSentenceSummary      string         `json:"one_sentence_summary"`
+	EstimatedSessionLength  string         `json:"estimated_session_length"`
+	EstimatedCompletionDate string         `json:"estimated_completion_date"`
+	Updated                 *time.Time     `json:"updated"`
+	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
 type BountyData struct {

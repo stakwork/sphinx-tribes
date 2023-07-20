@@ -128,7 +128,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
 				Updated:                 bounty.BountyUpdated,
-				CodingLanguage:          bounty.CodingLanguage,
+				CodingLanguages:         bounty.CodingLanguages,
 			},
 			Assignee: db.Person{
 				ID:               bounty.AssigneeId,
