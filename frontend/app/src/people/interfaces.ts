@@ -212,7 +212,7 @@ export interface WantedSummaryProps {
   paid: boolean;
   badgeRecipient: string;
   loomEmbedUrl: string;
-  coding_language: { [key: string]: any };
+  coding_languages: { [key: string]: any };
   estimated_session_length: string;
   assignee: Person;
   fromBountyPage: string;
@@ -346,7 +346,7 @@ export interface WantedViews2Props extends WantedViewsProps {
   issue?: string;
   repo?: string;
   type?: string;
-  coding_language?: any;
+  coding_languages?: any;
   fromBountyPage?: boolean;
 }
 
