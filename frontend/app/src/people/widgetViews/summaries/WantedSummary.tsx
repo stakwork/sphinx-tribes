@@ -150,7 +150,7 @@ function WantedSummary(props: WantedSummaryProps) {
           value: value?.owner_pubkey || '',
           label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
         },
-        coding_language: coding_languages?.map((x: any) => ({ ...x })),
+        coding_language: coding_languages?.map((x: any) => ({ label: x, value: x })),
         estimated_session_length: estimated_session_length,
         show: show,
         type: type,
@@ -196,7 +196,7 @@ function WantedSummary(props: WantedSummaryProps) {
     let res;
     if (coding_languages?.length > 0) {
       res = LanguageObject?.filter(
-        (value: any) => coding_languages?.find((val: any) => val.label === value.label)
+        (value: any) => coding_languages?.find((val: any) => val === value.label)
       );
     }
     setDataValue(res);
@@ -214,7 +214,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   useEffect(() => {
     if (coding_languages) {
-      const values = coding_languages.map((value: any) => ({ ...value }));
+      const values = coding_languages.map((value: any) => ({ label: value, value: value }));
       setLabels(values);
     }
   }, [coding_languages]);

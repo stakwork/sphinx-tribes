@@ -98,7 +98,7 @@ function WantedView(props: WantedViews2Props) {
 
   useEffect(() => {
     if (coding_languages) {
-      const values = coding_languages.map((value: any) => ({ ...value }));
+      const values = coding_languages.map((value: any) => ({ label: value, value: value }));
       setLabels(values);
     }
   }, [coding_languages]);
