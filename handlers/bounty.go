@@ -20,6 +20,22 @@ func GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyResponse)
 }
 
+func GetBountyById(w http.ResponseWriter, r *http.Request) {
+	bountyId := chi.URLParam(r, "bountyId")
+	if bountyId == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetBountyById(bountyId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
 func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	if pubkey == "" {

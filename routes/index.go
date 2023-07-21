@@ -53,6 +53,7 @@ func NewRouter() *http.Server {
 		r.Get("/save/{key}", db.PollSave)
 		r.Get("/websocket", handlers.HandleWebSocket)
 		r.Get("/bounty/all", handlers.GetAllBounties)
+		r.Get("/bounty/id/{bountyId}", handlers.GetBountyById)
 		r.Get("/migrate_bounties", handlers.MigrateBounties)
 		r.Post("/bounty", handlers.CreateOrEditBounty)
 		r.Delete("/bounty/assignee", handlers.DeleteBountyAssignee)
