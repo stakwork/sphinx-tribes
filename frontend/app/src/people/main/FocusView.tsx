@@ -62,9 +62,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -79,7 +79,8 @@ function FocusedView(props: FocusViewProps) {
     isFirstTimeScreen,
     fromBountyPage,
     newDesign,
-    setIsModalSideButton
+    setIsModalSideButton,
+    bounty,
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -177,7 +178,7 @@ function FocusedView(props: FocusViewProps) {
 
         if (!fullMeData.extras) fullMeData.extras = {};
         // if editing widget
-        if (selectedIndex > -1) {
+        if (selectedIndex >= 0) {
           // mutate it
           fullMeData.extras[config.name][selectedIndex] = v;
         } else {
@@ -196,11 +197,12 @@ function FocusedView(props: FocusViewProps) {
   }
 
   async function deleteIt() {
-    const bounty = main.peopleWanteds[selectedIndex];
+    const delBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+    if (!delBounty) return;
     setDeleting(true);
     try {
-      if (bounty.body.created) {
-        await main.deleteBounty(bounty.body.created);
+      if (delBounty.body.created) {
+        await main.deleteBounty(delBounty.body.created);
         closeModal();
         if (props?.deleteExtraFunction) props?.deleteExtraFunction();
       }
@@ -289,10 +291,11 @@ function FocusedView(props: FocusViewProps) {
   let initialValues: any = {};
 
   const personInfo = canEdit ? ui.meInfo : person;
+  const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
 
   // set initials here
-  if (personInfo && selectedIndex >= 0) {
-    let wanted = main.peopleWanteds[selectedIndex].body;
+  if (personInfo && selectedBounty && selectedIndex >= 0) {
+    let wanted = selectedBounty.body;
     if (config && config.name === 'about') {
       initialValues.id = personInfo.id || 0;
       initialValues.pubkey = personInfo.pubkey;
@@ -335,7 +338,7 @@ function FocusedView(props: FocusViewProps) {
                 [s.name]: wanted['one_sentence_summary'] || wanted['title']
               };
             } else if (s.name === 'coding_languages') {
-              let coding_languages = wanted['coding_languages'].length
+              let coding_languages = wanted['coding_languages'] && wanted['coding_languages'].length
                 ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
                 : [];
               return {
@@ -362,9 +365,10 @@ function FocusedView(props: FocusViewProps) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
+    const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
     if (selectedIndex >= 0) {
-      if (main.peopleWanteds[selectedIndex]) {
-        return main.peopleWanteds[selectedIndex].body;
+      if (selectedBounty) {
+        return selectedBounty.body;
       } else {
         return null;
       }
@@ -403,8 +407,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
