@@ -62,9 +62,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: '#5a606c',
-  trackBackgroundColor: 'rgba(0,0,0,0)'
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -80,7 +80,7 @@ function FocusedView(props: FocusViewProps) {
     fromBountyPage,
     newDesign,
     setIsModalSideButton,
-    bounty,
+    bounty
   } = props;
   const { ui, main } = useStores();
   const { ownerTribes } = main;
@@ -338,9 +338,10 @@ function FocusedView(props: FocusViewProps) {
                 [s.name]: wanted['one_sentence_summary'] || wanted['title']
               };
             } else if (s.name === 'coding_languages') {
-              let coding_languages = wanted['coding_languages'] && wanted['coding_languages'].length
-                ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
-                : [];
+              let coding_languages =
+                wanted['coding_languages'] && wanted['coding_languages'].length
+                  ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
+                  : [];
               return {
                 [s.name]: coding_languages
               };
@@ -407,8 +408,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />

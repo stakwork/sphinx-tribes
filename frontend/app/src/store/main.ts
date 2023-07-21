@@ -732,7 +732,7 @@ export class MainStore {
       const ps2 = await api.get(query);
       const ps3: any[] = [];
 
-      if(ps2 && ps2.length) {
+      if (ps2 && ps2.length) {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
@@ -769,7 +769,7 @@ export class MainStore {
       const ps2 = await api.get(query);
       const ps3: any[] = [];
 
-      if(ps2 && ps2.length) {
+      if (ps2 && ps2.length) {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
@@ -798,7 +798,7 @@ export class MainStore {
       const ps2 = await api.get(`bounty/id/${id}`);
       const ps3: any[] = [];
 
-      if(ps2 && ps2.length) {
+      if (ps2 && ps2.length) {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
