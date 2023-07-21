@@ -36,6 +36,22 @@ func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
+	pubkey := chi.URLParam(r, "pubkey")
+	if pubkey == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetAssignedBounties(pubkey)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
 func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	bounty := db.Bounty{}
 	body, err := ioutil.ReadAll(r.Body)
