@@ -793,6 +793,35 @@ export class MainStore {
     }
   }
 
+  async getWantedById(id: number): Promise<PersonWanted[]> {
+    try {
+      const ps2 = await api.get(`bounty/id/${id}`);
+      const ps3: any[] = [];
+
+      if(ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] }
+          });
+        }
+      }
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getCreatedWanteds: ', e);
+      return [];
+    }
+  }
+
   @persist('list')
   peopleOffers: PersonOffer[] = [];
 

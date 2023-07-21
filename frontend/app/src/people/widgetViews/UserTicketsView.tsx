@@ -72,9 +72,9 @@ const UserTickets = () => {
     setIsLoading(false);
   }
 
-  function onPanelClick(i: number) {
+  function onPanelClick(id: number, index: number) {
     history.push({
-      pathname: `${url}/${i}`
+      pathname: `${url}/${id}/${index}`
     });
   }
 
@@ -123,7 +123,7 @@ const UserTickets = () => {
               colors={color}
               showName
               onPanelClick={() => {
-                onPanelClick(i);
+                onPanelClick(body.id, i);
               }}
               person={person}
               showModal={showModal}
@@ -144,7 +144,7 @@ const UserTickets = () => {
       <Container>
         <Router history={history}>
           <Switch>
-            <Route path={`${path}/:wantedId`}>
+            <Route path={`${path}/:wantedId/:wantedIndex`}>
               <BountyModal basePath={url} />
             </Route>
           </Switch>
