@@ -86,7 +86,7 @@ export const Wanted = observer(() => {
   return (
     <Container>
       <Switch>
-        <Route path={`${path}/:wantedId`}>
+        <Route path={`${path}/:wantedId/:wantedIndex`}>
           <BountyModal basePath={url} />
         </Route>
       </Switch>
@@ -108,7 +108,7 @@ export const Wanted = observer(() => {
               isMobile={false}
               onClick={() =>
                 history.push({
-                  pathname: `${url}/${i}`
+                  pathname: `${url}/${w.body.id}/${i}`
                 })
               }
             >

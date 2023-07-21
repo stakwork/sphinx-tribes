@@ -9,25 +9,9 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/go-chi/chi"
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/db"
 )
-
-func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	people, err := db.DB.GetAssignedBounties(pubkey)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
-	} else {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(people)
-	}
-}
 
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
 	var ret struct {
