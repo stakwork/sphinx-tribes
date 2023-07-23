@@ -822,6 +822,17 @@ export class MainStore {
     }
   }
 
+  async getBountyCount(personKey: string, tabType: string): Promise<number> {
+    try {
+      const count = await api.get(`bounty/count/${personKey}/${tabType}`);
+
+      return count;
+    } catch (e) {
+      console.log('fetch failed getCreatedWanteds: ', e);
+      return 0;
+    }
+  }
+
   @persist('list')
   peopleOffers: PersonOffer[] = [];
 
@@ -881,7 +892,7 @@ export class MainStore {
     if (queryParams?.page) setPage(queryParams.page);
     const l = [...currentList, ...newList];
 
-    let set = new Set();
+    const set = new Set();
     if (type === 'wanted') {
       const uniqueArray = l.filter((item: any) => {
         if (item.body && item.body.id && !set.has(item.body.id)) {
@@ -1065,7 +1076,7 @@ export class MainStore {
     if (!body.coding_languages || !body.coding_languages.length) {
       body.coding_languages = [];
     } else {
-      let languages: string[] = [];
+      const languages: string[] = [];
       body.coding_languages.forEach((lang: any) => {
         languages.push(lang.value);
       });
