@@ -36,6 +36,19 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetBountyCount(w http.ResponseWriter, r *http.Request) {
+	personKey := chi.URLParam(r, "personKey")
+	tabType := chi.URLParam(r, "tabType")
+
+	if personKey == "" || tabType == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bountyCount := db.DB.GetBountiesCounty(personKey, tabType)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyCount)
+}
+
 func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	if pubkey == "" {
