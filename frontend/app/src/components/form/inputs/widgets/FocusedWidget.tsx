@@ -84,7 +84,6 @@ export default function FocusedWidget(props: FocusedWidgetProps) {
     let value: any = '';
     if (type === 'number') value = 0;
     if (type === 'gallery') value = [];
-    console.log('getInitialValueByType', value);
     return value;
   }
 
