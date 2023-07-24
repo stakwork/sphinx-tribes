@@ -86,13 +86,13 @@ export const TabsPages = observer(() => {
   const getBountiesCount = async (personKey: string, name: string) => {
     if (personKey) {
       const count = await main.getBountyCount(personKey, name);
-      if (name === "wanted") {
+      if (name === 'wanted') {
         setBountyCount(count);
       } else {
-        setAssignedCount(count)
+        setAssignedCount(count);
       }
     }
-  }
+  };
 
   useEffect(() => {
     const tabSelected = tabsNames.some((name: any) => location.pathname.includes(name));
@@ -124,20 +124,20 @@ export const TabsPages = observer(() => {
             const selected = location.pathname.includes(name);
             const hasExtras = !!person?.extras?.[name]?.length;
             let count: any = 0;
-            if (name === "wanted") {
+            if (name === 'wanted') {
               count = bountyCount;
-            } else if (name === "usertickets") {
+            } else if (name === 'usertickets') {
               count = assignedCount;
             } else {
               count = hasExtras
                 ? person.extras[name].filter((f: any) => {
-                  if ('show' in f) {
-                    // show has a value
-                    if (!f.show) return false;
-                  }
-                  // if no value default to true
-                  return true;
-                }).length
+                    if ('show' in f) {
+                      // show has a value
+                      if (!f.show) return false;
+                    }
+                    // if no value default to true
+                    return true;
+                  }).length
                 : null;
             }
 
