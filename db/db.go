@@ -502,6 +502,20 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
+func (db database) GetBountiesCounty(personKey string, tabType string) int64 {
+	var count int64
+
+	query := db.db.Model(&Bounty{})
+	if tabType == "wanted" {
+		query.Where("owner_id", personKey)
+	} else if tabType == "usertickets" {
+		query.Where("assignee", personKey)
+	}
+
+	query.Count(&count)
+	return count
+}
+
 func (db database) GetAssignedBounties(pubkey string) ([]BountyData, error) {
 	ms := []BountyData{}
 
