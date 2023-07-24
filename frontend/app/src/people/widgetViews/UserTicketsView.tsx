@@ -9,7 +9,6 @@ import { BountyModal } from 'people/main/bountyModal/BountyModal';
 import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import history from '../../config/history';
 import { colors } from '../../config/colors';
-import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import WantedView from './WantedView';
 import DeleteTicketModal from './DeleteModal';
 
@@ -54,14 +53,6 @@ const UserTickets = () => {
   const data = {
     checkboxIdToSelectedMap
   };
-
-  const activeList = userTickets.filter((body: any) => {
-    const value = { ...body };
-    return (
-      bountyHeaderFilter(data.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-      bountyHeaderLanguageFilter(value?.codingLanguage, {})
-    );
-  });
 
   async function getUserTickets() {
     setIsLoading(true);
@@ -109,8 +100,8 @@ const UserTickets = () => {
   }, []);
 
   const listItems =
-    activeList && activeList.length ? (
-      activeList.slice(0, currentItems).map((item: any, i: number) => {
+    userTickets && userTickets.length ? (
+      userTickets.slice(0, currentItems).map((item: any, i: number) => {
         const person = main.people.find((p: any) => p.owner_pubkey === item.body.owner_id);
         const body = { ...item.body };
 
