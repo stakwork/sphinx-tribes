@@ -283,9 +283,7 @@ function Badges(props: BadgesProps) {
     el.click();
   }
 
-  // console.log('balancesTxns', balancesTxns)
   // metadata should be json to support badge details
-
   const topLevelBadges = balancesTxns?.balances?.map((b: any, i: number) => {
     const badgeDetails = badgeList?.find((f: any) => f.id === b.asset_id);
     // if early adopter badge

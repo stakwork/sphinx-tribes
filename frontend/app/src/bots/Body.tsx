@@ -476,7 +476,6 @@ function BotBody() {
             value={ui.searchText}
             style={{ width: 164, height: 40, border: '1px solid #DDE1E5', background: '#fff' }}
             onChange={(e: any) => {
-              console.log('handleChange', e);
               ui.setSearchText(e);
             }}
           />
