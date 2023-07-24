@@ -59,7 +59,6 @@ function DesktopView(props: WantedViewsProps) {
           }}
         />
       )}
-
       <DWrap isClosed={isClosed} color={color}>
         <Pad style={{ padding: 20, minHeight: 410 }}>
           <div
@@ -125,10 +124,9 @@ function DesktopView(props: WantedViewsProps) {
                   onClick={(e: any) => {
                     e.stopPropagation();
                     window.open(
-                      `/p/${
-                        {
-                          ...assignee
-                        }.owner_pubkey
+                      `/p/${{
+                        ...assignee
+                      }.owner_pubkey
                       }?widget=wanted`,
                       '_blank'
                     );
