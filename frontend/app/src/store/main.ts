@@ -749,8 +749,6 @@ export class MainStore {
         }
       }
 
-      this.setPersonWanteds(ps3);
-
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
