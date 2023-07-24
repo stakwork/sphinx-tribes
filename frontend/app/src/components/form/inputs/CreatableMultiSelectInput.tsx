@@ -63,7 +63,6 @@ export default function CreatableMultiSelectInput({
             writeMode={type === 'multiselectwrite'}
             value={value}
             onChange={(e: any) => {
-              console.log('onChange', e);
               handleChange(e);
               setIsTop(true);
             }}

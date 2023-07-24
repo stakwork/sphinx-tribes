@@ -2,7 +2,7 @@ import { useIsMobile, usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import RenderWidgets from 'people/widgetViews/RenderWidgets';
 import { widgetConfigs } from 'people/utils/Constants';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
@@ -59,12 +59,14 @@ const Counter = styled.div`
 const tabs = widgetConfigs;
 export const TabsPages = observer(() => {
   const location = useLocation();
-  const { ui } = useStores();
+  const { ui, main } = useStores();
   const { url, path } = useRouteMatch();
   const history = useHistory();
   const isMobile = useIsMobile();
   const personId = ui.selectedPerson;
   const { person, canEdit } = usePerson(personId);
+  const [bountyCount, setBountyCount] = useState<number>(0);
+  const [assignedCount, setAssignedCount] = useState<number>(0);
 
   const tabsNames = Object.keys(tabs).filter((name: any) => {
     if (name === 'about' && !isMobile) {
@@ -81,12 +83,26 @@ export const TabsPages = observer(() => {
     [history, url]
   );
 
+  const getBountiesCount = async (personKey: string, name: string) => {
+    if (personKey) {
+      const count = await main.getBountyCount(personKey, name);
+      if (name === "wanted") {
+        setBountyCount(count);
+      } else {
+        setAssignedCount(count)
+      }
+    }
+  }
+
   useEffect(() => {
     const tabSelected = tabsNames.some((name: any) => location.pathname.includes(name));
     if (!tabSelected) {
       changeTabHandler(tabsNames[0]);
+    } else {
+      getBountiesCount(person?.owner_pubkey || '', 'wanted');
+      getBountiesCount(person?.owner_pubkey || '', 'usertickets');
     }
-  }, [changeTabHandler, location.pathname, tabsNames]);
+  }, [changeTabHandler, location.pathname, tabsNames, person]);
 
   const fullSelectedWidget = (name: any) => person?.extras?.[name];
 
@@ -104,10 +120,17 @@ export const TabsPages = observer(() => {
           tabsNames.map((name: any, i: number) => {
             const t = tabs[name];
             const { label } = t;
+
             const selected = location.pathname.includes(name);
             const hasExtras = !!person?.extras?.[name]?.length;
-            const count: any = hasExtras
-              ? person.extras[name].filter((f: any) => {
+            let count: any = 0;
+            if (name === "wanted") {
+              count = bountyCount;
+            } else if (name === "usertickets") {
+              count = assignedCount;
+            } else {
+              count = hasExtras
+                ? person.extras[name].filter((f: any) => {
                   if ('show' in f) {
                     // show has a value
                     if (!f.show) return false;
@@ -115,7 +138,8 @@ export const TabsPages = observer(() => {
                   // if no value default to true
                   return true;
                 }).length
-              : null;
+                : null;
+            }
 
             return (
               <Tab
