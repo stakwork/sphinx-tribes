@@ -5,6 +5,7 @@ import { widgetConfigs } from 'people/utils/Constants';
 import NoneSpace from 'people/utils/NoneSpace';
 import { PostBounty } from 'people/widgetViews/postBounty';
 import WantedView from 'people/widgetViews/WantedView';
+import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
@@ -42,11 +43,14 @@ export const Wanted = observer(() => {
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const [createdBounties, setCreatedBounties] = useState<PersonWanted[]>([]);
+  const [loading, setIsLoading] = useState<boolean>(false);
 
   async function getUserTickets() {
+    setIsLoading(true);
     const userBounties = await main.getPersonCreatedWanteds({}, personPubkey);
     setCreatedBounties(userBounties);
     await main.getPersonAssignedWanteds({}, personPubkey);
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -85,6 +89,7 @@ export const Wanted = observer(() => {
   }
   return (
     <Container>
+      <PageLoadSpinner show={loading} />
       <Switch>
         <Route path={`${path}/:wantedId/:wantedIndex`}>
           <BountyModal basePath={url} />

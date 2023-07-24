@@ -6,6 +6,7 @@ import { useIsMobile } from 'hooks';
 import { Spacer } from 'people/main/Body';
 import styled from 'styled-components';
 import { BountyModal } from 'people/main/bountyModal/BountyModal';
+import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import history from '../../config/history';
 import { colors } from '../../config/colors';
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
@@ -64,11 +65,8 @@ const UserTickets = () => {
 
   async function getUserTickets() {
     setIsLoading(true);
-
     const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
-
     setUserTickets(tickets);
-
     setIsLoading(false);
   }
 
@@ -142,6 +140,7 @@ const UserTickets = () => {
   return (
     <div data-testid="test">
       <Container>
+        <PageLoadSpinner show={loading} />
         <Router history={history}>
           <Switch>
             <Route path={`${path}/:wantedId/:wantedIndex`}>
