@@ -29,6 +29,7 @@ func NewRouter() *http.Server {
 	r.Mount("/person", PersonRoutes())
 	r.Mount("/connectioncodes", ConnectionCodesRoutes())
 	r.Mount("/github_issue", GithubIssuesRoutes())
+	r.Mount("/bounty", BountyRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", handlers.GetFirstTribeByFeed)
@@ -52,12 +53,7 @@ func NewRouter() *http.Server {
 		r.Post("/save", db.PostSave)
 		r.Get("/save/{key}", db.PollSave)
 		r.Get("/websocket", handlers.HandleWebSocket)
-		r.Get("/bounty/all", handlers.GetAllBounties)
-		r.Get("/bounty/id/{bountyId}", handlers.GetBountyById)
 		r.Get("/migrate_bounties", handlers.MigrateBounties)
-		r.Post("/bounty", handlers.CreateOrEditBounty)
-		r.Delete("/bounty/assignee", handlers.DeleteBountyAssignee)
-		r.Delete("/bounty/{pubKey}/{created}", handlers.DeleteBounty)
 	})
 
 	r.Group(func(r chi.Router) {
