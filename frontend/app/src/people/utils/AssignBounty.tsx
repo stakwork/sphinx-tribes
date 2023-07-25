@@ -74,6 +74,7 @@ export default function AssignBounty(props: ConnectCardProps) {
       }
     ]);
   };
+
   const removeToast = () => {
     setToasts([]);
   };
