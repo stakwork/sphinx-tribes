@@ -62,9 +62,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -124,78 +124,6 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  function mergeFormWithMeData(v: any) {
-    let fullMeData: any = null;
-
-    if (ui.meInfo) {
-      fullMeData = { ...ui.meInfo };
-
-      // add extras if doesnt exist, for brand new users
-      if (!fullMeData.extras) fullMeData.extras = {};
-      // if about
-      if (config.name === 'about') {
-        config?.schema?.forEach((s: any) => {
-          if (s.widget && fullMeData.extras) {
-            // this allows the link widgets to be edited as a part of about me,
-            // when really they are stored as extras
-
-            // include full tribe info from ownerTribes data
-            if (s.name === 'tribes') {
-              const submitTribes: any = [];
-
-              v[s.name] &&
-                v[s.name].forEach((t: any) => {
-                  const fullTribeInfo =
-                    ownerTribes && ownerTribes?.find((f: any) => f.unique_name === t.value);
-
-                  // disclude sensitive details
-                  if (fullTribeInfo)
-                    submitTribes.push({
-                      name: fullTribeInfo.name,
-                      unique_name: fullTribeInfo.unique_name,
-                      img: fullTribeInfo.img,
-                      description: fullTribeInfo.description,
-                      ...t
-                    });
-                });
-
-              fullMeData.extras[s.name] = submitTribes;
-            } else if (s.name === 'repos' || s.name === 'coding_languages') {
-              // multiples, so we don't need a wrapper
-              fullMeData.extras[s.name] = v[s.name];
-            } else {
-              fullMeData.extras[s.name] = [{ value: v[s.name] }];
-            }
-          } else {
-            fullMeData[s.name] = v[s.name];
-          }
-        });
-      }
-      // if extras
-      else {
-        // add timestamp if not there
-        if (!v.created) v.created = moment().unix();
-
-        if (!fullMeData.extras) fullMeData.extras = {};
-        // if editing widget
-        if (selectedIndex >= 0) {
-          // mutate it
-          fullMeData.extras[config.name][selectedIndex] = v;
-        } else {
-          // if creating new widget
-          if (fullMeData.extras[config.name]) {
-            //if not first of its kind
-            fullMeData.extras[config.name].unshift(v);
-          } else {
-            //if first of its kind
-            fullMeData.extras[config.name] = [v];
-          }
-        }
-      }
-    }
-    return fullMeData;
-  }
-
   async function deleteIt() {
     const delBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
     if (!delBounty) return;
@@ -214,6 +142,7 @@ function FocusedView(props: FocusViewProps) {
   }
 
   async function preSubmitFunctions(body: any) {
+    console.log("IN Presubmit")
     const newBody = cloneDeep(body);
 
     // if github repo
@@ -225,7 +154,8 @@ function FocusedView(props: FocusViewProps) {
           newBody.type === 'coding_task' ||
           newBody.type === 'freelance_job_request')
       ) {
-        const { repo, issue } = extractRepoAndIssueFromIssueUrl(newBody.ticketUrl);
+        const { repo, issue } = extractRepoAndIssueFromIssueUrl(newBody.ticket_url);
+        console.log("Github REpo data", repo, issue)
         const splitString = repo.split('/');
         const [ownerName, repoName] = splitString;
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
@@ -254,6 +184,7 @@ function FocusedView(props: FocusViewProps) {
   }
 
   async function submitForm(body: any) {
+    // console.log("In submit action")
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);
@@ -268,16 +199,15 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      const newBody2 = body;
       body.assignee = '';
       if (body?.assignee?.owner_pubkey) {
-        newBody2.assignee = body.assignee.owner_pubkey;
+        newBody.assignee = body.assignee.owner_pubkey;
       }
-      newBody2.title = body.one_sentence_summary;
-      newBody2.one_sentence_summary = '';
-      newBody2.owner_id = info.pubkey;
+      newBody.title = body.one_sentence_summary;
+      newBody.one_sentence_summary = '';
+      newBody.owner_id = info.pubkey;
 
-      await main.saveBounty(newBody2);
+      await main.saveBounty(newBody);
       closeModal();
     } catch (e) {
       console.log('e', e);
@@ -408,8 +338,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
