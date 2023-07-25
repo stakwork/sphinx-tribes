@@ -37,7 +37,7 @@ describe('Post bounty modal', () => {
   };
   test('FillForm', async () => {
     const closeHandler = jest.fn();
-    const successHandler = jest.fn(() => {});
+    const successHandler = jest.fn(() => { });
     render(
       <PostModal onSucces={successHandler} isOpen={true} onClose={closeHandler} widget="wanted" />
     );
@@ -60,7 +60,7 @@ describe('Post bounty modal', () => {
     // 3 step
     expect(screen.queryAllByText('Description')[0]).toBeInTheDocument();
     await waitFor(async () => {
-      await userEvent.type(screen.getByLabelText('Description*'), formData.description);
+      await userEvent.type(screen.getByLabelText('Description'), formData.description);
       await userEvent.click(screen.getByText('Next'));
     });
 
