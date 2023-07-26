@@ -42,13 +42,11 @@ export const Wanted = observer(() => {
   const { path, url } = useRouteMatch();
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
-  const [createdBounties, setCreatedBounties] = useState<PersonWanted[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
 
   async function getUserTickets() {
     setIsLoading(true);
-    const userBounties = await main.getPersonCreatedWanteds({}, personPubkey);
-    setCreatedBounties(userBounties);
+    await main.getPersonCreatedWanteds({}, personPubkey);
     await main.getPersonAssignedWanteds({}, personPubkey);
     setIsLoading(false);
   }
