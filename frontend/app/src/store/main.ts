@@ -679,19 +679,21 @@ export class MainStore {
       const ps2 = await api.get(query2);
       const ps3: any[] = [];
 
-      for (let i = 0; i < ps2.length; i++) {
-        const bounty = { ...ps2[i].bounty };
-        let assignee;
-        const owner = { ...ps2[i].owner };
+      if(ps2) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          const owner = { ...ps2[i].owner };
 
-        if (bounty.assignee) {
-          assignee = { ...ps2[i].assignee };
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] }
+          });
         }
-
-        ps3.push({
-          body: { ...bounty, assignee: assignee || '' },
-          person: { ...owner, wanteds: [] } || { wanteds: [] }
-        });
       }
 
       // for search always reset page
