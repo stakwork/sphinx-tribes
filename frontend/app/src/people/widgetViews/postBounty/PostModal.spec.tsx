@@ -37,7 +37,7 @@ describe('Post bounty modal', () => {
   };
   test('FillForm', async () => {
     const closeHandler = jest.fn();
-    const successHandler = jest.fn(() => {});
+    const successHandler = jest.fn(() => { });
     render(
       <PostModal onSucces={successHandler} isOpen={true} onClose={closeHandler} widget="wanted" />
     );

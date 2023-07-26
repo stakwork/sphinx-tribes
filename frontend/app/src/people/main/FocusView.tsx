@@ -63,9 +63,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -222,6 +222,11 @@ function FocusedView(props: FocusViewProps) {
       newBody.owner_id = info.pubkey;
 
       await main.saveBounty(newBody);
+      // Refresh the tickets page if a user eidts from the tickets tab
+      if (window.location.href.includes('wanted')) {
+        await main.getPersonCreatedWanteds({}, info.pubkey);
+      }
+      await main.saveBounty(newBody);
       closeModal();
     } catch (e) {
       console.log('e', e);
@@ -352,8 +357,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />

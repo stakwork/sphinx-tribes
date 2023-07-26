@@ -42,13 +42,11 @@ export const Wanted = observer(() => {
   const { path, url } = useRouteMatch();
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
-  const [createdBounties, setCreatedBounties] = useState<PersonWanted[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
 
   async function getUserTickets() {
     setIsLoading(true);
-    const userBounties = await main.getPersonCreatedWanteds({}, personPubkey);
-    setCreatedBounties(userBounties);
+    await main.getPersonCreatedWanteds({}, personPubkey);
     await main.getPersonAssignedWanteds({}, personPubkey);
     setIsLoading(false);
   }
@@ -57,7 +55,7 @@ export const Wanted = observer(() => {
     getUserTickets();
   }, []);
 
-  if (!createdBounties?.length) {
+  if (!main.createdWanteds?.length) {
     return (
       <NoneSpace
         style={{
@@ -105,7 +103,7 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {createdBounties.map((w: any, i: any) => {
+      {main.createdWanteds.map((w: any, i: any) => {
         if (w.body.owner_id === person?.owner_pubkey) {
           return (
             <Panel
