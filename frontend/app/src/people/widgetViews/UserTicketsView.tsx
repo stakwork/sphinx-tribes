@@ -43,16 +43,12 @@ const UserTickets = () => {
   const { path, url } = useRouteMatch();
 
   const [userTickets, setUserTickets] = useState<any>([]);
-  const [checkboxIdToSelectedMap] = useState<any>({});
   const [currentItems] = useState<number>(10);
   const [deletePayload, setDeletePayload] = useState<object>({});
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
   const [loading, setIsLoading] = useState<boolean>(false);
-  const data = {
-    checkboxIdToSelectedMap
-  };
 
   async function getUserTickets() {
     setIsLoading(true);

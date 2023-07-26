@@ -57,7 +57,7 @@ export const Wanted = observer(() => {
     getUserTickets();
   }, []);
 
-  if (!createdBounties?.length) {
+  if (!main.createdWanteds?.length) {
     return (
       <NoneSpace
         style={{
@@ -105,7 +105,7 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {createdBounties.map((w: any, i: any) => {
+      {main.createdWanteds.map((w: any, i: any) => {
         if (w.body.owner_id === person?.owner_pubkey) {
           return (
             <Panel
