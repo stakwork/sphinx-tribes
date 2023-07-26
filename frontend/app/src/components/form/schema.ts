@@ -718,7 +718,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'description',
     label: 'Description',
-    type: 'textarea',
+    type: 'textarea'
   },
   {
     name: 'price',
