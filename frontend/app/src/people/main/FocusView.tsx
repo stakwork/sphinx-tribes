@@ -4,6 +4,7 @@ import moment from 'moment';
 import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
+import { EuiGlobalToastList } from '@elastic/eui';
 import { useStores } from '../../store';
 import Form from '../../components/form';
 import { Button, IconButton } from '../../components/common';
@@ -83,7 +84,6 @@ function FocusedView(props: FocusViewProps) {
     bounty
   } = props;
   const { ui, main } = useStores();
-  const { ownerTribes } = main;
 
   const skipEditLayer = selectedIndex < 0 || config.skipEditLayer ? true : false;
 
@@ -91,6 +91,7 @@ function FocusedView(props: FocusViewProps) {
   const [deleting, setDeleting] = useState(false);
   const [editMode, setEditMode] = useState(skipEditLayer);
   const [editable, setEditable] = useState<boolean>(!canEdit);
+  const [toasts, setToasts]: any = useState([]);
 
   const scrollDiv: any = useRef(null);
   const formRef: any = useRef(null);
@@ -112,6 +113,19 @@ function FocusedView(props: FocusViewProps) {
       if (props.goBack) props.goBack();
     }
   }
+
+  const addToast = () => {
+    setToasts([
+      {
+        id: '1',
+        title: 'Add a description to your bounty'
+      }
+    ]);
+  };
+
+  const removeToast = () => {
+    setToasts([]);
+  };
 
   // get self on unmount if tor user
   useEffect(
@@ -153,7 +167,7 @@ function FocusedView(props: FocusViewProps) {
           newBody.type === 'coding_task' ||
           newBody.type === 'freelance_job_request')
       ) {
-        const { repo, issue } = extractRepoAndIssueFromIssueUrl(newBody.ticketUrl);
+        const { repo, issue } = extractRepoAndIssueFromIssueUrl(newBody.ticket_url);
         const splitString = repo.split('/');
         const [ownerName, repoName] = splitString;
         const res = await main.getGithubIssueData(ownerName, repoName, `${issue}`);
@@ -192,24 +206,27 @@ function FocusedView(props: FocusViewProps) {
     }
 
     if (!newBody) return; // avoid saving bad state
+    if (!newBody.description) {
+      addToast();
+    }
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      const newBody2 = body;
       body.assignee = '';
       if (body?.assignee?.owner_pubkey) {
-        newBody2.assignee = body.assignee.owner_pubkey;
+        newBody.assignee = body.assignee.owner_pubkey;
       }
-      newBody2.title = body.one_sentence_summary;
-      newBody2.one_sentence_summary = '';
-      newBody2.owner_id = info.pubkey;
+      newBody.title = body.one_sentence_summary;
+      newBody.one_sentence_summary = '';
+      newBody.owner_id = info.pubkey;
 
-      await main.saveBounty(newBody2);
+      await main.saveBounty(newBody);
       // Refresh the tickets page if a user eidts from the tickets tab
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
+      await main.saveBounty(newBody);
       closeModal();
     } catch (e) {
       console.log('e', e);
@@ -426,6 +443,7 @@ function FocusedView(props: FocusViewProps) {
           />
         </>
       )}
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </div>
   );
 }

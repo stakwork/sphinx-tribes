@@ -718,8 +718,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'description',
     label: 'Description',
-    type: 'textarea',
-    validator: strValidator
+    type: 'textarea'
   },
   {
     name: 'price',

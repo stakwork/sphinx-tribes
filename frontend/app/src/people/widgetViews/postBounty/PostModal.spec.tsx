@@ -60,7 +60,7 @@ describe('Post bounty modal', () => {
     // 3 step
     expect(screen.queryAllByText('Description')[0]).toBeInTheDocument();
     await waitFor(async () => {
-      await userEvent.type(screen.getByLabelText('Description*'), formData.description);
+      await userEvent.type(screen.getByLabelText('Description'), formData.description);
       await userEvent.click(screen.getByText('Next'));
     });
 

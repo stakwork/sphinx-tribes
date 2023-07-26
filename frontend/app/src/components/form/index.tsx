@@ -211,7 +211,7 @@ function Form(props: FormProps) {
           key === '' ? true : values?.[key]
         );
 
-        const isBtnDisabled = !valid || (stepTracker === 3 && !isDescriptionValid);
+        const isBtnDisabled = (stepTracker === 3 && !isDescriptionValid) || !valid;
 
         return (
           <Wrap
