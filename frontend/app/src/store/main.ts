@@ -679,7 +679,7 @@ export class MainStore {
       const ps2 = await api.get(query2);
       const ps3: any[] = [];
 
-      if(ps2) {
+      if (ps2) {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
