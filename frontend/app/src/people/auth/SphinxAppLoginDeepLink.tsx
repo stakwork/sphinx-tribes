@@ -31,7 +31,7 @@ function makeQR(challenge: string, ts: string) {
 let interval;
 
 export default function SphinxAppLoginDeeplink(props: AuthProps) {
-  const { ui } = useStores();
+  const { ui, main } = useStores();
   const [challenge, setChallenge] = useState('');
   const [ts, setTS] = useState('');
 
@@ -41,8 +41,8 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
     interval = setInterval(async () => {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
-        console.log(me);
         if (me && me.pubkey) {
+          await main.saveProfile(me);
           ui.setMeInfo(me);
           setChallenge('');
           if (props.onSuccess) props.onSuccess();
@@ -52,7 +52,7 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
   async function getChallenge() {
