@@ -159,6 +159,7 @@ export interface LnInvoice {
   };
 }
 export class MainStore {
+  [x: string]: any;
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
 
@@ -758,6 +759,12 @@ export class MainStore {
     }
   }
 
+  createdWanteds: PersonWanted[] = [];
+
+  setCreatedWanteds(wanteds: PersonWanted[]) {
+    this.createdWanteds = wanteds;
+  }
+
   async getPersonCreatedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
@@ -785,6 +792,8 @@ export class MainStore {
           });
         }
       }
+
+      this.setCreatedWanteds(ps3);
 
       return ps3;
     } catch (e) {
@@ -1141,7 +1150,6 @@ export class MainStore {
     let error: any = null;
 
     const info = uiStore.meInfo as any;
-    
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     if (!info) {
       error = new Error('Youre not logged in');

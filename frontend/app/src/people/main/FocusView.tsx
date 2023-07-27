@@ -222,6 +222,11 @@ function FocusedView(props: FocusViewProps) {
       newBody.owner_id = info.pubkey;
 
       await main.saveBounty(newBody);
+      // Refresh the tickets page if a user eidts from the tickets tab
+      if (window.location.href.includes('wanted')) {
+        await main.getPersonCreatedWanteds({}, info.pubkey);
+      }
+      await main.saveBounty(newBody);
       closeModal();
     } catch (e) {
       console.log('e', e);
