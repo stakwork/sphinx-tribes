@@ -1150,6 +1150,7 @@ export class MainStore {
     let error: any = null;
 
     const info = uiStore.meInfo as any;
+    
     const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
     if (!info) {
       error = new Error('Youre not logged in');

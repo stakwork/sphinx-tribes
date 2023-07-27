@@ -137,7 +137,7 @@ function BodyComponent() {
         {(people ?? []).map((t: any) => (
           <Person
             {...t}
-            key={t.id}
+            key={t.owner_pubkey}
             small={isMobile}
             squeeze={screenWidth < 1420}
             selected={ui.selectedPerson === t.id}

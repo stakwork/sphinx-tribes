@@ -42,8 +42,9 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
         if (me && me.pubkey) {
+          await ui.setMeInfo(me);
           await main.saveProfile(me);
-          ui.setMeInfo(me);
+
           setChallenge('');
           if (props.onSuccess) props.onSuccess();
           if (interval) clearInterval(interval);
