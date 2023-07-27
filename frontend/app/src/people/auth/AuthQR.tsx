@@ -39,7 +39,9 @@ function AuthQR(props: AuthProps) {
       try {
         const me: MeInfo = await api.get(`poll/${challenge}`);
         if (me && me?.pubkey) {
-          ui.setMeInfo(me);
+          await ui.setMeInfo(me);
+          await main.saveProfile(me);
+
           await main.getSelf(me);
           setChallenge('');
           if (props.onSuccess) props.onSuccess();
@@ -49,7 +51,7 @@ function AuthQR(props: AuthProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
   async function getChallenge() {
