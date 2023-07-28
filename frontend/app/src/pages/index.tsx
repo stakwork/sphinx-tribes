@@ -26,7 +26,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/b/">
           <BotsBody />
         </Route>
-        <Route path="/p/" render={() => <People />} />
+        <Route path="/p/">
+          <People />
+        </Route>
         <Route path="/tickets/">
           <TicketsPage />
         </Route>
