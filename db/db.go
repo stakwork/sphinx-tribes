@@ -221,7 +221,7 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 		db.db.Model(&m).Where("id = ?", m.ID).UpdateColumns(&updatePriceToMeet)
 	}
 
-	if db.db.Model(&m).Where("id = ?", m.ID).Updates(&m).RowsAffected == 0 {
+	if db.db.Model(&m).Where("owner_pub_key = ?", m.OwnerPubKey).Updates(&m).RowsAffected == 0 {
 		db.db.Create(&m)
 	}
 
