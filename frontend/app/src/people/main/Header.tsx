@@ -326,7 +326,7 @@ function Header() {
   function goToEditSelf() {
     const path = location.pathname;
     if (ui.meInfo?.id) {
-      history.push(`/p/${ui.meInfo.owner_pubkey}/`);
+      history.push(`/p/${ui.meInfo.owner_pubkey}/badges`);
       if (path.includes('/p')) {
         window.location.reload();
       }
