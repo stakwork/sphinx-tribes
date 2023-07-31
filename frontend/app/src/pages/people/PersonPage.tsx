@@ -50,7 +50,6 @@ export const PersonPage = observer(() => {
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const { personPubkey } = useParams<{ personPubkey: string }>();
-  alert(personPubkey)
   const [showSupport, setShowSupport] = useState(false);
 
   useEffect(() => {
