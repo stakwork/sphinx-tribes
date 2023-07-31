@@ -5,6 +5,7 @@ import { PersonPage } from './PersonPage';
 
 export const People = () => {
   const { path } = useRouteMatch();
+
   return (
     <BrowserRouter>
       <Switch>
