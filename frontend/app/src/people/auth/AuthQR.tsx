@@ -3,11 +3,13 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { AuthProps } from 'people/interfaces';
+import { formatRelayPerson } from 'helpers';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
 import QR from '../utils/QR';
+
 const ConfirmWrap = styled.div`
   display: flex;
   align-items: center;
@@ -40,7 +42,8 @@ function AuthQR(props: AuthProps) {
         const me: MeInfo = await api.get(`poll/${challenge}`);
         if (me && me?.pubkey) {
           await ui.setMeInfo(me);
-          await main.saveProfile(me);
+          const person = formatRelayPerson(me);
+          await main.saveProfile(person);
 
           await main.getSelf(me);
           setChallenge('');
@@ -51,7 +54,7 @@ function AuthQR(props: AuthProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
   async function getChallenge() {

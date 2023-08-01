@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
 import { AuthProps } from 'people/interfaces';
+import { formatRelayPerson } from 'helpers';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
@@ -24,6 +25,7 @@ const InnerWrap = styled.div`
 `;
 
 const host = getHost();
+
 function makeQR(challenge: string, ts: string) {
   return `sphinx.chat://?action=auth&host=${host}&challenge=${challenge}&ts=${ts}`;
 }
@@ -36,6 +38,7 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
   const [ts, setTS] = useState('');
 
   const qrString = makeQR(challenge, ts);
+
   async function startPolling(challenge: string) {
     let i = 0;
     interval = setInterval(async () => {
@@ -43,7 +46,8 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
         const me: MeInfo = await api.get(`poll/${challenge}`);
         if (me && me.pubkey) {
           await ui.setMeInfo(me);
-          await main.saveProfile(me);
+          const person = formatRelayPerson(me);
+          await main.saveProfile(person);
 
           setChallenge('');
           if (props.onSuccess) props.onSuccess();
@@ -53,7 +57,7 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 3000);
   }
   async function getChallenge() {
