@@ -1,3 +1,4 @@
+import { Person } from 'store/main';
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
@@ -118,3 +119,17 @@ export const calculateTimeLeft = (
 
   return timeLeft;
 };
+
+export const formatRelayPerson = (person: any): any => {
+ return {
+    owner_pubkey: person.owner_pubkey,
+    owner_alias: person.alias,
+    owner_contact_key: person.contact_key,
+    description: person.description,
+    extras: person.extras,
+    price_to_meet: person.price_to_meet,
+    img: person.img,
+    tags: [],
+    route_hint: person.route_hint
+  }
+}

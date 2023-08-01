@@ -59,7 +59,7 @@ export interface Person {
   description: string;
   img: string;
   tags: string[];
-  pubkey: string;
+  pubkey?: string;
   photo_url: string;
   alias: string;
   route_hint: string;
