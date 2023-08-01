@@ -121,7 +121,7 @@ export const calculateTimeLeft = (
 };
 
 export const formatRelayPerson = (person: any): any => {
- return {
+  return {
     owner_pubkey: person.owner_pubkey,
     owner_alias: person.alias,
     owner_contact_key: person.contact_key,
@@ -131,5 +131,5 @@ export const formatRelayPerson = (person: any): any => {
     img: person.img,
     tags: [],
     route_hint: person.route_hint
-  }
-}
+  };
+};
