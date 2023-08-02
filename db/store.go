@@ -177,7 +177,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// set into the cache
-	Store.SetCache(challenge, string(marshalled))
+	Store.SetChallengeCache(challenge, string(marshalled))
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{})
@@ -186,7 +186,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 func Poll(w http.ResponseWriter, r *http.Request) {
 
 	challenge := chi.URLParam(r, "challenge")
-	res, err := Store.GetCache(challenge)
+	res, err := Store.GetChallengeCache(challenge)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
