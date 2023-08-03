@@ -62,6 +62,7 @@ func YoutubeVideosForChannel(channelId string) ([]Item, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	call := tube.Search.List([]string{"snippet"})
 	call.ChannelId(channelId)
 	call.Type("video")
