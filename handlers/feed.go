@@ -81,7 +81,8 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 
 		// Add the Youtube results to the data result it should be one if the video exists
 		if response.PageInfo.TotalResults < 1 {
-			break
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Could not process Youtube download, one of the youtueb videos does not exists")
 		} else {
 			dataCount += response.PageInfo.TotalResults
 		}
@@ -91,9 +92,6 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 		processYoutubeDownload(youtube_download.YoutubeUrls)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode("Youtube download processed successfully")
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Could not process Youtube download, one of the youtueb videos does not exists")
 	}
 }
 
