@@ -68,7 +68,6 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var dataCount int64 = 0
 	for i := 0; i < len(youtube_download.YoutubeUrls); i++ {
 		url := youtube_download.YoutubeUrls[i]
 		// Split URL to get video ID
@@ -83,16 +82,13 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 		if response.PageInfo.TotalResults < 1 {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode("Could not process Youtube download, one of the youtueb videos does not exists")
-		} else {
-			dataCount += response.PageInfo.TotalResults
+			return
 		}
 	}
 
-	if int(dataCount) == len(youtube_download.YoutubeUrls) {
-		processYoutubeDownload(youtube_download.YoutubeUrls)
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("Youtube download processed successfully")
-	}
+	processYoutubeDownload(youtube_download.YoutubeUrls)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Youtube download processed successfully")
 }
 
 func processYoutubeDownload(data []string) {
