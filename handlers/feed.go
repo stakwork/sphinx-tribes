@@ -80,7 +80,11 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 		response, _ := call.Do()
 
 		// Add the Youtube results to the data result it should be one if the video exists
-		dataCount += response.PageInfo.TotalResults
+		if response.PageInfo.TotalResults < 1 {
+			break
+		} else {
+			dataCount += response.PageInfo.TotalResults
+		}
 	}
 
 	if int(dataCount) == len(youtube_download.YoutubeUrls) {
