@@ -18,7 +18,6 @@ require (
 	github.com/go-co-op/gocron v1.25.0
 	github.com/gobuffalo/logger v1.0.4 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
-	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-github/v39 v39.2.0
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/imroc/req v0.3.0
@@ -26,6 +25,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
 	github.com/karrick/godirwalk v1.16.1 // indirect
+	github.com/kkdai/youtube/v2 v2.8.1 // indirect
 	github.com/lib/pq v1.10.7
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/rs/cors v1.7.0
@@ -33,8 +33,8 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/crypto v0.7.0 // indirect
-	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	google.golang.org/api v0.112.0
+	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
+	google.golang.org/api v0.134.0
 	gorm.io/driver/postgres v1.5.0
 	gorm.io/gorm v1.25.0
 )

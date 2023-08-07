@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
+	streamYoutube "github.com/kkdai/youtube/v2"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/feeds"
 	"google.golang.org/api/option"
@@ -148,6 +150,33 @@ func processYoutubeDownload(data []string) {
 			fmt.Println("Youtube Download Request Error ==", err)
 		}
 		fmt.Println("Youtube Download Succces ==", string(res))
+	}
+}
+
+func StreamVideo(w http.ResponseWriter, r *http.Request) {
+	videoID := "rYMTSfL_kTk"
+	client := streamYoutube.Client{}
+
+	video, err := client.GetVideo(videoID)
+	if err != nil {
+		panic(err)
+	}
+
+	formats := video.Formats.WithAudioChannels() // only get videos with audio
+	stream, _, err := client.GetStream(video, &formats[0])
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.Create("video.mp4")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, stream)
+	if err != nil {
+		panic(err)
 	}
 }
 
