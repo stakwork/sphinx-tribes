@@ -389,6 +389,7 @@ type Organization struct {
 	UUID        string     `json:"uuid"`
 	Name        string     `json:"name"`
 	OwnerPubKey string     `json:"owner_pubkey"`
+	Img         string     `json:"img"`
 	Created     *time.Time `json:"created"`
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`

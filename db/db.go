@@ -65,6 +65,13 @@ func InitDB() {
 	db.AutoMigrate(&LeaderBoard{})
 	db.AutoMigrate(&ConnectionCodes{})
 	db.AutoMigrate(&Bounty{})
+	db.AutoMigrate(&Organization{})
+	db.AutoMigrate(&OrganizationUsers{})
+	db.AutoMigrate(&BountyRoles{})
+	db.AutoMigrate(&UserRoles{})
+	db.AutoMigrate(&BountyBudget{})
+	db.AutoMigrate(&BudgetHistory{})
+	db.AutoMigrate(&PaymentHistory{})
 
 	people := DB.GetAllPeople()
 	for _, p := range people {
@@ -986,4 +993,21 @@ func GetLeaderData(arr []LeaderData, key string) (int, int) {
 		}
 	}
 	return found, index
+}
+
+func (db database) GetOrganizations(r *http.Request) []Organization {
+	ms := []Organization{}
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+
+	// return if like owner_alias, unique_name, or equals pubkey
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Find(&ms)
+	return ms
+}
+
+func (db database) GetOrganizationByUuid(uuid string) Organization {
+	ms := Organization{}
+
+	db.db.Model(&Organization{}).Where("uuid = ?", uuid).Find(&ms)
+
+	return ms
 }
