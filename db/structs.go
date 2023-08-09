@@ -96,14 +96,6 @@ type Tabler interface {
 	TableName() string
 }
 
-func (Person) TableName() string {
-	return "people"
-}
-
-func (PersonInShort) TableName() string {
-	return "people"
-}
-
 // Person struct
 type Person struct {
 	ID               uint           `json:"id"`
@@ -326,6 +318,11 @@ type YoutubeDownload struct {
 	YoutubeUrls []string `json:"youtube_urls"`
 }
 
+type Client struct {
+	Host string
+	Conn *websocket.Conn
+}
+
 type Bounty struct {
 	ID                      uint           `json:"id"`
 	OwnerID                 string         `json:"owner_id"`
@@ -388,13 +385,69 @@ type BountyResponse struct {
 	Owner    Person `json:"owner"`
 }
 
-func (Bounty) TableName() string {
-	return "bounty"
+type Organization struct {
+	UUID        string     `json:"uuid"`
+	Name        string     `json:"name"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	Show        bool       `json:"show"`
 }
 
-type Client struct {
-	Host string
-	Conn *websocket.Conn
+type OrganizationUsers struct {
+	OwnerPubKey  string     `json:"owner_pubkey"`
+	Organization string     `json:"organization"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+}
+
+type BountyRoles struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
+type UserRoles struct {
+	Role         string     `json:"role"`
+	OwnerPubKey  string     `json:"owner_pubkey"`
+	Organization string     `json:"organization"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+}
+
+type BountyBudget struct {
+	Organization string     `json:"organization"`
+	TotalBudget  uint       `json:"total_budget"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+}
+
+type BudgetHistory struct {
+	Organization string     `json:"organization"`
+	Amount       uint       `json:"amount"`
+	SenderPubKey string     `json:"sender_pubkey"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+}
+
+type PaymentHistory struct {
+	Organization   string     `json:"organization"`
+	SenderPubKey   string     `json:"sender_pubkey"`
+	ReceiverPubKey string     `json:"receiver_pubkey"`
+	Amount         uint       `json:"amount"`
+	BountyId       uint       `json:"id"`
+	Created        *time.Time `json:"created"`
+}
+
+func (Person) TableName() string {
+	return "people"
+}
+
+func (PersonInShort) TableName() string {
+	return "people"
+}
+
+func (Bounty) TableName() string {
+	return "bounty"
 }
 
 func (ConnectionCodes) TableName() string {
