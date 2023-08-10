@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -51,15 +52,20 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// check if the organization name already exists
-		orgName := db.DB.GetOrganizationByName(org.Name)
+		name := strings.ToLower(org.Name)
 
-		if orgName.Name != org.Name {
+		// check if the organization name already exists
+		orgName := db.DB.GetOrganizationByName(name)
+
+		if orgName.Name == name {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode("Organization name alreday exists")
+			return
 		} else {
 			org.Created = &now
+			org.Updated = &now
 			org.Uuid = xid.New().String()
+			org.Name = name
 		}
 	} else {
 		if org.ID == 0 {
