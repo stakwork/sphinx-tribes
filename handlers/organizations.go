@@ -106,3 +106,11 @@ func GetOrganizationByUuid(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(org)
 }
+
+func GetOrganizationUsers(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	orgUsers := db.DB.GetOrganizationUsers(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(orgUsers)
+}
