@@ -12,6 +12,7 @@ func OrganizationRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Get("/", handlers.GetOrganizations)
 		r.Get("/{uuid}", handlers.GetOrganizationByUuid)
+		r.Get("/users/{uuid}", handlers.GetOrganizationUsers)
 	})
 
 	r.Group(func(r chi.Router) {

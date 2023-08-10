@@ -1020,7 +1020,6 @@ func (db database) GetOrganizationByName(name string) Organization {
 	return ms
 }
 
-// check that update owner_pub_key does in fact throw error
 func (db database) CreateOrEditOrganization(m Organization) (Organization, error) {
 	if m.OwnerPubKey == "" {
 		return Organization{}, errors.New("no pub key")
@@ -1031,4 +1030,12 @@ func (db database) CreateOrEditOrganization(m Organization) (Organization, error
 	}
 
 	return m, nil
+}
+
+func (db database) GetOrganizationUsers(uuid string) OrganizationUsers {
+	ms := OrganizationUsers{}
+
+	db.db.Model(&OrganizationUsers{}).Where("organization = ?", uuid).Find(&ms)
+
+	return ms
 }
