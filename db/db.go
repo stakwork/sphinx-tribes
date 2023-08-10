@@ -1011,3 +1011,24 @@ func (db database) GetOrganizationByUuid(uuid string) Organization {
 
 	return ms
 }
+
+func (db database) GetOrganizationByName(name string) Organization {
+	ms := Organization{}
+
+	db.db.Model(&Organization{}).Where("name = ?", name).Find(&ms)
+
+	return ms
+}
+
+// check that update owner_pub_key does in fact throw error
+func (db database) CreateOrEditOrganization(m Organization) (Organization, error) {
+	if m.OwnerPubKey == "" {
+		return Organization{}, errors.New("no pub key")
+	}
+
+	if db.db.Model(&m).Where("uuid = ?", m.Uuid).Updates(&m).RowsAffected == 0 {
+		db.db.Create(&m)
+	}
+
+	return m, nil
+}

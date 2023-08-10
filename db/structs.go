@@ -386,8 +386,9 @@ type BountyResponse struct {
 }
 
 type Organization struct {
-	UUID        string     `json:"uuid"`
-	Name        string     `json:"name"`
+	ID          uint       `json:"id"`
+	Uuid        string     `json:"uuid"`
+	Name        string     `gorm:"unique;not null" json:"name"`
 	OwnerPubKey string     `json:"owner_pubkey"`
 	Img         string     `json:"img"`
 	Created     *time.Time `json:"created"`
