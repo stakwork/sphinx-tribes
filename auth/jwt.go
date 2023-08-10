@@ -15,7 +15,7 @@ func InitJwt() {
 	if config.JwtKey == "" {
 		log.Fatal("No JWT key")
 	}
-	TokenAuth = jwtauth.New("HS256", []byte(config.JwtKey), nil)
+	TokenAuth = jwtauth.New("HS384", []byte(config.JwtKey), nil)
 }
 
 // ExpireInHours for jwt
