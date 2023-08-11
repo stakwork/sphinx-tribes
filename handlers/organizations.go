@@ -107,6 +107,52 @@ func GetOrganizationByUuid(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(org)
 }
 
+func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	orgUser := db.OrganizationUsers{}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &orgUser)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	org := db.DB.GetOrganizationByUuid(orgUser.Organization)
+
+	// if not the orgnization admin
+	if pubKeyFromAuth != org.OwnerPubKey {
+		// todo check if the user as create user access
+		fmt.Println("don't have access to create auser")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if user already exists
+	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
+
+	if userExists.ID != 0 {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User already exists")
+		return
+	}
+
+	// create user
+	user, _ := db.DB.CreateOrganizationUser(orgUser)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
 func GetOrganizationUsers(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	orgUsers := db.DB.GetOrganizationUsers(uuid)

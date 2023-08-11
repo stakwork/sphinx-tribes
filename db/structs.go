@@ -397,6 +397,7 @@ type Organization struct {
 }
 
 type OrganizationUsers struct {
+	ID           uint       `json:"id"`
 	OwnerPubKey  string     `json:"owner_pubkey"`
 	Organization string     `json:"organization"`
 	Created      *time.Time `json:"created"`
