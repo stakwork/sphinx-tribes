@@ -1039,3 +1039,17 @@ func (db database) GetOrganizationUsers(uuid string) OrganizationUsers {
 
 	return ms
 }
+
+func (db database) GetOrganizationUser(pubkey string, org string) OrganizationUsers {
+	ms := OrganizationUsers{}
+
+	db.db.Model(&OrganizationUsers{}).Where("organization = ?", org).Where("owner_pub_key = ?", pubkey).Find(&ms)
+
+	return ms
+}
+
+func (db database) CreateOrganizationUser(orgUser OrganizationUsers) (OrganizationUsers, error) {
+	db.db.Create(&orgUser)
+
+	return orgUser, nil
+}

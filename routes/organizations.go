@@ -19,6 +19,7 @@ func OrganizationRoutes() chi.Router {
 		r.Use(auth.PubKeyContext)
 
 		r.Post("/", handlers.CreateOrEditOrganization)
+		r.Post("/users/{uuid}", handlers.CreateOrganizationUser)
 	})
 
 	return r
