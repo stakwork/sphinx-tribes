@@ -20,6 +20,7 @@ func OrganizationRoutes() chi.Router {
 
 		r.Post("/", handlers.CreateOrEditOrganization)
 		r.Post("/users/{uuid}", handlers.CreateOrganizationUser)
+		r.Delete("/users/{uuid}", handlers.DeleteOrganizationUser)
 	})
 
 	return r
