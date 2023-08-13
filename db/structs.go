@@ -404,6 +404,12 @@ type OrganizationUsers struct {
 	Updated      *time.Time `json:"updated"`
 }
 
+type OrganizationUsersData struct {
+	Organization string `json:"organization"`
+	UserCreated  int64  `json:"user_created"`
+	Person
+}
+
 type BountyRoles struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
