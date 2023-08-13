@@ -1053,3 +1053,9 @@ func (db database) CreateOrganizationUser(orgUser OrganizationUsers) (Organizati
 
 	return orgUser, nil
 }
+
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsers) (OrganizationUsers, error) {
+	db.db.Delete(&orgUser)
+
+	return orgUser, nil
+}

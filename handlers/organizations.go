@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -20,7 +20,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	org := db.Organization{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &org)
 
@@ -112,7 +112,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	orgUser := db.OrganizationUsers{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &orgUser)
 
@@ -159,4 +159,47 @@ func GetOrganizationUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(orgUsers)
+}
+
+func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	orgUser := db.OrganizationUsers{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &orgUser)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	org := db.DB.GetOrganizationByUuid(orgUser.Organization)
+
+	if orgUser.OwnerPubKey == org.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot delete organization admin")
+		return
+	}
+
+	// if not the orgnization admin
+	if pubKeyFromAuth != org.OwnerPubKey {
+		// todo check if the user as create user access
+		fmt.Println("don't have access to create auser")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	db.DB.DeleteOrganizationUser(orgUser)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(orgUser)
 }
