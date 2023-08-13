@@ -139,7 +139,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if user already exists
-	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
+	userExists, _ := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
 
 	if userExists.ID != 0 {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -155,7 +155,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 
 func GetOrganizationUsers(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	orgUsers := db.DB.GetOrganizationUsers(uuid)
+	orgUsers, _ := db.DB.GetOrganizationUsers(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(orgUsers)
