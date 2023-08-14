@@ -1035,17 +1035,17 @@ func (db database) CreateOrEditOrganization(m Organization) (Organization, error
 func (db database) GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error) {
 	ms := []OrganizationUsersData{}
 
-	err := db.db.Raw(`SELECT org.organization, org.created AS user_created FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON user.owner_pub_key = person.owner_pub_key WHERE org.organization = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
+	err := db.db.Raw(`SELECT org.organization, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.organization = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
 
 	return ms, err
 }
 
-func (db database) GetOrganizationUser(pubkey string, org string) (OrganizationUsersData, error) {
-	ms := OrganizationUsersData{}
+func (db database) GetOrganizationUser(pubkey string, org string) OrganizationUsers {
+	ms := OrganizationUsers{}
 
-	err := db.db.Raw(`SELECT org.organization, org.created AS user_created FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON user.owner_pub_key = person.owner_pub_key WHERE org.owner_pub_key = '` + pubkey + `' AND org.organization = '` + org + `' ORDER BY org.created DESC`).Find(&ms).Error
+	db.db.Where("organization = ?", org).Where("owner_pub_key = ?", pubkey).Find(&ms)
 
-	return ms, err
+	return ms
 }
 
 func (db database) CreateOrganizationUser(orgUser OrganizationUsers) (OrganizationUsers, error) {
