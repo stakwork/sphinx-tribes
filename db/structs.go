@@ -411,7 +411,6 @@ type OrganizationUsersData struct {
 }
 
 type BountyRoles struct {
-	ID   uint   `json:"id"`
 	Name string `json:"name"`
 }
 
