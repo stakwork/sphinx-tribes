@@ -110,6 +110,7 @@ func GetOrganizationByUuid(w http.ResponseWriter, r *http.Request) {
 func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	now := time.Now()
 
 	orgUser := db.OrganizationUsers{}
 	body, err := io.ReadAll(r.Body)
@@ -139,13 +140,16 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if user already exists
-	userExists, _ := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
+	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
 
 	if userExists.ID != 0 {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User already exists")
 		return
 	}
+
+	orgUser.Created = &now
+	orgUser.Updated = &now
 
 	// create user
 	user, _ := db.DB.CreateOrganizationUser(orgUser)
