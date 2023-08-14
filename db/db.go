@@ -82,41 +82,15 @@ func InitDB() {
 
 }
 
-var updatables = []string{
-	"name", "description", "tags", "img",
-	"owner_alias", "price_to_join", "price_per_message",
-	"escrow_amount", "escrow_millis",
-	"unlisted", "private", "deleted",
-	"app_url", "bots", "feed_url", "feed_type",
-	"owner_route_hint", "updated", "pin",
-	"profile_filters",
-}
-var botupdatables = []string{
-	"name", "description", "tags", "img",
-	"owner_alias", "price_per_use",
-	"unlisted", "deleted",
-	"owner_route_hint", "updated",
-}
-var peopleupdatables = []string{
-	"description", "tags", "img",
-	"owner_alias",
-	"unlisted", "deleted",
-	"owner_route_hint",
-	"price_to_meet", "updated",
-	"extras",
-}
-var channelupdatables = []string{
-	"name", "deleted"}
-
 // check that update owner_pub_key does in fact throw error
 func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 	if m.OwnerPubKey == "" {
 		return Tribe{}, errors.New("no pub key")
 	}
 	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
-	for i, u := range updatables {
+	for i, u := range Updatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(updatables)-1 {
+		if i < len(Updatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
@@ -166,9 +140,9 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 		return Bot{}, errors.New("no unique name")
 	}
 	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
-	for i, u := range botupdatables {
+	for i, u := range Botupdatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(botupdatables)-1 {
+		if i < len(Botupdatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
@@ -200,9 +174,9 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 		return Person{}, errors.New("no pub key")
 	}
 	onConflict := "ON CONFLICT (id) DO UPDATE SET"
-	for i, u := range peopleupdatables {
+	for i, u := range Peopleupdatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(peopleupdatables)-1 {
+		if i < len(Peopleupdatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
