@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,71 +15,7 @@ import (
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/utils"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
-
-type database struct {
-	db *gorm.DB
-}
-
-// DB is the object
-var DB database
-
-func InitDB() {
-	dbURL := os.Getenv("DATABASE_URL")
-	fmt.Printf("db url : %v", dbURL)
-
-	if dbURL == "" {
-		rdsHost := os.Getenv("RDS_HOSTNAME")
-		rdsPort := os.Getenv("RDS_PORT")
-		rdsDbName := os.Getenv("RDS_DB_NAME")
-		rdsUsername := os.Getenv("RDS_USERNAME")
-		rdsPassword := os.Getenv("RDS_PASSWORD")
-		dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", rdsUsername, rdsPassword, rdsHost, rdsPort, rdsDbName)
-	}
-
-	if dbURL == "" {
-		panic("DB env vars not found")
-	}
-
-	var err error
-
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  dbURL,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
-
-	if err != nil {
-		panic(err)
-	}
-
-	DB.db = db
-
-	fmt.Println("db connected")
-
-	// migrate table changes
-	db.AutoMigrate(&Person{})
-	db.AutoMigrate(&Channel{})
-	db.AutoMigrate(&LeaderBoard{})
-	db.AutoMigrate(&ConnectionCodes{})
-	db.AutoMigrate(&Bounty{})
-	db.AutoMigrate(&Organization{})
-	db.AutoMigrate(&OrganizationUsers{})
-	db.AutoMigrate(&BountyRoles{})
-	db.AutoMigrate(&UserRoles{})
-	db.AutoMigrate(&BountyBudget{})
-	db.AutoMigrate(&BudgetHistory{})
-	db.AutoMigrate(&PaymentHistory{})
-
-	people := DB.GetAllPeople()
-	for _, p := range people {
-		if p.Uuid == "" {
-			DB.AddUuidToPerson(p.ID, xid.New().String())
-		}
-	}
-
-}
 
 // check that update owner_pub_key does in fact throw error
 func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
