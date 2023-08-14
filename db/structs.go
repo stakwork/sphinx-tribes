@@ -405,8 +405,8 @@ type OrganizationUsers struct {
 }
 
 type OrganizationUsersData struct {
-	Organization string `json:"organization"`
-	UserCreated  int64  `json:"user_created"`
+	Organization string     `json:"organization"`
+	UserCreated  *time.Time `json:"user_created"`
 	Person
 }
 
