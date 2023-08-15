@@ -419,7 +419,6 @@ type UserRoles struct {
 	OwnerPubKey  string     `json:"owner_pubkey"`
 	Organization string     `json:"organization"`
 	Created      *time.Time `json:"created"`
-	Updated      *time.Time `json:"updated"`
 }
 
 type BountyBudget struct {

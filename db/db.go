@@ -977,8 +977,14 @@ func (db database) GetBountyRoles() []BountyRoles {
 
 func (db database) CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles {
 	// delete roles and create new ones
-	db.db.Where("organizarion = ?", uuid).Where("owner_pub_key = ?", pubkey).Delete(&UserRoles{})
+	db.db.Where("organization = ?", uuid).Where("owner_pub_key = ?", pubkey).Delete(&UserRoles{})
 	db.db.Create(&roles)
 
 	return roles
+}
+
+func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
+	ms := []UserRoles{}
+	db.db.Where("organization = ?", uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
+	return ms
 }
