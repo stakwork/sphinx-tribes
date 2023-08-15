@@ -957,14 +957,28 @@ func (db database) GetOrganizationUser(pubkey string, org string) OrganizationUs
 	return ms
 }
 
-func (db database) CreateOrganizationUser(orgUser OrganizationUsers) (OrganizationUsers, error) {
+func (db database) CreateOrganizationUser(orgUser OrganizationUsers) OrganizationUsers {
 	db.db.Create(&orgUser)
 
-	return orgUser, nil
+	return orgUser
 }
 
-func (db database) DeleteOrganizationUser(orgUser OrganizationUsers) (OrganizationUsers, error) {
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsers) OrganizationUsers {
 	db.db.Delete(&orgUser)
 
-	return orgUser, nil
+	return orgUser
+}
+
+func (db database) GetBountyRoles() []BountyRoles {
+	ms := []BountyRoles{}
+	db.db.Find(&ms)
+	return ms
+}
+
+func (db database) CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles {
+	// delete roles and create new ones
+	db.db.Where("organizarion = ?", uuid).Where("owner_pub_key = ?", pubkey).Delete(&UserRoles{})
+	db.db.Create(&roles)
+
+	return roles
 }
