@@ -220,10 +220,11 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 	user := chi.URLParam(r, "user")
+	now := time.Now()
 
 	if uuid == "" || user == "" {
-		fmt.Println("no uuid, or user pubkey")
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("no uuid, or user pubkey")
 		return
 	}
 
@@ -239,8 +240,8 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("no pubkey from auth")
 		return
 	}
 
@@ -249,21 +250,25 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// if not the orgnization admin
 	if pubKeyFromAuth != org.OwnerPubKey {
 		// todo check if the user as create user access
-		fmt.Println("don't have access to create auser")
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("don't have access to create user")
 		return
 	}
 
 	rolesMap := db.GetRolesMap()
-
+	insertRoles := []db.UserRoles{}
 	for _, role := range roles {
 		_, ok := rolesMap[role.Role]
 		// if any of the roles does not exists return an error
 		if !ok {
-			fmt.Println("don't have access to create auser")
 			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("not a valid user role")
 			return
 		}
+
+		// add created time for insert
+		role.Created = &now
+		insertRoles = append(insertRoles, role)
 	}
 
 	// check if user already exists
@@ -272,13 +277,23 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// if not the orgnization admin
 	if userExists.OwnerPubKey != user || userExists.Organization != uuid {
 		// todo check if the user as create user access
-		fmt.Println("user deos not exists in this organization")
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("user deos not exists in this organization")
 		return
 	}
 
-	db.DB.CreateUserRoles(roles, uuid, user)
+	db.DB.CreateUserRoles(insertRoles, uuid, user)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(roles)
+	json.NewEncoder(w).Encode(insertRoles)
+}
+
+func GetUserRoles(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	user := chi.URLParam(r, "user")
+
+	userRoles := db.DB.GetUserRoles(uuid, user)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(userRoles)
 }
