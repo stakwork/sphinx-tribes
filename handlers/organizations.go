@@ -152,7 +152,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	orgUser.Updated = &now
 
 	// create user
-	user, _ := db.DB.CreateOrganizationUser(orgUser)
+	user := db.DB.CreateOrganizationUser(orgUser)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(user)
 }
@@ -206,4 +206,79 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(orgUser)
+}
+
+func GetBountyRoles(w http.ResponseWriter, r *http.Request) {
+	roles := db.DB.GetBountyRoles()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(roles)
+}
+
+func AddUserRoles(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+	user := chi.URLParam(r, "user")
+
+	if uuid == "" || user == "" {
+		fmt.Println("no uuid, or user pubkey")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	roles := []db.UserRoles{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &roles)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	org := db.DB.GetOrganizationByUuid(uuid)
+
+	// if not the orgnization admin
+	if pubKeyFromAuth != org.OwnerPubKey {
+		// todo check if the user as create user access
+		fmt.Println("don't have access to create auser")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	rolesMap := db.GetRolesMap()
+
+	for _, role := range roles {
+		_, ok := rolesMap[role.Role]
+		// if any of the roles does not exists return an error
+		if !ok {
+			fmt.Println("don't have access to create auser")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
+
+	// check if user already exists
+	userExists := db.DB.GetOrganizationUser(user, uuid)
+
+	// if not the orgnization admin
+	if userExists.OwnerPubKey != user || userExists.Organization != uuid {
+		// todo check if the user as create user access
+		fmt.Println("user deos not exists in this organization")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	db.DB.CreateUserRoles(roles, uuid, user)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(roles)
 }
