@@ -156,3 +156,11 @@ func InitRoles() {
 		DB.CreateRoles()
 	}
 }
+
+func GetRolesMap() map[string]string {
+	roles := map[string]string{}
+	for _, v := range ConfigBountyRoles {
+		roles[v.Name] = v.Name
+	}
+	return roles
+}
