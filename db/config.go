@@ -71,36 +71,53 @@ func InitDB() {
 
 }
 
+const (
+	AddBounty      = "ADD BOUNTY"
+	UpdateBounty   = "UPDATE BOUNTY"
+	DeleteBounty   = "DELETE BOUNTY"
+	PayBounty      = "PAY BOUNTY"
+	AddUser        = "ADD USER"
+	UpdateUser     = "UPDATE USER"
+	DeleteUser     = "DELETE USER"
+	AddRoles       = "ADD ROLES"
+	AddBudget      = "ADD BUDGET"
+	WithdrawBudget = "WITHDRAW BUDGET"
+	ViewReport     = "VIEW REPORT"
+)
+
 var ConfigBountyRoles []BountyRoles = []BountyRoles{
 	{
-		Name: "ADD BOUNTY",
+		Name: AddBounty,
 	},
 	{
-		Name: "UPDATE BOUNTY",
+		Name: UpdateBounty,
 	},
 	{
-		Name: "DELETE BOUNTY",
+		Name: DeleteBounty,
 	},
 	{
-		Name: "PAY BOUNTY",
+		Name: PayBounty,
 	},
 	{
-		Name: "ADD USER",
+		Name: AddUser,
 	},
 	{
-		Name: "UPDATE USER",
+		Name: UpdateUser,
 	},
 	{
-		Name: "DELETE USER",
+		Name: DeleteUser,
 	},
 	{
-		Name: "ADD BUDGET",
+		Name: AddRoles,
 	},
 	{
-		Name: "WITHDRAW BUDGET",
+		Name: AddBudget,
 	},
 	{
-		Name: "VIEW REPORT",
+		Name: WithdrawBudget,
+	},
+	{
+		Name: ViewReport,
 	},
 }
 
@@ -163,4 +180,35 @@ func GetRolesMap() map[string]string {
 		roles[v.Name] = v.Name
 	}
 	return roles
+}
+
+func GetUserRolesMap(userRoles []UserRoles) map[string]string {
+	roles := map[string]string{}
+	for _, v := range userRoles {
+		roles[v.Role] = v.Role
+	}
+	return roles
+}
+
+func RolesCheck(userRoles []UserRoles, check string) bool {
+	hasRole := false
+	rolesMap := GetRolesMap()
+	userRolesMap := GetUserRolesMap(userRoles)
+
+	// check if roles exists in config
+	_, ok := rolesMap[check]
+	_, ok1 := userRolesMap[check]
+
+	// if any of the roles does not exists return false
+	// if any of the roles does not exists user roles return false
+	if !ok {
+		hasRole = false
+		return hasRole
+	} else if !ok1 {
+		hasRole = false
+		return hasRole
+	}
+
+	hasRole = true
+	return hasRole
 }

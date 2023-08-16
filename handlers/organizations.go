@@ -70,13 +70,13 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	} else {
 		if org.ID == 0 {
 			// cant create that already exists
-			fmt.Println("cant create existing")
+			fmt.Println("can't create existing organization")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		if org.ID != existing.ID { // cant edit someone else's
-			fmt.Println("cant edit someone else")
+			fmt.Println("cant edit another organization")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -133,10 +133,13 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	if pubKeyFromAuth != org.OwnerPubKey {
-		// todo check if the user as create user access
-		fmt.Println("don't have access to create auser")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		userRoles := db.DB.GetUserRoles(orgUser.Organization, pubKeyFromAuth)
+		hasRole := db.RolesCheck(userRoles, db.AddUser)
+		if !hasRole {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("Don't have access to add user")
+			return
+		}
 	}
 
 	// check if user already exists
@@ -196,10 +199,14 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	if pubKeyFromAuth != org.OwnerPubKey {
-		// todo check if the user as create user access
-		fmt.Println("don't have access to create auser")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		userRoles := db.DB.GetUserRoles(orgUser.Organization, pubKeyFromAuth)
+		hasRole := db.RolesCheck(userRoles, db.DeleteUser)
+
+		if !hasRole {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("Don't have access to delete user")
+			return
+		}
 	}
 
 	db.DB.DeleteOrganizationUser(orgUser)
@@ -276,10 +283,14 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	if userExists.OwnerPubKey != user || userExists.Organization != uuid {
-		// todo check if the user as create user access
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("user deos not exists in this organization")
-		return
+		userRoles := db.DB.GetUserRoles(uuid, user)
+		hasRole := db.RolesCheck(userRoles, db.AddRoles)
+
+		if !hasRole {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("user cannot add roles")
+			return
+		}
 	}
 
 	db.DB.CreateUserRoles(insertRoles, uuid, user)
