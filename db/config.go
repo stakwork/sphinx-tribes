@@ -212,3 +212,15 @@ func RolesCheck(userRoles []UserRoles, check string) bool {
 	hasRole = true
 	return hasRole
 }
+
+func CheckUser(userRoles []UserRoles, pubkey string) bool {
+	isUser := false
+	for _, role := range userRoles {
+		if role.OwnerPubKey == pubkey {
+			isUser = true
+			return isUser
+		}
+	}
+
+	return isUser
+}
