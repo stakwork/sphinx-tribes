@@ -256,10 +256,29 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	if pubKeyFromAuth != org.OwnerPubKey {
-		// todo check if the user as create user access
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("don't have access to create user")
-		return
+		userRoles := db.DB.GetUserRoles(uuid, pubKeyFromAuth)
+		hasRole := db.RolesCheck(userRoles, db.AddRoles)
+		// check if the user added his pubkey to the post body
+		isUser := db.CheckUser(userRoles, pubKeyFromAuth)
+
+		if isUser {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("cannot add roles for self")
+			return
+		}
+
+		// check if the user added his pubkey to the route
+		if pubKeyFromAuth == user {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("cannot add roles for self")
+			return
+		}
+
+		if !hasRole {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("user cannot add roles")
+			return
+		}
 	}
 
 	rolesMap := db.GetRolesMap()
@@ -283,14 +302,9 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	if userExists.OwnerPubKey != user || userExists.Organization != uuid {
-		userRoles := db.DB.GetUserRoles(uuid, user)
-		hasRole := db.RolesCheck(userRoles, db.AddRoles)
-
-		if !hasRole {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("user cannot add roles")
-			return
-		}
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User does not exists in the organization")
+		return
 	}
 
 	db.DB.CreateUserRoles(insertRoles, uuid, user)
