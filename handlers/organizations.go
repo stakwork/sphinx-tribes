@@ -99,6 +99,13 @@ func GetOrganizations(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(orgs)
 }
 
+func GetOrganizationsCount(w http.ResponseWriter, r *http.Request) {
+	count := db.DB.GetOrganizations(r)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(count)
+}
+
 func GetOrganizationByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	org := db.DB.GetOrganizationByUuid(uuid)
