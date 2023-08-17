@@ -100,7 +100,7 @@ func GetOrganizations(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOrganizationsCount(w http.ResponseWriter, r *http.Request) {
-	count := db.DB.GetOrganizations(r)
+	count := db.DB.GetOrganizationsCount()
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(count)
@@ -173,6 +173,14 @@ func GetOrganizationUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(orgUsers)
+}
+
+func GetOrganizationUsersCount(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	count := db.DB.GetOrganizationUsersCount(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(count)
 }
 
 func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
