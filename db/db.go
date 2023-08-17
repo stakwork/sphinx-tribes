@@ -913,6 +913,12 @@ func (db database) GetOrganizations(r *http.Request) []Organization {
 	return ms
 }
 
+func (db database) GetOrganizationsCount() int64 {
+	var count int64
+	db.db.Model(&Organization{}).Count(&count)
+	return count
+}
+
 func (db database) GetOrganizationByUuid(uuid string) Organization {
 	ms := Organization{}
 
