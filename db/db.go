@@ -955,6 +955,12 @@ func (db database) GetOrganizationUsers(uuid string) ([]OrganizationUsersData, e
 	return ms, err
 }
 
+func (db database) GetOrganizationUsersCount(uuid string) int64 {
+	var count int64
+	db.db.Model(&OrganizationUsers{}).Where("organization  = ?", uuid).Count(&count)
+	return count
+}
+
 func (db database) GetOrganizationUser(pubkey string, org string) OrganizationUsers {
 	ms := OrganizationUsers{}
 
