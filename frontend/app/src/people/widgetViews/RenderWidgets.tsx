@@ -14,6 +14,7 @@ import OfferView from './OfferView';
 import { AboutView } from './AboutView';
 import { PostBounty } from './postBounty';
 import UserTickets from './UserTicketsView';
+import OrganizationView from './OrganizationView';
 
 interface PanelProps {
   isMobile: boolean;
@@ -108,15 +109,15 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
 
       const panelStyles = isMobile
         ? {
-            minHeight: 132
-          }
+          minHeight: 132
+        }
         : {
-            maxWidth: 291,
-            minWidth: 291,
-            marginRight: 20,
-            marginBottom: 20,
-            minHeight: 472
-          };
+          maxWidth: 291,
+          minWidth: 291,
+          marginRight: 20,
+          marginBottom: 20,
+          minHeight: 472
+        };
 
       fullSelectedWidget &&
         fullSelectedWidget.forEach((s: any, i: number) => {
@@ -128,9 +129,9 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
           const conditionalStyles =
             !isMobile && s?.paid
               ? {
-                  border: '1px solid #dde1e5',
-                  boxShadow: 'none'
-                }
+                border: '1px solid #dde1e5',
+                boxShadow: 'none'
+              }
               : {};
 
           elementArray.push(
@@ -184,6 +185,8 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
     }
 
     switch (selectedWidget) {
+      case 'organizations':
+        return <OrganizationView />;
       case 'badges':
         return <Badges person={person} />;
       case 'about':

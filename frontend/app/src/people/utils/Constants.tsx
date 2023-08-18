@@ -23,6 +23,30 @@ const widgetConfigs = {
       icon: 'edit'
     }
   },
+  organizations: {
+    label: 'Organizations',
+    name: 'organizations',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: [],
+    action: {
+      text: 'Add New Organization',
+      icon: 'local_offer'
+    },
+    noneSpace: {
+      noResult: {
+        img: 'no_wanted2.png',
+        text: 'No Organization Yet',
+        sub: 'Looks like this person has not created or added to any organozation yet.'
+      }
+    }
+  },
   badges: {
     label: 'Badges',
     name: 'badges',
