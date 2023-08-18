@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,90 +15,7 @@ import (
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/utils"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
-
-type database struct {
-	db *gorm.DB
-}
-
-// DB is the object
-var DB database
-
-func InitDB() {
-	dbURL := os.Getenv("DATABASE_URL")
-	fmt.Printf("db url : %v", dbURL)
-
-	if dbURL == "" {
-		rdsHost := os.Getenv("RDS_HOSTNAME")
-		rdsPort := os.Getenv("RDS_PORT")
-		rdsDbName := os.Getenv("RDS_DB_NAME")
-		rdsUsername := os.Getenv("RDS_USERNAME")
-		rdsPassword := os.Getenv("RDS_PASSWORD")
-		dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", rdsUsername, rdsPassword, rdsHost, rdsPort, rdsDbName)
-	}
-
-	if dbURL == "" {
-		panic("DB env vars not found")
-	}
-
-	var err error
-
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  dbURL,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
-
-	if err != nil {
-		panic(err)
-	}
-
-	DB.db = db
-
-	fmt.Println("db connected")
-
-	// migrate table changes
-	db.AutoMigrate(&Person{})
-	db.AutoMigrate(&Channel{})
-	db.AutoMigrate(&LeaderBoard{})
-	db.AutoMigrate(&ConnectionCodes{})
-	db.AutoMigrate(&Bounty{})
-
-	people := DB.GetAllPeople()
-	for _, p := range people {
-		if p.Uuid == "" {
-			DB.AddUuidToPerson(p.ID, xid.New().String())
-		}
-	}
-
-}
-
-var updatables = []string{
-	"name", "description", "tags", "img",
-	"owner_alias", "price_to_join", "price_per_message",
-	"escrow_amount", "escrow_millis",
-	"unlisted", "private", "deleted",
-	"app_url", "bots", "feed_url", "feed_type",
-	"owner_route_hint", "updated", "pin",
-	"profile_filters",
-}
-var botupdatables = []string{
-	"name", "description", "tags", "img",
-	"owner_alias", "price_per_use",
-	"unlisted", "deleted",
-	"owner_route_hint", "updated",
-}
-var peopleupdatables = []string{
-	"description", "tags", "img",
-	"owner_alias",
-	"unlisted", "deleted",
-	"owner_route_hint",
-	"price_to_meet", "updated",
-	"extras",
-}
-var channelupdatables = []string{
-	"name", "deleted"}
 
 // check that update owner_pub_key does in fact throw error
 func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
@@ -107,9 +23,9 @@ func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 		return Tribe{}, errors.New("no pub key")
 	}
 	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
-	for i, u := range updatables {
+	for i, u := range Updatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(updatables)-1 {
+		if i < len(Updatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
@@ -159,9 +75,9 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 		return Bot{}, errors.New("no unique name")
 	}
 	onConflict := "ON CONFLICT (uuid) DO UPDATE SET"
-	for i, u := range botupdatables {
+	for i, u := range Botupdatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(botupdatables)-1 {
+		if i < len(Botupdatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
@@ -193,9 +109,9 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 		return Person{}, errors.New("no pub key")
 	}
 	onConflict := "ON CONFLICT (id) DO UPDATE SET"
-	for i, u := range peopleupdatables {
+	for i, u := range Peopleupdatables {
 		onConflict = onConflict + fmt.Sprintf(" %s=EXCLUDED.%s", u, u)
-		if i < len(peopleupdatables)-1 {
+		if i < len(Peopleupdatables)-1 {
 			onConflict = onConflict + ","
 		}
 	}
@@ -986,4 +902,101 @@ func GetLeaderData(arr []LeaderData, key string) (int, int) {
 		}
 	}
 	return found, index
+}
+
+func (db database) GetOrganizations(r *http.Request) []Organization {
+	ms := []Organization{}
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+
+	// return if like owner_alias, unique_name, or equals pubkey
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Find(&ms)
+	return ms
+}
+
+func (db database) GetOrganizationsCount() int64 {
+	var count int64
+	db.db.Model(&Organization{}).Count(&count)
+	return count
+}
+
+func (db database) GetOrganizationByUuid(uuid string) Organization {
+	ms := Organization{}
+
+	db.db.Model(&Organization{}).Where("uuid = ?", uuid).Find(&ms)
+
+	return ms
+}
+
+func (db database) GetOrganizationByName(name string) Organization {
+	ms := Organization{}
+
+	db.db.Model(&Organization{}).Where("name = ?", name).Find(&ms)
+
+	return ms
+}
+
+func (db database) CreateOrEditOrganization(m Organization) (Organization, error) {
+	if m.OwnerPubKey == "" {
+		return Organization{}, errors.New("no pub key")
+	}
+
+	if db.db.Model(&m).Where("uuid = ?", m.Uuid).Updates(&m).RowsAffected == 0 {
+		db.db.Create(&m)
+	}
+
+	return m, nil
+}
+
+func (db database) GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error) {
+	ms := []OrganizationUsersData{}
+
+	err := db.db.Raw(`SELECT org.organization, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.organization = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
+
+	return ms, err
+}
+
+func (db database) GetOrganizationUsersCount(uuid string) int64 {
+	var count int64
+	db.db.Model(&OrganizationUsers{}).Where("organization  = ?", uuid).Count(&count)
+	return count
+}
+
+func (db database) GetOrganizationUser(pubkey string, org string) OrganizationUsers {
+	ms := OrganizationUsers{}
+
+	db.db.Where("organization = ?", org).Where("owner_pub_key = ?", pubkey).Find(&ms)
+
+	return ms
+}
+
+func (db database) CreateOrganizationUser(orgUser OrganizationUsers) OrganizationUsers {
+	db.db.Create(&orgUser)
+
+	return orgUser
+}
+
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsers) OrganizationUsers {
+	db.db.Delete(&orgUser)
+
+	return orgUser
+}
+
+func (db database) GetBountyRoles() []BountyRoles {
+	ms := []BountyRoles{}
+	db.db.Find(&ms)
+	return ms
+}
+
+func (db database) CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles {
+	// delete roles and create new ones
+	db.db.Where("organization = ?", uuid).Where("owner_pub_key = ?", pubkey).Delete(&UserRoles{})
+	db.db.Create(&roles)
+
+	return roles
+}
+
+func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
+	ms := []UserRoles{}
+	db.db.Where("organization = ?", uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
+	return ms
 }
