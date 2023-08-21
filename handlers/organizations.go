@@ -337,3 +337,27 @@ func GetUserRoles(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(userRoles)
 }
+
+func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// get the organizations created by the user, then get all the organizations
+	// the user has been added to, loop through to get the organization
+	organizations := db.DB.GetUserCreatedOrganizations(pubKeyFromAuth)
+	assignedOrganizations := db.DB.GetUserAssignedOrganizations(pubKeyFromAuth)
+
+	for _, value := range assignedOrganizations {
+		organization := db.DB.GetOrganizationByUuid(value.Organization)
+		organizations = append(organizations, organization)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizations)
+}
