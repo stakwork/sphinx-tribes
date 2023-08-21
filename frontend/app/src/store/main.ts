@@ -158,6 +158,17 @@ export interface LnInvoice {
     invoice: string;
   };
 }
+
+export interface Organization {
+  id: string
+	uuid: string,
+	name: string,
+	owner_pubkey: string,
+	img: string,
+	created: string
+	updated: string,
+	show: boolean
+}
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -880,7 +891,7 @@ export class MainStore {
   doPageListMerger(
     currentList: any[],
     newList: any[],
-    setPage: Function,
+    setPage: (any) => void,
     queryParams?: any,
     type?: string
   ) {
@@ -1398,6 +1409,34 @@ export class MainStore {
       return r;
     } catch (e) {
       return false;
+    }
+  }
+
+  @observable
+  organizations: Organization[] = [];
+
+  @action setOrganizations(organizations: Organization[]) {
+    this.organizations = organizations;
+  }
+
+  @action async getUserOrganizations(): Promise<Organization[]> {
+   try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/user`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      this.setOrganizations(data);
+      return await data;
+    } catch (e) {
+      return [];
     }
   }
 }

@@ -1000,3 +1000,15 @@ func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
 	db.db.Where("organization = ?", uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
 	return ms
 }
+
+func (db database) GetUserCreatedOrganizations(pubkey string) []Organization {
+	ms := []Organization{}
+	db.db.Where("owner_pub_key = ?", pubkey).Find(&ms)
+	return ms
+}
+
+func (db database) GetUserAssignedOrganizations(pubkey string) []OrganizationUsers {
+	ms := []OrganizationUsers{}
+	db.db.Where("owner_pub_key = ?", pubkey).Find(&ms)
+	return ms
+}
