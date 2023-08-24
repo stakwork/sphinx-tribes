@@ -5,7 +5,9 @@ import {
   offerSkillSchema,
   offerOtherSchema,
   wantedCodingTaskSchema,
-  wantedOtherSchema
+  wantedOtherSchema,
+  organizationSchema,
+  organizationUserSchema
 } from '../../components/form/schema';
 
 const MAX_UPLOAD_SIZE = 10194304; //10MB
@@ -34,7 +36,7 @@ const widgetConfigs = {
       minHeight: '40%',
       maxHeight: '70%'
     },
-    schema: [],
+    schema: organizationSchema,
     action: {
       text: 'Add New Organization',
       icon: 'local_offer'
@@ -46,6 +48,19 @@ const widgetConfigs = {
         sub: 'Looks like this person has not created or added to any organozation yet.'
       }
     }
+  },
+  organizationusers: {
+    label: 'Organization Users',
+    name: 'organizationusers',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: organizationUserSchema,
   },
   badges: {
     label: 'Badges',

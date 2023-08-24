@@ -1,4 +1,3 @@
-import { Person } from 'store/main';
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 

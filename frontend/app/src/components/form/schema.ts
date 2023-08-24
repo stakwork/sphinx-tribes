@@ -813,3 +813,31 @@ export const dynamicSchemaAutofillFieldsByType = {
     ticket_url: 'lastGithubRepo'
   }
 };
+
+export const organizationSchema: FormField[] = [
+  {
+    name: 'name',
+    label: 'Organization name',
+    type: 'text',
+    validator: strValidator
+  },
+  {
+    name: 'img',
+    label: 'Image url',
+    type: 'text'
+  },
+  {
+    name: 'show',
+    label: 'Show to public',
+    type: 'switch'
+  },
+];
+
+export const organizationUserSchema: FormField[] = [
+  {
+    name: 'owner_pubkey',
+    label: 'Public key',
+    type: 'text',
+    validator: strValidator
+  }
+];

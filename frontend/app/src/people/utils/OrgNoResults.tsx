@@ -4,7 +4,7 @@ import { NoResultProps } from 'people/interfaces';
 import { widgetConfigs } from './Constants';
 import NoneSpace from './NoneSpace';
 
-function OrgNoResults(props: NoResultProps) {
+function OrgNoResults() {
     const tabs = widgetConfigs;
 
     return (

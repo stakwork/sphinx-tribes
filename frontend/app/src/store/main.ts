@@ -1393,7 +1393,6 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      //TODO: add authentication
       const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
         method: 'DELETE',
         mode: 'cors',
@@ -1439,6 +1438,87 @@ export class MainStore {
       return [];
     }
   }
+
+  @action async addOrganization(body: {
+    name: string;
+    img: string;
+  }): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async getOrganizationUsersCount(
+    uuid: string
+  ): Promise<number> {
+    try {
+      const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}/count`, {
+        method: 'GET',
+        mode: 'cors',
+      });
+
+      return r.json();
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  async getOrganizationUsers(
+    uuid: string
+  ): Promise<Person[]> {
+    try {
+      const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+      });
+
+      return r.json();
+    } catch (e) {
+      return [];
+    }
+  }
+
+   @action async addOrganizationUser(body: {
+    owner_pubkey: string;
+    organization: string;
+  }): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/${body.organization}`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
 }
 
 export const mainStore = new MainStore();
