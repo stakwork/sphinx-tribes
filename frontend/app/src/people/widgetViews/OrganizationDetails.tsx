@@ -162,7 +162,6 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
 
     const getBountyRoles = useCallback(async () => {
         const roles = await main.getRoles();
-
         const bountyRolesData = roles.map((role: any) => ({
             name: role.name,
             status: false
@@ -174,7 +173,8 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         if (props.org?.uuid && user.owner_pubkey) {
             const userRoles = await main.getUserRoles(props.org.uuid, user.owner_pubkey);
 
-            const rolesData = bountyRolesData;
+            // set all values to false, so every user data will be fresh
+            const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
 
             userRoles.forEach((userRole: any) => {
                 const index = rolesData.findIndex((role: any) => role.name === userRole.role);
@@ -185,7 +185,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         }
     };
 
-    const handleSettingsClick = (user: any) => {
+    const handleSettingsClick = async (user: any) => {
         setUser(user);
         setIsOpenRoles(true);
         getUserRoles(user);
