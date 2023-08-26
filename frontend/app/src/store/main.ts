@@ -169,6 +169,10 @@ export interface Organization {
 	updated: string,
 	show: boolean
 }
+
+export interface BountyRoles {
+  name: string;
+}
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -1518,6 +1522,87 @@ export class MainStore {
       return false;
     }
   }
+
+  @action async deleteOrganizationUser(body: any, uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async getRoles(): Promise<BountyRoles[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/bounty/roles`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async getUserRoles(uuid: string, user: string): Promise<any[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/role/${uuid}/${user}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async addUserRoles(body: any, uuid: string, user: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/role/${uuid}/${user}`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+  
 
 }
 

@@ -187,7 +187,7 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	orgUser := db.OrganizationUsers{}
+	orgUser := db.OrganizationUsersData{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &orgUser)

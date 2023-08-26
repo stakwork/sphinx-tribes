@@ -54,6 +54,10 @@ const TableHead = styled.div`
   background: #D3D3D3;
 `;
 
+const ModalTitle = styled.h3`
+    font-size: 1.2rem;
+`;
+
 const Th = styled.div`
     font-size: 1.1rem;
     font-weight: bold;
@@ -86,14 +90,44 @@ const Actions = styled.div`
     min-width: 25%;
   `;
 
+const CheckUl = styled.ul`
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+`;
+
+const CheckLi = styled.li`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    margin-bottom: 10px;
+`;
+
+const Check = styled.input`
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    padding: 0px;
+    margin-right: 10px;
+`;
+
+const CheckLabel = styled.label`
+    padding: 0px;
+    margin: 0px;
+`;
+
 const OrganizationDetails = (props: { close: () => void, org: Organization | undefined }) => {
     const [loading, setIsLoading] = useState<boolean>(false);
     const isMobile = useIsMobile();
     const { main, ui } = useStores();
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
     const [usersCount, setUsersCount] = useState(0);
     const [disableFormButtons, setDisableFormButtons] = useState(false);
     const [users, setUsers] = useState<Person[]>([]);
+    const [user, setUser] = useState<Person>();
+    const [bountyRolesData, setBountyRolesData] = useState<any[]>([]);
     const config = widgetConfigs['organizationusers'];
 
     const formRef = useRef(null);
@@ -118,8 +152,51 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         }
     }, [main, props.org?.uuid]);
 
+    const deleteOrganizationUser = async (user: any) => {
+        if (props.org?.uuid) {
+            await main.deleteOrganizationUser(user, props.org?.uuid);
+            await getOrganizationUsers();
+            await getOrganizationUsersCount();
+        }
+    };
+
+    const getBountyRoles = useCallback(async () => {
+        const roles = await main.getRoles();
+
+        const bountyRolesData = roles.map((role: any) => ({
+            name: role.name,
+            status: false
+        }));
+        setBountyRolesData(bountyRolesData);
+    }, [main])
+
+    const getUserRoles = async (user: any) => {
+        if (props.org?.uuid && user.owner_pubkey) {
+            const userRoles = await main.getUserRoles(props.org.uuid, user.owner_pubkey);
+
+            const rolesData = bountyRolesData;
+
+            userRoles.forEach((userRole: any) => {
+                const index = rolesData.findIndex((role: any) => role.name === userRole.role);
+                rolesData[index]['status'] = true;
+            });
+
+            setBountyRolesData(rolesData);
+        }
+    };
+
+    const handleSettingsClick = (user: any) => {
+        setUser(user);
+        setIsOpenRoles(true);
+        getUserRoles(user);
+    };
+
     const closeHandler = () => {
-        setIsOpen(false)
+        setIsOpenRoles(false)
+    };
+
+    const closeRolesHandler = () => {
+        setIsOpenRoles(false)
     };
 
     const onSubmit = async (body: any) => {
@@ -135,10 +212,40 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         closeHandler();
     };
 
+    const roleChange = (e: any) => {
+        const rolesData = bountyRolesData;
+
+        rolesData.map((role: any) => {
+            if (role.name === e.target.value) {
+                role.status = !role.status
+            }
+            return role;
+        });
+        setBountyRolesData(rolesData);
+    };
+
+    const submitRoles = async () => {
+        const roleData = bountyRolesData.filter((r: any) => r.status).map((role: any) => (
+            {
+                owner_pubkey: user?.owner_pubkey,
+                organization: props.org?.uuid,
+                role: role.name
+            }
+        ));
+
+        if (props.org?.uuid && user?.owner_pubkey) {
+            await main.addUserRoles(roleData, props.org.uuid, user.owner_pubkey);
+            await main.getUserRoles(props.org.uuid, user.owner_pubkey);
+
+            setIsOpenRoles(false);
+        }
+    };
+
     useEffect(() => {
         getOrganizationUsers();
         getOrganizationUsersCount();
-    }, [getOrganizationUsers, getOrganizationUsersCount]);
+        getBountyRoles();
+    }, [getOrganizationUsers, getOrganizationUsersCount, getBountyRoles]);
 
     return (
         <Container>
@@ -178,7 +285,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                 {isOrganizationAdmin && (
                                     <Actions>
                                         <MaterialIcon
-                                            onClick={() => props.close()}
+                                            onClick={() => handleSettingsClick(user)}
                                             icon={'settings'}
                                             style={{
                                                 fontSize: 20,
@@ -188,7 +295,9 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                             }}
                                         />
                                         <MaterialIcon
-                                            onClick={() => props.close()}
+                                            onClick={() => {
+                                                deleteOrganizationUser(user)
+                                            }}
                                             icon={'delete'}
                                             style={{
                                                 fontSize: 20,
@@ -203,7 +312,6 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                         </TableRow>
                     ))}
                 </UsersTable>
-
                 {isOpen && (
                     <Modal
                         visible={isOpen}
@@ -239,7 +347,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                     <Wrap
                                         newDesign={true}
                                     >
-                                        <h5>Add new user</h5>
+                                        <ModalTitle>Add new user</ModalTitle>
                                         <div className="SchemaInnerContainer">
                                             {schema.map((item: FormField) => (
                                                 <Input
@@ -291,6 +399,62 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                         </Formik>
                     </Modal>
                 )}
+                {
+                    isOpenRoles && (
+                        <Modal
+                            visible={isOpenRoles}
+                            style={{
+                                height: '100%',
+                                flexDirection: 'column'
+                            }}
+                            envStyle={{
+                                marginTop: isMobile ? 64 : 0,
+                                background: color.pureWhite,
+                                zIndex: 20,
+                                ...(config?.modalStyle ?? {}),
+                                maxHeight: '100%',
+                                borderRadius: '10px'
+                            }}
+                            overlayClick={closeRolesHandler}
+                            bigCloseImage={closeRolesHandler}
+                            bigCloseImageStyle={{
+                                top: '-18px',
+                                right: '-18px',
+                                background: '#000',
+                                borderRadius: '50%'
+                            }}
+                        >
+                            <Wrap
+                                newDesign={true}
+                            >
+                                <ModalTitle>Add user roles</ModalTitle>
+                                <CheckUl>
+                                    {
+
+                                        bountyRolesData.map((role: any, i: number) => (
+                                            <CheckLi key={i}>
+                                                <Check
+                                                    checked={role.status}
+                                                    onChange={roleChange}
+                                                    type="checkbox"
+                                                    name={role.name}
+                                                    value={role.name}
+                                                />
+                                                <CheckLabel>{role.name}</CheckLabel>
+                                            </CheckLi>
+                                        ))
+                                    }
+                                </CheckUl>
+                                <Button
+                                    onClick={() => submitRoles()}
+                                    style={{ width: '100%' }}
+                                    color={'primary'}
+                                    text={'Add roles'}
+                                />
+                            </Wrap>
+                        </Modal>
+                    )
+                }
             </DetailsWrap>
         </Container>
     );
