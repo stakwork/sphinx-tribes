@@ -1,6 +1,5 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { NoResultProps } from 'people/interfaces';
 import { widgetConfigs } from './Constants';
 import NoneSpace from './NoneSpace';
 

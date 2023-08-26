@@ -975,8 +975,8 @@ func (db database) CreateOrganizationUser(orgUser OrganizationUsers) Organizatio
 	return orgUser
 }
 
-func (db database) DeleteOrganizationUser(orgUser OrganizationUsers) OrganizationUsers {
-	db.db.Delete(&orgUser)
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData) OrganizationUsersData {
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Delete(&OrganizationUsers{})
 
 	return orgUser
 }
