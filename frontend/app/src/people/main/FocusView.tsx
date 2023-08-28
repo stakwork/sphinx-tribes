@@ -217,7 +217,11 @@ function FocusedView(props: FocusViewProps) {
       if (body?.assignee?.owner_pubkey) {
         newBody.assignee = body.assignee.owner_pubkey;
       }
-      newBody.title = body.one_sentence_summary;
+      if (body.one_sentence_summary !== '') {
+        newBody.title = body.one_sentence_summary;
+      } else {
+        newBody.title = body.title;
+      }
       newBody.one_sentence_summary = '';
       newBody.owner_id = info.pubkey;
 
