@@ -45,7 +45,7 @@ const widgetConfigs = {
       noResult: {
         img: 'no_wanted2.png',
         text: 'No Organization Yet',
-        sub: 'Looks like this person has not created or added to any organozation yet.'
+        sub: 'Looks like this person has not created or added to any organizations yet.'
       }
     }
   },
