@@ -138,23 +138,25 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         owner_pubkey: '',
     };
 
+    const uuid = props.org?.uuid;
+
     const getOrganizationUsersCount = useCallback(async () => {
-        if (props.org?.uuid) {
-            const count = await main.getOrganizationUsersCount(props.org?.uuid);
+        if (uuid) {
+            const count = await main.getOrganizationUsersCount(uuid);
             setUsersCount(count);
         }
-    }, [main, props.org?.uuid]);
+    }, [main, uuid]);
 
     const getOrganizationUsers = useCallback(async () => {
-        if (props.org?.uuid) {
-            const users = await main.getOrganizationUsers(props.org?.uuid);
+        if (uuid) {
+            const users = await main.getOrganizationUsers(uuid);
             setUsers(users);
         }
-    }, [main, props.org?.uuid]);
+    }, [main, uuid]);
 
     const deleteOrganizationUser = async (user: any) => {
-        if (props.org?.uuid) {
-            await main.deleteOrganizationUser(user, props.org?.uuid);
+        if (uuid) {
+            await main.deleteOrganizationUser(user, uuid);
             await getOrganizationUsers();
             await getOrganizationUsersCount();
         }
@@ -170,8 +172,8 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     }, [main])
 
     const getUserRoles = async (user: any) => {
-        if (props.org?.uuid && user.owner_pubkey) {
-            const userRoles = await main.getUserRoles(props.org.uuid, user.owner_pubkey);
+        if (uuid && user.owner_pubkey) {
+            const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
 
             // set all values to false, so every user data will be fresh
             const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
@@ -202,7 +204,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const onSubmit = async (body: any) => {
         setIsLoading(true);
 
-        body.organization = props.org?.uuid;
+        body.organization = uuid;
 
         await main.addOrganizationUser(body);
         await getOrganizationUsers();
@@ -228,14 +230,14 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         const roleData = bountyRolesData.filter((r: any) => r.status).map((role: any) => (
             {
                 owner_pubkey: user?.owner_pubkey,
-                organization: props.org?.uuid,
+                organization: uuid,
                 role: role.name
             }
         ));
 
-        if (props.org?.uuid && user?.owner_pubkey) {
-            await main.addUserRoles(roleData, props.org.uuid, user.owner_pubkey);
-            await main.getUserRoles(props.org.uuid, user.owner_pubkey);
+        if (uuid && user?.owner_pubkey) {
+            await main.addUserRoles(roleData, uuid, user.owner_pubkey);
+            await main.getUserRoles(uuid, user.owner_pubkey);
 
             setIsOpenRoles(false);
         }
