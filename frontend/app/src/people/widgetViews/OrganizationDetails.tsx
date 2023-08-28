@@ -6,8 +6,9 @@ import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { Organization, Person } from 'store/main';
+import { BountyRoles, Organization, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
+import { userHasRole } from 'helpers';
 import { Modal } from '../../components/common';
 import { colors } from '../../config/colors';
 import { nonWidgetConfigs } from '../utils/Constants';
@@ -127,7 +128,9 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const [disableFormButtons, setDisableFormButtons] = useState(false);
     const [users, setUsers] = useState<Person[]>([]);
     const [user, setUser] = useState<Person>();
-    const [bountyRolesData, setBountyRolesData] = useState<any[]>([]);
+    const [userRoles, setUserRoles] = useState<any[]>([]);
+    const [bountyRoles, setBountyRoles] = useState<any[]>([]);
+    const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
     const config = nonWidgetConfigs['organizationusers'];
 
     const formRef = useRef(null);
@@ -164,6 +167,8 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
 
     const getBountyRoles = useCallback(async () => {
         const roles = await main.getRoles();
+        setBountyRoles(roles);
+
         const bountyRolesData = roles.map((role: any) => ({
             name: role.name,
             status: false
@@ -174,6 +179,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const getUserRoles = async (user: any) => {
         if (uuid && user.owner_pubkey) {
             const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
+            setUserRoles(userRoles);
 
             // set all values to false, so every user data will be fresh
             const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
@@ -263,7 +269,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
             <DetailsWrap>
                 <UsersCount>{usersCount} User{usersCount > 1 && 's'}</UsersCount>
 
-                {isOrganizationAdmin && (
+                {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD USER')) && (
                     <IconButton
                         width={150}
                         height={isMobile ? 36 : 48}
@@ -283,8 +289,9 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                             <Td>{user.unique_name}</Td>
                             <TdKey>{user.owner_pubkey}</TdKey>
                             <Td>
-                                {isOrganizationAdmin && (
-                                    <Actions>
+
+                                <Actions>
+                                    {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD ROLES')) && (
                                         <MaterialIcon
                                             onClick={() => handleSettingsClick(user)}
                                             icon={'settings'}
@@ -295,6 +302,8 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                                 color: 'green',
                                             }}
                                         />
+                                    )}
+                                    {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'DELETE USER')) && (
                                         <MaterialIcon
                                             onClick={() => {
                                                 deleteOrganizationUser(user)
@@ -307,8 +316,9 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                                 color: 'red',
                                             }}
                                         />
-                                    </Actions>
-                                )}
+                                    )}
+                                </Actions>
+
                             </Td>
                         </TableRow>
                     ))}

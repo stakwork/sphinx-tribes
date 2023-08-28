@@ -145,7 +145,7 @@ export type Roles = "ADD BOUNTY" |
                     "WITHDRAW BUDGET" |
                     "VIEW REPORT";
 
-export const CheckUserRole = (bountyRoles : any[], userRoles: any[], role: Roles): boolean => {
+export const userHasRole = (bountyRoles : any[], userRoles: any[], role: Roles): boolean => {
   let hasRole = false;
   const bountyRolesMap = {};
   const userRolesMap = {};
