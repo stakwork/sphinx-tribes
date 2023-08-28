@@ -10,7 +10,7 @@ import { Organization, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Modal } from '../../components/common';
 import { colors } from '../../config/colors';
-import { widgetConfigs } from '../utils/Constants';
+import { nonWidgetConfigs } from '../utils/Constants';
 import Input from '../../components/form/inputs';
 
 const color = colors['light'];
@@ -128,7 +128,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const [users, setUsers] = useState<Person[]>([]);
     const [user, setUser] = useState<Person>();
     const [bountyRolesData, setBountyRolesData] = useState<any[]>([]);
-    const config = widgetConfigs['organizationusers'];
+    const config = nonWidgetConfigs['organizationusers'];
 
     const formRef = useRef(null);
     const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
@@ -215,14 +215,13 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     };
 
     const roleChange = (e: any) => {
-        const rolesData = bountyRolesData;
-
-        rolesData.map((role: any) => {
+        const rolesData = bountyRolesData.map((role: any) => {
             if (role.name === e.target.value) {
                 role.status = !role.status
             }
             return role;
         });
+
         setBountyRolesData(rolesData);
     };
 

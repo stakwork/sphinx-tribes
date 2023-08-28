@@ -49,19 +49,6 @@ const widgetConfigs = {
       }
     }
   },
-  organizationusers: {
-    label: 'Organization Users',
-    name: 'organizationusers',
-    submitText: 'Save',
-    modalStyle: {
-      width: 'auto',
-      maxWidth: 'auto',
-      minWidth: '400px',
-      minHeight: '40%',
-      maxHeight: '70%'
-    },
-    schema: organizationUserSchema,
-  },
   badges: {
     label: 'Badges',
     name: 'badges',
@@ -216,4 +203,20 @@ const badges = {
   }
 };
 
-export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions, badges };
+const nonWidgetConfigs = {
+  organizationusers: {
+    label: 'Organization Users',
+    name: 'organizationusers',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: organizationUserSchema,
+  },
+}
+
+export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions, badges, nonWidgetConfigs };
