@@ -149,6 +149,14 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// check if the user exists on peoples table
+	isUser := db.DB.GetPersonByPubkey(orgUser.OwnerPubKey)
+	if isUser.OwnerPubKey != orgUser.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User doesn't exists in people")
+		return
+	}
+
 	// check if user already exists
 	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
 
