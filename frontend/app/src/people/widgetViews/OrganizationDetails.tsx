@@ -192,7 +192,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     };
 
     const closeHandler = () => {
-        setIsOpenRoles(false)
+        setIsOpen(false)
     };
 
     const closeRolesHandler = () => {
