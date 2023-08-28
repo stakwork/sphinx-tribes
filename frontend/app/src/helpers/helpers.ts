@@ -132,3 +132,35 @@ export const formatRelayPerson = (person: any): any => {
     route_hint: person.route_hint
   };
 };
+
+export type Roles = "ADD BOUNTY" | 
+                    "UPDATE BOUNTY" |
+                    "DELETE BOUNTY" |
+                    "PAY BOUNTY" |
+                    "ADD USER"  |
+                    "UPDATE USER" |
+                    "DELETE USER" |
+                    "ADD ROLES" |
+                    "ADD BUDGET" |
+                    "WITHDRAW BUDGET" |
+                    "VIEW REPORT";
+
+export const CheckUserRole = (bountyRoles : any[], userRoles: any[], role: Roles): boolean => {
+  let hasRole = false;
+  const bountyRolesMap = {};
+  const userRolesMap = {};
+
+  bountyRoles.forEach((role: any) => { 
+    bountyRolesMap[role.name] = role.name;
+  });
+
+  userRoles.forEach((user: any) => { 
+    userRolesMap[user.role] = user.role;
+  });
+
+  if(bountyRolesMap.hasOwnProperty(role) &&  userRolesMap.hasOwnProperty(role))  {
+    hasRole = true;
+  }
+  
+  return hasRole;
+}

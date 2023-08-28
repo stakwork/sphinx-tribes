@@ -120,7 +120,7 @@ const UserTickets = () => {
         );
       })
     ) : (
-      <NoResults loading={loading} />
+      <NoResults />
     );
 
   return (
