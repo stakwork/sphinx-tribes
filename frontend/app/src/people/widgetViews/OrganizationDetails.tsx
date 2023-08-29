@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
 import { Wrap } from 'components/form/style';
+import { EuiGlobalToastList } from '@elastic/eui';
 import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
@@ -131,6 +132,8 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const [userRoles, setUserRoles] = useState<any[]>([]);
     const [bountyRoles, setBountyRoles] = useState<any[]>([]);
     const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
+    const [toasts, setToasts]: any = useState([]);
+
     const config = nonWidgetConfigs['organizationusers'];
 
     const formRef = useRef(null);
@@ -142,6 +145,20 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     };
 
     const uuid = props.org?.uuid;
+
+    function addToast(title: string) {
+        setToasts([
+            {
+                id: '1',
+                title,
+                color: 'danger'
+            }
+        ]);
+    }
+
+    function removeToast() {
+        setToasts([]);
+    }
 
     const getOrganizationUsersCount = useCallback(async () => {
         if (uuid) {
@@ -159,9 +176,14 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
 
     const deleteOrganizationUser = async (user: any) => {
         if (uuid) {
-            await main.deleteOrganizationUser(user, uuid);
-            await getOrganizationUsers();
-            await getOrganizationUsersCount();
+            const res = await main.deleteOrganizationUser(user, uuid);
+
+            if (res.status === 200) {
+                await getOrganizationUsers();
+                await getOrganizationUsersCount();
+            } else {
+                addToast('Error: could not delete user');
+            }
         }
     };
 
@@ -212,12 +234,15 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
 
         body.organization = uuid;
 
-        await main.addOrganizationUser(body);
-        await getOrganizationUsers();
-        await getOrganizationUsersCount();
-
-        setIsLoading(false);
+        const res = await main.addOrganizationUser(body);
+        if (res.status === 200) {
+            await getOrganizationUsers();
+            await getOrganizationUsersCount();
+        } else {
+            addToast('Error: could not add user');
+        }
         closeHandler();
+        setIsLoading(false);
     };
 
     const roleChange = (e: any) => {
@@ -241,9 +266,12 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         ));
 
         if (uuid && user?.owner_pubkey) {
-            await main.addUserRoles(roleData, uuid, user.owner_pubkey);
-            await main.getUserRoles(uuid, user.owner_pubkey);
-
+            const res = await main.addUserRoles(roleData, uuid, user.owner_pubkey);
+            if (res.status === 200) {
+                await main.getUserRoles(uuid, user.owner_pubkey);
+            } else {
+                addToast('Error: could not add user roles');
+            }
             setIsOpenRoles(false);
         }
     };
@@ -467,6 +495,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                     )
                 }
             </DetailsWrap>
+            <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
         </Container>
     );
 };
