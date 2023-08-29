@@ -95,8 +95,11 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
+	//Check if bounty exists
 	bounty.Updated = &now
-	bounty.Created = time.Now().Unix()
+	if bounty.Created == 0 {
+		bounty.Created = time.Now().Unix()
+	}
 
 	if bounty.Type == "" {
 		w.WriteHeader(http.StatusBadRequest)
