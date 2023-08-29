@@ -1117,7 +1117,7 @@ export class MainStore {
     }
   }
 
-  async deleteBounty(created: number): Promise<void> {
+  async deleteBounty(created: number, owner_pubkey: string): Promise<void> {
     const info = uiStore.meInfo as any;
     if (!info) {
       console.log('Youre not logged in');
@@ -1125,7 +1125,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty/${info?.jwt}/${created}`;
+      const request = `bounty/${info?.jwt}/${owner_pubkey}/${created}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'DELETE',
