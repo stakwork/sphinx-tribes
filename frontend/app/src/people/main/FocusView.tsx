@@ -144,7 +144,7 @@ function FocusedView(props: FocusViewProps) {
     setDeleting(true);
     try {
       if (delBounty.body.created) {
-        await main.deleteBounty(delBounty.body.created);
+        await main.deleteBounty(delBounty.body.created, delBounty.body.owner_pubkey);
         closeModal();
         if (props?.deleteExtraFunction) props?.deleteExtraFunction();
       }
@@ -223,7 +223,7 @@ function FocusedView(props: FocusViewProps) {
         newBody.title = body.title;
       }
       newBody.one_sentence_summary = '';
-      newBody.owner_id = info.pubkey;
+      newBody.owner_id = info.pubkey
 
       await main.saveBounty(newBody);
       // Refresh the tickets page if a user eidts from the tickets tab
