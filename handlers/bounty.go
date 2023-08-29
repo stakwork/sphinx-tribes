@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
