@@ -1125,7 +1125,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty/${info?.jwt}/${owner_pubkey}/${created}`;
+      const request = `bounty/${owner_pubkey}/${created}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'DELETE',
