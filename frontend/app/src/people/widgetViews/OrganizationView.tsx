@@ -5,6 +5,7 @@ import NoResults from 'people/utils/OrgNoResults';
 import { useStores } from 'store';
 import { Organization } from 'store/main';
 import { Wrap } from 'components/form/style';
+import { EuiGlobalToastList } from '@elastic/eui';
 import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
@@ -65,6 +66,7 @@ const Organizations = () => {
     const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
     const [organization, setOrganization] = useState<Organization>();
     const [disableFormButtons, setDisableFormButtons] = useState(false);
+    const [toasts, setToasts]: any = useState([]);
     const { main, ui } = useStores();
     const isMobile = useIsMobile();
     const config = widgetConfigs['organizations'];
@@ -77,6 +79,20 @@ const Organizations = () => {
         img: '',
         show: false
     };
+
+    function addToast(title: string) {
+        setToasts([
+            {
+                id: '1',
+                title,
+                color: 'danger'
+            }
+        ]);
+    }
+
+    function removeToast() {
+        setToasts([]);
+    }
 
     const getUserOrganizations = useCallback(async () => {
         setIsLoading(true);
@@ -98,13 +114,15 @@ const Organizations = () => {
 
     const onSubmit = async (body: any) => {
         setIsLoading(true);
-
         body.owner_pubkey = ui.meInfo?.owner_pubkey;
-        await main.addOrganization(body)
-        await getUserOrganizations();
-
-        setIsLoading(false);
+        const res = await main.addOrganization(body)
+        if (res.status === 200) {
+            await getUserOrganizations();
+        } else {
+            addToast('Error: could not create organization');
+        }
         closeHandler();
+        setIsLoading(false);
     };
 
     const renderOrganizations = () => {
@@ -126,115 +144,114 @@ const Organizations = () => {
     }
 
     return (
-        <div>
-            <Container>
-                <PageLoadSpinner show={loading} />
-                {detailsOpen && (<OrganizationDetails close={closeDetails} org={organization} />)}
-                {!detailsOpen &&
-                    <>
-                        <IconButton
-                            width={150}
-                            height={isMobile ? 36 : 48}
-                            text="Add Organization"
-                            onClick={() => setIsOpen(true)}
+        <Container>
+            <PageLoadSpinner show={loading} />
+            {detailsOpen && (<OrganizationDetails close={closeDetails} org={organization} />)}
+            {!detailsOpen &&
+                <>
+                    <IconButton
+                        width={150}
+                        height={isMobile ? 36 : 48}
+                        text="Add Organization"
+                        onClick={() => setIsOpen(true)}
+                        style={{
+                            marginLeft: '10px'
+                        }}
+                    />
+                    <OrganizationContainer>
+                        {renderOrganizations()}
+                    </OrganizationContainer>
+                    {isOpen && (
+                        <Modal
+                            visible={isOpen}
                             style={{
-                                marginLeft: '10px'
+                                height: '100%',
+                                flexDirection: 'column'
                             }}
-                        />
-                        <OrganizationContainer>
-                            {renderOrganizations()}
-                        </OrganizationContainer>
-                        {isOpen && (
-                            <Modal
-                                visible={isOpen}
-                                style={{
-                                    height: '100%',
-                                    flexDirection: 'column'
-                                }}
-                                envStyle={{
-                                    marginTop: isMobile ? 64 : 0,
-                                    background: color.pureWhite,
-                                    zIndex: 20,
-                                    ...(config?.modalStyle ?? {}),
-                                    maxHeight: '100%',
-                                    borderRadius: '10px'
-                                }}
-                                overlayClick={closeHandler}
-                                bigCloseImage={closeHandler}
-                                bigCloseImageStyle={{
-                                    top: '-18px',
-                                    right: '-18px',
-                                    background: '#000',
-                                    borderRadius: '50%'
-                                }}
+                            envStyle={{
+                                marginTop: isMobile ? 64 : 0,
+                                background: color.pureWhite,
+                                zIndex: 20,
+                                ...(config?.modalStyle ?? {}),
+                                maxHeight: '100%',
+                                borderRadius: '10px'
+                            }}
+                            overlayClick={closeHandler}
+                            bigCloseImage={closeHandler}
+                            bigCloseImageStyle={{
+                                top: '-18px',
+                                right: '-18px',
+                                background: '#000',
+                                borderRadius: '50%'
+                            }}
+                        >
+                            <Formik
+                                initialValues={initValues || {}}
+                                onSubmit={onSubmit}
+                                innerRef={formRef}
+                                validationSchema={validator(schema)}
                             >
-                                <Formik
-                                    initialValues={initValues || {}}
-                                    onSubmit={onSubmit}
-                                    innerRef={formRef}
-                                    validationSchema={validator(schema)}
-                                >
-                                    {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => {
-                                        return (
-                                            <Wrap
-                                                newDesign={true}
-                                            >
-                                                <h5>Add new organization</h5>
-                                                <div className="SchemaInnerContainer">
-                                                    {schema.length && schema.map((item: FormField) => (
-                                                        <Input
-                                                            {...item}
-                                                            key={item.name}
-                                                            values={values}
-                                                            errors={errors}
-                                                            value={values[item.name]}
-                                                            error={errors[item.name]}
-                                                            initialValues={initialValues}
-                                                            deleteErrors={() => {
-                                                                if (errors[item.name]) delete errors[item.name];
-                                                            }}
-                                                            handleChange={(e: any) => {
-                                                                setFieldValue(item.name, e);
-                                                            }}
-                                                            setFieldValue={(e: any, f: any) => {
-                                                                setFieldValue(e, f);
-                                                            }}
-                                                            setFieldTouched={setFieldTouched}
-                                                            handleBlur={() => setFieldTouched(item.name, false)}
-                                                            handleFocus={() => setFieldTouched(item.name, true)}
-                                                            setDisableFormButtons={setDisableFormButtons}
-                                                            borderType={'bottom'}
-                                                            imageIcon={true}
-                                                            style={
-                                                                item.name === 'github_description' && !values.ticket_url
-                                                                    ? {
-                                                                        display: 'none'
-                                                                    }
-                                                                    : undefined
-                                                            }
-                                                        />
-                                                    ))}
-
-                                                    <Button
-                                                        disabled={disableFormButtons || loading}
-                                                        onClick={() => {
-                                                            handleSubmit();
+                                {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => {
+                                    return (
+                                        <Wrap
+                                            newDesign={true}
+                                        >
+                                            <h5>Add new organization</h5>
+                                            <div className="SchemaInnerContainer">
+                                                {schema.length && schema.map((item: FormField) => (
+                                                    <Input
+                                                        {...item}
+                                                        key={item.name}
+                                                        values={values}
+                                                        errors={errors}
+                                                        value={values[item.name]}
+                                                        error={errors[item.name]}
+                                                        initialValues={initialValues}
+                                                        deleteErrors={() => {
+                                                            if (errors[item.name]) delete errors[item.name];
                                                         }}
-                                                        loading={loading}
-                                                        style={{ width: '100%' }}
-                                                        color={'primary'}
-                                                        text={'Add organization'}
+                                                        handleChange={(e: any) => {
+                                                            setFieldValue(item.name, e);
+                                                        }}
+                                                        setFieldValue={(e: any, f: any) => {
+                                                            setFieldValue(e, f);
+                                                        }}
+                                                        setFieldTouched={setFieldTouched}
+                                                        handleBlur={() => setFieldTouched(item.name, false)}
+                                                        handleFocus={() => setFieldTouched(item.name, true)}
+                                                        setDisableFormButtons={setDisableFormButtons}
+                                                        borderType={'bottom'}
+                                                        imageIcon={true}
+                                                        style={
+                                                            item.name === 'github_description' && !values.ticket_url
+                                                                ? {
+                                                                    display: 'none'
+                                                                }
+                                                                : undefined
+                                                        }
                                                     />
-                                                </div>
-                                            </Wrap>
-                                        )
-                                    }}
-                                </Formik>
-                            </Modal>
-                        )}
-                    </>}
-            </Container>
-        </div>
+                                                ))}
+
+                                                <Button
+                                                    disabled={disableFormButtons || loading}
+                                                    onClick={() => {
+                                                        handleSubmit();
+                                                    }}
+                                                    loading={loading}
+                                                    style={{ width: '100%' }}
+                                                    color={'primary'}
+                                                    text={'Add organization'}
+                                                />
+                                            </div>
+                                        </Wrap>
+                                    )
+                                }}
+                            </Formik>
+                        </Modal>
+                    )}
+                </>}
+            <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
+        </Container>
     );
 };
 
