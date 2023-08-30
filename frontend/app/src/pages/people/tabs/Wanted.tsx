@@ -9,7 +9,6 @@ import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
-import { PersonWanted } from 'store/main';
 import styled from 'styled-components';
 const config = widgetConfigs.wanted;
 
