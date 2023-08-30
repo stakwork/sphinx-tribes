@@ -339,6 +339,7 @@ type Bounty struct {
 	Created                 int64          `json:"created"`
 	Assignee                string         `json:"assignee"`
 	TicketUrl               string         `json:"ticket_url"`
+	Organization            string         `json:"organization"`
 	Description             string         `json:"description"`
 	WantedType              string         `json:"wanted_type"`
 	Deliverables            string         `json:"deliverables"`

@@ -5,6 +5,7 @@ import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { Organization } from 'store/main';
 import { useStores } from '../../store';
 import Form from '../../components/form';
 import { Button, IconButton } from '../../components/common';
@@ -99,6 +100,11 @@ function FocusedView(props: FocusViewProps) {
   const isMobile = useIsMobile();
 
   const isTorSave = canEdit && main.isTorSave();
+
+  const userOrganizations = main.organizations.map((org: Organization) => ({
+    label: org.name[0].toUpperCase() + org.name.slice(1),
+    value: org.uuid
+  }))
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -226,7 +232,6 @@ function FocusedView(props: FocusViewProps) {
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
-      await main.saveBounty(newBody);
       closeModal();
     } catch (e) {
       console.log('e', e);
@@ -325,6 +330,10 @@ function FocusedView(props: FocusViewProps) {
     }
     return null;
   }
+
+
+  // set user organizations
+  config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
 
   return (
     <div
