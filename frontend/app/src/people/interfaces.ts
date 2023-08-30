@@ -64,6 +64,9 @@ export interface BountiesProps {
   isPaid: boolean;
   widget?: any;
   assignee?: Person;
+  name?: string;
+  uuid?: string;
+  img?: string;
 }
 
 export interface BadgesProps {
@@ -105,6 +108,9 @@ export interface NameTagProps {
   isPaid?: boolean;
   ticket_url?: string;
   loomEmbedUrl?: string;
+  org_img?: string;
+  org_name?: string;
+  org_uuid?: string;
 }
 
 export interface NoneSpaceProps {
@@ -342,6 +348,9 @@ export interface WantedViewsProps {
   titleString: string | JSX.Element | JSX.Element[];
   bounty_expires?: string;
   commitment_fee?: number;
+  name?: string;
+  img?: string;
+  uuid?: string;
 }
 
 export interface WantedViews2Props extends WantedViewsProps {

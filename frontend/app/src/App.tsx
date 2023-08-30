@@ -15,7 +15,7 @@ function App() {
   // get usd/sat exchange rate every 100 second;
   const getUserOrganizations = useCallback(async () => {
     await mainStore.getUserOrganizations();
-  }, [mainStore])
+  }, [])
 
   useEffect(() => {
     mainStore.getUsdToSatsExchangeRate();

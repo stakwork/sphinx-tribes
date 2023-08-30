@@ -32,6 +32,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/tickets/">
           <TicketsPage />
         </Route>
+        <Route path="/org/tickets/:uuid">
+          <TicketsPage />
+        </Route>
         <Route path="/leaderboard">
           <LeaderboardPage />
         </Route>
