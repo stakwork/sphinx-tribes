@@ -503,7 +503,7 @@ func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 		return Bounty{}, errors.New("no pub key")
 	}
 
-	if db.db.Model(&b).Where("id = ?", b.ID).Updates(&b).RowsAffected == 0 {
+	if db.db.Model(&b).Where("id = ? OR owner_id = ? AND created = ?", b.ID, b.OwnerID, b.Created).Updates(&b).RowsAffected == 0 {
 		db.db.Create(&b)
 	}
 	return b, nil
