@@ -150,7 +150,7 @@ function FocusedView(props: FocusViewProps) {
     setDeleting(true);
     try {
       if (delBounty.body.created) {
-        await main.deleteBounty(delBounty.body.created);
+        await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
         closeModal();
         if (props?.deleteExtraFunction) props?.deleteExtraFunction();
       }
@@ -223,7 +223,11 @@ function FocusedView(props: FocusViewProps) {
       if (body?.assignee?.owner_pubkey) {
         newBody.assignee = body.assignee.owner_pubkey;
       }
-      newBody.title = body.one_sentence_summary;
+      if (body.one_sentence_summary !== '') {
+        newBody.title = body.one_sentence_summary;
+      } else {
+        newBody.title = body.title;
+      }
       newBody.one_sentence_summary = '';
       newBody.owner_id = info.pubkey;
 

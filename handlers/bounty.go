@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -95,8 +94,11 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
+	//Check if bounty exists
 	bounty.Updated = &now
-	bounty.Created = time.Now().Unix()
+	if bounty.Created == 0 {
+		bounty.Created = time.Now().Unix()
+	}
 
 	if bounty.Type == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -129,17 +131,23 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteBounty(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	//ctx := r.Context()
+	//pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	created := chi.URLParam(r, "created")
+	pubkey := chi.URLParam(r, "pubkey")
 
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+	if pubkey == "" {
+		fmt.Println("no pubkey from route")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if created == "" {
+		fmt.Println("no created timestamp from route")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	b, _ := db.DB.DeleteBounty(pubKeyFromAuth, created)
+	b, _ := db.DB.DeleteBounty(pubkey, created)
 	json.NewEncoder(w).Encode(b)
 }
 

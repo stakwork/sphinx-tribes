@@ -143,13 +143,7 @@ function WantedSummary(props: WantedSummaryProps) {
         github_description: github_description,
         description: description,
         price: price,
-        assignee: {
-          owner_alias: value?.owner_alias || '',
-          owner_pubkey: value?.owner_pubkey || '',
-          img: value?.img || '',
-          value: value?.owner_pubkey || '',
-          label: `${value.owner_alias} (${value.owner_alias.toLowerCase().replace(' ', '')})` || ''
-        },
+        assignee: value?.owner_pubkey || '',
         coding_language: coding_languages?.map((x: any) => ({ label: x, value: x })),
         estimated_session_length: estimated_session_length,
         show: show,

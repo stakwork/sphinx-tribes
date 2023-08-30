@@ -11,10 +11,11 @@ func BountyRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Post("/", handlers.CreateOrEditBounty)
 		r.Delete("/assignee", handlers.DeleteBountyAssignee)
-		r.Delete("/{pubKey}/{created}", handlers.DeleteBounty)
+		r.Delete("/{pubkey}/{created}", handlers.DeleteBounty)
 		r.Get("/all", handlers.GetAllBounties)
 		r.Get("/id/{bountyId}", handlers.GetBountyById)
 		r.Get("/count/{personKey}/{tabType}", handlers.GetBountyCount)
 	})
+
 	return r
 }
