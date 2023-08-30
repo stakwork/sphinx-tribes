@@ -63,9 +63,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -197,6 +197,7 @@ function FocusedView(props: FocusViewProps) {
 
   async function submitForm(body: any) {
     let newBody = cloneDeep(body);
+    delete newBody.assignee;
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -213,7 +214,6 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      body.assignee = '';
       if (body?.assignee?.owner_pubkey) {
         newBody.assignee = body.assignee.owner_pubkey;
       }
@@ -360,8 +360,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
