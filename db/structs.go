@@ -378,12 +378,16 @@ type BountyData struct {
 	OwnerContactKey       string         `json:"owner_contact_key"`
 	OwnerPriceToMeet      int64          `json:"owner_price_to_meet"`
 	OwnerTwitterConfirmed bool           `json:"owner_twitter_confirmed"`
+	OrganizationName      string         `json:"organization_name"`
+	OrganizationImg       string         `json:"organization_img"`
+	OrganizationUuid      string         `json:"organization_uuid"`
 }
 
 type BountyResponse struct {
-	Bounty   Bounty `json:"bounty"`
-	Assignee Person `json:"assignee"`
-	Owner    Person `json:"owner"`
+	Bounty       Bounty            `json:"bounty"`
+	Assignee     Person            `json:"assignee"`
+	Owner        Person            `json:"owner"`
+	Organization OrganizationSHort `json:"organization"`
 }
 
 type Organization struct {
@@ -395,6 +399,12 @@ type Organization struct {
 	Created     *time.Time `json:"created"`
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`
+}
+
+type OrganizationSHort struct {
+	Uuid string `json:"uuid"`
+	Name string `gorm:"unique;not null" json:"name"`
+	Img  string `json:"img"`
 }
 
 type OrganizationUsers struct {

@@ -12,6 +12,8 @@ export interface BountiesDescriptionProps {
   owner_pubkey: string;
   img: string;
   created?: number;
+  name?: string;
+  uuid?: string;
 }
 
 export interface BountiesPriceProps {

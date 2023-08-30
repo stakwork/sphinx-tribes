@@ -369,3 +369,19 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(organizations)
 }
+
+func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+
+	// get the organization bounties
+	organizationBounties, err := db.DB.GetOrganizationBounties(uuid)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = generateBountyResponse(organizationBounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}

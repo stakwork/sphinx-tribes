@@ -106,6 +106,7 @@ export interface PersonPost {
 export interface PersonWanted {
   person?: any;
   body?: any;
+  organization?: any;
   title?: string;
   description?: string;
   owner_id: string;
@@ -699,15 +700,21 @@ export class MainStore {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
+          let organization;
           const owner = { ...ps2[i].owner };
 
           if (bounty.assignee) {
             assignee = { ...ps2[i].assignee };
           }
 
+          if(bounty.organization) {
+            organization = {...ps2[i].organization}
+          }
+
           ps3.push({
             body: { ...bounty, assignee: assignee || '' },
-            person: { ...owner, wanteds: [] } || { wanteds: [] }
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
           });
         }
       }
@@ -754,22 +761,28 @@ export class MainStore {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
+          let organization;
           const owner = { ...ps2[i].owner };
 
           if (bounty.assignee) {
             assignee = { ...ps2[i].assignee };
           }
 
+          if(bounty.organization) {
+            organization = {...ps2[i].organization}
+          }
+
           ps3.push({
             body: { ...bounty, assignee: assignee || '' },
-            person: { ...owner, wanteds: [] } || { wanteds: [] }
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
           });
         }
       }
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPeopleWanteds: ', e);
+      console.log('fetch failed getPersonAssignedWanteds: ', e);
       return [];
     }
   }
@@ -795,15 +808,21 @@ export class MainStore {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
+          let organization;
           const owner = { ...ps2[i].owner };
 
           if (bounty.assignee) {
             assignee = { ...ps2[i].assignee };
           }
 
+          if(bounty.organization) {
+            organization = {...ps2[i].organization}
+          }
+
           ps3.push({
             body: { ...bounty, assignee: assignee || '' },
-            person: { ...owner, wanteds: [] } || { wanteds: [] }
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
           });
         }
       }
@@ -812,7 +831,7 @@ export class MainStore {
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getCreatedWanteds: ', e);
+      console.log('fetch failed getPersonCreatedWanteds: ', e);
       return [];
     }
   }
@@ -826,22 +845,63 @@ export class MainStore {
         for (let i = 0; i < ps2.length; i++) {
           const bounty = { ...ps2[i].bounty };
           let assignee;
+          let organization;
           const owner = { ...ps2[i].owner };
 
           if (bounty.assignee) {
             assignee = { ...ps2[i].assignee };
           }
 
+          if(bounty.organization) {
+            organization = {...ps2[i].organization}
+          }
+
           ps3.push({
             body: { ...bounty, assignee: assignee || '' },
-            person: { ...owner, wanteds: [] } || { wanteds: [] }
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
           });
         }
       }
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getCreatedWanteds: ', e);
+      console.log('fetch failed getWantedById: ', e);
+      return [];
+    }
+  }
+
+  async getOrganizationWanted(uuid: string): Promise<PersonWanted[]> {
+    try {
+      const ps2 = await api.get(`organizations/bounties/${uuid}`);
+      const ps3: any[] = [];
+
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if(bounty.organization) {
+            organization = {...ps2[i].organization}
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getOrganizationWanted: ', e);
       return [];
     }
   }

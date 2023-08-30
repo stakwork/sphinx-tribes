@@ -42,6 +42,9 @@ function WantedView(props: WantedViews2Props) {
     assignee,
     estimated_session_length,
     loomEmbedUrl,
+    img,
+    name,
+    uuid,
     onPanelClick,
     show = true,
     paid = false
@@ -173,6 +176,9 @@ function WantedView(props: WantedViews2Props) {
                 sessionLength={estimated_session_length || ''}
                 description={description}
                 isPaid={paid}
+                name={name}
+                uuid={uuid}
+                img={img}
               />
             </BountyBox>
           )}

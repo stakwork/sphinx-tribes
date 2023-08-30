@@ -168,7 +168,7 @@
     "@types/dateformat": "^3.0.1",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.27",
-    "@types/react-dom": "^16.9.5",
+    "@types/react-dom": "18.0.4",
     "@types/react-router-dom": "^5.1.8",
     "@types/styled-components": "^5.1.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
