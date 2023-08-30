@@ -59,6 +59,7 @@ export interface BountiesProps {
   created?: number;
   ticketUrl?: string;
   loomEmbedUrl?: string;
+  organization?: string;
   description?: any;
   isPaid: boolean;
   widget?: any;
@@ -145,6 +146,7 @@ export interface PaidBountiesProps {
   description: string;
   owner_alias: string;
   owner_pubkey: string;
+  organization?: string;
   img: string;
   id: number;
   widget: any;
@@ -225,6 +227,7 @@ export interface WantedSummaryProps {
   setIsExtraStyle: (any) => void;
   formSubmit: (any) => void;
   title: string;
+  organization?: string;
 }
 
 export interface CodingBountiesProps {

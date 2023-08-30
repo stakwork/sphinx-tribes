@@ -172,6 +172,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				OneSentenceSummary:      bounty.OneSentenceSummary,
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
+				Organization:            bounty.Organization,
 				Updated:                 bounty.BountyUpdated,
 				CodingLanguages:         bounty.CodingLanguages,
 			},

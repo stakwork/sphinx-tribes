@@ -637,6 +637,7 @@ export const wantedOtherSchema: FormField[] = [
     type: 'select',
     options: helpType_wanted_other_schema
   },
+
   {
     name: 'title',
     label: 'Title*',
@@ -688,6 +689,13 @@ export const wantedOtherSchema: FormField[] = [
 ];
 
 export const wantedCodingTaskSchema: FormField[] = [
+  {
+    name: 'organization',
+    label: 'Organization(optional)',
+    type: 'select',
+    options: [],
+    validator: strValidatorNotRequired
+  },
   {
     name: 'title',
     label: 'Title',
