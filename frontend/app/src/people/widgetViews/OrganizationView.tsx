@@ -6,6 +6,7 @@ import { useStores } from 'store';
 import { Organization } from 'store/main';
 import { Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { Link } from 'react-router-dom';
 import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
@@ -136,6 +137,7 @@ const Organizations = () => {
                     <OrganizationText>
                         {org.name}
                     </OrganizationText>
+                    <Link to={`/org/tickets/${org.uuid}`} target="_blank">Bounties</Link>
                 </OrganizationWrap>
             ))
         } else {

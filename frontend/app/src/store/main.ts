@@ -871,7 +871,8 @@ export class MainStore {
     }
   }
 
-  async getOrganizationWanted(uuid: string): Promise<PersonWanted[]> {
+  async getOrganizationWanted(uuid: string, queryParams?: any): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
     try {
       const ps2 = await api.get(`organizations/bounties/${uuid}`);
       const ps3: any[] = [];
@@ -899,6 +900,20 @@ export class MainStore {
         }
       }
 
+      // for search always reset page
+      if (queryParams && queryParams.resetPage) {
+        this.peopleWanteds = ps3;
+        uiStore.setPeopleWantedsPageNumber(1);
+      } else {
+        // all other cases, merge
+        this.peopleWanteds = this.doPageListMerger(
+          this.peopleWanteds,
+          ps3,
+          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          queryParams,
+          'wanted'
+        );
+      }
       return ps3;
     } catch (e) {
       console.log('fetch failed getOrganizationWanted: ', e);
