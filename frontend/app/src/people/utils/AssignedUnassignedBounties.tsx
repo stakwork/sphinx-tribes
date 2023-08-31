@@ -158,7 +158,7 @@ const Bounties = (props: BountiesProps) => {
     <>
       {props.uuid && props.name && (
         <OrganizationWrap>
-          <Link to={`/org/tickets/${props.uuid}`} target="_blank" >
+          <Link to={`/org/tickets/${props.uuid}`} target="_blank">
             <OrganizationText>{props.name}</OrganizationText>
           </Link>
         </OrganizationWrap>
