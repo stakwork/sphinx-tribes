@@ -18,7 +18,7 @@ interface styledProps {
 
 const BountyBox = styled.div<styledProps>`
   min-height: 160px;
-  max-height: 160px;
+  max-height: auto;
   width: 1100px;
   box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
   border: none;

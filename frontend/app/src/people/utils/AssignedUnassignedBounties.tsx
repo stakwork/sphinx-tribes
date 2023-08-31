@@ -1,5 +1,6 @@
 import { EuiText } from '@elastic/eui';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { BountiesProps } from 'people/interfaces';
@@ -25,7 +26,8 @@ const BountyContainer = styled.div<containerProps>`
   flex-direction: row;
   width: 1100px !important;
   font-family: Barlow;
-  height: 160px;
+  min-height: 160px;
+  max-height: auto;
   background: transparent;
   background: ${(p: any) => (p.assignedBackgroundImage ? p.assignedBackgroundImage : '')};
   background-repeat: no-repeat;
@@ -52,7 +54,8 @@ const DescriptionPriceContainer = styled.div<containerProps>`
   display: flex;
   flex-direction: row;
   width: 758px;
-  min-height: 160px !important;
+  min-height: 160px;
+  max-height: auto;
   height: 100%;
   background: ${(p: any) => (p.unAssignedBackgroundImage ? p.unAssignedBackgroundImage : '')};
   background-repeat: no-repeat;
@@ -71,6 +74,7 @@ const DescriptionPriceContainer = styled.div<containerProps>`
 const UnassignedPersonProfile = styled.div<containerProps>`
   min-width: 336px;
   min-height: 160px;
+  max-height: auto;
   background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23B0B7BCFF' stroke-width='3' stroke-dasharray='4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
   border-radius: 10px;
   display: flex;
@@ -103,6 +107,29 @@ const UnassignedPersonProfile = styled.div<containerProps>`
     align-items: center;
   }
 `;
+
+const OrganizationWrap = styled.div`
+  margin-left: 0px;
+  cursor: pointer;
+  padding: 0px;
+  background: white;
+  padding: 2px 10px;
+  max-width: 180px;
+  text-align: center;
+  border-radius: 0px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const OrganizationText = styled.span`
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  color: #20c997;
+`;
+
 const Bounties = (props: BountiesProps) => {
   const {
     assignee,
@@ -129,6 +156,13 @@ const Bounties = (props: BountiesProps) => {
   const { ui } = useStores();
   return (
     <>
+      {props.uuid && props.name && (
+        <OrganizationWrap>
+          <Link to={`/org/tickets/${props.uuid}`} target="_blank" >
+            <OrganizationText>{props.name}</OrganizationText>
+          </Link>
+        </OrganizationWrap>
+      )}
       {!!assignee?.owner_pubkey && !!assignee?.owner_alias ? (
         <BountyContainer
           onClick={onPanelClick}
