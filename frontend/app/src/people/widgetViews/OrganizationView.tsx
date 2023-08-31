@@ -55,10 +55,19 @@ const OrganizationWrap = styled.div`
   cursor: pointer;
 `;
 
+const OrganizationData = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+`;
+
 const OrganizationContainer = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  cursor: pointer;
 `;
 
 const Organizations = () => {
@@ -129,14 +138,16 @@ const Organizations = () => {
     const renderOrganizations = () => {
         if (main.organizations.length) {
             return main.organizations.map((org: Organization, i: number) => (
-                <OrganizationWrap key={i} onClick={() => {
-                    setOrganization(org);
-                    setDetailsOpen(true);
-                }}>
-                    <OrganizationImg src={org.img || avatarIcon} />
-                    <OrganizationText>
-                        {org.name}
-                    </OrganizationText>
+                <OrganizationWrap key={i}>
+                    <OrganizationData onClick={() => {
+                        setOrganization(org);
+                        setDetailsOpen(true);
+                    }}>
+                        <OrganizationImg src={org.img || avatarIcon} />
+                        <OrganizationText>
+                            {org.name}
+                        </OrganizationText>
+                    </OrganizationData>
                     <Link to={`/org/tickets/${org.uuid}`} target="_blank">Bounties</Link>
                 </OrganizationWrap>
             ))
