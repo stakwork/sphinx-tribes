@@ -21,7 +21,7 @@ interface PanelProps {
 }
 
 const Panel = styled.div<PanelProps>`
-  margin-top: 4px;
+  margin-top: 5px;
   background: ${(p: any) => p.color && p.color.pureWhite};
   color: ${(p: any) => p.color && p.color.pureBlack};
   padding: 20px;
@@ -178,7 +178,8 @@ function WidgetSwitchViewer(props: any) {
               padding: 0,
               overflow: 'hidden',
               background: 'transparent',
-              minHeight: !isMobile ? '160px' : '',
+              minHeight: body.organization ? '185px' : !isMobile ? '160px' : '',
+              maxHeight: 'auto',
               boxShadow: 'none'
             }}
           >

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import moment from 'moment';
 import { useHistory } from 'react-router';
@@ -72,18 +71,6 @@ const Wrap = styled.div<WrapProps>`
   // }
 `;
 
-const OrganizationWrap = styled.div`
-  margin-left: 20px;
-  cursor: pointer;
-`;
-
-const OrganizationText = styled.span`
-  font-weight: bold;
-  font-size: 0.92rem;
-  text-transform: capitalize;
-  color: #20c997;
-`;
-
 function NameTag(props: NameTagProps) {
   const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid, org_name, org_uuid } =
     props;
@@ -148,11 +135,6 @@ function NameTag(props: NameTagProps) {
           </>
         )}
         <Date>{lastSeen}</Date>
-        <OrganizationWrap>
-          <Link to={`/org/tickets/${org_uuid}`} >
-            <OrganizationText>{org_name}</OrganizationText>
-          </Link>
-        </OrganizationWrap>
       </Wrap>
     );
   }
@@ -185,11 +167,6 @@ function NameTag(props: NameTagProps) {
           <Date>{lastSeen}</Date>
           { }
         </div>
-        <OrganizationWrap>
-          <Link to={`/org/tickets/${org_uuid}`} >
-            <OrganizationText>{org_name}</OrganizationText>
-          </Link>
-        </OrganizationWrap>
       </div>
     </Wrap>
   );
