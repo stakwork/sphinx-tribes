@@ -23,14 +23,14 @@ jobs:
       - name: Install modules
         run: yarn --cwd ./frontend/app install
       - name: Tests
-        run: yarn --cwd ./frontend/app run test
+        run: NODE_OPTIONS="--max_old_space_size=4096" yarn --cwd ./frontend/app run test
       - name: Set up Golang
         uses: actions/setup-go@v2
         with:
           go-version: 1.19
       - name: Go Test
         run: go test -v ./...
-   
+
   build:
     name: build Job
     runs-on:
