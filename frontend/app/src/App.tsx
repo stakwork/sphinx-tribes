@@ -12,14 +12,17 @@ import { mainStore } from './store/main';
 let exchangeRateInterval: any = null;
 
 function App() {
-  // get usd/sat exchange rate every 100 second;
   const getUserOrganizations = useCallback(async () => {
     await mainStore.getUserOrganizations();
   }, [])
 
   useEffect(() => {
-    mainStore.getUsdToSatsExchangeRate();
     getUserOrganizations();
+  }, [getUserOrganizations]);
+
+  useEffect(() => {
+    // get usd/sat exchange rate every 100 second;
+    mainStore.getUsdToSatsExchangeRate();
 
     exchangeRateInterval = setInterval(() => {
       mainStore.getUsdToSatsExchangeRate();
@@ -28,7 +31,7 @@ function App() {
     return function cleanup() {
       clearInterval(exchangeRateInterval);
     };
-  }, [getUserOrganizations]);
+  }, []);
 
   return (
     <WithStores>

@@ -958,11 +958,9 @@ textarea.qr-string {
 
 .euiFormRow__fieldWrapper .euiFormControlLayout--group {
   background-color: #ffffff00;
-
   box-shadow: none;
   transition: none;
   display: flex;
-
   padding: 1px;
 }
 

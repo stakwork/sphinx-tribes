@@ -218,7 +218,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				PriceToMeet:      bounty.OwnerPriceToMeet,
 				TwitterConfirmed: bounty.OwnerTwitterConfirmed,
 			},
-			Organization: db.OrganizationSHort{
+			Organization: db.OrganizationShort{
 				Name: bounty.OrganizationName,
 				Uuid: bounty.OrganizationUuid,
 				Img:  bounty.OrganizationImg,

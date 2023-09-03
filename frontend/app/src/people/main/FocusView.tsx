@@ -12,7 +12,7 @@ import { Button, IconButton } from '../../components/common';
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
-import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
+import { extractRepoAndIssueFromIssueUrl, toCapitalize } from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own
 const BWrap = styled.div`
@@ -102,7 +102,7 @@ function FocusedView(props: FocusViewProps) {
   const isTorSave = canEdit && main.isTorSave();
 
   const userOrganizations = main.organizations.map((org: Organization) => ({
-    label: org.name[0].toUpperCase() + org.name.slice(1),
+    label: toCapitalize(org.name),
     value: org.uuid
   }))
 
