@@ -72,7 +72,7 @@ const Wrap = styled.div<WrapProps>`
 `;
 
 function NameTag(props: NameTagProps) {
-  const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid, org_name, org_uuid } =
+  const { owner_alias, owner_pubkey, img, created, id, style, widget, iconSize, textSize, isPaid } =
     props;
   const { ui } = useStores();
   const color = colors['light'];

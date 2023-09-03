@@ -142,7 +142,9 @@ const Bounties = (props: BountiesProps) => {
     person,
     onPanelClick,
     widget,
-    created
+    created,
+    uuid,
+    name
   } = props;
 
   const color = colors['light'];
@@ -156,10 +158,10 @@ const Bounties = (props: BountiesProps) => {
   const { ui } = useStores();
   return (
     <>
-      {props.uuid && props.name && (
+      {uuid && name && (
         <OrganizationWrap>
-          <Link to={`/org/tickets/${props.uuid}`} target="_blank">
-            <OrganizationText>{props.name}</OrganizationText>
+          <Link to={`/org/tickets/${uuid}`} target="_blank">
+            <OrganizationText>{name}</OrganizationText>
           </Link>
         </OrganizationWrap>
       )}

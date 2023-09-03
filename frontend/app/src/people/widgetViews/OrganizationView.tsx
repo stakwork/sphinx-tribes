@@ -142,7 +142,8 @@ const Organizations = () => {
                     <OrganizationData onClick={() => {
                         setOrganization(org);
                         setDetailsOpen(true);
-                    }}>
+                    }}
+                    >
                         <OrganizationImg src={org.img || avatarIcon} />
                         <OrganizationText>
                             {org.name}
