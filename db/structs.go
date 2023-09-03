@@ -387,7 +387,7 @@ type BountyResponse struct {
 	Bounty       Bounty            `json:"bounty"`
 	Assignee     Person            `json:"assignee"`
 	Owner        Person            `json:"owner"`
-	Organization OrganizationSHort `json:"organization"`
+	Organization OrganizationShort `json:"organization"`
 }
 
 type Organization struct {
@@ -401,7 +401,7 @@ type Organization struct {
 	Show        bool       `json:"show"`
 }
 
-type OrganizationSHort struct {
+type OrganizationShort struct {
 	Uuid string `json:"uuid"`
 	Name string `gorm:"unique;not null" json:"name"`
 	Img  string `json:"img"`
