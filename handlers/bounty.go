@@ -180,6 +180,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				OneSentenceSummary:      bounty.OneSentenceSummary,
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
+				Organization:            bounty.Organization,
 				Updated:                 bounty.BountyUpdated,
 				CodingLanguages:         bounty.CodingLanguages,
 			},
@@ -216,6 +217,11 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				OwnerContactKey:  bounty.OwnerContactKey,
 				PriceToMeet:      bounty.OwnerPriceToMeet,
 				TwitterConfirmed: bounty.OwnerTwitterConfirmed,
+			},
+			Organization: db.OrganizationShort{
+				Name: bounty.OrganizationName,
+				Uuid: bounty.OrganizationUuid,
+				Img:  bounty.OrganizationImg,
 			},
 		}
 		bountyResponse = append(bountyResponse, b)

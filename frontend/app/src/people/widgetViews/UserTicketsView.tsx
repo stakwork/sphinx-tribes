@@ -93,14 +93,13 @@ const UserTickets = () => {
 
   useEffect(() => {
     getUserTickets();
-  }, []);
+  }, [getUserTickets]);
 
   const listItems =
     userTickets && userTickets.length ? (
       userTickets.slice(0, currentItems).map((item: any, i: number) => {
         const person = main.people.find((p: any) => p.owner_pubkey === item.body.owner_id);
         const body = { ...item.body };
-
         // if this person has entries for this widget
         return (
           <Panel isMobile={isMobile} key={i + body?.created}>
@@ -121,7 +120,7 @@ const UserTickets = () => {
         );
       })
     ) : (
-      <NoResults loading={loading} />
+      <NoResults />
     );
 
   return (

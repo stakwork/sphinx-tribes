@@ -637,6 +637,7 @@ export const wantedOtherSchema: FormField[] = [
     type: 'select',
     options: helpType_wanted_other_schema
   },
+
   {
     name: 'title',
     label: 'Title*',
@@ -688,6 +689,13 @@ export const wantedOtherSchema: FormField[] = [
 ];
 
 export const wantedCodingTaskSchema: FormField[] = [
+  {
+    name: 'organization',
+    label: 'Organization(optional)',
+    type: 'select',
+    options: [],
+    validator: strValidatorNotRequired
+  },
   {
     name: 'title',
     label: 'Title',
@@ -813,3 +821,31 @@ export const dynamicSchemaAutofillFieldsByType = {
     ticket_url: 'lastGithubRepo'
   }
 };
+
+export const organizationSchema: FormField[] = [
+  {
+    name: 'name',
+    label: 'Organization name',
+    type: 'text',
+    validator: strValidator
+  },
+  {
+    name: 'img',
+    label: 'Image url',
+    type: 'text'
+  },
+  {
+    name: 'show',
+    label: 'Show to public',
+    type: 'switch'
+  },
+];
+
+export const organizationUserSchema: FormField[] = [
+  {
+    name: 'owner_pubkey',
+    label: 'Public key',
+    type: 'text',
+    validator: strValidator
+  }
+];

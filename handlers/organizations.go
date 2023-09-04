@@ -149,6 +149,14 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// check if the user exists on peoples table
+	isUser := db.DB.GetPersonByPubkey(orgUser.OwnerPubKey)
+	if isUser.OwnerPubKey != orgUser.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User doesn't exists in people")
+		return
+	}
+
 	// check if user already exists
 	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
 
@@ -187,7 +195,7 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	orgUser := db.OrganizationUsers{}
+	orgUser := db.OrganizationUsersData{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &orgUser)
@@ -336,4 +344,39 @@ func GetUserRoles(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(userRoles)
+}
+
+func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// get the organizations created by the user, then get all the organizations
+	// the user has been added to, loop through to get the organization
+	organizations := db.DB.GetUserCreatedOrganizations(pubKeyFromAuth)
+	assignedOrganizations := db.DB.GetUserAssignedOrganizations(pubKeyFromAuth)
+
+	for _, value := range assignedOrganizations {
+		organization := db.DB.GetOrganizationByUuid(value.Organization)
+		organizations = append(organizations, organization)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizations)
+}
+
+func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+
+	// get the organization bounties
+	organizationBounties := db.DB.GetOrganizationBounties(r, uuid)
+
+	var bountyResponse []db.BountyResponse = generateBountyResponse(organizationBounties)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyResponse)
 }

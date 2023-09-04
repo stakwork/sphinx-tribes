@@ -123,7 +123,6 @@ function NameTag(props: NameTagProps) {
             >
               {owner_alias}
             </Name>
-
             <div
               style={{
                 height: 3,
@@ -135,7 +134,6 @@ function NameTag(props: NameTagProps) {
             />
           </>
         )}
-
         <Date>{lastSeen}</Date>
       </Wrap>
     );
@@ -167,6 +165,7 @@ function NameTag(props: NameTagProps) {
             {owner_alias}
           </Name>
           <Date>{lastSeen}</Date>
+          { }
         </div>
       </div>
     </Wrap>

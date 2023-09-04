@@ -18,7 +18,7 @@ interface styledProps {
 
 const BountyBox = styled.div<styledProps>`
   min-height: 160px;
-  max-height: 160px;
+  max-height: auto;
   width: 1100px;
   box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
   border: none;
@@ -42,6 +42,9 @@ function WantedView(props: WantedViews2Props) {
     assignee,
     estimated_session_length,
     loomEmbedUrl,
+    img,
+    name,
+    uuid,
     onPanelClick,
     show = true,
     paid = false
@@ -173,6 +176,9 @@ function WantedView(props: WantedViews2Props) {
                 sessionLength={estimated_session_length || ''}
                 description={description}
                 isPaid={paid}
+                name={name}
+                uuid={uuid}
+                img={img}
               />
             </BountyBox>
           )}

@@ -5,13 +5,14 @@ import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { Organization } from 'store/main';
 import { useStores } from '../../store';
 import Form from '../../components/form';
 import { Button, IconButton } from '../../components/common';
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
-import { extractRepoAndIssueFromIssueUrl } from '../../helpers';
+import { extractRepoAndIssueFromIssueUrl, toCapitalize } from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own
 const BWrap = styled.div`
@@ -63,9 +64,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -99,6 +100,11 @@ function FocusedView(props: FocusViewProps) {
   const isMobile = useIsMobile();
 
   const isTorSave = canEdit && main.isTorSave();
+
+  const userOrganizations = main.organizations.map((org: Organization) => ({
+    label: toCapitalize(org.name),
+    value: org.uuid
+  }))
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -247,7 +253,7 @@ function FocusedView(props: FocusViewProps) {
 
   // set initials here
   if (personInfo && selectedBounty && selectedIndex >= 0) {
-    let wanted = selectedBounty.body;
+    const wanted = selectedBounty.body;
     if (config && config.name === 'about') {
       initialValues.id = personInfo.id || 0;
       initialValues.pubkey = personInfo.pubkey;
@@ -290,7 +296,7 @@ function FocusedView(props: FocusViewProps) {
                 [s.name]: wanted['one_sentence_summary'] || wanted['title']
               };
             } else if (s.name === 'coding_languages') {
-              let coding_languages =
+              const coding_languages =
                 wanted['coding_languages'] && wanted['coding_languages'].length
                   ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
                   : [];
@@ -329,6 +335,10 @@ function FocusedView(props: FocusViewProps) {
     return null;
   }
 
+
+  // set user organizations
+  config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+
   return (
     <div
       style={{
@@ -360,8 +370,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />

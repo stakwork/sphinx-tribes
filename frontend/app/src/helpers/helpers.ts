@@ -1,12 +1,11 @@
-import { Person } from 'store/main';
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export function formatPrice(amount: number = 0) {
+export const formatPrice = (amount: number = 0) => {
   return amount;
 }
 
-export function satToUsd(amount: number = 0) {
+export const satToUsd = (amount: number = 0) => {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);
@@ -28,7 +27,7 @@ export function makeConnectQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-export function extractRepoAndIssueFromIssueUrl(url: string) {
+export const extractRepoAndIssueFromIssueUrl = (url: string) => {
   let orgName = '';
   let repoName = '';
   let repo = '';
@@ -55,20 +54,20 @@ export function extractRepoAndIssueFromIssueUrl(url: string) {
   return { repo, issue };
 }
 
-export function extractGithubIssue(
+export const extractGithubIssue = (
   person: { github_issues: Record<string, any> },
   repo: string,
   issue: string
-) {
+) => {
   const { github_issues } = person;
   const keyname = `${repo}/${issue}`;
   return (github_issues && github_issues[keyname]) || {};
 }
 
-export function extractGithubIssueFromUrl(
+export const extractGithubIssueFromUrl = (
   person: { github_issues: Record<string, any> },
   url: string
-) {
+) => {
   try {
     const { repo, issue } = extractRepoAndIssueFromIssueUrl(url);
     return extractGithubIssue(person, repo, issue);
@@ -82,7 +81,7 @@ export const randomString = (l: number): string =>
     `0${(byte & 0xff).toString(16)}`.slice(-2)
   ).join('');
 
-export function sendToRedirect(url: string) {
+export const sendToRedirect = (url: string) => {
   const el = document.createElement('a');
   el.href = url;
   el.target = '_blank';
@@ -133,3 +132,43 @@ export const formatRelayPerson = (person: any): any => {
     route_hint: person.route_hint
   };
 };
+
+export type Roles = "ADD BOUNTY" | 
+                    "UPDATE BOUNTY" |
+                    "DELETE BOUNTY" |
+                    "PAY BOUNTY" |
+                    "ADD USER"  |
+                    "UPDATE USER" |
+                    "DELETE USER" |
+                    "ADD ROLES" |
+                    "ADD BUDGET" |
+                    "WITHDRAW BUDGET" |
+                    "VIEW REPORT";
+
+export const userHasRole = (bountyRoles : any[], userRoles: any[], role: Roles): boolean => {
+  let hasRole = false;
+  const bountyRolesMap = {};
+  const userRolesMap = {};
+
+  bountyRoles.forEach((role: any) => { 
+    bountyRolesMap[role.name] = role.name;
+  });
+
+  userRoles.forEach((user: any) => { 
+    userRolesMap[user.role] = user.role;
+  });
+
+  if(bountyRolesMap.hasOwnProperty(role) &&  userRolesMap.hasOwnProperty(role))  {
+    hasRole = true;
+  }
+  
+  return hasRole;
+}
+
+export const toCapitalize = (word: string): string => {
+  const wordString = word.split(" ");
+  const capitalizeStrings = wordString.map((w: string) => w[0].toUpperCase() + w.slice(1));
+  
+  const result = capitalizeStrings.join(" ");
+  return result;
+}
