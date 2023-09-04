@@ -15,6 +15,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/{uuid}", handlers.GetOrganizationByUuid)
 		r.Get("/users/{uuid}", handlers.GetOrganizationUsers)
 		r.Get("/users/{uuid}/count", handlers.GetOrganizationUsersCount)
+		r.Get("/bounties/{uuid}", handlers.GetOrganizationBounties)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -27,6 +28,7 @@ func OrganizationRoutes() chi.Router {
 
 		r.Get("/bounty/roles", handlers.GetBountyRoles)
 		r.Get("/users/role/{uuid}/{user}", handlers.GetUserRoles)
+		r.Get("/user", handlers.GetUserOrganizations)
 	})
 
 	return r

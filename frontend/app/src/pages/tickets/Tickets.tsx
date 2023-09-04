@@ -7,9 +7,11 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
+import { useParams } from 'react-router-dom';
 import { colors } from '../../config/colors';
 import { useIsMobile, usePageScroll } from '../../hooks';
 import { useStores } from '../../store';
+
 
 // avoid hook within callback warning by renaming hooks
 const Body = styled.div`
@@ -49,6 +51,8 @@ function BodyComponent() {
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const { uuid } = useParams<{ uuid: string }>();
+
   const color = colors['light'];
   const { peopleWantedsPageNumber } = ui;
 
@@ -56,10 +60,17 @@ function BodyComponent() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    main.getOpenGithubIssues();
-    main.getBadgeList();
-    main.getPeople();
-    main.getPeopleWanteds();
+    (async () => {
+      await main.getOpenGithubIssues();
+      await main.getBadgeList();
+      await main.getPeople();
+      if (uuid) {
+        await main.getOrganizationWanted(uuid, { page: 1, resetPage: true });
+      } else {
+        await main.getPeopleWanteds({ page: 1, resetPage: true });
+      }
+      setLoading(false);
+    })();
   }, [main]);
 
   useEffect(() => {
@@ -67,14 +78,6 @@ function BodyComponent() {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
   }, [main, ui.meInfo]);
-
-  useEffect(() => {
-    (async () => {
-      await main.getPeople();
-      await main.getPeopleWanteds({ page: 1, resetPage: true });
-      setLoading(false);
-    })();
-  }, [main]);
 
   const onChangeStatus = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {

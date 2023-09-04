@@ -5,7 +5,9 @@ import {
   offerSkillSchema,
   offerOtherSchema,
   wantedCodingTaskSchema,
-  wantedOtherSchema
+  wantedOtherSchema,
+  organizationSchema,
+  organizationUserSchema
 } from '../../components/form/schema';
 
 const MAX_UPLOAD_SIZE = 10194304; //10MB
@@ -21,6 +23,30 @@ const widgetConfigs = {
     action: {
       text: 'Edit Profile',
       icon: 'edit'
+    }
+  },
+  organizations: {
+    label: 'Organizations',
+    name: 'organizations',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: organizationSchema,
+    action: {
+      text: 'Add New Organization',
+      icon: 'local_offer'
+    },
+    noneSpace: {
+      noResult: {
+        img: 'no_wanted2.png',
+        text: 'No Organization Yet',
+        sub: 'Looks like this person has not created or added to any organizations yet.'
+      }
     }
   },
   badges: {
@@ -177,4 +203,20 @@ const badges = {
   }
 };
 
-export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions, badges };
+const nonWidgetConfigs = {
+  organizationusers: {
+    label: 'Organization Users',
+    name: 'organizationusers',
+    submitText: 'Save',
+    modalStyle: {
+      width: 'auto',
+      maxWidth: 'auto',
+      minWidth: '400px',
+      minHeight: '40%',
+      maxHeight: '70%'
+    },
+    schema: organizationUserSchema,
+  },
+}
+
+export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions, badges, nonWidgetConfigs };

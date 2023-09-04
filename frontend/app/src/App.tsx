@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 /* eslint-disable func-style */
 import '@material/react-material-icon/dist/material-icon.css';
 import { Router } from 'react-router-dom';
@@ -12,9 +12,16 @@ import { mainStore } from './store/main';
 let exchangeRateInterval: any = null;
 
 function App() {
-  // get usd/sat exchange rate every 100 second;
+  const getUserOrganizations = useCallback(async () => {
+    await mainStore.getUserOrganizations();
+  }, [])
 
   useEffect(() => {
+    getUserOrganizations();
+  }, [getUserOrganizations]);
+
+  useEffect(() => {
+    // get usd/sat exchange rate every 100 second;
     mainStore.getUsdToSatsExchangeRate();
 
     exchangeRateInterval = setInterval(() => {
