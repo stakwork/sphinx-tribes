@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -41,7 +41,7 @@ func InitInvoiceCron() {
 
 				defer res.Body.Close()
 
-				body, err := ioutil.ReadAll(res.Body)
+				body, err := io.ReadAll(res.Body)
 
 				// Unmarshal result
 				invoiceRes := db.InvoiceResult{}
@@ -89,7 +89,7 @@ func InitInvoiceCron() {
 
 							defer res.Body.Close()
 
-							body, err = ioutil.ReadAll(res.Body)
+							body, err = io.ReadAll(res.Body)
 
 							if res.StatusCode == 200 {
 								// Unmarshal result
@@ -168,10 +168,73 @@ func InitInvoiceCron() {
 		}
 	})
 
+	s.Every(1).Seconds().Do(func() {
+		invoiceList, _ := db.Store.GetBudgetInvoiceCache()
+		invoiceCount := len(invoiceList)
+
+		if invoiceCount > 0 {
+			for index, inv := range invoiceList {
+				url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, inv.Invoice)
+
+				client := &http.Client{}
+				req, err := http.NewRequest(http.MethodGet, url, nil)
+
+				req.Header.Set("x-user-token", config.RelayAuthKey)
+				req.Header.Set("Content-Type", "application/json")
+				res, _ := client.Do(req)
+
+				if err != nil {
+					log.Printf("Request Failed: %s", err)
+					return
+				}
+
+				defer res.Body.Close()
+
+				body, err := io.ReadAll(res.Body)
+
+				// Unmarshal result
+				invoiceRes := db.InvoiceResult{}
+
+				err = json.Unmarshal(body, &invoiceRes)
+
+				if err != nil {
+					log.Printf("Reading body failed: %s", err)
+					return
+				}
+
+				if invoiceRes.Response.Settled {
+					if inv.Invoice == invoiceRes.Response.Payment_request {
+						/**
+						  If the invoice is settled and still in store
+						  make keysend payment
+						*/
+						msg["msg"] = "budget_success"
+						msg["invoice"] = inv.Invoice
+
+						socket, err := db.Store.GetSocketConnections(inv.Host)
+
+						if err == nil {
+							socket.Conn.WriteJSON(msg)
+						}
+
+						db.DB.AddAndUpdateBudget(inv)
+						updateBudgetInvoiceCache(invoiceList, index)
+					}
+				}
+			}
+
+		}
+	})
+
 	s.StartAsync()
 }
 
 func updateInvoiceCache(invoiceList []db.InvoiceStoreData, index int) {
 	newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
 	db.Store.SetInvoiceCache(newInvoiceList)
+}
+
+func updateBudgetInvoiceCache(invoiceList []db.BudgetStoreData, index int) {
+	newInvoiceList := append(invoiceList[:index], invoiceList[index+1:]...)
+	db.Store.SetBudgetInvoiceCache(newInvoiceList)
 }

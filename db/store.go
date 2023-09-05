@@ -86,6 +86,21 @@ func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
 	return c, nil
 }
 
+func (s StoreData) SetBudgetInvoiceCache(value []BudgetStoreData) error {
+	// The invoice should expire every 6 minutes
+	s.Cache.Set(config.BudgetInvoiceList, value, 6*time.Minute)
+	return nil
+}
+
+func (s StoreData) GetBudgetInvoiceCache() ([]BudgetStoreData, error) {
+	value, found := s.Cache.Get(config.BudgetInvoiceList)
+	c, _ := value.([]BudgetStoreData)
+	if !found {
+		return []BudgetStoreData{}, errors.New("Budget Invoice Cache not found")
+	}
+	return c, nil
+}
+
 func (s StoreData) SetSocketConnections(value Client) error {
 	// The websocket in cache should not expire unless when deleted
 	s.Cache.Set(value.Host, value, cache.NoExpiration)

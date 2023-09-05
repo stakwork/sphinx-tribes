@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import { useStores } from 'store';
 import { Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
+import moment from 'moment';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
@@ -13,6 +16,7 @@ import { userHasRole } from 'helpers';
 import { Modal } from '../../components/common';
 import { colors } from '../../config/colors';
 import { nonWidgetConfigs } from '../utils/Constants';
+import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import Input from '../../components/form/inputs';
 
 const color = colors['light'];
@@ -32,9 +36,23 @@ const DetailsWrap = styled.div`
   padding: 0px 20px;
 `;
 
-const UsersCount = styled.h3`
-    font-size: 1.3rem;
+const OrgInfoWrap = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const DataCount = styled.div`
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+`;
+
+const DataText = styled.h3`
+    font-size: 1.3rem;
+    padding: 0px;
+    margin: 0px;
+    margin-right: 10px;
 `;
 
 const UsersTable = styled.div`
@@ -125,7 +143,9 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const { main, ui } = useStores();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
-    const [usersCount, setUsersCount] = useState(0);
+    const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
+    const [usersCount, setUsersCount] = useState<number>(0);
+    const [orgBudget, setOrgBudget] = useState<number>(0);
     const [disableFormButtons, setDisableFormButtons] = useState(false);
     const [users, setUsers] = useState<Person[]>([]);
     const [user, setUser] = useState<Person>();
@@ -133,6 +153,11 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const [bountyRoles, setBountyRoles] = useState<any[]>([]);
     const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
     const [toasts, setToasts]: any = useState([]);
+    const [lnInvoice, setLnInvoice] = useState('');
+    const [invoiceStatus, setInvoiceStatus] = useState(false);
+    const [amount, setAmount] = useState(1);
+
+    const pollMinutes = 2;
 
     const config = nonWidgetConfigs['organizationusers'];
 
@@ -144,14 +169,14 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         owner_pubkey: '',
     };
 
-    const uuid = props.org?.uuid;
+    const uuid = props.org?.uuid || '';
 
-    function addToast(title: string) {
+    function addToast(title: string, color: 'danger' | 'success') {
         setToasts([
             {
                 id: '1',
                 title,
-                color: 'danger'
+                color
             }
         ]);
     }
@@ -182,7 +207,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                 await getOrganizationUsers();
                 await getOrganizationUsersCount();
             } else {
-                addToast('Error: could not delete user');
+                addToast('Error: could not delete user', 'danger');
             }
         }
     };
@@ -215,6 +240,25 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         }
     };
 
+    const getOrganizationBudget = useCallback(async () => {
+        const organizationBudget = await main.getOrganizationBudget(uuid);
+        setOrgBudget(organizationBudget.total_budget);
+    }, [main])
+
+    const generateInvoice = async () => {
+        const token = ui.meInfo?.websocketToken;
+        if (token) {
+            const data = await main.getBudgetInvoice({
+                amount: amount,
+                sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
+                organization: uuid,
+                websocket_token: token
+            });
+
+            setLnInvoice(data.response.invoice);
+        }
+    };
+
     const handleSettingsClick = async (user: any) => {
         setUser(user);
         setIsOpenRoles(true);
@@ -229,6 +273,10 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         setIsOpenRoles(false)
     };
 
+    const closeBudgetHandler = () => {
+        setIsOpenBudget(false)
+    };
+
     const onSubmit = async (body: any) => {
         setIsLoading(true);
 
@@ -239,7 +287,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
             await getOrganizationUsers();
             await getOrganizationUsersCount();
         } else {
-            addToast('Error: could not add user');
+            addToast('Error: could not add user', 'danger');
         }
         closeHandler();
         setIsLoading(false);
@@ -270,9 +318,29 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
             if (res.status === 200) {
                 await main.getUserRoles(uuid, user.owner_pubkey);
             } else {
-                addToast('Error: could not add user roles');
+                addToast('Error: could not add user roles', 'danger');
             }
             setIsOpenRoles(false);
+        }
+    };
+
+    const onHandle = (event: any) => {
+        const res = JSON.parse(event.data);
+        if (res.msg === SOCKET_MSG.user_connect) {
+            const user = ui.meInfo;
+            if (user) {
+                user.websocketToken = res.body;
+                ui.setMeInfo(user);
+            }
+        } else if (res.msg === SOCKET_MSG.budget_success && res.invoice === main.lnInvoice) {
+            addToast('Budget was added successfully', 'success');
+            setLnInvoice('');
+            setInvoiceStatus(true);
+            main.setLnInvoice('');
+
+            // get new organization budget
+            getOrganizationBudget();
+            closeBudgetHandler();
         }
     };
 
@@ -280,7 +348,24 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         getOrganizationUsers();
         getOrganizationUsersCount();
         getBountyRoles();
-    }, [getOrganizationUsers, getOrganizationUsersCount, getBountyRoles]);
+        getOrganizationBudget();
+    }, [getOrganizationUsers, getOrganizationUsersCount, getBountyRoles, getOrganizationBudget]);
+
+    useEffect(() => {
+        const socket: WebSocket = createSocketInstance();
+
+        socket.onopen = () => {
+            console.log('Socket connected');
+        };
+
+        socket.onmessage = (event: MessageEvent) => {
+            onHandle(event);
+        };
+
+        socket.onclose = () => {
+            console.log('Socket disconnected');
+        };
+    }, []);
 
     return (
         <Container>
@@ -295,16 +380,30 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
             />
 
             <DetailsWrap>
-                <UsersCount>{usersCount} User{usersCount > 1 && 's'}</UsersCount>
-
-                {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD USER')) && (
-                    <IconButton
-                        width={150}
-                        height={isMobile ? 36 : 48}
-                        text="Add User"
-                        onClick={() => setIsOpen(true)}
-                    />)
-                }
+                <OrgInfoWrap>
+                    <DataCount>
+                        <DataText>User{usersCount > 1 && 's'} {usersCount}</DataText>
+                        {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD USER')) && (
+                            <IconButton
+                                width={10}
+                                height={isMobile ? 36 : 40}
+                                text="Add"
+                                onClick={() => setIsOpen(true)}
+                            />)
+                        }
+                    </DataCount>
+                    <DataCount>
+                        <DataText>Budget {orgBudget} sats</DataText>
+                        {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD BUDGET')) && (
+                            <IconButton
+                                width={10}
+                                height={isMobile ? 36 : 40}
+                                text="Add"
+                                onClick={() => setIsOpenBudget(true)}
+                            />)
+                        }
+                    </DataCount>
+                </OrgInfoWrap>
 
                 <UsersTable>
                     <TableHead>
@@ -488,6 +587,79 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                     color={'primary'}
                                     text={'Add roles'}
                                 />
+                            </Wrap>
+                        </Modal>
+                    )
+                }
+                {
+                    isOpenBudget && (
+                        <Modal
+                            visible={isOpenBudget}
+                            style={{
+                                height: '100%',
+                                flexDirection: 'column'
+                            }}
+                            envStyle={{
+                                marginTop: isMobile ? 64 : 0,
+                                background: color.pureWhite,
+                                zIndex: 20,
+                                ...(config?.modalStyle ?? {}),
+                                maxHeight: '100%',
+                                borderRadius: '10px'
+                            }}
+                            overlayClick={closeBudgetHandler}
+                            bigCloseImage={closeBudgetHandler}
+                            bigCloseImageStyle={{
+                                top: '-18px',
+                                right: '-18px',
+                                background: '#000',
+                                borderRadius: '50%'
+                            }}
+                        >
+                            <Wrap
+                                newDesign={true}
+                            >
+                                <ModalTitle>Add budget</ModalTitle>
+                                {lnInvoice && ui.meInfo?.owner_pubkey && (
+                                    <>
+                                        <Invoice
+                                            startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
+                                            invoiceStatus={invoiceStatus}
+                                            lnInvoice={lnInvoice}
+                                            invoiceTime={pollMinutes}
+                                        />
+                                    </>
+                                )}
+                                {!lnInvoice && ui.meInfo?.owner_pubkey && (
+                                    <>
+                                        <InvoiceForm>
+                                            <InvoiceLabel
+                                                style={{
+                                                    display: 'block'
+                                                }}>
+                                                Amount (in sats)
+                                            </InvoiceLabel>
+                                            <InvoiceInput
+                                                type="number"
+                                                style={{
+                                                    width: '100%'
+                                                }}
+                                                value={amount}
+                                                onChange={(e: any) => setAmount(Number(e.target.value))}
+                                            />
+                                        </InvoiceForm>
+                                        <Button
+                                            text={'Generate Invoice'}
+                                            color={'primary'}
+                                            style={{ paddingLeft: 25, margin: '12px 0 10px' }}
+                                            img={'sphinx_white.png'}
+                                            imgSize={27}
+                                            height={48}
+                                            width={'100%'}
+                                            onClick={generateInvoice}
+                                        />
+                                    </>
+                                )}
                             </Wrap>
                         </Modal>
                     )

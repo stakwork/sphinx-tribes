@@ -433,26 +433,46 @@ type UserRoles struct {
 }
 
 type BountyBudget struct {
+	ID           uint       `json:"id"`
 	Organization string     `json:"organization"`
 	TotalBudget  uint       `json:"total_budget"`
 	Created      *time.Time `json:"created"`
 	Updated      *time.Time `json:"updated"`
 }
 
+type BudgetInvoiceRequest struct {
+	Amount          uint   `json:"amount"`
+	SenderPubKey    string `json:"sender_pubkey"`
+	Organization    string `json:"organization"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+}
+
+type BudgetStoreData struct {
+	Amount       uint       `json:"amount"`
+	SenderPubKey string     `json:"sender_pubkey"`
+	Organization string     `json:"organization"`
+	Invoice      string     `json:"invoice"`
+	Host         string     `json:"host,omitempty"`
+	Created      *time.Time `json:"created"`
+}
+
 type BudgetHistory struct {
+	ID           uint       `json:"id"`
 	Organization string     `json:"organization"`
 	Amount       uint       `json:"amount"`
 	SenderPubKey string     `json:"sender_pubkey"`
 	Created      *time.Time `json:"created"`
 	Updated      *time.Time `json:"updated"`
+	Status       bool       `json:"status"`
 }
 
 type PaymentHistory struct {
+	ID             uint       `json:"id"`
 	Organization   string     `json:"organization"`
 	SenderPubKey   string     `json:"sender_pubkey"`
 	ReceiverPubKey string     `json:"receiver_pubkey"`
 	Amount         uint       `json:"amount"`
-	BountyId       uint       `json:"id"`
+	BountyId       uint       `json:"bounty_id"`
 	Created        *time.Time `json:"created"`
 }
 
