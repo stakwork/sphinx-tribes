@@ -1050,3 +1050,63 @@ func (db database) GetUserAssignedOrganizations(pubkey string) []OrganizationUse
 	db.db.Where("owner_pub_key = ?", pubkey).Find(&ms)
 	return ms
 }
+
+func (db database) AddBudgetHistory(budget BudgetHistory) BudgetHistory {
+	db.db.Create(&budget)
+	return budget
+}
+
+func (db database) CreateOrganizationBudget(budget BountyBudget) BountyBudget {
+	db.db.Create(&budget)
+	return budget
+}
+
+func (db database) UpdateOrganizationBudget(budget BountyBudget) BountyBudget {
+	db.db.Where("organization = ?", budget.Organization).Updates(budget)
+	return budget
+}
+
+func (db database) GetBudgetHistoryByCreated(created *time.Time, organization string) BudgetHistory {
+	ms := BudgetHistory{}
+	db.db.Where("created = ?", created).Where("organization = ? ", organization).Find(&ms)
+	return ms
+}
+
+func (db database) GetOrganizationBudget(organization string) BountyBudget {
+	ms := BountyBudget{}
+	db.db.Where("organization = ?", organization).Find(&ms)
+	return ms
+}
+
+func (db database) AddAndUpdateBudget(budget BudgetStoreData) BudgetHistory {
+	db.db.Create(&budget)
+	created := budget.Created
+	organization := budget.Organization
+
+	budgetHistory := db.GetBudgetHistoryByCreated(created, organization)
+
+	if budgetHistory.Organization != "" && budgetHistory.Amount != 0 {
+		budgetHistory.Status = true
+		db.db.Where("created = ?", created).Where("organization = ? ", organization).Updates(budgetHistory)
+
+		// get organization budget and add payment to total budget
+		organizationBudget := db.GetOrganizationBudget(organization)
+
+		if organizationBudget.Organization == "" {
+			now := time.Now()
+			orgBudget := BountyBudget{
+				Organization: organization,
+				TotalBudget:  budget.Amount,
+				Created:      &now,
+				Updated:      &now,
+			}
+			db.CreateOrganizationBudget(orgBudget)
+		} else {
+			totalBudget := organizationBudget.TotalBudget
+			organizationBudget.TotalBudget = totalBudget + budget.Amount
+			db.UpdateOrganizationBudget(organizationBudget)
+		}
+	}
+
+	return budgetHistory
+}

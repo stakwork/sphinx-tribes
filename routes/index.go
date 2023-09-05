@@ -78,6 +78,7 @@ func NewRouter() *http.Server {
 		r.Get("/lnauth", handlers.GetLnurlAuth)
 		r.Get("/refresh_jwt", handlers.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
+		r.Post("/budgetinvoices", handlers.GenerateBudgetInvoice)
 	})
 
 	PORT := os.Getenv("PORT")

@@ -1426,7 +1426,7 @@ export class MainStore {
     this.lnInvoice = invoice;
   }
 
-  @action async getLnInvoice(body: {
+  async getLnInvoice(body: {
     amount: number;
     memo: string;
     owner_pubkey: string;
@@ -1451,6 +1451,34 @@ export class MainStore {
           commitment_fee: body.commitment_fee,
           bounty_expires: body.bounty_expires,
           websocket_token: uiStore.meInfo?.websocketToken
+        },
+        {
+          'Content-Type': 'application/json'
+        }
+      );
+      if (data.success) {
+        this.setLnInvoice(data.response.invoice);
+      }
+      return data;
+    } catch (e) {
+      return { success: false, response: { invoice: '' } };
+    }
+  }
+
+  async getBudgetInvoice(body: {
+    amount: number;
+    organization: string;
+    sender_pubkey: string;
+    websocket_token: string;
+  }): Promise<LnInvoice> {
+    try {
+      const data = await api.post(
+        'budgetinvoices',
+        {
+          amount: body.amount,
+          organization: body.organization,
+          sender_pubkey: body.sender_pubkey,
+          websocket_token: body.websocket_token
         },
         {
           'Content-Type': 'application/json'
@@ -1673,6 +1701,25 @@ export class MainStore {
       });
 
       return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async getOrganizationBudget(uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/budget/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
     } catch (e) {
       return false;
     }

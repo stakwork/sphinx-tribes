@@ -380,3 +380,13 @@ func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }
+
+func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+
+	// get the organization budget
+	organizationBudget := db.DB.GetOrganizationBudget(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizationBudget)
+}
