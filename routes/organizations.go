@@ -29,6 +29,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/bounty/roles", handlers.GetBountyRoles)
 		r.Get("/users/role/{uuid}/{user}", handlers.GetUserRoles)
 		r.Get("/user", handlers.GetUserOrganizations)
+		r.Get("/budget/{uuid}", handlers.GetOrganizationBudget)
 	})
 
 	return r
