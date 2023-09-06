@@ -429,7 +429,6 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	invoice := db.InvoiceRequest{}
 	body, err := io.ReadAll(r.Body)
-
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &invoice)
@@ -554,7 +553,6 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now()
-
 	var budgetHistoryData = db.BudgetHistory{
 		Amount:       invoice.Amount,
 		Organization: invoice.Organization,
@@ -600,4 +598,69 @@ func makeInvoiceRequest(amount string, memo string) (*http.Response, error) {
 	res, _ := client.Do(req)
 
 	return res, err
+}
+
+func KeysendPayment(w http.ResponseWriter, r *http.Request) {
+	request := db.KeysendRequest{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	url := fmt.Sprintf("%s/payment", config.RelayUrl)
+	bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, request.Amount, request.ReceiverPubKey)
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+	body, err = io.ReadAll(res.Body)
+
+	// payment is successful add to payment history
+	// and reduce organizations budget
+	if res.StatusCode == 200 {
+		// Unmarshal result
+		keysendRes := db.KeysendSuccess{}
+		err = json.Unmarshal(body, &keysendRes)
+
+		now := time.Now()
+		paymentHistory := db.PaymentHistory{
+			Amount:         request.Amount,
+			SenderPubKey:   request.SenderPubKey,
+			ReceiverPubKey: request.ReceiverPubKey,
+			Organization:   request.Organization,
+			BountyId:       request.BountyId,
+			Created:        &now,
+		}
+		db.DB.AddPaymentHistory(paymentHistory)
+
+		bounty := db.DB.GetBounty(request.BountyId)
+		if bounty.ID == request.BountyId {
+			bounty.Paid = true
+			db.DB.UpdateBounty(bounty)
+		}
+
+		msg := make(map[string]interface{})
+		msg["msg"] = "keysend_success"
+		msg["invoice"] = ""
+
+		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
+		if err == nil {
+			socket.Conn.WriteJSON(msg)
+		}
+	}
 }

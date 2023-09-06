@@ -476,6 +476,15 @@ type PaymentHistory struct {
 	Created        *time.Time `json:"created"`
 }
 
+type KeysendRequest struct {
+	Amount          uint   `json:"amount"`
+	Organization    string `json:"organization"`
+	SenderPubKey    string `json:"sender_pubkey"`
+	ReceiverPubKey  string `json:"receiver_pubkey"`
+	BountyId        uint   `json:"bounty_id"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
