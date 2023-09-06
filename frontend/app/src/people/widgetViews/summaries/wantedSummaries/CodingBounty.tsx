@@ -97,10 +97,11 @@ function MobileView(props: CodingBountiesProps) {
 
   const { ui, main } = useStores();
   const [invoiceStatus, setInvoiceStatus] = useState(false);
+  const [keysendStatus, setKeysendStatus] = useState(false);
   const [lnInvoice, setLnInvoice] = useState('');
   const [toasts, setToasts]: any = useState([]);
 
-  const bountyPaid = paid || invoiceStatus;
+  const bountyPaid = paid || invoiceStatus || keysendStatus;
   const pollMinutes = 1;
 
   const bountyExpired = !bounty_expires
@@ -114,7 +115,8 @@ function MobileView(props: CodingBountiesProps) {
         return setToasts([
           {
             id: '1',
-            title: 'Invoice has been paid'
+            title: 'Invoice has been paid',
+            color: 'success'
           }
         ]);
       }
@@ -123,7 +125,8 @@ function MobileView(props: CodingBountiesProps) {
           {
             id: '2',
             title: 'Keysend payment failed',
-            toastLifeTimeMs: 10000
+            toastLifeTimeMs: 10000,
+            color: 'error'
           }
         ]);
       }
@@ -131,7 +134,8 @@ function MobileView(props: CodingBountiesProps) {
         return setToasts([
           {
             id: '3',
-            title: 'Successful keysend payment'
+            title: 'Successful keysend payment',
+            color: 'success'
           }
         ]);
       }
@@ -212,6 +216,9 @@ function MobileView(props: CodingBountiesProps) {
       setInvoiceStatus(true);
     } else if (res.msg === SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.keysend_success);
+      if (organization) {
+        setKeysendStatus(true);
+      }
     } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.keysend_error);
     }
@@ -503,7 +510,7 @@ function MobileView(props: CodingBountiesProps) {
                      */}
                     {!bountyExpired &&
                       !invoiceStatus &&
-                      assignee.owner_alias.length < 30 && (
+                      assignee && assignee.owner_alias.length < 30 && (
                         <>
                           {bounty_expires && (
                             <BountyTime>
