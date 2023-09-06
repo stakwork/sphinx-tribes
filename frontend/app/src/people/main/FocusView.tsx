@@ -203,7 +203,6 @@ function FocusedView(props: FocusViewProps) {
 
   async function submitForm(body: any) {
     let newBody = cloneDeep(body);
-    delete body.assignee;
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -220,6 +219,9 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
+      if (newBody?.assignee?.owner_pubkey) {
+        newBody.assignee = newBody.assignee.owner_pubkey;
+      }
       if (body?.assignee?.owner_pubkey) {
         newBody.assignee = body.assignee.owner_pubkey;
       }
