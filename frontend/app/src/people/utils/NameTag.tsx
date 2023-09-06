@@ -165,7 +165,7 @@ function NameTag(props: NameTagProps) {
             {owner_alias}
           </Name>
           <Date>{lastSeen}</Date>
-          { }
+          {}
         </div>
       </div>
     </Wrap>

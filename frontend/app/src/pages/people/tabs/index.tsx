@@ -131,13 +131,13 @@ export const TabsPages = observer(() => {
             } else {
               count = hasExtras
                 ? person.extras[name].filter((f: any) => {
-                  if ('show' in f) {
-                    // show has a value
-                    if (!f.show) return false;
-                  }
-                  // if no value default to true
-                  return true;
-                }).length
+                    if ('show' in f) {
+                      // show has a value
+                      if (!f.show) return false;
+                    }
+                    // if no value default to true
+                    return true;
+                  }).length
                 : null;
             }
 
@@ -165,7 +165,7 @@ export const TabsPages = observer(() => {
                 height: 'calc(100% - 63px)',
                 overflowY: 'auto',
                 position: 'relative',
-                width: '100%',
+                width: '100%'
               }}
             >
               <div

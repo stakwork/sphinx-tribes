@@ -3,7 +3,7 @@ import { uiStore } from '../store/ui';
 
 export const formatPrice = (amount: number = 0) => {
   return amount;
-}
+};
 
 export const satToUsd = (amount: number = 0) => {
   if (!amount) amount = 0;
@@ -15,7 +15,7 @@ export const satToUsd = (amount: number = 0) => {
   }
 
   return returnValue;
-}
+};
 
 export const DollarConverter = (e: any) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');
@@ -52,7 +52,7 @@ export const extractRepoAndIssueFromIssueUrl = (url: string) => {
   repo = `${orgName}/${repoName}`;
 
   return { repo, issue };
-}
+};
 
 export const extractGithubIssue = (
   person: { github_issues: Record<string, any> },
@@ -62,7 +62,7 @@ export const extractGithubIssue = (
   const { github_issues } = person;
   const keyname = `${repo}/${issue}`;
   return (github_issues && github_issues[keyname]) || {};
-}
+};
 
 export const extractGithubIssueFromUrl = (
   person: { github_issues: Record<string, any> },
@@ -74,7 +74,7 @@ export const extractGithubIssueFromUrl = (
   } catch (e) {
     return {};
   }
-}
+};
 
 export const randomString = (l: number): string =>
   Array.from(crypto.getRandomValues(new Uint8Array(l)), (byte: any) =>
@@ -86,7 +86,7 @@ export const sendToRedirect = (url: string) => {
   el.href = url;
   el.target = '_blank';
   el.click();
-}
+};
 
 export const calculateTimeLeft = (
   timeLimit: Date,
@@ -133,42 +133,43 @@ export const formatRelayPerson = (person: any): any => {
   };
 };
 
-export type Roles = "ADD BOUNTY" | 
-                    "UPDATE BOUNTY" |
-                    "DELETE BOUNTY" |
-                    "PAY BOUNTY" |
-                    "ADD USER"  |
-                    "UPDATE USER" |
-                    "DELETE USER" |
-                    "ADD ROLES" |
-                    "ADD BUDGET" |
-                    "WITHDRAW BUDGET" |
-                    "VIEW REPORT";
+export type Roles =
+  | 'ADD BOUNTY'
+  | 'UPDATE BOUNTY'
+  | 'DELETE BOUNTY'
+  | 'PAY BOUNTY'
+  | 'ADD USER'
+  | 'UPDATE USER'
+  | 'DELETE USER'
+  | 'ADD ROLES'
+  | 'ADD BUDGET'
+  | 'WITHDRAW BUDGET'
+  | 'VIEW REPORT';
 
-export const userHasRole = (bountyRoles : any[], userRoles: any[], role: Roles): boolean => {
+export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): boolean => {
   let hasRole = false;
   const bountyRolesMap = {};
   const userRolesMap = {};
 
-  bountyRoles.forEach((role: any) => { 
+  bountyRoles.forEach((role: any) => {
     bountyRolesMap[role.name] = role.name;
   });
 
-  userRoles.forEach((user: any) => { 
+  userRoles.forEach((user: any) => {
     userRolesMap[user.role] = user.role;
   });
 
-  if(bountyRolesMap.hasOwnProperty(role) &&  userRolesMap.hasOwnProperty(role))  {
+  if (bountyRolesMap.hasOwnProperty(role) && userRolesMap.hasOwnProperty(role)) {
     hasRole = true;
   }
-  
+
   return hasRole;
-}
+};
 
 export const toCapitalize = (word: string): string => {
-  const wordString = word.split(" ");
+  const wordString = word.split(' ');
   const capitalizeStrings = wordString.map((w: string) => w[0].toUpperCase() + w.slice(1));
-  
-  const result = capitalizeStrings.join(" ");
+
+  const result = capitalizeStrings.join(' ');
   return result;
-}
+};

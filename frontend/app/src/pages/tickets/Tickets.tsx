@@ -12,7 +12,6 @@ import { colors } from '../../config/colors';
 import { useIsMobile, usePageScroll } from '../../hooks';
 import { useStores } from '../../store';
 
-
 // avoid hook within callback warning by renaming hooks
 const Body = styled.div`
   flex: 1;

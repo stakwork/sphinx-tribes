@@ -117,29 +117,29 @@ describe('testing helpers', () => {
     test('test user has roles', () => {
       const testRoles = [
         {
-          name: "ADD BOUNTY"
+          name: 'ADD BOUNTY'
         },
         {
-          name: "DELETE BOUNTY"
+          name: 'DELETE BOUNTY'
         },
-          {
-          name: "PAY BOUNTY"
-        },
+        {
+          name: 'PAY BOUNTY'
+        }
       ];
 
       const userRole = [
         {
-          "role": "ADD BOUNTY"
+          role: 'ADD BOUNTY'
         }
-      ]
-      const hasRole = userHasRole(testRoles, userRole, 'ADD BOUNTY')
+      ];
+      const hasRole = userHasRole(testRoles, userRole, 'ADD BOUNTY');
       expect(hasRole).toBe(true);
     });
   });
   describe('toCapitalize', () => {
     test('test to capitalize string', () => {
-      const capitalizeString = toCapitalize("hello test sphinx")
-      expect(capitalizeString).toBe("Hello Test Sphinx");
+      const capitalizeString = toCapitalize('hello test sphinx');
+      expect(capitalizeString).toBe('Hello Test Sphinx');
     });
   });
 });
