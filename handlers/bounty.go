@@ -42,7 +42,7 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	if personKey == "" || tabType == "" {
 		w.WriteHeader(http.StatusNotFound)
 	}
-	bountyCount := db.DB.GetBountiesCounty(personKey, tabType)
+	bountyCount := db.DB.GetBountiesCount(personKey, tabType)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyCount)
