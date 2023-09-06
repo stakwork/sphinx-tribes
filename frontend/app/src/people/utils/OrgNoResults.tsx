@@ -4,17 +4,17 @@ import { widgetConfigs } from './Constants';
 import NoneSpace from './NoneSpace';
 
 function OrgNoResults() {
-    const tabs = widgetConfigs;
+  const tabs = widgetConfigs;
 
-    return (
-        <NoneSpace
-            small
-            style={{
-                margin: 'auto',
-                marginTop: '10%',
-            }}
-            {...tabs['organizations']?.noneSpace['noResult']}
-        />
-    );
+  return (
+    <NoneSpace
+      small
+      style={{
+        margin: 'auto',
+        marginTop: '10%'
+      }}
+      {...tabs['organizations']?.noneSpace['noResult']}
+    />
+  );
 }
 export default observer(OrgNoResults);

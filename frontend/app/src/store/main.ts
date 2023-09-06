@@ -161,14 +161,14 @@ export interface LnInvoice {
 }
 
 export interface Organization {
-  id: string
-	uuid: string,
-	name: string,
-	owner_pubkey: string,
-	img: string,
-	created: string
-	updated: string,
-	show: boolean
+  id: string;
+  uuid: string;
+  name: string;
+  owner_pubkey: string;
+  img: string;
+  created: string;
+  updated: string;
+  show: boolean;
 }
 
 export interface BountyRoles {
@@ -707,8 +707,8 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if(bounty.organization) {
-            organization = {...ps2[i].organization}
+          if (bounty.organization) {
+            organization = { ...ps2[i].organization };
           }
 
           ps3.push({
@@ -768,8 +768,8 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if(bounty.organization) {
-            organization = {...ps2[i].organization}
+          if (bounty.organization) {
+            organization = { ...ps2[i].organization };
           }
 
           ps3.push({
@@ -815,8 +815,8 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if(bounty.organization) {
-            organization = {...ps2[i].organization}
+          if (bounty.organization) {
+            organization = { ...ps2[i].organization };
           }
 
           ps3.push({
@@ -852,8 +852,8 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if(bounty.organization) {
-            organization = {...ps2[i].organization}
+          if (bounty.organization) {
+            organization = { ...ps2[i].organization };
           }
 
           ps3.push({
@@ -888,8 +888,8 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if(bounty.organization) {
-            organization = {...ps2[i].organization}
+          if (bounty.organization) {
+            organization = { ...ps2[i].organization };
           }
 
           ps3.push({
@@ -1526,7 +1526,7 @@ export class MainStore {
   }
 
   @action async getUserOrganizations(): Promise<Organization[]> {
-   try {
+    try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations/user`, {
@@ -1546,10 +1546,7 @@ export class MainStore {
     }
   }
 
-  @action async addOrganization(body: {
-    name: string;
-    img: string;
-  }): Promise<any> {
+  @action async addOrganization(body: { name: string; img: string }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
@@ -1571,13 +1568,11 @@ export class MainStore {
     }
   }
 
-  async getOrganizationUsersCount(
-    uuid: string
-  ): Promise<number> {
+  async getOrganizationUsersCount(uuid: string): Promise<number> {
     try {
       const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}/count`, {
         method: 'GET',
-        mode: 'cors',
+        mode: 'cors'
       });
 
       return r.json();
@@ -1586,13 +1581,11 @@ export class MainStore {
     }
   }
 
-  async getOrganizationUsers(
-    uuid: string
-  ): Promise<Person[]> {
+  async getOrganizationUsers(uuid: string): Promise<Person[]> {
     try {
       const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}`, {
         method: 'GET',
-        mode: 'cors',
+        mode: 'cors'
       });
 
       return r.json();
@@ -1601,7 +1594,7 @@ export class MainStore {
     }
   }
 
-   @action async addOrganizationUser(body: {
+  @action async addOrganizationUser(body: {
     owner_pubkey: string;
     organization: string;
   }): Promise<any> {

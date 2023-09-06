@@ -838,7 +838,7 @@ export const organizationSchema: FormField[] = [
     name: 'show',
     label: 'Show to public',
     type: 'switch'
-  },
+  }
 ];
 
 export const organizationUserSchema: FormField[] = [
