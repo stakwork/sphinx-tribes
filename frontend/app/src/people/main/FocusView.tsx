@@ -203,7 +203,7 @@ function FocusedView(props: FocusViewProps) {
 
   async function submitForm(body: any) {
     let newBody = cloneDeep(body);
-    delete newBody.assignee;
+    delete body.assignee;
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
