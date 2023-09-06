@@ -104,7 +104,7 @@ function FocusedView(props: FocusViewProps) {
   const userOrganizations = main.organizations.map((org: Organization) => ({
     label: toCapitalize(org.name),
     value: org.uuid
-  }))
+  }));
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -203,9 +203,6 @@ function FocusedView(props: FocusViewProps) {
 
   async function submitForm(body: any) {
     let newBody = cloneDeep(body);
-    if (typeof newBody.assignee === 'object' && newBody.assignee !== null) {
-      newBody.assignee = newBody.assignee.owner_pubkey;
-    }
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -222,6 +219,12 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
+      if (newBody?.assignee?.owner_pubkey) {
+        newBody.assignee = newBody.assignee.owner_pubkey;
+      }
+      if (body?.assignee?.owner_pubkey) {
+        newBody.assignee = body.assignee.owner_pubkey;
+      }
       if (body.one_sentence_summary !== '') {
         newBody.title = body.one_sentence_summary;
       } else {
@@ -333,7 +336,6 @@ function FocusedView(props: FocusViewProps) {
     }
     return null;
   }
-
 
   // set user organizations
   config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
