@@ -203,7 +203,9 @@ function FocusedView(props: FocusViewProps) {
 
   async function submitForm(body: any) {
     let newBody = cloneDeep(body);
-    delete newBody.assignee;
+    if (typeof newBody.assignee === 'object' && newBody.assignee !== null) {
+      newBody.assignee = newBody.assignee.owner_pubkey;
+    }
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -220,9 +222,6 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      if (body?.assignee?.owner_pubkey) {
-        newBody.assignee = body.assignee.owner_pubkey;
-      }
       if (body.one_sentence_summary !== '') {
         newBody.title = body.one_sentence_summary;
       } else {
