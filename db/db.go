@@ -418,7 +418,7 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 	return ms, result.Error
 }
 
-func (db database) GetBountiesCounty(personKey string, tabType string) int64 {
+func (db database) GetBountiesCount(personKey string, tabType string) int64 {
 	var count int64
 
 	query := db.db.Model(&Bounty{})
@@ -557,6 +557,12 @@ func (db database) GetBountyByCreated(created uint) (Bounty, error) {
 	b := Bounty{}
 	err := db.db.Where("created", created).Find(&b).Error
 	return b, err
+}
+
+func (db database) GetBounty(id uint) Bounty {
+	b := Bounty{}
+	db.db.Where("id", id).Find(&b)
+	return b
 }
 
 func (db database) UpdateBounty(b Bounty) (Bounty, error) {
@@ -1109,4 +1115,16 @@ func (db database) AddAndUpdateBudget(budget BudgetStoreData) BudgetHistory {
 	}
 
 	return budgetHistory
+}
+
+func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
+	db.db.Create(&payment)
+
+	// get organization budget and substract payment from total budget
+	organizationBudget := db.GetOrganizationBudget(payment.Organization)
+	totalBudget := organizationBudget.TotalBudget
+	organizationBudget.TotalBudget = totalBudget - payment.Amount
+	db.UpdateOrganizationBudget(organizationBudget)
+
+	return payment
 }

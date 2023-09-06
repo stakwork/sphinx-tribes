@@ -1724,6 +1724,34 @@ export class MainStore {
       return false;
     }
   }
+
+  async makeKeysendPayment(body: {
+    bounty_id: number,
+    sender_pubkey: string;
+    receiver_pubkey: string;
+    amount: number,
+    organization: string;
+    websocket_token: string;
+  }
+  ): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/keysend`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
   
 
 }

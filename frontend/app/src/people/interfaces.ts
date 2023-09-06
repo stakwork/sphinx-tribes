@@ -234,6 +234,7 @@ export interface WantedSummaryProps {
   formSubmit: (any) => void;
   title: string;
   organization?: string;
+  id?: number;
 }
 
 export interface CodingBountiesProps {
@@ -294,6 +295,8 @@ export interface CodingBountiesProps {
   extraModalFunction?: () => void;
   commitment_fee?: number;
   bounty_expires?: string;
+  organization?: string;
+  id?: number;
 }
 
 export interface CodingViewProps {
