@@ -125,11 +125,13 @@ button:focus {
 }
 
 #header .euiFieldSearch:focus {
-  background-image: linear-gradient(to top,
-      #5d8fdd,
-      #5d8fdd 2px,
-      transparent 2px,
-      transparent 100%);
+  background-image: linear-gradient(
+    to top,
+    #5d8fdd,
+    #5d8fdd 2px,
+    transparent 2px,
+    transparent 100%
+  );
 }
 
 #header-right {
@@ -512,11 +514,13 @@ textarea.qr-string {
 }
 
 #header .euiFieldSearch:focus {
-  background-image: linear-gradient(to top,
-      #5d8fdd,
-      #5d8fdd 2px,
-      transparent 2px,
-      transparent 100%);
+  background-image: linear-gradient(
+    to top,
+    #5d8fdd,
+    #5d8fdd 2px,
+    transparent 2px,
+    transparent 100%
+  );
 }
 
 #header-right {
@@ -871,7 +875,7 @@ textarea.qr-string {
   border: none;
 }
 
-.react-datepicker__year-dropdown-container>div:not([class*='read-view']),
+.react-datepicker__year-dropdown-container > div:not([class*='read-view']),
 .react-datepicker__month-dropdown {
   background: #fff !important;
   color: #000 !important;
@@ -970,7 +974,10 @@ textarea.qr-string {
   background-color: #ffffff00 !important;
 }
 
-.euiFormRow__fieldWrapper .euiFormControlLayout--group .euiFormLabel .euiFormControlLayout__prepend {
+.euiFormRow__fieldWrapper
+  .euiFormControlLayout--group
+  .euiFormLabel
+  .euiFormControlLayout__prepend {
   background-color: #ffffff00 !important;
 }
 
@@ -1014,8 +1021,8 @@ input::-webkit-search-cancel-button {
 }
 
 .euiPanel:focus-visible,
-.euiPanel>div:focus-visible,
-.euiPanel>div>div:focus-visible {
+.euiPanel > div:focus-visible,
+.euiPanel > div > div:focus-visible {
   outline: none;
   border: none;
 }

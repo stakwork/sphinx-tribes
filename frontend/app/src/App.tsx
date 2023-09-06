@@ -14,7 +14,7 @@ let exchangeRateInterval: any = null;
 function App() {
   const getUserOrganizations = useCallback(async () => {
     await mainStore.getUserOrganizations();
-  }, [])
+  }, []);
 
   useEffect(() => {
     getUserOrganizations();

@@ -215,8 +215,8 @@ const nonWidgetConfigs = {
       minHeight: '40%',
       maxHeight: '70%'
     },
-    schema: organizationUserSchema,
-  },
-}
+    schema: organizationUserSchema
+  }
+};
 
 export { MAX_UPLOAD_SIZE, widgetConfigs, formDropdownOptions, badges, nonWidgetConfigs };
