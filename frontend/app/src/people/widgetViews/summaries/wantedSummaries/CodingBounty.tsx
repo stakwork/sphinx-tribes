@@ -159,7 +159,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const makePayment = async () => {
     // If the bounty has a commitment fee, add the fee to the user payment
-    const price = commitment_fee && props.price ? commitment_fee + props.price : props?.price;
+    const price = Number(commitment_fee && props.price ? commitment_fee + props.price : props?.price);
     // if there is an organization and the organization's
     // buudget is sufficient keysend to the user immediately
     // without generating an invoice, else generate an invoice
