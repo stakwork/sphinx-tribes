@@ -613,14 +613,14 @@ func KeysendPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := fmt.Sprintf("%s/payment", config.RelayUrl)
-	bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, request.Amount, request.ReceiverPubKey)
+	bodyData := fmt.Sprintf(`{"amount": %d, "destination_key": "%s"}`, request.Amount, request.ReceiverPubKey)
 	jsonBody := []byte(bodyData)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
+	res, err := client.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
@@ -629,6 +629,7 @@ func KeysendPayment(w http.ResponseWriter, r *http.Request) {
 
 	defer res.Body.Close()
 	body, err = io.ReadAll(res.Body)
+	msg := make(map[string]interface{})
 
 	// payment is successful add to payment history
 	// and reduce organizations budget
@@ -654,8 +655,15 @@ func KeysendPayment(w http.ResponseWriter, r *http.Request) {
 			db.DB.UpdateBounty(bounty)
 		}
 
-		msg := make(map[string]interface{})
 		msg["msg"] = "keysend_success"
+		msg["invoice"] = ""
+
+		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
+		if err == nil {
+			socket.Conn.WriteJSON(msg)
+		}
+	} else {
+		msg["msg"] = "keysend_error"
 		msg["invoice"] = ""
 
 		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
