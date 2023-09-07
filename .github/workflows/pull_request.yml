@@ -23,7 +23,7 @@ jobs:
       - name: Install modules
         run: yarn --cwd ./frontend/app install
       - name: Tests
-        run: NODE_OPTIONS="--max_old_space_size=4096" yarn --cwd ./frontend/app run test
+        run: NODE_OPTIONS="--max_old_space_size=8192" yarn --cwd ./frontend/app run test
       - name: Set up Golang
         uses: actions/setup-go@v2
         with:
