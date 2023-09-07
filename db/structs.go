@@ -476,12 +476,18 @@ type PaymentHistory struct {
 	Created        *time.Time `json:"created"`
 }
 
-type KeysendRequest struct {
-	Amount          uint   `json:"amount"`
-	Organization    string `json:"organization"`
-	SenderPubKey    string `json:"sender_pubkey"`
+type PaymentHistoryData struct {
+	ID           uint       `json:"id"`
+	Organization string     `json:"organization"`
+	SenderName   string     `json:"sender_name"`
+	ReceiverName string     `json:"receiver_name"`
+	Amount       uint       `json:"amount"`
+	BountyId     uint       `json:"bounty_id"`
+	Created      *time.Time `json:"created"`
+}
+
+type BountyPayRequest struct {
 	ReceiverPubKey  string `json:"receiver_pubkey"`
-	BountyId        uint   `json:"bounty_id"`
 	Websocket_token string `json:"websocket_token,omitempty"`
 }
 
