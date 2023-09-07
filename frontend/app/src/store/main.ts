@@ -122,6 +122,16 @@ export interface PersonWanted {
   commitment_fee?: number;
 }
 
+export interface PaymentHistory {
+  id: number;
+  bounty_id: number;
+  amount: number;
+  organization: string;
+  sender_name: string;
+  receiver_name: string;
+  created: string;
+}
+
 export interface PersonOffer {
   person: PersonFlex;
   title: string;
@@ -1718,19 +1728,16 @@ export class MainStore {
     }
   }
 
-  async makeKeysendPayment(body: {
-    bounty_id: number,
-    sender_pubkey: string;
+  async makeBountyPayment(body: {
+    id: number,
     receiver_pubkey: string;
-    amount: number,
-    organization: string;
     websocket_token: string;
   }
   ): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/keysend`, {
+      const r: any = await fetch(`${TribesURL}/bounty/pay/${body.id}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(body),
@@ -1745,8 +1752,27 @@ export class MainStore {
       return false;
     }
   }
-  
 
+  async getPaymentHistories(uuid: string): Promise<PaymentHistory[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      
+      const r: any = await fetch(`${TribesURL}/organizations/payments/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return [];
+    }
+  }
+  
 }
 
 export const mainStore = new MainStore();

@@ -10,6 +10,8 @@ var Host string
 var JwtKey string
 var RelayUrl string
 var RelayAuthKey string
+
+// these are constants for the store
 var InvoiceList = "INVOICELIST"
 var BudgetInvoiceList = "BUDGETINVOICELIST"
 

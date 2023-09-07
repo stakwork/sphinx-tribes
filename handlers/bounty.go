@@ -1,14 +1,20 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func GetAllBounties(w http.ResponseWriter, r *http.Request) {
@@ -228,4 +234,115 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 	}
 
 	return bountyResponse
+}
+
+func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	idParam := chi.URLParam(r, "id")
+
+	id, err := utils.ConvertStringToUint(idParam)
+	if err != nil {
+		fmt.Println("could not parse id")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	bounty := db.DB.GetBounty(id)
+	amount, _ := utils.ConvertStringToUint(bounty.Price)
+
+	if bounty.ID != id {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// check if user is the admin of the organization
+	// or has a pay bounty role
+	hasRole := db.UserHasAccess(pubKeyFromAuth, bounty.Organization, db.PayBounty)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if the orgnization bounty balance
+	// is greater than the amount
+	orgBudget := db.DB.GetOrganizationBudget(bounty.Organization)
+	if orgBudget.TotalBudget < amount {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode("organization budget is not enough to pay the amount")
+		return
+	}
+
+	request := db.BountyPayRequest{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	url := fmt.Sprintf("%s/payment", config.RelayUrl)
+	bodyData := fmt.Sprintf(`{"amount": %d, "destination_key": "%s"}`, amount, request.ReceiverPubKey)
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+	body, err = io.ReadAll(res.Body)
+	msg := make(map[string]interface{})
+
+	// payment is successful add to payment history
+	// and reduce organizations budget
+	if res.StatusCode == 200 {
+		// Unmarshal result
+		keysendRes := db.KeysendSuccess{}
+		err = json.Unmarshal(body, &keysendRes)
+
+		now := time.Now()
+		paymentHistory := db.PaymentHistory{
+			Amount:         amount,
+			SenderPubKey:   pubKeyFromAuth,
+			ReceiverPubKey: request.ReceiverPubKey,
+			Organization:   bounty.Organization,
+			BountyId:       id,
+			Created:        &now,
+		}
+		db.DB.AddPaymentHistory(paymentHistory)
+		bounty.Paid = true
+		db.DB.UpdateBounty(bounty)
+
+		msg["msg"] = "keysend_success"
+		msg["invoice"] = ""
+
+		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
+		if err == nil {
+			socket.Conn.WriteJSON(msg)
+		}
+	} else {
+		msg["msg"] = "keysend_error"
+		msg["invoice"] = ""
+
+		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
+		if err == nil {
+			socket.Conn.WriteJSON(msg)
+		}
+	}
 }
