@@ -224,3 +224,15 @@ func CheckUser(userRoles []UserRoles, pubkey string) bool {
 
 	return isUser
 }
+
+func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
+	org := DB.GetOrganizationByUuid(uuid)
+	var hasRole bool = false
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+		hasRole = RolesCheck(userRoles, role)
+		return hasRole
+	}
+	hasRole = true
+	return hasRole
+}
