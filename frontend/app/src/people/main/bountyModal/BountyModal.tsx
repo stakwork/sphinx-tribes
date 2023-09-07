@@ -45,7 +45,6 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       pathname: basePath
     });
   };
-  
 
   useEffect(() => {
     async function getBounty() {
@@ -54,7 +53,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
         setBounty(bounty);
       }
     }
-    
+
     getBounty();
   }, [bounty, main, wantedId]);
 
