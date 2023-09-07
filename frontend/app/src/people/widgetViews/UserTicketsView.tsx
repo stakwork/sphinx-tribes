@@ -50,7 +50,6 @@ const UserTickets = () => {
   const showModal = () => setShowDeleteModal(true);
   const [loading, setIsLoading] = useState<boolean>(false);
 
-
   function onPanelClick(id: number, index: number) {
     history.push({
       pathname: `${url}/${id}/${index}`
@@ -94,7 +93,7 @@ const UserTickets = () => {
     }
 
     getUserTickets();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [main.getPersonAssignedWanteds, personPubkey]);
 
   const listItems =
