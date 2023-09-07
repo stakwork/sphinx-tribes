@@ -226,8 +226,9 @@ export const DescriptionBox = styled.div<colorProps>`
       font-style: normal;
       font-weight: 400;
       font-size: 15px;
-      line-height: 25px;
+      line-height: 20px;
       color: ${(p: any) => p?.color && p.color.black500};
+      white-space: pre-wrap;
     }
   }
   ::-webkit-scrollbar {
