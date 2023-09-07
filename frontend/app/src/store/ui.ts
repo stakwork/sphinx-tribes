@@ -26,6 +26,7 @@ export interface MeInfo {
   contact_key: string;
   price_to_meet: number;
   jwt: string;
+  tribe_jwt: string;
   url: string;
   description: string;
   verification_signature: string;
@@ -187,6 +188,7 @@ export const emptyMeData: MeData = {
   photo_url: '',
   url: '',
   jwt: '',
+  tribe_jwt: '',
   description: '',
   verification_signature: '',
   extras: {},
@@ -202,6 +204,7 @@ export const emptyMeInfo: MeInfo = {
   photo_url: '',
   url: '',
   jwt: '',
+   tribe_jwt: '',
   description: '',
   verification_signature: '',
   extras: {},
