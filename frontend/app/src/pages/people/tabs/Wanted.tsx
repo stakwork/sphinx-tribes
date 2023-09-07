@@ -106,7 +106,7 @@ export const Wanted = observer(() => {
         if (w.body.owner_id === person?.owner_pubkey) {
           return (
             <Panel
-              key={w.created}
+              key={w.body.id}
               isMobile={false}
               onClick={() =>
                 history.push({
