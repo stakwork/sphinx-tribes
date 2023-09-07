@@ -14,6 +14,8 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   position: relative;
   border-radius: 100px;
   height: 36px;
+  width: 36px;
+  min-width: 36px;
   font-weight: bold;
   border: none;
   font-weight: 500;
@@ -209,6 +211,7 @@ export default function IconButton(props: IconButtonProps) {
       activecolor={props.activecolor}
       shadowcolor={props.shadowcolor}
       disabled={props.disabled}
+      className="test"
       onClick={props.onClick}
     >
       <div>
