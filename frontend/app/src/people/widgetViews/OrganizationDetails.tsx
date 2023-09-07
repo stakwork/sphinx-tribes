@@ -10,7 +10,7 @@ import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { BountyRoles, Organization, Person } from 'store/main';
+import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { userHasRole } from 'helpers';
 import { Modal } from '../../components/common';
@@ -53,6 +53,14 @@ const DataText = styled.h3`
     padding: 0px;
     margin: 0px;
     margin-right: 10px;
+`;
+
+const ViewHistoryText = styled.p`
+    padding: 0px;
+    margin: 0px;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
 `;
 
 const UsersTable = styled.div`
@@ -144,8 +152,10 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
     const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
+    const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
     const [usersCount, setUsersCount] = useState<number>(0);
     const [orgBudget, setOrgBudget] = useState<number>(0);
+    const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([])
     const [disableFormButtons, setDisableFormButtons] = useState(false);
     const [users, setUsers] = useState<Person[]>([]);
     const [user, setUser] = useState<Person>();
@@ -245,6 +255,11 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         setOrgBudget(organizationBudget.total_budget);
     }, [main])
 
+    const getPaymentsHistory = useCallback(async () => {
+        const paymentHistories = await main.getPaymentHistories(uuid);
+        setPaymentsHistory(paymentHistories);
+    }, [main])
+
     const generateInvoice = async () => {
         const token = ui.meInfo?.websocketToken;
         if (token) {
@@ -275,6 +290,10 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
 
     const closeBudgetHandler = () => {
         setIsOpenBudget(false)
+    };
+
+    const closeHistoryHandler = () => {
+        setIsOpenHistory(false)
     };
 
     const onSubmit = async (body: any) => {
@@ -349,11 +368,17 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         getOrganizationUsersCount();
         getBountyRoles();
         getOrganizationBudget();
-    }, [getOrganizationUsers, getOrganizationUsersCount, getBountyRoles, getOrganizationBudget]);
+        getPaymentsHistory();
+    }, [
+        getOrganizationUsers,
+        getOrganizationUsersCount,
+        getBountyRoles,
+        getOrganizationBudget,
+        getPaymentsHistory
+    ]);
 
     useEffect(() => {
         const socket: WebSocket = createSocketInstance();
-
         socket.onopen = () => {
             console.log('Socket connected');
         };
@@ -378,7 +403,6 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                     cursor: 'pointer'
                 }}
             />
-
             <DetailsWrap>
                 <OrgInfoWrap>
                     <DataCount>
@@ -402,6 +426,9 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                 onClick={() => setIsOpenBudget(true)}
                             />)
                         }
+                        {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'VIEW REPORT')) && (
+                            <ViewHistoryText onClick={() => setIsOpenHistory(true)}>View history</ViewHistoryText>
+                        )}
                     </DataCount>
                 </OrgInfoWrap>
 
@@ -660,6 +687,57 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                                         />
                                     </>
                                 )}
+                            </Wrap>
+                        </Modal>
+                    )
+                }
+                {
+                    isOpenHistory && (
+                        <Modal
+                            visible={isOpenHistory}
+                            style={{
+                                height: '100%',
+                                flexDirection: 'column'
+                            }}
+                            envStyle={{
+                                marginTop: isMobile ? 64 : 0,
+                                background: color.pureWhite,
+                                zIndex: 20,
+                                ...(config?.modalStyle ?? {}),
+                                maxHeight: '100%',
+                                borderRadius: '10px'
+                            }}
+                            overlayClick={closeHistoryHandler}
+                            bigCloseImage={closeHistoryHandler}
+                            bigCloseImageStyle={{
+                                top: '-18px',
+                                right: '-18px',
+                                background: '#000',
+                                borderRadius: '50%'
+                            }}
+                        >
+                            <Wrap style={{ width: '300px' }}>
+                                <ModalTitle>Payment history</ModalTitle>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Sender</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            paymentsHistory.map((pay: PaymentHistory, i: number) => (
+                                                <tr key={i}>
+                                                    <td className="ellipsis">{pay.sender_name}</td>
+                                                    <td>{pay.amount} sats</td>
+                                                    <td>{moment(pay.created).fromNow()}</td>
+                                                </tr>
+                                            ))
+                                        }
+                                    </tbody>
+                                </table>
                             </Wrap>
                         </Modal>
                     )

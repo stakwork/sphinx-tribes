@@ -173,15 +173,12 @@ function MobileView(props: CodingBountiesProps) {
       if (Number(budget) > Number(price)) {
         // make keysend payment
         const body = {
-          bounty_id: id || 0,
-          amount: price || 0,
+          id: id || 0,
           websocket_token: ui.meInfo?.websocketToken || '',
-          sender_pubkey: ui.meInfo?.owner_pubkey || '',
           receiver_pubkey: assignee.owner_pubkey,
-          organization: organization
         };
 
-        await main.makeKeysendPayment(body);
+        await main.makeBountyPayment(body);
       } else {
         generateInvoice(price || 0);
       }
