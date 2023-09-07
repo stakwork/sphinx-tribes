@@ -132,7 +132,7 @@ export default function Modal(props: ModalProps) {
   const fillStyle = fill
     ? {
         minHeight: '100%',
-        height: 'auto',
+        height: '100%',
         width: '100%',
         borderRadius: 0
       }
@@ -159,7 +159,8 @@ export default function Modal(props: ModalProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          overflowX: 'hidden'
         }}
       >
         <Env
