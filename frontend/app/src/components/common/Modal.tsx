@@ -12,7 +12,7 @@ interface styledProps {
 
 const R = styled.div<styledProps>`
   position: absolute;
-  right: -85px;
+  right: -75px;
   top: 0px;
   height: 100%;
   display: flex;
@@ -22,7 +22,7 @@ const R = styled.div<styledProps>`
 
 const L = styled.div<styledProps>`
   position: absolute;
-  left: -85px;
+  left: -75px;
   top: 0px;
   height: 100%;
   display: flex;
@@ -93,7 +93,7 @@ const X = styled.div<styledProps>`
 const BigX = styled.div<styledProps>`
   position: absolute;
   top: 20px;
-  right: -68px;
+  right: -58px;
   cursor: pointer;
   z-index: 10;
 `;
@@ -176,7 +176,7 @@ export default function Modal(props: ModalProps) {
 
           {bigClose && (
             <BigX color={color}>
-              <IconButton onClick={bigClose} size={36} icon="close" />
+              <IconButton onClick={bigClose} size={36} icon="close" color="transparent" />
             </BigX>
           )}
 
@@ -203,6 +203,7 @@ export default function Modal(props: ModalProps) {
             <L color={color}>
               <Circ color={color}>
                 <IconButton
+                  color="noColor"
                   iconStyle={{ color: color.pureWhite }}
                   icon={'chevron_left'}
                   onClick={(e: any) => {
@@ -217,6 +218,7 @@ export default function Modal(props: ModalProps) {
             <R color={color}>
               <Circ color={color}>
                 <IconButton
+                  color="noColor"
                   icon={'chevron_right'}
                   iconStyle={{ color: color.pureWhite }}
                   onClick={(e: any) => {
