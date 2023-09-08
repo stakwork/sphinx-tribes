@@ -67,7 +67,6 @@ function MobileView(props: CodingBountiesProps) {
     sendToRedirect,
     handleCopyUrl,
     isCopied,
-    setExtrasPropertyAndSave,
     replitLink,
     assigneeHandlerOpen,
     setCreatorStep,
