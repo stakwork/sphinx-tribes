@@ -1685,7 +1685,7 @@ export class MainStore {
     }
   }
 
-  async  updateBountyPaymentStatus(created: number): Promise<any> {
+  async updateBountyPaymentStatus(created: number): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
