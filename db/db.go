@@ -913,7 +913,7 @@ func (db database) GetBountiesLeaderboard() []LeaderData {
 	ms := []BountyLeaderboard{}
 	var users = []LeaderData{}
 
-	db.db.Raw(`SELECT assignee as owner_pubkey, COUNT(assignee) as total_bounties_completed, price as total_sats_earned From bounty GROUP BY assignee, price`).Find(&ms)
+	db.db.Raw(`SELECT assignee as owner_pubkey, COUNT(assignee) as total_bounties_completed, price as total_sats_earned From bounty where paid=true and assignee != '' GROUP BY assignee, price Order by cast(price as integer) DESC`).Find(&ms)
 
 	for _, val := range ms {
 		var newLeader = make(map[string]interface{})
