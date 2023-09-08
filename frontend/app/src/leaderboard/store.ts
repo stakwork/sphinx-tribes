@@ -34,7 +34,7 @@ export class LeaderboardStore {
         },
         { owner_pubkey: '', total_bounties_completed: 0, total_sats_earned: 0 }
       );
-      this.leaders = resp.slice(1);
+      this.leaders = resp;
     } catch (e) {
       this.error = e;
     } finally {
