@@ -733,6 +733,7 @@ export class MainStore {
           'wanted'
         );
       }
+      this.setPeopleWanteds(ps3);
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -1659,6 +1660,25 @@ export class MainStore {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async  updateBountyPaymentStatus(created: number): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/bounty/paymentstatus/${created}`, {
+        method: 'POST',
+        mode: 'cors',
         headers: {
           'x-jwt': info.jwt,
           'Content-Type': 'application/json'
