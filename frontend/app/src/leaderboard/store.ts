@@ -9,12 +9,13 @@ export type LeaderItem = {
   total_bounties_completed: number;
   total_sats_earned: number;
 };
+
 export class LeaderboardStore {
   private leaders: LeaderItem[] = [];
 
   public isLoading = false;
   public error: any;
-  public total: Omit<LeaderItem, 'owner_pubkey'> | null = null;
+  public total: LeaderItem | null = null;
   constructor() {
     makeAutoObservable(this);
   }
@@ -24,7 +25,15 @@ export class LeaderboardStore {
     this.isLoading = true;
     try {
       const resp = (await api.get('people/bounty/leaderboard')) as LeaderItem[];
-      this.total = resp[0];
+      this.total = resp.reduce(
+        (partialSum: LeaderItem, assigneeStats: LeaderItem) => {
+          partialSum.total_bounties_completed += assigneeStats.total_bounties_completed;
+          partialSum.total_sats_earned += assigneeStats.total_sats_earned;
+
+          return partialSum;
+        },
+        { owner_pubkey: '', total_bounties_completed: 0, total_sats_earned: 0 }
+      );
       this.leaders = resp.slice(1);
     } catch (e) {
       this.error = e;
