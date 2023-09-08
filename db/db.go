@@ -564,6 +564,13 @@ func (db database) UpdateBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
+func (db database) UpdateBountyPayment(b Bounty) (Bounty, error) {
+	db.db.Model(&b).Where("created", b.Created).Updates(map[string]interface{}{
+		"paid": b.Paid,
+	})
+	return b, nil
+}
+
 func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
 	ms := []Person{}
 
