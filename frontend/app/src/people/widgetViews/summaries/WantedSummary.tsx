@@ -553,13 +553,13 @@ function WantedSummary(props: WantedSummaryProps) {
           handleCopyUrl={handleCopyUrl}
           isCopied={isCopied}
           setExtrasPropertyAndSave={setExtrasPropertyAndSave}
+          setExtrasPropertyAndSaveMultiple={setExtrasPropertyAndSaveMultiple}
           setIsModalSideButton={setIsModalSideButton}
           replitLink={replitLink}
           assigneeHandlerOpen={assigneeHandlerOpen}
           setCreatorStep={setCreatorStep}
           setIsExtraStyle={setIsExtraStyle}
           awards={awards}
-          setExtrasPropertyAndSaveMultiple={setExtrasPropertyAndSaveMultiple}
           handleAssigneeDetails={handleAssigneeDetails}
           peopleList={peopleList}
           setIsPaidStatusBadgeInfo={setIsPaidStatusBadgeInfo}

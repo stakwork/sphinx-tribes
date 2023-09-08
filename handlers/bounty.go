@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -148,7 +149,22 @@ func DeleteBounty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	b, _ := db.DB.DeleteBounty(pubkey, created)
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(b)
+}
+
+func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
+	createdParam := chi.URLParam(r, "created")
+	created, _ := strconv.ParseUint(createdParam, 10, 32)
+
+	bounty, _ := db.DB.GetBountyByCreated(uint(created))
+	if bounty.ID != 0 && bounty.Created == int64(created) {
+		bounty.Paid = !bounty.Paid
+		db.DB.UpdateBountyPayment(bounty)
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bounty)
 }
 
 func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
