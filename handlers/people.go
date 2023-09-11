@@ -329,6 +329,15 @@ func GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
+func GetPersonById(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idParam, 10, 32)
+
+	person := db.DB.GetPerson(uint(id))
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(person)
+}
+
 func GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	person := db.DB.GetPersonByUuid(uuid)

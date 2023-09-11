@@ -11,6 +11,7 @@ func PersonRoutes() chi.Router {
 
 	r.Group(func(r chi.Router) {
 		r.Get("/{pubkey}", handlers.GetPersonByPubkey)
+		r.Get("/id/{id}", handlers.GetPersonById)
 		r.Get("/uuid/{uuid}", handlers.GetPersonByUuid)
 		r.Get("/uuid/{uuid}/assets", handlers.GetPersonAssetsByUuid)
 		r.Get("/githubname/{github}", handlers.GetPersonByGithubName)
