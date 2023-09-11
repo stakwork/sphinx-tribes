@@ -1007,9 +1007,24 @@ export class MainStore {
     return l;
   }
 
+  @persist('list')
+  activePerson: Person[] = [];
+
+  setActivePerson(p: Person) {
+    this.activePerson = [p];
+  }
+
   @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
+    this.setActivePerson(p);
+    return p;
+  }
+
+  @memo()
+  async getPersonById(id: number): Promise<Person> {
+    const p = await api.get(`person/id/${id}`);
+    this.setActivePerson(p);
     return p;
   }
 

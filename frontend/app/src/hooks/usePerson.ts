@@ -5,14 +5,7 @@ export const usePerson = (id: any) => {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
 
-  let person: Person | undefined;
-
-  if (main.personAssignedWanteds.length) {
-    const pubkey = main.personAssignedWanteds[0].body.assignee.owner_pubkey;
-    person = (main.people || []).find((f: any) => f.owner_pubkey === pubkey);
-  } else {
-    person = (main.people || []).find((f: any) => f.id === id);
-  }
+  let person: Person | undefined = main.activePerson.length ? main.activePerson[0] : undefined;
 
   const canEdit = meInfo?.id === person?.id;
 
