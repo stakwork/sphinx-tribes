@@ -1007,9 +1007,17 @@ export class MainStore {
     return l;
   }
 
+  @persist('list')
+  activePerson: Person[] = [];
+
+  setActivePerson(p: Person) {
+    this.activePerson = [p];
+  }
+
   @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
+    this.setActivePerson(p);
     return p;
   }
 
@@ -1414,6 +1422,7 @@ export class MainStore {
   @action async getLnAuth(): Promise<any> {
     try {
       const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
+      console.log("LN DATA ", data)
       this.setLnAuth(data);
       return data;
     } catch (e) {
