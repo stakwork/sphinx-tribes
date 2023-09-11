@@ -743,6 +743,7 @@ export class MainStore {
           'wanted'
         );
       }
+      this.setPeopleWanteds(ps3);
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -1400,6 +1401,7 @@ export class MainStore {
       const data = await api.get('people/wanteds/header');
       return data;
     } catch (e) {
+      console.log('Error getBountyHeaderData', e);
       return '';
     }
   }
@@ -1425,6 +1427,7 @@ export class MainStore {
       this.setLnAuth(data);
       return data;
     } catch (e) {
+      console.log('Error getLnAuth', e);
       return '';
     }
   }
@@ -1471,6 +1474,7 @@ export class MainStore {
       }
       return data;
     } catch (e) {
+      console.log('Error getLnInvoice', e);
       return { success: false, response: { invoice: '' } };
     }
   }
@@ -1524,6 +1528,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error deleteBountyAssignee', e);
       return false;
     }
   }
@@ -1552,6 +1557,7 @@ export class MainStore {
       this.setOrganizations(data);
       return await data;
     } catch (e) {
+      console.log('Error getUserOrganizations', e);
       return [];
     }
   }
@@ -1574,6 +1580,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error addOrganization', e);
       return false;
     }
   }
@@ -1587,6 +1594,7 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getOrganizationUsersCount', e);
       return 0;
     }
   }
@@ -1600,6 +1608,7 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getOrganizationUsers', e);
       return [];
     }
   }
@@ -1625,6 +1634,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error addOrganizationUser', e);
       return false;
     }
   }
@@ -1647,6 +1657,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error deleteOrganizationUser', e);
       return false;
     }
   }
@@ -1666,6 +1677,7 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getRoles', e);
       return [];
     }
   }
@@ -1685,6 +1697,7 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getUserRoles', e);
       return [];
     }
   }
@@ -1705,6 +1718,27 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error addUserRoles', e);
+      return false;
+    }
+  }
+
+  async updateBountyPaymentStatus(created: number): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/bounty/paymentstatus/${created}`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error updateBountyPaymentStatus', e);
       return false;
     }
   }

@@ -36,7 +36,7 @@ export default function MobileView(props: CodingViewProps) {
   const color = colors['light'];
 
   return (
-    <div style={{ padding: 20, overflow: 'auto' }}>
+    <div style={{ padding: 20, overflow: 'auto', height: 'calc(100% - 60px)' }}>
       <Pad>
         {nametag}
 

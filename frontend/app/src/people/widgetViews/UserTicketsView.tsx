@@ -50,13 +50,6 @@ const UserTickets = () => {
   const showModal = () => setShowDeleteModal(true);
   const [loading, setIsLoading] = useState<boolean>(false);
 
-  async function getUserTickets() {
-    setIsLoading(true);
-    const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
-    setUserTickets(tickets);
-    setIsLoading(false);
-  }
-
   function onPanelClick(id: number, index: number) {
     history.push({
       pathname: `${url}/${id}/${index}`
@@ -92,8 +85,16 @@ const UserTickets = () => {
   };
 
   useEffect(() => {
+    async function getUserTickets() {
+      setIsLoading(true);
+      const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
+      setUserTickets(tickets);
+      setIsLoading(false);
+    }
+
     getUserTickets();
-  }, [getUserTickets]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [main.getPersonAssignedWanteds, personPubkey]);
 
   const listItems =
     userTickets && userTickets.length ? (
