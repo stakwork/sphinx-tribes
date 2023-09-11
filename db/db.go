@@ -570,6 +570,13 @@ func (db database) UpdateBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
+func (db database) UpdateBountyPayment(b Bounty) (Bounty, error) {
+	db.db.Model(&b).Where("created", b.Created).Updates(map[string]interface{}{
+		"paid": b.Paid,
+	})
+	return b, nil
+}
+
 func (db database) GetPeopleForNewTicket(languages []interface{}) ([]Person, error) {
 	ms := []Person{}
 
@@ -912,7 +919,20 @@ func (db database) GetBountiesLeaderboard() []LeaderData {
 	ms := []BountyLeaderboard{}
 	var users = []LeaderData{}
 
-	db.db.Raw(`SELECT assignee as owner_pubkey, COUNT(assignee) as total_bounties_completed, price as total_sats_earned From bounty GROUP BY assignee, price`).Find(&ms)
+	db.db.Raw(`SELECT t1.owner_pubkey, total_bounties_completed, total_sats_earned FROM
+(SELECT assignee as owner_pubkey, 
+COUNT(assignee) as total_bounties_completed
+From bounty 
+where paid=true and assignee != '' 
+GROUP BY assignee) t1
+ Right Join
+(SELECT assignee as owner_pubkey,  
+SUM(CAST(price as integer)) as total_sats_earned
+From bounty
+where paid=true and assignee != ''
+GROUP BY assignee) t2
+ON t1.owner_pubkey = t2.owner_pubkey
+ORDER by total_sats_earned DESC`).Find(&ms)
 
 	for _, val := range ms {
 		var newLeader = make(map[string]interface{})
