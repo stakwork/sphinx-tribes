@@ -1021,6 +1021,13 @@ export class MainStore {
     return p;
   }
 
+  @memo()
+  async getPersonById(id: number): Promise<Person> {
+    const p = await api.get(`person/id/${id}`);
+    this.setActivePerson(p);
+    return p;
+  }
+
   async getPersonByGithubName(github: string): Promise<Person> {
     const p = await api.get(`person/githubname/${github}`);
     return p;
@@ -1422,7 +1429,6 @@ export class MainStore {
   @action async getLnAuth(): Promise<any> {
     try {
       const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
-      console.log("LN DATA ", data)
       this.setLnAuth(data);
       return data;
     } catch (e) {
