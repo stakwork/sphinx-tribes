@@ -46,16 +46,16 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
     });
   };
 
-  async function getBounty() {
-    if (wantedId && !bounty.length) {
-      const bounty = await main.getWantedById(Number(wantedId));
-      setBounty(bounty);
-    }
-  }
-
   useEffect(() => {
+    async function getBounty() {
+      if (wantedId && !bounty.length) {
+        const bounty = await main.getWantedById(Number(wantedId));
+        setBounty(bounty);
+      }
+    }
+
     getBounty();
-  }, [getBounty, bounty]);
+  }, [bounty, main, wantedId]);
 
   return (
     <Modal
@@ -71,17 +71,13 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
         height: '100%',
         width: 'auto',
         minWidth: 500,
-        maxWidth: '90%',
+        maxWidth: '80%',
         zIndex: 20
       }}
+      overlayClick={onGoBack}
+      bigCloseImage={onGoBack}
       nextArrow={() => changeWanted(1)}
       prevArrow={() => changeWanted(-1)}
-      overlayClick={() => {
-        onGoBack();
-      }}
-      bigClose={() => {
-        onGoBack();
-      }}
     >
       <FocusedView
         person={person}

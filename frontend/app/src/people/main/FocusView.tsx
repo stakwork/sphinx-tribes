@@ -389,6 +389,7 @@ function FocusedView(props: FocusViewProps) {
               {goBack ? (
                 <IconButton
                   icon="arrow_back"
+                  color="noColor"
                   onClick={() => {
                     if (goBack) goBack();
                   }}

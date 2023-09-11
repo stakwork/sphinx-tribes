@@ -67,7 +67,6 @@ function MobileView(props: CodingBountiesProps) {
     sendToRedirect,
     handleCopyUrl,
     isCopied,
-    setExtrasPropertyAndSave,
     replitLink,
     assigneeHandlerOpen,
     setCreatorStep,
@@ -219,6 +218,11 @@ function MobileView(props: CodingBountiesProps) {
     } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.keysend_error);
     }
+  };
+
+  const updatePaymentStatus = async (created: number) => {
+    await main.updateBountyPaymentStatus(created);
+    await main.getPeopleWanteds();
   };
 
   useEffect(() => {
@@ -590,7 +594,7 @@ function MobileView(props: CodingBountiesProps) {
                         }}
                         onClick={(e: any) => {
                           e.stopPropagation();
-                          setExtrasPropertyAndSave('paid', !bountyPaid);
+                          updatePaymentStatus(created || 0);
                         }}
                       />
                     ) : (
@@ -801,9 +805,8 @@ function MobileView(props: CodingBountiesProps) {
                   shadowcolor={color.button_primary.shadow}
                   onClick={(e: any) => {
                     e.stopPropagation();
+                    updatePaymentStatus(created || 0);
                     setExtrasPropertyAndSaveMultiple('paid', {
-                      paid: !bountyPaid,
-                      price: bountyPrice,
                       award: awardDetails.name
                     });
 

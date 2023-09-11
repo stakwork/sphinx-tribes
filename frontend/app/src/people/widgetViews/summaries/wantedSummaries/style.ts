@@ -129,8 +129,7 @@ export const Img = styled.div<ImageProps>`
 export const Creator = styled.div`
   min-width: 892px;
   max-width: 892px;
-  min-height: 768px;
-  max-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: space-between;
 `;
@@ -138,7 +137,9 @@ export const Creator = styled.div`
 export const NormalUser = styled.div`
   min-width: 892px;
   max-width: 892px;
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   justify-content: space-between;
 `;
@@ -146,7 +147,7 @@ export const NormalUser = styled.div`
 export const CreatorDescription = styled.div<styleProps>`
   min-width: 600px;
   max-width: 600px;
-  min-height: 768px;
+  overflow: auto;
   height: 100vh;
   border-right: ${(p: any) =>
     p?.paid ? `3px solid ${p?.color?.primaryColor.P400}` : `1px solid ${p?.color.grayish.G700}`};
@@ -187,8 +188,7 @@ export const TitleBox = styled.div<colorProps>`
 export const DescriptionBox = styled.div<colorProps>`
   padding-right: 44px;
   margin-right: 5px;
-  min-height: 540px;
-  max-height: 560px;
+  max-height: calc(100% - 160px);
   overflow-y: scroll;
   overflow-wrap: anywhere;
   font-family: Barlow;
@@ -226,8 +226,9 @@ export const DescriptionBox = styled.div<colorProps>`
       font-style: normal;
       font-weight: 400;
       font-size: 15px;
-      line-height: 25px;
+      line-height: 20px;
       color: ${(p: any) => p?.color && p.color.black500};
+      white-space: pre-wrap;
     }
   }
   ::-webkit-scrollbar {
@@ -246,7 +247,6 @@ export const DescriptionBox = styled.div<colorProps>`
 export const AssigneeProfile = styled.div<colorProps>`
   min-width: 292px;
   max-width: 292px;
-  min-height: 768px;
   max-height: 100vh;
   background: ${(p: any) => p?.color && p.color.pureWhite};
   display: flex;
@@ -481,7 +481,6 @@ export const AdjustAmountContainer = styled.div<colorProps>`
 export const AwardsContainer = styled.div<colorProps>`
   width: 622px;
   height: 100vh;
-  min-height: 768px;
   max-height: 100vh;
   background: ${(p: any) => p.color && p.color.pureWhite};
   display: flex;
