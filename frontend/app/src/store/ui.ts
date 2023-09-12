@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import { persist } from 'mobx-persist';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import tags from '../tribes/tags';
+import { mainStore } from './main';
 
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;
 export interface EuiSelectableOption {
@@ -97,6 +98,7 @@ class UiStore {
   selectedPerson = 0;
   setSelectedPerson(n: number | undefined) {
     if (n) this.selectedPerson = n;
+    mainStore.getPersonById(n || 0);
   }
 
   // this is for animations, if you deselect as a component is fading out,
