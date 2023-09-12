@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useObserver } from 'mobx-react-lite';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
@@ -76,15 +76,20 @@ function SignIn(props: AuthProps) {
 
   const isMobile = useIsMobile();
 
-  useEffect(() => {
+  const getLnUrl = useCallback(async () => {
     if (ui.websocketToken) {
-      main.getLnAuth();
+      await main.getLnAuth();
     }
   }, [ui.websocketToken]);
+
+  useEffect(() => {
+    getLnUrl();
+  }, [getLnUrl]);
 
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
     ui.setWebsocketToken(res.body);
+
     if (res.msg === SOCKET_MSG.user_connect) {
       const user = ui.meInfo;
       if (user) {
@@ -98,6 +103,7 @@ function SignIn(props: AuthProps) {
         main.setLnAuth({ encode: '', k1: '' });
         main.setLnToken(res.jwt);
         ui.setMeInfo({ ...res.user, jwt: res.jwt, tribe_jwt: res.jwt });
+        ui.setSelectedPerson(res.id);
       }
     }
   };
@@ -137,7 +143,7 @@ function SignIn(props: AuthProps) {
             </Description>
 
             {page === 'lnurl' ? (
-              <QR value={main.lnauth.encode} size={200} />
+              <QR value={main.lnauth.encode.toLocaleUpperCase()} size={200} />
             ) : (
               !isMobile && (
                 <AuthQR
