@@ -555,7 +555,7 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	var budgetHistoryData = db.BudgetHistory{
 		Amount:       invoice.Amount,
-		Organization: invoice.Organization,
+		OrgUuid:      invoice.OrgUuid,
 		SenderPubKey: invoice.SenderPubKey,
 		Created:      &now,
 		Updated:      &now,
@@ -570,7 +570,7 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	var invoiceData = db.BudgetStoreData{
 		Amount:       invoice.Amount,
 		Invoice:      invoiceRes.Response.Invoice,
-		Organization: invoice.Organization,
+		OrgUuid:      invoice.OrgUuid,
 		SenderPubKey: invoice.SenderPubKey,
 		Host:         websocketToken,
 		Created:      &now,
