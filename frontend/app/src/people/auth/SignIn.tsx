@@ -80,7 +80,7 @@ function SignIn(props: AuthProps) {
     if (ui.websocketToken) {
       await main.getLnAuth();
     }
-  }, [ui.websocketToken])
+  }, [ui.websocketToken]);
 
   useEffect(() => {
     getLnUrl();
@@ -103,7 +103,7 @@ function SignIn(props: AuthProps) {
         main.setLnAuth({ encode: '', k1: '' });
         main.setLnToken(res.jwt);
         ui.setMeInfo({ ...res.user, jwt: res.jwt });
-        ui.setSelectedPerson(res.id)
+        ui.setSelectedPerson(res.id);
       }
     }
   };
