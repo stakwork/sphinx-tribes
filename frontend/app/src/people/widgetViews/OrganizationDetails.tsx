@@ -266,7 +266,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
             const data = await main.getBudgetInvoice({
                 amount: amount,
                 sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
-                organization: uuid,
+                org_uuid: uuid,
                 websocket_token: token
             });
 
@@ -299,7 +299,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
     const onSubmit = async (body: any) => {
         setIsLoading(true);
 
-        body.organization = uuid;
+        body.org_uuid = uuid;
 
         const res = await main.addOrganizationUser(body);
         if (res.status === 200) {
@@ -327,7 +327,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
         const roleData = bountyRolesData.filter((r: any) => r.status).map((role: any) => (
             {
                 owner_pubkey: user?.owner_pubkey,
-                organization: uuid,
+                org_uuid: uuid,
                 role: role.name
             }
         ));
@@ -409,7 +409,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                         <DataText>User{usersCount > 1 && 's'} {usersCount}</DataText>
                         {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD USER')) && (
                             <IconButton
-                                width={10}
+                                width={80}
                                 height={isMobile ? 36 : 40}
                                 text="Add"
                                 onClick={() => setIsOpen(true)}
@@ -420,7 +420,7 @@ const OrganizationDetails = (props: { close: () => void, org: Organization | und
                         <DataText>Budget {orgBudget} sats</DataText>
                         {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD BUDGET')) && (
                             <IconButton
-                                width={10}
+                                width={80}
                                 height={isMobile ? 36 : 40}
                                 text="Add"
                                 onClick={() => setIsOpenBudget(true)}

@@ -106,7 +106,7 @@ export interface PersonPost {
 export interface PersonWanted {
   person?: any;
   body?: any;
-  organization?: any;
+  org_uuid?: any;
   title?: string;
   description?: string;
   owner_id: string;
@@ -126,7 +126,7 @@ export interface PaymentHistory {
   id: number;
   bounty_id: number;
   amount: number;
-  organization: string;
+  org_uuid: string;
   sender_name: string;
   receiver_name: string;
   created: string;
@@ -717,7 +717,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -779,7 +779,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -826,7 +826,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -863,7 +863,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -899,7 +899,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -1481,7 +1481,7 @@ export class MainStore {
 
   async getBudgetInvoice(body: {
     amount: number;
-    organization: string;
+    org_uuid: string;
     sender_pubkey: string;
     websocket_token: string;
   }): Promise<LnInvoice> {
@@ -1490,7 +1490,7 @@ export class MainStore {
         'budgetinvoices',
         {
           amount: body.amount,
-          organization: body.organization,
+          org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
           websocket_token: body.websocket_token
         },
@@ -1615,12 +1615,12 @@ export class MainStore {
 
   @action async addOrganizationUser(body: {
     owner_pubkey: string;
-    organization: string;
+    org_uuid: string;
   }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/users/${body.organization}`, {
+      const r: any = await fetch(`${TribesURL}/organizations/users/${body.org_uuid}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify({

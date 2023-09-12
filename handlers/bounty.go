@@ -202,7 +202,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				OneSentenceSummary:      bounty.OneSentenceSummary,
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
-				Organization:            bounty.Organization,
+				OrgUuid:                 bounty.OrgUuid,
 				Updated:                 bounty.BountyUpdated,
 				CodingLanguages:         bounty.CodingLanguages,
 			},
@@ -280,7 +280,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	// check if user is the admin of the organization
 	// or has a pay bounty role
-	hasRole := db.UserHasAccess(pubKeyFromAuth, bounty.Organization, db.PayBounty)
+	hasRole := db.UserHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -288,7 +288,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	// check if the orgnization bounty balance
 	// is greater than the amount
-	orgBudget := db.DB.GetOrganizationBudget(bounty.Organization)
+	orgBudget := db.DB.GetOrganizationBudget(bounty.OrgUuid)
 	if orgBudget.TotalBudget < amount {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode("organization budget is not enough to pay the amount")
@@ -337,7 +337,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
 			ReceiverPubKey: request.ReceiverPubKey,
-			Organization:   bounty.Organization,
+			OrgUuid:        bounty.OrgUuid,
 			BountyId:       id,
 			Created:        &now,
 		}
