@@ -97,7 +97,7 @@ class UiStore {
   selectedPerson = 0;
   setSelectedPerson(n: number | undefined) {
     if (n) this.selectedPerson = n;
-    mainStore.getPersonById(n || 0)
+    mainStore.getPersonById(n || 0);
   }
 
   // this is for animations, if you deselect as a component is fading out,
