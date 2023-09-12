@@ -89,7 +89,7 @@ function MobileView(props: CodingBountiesProps) {
     loomEmbedUrl,
     bounty_expires,
     commitment_fee,
-    organization,
+    org_uuid,
     id
   } = props;
   const color = colors['light'];
@@ -166,8 +166,8 @@ function MobileView(props: CodingBountiesProps) {
     // if there is an organization and the organization's
     // buudget is sufficient keysend to the user immediately
     // without generating an invoice, else generate an invoice
-    if (organization) {
-      const organizationBudget = await main.getOrganizationBudget(organization);
+    if (org_uuid) {
+      const organizationBudget = await main.getOrganizationBudget(org_uuid);
       const budget = organizationBudget.total_budget;
       if (Number(budget) > Number(price)) {
         // make keysend payment
@@ -212,7 +212,7 @@ function MobileView(props: CodingBountiesProps) {
       setInvoiceStatus(true);
     } else if (res.msg === SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.keysend_success);
-      if (organization) {
+      if (org_uuid) {
         setKeysendStatus(true);
       }
     } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {

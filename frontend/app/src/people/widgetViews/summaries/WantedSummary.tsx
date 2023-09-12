@@ -50,7 +50,7 @@ function WantedSummary(props: WantedSummaryProps) {
     setIsExtraStyle,
     formSubmit,
     title,
-    organization,
+    org_uuid,
     id
   } = props;
 
@@ -579,7 +579,7 @@ function WantedSummary(props: WantedSummaryProps) {
           isPaidStatusPopOver={isPaidStatusPopOver}
           titleString={titleString}
           nametag={nametag}
-          organization={organization}
+          org_uuid={org_uuid}
           id={id}
         />
       );

@@ -191,7 +191,6 @@ func GetUserRolesMap(userRoles []UserRoles) map[string]string {
 }
 
 func RolesCheck(userRoles []UserRoles, check string) bool {
-	hasRole := false
 	rolesMap := GetRolesMap()
 	userRolesMap := GetUserRolesMap(userRoles)
 
@@ -202,27 +201,20 @@ func RolesCheck(userRoles []UserRoles, check string) bool {
 	// if any of the roles does not exists return false
 	// if any of the roles does not exists user roles return false
 	if !ok {
-		hasRole = false
-		return hasRole
+		return false
 	} else if !ok1 {
-		hasRole = false
-		return hasRole
+		return false
 	}
-
-	hasRole = true
-	return hasRole
+	return true
 }
 
 func CheckUser(userRoles []UserRoles, pubkey string) bool {
-	isUser := false
 	for _, role := range userRoles {
 		if role.OwnerPubKey == pubkey {
-			isUser = true
-			return isUser
+			return true
 		}
 	}
-
-	return isUser
+	return false
 }
 
 func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
@@ -233,6 +225,5 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 		hasRole = RolesCheck(userRoles, role)
 		return hasRole
 	}
-	hasRole = true
-	return hasRole
+	return true
 }

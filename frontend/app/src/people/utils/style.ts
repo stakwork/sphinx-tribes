@@ -44,3 +44,23 @@ export const InvoiceInput = styled.input`
   border-radius: 10px;
   border: 0.5px solid black;
 `;
+export const OrganizationWrap = styled.div`
+  margin-left: 0px;
+  cursor: pointer;
+  padding: 0px;
+  background: white;
+  padding: 2px 10px;
+  max-width: 180px;
+  text-align: center;
+  border-radius: 0px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+export const OrganizationText = styled.span`
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  color: #20c997;
+`;

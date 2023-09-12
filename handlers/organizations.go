@@ -137,7 +137,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// if not the orgnization admin
-	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.Organization, db.AddUser)
+	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.AddUser)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to add user")
@@ -153,7 +153,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if user already exists
-	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
+	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.OrgUuid)
 
 	if userExists.ID != 0 {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -207,7 +207,7 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	org := db.DB.GetOrganizationByUuid(orgUser.Organization)
+	org := db.DB.GetOrganizationByUuid(orgUser.OrgUuid)
 
 	if orgUser.OwnerPubKey == org.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -215,7 +215,7 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.Organization, db.DeleteUser)
+	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.DeleteUser)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to delete user")
@@ -309,7 +309,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	userExists := db.DB.GetOrganizationUser(user, uuid)
 
 	// if not the orgnization admin
-	if userExists.OwnerPubKey != user || userExists.Organization != uuid {
+	if userExists.OwnerPubKey != user || userExists.OrgUuid != uuid {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User does not exists in the organization")
 		return
@@ -346,7 +346,7 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	organizations := db.DB.GetUserCreatedOrganizations(pubKeyFromAuth)
 	assignedOrganizations := db.DB.GetUserAssignedOrganizations(pubKeyFromAuth)
 	for _, value := range assignedOrganizations {
-		organization := db.DB.GetOrganizationByUuid(value.Organization)
+		organization := db.DB.GetOrganizationByUuid(value.OrgUuid)
 		organizations = append(organizations, organization)
 	}
 
