@@ -1436,14 +1436,14 @@ export class MainStore {
     this.lnToken = token;
   }
 
-  @action async getLnAuth(): Promise<any> {
+  @action async getLnAuth(): Promise<LnAuthData> {
     try {
       const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
       this.setLnAuth(data);
       return data;
     } catch (e) {
       console.log('Error getLnAuth', e);
-      return '';
+      return { encode: '', k1: '' };
     }
   }
 
