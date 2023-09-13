@@ -1,6 +1,4 @@
-type LocType = 'English' | 'Spanish' | 'Russian';
-
-const loc: { [key in LocType]: any } = {
+const loc: { [key: string]: any } = {
   English: {
     tribes: 'Tribes',
     people: 'People',

@@ -8,11 +8,276 @@ import {
   coding_languages,
   GetValue,
   LanguageObject
-} from '../../../../people/utils/language_label_style';
-import { SvgMask } from '../../../../people/utils/svgMask';
-import ImageButton from '../../../common/Image_button';
+} from '../../../../people/utils/languageLabelStyle';
+import { SvgMask } from '../../../../people/utils/SvgMask';
+import ImageButton from '../../../common/ImageButton';
 import { InvitePeopleSearchProps } from './interfaces';
 
+interface styledProps {
+  color?: any;
+}
+
+interface labelProps {
+  value?: any;
+}
+
+const SearchOuterContainer = styled.div<styledProps>`
+  min-height: 256x;
+  max-height: 256x;
+  min-width: 292px;
+  max-width: 292px;
+  background: ${(p: any) => p?.color && p?.color?.pureWhite};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .SearchSkillContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 8px;
+    height: fit-content;
+    .SearchContainer {
+      position: relative;
+      .SearchInput {
+        background: ${(p: any) => p?.color && p?.color?.pureWhite};
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G600};
+        border-radius: 4px;
+        width: 177px;
+        height: 40px;
+        outline: none;
+        overflow: hidden;
+        caret-color: ${(p: any) => p?.color && p?.color?.textBlue1};
+        padding: 0px 32px 0px 18px;
+        margin-right: 11px;
+        font-family: Roboto !important;
+        font-weight: 400;
+        font-size: 13px;
+        line-height: 35px;
+
+        :focus-visible {
+          background: ${(p: any) => p?.color && p?.color?.pureWhite};
+          border: 1px solid ${(p: any) => p?.color && p?.color?.blue2};
+          outline: none;
+          .SearchText {
+            outline: none;
+            background: ${(p: any) => p?.color && p?.color?.pureWhite};
+            border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G600};
+            outline: none;
+          }
+        }
+        ::placeholder {
+          color: ${(p: any) => p?.color && p?.color?.grayish.G300};
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 13px;
+          line-height: 35px;
+          display: flex;
+          align-items: center;
+        }
+      }
+      .ImageContainer {
+        height: 40px;
+        width: 43px;
+        position: absolute;
+        top: 0px;
+        right: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        :active {
+          .crossImage {
+            filter: brightness(0) saturate(100%) invert(22%) sepia(5%) saturate(563%)
+              hue-rotate(161deg) brightness(91%) contrast(86%) !important;
+          }
+        }
+      }
+    }
+
+    .EuiPopOver {
+      margin-top: 0px;
+      .SkillSetContainer {
+        height: 40px;
+        width: 103px;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G600};
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+      }
+    }
+  }
+
+  .OuterContainer {
+    width: 412px;
+    background: ${(p: any) => p?.color && p.color.grayish.G950};
+    box-shadow: inset 0px 2px 8px ${(p: any) => p?.color && p.color.black100};
+    .PeopleList {
+      background: ${(p: any) => p?.color && p?.color?.grayish.G950};
+      box-shadow: inset 0px 2px 8px ${(p: any) => p?.color && p.color.black100};
+      width: 400px;
+      padding: 0 49px 16px;
+      min-height: 256px;
+      max-height: 256px;
+      overflow-y: scroll;
+      .People {
+        height: 32px;
+        min-width: 291.5813903808594px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 16px;
+        padding: 0px 0px 0px 6px;
+        .PeopleDetailContainer {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .ImageContainer {
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            object-fit: cover;
+          }
+          .PeopleName {
+            font-family: Barlow;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 16px;
+            color: ${(p: any) => p?.color && p?.color?.grayish.G10};
+            margin-left: 10px;
+          }
+        }
+      }
+      .no_result_container {
+        display: flex;
+        height: 210px;
+        justify-content: center;
+        align-items: center;
+        .no_result_text {
+          font-family: Barlow;
+          font-size: 16px;
+          font-weight: 600;
+          color: ${(p: any) => p?.color && p?.color?.grayish.G50};
+          word-spacing: 0.08em;
+        }
+      }
+    }
+  }
+`;
+
+const EuiPopOverCheckbox = styled.div<styledProps>`
+  width: 292px;
+  height: 293px;
+  padding: 20px 10px 10px 18px;
+
+  &.CheckboxOuter > div {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow-y: scroll;
+    .euiCheckboxGroup__item {
+      .euiCheckbox__square {
+        top: 5px;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
+        border-radius: 2px;
+      }
+      .euiCheckbox__input + .euiCheckbox__square {
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
+      }
+      .euiCheckbox__input:checked + .euiCheckbox__square {
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
+        background-image: url('static/checkboxImage.svg');
+      }
+      .euiCheckbox__label {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 16px;
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
+      }
+      input.euiCheckbox__input:checked ~ label {
+        color: ${(p: any) => p?.color && p?.color?.blue1};
+      }
+    }
+  }
+`;
+
+const LabelsContainer = styled.div<labelProps>`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  min-height: 24px;
+  width: 100%;
+`;
+
+const Label = styled.div<labelProps>`
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  border: ${(p: any) => p?.value && p?.value.border};
+  background: ${(p: any) => p?.value && p?.value.background};
+  margin-right: 4px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  .labelText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    color: ${(p: any) => p?.value && p?.value.color};
+  }
+`;
+
+const InvitedButton = styled.div<styledProps>`
+  width: 86px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: ${(p: any) => p.color && p.color.button_secondary.main};
+  box-shadow: 0px 2px 10px ${(p: any) => p.color && p.color.button_secondary.shadow};
+  border-radius: 32px;
+  color: ${(p: any) => p.color && p.color.pureWhite};
+  :hover {
+    background: ${(p: any) => p.color && p.color.button_secondary.hover};
+  }
+  :active {
+    background: ${(p: any) => p.color && p.color.button_secondary.active};
+  }
+  .nextText {
+    font-family: Barlow;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 15px;
+    user-select: none;
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+`;
+
+const LoaderContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 const codingLanguages = GetValue(coding_languages);
 
 const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
@@ -24,7 +289,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [labels, setLabels] = useState<any>([]);
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
-  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen) => !isPopoverOpen);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
 
   const { ref, inView } = useInView({
@@ -41,27 +306,30 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   }, [inView, initialPeopleCount]);
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x) => checkboxIdToSelectedMap[x.label]));
+    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
     setPeopleData(
-      (Object.keys(checkboxIdToSelectedMap).every((key) => !checkboxIdToSelectedMap[key])
+      (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
-        : props?.peopleList?.filter(({ extras }) =>
-            extras?.coding_languages?.some(({ value }) => checkboxIdToSelectedMap[value] ?? false)
+        : props?.peopleList?.filter(
+            ({ extras }: any) =>
+              extras?.coding_languages?.some(
+                ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+              )
           )
-      )?.filter((x) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
+      )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
     );
   }, [checkboxIdToSelectedMap, searchValue]);
 
   useEffect(() => {
     if (
       searchValue === '' &&
-      Object.keys(checkboxIdToSelectedMap).every((key) => !checkboxIdToSelectedMap[key])
+      Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
     ) {
       setPeopleData(props?.peopleList);
     }
   }, [searchValue, props, checkboxIdToSelectedMap]);
 
-  const handler = useCallback((e, value) => {
+  const handler = useCallback((e: any, value: any) => {
     if (value === '') {
       setSearchValue(e.target.value);
     } else {
@@ -69,9 +337,9 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
     }
   }, []);
 
-  const onChange = (optionId) => {
+  const onChange = (optionId: any) => {
     let trueCount = 0;
-    for (const [key, value] of Object.entries(checkboxIdToSelectedMap)) {
+    for (const [, value] of Object.entries(checkboxIdToSelectedMap)) {
       if (value) {
         trueCount += 1;
       }
@@ -95,7 +363,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
           <input
             value={searchValue}
             className="SearchInput"
-            onChange={(e) => {
+            onChange={(e: any) => {
               handler(e, '');
             }}
             placeholder={'Type to search ...'}
@@ -174,7 +442,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
             <EuiCheckboxGroup
               options={codingLanguages}
               idToSelectedMap={checkboxIdToSelectedMap}
-              onChange={(id) => {
+              onChange={(id: any) => {
                 onChange(id);
               }}
             />
@@ -189,7 +457,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
       >
         {!isPopoverOpen &&
           labels.length > 0 &&
-          labels?.map((x, index) => (
+          labels?.map((x: any) => (
             <Label
               key={x.label}
               value={x}
@@ -218,7 +486,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
 
       <div className="OuterContainer">
         <div className="PeopleList">
-          {peopleData?.slice(0, initialPeopleCount)?.map((value) => (
+          {peopleData?.slice(0, initialPeopleCount)?.map((value: any) => (
             <div className="People" key={value.id}>
               <div className="PeopleDetailContainer">
                 <div className="ImageContainer">
@@ -244,7 +512,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
               {inviteNameId === value?.id ? (
                 <InvitedButton
                   color={color}
-                  onClick={(e) => {
+                  onClick={() => {
                     handler('', value.owner_alias);
                     setInviteNameId(0);
                     if (props?.handleChange)
@@ -271,7 +539,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                     height: '30px',
                     background: `${color.grayish.G600}`
                   }}
-                  buttonAction={(e) => {
+                  buttonAction={() => {
                     if (props.isProvidingHandler) {
                       props.handleAssigneeDetails(value);
                     } else {
@@ -315,269 +583,3 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
 };
 
 export default InvitePeopleSearch;
-
-interface styledProps {
-  color?: any;
-}
-
-interface labelProps {
-  value?: any;
-}
-
-const SearchOuterContainer = styled.div<styledProps>`
-  min-height: 256x;
-  max-height: 256x;
-  min-width: 292px;
-  max-width: 292px;
-  background: ${(p) => p?.color && p?.color?.pureWhite};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .SearchSkillContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin-bottom: 8px;
-    height: fit-content;
-    .SearchContainer {
-      position: relative;
-      .SearchInput {
-        background: ${(p) => p?.color && p?.color?.pureWhite};
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
-        border-radius: 4px;
-        width: 177px;
-        height: 40px;
-        outline: none;
-        overflow: hidden;
-        caret-color: ${(p) => p?.color && p?.color?.textBlue1};
-        padding: 0px 32px 0px 18px;
-        margin-right: 11px;
-        font-family: Roboto !important;
-        font-weight: 400;
-        font-size: 13px;
-        line-height: 35px;
-
-        :focus-visible {
-          background: ${(p) => p?.color && p?.color?.pureWhite};
-          border: 1px solid ${(p) => p?.color && p?.color?.blue2};
-          outline: none;
-          .SearchText {
-            outline: none;
-            background: ${(p) => p?.color && p?.color?.pureWhite};
-            border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
-            outline: none;
-          }
-        }
-        ::placeholder {
-          color: ${(p) => p?.color && p?.color?.grayish.G300};
-          font-family: 'Roboto';
-          font-style: normal;
-          font-weight: 400;
-          font-size: 13px;
-          line-height: 35px;
-          display: flex;
-          align-items: center;
-        }
-      }
-      .ImageContainer {
-        height: 40px;
-        width: 43px;
-        position: absolute;
-        top: 0px;
-        right: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        :active {
-          .crossImage {
-            filter: brightness(0) saturate(100%) invert(22%) sepia(5%) saturate(563%)
-              hue-rotate(161deg) brightness(91%) contrast(86%) !important;
-          }
-        }
-      }
-    }
-
-    .EuiPopOver {
-      margin-top: 0px;
-      .SkillSetContainer {
-        height: 40px;
-        width: 103px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G600};
-        border-radius: 4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        user-select: none;
-      }
-    }
-  }
-
-  .OuterContainer {
-    width: 412px;
-    background: ${(p) => p?.color && p.color.grayish.G950};
-    box-shadow: inset 0px 2px 8px ${(p) => p?.color && p.color.black100};
-    .PeopleList {
-      background: ${(p) => p?.color && p?.color?.grayish.G950};
-      box-shadow: inset 0px 2px 8px ${(p) => p?.color && p.color.black100};
-      width: 400px;
-      padding: 0 49px 16px;
-      min-height: 256px;
-      max-height: 256px;
-      overflow-y: scroll;
-      .People {
-        height: 32px;
-        min-width: 291.5813903808594px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 16px;
-        padding: 0px 0px 0px 6px;
-        .PeopleDetailContainer {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          .ImageContainer {
-            height: 32px;
-            width: 32px;
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            object-fit: cover;
-          }
-          .PeopleName {
-            font-family: Barlow;
-            font-style: normal;
-            font-weight: 500;
-            font-size: 13px;
-            line-height: 16px;
-            color: ${(p) => p?.color && p?.color?.grayish.G10};
-            margin-left: 10px;
-          }
-        }
-      }
-      .no_result_container {
-        display: flex;
-        height: 210px;
-        justify-content: center;
-        align-items: center;
-        .no_result_text {
-          font-family: Barlow;
-          font-size: 16px;
-          font-weight: 600;
-          color: ${(p) => p?.color && p?.color?.grayish.G50};
-          word-spacing: 0.08em;
-        }
-      }
-    }
-  }
-`;
-
-const EuiPopOverCheckbox = styled.div<styledProps>`
-  width: 292px;
-  height: 293px;
-  padding: 20px 10px 10px 18px;
-
-  &.CheckboxOuter > div {
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    overflow-y: scroll;
-    .euiCheckboxGroup__item {
-      .euiCheckbox__square {
-        top: 5px;
-        border: 1px solid ${(p) => p?.color && p?.color?.grayish.G500};
-        border-radius: 2px;
-      }
-      .euiCheckbox__input + .euiCheckbox__square {
-        background: ${(p) => p?.color && p?.color?.pureWhite} no-repeat center;
-      }
-      .euiCheckbox__input:checked + .euiCheckbox__square {
-        border: 1px solid ${(p) => p?.color && p?.color?.blue1};
-        background: ${(p) => p?.color && p?.color?.blue1} no-repeat center;
-        background-image: url('static/checkboxImage.svg');
-      }
-      .euiCheckbox__label {
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 16px;
-        color: ${(p) => p?.color && p?.color?.grayish.G50};
-      }
-      input.euiCheckbox__input:checked ~ label {
-        color: ${(p) => p?.color && p?.color?.blue1};
-      }
-    }
-  }
-`;
-
-const LabelsContainer = styled.div<labelProps>`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  min-height: 24px;
-  width: 100%;
-`;
-
-const Label = styled.div<labelProps>`
-  height: 23px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-align: center;
-  border: ${(p) => p?.value && p?.value.border};
-  background: ${(p) => p?.value && p?.value.background};
-  margin-right: 4px;
-  border-radius: 4px;
-  padding: 2px 6px;
-  cursor: pointer;
-  .labelText {
-    font-family: 'Barlow';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 16px;
-    color: ${(p) => p?.value && p?.value.color};
-  }
-`;
-
-const InvitedButton = styled.div<styledProps>`
-  width: 86px;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  background: ${(p) => p.color && p.color.button_secondary.main};
-  box-shadow: 0px 2px 10px ${(p) => p.color && p.color.button_secondary.shadow};
-  border-radius: 32px;
-  color: ${(p) => p.color && p.color.pureWhite};
-  :hover {
-    background: ${(p) => p.color && p.color.button_secondary.hover};
-  }
-  :active {
-    background: ${(p) => p.color && p.color.button_secondary.active};
-  }
-  .nextText {
-    font-family: Barlow;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 15px;
-    user-select: none;
-    text-align: center;
-    letter-spacing: 0.01em;
-  }
-`;
-
-const LoaderContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;

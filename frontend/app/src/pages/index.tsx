@@ -3,17 +3,17 @@ import React from 'react';
 import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
-import BotsBody from '../bots/body';
-import PeopleHeader from '../people/main/header';
-import TokenRefresh from '../people/utils/tokenRefresh';
-import Body from '../tribes/body';
-import Header from '../tribes/header';
+import { observer } from 'mobx-react-lite';
+import BotsBody from '../bots/Body';
+import PeopleHeader from '../people/main/Header';
+import TokenRefresh from '../people/utils/TokenRefresh';
+import Body from '../tribes/Body';
+import Header from '../tribes/Header';
 import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
-import { People } from './People';
-import { TicketsPage } from './Tickets';
-import { observer } from 'mobx-react-lite';
-import { LeaderboardPage } from './Leaderboard';
+import { People } from './people';
+import { TicketsPage } from './tickets';
+import { LeaderboardPage } from './leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
@@ -26,8 +26,13 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/b/">
           <BotsBody />
         </Route>
-        <Route path="/p/" render={() => <People />} />
+        <Route path="/p/">
+          <People />
+        </Route>
         <Route path="/tickets/">
+          <TicketsPage />
+        </Route>
+        <Route path="/org/tickets/:uuid">
           <TicketsPage />
         </Route>
         <Route path="/leaderboard">

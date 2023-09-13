@@ -3,34 +3,7 @@ import styled from 'styled-components';
 import Select from 'react-select';
 import { SelProps } from 'components/interfaces';
 
-export default function SearchableSelect(props: SelProps) {
-  const { options, onChange, onInputChange, value, style, loading } = props;
-
-  const opts = options
-    ? options.map((o) => ({
-        ...o,
-        value: o.value,
-        label: o.label
-      }))
-    : [];
-
-  return (
-    <div style={{ position: 'relative', ...style }}>
-      <S
-        options={opts}
-        isLoading={loading}
-        placeholder={'Type to search...'}
-        isClearable={true}
-        isSearchable={true}
-        value={value}
-        onChange={onChange}
-        onInputChange={onInputChange}
-        className={'searchable-select-input'}
-      />
-    </div>
-  );
-}
-
+// @ts-ignore
 const S = styled(Select)`
 background:#ffffff00;
 border: 1px solid #E0E0E0;
@@ -84,3 +57,30 @@ button {
 }
 }
 `;
+export default function SearchableSelect(props: SelProps) {
+  const { options, onChange, onInputChange, value, style, loading } = props;
+
+  const opts = options
+    ? options.map((o: any) => ({
+        ...o,
+        value: o.value,
+        label: o.label
+      }))
+    : [];
+
+  return (
+    <div style={{ position: 'relative', ...style }}>
+      <S
+        options={opts}
+        isLoading={loading}
+        placeholder={'Type to search...'}
+        isClearable={true}
+        isSearchable={true}
+        value={value}
+        onChange={onChange}
+        onInputChange={onInputChange}
+        className={'searchable-select-input'}
+      />
+    </div>
+  );
+}

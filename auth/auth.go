@@ -45,10 +45,10 @@ func PubKeyContext(next http.Handler) http.Handler {
 			return
 		}
 
-		isJwt := strings.Contains(token, ".")
+		isJwt := strings.Contains(token, ".") && !strings.HasPrefix(token, ".")
 
 		if isJwt {
-			claims, err := DecodeToken(token)
+			claims, err := DecodeJwt(token)
 
 			if err != nil {
 				fmt.Println("Failed to parse JWT")
@@ -84,13 +84,12 @@ func PubKeyContext(next http.Handler) http.Handler {
 
 // VerifyTribeUUID takes base64 uuid and returns hex pubkey
 func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
-	sigByes, err := base64.URLEncoding.DecodeString(uuid)
+
+	ts, timeBuf, sigBuf, err := ParseTokenString(uuid)
 	if err != nil {
 		return "", err
 	}
 
-	timeBuf := sigByes[:4] // unix timestamp is 4 bytes, or uint32
-	sigBuf := sigByes[4:]
 	pubkey, valid, err := VerifyAndExtract(timeBuf, sigBuf)
 	if err != nil || !valid || pubkey == "" {
 		return "", err
@@ -98,9 +97,8 @@ func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
 
 	if checkTimestamp {
 		// 5 MINUTE MAX
-		ts := int64(binary.BigEndian.Uint32(timeBuf))
 		now := time.Now().Unix()
-		if ts < now-300 {
+		if int64(ts) < now-300 {
 			fmt.Println("TOO LATE!")
 			return "", errors.New("too late")
 		}
@@ -141,7 +139,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	return pubKeyHex, valid, nil
 }
 
-func DecodeToken(token string) (jwt.MapClaims, error) {
+func DecodeJwt(token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		key := config.JwtKey
@@ -151,7 +149,7 @@ func DecodeToken(token string) (jwt.MapClaims, error) {
 	return claims, err
 }
 
-func EncodeToken(pubkey string) (string, error) {
+func EncodeJwt(pubkey string) (string, error) {
 	exp := ExpireInHours(24 * 7)
 
 	claims := jwt.MapClaims{
@@ -166,4 +164,40 @@ func EncodeToken(pubkey string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+// tribe UUID is a base64 encoded string 69 bytes long
+// first 4 bytes is the timestamp
+// last 65 bytes is the sign
+
+// it can have two signature methods: signing the straight bytes
+// OR base64 encoding then utf8-string encoding than signing again.
+// the second method always prefixes the token with a "."
+// that way, signers that only support utf8 (CLN) can still make tokens
+
+func ParseTokenString(t string) (uint32, []byte, []byte, error) {
+	token := t
+	forceUtf8 := false
+	// this signifies its forced utf8 sig (for CLN SignMessage)
+	if strings.HasPrefix(t, ".") {
+		token = t[1:]
+		forceUtf8 = true
+	}
+	tBytes, err := base64.URLEncoding.DecodeString(token)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+	if len(tBytes) < 5 {
+		return 0, nil, nil, errors.New("invalid signature (too short)")
+	}
+	sig := tBytes[4:]
+	timeBuf := tBytes[:4]
+	ts := binary.BigEndian.Uint32(timeBuf)
+	if forceUtf8 {
+		ts64 := base64.URLEncoding.EncodeToString(timeBuf)
+		return ts, []byte(ts64), sig, nil
+	} else {
+		timeBuf := tBytes[:4]
+		return ts, timeBuf, sig, nil
+	}
 }

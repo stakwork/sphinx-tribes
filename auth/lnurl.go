@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/rand"
+	"strings"
 
 	lnurl "github.com/fiatjaf/go-lnurl"
 	"github.com/gobuffalo/packr/v2/file/resolver/encoding/hex"
@@ -13,9 +14,13 @@ type LnEncodeData struct {
 	K1     string
 }
 
-func EncodeLNURL() (LnEncodeData, error) {
+func EncodeLNURL(host string) (LnEncodeData, error) {
+	hostUrl := config.Host
+	if !strings.Contains(host, "localhost") {
+		hostUrl = "https://" + host
+	}
 	k1 := generate32Bytes()
-	url := config.Host + "/" + "lnauth_login?tag=login&k1=" + k1 + "&action=login"
+	url := hostUrl + "/" + "lnauth_login?tag=login&k1=" + k1 + "&action=login"
 
 	encode, err := lnurl.Encode(url)
 

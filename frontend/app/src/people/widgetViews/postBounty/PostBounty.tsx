@@ -1,12 +1,25 @@
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
 import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
-import IconButton from '../../../components/common/icon_button';
+import IconButton from '../../../components/common/IconButton2';
 import { useStores } from '../../../store';
-import StartUpModal from '../../utils/start_up_modal';
+import StartUpModal from '../../utils/StartUpModal';
 import { PostModal, PostModalProps } from './PostModal';
-import { observer } from 'mobx-react-lite';
+
+const color = colors['light'];
+const StyledIconButton = styled(IconButton)`
+  color: ${color.pureWhite};
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+`;
+
+const iconStyle = {
+  fontSize: '16px',
+  fontWeight: 400
+};
 
 interface Props extends Omit<PostModalProps, 'onClose' | 'isOpen'> {
   title?: string;
@@ -16,8 +29,6 @@ interface Props extends Omit<PostModalProps, 'onClose' | 'isOpen'> {
     color?: 'primary' | 'secondary';
   };
 }
-
-const color = colors['light'];
 
 const mapBtnColorProps = {
   primary: {
@@ -41,7 +52,7 @@ export const PostBounty: FC<Props> = observer(
       color: 'primary'
     },
     ...modalProps
-  }) => {
+  }: any) => {
     const { ui } = useStores();
     const [isOpenPostModal, setIsOpenPostModal] = useState(false);
     const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
@@ -103,15 +114,3 @@ export const PostBounty: FC<Props> = observer(
     );
   }
 );
-
-const StyledIconButton = styled(IconButton)`
-  color: ${color.pureWhite};
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-`;
-
-const iconStyle = {
-  fontSize: '16px',
-  fontWeight: 400
-};

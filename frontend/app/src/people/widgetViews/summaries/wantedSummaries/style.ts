@@ -18,7 +18,7 @@ export const Wrap = styled.div<colorProps>`
   font-style: normal;
   font-weight: 500;
   font-size: 24px;
-  color: ${(p) => p?.color && p.color.grayish.G10};
+  color: ${(p: any) => p?.color && p.color.grayish.G10};
   justify-content: space-between;
 `;
 
@@ -49,17 +49,17 @@ export const T = styled.div`
 export const B = styled.span<colorProps>`
   font-size: 15px;
   font-weight: bold;
-  color: ${(p) => p?.color && p.color.grayish.G10};
+  color: ${(p: any) => p?.color && p.color.grayish.G10};
 `;
 
 export const P = styled.div<colorProps>`
   font-weight: regular;
   font-size: 15px;
-  color: ${(p) => p?.color && p.color.grayish.G100};
+  color: ${(p: any) => p?.color && p.color.grayish.G100};
 `;
 
 export const D = styled.div<colorProps>`
-  color: ${(p) => p?.color && p.color.grayish.G50};
+  color: ${(p: any) => p?.color && p.color.grayish.G50};
   margin: 10px 0 30px;
 `;
 
@@ -69,7 +69,7 @@ export const Assignee = styled.div<colorProps>`
   cursor: pointer;
 
   &:hover {
-    color: ${(p) => p?.color && p.color.pureBlack};
+    color: ${(p: any) => p?.color && p.color.pureBlack};
   }
 `;
 
@@ -118,7 +118,7 @@ interface ImageProps {
 }
 
 export const Img = styled.div<ImageProps>`
-  background-image: url('${(p) => p.src}');
+  background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
   position: relative;
@@ -129,8 +129,7 @@ export const Img = styled.div<ImageProps>`
 export const Creator = styled.div`
   min-width: 892px;
   max-width: 892px;
-  min-height: 768px;
-  max-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: space-between;
 `;
@@ -138,7 +137,9 @@ export const Creator = styled.div`
 export const NormalUser = styled.div`
   min-width: 892px;
   max-width: 892px;
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   justify-content: space-between;
 `;
@@ -146,11 +147,11 @@ export const NormalUser = styled.div`
 export const CreatorDescription = styled.div<styleProps>`
   min-width: 600px;
   max-width: 600px;
-  min-height: 768px;
+  overflow: auto;
   height: 100vh;
-  border-right: ${(p) =>
+  border-right: ${(p: any) =>
     p?.paid ? `3px solid ${p?.color?.primaryColor.P400}` : `1px solid ${p?.color.grayish.G700}`};
-  background: ${(p) => p?.color && p.color.pureWhite};
+  background: ${(p: any) => p?.color && p.color.pureWhite};
   padding: 48px 0px 0px 48px;
   .DescriptionUpperContainerNormalView {
     padding-right: 28px;
@@ -181,21 +182,33 @@ export const TitleBox = styled.div<colorProps>`
   line-height: 26px;
   display: flex;
   align-items: center;
-  color: ${(p) => p?.color && p.color.text1};
+  color: ${(p: any) => p?.color && p.color.text1};
 `;
 
 export const DescriptionBox = styled.div<colorProps>`
   padding-right: 44px;
   margin-right: 5px;
-  min-height: 540px;
-  max-height: 560px;
+  max-height: calc(100% - 160px);
   overflow-y: scroll;
   overflow-wrap: anywhere;
   font-family: Barlow;
   font-weight: 400;
   font-size: 15px;
   line-height: 25px;
-  color: ${(p) => p?.color && p.color.black500};
+  color: ${(p: any) => p?.color && p.color.black500};
+  .loomContainer {
+    margin-top: 23px;
+  }
+  .loomHeading {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 25px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: ${(p: any) => p?.color && p.color.black500};
+  }
   .deliverablesContainer {
     margin-top: 23px;
     .deliverablesHeading {
@@ -206,15 +219,16 @@ export const DescriptionBox = styled.div<colorProps>`
       line-height: 25px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: ${(p) => p?.color && p.color.black500};
+      color: ${(p: any) => p?.color && p.color.black500};
     }
     .deliverablesDesc {
       font-family: 'Barlow';
       font-style: normal;
       font-weight: 400;
       font-size: 15px;
-      line-height: 25px;
-      color: ${(p) => p?.color && p.color.black500};
+      line-height: 20px;
+      color: ${(p: any) => p?.color && p.color.black500};
+      white-space: pre-wrap;
     }
   }
   ::-webkit-scrollbar {
@@ -222,7 +236,7 @@ export const DescriptionBox = styled.div<colorProps>`
     height: 6px;
   }
   ::-webkit-scrollbar-thumb {
-    background: ${(p) => p?.color && p.color.grayish.G300} !important;
+    background: ${(p: any) => p?.color && p.color.grayish.G300} !important;
     height: 80px;
   }
   ::-webkit-scrollbar-track-piece {
@@ -233,9 +247,8 @@ export const DescriptionBox = styled.div<colorProps>`
 export const AssigneeProfile = styled.div<colorProps>`
   min-width: 292px;
   max-width: 292px;
-  min-height: 768px;
   max-height: 100vh;
-  background: ${(p) => p?.color && p.color.pureWhite};
+  background: ${(p: any) => p?.color && p.color.pureWhite};
   display: flex;
   flex-direction: column;
   .buttonSet {
@@ -251,7 +264,7 @@ interface BountyPriceContainerProps {
 
 export const BountyPriceContainer = styled.div<BountyPriceContainerProps>`
   padding-left: 37px;
-  margin-top: ${(p) => p.margin_top};
+  margin-top: ${(p: any) => p.margin_top};
 `;
 
 interface codingLangProps {
@@ -271,9 +284,9 @@ export const LanguageContainer = styled.div`
 
 export const CodingLabels = styled.div<codingLangProps>`
   padding: 0px 8px;
-  border: ${(p) => (p.border ? p?.border : `1px solid ${p?.styledColors.pureBlack}`)};
-  color: ${(p) => (p.color ? p?.color : `${p?.styledColors.pureBlack}`)};
-  background: ${(p) => (p.background ? p?.background : `${p?.styledColors.pureWhite}`)};
+  border: ${(p: any) => (p.border ? p?.border : `1px solid ${p?.styledColors.pureBlack}`)};
+  color: ${(p: any) => (p.color ? p?.color : `${p?.styledColors.pureBlack}`)};
+  background: ${(p: any) => (p.background ? p?.background : `${p?.styledColors.pureWhite}`)};
   border-radius: 4px;
   overflow: hidden;
   max-height: 22.75px;
@@ -348,7 +361,7 @@ export const AutoCompleteContainer = styled.div<colorProps>`
     font-weight: 800;
     font-size: 26px;
     line-height: 36px;
-    color: ${(p) => p.color && p.color.text2};
+    color: ${(p: any) => p.color && p.color.text2};
     height: 44px;
     margin-bottom: 11px;
   }
@@ -364,7 +377,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
   min-width: 440px;
   max-width: 440px;
   border-radius: 10px;
-  background: ${(p) => p.color && p.color.pureWhite};
+  background: ${(p: any) => p.color && p.color.pureWhite};
   padding-top: 32px;
   .TopHeader {
     max-height: 48px;
@@ -388,7 +401,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
       line-height: 18px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: ${(p) => p.color && p.color.black500};
+      color: ${(p: any) => p.color && p.color.black500};
     }
   }
   .Header {
@@ -403,7 +416,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
       display: flex;
       align-items: center;
       text-align: center;
-      color: ${(p) => p.color && p.color.black500};
+      color: ${(p: any) => p.color && p.color.black500};
     }
   }
   .AssignedProfile {
@@ -422,14 +435,14 @@ export const AdjustAmountContainer = styled.div<colorProps>`
         line-height: 17px;
         display: flex;
         align-items: center;
-        color: ${(p) => (p.color ? p.color.grayish.G100 : '')};
+        color: ${(p: any) => (p.color ? p.color.grayish.G100 : '')};
         margin-right: 7px;
       }
       .InputContainerTextField {
         width: 296px;
-        background: ${(p) => p?.color && p?.color?.pureWhite};
-        border: 1px solid ${(p) => p.color && p.color.grayish.G600};
-        color: ${(p) => p.color && p.color.pureBlack};
+        background: ${(p: any) => p?.color && p?.color?.pureWhite};
+        border: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
+        color: ${(p: any) => p.color && p.color.pureBlack};
       }
       .InputContainerEndingText {
         font-family: Barlow;
@@ -439,7 +452,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
         line-height: 17px;
         display: flex;
         align-items: center;
-        color: ${(p) => p.color && p.color.grayish.G100};
+        color: ${(p: any) => p.color && p.color.grayish.G100};
         margin-left: 14px;
       }
     }
@@ -451,7 +464,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
       line-height: 16px !important;
       display: flex;
       align-items: center;
-      color: ${(p) => p.color && p.color.grayish.G100};
+      color: ${(p: any) => p.color && p.color.grayish.G100};
       margin-left: 42px;
       height: 32px;
     }
@@ -468,9 +481,8 @@ export const AdjustAmountContainer = styled.div<colorProps>`
 export const AwardsContainer = styled.div<colorProps>`
   width: 622px;
   height: 100vh;
-  min-height: 768px;
   max-height: 100vh;
-  background: ${(p) => p.color && p.color.pureWhite};
+  background: ${(p: any) => p.color && p.color.pureWhite};
   display: flex;
   flex-direction: column;
   .header {
@@ -480,8 +492,8 @@ export const AwardsContainer = styled.div<colorProps>`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-bottom: 1px solid ${(p) => p.color && p.color.grayish.G600};
-    box-shadow: 0px 1px 4px ${(p) => p.color && p.color.black80};
+    border-bottom: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
+    box-shadow: 0px 1px 4px ${(p: any) => p.color && p.color.black80};
     .headerTop {
       height: 48px;
       display: flex;
@@ -503,7 +515,7 @@ export const AwardsContainer = styled.div<colorProps>`
         line-height: 18px;
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        color: ${(p) => p.color && p.color.black500};
+        color: ${(p: any) => p.color && p.color.black500};
       }
     }
     .headerText {
@@ -514,7 +526,7 @@ export const AwardsContainer = styled.div<colorProps>`
       line-height: 43px;
       display: flex;
       align-items: center;
-      color: ${(p) => p.color && p.color.black500};
+      color: ${(p: any) => p.color && p.color.black500};
       margin-left: 73px;
       margin-bottom: 48px;
     }
@@ -540,7 +552,7 @@ export const AwardsContainer = styled.div<colorProps>`
       margin-top: 14px;
       border-radius: 6px;
       input[type='radio'] {
-        border: 1px solid ${(p) => p.color && p.color.grayish.G500};
+        border: 1px solid ${(p: any) => p.color && p.color.grayish.G500};
         border-radius: 2px;
         -webkit-appearance: none;
       }
@@ -562,7 +574,7 @@ export const AwardsContainer = styled.div<colorProps>`
       font-weight: 500;
       font-size: 13px;
       line-height: 15px;
-      color: ${(p) => p.color && p.color.grayish.G05};
+      color: ${(p: any) => p.color && p.color.grayish.G05};
     }
   }
 `;
@@ -572,8 +584,8 @@ export const AwardBottomContainer = styled.div<colorProps>`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-top: 1px solid ${(p) => p.color && p.color.grayish.G600};
-  box-shadow: 0px -1px 4px ${(p) => p.color && p.color.black80};
+  border-top: 1px solid ${(p: any) => p.color && p.color.grayish.G600};
+  box-shadow: 0px -1px 4px ${(p: any) => p.color && p.color.black80};
 `;
 
 export const PaidStatusPopover = styled.div<colorProps>`
@@ -592,7 +604,7 @@ export const PaidStatusPopover = styled.div<colorProps>`
   .PaidStatusContainer {
     height: 65px;
     width: 222px;
-    background: ${(p) => p.color && p.color.green1};
+    background: ${(p: any) => p.color && p.color.green1};
     margin-top: 5px;
     padding: 18px 0px 0px 21px;
     display: flex;
@@ -608,7 +620,7 @@ export const PaidStatusPopover = styled.div<colorProps>`
       font-weight: 700;
       font-size: 17px;
       line-height: 15px;
-      color: ${(p) => p.color && p.color.pureWhite};
+      color: ${(p: any) => p.color && p.color.pureWhite};
       margin-top: 6px;
       margin-left: 18px;
       user-select: none;
@@ -618,13 +630,13 @@ export const PaidStatusPopover = styled.div<colorProps>`
     display: flex;
     flex-direction: row;
     align-items: center;
-    background: ${(p) => p.color && p.color.black400};
+    background: ${(p: any) => p.color && p.color.black400};
     height: 75px;
     width: 222px;
     padding: 14px 0px 0px 19px;
     object-fit: cover;
     border-radius: 0px 0px 6px 6px;
-    opacity: ${(p) => (p?.isPaidStatusBadgeInfo ? 1 : 0)};
+    opacity: ${(p: any) => (p?.isPaidStatusBadgeInfo ? 1 : 0)};
     transition: all ease 4s;
     .imageContainer {
       position: absolute;
@@ -632,7 +644,7 @@ export const PaidStatusPopover = styled.div<colorProps>`
       left: 14px;
       height: 15px;
       width: 15px;
-      background: ${(p) => p.color && p.color.pureWhite};
+      background: ${(p: any) => p.color && p.color.pureWhite};
       display: flex;
       justify-content: center;
       align-items: center;
@@ -647,7 +659,7 @@ export const PaidStatusPopover = styled.div<colorProps>`
       line-height: 15px;
       display: flex;
       align-items: center;
-      color: ${(p) => p.color && p.color.pureWhite};
+      color: ${(p: any) => p.color && p.color.pureWhite};
       margin-left: 11px;
     }
   }
@@ -674,20 +686,24 @@ export const CountDownTimer = styled.p`
   font-weight: bolder;
 `;
 
-export const CopyInvoiceBtn = styled.button`
-  cursor: pointer;
-  margin: 0;
-  border: 0;
-  color: #000000;
-  padding: 10px 20px;
-  outline: 0;
-  margin-top: 15px;
-`;
-
 export const InvoiceWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 220px;
+`;
+
+export const QrWrap = styled.div`
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+`;
+
+export const BountyTime = styled.p`
+  font-size: 0.9rem;
+  padding: 5px 0px;
+  text-align: center;
+  width: 220px;
+  margin: 15px 0px;
 `;

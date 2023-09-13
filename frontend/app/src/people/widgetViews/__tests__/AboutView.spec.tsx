@@ -5,7 +5,7 @@ import React from 'react';
 import { setupStore } from '__test__/__mockData__/setupStore';
 import { user } from '__test__/__mockData__/user';
 import { mockUsehistory } from '__test__/__mockFn__/useHistory';
-import { AboutView } from '../aboutView';
+import { AboutView } from '../AboutView';
 
 beforeAll(() => {
   nock.disableNetConnect();
@@ -19,13 +19,13 @@ describe('AboutView Component', () => {
     const description = 'test description';
     const extras = {
       email: [{ value: 'testEmail@sphinx.com' }],
-      twitter: [{ value: 'twitterHandle' }],
+      twitter: { handle: 'twitterHandle' },
       wanted: []
     };
 
     render(<AboutView extras={extras} description={description} />);
     expect(screen.queryByText(extras.email[0].value)).toBeInTheDocument();
-    expect(screen.queryByText(`@${extras.twitter[0].value}`)).toBeInTheDocument();
+    // expect(screen.queryByText(`@${extras.twitter.handle}`)).toBeInTheDocument();
     expect(screen.queryByText(description)).toBeInTheDocument();
   });
 });

@@ -1,19 +1,191 @@
 import { makeAutoObservable, observable, action } from 'mobx';
+import memo from 'memo-decorator';
+import { persist } from 'mobx-persist';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
+import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
-import memo from 'memo-decorator';
-import { persist } from 'mobx-persist';
 
-export const queryLimit = 1000;
+export const queryLimit = 100;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
 }
 
+export interface Tribe {
+  uuid: string;
+  name: string;
+  unique_name: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
+  last_active: number;
+  matchCount?: number; // for tag search
+}
+
+export interface Bot {
+  id?: number;
+  uuid: string;
+  name: string;
+  owner_pubkey: string;
+  unique_name: string;
+  price_per_use: number;
+  created: string;
+  updated: string;
+  unlisted: boolean;
+  deleted: boolean;
+  owner_route_hint: string;
+  owner: string;
+  pubkey: string; // group encryption key
+  price: number;
+  img: string;
+  tags: string[];
+  description: string;
+  member_count: number;
+  hide?: boolean;
+}
+
+export interface Person {
+  id: number;
+  unique_name: string;
+  owner_pubkey: string;
+  owner_alias: string;
+  description: string;
+  img: string;
+  tags: string[];
+  pubkey?: string;
+  photo_url: string;
+  alias: string;
+  route_hint: string;
+  contact_key: string;
+  price_to_meet: number;
+  last_login?: number;
+  url: string;
+  verification_signature: string;
+  extras: Extras;
+  hide?: boolean;
+  commitment_fee?: number;
+  assigned_hours?: number;
+  bounty_expires?: number;
+}
+
+export interface PersonFlex {
+  id?: number;
+  unique_name?: string;
+  owner_pubkey?: string;
+  owner_alias?: string;
+  description?: string;
+  img?: string;
+  tags?: string[];
+  pubkey?: string;
+  photo_url?: string;
+  alias?: string;
+  route_hint?: string;
+  contact_key?: string;
+  last_login?: number;
+  price_to_meet?: number;
+  url?: string;
+  verification_signature?: string;
+  extras?: Extras;
+  hide?: boolean;
+}
+
+export interface PersonPost {
+  person: PersonFlex;
+  title?: string;
+  description?: string;
+  created: number;
+}
+
+export interface PersonWanted {
+  person?: any;
+  body?: any;
+  org_uuid?: any;
+  title?: string;
+  description?: string;
+  owner_id: string;
+  created?: number;
+  show?: boolean;
+  assignee?: any;
+  wanted_type: string;
+  type?: string;
+  price?: string;
+  codingLanguage: string;
+  estimated_session_length: string;
+  bounty_expires?: string;
+  commitment_fee?: number;
+}
+
+export interface PaymentHistory {
+  id: number;
+  bounty_id: number;
+  amount: number;
+  org_uuid: string;
+  sender_name: string;
+  receiver_name: string;
+  created: string;
+}
+
+export interface PersonOffer {
+  person: PersonFlex;
+  title: string;
+  description: string;
+  created: number;
+}
+
+export interface Jwt {
+  jwt: string;
+}
+
+export interface QueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  direction?: string;
+  search?: string;
+}
+
+export interface ClaimOnLiquid {
+  asset: number;
+  to: string;
+  amount?: number;
+  memo: string;
+}
+
+export interface LnAuthData {
+  encode: string;
+  k1: string;
+}
+
+export interface LnInvoice {
+  success: boolean;
+  response: {
+    invoice: string;
+  };
+}
+
+export interface Organization {
+  id: string;
+  uuid: string;
+  name: string;
+  owner_pubkey: string;
+  img: string;
+  created: string;
+  updated: string;
+  show: boolean;
+}
+
+export interface BountyRoles {
+  name: string;
+}
 export class MainStore {
+  [x: string]: any;
   tribes: Tribe[] = [];
   ownerTribes: Tribe[] = [];
 
@@ -25,10 +197,10 @@ export class MainStore {
     let ta = [...uiStore.tags];
 
     //make tags string for querys
-    ta = ta.filter((f) => f.checked);
+    ta = ta.filter((f: any) => f.checked);
     let tags = '';
     if (ta && ta.length) {
-      ta.forEach((o, i) => {
+      ta.forEach((o: any, i: any) => {
         tags += o.label;
         if (ta.length - 1 !== i) {
           tags += ',';
@@ -47,7 +219,7 @@ export class MainStore {
     this.tribes = this.doPageListMerger(
       this.tribes,
       ts,
-      (n) => uiStore.setTribesPageNumber(n),
+      (n: any) => uiStore.setTribesPageNumber(n),
       queryParams
     );
 
@@ -76,7 +248,7 @@ export class MainStore {
 
     // hide test bots and set images
     b &&
-      b.forEach((bb, i) => {
+      b.forEach((bb: any, i: any) => {
         if (bb.unique_name === 'btc') {
           // bb.img = "/static/bots_bitcoin.png";
           b.splice(i, 1);
@@ -124,8 +296,8 @@ export class MainStore {
       const tribeServerBots = await api.get(`bots/owner/${info.owner_pubkey}`);
 
       // merge data from tribe server, it has more than relay
-      const mergedBots = relayMyBots.map((b) => {
-        const thisBot = tribeServerBots.find((f) => f.uuid === b.uuid);
+      const mergedBots = relayMyBots.map((b: any) => {
+        const thisBot = tribeServerBots.find((f: any) => f.uuid === b.uuid);
         return {
           ...b,
           ...thisBot
@@ -140,7 +312,7 @@ export class MainStore {
     }
   }
 
-  async fetchFromRelay(path): Promise<any> {
+  async fetchFromRelay(path: string): Promise<any> {
     if (!uiStore.meInfo) return null;
 
     const info = uiStore.meInfo;
@@ -150,7 +322,7 @@ export class MainStore {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'x-jwt': info.jwt,
+        'x-jwt': info.tribe_jwt,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
@@ -170,7 +342,7 @@ export class MainStore {
     // put got on top
     // if already exists, delete
     const tribesClone = [...this.tribes];
-    const dupIndex = tribesClone.findIndex((f) => f.uuid === t.uuid);
+    const dupIndex = tribesClone.findIndex((f: any) => f.uuid === t.uuid);
     if (dupIndex > -1) {
       tribesClone.splice(dupIndex, 1);
     }
@@ -258,7 +430,7 @@ export class MainStore {
     }
 
     const headers = {
-      'x-jwt': info.jwt,
+      'x-jwt': info.tribe_jwt,
       'Content-Type': 'application/json'
     };
 
@@ -390,7 +562,7 @@ export class MainStore {
       queryParams.limit = limit;
       query += '?';
       const { length } = Object.keys(queryParams);
-      Object.keys(queryParams).forEach((k, i) => {
+      Object.keys(queryParams).forEach((k: string, i: number) => {
         query += `${k}=${queryParams[k]}`;
 
         // add & if not last param
@@ -425,7 +597,7 @@ export class MainStore {
     const ps = await this.fetchPeople(uiStore.searchText, queryParams);
 
     if (uiStore.meInfo) {
-      const index = ps.findIndex((f) => f.id === uiStore.meInfo?.id);
+      const index = ps.findIndex((f: any) => f.id === uiStore.meInfo?.id);
       if (index > -1) {
         // add 'hide' property to me in people list
         ps[index].hide = true;
@@ -441,7 +613,7 @@ export class MainStore {
       this.people = this.doPageListMerger(
         this.people,
         ps,
-        (n) => uiStore.setPeoplePageNumber(n),
+        (n: any) => uiStore.setPeoplePageNumber(n),
         params
       );
     }
@@ -465,7 +637,7 @@ export class MainStore {
 
   decodeListJSON(li: any): Promise<any[]> {
     if (li?.length) {
-      li.forEach((o, i) => {
+      li.forEach((o: any, i: any) => {
         li[i].body = JSON.parse(o.body);
         li[i].person = JSON.parse(o.person);
       });
@@ -496,7 +668,7 @@ export class MainStore {
         this.peoplePosts = this.doPageListMerger(
           this.peoplePosts,
           ps,
-          (n) => uiStore.setPeoplePostsPageNumber(n),
+          (n: any) => uiStore.setPeoplePostsPageNumber(n),
           queryParams
         );
       }
@@ -511,7 +683,7 @@ export class MainStore {
     resolver: (...args: any[]) => JSON.stringify({ args }),
     cache: new Map()
   })
-  private async fetchPeoplePosts(query) {
+  private async fetchPeoplePosts(query: string) {
     return await api.get(query);
   }
 
@@ -525,31 +697,54 @@ export class MainStore {
   async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams('people/wanteds', queryLimit, {
+    const query2 = this.appendQueryParams('bounty/all', queryLimit, {
       ...queryParams,
       sortBy: 'created'
     });
+
     try {
-      let ps = await api.get(query);
-      ps = this.decodeListJSON(ps);
+      const ps2 = await api.get(query2);
+      const ps3: any[] = [];
+
+      if (ps2) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        // Set person wanted to empty array to avoid wrong data
-        this.setPersonWanteds([]);
-
-        this.peopleWanteds = ps;
+        this.peopleWanteds = ps3;
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
         this.peopleWanteds = this.doPageListMerger(
           this.peopleWanteds,
-          ps,
-          (n) => uiStore.setPeopleWantedsPageNumber(n),
-          queryParams
+          ps3,
+          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          queryParams,
+          'wanted'
         );
       }
-      return ps;
+      this.setPeopleWanteds(ps3);
+      return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
       return [];
@@ -570,17 +765,181 @@ export class MainStore {
       sortBy: 'created'
     });
     try {
-      let ps = await api.get(query);
-      ps = this.decodeListJSON(ps);
+      const ps2 = await api.get(query);
+      const ps3: any[] = [];
 
-      navigator.clipboard.writeText(JSON.stringify(ps));
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
 
-      this.setPersonWanteds(ps);
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
 
-      return ps;
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      return ps3;
     } catch (e) {
-      console.log('fetch failed getPeopleWanteds: ', e);
+      console.log('fetch failed getPersonAssignedWanteds: ', e);
       return [];
+    }
+  }
+
+  createdWanteds: PersonWanted[] = [];
+
+  setCreatedWanteds(wanteds: PersonWanted[]) {
+    this.createdWanteds = wanteds;
+  }
+
+  async getPersonCreatedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+
+    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, queryLimit, {
+      ...queryParams,
+      sortBy: 'created'
+    });
+    try {
+      const ps2 = await api.get(query);
+      const ps3: any[] = [];
+
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      this.setCreatedWanteds(ps3);
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getPersonCreatedWanteds: ', e);
+      return [];
+    }
+  }
+
+  async getWantedById(id: number): Promise<PersonWanted[]> {
+    try {
+      const ps2 = await api.get(`bounty/id/${id}`);
+      const ps3: any[] = [];
+
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getWantedById: ', e);
+      return [];
+    }
+  }
+
+  async getOrganizationWanted(uuid: string, queryParams?: any): Promise<PersonWanted[]> {
+    queryParams = { ...queryParams, search: uiStore.searchText };
+    try {
+      const ps2 = await api.get(`organizations/bounties/${uuid}`);
+      const ps3: any[] = [];
+
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      // for search always reset page
+      if (queryParams && queryParams.resetPage) {
+        this.peopleWanteds = ps3;
+        uiStore.setPeopleWantedsPageNumber(1);
+      } else {
+        // all other cases, merge
+        this.peopleWanteds = this.doPageListMerger(
+          this.peopleWanteds,
+          ps3,
+          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          queryParams,
+          'wanted'
+        );
+      }
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getOrganizationWanted: ', e);
+      return [];
+    }
+  }
+
+  async getBountyCount(personKey: string, tabType: string): Promise<number> {
+    try {
+      const count = await api.get(`bounty/count/${personKey}/${tabType}`);
+
+      return count;
+    } catch (e) {
+      console.log('fetch failed getCreatedWanteds: ', e);
+      return 0;
     }
   }
 
@@ -607,7 +966,7 @@ export class MainStore {
         this.peopleOffers = this.doPageListMerger(
           this.peopleOffers,
           ps,
-          (n) => uiStore.setPeopleOffersPageNumber(n),
+          (n: any) => uiStore.setPeopleOffersPageNumber(n),
           queryParams
         );
       }
@@ -619,7 +978,13 @@ export class MainStore {
     }
   }
 
-  doPageListMerger(currentList: any[], newList: any[], setPage: Function, queryParams?: any) {
+  doPageListMerger(
+    currentList: any[],
+    newList: any[],
+    setPage: (any) => void,
+    queryParams?: any,
+    type?: string
+  ) {
     if (!newList || !newList.length) {
       if (queryParams.search) {
         // if search and no results, return nothing
@@ -637,12 +1002,39 @@ export class MainStore {
     if (queryParams?.page) setPage(queryParams.page);
     const l = [...currentList, ...newList];
 
+    const set = new Set();
+    if (type === 'wanted') {
+      const uniqueArray = l.filter((item: any) => {
+        if (item.body && item.body.id && !set.has(item.body.id)) {
+          set.add(item.body.id);
+          return true;
+        }
+        return false;
+      }, set);
+      return uniqueArray;
+    }
+
     return l;
+  }
+
+  @persist('list')
+  activePerson: Person[] = [];
+
+  setActivePerson(p: Person) {
+    this.activePerson = [p];
   }
 
   @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
+    this.setActivePerson(p);
+    return p;
+  }
+
+  @memo()
+  async getPersonById(id: number): Promise<Person> {
+    const p = await api.get(`person/id/${id}`);
+    this.setActivePerson(p);
     return p;
   }
 
@@ -664,7 +1056,7 @@ export class MainStore {
           const response = await api.get(`admin_pubkeys`);
           const admin_keys = response?.pubkeys;
           if (admin_keys !== null) {
-            return !!admin_keys.find((value) => value === self.owner_pubkey);
+            return !!admin_keys.find((value: any) => value === self.owner_pubkey);
           } else {
             return false;
           }
@@ -766,7 +1158,7 @@ export class MainStore {
     }
   }
 
-  async saveProfile(body) {
+  async saveProfile(body: any) {
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
@@ -799,6 +1191,75 @@ export class MainStore {
     }
   }
 
+  async saveBounty(body: any): Promise<void> {
+    const info = uiStore.meInfo as any;
+    if (!info && !body) {
+      console.log('Youre not logged in');
+      return;
+    }
+
+    if (!body.coding_languages || !body.coding_languages.length) {
+      body.coding_languages = [];
+    } else {
+      const languages: string[] = [];
+      body.coding_languages.forEach((lang: any) => {
+        languages.push(lang.value);
+      });
+
+      body.coding_languages = languages;
+    }
+
+    try {
+      const request = `bounty?token=${info?.tribe_jwt}`;
+      //TODO: add some sort of authentication
+      const response = await fetch(`${TribesURL}/${request}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...body
+        }),
+        mode: 'cors',
+        headers: {
+          'x-jwt': info?.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status) {
+        this.getPeopleWanteds({ resetPage: true });
+      }
+      return;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async deleteBounty(created: number, owner_pubkey: string): Promise<void> {
+    const info = uiStore.meInfo as any;
+    if (!info) {
+      console.log('Youre not logged in');
+      return;
+    }
+
+    try {
+      const request = `bounty/${owner_pubkey}/${created}`;
+      //TODO: add some sort of authentication
+      const response = await fetch(`${TribesURL}/${request}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info?.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.status) {
+        await this.getPeopleWanteds({ resetPage: true });
+      }
+      return;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   // this method is used whenever changing data from the frontend,
   // forks between tor users and non-tor
   async doCallToRelay(method: string, path: string, body: any): Promise<any> {
@@ -819,7 +1280,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -868,7 +1329,7 @@ export class MainStore {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
       const clonedEx: any = clonedExtras && clonedExtras[extrasName];
-      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+      const targetIndex = clonedEx?.findIndex((f: any) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {
@@ -895,7 +1356,7 @@ export class MainStore {
       const clonedMeInfo = { ...uiStore.meInfo };
       const clonedExtras = clonedMeInfo?.extras;
       const clonedEx: any = clonedExtras && clonedExtras[extrasName];
-      const targetIndex = clonedEx?.findIndex((f) => f.created === created);
+      const targetIndex = clonedEx?.findIndex((f: any) => f.created === created);
 
       if (clonedEx && (targetIndex || targetIndex === 0) && targetIndex > -1) {
         try {
@@ -930,7 +1391,7 @@ export class MainStore {
           price_to_meet: parseInt(body.price_to_meet)
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -955,6 +1416,7 @@ export class MainStore {
       const data = await api.get('people/wanteds/header');
       return data;
     } catch (e) {
+      console.log('Error getBountyHeaderData', e);
       return '';
     }
   }
@@ -974,62 +1436,78 @@ export class MainStore {
     this.lnToken = token;
   }
 
-  @action async getLnAuth(): Promise<any> {
+  @action async getLnAuth(): Promise<LnAuthData> {
     try {
-      const data = await api.get('lnauth');
+      const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
       this.setLnAuth(data);
       return data;
     } catch (e) {
-      return '';
-    }
-  }
-
-  @action async getLnAuthPoll(): Promise<{ k1: string; status: boolean }> {
-    try {
-      const data = await api.get(`lnauth_poll?k1=${this.lnauth.k1}`);
-      if (data.status) {
-        uiStore.setShowSignIn(false);
-
-        this.setLnAuth({ encode: '', k1: '' });
-        this.setLnToken(data.jwt);
-        uiStore.setMeInfo({ ...data.user, jwt: data.jwt });
-      }
-      return data;
-    } catch (e) {
-      return { k1: '', status: false };
+      console.log('Error getLnAuth', e);
+      return { encode: '', k1: '' };
     }
   }
 
   @observable
-  lnInvoice: string = '';
+  lnInvoice = '';
 
   @action setLnInvoice(invoice: string) {
     this.lnInvoice = invoice;
   }
 
-  @observable
-  lnInvoiceStatus: boolean = false;
-
-  @action setLnInvoiceStatus(status: boolean) {
-    this.lnInvoiceStatus = status;
-  }
-
-  @action async getLnInvoice(body: {
+  async getLnInvoice(body: {
     amount: number;
     memo: string;
     owner_pubkey: string;
     user_pubkey: string;
     created: string;
+    type: 'KEYSEND' | 'ASSIGN';
+    assigned_hours?: number;
+    commitment_fee?: number;
+    bounty_expires?: string;
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
         'invoices',
         {
-          amount: body.amount,
+          amount: body.amount.toString(),
           memo: body.memo,
           owner_pubkey: body.owner_pubkey,
           user_pubkey: body.user_pubkey,
-          created: body.created
+          created: body.created,
+          type: body.type,
+          assigned_hours: body.assigned_hours,
+          commitment_fee: body.commitment_fee,
+          bounty_expires: body.bounty_expires,
+          websocket_token: uiStore.meInfo?.websocketToken
+        },
+        {
+          'Content-Type': 'application/json'
+        }
+      );
+      if (data.success) {
+        this.setLnInvoice(data.response.invoice);
+      }
+      return data;
+    } catch (e) {
+      console.log('Error getLnInvoice', e);
+      return { success: false, response: { invoice: '' } };
+    }
+  }
+
+  async getBudgetInvoice(body: {
+    amount: number;
+    org_uuid: string;
+    sender_pubkey: string;
+    websocket_token: string;
+  }): Promise<LnInvoice> {
+    try {
+      const data = await api.post(
+        'budgetinvoices',
+        {
+          amount: body.amount,
+          org_uuid: body.org_uuid,
+          sender_pubkey: body.sender_pubkey,
+          websocket_token: body.websocket_token
         },
         {
           'Content-Type': 'application/json'
@@ -1044,158 +1522,303 @@ export class MainStore {
     }
   }
 
-  @action async getLnInvoiceStatus(
-    payment_req: string
-  ): Promise<{ invoiceStatus: boolean; bountyPaid: boolean }> {
+  @action async deleteBountyAssignee(body: {
+    owner_pubkey: string;
+    created: string;
+  }): Promise<any> {
     try {
-      const data = await api.get(`invoices/${payment_req}`, {
-        'Content-Type': 'application/json'
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
       });
 
-      if (data.status) {
-        this.setLnInvoiceStatus(data.status);
-      }
-      return { invoiceStatus: data.status, bountyPaid: data.bounty_paid };
+      return r;
     } catch (e) {
-      return { invoiceStatus: false, bountyPaid: false };
+      console.log('Error deleteBountyAssignee', e);
+      return false;
+    }
+  }
+
+  @observable
+  organizations: Organization[] = [];
+
+  @action setOrganizations(organizations: Organization[]) {
+    this.organizations = organizations;
+  }
+
+  @action async getUserOrganizations(): Promise<Organization[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/user`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      this.setOrganizations(data);
+      return await data;
+    } catch (e) {
+      console.log('Error getUserOrganizations', e);
+      return [];
+    }
+  }
+
+  @action async addOrganization(body: { name: string; img: string }): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error addOrganization', e);
+      return false;
+    }
+  }
+
+  async getOrganizationUsersCount(uuid: string): Promise<number> {
+    try {
+      const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}/count`, {
+        method: 'GET',
+        mode: 'cors'
+      });
+
+      return r.json();
+    } catch (e) {
+      console.log('Error getOrganizationUsersCount', e);
+      return 0;
+    }
+  }
+
+  async getOrganizationUsers(uuid: string): Promise<Person[]> {
+    try {
+      const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}`, {
+        method: 'GET',
+        mode: 'cors'
+      });
+
+      return r.json();
+    } catch (e) {
+      console.log('Error getOrganizationUsers', e);
+      return [];
+    }
+  }
+
+  @action async addOrganizationUser(body: {
+    owner_pubkey: string;
+    org_uuid: string;
+  }): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/${body.org_uuid}`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error addOrganizationUser', e);
+      return false;
+    }
+  }
+
+  @action async deleteOrganizationUser(body: any, uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error deleteOrganizationUser', e);
+      return false;
+    }
+  }
+
+  async getRoles(): Promise<BountyRoles[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/bounty/roles`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.log('Error getRoles', e);
+      return [];
+    }
+  }
+
+  async getUserRoles(uuid: string, user: string): Promise<any[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/role/${uuid}/${user}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.log('Error getUserRoles', e);
+      return [];
+    }
+  }
+
+  async addUserRoles(body: any, uuid: string, user: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/users/role/${uuid}/${user}`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error addUserRoles', e);
+      return false;
+    }
+  }
+
+  async updateBountyPaymentStatus(created: number): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/bounty/paymentstatus/${created}`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error updateBountyPaymentStatus', e);
+      return false;
+    }
+  }
+
+  async getOrganizationBudget(uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/budget/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async makeBountyPayment(body: {
+    id: number;
+    receiver_pubkey: string;
+    websocket_token: string;
+  }): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/bounty/pay/${body.id}`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async getPaymentHistories(uuid: string): Promise<PaymentHistory[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/payments/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return [];
     }
   }
 }
 
 export const mainStore = new MainStore();
-
-export interface Tribe {
-  uuid: string;
-  name: string;
-  unique_name: string;
-  owner: string;
-  pubkey: string; // group encryption key
-  price: number;
-  img: string;
-  tags: string[];
-  description: string;
-  member_count: number;
-  last_active: number;
-  matchCount?: number; // for tag search
-}
-
-export interface Bot {
-  id?: number;
-  uuid: string;
-  name: string;
-  owner_pubkey: string;
-  unique_name: string;
-  price_per_use: number;
-  created: string;
-  updated: string;
-  unlisted: boolean;
-  deleted: boolean;
-  owner_route_hint: string;
-  owner: string;
-  pubkey: string; // group encryption key
-  price: number;
-  img: string;
-  tags: string[];
-  description: string;
-  member_count: number;
-  hide?: boolean;
-}
-
-export interface Person {
-  id: number;
-  unique_name: string;
-  owner_pubkey: string;
-  owner_alias: string;
-  description: string;
-  img: string;
-  tags: string[];
-  pubkey: string;
-  photo_url: string;
-  alias: string;
-  route_hint: string;
-  contact_key: string;
-  price_to_meet: number;
-  last_login?: number;
-  url: string;
-  verification_signature: string;
-  extras: Extras;
-  hide?: boolean;
-}
-
-export interface PersonFlex {
-  id?: number;
-  unique_name?: string;
-  owner_pubkey?: string;
-  owner_alias?: string;
-  description?: string;
-  img?: string;
-  tags?: string[];
-  pubkey?: string;
-  photo_url?: string;
-  alias?: string;
-  route_hint?: string;
-  contact_key?: string;
-  last_login?: number;
-  price_to_meet?: number;
-  url?: string;
-  verification_signature?: string;
-  extras?: Extras;
-  hide?: boolean;
-}
-
-export interface PersonPost {
-  person: PersonFlex;
-  title?: string;
-  description?: string;
-  created: number;
-}
-
-export interface PersonWanted {
-  person: PersonFlex;
-  title?: string;
-  description?: string;
-  created?: number;
-  show?: boolean;
-  assignee?: any;
-  body: PersonWanted | any;
-  type?: string;
-  price?: string;
-}
-
-export interface PersonOffer {
-  person: PersonFlex;
-  title: string;
-  description: string;
-  created: number;
-}
-
-export interface Jwt {
-  jwt: string;
-}
-
-export interface QueryParams {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  direction?: string;
-  search?: string;
-}
-
-export interface ClaimOnLiquid {
-  asset: number;
-  to: string;
-  amount?: number;
-  memo: string;
-}
-
-export interface LnAuthData {
-  encode: string;
-  k1: string;
-}
-
-export interface LnInvoice {
-  success: boolean;
-  response: {
-    invoice: string;
-  };
-}

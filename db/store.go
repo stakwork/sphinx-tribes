@@ -14,7 +14,6 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
-	"golang.org/x/crypto/blake2b"
 )
 
 type StoreData struct {
@@ -73,7 +72,7 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 }
 
 func (s StoreData) SetInvoiceCache(value []InvoiceStoreData) error {
-	// The invoice should expire every 2 minutes
+	// The invoice should expire every 6 minutes
 	s.Cache.Set(config.InvoiceList, value, 6*time.Minute)
 	return nil
 }
@@ -87,26 +86,58 @@ func (s StoreData) GetInvoiceCache() ([]InvoiceStoreData, error) {
 	return c, nil
 }
 
-func (s StoreData) SetInvoiceCount(key string, value uint) error {
-	s.Cache.Set(key, value, cache.DefaultExpiration)
+func (s StoreData) SetBudgetInvoiceCache(value []BudgetStoreData) error {
+	// The invoice should expire every 6 minutes
+	s.Cache.Set(config.BudgetInvoiceList, value, 6*time.Minute)
 	return nil
 }
 
-func (s StoreData) GetInvoiceCount(key string) (uint, error) {
-	value, found := s.Cache.Get(key)
-	c, _ := value.(uint)
+func (s StoreData) GetBudgetInvoiceCache() ([]BudgetStoreData, error) {
+	value, found := s.Cache.Get(config.BudgetInvoiceList)
+	c, _ := value.([]BudgetStoreData)
 	if !found {
-		return 0, errors.New("Invoice count cache not found")
+		return []BudgetStoreData{}, errors.New("Budget Invoice Cache not found")
+	}
+	return c, nil
+}
+
+func (s StoreData) SetSocketConnections(value Client) error {
+	// The websocket in cache should not expire unless when deleted
+	s.Cache.Set(value.Host, value, cache.NoExpiration)
+	return nil
+}
+
+func (s StoreData) GetSocketConnections(host string) (Client, error) {
+	value, found := s.Cache.Get(host)
+	c, _ := value.(Client)
+	if !found {
+		return Client{}, errors.New("Socket Cache not found")
+	}
+	return c, nil
+}
+
+func (s StoreData) SetChallengeCache(key string, value string) error {
+	// The challenge should expire every 10 minutes
+	s.Cache.Set(key, value, 10*time.Minute)
+	return nil
+}
+
+func (s StoreData) GetChallengeCache(key string) (string, error) {
+	value, found := s.Cache.Get(key)
+	c, _ := value.(string)
+	if !found {
+		return "", errors.New("Challenge Cache not found")
 	}
 	return c, nil
 }
 
 func Ask(w http.ResponseWriter, r *http.Request) {
 	ts := strconv.Itoa(int(time.Now().Unix()))
-	h := blake2b.Sum256([]byte(ts))
+	h := []byte(ts)
+	// h := blake2b.Sum256([]byte(ts))
 	challenge := base64.URLEncoding.EncodeToString(h[:])
 
-	Store.SetCache(challenge, ts)
+	Store.SetChallengeCache(challenge, ts)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
@@ -128,6 +159,7 @@ type VerifyPayload struct {
 	Description           string                 `json:"description"`
 	VerificationSignature string                 `json:"verification_signature"`
 	Extras                map[string]interface{} `json:"extras"`
+	TribeJWT              string                 `json:"tribe_jwt"`
 }
 
 func Verify(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +167,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	challenge := chi.URLParam(r, "challenge")
-	_, err := Store.GetCache(challenge)
+	_, err := Store.GetChallengeCache(challenge)
 	if err != nil {
 		fmt.Println("challenge not found", err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -160,7 +192,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// set into the cache
-	Store.SetCache(challenge, string(marshalled))
+	Store.SetChallengeCache(challenge, string(marshalled))
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{})
@@ -169,7 +201,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 func Poll(w http.ResponseWriter, r *http.Request) {
 
 	challenge := chi.URLParam(r, "challenge")
-	res, err := Store.GetCache(challenge)
+	res, err := Store.GetChallengeCache(challenge)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -211,6 +243,9 @@ func Poll(w http.ResponseWriter, r *http.Request) {
 	DB.UpdatePerson(pld.ID, map[string]interface{}{
 		"last_login": time.Now().Unix(),
 	})
+
+	tribeJWT, _ := auth.EncodeJwt(pld.Pubkey)
+	pld.TribeJWT = tribeJWT
 
 	// store.DeleteChallenge(challenge)
 

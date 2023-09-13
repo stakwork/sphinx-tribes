@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -34,7 +34,7 @@ func CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	code := db.ConnectionCodes{}
 	now := time.Now()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &code)
@@ -65,8 +65,12 @@ func GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(connectionCode)
 }
 
-func GetLnurlAuth(w http.ResponseWriter, _ *http.Request) {
-	encodeData, err := auth.EncodeLNURL()
+func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
+	socketKey := r.URL.Query().Get("socketKey")
+	socket, _ := db.Store.GetSocketConnections(socketKey)
+	serverHost := r.Host
+
+	encodeData, err := auth.EncodeLNURL(serverHost)
 	responseData := make(map[string]string)
 
 	if err != nil {
@@ -79,6 +83,12 @@ func GetLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 
 	db.Store.SetLnCache(encodeData.K1, db.LnStore{K1: encodeData.K1, Key: "", Status: false})
 
+	// add socket to store with K1, so the LNURL return data can use it
+	db.Store.SetSocketConnections(db.Client{
+		Host: encodeData.K1[0:20],
+		Conn: socket.Conn,
+	})
+
 	responseData["k1"] = encodeData.K1
 	responseData["encode"] = encodeData.Encode
 
@@ -86,45 +96,8 @@ func GetLnurlAuth(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(responseData)
 }
 
-func PollLnurlAuth(w http.ResponseWriter, r *http.Request) {
-	k1 := r.URL.Query().Get("k1")
-	responseData := make(map[string]interface{})
-
-	res, err := db.Store.GetLnCache(k1)
-
-	if err != nil {
-		responseData["k1"] = ""
-		responseData["status"] = false
-
-		fmt.Println("=> ERR polling LNURL AUTH", err)
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("LNURL auth data not found")
-	}
-
-	tokenString, err := auth.EncodeToken(res.Key)
-
-	if err != nil {
-		fmt.Println("error creating JWT")
-		w.WriteHeader(http.StatusNotAcceptable)
-		json.NewEncoder(w).Encode(err.Error())
-		return
-	}
-
-	person := db.DB.GetPersonByPubkey(res.Key)
-	user := returnUserMap(person)
-
-	responseData["k1"] = res.K1
-	responseData["status"] = res.Status
-	responseData["jwt"] = tokenString
-	responseData["user"] = user
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(responseData)
-}
-
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
-
 	k1 := r.URL.Query().Get("k1")
 
 	responseMsg := make(map[string]string)
@@ -135,6 +108,37 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 
 		// Set store data to true
 		db.Store.SetLnCache(k1, db.LnStore{K1: k1, Key: userKey, Status: true})
+
+		// Send socket message
+		tokenString, err := auth.EncodeJwt(userKey)
+
+		if err != nil {
+			fmt.Println("error creating LNAUTH JWT")
+			w.WriteHeader(http.StatusNotAcceptable)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+
+		person := db.DB.GetPersonByPubkey(userKey)
+		user := returnUserMap(person)
+
+		socketMsg := make(map[string]interface{})
+
+		// Send socket message
+		socketMsg["k1"] = k1
+		socketMsg["status"] = true
+		socketMsg["jwt"] = tokenString
+		socketMsg["user"] = user
+		socketMsg["msg"] = "lnauth_success"
+
+		socket, err := db.Store.GetSocketConnections(k1[0:20])
+
+		if err == nil {
+			socket.Conn.WriteJSON(socketMsg)
+			db.Store.DeleteCache(k1[0:20])
+		} else {
+			fmt.Println("Socket Error", err)
+		}
 
 		responseMsg["status"] = "OK"
 		w.WriteHeader(http.StatusOK)
@@ -150,7 +154,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
 	responseData := make(map[string]interface{})
-	claims, err := auth.DecodeToken(token)
+	claims, err := auth.DecodeJwt(token)
 
 	if err != nil {
 		fmt.Println("Failed to parse JWT")
@@ -164,7 +168,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	if userCount > 0 {
 		// Generate a new token
-		tokenString, err := auth.EncodeToken(pubkey)
+		tokenString, err := auth.EncodeJwt(pubkey)
 
 		if err != nil {
 			fmt.Println("error creating  refresh JWT")
@@ -204,6 +208,5 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
 	user["url"] = config.Host
-
 	return user
 }

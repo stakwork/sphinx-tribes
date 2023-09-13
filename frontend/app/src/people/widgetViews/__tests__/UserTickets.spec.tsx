@@ -5,10 +5,10 @@ import React from 'react';
 import { setupStore } from '__test__/__mockData__/setupStore';
 import { user } from '__test__/__mockData__/user';
 import { mockUsehistory } from '__test__/__mockFn__/useHistory';
-import UserTicketsView from '../userTicketsView';
 import routeData from 'react-router';
 import { people } from '__test__/__mockData__/persons';
 import { userAssignedTickets } from '__test__/__mockData__/userTickets';
+import UserTicketsView from '../UserTicketsView';
 
 beforeAll(() => {
   nock.disableNetConnect();

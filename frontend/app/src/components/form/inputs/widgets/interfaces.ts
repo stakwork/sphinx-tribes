@@ -1,40 +1,3 @@
-export interface FormState {
-  img?: string;
-  pubkey: string;
-  owner_alias?: string;
-  alias?: string;
-  description?: string;
-  price_to_meet: number;
-  id?: number;
-  extras?: Extras;
-}
-
-export interface BlogPost {
-  title: string;
-  markdown: string;
-  gallery?: [string];
-  created: number;
-  show?: boolean;
-}
-
-export interface Post {
-  title: string;
-  content: string;
-  created: number;
-  gallery?: [string];
-  show?: boolean;
-}
-
-export interface Offer {
-  title: string;
-  price: number;
-  description: string;
-  gallery?: [string];
-  url?: string;
-  created: number;
-  show?: boolean;
-}
-
 export interface Wanted {
   title: string;
   priceMin: number;
@@ -55,12 +18,30 @@ export interface SupportMe {
   show?: boolean;
 }
 
-export interface Twitter {
-  handle: string;
+export interface Offer {
+  title: string;
+  price: number;
+  description: string;
+  gallery?: [string];
+  url?: string;
+  created: number;
+  show?: boolean;
+}
+
+export interface BlogPost {
+  title: string;
+  markdown: string;
+  gallery?: [string];
+  created: number;
+  show?: boolean;
 }
 
 export interface SingleValueExtra {
   value: string;
+}
+
+export interface Twitter {
+  handle: string;
 }
 
 export interface Extras {
@@ -77,6 +58,25 @@ export interface Extras {
   repos?: [{ [key: string]: string }];
   lightning?: [{ [key: string]: string }];
   amboss?: [{ [key: string]: string }];
+}
+
+export interface FormState {
+  img?: string;
+  pubkey: string;
+  owner_alias?: string;
+  alias?: string;
+  description?: string;
+  price_to_meet: number;
+  id?: number;
+  extras?: Extras;
+}
+
+export interface Post {
+  title: string;
+  content: string;
+  created: number;
+  gallery?: [string];
+  show?: boolean;
 }
 
 export interface FocusedWidgetProps {

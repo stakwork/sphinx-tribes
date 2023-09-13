@@ -1,19 +1,6 @@
 import { getHost } from '../config/host';
 
-class API {
-  constructor() {
-    this.get = addMethod('GET');
-    this.post = addMethod('POST');
-    this.put = addMethod('PUT');
-    this.del = addMethod('DELETE');
-  }
-  get: Function;
-  post: Function;
-  put: Function;
-  del: Function;
-}
-
-function addMethod(m: string): Function {
+function addMethod(m: string): (url: string, data?: any, incomingHeaders?: any) => void {
   const host = getHost();
   const rootUrl =
     host.includes('localhost') || host.includes('internal')
@@ -64,6 +51,19 @@ function addMethod(m: string): Function {
     }
   };
   return func;
+}
+
+class API {
+  constructor() {
+    this.get = addMethod('GET');
+    this.post = addMethod('POST');
+    this.put = addMethod('PUT');
+    this.del = addMethod('DELETE');
+  }
+  get: (url: string, data?: any, incomingHeaders?: any) => any;
+  post: (url: string, data?: any, incomingHeaders?: any) => any;
+  put: (url: string, data?: any, incomingHeaders?: any) => any;
+  del: (url: string, data?: any, incomingHeaders?: any) => any;
 }
 
 export default new API();

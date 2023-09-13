@@ -29,6 +29,8 @@ func NewRouter() *http.Server {
 	r.Mount("/person", PersonRoutes())
 	r.Mount("/connectioncodes", ConnectionCodesRoutes())
 	r.Mount("/github_issue", GithubIssuesRoutes())
+	r.Mount("/bounty", BountyRoutes())
+	r.Mount("/organizations", OrganizationRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", handlers.GetFirstTribeByFeed)
@@ -39,8 +41,11 @@ func NewRouter() *http.Server {
 		r.Get("/search/bots/{query}", handlers.SearchBots)
 		r.Get("/podcast", handlers.GetPodcast)
 		r.Get("/feed", handlers.GetGenericFeed)
+		r.Post("/feed/download", handlers.DownloadYoutubeFeed)
 		r.Get("/search_podcasts", handlers.SearchPodcasts)
+		r.Get("/search_podcast_episodes", handlers.SearchPodcastEpisodes)
 		r.Get("/search_youtube", handlers.SearchYoutube)
+		r.Get("/search_youtube_videos", handlers.SearchYoutubeVideos)
 		r.Get("/youtube_videos", handlers.YoutubeVideosForChannel)
 		r.Get("/admin_pubkeys", handlers.GetAdminPubkeys)
 
@@ -48,6 +53,8 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", db.Poll)
 		r.Post("/save", db.PostSave)
 		r.Get("/save/{key}", db.PollSave)
+		r.Get("/websocket", handlers.HandleWebSocket)
+		r.Get("/migrate_bounties", handlers.MigrateBounties)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -69,10 +76,9 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/lnauth_login", handlers.ReceiveLnAuthData)
 		r.Get("/lnauth", handlers.GetLnurlAuth)
-		r.Get("/lnauth_poll", handlers.PollLnurlAuth)
 		r.Get("/refresh_jwt", handlers.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
-		r.Get("/invoices/{payment_request}", handlers.GetInvoiceStatus)
+		r.Post("/budgetinvoices", handlers.GenerateBudgetInvoice)
 	})
 
 	PORT := os.Getenv("PORT")
@@ -81,6 +87,7 @@ func NewRouter() *http.Server {
 	}
 
 	server := &http.Server{Addr: ":" + PORT, Handler: r}
+
 	go func() {
 		fmt.Println("Listening on port " + PORT)
 		if err := server.ListenAndServe(); err != nil {

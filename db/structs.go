@@ -7,6 +7,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -14,35 +15,35 @@ import (
 
 // Tribe struct
 type Tribe struct {
-	UUID            string      `json:"uuid"`
-	OwnerPubKey     string      `json:"owner_pubkey"`
-	OwnerAlias      string      `json:"owner_alias"`
-	GroupKey        string      `json:"group_key"`
-	Name            string      `json:"name"`
-	UniqueName      string      `json:"unique_name"`
-	Description     string      `json:"description"`
-	Tags            StringArray `json:"tags"`
-	Img             string      `json:"img"`
-	PriceToJoin     int64       `json:"price_to_join"`
-	PricePerMessage int64       `json:"price_per_message"`
-	EscrowAmount    int64       `json:"escrow_amount"`
-	EscrowMillis    int64       `json:"escrow_millis"`
-	Created         *time.Time  `json:"created"`
-	Updated         *time.Time  `json:"updated"`
-	MemberCount     uint64      `json:"member_count"`
-	Unlisted        bool        `json:"unlisted"`
-	Private         bool        `json:"private"`
-	Deleted         bool        `json:"deleted"`
-	AppURL          string      `json:"app_url"`
-	FeedURL         string      `json:"feed_url"`
-	FeedType        uint64      `json:"feed_type"`
-	LastActive      int64       `json:"last_active"`
-	Bots            string      `json:"bots"`
-	OwnerRouteHint  string      `json:"owner_route_hint"`
-	Pin             string      `json:"pin"`
-	Preview         string      `json:"preview"`
-	ProfileFilters  string      `json:"profile_filters"` // "twitter,github"
-	Badges          StringArray `json:"badges"`
+	UUID            string         `json:"uuid"`
+	OwnerPubKey     string         `json:"owner_pubkey"`
+	OwnerAlias      string         `json:"owner_alias"`
+	GroupKey        string         `json:"group_key"`
+	Name            string         `json:"name"`
+	UniqueName      string         `json:"unique_name"`
+	Description     string         `json:"description"`
+	Tags            pq.StringArray `gorm:"type:text[]" json:"tags"`
+	Img             string         `json:"img"`
+	PriceToJoin     int64          `json:"price_to_join"`
+	PricePerMessage int64          `json:"price_per_message"`
+	EscrowAmount    int64          `json:"escrow_amount"`
+	EscrowMillis    int64          `json:"escrow_millis"`
+	Created         *time.Time     `json:"created"`
+	Updated         *time.Time     `json:"updated"`
+	MemberCount     uint64         `json:"member_count"`
+	Unlisted        bool           `json:"unlisted"`
+	Private         bool           `json:"private"`
+	Deleted         bool           `json:"deleted"`
+	AppURL          string         `json:"app_url"`
+	FeedURL         string         `json:"feed_url"`
+	FeedType        uint64         `json:"feed_type"`
+	LastActive      int64          `json:"last_active"`
+	Bots            string         `json:"bots"`
+	OwnerRouteHint  string         `json:"owner_route_hint"`
+	Pin             string         `json:"pin"`
+	Preview         string         `json:"preview"`
+	ProfileFilters  string         `json:"profile_filters"` // "twitter,github"
+	Badges          pq.StringArray `gorm:"type:text[]" json:"badges"`
 }
 
 // Bot struct
@@ -53,7 +54,7 @@ type Bot struct {
 	Name           string         `json:"name"`
 	UniqueName     string         `json:"unique_name"`
 	Description    string         `json:"description"`
-	Tags           pq.StringArray `json:"tags"`
+	Tags           pq.StringArray ` `
 	Img            string         `json:"img"`
 	PricePerUse    int64          `json:"price_per_use"`
 	Created        *time.Time     `json:"created"`
@@ -95,14 +96,6 @@ type Tabler interface {
 	TableName() string
 }
 
-func (Person) TableName() string {
-	return "people"
-}
-
-func (PersonInShort) TableName() string {
-	return "people"
-}
-
 // Person struct
 type Person struct {
 	ID               uint           `json:"id"`
@@ -121,10 +114,10 @@ type Person struct {
 	OwnerRouteHint   string         `json:"owner_route_hint"`
 	OwnerContactKey  string         `json:"owner_contact_key"`
 	PriceToMeet      int64          `json:"price_to_meet"`
-	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
-	TwitterConfirmed bool           `json:"twitter_confirmed"`
-	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
+	TwitterConfirmed bool           `json:"twitter_confirmed"`
+	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
+	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
 }
 
 type GormDataTypeInterface interface {
@@ -138,7 +131,13 @@ type GormDBDataTypeInterface interface {
 type StringArray pq.StringArray
 
 func (StringArray) GormDataType() string {
-	return "text[]"
+	return `gorm:"type:text[]"`
+}
+
+func (p StringArray) Value() (driver.Value, error) {
+	b := pq.StringArray(p)
+
+	return b, nil
 }
 
 type PersonInShort struct {
@@ -152,10 +151,6 @@ type PersonInShort struct {
 
 // Github struct
 type GithubIssue struct {
-	// ID          uint `json:"id"`
-	// PersonID    uint `json:"person_id"`
-	// Person      Person
-	// URL         string `json:"url"` // this will function as id
 	Title       string `json:"title"`
 	Status      string `json:"status"`
 	Assignee    string `json:"assignee"`
@@ -235,11 +230,16 @@ type ConnectionCodesShort struct {
 }
 
 type InvoiceRequest struct {
-	Amount       string `json:"amount"`
-	Memo         string `json:"memo"`
-	Owner_pubkey string `json:"owner_pubkey"`
-	User_pubkey  string `json:"user_pubkey"`
-	Created      string `json:"created"`
+	Amount          string `json:"amount"`
+	Memo            string `json:"memo"`
+	Owner_pubkey    string `json:"owner_pubkey"`
+	User_pubkey     string `json:"user_pubkey"`
+	Created         string `json:"created"`
+	Type            string `json:"type"`
+	Assigned_hours  uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee  uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires  string `json:"bounty_expires,omitempty"`
+	Websocket_token string `json:"websocket_token,omitempty"`
 }
 
 type Invoice struct {
@@ -252,11 +252,16 @@ type InvoiceResponse struct {
 }
 
 type InvoiceStoreData struct {
-	Invoice      string `json:"invoice"`
-	Owner_pubkey string `json:"owner_pubkey"`
-	User_pubkey  string `json:"user_pubkey"`
-	Amount       string `json:"amount"`
-	Created      string `json:"created"`
+	Invoice        string `json:"invoice"`
+	Owner_pubkey   string `json:"owner_pubkey"`
+	User_pubkey    string `json:"user_pubkey"`
+	Amount         string `json:"amount"`
+	Created        string `json:"created"`
+	Host           string `json:"host,omitempty"`
+	Type           string `json:"type"`
+	Assigned_hours uint   `json:"assigned_hours,omitempty"`
+	Commitment_fee uint   `json:"commitment_fee,omitempty"`
+	Bounty_expires string `json:"bounty_expires,omitempty"`
 }
 
 type InvoiceStatus struct {
@@ -277,6 +282,11 @@ type InvoiceCheckResponse struct {
 	Amount          uint   `json:"amount"`
 }
 
+type DeleteBountyAssignee struct {
+	Owner_pubkey string `json:"owner_pubkey"`
+	Created      string `json:"created"`
+}
+
 type KeysendPayment struct {
 	Amount          string `json:"amount"`
 	Destination_key string `json:"destination_key"`
@@ -290,6 +300,211 @@ type KeysendSuccess struct {
 type KeysendError struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
+}
+
+type LnHost struct {
+	Msg  string `json:"msg"`
+	Host string `json:"host"`
+	K1   string `json:"k1"`
+}
+
+type LnEncode struct {
+	Host string `json:"host"`
+}
+
+type BountyLeaderboard struct {
+	Owner_pubkey             string `json:"owner_pubkey"`
+	Total_bounties_completed uint   `json:"total_bounties_completed"`
+	Total_sats_earned        uint   `json:"total_sats_earned"`
+}
+
+type YoutubeDownload struct {
+	YoutubeUrls []string `json:"youtube_urls"`
+}
+
+type Client struct {
+	Host string
+	Conn *websocket.Conn
+}
+
+type Bounty struct {
+	ID                      uint           `json:"id"`
+	OwnerID                 string         `json:"owner_id"`
+	Paid                    bool           `json:"paid"`
+	Show                    bool           `json:"show"`
+	Type                    string         `json:"type"`
+	Award                   string         `json:"award"`
+	AssignedHours           uint8          `json:"assigned_hours"`
+	BountyExpires           string         `json:"bounty_expires"`
+	CommitmentFee           uint64         `json:"commitment_fee"`
+	Price                   string         `json:"price"`
+	Title                   string         `json:"title"`
+	Tribe                   string         `json:"tribe"`
+	Created                 int64          `json:"created"`
+	Assignee                string         `json:"assignee"`
+	TicketUrl               string         `json:"ticket_url"`
+	OrgUuid                 string         `json:"org_uuid"`
+	Description             string         `json:"description"`
+	WantedType              string         `json:"wanted_type"`
+	Deliverables            string         `json:"deliverables"`
+	GithubDescription       bool           `json:"github_description"`
+	OneSentenceSummary      string         `json:"one_sentence_summary"`
+	EstimatedSessionLength  string         `json:"estimated_session_length"`
+	EstimatedCompletionDate string         `json:"estimated_completion_date"`
+	Updated                 *time.Time     `json:"updated"`
+	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
+}
+
+type BountyData struct {
+	Bounty
+	BountyId          uint       `json:"bounty_id"`
+	BountyCreated     int64      `json:"bounty_created"`
+	BountyUpdated     *time.Time `json:"bounty_updated"`
+	BountyDescription string     `json:"bounty_description"`
+	Person
+	AssigneeAlias         string         `json:"assignee_alias"`
+	AssigneeId            uint           `json:"assignee_id"`
+	AssigneeCreated       *time.Time     `json:"assignee_created"`
+	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
+	AssigneeDescription   string         `json:"assignee_description"`
+	BountyOwnerId         uint           `json:"bounty_owner_id"`
+	OwnerUuid             string         `json:"owner_uuid"`
+	OwnerKey              string         `json:"owner_key"`
+	OwnerAlias            string         `json:"owner_alias"`
+	OwnerUniqueName       string         `json:"owner_unique_name"`
+	OwnerDescription      string         `json:"owner_description"`
+	OwnerTags             pq.StringArray `gorm:"type:text[]" json:"owner_tags" null`
+	OwnerImg              string         `json:"owner_img"`
+	OwnerCreated          *time.Time     `json:"owner_created"`
+	OwnerUpdated          *time.Time     `json:"owner_updated"`
+	OwnerLastLogin        int64          `json:"owner_last_login"`
+	OwnerRouteHint        string         `json:"owner_route_hint"`
+	OwnerContactKey       string         `json:"owner_contact_key"`
+	OwnerPriceToMeet      int64          `json:"owner_price_to_meet"`
+	OwnerTwitterConfirmed bool           `json:"owner_twitter_confirmed"`
+	OrganizationName      string         `json:"organization_name"`
+	OrganizationImg       string         `json:"organization_img"`
+	OrganizationUuid      string         `json:"organization_uuid"`
+}
+
+type BountyResponse struct {
+	Bounty       Bounty            `json:"bounty"`
+	Assignee     Person            `json:"assignee"`
+	Owner        Person            `json:"owner"`
+	Organization OrganizationShort `json:"organization"`
+}
+
+type Organization struct {
+	ID          uint       `json:"id"`
+	Uuid        string     `json:"uuid"`
+	Name        string     `gorm:"unique;not null" json:"name"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	Img         string     `json:"img"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	Show        bool       `json:"show"`
+}
+
+type OrganizationShort struct {
+	Uuid string `json:"uuid"`
+	Name string `gorm:"unique;not null" json:"name"`
+	Img  string `json:"img"`
+}
+
+type OrganizationUsers struct {
+	ID          uint       `json:"id"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	OrgUuid     string     `json:"org_uuid"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+}
+
+type OrganizationUsersData struct {
+	OrgUuid     string     `json:"org_uuid"`
+	UserCreated *time.Time `json:"user_created"`
+	Person
+}
+
+type BountyRoles struct {
+	Name string `json:"name"`
+}
+
+type UserRoles struct {
+	Role        string     `json:"role"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	OrgUuid     string     `json:"org_uuid"`
+	Created     *time.Time `json:"created"`
+}
+
+type BountyBudget struct {
+	ID          uint       `json:"id"`
+	OrgUuid     string     `json:"org_uuid"`
+	TotalBudget uint       `json:"total_budget"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+}
+
+type BudgetInvoiceRequest struct {
+	Amount          uint   `json:"amount"`
+	SenderPubKey    string `json:"sender_pubkey"`
+	OrgUuid         string `json:"org_uuid"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+}
+
+type BudgetStoreData struct {
+	Amount       uint       `json:"amount"`
+	SenderPubKey string     `json:"sender_pubkey"`
+	OrgUuid      string     `json:"org_uuid"`
+	Invoice      string     `json:"invoice"`
+	Host         string     `json:"host,omitempty"`
+	Created      *time.Time `json:"created"`
+}
+
+type BudgetHistory struct {
+	ID           uint       `json:"id"`
+	OrgUuid      string     `json:"org_uuid"`
+	Amount       uint       `json:"amount"`
+	SenderPubKey string     `json:"sender_pubkey"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+	Status       bool       `json:"status"`
+}
+
+type PaymentHistory struct {
+	ID             uint       `json:"id"`
+	OrgUuid        string     `json:"org_uuid"`
+	SenderPubKey   string     `json:"sender_pubkey"`
+	ReceiverPubKey string     `json:"receiver_pubkey"`
+	Amount         uint       `json:"amount"`
+	BountyId       uint       `json:"bounty_id"`
+	Created        *time.Time `json:"created"`
+}
+
+type PaymentHistoryData struct {
+	ID           uint       `json:"id"`
+	OrgUuid      string     `json:"org_uuid"`
+	SenderName   string     `json:"sender_name"`
+	ReceiverName string     `json:"receiver_name"`
+	Amount       uint       `json:"amount"`
+	BountyId     uint       `json:"bounty_id"`
+	Created      *time.Time `json:"created"`
+}
+
+type BountyPayRequest struct {
+	ReceiverPubKey  string `json:"receiver_pubkey"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+}
+
+func (Person) TableName() string {
+	return "people"
+}
+
+func (PersonInShort) TableName() string {
+	return "people"
+}
+
+func (Bounty) TableName() string {
+	return "bounty"
 }
 
 func (ConnectionCodes) TableName() string {
@@ -307,7 +522,6 @@ type PropertyMap map[string]interface{}
 func (p PropertyMap) Value() (driver.Value, error) {
 	b := new(bytes.Buffer)
 	err := json.NewEncoder(b).Encode(p)
-
 	return b, err
 }
 
@@ -327,6 +541,21 @@ func (p *PropertyMap) Scan(src interface{}) error {
 	if !ok {
 		return errors.New("type assertion .(map[string]interface{}) failed")
 	}
-
 	return nil
+}
+
+type JSONB []interface{}
+
+// Value Marshal
+func (a JSONB) Value() (driver.Value, error) {
+	return json.Marshal(a)
+}
+
+// Scan Unmarshal
+func (a *JSONB) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
+	return json.Unmarshal(b, &a)
 }

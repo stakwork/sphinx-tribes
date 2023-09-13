@@ -50,7 +50,7 @@ export interface FormField {
 
 export function validator(config: FormField[]) {
   const shape: { [k: string]: any } = {};
-  config.forEach((field) => {
+  config.forEach((field: any) => {
     if (typeof field === 'object') {
       shape[field.name] = field.validator;
     }

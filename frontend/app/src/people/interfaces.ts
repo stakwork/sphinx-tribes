@@ -1,8 +1,8 @@
 import React from 'react';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import { Widget } from './main/types';
-import { Person } from '../store/main';
+import { Person, PersonWanted } from '../store/main';
 import { MeData } from '../store/ui';
+import { Widget } from './main/types';
 
 export interface AuthProps {
   style?: React.CSSProperties;
@@ -33,6 +33,7 @@ export interface FocusViewProps {
   deleteExtraFunction?: () => void;
   style?: React.CSSProperties;
   setIsExtraStyle?: any;
+  bounty?: PersonWanted[];
 }
 
 export interface PeopleMobileeHeaderProps {
@@ -58,10 +59,14 @@ export interface BountiesProps {
   created?: number;
   ticketUrl?: string;
   loomEmbedUrl?: string;
+  org_uuid?: string;
   description?: any;
   isPaid: boolean;
   widget?: any;
   assignee?: Person;
+  name?: string;
+  uuid?: string;
+  img?: string;
 }
 
 export interface BadgesProps {
@@ -75,6 +80,8 @@ export interface ConnectCardProps {
   dismiss: () => void;
   modalStyle?: React.CSSProperties;
   visible: boolean;
+  created?: number;
+  dismissConnectModal?: () => void;
 }
 
 export interface LoomViewProps {
@@ -99,8 +106,11 @@ export interface NameTagProps {
   iconSize?: number;
   textSize?: number;
   isPaid?: boolean;
-  ticketUrl?: string;
+  ticket_url?: string;
   loomEmbedUrl?: string;
+  org_img?: string;
+  org_name?: string;
+  org_uuid?: string;
 }
 
 export interface NoneSpaceProps {
@@ -142,10 +152,12 @@ export interface PaidBountiesProps {
   description: string;
   owner_alias: string;
   owner_pubkey: string;
+  org_uuid?: string;
   img: string;
   id: number;
   widget: any;
   created: number;
+  name?: string;
 }
 
 export interface QRProps {
@@ -157,7 +169,7 @@ export interface QRProps {
 
 export interface QRBarProps {
   simple?: boolean;
-  value: string | undefined;
+  value: string;
   style?: React.CSSProperties;
 }
 
@@ -199,7 +211,7 @@ export interface GithubStatusPillProps {
 export interface WantedSummaryProps {
   description: any;
   priceMin: number;
-  ticketUrl: string;
+  ticket_url: string;
   person: any;
   created?: number | undefined;
   repo: string;
@@ -210,8 +222,8 @@ export interface WantedSummaryProps {
   paid: boolean;
   badgeRecipient: string;
   loomEmbedUrl: string;
-  codingLanguage: { [key: string]: any };
-  estimate_session_length: string;
+  coding_languages: { [key: string]: any };
+  estimated_session_length: string;
   assignee: Person;
   fromBountyPage: string;
   wanted_type: string;
@@ -222,12 +234,14 @@ export interface WantedSummaryProps {
   setIsExtraStyle: (any) => void;
   formSubmit: (any) => void;
   title: string;
+  org_uuid?: string;
+  id?: number;
 }
 
 export interface CodingBountiesProps {
   deliverables?: string;
   description: any;
-  ticketUrl: string;
+  ticket_url: string;
   assignee: Person;
   created?: number;
   titleString: string;
@@ -277,18 +291,23 @@ export interface CodingBountiesProps {
   priceMin?: number;
   priceMax?: number;
   price?: number;
-  estimate_session_length?: string;
+  estimated_session_length?: string;
+  loomEmbedUrl?: string;
   extraModalFunction?: () => void;
+  commitment_fee?: number;
+  bounty_expires?: string;
+  org_uuid?: string;
+  id?: number;
 }
 
 export interface CodingViewProps {
   paid?: boolean;
   titleString: string;
   labels?: { [key: string]: any };
-  price?: Number;
+  price?: number;
   description?: string;
   envHeight?: string;
-  estimate_session_length?: string;
+  estimated_session_length?: string;
   loomEmbedUrl?: string;
   ticketUrl?: string;
   assignee: Person;
@@ -315,7 +334,7 @@ export interface WantedViewsProps {
   ticketUrl?: string;
   gallery?: any;
   assignee?: Person;
-  estimate_session_length?: string;
+  estimated_session_length?: string;
   loomEmbedUrl?: string;
   showModal?: () => void;
   setDeletePayload?: (boolean) => void;
@@ -331,6 +350,11 @@ export interface WantedViewsProps {
   paid?: boolean;
   isMine?: boolean;
   titleString: string | JSX.Element | JSX.Element[];
+  bounty_expires?: string;
+  commitment_fee?: number;
+  name?: string;
+  img?: string;
+  org_uuid?: string;
 }
 
 export interface WantedViews2Props extends WantedViewsProps {
@@ -339,7 +363,7 @@ export interface WantedViews2Props extends WantedViewsProps {
   issue?: string;
   repo?: string;
   type?: string;
-  codingLanguage?: any;
+  coding_languages?: any;
   fromBountyPage?: boolean;
 }
 

@@ -4,16 +4,18 @@ go 1.2
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/ambelovsky/go-structs v1.1.0 // indirect
+	github.com/ambelovsky/gosf v0.0.0-20201109201340-237aea4d6109
+	github.com/ambelovsky/gosf-socketio v0.0.0-20220810204405-0f97832ec7af // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/btcsuite/btcd v0.23.3 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1
-	github.com/dariubs/gorm-jsonb v0.1.5 // indirect
 	github.com/fiatjaf/go-lnurl v1.12.1
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible
 	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/go-chi/jwtauth v1.2.0
-	github.com/go-co-op/gocron v1.25.0 // indirect
+	github.com/go-co-op/gocron v1.25.0
 	github.com/gobuffalo/logger v1.0.4 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/google/go-cmp v0.5.8 // indirect
@@ -30,7 +32,7 @@ require (
 	github.com/rs/xid v1.4.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/crypto v0.7.0
+	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.112.0
 	gorm.io/driver/postgres v1.5.0

@@ -1,4 +1,8 @@
-export const bountyHeaderFilter = ({ Paid, Assigned, Open }, bodyPaid, bodyAssignee) => {
+export const bountyHeaderFilter = (
+  { Paid, Assigned, Open }: any,
+  bodyPaid: any,
+  bodyAssignee: any
+) => {
   if (Paid) {
     if (Assigned) {
       if (Open) {
@@ -30,8 +34,8 @@ export const bountyHeaderFilter = ({ Paid, Assigned, Open }, bodyPaid, bodyAssig
   }
 };
 
-export const bountyHeaderLanguageFilter = (codingLanguage, filterLanguage) => {
-  if (Object.keys(filterLanguage)?.every((key) => !filterLanguage[key])) {
+export const bountyHeaderLanguageFilter = (codingLanguage: any, filterLanguage: any) => {
+  if (Object.keys(filterLanguage)?.every((key: any) => !filterLanguage[key])) {
     return true;
-  } else return codingLanguage?.some(({ value }) => filterLanguage[value]) ?? false;
+  } else return codingLanguage?.some(({ value }: any) => filterLanguage[value]) ?? false;
 };

@@ -17,8 +17,8 @@ export default function rmmd(md: string) {
   try {
     if (options.stripListLeaders) {
       if (options.listUnicodeChar)
-        output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, `${options.listUnicodeChar} $1`);
-      else output = output.replace(/^([\s\t]*)([\*\-\+]|\d+\.)\s+/gm, '$1');
+        output = output.replace(/^([\s\t]*)([*-+]|\d+\.)\s+/gm, `${options.listUnicodeChar} $1`);
+      else output = output.replace(/^([\s\t]*)([*\-+]|\d+\.)\s+/gm, '$1');
     }
     if (options.gfm) {
       output = output
@@ -35,12 +35,12 @@ export default function rmmd(md: string) {
       // Remove HTML tags
       .replace(/<[^>]*>/g, '')
       // Remove setext-style headers
-      .replace(/^[=\-]{2,}\s*$/g, '')
+      .replace(/^[=-]{2,}\s*$/g, '')
       // Remove footnotes?
-      .replace(/\[\^.+?\](\: .*?$)?/g, '')
+      .replace(/\[\^.+?\](: .*?$)?/g, '')
       .replace(/\s{0,2}\[.*?\]: .*?$/g, '')
       // Remove images
-      .replace(/\!\[(.*?)\][\[\(].*?[\]\)]/g, options.useImgAltText ? '$1' : '')
+      .replace(/!\[(.*?)\][\[\(].*?[\]\)]/g, options.useImgAltText ? '$1' : '')
       // Remove inline links
       .replace(/\[(.*?)\][\[\(].*?[\]\)]/g, '$1')
       // Remove blockquotes
@@ -50,8 +50,8 @@ export default function rmmd(md: string) {
       // Remove atx-style headers
       .replace(/^(\n)?\s{0,}#{1,6}\s+| {0,}(\n)?\s{0,}#{0,} {0,}(\n)?\s{0,}$/gm, '$1$2$3')
       // Remove emphasis (repeat the line to remove double emphasis)
-      .replace(/([\*_]{1,3})(\S.*?\S{0,1})\1/g, '$2')
-      .replace(/([\*_]{1,3})(\S.*?\S{0,1})\1/g, '$2')
+      .replace(/([*_]{1,3})(\S.*?\S{0,1})\1/g, '$2')
+      .replace(/([*_]{1,3})(\S.*?\S{0,1})\1/g, '$2')
       // Remove code blocks
       .replace(/(`{3,})(.*?)\1/gm, '$2')
       // Remove inline code

@@ -323,7 +323,17 @@ func processGithubConfirmationsLoop() {
 
 func GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
+
 	person := db.DB.GetPersonByPubkey(pubkey)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(person)
+}
+
+func GetPersonById(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, _ := strconv.ParseUint(idParam, 10, 32)
+
+	person := db.DB.GetPerson(uint(id))
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }

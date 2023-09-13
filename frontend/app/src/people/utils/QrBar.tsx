@@ -4,81 +4,6 @@ import MaterialIcon from '@material/react-material-icon';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { QRBarProps } from 'people/interfaces';
 
-export default function QrBar(props: QRBarProps) {
-  const { value, simple } = props;
-  const [toasts, setToasts]: any = useState([]);
-
-  function addToast() {
-    setToasts([
-      {
-        id: '1',
-        title: 'Copied!'
-      }
-    ]);
-  }
-
-  function removeToast() {
-    setToasts([]);
-  }
-
-  function copyToClipboard(str) {
-    const el = document.createElement('textarea');
-    el.value = str;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    addToast();
-  }
-
-  return (
-    <Row style={props.style} onClick={() => copyToClipboard(value)}>
-      <QRWrap
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          width: '70%',
-          overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis'
-        }}
-      >
-        {!simple && (
-          <MaterialIcon
-            icon={'qr_code_2'}
-            style={{ fontSize: 20, color: '#B0B7BC', marginRight: 10 }}
-          />
-        )}
-
-        <div
-          style={{
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {value}
-        </div>
-      </QRWrap>
-
-      <Copy
-        style={{
-          display: 'flex',
-          fontSize: 11,
-          alignItems: 'center',
-          color: '#618AFF',
-          cursor: 'pointer',
-          letterSpacing: '0.3px'
-        }}
-        // onClick={() => copyToClipboard(value)}
-      >
-        COPY
-      </Copy>
-
-      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={1000} />
-    </Row>
-  );
-}
 const QRWrap = styled.div`
   font-family: Roboto;
   font-style: normal;
@@ -128,3 +53,78 @@ const Copy = styled.div`
 
   color: #618aff;
 `;
+
+export default function QrBar(props: QRBarProps) {
+  const { value, simple } = props;
+  const [toasts, setToasts]: any = useState([]);
+
+  function addToast() {
+    setToasts([
+      {
+        id: '1',
+        title: 'Copied!'
+      }
+    ]);
+  }
+
+  function removeToast() {
+    setToasts([]);
+  }
+
+  function copyToClipboard(str: string) {
+    const el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    addToast();
+  }
+
+  return (
+    <Row style={props.style} onClick={() => copyToClipboard(value)}>
+      <QRWrap
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '70%',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis'
+        }}
+      >
+        {!simple && (
+          <MaterialIcon
+            icon={'qr_code_2'}
+            style={{ fontSize: 20, color: '#B0B7BC', marginRight: 10 }}
+          />
+        )}
+
+        <div
+          style={{
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {value}
+        </div>
+      </QRWrap>
+
+      <Copy
+        style={{
+          display: 'flex',
+          fontSize: 11,
+          alignItems: 'center',
+          color: '#618AFF',
+          cursor: 'pointer',
+          letterSpacing: '0.3px'
+        }}
+      >
+        COPY
+      </Copy>
+
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={1000} />
+    </Row>
+  );
+}

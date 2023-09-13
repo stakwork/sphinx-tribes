@@ -20,6 +20,10 @@ Authentication is handled by [sphinx-auth](https://github.com/stakwork/sphinx-au
 
 docker build --no-cache -t sphinx-tribes .
 
+docker tag sphinx-tribes sphinxlightning/sphinx-tribes:x
+
+docker push sphinxlightning/sphinx-tribes:x
+
 ### run against sphinx-stack
 
 To run tribes frontend locally, use these ports:
@@ -78,4 +82,16 @@ If you would like to enable Relay for invoice creation and keysend payment add t
 ```
     RELAY_URL=
     RELAY_AUTH_KEY=
+```
+
+### For Contributions
+
+Read the contribution doc [here](./Contribution.md)
+
+### Stakwork Youtube vidoes download for tribes feed
+
+If you would like to enable Stakwork jobs for Youtube videos download add the Stakwork env key and values to the .env file
+
+```
+    STAKWORK_KEY=
 ```
