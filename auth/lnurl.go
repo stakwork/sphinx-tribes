@@ -2,7 +2,6 @@ package auth
 
 import (
 	"crypto/rand"
-	"fmt"
 	"strings"
 
 	lnurl "github.com/fiatjaf/go-lnurl"
@@ -16,7 +15,6 @@ type LnEncodeData struct {
 }
 
 func EncodeLNURL(host string) (LnEncodeData, error) {
-	fmt.Println("Host ===", host)
 	hostUrl := config.Host
 	if !strings.Contains(host, "localhost") {
 		hostUrl = "https://" + host
