@@ -343,7 +343,7 @@ type Bounty struct {
 	Created                 int64          `json:"created"`
 	Assignee                string         `json:"assignee"`
 	TicketUrl               string         `json:"ticket_url"`
-	Organization            string         `json:"organization"`
+	OrgUuid                 string         `json:"org_uuid"`
 	Description             string         `json:"description"`
 	WantedType              string         `json:"wanted_type"`
 	Deliverables            string         `json:"deliverables"`
@@ -412,16 +412,16 @@ type OrganizationShort struct {
 }
 
 type OrganizationUsers struct {
-	ID           uint       `json:"id"`
-	OwnerPubKey  string     `json:"owner_pubkey"`
-	Organization string     `json:"organization"`
-	Created      *time.Time `json:"created"`
-	Updated      *time.Time `json:"updated"`
+	ID          uint       `json:"id"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	OrgUuid     string     `json:"org_uuid"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
 }
 
 type OrganizationUsersData struct {
-	Organization string     `json:"organization"`
-	UserCreated  *time.Time `json:"user_created"`
+	OrgUuid     string     `json:"org_uuid"`
+	UserCreated *time.Time `json:"user_created"`
 	Person
 }
 
@@ -430,34 +430,69 @@ type BountyRoles struct {
 }
 
 type UserRoles struct {
-	Role         string     `json:"role"`
-	OwnerPubKey  string     `json:"owner_pubkey"`
-	Organization string     `json:"organization"`
-	Created      *time.Time `json:"created"`
+	Role        string     `json:"role"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	OrgUuid     string     `json:"org_uuid"`
+	Created     *time.Time `json:"created"`
 }
 
 type BountyBudget struct {
-	Organization string     `json:"organization"`
-	TotalBudget  uint       `json:"total_budget"`
+	ID          uint       `json:"id"`
+	OrgUuid     string     `json:"org_uuid"`
+	TotalBudget uint       `json:"total_budget"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+}
+
+type BudgetInvoiceRequest struct {
+	Amount          uint   `json:"amount"`
+	SenderPubKey    string `json:"sender_pubkey"`
+	OrgUuid         string `json:"org_uuid"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+}
+
+type BudgetStoreData struct {
+	Amount       uint       `json:"amount"`
+	SenderPubKey string     `json:"sender_pubkey"`
+	OrgUuid      string     `json:"org_uuid"`
+	Invoice      string     `json:"invoice"`
+	Host         string     `json:"host,omitempty"`
 	Created      *time.Time `json:"created"`
-	Updated      *time.Time `json:"updated"`
 }
 
 type BudgetHistory struct {
-	Organization string     `json:"organization"`
+	ID           uint       `json:"id"`
+	OrgUuid      string     `json:"org_uuid"`
 	Amount       uint       `json:"amount"`
 	SenderPubKey string     `json:"sender_pubkey"`
 	Created      *time.Time `json:"created"`
 	Updated      *time.Time `json:"updated"`
+	Status       bool       `json:"status"`
 }
 
 type PaymentHistory struct {
-	Organization   string     `json:"organization"`
+	ID             uint       `json:"id"`
+	OrgUuid        string     `json:"org_uuid"`
 	SenderPubKey   string     `json:"sender_pubkey"`
 	ReceiverPubKey string     `json:"receiver_pubkey"`
 	Amount         uint       `json:"amount"`
-	BountyId       uint       `json:"id"`
+	BountyId       uint       `json:"bounty_id"`
 	Created        *time.Time `json:"created"`
+}
+
+type PaymentHistoryData struct {
+	ID           uint       `json:"id"`
+	OrgUuid      string     `json:"org_uuid"`
+	SenderName   string     `json:"sender_name"`
+	ReceiverName string     `json:"receiver_name"`
+	Amount       uint       `json:"amount"`
+	BountyId     uint       `json:"bounty_id"`
+	Created      *time.Time `json:"created"`
+}
+
+type BountyPayRequest struct {
+	ReceiverPubKey  string `json:"receiver_pubkey"`
+	Websocket_token string `json:"websocket_token,omitempty"`
 }
 
 func (Person) TableName() string {
