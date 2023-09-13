@@ -158,7 +158,8 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println("Failed to parse JWT")
-		http.Error(w, http.StatusText(401), 401)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 
