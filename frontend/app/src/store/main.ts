@@ -1428,9 +1428,7 @@ export class MainStore {
 
   @action async getLnAuth(): Promise<LnAuthData> {
     try {
-      const data = await api.post(`lnauth?socketKey=${uiStore.websocketToken}`, {
-        host: TribesURL
-      });
+      const data = await api.get(`lnauth?socketKey=${uiStore.websocketToken}`);
       this.setLnAuth(data);
       return data;
     } catch (e) {
