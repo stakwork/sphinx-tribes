@@ -39,10 +39,7 @@ const PriceUserContainer = styled.div<PaidBountyProps>`
 `;
 const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];
-  const {
-    org_uuid,
-    name
-  } = props;
+  const { org_uuid, name } = props;
 
   return (
     <>

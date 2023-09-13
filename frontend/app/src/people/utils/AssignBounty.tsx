@@ -7,7 +7,7 @@ import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
-import { InvoiceInput, InvoiceLabel, InvoiceForm, B, N, ModalBottomText } from './style'
+import { InvoiceInput, InvoiceLabel, InvoiceForm, B, N, ModalBottomText } from './style';
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];

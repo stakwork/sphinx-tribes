@@ -206,7 +206,7 @@ export const emptyMeInfo: MeInfo = {
   photo_url: '',
   url: '',
   jwt: '',
-   tribe_jwt: '',
+  tribe_jwt: '',
   description: '',
   verification_signature: '',
   extras: {},
