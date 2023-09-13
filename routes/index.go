@@ -75,7 +75,7 @@ func NewRouter() *http.Server {
 
 	r.Group(func(r chi.Router) {
 		r.Get("/lnauth_login", handlers.ReceiveLnAuthData)
-		r.Post("/lnauth", handlers.GetLnurlAuth)
+		r.Get("/lnauth", handlers.GetLnurlAuth)
 		r.Get("/refresh_jwt", handlers.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
 	})
