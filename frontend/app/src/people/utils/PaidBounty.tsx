@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PaidBountiesProps } from 'people/interfaces';
+import { Link } from 'react-router-dom';
 import BountyDescription from '../../bounties/BountyDescription';
 import BountyPrice from '../../bounties/BountyPrice';
 import BountyProfileView from '../../bounties/BountyProfileView';
 import { colors } from '../../config/colors';
+import { OrganizationWrap, OrganizationText } from './style';
 
 interface PaidBountyProps {
   Price_User_Container_Border?: string;
@@ -37,52 +39,66 @@ const PriceUserContainer = styled.div<PaidBountyProps>`
 `;
 const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];
+  const {
+    org_uuid,
+    name
+  } = props;
+
   return (
-    <BountyContainer
-      onClick={props.onPanelClick}
-      Bounty_Container_Background={color.pureWhite}
-      color={color}
-    >
-      <BountyDescription
-        {...props}
-        title={props.title}
-        codingLanguage={props.codingLanguage}
-        isPaid={true}
-      />
-      <PriceUserContainer Price_User_Container_Border={color.primaryColor.P400}>
-        <BountyPrice
-          priceMin={props.priceMin}
-          priceMax={props.priceMax}
-          price={props.price}
-          sessionLength={props.sessionLength}
+    <>
+      {org_uuid && name && (
+        <OrganizationWrap>
+          <Link to={`/org/tickets/${org_uuid}`} target="_blank">
+            <OrganizationText>{name}</OrganizationText>
+          </Link>
+        </OrganizationWrap>
+      )}
+      <BountyContainer
+        onClick={props.onPanelClick}
+        Bounty_Container_Background={color.pureWhite}
+        color={color}
+      >
+        <BountyDescription
+          {...props}
+          title={props.title}
+          codingLanguage={props.codingLanguage}
+          isPaid={true}
+        />
+        <PriceUserContainer Price_User_Container_Border={color.primaryColor.P400}>
+          <BountyPrice
+            priceMin={props.priceMin}
+            priceMax={props.priceMax}
+            price={props.price}
+            sessionLength={props.sessionLength}
+            style={{
+              borderRight: `1px solid ${color.primaryColor.P200}`,
+              maxWidth: '245px',
+              minWidth: '245px'
+            }}
+          />
+          <BountyProfileView
+            assignee={props.assignee}
+            status={'COMPLETED'}
+            canViewProfile={true}
+            statusStyle={{
+              width: '63px',
+              height: '16px',
+              background: color.statusCompleted
+            }}
+          />
+        </PriceUserContainer>
+        <img
+          src={'/static/paid_ribbon.svg'}
           style={{
-            borderRight: `1px solid ${color.primaryColor.P200}`,
-            maxWidth: '245px',
-            minWidth: '245px'
+            position: 'sticky',
+            width: '80px',
+            height: '80px',
+            right: '-1.5px'
           }}
+          alt={'paid_ribbon'}
         />
-        <BountyProfileView
-          assignee={props.assignee}
-          status={'COMPLETED'}
-          canViewProfile={true}
-          statusStyle={{
-            width: '63px',
-            height: '16px',
-            background: color.statusCompleted
-          }}
-        />
-      </PriceUserContainer>
-      <img
-        src={'/static/paid_ribbon.svg'}
-        style={{
-          position: 'sticky',
-          width: '80px',
-          height: '80px',
-          right: '-1.5px'
-        }}
-        alt={'paid_ribbon'}
-      />
-    </BountyContainer>
+      </BountyContainer>
+    </>
   );
 };
 

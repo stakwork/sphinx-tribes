@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"fmt"
+	"strconv"
 )
 
 func GetRandomToken(length int) string {
@@ -13,4 +14,15 @@ func GetRandomToken(length int) string {
 		fmt.Println("Random token erorr ==", err)
 	}
 	return base32.StdEncoding.EncodeToString(randomBytes)[:length]
+}
+
+func ConvertStringToUint(number string) (uint, error) {
+	numberParse, err := strconv.ParseUint(number, 10, 32)
+
+	if err != nil {
+		fmt.Println("could not parse string to uint")
+		return 0, err
+	}
+
+	return uint(numberParse), nil
 }
