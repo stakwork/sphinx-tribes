@@ -30,6 +30,7 @@ describe('Post bounty modal', () => {
   });
 
   const formData = {
+    organization: 'organization',
     title: 'title',
     category: 'Mobile development',
     description: 'description',
@@ -51,6 +52,7 @@ describe('Post bounty modal', () => {
     expect(screen.queryByText('Basic info')).toBeInTheDocument();
     expect(screen.queryByText('Next')).toHaveClass('disableText');
     await waitFor(async () => {
+      await userEvent.click(screen.getByText('Organization'));
       await userEvent.type(screen.getByLabelText('Bounty Title'), formData.title);
       await userEvent.click(screen.getByTestId('Category'));
       await userEvent.click(screen.getByText(formData.category));
