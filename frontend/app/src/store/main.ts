@@ -322,7 +322,7 @@ export class MainStore {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'x-jwt': info.tribe_jwt,
+        'x-jwt': info.jwt,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
