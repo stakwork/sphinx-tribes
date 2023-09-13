@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -34,7 +34,7 @@ func CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	code := db.ConnectionCodes{}
 	now := time.Now()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &code)
@@ -68,9 +68,14 @@ func GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	socketKey := r.URL.Query().Get("socketKey")
 	socket, _ := db.Store.GetSocketConnections(socketKey)
-	serverHost := r.Host
 
-	encodeData, err := auth.EncodeLNURL(serverHost)
+	hostData := db.LnEncode{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &hostData)
+
+	encodeData, err := auth.EncodeLNURL(hostData.Host)
 	responseData := make(map[string]string)
 
 	if err != nil {
