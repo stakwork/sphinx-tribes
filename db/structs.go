@@ -308,6 +308,10 @@ type LnHost struct {
 	K1   string `json:"k1"`
 }
 
+type LnEncode struct {
+	Host string `json:"host"`
+}
+
 type BountyLeaderboard struct {
 	Owner_pubkey             string `json:"owner_pubkey"`
 	Total_bounties_completed uint   `json:"total_bounties_completed"`
