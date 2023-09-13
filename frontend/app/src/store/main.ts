@@ -1778,11 +1778,10 @@ export class MainStore {
   }
 
   async makeBountyPayment(body: {
-    id: number,
+    id: number;
     receiver_pubkey: string;
     websocket_token: string;
-  }
-  ): Promise<any> {
+  }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
@@ -1820,7 +1819,6 @@ export class MainStore {
       return [];
     }
   }
-  
 }
 
 export const mainStore = new MainStore();
