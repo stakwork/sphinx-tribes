@@ -691,7 +691,7 @@ export const wantedOtherSchema: FormField[] = [
 export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'organization',
-    label: 'Organization(optional)',
+    label: 'Organization',
     type: 'select',
     options: [],
     validator: strValidatorNotRequired
