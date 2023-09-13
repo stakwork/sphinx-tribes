@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -51,7 +51,7 @@ func PutTribeStats(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	tribe := db.Tribe{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &tribe)
 	if err != nil {
@@ -174,7 +174,7 @@ func CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	tribe := db.Tribe{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &tribe)
 	if err != nil {
@@ -325,7 +325,7 @@ func CreateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &leaderBoard)
 	if err != nil {
@@ -398,7 +398,7 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	leaderBoard := db.LeaderBoard{}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &leaderBoard)
 	if err != nil {
@@ -428,8 +428,7 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	invoice := db.InvoiceRequest{}
-	body, err := ioutil.ReadAll(r.Body)
-
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &invoice)
@@ -471,7 +470,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	defer res.Body.Close()
 
-	body, err = ioutil.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 
 	// Unmarshal result
 	invoiceRes := db.InvoiceResponse{}
@@ -502,6 +501,83 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	// save the invoice to store
 	db.Store.SetInvoiceCache(invoiceList)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceRes)
+}
+
+func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
+	invoice := db.BudgetInvoiceRequest{}
+	body, err := io.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, invoice.Amount, "Budget Invoice")
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	body, err = io.ReadAll(res.Body)
+
+	// Unmarshal result
+	invoiceRes := db.InvoiceResponse{}
+
+	err = json.Unmarshal(body, &invoiceRes)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
+	now := time.Now()
+	var budgetHistoryData = db.BudgetHistory{
+		Amount:       invoice.Amount,
+		OrgUuid:      invoice.OrgUuid,
+		SenderPubKey: invoice.SenderPubKey,
+		Created:      &now,
+		Updated:      &now,
+		Status:       false,
+	}
+
+	db.DB.AddBudgetHistory(budgetHistoryData)
+
+	var invoiceCache, _ = db.Store.GetBudgetInvoiceCache()
+
+	websocketToken := invoice.Websocket_token
+	var invoiceData = db.BudgetStoreData{
+		Amount:       invoice.Amount,
+		Invoice:      invoiceRes.Response.Invoice,
+		OrgUuid:      invoice.OrgUuid,
+		SenderPubKey: invoice.SenderPubKey,
+		Host:         websocketToken,
+		Created:      &now,
+	}
+	var invoiceList = append(invoiceCache, invoiceData)
+	// save the budget invoice to store
+	db.Store.SetBudgetInvoiceCache(invoiceList)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
