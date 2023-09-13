@@ -68,8 +68,9 @@ func GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	socketKey := r.URL.Query().Get("socketKey")
 	socket, _ := db.Store.GetSocketConnections(socketKey)
+	serverHost := r.Host
 
-	encodeData, err := auth.EncodeLNURL()
+	encodeData, err := auth.EncodeLNURL(serverHost)
 	responseData := make(map[string]string)
 
 	if err != nil {
