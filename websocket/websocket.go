@@ -15,7 +15,7 @@ var WebsocketPool = NewPool()
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		if config.Host == "https://people.sphinx.chat" {
-			if r.Host != "people.sphinx.chat" && r.Host != "people-test.sphinx.chat" {
+			if r.Host != "people.sphinx.chat" && r.Host != "people-test.sphinx.chat" && r.Host != "community.sphinx.chat" {
 				return false
 			} else {
 				return true
