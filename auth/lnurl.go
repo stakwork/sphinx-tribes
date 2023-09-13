@@ -17,7 +17,7 @@ type LnEncodeData struct {
 func EncodeLNURL(host string) (LnEncodeData, error) {
 	hostUrl := config.Host
 	if !strings.Contains(host, "localhost") {
-		hostUrl = "https://" + host
+		hostUrl = host
 	}
 	k1 := generate32Bytes()
 	url := hostUrl + "/" + "lnauth_login?tag=login&k1=" + k1 + "&action=login"
