@@ -106,7 +106,7 @@ export interface PersonPost {
 export interface PersonWanted {
   person?: any;
   body?: any;
-  organization?: any;
+  org_uuid?: any;
   title?: string;
   description?: string;
   owner_id: string;
@@ -120,6 +120,16 @@ export interface PersonWanted {
   estimated_session_length: string;
   bounty_expires?: string;
   commitment_fee?: number;
+}
+
+export interface PaymentHistory {
+  id: number;
+  bounty_id: number;
+  amount: number;
+  org_uuid: string;
+  sender_name: string;
+  receiver_name: string;
+  created: string;
 }
 
 export interface PersonOffer {
@@ -312,7 +322,7 @@ export class MainStore {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'x-jwt': info.jwt,
+        'x-jwt': info.tribe_jwt,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
@@ -420,7 +430,7 @@ export class MainStore {
     }
 
     const headers = {
-      'x-jwt': info.jwt,
+      'x-jwt': info.tribe_jwt,
       'Content-Type': 'application/json'
     };
 
@@ -707,7 +717,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -769,7 +779,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -816,7 +826,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -853,7 +863,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -889,7 +899,7 @@ export class MainStore {
             assignee = { ...ps2[i].assignee };
           }
 
-          if (bounty.organization) {
+          if (bounty.org_uuid) {
             organization = { ...ps2[i].organization };
           }
 
@@ -1200,7 +1210,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty?token=${info?.jwt}`;
+      const request = `bounty?token=${info?.tribe_jwt}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'POST',
@@ -1209,7 +1219,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': info?.jwt,
+          'x-jwt': info?.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1237,7 +1247,7 @@ export class MainStore {
         method: 'DELETE',
         mode: 'cors',
         headers: {
-          'x-jwt': info?.jwt,
+          'x-jwt': info?.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1270,7 +1280,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1381,7 +1391,7 @@ export class MainStore {
           price_to_meet: parseInt(body.price_to_meet)
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1444,7 +1454,7 @@ export class MainStore {
     this.lnInvoice = invoice;
   }
 
-  @action async getLnInvoice(body: {
+  async getLnInvoice(body: {
     amount: number;
     memo: string;
     owner_pubkey: string;
@@ -1484,6 +1494,34 @@ export class MainStore {
     }
   }
 
+  async getBudgetInvoice(body: {
+    amount: number;
+    org_uuid: string;
+    sender_pubkey: string;
+    websocket_token: string;
+  }): Promise<LnInvoice> {
+    try {
+      const data = await api.post(
+        'budgetinvoices',
+        {
+          amount: body.amount,
+          org_uuid: body.org_uuid,
+          sender_pubkey: body.sender_pubkey,
+          websocket_token: body.websocket_token
+        },
+        {
+          'Content-Type': 'application/json'
+        }
+      );
+      if (data.success) {
+        this.setLnInvoice(data.response.invoice);
+      }
+      return data;
+    } catch (e) {
+      return { success: false, response: { invoice: '' } };
+    }
+  }
+
   @action async deleteBountyAssignee(body: {
     owner_pubkey: string;
     created: string;
@@ -1498,7 +1536,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1525,7 +1563,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1550,7 +1588,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1592,19 +1630,19 @@ export class MainStore {
 
   @action async addOrganizationUser(body: {
     owner_pubkey: string;
-    organization: string;
+    org_uuid: string;
   }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/users/${body.organization}`, {
+      const r: any = await fetch(`${TribesURL}/organizations/users/${body.org_uuid}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify({
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1627,7 +1665,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1647,7 +1685,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1667,7 +1705,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1688,7 +1726,7 @@ export class MainStore {
         mode: 'cors',
         body: JSON.stringify(body),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1719,6 +1757,70 @@ export class MainStore {
       return false;
     }
   }
+
+  async getOrganizationBudget(uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/budget/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async makeBountyPayment(body: {
+    id: number,
+    receiver_pubkey: string;
+    websocket_token: string;
+  }
+  ): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/bounty/pay/${body.id}`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async getPaymentHistories(uuid: string): Promise<PaymentHistory[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/payments/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      return [];
+    }
+  }
+  
 }
 
 export const mainStore = new MainStore();

@@ -44,7 +44,7 @@ function WantedView(props: WantedViews2Props) {
     loomEmbedUrl,
     img,
     name,
-    uuid,
+    org_uuid,
     onPanelClick,
     show = true,
     paid = false
@@ -177,7 +177,7 @@ function WantedView(props: WantedViews2Props) {
                 description={description}
                 isPaid={paid}
                 name={name}
-                uuid={uuid}
+                org_uuid={org_uuid}
                 img={img}
               />
             </BountyBox>

@@ -12,6 +12,7 @@ import BountyProfileView from '../../bounties/BountyProfileView';
 import IconButton from '../../components/common/IconButton2';
 import ConnectCard from './ConnectCard';
 import StartUpModal from './StartUpModal';
+import { OrganizationWrap, OrganizationText } from './style';
 
 interface containerProps {
   unAssignedBackgroundImage?: string;
@@ -108,28 +109,6 @@ const UnassignedPersonProfile = styled.div<containerProps>`
   }
 `;
 
-const OrganizationWrap = styled.div`
-  margin-left: 0px;
-  cursor: pointer;
-  padding: 0px;
-  background: white;
-  padding: 2px 10px;
-  max-width: 180px;
-  text-align: center;
-  border-radius: 0px;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const OrganizationText = styled.span`
-  font-weight: bold;
-  font-size: 0.9rem;
-  text-transform: capitalize;
-  color: #20c997;
-`;
-
 const Bounties = (props: BountiesProps) => {
   const {
     assignee,
@@ -143,7 +122,7 @@ const Bounties = (props: BountiesProps) => {
     onPanelClick,
     widget,
     created,
-    uuid,
+    org_uuid,
     name
   } = props;
 
@@ -158,9 +137,9 @@ const Bounties = (props: BountiesProps) => {
   const { ui } = useStores();
   return (
     <>
-      {uuid && name && (
+      {org_uuid && name && (
         <OrganizationWrap>
-          <Link to={`/org/tickets/${uuid}`} target="_blank">
+          <Link to={`/org/tickets/${org_uuid}`} target="_blank">
             <OrganizationText>{name}</OrganizationText>
           </Link>
         </OrganizationWrap>

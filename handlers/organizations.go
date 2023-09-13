@@ -136,17 +136,12 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	org := db.DB.GetOrganizationByUuid(orgUser.Organization)
-
 	// if not the orgnization admin
-	if pubKeyFromAuth != org.OwnerPubKey {
-		userRoles := db.DB.GetUserRoles(orgUser.Organization, pubKeyFromAuth)
-		hasRole := db.RolesCheck(userRoles, db.AddUser)
-		if !hasRole {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Don't have access to add user")
-			return
-		}
+	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.AddUser)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Don't have access to add user")
+		return
 	}
 
 	// check if the user exists on peoples table
@@ -158,7 +153,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if user already exists
-	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.Organization)
+	userExists := db.DB.GetOrganizationUser(orgUser.OwnerPubKey, orgUser.OrgUuid)
 
 	if userExists.ID != 0 {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -212,7 +207,7 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	org := db.DB.GetOrganizationByUuid(orgUser.Organization)
+	org := db.DB.GetOrganizationByUuid(orgUser.OrgUuid)
 
 	if orgUser.OwnerPubKey == org.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -220,16 +215,11 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if not the orgnization admin
-	if pubKeyFromAuth != org.OwnerPubKey {
-		userRoles := db.DB.GetUserRoles(orgUser.Organization, pubKeyFromAuth)
-		hasRole := db.RolesCheck(userRoles, db.DeleteUser)
-
-		if !hasRole {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Don't have access to delete user")
-			return
-		}
+	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.DeleteUser)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Don't have access to delete user")
+		return
 	}
 
 	db.DB.DeleteOrganizationUser(orgUser)
@@ -275,33 +265,28 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	org := db.DB.GetOrganizationByUuid(uuid)
-
 	// if not the orgnization admin
-	if pubKeyFromAuth != org.OwnerPubKey {
-		userRoles := db.DB.GetUserRoles(uuid, pubKeyFromAuth)
-		hasRole := db.RolesCheck(userRoles, db.AddRoles)
-		// check if the user added his pubkey to the post body
-		isUser := db.CheckUser(userRoles, pubKeyFromAuth)
+	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.AddRoles)
+	userRoles := db.DB.GetUserRoles(uuid, pubKeyFromAuth)
+	isUser := db.CheckUser(userRoles, pubKeyFromAuth)
 
-		if isUser {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("cannot add roles for self")
-			return
-		}
+	if isUser {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("cannot add roles for self")
+		return
+	}
 
-		// check if the user added his pubkey to the route
-		if pubKeyFromAuth == user {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("cannot add roles for self")
-			return
-		}
+	// check if the user added his pubkey to the route
+	if pubKeyFromAuth == user {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("cannot add roles for self")
+		return
+	}
 
-		if !hasRole {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("user cannot add roles")
-			return
-		}
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("user cannot add roles")
+		return
 	}
 
 	rolesMap := db.GetRolesMap()
@@ -324,7 +309,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	userExists := db.DB.GetOrganizationUser(user, uuid)
 
 	// if not the orgnization admin
-	if userExists.OwnerPubKey != user || userExists.Organization != uuid {
+	if userExists.OwnerPubKey != user || userExists.OrgUuid != uuid {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User does not exists in the organization")
 		return
@@ -360,9 +345,8 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	// the user has been added to, loop through to get the organization
 	organizations := db.DB.GetUserCreatedOrganizations(pubKeyFromAuth)
 	assignedOrganizations := db.DB.GetUserAssignedOrganizations(pubKeyFromAuth)
-
 	for _, value := range assignedOrganizations {
-		organization := db.DB.GetOrganizationByUuid(value.Organization)
+		organization := db.DB.GetOrganizationByUuid(value.OrgUuid)
 		organizations = append(organizations, organization)
 	}
 
@@ -379,4 +363,33 @@ func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
 	var bountyResponse []db.BountyResponse = generateBountyResponse(organizationBounties)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
+}
+
+func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	// get the organization budget
+	organizationBudget := db.DB.GetOrganizationBudget(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizationBudget)
+}
+
+func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	// if not the orgnization admin
+	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Don't have access to view payments")
+		return
+	}
+
+	// get the organization payment history
+	paymentHistory := db.DB.GetPaymentHistory(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(paymentHistory)
 }

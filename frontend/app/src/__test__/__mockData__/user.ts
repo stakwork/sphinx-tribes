@@ -9,6 +9,7 @@ export const user: MeInfo = {
   route_hint: 'test_hint:1099567661057',
   price_to_meet: 0,
   jwt: 'test_jwt',
+  tribe_jwt: 'test_jwt',
   url: 'https://mockApi.com',
   description: 'description',
   verification_signature: 'test_verification_signature',

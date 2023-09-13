@@ -49,7 +49,9 @@ function WantedSummary(props: WantedSummaryProps) {
     setIsModalSideButton,
     setIsExtraStyle,
     formSubmit,
-    title
+    title,
+    org_uuid,
+    id
   } = props;
 
   const titleString = one_sentence_summary || title || '';
@@ -577,6 +579,8 @@ function WantedSummary(props: WantedSummaryProps) {
           isPaidStatusPopOver={isPaidStatusPopOver}
           titleString={titleString}
           nametag={nametag}
+          org_uuid={org_uuid}
+          id={id}
         />
       );
     }
