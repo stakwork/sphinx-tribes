@@ -1214,11 +1214,7 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       });
-
-      console.log('Save Profile result ==', r.json());
-
       if (!r) return; // tor user will return here
-
       // first time profile makers will need this on first login
       if (!body.id) {
         const j = await r.json();
