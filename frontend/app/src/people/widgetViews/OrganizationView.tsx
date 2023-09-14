@@ -211,60 +211,59 @@ const Organizations = () => {
                   setFieldValue,
                   errors,
                   initialValues
-                }: any) => {
-                  return (
-                    <Wrap newDesign={true}>
-                      <h5>Add new organization</h5>
-                      <div className="SchemaInnerContainer">
-                        {schema.length &&
-                          schema.map((item: FormField) => (
-                            <Input
-                              {...item}
-                              key={item.name}
-                              values={values}
-                              errors={errors}
-                              value={values[item.name]}
-                              error={errors[item.name]}
-                              initialValues={initialValues}
-                              deleteErrors={() => {
-                                if (errors[item.name]) delete errors[item.name];
-                              }}
-                              handleChange={(e: any) => {
-                                setFieldValue(item.name, e);
-                              }}
-                              setFieldValue={(e: any, f: any) => {
-                                setFieldValue(e, f);
-                              }}
-                              setFieldTouched={setFieldTouched}
-                              handleBlur={() => setFieldTouched(item.name, false)}
-                              handleFocus={() => setFieldTouched(item.name, true)}
-                              setDisableFormButtons={setDisableFormButtons}
-                              borderType={'bottom'}
-                              imageIcon={true}
-                              style={
-                                item.name === 'github_description' && !values.ticket_url
-                                  ? {
-                                      display: 'none'
-                                    }
-                                  : undefined
-                              }
-                            />
-                          ))}
+                }: any) => (
+                  <Wrap newDesign={true}>
+                    <h5>Add new organization</h5>
+                    <div className="SchemaInnerContainer">
+                      {schema.length &&
+                        schema.map((item: FormField) => (
+                          <Input
+                            {...item}
+                            key={item.name}
+                            values={values}
+                            errors={errors}
+                            value={values[item.name]}
+                            error={errors[item.name]}
+                            initialValues={initialValues}
+                            deleteErrors={() => {
+                              if (errors[item.name]) delete errors[item.name];
+                            }}
+                            handleChange={(e: any) => {
+                              setFieldValue(item.name, e);
+                            }}
+                            setFieldValue={(e: any, f: any) => {
+                              setFieldValue(e, f);
+                            }}
+                            setFieldTouched={setFieldTouched}
+                            handleBlur={() => setFieldTouched(item.name, false)}
+                            handleFocus={() => setFieldTouched(item.name, true)}
+                            setDisableFormButtons={setDisableFormButtons}
+                            borderType={'bottom'}
+                            imageIcon={true}
+                            style={
+                              item.name === 'github_description' && !values.ticket_url
+                                ? {
+                                  display: 'none'
+                                }
+                                : undefined
+                            }
+                          />
+                        ))}
 
-                        <Button
-                          disabled={disableFormButtons || loading}
-                          onClick={() => {
-                            handleSubmit();
-                          }}
-                          loading={loading}
-                          style={{ width: '100%' }}
-                          color={'primary'}
-                          text={'Add organization'}
-                        />
-                      </div>
-                    </Wrap>
-                  );
-                }}
+                      <Button
+                        disabled={disableFormButtons || loading}
+                        onClick={() => {
+                          handleSubmit();
+                        }}
+                        loading={loading}
+                        style={{ width: '100%' }}
+                        color={'primary'}
+                        text={'Add organization'}
+                      />
+                    </div>
+                  </Wrap>
+                )
+                }
               </Formik>
             </Modal>
           )}
