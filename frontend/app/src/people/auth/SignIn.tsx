@@ -102,7 +102,7 @@ function SignIn(props: AuthProps) {
 
         main.setLnAuth({ encode: '', k1: '' });
         main.setLnToken(res.jwt);
-        ui.setMeInfo({ ...res.user, jwt: res.jwt, tribe_jwt: res.jwt });
+        ui.setMeInfo({ ...res.user, tribe_jwt: res.jwt });
         ui.setSelectedPerson(res.id);
       }
     }

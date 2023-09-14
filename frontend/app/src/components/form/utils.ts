@@ -46,6 +46,7 @@ export interface FormField {
   defaultSchemaName?: string;
   dropdownOptions?: string;
   dynamicSchemas?: any[];
+  testId?: string;
 }
 
 export function validator(config: FormField[]) {
