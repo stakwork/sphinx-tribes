@@ -33,9 +33,11 @@ func IndexRoutes() chi.Router {
 		r.Get("/p/{pubkey}/badges", frontend.IndexRoute)
 		r.Get("/p/{pubkey}/wanted", frontend.IndexRoute)
 		r.Get("/p/{pubkey}/usertickets", frontend.IndexRoute)
+		r.Get("/p/{pubkey}/organizations", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
 		r.Get("/tickets", frontend.IndexRoute)
 		r.Get("/leaderboard", frontend.IndexRoute)
+		r.Get("/org/tickets/*", frontend.IndexRoute)
 	})
 
 	return r
