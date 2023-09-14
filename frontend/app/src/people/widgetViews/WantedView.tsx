@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
-import { WantedViews2Props } from 'people/interfaces';
+import { CodingLanguageLabel, WantedViews2Props } from 'people/interfaces';
 import { useIsMobile } from '../../hooks';
 import { extractGithubIssue, extractGithubIssueFromUrl } from '../../helpers';
 import { useStores } from '../../store';
@@ -54,7 +54,7 @@ function WantedView(props: WantedViews2Props) {
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
-  const [labels, setLabels] = useState<[{ [key: string]: string }]>([{}]);
+  const [labels, setLabels] = useState<Array<CodingLanguageLabel>>([]);
   const { peopleWanteds } = main;
   const color = colors['light'];
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
@@ -101,7 +101,7 @@ function WantedView(props: WantedViews2Props) {
 
   useEffect(() => {
     if (coding_languages) {
-      const values = coding_languages.map((value: any) => ({ label: value, value: value }));
+      const values = coding_languages.map((value: string) => ({ label: value, value: value }));
       setLabels(values);
     }
   }, [coding_languages]);

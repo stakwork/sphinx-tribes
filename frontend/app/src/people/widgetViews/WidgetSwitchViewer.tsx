@@ -156,7 +156,7 @@ function WidgetSwitchViewer(props: any) {
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
         const { person, body, organization } = item;
-
+        person.img = person.img || main.getUserAvatarPlaceholder(person.owner_pubkey);
         const conditionalStyles = body?.paid
           ? {
               border: isMobile ? `2px 0 0 0 solid ${color.grayish.G600}` : '',
