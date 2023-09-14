@@ -314,11 +314,9 @@ export class MainStore {
 
   async fetchFromRelay(path: string): Promise<any> {
     if (!uiStore.meInfo) return null;
-
     const info = uiStore.meInfo;
-    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
 
-    const r: any = await fetch(`${URL}/${path}`, {
+    const r: any = await fetch(`${TribesURL}/${path}`, {
       method: 'GET',
       mode: 'cors',
       headers: {
