@@ -18,11 +18,11 @@ export const getTwitterLink = ({ title, issueCreated, ownerPubkey, labels }: Pro
   }
 
   const params = {
-    text: `Hey, I created a new ticket on Sphinx community. ${title}`,
-    url: `${bountyUrl}`,
+    text: `I just created a bounty on Sphinx Community: ${title}\n`,
+    url: `${bountyUrl}\n`,
     hashtags: [...(labels ?? []), { label: 'sphinxchat', value: '' }]
-      .map((x: CodingLanguageLabel) => x.label)
-      .join(',')
+    .map((x: CodingLanguageLabel) => x.label)
+    .join(','),
   };
 
   const link = new URL('https://twitter.com/intent/tweet');
