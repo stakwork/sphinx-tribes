@@ -1,8 +1,9 @@
+import { CodingLanguageLabel } from 'people/interfaces';
 import { Person } from 'store/main';
 
 export interface BountiesDescriptionProps {
   description?: any;
-  codingLanguage: [{ [key: string]: string }] | string;
+  codingLanguage: Array<CodingLanguageLabel>;
   isPaid?: boolean;
   title: string;
   style?: React.CSSProperties;

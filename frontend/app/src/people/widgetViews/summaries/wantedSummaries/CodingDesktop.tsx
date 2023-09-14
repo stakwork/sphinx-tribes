@@ -26,7 +26,9 @@ export default function DesktopView(props: CodingViewProps) {
     assigneeLabel,
     nametag,
     actionButtons,
-    status
+    status,
+    owner_id,
+    created
   } = props;
   const color = colors['light'];
 
@@ -140,34 +142,33 @@ export default function DesktopView(props: CodingViewProps) {
                 flexDirection: 'row'
               }}
             >
-              {labels?.length > 0 &&
-                labels?.map((x: any) => (
-                  <>
+              {(labels ?? []).map((x: any) => (
+                <>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      height: '22px',
+                      minWidth: 'fit-content',
+                      backgroundColor: color.grayish.G1000,
+                      border: `1px solid ${color.grayish.G70}`,
+                      padding: '3px 10px',
+                      borderRadius: '20px',
+                      marginRight: '3px',
+                      boxShadow: `1px 1px ${color.grayish.G70}`
+                    }}
+                  >
                     <div
                       style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        height: '22px',
-                        minWidth: 'fit-content',
-                        backgroundColor: color.grayish.G1000,
-                        border: `1px solid ${color.grayish.G70}`,
-                        padding: '3px 10px',
-                        borderRadius: '20px',
-                        marginRight: '3px',
-                        boxShadow: `1px 1px ${color.grayish.G70}`
+                        fontSize: '10px',
+                        color: color.black300
                       }}
                     >
-                      <div
-                        style={{
-                          fontSize: '10px',
-                          color: color.black300
-                        }}
-                      >
-                        {x.label}
-                      </div>
+                      {x.label}
                     </div>
-                  </>
-                ))}
+                  </div>
+                </>
+              ))}
             </div>
           </SectionPad>
           <Divider />
@@ -188,7 +189,12 @@ export default function DesktopView(props: CodingViewProps) {
               <ViewTribe {...props} />
               <AddToFavorites {...props} />
               <CopyLink {...props} />
-              <ShareOnTwitter {...props} />
+              <ShareOnTwitter
+                issueCreated={created}
+                ownerPubkey={owner_id}
+                labels={labels}
+                titleString={titleString}
+              />
             </ButtonRow>
 
             {actionButtons}

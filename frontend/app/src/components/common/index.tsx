@@ -13,6 +13,7 @@ import SearchableSelect from './SearchableSelect';
 import { Portal } from './Portal';
 
 export { PriceOuterContainer } from './PriceOuterContainer';
+export { LazyImg, LazyImgBg } from './LazyImg';
 
 export {
   SearchableSelect,
