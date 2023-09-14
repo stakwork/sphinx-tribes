@@ -1143,7 +1143,8 @@ export class MainStore {
         this.lnToken = j.jwt;
         return j;
       }
-      return j.response;
+
+      return j;
     } catch (e) {
       console.log('Error refreshJwt: ', e);
       // could not refresh jwt, logout!
@@ -1221,18 +1222,16 @@ export class MainStore {
       // first time profile makers will need this on first login
       if (!body.id) {
         const j = await r.json();
-        if (j.response.id) {
-          body.id = j.response.id;
+        if (j.id) {
+          body.id = j.id;
         }
       }
-
       uiStore.setToasts([
         {
           id: '1',
           title: 'Saved.'
         }
       ]);
-
       await this.getSelf(body);
     } catch (e) {
       console.log('Error saveProfile: ', e);
