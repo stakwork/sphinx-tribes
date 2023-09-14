@@ -322,7 +322,7 @@ export class MainStore {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'x-jwt': info.jwt,
+        'x-jwt': info.tribe_jwt,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
@@ -1210,7 +1210,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty?token=${info?.jwt}`;
+      const request = `bounty?token=${info?.tribe_jwt}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'POST',
@@ -1219,7 +1219,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': info?.jwt,
+          'x-jwt': info?.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1247,7 +1247,7 @@ export class MainStore {
         method: 'DELETE',
         mode: 'cors',
         headers: {
-          'x-jwt': info?.jwt,
+          'x-jwt': info?.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1391,7 +1391,7 @@ export class MainStore {
           price_to_meet: parseInt(body.price_to_meet)
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1536,7 +1536,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1563,7 +1563,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1588,7 +1588,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1642,7 +1642,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1665,7 +1665,7 @@ export class MainStore {
           ...body
         }),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1685,7 +1685,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1705,7 +1705,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1726,7 +1726,7 @@ export class MainStore {
         mode: 'cors',
         body: JSON.stringify(body),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1746,7 +1746,7 @@ export class MainStore {
         method: 'POST',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1766,7 +1766,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1790,7 +1790,7 @@ export class MainStore {
         mode: 'cors',
         body: JSON.stringify(body),
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1809,7 +1809,7 @@ export class MainStore {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
