@@ -314,13 +314,15 @@ export class MainStore {
 
   async fetchFromRelay(path: string): Promise<any> {
     if (!uiStore.meInfo) return null;
-    const info = uiStore.meInfo;
 
-    const r: any = await fetch(`${TribesURL}/${path}`, {
+    const info = uiStore.meInfo;
+    const URL = info.url.startsWith('http') ? info.url : `https://${info.url}`;
+
+    const r: any = await fetch(`${URL}/${path}`, {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'x-jwt': info.tribe_jwt,
+        'x-jwt': info.jwt,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
@@ -1096,9 +1098,19 @@ export class MainStore {
   async refreshJwt() {
     try {
       if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
 
-      const res: any = await this.fetchFromRelay('refresh_jwt');
-      const j = await res.json();
+      const r: any = await fetch(`${TribesURL}/refresh_jwt`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        }
+      });
+ 
+      const j = await r.json();
 
       if (this.lnToken) {
         this.lnToken = j.jwt;
