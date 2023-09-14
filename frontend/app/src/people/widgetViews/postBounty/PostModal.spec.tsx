@@ -32,13 +32,13 @@ describe('Post bounty modal', () => {
   const formData = {
     organization: 'organization',
     title: 'title',
-    category: 'Mobile development',
+    category: 'Web development',
     description: 'description',
     price: 1
   };
   test('FillForm', async () => {
     const closeHandler = jest.fn();
-    const successHandler = jest.fn(() => {});
+    const successHandler = jest.fn(() => { });
     render(
       <PostModal onSucces={successHandler} isOpen={true} onClose={closeHandler} widget="wanted" />
     );
@@ -52,7 +52,6 @@ describe('Post bounty modal', () => {
     expect(screen.queryByText('Basic info')).toBeInTheDocument();
     expect(screen.queryByText('Next')).toHaveClass('disableText');
     await waitFor(async () => {
-      await userEvent.click(screen.getByText('Organization'));
       await userEvent.type(screen.getByLabelText('Bounty Title'), formData.title);
       await userEvent.click(screen.getByTestId('Category'));
       await userEvent.click(screen.getByText(formData.category));
