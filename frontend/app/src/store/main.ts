@@ -1169,15 +1169,27 @@ export class MainStore {
   }
 
   async saveProfile(body: any) {
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
     if (!body) return; // avoid saving bad state
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      let request = 'profile';
-      if (this.lnToken) request = 'person';
 
-      const [r, error] = await this.doCallToRelay('POST', request, body);
-      if (error) throw error;
+      const r = await fetch(`${TribesURL}/person`, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...body
+        }),
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log("Save Profile result ==", r.json())
+
       if (!r) return; // tor user will return here
 
       // first time profile makers will need this on first login
