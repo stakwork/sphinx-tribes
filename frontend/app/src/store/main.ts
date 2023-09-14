@@ -1175,7 +1175,6 @@ export class MainStore {
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-
       const r = await fetch(`${TribesURL}/person`, {
         method: 'POST',
         body: JSON.stringify({
@@ -1188,7 +1187,7 @@ export class MainStore {
         }
       });
 
-      console.log("Save Profile result ==", r.json())
+      console.log('Save Profile result ==', r.json());
 
       if (!r) return; // tor user will return here
 
