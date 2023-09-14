@@ -17,7 +17,7 @@ function App() {
     if (uiStore.meInfo && uiStore.meInfo?.tribe_jwt) {
       await mainStore.getUserOrganizations();
     }
-  }, [uiStore.meInfo]);
+  }, []);
 
   useEffect(() => {
     getUserOrganizations();

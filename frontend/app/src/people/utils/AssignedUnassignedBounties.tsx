@@ -134,7 +134,7 @@ const Bounties = (props: BountiesProps) => {
   const closeConnectModal = () => setConnectModal(false);
   const showConnectModal = () => setConnectModal(true);
 
-  const { ui, main } = useStores();
+  const { ui } = useStores();
   return (
     <>
       {org_uuid && name && (
