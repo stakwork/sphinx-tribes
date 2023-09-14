@@ -3,6 +3,7 @@ import React, { useCallback, useEffect } from 'react';
 import '@material/react-material-icon/dist/material-icon.css';
 import { Router } from 'react-router-dom';
 import history from 'config/history';
+import { uiStore } from 'store/ui';
 import { WithStores } from './store';
 import './App.css';
 import { ModeDispatcher } from './config/ModeDispatcher';
@@ -13,8 +14,10 @@ let exchangeRateInterval: any = null;
 
 function App() {
   const getUserOrganizations = useCallback(async () => {
-    await mainStore.getUserOrganizations();
-  }, []);
+    if (uiStore.meInfo && uiStore.meInfo?.tribe_jwt) {
+      await mainStore.getUserOrganizations();
+    }
+  }, [uiStore.meInfo]);
 
   useEffect(() => {
     getUserOrganizations();
