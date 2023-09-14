@@ -12,18 +12,17 @@ function TokenRefresh() {
   useEffect(() => {
     timeout = setTimeout(async () => {
       if (ui.meInfo) {
-        const res = await main.refreshJwt();
-        if (res && res.jwt) {
-          ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt });
-        } else {
-          ui.setMeInfo(null);
-          ui.setSelectedPerson(0);
-          ui.setSelectingPerson(0);
-          setShow(true);
-
-          // run this to reset state
-          main.getPeople();
-        }
+        // const res = await main.refreshJwt();
+        // if (res && res.jwt) {
+        //   ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt });
+        // } else {
+        //   ui.setMeInfo(null);
+        //   ui.setSelectedPerson(0);
+        //   ui.setSelectingPerson(0);
+        //   setShow(true);
+        //   // run this to reset state
+        //   main.getPeople();
+        // }
       }
     }, 6000);
 

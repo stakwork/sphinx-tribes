@@ -1,8 +1,10 @@
 /* eslint-disable func-style */
 import React from 'react';
+import { CodingLanguageLabel } from 'people/interfaces';
 import FavoriteButton from '../../../utils/FavoriteButton';
 import { Button } from '../../../../components/common';
 import { sendToRedirect } from '../../../../helpers';
+import { getTwitterLink } from './lib';
 
 export const Heart = () => <FavoriteButton />;
 
@@ -72,8 +74,31 @@ export const CopyLink = (props: any) => {
   );
 };
 
-export const ShareOnTwitter = (props: any) => {
-  const { titleString, labels, createdURL, owner_idURL } = props;
+type ShareOnTwitterProps = {
+  titleString?: string;
+  labels?: Array<CodingLanguageLabel>;
+  issueCreated?: number;
+  ownerPubkey?: string;
+};
+export const ShareOnTwitter = ({
+  titleString,
+  labels,
+  issueCreated,
+  ownerPubkey
+}: ShareOnTwitterProps) => {
+  if (!(titleString && issueCreated && ownerPubkey)) {
+    return null;
+  }
+  const twitterHandler = () => {
+    const twitterLink = getTwitterLink({
+      title: titleString,
+      labels,
+      issueCreated: String(issueCreated),
+      ownerPubkey
+    });
+
+    sendToRedirect(twitterLink);
+  };
 
   return (
     <Button
@@ -89,12 +114,7 @@ export const ShareOnTwitter = (props: any) => {
         marginBottom: 20,
         paddingLeft: 5
       }}
-      onClick={() => {
-        const twitterLink = `https://twitter.com/intent/tweet?text=Hey, I created a new ticket on Sphinx community.%0A${titleString} %0A&url=https://community.sphinx.chat/p?owner_id=${owner_idURL}%26created${createdURL} %0A%0A&hashtags=${
-          labels && labels.map((x: any) => x.label)
-        },sphinxchat`;
-        sendToRedirect(twitterLink);
-      }}
+      onClick={twitterHandler}
     />
   );
 };
