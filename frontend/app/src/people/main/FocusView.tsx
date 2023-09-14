@@ -327,12 +327,8 @@ function FocusedView(props: FocusViewProps) {
 
   function getExtras(): any {
     const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
-    if (selectedIndex >= 0) {
-      if (selectedBounty) {
-        return selectedBounty.body;
-      } else {
-        return null;
-      }
+    if (selectedIndex >= 0 && selectedBounty) {
+      return selectedBounty.body;
     }
     return null;
   }
