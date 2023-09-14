@@ -7,6 +7,7 @@ import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
 import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
+import { getUserAvatarPlaceholder } from './lib';
 
 export const queryLimit = 100;
 
@@ -585,11 +586,28 @@ export class MainStore {
     return ps;
   }
 
+  getUserAvatarPlaceholder(ownerId: string) {
+
+    return getUserAvatarPlaceholder(ownerId)
+  }
+
   @persist('list')
-  people: Person[] = [];
+  _people: Person[] = [];
+
+  get people(){
+    return this._people.map((person: Person) => ({
+      ...person,
+      img: person.img || this.getUserAvatarPlaceholder(person.owner_pubkey)
+    }));
+  }
+
+  set people(people: Person[]) {
+    this._people = people
+  }
+
 
   setPeople(p: Person[]) {
-    this.people = p;
+    this._people = p;
   }
 
   async getPeople(queryParams?: any): Promise<Person[]> {
@@ -1018,7 +1036,18 @@ export class MainStore {
   }
 
   @persist('list')
-  activePerson: Person[] = [];
+  _activePerson: Person[] = [];
+
+  get activePerson() {
+    return this._activePerson.map((person: Person) => ({
+      ...person,
+      img: person.img || this.getUserAvatarPlaceholder(person.owner_pubkey)
+    }));
+  }
+
+  set activePerson(p: Person[]) {
+    this._activePerson = p;
+  }
 
   setActivePerson(p: Person) {
     this.activePerson = [p];
