@@ -111,7 +111,6 @@ function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
 
-
 export default function Person(props: PersonProps) {
   const {
     hideActions,

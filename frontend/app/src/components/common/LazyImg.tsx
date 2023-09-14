@@ -1,14 +1,21 @@
 import { noop } from 'lodash';
-import React, { ComponentProps, HTMLAttributes, ImgHTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  ComponentProps,
+  HTMLAttributes,
+  ImgHTMLAttributes,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import styled from 'styled-components';
 
 const Placeholder = styled.img`
   filter: blur(1rem);
 `;
 
-const Img = styled.img<{loaded: boolean}>`
-  filter: ${({ loaded }: any) =>loaded ?'"blur(0)"': "blur(1rem)" };
-
+const Img = styled.img<{ loaded: boolean }>`
+  filter: ${({ loaded }: any) => (loaded ? '"blur(0)"' : 'blur(1rem)')};
 `;
 
 export const LazyImg = ({
@@ -40,7 +47,7 @@ export const LazyImg = ({
   }, []);
 
   return inView ? (
-    <Img loaded={imgLoaded} {...props} alt={props.alt || ''} onLoad={() => setImgLoaded(true)}/>
+    <Img loaded={imgLoaded} {...props} alt={props.alt || ''} onLoad={() => setImgLoaded(true)} />
   ) : (
     <Placeholder {...props} ref={placeholderRef} src={placeholder} alt={props.alt || ''} />
   );
@@ -52,11 +59,12 @@ interface ImageProps {
 }
 const ImgDiv = styled.div<ImageProps>`
   background-image: url('${(p: any) => p.src}');
-  filter: ${({ loaded }: any) =>loaded ?'"blur(0)"': "blur(1rem)" };
+  filter: ${({ loaded }: any) => (loaded ? '"blur(0)"' : 'blur(1rem)')};
 `;
 
-
-export const LazyImgBg = (props: HTMLAttributes<HTMLDivElement> & { placeholder?: string; src: string }) => {
+export const LazyImgBg = (
+  props: HTMLAttributes<HTMLDivElement> & { placeholder?: string; src: string }
+) => {
   const [inView, setInView] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
 
@@ -82,16 +90,16 @@ export const LazyImgBg = (props: HTMLAttributes<HTMLDivElement> & { placeholder?
   }, []);
 
   useEffect(() => {
-    if(inView) {
+    if (inView) {
       const image = new Image();
       image.onload = () => {
         setImgLoaded(true);
       };
       image.src = props.src;
-      return () => image.onload = null
+      return () => (image.onload = null);
     }
-    return noop
-  }, [inView, props.src])
+    return noop;
+  }, [inView, props.src]);
 
   return inView ? (
     <ImgDiv loaded={imgLoaded} {...props} />
