@@ -1109,7 +1109,7 @@ export class MainStore {
           Accept: 'application/json'
         }
       });
- 
+
       const j = await r.json();
 
       if (this.lnToken) {
