@@ -164,8 +164,11 @@ class UiStore {
   @persist('object') _meInfo: MeData = null;
 
   get meInfo() {
-    const response:MeData = this._meInfo && this._meInfo.owner_pubkey ? {...this._meInfo, img: getUserAvatarPlaceholder(this._meInfo.owner_pubkey) }: null;
-    return response
+    const response: MeData =
+      this._meInfo && this._meInfo.owner_pubkey
+        ? { ...this._meInfo, img: getUserAvatarPlaceholder(this._meInfo.owner_pubkey) }
+        : null;
+    return response;
   }
 
   set meInfo(data: MeData) {

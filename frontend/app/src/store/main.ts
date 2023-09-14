@@ -587,14 +587,13 @@ export class MainStore {
   }
 
   getUserAvatarPlaceholder(ownerId: string) {
-
-    return getUserAvatarPlaceholder(ownerId)
+    return getUserAvatarPlaceholder(ownerId);
   }
 
   @persist('list')
   _people: Person[] = [];
 
-  get people(){
+  get people() {
     return this._people.map((person: Person) => ({
       ...person,
       img: person.img || this.getUserAvatarPlaceholder(person.owner_pubkey)
@@ -602,9 +601,8 @@ export class MainStore {
   }
 
   set people(people: Person[]) {
-    this._people = people
+    this._people = people;
   }
-
 
   setPeople(p: Person[]) {
     this._people = p;

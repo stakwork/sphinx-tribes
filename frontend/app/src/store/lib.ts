@@ -1,4 +1,4 @@
-import { random } from "lodash";
+import { random } from 'lodash';
 
 const getUserImagePlaceholderPath = (number: number) =>
   `/static/avatarPlaceholders/placeholder_${number}.jpg`;
