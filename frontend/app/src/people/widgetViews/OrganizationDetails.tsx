@@ -253,7 +253,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const getOrganizationBudget = useCallback(async () => {
     const organizationBudget = await main.getOrganizationBudget(uuid);
     setOrgBudget(organizationBudget.total_budget);
-  }, [main]);
+  }, [main, uuid]);
 
   const getPaymentsHistory = useCallback(async () => {
     const paymentHistories = await main.getPaymentHistories(uuid);
@@ -545,8 +545,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />
