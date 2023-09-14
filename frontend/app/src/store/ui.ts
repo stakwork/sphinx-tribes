@@ -3,6 +3,7 @@ import { persist } from 'mobx-persist';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import tags from '../tribes/tags';
 import { mainStore } from './main';
+import { getUserAvatarPlaceholder } from './lib';
 
 export type EuiSelectableOptionCheckedType = 'on' | 'off' | undefined;
 export interface EuiSelectableOption {
@@ -160,7 +161,17 @@ class UiStore {
     this.websocketToken = s;
   }
 
-  @persist('object') meInfo: MeData = null;
+  @persist('object') _meInfo: MeData = null;
+
+  get meInfo() {
+    const response:MeData = this._meInfo && this._meInfo.owner_pubkey ? {...this._meInfo, img: getUserAvatarPlaceholder(this._meInfo.owner_pubkey) }: null;
+    return response
+  }
+
+  set meInfo(data: MeData) {
+    this._meInfo = data;
+  }
+
   setMeInfo(t: MeData) {
     if (t) {
       if (t.photo_url && !t.img) t.img = t.photo_url;

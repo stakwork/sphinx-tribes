@@ -2,6 +2,9 @@ import { EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import React from 'react';
 import styled from 'styled-components';
+import { LazyImg } from 'components/common';
+import { observer } from 'mobx-react-lite';
+import { useStores } from 'store';
 import { colors } from '../config/colors';
 import { BountiesProfileProps } from './interfaces';
 
@@ -117,6 +120,7 @@ const ViewProfileButton = styled.div<BountyProfileViewProps>`
 `;
 const BountyProfileView = (props: BountiesProfileProps) => {
   const color = colors['light'];
+  const { main } = useStores();
   return (
     <>
       <UserProfileContainer
@@ -129,17 +133,11 @@ const BountyProfileView = (props: BountiesProfileProps) => {
             ...props.UserImageStyle
           }}
         >
-          <img
+          <LazyImg
             width={'100%'}
             height={'100%'}
             style={{ objectFit: 'cover' }}
-            src={
-              { ...props.assignee }.owner_alias
-                ? {
-                    ...props.assignee
-                  }.img || '/static/person_placeholder.png'
-                : '/static/default_profile_image.svg'
-            }
+            src={props.assignee.img || main.getUserAvatarPlaceholder(props.assignee.owner_pubkey)}
             alt={'assigned_person'}
           />
         </UserImage>
@@ -209,4 +207,4 @@ const BountyProfileView = (props: BountiesProfileProps) => {
   );
 };
 
-export default BountyProfileView;
+export default observer(BountyProfileView);

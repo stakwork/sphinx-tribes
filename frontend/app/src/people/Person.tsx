@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { random } from 'lodash';
 import { getHost } from '../config/host';
-import { Button, Divider } from '../components/common/index';
+import { Button, Divider, LazyImg, LazyImgBg } from '../components/common/index';
 import ConnectCard from './utils/ConnectCard';
 import { PersonProps } from './interfaces';
 
@@ -89,23 +90,14 @@ const DDescription = styled.div`
   font-size: 12px;
   line-height: 18px;
   color: #5f6368;
-  // white-space: nowrap;
-  // height:26px;
-  // text-overflow: ellipsis;
-  // overflow:hidden;
-  // margin-bottom:10px;
-
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `;
-interface ImageProps {
-  readonly src: string;
-}
-const Img = styled.div<ImageProps>`
-  background-image: url('${(p: any) => p.src}');
+
+const Img = styled(LazyImgBg)`
   background-position: center;
   background-size: cover;
   height: 96px;
@@ -118,6 +110,7 @@ const host = getHost();
 function makeQR(pubkey: string) {
   return `sphinx.chat://?action=person&host=${host}&pubkey=${pubkey}`;
 }
+
 
 export default function Person(props: PersonProps) {
   const {
@@ -197,7 +190,8 @@ export default function Person(props: PersonProps) {
           <div style={{ height: 210 }}>
             <Img
               style={{ height: '100%', width: '100%', borderRadius: 0 }}
-              src={img || defaultPic}
+              src={img}
+              // src={img || getUserPlaceholder(owner_pubkey)}
             />
           </div>
           <div style={{ padding: 16 }}>

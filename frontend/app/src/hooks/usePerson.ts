@@ -5,7 +5,7 @@ export const usePerson = (id: any) => {
   const { main, ui } = useStores();
   const { meInfo } = ui || {};
 
-  let person: Person | undefined = main.activePerson.length ? main.activePerson[0] : undefined;
+  const person: Person | undefined = main.activePerson.length ? main.activePerson[0] : undefined;
 
   const canEdit = meInfo?.id === person?.id;
 
