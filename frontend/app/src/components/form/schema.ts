@@ -705,6 +705,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     name: 'wanted_type',
     label: 'Category',
     type: 'select',
+    testId: 'Category',
     options: helpType_wanted_coding_task_schema
   },
   {
