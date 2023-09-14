@@ -243,8 +243,8 @@ const Organizations = () => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                  display: 'none'
-                                }
+                                    display: 'none'
+                                  }
                                 : undefined
                             }
                           />
@@ -262,8 +262,7 @@ const Organizations = () => {
                       />
                     </div>
                   </Wrap>
-                )
-                }
+                )}
               </Formik>
             </Modal>
           )}
