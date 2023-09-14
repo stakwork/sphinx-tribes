@@ -13,7 +13,7 @@ function TokenRefresh() {
     timeout = setTimeout(async () => {
       if ((ui.meInfo, ui.meInfo?.tribe_jwt)) {
         const res = await main.refreshJwt();
-        console.log('Refresh Token ==', res, res.jwt);
+        console.log('Refresh Token ==', res);
         if (res && res.jwt) {
           ui.setMeInfo({ ...ui.meInfo, tribe_jwt: res.jwt });
         } else {
