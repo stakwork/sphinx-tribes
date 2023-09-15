@@ -16,7 +16,7 @@ import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
 import { widgetConfigs } from '../utils/Constants';
 import Input from '../../components/form/inputs';
-import { Person } from '../../store/main'
+import { Person } from '../../store/main';
 import OrganizationDetails from './OrganizationDetails';
 
 const color = colors['light'];
@@ -71,7 +71,7 @@ const OrganizationContainer = styled.div`
   cursor: pointer;
 `;
 
-const Organizations = (props: {person: Person}) => {
+const Organizations = (props: { person: Person }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
@@ -82,7 +82,7 @@ const Organizations = (props: {person: Person}) => {
   const isMobile = useIsMobile();
   const config = widgetConfigs['organizations'];
   const formRef = useRef(null);
-				const isMyProfile = ui?.meInfo?.pubkey == props.person.owner_pubkey
+  const isMyProfile = ui?.meInfo?.pubkey == props.person.owner_pubkey;
 
   const schema = [...config.schema];
 
@@ -166,15 +166,17 @@ const Organizations = (props: {person: Person}) => {
       {detailsOpen && <OrganizationDetails close={closeDetails} org={organization} />}
       {!detailsOpen && (
         <>
-							{isMyProfile  && <IconButton
-            width={150}
-            height={isMobile ? 36 : 48}
-            text="Add Organization"
-            onClick={() => setIsOpen(true)}
-            style={{
-              marginLeft: '10px'
-            }}
-          />}
+          {isMyProfile && (
+            <IconButton
+              width={150}
+              height={isMobile ? 36 : 48}
+              text="Add Organization"
+              onClick={() => setIsOpen(true)}
+              style={{
+                marginLeft: '10px'
+              }}
+            />
+          )}
           <OrganizationContainer>{renderOrganizations()}</OrganizationContainer>
           {isOpen && (
             <Modal
