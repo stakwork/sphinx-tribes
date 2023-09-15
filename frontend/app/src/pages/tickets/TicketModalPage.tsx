@@ -28,6 +28,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const isMobile = useIsMobile();
+
   const search = useMemo(() => {
     const s = new URLSearchParams(location.search);
     return {

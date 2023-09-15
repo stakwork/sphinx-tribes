@@ -108,11 +108,12 @@ export const Wanted = observer(() => {
             <Panel
               key={w.body.id}
               isMobile={false}
-              onClick={() =>
+              onClick={() => {
+                ui.setBountyPerson(person?.id)
                 history.push({
                   pathname: `${url}/${w.body.id}/${i}`
                 })
-              }
+              }}
             >
               <WantedView {...w.body} person={person} />
             </Panel>
