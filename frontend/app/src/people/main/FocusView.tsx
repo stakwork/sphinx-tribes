@@ -201,7 +201,8 @@ function FocusedView(props: FocusViewProps) {
     return newBody;
   }
 
-  async function submitForm(body: any) {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+  async function submitForm(body: any, shouldCloseModal: boolean = true) {
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);
@@ -219,12 +220,10 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      if (newBody?.assignee?.owner_pubkey) {
-        newBody.assignee = newBody.assignee.owner_pubkey;
+      if (typeof newBody?.assignee !== 'string' || !newBody?.assignee) {
+        newBody.assignee = newBody.assignee?.owner_pubkey ?? 'emptyid';
       }
-      if (body?.assignee?.owner_pubkey) {
-        newBody.assignee = body.assignee.owner_pubkey;
-      }
+
       if (body.one_sentence_summary !== '') {
         newBody.title = body.one_sentence_summary;
       } else {
@@ -238,7 +237,9 @@ function FocusedView(props: FocusViewProps) {
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
-      closeModal();
+      if(shouldCloseModal) {
+        closeModal();
+      }
     } catch (e) {
       console.log('e', e);
     }
