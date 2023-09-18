@@ -90,7 +90,7 @@ export default function Select(props: SelProps) {
           onChange(value);
           if (handleActive) handleActive(false);
         }}
-					fullWidth={true}
+        fullWidth={true}
         itemLayoutAlign="top"
       />
     </div>
