@@ -445,8 +445,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             )}
             {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'VIEW REPORT')) && (
               <>
-                <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>Budget history</ViewHistoryText>
-                <ViewHistoryText onClick={() => setIsOpenHistory(true)}>Payment history</ViewHistoryText>
+                <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>
+                  Budget history
+                </ViewHistoryText>
+                <ViewHistoryText onClick={() => setIsOpenHistory(true)}>
+                  Payment history
+                </ViewHistoryText>
               </>
             )}
           </DataCount>
@@ -563,8 +567,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                              display: 'none'
-                            }
+                                display: 'none'
+                              }
                             : undefined
                         }
                       />
@@ -756,7 +760,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             visible={isOpenBudgetHistory}
             style={{
               height: '100%',
-              flexDirection: 'column',
+              flexDirection: 'column'
             }}
             envStyle={{
               marginTop: isMobile ? 64 : 0,

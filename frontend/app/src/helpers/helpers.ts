@@ -167,8 +167,8 @@ export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): 
 };
 
 export const toCapitalize = (word: string): string => {
-  if(!word.length) return word;
-  
+  if (!word.length) return word;
+
   const wordString = word.split(' ');
   const capitalizeStrings = wordString.map((w: string) => w[0].toUpperCase() + w.slice(1));
 

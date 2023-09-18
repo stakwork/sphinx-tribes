@@ -247,8 +247,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                  display: 'none'
-                                }
+                                    display: 'none'
+                                  }
                                 : undefined
                             }
                           />
