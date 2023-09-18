@@ -237,7 +237,7 @@ function FocusedView(props: FocusViewProps) {
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
-      if(shouldCloseModal) {
+      if (shouldCloseModal) {
         closeModal();
       }
     } catch (e) {
