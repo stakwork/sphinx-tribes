@@ -41,6 +41,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   };
 
   const onGoBack = () => {
+    ui.setBountyPerson(0);
     history.push({
       pathname: basePath
     });
@@ -81,7 +82,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
     >
       <FocusedView
         person={person}
-        canEdit={canEdit}
+        canEdit={ui.bountyPerson ? person?.id === ui.bountyPerson : canEdit}
         selectedIndex={Number(wantedIndex)}
         config={config}
         bounty={bounty}

@@ -1054,7 +1054,6 @@ export class MainStore {
   @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
-    this.setActivePerson(p);
     return p;
   }
 
