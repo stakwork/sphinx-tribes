@@ -266,7 +266,7 @@ function FocusedView(props: FocusViewProps) {
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
       initialValues.estimated_completion_date =
-        wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
+         moment(wanted?.estimated_completion_date) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -334,7 +334,12 @@ function FocusedView(props: FocusViewProps) {
   }
 
   // set user organizations
-  config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  if(
+    config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']  
+  ) {
+
+    config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  }
 
   return (
     <div

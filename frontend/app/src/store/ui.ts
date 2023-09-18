@@ -166,7 +166,7 @@ class UiStore {
   get meInfo() {
     const response: MeData =
       this._meInfo && this._meInfo.owner_pubkey
-        ? { ...this._meInfo, img: getUserAvatarPlaceholder(this._meInfo.owner_pubkey) }
+        ? { ...this._meInfo, img: this._meInfo.img || getUserAvatarPlaceholder(this._meInfo.owner_pubkey) }
         : null;
     return response;
   }
@@ -228,6 +228,3 @@ export const emptyMeInfo: MeInfo = {
 };
 
 export const uiStore = new UiStore();
-
-// const hydrate = createPersist()
-// hydrate('some', uiStore).then(() => { })
