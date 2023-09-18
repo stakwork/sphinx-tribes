@@ -140,6 +140,7 @@ export interface BudgetHistory {
   payment_type: string;
   created: string;
   updated: string;
+  sender_pub_key: string;
   sender_name: string;
   status: boolean;
 }

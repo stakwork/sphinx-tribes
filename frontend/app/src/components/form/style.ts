@@ -9,13 +9,23 @@ interface WrapProps {
 }
 
 export const Wrap = styled.div<WrapProps>`
-  padding: ${(p: any) => (p?.newDesign ? '28px 0px' : '30px 10px')};
+  padding: ${(p: any) => (p?.newDesign ? '28px 0px' : '80px 0px 0px 0px')};
   margin-bottom: ${(p: any) => !p?.newDesign && '100px'};
   display: flex;
   height: inherit;
   flex-direction: column;
   align-content: center;
-  min-width: 400px;
+  min-width: 230px;
+`;
+
+export const OrgWrap = styled.div<WrapProps>`
+  padding: ${(p: any) => (p?.newDesign ? '28px 0px' : '30px 20px')};
+  margin-bottom: ${(p: any) => !p?.newDesign && '100px'};
+  display: flex;
+  height: inherit;
+  flex-direction: column;
+  align-content: center;
+  min-width: 500px;
   max-width: auto;
 `;
 

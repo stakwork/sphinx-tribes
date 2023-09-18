@@ -464,8 +464,8 @@ type BudgetStoreData struct {
 type BudgetPaymentType string
 
 const (
-	Add      BudgetPaymentType = "add"
-	Withdraw BudgetPaymentType = "withdraw"
+	Add     BudgetPaymentType = "add"
+	Deposit BudgetPaymentType = "deposit"
 )
 
 type BudgetHistory struct {
@@ -480,14 +480,8 @@ type BudgetHistory struct {
 }
 
 type BudgetHistoryData struct {
-	ID          uint              `json:"id"`
-	OrgUuid     string            `json:"org_uuid"`
-	Amount      uint              `json:"amount"`
-	PaymentType BudgetPaymentType `json:"payment_type"`
-	Status      bool              `json:"status"`
-	SenderName  string            `json:"sender_name"`
-	Created     *time.Time        `json:"created"`
-	Updated     *time.Time        `json:"updated"`
+	BudgetHistory
+	SenderName string `json:"sender_name"`
 }
 
 type PaymentHistory struct {

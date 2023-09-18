@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
-import { Wrap } from 'components/form/style';
+import { OrgWrap, Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import moment from 'moment';
@@ -275,7 +275,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
         org_uuid: uuid,
         websocket_token: token,
-        payment_type: 'add'
+        payment_type: 'deposit'
       });
 
       setLnInvoice(data.response.invoice);
@@ -728,7 +728,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               borderRadius: '50%'
             }}
           >
-            <Wrap style={{ width: '300px' }}>
+            <OrgWrap style={{ width: '300px' }}>
               <ModalTitle>Payment history</ModalTitle>
               <table>
                 <thead>
@@ -748,7 +748,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                   ))}
                 </tbody>
               </table>
-            </Wrap>
+            </OrgWrap>
           </Modal>
         )}
         {isOpenBudgetHistory && (
@@ -775,7 +775,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               borderRadius: '50%'
             }}
           >
-            <Wrap>
+            <OrgWrap>
               <ModalTitle>Budget history</ModalTitle>
               <table>
                 <thead>
@@ -799,7 +799,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                   ))}
                 </tbody>
               </table>
-            </Wrap>
+            </OrgWrap>
           </Modal>
         )}
       </DetailsWrap>
