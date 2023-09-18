@@ -265,8 +265,7 @@ function FocusedView(props: FocusViewProps) {
       initialValues.price_to_meet = personInfo.price_to_meet || 0;
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      initialValues.estimated_completion_date =
-         moment(wanted?.estimated_completion_date) || '';
+      initialValues.estimated_completion_date = moment(wanted?.estimated_completion_date) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -334,10 +333,7 @@ function FocusedView(props: FocusViewProps) {
   }
 
   // set user organizations
-  if(
-    config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']  
-  ) {
-
+  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
     config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
   }
 
