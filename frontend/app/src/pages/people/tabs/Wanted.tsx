@@ -109,10 +109,10 @@ export const Wanted = observer(() => {
               key={w.body.id}
               isMobile={false}
               onClick={() => {
-                ui.setBountyPerson(person?.id)
+                ui.setBountyPerson(person?.id);
                 history.push({
                   pathname: `${url}/${w.body.id}/${i}`
-                })
+                });
               }}
             >
               <WantedView {...w.body} person={person} />
