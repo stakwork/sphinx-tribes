@@ -109,6 +109,7 @@ const UserTickets = () => {
               showName
               onPanelClick={() => {
                 onPanelClick(body.id, i);
+                ui.setBountyPerson(person?.id);
               }}
               person={person}
               showModal={showModal}

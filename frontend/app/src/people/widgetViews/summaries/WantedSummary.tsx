@@ -211,8 +211,7 @@ function WantedSummary(props: WantedSummaryProps) {
     (async () => {
       if (props.assignee) {
         try {
-          const p = await main.getPersonByPubkey(props.assignee.owner_pubkey);
-          setAssigneeInfo(p);
+          setAssigneeInfo(props.assignee);
         } catch (e) {
           console.log('e', e);
         }

@@ -102,6 +102,11 @@ class UiStore {
     mainStore.getPersonById(n || 0);
   }
 
+  bountyPerson = 0;
+  setBountyPerson(n: number | undefined) {
+    if (n) this.bountyPerson = n;
+  }
+
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
   selectingPerson = 0;
