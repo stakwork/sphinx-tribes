@@ -6,7 +6,7 @@ export const usePerson = (id: any) => {
   const { meInfo } = ui || {};
 
   const person: Person | undefined = main.activePerson.length ? main.activePerson[0] : undefined;
-  
+
   const canEdit = meInfo?.id === id;
 
   return {
