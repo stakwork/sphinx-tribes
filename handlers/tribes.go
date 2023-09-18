@@ -556,6 +556,7 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	var budgetHistoryData = db.BudgetHistory{
 		Amount:       invoice.Amount,
 		OrgUuid:      invoice.OrgUuid,
+		PaymentType:  invoice.PaymentType,
 		SenderPubKey: invoice.SenderPubKey,
 		Created:      &now,
 		Updated:      &now,
