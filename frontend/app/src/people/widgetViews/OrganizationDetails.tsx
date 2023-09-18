@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
-import { Wrap } from 'components/form/style';
+import { OrgWrap, Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import moment from 'moment';
@@ -10,7 +10,7 @@ import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
+import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { userHasRole } from 'helpers';
 import { Modal } from '../../components/common';
@@ -153,9 +153,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
+  const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
   const [usersCount, setUsersCount] = useState<number>(0);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
+  const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
@@ -260,6 +262,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setPaymentsHistory(paymentHistories);
   }, [main]);
 
+  const getBudgetHistory = useCallback(async () => {
+    const budgetHistories = await main.getBudgettHistories(uuid);
+    setBudgetsHistory(budgetHistories);
+  }, [main]);
+
   const generateInvoice = async () => {
     const token = ui.meInfo?.websocketToken;
     if (token) {
@@ -267,7 +274,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         amount: amount,
         sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
         org_uuid: uuid,
-        websocket_token: token
+        websocket_token: token,
+        payment_type: 'deposit'
       });
 
       setLnInvoice(data.response.invoice);
@@ -294,6 +302,10 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const closeHistoryHandler = () => {
     setIsOpenHistory(false);
+  };
+
+  const closeBudgetHistoryHandler = () => {
+    setIsOpenBudgetHistory(false);
   };
 
   const onSubmit = async (body: any) => {
@@ -359,6 +371,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
       // get new organization budget
       getOrganizationBudget();
+      getBudgetHistory();
       closeBudgetHandler();
     }
   };
@@ -369,12 +382,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
+    getBudgetHistory();
   }, [
     getOrganizationUsers,
     getOrganizationUsersCount,
     getBountyRoles,
     getOrganizationBudget,
-    getPaymentsHistory
+    getPaymentsHistory,
+    getBudgetHistory
   ]);
 
   useEffect(() => {
@@ -429,7 +444,10 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               />
             )}
             {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'VIEW REPORT')) && (
-              <ViewHistoryText onClick={() => setIsOpenHistory(true)}>View history</ViewHistoryText>
+              <>
+                <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>Budget history</ViewHistoryText>
+                <ViewHistoryText onClick={() => setIsOpenHistory(true)}>Payment history</ViewHistoryText>
+              </>
             )}
           </DataCount>
         </OrgInfoWrap>
@@ -545,8 +563,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />
@@ -710,7 +728,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               borderRadius: '50%'
             }}
           >
-            <Wrap style={{ width: '300px' }}>
+            <OrgWrap style={{ width: '300px' }}>
               <ModalTitle>Payment history</ModalTitle>
               <table>
                 <thead>
@@ -730,7 +748,58 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                   ))}
                 </tbody>
               </table>
-            </Wrap>
+            </OrgWrap>
+          </Modal>
+        )}
+        {isOpenBudgetHistory && (
+          <Modal
+            visible={isOpenBudgetHistory}
+            style={{
+              height: '100%',
+              flexDirection: 'column',
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeBudgetHistoryHandler}
+            bigCloseImage={closeBudgetHistoryHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <OrgWrap>
+              <ModalTitle>Budget history</ModalTitle>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sender</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetsHistory.map((b: BudgetHistory, i: number) => (
+                    <tr key={i}>
+                      <td className="ellipsis">{b.sender_name}</td>
+                      <td>{b.amount} sats</td>
+                      <td>{b.payment_type}</td>
+                      <td>{b.status ? 'settled' : 'peending'}</td>
+                      <td>{moment(b.created).fromNow()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </OrgWrap>
           </Modal>
         )}
       </DetailsWrap>

@@ -1104,6 +1104,12 @@ func (db database) GetOrganizationBudget(org_uuid string) BountyBudget {
 	return ms
 }
 
+func (db database) GetOrganizationBudgetHistory(org_uuid string) []BudgetHistoryData {
+	budgetHistory := []BudgetHistoryData{}
+	db.db.Raw(`SELECT budget.id, budget.org_uuid, budget.amount, budget.created, budget.updated, budget.payment_type, budget.status, budget.sender_pub_key, sender.unique_name AS sender_name FROM public.budget_histories AS budget LEFT OUTER JOIN public.people AS sender ON budget.sender_pub_key = sender.owner_pub_key WHERE budget.org_uuid = '` + org_uuid + `' ORDER BY budget.created DESC`).Find(&budgetHistory)
+	return budgetHistory
+}
+
 func (db database) AddAndUpdateBudget(budget BudgetStoreData) BudgetHistory {
 	created := budget.Created
 	org_uuid := budget.OrgUuid
