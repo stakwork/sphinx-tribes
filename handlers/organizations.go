@@ -374,6 +374,15 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(organizationBudget)
 }
 
+func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	// get the organization budget
+	organizationBudget := db.DB.GetOrganizationBudgetHistory(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizationBudget)
+}
+
 func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
