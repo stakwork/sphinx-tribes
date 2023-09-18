@@ -79,6 +79,7 @@ export default function Sel(props: SelProps) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <S
+        placeholder={''}
         color={color}
         closeMenuOnSelect={false}
         isMulti
