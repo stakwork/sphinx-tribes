@@ -72,7 +72,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     }
   };
   const nextArrHandler = () => {
-    console.log("edakun")
+    
     if (activeListIndex + 1 > main.peopleWanteds?.length) return;
 
     const { person, body } = main.peopleWanteds[activeListIndex + 1];
