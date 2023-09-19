@@ -30,6 +30,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/users/role/{uuid}/{user}", handlers.GetUserRoles)
 		r.Get("/user", handlers.GetUserOrganizations)
 		r.Get("/budget/{uuid}", handlers.GetOrganizationBudget)
+		r.Get("/budget/history/{uuid}", handlers.GetOrganizationBudgetHistory)
 		r.Get("/payments/{uuid}", handlers.GetPaymentHistory)
 	})
 

@@ -445,10 +445,11 @@ type BountyBudget struct {
 }
 
 type BudgetInvoiceRequest struct {
-	Amount          uint   `json:"amount"`
-	SenderPubKey    string `json:"sender_pubkey"`
-	OrgUuid         string `json:"org_uuid"`
-	Websocket_token string `json:"websocket_token,omitempty"`
+	Amount          uint              `json:"amount"`
+	SenderPubKey    string            `json:"sender_pubkey"`
+	OrgUuid         string            `json:"org_uuid"`
+	PaymentType     BudgetPaymentType `json:"payment_type,omitempty"`
+	Websocket_token string            `json:"websocket_token,omitempty"`
 }
 
 type BudgetStoreData struct {
@@ -460,14 +461,27 @@ type BudgetStoreData struct {
 	Created      *time.Time `json:"created"`
 }
 
+type BudgetPaymentType string
+
+const (
+	Add     BudgetPaymentType = "add"
+	Deposit BudgetPaymentType = "deposit"
+)
+
 type BudgetHistory struct {
-	ID           uint       `json:"id"`
-	OrgUuid      string     `json:"org_uuid"`
-	Amount       uint       `json:"amount"`
-	SenderPubKey string     `json:"sender_pubkey"`
-	Created      *time.Time `json:"created"`
-	Updated      *time.Time `json:"updated"`
-	Status       bool       `json:"status"`
+	ID           uint              `json:"id"`
+	OrgUuid      string            `json:"org_uuid"`
+	Amount       uint              `json:"amount"`
+	SenderPubKey string            `json:"sender_pubkey"`
+	Created      *time.Time        `json:"created"`
+	Updated      *time.Time        `json:"updated"`
+	Status       bool              `json:"status"`
+	PaymentType  BudgetPaymentType `json:"payment_type"`
+}
+
+type BudgetHistoryData struct {
+	BudgetHistory
+	SenderName string `json:"sender_name"`
 }
 
 type PaymentHistory struct {

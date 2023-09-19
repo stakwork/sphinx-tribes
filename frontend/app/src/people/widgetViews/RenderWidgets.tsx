@@ -186,7 +186,7 @@ function RenderWidgets({ widget }: RenderWidgetsProps) {
 
     switch (selectedWidget) {
       case 'organizations':
-        return <OrganizationView />;
+        return <OrganizationView person={person} />;
       case 'badges':
         return <Badges person={person} />;
       case 'about':

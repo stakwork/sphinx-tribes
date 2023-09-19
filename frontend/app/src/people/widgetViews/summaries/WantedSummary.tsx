@@ -173,14 +173,45 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const changeAssignedPerson = useCallback(() => {
     setIsAssigned(false);
-  }, []);
+
+    setAssignedPerson(null);
+    const newValue = {
+      title: titleString,
+      wanted_type: wanted_type,
+      one_sentence_summary: one_sentence_summary,
+      ticketUrl: ticket_url,
+      github_description: github_description,
+      description: description,
+      price: price,
+      assignee: '',
+      coding_language: coding_languages?.map((x: string) => ({ label: x, value: x })),
+      estimated_session_length: estimated_session_length,
+      show: show,
+      type: type,
+      created: created
+    };
+    formSubmit && formSubmit(newValue, false);
+  }, [
+    coding_languages,
+    created,
+    description,
+    estimated_session_length,
+    formSubmit,
+    github_description,
+    one_sentence_summary,
+    price,
+    show,
+    ticket_url,
+    titleString,
+    type,
+    wanted_type
+  ]);
 
   useEffect(() => {
     (async () => {
       if (props.assignee) {
         try {
-          const p = await main.getPersonByPubkey(props.assignee.owner_pubkey);
-          setAssigneeInfo(p);
+          setAssigneeInfo(props.assignee);
         } catch (e) {
           console.log('e', e);
         }

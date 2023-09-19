@@ -201,7 +201,8 @@ function FocusedView(props: FocusViewProps) {
     return newBody;
   }
 
-  async function submitForm(body: any) {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+  async function submitForm(body: any, shouldCloseModal: boolean = true) {
     let newBody = cloneDeep(body);
     try {
       newBody = await preSubmitFunctions(newBody);
@@ -219,12 +220,10 @@ function FocusedView(props: FocusViewProps) {
     if (!info) return console.log('no meInfo');
     setLoading(true);
     try {
-      if (newBody?.assignee?.owner_pubkey) {
-        newBody.assignee = newBody.assignee.owner_pubkey;
+      if (typeof newBody?.assignee !== 'string' || !newBody?.assignee) {
+        newBody.assignee = newBody.assignee?.owner_pubkey ?? 'emptyid';
       }
-      if (body?.assignee?.owner_pubkey) {
-        newBody.assignee = body.assignee.owner_pubkey;
-      }
+
       if (body.one_sentence_summary !== '') {
         newBody.title = body.one_sentence_summary;
       } else {
@@ -238,7 +237,9 @@ function FocusedView(props: FocusViewProps) {
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
-      closeModal();
+      if (shouldCloseModal) {
+        closeModal();
+      }
     } catch (e) {
       console.log('e', e);
     }
@@ -265,8 +266,7 @@ function FocusedView(props: FocusViewProps) {
       initialValues.price_to_meet = personInfo.price_to_meet || 0;
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      initialValues.estimated_completion_date =
-        wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
+      initialValues.estimated_completion_date = moment(wanted?.estimated_completion_date) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -334,7 +334,9 @@ function FocusedView(props: FocusViewProps) {
   }
 
   // set user organizations
-  config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
+    config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  }
 
   return (
     <div

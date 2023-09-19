@@ -41,6 +41,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   };
 
   const onGoBack = () => {
+    ui.setBountyPerson(0);
     history.push({
       pathname: basePath
     });
@@ -76,12 +77,10 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       }}
       overlayClick={onGoBack}
       bigCloseImage={onGoBack}
-      nextArrow={() => changeWanted(1)}
-      prevArrow={() => changeWanted(-1)}
     >
       <FocusedView
         person={person}
-        canEdit={canEdit}
+        canEdit={ui.bountyPerson ? person?.id === ui.bountyPerson : canEdit}
         selectedIndex={Number(wantedIndex)}
         config={config}
         bounty={bounty}

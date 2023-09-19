@@ -102,6 +102,11 @@ class UiStore {
     mainStore.getPersonById(n || 0);
   }
 
+  bountyPerson = 0;
+  setBountyPerson(n: number | undefined) {
+    if (n) this.bountyPerson = n;
+  }
+
   // this is for animations, if you deselect as a component is fading out,
   // it empties and looks broke for a second
   selectingPerson = 0;
@@ -166,7 +171,10 @@ class UiStore {
   get meInfo() {
     const response: MeData =
       this._meInfo && this._meInfo.owner_pubkey
-        ? { ...this._meInfo, img: getUserAvatarPlaceholder(this._meInfo.owner_pubkey) }
+        ? {
+            ...this._meInfo,
+            img: this._meInfo.img || getUserAvatarPlaceholder(this._meInfo.owner_pubkey)
+          }
         : null;
     return response;
   }
@@ -228,6 +236,3 @@ export const emptyMeInfo: MeInfo = {
 };
 
 export const uiStore = new UiStore();
-
-// const hydrate = createPersist()
-// hydrate('some', uiStore).then(() => { })

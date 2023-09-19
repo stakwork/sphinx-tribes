@@ -30,7 +30,7 @@ export const help_wanted_coding_task_schema = [
   'Desktop app',
   'Dev ops',
   'Bitcoin / Lightning',
-  'other'
+  'Other'
 ];
 
 export const help_wanted_other_schema = ['Troubleshooting', 'Debugging', 'Tutoring'];

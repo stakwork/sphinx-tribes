@@ -236,7 +236,7 @@ export interface WantedSummaryProps {
   show: boolean;
   setIsModalSideButton: (any) => void;
   setIsExtraStyle: (any) => void;
-  formSubmit: (any) => void;
+  formSubmit: (any, close?: boolean) => void;
   title: string;
   org_uuid?: string;
   id?: number;

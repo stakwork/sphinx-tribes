@@ -133,6 +133,18 @@ export interface PaymentHistory {
   created: string;
 }
 
+export interface BudgetHistory {
+  id: number;
+  amount: number;
+  org_uuid: string;
+  payment_type: string;
+  created: string;
+  updated: string;
+  sender_pub_key: string;
+  sender_name: string;
+  status: boolean;
+}
+
 export interface PersonOffer {
   person: PersonFlex;
   title: string;
@@ -1054,7 +1066,6 @@ export class MainStore {
   @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
-    this.setActivePerson(p);
     return p;
   }
 
@@ -1542,6 +1553,7 @@ export class MainStore {
     org_uuid: string;
     sender_pubkey: string;
     websocket_token: string;
+    payment_type: string;
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1550,7 +1562,8 @@ export class MainStore {
           amount: body.amount,
           org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
-          websocket_token: body.websocket_token
+          websocket_token: body.websocket_token,
+          payment_type: body.payment_type
         },
         {
           'Content-Type': 'application/json'
@@ -1816,6 +1829,7 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getOrganizationBudget', e);
       return false;
     }
   }
@@ -1840,6 +1854,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error makeBountyPayment', e);
       return false;
     }
   }
@@ -1859,6 +1874,27 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getPaymentHistories', e);
+      return [];
+    }
+  }
+
+  async getBudgettHistories(uuid: string): Promise<BudgetHistory[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/budget/history/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.log('Error gettHistories', e);
       return [];
     }
   }
