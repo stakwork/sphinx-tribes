@@ -77,8 +77,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       }}
       overlayClick={onGoBack}
       bigCloseImage={onGoBack}
-      nextArrow={() => changeWanted(1)}
-      prevArrow={() => changeWanted(-1)}
+     
     >
       <FocusedView
         person={person}
