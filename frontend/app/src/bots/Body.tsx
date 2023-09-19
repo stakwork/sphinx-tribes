@@ -165,7 +165,7 @@ function BotBody() {
       un = window.location.pathname.substr(3);
     }
 
-    await main.getBots(un, null);
+    await main.getBots(un);
     await main.getMyBots();
     setLoading(false);
   }, [main]);
