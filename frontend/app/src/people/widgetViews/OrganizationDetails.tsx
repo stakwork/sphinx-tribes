@@ -12,7 +12,10 @@ import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
+import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
 import { userHasRole } from 'helpers';
+import { BountyModal } from 'people/main/bountyModal';
+import history from '../../config/history';
 import { Modal } from '../../components/common';
 import { colors } from '../../config/colors';
 import { nonWidgetConfigs } from '../utils/Constants';
@@ -145,6 +148,15 @@ const CheckLabel = styled.label`
   margin: 0px;
 `;
 
+const ViewBounty = styled.p`
+  padding: 0px;
+  margin: 0px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: green;
+  font-size: bold;
+`;
+
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const isMobile = useIsMobile();
@@ -168,6 +180,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [lnInvoice, setLnInvoice] = useState('');
   const [invoiceStatus, setInvoiceStatus] = useState(false);
   const [amount, setAmount] = useState(1);
+  const { path, url } = useRouteMatch();
+
 
   const pollMinutes = 2;
 
@@ -376,6 +390,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     }
   };
 
+  const viewBounty = async (bountyId: number) => {
+    ui.setBountyPerson(ui.meInfo?.id);
+
+    history.push({
+      pathname: `${url}/${bountyId}/${0}`
+    });
+  }
+
   useEffect(() => {
     getOrganizationUsers();
     getOrganizationUsersCount();
@@ -567,8 +589,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />
@@ -738,16 +760,20 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 <thead>
                   <tr>
                     <th>Sender</th>
+                    <th>Recipient</th>
                     <th>Amount</th>
                     <th>Date</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {paymentsHistory.map((pay: PaymentHistory, i: number) => (
                     <tr key={i}>
                       <td className="ellipsis">{pay.sender_name}</td>
+                      <td className="ellipsis">{pay.receiver_name}</td>
                       <td>{pay.amount} sats</td>
-                      <td>{moment(pay.created).fromNow()}</td>
+                      <td>{moment(pay.created).format('DD/MM/YY')}</td>
+                      <td><ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty></td>
                     </tr>
                   ))}
                 </tbody>
@@ -798,7 +824,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                       <td>{b.amount} sats</td>
                       <td>{b.payment_type}</td>
                       <td>{b.status ? 'settled' : 'peending'}</td>
-                      <td>{moment(b.created).fromNow()}</td>
+                      <td>{moment(b.created).format('DD/MM/YY')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -808,6 +834,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         )}
       </DetailsWrap>
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
+      <Router history={history}>
+        <Switch>
+          <Route path={`${path}/:wantedId/:wantedIndex`}>
+            <BountyModal basePath={url} />
+          </Route>
+        </Switch>
+      </Router>
     </Container>
   );
 };

@@ -718,7 +718,7 @@ export class MainStore {
   @persist('list')
   peopleWanteds: PersonWanted[] = [];
 
-  setPeopleWanteds(wanteds: PersonWanted[]) {
+  @action setPeopleWanteds(wanteds: PersonWanted[]) {
     this.peopleWanteds = wanteds;
   }
 
@@ -759,19 +759,19 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleWanteds = ps3;
+        this.setPeopleWanteds(ps3);
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
-        this.peopleWanteds = this.doPageListMerger(
+        const wanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams,
           'wanted'
         );
+        this.setPeopleWanteds(wanteds);
       }
-      this.setPeopleWanteds(ps3);
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -781,7 +781,7 @@ export class MainStore {
 
   personAssignedWanteds: PersonWanted[] = [];
 
-  setPersonWanteds(wanteds: PersonWanted[]) {
+  @action setPersonWanteds(wanteds: PersonWanted[]) {
     this.personAssignedWanteds = wanteds;
   }
 
@@ -828,7 +828,7 @@ export class MainStore {
 
   createdWanteds: PersonWanted[] = [];
 
-  setCreatedWanteds(wanteds: PersonWanted[]) {
+  @action setCreatedWanteds(wanteds: PersonWanted[]) {
     this.createdWanteds = wanteds;
   }
 
@@ -941,17 +941,19 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleWanteds = ps3;
+        this.setPeopleWanteds(ps3);
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
-        this.peopleWanteds = this.doPageListMerger(
+       const wanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams,
           'wanted'
         );
+
+        this.setPeopleWanteds(wanteds);
       }
       return ps3;
     } catch (e) {
