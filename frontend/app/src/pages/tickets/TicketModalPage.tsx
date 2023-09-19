@@ -59,7 +59,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const prevArrHandler = () => {
     if (activeListIndex === 0) return;
 
-    const { person, body } = main.peopleWanteds[activeListIndex-1];
+    const { person, body } = main.peopleWanteds[activeListIndex - 1];
     if (person && body) {
       history.replace({
         pathname: history?.location?.pathname,
@@ -72,7 +72,6 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     }
   };
   const nextArrHandler = () => {
-    
     if (activeListIndex + 1 > main.peopleWanteds?.length) return;
 
     const { person, body } = main.peopleWanteds[activeListIndex + 1];
