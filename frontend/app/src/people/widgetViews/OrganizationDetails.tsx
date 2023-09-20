@@ -273,12 +273,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const getPaymentsHistory = useCallback(async () => {
     const paymentHistories = await main.getPaymentHistories(uuid);
     setPaymentsHistory(paymentHistories);
-  }, [main]);
+  }, [main, uuid]);
 
   const getBudgetHistory = useCallback(async () => {
     const budgetHistories = await main.getBudgettHistories(uuid);
     setBudgetsHistory(budgetHistories);
-  }, [main]);
+  }, [main, uuid]);
 
   const generateInvoice = async () => {
     const token = ui.meInfo?.websocketToken;
@@ -426,7 +426,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-  }, []);
+  }, [onHandle]);
 
   return (
     <Container>
@@ -588,8 +588,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />
@@ -762,7 +762,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                     <th>Recipient</th>
                     <th>Amount</th>
                     <th>Date</th>
-                    <th></th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>

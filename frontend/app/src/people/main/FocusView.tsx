@@ -64,9 +64,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -103,9 +103,9 @@ function FocusedView(props: FocusViewProps) {
 
   const userOrganizations = main.organizations.length
     ? main.organizations.map((org: Organization) => ({
-        label: toCapitalize(org.name),
-        value: org.uuid
-      }))
+      label: toCapitalize(org.name),
+      value: org.uuid
+    }))
     : [];
 
   function isNotHttps(url: string | undefined) {
@@ -206,6 +206,14 @@ function FocusedView(props: FocusViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   async function submitForm(body: any, shouldCloseModal: boolean = true) {
     let newBody = cloneDeep(body);
+    if (config && config.name === 'about') {
+      const res = await main.saveProfile(newBody);
+      if (shouldCloseModal) {
+        closeModal();
+      }
+      return
+    }
+
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -239,9 +247,6 @@ function FocusedView(props: FocusViewProps) {
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
-      if (shouldCloseModal) {
-        closeModal();
-      }
     } catch (e) {
       console.log('e', e);
     }
@@ -257,18 +262,17 @@ function FocusedView(props: FocusViewProps) {
   const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
 
   // set initials here
-  if (personInfo && selectedBounty && selectedIndex >= 0) {
-    const wanted = selectedBounty.body;
+  if (personInfo) {
     if (config && config.name === 'about') {
       initialValues.id = personInfo.id || 0;
       initialValues.pubkey = personInfo.pubkey;
+      initialValues.owner_pubkey = personInfo.pubkey;
       initialValues.alert = personInfo.extras?.alert || false;
       initialValues.owner_alias = personInfo.owner_alias || '';
       initialValues.img = personInfo.img || '';
       initialValues.price_to_meet = personInfo.price_to_meet || 0;
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      initialValues.estimated_completion_date = moment(wanted?.estimated_completion_date) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -287,7 +291,10 @@ function FocusedView(props: FocusViewProps) {
         (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
     } else {
       // if there is a selected index, fill in values
-      if (selectedIndex >= 0) {
+      if (selectedBounty && selectedIndex >= 0) {
+        const wanted = selectedBounty.body;
+        initialValues.estimated_completion_date = wanted?.estimated_completion_date ? moment(wanted?.estimated_completion_date) : '';
+
         if (wanted.type) {
           const thisDynamicSchema = dynamicSchemasByType[wanted.type];
           const newValues = thisDynamicSchema.map((s: any) => {
@@ -371,8 +378,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
