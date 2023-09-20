@@ -82,7 +82,7 @@ const Organizations = (props: { person: Person }) => {
   const isMobile = useIsMobile();
   const config = widgetConfigs['organizations'];
   const formRef = useRef(null);
-  const isMyProfile = ui?.meInfo?.pubkey == props?.person?.owner_pubkey;
+  const isMyProfile = ui?.meInfo?.pubkey === props?.person?.owner_pubkey;
 
   const schema = [...config.schema];
 
@@ -247,8 +247,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                    display: 'none'
-                                  }
+                                  display: 'none'
+                                }
                                 : undefined
                             }
                           />
