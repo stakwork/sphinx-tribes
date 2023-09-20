@@ -58,13 +58,13 @@ interface fieldEnvProps {
   isTextField?: any;
 }
 
-export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
+export const FieldEnv = styled(EuiFormRow as any) <fieldEnvProps>`
   border: ${(p: any) =>
     p.border === 'bottom'
       ? ''
       : p?.isTop
-      ? `1px solid ${p?.color && p.color.pureWhite}`
-      : `1px solid ${p?.color && p.color.grayish.G600}`};
+        ? `1px solid ${p?.color && p.color.pureWhite}`
+        : `1px solid ${p?.color && p.color.grayish.G600}`};
   border-bottom: ${(p: any) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
   box-sizing: border-box;
   border-radius: ${(p: any) => (p.border === 'bottom' ? '0px' : '4px')};
@@ -77,7 +77,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   .euiFormRow__labelWrapper {
     margin-bottom: -20px;
     margin-top: ${(p: any) => (p?.isTextField ? '12px' : '10px')};
-    padding-left: 16px;
+    padding-left: 10.5px;
     height: ${(p: any) => (p?.isTextField ? '6px' : '14px')};
     position: relative;
     label {
@@ -91,11 +91,11 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
       font-weight: 500;
       font-size: 14px;
       display: flex;
-      align-items: center;
+      align-items: left;
     }
   }
 `;
-export const FieldText = styled(EuiFieldText)<styledProps>`
+export const FieldText = styled(EuiFieldText) <styledProps>`
 background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
 max-width:900px;
 background:${(p: any) => p?.color && p.color.pureWhite} !important;
@@ -136,7 +136,7 @@ margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')};
 
 
 `;
-export const FieldTextArea = styled(EuiTextArea)<styledProps>`
+export const FieldTextArea = styled(EuiTextArea) <styledProps>`
   // min-height: ${(p: any) => p?.height && p.height} !important;
   // max-height: ${(p: any) => p?.width && p.height} !important;
   width: ${(p: any) => p?.color && p.color.width};

@@ -99,11 +99,11 @@ function SignIn(props: AuthProps) {
     } else if (res.msg === SOCKET_MSG.lnauth_success && res.k1 === main.lnauth.k1) {
       if (res.status) {
         ui.setShowSignIn(false);
+        ui.setMeInfo({ ...res.user, tribe_jwt: res.jwt, jwt: res.jwt });
+        ui.setSelectedPerson(res.id);
 
         main.setLnAuth({ encode: '', k1: '' });
         main.setLnToken(res.jwt);
-        ui.setMeInfo({ ...res.user, tribe_jwt: res.jwt });
-        ui.setSelectedPerson(res.id);
       }
     }
   };
