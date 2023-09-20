@@ -25,7 +25,7 @@ export const OrgWrap = styled.div<WrapProps>`
   height: inherit;
   flex-direction: column;
   align-content: center;
-  min-width: 500px;
+  min-width: 550px;
   max-width: auto;
 `;
 
