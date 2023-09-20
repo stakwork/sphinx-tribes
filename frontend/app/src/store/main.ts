@@ -1225,35 +1225,51 @@ export class MainStore {
     if (!uiStore.meInfo) return null;
     const info = uiStore.meInfo;
     if (!body) return; // avoid saving bad state
+
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      const r = await fetch(`${TribesURL}/person`, {
-        method: 'POST',
-        body: JSON.stringify({
-          ...body
-        }),
-        mode: 'cors',
-        headers: {
-          'x-jwt': info.tribe_jwt,
-          'Content-Type': 'application/json'
+      if (this.lnToken) {
+        const r = await fetch(`${TribesURL}/person`, {
+          method: 'POST',
+          body: JSON.stringify({
+            ...body
+          }),
+          mode: 'cors',
+          headers: {
+            'x-jwt': info.tribe_jwt,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!r) return;
+        // first time profile makers will need this on first login
+        if (r.status === 200) {
+          const p = await r.json();
+          const updateSelf = { ...info, ...p };
+          uiStore.setMeInfo(updateSelf);
         }
-      });
-      if (!r) return; // tor user will return here
-      // first time profile makers will need this on first login
-      if (!body.id) {
-        const j = await r.json();
-        if (j.id) {
-          body.id = j.id;
+      } else {
+        const [r, error] = await this.doCallToRelay('POST', 'profile', body);
+        if (error) throw error;
+        if (!r) return;
+
+        // first time profile makers will need this on first login
+        if (!body.id) {
+          const j = await r.json();
+          if (j.response.id) {
+            body.id = j.response.id;
+          }
         }
+        
+        await this.getSelf(body);
+        uiStore.setToasts([
+          {
+            id: '1',
+            title: 'Saved.'
+          }
+        ]);
       }
-      uiStore.setToasts([
-        {
-          id: '1',
-          title: 'Saved.'
-        }
-      ]);
-      await this.getSelf(body);
+
     } catch (e) {
       console.log('Error saveProfile: ', e);
     }
