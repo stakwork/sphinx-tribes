@@ -1,15 +1,14 @@
 import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
+import { observer } from 'mobx-react-lite';
 import FirstTimeScreen from 'people/main/FirstTimeScreen';
-import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import styled from 'styled-components';
-import { observer } from 'mobx-react-lite';
 import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import { colors } from '../../config/colors';
-import { useIsMobile, usePageScroll } from '../../hooks';
+import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
 
 // avoid hook within callback warning by renaming hooks
@@ -40,8 +39,6 @@ export const Spacer = styled.div`
   width: 100%;
 `;
 
-const getPageScroll = usePageScroll;
-
 function BodyComponent() {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
@@ -53,7 +50,6 @@ function BodyComponent() {
   const { uuid } = useParams<{ uuid: string }>();
 
   const color = colors['light'];
-  const { peopleWantedsPageNumber } = ui;
 
   const history = useHistory();
   const isMobile = useIsMobile();
@@ -98,24 +94,6 @@ function BodyComponent() {
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
   };
 
-  async function loadMore(direction: number) {
-    let currentPage = 1;
-    currentPage = peopleWantedsPageNumber;
-    let newPage = currentPage + direction;
-    if (newPage < 1) newPage = 1;
-    try {
-      await main.getPeopleWanteds({ page: newPage });
-    } catch (e) {
-      console.log('load failed', e);
-    }
-  }
-  const loadForwardFunc = () => loadMore(1);
-  const loadBackwardFunc = () => loadMore(-1);
-  const { loadingTop, loadingBottom, handleScroll } = getPageScroll(
-    loadForwardFunc,
-    loadBackwardFunc
-  );
-
   const onPanelClick = (person: any, item: any) => {
     history.replace({
       pathname: history?.location?.pathname,
@@ -151,7 +129,7 @@ function BodyComponent() {
 
   if (isMobile) {
     return (
-      <Body onScroll={handleScroll}>
+      <Body>
         <div
           style={{
             width: '100%',
@@ -175,7 +153,6 @@ function BodyComponent() {
 
         {showDropdown && <Backdrop onClick={() => setShowDropdown(false)} />}
         <div style={{ width: '100%' }}>
-          <PageLoadSpinner show={loadingTop} />
           <WidgetSwitchViewer
             checkboxIdToSelectedMap={checkboxIdToSelectedMap}
             checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
@@ -184,7 +161,6 @@ function BodyComponent() {
             selectedWidget={selectedWidget}
             loading={loading}
           />
-          <PageLoadSpinner noAnimate show={loadingBottom} />
         </div>
 
         {toastsEl}
@@ -195,7 +171,6 @@ function BodyComponent() {
     <Body
       onScroll={(e: any) => {
         setScrollValue(e?.currentTarget?.scrollTop >= 20);
-        handleScroll(e);
       }}
       style={{
         background: color.grayish.G950,
@@ -229,7 +204,6 @@ function BodyComponent() {
             padding: '0px 20px 20px 20px'
           }}
         >
-          <PageLoadSpinner show={loadingTop} />
           <div
             style={{
               width: '100%',
@@ -248,7 +222,6 @@ function BodyComponent() {
               loading={loading}
             />
           </div>
-          <PageLoadSpinner noAnimate show={loadingBottom} />
         </div>
       </>
       {toastsEl}

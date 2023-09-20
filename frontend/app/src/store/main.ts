@@ -1,6 +1,7 @@
 import { makeAutoObservable, observable, action } from 'mobx';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
+import { uniqBy } from 'lodash';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
@@ -162,6 +163,7 @@ export interface QueryParams {
   sortBy?: string;
   direction?: string;
   search?: string;
+  resetPage?: boolean;
 }
 
 export interface ClaimOnLiquid {
@@ -243,7 +245,7 @@ export class MainStore {
   myBots: Bot[] = [];
 
   async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
-    const query = this.appendQueryParams('bots', queryParams);
+    const query = this.appendQueryParams('bots', 100, queryParams);
     const b = await api.get(query);
 
     const info = uiStore.meInfo;
@@ -570,22 +572,16 @@ export class MainStore {
   }
 
   appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
-    let query = path;
-    if (queryParams) {
-      queryParams.limit = limit;
-      query += '?';
-      const { length } = Object.keys(queryParams);
-      Object.keys(queryParams).forEach((k: string, i: number) => {
-        query += `${k}=${queryParams[k]}`;
+    const adaptedParams = {
+      ...queryParams,
+      limit: String(limit),
+      ...(queryParams?.resetPage ? { resetPage: String(queryParams.resetPage) } : {}),
+      ...(queryParams?.page ? { page: String(queryParams.page) } : {})
+    } as Record<string, string>;
 
-        // add & if not last param
-        if (i !== length - 1) {
-          query += '&';
-        }
-      });
-    }
+    const searchParams = new URLSearchParams(adaptedParams);
 
-    return query;
+    return `${path}?${searchParams.toString()}`;
   }
 
   async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
@@ -613,7 +609,7 @@ export class MainStore {
   }
 
   set people(people: Person[]) {
-    this._people = people;
+    this._people = uniqBy(people, 'uuid');
   }
 
   setPeople(p: Person[]) {
@@ -722,13 +718,29 @@ export class MainStore {
     this.peopleWanteds = wanteds;
   }
 
-  async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
+  getWantedsPrevParams?: QueryParams = {};
 
-    const query2 = this.appendQueryParams('bounty/all', queryLimit, {
-      ...queryParams,
-      sortBy: 'created'
-    });
+  async getPeopleWanteds(params?: QueryParams): Promise<PersonWanted[]> {
+    const queryParams: QueryParams = {
+      limit: 100,
+      sortBy: 'created',
+      search: uiStore.searchText ?? '',
+      page: 1,
+      resetPage: false,
+      ...params
+    };
+
+    if (params) {
+      // save previous params
+      this.getWantedsPrevParams = queryParams;
+    }
+
+    // if we don't pass the params, we should use previous params for invalidate query
+    const query2 = this.appendQueryParams(
+      'bounty/all',
+      queryLimit,
+      params ? queryParams : this.getWantedsPrevParams
+    );
 
     try {
       const ps2 = await api.get(query2);
