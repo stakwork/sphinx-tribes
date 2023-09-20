@@ -182,7 +182,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [amount, setAmount] = useState(1);
   const { path, url } = useRouteMatch();
 
-
   const pollMinutes = 2;
 
   const config = nonWidgetConfigs['organizationusers'];
@@ -396,7 +395,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     history.push({
       pathname: `${url}/${bountyId}/${0}`
     });
-  }
+  };
 
   useEffect(() => {
     getOrganizationUsers();
@@ -589,8 +588,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                              display: 'none'
-                            }
+                                display: 'none'
+                              }
                             : undefined
                         }
                       />
@@ -773,7 +772,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                       <td className="ellipsis">{pay.receiver_name}</td>
                       <td>{pay.amount} sats</td>
                       <td>{moment(pay.created).format('DD/MM/YY')}</td>
-                      <td><ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty></td>
+                      <td>
+                        <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
+                          View bounty
+                        </ViewBounty>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

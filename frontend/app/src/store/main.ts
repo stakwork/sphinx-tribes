@@ -957,7 +957,7 @@ export class MainStore {
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
-       const wanteds = this.doPageListMerger(
+        const wanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
