@@ -43,6 +43,7 @@ export default function MultiSelectInput({
   extraHTML
 }: Props) {
   let labeltext = label;
+  console.log("Label Text ==", labeltext)
   if (error) labeltext = `${labeltext} (${error})`;
   const color = colors['light'];
 
