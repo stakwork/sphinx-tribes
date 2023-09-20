@@ -10,7 +10,7 @@ interface styledProps {
 }
 
 // @ts-ignore
-const S = styled(CreatableSelect) <styledProps>`
+const S = styled(CreatableSelect)<styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};
 color: ${(p: any) => p.color && p.color.pureBlack};

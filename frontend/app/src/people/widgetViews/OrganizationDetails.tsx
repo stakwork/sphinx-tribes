@@ -588,8 +588,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                              display: 'none'
-                            }
+                                display: 'none'
+                              }
                             : undefined
                         }
                       />
