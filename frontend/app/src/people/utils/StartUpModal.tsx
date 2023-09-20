@@ -137,6 +137,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
           </QrContainer>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <p style={{ textAlign: 'center', fontWeight: 600}}>Step 1</p>
             <p style={{ textAlign: 'center' }}>Download App</p>
             <AndroidIosButtonConatiner>
               <IconButton
@@ -175,6 +176,8 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
           </div>
         )}
       </ModalContainer>
+      <p style={{ textAlign: 'center', fontWeight: 600 }}>Step 2</p>
+      <p style={{ textAlign: 'center'}}>Scan Code</p>
       <ButtonContainer>
         <IconButton
           text={'Reveal Connection Code'}
