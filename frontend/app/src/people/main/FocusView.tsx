@@ -64,9 +64,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: '#5a606c',
-  trackBackgroundColor: 'rgba(0,0,0,0)'
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -103,9 +103,9 @@ function FocusedView(props: FocusViewProps) {
 
   const userOrganizations = main.organizations.length
     ? main.organizations.map((org: Organization) => ({
-      label: toCapitalize(org.name),
-      value: org.uuid
-    }))
+        label: toCapitalize(org.name),
+        value: org.uuid
+      }))
     : [];
 
   function isNotHttps(url: string | undefined) {
@@ -211,7 +211,7 @@ function FocusedView(props: FocusViewProps) {
       if (shouldCloseModal) {
         closeModal();
       }
-      return
+      return;
     }
 
     try {
@@ -293,7 +293,9 @@ function FocusedView(props: FocusViewProps) {
       // if there is a selected index, fill in values
       if (selectedBounty && selectedIndex >= 0) {
         const wanted = selectedBounty.body;
-        initialValues.estimated_completion_date = wanted?.estimated_completion_date ? moment(wanted?.estimated_completion_date) : '';
+        initialValues.estimated_completion_date = wanted?.estimated_completion_date
+          ? moment(wanted?.estimated_completion_date)
+          : '';
 
         if (wanted.type) {
           const thisDynamicSchema = dynamicSchemasByType[wanted.type];
@@ -378,8 +380,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />

@@ -1260,7 +1260,7 @@ export class MainStore {
             body.id = j.response.id;
           }
         }
-        
+
         await this.getSelf(body);
         uiStore.setToasts([
           {
@@ -1269,7 +1269,6 @@ export class MainStore {
           }
         ]);
       }
-
     } catch (e) {
       console.log('Error saveProfile: ', e);
     }
