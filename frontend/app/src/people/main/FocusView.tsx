@@ -64,9 +64,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
+  thumbColor: '#5a606c',
+  trackBackgroundColor: 'rgba(0,0,0,0)'
+})}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -103,9 +103,9 @@ function FocusedView(props: FocusViewProps) {
 
   const userOrganizations = main.organizations.length
     ? main.organizations.map((org: Organization) => ({
-        label: toCapitalize(org.name),
-        value: org.uuid
-      }))
+      label: toCapitalize(org.name),
+      value: org.uuid
+    }))
     : [];
 
   function isNotHttps(url: string | undefined) {
@@ -206,6 +206,7 @@ function FocusedView(props: FocusViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   async function submitForm(body: any, shouldCloseModal: boolean = true) {
     let newBody = cloneDeep(body);
+
     if (config && config.name === 'about') {
       const res = await main.saveProfile(newBody);
       if (shouldCloseModal) {
@@ -226,9 +227,11 @@ function FocusedView(props: FocusViewProps) {
     if (!newBody.description) {
       addToast();
     }
+
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
     setLoading(true);
+
     try {
       if (typeof newBody?.assignee !== 'string' || !newBody?.assignee) {
         newBody.assignee = newBody.assignee?.owner_pubkey ?? 'emptyid';
@@ -250,7 +253,9 @@ function FocusedView(props: FocusViewProps) {
     } catch (e) {
       console.log('e', e);
     }
+
     if (props?.onSuccess) props.onSuccess();
+
     setLoading(false);
     if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties)
       props?.ReCallBounties();
@@ -380,8 +385,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
