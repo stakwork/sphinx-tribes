@@ -552,6 +552,15 @@ func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
+func (db database) UpdateBountyNullColumn(b Bounty, column string) Bounty {
+	columnMap := make(map[string]interface{})
+	columnMap[column] = ""
+
+	db.db.Model(&b).Where("created = ?", b.Created).UpdateColumns(&columnMap)
+
+	return b
+}
+
 func (db database) DeleteBounty(pubkey string, created string) (Bounty, error) {
 	m := Bounty{}
 	db.db.Where("owner_id", pubkey).Where("created", created).Delete(&m)
