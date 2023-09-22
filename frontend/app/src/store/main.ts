@@ -1256,12 +1256,14 @@ export class MainStore {
         // first time profile makers will need this on first login
         if (!body.id) {
           const j = await r.json();
-          if (j.response.id) {
+          if (j.response && j.response.id) {
             body.id = j.response.id;
           }
         }
 
-        await this.getSelf(body);
+        const updateSelf = { ...info, ...body };
+        await this.getSelf(updateSelf);
+
         uiStore.setToasts([
           {
             id: '1',

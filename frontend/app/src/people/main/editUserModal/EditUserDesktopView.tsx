@@ -7,6 +7,7 @@ import { formConfig } from './config';
 
 export const EditUserDesktopView = observer(() => {
   const { canEdit, closeHandler, person, modals } = useUserEdit();
+
   return (
     <Modal
       visible={modals.userEditModal}

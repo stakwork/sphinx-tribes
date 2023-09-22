@@ -152,6 +152,7 @@ function WantedSummary(props: WantedSummaryProps) {
         type: type,
         created: created
       };
+
       formSubmit && formSubmit(newValue);
     },
     [
