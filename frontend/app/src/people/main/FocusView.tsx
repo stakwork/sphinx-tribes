@@ -6,9 +6,15 @@ import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Organization } from 'store/main';
+import { Box } from '@mui/system';
 import { useStores } from '../../store';
 import Form from '../../components/form';
-import { Button, IconButton } from '../../components/common';
+import {
+  Button,
+  IconButton,
+  useAfterDeleteNotification,
+  useDeleteConfirmationModal
+} from '../../components/common';
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
@@ -146,6 +152,18 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
+  const currentBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+  const canDeleteBounty = !(currentBounty?.body?.paid || currentBounty?.body?.assignee.id);
+
+  const { openAfterDeleteNotification } = useAfterDeleteNotification();
+
+  const afterDeleteHandler = (title?: string, link?: string) => {
+    openAfterDeleteNotification({
+      bountyTitle: title,
+      bountyLink: link
+    });
+  };
+
   async function deleteIt() {
     const delBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
     if (!delBounty) return;
@@ -153,6 +171,7 @@ function FocusedView(props: FocusViewProps) {
     try {
       if (delBounty.body.created) {
         await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
+        afterDeleteHandler(delBounty.body.title, delBounty.body.ticket_url);
         closeModal();
         if (props?.deleteExtraFunction) props?.deleteExtraFunction();
       }
@@ -162,6 +181,22 @@ function FocusedView(props: FocusViewProps) {
     setDeleting(false);
     if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
+
+  const { openDeleteConfirmation } = useDeleteConfirmationModal();
+
+  const deleteHandler = () => {
+    openDeleteConfirmation({
+      onDelete: deleteIt,
+      children: (
+        <Box fontSize={20} textAlign="center">
+          Are you sure you want to <br />
+          <Box component="span" fontWeight="500">
+            Delete this Bounty?
+          </Box>
+        </Box>
+      )
+    });
+  };
 
   async function preSubmitFunctions(body: any) {
     const newBody = cloneDeep(body);
@@ -427,9 +462,10 @@ function FocusedView(props: FocusViewProps) {
                     text={'Edit'}
                   />
                   <Button
-                    onClick={() => deleteIt()}
+                    onClick={deleteHandler}
                     color={'white'}
                     loading={deleting}
+                    disabled={!canDeleteBounty}
                     leadingIcon={'delete_outline'}
                     text={'Delete'}
                     style={{
@@ -456,7 +492,7 @@ function FocusedView(props: FocusViewProps) {
             config={config}
             fromBountyPage={fromBountyPage}
             extraModalFunction={props?.extraModalFunction}
-            deleteAction={deleteIt}
+            deleteAction={canDeleteBounty ? deleteHandler : undefined}
             deletingState={deleting}
             editAction={() => {
               setEditable(false);
