@@ -174,7 +174,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
   const [userRoles, setUserRoles] = useState<any[]>([]);
-  const [bountyRoles, setBountyRoles] = useState<any[]>([]);
   const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
   const [toasts, setToasts]: any = useState([]);
   const [lnInvoice, setLnInvoice] = useState('');
@@ -238,15 +237,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const getBountyRoles = useCallback(async () => {
-    const roles = await main.getRoles();
-    setBountyRoles(roles);
-
-    const bountyRolesData = roles.map((role: any) => ({
+    const bountyRolesData = main.bountyRoles.map((role: any) => ({
       name: role.name,
       status: false
     }));
     setBountyRolesData(bountyRolesData);
-  }, [main]);
+  }, [main.bountyRoles]);
 
   const getUserRoles = async (user: any) => {
     if (uuid && user.owner_pubkey) {
@@ -445,7 +441,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             <DataText>
               User{usersCount > 1 && 's'} {usersCount}
             </DataText>
-            {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD USER')) && (
+            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD USER')) && (
               <IconButton
                 width={80}
                 height={isMobile ? 36 : 40}
@@ -456,7 +452,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           </DataCount>
           <DataCount>
             <DataText>Budget {orgBudget} sats</DataText>
-            {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD BUDGET')) && (
+            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET')) && (
               <IconButton
                 width={80}
                 height={isMobile ? 36 : 40}
@@ -464,7 +460,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 onClick={() => setIsOpenBudget(true)}
               />
             )}
-            {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'VIEW REPORT')) && (
+            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')) && (
               <>
                 <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>
                   Budget history
@@ -489,7 +485,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               <TdKey>{user.owner_pubkey}</TdKey>
               <Td>
                 <Actions>
-                  {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD ROLES')) && (
+                  {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
                     <MaterialIcon
                       onClick={() => handleSettingsClick(user)}
                       icon={'settings'}
@@ -501,7 +497,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                       }}
                     />
                   )}
-                  {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'DELETE USER')) && (
+                  {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
                     <MaterialIcon
                       onClick={() => {
                         deleteOrganizationUser(user);
@@ -588,8 +584,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />

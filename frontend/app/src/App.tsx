@@ -19,14 +19,22 @@ const theme = createTheme({
 
 function App() {
   const getUserOrganizations = useCallback(async () => {
-    if (uiStore.meInfo && uiStore.meInfo?.tribe_jwt) {
-      await mainStore.getUserOrganizations();
+    if (uiStore.selectedPerson !== 0) {
+      await mainStore.getUserOrganizations(uiStore.selectedPerson);
     }
-  }, []);
+  }, [uiStore.selectedPerson]);
 
   useEffect(() => {
     getUserOrganizations();
   }, [getUserOrganizations]);
+
+  const getBountyRoles = useCallback(async () => {
+    await mainStore.getRoles();
+  }, []);
+
+  useEffect(() => {
+    getBountyRoles();
+  }, [])
 
   useEffect(() => {
     // get usd/sat exchange rate every 100 second;

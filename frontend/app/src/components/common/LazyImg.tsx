@@ -1,10 +1,8 @@
 import { noop } from 'lodash';
 import React, {
-  ComponentProps,
   HTMLAttributes,
   ImgHTMLAttributes,
   useEffect,
-  useMemo,
   useRef,
   useState
 } from 'react';

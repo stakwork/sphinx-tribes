@@ -194,6 +194,7 @@ export interface Organization {
   created: string;
   updated: string;
   show: boolean;
+  bounty_count?: number;
 }
 
 export interface BountyRoles {
@@ -1642,11 +1643,11 @@ export class MainStore {
     this.organizations = organizations;
   }
 
-  @action async getUserOrganizations(): Promise<Organization[]> {
+  @action async getUserOrganizations(id: number): Promise<Organization[]> {
     try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/user`, {
+      const r: any = await fetch(`${TribesURL}/organizations/user/${id}`, {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -1764,6 +1765,13 @@ export class MainStore {
     }
   }
 
+  @observable
+  bountyRoles: BountyRoles[] = [];
+
+  @action setBountyRoles(roles: BountyRoles[]) {
+    this.bountyRoles = roles;
+  }
+
   async getRoles(): Promise<BountyRoles[]> {
     try {
       if (!uiStore.meInfo) return [];
@@ -1777,7 +1785,10 @@ export class MainStore {
         }
       });
 
-      return r.json();
+      const roles = await r.json();
+      this.setBountyRoles(roles);
+
+      return roles;
     } catch (e) {
       console.log('Error getRoles', e);
       return [];
