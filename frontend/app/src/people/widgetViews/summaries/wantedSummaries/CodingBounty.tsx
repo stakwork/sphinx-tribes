@@ -365,6 +365,7 @@ function MobileView(props: CodingBountiesProps) {
                           leadingImageContainerStyle={{
                             left: 450
                           }}
+                          disabled={!props?.deleteAction}
                           buttonAction={props?.deleteAction}
                         />
                       </div>
