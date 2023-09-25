@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 interface ButtonContainerProps {
   topMargin?: string;
+  disabled?: boolean;
 }
 
 const ButtonContainer = styled.div<ButtonContainerProps>`
@@ -13,6 +14,11 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  pointer-events: ${({ disabled }: ButtonContainerProps) => (disabled ? 'none' : 'all')};
+  cursor: pointer;
+
+  opacity: ${({ disabled }: ButtonContainerProps) => (disabled ? 0.8 : 1)};
   margin-top: ${(p: any) => p?.topMargin};
   background: #ffffff;
   border: 1px solid #dde1e5;
@@ -61,6 +67,7 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
 `;
 const ImageButton = (props: ImageButtonProps) => (
   <ButtonContainer
+    disabled={props.disabled}
     onClick={props?.buttonAction}
     style={{
       ...props.ButtonContainerStyle

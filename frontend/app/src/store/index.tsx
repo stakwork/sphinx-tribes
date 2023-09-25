@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { create } from 'mobx-persist';
 import { configure } from 'mobx';
 import { leaderboardStore } from 'leaderboard';
@@ -38,4 +38,25 @@ export const WithStores = ({ children }: any) => (
     {children}
   </Context.Provider>
 );
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function withStores<T extends Object>(Component: FC<T>) {
+  // eslint-disable-next-line react/display-name
+  return function (props: T) {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    return (
+      <Context.Provider
+        value={{
+          ui: uiStore,
+          main: mainStore,
+          modals: modalsVisibilityStore,
+          leaderboard: leaderboardStore
+        }}
+      >
+        <Component {...props} />
+      </Context.Provider>
+    );
+  };
+}
+
 export const useStores = () => React.useContext(Context);

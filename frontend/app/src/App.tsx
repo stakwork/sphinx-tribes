@@ -1,16 +1,21 @@
 import React, { useCallback, useEffect } from 'react';
 /* eslint-disable func-style */
 import '@material/react-material-icon/dist/material-icon.css';
-import { Router } from 'react-router-dom';
 import history from 'config/history';
+import { withProviders } from 'providers';
+import { Router } from 'react-router-dom';
 import { uiStore } from 'store/ui';
-import { WithStores } from './store';
 import './App.css';
+import { ThemeProvider, createTheme } from '@mui/system';
 import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
 import { mainStore } from './store/main';
 
 let exchangeRateInterval: any = null;
+
+const theme = createTheme({
+  spacing: 8
+});
 
 function App() {
   const getUserOrganizations = useCallback(async () => {
@@ -37,12 +42,12 @@ function App() {
   }, []);
 
   return (
-    <WithStores>
+    <ThemeProvider theme={theme}>
       <Router history={history}>
         <ModeDispatcher>{(mode: any) => <Pages mode={mode} />}</ModeDispatcher>
       </Router>
-    </WithStores>
+    </ThemeProvider>
   );
 }
 
-export default App;
+export default withProviders(App);
