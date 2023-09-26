@@ -147,7 +147,7 @@ export type Roles =
   | 'VIEW REPORT';
 
 export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): boolean => {
-  if(bountyRoles.length) {
+  if (bountyRoles.length) {
     const bountyRolesMap = {};
     const userRolesMap = {};
 
@@ -165,7 +165,7 @@ export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): 
 
     return false;
   }
-  return false
+  return false;
 };
 
 export const toCapitalize = (word: string): string => {
