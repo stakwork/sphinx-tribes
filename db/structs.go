@@ -100,7 +100,7 @@ type Tabler interface {
 type Person struct {
 	ID               uint           `json:"id"`
 	Uuid             string         `json:"uuid"`
-	OwnerPubKey      string         `json:"owner_pubkey"`
+	OwnerPubKey      string         `gorm:"uniqueIndex,unique"json:"owner_pubkey"`
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
 	Description      string         `json:"description"`
@@ -403,6 +403,7 @@ type Organization struct {
 	Created     *time.Time `json:"created"`
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`
+	BountyCount int64      `json:"bounty_count,omitempty"`
 }
 
 type OrganizationShort struct {

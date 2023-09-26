@@ -1039,6 +1039,12 @@ func (db database) GetOrganizationUsersCount(uuid string) int64 {
 	return count
 }
 
+func (db database) GetOrganizationBountyCount(uuid string) int64 {
+	var count int64
+	db.db.Model(&Bounty{}).Where("org_uuid  = ?", uuid).Count(&count)
+	return count
+}
+
 func (db database) GetOrganizationUser(pubkey string, org_uuid string) OrganizationUsers {
 	ms := OrganizationUsers{}
 
