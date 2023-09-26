@@ -1,11 +1,5 @@
 import { noop } from 'lodash';
-import React, {
-  HTMLAttributes,
-  ImgHTMLAttributes,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { HTMLAttributes, ImgHTMLAttributes, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 const Placeholder = styled.img`

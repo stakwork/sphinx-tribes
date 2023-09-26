@@ -158,32 +158,32 @@ const Organizations = (props: { person: Person }) => {
         <OrganizationData
           onClick={async () => {
             const userRoles = await getUserRoles(org.uuid);
-            if (isOrganizationAdmin
-              || userHasRole(main.bountyRoles, userRoles, 'ADD USER')
-              || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')) {
+            if (
+              isOrganizationAdmin ||
+              userHasRole(main.bountyRoles, userRoles, 'ADD USER') ||
+              userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')
+            ) {
               setOrganization(org);
               setDetailsOpen(true);
             }
-          }
-          }
+          }}
         >
           <OrganizationImg src={org.img || avatarIcon} />
           <OrganizationText>{org.name}</OrganizationText>
         </OrganizationData>
 
-        {(org.bounty_count && org.bount_count !== 0) && org.uuid &&
-          (<Link to={`/org/tickets/${org.uuid}`} target="_blank">
+        {org.bounty_count && org.bount_count !== 0 && org.uuid && (
+          <Link to={`/org/tickets/${org.uuid}`} target="_blank">
             Bounties
           </Link>
-          )
-        }
+        )}
       </OrganizationWrap>
-    )
-  }
+    );
+  };
 
   const renderOrganizations = () => {
     if (main.organizations.length) {
-      return main.organizations.map((org: Organization, i: number) => orgUi(org, i))
+      return main.organizations.map((org: Organization, i: number) => orgUi(org, i));
     } else {
       return <NoResults />;
     }
@@ -276,8 +276,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                  display: 'none'
-                                }
+                                    display: 'none'
+                                  }
                                 : undefined
                             }
                           />
