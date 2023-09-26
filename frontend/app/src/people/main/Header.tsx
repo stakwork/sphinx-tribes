@@ -275,10 +275,6 @@ function Header() {
   }
 
   const showSignIn = () => {
-    if (isMobile) {
-      ui.setShowSignIn(true);
-      return;
-    }
     setIsOpenStartupModal(true);
   };
 
@@ -409,6 +405,13 @@ function Header() {
                 })}
             </MTabs>
           </div>
+          {isOpenStartUpModel && (
+            <StartUpModal
+              closeModal={() => setIsOpenStartupModal(false)}
+              dataObject={'createWork'}
+              buttonColor={'success'}
+            />
+          )}
         </EuiHeader>
       );
     }
