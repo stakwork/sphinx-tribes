@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/typedef */
 import { Modal, ModalProps } from '@mui/base';
-import { Box, styled } from '@mui/system';
+import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React from 'react';
 

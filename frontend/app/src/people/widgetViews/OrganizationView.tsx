@@ -11,6 +11,7 @@ import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
+import { userHasRole } from 'helpers';
 import { Modal } from '../../components/common';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
@@ -78,6 +79,7 @@ const Organizations = (props: { person: Person }) => {
   const [organization, setOrganization] = useState<Organization>();
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [toasts, setToasts]: any = useState([]);
+  const [user, setUser] = useState<Person>();
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const config = widgetConfigs['organizations'];
@@ -108,9 +110,21 @@ const Organizations = (props: { person: Person }) => {
 
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
-    await main.getUserOrganizations();
+    if (ui.selectedPerson !== 0) {
+      await main.getUserOrganizations(ui.selectedPerson);
+      const user = await main.getPersonById(ui.selectedPerson);
+      setUser(user);
+    }
     setIsLoading(false);
-  }, [main]);
+  }, [main, ui.selectedPerson]);
+
+  const getUserRoles = async (orgUuid: string): Promise<any[]> => {
+    if (user?.owner_pubkey) {
+      const userRoles = await main.getUserRoles(orgUuid, user.owner_pubkey);
+      return userRoles;
+    }
+    return [];
+  };
 
   useEffect(() => {
     getUserOrganizations();
@@ -137,24 +151,39 @@ const Organizations = (props: { person: Person }) => {
     setIsLoading(false);
   };
 
-  const renderOrganizations = () => {
-    if (main.organizations.length) {
-      return main.organizations.map((org: Organization, i: number) => (
-        <OrganizationWrap key={i}>
-          <OrganizationData
-            onClick={() => {
+  const orgUi = (org: any, key: number) => {
+    const isOrganizationAdmin = org?.owner_pubkey === user?.owner_pubkey;
+    return (
+      <OrganizationWrap key={key}>
+        <OrganizationData
+          onClick={async () => {
+            const userRoles = await getUserRoles(org.uuid);
+            if (isOrganizationAdmin
+              || userHasRole(main.bountyRoles, userRoles, 'ADD USER')
+              || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')) {
               setOrganization(org);
               setDetailsOpen(true);
-            }}
-          >
-            <OrganizationImg src={org.img || avatarIcon} />
-            <OrganizationText>{org.name}</OrganizationText>
-          </OrganizationData>
-          <Link to={`/org/tickets/${org.uuid}`} target="_blank">
+            }
+          }
+          }
+        >
+          <OrganizationImg src={org.img || avatarIcon} />
+          <OrganizationText>{org.name}</OrganizationText>
+        </OrganizationData>
+
+        {(org.bounty_count && org.bount_count !== 0) && org.uuid &&
+          (<Link to={`/org/tickets/${org.uuid}`} target="_blank">
             Bounties
           </Link>
-        </OrganizationWrap>
-      ));
+          )
+        }
+      </OrganizationWrap>
+    )
+  }
+
+  const renderOrganizations = () => {
+    if (main.organizations.length) {
+      return main.organizations.map((org: Organization, i: number) => orgUi(org, i))
     } else {
       return <NoResults />;
     }
@@ -247,8 +276,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                    display: 'none'
-                                  }
+                                  display: 'none'
+                                }
                                 : undefined
                             }
                           />
