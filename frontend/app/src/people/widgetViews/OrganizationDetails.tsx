@@ -485,7 +485,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               <TdKey>{user.owner_pubkey}</TdKey>
               <Td>
                 <Actions>
-                  {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
+                  {(isOrganizationAdmin ||
+                    userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
                     <MaterialIcon
                       onClick={() => handleSettingsClick(user)}
                       icon={'settings'}
@@ -497,7 +498,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                       }}
                     />
                   )}
-                  {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
+                  {(isOrganizationAdmin ||
+                    userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
                     <MaterialIcon
                       onClick={() => {
                         deleteOrganizationUser(user);
@@ -584,8 +586,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                              display: 'none'
-                            }
+                                display: 'none'
+                              }
                             : undefined
                         }
                       />

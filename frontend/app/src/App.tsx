@@ -34,7 +34,7 @@ function App() {
 
   useEffect(() => {
     getBountyRoles();
-  }, [])
+  }, []);
 
   useEffect(() => {
     // get usd/sat exchange rate every 100 second;
