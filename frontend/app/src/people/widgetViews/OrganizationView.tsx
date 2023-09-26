@@ -32,7 +32,6 @@ const Container = styled.div`
 
 const OrganizationText = styled.p`
   font-size: 1rem;
-  text-transform: capitalize;
   font-weight: bold;
   margin-top: 15px;
 `;

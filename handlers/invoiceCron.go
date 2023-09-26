@@ -71,7 +71,12 @@ func InitInvoiceCron() {
 						if inv.Type == "KEYSEND" {
 							url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-							bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
+							var bodyData string
+							if inv.Route_hint != "" {
+								bodyData = fmt.Sprintf(`{"amount": %s, "destination_key": "%s", "route_hint": "%s"}`, inv.Amount, inv.User_pubkey, inv.Route_hint)
+							} else {
+								bodyData = fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
+							}
 
 							jsonBody := []byte(bodyData)
 

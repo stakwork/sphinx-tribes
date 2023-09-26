@@ -1550,6 +1550,7 @@ export class MainStore {
     assigned_hours?: number;
     commitment_fee?: number;
     bounty_expires?: string;
+    route_hint?: string;
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1564,7 +1565,8 @@ export class MainStore {
           assigned_hours: body.assigned_hours,
           commitment_fee: body.commitment_fee,
           bounty_expires: body.bounty_expires,
-          websocket_token: uiStore.meInfo?.websocketToken
+          websocket_token: uiStore.meInfo?.websocketToken,
+          route_hint: body.route_hint
         },
         {
           'Content-Type': 'application/json'
@@ -1880,6 +1882,7 @@ export class MainStore {
     id: number;
     receiver_pubkey: string;
     websocket_token: string;
+    route_hint: string;
   }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;

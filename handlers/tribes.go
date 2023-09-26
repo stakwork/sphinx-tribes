@@ -449,6 +449,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	commitmentFee := invoice.Commitment_fee
 	bountyExpires := invoice.Bounty_expires
 	websocketToken := invoice.Websocket_token
+	routeHint := invoice.Route_hint
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
@@ -495,6 +496,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		Assigned_hours: assigedHours,
 		Commitment_fee: commitmentFee,
 		Bounty_expires: bountyExpires,
+		Route_hint:     routeHint,
 	}
 
 	var invoiceList = append(invoiceCache, invoiceData)
