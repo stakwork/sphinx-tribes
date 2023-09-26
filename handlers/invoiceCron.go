@@ -13,6 +13,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func InitInvoiceCron() {
@@ -71,12 +72,9 @@ func InitInvoiceCron() {
 						if inv.Type == "KEYSEND" {
 							url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-							var bodyData string
-							if inv.Route_hint != "" {
-								bodyData = fmt.Sprintf(`{"amount": %s, "destination_key": "%s", "route_hint": "%s"}`, inv.Amount, inv.User_pubkey, inv.Route_hint)
-							} else {
-								bodyData = fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
-							}
+							amount, _ := utils.ConvertStringToUint(inv.Amount)
+
+							bodyData := utils.BuildKeysendBodyData(amount, inv.User_pubkey, inv.Route_hint)
 
 							jsonBody := []byte(bodyData)
 
