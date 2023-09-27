@@ -136,6 +136,13 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if the user tries to add their self
+	if pubKeyFromAuth == orgUser.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot add userself as a user")
+		return
+	}
+
 	// if not the orgnization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.AddUser)
 	if !hasRole {
