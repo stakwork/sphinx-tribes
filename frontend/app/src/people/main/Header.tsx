@@ -525,7 +525,7 @@ function Header() {
             ui.setShowSignIn(false);
             setShowWelcome(true);
             // if page is not /p, go to /p (people)
-            window.location.reload()
+            window.location.reload();
           }}
         />
       </Modal>

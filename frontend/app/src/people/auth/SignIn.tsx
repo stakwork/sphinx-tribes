@@ -130,9 +130,9 @@ function SignIn(props: AuthProps) {
           <SphinxAppLoginDeepLink
             onSuccess={async () => {
               if (props.onSuccess) props.onSuccess();
-                  main.getPeople({ resetPage: true });
-                  }
-                }/>
+              main.getPeople({ resetPage: true });
+            }}
+          />
         </Column>
       ) : (
         <>
