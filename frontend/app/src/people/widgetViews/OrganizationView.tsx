@@ -32,7 +32,6 @@ const Container = styled.div`
 
 const OrganizationText = styled.p`
   font-size: 1rem;
-  text-transform: capitalize;
   font-weight: bold;
   margin-top: 15px;
 `;
@@ -276,8 +275,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                    display: 'none'
-                                  }
+                                  display: 'none'
+                                }
                                 : undefined
                             }
                           />
