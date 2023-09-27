@@ -127,7 +127,12 @@ function SignIn(props: AuthProps) {
     <div>
       {showSignIn ? (
         <Column>
-          <SphinxAppLoginDeepLink />
+          <SphinxAppLoginDeepLink
+            onSuccess={async () => {
+              if (props.onSuccess) props.onSuccess();
+                  main.getPeople({ resetPage: true });
+                  }
+                }/>
         </Column>
       ) : (
         <>
