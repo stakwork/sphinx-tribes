@@ -566,7 +566,6 @@ function Header() {
               onClick={() => {
                 // switch from welcome modal to edit modal
                 setShowWelcome(false);
-                goToEditSelf();
               }}
               hovercolor={'#5881F8'}
               activecolor={'#5078F2'}
