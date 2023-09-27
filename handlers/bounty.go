@@ -311,7 +311,9 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := fmt.Sprintf("%s/payment", config.RelayUrl)
-	bodyData := fmt.Sprintf(`{"amount": %d, "destination_key": "%s"}`, amount, request.ReceiverPubKey)
+
+	bodyData := utils.BuildKeysendBodyData(amount, request.ReceiverPubKey, request.RouteHint)
+
 	jsonBody := []byte(bodyData)
 
 	client := &http.Client{}

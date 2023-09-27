@@ -42,6 +42,7 @@ export default function AssignBounty(props: ConnectCardProps) {
         memo: '',
         owner_pubkey: person?.owner_pubkey ?? '',
         user_pubkey: ui.meInfo?.owner_pubkey ?? '',
+        route_hint: person?.route_hint,
         created: created ? created.toString() : '',
         type: 'ASSIGN',
         assigned_hours: bountyHours,

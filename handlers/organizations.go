@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -53,7 +52,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name := strings.ToLower(org.Name)
+		name := org.Name
 
 		// check if the organization name already exists
 		orgName := db.DB.GetOrganizationByName(name)
