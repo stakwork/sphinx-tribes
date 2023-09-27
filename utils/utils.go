@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -51,4 +52,15 @@ func BuildSearchQuery(key string, term string) (string, string) {
 	arg1 := key + " LIKE ?"
 	arg2 := "%" + term + "%"
 	return arg1, arg2
+}
+
+func BuildKeysendBodyData(amount uint, receiver_pubkey string, route_hint string) string {
+	var bodyData string
+	if route_hint != "" {
+		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "route_hint": "%s"}`, amount, receiver_pubkey, route_hint)
+	} else {
+		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s"}`, amount, receiver_pubkey)
+	}
+
+	return bodyData
 }
