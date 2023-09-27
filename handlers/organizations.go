@@ -12,6 +12,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
@@ -334,6 +335,8 @@ func GetUserRoles(w http.ResponseWriter, r *http.Request) {
 func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	userIdParam := chi.URLParam(r, "userId")
+	userId, _ := utils.ConvertStringToUint(userIdParam)
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -341,12 +344,30 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userId == 0 {
+		fmt.Println("provide user id")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	user := db.DB.GetPerson(userId)
+
 	// get the organizations created by the user, then get all the organizations
 	// the user has been added to, loop through to get the organization
-	organizations := db.DB.GetUserCreatedOrganizations(pubKeyFromAuth)
-	assignedOrganizations := db.DB.GetUserAssignedOrganizations(pubKeyFromAuth)
+	organizations := db.DB.GetUserCreatedOrganizations(user.OwnerPubKey)
+	// add bounty count to the organization
+	for index, value := range organizations {
+		bountyCount := db.DB.GetOrganizationBountyCount(value.Uuid)
+		organizations[index].BountyCount = bountyCount
+	}
+
+	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
 	for _, value := range assignedOrganizations {
 		organization := db.DB.GetOrganizationByUuid(value.OrgUuid)
+
+		bountyCount := db.DB.GetOrganizationBountyCount(value.OrgUuid)
+		organization.BountyCount = bountyCount
+
 		organizations = append(organizations, organization)
 	}
 
@@ -369,6 +390,15 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	// get the organization budget
 	organizationBudget := db.DB.GetOrganizationBudget(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizationBudget)
+}
+
+func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	// get the organization budget
+	organizationBudget := db.DB.GetOrganizationBudgetHistory(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(organizationBudget)

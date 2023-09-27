@@ -28,6 +28,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const isMobile = useIsMobile();
+
   const search = useMemo(() => {
     const s = new URLSearchParams(location.search);
     return {
@@ -58,7 +59,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const prevArrHandler = () => {
     if (activeListIndex === 0) return;
 
-    const { person, body } = main.peopleWanteds[activeListIndex];
+    const { person, body } = main.peopleWanteds[activeListIndex - 1];
     if (person && body) {
       history.replace({
         pathname: history?.location?.pathname,

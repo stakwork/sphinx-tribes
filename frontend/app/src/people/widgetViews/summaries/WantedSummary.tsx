@@ -12,7 +12,7 @@ import { useStores } from '../../../store';
 import { LanguageObject, awards } from '../../utils/languageLabelStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
-import { WantedSummaryProps } from '../../interfaces';
+import { CodingLanguageLabel, WantedSummaryProps } from '../../interfaces';
 import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
@@ -110,7 +110,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
 
-  const [labels, setLabels] = useState([]);
+  const [labels, setLabels] = useState<Array<CodingLanguageLabel>>([]);
   const [assigneeValue, setAssigneeValue] = useState(false);
 
   const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue: any) => !assigneeValue);
@@ -146,12 +146,13 @@ function WantedSummary(props: WantedSummaryProps) {
         description: description,
         price: price,
         assignee: value?.owner_pubkey || '',
-        coding_language: coding_languages?.map((x: any) => ({ label: x, value: x })),
+        coding_language: coding_languages?.map((x: string) => ({ label: x, value: x })),
         estimated_session_length: estimated_session_length,
         show: show,
         type: type,
         created: created
       };
+
       formSubmit && formSubmit(newValue);
     },
     [
@@ -173,14 +174,45 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const changeAssignedPerson = useCallback(() => {
     setIsAssigned(false);
-  }, []);
+
+    setAssignedPerson(null);
+    const newValue = {
+      title: titleString,
+      wanted_type: wanted_type,
+      one_sentence_summary: one_sentence_summary,
+      ticketUrl: ticket_url,
+      github_description: github_description,
+      description: description,
+      price: price,
+      assignee: '',
+      coding_language: coding_languages?.map((x: string) => ({ label: x, value: x })),
+      estimated_session_length: estimated_session_length,
+      show: show,
+      type: type,
+      created: created
+    };
+    formSubmit && formSubmit(newValue, false);
+  }, [
+    coding_languages,
+    created,
+    description,
+    estimated_session_length,
+    formSubmit,
+    github_description,
+    one_sentence_summary,
+    price,
+    show,
+    ticket_url,
+    titleString,
+    type,
+    wanted_type
+  ]);
 
   useEffect(() => {
     (async () => {
       if (props.assignee) {
         try {
-          const p = await main.getPersonByPubkey(props.assignee.owner_pubkey);
-          setAssigneeInfo(p);
+          setAssigneeInfo(props.assignee);
         } catch (e) {
           console.log('e', e);
         }
@@ -192,11 +224,10 @@ function WantedSummary(props: WantedSummaryProps) {
     let res;
     if (coding_languages?.length > 0) {
       res = LanguageObject?.filter(
-        (value: any) => coding_languages?.find((val: any) => val === value.label)
+        (value: any) => coding_languages?.find((val: string) => val === value.label)
       );
     }
     setDataValue(res);
-    setLabels(res);
   }, [coding_languages]);
 
   const searchParams = useQuery();
@@ -210,7 +241,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   useEffect(() => {
     if (coding_languages) {
-      const values = coding_languages.map((value: any) => ({ label: value, value: value }));
+      const values = coding_languages.map((value: string) => ({ label: value, value: value }));
       setLabels(values);
     }
   }, [coding_languages]);
@@ -543,6 +574,7 @@ function WantedSummary(props: WantedSummaryProps) {
       return (
         <CodingBounty
           {...props}
+          labels={labels}
           person={person}
           awardDetails={awardDetails}
           setAwardDetails={setAwardDetails}
@@ -589,13 +621,13 @@ function WantedSummary(props: WantedSummaryProps) {
       <div>
         <CodingDesktop
           {...props}
+          labels={labels}
           actionButtons={actionButtons}
           nametag={nametag}
           assigneeLabel={assigneeLabel}
           assignee={assignee}
           loomEmbedUrl={loomEmbedUrl}
           titleString={titleString}
-          // status={status}
           handleCopyUrl={handleCopyUrlProfilePage}
           isCopied={isCopied}
         />

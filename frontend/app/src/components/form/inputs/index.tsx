@@ -77,7 +77,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   .euiFormRow__labelWrapper {
     margin-bottom: -20px;
     margin-top: ${(p: any) => (p?.isTextField ? '12px' : '10px')};
-    padding-left: 16px;
+    padding-left: 10.5px;
     height: ${(p: any) => (p?.isTextField ? '6px' : '14px')};
     position: relative;
     label {
@@ -91,7 +91,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
       font-weight: 500;
       font-size: 14px;
       display: flex;
-      align-items: center;
+      align-items: left;
     }
   }
 `;

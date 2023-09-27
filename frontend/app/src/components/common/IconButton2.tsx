@@ -112,6 +112,10 @@ export default function IconButton(props: IconButtonProps) {
       background: '#49C998',
       color: '#fff'
     },
+    error: {
+      background: '#ED7474',
+      color: '#fff'
+    },
     white: {
       background: '#fff',
       color: '#5F6368',

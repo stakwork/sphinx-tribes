@@ -47,12 +47,16 @@ export interface UserInfoProps {
   setShowSupport: (boolean) => void;
 }
 
+export interface CodingLanguageLabel {
+  label: string;
+  value: string;
+}
 export interface BountiesProps {
   price: number;
   sessionLength: string;
   priceMin: number;
   priceMax: number;
-  codingLanguage: [{ [key: string]: string }];
+  codingLanguage: Array<CodingLanguageLabel>;
   title: string;
   person: Person;
   onPanelClick: () => void;
@@ -143,7 +147,7 @@ export interface NoResultProps {
 export interface PaidBountiesProps {
   onPanelClick: () => void;
   title: string;
-  codingLanguage: [{ [key: string]: string }];
+  codingLanguage: Array<CodingLanguageLabel>;
   priceMax: number;
   priceMin: number;
   price: number;
@@ -222,7 +226,7 @@ export interface WantedSummaryProps {
   paid: boolean;
   badgeRecipient: string;
   loomEmbedUrl: string;
-  coding_languages: { [key: string]: any };
+  coding_languages: string[];
   estimated_session_length: string;
   assignee: Person;
   fromBountyPage: string;
@@ -232,10 +236,11 @@ export interface WantedSummaryProps {
   show: boolean;
   setIsModalSideButton: (any) => void;
   setIsExtraStyle: (any) => void;
-  formSubmit: (any) => void;
+  formSubmit: (any, close?: boolean) => void;
   title: string;
   org_uuid?: string;
   id?: number;
+  owner_id?: string;
 }
 
 export interface CodingBountiesProps {
@@ -246,7 +251,7 @@ export interface CodingBountiesProps {
   created?: number;
   titleString: string;
   nametag: JSX.Element;
-  labels?: { [key: string]: any };
+  labels?: Array<CodingLanguageLabel>;
   person: Person;
   setIsPaidStatusPopOver?: (boolean) => void;
   creatorStep: number;
@@ -300,15 +305,16 @@ export interface CodingBountiesProps {
   id?: number;
 }
 
-export interface CodingViewProps {
-  paid?: boolean;
+export interface CodingViewProps extends WantedSummaryProps {
+  // paid?: boolean;
+  // price?: number;
+  // description?: string;
+  // estimated_session_length?: string;
+  // loomEmbedUrl?: string;
+  // tribe?: string;
   titleString: string;
-  labels?: { [key: string]: any };
-  price?: number;
-  description?: string;
+  labels?: Array<CodingLanguageLabel>;
   envHeight?: string;
-  estimated_session_length?: string;
-  loomEmbedUrl?: string;
   ticketUrl?: string;
   assignee: Person;
   assigneeLabel?: { [key: string]: any };
@@ -317,7 +323,7 @@ export interface CodingViewProps {
   status?: string;
   handleCopyUrl?: () => void;
   isCopied?: boolean;
-  tribe?: string;
+  // owner_id: string;
 }
 
 export interface AddToFavoritesProps {
@@ -341,7 +347,7 @@ export interface WantedViewsProps {
   key?: string;
   setExtrasPropertyAndSave?: (any) => void;
   saving?: boolean;
-  labels?: [{ [key: string]: string }] | never[];
+  labels?: Array<CodingLanguageLabel>;
   isClosed?: boolean;
   onPanelClick: () => void;
   status?: string;

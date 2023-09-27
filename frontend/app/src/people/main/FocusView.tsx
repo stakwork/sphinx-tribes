@@ -6,9 +6,15 @@ import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Organization } from 'store/main';
+import { Box } from '@mui/system';
 import { useStores } from '../../store';
 import Form from '../../components/form';
-import { Button, IconButton } from '../../components/common';
+import {
+  Button,
+  IconButton,
+  useAfterDeleteNotification,
+  useDeleteConfirmationModal
+} from '../../components/common';
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
@@ -101,10 +107,12 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  const userOrganizations = main.organizations.map((org: Organization) => ({
-    label: toCapitalize(org.name),
-    value: org.uuid
-  }));
+  const userOrganizations = main.organizations.length
+    ? main.organizations.map((org: Organization) => ({
+        label: toCapitalize(org.name),
+        value: org.uuid
+      }))
+    : [];
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -144,6 +152,18 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
+  const currentBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+  const canDeleteBounty = !(currentBounty?.body?.paid || currentBounty?.body?.assignee.id);
+
+  const { openAfterDeleteNotification } = useAfterDeleteNotification();
+
+  const afterDeleteHandler = (title?: string, link?: string) => {
+    openAfterDeleteNotification({
+      bountyTitle: title,
+      bountyLink: link
+    });
+  };
+
   async function deleteIt() {
     const delBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
     if (!delBounty) return;
@@ -151,6 +171,7 @@ function FocusedView(props: FocusViewProps) {
     try {
       if (delBounty.body.created) {
         await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
+        afterDeleteHandler(delBounty.body.title, delBounty.body.ticket_url);
         closeModal();
         if (props?.deleteExtraFunction) props?.deleteExtraFunction();
       }
@@ -160,6 +181,22 @@ function FocusedView(props: FocusViewProps) {
     setDeleting(false);
     if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
+
+  const { openDeleteConfirmation } = useDeleteConfirmationModal();
+
+  const deleteHandler = () => {
+    openDeleteConfirmation({
+      onDelete: deleteIt,
+      children: (
+        <Box fontSize={20} textAlign="center">
+          Are you sure you want to <br />
+          <Box component="span" fontWeight="500">
+            Delete this Bounty?
+          </Box>
+        </Box>
+      )
+    });
+  };
 
   async function preSubmitFunctions(body: any) {
     const newBody = cloneDeep(body);
@@ -201,8 +238,18 @@ function FocusedView(props: FocusViewProps) {
     return newBody;
   }
 
-  async function submitForm(body: any) {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+  async function submitForm(body: any, shouldCloseModal: boolean = true) {
     let newBody = cloneDeep(body);
+
+    if (config && config.name === 'about') {
+      const res = await main.saveProfile(newBody);
+      if (shouldCloseModal) {
+        closeModal();
+      }
+      return;
+    }
+
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -215,16 +262,16 @@ function FocusedView(props: FocusViewProps) {
     if (!newBody.description) {
       addToast();
     }
+
     const info = ui.meInfo as any;
     if (!info) return console.log('no meInfo');
     setLoading(true);
+
     try {
-      if (newBody?.assignee?.owner_pubkey) {
-        newBody.assignee = newBody.assignee.owner_pubkey;
+      if (typeof newBody?.assignee !== 'string' || !newBody?.assignee) {
+        newBody.assignee = newBody.assignee?.owner_pubkey ?? '';
       }
-      if (body?.assignee?.owner_pubkey) {
-        newBody.assignee = body.assignee.owner_pubkey;
-      }
+
       if (body.one_sentence_summary !== '') {
         newBody.title = body.one_sentence_summary;
       } else {
@@ -238,11 +285,12 @@ function FocusedView(props: FocusViewProps) {
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedWanteds({}, info.pubkey);
       }
-      closeModal();
     } catch (e) {
       console.log('e', e);
     }
+
     if (props?.onSuccess) props.onSuccess();
+
     setLoading(false);
     if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties)
       props?.ReCallBounties();
@@ -254,19 +302,17 @@ function FocusedView(props: FocusViewProps) {
   const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
 
   // set initials here
-  if (personInfo && selectedBounty && selectedIndex >= 0) {
-    const wanted = selectedBounty.body;
+  if (personInfo) {
     if (config && config.name === 'about') {
       initialValues.id = personInfo.id || 0;
       initialValues.pubkey = personInfo.pubkey;
+      initialValues.owner_pubkey = personInfo.pubkey;
       initialValues.alert = personInfo.extras?.alert || false;
       initialValues.owner_alias = personInfo.owner_alias || '';
       initialValues.img = personInfo.img || '';
       initialValues.price_to_meet = personInfo.price_to_meet || 0;
       initialValues.description = personInfo.description || '';
       initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      initialValues.estimated_completion_date =
-        wanted?.map((value: any) => moment(value?.estimated_completion_date)) || '';
       // below are extras,
       initialValues.twitter =
         (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
@@ -285,7 +331,12 @@ function FocusedView(props: FocusViewProps) {
         (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
     } else {
       // if there is a selected index, fill in values
-      if (selectedIndex >= 0) {
+      if (selectedBounty && selectedIndex >= 0) {
+        const wanted = selectedBounty.body;
+        initialValues.estimated_completion_date = wanted?.estimated_completion_date
+          ? moment(wanted?.estimated_completion_date)
+          : '';
+
         if (wanted.type) {
           const thisDynamicSchema = dynamicSchemasByType[wanted.type];
           const newValues = thisDynamicSchema.map((s: any) => {
@@ -327,18 +378,16 @@ function FocusedView(props: FocusViewProps) {
 
   function getExtras(): any {
     const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
-    if (selectedIndex >= 0) {
-      if (selectedBounty) {
-        return selectedBounty.body;
-      } else {
-        return null;
-      }
+    if (selectedIndex >= 0 && selectedBounty) {
+      return selectedBounty.body;
     }
     return null;
   }
 
   // set user organizations
-  config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
+    config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  }
 
   return (
     <div
@@ -418,9 +467,10 @@ function FocusedView(props: FocusViewProps) {
                     text={'Edit'}
                   />
                   <Button
-                    onClick={() => deleteIt()}
+                    onClick={deleteHandler}
                     color={'white'}
                     loading={deleting}
+                    disabled={!canDeleteBounty}
                     leadingIcon={'delete_outline'}
                     text={'Delete'}
                     style={{
@@ -447,7 +497,7 @@ function FocusedView(props: FocusViewProps) {
             config={config}
             fromBountyPage={fromBountyPage}
             extraModalFunction={props?.extraModalFunction}
-            deleteAction={deleteIt}
+            deleteAction={canDeleteBounty ? deleteHandler : undefined}
             deletingState={deleting}
             editAction={() => {
               setEditable(false);

@@ -74,6 +74,7 @@ export const TabsPages = observer(() => {
     }
     return true;
   });
+
   const changeTabHandler = useCallback(
     (tabName: any) => {
       history.replace({

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
-import { Wrap } from 'components/form/style';
+import { OrgWrap, Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import moment from 'moment';
@@ -10,9 +10,12 @@ import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
+import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
+import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
 import { userHasRole } from 'helpers';
+import { BountyModal } from 'people/main/bountyModal';
+import history from '../../config/history';
 import { Modal } from '../../components/common';
 import { colors } from '../../config/colors';
 import { nonWidgetConfigs } from '../utils/Constants';
@@ -145,6 +148,15 @@ const CheckLabel = styled.label`
   margin: 0px;
 `;
 
+const ViewBounty = styled.p`
+  padding: 0px;
+  margin: 0px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: green;
+  font-size: bold;
+`;
+
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const isMobile = useIsMobile();
@@ -153,19 +165,21 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
+  const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
   const [usersCount, setUsersCount] = useState<number>(0);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
+  const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
   const [userRoles, setUserRoles] = useState<any[]>([]);
-  const [bountyRoles, setBountyRoles] = useState<any[]>([]);
   const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
   const [toasts, setToasts]: any = useState([]);
   const [lnInvoice, setLnInvoice] = useState('');
   const [invoiceStatus, setInvoiceStatus] = useState(false);
   const [amount, setAmount] = useState(1);
+  const { path, url } = useRouteMatch();
 
   const pollMinutes = 2;
 
@@ -223,15 +237,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const getBountyRoles = useCallback(async () => {
-    const roles = await main.getRoles();
-    setBountyRoles(roles);
-
-    const bountyRolesData = roles.map((role: any) => ({
+    const bountyRolesData = main.bountyRoles.map((role: any) => ({
       name: role.name,
       status: false
     }));
     setBountyRolesData(bountyRolesData);
-  }, [main]);
+  }, [main.bountyRoles]);
 
   const getUserRoles = async (user: any) => {
     if (uuid && user.owner_pubkey) {
@@ -253,12 +264,17 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const getOrganizationBudget = useCallback(async () => {
     const organizationBudget = await main.getOrganizationBudget(uuid);
     setOrgBudget(organizationBudget.total_budget);
-  }, [main]);
+  }, [main, uuid]);
 
   const getPaymentsHistory = useCallback(async () => {
     const paymentHistories = await main.getPaymentHistories(uuid);
     setPaymentsHistory(paymentHistories);
-  }, [main]);
+  }, [main, uuid]);
+
+  const getBudgetHistory = useCallback(async () => {
+    const budgetHistories = await main.getBudgettHistories(uuid);
+    setBudgetsHistory(budgetHistories);
+  }, [main, uuid]);
 
   const generateInvoice = async () => {
     const token = ui.meInfo?.websocketToken;
@@ -267,7 +283,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         amount: amount,
         sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
         org_uuid: uuid,
-        websocket_token: token
+        websocket_token: token,
+        payment_type: 'deposit'
       });
 
       setLnInvoice(data.response.invoice);
@@ -294,6 +311,10 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const closeHistoryHandler = () => {
     setIsOpenHistory(false);
+  };
+
+  const closeBudgetHistoryHandler = () => {
+    setIsOpenBudgetHistory(false);
   };
 
   const onSubmit = async (body: any) => {
@@ -359,8 +380,17 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
       // get new organization budget
       getOrganizationBudget();
+      getBudgetHistory();
       closeBudgetHandler();
     }
+  };
+
+  const viewBounty = async (bountyId: number) => {
+    ui.setBountyPerson(ui.meInfo?.id);
+
+    history.push({
+      pathname: `${url}/${bountyId}/${0}`
+    });
   };
 
   useEffect(() => {
@@ -369,12 +399,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
+    getBudgetHistory();
   }, [
     getOrganizationUsers,
     getOrganizationUsersCount,
     getBountyRoles,
     getOrganizationBudget,
-    getPaymentsHistory
+    getPaymentsHistory,
+    getBudgetHistory
   ]);
 
   useEffect(() => {
@@ -390,7 +422,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-  }, []);
+  }, [onHandle]);
 
   return (
     <Container>
@@ -409,7 +441,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             <DataText>
               User{usersCount > 1 && 's'} {usersCount}
             </DataText>
-            {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD USER')) && (
+            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD USER')) && (
               <IconButton
                 width={80}
                 height={isMobile ? 36 : 40}
@@ -420,7 +452,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           </DataCount>
           <DataCount>
             <DataText>Budget {orgBudget} sats</DataText>
-            {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD BUDGET')) && (
+            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET')) && (
               <IconButton
                 width={80}
                 height={isMobile ? 36 : 40}
@@ -428,8 +460,15 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 onClick={() => setIsOpenBudget(true)}
               />
             )}
-            {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'VIEW REPORT')) && (
-              <ViewHistoryText onClick={() => setIsOpenHistory(true)}>View history</ViewHistoryText>
+            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')) && (
+              <>
+                <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>
+                  Budget history
+                </ViewHistoryText>
+                <ViewHistoryText onClick={() => setIsOpenHistory(true)}>
+                  Payment history
+                </ViewHistoryText>
+              </>
             )}
           </DataCount>
         </OrgInfoWrap>
@@ -446,7 +485,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               <TdKey>{user.owner_pubkey}</TdKey>
               <Td>
                 <Actions>
-                  {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'ADD ROLES')) && (
+                  {(isOrganizationAdmin ||
+                    userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
                     <MaterialIcon
                       onClick={() => handleSettingsClick(user)}
                       icon={'settings'}
@@ -458,7 +498,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                       }}
                     />
                   )}
-                  {(isOrganizationAdmin || userHasRole(bountyRoles, userRoles, 'DELETE USER')) && (
+                  {(isOrganizationAdmin ||
+                    userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
                     <MaterialIcon
                       onClick={() => {
                         deleteOrganizationUser(user);
@@ -710,31 +751,97 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               borderRadius: '50%'
             }}
           >
-            <Wrap style={{ width: '300px' }}>
+            <OrgWrap style={{ width: '300px' }}>
               <ModalTitle>Payment history</ModalTitle>
               <table>
                 <thead>
                   <tr>
                     <th>Sender</th>
+                    <th>Recipient</th>
                     <th>Amount</th>
                     <th>Date</th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>
                   {paymentsHistory.map((pay: PaymentHistory, i: number) => (
                     <tr key={i}>
                       <td className="ellipsis">{pay.sender_name}</td>
+                      <td className="ellipsis">{pay.receiver_name}</td>
                       <td>{pay.amount} sats</td>
-                      <td>{moment(pay.created).fromNow()}</td>
+                      <td>{moment(pay.created).format('DD/MM/YY')}</td>
+                      <td>
+                        <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
+                          View bounty
+                        </ViewBounty>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </Wrap>
+            </OrgWrap>
+          </Modal>
+        )}
+        {isOpenBudgetHistory && (
+          <Modal
+            visible={isOpenBudgetHistory}
+            style={{
+              height: '100%',
+              flexDirection: 'column'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeBudgetHistoryHandler}
+            bigCloseImage={closeBudgetHistoryHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <OrgWrap>
+              <ModalTitle>Budget history</ModalTitle>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sender</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetsHistory.map((b: BudgetHistory, i: number) => (
+                    <tr key={i}>
+                      <td className="ellipsis">{b.sender_name}</td>
+                      <td>{b.amount} sats</td>
+                      <td>{b.payment_type}</td>
+                      <td>{b.status ? 'settled' : 'peending'}</td>
+                      <td>{moment(b.created).format('DD/MM/YY')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </OrgWrap>
           </Modal>
         )}
       </DetailsWrap>
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
+      <Router history={history}>
+        <Switch>
+          <Route path={`${path}/:wantedId/:wantedIndex`}>
+            <BountyModal basePath={url} />
+          </Route>
+        </Switch>
+      </Router>
     </Container>
   );
 };

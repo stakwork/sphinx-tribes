@@ -147,26 +147,30 @@ export type Roles =
   | 'VIEW REPORT';
 
 export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): boolean => {
-  let hasRole = false;
-  const bountyRolesMap = {};
-  const userRolesMap = {};
+  if (bountyRoles.length) {
+    const bountyRolesMap = {};
+    const userRolesMap = {};
 
-  bountyRoles.forEach((role: any) => {
-    bountyRolesMap[role.name] = role.name;
-  });
+    bountyRoles.forEach((role: any) => {
+      bountyRolesMap[role.name] = role.name;
+    });
 
-  userRoles.forEach((user: any) => {
-    userRolesMap[user.role] = user.role;
-  });
+    userRoles.forEach((user: any) => {
+      userRolesMap[user.role] = user.role;
+    });
 
-  if (bountyRolesMap.hasOwnProperty(role) && userRolesMap.hasOwnProperty(role)) {
-    hasRole = true;
+    if (bountyRolesMap.hasOwnProperty(role) && userRolesMap.hasOwnProperty(role)) {
+      return true;
+    }
+
+    return false;
   }
-
-  return hasRole;
+  return false;
 };
 
 export const toCapitalize = (word: string): string => {
+  if (!word.length) return word;
+
   const wordString = word.split(' ');
   const capitalizeStrings = wordString.map((w: string) => w[0].toUpperCase() + w.slice(1));
 

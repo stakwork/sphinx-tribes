@@ -18,6 +18,17 @@ export const Wrap = styled.div<WrapProps>`
   min-width: 230px;
 `;
 
+export const OrgWrap = styled.div<WrapProps>`
+  padding: ${(p: any) => (p?.newDesign ? '28px 0px' : '30px 20px')};
+  margin-bottom: ${(p: any) => !p?.newDesign && '100px'};
+  display: flex;
+  height: inherit;
+  flex-direction: column;
+  align-content: center;
+  min-width: 550px;
+  max-width: auto;
+`;
+
 interface bottomButtonProps {
   assigneeName?: string;
   color?: any;

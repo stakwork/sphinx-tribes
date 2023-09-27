@@ -1,12 +1,14 @@
 import { makeAutoObservable, observable, action } from 'mobx';
 import memo from 'memo-decorator';
 import { persist } from 'mobx-persist';
+import { uniqBy } from 'lodash';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
 import { randomString } from '../helpers';
 import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
+import { getUserAvatarPlaceholder } from './lib';
 
 export const queryLimit = 100;
 
@@ -132,6 +134,18 @@ export interface PaymentHistory {
   created: string;
 }
 
+export interface BudgetHistory {
+  id: number;
+  amount: number;
+  org_uuid: string;
+  payment_type: string;
+  created: string;
+  updated: string;
+  sender_pub_key: string;
+  sender_name: string;
+  status: boolean;
+}
+
 export interface PersonOffer {
   person: PersonFlex;
   title: string;
@@ -149,6 +163,7 @@ export interface QueryParams {
   sortBy?: string;
   direction?: string;
   search?: string;
+  resetPage?: boolean;
 }
 
 export interface ClaimOnLiquid {
@@ -179,6 +194,7 @@ export interface Organization {
   created: string;
   updated: string;
   show: boolean;
+  bounty_count?: number;
 }
 
 export interface BountyRoles {
@@ -230,7 +246,7 @@ export class MainStore {
   myBots: Bot[] = [];
 
   async getBots(uniqueName?: string, queryParams?: any): Promise<any> {
-    const query = this.appendQueryParams('bots', queryParams);
+    const query = this.appendQueryParams('bots', 100, queryParams);
     const b = await api.get(query);
 
     const info = uiStore.meInfo;
@@ -322,7 +338,7 @@ export class MainStore {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'x-jwt': info.tribe_jwt,
+        'x-jwt': info.jwt,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
@@ -430,7 +446,7 @@ export class MainStore {
     }
 
     const headers = {
-      'x-jwt': info.tribe_jwt,
+      'x-jwt': info.jwt,
       'Content-Type': 'application/json'
     };
 
@@ -557,22 +573,16 @@ export class MainStore {
   }
 
   appendQueryParams(path: string, limit: number, queryParams?: QueryParams): string {
-    let query = path;
-    if (queryParams) {
-      queryParams.limit = limit;
-      query += '?';
-      const { length } = Object.keys(queryParams);
-      Object.keys(queryParams).forEach((k: string, i: number) => {
-        query += `${k}=${queryParams[k]}`;
+    const adaptedParams = {
+      ...queryParams,
+      limit: String(limit),
+      ...(queryParams?.resetPage ? { resetPage: String(queryParams.resetPage) } : {}),
+      ...(queryParams?.page ? { page: String(queryParams.page) } : {})
+    } as Record<string, string>;
 
-        // add & if not last param
-        if (i !== length - 1) {
-          query += '&';
-        }
-      });
-    }
+    const searchParams = new URLSearchParams(adaptedParams);
 
-    return query;
+    return `${path}?${searchParams.toString()}`;
   }
 
   async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
@@ -585,11 +595,26 @@ export class MainStore {
     return ps;
   }
 
+  getUserAvatarPlaceholder(ownerId: string) {
+    return getUserAvatarPlaceholder(ownerId);
+  }
+
   @persist('list')
-  people: Person[] = [];
+  _people: Person[] = [];
+
+  get people() {
+    return this._people.map((person: Person) => ({
+      ...person,
+      img: person.img || this.getUserAvatarPlaceholder(person.owner_pubkey)
+    }));
+  }
+
+  set people(people: Person[]) {
+    this._people = uniqBy(people, 'uuid');
+  }
 
   setPeople(p: Person[]) {
-    this.people = p;
+    this._people = p;
   }
 
   async getPeople(queryParams?: any): Promise<Person[]> {
@@ -690,17 +715,33 @@ export class MainStore {
   @persist('list')
   peopleWanteds: PersonWanted[] = [];
 
-  setPeopleWanteds(wanteds: PersonWanted[]) {
+  @action setPeopleWanteds(wanteds: PersonWanted[]) {
     this.peopleWanteds = wanteds;
   }
 
-  async getPeopleWanteds(queryParams?: any): Promise<PersonWanted[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
+  getWantedsPrevParams?: QueryParams = {};
 
-    const query2 = this.appendQueryParams('bounty/all', queryLimit, {
-      ...queryParams,
-      sortBy: 'created'
-    });
+  async getPeopleWanteds(params?: QueryParams): Promise<PersonWanted[]> {
+    const queryParams: QueryParams = {
+      limit: 100,
+      sortBy: 'created',
+      search: uiStore.searchText ?? '',
+      page: 1,
+      resetPage: false,
+      ...params
+    };
+
+    if (params) {
+      // save previous params
+      this.getWantedsPrevParams = queryParams;
+    }
+
+    // if we don't pass the params, we should use previous params for invalidate query
+    const query2 = this.appendQueryParams(
+      'bounty/all',
+      queryLimit,
+      params ? queryParams : this.getWantedsPrevParams
+    );
 
     try {
       const ps2 = await api.get(query2);
@@ -731,19 +772,19 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleWanteds = ps3;
+        this.setPeopleWanteds(ps3);
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
-        this.peopleWanteds = this.doPageListMerger(
+        const wanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams,
           'wanted'
         );
+        this.setPeopleWanteds(wanteds);
       }
-      this.setPeopleWanteds(ps3);
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleWanteds: ', e);
@@ -753,7 +794,7 @@ export class MainStore {
 
   personAssignedWanteds: PersonWanted[] = [];
 
-  setPersonWanteds(wanteds: PersonWanted[]) {
+  @action setPersonWanteds(wanteds: PersonWanted[]) {
     this.personAssignedWanteds = wanteds;
   }
 
@@ -800,7 +841,7 @@ export class MainStore {
 
   createdWanteds: PersonWanted[] = [];
 
-  setCreatedWanteds(wanteds: PersonWanted[]) {
+  @action setCreatedWanteds(wanteds: PersonWanted[]) {
     this.createdWanteds = wanteds;
   }
 
@@ -913,17 +954,19 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.peopleWanteds = ps3;
+        this.setPeopleWanteds(ps3);
         uiStore.setPeopleWantedsPageNumber(1);
       } else {
         // all other cases, merge
-        this.peopleWanteds = this.doPageListMerger(
+        const wanteds = this.doPageListMerger(
           this.peopleWanteds,
           ps3,
           (n: any) => uiStore.setPeopleWantedsPageNumber(n),
           queryParams,
           'wanted'
         );
+
+        this.setPeopleWanteds(wanteds);
       }
       return ps3;
     } catch (e) {
@@ -1018,7 +1061,18 @@ export class MainStore {
   }
 
   @persist('list')
-  activePerson: Person[] = [];
+  _activePerson: Person[] = [];
+
+  get activePerson() {
+    return this._activePerson.map((person: Person) => ({
+      ...person,
+      img: person.img || this.getUserAvatarPlaceholder(person.owner_pubkey)
+    }));
+  }
+
+  set activePerson(p: Person[]) {
+    this._activePerson = p;
+  }
 
   setActivePerson(p: Person) {
     this.activePerson = [p];
@@ -1027,7 +1081,6 @@ export class MainStore {
   @memo()
   async getPersonByPubkey(pubkey: string): Promise<Person> {
     const p = await api.get(`person/${pubkey}`);
-    this.setActivePerson(p);
     return p;
   }
 
@@ -1098,15 +1151,26 @@ export class MainStore {
   async refreshJwt() {
     try {
       if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
 
-      const res: any = await this.fetchFromRelay('refresh_jwt');
-      const j = await res.json();
+      const r: any = await fetch(`${TribesURL}/refresh_jwt`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        }
+      });
+
+      const j = await r.json();
 
       if (this.lnToken) {
         this.lnToken = j.jwt;
         return j;
       }
-      return j.response;
+
+      return j;
     } catch (e) {
       console.log('Error refreshJwt: ', e);
       // could not refresh jwt, logout!
@@ -1159,33 +1223,55 @@ export class MainStore {
   }
 
   async saveProfile(body: any) {
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
     if (!body) return; // avoid saving bad state
+
     if (body.price_to_meet) body.price_to_meet = parseInt(body.price_to_meet); // must be an int
 
     try {
-      let request = 'profile';
-      if (this.lnToken) request = 'person';
-
-      const [r, error] = await this.doCallToRelay('POST', request, body);
-      if (error) throw error;
-      if (!r) return; // tor user will return here
-
-      // first time profile makers will need this on first login
-      if (!body.id) {
-        const j = await r.json();
-        if (j.response.id) {
-          body.id = j.response.id;
+      if (this.lnToken) {
+        const r = await fetch(`${TribesURL}/person`, {
+          method: 'POST',
+          body: JSON.stringify({
+            ...body
+          }),
+          mode: 'cors',
+          headers: {
+            'x-jwt': info.tribe_jwt,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!r) return;
+        // first time profile makers will need this on first login
+        if (r.status === 200) {
+          const p = await r.json();
+          const updateSelf = { ...info, ...p };
+          uiStore.setMeInfo(updateSelf);
         }
+      } else {
+        const [r, error] = await this.doCallToRelay('POST', 'profile', body);
+        if (error) throw error;
+        if (!r) return;
+
+        // first time profile makers will need this on first login
+        if (!body.id) {
+          const j = await r.json();
+          if (j.response && j.response.id) {
+            body.id = j.response.id;
+          }
+        }
+
+        const updateSelf = { ...info, ...body };
+        await this.getSelf(updateSelf);
+
+        uiStore.setToasts([
+          {
+            id: '1',
+            title: 'Saved.'
+          }
+        ]);
       }
-
-      uiStore.setToasts([
-        {
-          id: '1',
-          title: 'Saved.'
-        }
-      ]);
-
-      await this.getSelf(body);
     } catch (e) {
       console.log('Error saveProfile: ', e);
     }
@@ -1280,7 +1366,7 @@ export class MainStore {
         }),
         mode: 'cors',
         headers: {
-          'x-jwt': info.tribe_jwt,
+          'x-jwt': info.jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1499,6 +1585,7 @@ export class MainStore {
     org_uuid: string;
     sender_pubkey: string;
     websocket_token: string;
+    payment_type: string;
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1507,7 +1594,8 @@ export class MainStore {
           amount: body.amount,
           org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
-          websocket_token: body.websocket_token
+          websocket_token: body.websocket_token,
+          payment_type: body.payment_type
         },
         {
           'Content-Type': 'application/json'
@@ -1555,11 +1643,11 @@ export class MainStore {
     this.organizations = organizations;
   }
 
-  @action async getUserOrganizations(): Promise<Organization[]> {
+  @action async getUserOrganizations(id: number): Promise<Organization[]> {
     try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/user`, {
+      const r: any = await fetch(`${TribesURL}/organizations/user/${id}`, {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -1677,6 +1765,13 @@ export class MainStore {
     }
   }
 
+  @observable
+  bountyRoles: BountyRoles[] = [];
+
+  @action setBountyRoles(roles: BountyRoles[]) {
+    this.bountyRoles = roles;
+  }
+
   async getRoles(): Promise<BountyRoles[]> {
     try {
       if (!uiStore.meInfo) return [];
@@ -1690,7 +1785,10 @@ export class MainStore {
         }
       });
 
-      return r.json();
+      const roles = await r.json();
+      this.setBountyRoles(roles);
+
+      return roles;
     } catch (e) {
       console.log('Error getRoles', e);
       return [];
@@ -1746,7 +1844,7 @@ export class MainStore {
         method: 'POST',
         mode: 'cors',
         headers: {
-          'x-jwt': info.jwt,
+          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1773,6 +1871,7 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getOrganizationBudget', e);
       return false;
     }
   }
@@ -1797,6 +1896,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
+      console.log('Error makeBountyPayment', e);
       return false;
     }
   }
@@ -1816,6 +1916,27 @@ export class MainStore {
 
       return r.json();
     } catch (e) {
+      console.log('Error getPaymentHistories', e);
+      return [];
+    }
+  }
+
+  async getBudgettHistories(uuid: string): Promise<BudgetHistory[]> {
+    try {
+      if (!uiStore.meInfo) return [];
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/budget/history/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.log('Error gettHistories', e);
       return [];
     }
   }

@@ -19,28 +19,8 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
 
   const wantedLength = person?.extras ? person?.extras.wanted?.length : 0;
 
-  const changeWanted = (step: any) => {
-    if (!wantedLength) return;
-    const currentStep = Number(wantedIndex);
-    const newStep = currentStep + step;
-
-    if (step === 1) {
-      if (newStep < wantedLength) {
-        history.replace({
-          pathname: `${basePath}/${newStep}`
-        });
-      }
-    }
-    if (step === -1) {
-      if (newStep >= 0) {
-        history.replace({
-          pathname: `${basePath}/${newStep}`
-        });
-      }
-    }
-  };
-
   const onGoBack = () => {
+    ui.setBountyPerson(0);
     history.push({
       pathname: basePath
     });
@@ -76,12 +56,10 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       }}
       overlayClick={onGoBack}
       bigCloseImage={onGoBack}
-      nextArrow={() => changeWanted(1)}
-      prevArrow={() => changeWanted(-1)}
     >
       <FocusedView
         person={person}
-        canEdit={canEdit}
+        canEdit={ui.bountyPerson ? person?.id === ui.bountyPerson : canEdit}
         selectedIndex={Number(wantedIndex)}
         config={config}
         bounty={bounty}

@@ -11,16 +11,15 @@ function TokenRefresh() {
 
   useEffect(() => {
     timeout = setTimeout(async () => {
-      if (ui.meInfo) {
+      if ((ui.meInfo, ui.meInfo?.tribe_jwt)) {
         const res = await main.refreshJwt();
         if (res && res.jwt) {
-          ui.setMeInfo({ ...ui.meInfo, jwt: res.jwt });
+          ui.setMeInfo({ ...ui.meInfo, tribe_jwt: res.jwt });
         } else {
           ui.setMeInfo(null);
           ui.setSelectedPerson(0);
           ui.setSelectingPerson(0);
           setShow(true);
-
           // run this to reset state
           main.getPeople();
         }
