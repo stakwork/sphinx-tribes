@@ -27,7 +27,7 @@ export const DeleteConfirmationModal = ({
     onClose();
   };
   return (
-    <BaseModal open onClose={closeHandler}>
+    <BaseModal backdrop="white" open onClose={closeHandler}>
       <Stack minWidth={350} p={4} alignItems="center" spacing={3}>
         {icon}
 
