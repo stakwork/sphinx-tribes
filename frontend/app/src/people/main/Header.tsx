@@ -522,8 +522,7 @@ function Header() {
             ui.setShowSignIn(false);
             setShowWelcome(true);
             // if page is not /p, go to /p (people)
-            const path = location.pathname;
-            if (!path.includes('/p')) history.push('/p');
+            window.location.reload()
           }}
         />
       </Modal>
