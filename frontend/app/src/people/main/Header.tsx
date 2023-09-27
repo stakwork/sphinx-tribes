@@ -525,8 +525,7 @@ function Header() {
             ui.setShowSignIn(false);
             setShowWelcome(true);
             // if page is not /p, go to /p (people)
-            const path = location.pathname;
-            if (!path.includes('/p')) history.push('/p');
+            window.location.reload()
           }}
         />
       </Modal>
@@ -569,7 +568,6 @@ function Header() {
               onClick={() => {
                 // switch from welcome modal to edit modal
                 setShowWelcome(false);
-                goToEditSelf();
               }}
               hovercolor={'#5881F8'}
               activecolor={'#5078F2'}
