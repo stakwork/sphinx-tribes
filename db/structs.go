@@ -240,6 +240,7 @@ type InvoiceRequest struct {
 	Commitment_fee  uint   `json:"commitment_fee,omitempty"`
 	Bounty_expires  string `json:"bounty_expires,omitempty"`
 	Websocket_token string `json:"websocket_token,omitempty"`
+	Route_hint      string `json:"route_hint,omitempty"`
 }
 
 type Invoice struct {
@@ -262,6 +263,7 @@ type InvoiceStoreData struct {
 	Assigned_hours uint   `json:"assigned_hours,omitempty"`
 	Commitment_fee uint   `json:"commitment_fee,omitempty"`
 	Bounty_expires string `json:"bounty_expires,omitempty"`
+	Route_hint     string `json:"route_hint,omitempty"`
 }
 
 type InvoiceStatus struct {
@@ -508,6 +510,7 @@ type PaymentHistoryData struct {
 type BountyPayRequest struct {
 	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
+	RouteHint       string `json:"route_hint,omitempty"`
 }
 
 func (Person) TableName() string {
