@@ -65,11 +65,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
   const [connection_string, setConnectionString] = useState('');
 
   async function getConnectionCode() {
-    if (!connection_string) {
+    if (!ui.meInfo && !connection_string) {
       const code = await api.get('connectioncodes');
       if (code.connection_string) {
         setConnectionString(code.connection_string);
-        main.getPeople({ resetPage: true });
       }
     }
   }
@@ -137,7 +136,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
       <ModalContainer>
         {connection_string ? (
           <QrContainer>
-            <QR size={200} value={ui.connection_string} />
+            <QR size={200} value={connection_string} />
             <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
           </QrContainer>
         ) : (
