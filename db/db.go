@@ -288,6 +288,12 @@ func (db database) GetAllTribesByOwner(pubkey string) []Tribe {
 	return ms
 }
 
+func (db database) GetTribesByAppUrl(aurl string) []Tribe {
+	ms := []Tribe{}
+	db.db.Where("LOWER(app_url) LIKE ?", "%"+aurl+"%").Find(&ms)
+	return ms
+}
+
 func (db database) GetChannelsByTribe(tribe_uuid string) []Channel {
 	ms := []Channel{}
 	db.db.Where("tribe_uuid = ? AND (deleted = 'f' OR deleted is null)", tribe_uuid).Find(&ms)
