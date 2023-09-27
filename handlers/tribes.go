@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -44,6 +45,26 @@ func GetTribesByOwner(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
+}
+
+func GetTribesByAppUrl(w http.ResponseWriter, r *http.Request) {
+	tribes := []db.Tribe{}
+	app_url := chi.URLParam(r, "app_url")
+	tribes = db.DB.GetTribesByAppUrl(app_url)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tribes)
+}
+
+func GetTribesByAppUrls(w http.ResponseWriter, r *http.Request) {
+	app_urls := chi.URLParam(r, "app_urls")
+	app_url_list := strings.Split(app_urls, ",")
+	m := make(map[string][]db.Tribe)
+	for _, app_url := range app_url_list {
+		tribes := db.DB.GetTribesByAppUrl(app_url)
+		m[app_url] = tribes
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(m)
 }
 
 func PutTribeStats(w http.ResponseWriter, r *http.Request) {
