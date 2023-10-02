@@ -50,7 +50,6 @@ const Inner = styled('div')(() => ({
     outline: 'none'
   },
   fontFamily: 'Barlow'
-  
 }));
 
 export const BaseModal = ({ children, backdrop, ...props }: BaseModalProps) => (
