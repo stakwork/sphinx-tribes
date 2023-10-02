@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/auth"
-	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
@@ -208,6 +207,6 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["last_login"] = p.LastLogin
 	user["price_to_meet"] = p.PriceToMeet
 	user["alias"] = p.OwnerAlias
-	user["url"] = config.Host
+	user["url"] = "http://localhost:5005"
 	return user
 }
