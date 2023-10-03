@@ -55,12 +55,12 @@ function WantedView(props: WantedViews2Props) {
   const { ui, main } = useStores();
   const [saving, setSaving] = useState(false);
   const [labels, setLabels] = useState<Array<CodingLanguageLabel>>([]);
-  const { peopleWanteds } = main;
+  const { peopleBounties } = main;
   const color = colors['light'];
   const isMine = ui.meInfo?.owner_pubkey === person?.owner_pubkey;
 
   async function setExtrasPropertyAndSave(propertyName: string) {
-    if (peopleWanteds) {
+    if (peopleBounties) {
       setSaving(true);
       try {
         const targetProperty = props[propertyName];
@@ -72,24 +72,24 @@ function WantedView(props: WantedViews2Props) {
         );
 
         // saved? ok update in wanted list if found
-        const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
+        const peopleBountiesClone: any = [...peopleBounties];
+        const indexFromPeopleBounty = peopleBountiesClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
         // if we found it in the wanted list, update in people wanted list
-        if (indexFromPeopleWanted > -1) {
+        if (indexFromPeopleBounty > -1) {
           // if it should be hidden now, remove it from the list
           if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
-            peopleWantedsClone.splice(indexFromPeopleWanted, 1);
+            peopleBountiesClone.splice(indexFromPeopleBounty, 1);
           } else {
-            peopleWantedsClone[indexFromPeopleWanted] = {
+            peopleBountiesClone[indexFromPeopleBounty] = {
               person: person,
               body: clonedEx[targetIndex]
             };
           }
-          main.setPeopleWanteds(peopleWantedsClone);
+          main.setPeopleBounties(peopleBountiesClone);
         }
       } catch (e) {
         console.log('e', e);

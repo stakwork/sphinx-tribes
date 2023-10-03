@@ -71,7 +71,7 @@ export default function AssignBounty(props: ConnectCardProps) {
       main.setLnInvoice('');
 
       // get new wanted list
-      main.getPeopleWanteds({ page: 1, resetPage: true });
+      main.getPeopleBounties({ page: 1, resetPage: true });
 
       props.dismiss();
       if (props.dismissConnectModal) props.dismissConnectModal();

@@ -105,7 +105,7 @@ export interface PersonPost {
   created: number;
 }
 
-export interface PersonWanted {
+export interface PersonBounty {
   person?: any;
   body?: any;
   org_uuid?: any;
@@ -713,15 +713,15 @@ export class MainStore {
   }
 
   @persist('list')
-  peopleWanteds: PersonWanted[] = [];
+  peopleBounties: PersonBounty[] = [];
 
-  @action setPeopleWanteds(wanteds: PersonWanted[]) {
-    this.peopleWanteds = wanteds;
+  @action setPeopleBounties(bounties: PersonBounty[]) {
+    this.peopleBounties = bounties;
   }
 
   getWantedsPrevParams?: QueryParams = {};
 
-  async getPeopleWanteds(params?: QueryParams): Promise<PersonWanted[]> {
+  async getPeopleBounties(params?: QueryParams): Promise<PersonBounty[]> {
     const queryParams: QueryParams = {
       limit: 100,
       sortBy: 'created',
@@ -772,33 +772,33 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.setPeopleWanteds(ps3);
-        uiStore.setPeopleWantedsPageNumber(1);
+        this.setPeopleBounties(ps3);
+        uiStore.setPeopleBountiesPageNumber(1);
       } else {
         // all other cases, merge
         const wanteds = this.doPageListMerger(
-          this.peopleWanteds,
+          this.peopleBounties,
           ps3,
-          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleBountiesPageNumber(n),
           queryParams,
           'wanted'
         );
-        this.setPeopleWanteds(wanteds);
+        this.setPeopleBounties(wanteds);
       }
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPeopleWanteds: ', e);
+      console.log('fetch failed getPeopleBounties: ', e);
       return [];
     }
   }
 
-  personAssignedWanteds: PersonWanted[] = [];
+  personAssignedBounties: PersonBounty[] = [];
 
-  @action setPersonWanteds(wanteds: PersonWanted[]) {
-    this.personAssignedWanteds = wanteds;
+  @action setPersonBounties(bounties: PersonBounty[]) {
+    this.personAssignedBounties = bounties;
   }
 
-  async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+  async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
@@ -834,18 +834,17 @@ export class MainStore {
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPersonAssignedWanteds: ', e);
+      console.log('fetch failed getPersonAssignedBounties: ', e);
       return [];
     }
   }
 
-  createdWanteds: PersonWanted[] = [];
-
-  @action setCreatedWanteds(wanteds: PersonWanted[]) {
-    this.createdWanteds = wanteds;
+  createdBounties: PersonBounty[] = [];
+  @action setCreatedBounties(bounties: PersonBounty[]) {
+    this.createdBounties = bounties;
   }
 
-  async getPersonCreatedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+  async getPersonCreatedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, queryLimit, {
@@ -879,16 +878,16 @@ export class MainStore {
         }
       }
 
-      this.setCreatedWanteds(ps3);
+      this.setCreatedBounties(ps3);
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPersonCreatedWanteds: ', e);
+      console.log('fetch failed getPersonCreatedBounties: ', e);
       return [];
     }
   }
 
-  async getWantedById(id: number): Promise<PersonWanted[]> {
+  async getBountyById(id: number): Promise<PersonBounty[]> {
     try {
       const ps2 = await api.get(`bounty/id/${id}`);
       const ps3: any[] = [];
@@ -918,12 +917,12 @@ export class MainStore {
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getWantedById: ', e);
+      console.log('fetch failed getBountyById: ', e);
       return [];
     }
   }
 
-  async getOrganizationWanted(uuid: string, queryParams?: any): Promise<PersonWanted[]> {
+  async getOrganizationBounties(uuid: string, queryParams?: any): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
     try {
       const ps2 = await api.get(`organizations/bounties/${uuid}`);
@@ -954,23 +953,23 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.setPeopleWanteds(ps3);
-        uiStore.setPeopleWantedsPageNumber(1);
+        this.setPeopleBounties(ps3);
+        uiStore.setPeopleBountiesPageNumber(1);
       } else {
         // all other cases, merge
         const wanteds = this.doPageListMerger(
-          this.peopleWanteds,
+          this.peopleBounties,
           ps3,
-          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleBountiesPageNumber(n),
           queryParams,
           'wanted'
         );
 
-        this.setPeopleWanteds(wanteds);
+        this.setPeopleBounties(wanteds);
       }
       return ps3;
     } catch (e) {
-      console.log('fetch failed getOrganizationWanted: ', e);
+      console.log('fetch failed getOrganizationBounties: ', e);
       return [];
     }
   }
@@ -981,7 +980,7 @@ export class MainStore {
 
       return count;
     } catch (e) {
-      console.log('fetch failed getCreatedWanteds: ', e);
+      console.log('fetch failed getCreatedBounties: ', e);
       return 0;
     }
   }
@@ -1311,7 +1310,7 @@ export class MainStore {
       });
 
       if (response.status) {
-        this.getPeopleWanteds({ resetPage: true });
+        this.getPeopleBounties({ resetPage: true });
       }
       return;
     } catch (e) {
@@ -1338,7 +1337,7 @@ export class MainStore {
         }
       });
       if (response.status) {
-        await this.getPeopleWanteds({ resetPage: true });
+        await this.getPeopleBounties({ resetPage: true });
       }
       return;
     } catch (e) {
