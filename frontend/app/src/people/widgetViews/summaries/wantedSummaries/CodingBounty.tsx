@@ -199,7 +199,7 @@ function MobileView(props: CodingBountiesProps) {
 
     if (data) {
       // get new wanted list
-      main.getPeopleWanteds({ page: 1, resetPage: true });
+      main.getPeopleBounties({ page: 1, resetPage: true });
     }
   };
 
@@ -227,7 +227,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const updatePaymentStatus = async (created: number) => {
     await main.updateBountyPaymentStatus(created);
-    await main.getPeopleWanteds();
+    await main.getPeopleBounties();
   };
 
   useEffect(() => {
@@ -258,8 +258,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-      ui.meInfo?.owner_alias &&
-      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+        ui.meInfo?.owner_alias &&
+        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */

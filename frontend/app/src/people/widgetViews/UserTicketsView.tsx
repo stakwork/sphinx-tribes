@@ -87,14 +87,14 @@ const UserTickets = () => {
   useEffect(() => {
     async function getUserTickets() {
       setIsLoading(true);
-      const tickets = await main.getPersonAssignedWanteds({}, personPubkey);
+      const tickets = await main.getPersonAssignedBounties({}, personPubkey);
       setUserTickets(tickets);
       setIsLoading(false);
     }
 
     getUserTickets();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [main.getPersonAssignedWanteds, personPubkey]);
+  }, [main.getPersonAssignedBounties, personPubkey]);
 
   const listItems =
     userTickets && userTickets.length ? (
