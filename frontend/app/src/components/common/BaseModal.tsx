@@ -49,9 +49,7 @@ const Inner = styled('div')(() => ({
   '&:focus, &:focus-visible': {
     outline: 'none'
   },
-  '*': {
-    fontFamily: 'Barlow'
-  }
+  fontFamily: 'Barlow'
 }));
 
 export const BaseModal = ({ children, backdrop, ...props }: BaseModalProps) => (
