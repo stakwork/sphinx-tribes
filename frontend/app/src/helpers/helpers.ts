@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export const formatPrice = (amount: number = 0) => {
-  return amount;
-};
+export const formatPrice = (amount: number = 0) => amount;
+
+export const formatSatPrice= (amount: number=0) =>
+{
+  const dollarUSLocale = Intl.NumberFormat('en-US');
+  return dollarUSLocale.format(amount)
+}
 
 export const satToUsd = (amount: number = 0) => {
   if (!amount) amount = 0;
@@ -14,8 +19,11 @@ export const satToUsd = (amount: number = 0) => {
     return '. . .';
   }
 
-  return returnValue;
+  
+  return formatSatPrice((Number(returnValue)))
+  
 };
+
 
 export const DollarConverter = (e: any) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');
@@ -119,8 +127,7 @@ export const calculateTimeLeft = (
   return timeLeft;
 };
 
-export const formatRelayPerson = (person: any): any => {
-  return {
+export const formatRelayPerson = (person: any): any => ({
     owner_pubkey: person.owner_pubkey,
     owner_alias: person.alias,
     owner_contact_key: person.contact_key,
@@ -131,8 +138,7 @@ export const formatRelayPerson = (person: any): any => {
     img: person.img,
     tags: [],
     route_hint: person.route_hint
-  };
-};
+  });
 
 export type Roles =
   | 'ADD BOUNTY'
