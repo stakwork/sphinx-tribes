@@ -153,7 +153,7 @@ function MobileView(props: CodingBountiesProps) {
         memo: '',
         owner_pubkey: person.owner_pubkey,
         user_pubkey: assignee.owner_pubkey,
-        route_hint: assignee.route_hint,
+        route_hint: assignee.owner_route_hint ?? '',
         created: created ? created?.toString() : '',
         type: 'KEYSEND'
       });
@@ -179,7 +179,7 @@ function MobileView(props: CodingBountiesProps) {
           id: id || 0,
           websocket_token: ui.meInfo?.websocketToken || '',
           receiver_pubkey: assignee.owner_pubkey,
-          route_hint: assignee.route_hint
+          route_hint: assignee.owner_route_hint ?? '',
         };
 
         await main.makeBountyPayment(body);
@@ -258,8 +258,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-      ui.meInfo?.owner_alias &&
-      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+        ui.meInfo?.owner_alias &&
+        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */

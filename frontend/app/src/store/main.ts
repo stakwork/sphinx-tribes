@@ -65,6 +65,7 @@ export interface Person {
   photo_url: string;
   alias: string;
   route_hint: string;
+  owner_route_hint?: string;
   contact_key: string;
   price_to_meet: number;
   last_login?: number;
