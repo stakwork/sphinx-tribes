@@ -1888,6 +1888,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
+
       const r: any = await fetch(`${TribesURL}/bounty/pay/${body.id}`, {
         method: 'POST',
         mode: 'cors',
