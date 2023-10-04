@@ -222,7 +222,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				Created:          bounty.AssigneeCreated,
 				Updated:          bounty.AssigneeUpdated,
 				LastLogin:        bounty.LastLogin,
-				OwnerRouteHint:   bounty.OwnerRouteHint,
+				OwnerRouteHint:   bounty.AssigneeRouteHint,
 				OwnerContactKey:  bounty.OwnerContactKey,
 				PriceToMeet:      bounty.PriceToMeet,
 				TwitterConfirmed: bounty.TwitterConfirmed,
