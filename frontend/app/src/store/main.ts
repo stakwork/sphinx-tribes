@@ -1296,7 +1296,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty?token=${info?.tribe_jwt}`;
+      const request = `gobounties?token=${info?.tribe_jwt}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'POST',
