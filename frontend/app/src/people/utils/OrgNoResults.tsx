@@ -13,6 +13,9 @@ function OrgNoResults() {
         margin: 'auto',
         marginTop: '10%'
       }}
+      action={() => false}
+      buttonText={tabs['organizations'].action.text}
+      buttonIcon={tabs['organizations'].action.icon}
       {...tabs['organizations']?.noneSpace['noResult']}
     />
   );

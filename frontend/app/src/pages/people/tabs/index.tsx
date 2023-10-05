@@ -132,13 +132,13 @@ export const TabsPages = observer(() => {
             } else {
               count = hasExtras
                 ? person.extras[name].filter((f: any) => {
-                    if ('show' in f) {
-                      // show has a value
-                      if (!f.show) return false;
-                    }
-                    // if no value default to true
-                    return true;
-                  }).length
+                  if ('show' in f) {
+                    // show has a value
+                    if (!f.show) return false;
+                  }
+                  // if no value default to true
+                  return true;
+                }).length
                 : null;
             }
 
@@ -162,7 +162,7 @@ export const TabsPages = observer(() => {
           <Route key={name} path={`${path}${name}`}>
             <div
               style={{
-                padding: 20,
+                padding: '20px 30px',
                 height: 'calc(100% - 63px)',
                 overflowY: 'auto',
                 position: 'relative',

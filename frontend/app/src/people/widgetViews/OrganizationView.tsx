@@ -25,31 +25,15 @@ const color = colors['light'];
 const Container = styled.div`
   display: flex;
   flex-flow: column wrap;
-  gap: 1rem;
   min-width: 77vw;
   flex: 1 1 100%;
 `;
 
-const OrganizationText = styled.p`
-  font-size: 1rem;
-  font-weight: bold;
-  margin-top: 15px;
-`;
-
-const OrganizationImg = styled.img`
-  width: 60px;
-  height: 60px;
-`;
-
 const OrganizationWrap = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: calc(19% - 40px);
-  margin-left: 0.5%;
-  margin-right: 0.5%;
-  margin; 10px;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom; 10px;
   background: white;
   padding: 20px;
   border-radius: 2px;
@@ -59,9 +43,29 @@ const OrganizationWrap = styled.div`
 const OrganizationData = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
+`;
+
+const OrganizationImg = styled.img`
+  width: 65px;
+  height: 65px;
+`;
+
+const OrganizationTextWrap = styled.div`
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const OrganizationText = styled.p`
+  font-size: 1rem;
+  font-weight: bold;
+`;
+
+const OrganizationBudgetText = styled.small`
+  margin-top: auto;
+  font-size: 0.9rem;
 `;
 
 const OrganizationContainer = styled.div`
@@ -69,7 +73,19 @@ const OrganizationContainer = styled.div`
   flex-direction: row;
   width: 100%;
   cursor: pointer;
+  margin-top: 20px;
 `;
+
+const OrgHeadWrap = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+`
+
+const OrgText = styled.div`
+  font-size: 1.4rem;
+  font-weight: bold;
+`
 
 const Organizations = (props: { person: Person }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
@@ -168,7 +184,10 @@ const Organizations = (props: { person: Person }) => {
           }}
         >
           <OrganizationImg src={org.img || avatarIcon} />
-          <OrganizationText>{org.name}</OrganizationText>
+          <OrganizationTextWrap>
+            <OrganizationText>{org.name}</OrganizationText>
+            <OrganizationBudgetText>3000 SAT / 11 USD </OrganizationBudgetText>
+          </OrganizationTextWrap>
         </OrganizationData>
 
         {org.bounty_count && org.bount_count !== 0 && org.uuid && (
@@ -194,17 +213,20 @@ const Organizations = (props: { person: Person }) => {
       {detailsOpen && <OrganizationDetails close={closeDetails} org={organization} />}
       {!detailsOpen && (
         <>
-          {isMyProfile && (
-            <IconButton
-              width={150}
-              height={isMobile ? 36 : 48}
-              text="Add Organization"
-              onClick={() => setIsOpen(true)}
-              style={{
-                marginLeft: '10px'
-              }}
-            />
-          )}
+          <OrgHeadWrap>
+            <OrgText>Organizations</OrgText>
+            {isMyProfile && (
+              <IconButton
+                width={156}
+                height={isMobile ? 36 : 48}
+                text="Add Organization"
+                icon="add"
+                iconSize={'xs'}
+                onClick={() => setIsOpen(true)}
+                style={{ marginLeft: 'auto' }}
+              />
+            )}
+          </OrgHeadWrap>
           <OrganizationContainer>{renderOrganizations()}</OrganizationContainer>
           {isOpen && (
             <Modal
@@ -275,8 +297,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                    display: 'none'
-                                  }
+                                  display: 'none'
+                                }
                                 : undefined
                             }
                           />

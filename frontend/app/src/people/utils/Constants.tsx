@@ -38,14 +38,14 @@ const widgetConfigs = {
     },
     schema: organizationSchema,
     action: {
-      text: 'Add New Organization',
-      icon: 'local_offer'
+      text: 'Add Organization',
+      icon: 'add'
     },
     noneSpace: {
       noResult: {
-        img: 'no_wanted2.png',
-        text: 'No Organization Yet',
-        sub: 'Looks like this person has not created or added to any organizations yet.'
+        img: 'no_org.png',
+        text: 'Manage and organize your tickets',
+        sub: 'Fund and pay bounties directly through the website, add members, organize tickets, and more!'
       }
     }
   },

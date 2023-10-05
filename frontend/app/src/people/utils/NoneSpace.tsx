@@ -141,7 +141,7 @@ export default function NoneSpace(props: NoneSpaceProps) {
             leadingIcon={props.buttonIcon}
             width={210}
             height={48}
-            style={{ marginTop: 40 }}
+            style={{ marginTop: 20 }}
             onClick={props.action}
             color="primary"
           />
