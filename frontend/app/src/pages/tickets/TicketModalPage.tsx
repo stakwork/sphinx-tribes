@@ -7,6 +7,7 @@ import { widgetConfigs } from 'people/utils/Constants';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
+import { PersonBounty } from 'store/main';
 
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
@@ -26,13 +27,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const isMobile = useIsMobile();
 
-  const findPerson = (bountyId: string) => (item: any) => {
-    const { body } = item;
-    return Number(body.id) === Number(bountyId);
-  };
-
   useEffect(() => {
-    const activeIndex = (main.peopleBounties ?? []).findIndex(findPerson(bountyId));
+    const activeIndex = main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
     const connectPerson = (main.peopleBounties ?? [])[activeIndex];
 
     setPublicFocusIndex(activeIndex);
@@ -64,7 +60,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   if (isMobile) {
     return (
-      <Modal visible={bountyId && connectPersonBody?.owner_pubkey} fill={true}>
+      <Modal visible={bountyId} fill={true}>
         <FocusedView
           person={connectPersonBody}
           personBody={connectPersonBody}
@@ -79,7 +75,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   return (
     <Modal
-      visible={bountyId && connectPersonBody?.owner_pubkey}
+      visible={bountyId && activeListIndex !== -1}
       envStyle={{
         background: color.pureWhite,
         ...focusedDesktopModalStyles,
