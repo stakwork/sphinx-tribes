@@ -702,6 +702,11 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'hide'
   },
   {
+    name: 'created',
+    label: 'Created',
+    type: 'hide'
+  },
+  {
     name: 'wanted_type',
     label: 'Category',
     type: 'select',

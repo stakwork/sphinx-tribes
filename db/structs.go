@@ -369,6 +369,7 @@ type BountyData struct {
 	AssigneeCreated       *time.Time     `json:"assignee_created"`
 	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
 	AssigneeDescription   string         `json:"assignee_description"`
+	AssigneeRouteHint     string         `json:"assignee_route_hint"`
 	BountyOwnerId         uint           `json:"bounty_owner_id"`
 	OwnerUuid             string         `json:"owner_uuid"`
 	OwnerKey              string         `json:"owner_key"`

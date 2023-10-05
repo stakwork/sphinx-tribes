@@ -58,7 +58,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
-  const { peopleWanteds } = main;
+  const { peopleBounties } = main;
   const color = colors['light'];
 
   const [assigneeInfo, setAssigneeInfo]: any = useState(null);
@@ -247,7 +247,7 @@ function WantedSummary(props: WantedSummaryProps) {
   }, [coding_languages]);
 
   async function setExtrasPropertyAndSave(propertyName: string, value: any) {
-    if (peopleWanteds) {
+    if (peopleBounties) {
       setSaving(propertyName);
       try {
         const [clonedEx, targetIndex] = await main.setExtrasPropertyAndSave(
@@ -258,28 +258,28 @@ function WantedSummary(props: WantedSummaryProps) {
         );
 
         // saved? ok update in wanted list if found
-        const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
+        const peopleBountiesClone: any = [...peopleBounties];
+        const indexFromPeopleBounty = peopleBountiesClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
         // if we found it in the wanted list, update in people wanted list
-        if (indexFromPeopleWanted > -1) {
+        if (indexFromPeopleBounty > -1) {
           // if it should be hidden now, remove it from the list
           if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
-            peopleWantedsClone.splice(indexFromPeopleWanted, 1);
+            peopleBountiesClone.splice(indexFromPeopleBounty, 1);
           } else {
             // gotta update person extras! this is what is used for summary viewer
             const personClone: any = person;
             personClone.extras['wanted'][targetIndex] = clonedEx[targetIndex];
 
-            peopleWantedsClone[indexFromPeopleWanted] = {
+            peopleBountiesClone[indexFromPeopleBounty] = {
               person: personClone,
               body: clonedEx[targetIndex]
             };
           }
-          main.setPeopleWanteds(peopleWantedsClone);
+          main.setPeopleBounties(peopleBountiesClone);
         }
       } catch (e) {
         console.log('e', e);
@@ -290,7 +290,7 @@ function WantedSummary(props: WantedSummaryProps) {
   }
 
   async function setExtrasPropertyAndSaveMultiple(propertyName: any, dataObject: any) {
-    if (peopleWanteds) {
+    if (peopleBounties) {
       setIsMarkPaidSaved(true);
       try {
         const [clonedEx, targetIndex] = await main.setExtrasMultipleProperty(
@@ -300,29 +300,29 @@ function WantedSummary(props: WantedSummaryProps) {
         );
 
         // saved? ok update in wanted list if found
-        const peopleWantedsClone: any = [...peopleWanteds];
-        const indexFromPeopleWanted = peopleWantedsClone.findIndex((f: any) => {
+        const peopleBountiesClone: any = [...peopleBounties];
+        const indexFromPeopleBounty = peopleBountiesClone.findIndex((f: any) => {
           const val = f.body || {};
           return f.person.owner_pubkey === ui.meInfo?.owner_pubkey && val.created === created;
         });
 
         // if we found it in the wanted list, update in people wanted list
-        if (indexFromPeopleWanted > -1) {
+        if (indexFromPeopleBounty > -1) {
           // if it should be hidden now, remove it from the list
           if ('show' in clonedEx[targetIndex] && clonedEx[targetIndex].show === false) {
-            peopleWantedsClone.splice(indexFromPeopleWanted, 1);
+            peopleBountiesClone.splice(indexFromPeopleBounty, 1);
           } else {
             // gotta update person extras! this is what is used for summary viewer
             const personClone: any = person;
             personClone.extras['wanted'][targetIndex] = clonedEx[targetIndex];
 
-            peopleWantedsClone[indexFromPeopleWanted] = {
+            peopleBountiesClone[indexFromPeopleBounty] = {
               person: personClone,
               body: clonedEx[targetIndex]
             };
           }
 
-          main.setPeopleWanteds(peopleWantedsClone);
+          main.setPeopleBounties(peopleBountiesClone);
         }
       } catch (e) {
         console.log('e', e);
@@ -349,7 +349,7 @@ function WantedSummary(props: WantedSummaryProps) {
     const id = location.href.split('/')[4];
 
     const el = document.createElement('input');
-    el.value = `${host}/tickets?owner_id=${id}&created=${created}`;
+    el.value = `${host}/bounty/${id}?created=${created}`;
     document.body.appendChild(el);
     el.select();
 
