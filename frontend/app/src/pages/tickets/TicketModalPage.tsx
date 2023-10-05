@@ -28,7 +28,9 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const activeIndex = main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
+    const activeIndex = main.peopleBounties.findIndex(
+      (bounty: PersonBounty) => bounty.body.id === Number(bountyId)
+    );
     const connectPerson = (main.peopleBounties ?? [])[activeIndex];
 
     setPublicFocusIndex(activeIndex);
