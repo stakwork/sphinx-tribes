@@ -37,7 +37,7 @@ func IndexRoutes() chi.Router {
 		r.Get("/p/{pubkey}/organizations", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
 		r.Get("/bounties", frontend.IndexRoute)
-		r.Get("/bounty/{bountyId}", frontend.IndexRoute)
+		r.Get("/bounty/*", frontend.IndexRoute)
 		r.Get("/leaderboard", frontend.IndexRoute)
 		r.Get("/org/bounties/*", frontend.IndexRoute)
 	})
