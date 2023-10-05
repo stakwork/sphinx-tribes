@@ -55,7 +55,7 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyCount)
 }
 
-func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
+func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	if pubkey == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -71,7 +71,7 @@ func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
+func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	if pubkey == "" {
 		w.WriteHeader(http.StatusNotFound)
