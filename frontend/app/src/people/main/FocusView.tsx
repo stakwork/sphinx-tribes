@@ -152,7 +152,7 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  const currentBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+  const currentBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
   const canDeleteBounty = !(currentBounty?.body?.paid || currentBounty?.body?.assignee.id);
 
   const { openAfterDeleteNotification } = useAfterDeleteNotification();
@@ -165,7 +165,7 @@ function FocusedView(props: FocusViewProps) {
   };
 
   async function deleteIt() {
-    const delBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+    const delBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
     if (!delBounty) return;
     setDeleting(true);
     try {
@@ -283,7 +283,7 @@ function FocusedView(props: FocusViewProps) {
       await main.saveBounty(newBody);
       // Refresh the tickets page if a user eidts from the tickets tab
       if (window.location.href.includes('wanted')) {
-        await main.getPersonCreatedWanteds({}, info.pubkey);
+        await main.getPersonCreatedBounties({}, info.pubkey);
       }
     } catch (e) {
       console.log('e', e);
@@ -299,7 +299,7 @@ function FocusedView(props: FocusViewProps) {
   let initialValues: any = {};
 
   const personInfo = canEdit ? ui.meInfo : person;
-  const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+  const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
 
   // set initials here
   if (personInfo) {
@@ -377,7 +377,7 @@ function FocusedView(props: FocusViewProps) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-    const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleWanteds[selectedIndex];
+    const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
     if (selectedIndex >= 0 && selectedBounty) {
       return selectedBounty.body;
     }

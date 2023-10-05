@@ -191,7 +191,7 @@ const Organizations = (props: { person: Person }) => {
         </OrganizationData>
 
         {org.bounty_count && org.bount_count !== 0 && org.uuid && (
-          <Link to={`/org/tickets/${org.uuid}`} target="_blank">
+          <Link to={`/org/bounties/${org.uuid}`} target="_blank">
             Bounties
           </Link>
         )}

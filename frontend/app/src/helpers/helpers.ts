@@ -124,6 +124,7 @@ export const formatRelayPerson = (person: any): any => {
     owner_pubkey: person.owner_pubkey,
     owner_alias: person.alias,
     owner_contact_key: person.contact_key,
+    owner_route_hint: person.route_hint ?? '',
     description: person.description,
     extras: person.extras,
     price_to_meet: person.price_to_meet,
