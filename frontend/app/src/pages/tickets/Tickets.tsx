@@ -47,7 +47,7 @@ function BodyComponent() {
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
-  const { uuid } = useParams<{ uuid: string, bountyId: string }>();
+  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
 
   const color = colors['light'];
 
@@ -95,7 +95,7 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    history.replace(`/bounty/${item.id}`)
+    history.replace(`/bounty/${item.id}`);
   };
 
   if (loading) {

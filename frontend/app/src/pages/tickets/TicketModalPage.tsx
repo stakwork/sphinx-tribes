@@ -4,7 +4,7 @@ import { useIsMobile } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
-import React, { useEffect, useState, } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 
@@ -22,13 +22,13 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
-  const { bountyId } = useParams<{ uuid: string, bountyId: string }>();
+  const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
 
   const isMobile = useIsMobile();
 
   const findPerson = (bountyId: string) => (item: any) => {
     const { body } = item;
-    return (Number(body.id) === Number(bountyId));
+    return Number(body.id) === Number(bountyId);
   };
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const { person, body } = main.peopleBounties[activeListIndex - 1];
     if (person && body) {
-      history.replace(`/bounty/${body.id}`)
+      history.replace(`/bounty/${body.id}`);
     }
   };
   const nextArrHandler = () => {
@@ -58,7 +58,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const { person, body } = main.peopleBounties[activeListIndex + 1];
     if (person && body) {
-      history.replace(`/bounty/${body.id}`)
+      history.replace(`/bounty/${body.id}`);
     }
   };
 
@@ -79,7 +79,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   return (
     <Modal
-      visible={(bountyId && connectPersonBody?.owner_pubkey)}
+      visible={bountyId && connectPersonBody?.owner_pubkey}
       envStyle={{
         background: color.pureWhite,
         ...focusedDesktopModalStyles,
