@@ -7,7 +7,7 @@ import { ButtonProps } from 'components/interfaces';
 
 const B = styled(EuiButton)`
   position: relative;
-  border-radius: 100px;
+  border-radius: 10px;
   height: 36px;
   font-weight: bold;
   border: none;
