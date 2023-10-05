@@ -110,7 +110,7 @@ const widgetConfigs = {
   },
   // TODO: REMOVE
   wanted: {
-    label: 'Tickets',
+    label: 'Bounties',
     name: 'wanted',
     submitText: 'Save',
     modalStyle: {
@@ -140,7 +140,7 @@ const widgetConfigs = {
     }
   },
   usertickets: {
-    label: 'Assigned Tickets',
+    label: 'Assigned Bounties',
     name: 'userwanted',
     submitText: 'Save',
     modalStyle: {

@@ -89,7 +89,7 @@ function WidgetSwitchViewer(props: any) {
         justifyContent: 'center'
       };
 
-  const { peoplePosts, peopleWanteds, peopleOffers } = main;
+  const { peoplePosts, peopleBounties, peopleOffers } = main;
 
   const { selectedWidget, onPanelClick } = props;
 
@@ -99,7 +99,7 @@ function WidgetSwitchViewer(props: any) {
 
   const listSource = {
     post: peoplePosts,
-    wanted: peopleWanteds,
+    wanted: peopleBounties,
     offer: peopleOffers
   };
 
