@@ -45,8 +45,8 @@ export const Wanted = observer(() => {
 
   async function getUserTickets() {
     setIsLoading(true);
-    await main.getPersonCreatedWanteds({}, personPubkey);
-    await main.getPersonAssignedWanteds({}, personPubkey);
+    await main.getPersonCreatedBounties({}, personPubkey);
+    await main.getPersonAssignedBounties({}, personPubkey);
     setIsLoading(false);
   }
 
@@ -54,7 +54,7 @@ export const Wanted = observer(() => {
     getUserTickets();
   }, []);
 
-  if (!main.createdWanteds?.length) {
+  if (!main.createdBounties?.length) {
     return (
       <NoneSpace
         style={{
@@ -102,7 +102,7 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {main.createdWanteds.map((w: any, i: any) => {
+      {main.createdBounties.map((w: any, i: any) => {
         if (w.body.owner_id === person?.owner_pubkey) {
           return (
             <Panel

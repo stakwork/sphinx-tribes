@@ -1,6 +1,6 @@
-import { PersonWanted } from 'store/main';
+import { PersonBounty } from 'store/main';
 
-export const userAssignedTickets: PersonWanted[] = [
+export const userAssignedBounties: PersonBounty[] = [
   {
     owner_id: '03a394d0ebf0d003124ab130c6b12b8b990a50a30a464354800a51981ba745bb07',
     show: true,

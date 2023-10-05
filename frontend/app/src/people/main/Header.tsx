@@ -249,8 +249,8 @@ function Header() {
     },
     {
       label: 'Bounties',
-      name: 'tickets',
-      path: '/tickets'
+      name: 'bounties',
+      path: '/bounties'
     },
     {
       label: 'Bots',
