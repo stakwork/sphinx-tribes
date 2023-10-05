@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { BountyModalProps } from 'people/interfaces';
-import { PersonWanted } from 'store/main';
+import { PersonBounty } from 'store/main';
 import FocusedView from '../FocusView';
 
 const config = widgetConfigs.wanted;
@@ -15,7 +15,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
 
   const { ui, main } = useStores();
   const { canEdit, person } = usePerson(ui.selectedPerson);
-  const [bounty, setBounty] = useState<PersonWanted[]>([]);
+  const [bounty, setBounty] = useState<PersonBounty[]>([]);
 
   const wantedLength = person?.extras ? person?.extras.wanted?.length : 0;
 
@@ -29,7 +29,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   useEffect(() => {
     async function getBounty() {
       if (wantedId && !bounty.length) {
-        const bounty = await main.getWantedById(Number(wantedId));
+        const bounty = await main.getBountyById(Number(wantedId));
         setBounty(bounty);
       }
     }

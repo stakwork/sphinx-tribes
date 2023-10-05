@@ -47,7 +47,7 @@ function BodyComponent() {
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
-  const { uuid } = useParams<{ uuid: string }>();
+  const { uuid } = useParams<{ uuid: string, bountyId: string }>();
 
   const color = colors['light'];
 
@@ -60,9 +60,9 @@ function BodyComponent() {
       await main.getBadgeList();
       await main.getPeople();
       if (uuid) {
-        await main.getOrganizationWanted(uuid, { page: 1, resetPage: true });
+        await main.getOrganizationBounties(uuid, { page: 1, resetPage: true });
       } else {
-        await main.getPeopleWanteds({ page: 1, resetPage: true });
+        await main.getPeopleBounties({ page: 1, resetPage: true });
       }
       setLoading(false);
     })();
@@ -95,14 +95,7 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    history.replace({
-      pathname: history?.location?.pathname,
-      search: `?owner_id=${person.owner_pubkey}&created=${item.created}`,
-      state: {
-        owner_id: person.owner_pubkey,
-        created: item.created
-      }
-    });
+    history.replace(`/bounty/${item.id}`)
   };
 
   if (loading) {

@@ -15,7 +15,7 @@ export const getTwitterLink = ({ title, issueCreated, ownerPubkey, labels }: Pro
     ? 'https://community.sphinx.chat'
     : window.location.origin;
 
-  const bountyUrl = new URL('/tickets', origin);
+  const bountyUrl = new URL('/bounties', origin);
 
   for (const key in bountyParams) {
     bountyUrl.searchParams.append(key, bountyParams[key]);
