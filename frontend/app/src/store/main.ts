@@ -739,7 +739,7 @@ export class MainStore {
 
     // if we don't pass the params, we should use previous params for invalidate query
     const query2 = this.appendQueryParams(
-      'bounty/all',
+      'bounties/all',
       queryLimit,
       params ? queryParams : this.getWantedsPrevParams
     );
@@ -890,7 +890,7 @@ export class MainStore {
 
   async getBountyById(id: number): Promise<PersonBounty[]> {
     try {
-      const ps2 = await api.get(`bounty/id/${id}`);
+      const ps2 = await api.get(`bounties/id/${id}`);
       const ps3: any[] = [];
 
       if (ps2 && ps2.length) {
@@ -977,7 +977,7 @@ export class MainStore {
 
   async getBountyCount(personKey: string, tabType: string): Promise<number> {
     try {
-      const count = await api.get(`bounty/count/${personKey}/${tabType}`);
+      const count = await api.get(`bounties/count/${personKey}/${tabType}`);
 
       return count;
     } catch (e) {
@@ -1327,7 +1327,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty/${owner_pubkey}/${created}`;
+      const request = `bounties/${owner_pubkey}/${created}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'DELETE',
@@ -1619,7 +1619,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
+      const r: any = await fetch(`${TribesURL}/bounties/assignee`, {
         method: 'DELETE',
         mode: 'cors',
         body: JSON.stringify({
@@ -1842,7 +1842,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/bounty/paymentstatus/${created}`, {
+      const r: any = await fetch(`${TribesURL}/bounties/paymentstatus/${created}`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -1888,7 +1888,7 @@ export class MainStore {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
 
-      const r: any = await fetch(`${TribesURL}/bounty/pay/${body.id}`, {
+      const r: any = await fetch(`${TribesURL}/bounties/pay/${body.id}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(body),
