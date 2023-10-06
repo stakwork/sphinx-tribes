@@ -95,6 +95,8 @@ export default function ConnectCard(props: ConnectCardProps) {
   const showAssignModal = () => setAssignModal(true);
 
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
+  const ownerPubkey = person && person?.owner_pubkey ? `${person.owner_pubkey}` : ''
+  const routeHint = person && person?.route_hint ? `:${person.route_hint}` : ''
 
   return (
     <div onClick={(e: any) => e.stopPropagation()}>
@@ -124,7 +126,7 @@ export default function ConnectCard(props: ConnectCardProps) {
 
             <>
               {person?.owner_pubkey && (
-                <QrBar value={person?.owner_pubkey} simple style={{ marginTop: 11 }} />
+                <QrBar value={`${ownerPubkey}${routeHint}`} simple style={{ marginTop: 11 }} />
               )}
             </>
             <Button
