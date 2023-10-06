@@ -20,7 +20,7 @@ func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
 	msg := make(map[string]interface{})
 
-	s.Every(1).Seconds().Do(func() {
+	s.Every(6).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
@@ -171,7 +171,7 @@ func InitInvoiceCron() {
 		}
 	})
 
-	s.Every(1).Seconds().Do(func() {
+	s.Every(6).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetBudgetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
@@ -198,6 +198,9 @@ func InitInvoiceCron() {
 				// Unmarshal result
 				invoiceRes := db.InvoiceResult{}
 
+				fmt.Println("Invoice Response ===", invoiceRes.Response.Settled)
+				fmt.Println("Invoice Payment Request ===", invoiceRes.Response.Payment_request)
+
 				err = json.Unmarshal(body, &invoiceRes)
 
 				if err != nil {
@@ -206,6 +209,7 @@ func InitInvoiceCron() {
 				}
 
 				if invoiceRes.Response.Settled {
+					fmt.Println("Settled ===", invoiceRes.Response.Settled)
 					if inv.Invoice == invoiceRes.Response.Payment_request {
 						/**
 						  If the invoice is settled and still in store

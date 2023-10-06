@@ -17,7 +17,7 @@ function OrgNoResults(props: { showAction: boolean, action: () => void }) {
         action={props.action}
         buttonText={tabs['organizations'].action.text}
         buttonIcon={tabs['organizations'].action.icon}
-        {...tabs['organizations']?.noneSpace['noResult']}
+        {...tabs['organizations']?.noneSpace['noUserResult']}
       />
     )
   }
