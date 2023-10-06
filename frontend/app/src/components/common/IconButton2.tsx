@@ -12,7 +12,7 @@ interface ButtonHoverProps {
 
 const B = styled(EuiButton) <ButtonHoverProps>`
   position: relative;
-  border-radius: 10px;
+  border-radius: 100px;
   height: 36px;
   width: 36px;
   min-width: 36px;
