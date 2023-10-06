@@ -381,6 +381,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       // get new organization budget
       getOrganizationBudget();
       getBudgetHistory();
+      main.getUserOrganizations(ui.selectedPerson);
       closeBudgetHandler();
     }
   };
@@ -487,32 +488,32 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 <Actions>
                   {(isOrganizationAdmin ||
                     userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
-                    <MaterialIcon
-                      onClick={() => handleSettingsClick(user)}
-                      icon={'settings'}
-                      style={{
-                        fontSize: 20,
-                        marginLeft: 10,
-                        cursor: 'pointer',
-                        color: 'green'
-                      }}
-                    />
-                  )}
+                      <MaterialIcon
+                        onClick={() => handleSettingsClick(user)}
+                        icon={'settings'}
+                        style={{
+                          fontSize: 20,
+                          marginLeft: 10,
+                          cursor: 'pointer',
+                          color: 'green'
+                        }}
+                      />
+                    )}
                   {(isOrganizationAdmin ||
                     userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
-                    <MaterialIcon
-                      onClick={() => {
-                        deleteOrganizationUser(user);
-                      }}
-                      icon={'delete'}
-                      style={{
-                        fontSize: 20,
-                        marginLeft: 10,
-                        cursor: 'pointer',
-                        color: 'red'
-                      }}
-                    />
-                  )}
+                      <MaterialIcon
+                        onClick={() => {
+                          deleteOrganizationUser(user);
+                        }}
+                        icon={'delete'}
+                        style={{
+                          fontSize: 20,
+                          marginLeft: 10,
+                          cursor: 'pointer',
+                          color: 'red'
+                        }}
+                      />
+                    )}
                 </Actions>
               </Td>
             </TableRow>
@@ -586,8 +587,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />

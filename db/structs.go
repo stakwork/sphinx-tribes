@@ -407,6 +407,7 @@ type Organization struct {
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
+	Budget      uint       `json:"budget,omitempty"`
 }
 
 type OrganizationShort struct {
