@@ -333,7 +333,7 @@ type Bounty struct {
 	ID                      uint           `json:"id"`
 	OwnerID                 string         `json:"owner_id"`
 	Paid                    bool           `json:"paid"`
-	Show                    bool           `json:"show"`
+	Show                    bool           `gorm:"default:false" json:"show"`
 	Type                    string         `json:"type"`
 	Award                   string         `json:"award"`
 	AssignedHours           uint8          `json:"assigned_hours"`
