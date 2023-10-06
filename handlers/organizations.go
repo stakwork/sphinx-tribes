@@ -364,7 +364,10 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	// add bounty count to the organization
 	for index, value := range organizations {
 		bountyCount := db.DB.GetOrganizationBountyCount(value.Uuid)
+		budget := db.DB.GetOrganizationBudget(value.Uuid)
+
 		organizations[index].BountyCount = bountyCount
+		organizations[index].Budget = budget.TotalBudget
 	}
 
 	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
@@ -372,7 +375,10 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 		organization := db.DB.GetOrganizationByUuid(value.OrgUuid)
 
 		bountyCount := db.DB.GetOrganizationBountyCount(value.OrgUuid)
+		budget := db.DB.GetOrganizationBudget(value.OrgUuid)
+
 		organization.BountyCount = bountyCount
+		organization.Budget = budget.TotalBudget
 
 		organizations = append(organizations, organization)
 	}
