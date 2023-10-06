@@ -82,7 +82,7 @@ export const PersonPage = observer(() => {
             height: '100%'
           }}
         >
-          <Panel isMobile={isMobile} style={{ paddingBottom: 0, paddingTop: 80 }}>
+          <Panel isMobile={isMobile} style={{ paddingBottom: isMobile ? 80 : 0, paddingTop: 80 }}>
             <UserInfo setShowSupport={setShowSupport} />
             <TabsPages />
           </Panel>

@@ -8,7 +8,7 @@ interface BProps {
   background: string;
   width: string;
 }
-const B = styled(EuiButton)<BProps>`
+const B = styled(EuiButton) <BProps>`
   background: ${(p: any) => (p.background ? p.background : '#ffffff00')} !important;
   position: relative;
   width: fit-content !important;

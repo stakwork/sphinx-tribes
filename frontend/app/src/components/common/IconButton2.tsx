@@ -42,6 +42,9 @@ const B = styled(EuiButton) <ButtonHoverProps>`
     transform: none !important;
     text-decoration: none !important;
   }
+  @media only screen and (max-width: 700px) {
+    font-size: 12.5px;
+  }
 `;
 
 const T = styled(EuiButton)`

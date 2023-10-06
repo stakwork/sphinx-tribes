@@ -6,7 +6,7 @@ import { useStores } from 'store';
 import { Organization } from 'store/main';
 import { Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Button, IconButton } from 'components/common';
+import { Button } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
@@ -26,6 +26,7 @@ const Container = styled.div`
   display: flex;
   flex-flow: column wrap;
   min-width: 100%;
+  min-height: 100%;
   flex: 1 1 100%;
 `;
 
@@ -33,11 +34,20 @@ const OrganizationWrap = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  margin-bottom; 10px;
   background: white;
   padding: 25px 30px;
   border-radius: 6px;
   cursor: pointer;
+  @media only screen and (max-width: 800px) {
+    padding: 15px 0px;
+  }
+  @media only screen and (max-width: 700px) {
+    padding: 12px 0px;
+    margin-bottom: 10px;
+  }
+  @media only screen and (max-width: 500px) {
+    padding: 0px;
+  }
 `;
 
 const OrganizationData = styled.div`
@@ -45,27 +55,67 @@ const OrganizationData = styled.div`
   align-items: center;
   flex-direction: row;
   width: 100%;
+  @media only screen and (max-width: 470px) {
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px 0px; 
+  }
 `;
 
 const OrganizationImg = styled.img`
   width: 65px;
   height: 65px;
+  @media only screen and (max-width: 700px) {
+    width: 55px;
+    height: 55px;
+  }
+  @media only screen and (max-width: 500px) {
+    width: 48px;
+    height: 48px;
+  }
+  @media only screen and (max-width: 470px) {
+    width: 60px;
+    height: 60px;
+  }
 `;
 
 const OrganizationTextWrap = styled.div`
   margin-left: 20px;
   display: flex;
   flex-direction: column;
+  @media only screen and (max-width: 470px) {
+    margin-left: 0px;
+    margin-top: 15px;
+    justify-content: center;
+  }
 `;
 
 const OrganizationText = styled.p`
   font-size: 1rem;
   font-weight: bold;
+  @media only screen and (max-width: 700px) {
+    font-size: 0.85rem;
+  }
+  @media only screen and (max-width: 500px) {
+    font-size: 0.79rem;
+  }
+  @media only screen and (max-width: 470px) {
+    font-size: 0.85rem;
+    text-align: center;
+  }
 `;
 
 const OrganizationBudgetText = styled.small`
   margin-top: auto;
   font-size: 0.9rem;
+  @media only screen and (max-width: 700px) {
+    font-size: 0.8rem;
+  }
+  @media only screen and (max-width: 500px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const OrganizationContainer = styled.div`
@@ -86,17 +136,29 @@ const OrgHeadWrap = styled.div`
 const OrgText = styled.div`
   font-size: 1.4rem;
   font-weight: bold;
+  @media only screen and (max-width: 700px) {
+    font-size: 1.1rem;
+  }
+  @media only screen and (max-width: 700px) {
+    font-size: 0.95rem;
+  }
 `
-
 const OrganizationActionWrap = styled.div`
   margin-left: auto;
   display: flex;
   align-items: center;
   gap: 15px;
+  @media only screen and (max-width: 470px) {
+    margin-left: 0;
+    margin-top: 20px;
+  }
 `;
 
 const SatsGap = styled.span`
   margin: 0px 10px;
+  @media only screen and (max-width: 700px) {
+    margin: 0px 5px;
+  }
 `;
 
 const Organizations = (props: { person: Person }) => {
@@ -171,6 +233,7 @@ const Organizations = (props: { person: Person }) => {
   };
 
   const orgUi = (org: any, key: number) => {
+    const btnDisabled = (!org.bounty_count && org.bount_count !== 0) || !org.uuid;
     return (
       <OrganizationWrap key={key}>
         <OrganizationData>
@@ -184,19 +247,18 @@ const Organizations = (props: { person: Person }) => {
               setOrganization(org);
               setDetailsOpen(true);
             }} />
-            {org.bounty_count && org.bount_count !== 0 && org.uuid && (
-              <Button
-                color="white"
-                text="View Bounties"
-                endingIcon="open_in_new"
-                onClick={() => window.open(`/org/bounties/${org.uuid}`, '_target')}
-                style={{
-                  height: 40,
-                  color: '#000000',
-                  borderRadius: 10
-                }}
-              />
-            )}
+            <Button
+              disabled={btnDisabled}
+              color={!btnDisabled ? 'white' : 'grey'}
+              text="View Bounties"
+              endingIcon="open_in_new"
+              onClick={() => window.open(`/org/bounties/${org.uuid}`, '_target')}
+              style={{
+                height: 40,
+                color: '#000000',
+                borderRadius: 10,
+              }}
+            />
 
           </OrganizationActionWrap>
         </OrganizationData>
@@ -211,10 +273,9 @@ const Organizations = (props: { person: Person }) => {
           <OrgHeadWrap>
             <OrgText>Organizations</OrgText>
             {isMyProfile && (
-              <IconButton
+              <Button
                 leadingIcon={'add'}
-                width={182}
-                height={45}
+                height={isMobile ? 40 : 45}
                 text="Add Organization"
                 onClick={() => setIsOpen(true)}
                 style={{ marginLeft: 'auto', borderRadius: 10 }}

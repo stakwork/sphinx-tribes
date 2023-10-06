@@ -173,7 +173,7 @@ function MobileView(props: CodingBountiesProps) {
     if (org_uuid) {
       const organizationBudget = await main.getOrganizationBudget(org_uuid);
       const budget = organizationBudget.total_budget;
-      if (Number(budget) > Number(price)) {
+      if (Number(budget) >= Number(price)) {
         // make keysend payment
         const body = {
           id: id || 0,
@@ -258,8 +258,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-      ui.meInfo?.owner_alias &&
-      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+        ui.meInfo?.owner_alias &&
+        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */
