@@ -125,8 +125,12 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
+
+	if bounty.Show == false && bounty.ID != 0 {
+		db.DB.UpdateBountyBoolColumn(bounty, "show")
+	}
+
 	if bounty.Title != "" && bounty.Assignee == "" {
-		fmt.Println("Assigneee is EMpty")
 		db.DB.UpdateBountyNullColumn(bounty, "assignee")
 	}
 
