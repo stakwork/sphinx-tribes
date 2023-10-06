@@ -3,8 +3,24 @@ import { observer } from 'mobx-react-lite';
 import { widgetConfigs } from './Constants';
 import NoneSpace from './NoneSpace';
 
-function OrgNoResults() {
+function OrgNoResults(props: { showAction: boolean, action: () => void }) {
   const tabs = widgetConfigs;
+
+  if (props.showAction) {
+    return (
+      <NoneSpace
+        small
+        style={{
+          margin: 'auto',
+          marginTop: '10%'
+        }}
+        action={props.action}
+        buttonText={tabs['organizations'].action.text}
+        buttonIcon={tabs['organizations'].action.icon}
+        {...tabs['organizations']?.noneSpace['noResult']}
+      />
+    )
+  }
 
   return (
     <NoneSpace
@@ -13,9 +29,6 @@ function OrgNoResults() {
         margin: 'auto',
         marginTop: '10%'
       }}
-      action={() => false}
-      buttonText={tabs['organizations'].action.text}
-      buttonIcon={tabs['organizations'].action.icon}
       {...tabs['organizations']?.noneSpace['noResult']}
     />
   );

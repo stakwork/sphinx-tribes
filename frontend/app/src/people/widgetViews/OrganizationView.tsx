@@ -6,12 +6,11 @@ import { useStores } from 'store';
 import { Organization } from 'store/main';
 import { Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Link } from 'react-router-dom';
 import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { userHasRole } from 'helpers';
+import { DollarConverter, satToUsd, userHasRole } from 'helpers';
 import { Modal } from '../../components/common';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
@@ -25,7 +24,7 @@ const color = colors['light'];
 const Container = styled.div`
   display: flex;
   flex-flow: column wrap;
-  min-width: 77vw;
+  min-width: 100%;
   flex: 1 1 100%;
 `;
 
@@ -35,8 +34,8 @@ const OrganizationWrap = styled.div`
   width: 100%;
   margin-bottom; 10px;
   background: white;
-  padding: 20px;
-  border-radius: 2px;
+  padding: 25px 30px;
+  border-radius: 6px;
   cursor: pointer;
 `;
 
@@ -70,22 +69,34 @@ const OrganizationBudgetText = styled.small`
 
 const OrganizationContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   cursor: pointer;
-  margin-top: 20px;
+  gap: 15px;
 `;
 
 const OrgHeadWrap = styled.div`
   display: flex;
   align-items: center;
   margin-top: 5px;
+  margin-bottom: 20px;
 `
 
 const OrgText = styled.div`
   font-size: 1.4rem;
   font-weight: bold;
 `
+
+const OrganizationActionWrap = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+`;
+
+const SatsGap = styled.span`
+  margin: 0px 10px;
+`;
 
 const Organizations = (props: { person: Person }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
@@ -170,40 +181,82 @@ const Organizations = (props: { person: Person }) => {
     const isOrganizationAdmin = org?.owner_pubkey === user?.owner_pubkey;
     return (
       <OrganizationWrap key={key}>
-        <OrganizationData
-          onClick={async () => {
-            const userRoles = await getUserRoles(org.uuid);
-            if (
-              isOrganizationAdmin ||
-              userHasRole(main.bountyRoles, userRoles, 'ADD USER') ||
-              userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')
-            ) {
-              setOrganization(org);
-              setDetailsOpen(true);
-            }
-          }}
-        >
+        <OrganizationData>
           <OrganizationImg src={org.img || avatarIcon} />
           <OrganizationTextWrap>
             <OrganizationText>{org.name}</OrganizationText>
-            <OrganizationBudgetText>3000 SAT / 11 USD </OrganizationBudgetText>
+            <OrganizationBudgetText> {DollarConverter(org.budget ?? 0)} <SatsGap>/</SatsGap> {satToUsd(org.budget ?? 0)} USD</OrganizationBudgetText>
           </OrganizationTextWrap>
-        </OrganizationData>
+          <OrganizationActionWrap>
+            <Button
+              text="Manage"
+              color="white"
+              style={{
+                width: 112,
+                height: 40,
+                color: '#000000',
+                borderRadius: 10
+              }}
+              onClick={async () => {
+                const userRoles = await getUserRoles(org.uuid);
+                if (
+                  isOrganizationAdmin ||
+                  userHasRole(main.bountyRoles, userRoles, 'ADD USER') ||
+                  userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')
+                ) {
+                  setOrganization(org);
+                  setDetailsOpen(true);
+                }
+              }}
+            />
+            {org.bounty_count && org.bount_count !== 0 && org.uuid && (
+              <Button
+                color="white"
+                text="View Bounties"
+                endingIcon="open_in_new"
+                onClick={() => window.open(`/org/bounties/${org.uuid}`, '_target')}
+                style={{
+                  height: 40,
+                  color: '#000000',
+                  borderRadius: 10
+                }}
+              />
+            )}
 
-        {org.bounty_count && org.bount_count !== 0 && org.uuid && (
-          <Link to={`/org/bounties/${org.uuid}`} target="_blank">
-            Bounties
-          </Link>
-        )}
+          </OrganizationActionWrap>
+        </OrganizationData>
       </OrganizationWrap>
     );
   };
 
   const renderOrganizations = () => {
     if (main.organizations.length) {
-      return main.organizations.map((org: Organization, i: number) => orgUi(org, i));
+      return (
+        <>
+          <OrgHeadWrap>
+            <OrgText>Organizations</OrgText>
+            {isMyProfile && (
+              <IconButton
+                leadingIcon={'add'}
+                width={182}
+                height={45}
+                text="Add Organization"
+                onClick={() => setIsOpen(true)}
+                style={{ marginLeft: 'auto', borderRadius: 10 }}
+              />
+            )}
+          </OrgHeadWrap>
+          <OrganizationContainer>
+            {main.organizations.map((org: Organization, i: number) => orgUi(org, i))}
+          </OrganizationContainer>
+        </>
+      );
     } else {
-      return <NoResults />;
+      return (
+        <Container>
+          <NoResults showAction={isMyProfile} action={() => setIsOpen(true)} />
+        </Container>
+      );
     }
   };
 
@@ -213,21 +266,7 @@ const Organizations = (props: { person: Person }) => {
       {detailsOpen && <OrganizationDetails close={closeDetails} org={organization} />}
       {!detailsOpen && (
         <>
-          <OrgHeadWrap>
-            <OrgText>Organizations</OrgText>
-            {isMyProfile && (
-              <IconButton
-                width={156}
-                height={isMobile ? 36 : 48}
-                text="Add Organization"
-                icon="add"
-                iconSize={'xs'}
-                onClick={() => setIsOpen(true)}
-                style={{ marginLeft: 'auto' }}
-              />
-            )}
-          </OrgHeadWrap>
-          <OrganizationContainer>{renderOrganizations()}</OrganizationContainer>
+          {renderOrganizations()}
           {isOpen && (
             <Modal
               visible={isOpen}
@@ -310,7 +349,12 @@ const Organizations = (props: { person: Person }) => {
                           handleSubmit();
                         }}
                         loading={loading}
-                        style={{ width: '100%' }}
+                        style={{
+                          width: '100%',
+                          borderRadius: 10,
+                          height: 45,
+                          marginTop: 15
+                        }}
                         color={'primary'}
                         text={'Add Organization'}
                       />
@@ -321,9 +365,10 @@ const Organizations = (props: { person: Person }) => {
             </Modal>
           )}
         </>
-      )}
+      )
+      }
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
-    </Container>
+    </Container >
   );
 };
 
