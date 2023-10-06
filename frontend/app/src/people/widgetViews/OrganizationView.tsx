@@ -10,7 +10,7 @@ import { Button, IconButton } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { DollarConverter, satToUsd, userHasRole } from 'helpers';
+import { DollarConverter, satToUsd } from 'helpers';
 import { Modal } from '../../components/common';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
@@ -18,6 +18,7 @@ import { widgetConfigs } from '../utils/Constants';
 import Input from '../../components/form/inputs';
 import { Person } from '../../store/main';
 import OrganizationDetails from './OrganizationDetails';
+import ManageButton from './ManageOrgButton';
 
 const color = colors['light'];
 
@@ -144,14 +145,6 @@ const Organizations = (props: { person: Person }) => {
     setIsLoading(false);
   }, [main, ui.selectedPerson]);
 
-  const getUserRoles = async (orgUuid: string): Promise<any[]> => {
-    if (user?.owner_pubkey) {
-      const userRoles = await main.getUserRoles(orgUuid, user.owner_pubkey);
-      return userRoles;
-    }
-    return [];
-  };
-
   useEffect(() => {
     getUserOrganizations();
   }, [getUserOrganizations]);
@@ -178,7 +171,6 @@ const Organizations = (props: { person: Person }) => {
   };
 
   const orgUi = (org: any, key: number) => {
-    const isOrganizationAdmin = org?.owner_pubkey === user?.owner_pubkey;
     return (
       <OrganizationWrap key={key}>
         <OrganizationData>
@@ -188,27 +180,10 @@ const Organizations = (props: { person: Person }) => {
             <OrganizationBudgetText> {DollarConverter(org.budget ?? 0)} <SatsGap>/</SatsGap> {satToUsd(org.budget ?? 0)} USD</OrganizationBudgetText>
           </OrganizationTextWrap>
           <OrganizationActionWrap>
-            <Button
-              text="Manage"
-              color="white"
-              style={{
-                width: 112,
-                height: 40,
-                color: '#000000',
-                borderRadius: 10
-              }}
-              onClick={async () => {
-                const userRoles = await getUserRoles(org.uuid);
-                if (
-                  isOrganizationAdmin ||
-                  userHasRole(main.bountyRoles, userRoles, 'ADD USER') ||
-                  userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')
-                ) {
-                  setOrganization(org);
-                  setDetailsOpen(true);
-                }
-              }}
-            />
+            <ManageButton org={org} user_pubkey={user?.owner_pubkey ?? ''} action={() => {
+              setOrganization(org);
+              setDetailsOpen(true);
+            }} />
             {org.bounty_count && org.bount_count !== 0 && org.uuid && (
               <Button
                 color="white"
