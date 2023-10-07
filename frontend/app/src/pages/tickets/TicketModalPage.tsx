@@ -4,19 +4,26 @@ import { useIsMobile } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { PersonBounty } from 'store/main';
 
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
 
+const findPerson = (search: any) => (item: any) => {
+  const { person, body } = item;
+  return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
+};
+
 type Props = {
   setConnectPerson: (p: any) => void;
 };
 
 export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
+  const location = useLocation();
+
   const { main, modals, ui } = useStores();
 
   const history = useHistory();
@@ -27,17 +34,25 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const isMobile = useIsMobile();
 
+  const search = useMemo(() => {
+    const s = new URLSearchParams(location.search);
+    return {
+      owner_id: s.get('owner_id'),
+      created: s.get('created')
+    };
+  }, [location.search]);
+
   useEffect(() => {
-    const activeIndex = main.peopleBounties.findIndex(
+    const activeIndex = bountyId ? main.peopleBounties.findIndex(
       (bounty: PersonBounty) => bounty.body.id === Number(bountyId)
-    );
+    ) : (main.peopleBounties ?? []).findIndex(findPerson(search));
     const connectPerson = (main.peopleBounties ?? [])[activeIndex];
 
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
 
     setConnectPersonBody(connectPerson?.person);
-  }, [main.peopleBounties, bountyId]);
+  }, [main.peopleBounties, bountyId, search]);
 
   const goBack = () => {
     history.push('/bounties');
@@ -48,7 +63,17 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const { person, body } = main.peopleBounties[activeListIndex - 1];
     if (person && body) {
-      history.replace(`/bounty/${body.id}`);
+      if (bountyId) history.replace(`/bounty/${body.id}`);
+      else {
+        history.replace({
+          pathname: history?.location?.pathname,
+          search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+          state: {
+            owner_id: person?.owner_pubkey,
+            created: body?.created
+          }
+        });
+      }
     }
   };
   const nextArrHandler = () => {
@@ -56,13 +81,23 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const { person, body } = main.peopleBounties[activeListIndex + 1];
     if (person && body) {
-      history.replace(`/bounty/${body.id}`);
+      if (bountyId) history.replace(`/bounty/${body.id}`);
+      else {
+        history.replace({
+          pathname: history?.location?.pathname,
+          search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
+          state: {
+            owner_id: person?.owner_pubkey,
+            created: body?.created
+          }
+        });
+      }
     }
   };
 
   if (isMobile) {
     return (
-      <Modal visible={bountyId} fill={true}>
+      <Modal visible={activeListIndex !== -1} fill={true}>
         <FocusedView
           person={connectPersonBody}
           personBody={connectPersonBody}
@@ -77,7 +112,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   return (
     <Modal
-      visible={bountyId && activeListIndex !== -1}
+      visible={activeListIndex !== -1}
       envStyle={{
         background: color.pureWhite,
         ...focusedDesktopModalStyles,
@@ -117,3 +152,4 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     </Modal>
   );
 });
+
