@@ -97,7 +97,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   if (isMobile) {
     return (
-      <Modal visible={activeListIndex !== -1} fill={true}>
+      <Modal visible={activeListIndex !== -1 && (bountyId || search.created)} fill={true}>
         <FocusedView
           person={connectPersonBody}
           personBody={connectPersonBody}
@@ -112,7 +112,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   return (
     <Modal
-      visible={activeListIndex !== -1}
+      visible={activeListIndex !== -1 && (bountyId || search.created)}
       envStyle={{
         background: color.pureWhite,
         ...focusedDesktopModalStyles,
