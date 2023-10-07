@@ -43,9 +43,9 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   }, [location.search]);
 
   useEffect(() => {
-    const activeIndex = bountyId ? main.peopleBounties.findIndex(
-      (bounty: PersonBounty) => bounty.body.id === Number(bountyId)
-    ) : (main.peopleBounties ?? []).findIndex(findPerson(search));
+    const activeIndex = bountyId
+      ? main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
+      : (main.peopleBounties ?? []).findIndex(findPerson(search));
     const connectPerson = (main.peopleBounties ?? [])[activeIndex];
 
     setPublicFocusIndex(activeIndex);
@@ -152,4 +152,3 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     </Modal>
   );
 });
-
