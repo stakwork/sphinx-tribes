@@ -24,6 +24,8 @@ func InitInvoiceCron() {
 		invoiceList, _ := db.Store.GetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
+		fmt.Println("Invoice Count ===", invoiceCount)
+
 		if invoiceCount > 0 {
 			for index, inv := range invoiceList {
 				url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, inv.Invoice)
@@ -54,7 +56,11 @@ func InitInvoiceCron() {
 					return
 				}
 
+				fmt.Println("Invoice RESPONSE ===", invoiceRes)
+				fmt.Println("Invoice SETTLED ===", invoiceRes.Response.Settled)
+
 				if invoiceRes.Response.Settled {
+					fmt.Println("IS SETTLED ===", invoiceRes.Response.Settled)
 					if inv.Invoice == invoiceRes.Response.Payment_request {
 						/**
 						  If the invoice is settled and still in store
@@ -175,6 +181,8 @@ func InitInvoiceCron() {
 		invoiceList, _ := db.Store.GetBudgetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
+		fmt.Println("INVOICE COUNT ===", invoiceCount)
+
 		if invoiceCount > 0 {
 			for index, inv := range invoiceList {
 				url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, inv.Invoice)
@@ -198,14 +206,20 @@ func InitInvoiceCron() {
 				// Unmarshal result
 				invoiceRes := db.InvoiceResult{}
 
+				fmt.Println("Invoice RESPONSE 1 ===", invoiceRes)
+
 				err = json.Unmarshal(body, &invoiceRes)
 
 				if err != nil {
-					log.Printf("Reading body failed: %s", err)
+					log.Printf("Reading Invoice body failed: %s", err)
 					return
 				}
 
+				fmt.Println("Invoice RESPONSE 2 ===", invoiceRes)
+				fmt.Println("Invoice SETTLED ===", invoiceRes.Response.Settled)
+
 				if invoiceRes.Response.Settled {
+					fmt.Sprintln("INVOICE SETTLED")
 					if inv.Invoice == invoiceRes.Response.Payment_request {
 						/**
 						  If the invoice is settled and still in store
