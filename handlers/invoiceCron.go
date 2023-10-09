@@ -207,6 +207,7 @@ func InitInvoiceCron() {
 				invoiceRes := db.InvoiceResult{}
 
 				fmt.Println("Invoice RESPONSE 1 ===", invoiceRes)
+				fmt.Println("Invoice SETTLED ===", invoiceRes.Response.Settled)
 
 				err = json.Unmarshal(body, &invoiceRes)
 
@@ -216,7 +217,6 @@ func InitInvoiceCron() {
 				}
 
 				fmt.Println("Invoice RESPONSE 2 ===", invoiceRes)
-				fmt.Println("Invoice SETTLED ===", invoiceRes.Response.Settled)
 
 				if invoiceRes.Response.Settled {
 					fmt.Sprintln("INVOICE SETTLED")
