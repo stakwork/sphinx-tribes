@@ -21,6 +21,7 @@ import { colors } from '../../config/colors';
 import { nonWidgetConfigs } from '../utils/Constants';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import Input from '../../components/form/inputs';
+import avatarIcon from '../../public/static/profile_avatar.svg';
 
 const color = colors['light'];
 
@@ -29,7 +30,37 @@ const Container = styled.div`
   min-height: 100%;
   background: white;
   padding: 20px 0px;
+  padding-top: 0px;
   z-index: 100;
+`;
+
+const HeadWrap = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 25px 40px;
+  border-bottom: 1px solid #EBEDEF;
+`;
+
+const OrgImg = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-left: 20px;
+`;
+
+const OrgName = styled.h3`
+  padding: 0px;
+  margin: 0px;
+  font-size: 1.3rem;
+  margin-left: 25px; 
+  font-weight: 700;
+`;
+
+const HeadButtonWrap = styled.div`
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
 `;
 
 const DetailsWrap = styled.div`
@@ -193,7 +224,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     owner_pubkey: ''
   };
 
-  const uuid = props.org?.uuid || '';
+  const { org } = props;
+  const uuid = org?.uuid || '';
 
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
@@ -426,15 +458,23 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   return (
     <Container>
-      <MaterialIcon
-        onClick={() => props.close()}
-        icon={'arrow_back'}
-        style={{
-          fontSize: 30,
-          marginLeft: 15,
-          cursor: 'pointer'
-        }}
-      />
+      <HeadWrap>
+        <MaterialIcon
+          onClick={() => props.close()}
+          icon={'arrow_back'}
+          style={{
+            fontSize: 25,
+            cursor: 'pointer',
+          }}
+        />
+        <OrgImg src={org?.img || avatarIcon} />
+        <OrgName>{org?.name}</OrgName>
+        <HeadButtonWrap>
+          <Button text="History" color="white" style={{ borderRadius: '5px' }} />
+          <Button text="Withdraw" color="white" style={{ borderRadius: '5px' }} />
+          <Button text="Deposit" color="white" style={{ borderRadius: '5px' }} />
+        </HeadButtonWrap>
+      </HeadWrap>
       <DetailsWrap>
         <OrgInfoWrap>
           <DataCount>
@@ -487,32 +527,32 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 <Actions>
                   {(isOrganizationAdmin ||
                     userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
-                    <MaterialIcon
-                      onClick={() => handleSettingsClick(user)}
-                      icon={'settings'}
-                      style={{
-                        fontSize: 20,
-                        marginLeft: 10,
-                        cursor: 'pointer',
-                        color: 'green'
-                      }}
-                    />
-                  )}
+                      <MaterialIcon
+                        onClick={() => handleSettingsClick(user)}
+                        icon={'settings'}
+                        style={{
+                          fontSize: 20,
+                          marginLeft: 10,
+                          cursor: 'pointer',
+                          color: 'green'
+                        }}
+                      />
+                    )}
                   {(isOrganizationAdmin ||
                     userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
-                    <MaterialIcon
-                      onClick={() => {
-                        deleteOrganizationUser(user);
-                      }}
-                      icon={'delete'}
-                      style={{
-                        fontSize: 20,
-                        marginLeft: 10,
-                        cursor: 'pointer',
-                        color: 'red'
-                      }}
-                    />
-                  )}
+                      <MaterialIcon
+                        onClick={() => {
+                          deleteOrganizationUser(user);
+                        }}
+                        icon={'delete'}
+                        style={{
+                          fontSize: 20,
+                          marginLeft: 10,
+                          cursor: 'pointer',
+                          color: 'red'
+                        }}
+                      />
+                    )}
                 </Actions>
               </Td>
             </TableRow>
@@ -586,8 +626,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                                display: 'none'
-                              }
+                              display: 'none'
+                            }
                             : undefined
                         }
                       />
