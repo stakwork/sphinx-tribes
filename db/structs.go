@@ -277,11 +277,11 @@ type InvoiceResult struct {
 }
 
 type InvoiceCheckResponse struct {
-	Settled         bool   `json:"settled"`
-	Payment_request string `json:"payment_request"`
-	Payment_hash    string `json:"payment_hash"`
-	Preimage        string `json:"preimage"`
-	Amount          int    `json:"amount"`
+	Settled         bool    `json:"settled"`
+	Payment_request string  `json:"payment_request"`
+	Payment_hash    string  `json:"payment_hash"`
+	Preimage        string  `json:"preimage"`
+	Amount          float64 `json:"amount"`
 }
 
 type DeleteBountyAssignee struct {
