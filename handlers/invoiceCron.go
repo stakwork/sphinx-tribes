@@ -20,7 +20,7 @@ func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
 	msg := make(map[string]interface{})
 
-	s.Every(1).Seconds().Do(func() {
+	s.Every(5).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
@@ -177,7 +177,7 @@ func InitInvoiceCron() {
 		}
 	})
 
-	s.Every(1).Seconds().Do(func() {
+	s.Every(5).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetBudgetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
