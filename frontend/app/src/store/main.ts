@@ -65,6 +65,7 @@ export interface Person {
   photo_url: string;
   alias: string;
   route_hint: string;
+  owner_route_hint?: string;
   contact_key: string;
   price_to_meet: number;
   last_login?: number;
@@ -105,7 +106,7 @@ export interface PersonPost {
   created: number;
 }
 
-export interface PersonWanted {
+export interface PersonBounty {
   person?: any;
   body?: any;
   org_uuid?: any;
@@ -713,15 +714,15 @@ export class MainStore {
   }
 
   @persist('list')
-  peopleWanteds: PersonWanted[] = [];
+  peopleBounties: PersonBounty[] = [];
 
-  @action setPeopleWanteds(wanteds: PersonWanted[]) {
-    this.peopleWanteds = wanteds;
+  @action setPeopleBounties(bounties: PersonBounty[]) {
+    this.peopleBounties = bounties;
   }
 
   getWantedsPrevParams?: QueryParams = {};
 
-  async getPeopleWanteds(params?: QueryParams): Promise<PersonWanted[]> {
+  async getPeopleBounties(params?: QueryParams): Promise<PersonBounty[]> {
     const queryParams: QueryParams = {
       limit: 100,
       sortBy: 'created',
@@ -738,7 +739,7 @@ export class MainStore {
 
     // if we don't pass the params, we should use previous params for invalidate query
     const query2 = this.appendQueryParams(
-      'bounty/all',
+      'gobounties/all',
       queryLimit,
       params ? queryParams : this.getWantedsPrevParams
     );
@@ -772,33 +773,33 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.setPeopleWanteds(ps3);
-        uiStore.setPeopleWantedsPageNumber(1);
+        this.setPeopleBounties(ps3);
+        uiStore.setPeopleBountiesPageNumber(1);
       } else {
         // all other cases, merge
         const wanteds = this.doPageListMerger(
-          this.peopleWanteds,
+          this.peopleBounties,
           ps3,
-          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleBountiesPageNumber(n),
           queryParams,
           'wanted'
         );
-        this.setPeopleWanteds(wanteds);
+        this.setPeopleBounties(wanteds);
       }
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPeopleWanteds: ', e);
+      console.log('fetch failed getPeopleBounties: ', e);
       return [];
     }
   }
 
-  personAssignedWanteds: PersonWanted[] = [];
+  personAssignedBounties: PersonBounty[] = [];
 
-  @action setPersonWanteds(wanteds: PersonWanted[]) {
-    this.personAssignedWanteds = wanteds;
+  @action setPersonBounties(bounties: PersonBounty[]) {
+    this.personAssignedBounties = bounties;
   }
 
-  async getPersonAssignedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+  async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
@@ -834,18 +835,17 @@ export class MainStore {
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPersonAssignedWanteds: ', e);
+      console.log('fetch failed getPersonAssignedBounties: ', e);
       return [];
     }
   }
 
-  createdWanteds: PersonWanted[] = [];
-
-  @action setCreatedWanteds(wanteds: PersonWanted[]) {
-    this.createdWanteds = wanteds;
+  createdBounties: PersonBounty[] = [];
+  @action setCreatedBounties(bounties: PersonBounty[]) {
+    this.createdBounties = bounties;
   }
 
-  async getPersonCreatedWanteds(queryParams?: any, pubkey?: string): Promise<PersonWanted[]> {
+  async getPersonCreatedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, queryLimit, {
@@ -879,18 +879,18 @@ export class MainStore {
         }
       }
 
-      this.setCreatedWanteds(ps3);
+      this.setCreatedBounties(ps3);
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getPersonCreatedWanteds: ', e);
+      console.log('fetch failed getPersonCreatedBounties: ', e);
       return [];
     }
   }
 
-  async getWantedById(id: number): Promise<PersonWanted[]> {
+  async getBountyById(id: number): Promise<PersonBounty[]> {
     try {
-      const ps2 = await api.get(`bounty/id/${id}`);
+      const ps2 = await api.get(`gobounties/id/${id}`);
       const ps3: any[] = [];
 
       if (ps2 && ps2.length) {
@@ -918,12 +918,12 @@ export class MainStore {
 
       return ps3;
     } catch (e) {
-      console.log('fetch failed getWantedById: ', e);
+      console.log('fetch failed getBountyById: ', e);
       return [];
     }
   }
 
-  async getOrganizationWanted(uuid: string, queryParams?: any): Promise<PersonWanted[]> {
+  async getOrganizationBounties(uuid: string, queryParams?: any): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
     try {
       const ps2 = await api.get(`organizations/bounties/${uuid}`);
@@ -954,34 +954,34 @@ export class MainStore {
 
       // for search always reset page
       if (queryParams && queryParams.resetPage) {
-        this.setPeopleWanteds(ps3);
-        uiStore.setPeopleWantedsPageNumber(1);
+        this.setPeopleBounties(ps3);
+        uiStore.setPeopleBountiesPageNumber(1);
       } else {
         // all other cases, merge
         const wanteds = this.doPageListMerger(
-          this.peopleWanteds,
+          this.peopleBounties,
           ps3,
-          (n: any) => uiStore.setPeopleWantedsPageNumber(n),
+          (n: any) => uiStore.setPeopleBountiesPageNumber(n),
           queryParams,
           'wanted'
         );
 
-        this.setPeopleWanteds(wanteds);
+        this.setPeopleBounties(wanteds);
       }
       return ps3;
     } catch (e) {
-      console.log('fetch failed getOrganizationWanted: ', e);
+      console.log('fetch failed getOrganizationBounties: ', e);
       return [];
     }
   }
 
   async getBountyCount(personKey: string, tabType: string): Promise<number> {
     try {
-      const count = await api.get(`bounty/count/${personKey}/${tabType}`);
+      const count = await api.get(`gobounties/count/${personKey}/${tabType}`);
 
       return count;
     } catch (e) {
-      console.log('fetch failed getCreatedWanteds: ', e);
+      console.log('fetch failed getCreatedBounties: ', e);
       return 0;
     }
   }
@@ -1296,7 +1296,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty?token=${info?.tribe_jwt}`;
+      const request = `gobounties?token=${info?.tribe_jwt}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'POST',
@@ -1311,7 +1311,7 @@ export class MainStore {
       });
 
       if (response.status) {
-        this.getPeopleWanteds({ resetPage: true });
+        this.getPeopleBounties({ resetPage: true });
       }
       return;
     } catch (e) {
@@ -1327,7 +1327,7 @@ export class MainStore {
     }
 
     try {
-      const request = `bounty/${owner_pubkey}/${created}`;
+      const request = `gobounties/${owner_pubkey}/${created}`;
       //TODO: add some sort of authentication
       const response = await fetch(`${TribesURL}/${request}`, {
         method: 'DELETE',
@@ -1338,7 +1338,7 @@ export class MainStore {
         }
       });
       if (response.status) {
-        await this.getPeopleWanteds({ resetPage: true });
+        await this.getPeopleBounties({ resetPage: true });
       }
       return;
     } catch (e) {
@@ -1550,6 +1550,7 @@ export class MainStore {
     assigned_hours?: number;
     commitment_fee?: number;
     bounty_expires?: string;
+    route_hint?: string;
   }): Promise<LnInvoice> {
     try {
       const data = await api.post(
@@ -1564,7 +1565,8 @@ export class MainStore {
           assigned_hours: body.assigned_hours,
           commitment_fee: body.commitment_fee,
           bounty_expires: body.bounty_expires,
-          websocket_token: uiStore.meInfo?.websocketToken
+          websocket_token: uiStore.meInfo?.websocketToken,
+          route_hint: body.route_hint
         },
         {
           'Content-Type': 'application/json'
@@ -1617,7 +1619,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/bounty/assignee`, {
+      const r: any = await fetch(`${TribesURL}/gobounties/assignee`, {
         method: 'DELETE',
         mode: 'cors',
         body: JSON.stringify({
@@ -1840,7 +1842,7 @@ export class MainStore {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/bounty/paymentstatus/${created}`, {
+      const r: any = await fetch(`${TribesURL}/gobounties/paymentstatus/${created}`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -1880,11 +1882,13 @@ export class MainStore {
     id: number;
     receiver_pubkey: string;
     websocket_token: string;
+    route_hint: string;
   }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/bounty/pay/${body.id}`, {
+
+      const r: any = await fetch(`${TribesURL}/gobounties/pay/${body.id}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(body),

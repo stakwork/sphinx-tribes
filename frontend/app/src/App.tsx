@@ -21,6 +21,8 @@ function App() {
   const getUserOrganizations = useCallback(async () => {
     if (uiStore.selectedPerson !== 0) {
       await mainStore.getUserOrganizations(uiStore.selectedPerson);
+    } else {
+      await mainStore.getUserOrganizations(uiStore.meInfo?.id || 0);
     }
   }, [uiStore.selectedPerson]);
 
@@ -30,6 +32,7 @@ function App() {
 
   const getBountyRoles = useCallback(async () => {
     await mainStore.getRoles();
+    await mainStore.getPeopleBounties();
   }, []);
 
   useEffect(() => {

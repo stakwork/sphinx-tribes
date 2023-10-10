@@ -81,9 +81,9 @@ class UiStore {
     this.peoplePostsPageNumber = n;
   }
 
-  peopleWantedsPageNumber = 1;
-  setPeopleWantedsPageNumber(n: number) {
-    this.peopleWantedsPageNumber = n;
+  peopleBountiesPageNumber = 1;
+  setPeopleBountiesPageNumber(n: number) {
+    this.peopleBountiesPageNumber = n;
   }
 
   peopleOffersPageNumber = 1;

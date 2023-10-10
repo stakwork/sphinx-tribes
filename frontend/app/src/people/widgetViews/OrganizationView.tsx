@@ -32,7 +32,6 @@ const Container = styled.div`
 
 const OrganizationText = styled.p`
   font-size: 1rem;
-  text-transform: capitalize;
   font-weight: bold;
   margin-top: 15px;
 `;
@@ -173,7 +172,7 @@ const Organizations = (props: { person: Person }) => {
         </OrganizationData>
 
         {org.bounty_count && org.bount_count !== 0 && org.uuid && (
-          <Link to={`/org/tickets/${org.uuid}`} target="_blank">
+          <Link to={`/org/bounties/${org.uuid}`} target="_blank">
             Bounties
           </Link>
         )}

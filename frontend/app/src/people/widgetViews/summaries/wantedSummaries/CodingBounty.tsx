@@ -153,6 +153,7 @@ function MobileView(props: CodingBountiesProps) {
         memo: '',
         owner_pubkey: person.owner_pubkey,
         user_pubkey: assignee.owner_pubkey,
+        route_hint: assignee.owner_route_hint ?? '',
         created: created ? created?.toString() : '',
         type: 'KEYSEND'
       });
@@ -177,7 +178,8 @@ function MobileView(props: CodingBountiesProps) {
         const body = {
           id: id || 0,
           websocket_token: ui.meInfo?.websocketToken || '',
-          receiver_pubkey: assignee.owner_pubkey
+          receiver_pubkey: assignee.owner_pubkey,
+          route_hint: assignee.owner_route_hint ?? ''
         };
 
         await main.makeBountyPayment(body);
@@ -197,7 +199,7 @@ function MobileView(props: CodingBountiesProps) {
 
     if (data) {
       // get new wanted list
-      main.getPeopleWanteds({ page: 1, resetPage: true });
+      main.getPeopleBounties({ page: 1, resetPage: true });
     }
   };
 
@@ -225,7 +227,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const updatePaymentStatus = async (created: number) => {
     await main.updateBountyPaymentStatus(created);
-    await main.getPeopleWanteds();
+    await main.getPeopleBounties();
   };
 
   useEffect(() => {

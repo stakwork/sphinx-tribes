@@ -249,8 +249,8 @@ function Header() {
     },
     {
       label: 'Bounties',
-      name: 'tickets',
-      path: '/tickets'
+      name: 'bounties',
+      path: '/bounties'
     },
     {
       label: 'Bots',
@@ -275,10 +275,6 @@ function Header() {
   }
 
   const showSignIn = () => {
-    if (isMobile) {
-      ui.setShowSignIn(true);
-      return;
-    }
     setIsOpenStartupModal(true);
   };
 
@@ -409,6 +405,13 @@ function Header() {
                 })}
             </MTabs>
           </div>
+          {isOpenStartUpModel && (
+            <StartUpModal
+              closeModal={() => setIsOpenStartupModal(false)}
+              dataObject={'createWork'}
+              buttonColor={'success'}
+            />
+          )}
         </EuiHeader>
       );
     }
@@ -522,8 +525,7 @@ function Header() {
             ui.setShowSignIn(false);
             setShowWelcome(true);
             // if page is not /p, go to /p (people)
-            const path = location.pathname;
-            if (!path.includes('/p')) history.push('/p');
+            window.location.reload();
           }}
         />
       </Modal>
@@ -566,7 +568,6 @@ function Header() {
               onClick={() => {
                 // switch from welcome modal to edit modal
                 setShowWelcome(false);
-                goToEditSelf();
               }}
               hovercolor={'#5881F8'}
               activecolor={'#5078F2'}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import { Person, PersonWanted } from '../store/main';
+import { Person, PersonBounty } from '../store/main';
 import { MeData } from '../store/ui';
 import { Widget } from './main/types';
 
@@ -33,7 +33,7 @@ export interface FocusViewProps {
   deleteExtraFunction?: () => void;
   style?: React.CSSProperties;
   setIsExtraStyle?: any;
-  bounty?: PersonWanted[];
+  bounty?: PersonBounty[];
 }
 
 export interface PeopleMobileeHeaderProps {

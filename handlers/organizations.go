@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -53,7 +52,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name := strings.ToLower(org.Name)
+		name := org.Name
 
 		// check if the organization name already exists
 		orgName := db.DB.GetOrganizationByName(name)
@@ -134,6 +133,13 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if the user tries to add their self
+	if pubKeyFromAuth == orgUser.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot add userself as a user")
 		return
 	}
 

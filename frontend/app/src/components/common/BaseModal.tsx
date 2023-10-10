@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/typedef */
 import { Modal, ModalProps } from '@mui/base';
-import { styled } from '@mui/system';
+import { Box, styled } from '@mui/system';
 import clsx from 'clsx';
 import React from 'react';
 
-export type BaseModalProps = ModalProps;
+export type BackdropProps = {
+  backdrop?: 'white' | 'black';
+};
+
+export type BaseModalProps = ModalProps & BackdropProps;
 
 const StyledModal = styled(Modal)`
   position: fixed;
@@ -23,28 +27,58 @@ const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean; className: s
   }
 );
 
-const StyledBackdrop = styled(Backdrop)`
+const StyledBackdrop = styled(Backdrop)<BackdropProps>`
   z-index: -1;
   position: fixed;
   inset: 0;
-  background-color: rgb(255 255 255 / 0.8);
+  background-color: ${({ backdrop = 'black' }: BackdropProps) => {
+    if (backdrop === 'white') {
+      return 'rgb(255 255 255 / 0.8)';
+    }
+
+    return 'rgb(0 0 0 / 0.6)';
+  }};
   -webkit-tap-highlight-color: transparent;
 `;
 
 const Inner = styled('div')(() => ({
   backgroundColor: 'white',
+  position: 'relative',
   borderRadius: '0.5rem',
   boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.15)',
   '&:focus, &:focus-visible': {
     outline: 'none'
   },
-  '*': {
-    fontFamily: 'Barlow'
-  }
+  fontFamily: 'Barlow'
 }));
 
-export const BaseModal = ({ children, ...props }: BaseModalProps) => (
-  <StyledModal {...props} slots={{ backdrop: StyledBackdrop }}>
-    <Inner>{children}</Inner>
+export const BaseModal = ({ children, backdrop, ...props }: BaseModalProps) => (
+  <StyledModal
+    {...props}
+    slots={{ backdrop: StyledBackdrop }}
+    slotProps={{
+      backdrop: {
+        backdrop
+      } as any
+    }}
+  >
+    <Inner>
+      <>
+        {props.onClose && (
+          <Box
+            onClick={(e) => props.onClose?.(e, 'backdropClick')}
+            p={1}
+            sx={{ cursor: 'pointer' }}
+            component="img"
+            src="/static/close-thin.svg"
+            alt="close_icon"
+            position="absolute"
+            right={1}
+            top={1}
+          />
+        )}
+        {children}
+      </>
+    </Inner>
   </StyledModal>
 );

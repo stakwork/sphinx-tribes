@@ -1,12 +1,13 @@
-import { EuiModal, EuiOverlayMask } from '@elastic/eui';
-import { useState } from 'react';
-import React from 'react';
-import styled from 'styled-components';
+import { Box } from '@mui/system';
+import { BaseModal } from 'components/common';
+import { colors } from 'config';
 import { observer } from 'mobx-react-lite';
 import { StartUpModalProps } from 'people/interfaces';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import api from '../../api';
 import IconButton from '../../components/common/IconButton2';
 import { useStores } from '../../store';
-import api from '../../api';
 import QR from './QR';
 
 const ModalContainer = styled.div`
@@ -45,6 +46,7 @@ const DirectionWrap = styled.div`
   padding: 0px;
   display: flex;
   width: 100%;
+  gap: 0.5rem;
 `;
 
 const AndroidIosButtonConatiner = styled.div`
@@ -54,17 +56,19 @@ const AndroidIosButtonConatiner = styled.div`
   margin-right: 20px;
   justify-content: space-between;
 `;
+
+const palette = colors.light;
+
 const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps) => {
   const { ui, main } = useStores();
   const [step, setStep] = useState(1);
   const [connection_string, setConnectionString] = useState('');
 
   async function getConnectionCode() {
-    if (!connection_string) {
+    if (!ui.meInfo && !connection_string) {
       const code = await api.get('connectioncodes');
       if (code.connection_string) {
         setConnectionString(code.connection_string);
-        main.getPeople({ resetPage: true });
       }
     }
   }
@@ -132,7 +136,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
       <ModalContainer>
         {connection_string ? (
           <QrContainer>
-            <QR size={200} value={ui.connection_string} />
+            <QR size={200} value={connection_string} />
             <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
           </QrContainer>
         ) : (
@@ -284,29 +288,11 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
   );
 
   return (
-    <>
-      <EuiOverlayMask>
-        <EuiModal
-          onClose={(e: any) => {
-            e?.stopPropagation();
-            closeModal();
-          }}
-          style={{
-            background: '#F2F3F5',
-            padding: '30px',
-            borderRadius: '8px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '585px',
-            maxHeight: '585px',
-            width: '425px'
-          }}
-        >
-          {step === 1 ? <StepOne /> : step === 2 ? <StepTwo /> : <StepThree />}
-        </EuiModal>
-      </EuiOverlayMask>
-    </>
+    <BaseModal open onClose={closeModal}>
+      <Box p={4} bgcolor={palette.grayish.G950} borderRadius={2} maxWidth={400} minWidth={350}>
+        {step === 1 ? <StepOne /> : step === 2 ? <StepTwo /> : <StepThree />}
+      </Box>
+    </BaseModal>
   );
 };
 

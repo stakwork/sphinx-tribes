@@ -13,13 +13,14 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
 	msg := make(map[string]interface{})
 
-	s.Every(1).Seconds().Do(func() {
+	s.Every(5).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
@@ -49,7 +50,7 @@ func InitInvoiceCron() {
 				err = json.Unmarshal(body, &invoiceRes)
 
 				if err != nil {
-					log.Printf("Reading body failed: %s", err)
+					log.Printf("Reading Invoice body failed: %s", err)
 					return
 				}
 
@@ -71,7 +72,9 @@ func InitInvoiceCron() {
 						if inv.Type == "KEYSEND" {
 							url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-							bodyData := fmt.Sprintf(`{"amount": %s, "destination_key": "%s"}`, inv.Amount, inv.User_pubkey)
+							amount, _ := utils.ConvertStringToUint(inv.Amount)
+
+							bodyData := utils.BuildKeysendBodyData(amount, inv.User_pubkey, inv.Route_hint)
 
 							jsonBody := []byte(bodyData)
 
@@ -168,7 +171,7 @@ func InitInvoiceCron() {
 		}
 	})
 
-	s.Every(1).Seconds().Do(func() {
+	s.Every(5).Seconds().Do(func() {
 		invoiceList, _ := db.Store.GetBudgetInvoiceCache()
 		invoiceCount := len(invoiceList)
 
@@ -198,11 +201,12 @@ func InitInvoiceCron() {
 				err = json.Unmarshal(body, &invoiceRes)
 
 				if err != nil {
-					log.Printf("Reading body failed: %s", err)
+					log.Printf("Reading Organization Invoice body failed: %s", err)
 					return
 				}
 
 				if invoiceRes.Response.Settled {
+					fmt.Sprintln("INVOICE SETTLED")
 					if inv.Invoice == invoiceRes.Response.Payment_request {
 						/**
 						  If the invoice is settled and still in store

@@ -240,6 +240,7 @@ type InvoiceRequest struct {
 	Commitment_fee  uint   `json:"commitment_fee,omitempty"`
 	Bounty_expires  string `json:"bounty_expires,omitempty"`
 	Websocket_token string `json:"websocket_token,omitempty"`
+	Route_hint      string `json:"route_hint,omitempty"`
 }
 
 type Invoice struct {
@@ -262,6 +263,7 @@ type InvoiceStoreData struct {
 	Assigned_hours uint   `json:"assigned_hours,omitempty"`
 	Commitment_fee uint   `json:"commitment_fee,omitempty"`
 	Bounty_expires string `json:"bounty_expires,omitempty"`
+	Route_hint     string `json:"route_hint,omitempty"`
 }
 
 type InvoiceStatus struct {
@@ -275,11 +277,11 @@ type InvoiceResult struct {
 }
 
 type InvoiceCheckResponse struct {
-	Settled         bool   `json:"settled"`
-	Payment_request string `json:"payment_request"`
-	Payment_hash    string `json:"payment_hash"`
-	Preimage        string `json:"preimage"`
-	Amount          uint   `json:"amount"`
+	Settled         bool    `json:"settled"`
+	Payment_request string  `json:"payment_request"`
+	Payment_hash    string  `json:"payment_hash"`
+	Preimage        string  `json:"preimage"`
+	Amount          float64 `json:"amount"`
 }
 
 type DeleteBountyAssignee struct {
@@ -331,7 +333,7 @@ type Bounty struct {
 	ID                      uint           `json:"id"`
 	OwnerID                 string         `json:"owner_id"`
 	Paid                    bool           `json:"paid"`
-	Show                    bool           `json:"show"`
+	Show                    bool           `gorm:"default:false" json:"show"`
 	Type                    string         `json:"type"`
 	Award                   string         `json:"award"`
 	AssignedHours           uint8          `json:"assigned_hours"`
@@ -367,6 +369,7 @@ type BountyData struct {
 	AssigneeCreated       *time.Time     `json:"assignee_created"`
 	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
 	AssigneeDescription   string         `json:"assignee_description"`
+	AssigneeRouteHint     string         `json:"assignee_route_hint"`
 	BountyOwnerId         uint           `json:"bounty_owner_id"`
 	OwnerUuid             string         `json:"owner_uuid"`
 	OwnerKey              string         `json:"owner_key"`
@@ -508,6 +511,7 @@ type PaymentHistoryData struct {
 type BountyPayRequest struct {
 	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
+	RouteHint       string `json:"route_hint,omitempty"`
 }
 
 func (Person) TableName() string {
