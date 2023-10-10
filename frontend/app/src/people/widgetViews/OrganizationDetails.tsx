@@ -6,14 +6,14 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import moment from 'moment';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
-import { Button, IconButton } from 'components/common';
+import { Button } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { userHasRole } from 'helpers';
+import { satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import { Modal } from '../../components/common';
@@ -70,86 +70,139 @@ const DetailsWrap = styled.div`
   padding: 0px 20px;
 `;
 
-const OrgInfoWrap = styled.div`
+const ActionWrap = styled.div`
   display: flex;
   align-items: center;
+  padding: 25px 40px;
+  border-bottom: 1px solid #EBEDEF;
 `;
 
-const DataCount = styled.div`
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-`;
-
-const DataText = styled.h3`
-  font-size: 1.3rem;
-  padding: 0px;
-  margin: 0px;
-  margin-right: 10px;
-`;
-
-const ViewHistoryText = styled.p`
-  padding: 0px;
-  margin: 0px;
-  margin-left: 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-`;
-
-const UsersTable = styled.div`
+const BudgetWrap = styled.div`
+  padding: 25px 40px;
+  width: 55%;
   display: flex;
   flex-direction: column;
-  margin-top: 25px;
 `;
 
-const TableRow = styled.div`
+const NoBudgetWrap = styled.div`
   display: flex;
   flex-direction: row;
-  padding: 10px;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #EBEDEF;
 `;
 
-const TableHead = styled.div`
+const ViewBudgetWrap = styled.div`
   display: flex;
-  flex-direction: row;
-  padding: 10px;
-  background: #d3d3d3;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const BudgetSmall = styled.h6`
+  padding: 0px;
+  font-size: 0.8rem;
+  color: #8E969C;
+`;
+
+const BudgetSmallHead = styled.h6`
+  padding: 0px;
+  font-size: 0.7rem;
+  color: #8E969C;
+`;
+
+const Budget = styled.h4`
+  color: #3C3F41;
+  font-size: 1.15rem;
+`;
+
+const Grey = styled.span`
+  color: #8E969C;
+`;
+
+const NoBudgetText = styled.p`
+  font-size: 0.85rem;
+  padding: 0px;
+  margin: 0px;
+  color: #8E969C;
+  width: 90%;
+  margin-left: auto;
+`;
+
+const UserWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 25px 40px;
+`;
+
+const UsersHeadWrap = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid #EBEDEF;
+  padding-top: 5px;
+  padding-bottom: 20px;
+`;
+
+const UsersHeader = styled.h4`
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0;
+  margin: 0;
+`;
+
+const UsersList = styled.div`
+  overflow-y: scroll;
+`;
+
+const UserImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+`;
+
+const User = styled.div`
+  padding: 15px 0px;
+  border-bottom: 1px solid #EBEDEF;
+  display: flex;
+  align-items: center;
+`;
+
+const UserDetails = styled.div`
+  display: flex;
+  flex-gap: 12px;
+  flex-direction: column;
+  margin-left: 2%;
+  width: 30%;
+`;
+
+const UserName = styled.p`
+  padding: 0px;
+  margin: 0px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  font-weight: bold;
+`;
+
+const UserPubkey = styled.p`
+  padding: 0px;
+  margin: 0px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 90%;
+  color: #5F6368;
+`;
+
+const UserAction = styled.div`
+  display: flex;
+  flex-gap: 25px;
+  align-items: center;
+  margin-left: auto;
 `;
 
 const ModalTitle = styled.h3`
   font-size: 1.2rem;
-`;
-
-const Th = styled.div`
-  font-size: 1.1rem;
-  font-weight: bold;
-  min-width: 25%;
-`;
-
-const ThKey = styled.div`
-  font-size: 1.1rem;
-  font-weight: bold;
-  min-width: 50%;
-`;
-
-const Td = styled.div`
-  font-size: 0.95rem;
-  min-width: 25%;
-  text-transform: capitalize;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const TdKey = styled.div`
-  font-size: 0.95rem;
-  min-width: 50%;
-  text-transform: capitalize;
-`;
-
-const Actions = styled.div`
-  font-size: 0.95rem;
-  min-width: 25%;
 `;
 
 const CheckUl = styled.ul`
@@ -197,7 +250,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
   const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
-  const [usersCount, setUsersCount] = useState<number>(0);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
   const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
@@ -220,6 +272,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
   const schema = [...config.schema];
 
+  const addUserDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER'));
+  const viewReportDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT'));
+  const addBudgetDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET'));
+  const deleteUserDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER'));
+  const addRolesDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES'));
+
   const initValues = {
     owner_pubkey: ''
   };
@@ -241,13 +299,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setToasts([]);
   }
 
-  const getOrganizationUsersCount = useCallback(async () => {
-    if (uuid) {
-      const count = await main.getOrganizationUsersCount(uuid);
-      setUsersCount(count);
-    }
-  }, [main, uuid]);
-
   const getOrganizationUsers = useCallback(async () => {
     if (uuid) {
       const users = await main.getOrganizationUsers(uuid);
@@ -261,7 +312,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
       if (res.status === 200) {
         await getOrganizationUsers();
-        await getOrganizationUsersCount();
       } else {
         addToast('Error: could not delete user', 'danger');
       }
@@ -357,7 +407,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     const res = await main.addOrganizationUser(body);
     if (res.status === 200) {
       await getOrganizationUsers();
-      await getOrganizationUsersCount();
     } else {
       addToast('Error: could not add user', 'danger');
     }
@@ -427,14 +476,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   useEffect(() => {
     getOrganizationUsers();
-    getOrganizationUsersCount();
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
     getBudgetHistory();
   }, [
     getOrganizationUsers,
-    getOrganizationUsersCount,
     getBountyRoles,
     getOrganizationBudget,
     getPaymentsHistory,
@@ -454,7 +501,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-  }, [onHandle]);
+  }, []);
 
   return (
     <Container>
@@ -470,94 +517,115 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         <OrgImg src={org?.img || avatarIcon} />
         <OrgName>{org?.name}</OrgName>
         <HeadButtonWrap>
-          <Button text="History" color="white" style={{ borderRadius: '5px' }} />
-          <Button text="Withdraw" color="white" style={{ borderRadius: '5px' }} />
-          <Button text="Deposit" color="white" style={{ borderRadius: '5px' }} />
+          <Button text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+          <Button
+            disabled={!org?.bounty_count}
+            text="View Bounties"
+            color="white"
+            style={{ borderRadius: '5px' }}
+            endingIcon="open_in_new"
+          />
         </HeadButtonWrap>
       </HeadWrap>
-      <DetailsWrap>
-        <OrgInfoWrap>
-          <DataCount>
-            <DataText>
-              User{usersCount > 1 && 's'} {usersCount}
-            </DataText>
-            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD USER')) && (
-              <IconButton
-                width={80}
-                height={isMobile ? 36 : 40}
-                text="Add"
-                onClick={() => setIsOpen(true)}
+      <ActionWrap>
+        <BudgetWrap>
+          {viewReportDisabled ? (
+            <NoBudgetWrap>
+              <MaterialIcon
+                icon={'lock'}
+                style={{
+                  fontSize: 30,
+                  cursor: 'pointer',
+                  color: '#CCC',
+                }}
               />
-            )}
-          </DataCount>
-          <DataCount>
-            <DataText>Budget {orgBudget} sats</DataText>
-            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET')) && (
-              <IconButton
-                width={80}
-                height={isMobile ? 36 : 40}
-                text="Add"
-                onClick={() => setIsOpenBudget(true)}
-              />
-            )}
-            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')) && (
-              <>
-                <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>
-                  Budget history
-                </ViewHistoryText>
-                <ViewHistoryText onClick={() => setIsOpenHistory(true)}>
-                  Payment history
-                </ViewHistoryText>
-              </>
-            )}
-          </DataCount>
-        </OrgInfoWrap>
-
-        <UsersTable>
-          <TableHead>
-            <Th>Unique name</Th>
-            <ThKey>Public key</ThKey>
-            <Th>User actions</Th>
-          </TableHead>
+              <NoBudgetText>
+                You have restricted permissions and are unable to view the budget.
+                Reach out to the organization admin to get them updated.
+              </NoBudgetText>
+            </NoBudgetWrap>
+          ) : (
+            <ViewBudgetWrap>
+              <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
+              <Budget>{orgBudget.toLocaleString()} <Grey>SATS</Grey></Budget>
+              <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
+            </ViewBudgetWrap>
+          )}
+        </BudgetWrap>
+        <HeadButtonWrap>
+          <Button
+            disabled={viewReportDisabled}
+            text="History" color="white"
+            style={{ borderRadius: '5px' }}
+            onClick={() => setIsOpenHistory(true)}
+          />
+          <Button
+            disabled={true}
+            text="Withdraw"
+            color="white"
+            style={{ borderRadius: '5px' }}
+          />
+          <Button
+            disabled={addBudgetDisabled}
+            text="Deposit"
+            color="white"
+            style={{ borderRadius: '5px' }}
+            onClick={() => setIsOpenBudget(true)}
+          />
+        </HeadButtonWrap>
+      </ActionWrap>
+      <UserWrap>
+        <UsersHeadWrap>
+          <UsersHeader>USERS</UsersHeader>
+          <HeadButtonWrap>
+            <Button
+              disabled={addUserDisabled}
+              text="Add User"
+              color="white"
+              style={{
+                borderRadius: '5px'
+              }}
+              onClick={() => setIsOpen(true)}
+            />
+          </HeadButtonWrap>
+        </UsersHeadWrap>
+        <UsersList>
           {users.map((user: Person, i: number) => (
-            <TableRow key={i}>
-              <Td>{user.unique_name}</Td>
-              <TdKey>{user.owner_pubkey}</TdKey>
-              <Td>
-                <Actions>
-                  {(isOrganizationAdmin ||
-                    userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
-                      <MaterialIcon
-                        onClick={() => handleSettingsClick(user)}
-                        icon={'settings'}
-                        style={{
-                          fontSize: 20,
-                          marginLeft: 10,
-                          cursor: 'pointer',
-                          color: 'green'
-                        }}
-                      />
-                    )}
-                  {(isOrganizationAdmin ||
-                    userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
-                      <MaterialIcon
-                        onClick={() => {
-                          deleteOrganizationUser(user);
-                        }}
-                        icon={'delete'}
-                        style={{
-                          fontSize: 20,
-                          marginLeft: 10,
-                          cursor: 'pointer',
-                          color: 'red'
-                        }}
-                      />
-                    )}
-                </Actions>
-              </Td>
-            </TableRow>
+            <User key={i}>
+              <UserImage src={user.img || avatarIcon} />
+              <UserDetails>
+                <UserName>{user.unique_name}</UserName>
+                <UserPubkey>{user.owner_pubkey}</UserPubkey>
+              </UserDetails>
+              <UserAction>
+                <MaterialIcon
+                  disabled={addRolesDisabled}
+                  icon={'settings'}
+                  style={{
+                    fontSize: 24,
+                    cursor: 'pointer',
+                    color: '#CCC',
+                  }}
+                  onClick={() => handleSettingsClick(user)}
+                />
+                <MaterialIcon
+                  icon={'delete'}
+                  disabled={deleteUserDisabled}
+                  style={{
+                    fontSize: 24,
+                    cursor: 'pointer',
+                    color: '#CCC',
+                  }}
+                  onClick={() => {
+                    deleteOrganizationUser(user);
+                  }}
+                />
+              </UserAction>
+            </User>
           ))}
-        </UsersTable>
+        </UsersList>
+      </UserWrap>
+      <DetailsWrap>
         {isOpen && (
           <Modal
             visible={isOpen}
