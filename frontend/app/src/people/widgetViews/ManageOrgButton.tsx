@@ -9,6 +9,12 @@ const ManageButton = (props: { user_pubkey: string, org: any, action: () => void
 
     const { user_pubkey, org, action } = props;
 
+    const isOrganizationAdmin = org?.owner_pubkey === ui.meInfo?.owner_pubkey;
+
+    const hasAccess = (isOrganizationAdmin
+        || userHasRole(main.bountyRoles, userRoles, 'ADD USER')
+        || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT'));
+
     const getUserRoles = useCallback(async () => {
         const userRoles = await main.getUserRoles(org.uuid, user_pubkey);
         setUserRoles(userRoles);
@@ -19,25 +25,19 @@ const ManageButton = (props: { user_pubkey: string, org: any, action: () => void
     }, [getUserRoles])
 
 
-    const isOrganizationAdmin = org?.owner_pubkey === ui.meInfo?.owner_pubkey;
-
     return (
         <>
-            {
-                (isOrganizationAdmin ||
-                    userHasRole(main.bountyRoles, userRoles, 'ADD USER') ||
-                    userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT'))
-                && (<Button
-                    text="Manage"
-                    color="white"
-                    style={{
-                        width: 112,
-                        height: 40,
-                        color: '#000000',
-                        borderRadius: 10
-                    }}
-                    onClick={action}
-                />)
+            {hasAccess && (<Button
+                text="Manage"
+                color="white"
+                style={{
+                    width: 112,
+                    height: 40,
+                    color: '#000000',
+                    borderRadius: 10
+                }}
+                onClick={action}
+            />)
             }
         </>
 

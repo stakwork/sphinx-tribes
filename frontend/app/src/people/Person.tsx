@@ -189,7 +189,6 @@ export default function Person(props: PersonProps) {
             <Img
               style={{ height: '100%', width: '100%', borderRadius: 0 }}
               src={img}
-            // src={img || getUserPlaceholder(owner_pubkey)}
             />
           </div>
           <div style={{ padding: 16 }}>
