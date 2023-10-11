@@ -1,7 +1,6 @@
 import {
   aboutSchema,
   wantedSchema,
-  offerSchema,
   offerSkillSchema,
   offerOtherSchema,
   wantedCodingTaskSchema,
@@ -38,12 +37,17 @@ const widgetConfigs = {
     },
     schema: organizationSchema,
     action: {
-      text: 'Add New Organization',
-      icon: 'local_offer'
+      text: 'Add Organization',
+      icon: 'add'
     },
     noneSpace: {
+      noUserResult: {
+        img: 'no_org.png',
+        text: 'Manage and organize your tickets',
+        sub: 'Fund and pay bounties directly through the website, add members, organize tickets, and more!'
+      },
       noResult: {
-        img: 'no_wanted2.png',
+        img: 'no_org.png',
         text: 'No Organization Yet',
         sub: 'Looks like this person has not created or added to any organizations yet.'
       }
@@ -70,41 +74,6 @@ const widgetConfigs = {
         img: '',
         text: 'No Badges',
         sub: "Looks like this person doesn't have any Badges yet."
-      }
-    }
-  },
-  offer: {
-    label: 'Portfolio',
-    name: 'offer',
-    submitText: 'Save',
-    modalStyle: {
-      width: 'auto',
-      maxWidth: 'auto',
-      minWidth: '400px',
-      minHeight: '40%',
-      maxHeight: '70%'
-    },
-    schema: offerSchema,
-    action: {
-      text: 'Add to Portfolio',
-      // text: 'Sell Something',
-      icon: 'work'
-    },
-    noneSpace: {
-      me: {
-        img: 'no_offers.png',
-        text: 'Use lightning network to market your skills!',
-        // text: 'Use lightning network to sell your digital goods!',
-        buttonText: 'Add to Portfolio',
-        // buttonText: 'Sell something',
-        buttonIcon: 'work'
-      },
-      otherUser: {
-        img: 'no_offers2.png',
-        text: 'Portfolio is Empty',
-        // text: 'No Offers Yet',
-        sub: "Looks like this person hasn't shared their porfolio."
-        // sub: 'Looks like this person is not selling anything yet.'
       }
     }
   },

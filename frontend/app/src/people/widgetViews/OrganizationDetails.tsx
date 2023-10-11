@@ -39,6 +39,26 @@ const HeadWrap = styled.div`
   align-items: center;
   padding: 25px 40px;
   border-bottom: 1px solid #EBEDEF;
+  @media only screen and (max-width: 800px) {
+    padding: 15px 0px;
+  }
+  @media only screen and (max-width: 700px) {
+    padding: 12px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    padding: 0px;
+    padding-bottom: 15px;
+    flex-direction: column;
+    align-items: start;
+  }
+`;
+
+const HeadNameWrap = styled.div`
+  display: flex;
+  align-items: center;
+  @media only screen and (max-width: 500px) {
+    margin-bottom: 20px;
+  }
 `;
 
 const OrgImg = styled.img`
@@ -46,6 +66,18 @@ const OrgImg = styled.img`
   height: 48px;
   border-radius: 50%;
   margin-left: 20px;
+    @media only screen and (max-width: 700px) {
+    width: 42px;
+    height: 42px;
+  }
+  @media only screen and (max-width: 500px) {
+    width: 38px;
+    height: 38px;
+  }
+  @media only screen and (max-width: 470px) {
+    width: 35px;
+    height: 35px;
+  }
 `;
 
 const OrgName = styled.h3`
@@ -54,13 +86,39 @@ const OrgName = styled.h3`
   font-size: 1.3rem;
   margin-left: 25px; 
   font-weight: 700;
+  margin-left: 20px;
+  @media only screen and (max-width: 800px) {
+    font-size: 1.05rem;
+  }
+  @media only screen and (max-width: 700px) {
+    font-size: 1rem;
+  }
+  @media only screen and (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+  @media only screen and (max-width: 470px) {
+    font-size: 0.8rem;
+  }
 `;
 
-const HeadButtonWrap = styled.div`
+const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
   margin-left: auto;
   display: flex;
   flex-direction: row;
   gap: 15px;
+  @media only screen and (max-width: 700px) {
+    gap: 10px;
+    margin-left: auto;
+  }
+  @media only screen and (max-width: 500px) {
+    gap: 8px;
+    margin-left: 0px;
+    width: 100vw;
+    margin-left: ${(p: any) => p.forSmallScreen ? '50px' : '0px'};
+  }
+  @media only screen and (max-width: 470px) {
+    gap: 6px;
+  }
 `;
 
 const DetailsWrap = styled.div`
@@ -75,6 +133,14 @@ const ActionWrap = styled.div`
   align-items: center;
   padding: 25px 40px;
   border-bottom: 1px solid #EBEDEF;
+  @media only screen and (max-width: 700px) {
+    padding: 25px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    flex-direction: column;
+    width: 100%;
+    padding: 25px 0px;
+  }
 `;
 
 const BudgetWrap = styled.div`
@@ -82,6 +148,14 @@ const BudgetWrap = styled.div`
   width: 55%;
   display: flex;
   flex-direction: column;
+  @media only screen and (max-width: 700px) {
+    width: 100%;
+    padding: 22px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+    padding: 20px 0px;
+  }
 `;
 
 const NoBudgetWrap = styled.div`
@@ -102,6 +176,9 @@ const BudgetSmall = styled.h6`
   padding: 0px;
   font-size: 0.8rem;
   color: #8E969C;
+  @media only screen and (max-width: 500px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const BudgetSmallHead = styled.h6`
@@ -113,6 +190,9 @@ const BudgetSmallHead = styled.h6`
 const Budget = styled.h4`
   color: #3C3F41;
   font-size: 1.15rem;
+  @media only screen and (max-width: 500px) {
+    font-size: 1rem;
+  }
 `;
 
 const Grey = styled.span`
@@ -132,6 +212,13 @@ const UserWrap = styled.div`
   display: flex;
   flex-direction: column;
   padding: 25px 40px;
+  @media only screen and (max-width: 700px) {
+    width: 100%;
+    padding: 20px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    padding: 20px 0px;
+  }
 `;
 
 const UsersHeadWrap = styled.div`
@@ -141,6 +228,9 @@ const UsersHeadWrap = styled.div`
   border-bottom: 1px solid #EBEDEF;
   padding-top: 5px;
   padding-bottom: 20px;
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+  }
 `;
 
 const UsersHeader = styled.h4`
@@ -148,10 +238,16 @@ const UsersHeader = styled.h4`
   font-weight: 600;
   padding: 0;
   margin: 0;
+  @media only screen and (max-width: 500px) {
+    font-size: 0.8rem;
+    margin-right: 55%;
+  }
 `;
 
 const UsersList = styled.div`
-  overflow-y: scroll;
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+  }
 `;
 
 const UserImage = styled.img`
@@ -165,6 +261,10 @@ const User = styled.div`
   border-bottom: 1px solid #EBEDEF;
   display: flex;
   align-items: center;
+  @media only screen and (max-width: 500px) {
+    padding: 10px 0px;
+    width: 100%;
+  }
 `;
 
 const UserDetails = styled.div`
@@ -173,6 +273,10 @@ const UserDetails = styled.div`
   flex-direction: column;
   margin-left: 2%;
   width: 30%;
+  @media only screen and (max-width: 500px) {
+    width: 60%;
+    margin-left: 5%;
+  }
 `;
 
 const UserName = styled.p`
@@ -181,6 +285,10 @@ const UserName = styled.p`
   font-size: 0.9rem;
   text-transform: capitalize;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 `;
 
 const UserPubkey = styled.p`
@@ -190,7 +298,7 @@ const UserPubkey = styled.p`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 90%;
+  width: 100%;
   color: #5F6368;
 `;
 
@@ -199,6 +307,9 @@ const UserAction = styled.div`
   flex-gap: 25px;
   align-items: center;
   margin-left: auto;
+  @media only screen and (max-width: 500px) {
+    flex-gap: 10px;
+  }
 `;
 
 const ModalTitle = styled.h3`
@@ -239,6 +350,10 @@ const ViewBounty = styled.p`
   font-size: 0.9rem;
   color: green;
   font-size: bold;
+`;
+
+const HeadButton = styled(Button)`
+  border-radius: 5px;
 `;
 
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
@@ -462,6 +577,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       // get new organization budget
       getOrganizationBudget();
       getBudgetHistory();
+      main.getUserOrganizations(ui.selectedPerson);
       closeBudgetHandler();
     }
   };
@@ -506,18 +622,25 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   return (
     <Container>
       <HeadWrap>
-        <MaterialIcon
-          onClick={() => props.close()}
-          icon={'arrow_back'}
-          style={{
-            fontSize: 25,
-            cursor: 'pointer',
-          }}
-        />
-        <OrgImg src={org?.img || avatarIcon} />
-        <OrgName>{org?.name}</OrgName>
-        <HeadButtonWrap>
-          <Button text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+        <HeadNameWrap>
+          <MaterialIcon
+            onClick={() => props.close()}
+            icon={'arrow_back'}
+            style={{
+              fontSize: 25,
+              cursor: 'pointer',
+            }}
+          />
+          <OrgImg src={org?.img || avatarIcon} />
+          <OrgName>{org?.name}</OrgName>
+        </HeadNameWrap>
+        <HeadButtonWrap forSmallScreen={false}>
+          <HeadButton
+            text="Edit"
+            disabled={true}
+            color="white"
+            style={{ borderRadius: '5px' }}
+          />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"
@@ -552,7 +675,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             </ViewBudgetWrap>
           )}
         </BudgetWrap>
-        <HeadButtonWrap>
+        <HeadButtonWrap forSmallScreen={true}>
           <Button
             disabled={viewReportDisabled}
             text="History" color="white"
@@ -577,7 +700,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       <UserWrap>
         <UsersHeadWrap>
           <UsersHeader>USERS</UsersHeader>
-          <HeadButtonWrap>
+          <HeadButtonWrap forSmallScreen={false}>
             <Button
               disabled={addUserDisabled}
               text="Add User"
