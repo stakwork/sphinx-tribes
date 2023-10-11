@@ -196,6 +196,7 @@ export interface Organization {
   updated: string;
   show: boolean;
   bounty_count?: number;
+  budget?: number
 }
 
 export interface BountyRoles {

@@ -206,7 +206,6 @@ func InitInvoiceCron() {
 				}
 
 				if invoiceRes.Response.Settled {
-					fmt.Sprintln("INVOICE SETTLED")
 					if inv.Invoice == invoiceRes.Response.Payment_request {
 						/**
 						  If the invoice is settled and still in store

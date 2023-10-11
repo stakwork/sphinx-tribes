@@ -7,12 +7,13 @@ import { Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-rou
 import { useStores } from 'store';
 import styled from 'styled-components';
 import { Wanted } from './Wanted';
+
 const Container = styled.div<{ isMobile: boolean }>`
   flex-grow: 1;
   margin: ${(p: any) => (p.isMobile ? '0 -20px' : '0')};
 `;
 
-const Tabs = styled.div`
+const Tabs = styled.div<{ canEdit: boolean }>`
   display: flex;
   width: 100%;
   align-items: center;
@@ -20,6 +21,10 @@ const Tabs = styled.div`
   ::-webkit-scrollbar {
     display: none;
   }
+  background: #fff;
+  padding: 0 20px;
+  border-bottom: solid 1px #ebedef;
+  box-shadow: ${(p: any) => (p.canEdit ? '0px 2px 0px rgba(0, 0, 0, 0.07)' : '0px 2px 6px rgba(0, 0, 0, 0.07)')};
 `;
 interface TagProps {
   selected: boolean;
@@ -54,6 +59,26 @@ const Counter = styled.div`
   /* Placeholder Text */
 
   color: #b0b7bc;
+`;
+
+const RouteWrap = styled.div`
+  padding: 20px 30px;
+  height: calc(100% - 63px);
+  overflow-y: auto;
+  position: relative;
+  width: 100%;
+`;
+
+interface RouteDataProps {
+  fullSelectedWidget: (name: any) => any;
+}
+
+const RouteData = styled.div<RouteDataProps>`
+  display: flex;
+  align-items: flex-start;
+  justify-content: ${(p: any) => p.fullSelectedWidget && p.fullSelectedWidget.length > 0 ? 'flex-start' : 'center'};
+  flex-wrap: wrap;
+  min-height: 100%;
 `;
 
 const tabs = widgetConfigs;
@@ -109,14 +134,7 @@ export const TabsPages = observer(() => {
 
   return (
     <Container isMobile={isMobile}>
-      <Tabs
-        style={{
-          background: '#fff',
-          padding: '0 20px',
-          borderBottom: 'solid 1px #ebedef',
-          boxShadow: canEdit ? '0px 2px 0px rgba(0, 0, 0, 0.07)' : '0px 2px 6px rgba(0, 0, 0, 0.07)'
-        }}
-      >
+      <Tabs canEdit={canEdit}>
         {tabs &&
           tabsNames.map((name: any, i: number) => {
             const t = tabs[name];
@@ -132,13 +150,13 @@ export const TabsPages = observer(() => {
             } else {
               count = hasExtras
                 ? person.extras[name].filter((f: any) => {
-                    if ('show' in f) {
-                      // show has a value
-                      if (!f.show) return false;
-                    }
-                    // if no value default to true
-                    return true;
-                  }).length
+                  if ('show' in f) {
+                    // show has a value
+                    if (!f.show) return false;
+                  }
+                  // if no value default to true
+                  return true;
+                }).length
                 : null;
             }
 
@@ -160,29 +178,12 @@ export const TabsPages = observer(() => {
       <Switch>
         {tabsNames.map((name: any) => (
           <Route key={name} path={`${path}${name}`}>
-            <div
-              style={{
-                padding: 20,
-                height: 'calc(100% - 63px)',
-                overflowY: 'auto',
-                position: 'relative',
-                width: '100%'
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent:
-                    fullSelectedWidget && fullSelectedWidget.length > 0 ? 'flex-start' : 'center',
-                  flexWrap: 'wrap',
-                  minHeight: '100%'
-                }}
-              >
+            <RouteWrap>
+              <RouteData fullSelectedWidget={fullSelectedWidget}>
                 {name === 'wanted' && <Wanted />}
                 <RenderWidgets widget={name} />
-              </div>
-            </div>
+              </RouteData>
+            </RouteWrap>
           </Route>
         ))}
       </Switch>
