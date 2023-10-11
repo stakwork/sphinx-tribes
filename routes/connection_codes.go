@@ -7,11 +7,9 @@ import (
 
 func ConnectionCodesRoutes() chi.Router {
 	r := chi.NewRouter()
-
 	r.Group(func(r chi.Router) {
 		r.Post("/", handlers.CreateConnectionCode)
 		r.Get("/", handlers.GetConnectionCode)
 	})
-
 	return r
 }
