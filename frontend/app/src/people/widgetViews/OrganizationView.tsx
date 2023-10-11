@@ -240,7 +240,11 @@ const Organizations = (props: { person: Person }) => {
           <OrganizationImg src={org.img || avatarIcon} />
           <OrganizationTextWrap>
             <OrganizationText>{org.name}</OrganizationText>
-            <OrganizationBudgetText> {DollarConverter(org.budget ?? 0)} <SatsGap>/</SatsGap> {satToUsd(org.budget ?? 0)} USD</OrganizationBudgetText>
+            <OrganizationBudgetText>
+              {DollarConverter(org.budget ?? 0)}
+              <SatsGap>/</SatsGap>
+              {satToUsd(org.budget ?? 0)} USD
+            </OrganizationBudgetText>
           </OrganizationTextWrap>
           <OrganizationActionWrap>
             <ManageButton org={org} user_pubkey={user?.owner_pubkey ?? ''} action={() => {

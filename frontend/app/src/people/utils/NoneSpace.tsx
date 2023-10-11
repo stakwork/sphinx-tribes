@@ -79,6 +79,11 @@ const C = styled.div<styledProps>`
   padding: 0 65px;
 `;
 
+const NonSpaceButton = styled(Button)`
+  margin-top: 20px
+  border-radius: 10px;
+`;
+
 export default function NoneSpace(props: NoneSpaceProps) {
   const color = colors['light'];
   if (props.banner) {
@@ -136,12 +141,11 @@ export default function NoneSpace(props: NoneSpaceProps) {
       <div style={{ height: 200 }}>
         <div style={{ marginTop: 20 }}>{props.Button}</div>
         {!props.Button && props.buttonText && (
-          <Button
+          <NonSpaceButton
             text={props.buttonText}
             leadingIcon={props.buttonIcon}
             width={210}
             height={48}
-            style={{ marginTop: 20, borderRadius: 10 }}
             onClick={props.action}
             color="primary"
           />

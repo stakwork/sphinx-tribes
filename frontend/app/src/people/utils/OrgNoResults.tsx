@@ -4,7 +4,7 @@ import { widgetConfigs } from './Constants';
 import NoneSpace from './NoneSpace';
 
 function OrgNoResults(props: { showAction: boolean, action: () => void }) {
-  const tabs = widgetConfigs;
+  const { text, icon } = widgetConfigs['organizations'].action;
 
   if (props.showAction) {
     return (
@@ -15,9 +15,9 @@ function OrgNoResults(props: { showAction: boolean, action: () => void }) {
           marginTop: '10%'
         }}
         action={props.action}
-        buttonText={tabs['organizations'].action.text}
-        buttonIcon={tabs['organizations'].action.icon}
-        {...tabs['organizations']?.noneSpace['noUserResult']}
+        buttonText={text}
+        buttonIcon={icon}
+        {...widgetConfigs['organizations']?.noneSpace['noUserResult']}
       />
     )
   }
@@ -29,7 +29,7 @@ function OrgNoResults(props: { showAction: boolean, action: () => void }) {
         margin: 'auto',
         marginTop: '10%'
       }}
-      {...tabs['organizations']?.noneSpace['noResult']}
+      {...widgetConfigs['organizations']?.noneSpace['noResult']}
     />
   );
 }
