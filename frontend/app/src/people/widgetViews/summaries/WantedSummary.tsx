@@ -356,7 +356,7 @@ function WantedSummary(props: WantedSummaryProps) {
     document.execCommand('copy');
     document.body.removeChild(el);
     setIsCopied(true);
-  }, [created]);
+  }, []);
 
   async function sendBadge(body: any) {
     const { recipient, badge } = body;

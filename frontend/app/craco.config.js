@@ -1,9 +1,9 @@
-const { whenTest } = require( '@craco/craco' )
+const { whenTest } = require('@craco/craco')
 
 module.exports = {
 	babel: {
 		plugins: [
-			...whenTest( () => [ [ '@babel/plugin-transform-modules-commonjs', { allowTopLevelThis: true } ] ], [] )
+			...whenTest(() => [['@babel/plugin-transform-modules-commonjs', { allowTopLevelThis: true }]], [])
 		]
 	}
 }

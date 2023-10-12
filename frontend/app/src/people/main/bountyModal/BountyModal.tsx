@@ -17,8 +17,6 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   const { canEdit, person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
 
-  const wantedLength = person?.extras ? person?.extras.wanted?.length : 0;
-
   const onGoBack = () => {
     ui.setBountyPerson(0);
     history.push({

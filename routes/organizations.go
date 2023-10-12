@@ -17,7 +17,6 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/users/{uuid}/count", handlers.GetOrganizationUsersCount)
 		r.Get("/bounties/{uuid}", handlers.GetOrganizationBounties)
 	})
-
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
@@ -33,6 +32,5 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/budget/history/{uuid}", handlers.GetOrganizationBudgetHistory)
 		r.Get("/payments/{uuid}", handlers.GetPaymentHistory)
 	})
-
 	return r
 }

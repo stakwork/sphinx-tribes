@@ -7,7 +7,6 @@ import (
 
 func PeopleRoutes() chi.Router {
 	r := chi.NewRouter()
-
 	r.Group(func(r chi.Router) {
 		r.Get("/", handlers.GetListedPeople)
 		r.Get("/search", handlers.GetPeopleBySearch)
