@@ -16,6 +16,7 @@
     "lint": "eslint src --max-warnings 67 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
+    "prettier:check": "npx prettier --config .prettierrc.json --check ./src",
     "prepare": "cd ../.. && husky install frontend/app/.husky"
   },
   "resolutions": {
