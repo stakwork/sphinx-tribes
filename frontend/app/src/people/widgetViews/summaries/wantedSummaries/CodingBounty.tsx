@@ -102,18 +102,18 @@ function MobileView(props: CodingBountiesProps) {
   const [keysendStatus, setKeysendStatus] = useState(false);
   const [lnInvoice, setLnInvoice] = useState('');
   const [toasts, setToasts]: any = useState([]);
-  const [updatingPayment,setUpdatingPayment ]= useState<boolean>(false)
+  const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
 
-  let bountyPaid = paid || invoiceStatus || keysendStatus
+  let bountyPaid = paid || invoiceStatus || keysendStatus;
 
-  if(localPaid === "PAID"){
-    bountyPaid = true
+  if (localPaid === 'PAID') {
+    bountyPaid = true;
   }
 
-  if(localPaid === "UNPAID"){
-    bountyPaid = false
+  if (localPaid === 'UNPAID') {
+    bountyPaid = false;
   }
-  
+
   const pollMinutes = 1;
 
   const bountyExpired = !bounty_expires
@@ -226,12 +226,12 @@ function MobileView(props: CodingBountiesProps) {
     } else if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.invoice_success);
       setLnInvoice('');
-      setLocalPaid("UNKNOWN")
+      setLocalPaid('UNKNOWN');
       setInvoiceStatus(true);
     } else if (res.msg === SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.keysend_success);
       if (org_uuid) {
-        setLocalPaid("UNKNOWN")
+        setLocalPaid('UNKNOWN');
         setKeysendStatus(true);
       }
     } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
@@ -620,10 +620,10 @@ function MobileView(props: CodingBountiesProps) {
                         }}
                         onClick={async (e: any) => {
                           e.stopPropagation();
-                          setUpdatingPayment(true)
+                          setUpdatingPayment(true);
                           await updatePaymentStatus(created || 0);
-                          setLocalPaid("UNPAID")
-                          setUpdatingPayment(false)
+                          setLocalPaid('UNPAID');
+                          setUpdatingPayment(false);
                         }}
                       />
                     ) : (
@@ -834,7 +834,7 @@ function MobileView(props: CodingBountiesProps) {
                   shadowcolor={color.button_primary.shadow}
                   onClick={async (e: any) => {
                     e.stopPropagation();
-                    setUpdatingPayment(true)
+                    setUpdatingPayment(true);
                     await updatePaymentStatus(created || 0);
                     await setExtrasPropertyAndSaveMultiple('paid', {
                       award: awardDetails.name
@@ -846,7 +846,7 @@ function MobileView(props: CodingBountiesProps) {
                       if (awardDetails?.name !== '') {
                         setIsPaidStatusBadgeInfo(true);
                       }
-                      setUpdatingPayment(false)
+                      setUpdatingPayment(false);
                     }, 3000);
                   }}
                 />
