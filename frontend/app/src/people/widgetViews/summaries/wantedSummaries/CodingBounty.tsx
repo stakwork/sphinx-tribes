@@ -598,7 +598,7 @@ function MobileView(props: CodingBountiesProps) {
                           color: color.borderGreen1
                         }}
                         text={'Mark Unpaid'}
-                        loading={saving === 'paid'}
+                        loading={saving === 'paid' || updatingPayment}
                         endingImg={'/static/mark_unpaid.svg'}
                         textStyle={{
                           width: '130px',
@@ -607,9 +607,12 @@ function MobileView(props: CodingBountiesProps) {
                           fontFamily: 'Barlow',
                           marginLeft: '30px'
                         }}
-                        onClick={(e: any) => {
+                        onClick={async (e: any) => {
                           e.stopPropagation();
-                          updatePaymentStatus(created || 0);
+                          setUpdatingPayment(true)
+                          await updatePaymentStatus(created || 0);
+                          setLocalPaid(false)
+                          setUpdatingPayment(false)
                         }}
                       />
                     ) : (
