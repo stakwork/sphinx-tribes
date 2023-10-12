@@ -6,15 +6,14 @@ import { PersonPage } from './PersonPage';
 export const People = () => {
   const { path } = useRouteMatch();
 
-
   return (
-      <Switch>
-        <Route path={`${path}:personPubkey/`}>
-          <PersonPage />
-        </Route>
-        <Route path={`${path}`}>
-          <PeoplePage />
-        </Route>
-      </Switch>
+    <Switch>
+      <Route path={`${path}:personPubkey/`}>
+        <PersonPage />
+      </Route>
+      <Route path={`${path}`}>
+        <PeoplePage />
+      </Route>
+    </Switch>
   );
 };
