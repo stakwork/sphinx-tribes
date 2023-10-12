@@ -60,7 +60,7 @@ const OrganizationData = styled.div`
     justify-content: center;
     border: 1px solid #ccc;
     border-radius: 10px;
-    padding: 15px 0px; 
+    padding: 15px 0px;
   }
 `;
 
@@ -131,7 +131,7 @@ const OrgHeadWrap = styled.div`
   align-items: center;
   margin-top: 5px;
   margin-bottom: 20px;
-`
+`;
 
 const OrgText = styled.div`
   font-size: 1.4rem;
@@ -142,7 +142,7 @@ const OrgText = styled.div`
   @media only screen and (max-width: 700px) {
     font-size: 0.95rem;
   }
-`
+`;
 const OrganizationActionWrap = styled.div`
   margin-left: auto;
   display: flex;
@@ -163,9 +163,9 @@ const SatsGap = styled.span`
 
 const AddOrgButton = styled(Button)`
   width: 100%;
-  borderRadius: 10;
+  borderradius: 10;
   height: 45;
-  marginTop: 15;
+  margintop: 15;
 `;
 
 const Organizations = (props: { person: Person }) => {
@@ -254,10 +254,14 @@ const Organizations = (props: { person: Person }) => {
             </OrganizationBudgetText>
           </OrganizationTextWrap>
           <OrganizationActionWrap>
-            <ManageButton org={org} user_pubkey={user?.owner_pubkey ?? ''} action={() => {
-              setOrganization(org);
-              setDetailsOpen(true);
-            }} />
+            <ManageButton
+              org={org}
+              user_pubkey={user?.owner_pubkey ?? ''}
+              action={() => {
+                setOrganization(org);
+                setDetailsOpen(true);
+              }}
+            />
             <Button
               disabled={btnDisabled}
               color={!btnDisabled ? 'white' : 'grey'}
@@ -267,10 +271,9 @@ const Organizations = (props: { person: Person }) => {
               style={{
                 height: 40,
                 color: '#000000',
-                borderRadius: 10,
+                borderRadius: 10
               }}
             />
-
           </OrganizationActionWrap>
         </OrganizationData>
       </OrganizationWrap>
@@ -383,8 +386,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                  display: 'none'
-                                }
+                                    display: 'none'
+                                  }
                                 : undefined
                             }
                           />
@@ -406,10 +409,9 @@ const Organizations = (props: { person: Person }) => {
             </Modal>
           )}
         </>
-      )
-      }
+      )}
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
-    </Container >
+    </Container>
   );
 };
 

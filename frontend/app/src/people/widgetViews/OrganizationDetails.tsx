@@ -38,7 +38,7 @@ const HeadWrap = styled.div`
   display: flex;
   align-items: center;
   padding: 25px 40px;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   @media only screen and (max-width: 800px) {
     padding: 15px 0px;
   }
@@ -66,7 +66,7 @@ const OrgImg = styled.img`
   height: 48px;
   border-radius: 50%;
   margin-left: 20px;
-    @media only screen and (max-width: 700px) {
+  @media only screen and (max-width: 700px) {
     width: 42px;
     height: 42px;
   }
@@ -84,7 +84,7 @@ const OrgName = styled.h3`
   padding: 0px;
   margin: 0px;
   font-size: 1.3rem;
-  margin-left: 25px; 
+  margin-left: 25px;
   font-weight: 700;
   margin-left: 20px;
   @media only screen and (max-width: 800px) {
@@ -114,7 +114,7 @@ const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
     gap: 8px;
     margin-left: 0px;
     width: 100vw;
-    margin-left: ${(p: any) => p.forSmallScreen ? '50px' : '0px'};
+    margin-left: ${(p: any) => (p.forSmallScreen ? '50px' : '0px')};
   }
   @media only screen and (max-width: 470px) {
     gap: 6px;
@@ -132,7 +132,7 @@ const ActionWrap = styled.div`
   display: flex;
   align-items: center;
   padding: 25px 40px;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   @media only screen and (max-width: 700px) {
     padding: 25px 0px;
   }
@@ -163,7 +163,7 @@ const NoBudgetWrap = styled.div`
   flex-direction: row;
   align-items: center;
   width: 100%;
-  border: 1px solid #EBEDEF;
+  border: 1px solid #ebedef;
 `;
 
 const ViewBudgetWrap = styled.div`
@@ -175,7 +175,7 @@ const ViewBudgetWrap = styled.div`
 const BudgetSmall = styled.h6`
   padding: 0px;
   font-size: 0.8rem;
-  color: #8E969C;
+  color: #8e969c;
   @media only screen and (max-width: 500px) {
     font-size: 0.75rem;
   }
@@ -184,11 +184,11 @@ const BudgetSmall = styled.h6`
 const BudgetSmallHead = styled.h6`
   padding: 0px;
   font-size: 0.7rem;
-  color: #8E969C;
+  color: #8e969c;
 `;
 
 const Budget = styled.h4`
-  color: #3C3F41;
+  color: #3c3f41;
   font-size: 1.15rem;
   @media only screen and (max-width: 500px) {
     font-size: 1rem;
@@ -196,14 +196,14 @@ const Budget = styled.h4`
 `;
 
 const Grey = styled.span`
-  color: #8E969C;
+  color: #8e969c;
 `;
 
 const NoBudgetText = styled.p`
   font-size: 0.85rem;
   padding: 0px;
   margin: 0px;
-  color: #8E969C;
+  color: #8e969c;
   width: 90%;
   margin-left: auto;
 `;
@@ -225,7 +225,7 @@ const UsersHeadWrap = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   padding-top: 5px;
   padding-bottom: 20px;
   @media only screen and (max-width: 500px) {
@@ -258,7 +258,7 @@ const UserImage = styled.img`
 
 const User = styled.div`
   padding: 15px 0px;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   display: flex;
   align-items: center;
   @media only screen and (max-width: 500px) {
@@ -299,7 +299,7 @@ const UserPubkey = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  color: #5F6368;
+  color: #5f6368;
 `;
 
 const UserAction = styled.div`
@@ -387,11 +387,16 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
   const schema = [...config.schema];
 
-  const addUserDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER'));
-  const viewReportDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT'));
-  const addBudgetDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET'));
-  const deleteUserDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER'));
-  const addRolesDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES'));
+  const addUserDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
+  const viewReportDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+  const addBudgetDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET');
+  const deleteUserDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER');
+  const addRolesDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
 
   const initValues = {
     owner_pubkey: ''
@@ -628,19 +633,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             icon={'arrow_back'}
             style={{
               fontSize: 25,
-              cursor: 'pointer',
+              cursor: 'pointer'
             }}
           />
           <OrgImg src={org?.img || avatarIcon} />
           <OrgName>{org?.name}</OrgName>
         </HeadNameWrap>
         <HeadButtonWrap forSmallScreen={false}>
-          <HeadButton
-            text="Edit"
-            disabled={true}
-            color="white"
-            style={{ borderRadius: '5px' }}
-          />
+          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"
@@ -659,18 +659,20 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 style={{
                   fontSize: 30,
                   cursor: 'pointer',
-                  color: '#CCC',
+                  color: '#CCC'
                 }}
               />
               <NoBudgetText>
-                You have restricted permissions and are unable to view the budget.
-                Reach out to the organization admin to get them updated.
+                You have restricted permissions and are unable to view the budget. Reach out to the
+                organization admin to get them updated.
               </NoBudgetText>
             </NoBudgetWrap>
           ) : (
             <ViewBudgetWrap>
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-              <Budget>{orgBudget.toLocaleString()} <Grey>SATS</Grey></Budget>
+              <Budget>
+                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+              </Budget>
               <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
             </ViewBudgetWrap>
           )}
@@ -678,16 +680,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         <HeadButtonWrap forSmallScreen={true}>
           <Button
             disabled={viewReportDisabled}
-            text="History" color="white"
+            text="History"
+            color="white"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenHistory(true)}
           />
-          <Button
-            disabled={true}
-            text="Withdraw"
-            color="white"
-            style={{ borderRadius: '5px' }}
-          />
+          <Button disabled={true} text="Withdraw" color="white" style={{ borderRadius: '5px' }} />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
@@ -727,7 +725,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                   style={{
                     fontSize: 24,
                     cursor: 'pointer',
-                    color: '#CCC',
+                    color: '#CCC'
                   }}
                   onClick={() => handleSettingsClick(user)}
                 />
@@ -737,7 +735,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                   style={{
                     fontSize: 24,
                     cursor: 'pointer',
-                    color: '#CCC',
+                    color: '#CCC'
                   }}
                   onClick={() => {
                     deleteOrganizationUser(user);
@@ -817,8 +815,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
-                              display: 'none'
-                            }
+                                display: 'none'
+                              }
                             : undefined
                         }
                       />

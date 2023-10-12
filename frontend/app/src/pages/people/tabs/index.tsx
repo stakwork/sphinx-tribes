@@ -24,7 +24,8 @@ const Tabs = styled.div<{ canEdit: boolean }>`
   background: #fff;
   padding: 0 20px;
   border-bottom: solid 1px #ebedef;
-  box-shadow: ${(p: any) => (p.canEdit ? '0px 2px 0px rgba(0, 0, 0, 0.07)' : '0px 2px 6px rgba(0, 0, 0, 0.07)')};
+  box-shadow: ${(p: any) =>
+    p.canEdit ? '0px 2px 0px rgba(0, 0, 0, 0.07)' : '0px 2px 6px rgba(0, 0, 0, 0.07)'};
 `;
 interface TagProps {
   selected: boolean;
@@ -76,7 +77,8 @@ interface RouteDataProps {
 const RouteData = styled.div<RouteDataProps>`
   display: flex;
   align-items: flex-start;
-  justify-content: ${(p: any) => p.fullSelectedWidget && p.fullSelectedWidget.length > 0 ? 'flex-start' : 'center'};
+  justify-content: ${(p: any) =>
+    p.fullSelectedWidget && p.fullSelectedWidget.length > 0 ? 'flex-start' : 'center'};
   flex-wrap: wrap;
   min-height: 100%;
 `;
@@ -150,13 +152,13 @@ export const TabsPages = observer(() => {
             } else {
               count = hasExtras
                 ? person.extras[name].filter((f: any) => {
-                  if ('show' in f) {
-                    // show has a value
-                    if (!f.show) return false;
-                  }
-                  // if no value default to true
-                  return true;
-                }).length
+                    if ('show' in f) {
+                      // show has a value
+                      if (!f.show) return false;
+                    }
+                    // if no value default to true
+                    return true;
+                  }).length
                 : null;
             }
 

@@ -70,9 +70,9 @@ const B = styled.div<BProps>`
   overflow-y: auto;
   box-sizing: border-box;
   ${EnvWithScrollBar({
-  thumbColor: '#5a606c',
-  trackBackgroundColor: 'rgba(0,0,0,0)'
-})}
+    thumbColor: '#5a606c',
+    trackBackgroundColor: 'rgba(0,0,0,0)'
+  })}
 `;
 function FocusedView(props: FocusViewProps) {
   const {
@@ -109,9 +109,9 @@ function FocusedView(props: FocusViewProps) {
 
   const userOrganizations = main.organizations.length
     ? main.organizations.map((org: Organization) => ({
-      label: toCapitalize(org.name),
-      value: org.uuid
-    }))
+        label: toCapitalize(org.name),
+        value: org.uuid
+      }))
     : [];
 
   function isNotHttps(url: string | undefined) {
@@ -420,8 +420,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />
