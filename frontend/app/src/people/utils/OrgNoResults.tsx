@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { widgetConfigs } from './Constants';
 import NoneSpace from './NoneSpace';
 
-function OrgNoResults(props: { showAction: boolean, action: () => void }) {
+function OrgNoResults(props: { showAction: boolean; action: () => void }) {
   const { text, icon } = widgetConfigs['organizations'].action;
 
   if (props.showAction) {
@@ -19,7 +19,7 @@ function OrgNoResults(props: { showAction: boolean, action: () => void }) {
         buttonIcon={icon}
         {...widgetConfigs['organizations']?.noneSpace['noUserResult']}
       />
-    )
+    );
   }
 
   return (
