@@ -303,6 +303,8 @@ export interface CodingBountiesProps {
   bounty_expires?: string;
   org_uuid?: string;
   id?: number;
+  localPaid: boolean,
+  setLocalPaid: (boolean) => void
 }
 
 export interface CodingViewProps extends WantedSummaryProps {
