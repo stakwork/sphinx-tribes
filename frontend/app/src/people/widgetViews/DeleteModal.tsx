@@ -1,7 +1,8 @@
-import { EuiButton, EuiButtonEmpty, EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
+import { EuiButton, EuiModal, EuiOverlayMask, EuiText } from '@elastic/eui';
 import { DeleteTicketModalProps } from 'people/interfaces';
 import React from 'react';
 import styled from 'styled-components';
+import avatarIcon from '../../public/static/profile_avatar.svg';
 
 const ModalButtonContainer = styled.div`
   display: flex;
@@ -10,7 +11,43 @@ const ModalButtonContainer = styled.div`
   margin-top: 30px;
   padding: 2px;
 `;
-const DeleteTicketModal = ({ closeModal, confirmDelete }: DeleteTicketModalProps) => (
+
+const BoldText = styled.span`
+  font-weight: bold;
+`;
+
+const WarningText = styled(EuiText)`
+  text-align: center;
+`;
+
+const UserImage = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-left: 26%;
+  z-index: 200;
+  position: absolute;
+  margin-top: -24%;
+  border: 4px solid #FFF;
+`;
+
+const CancelButton = styled(EuiButton)`
+  color: #000;
+  background: #FFF;
+  border: 1px solid #D0D5D8;
+  text-decoration: none !important;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+`;
+
+const DeleteButton = styled(EuiButton)`
+  background: #ED7474;
+  color: #FFFFFF;
+  border: none;
+  text-decoration: none !important;
+  box-shadow: 0px 2px 10px 0px rgba(237, 116, 116, 0.50);
+`;
+
+const DeleteTicketModal = ({ closeModal, confirmDelete, text, imgUrl, userDelete }: DeleteTicketModalProps) => (
   <EuiOverlayMask>
     <EuiModal
       onClose={closeModal}
@@ -19,27 +56,26 @@ const DeleteTicketModal = ({ closeModal, confirmDelete }: DeleteTicketModalProps
         padding: '50px 50px 30px 50px'
       }}
     >
-      <EuiText>Are you sure you want to delete this Ticket?</EuiText>
+      {
+        userDelete && (
+          <UserImage src={imgUrl || avatarIcon} />
+        )
+      }
+      <WarningText>
+        Are you sure you want to <br />
+        <BoldText>Delete this {text ? text : 'Ticket'}?</BoldText>
+      </WarningText>
       <ModalButtonContainer>
-        <EuiButtonEmpty
+        <CancelButton
           onClick={closeModal}
-          style={{
-            color: '#000'
-          }}
         >
           Cancel
-        </EuiButtonEmpty>
-        <EuiButton
+        </CancelButton>
+        <DeleteButton
           onClick={confirmDelete}
-          style={{
-            background: '#fff',
-            textDecoration: 'none',
-            color: '#303030',
-            border: '1px solid #909090'
-          }}
         >
           Delete
-        </EuiButton>
+        </DeleteButton>
       </ModalButtonContainer>
     </EuiModal>
   </EuiOverlayMask>
