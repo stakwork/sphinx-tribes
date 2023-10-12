@@ -8,7 +8,6 @@ import (
 
 func BountyRoutes() chi.Router {
 	r := chi.NewRouter()
-
 	r.Group(func(r chi.Router) {
 		r.Post("/", handlers.CreateOrEditBounty)
 		r.Delete("/assignee", handlers.DeleteBountyAssignee)
@@ -18,11 +17,9 @@ func BountyRoutes() chi.Router {
 		r.Get("/count/{personKey}/{tabType}", handlers.GetBountyCount)
 		r.Post("/paymentstatus/{created}", handlers.UpdatePaymentStatus)
 	})
-
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 		r.Post("/pay/{id}", handlers.MakeBountyPayment)
 	})
-
 	return r
 }
