@@ -112,6 +112,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const [labels, setLabels] = useState<Array<CodingLanguageLabel>>([]);
   const [assigneeValue, setAssigneeValue] = useState(false);
+  const [localPaid, setLocalPaid] = useState<boolean>(false)
 
   const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue: any) => !assigneeValue);
 
@@ -329,6 +330,7 @@ function WantedSummary(props: WantedSummaryProps) {
       }
 
       setIsMarkPaidSaved(false);
+      setLocalPaid(true)
     }
   }
 
@@ -613,6 +615,8 @@ function WantedSummary(props: WantedSummaryProps) {
           nametag={nametag}
           org_uuid={org_uuid}
           id={id}
+          localPaid={localPaid}
+          setLocalPaid={setLocalPaid}
         />
       );
     }

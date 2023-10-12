@@ -91,7 +91,9 @@ function MobileView(props: CodingBountiesProps) {
     bounty_expires,
     commitment_fee,
     org_uuid,
-    id
+    id,
+    localPaid,
+    setLocalPaid
   } = props;
   const color = colors['light'];
 
@@ -100,8 +102,9 @@ function MobileView(props: CodingBountiesProps) {
   const [keysendStatus, setKeysendStatus] = useState(false);
   const [lnInvoice, setLnInvoice] = useState('');
   const [toasts, setToasts]: any = useState([]);
+  const [updatingPayment,setUpdatingPayment ]= useState<boolean>(false)
 
-  const bountyPaid = paid || invoiceStatus || keysendStatus;
+  const bountyPaid = paid || invoiceStatus || keysendStatus || localPaid;
   const pollMinutes = 1;
 
   const bountyExpired = !bounty_expires
@@ -802,7 +805,7 @@ function MobileView(props: CodingBountiesProps) {
                     marginLeft: '36px'
                   }}
                   text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark Paid'}
-                  loading={isMarkPaidSaved}
+                  loading={isMarkPaidSaved || updatingPayment}
                   endingImg={'/static/mark_paid.svg'}
                   textStyle={{
                     width: '130px',
@@ -815,24 +818,22 @@ function MobileView(props: CodingBountiesProps) {
                   hovercolor={color.button_primary.hover}
                   activecolor={color.button_primary.active}
                   shadowcolor={color.button_primary.shadow}
-                  onClick={(e: any) => {
+                  onClick={async (e: any) => {
                     e.stopPropagation();
-                    updatePaymentStatus(created || 0);
-                    setExtrasPropertyAndSaveMultiple('paid', {
+                    setUpdatingPayment(true)
+                    await updatePaymentStatus(created || 0);
+                    await setExtrasPropertyAndSaveMultiple('paid', {
                       award: awardDetails.name
                     });
 
                     setTimeout(() => {
                       setCreatorStep(0);
-                    }, 3000);
-                    setTimeout(() => {
                       if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);
-                    }, 4000);
-                    setTimeout(() => {
                       if (awardDetails?.name !== '') {
                         setIsPaidStatusBadgeInfo(true);
                       }
-                    }, 5500);
+                      setUpdatingPayment(false)
+                    }, 3000);
                   }}
                 />
               </AwardBottomContainer>
