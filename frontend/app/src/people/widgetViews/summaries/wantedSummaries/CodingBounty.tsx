@@ -104,7 +104,16 @@ function MobileView(props: CodingBountiesProps) {
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment,setUpdatingPayment ]= useState<boolean>(false)
 
-  const bountyPaid = paid || invoiceStatus || keysendStatus || localPaid;
+  let bountyPaid = paid || invoiceStatus || keysendStatus
+
+  if(localPaid === "PAID"){
+    bountyPaid = true
+  }
+
+  if(localPaid === "UNPAID"){
+    bountyPaid = false
+  }
+  
   const pollMinutes = 1;
 
   const bountyExpired = !bounty_expires
@@ -217,10 +226,12 @@ function MobileView(props: CodingBountiesProps) {
     } else if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.invoice_success);
       setLnInvoice('');
+      setLocalPaid("UNKNOWN")
       setInvoiceStatus(true);
     } else if (res.msg === SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
       addToast(SOCKET_MSG.keysend_success);
       if (org_uuid) {
+        setLocalPaid("UNKNOWN")
         setKeysendStatus(true);
       }
     } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
@@ -611,7 +622,7 @@ function MobileView(props: CodingBountiesProps) {
                           e.stopPropagation();
                           setUpdatingPayment(true)
                           await updatePaymentStatus(created || 0);
-                          setLocalPaid(false)
+                          setLocalPaid("UNPAID")
                           setUpdatingPayment(false)
                         }}
                       />
