@@ -73,6 +73,43 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
     }
   }
 
+  const DisplayQRCode = () => (
+    <>
+      <ModalContainer>
+        {!connection_string ? (
+          <QRText>We are out of codes to sign up! Please check again later.</QRText>
+        ) : (
+          <QrContainer>
+            <QR size={200} value={connection_string} />
+            <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
+          </QrContainer>
+        )}
+      </ModalContainer>
+      <ButtonContainer>
+        <IconButton
+          text={'Back'}
+          width={210}
+          height={48}
+          buttonType={'text'}
+          style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+          onClick={(e: any) => {
+            e.stopPropagation();
+            setStep(2);
+          }}
+          textStyle={{
+            fontSize: '15px',
+            fontWeight: '500',
+            color: '#5F6368'
+          }}
+          iconStyle={{
+            top: '14px'
+          }}
+          color={buttonColor}
+        />
+      </ButtonContainer>
+    </>
+  );
+
   const StepOne = () => (
     <>
       <ModalContainer>
@@ -134,51 +171,44 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
   const StepTwo = () => (
     <>
       <ModalContainer>
-        {connection_string ? (
-          <QrContainer>
-            <QR size={200} value={connection_string} />
-            <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
-          </QrContainer>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <p style={{ textAlign: 'center', fontWeight: 600 }}>Step 1</p>
-            <p style={{ textAlign: 'center' }}>Download App</p>
-            <AndroidIosButtonConatiner>
-              <IconButton
-                text={'Android'}
-                width={100}
-                height={48}
-                style={{ marginTop: '20px', textDecoration: 'none' }}
-                onClick={() =>
-                  window.open('https://play.google.com/store/apps/details?id=chat.sphinx', '_blank')
-                }
-                textStyle={{
-                  fontSize: '15px',
-                  fontWeight: '500'
-                }}
-                iconStyle={{
-                  top: '14px'
-                }}
-                color={buttonColor}
-              />
-              <IconButton
-                text={'IOS'}
-                width={100}
-                height={48}
-                style={{ marginTop: '20px', textDecoration: 'none' }}
-                onClick={() => window.open('https://testflight.apple.com/join/QoaCkJn6', '_blank')}
-                textStyle={{
-                  fontSize: '15px',
-                  fontWeight: '500'
-                }}
-                iconStyle={{
-                  top: '14px'
-                }}
-                color={buttonColor}
-              />
-            </AndroidIosButtonConatiner>
-          </div>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <p style={{ textAlign: 'center', fontWeight: 600 }}>Step 1</p>
+          <p style={{ textAlign: 'center' }}>Download App</p>
+          <AndroidIosButtonConatiner>
+            <IconButton
+              text={'Android'}
+              width={100}
+              height={48}
+              style={{ marginTop: '20px', textDecoration: 'none' }}
+              onClick={() =>
+                window.open('https://play.google.com/store/apps/details?id=chat.sphinx', '_blank')
+              }
+              textStyle={{
+                fontSize: '15px',
+                fontWeight: '500'
+              }}
+              iconStyle={{
+                top: '14px'
+              }}
+              color={buttonColor}
+            />
+            <IconButton
+              text={'IOS'}
+              width={100}
+              height={48}
+              style={{ marginTop: '20px', textDecoration: 'none' }}
+              onClick={() => window.open('https://testflight.apple.com/join/QoaCkJn6', '_blank')}
+              textStyle={{
+                fontSize: '15px',
+                fontWeight: '500'
+              }}
+              iconStyle={{
+                top: '14px'
+              }}
+              color={buttonColor}
+            />
+          </AndroidIosButtonConatiner>
+        </div>
       </ModalContainer>
       <p style={{ textAlign: 'center', fontWeight: 600 }}>Step 2</p>
       <p style={{ textAlign: 'center' }}>Scan Code</p>
@@ -194,7 +224,10 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
           shadowcolor={
             buttonColor === 'primary' ? 'rgba(97, 138, 255, 0.5)' : 'rgba(73, 201, 152, 0.5)'
           }
-          onClick={() => getConnectionCode()}
+          onClick={() => {
+            getConnectionCode();
+            setStep(4);
+          }}
           color={buttonColor}
         />
         <DirectionWrap>
@@ -290,7 +323,15 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
   return (
     <BaseModal open onClose={closeModal}>
       <Box p={4} bgcolor={palette.grayish.G950} borderRadius={2} maxWidth={400} minWidth={350}>
-        {step === 1 ? <StepOne /> : step === 2 ? <StepTwo /> : <StepThree />}
+        {step === 1 ? (
+          <StepOne />
+        ) : step === 2 ? (
+          <StepTwo />
+        ) : step === 3 ? (
+          <StepThree />
+        ) : (
+          <DisplayQRCode />
+        )}
       </Box>
     </BaseModal>
   );

@@ -186,10 +186,7 @@ export default function Person(props: PersonProps) {
       <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
         <div>
           <div style={{ height: 210 }}>
-            <Img
-              style={{ height: '100%', width: '100%', borderRadius: 0 }}
-              src={img}
-            />
+            <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={img} />
           </div>
           <div style={{ padding: 16 }}>
             <DTitle>{owner_alias}</DTitle>

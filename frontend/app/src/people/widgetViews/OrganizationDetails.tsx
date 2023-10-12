@@ -39,7 +39,7 @@ const HeadWrap = styled.div`
   display: flex;
   align-items: center;
   padding: 25px 40px;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   @media only screen and (max-width: 800px) {
     padding: 15px 0px;
   }
@@ -67,7 +67,7 @@ const OrgImg = styled.img`
   height: 48px;
   border-radius: 50%;
   margin-left: 20px;
-    @media only screen and (max-width: 700px) {
+  @media only screen and (max-width: 700px) {
     width: 42px;
     height: 42px;
   }
@@ -85,7 +85,7 @@ const OrgName = styled.h3`
   padding: 0px;
   margin: 0px;
   font-size: 1.3rem;
-  margin-left: 25px; 
+  margin-left: 25px;
   font-weight: 700;
   margin-left: 20px;
   @media only screen and (max-width: 800px) {
@@ -115,7 +115,7 @@ const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
     gap: 8px;
     margin-left: 0px;
     width: 100vw;
-    margin-left: ${(p: any) => p.forSmallScreen ? '50px' : '0px'};
+    margin-left: ${(p: any) => (p.forSmallScreen ? '50px' : '0px')};
   }
   @media only screen and (max-width: 470px) {
     gap: 6px;
@@ -133,7 +133,7 @@ const ActionWrap = styled.div`
   display: flex;
   align-items: center;
   padding: 25px 40px;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   @media only screen and (max-width: 700px) {
     padding: 25px 0px;
   }
@@ -164,7 +164,7 @@ const NoBudgetWrap = styled.div`
   flex-direction: row;
   align-items: center;
   width: 100%;
-  border: 1px solid #EBEDEF;
+  border: 1px solid #ebedef;
 `;
 
 const ViewBudgetWrap = styled.div`
@@ -176,7 +176,7 @@ const ViewBudgetWrap = styled.div`
 const BudgetSmall = styled.h6`
   padding: 0px;
   font-size: 0.8rem;
-  color: #8E969C;
+  color: #8e969c;
   @media only screen and (max-width: 500px) {
     font-size: 0.75rem;
   }
@@ -185,11 +185,11 @@ const BudgetSmall = styled.h6`
 const BudgetSmallHead = styled.h6`
   padding: 0px;
   font-size: 0.7rem;
-  color: #8E969C;
+  color: #8e969c;
 `;
 
 const Budget = styled.h4`
-  color: #3C3F41;
+  color: #3c3f41;
   font-size: 1.15rem;
   @media only screen and (max-width: 500px) {
     font-size: 1rem;
@@ -197,14 +197,14 @@ const Budget = styled.h4`
 `;
 
 const Grey = styled.span`
-  color: #8E969C;
+  color: #8e969c;
 `;
 
 const NoBudgetText = styled.p`
   font-size: 0.85rem;
   padding: 0px;
   margin: 0px;
-  color: #8E969C;
+  color: #8e969c;
   width: 90%;
   margin-left: auto;
 `;
@@ -226,7 +226,7 @@ const UsersHeadWrap = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   padding-top: 5px;
   padding-bottom: 20px;
   @media only screen and (max-width: 500px) {
@@ -259,7 +259,7 @@ const UserImage = styled.img`
 
 const User = styled.div`
   padding: 15px 0px;
-  border-bottom: 1px solid #EBEDEF;
+  border-bottom: 1px solid #ebedef;
   display: flex;
   align-items: center;
   @media only screen and (max-width: 500px) {
@@ -300,7 +300,7 @@ const UserPubkey = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  color: #5F6368;
+  color: #5f6368;
 `;
 
 const UserAction = styled.div`
@@ -657,19 +657,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             icon={'arrow_back'}
             style={{
               fontSize: 25,
-              cursor: 'pointer',
+              cursor: 'pointer'
             }}
           />
           <OrgImg src={org?.img || avatarIcon} />
           <OrgName>{org?.name}</OrgName>
         </HeadNameWrap>
         <HeadButtonWrap forSmallScreen={false}>
-          <HeadButton
-            text="Edit"
-            disabled={true}
-            color="white"
-            style={{ borderRadius: '5px' }}
-          />
+          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"
@@ -678,8 +673,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             endingIcon="open_in_new"
             onClick={() => window.open(`/org/bounties/${uuid}`, '_target')}
           />
-        </HeadButtonWrap>
-      </HeadWrap>
+        </HeadButtonWrap >
+      </HeadWrap >
       <ActionWrap>
         <BudgetWrap>
           {viewReportDisabled ? (
@@ -689,35 +684,33 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 style={{
                   fontSize: 30,
                   cursor: 'pointer',
-                  color: '#CCC',
+                  color: '#ccc'
                 }}
               />
               <NoBudgetText>
-                You have restricted permissions and are unable to view the budget.
-                Reach out to the organization admin to get them updated.
+                You have restricted permissions and are unable to view the budget. Reach out to the
+                organization admin to get them updated.
               </NoBudgetText>
             </NoBudgetWrap>
           ) : (
             <ViewBudgetWrap>
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-              <Budget>{orgBudget.toLocaleString()} <Grey>SATS</Grey></Budget>
+              <Budget>
+                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+              </Budget>
               <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
-            </ViewBudgetWrap>
+            </ViewBudgetWrap >
           )}
-        </BudgetWrap>
+        </BudgetWrap >
         <HeadButtonWrap forSmallScreen={true}>
           <Button
             disabled={viewReportDisabled}
-            text="History" color="white"
+            text="History"
+            color="white"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenHistory(true)}
           />
-          <Button
-            disabled={true}
-            text="Withdraw"
-            color="white"
-            style={{ borderRadius: '5px' }}
-          />
+          <Button disabled={true} text="Withdraw" color="white" style={{ borderRadius: '5px' }} />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
@@ -726,7 +719,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             onClick={() => setIsOpenBudget(true)}
           />
         </HeadButtonWrap>
-      </ActionWrap>
+      </ActionWrap >
       <UserWrap>
         <UsersHeadWrap>
           <UsersHeader>USERS</UsersHeader>
@@ -758,7 +751,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                     style={{
                       fontSize: 24,
                       cursor: 'pointer',
-                      color: '#CCC',
+                      color: '#ccc'
                     }}
                     onClick={() => handleSettingsClick(user)}
                   />
@@ -770,342 +763,357 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                     style={{
                       fontSize: 24,
                       cursor: 'pointer',
-                      color: '#CCC',
+                      color: '#ccc'
                     }}
-                    onClick={() => handleDeleteClick(user)}
+                    onClick={() => {
+                      setUser(user);
+                      handleDeleteClick(user);
+                    }}
                   />
                 </IconWrap>
-              </UserAction>
-            </User>
+              </UserAction >
+            </User >
           ))}
-        </UsersList>
-      </UserWrap>
+        </UsersList >
+      </UserWrap >
       <DetailsWrap>
-        {showDeleteModal && (
-          <DeleteTicketModal
-            closeModal={closeDeleteModal}
-            confirmDelete={confirmDelete}
-            text={'User'}
-            imgUrl={user?.img}
-            userDelete={true}
-          />
-        )}
-        {isOpen && (
-          <Modal
-            visible={isOpen}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeHandler}
-            bigCloseImage={closeHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <Formik
-              initialValues={initValues || {}}
-              onSubmit={onSubmit}
-              innerRef={formRef}
-              validationSchema={validator(schema)}
+        {
+          showDeleteModal && (
+            <DeleteTicketModal
+              closeModal={closeDeleteModal}
+              confirmDelete={confirmDelete}
+              text={'User'}
+              imgUrl={user?.img}
+              userDelete={true}
+            />
+          )
+        }
+        {
+          isOpen && (
+            <Modal
+              visible={isOpen}
+              style={{
+                height: '100%',
+                flexDirection: 'column'
+              }}
+              envStyle={{
+                marginTop: isMobile ? 64 : 0,
+                background: color.pureWhite,
+                zIndex: 20,
+                ...(config?.modalStyle ?? {}),
+                maxHeight: '100%',
+                borderRadius: '10px'
+              }}
+              overlayClick={closeHandler}
+              bigCloseImage={closeHandler}
+              bigCloseImageStyle={{
+                top: '-18px',
+                right: '-18px',
+                background: '#000',
+                borderRadius: '50%'
+              }}
             >
-              {({
-                setFieldTouched,
-                handleSubmit,
-                values,
-                setFieldValue,
-                errors,
-                initialValues
-              }: any) => (
-                <Wrap newDesign={true}>
-                  <ModalTitle>Add new user</ModalTitle>
-                  <div className="SchemaInnerContainer">
-                    {schema.map((item: FormField) => (
-                      <Input
-                        {...item}
-                        key={item.name}
-                        values={values}
-                        errors={errors}
-                        value={values[item.name]}
-                        error={errors[item.name]}
-                        initialValues={initialValues}
-                        deleteErrors={() => {
-                          if (errors[item.name]) delete errors[item.name];
+              <Formik
+                initialValues={initValues || {}}
+                onSubmit={onSubmit}
+                innerRef={formRef}
+                validationSchema={validator(schema)}
+              >
+                {({
+                  setFieldTouched,
+                  handleSubmit,
+                  values,
+                  setFieldValue,
+                  errors,
+                  initialValues
+                }: any) => (
+                  <Wrap newDesign={true}>
+                    <ModalTitle>Add new user</ModalTitle>
+                    <div className="SchemaInnerContainer">
+                      {schema.map((item: FormField) => (
+                        <Input
+                          {...item}
+                          key={item.name}
+                          values={values}
+                          errors={errors}
+                          value={values[item.name]}
+                          error={errors[item.name]}
+                          initialValues={initialValues}
+                          deleteErrors={() => {
+                            if (errors[item.name]) delete errors[item.name];
+                          }}
+                          handleChange={(e: any) => {
+                            setFieldValue(item.name, e);
+                          }}
+                          setFieldValue={(e: any, f: any) => {
+                            setFieldValue(e, f);
+                          }}
+                          setFieldTouched={setFieldTouched}
+                          handleBlur={() => setFieldTouched(item.name, false)}
+                          handleFocus={() => setFieldTouched(item.name, true)}
+                          setDisableFormButtons={setDisableFormButtons}
+                          borderType={'bottom'}
+                          imageIcon={true}
+                          style={
+                            item.name === 'github_description' && !values.ticket_url
+                              ? {
+                                display: 'none'
+                              }
+                              : undefined
+                          }
+                        />
+                      ))}
+                      <Button
+                        disabled={disableFormButtons || loading}
+                        onClick={() => {
+                          handleSubmit();
                         }}
-                        handleChange={(e: any) => {
-                          setFieldValue(item.name, e);
-                        }}
-                        setFieldValue={(e: any, f: any) => {
-                          setFieldValue(e, f);
-                        }}
-                        setFieldTouched={setFieldTouched}
-                        handleBlur={() => setFieldTouched(item.name, false)}
-                        handleFocus={() => setFieldTouched(item.name, true)}
-                        setDisableFormButtons={setDisableFormButtons}
-                        borderType={'bottom'}
-                        imageIcon={true}
-                        style={
-                          item.name === 'github_description' && !values.ticket_url
-                            ? {
-                              display: 'none'
-                            }
-                            : undefined
-                        }
+                        loading={loading}
+                        style={{ width: '100%' }}
+                        color={'primary'}
+                        text={'Add user'}
                       />
-                    ))}
+                    </div>
+                  </Wrap>
+                )}
+              </Formik>
+            </Modal>
+          )
+        }
+        {
+          isOpenRoles && (
+            <Modal
+              visible={isOpenRoles}
+              style={{
+                height: '100%',
+                flexDirection: 'column'
+              }}
+              envStyle={{
+                marginTop: isMobile ? 64 : 0,
+                background: color.pureWhite,
+                zIndex: 20,
+                ...(config?.modalStyle ?? {}),
+                maxHeight: '100%',
+                borderRadius: '10px'
+              }}
+              overlayClick={closeRolesHandler}
+              bigCloseImage={closeRolesHandler}
+              bigCloseImageStyle={{
+                top: '-18px',
+                right: '-18px',
+                background: '#000',
+                borderRadius: '50%'
+              }}
+            >
+              <Wrap newDesign={true}>
+                <ModalTitle>Add user roles</ModalTitle>
+                <CheckUl>
+                  {bountyRolesData.map((role: any, i: number) => (
+                    <CheckLi key={i}>
+                      <Check
+                        checked={role.status}
+                        onChange={roleChange}
+                        type="checkbox"
+                        name={role.name}
+                        value={role.name}
+                      />
+                      <CheckLabel>{role.name}</CheckLabel>
+                    </CheckLi>
+                  ))}
+                </CheckUl>
+                <Button
+                  onClick={() => submitRoles()}
+                  style={{ width: '100%' }}
+                  color={'primary'}
+                  text={'Add roles'}
+                />
+              </Wrap>
+            </Modal>
+          )
+        }
+        {
+          isOpenBudget && (
+            <Modal
+              visible={isOpenBudget}
+              style={{
+                height: '100%',
+                flexDirection: 'column'
+              }}
+              envStyle={{
+                marginTop: isMobile ? 64 : 0,
+                background: color.pureWhite,
+                zIndex: 20,
+                ...(config?.modalStyle ?? {}),
+                maxHeight: '100%',
+                borderRadius: '10px'
+              }}
+              overlayClick={closeBudgetHandler}
+              bigCloseImage={closeBudgetHandler}
+              bigCloseImageStyle={{
+                top: '-18px',
+                right: '-18px',
+                background: '#000',
+                borderRadius: '50%'
+              }}
+            >
+              <Wrap newDesign={true}>
+                <ModalTitle>Add budget</ModalTitle>
+                {lnInvoice && ui.meInfo?.owner_pubkey && (
+                  <>
+                    <Invoice
+                      startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
+                      invoiceStatus={invoiceStatus}
+                      lnInvoice={lnInvoice}
+                      invoiceTime={pollMinutes}
+                    />
+                  </>
+                )}
+                {!lnInvoice && ui.meInfo?.owner_pubkey && (
+                  <>
+                    <InvoiceForm>
+                      <InvoiceLabel
+                        style={{
+                          display: 'block'
+                        }}
+                      >
+                        Amount (in sats)
+                      </InvoiceLabel>
+                      <InvoiceInput
+                        type="number"
+                        style={{
+                          width: '100%'
+                        }}
+                        value={amount}
+                        onChange={(e: any) => setAmount(Number(e.target.value))}
+                      />
+                    </InvoiceForm>
                     <Button
-                      disabled={disableFormButtons || loading}
-                      onClick={() => {
-                        handleSubmit();
-                      }}
-                      loading={loading}
-                      style={{ width: '100%' }}
+                      text={'Generate Invoice'}
                       color={'primary'}
-                      text={'Add user'}
+                      style={{ paddingLeft: 25, margin: '12px 0 10px' }}
+                      img={'sphinx_white.png'}
+                      imgSize={27}
+                      height={48}
+                      width={'100%'}
+                      onClick={generateInvoice}
                     />
-                  </div>
-                </Wrap>
-              )}
-            </Formik>
-          </Modal>
-        )}
-        {isOpenRoles && (
-          <Modal
-            visible={isOpenRoles}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeRolesHandler}
-            bigCloseImage={closeRolesHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <Wrap newDesign={true}>
-              <ModalTitle>Add user roles</ModalTitle>
-              <CheckUl>
-                {bountyRolesData.map((role: any, i: number) => (
-                  <CheckLi key={i}>
-                    <Check
-                      checked={role.status}
-                      onChange={roleChange}
-                      type="checkbox"
-                      name={role.name}
-                      value={role.name}
-                    />
-                    <CheckLabel>{role.name}</CheckLabel>
-                  </CheckLi>
-                ))}
-              </CheckUl>
-              <Button
-                onClick={() => submitRoles()}
-                style={{ width: '100%' }}
-                color={'primary'}
-                text={'Add roles'}
-              />
-            </Wrap>
-          </Modal>
-        )}
-        {isOpenBudget && (
-          <Modal
-            visible={isOpenBudget}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeBudgetHandler}
-            bigCloseImage={closeBudgetHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <Wrap newDesign={true}>
-              <ModalTitle>Add budget</ModalTitle>
-              {lnInvoice && ui.meInfo?.owner_pubkey && (
-                <>
-                  <Invoice
-                    startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
-                    invoiceStatus={invoiceStatus}
-                    lnInvoice={lnInvoice}
-                    invoiceTime={pollMinutes}
-                  />
-                </>
-              )}
-              {!lnInvoice && ui.meInfo?.owner_pubkey && (
-                <>
-                  <InvoiceForm>
-                    <InvoiceLabel
-                      style={{
-                        display: 'block'
-                      }}
-                    >
-                      Amount (in sats)
-                    </InvoiceLabel>
-                    <InvoiceInput
-                      type="number"
-                      style={{
-                        width: '100%'
-                      }}
-                      value={amount}
-                      onChange={(e: any) => setAmount(Number(e.target.value))}
-                    />
-                  </InvoiceForm>
-                  <Button
-                    text={'Generate Invoice'}
-                    color={'primary'}
-                    style={{ paddingLeft: 25, margin: '12px 0 10px' }}
-                    img={'sphinx_white.png'}
-                    imgSize={27}
-                    height={48}
-                    width={'100%'}
-                    onClick={generateInvoice}
-                  />
-                </>
-              )}
-            </Wrap>
-          </Modal>
-        )}
-        {isOpenHistory && (
-          <Modal
-            visible={isOpenHistory}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeHistoryHandler}
-            bigCloseImage={closeHistoryHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <OrgWrap style={{ width: '300px' }}>
-              <ModalTitle>Payment history</ModalTitle>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sender</th>
-                    <th>Recipient</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {paymentsHistory.map((pay: PaymentHistory, i: number) => (
-                    <tr key={i}>
-                      <td className="ellipsis">{pay.sender_name}</td>
-                      <td className="ellipsis">{pay.receiver_name}</td>
-                      <td>{pay.amount} sats</td>
-                      <td>{moment(pay.created).format('DD/MM/YY')}</td>
-                      <td>
-                        <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
-                          View bounty
-                        </ViewBounty>
-                      </td>
+                  </>
+                )}
+              </Wrap>
+            </Modal>
+          )
+        }
+        {
+          isOpenHistory && (
+            <Modal
+              visible={isOpenHistory}
+              style={{
+                height: '100%',
+                flexDirection: 'column'
+              }}
+              envStyle={{
+                marginTop: isMobile ? 64 : 0,
+                background: color.pureWhite,
+                zIndex: 20,
+                ...(config?.modalStyle ?? {}),
+                maxHeight: '100%',
+                borderRadius: '10px'
+              }}
+              overlayClick={closeHistoryHandler}
+              bigCloseImage={closeHistoryHandler}
+              bigCloseImageStyle={{
+                top: '-18px',
+                right: '-18px',
+                background: '#000',
+                borderRadius: '50%'
+              }}
+            >
+              <OrgWrap style={{ width: '300px' }}>
+                <ModalTitle>Payment history</ModalTitle>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sender</th>
+                      <th>Recipient</th>
+                      <th>Amount</th>
+                      <th>Date</th>
+                      <th />
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </OrgWrap>
-          </Modal>
-        )}
-        {isOpenBudgetHistory && (
-          <Modal
-            visible={isOpenBudgetHistory}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeBudgetHistoryHandler}
-            bigCloseImage={closeBudgetHistoryHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <OrgWrap>
-              <ModalTitle>Budget history</ModalTitle>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sender</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {budgetsHistory.map((b: BudgetHistory, i: number) => (
-                    <tr key={i}>
-                      <td className="ellipsis">{b.sender_name}</td>
-                      <td>{b.amount} sats</td>
-                      <td>{b.payment_type}</td>
-                      <td>{b.status ? 'settled' : 'peending'}</td>
-                      <td>{moment(b.created).format('DD/MM/YY')}</td>
+                  </thead>
+                  <tbody>
+                    {paymentsHistory.map((pay: PaymentHistory, i: number) => (
+                      <tr key={i}>
+                        <td className="ellipsis">{pay.sender_name}</td>
+                        <td className="ellipsis">{pay.receiver_name}</td>
+                        <td>{pay.amount} sats</td>
+                        <td>{moment(pay.created).format('DD/MM/YY')}</td>
+                        <td>
+                          <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
+                            View bounty
+                          </ViewBounty>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </OrgWrap>
+            </Modal>
+          )
+        }
+        {
+          isOpenBudgetHistory && (
+            <Modal
+              visible={isOpenBudgetHistory}
+              style={{
+                height: '100%',
+                flexDirection: 'column'
+              }}
+              envStyle={{
+                marginTop: isMobile ? 64 : 0,
+                background: color.pureWhite,
+                zIndex: 20,
+                ...(config?.modalStyle ?? {}),
+                maxHeight: '100%',
+                borderRadius: '10px'
+              }}
+              overlayClick={closeBudgetHistoryHandler}
+              bigCloseImage={closeBudgetHistoryHandler}
+              bigCloseImageStyle={{
+                top: '-18px',
+                right: '-18px',
+                background: '#000',
+                borderRadius: '50%'
+              }}
+            >
+              <OrgWrap>
+                <ModalTitle>Budget history</ModalTitle>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sender</th>
+                      <th>Amount</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Date</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </OrgWrap>
-          </Modal>
-        )}
-      </DetailsWrap>
+                  </thead>
+                  <tbody>
+                    {budgetsHistory.map((b: BudgetHistory, i: number) => (
+                      <tr key={i}>
+                        <td className="ellipsis">{b.sender_name}</td>
+                        <td>{b.amount} sats</td>
+                        <td>{b.payment_type}</td>
+                        <td>{b.status ? 'settled' : 'peending'}</td>
+                        <td>{moment(b.created).format('DD/MM/YY')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </OrgWrap>
+            </Modal>
+          )
+        }
+      </DetailsWrap >
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
       <Router history={history}>
         <Switch>
@@ -1114,7 +1122,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           </Route>
         </Switch>
       </Router>
-    </Container>
+    </Container >
   );
 };
 
