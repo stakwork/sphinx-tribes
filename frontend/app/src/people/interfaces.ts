@@ -243,7 +243,7 @@ export interface WantedSummaryProps {
   owner_id?: string;
 }
 
-export type LocalPaymeentState = "UNKNOWN" | "PAID" | "UNPAID"
+export type LocalPaymeentState = 'UNKNOWN' | 'PAID' | 'UNPAID';
 
 export interface CodingBountiesProps {
   deliverables?: string;
@@ -305,10 +305,9 @@ export interface CodingBountiesProps {
   bounty_expires?: string;
   org_uuid?: string;
   id?: number;
-  localPaid: LocalPaymeentState,
-  setLocalPaid: (state: LocalPaymeentState) => void
+  localPaid: LocalPaymeentState;
+  setLocalPaid: (state: LocalPaymeentState) => void;
 }
-
 
 export interface CodingViewProps extends WantedSummaryProps {
   // paid?: boolean;

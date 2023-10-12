@@ -11,7 +11,11 @@ import FocusedView from '../FocusView';
 const config = widgetConfigs.wanted;
 export const BountyModal = ({ basePath }: BountyModalProps) => {
   const history = useHistory();
-  const { wantedId, wantedIndex, personPubkey } = useParams<{ wantedId: string; wantedIndex: string, personPubkey: string }>();
+  const { wantedId, wantedIndex, personPubkey } = useParams<{
+    wantedId: string;
+    wantedIndex: string;
+    personPubkey: string;
+  }>();
 
   const { ui, main } = useStores();
   const { canEdit, person } = usePerson(ui.selectedPerson);
