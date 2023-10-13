@@ -515,6 +515,12 @@ type BountyPayRequest struct {
 	RouteHint       string `json:"route_hint,omitempty"`
 }
 
+type WithdrawBudgetRequest struct {
+	PaymentRequest  string `json:"payment_request"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+	OrgUuid         string `json:"org_uuid"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

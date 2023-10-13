@@ -373,3 +373,88 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	request := db.WithdrawBudgetRequest{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	invoiceData, err := GetLightningInvoice(request.PaymentRequest)
+
+	if err == nil {
+		// check if the orgnization bounty balance
+		// is greater than the amount
+
+		invoiceAmount := invoiceData.Response.Amount
+		amount, _ := utils.ConvertStringToUint(invoiceAmount)
+		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
+
+		if amount > orgBudget.TotalBudget {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode("Organization budget is not enough to withdraw the amount")
+			return
+		}
+	}
+}
+
+func GetLightningInvoice(payment_request string) (db.InvoiceResult, error) {
+	url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, payment_request)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return db.InvoiceResult{}, err
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	// Unmarshal result
+	invoiceRes := db.InvoiceResult{}
+
+	err = json.Unmarshal(body, &invoiceRes)
+
+	if err != nil {
+		log.Printf("Reading Invoice body failed: %s", err)
+		return db.InvoiceResult{}, err
+	}
+
+	return db.InvoiceResult{}, nil
+}
+
+func GetInvoiceData(w http.ResponseWriter, r *http.Request) {
+	paymentRequest := chi.URLParam(r, "paymentRequest")
+
+	invoiceData, err := GetLightningInvoice(paymentRequest)
+
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode("Could not get invoice data")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceData.Response)
+}
