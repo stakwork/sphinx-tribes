@@ -112,6 +112,10 @@ export const coding_languages = [
   'C++',
   'Java',
   'Rust',
+  'Ruby',
+  'Python',
+  'Postgres',
+  'Elastic search',
   'Other'
 ];
 
