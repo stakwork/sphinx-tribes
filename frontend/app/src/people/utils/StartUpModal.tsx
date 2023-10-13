@@ -11,12 +11,12 @@ import { useStores } from '../../store';
 import QR from './QR';
 
 const ModalContainer = styled.div`
-  max-height: 274px;
-  overflow-y: auto;
+  max-height: auto;
+  overflow-y: visible;
   display: flex;
   justify-content: center;
   margin-top: 20px;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 `;
 
 const ButtonContainer = styled.div`
@@ -29,7 +29,7 @@ const QrContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 0;
+  margin-top: 20px;
   overflow-y: hidden;
 `;
 
@@ -91,7 +91,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
           width={210}
           height={48}
           buttonType={'text'}
-          style={{ color: '#83878b', marginTop: '20px', textDecoration: 'none' }}
+          style={{ color: '#83878b', marginTop: '0px', textDecoration: 'none' }}
           onClick={(e: any) => {
             e.stopPropagation();
             setStep(2);
