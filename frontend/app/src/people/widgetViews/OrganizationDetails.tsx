@@ -22,6 +22,7 @@ import { nonWidgetConfigs } from '../utils/Constants';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import Input from '../../components/form/inputs';
 import avatarIcon from '../../public/static/profile_avatar.svg';
+import DeleteTicketModal from './DeleteModal';
 
 const color = colors['light'];
 
@@ -304,11 +305,19 @@ const UserPubkey = styled.p`
 
 const UserAction = styled.div`
   display: flex;
-  flex-gap: 25px;
   align-items: center;
   margin-left: auto;
-  @media only screen and (max-width: 500px) {
-    flex-gap: 10px;
+`;
+
+const IconWrap = styled.div`
+  :first-child {
+    margin-right: 40px;
+    @media only screen and (max-width: 700px) {
+      margin-right: 20px;
+    }
+    @media only screen and (max-width: 500px) {
+      margin-right: 8px;
+    }
   }
 `;
 
@@ -365,6 +374,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
   const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
   const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
@@ -438,6 +448,19 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     }
   };
 
+  const closeDeleteModal = () => setShowDeleteModal(false);
+
+  const confirmDelete = async () => {
+    try {
+      if (user) {
+        await deleteOrganizationUser(user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    closeDeleteModal();
+  };
+
   const getBountyRoles = useCallback(async () => {
     const bountyRolesData = main.bountyRoles.map((role: any) => ({
       name: role.name,
@@ -497,6 +520,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setUser(user);
     setIsOpenRoles(true);
     getUserRoles(user);
+  };
+
+  const handleDeleteClick = async (user: any) => {
+    setUser(user);
+    setShowDeleteModal(true);
   };
 
   const closeHandler = () => {
@@ -647,6 +675,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             color="white"
             style={{ borderRadius: '5px' }}
             endingIcon="open_in_new"
+            onClick={() => window.open(`/org/bounties/${uuid}`, '_target')}
           />
         </HeadButtonWrap>
       </HeadWrap>
@@ -659,7 +688,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 style={{
                   fontSize: 30,
                   cursor: 'pointer',
-                  color: '#CCC'
+                  color: '#ccc'
                 }}
               />
               <NoBudgetText>
@@ -719,34 +748,48 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 <UserPubkey>{user.owner_pubkey}</UserPubkey>
               </UserDetails>
               <UserAction>
-                <MaterialIcon
-                  disabled={addRolesDisabled}
-                  icon={'settings'}
-                  style={{
-                    fontSize: 24,
-                    cursor: 'pointer',
-                    color: '#CCC'
-                  }}
-                  onClick={() => handleSettingsClick(user)}
-                />
-                <MaterialIcon
-                  icon={'delete'}
-                  disabled={deleteUserDisabled}
-                  style={{
-                    fontSize: 24,
-                    cursor: 'pointer',
-                    color: '#CCC'
-                  }}
-                  onClick={() => {
-                    deleteOrganizationUser(user);
-                  }}
-                />
+                <IconWrap>
+                  <MaterialIcon
+                    disabled={addRolesDisabled}
+                    icon={'settings'}
+                    style={{
+                      fontSize: 24,
+                      cursor: 'pointer',
+                      color: '#ccc'
+                    }}
+                    onClick={() => handleSettingsClick(user)}
+                  />
+                </IconWrap>
+                <IconWrap>
+                  <MaterialIcon
+                    icon={'delete'}
+                    disabled={deleteUserDisabled}
+                    style={{
+                      fontSize: 24,
+                      cursor: 'pointer',
+                      color: '#ccc'
+                    }}
+                    onClick={() => {
+                      setUser(user);
+                      handleDeleteClick(user);
+                    }}
+                  />
+                </IconWrap>
               </UserAction>
             </User>
           ))}
         </UsersList>
       </UserWrap>
       <DetailsWrap>
+        {showDeleteModal && (
+          <DeleteTicketModal
+            closeModal={closeDeleteModal}
+            confirmDelete={confirmDelete}
+            text={'User'}
+            imgUrl={user?.img}
+            userDelete={true}
+          />
+        )}
         {isOpen && (
           <Modal
             visible={isOpen}
