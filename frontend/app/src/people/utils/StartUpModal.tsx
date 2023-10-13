@@ -60,7 +60,7 @@ const AndroidIosButtonConatiner = styled.div`
 const palette = colors.light;
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps) => {
-  const { ui, main } = useStores();
+  const { ui, _main } = useStores();
   const [step, setStep] = useState(1);
   const [connection_string, setConnectionString] = useState('');
 
@@ -77,34 +77,36 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
     <>
       <ModalContainer>
         {
-          connection_string ? 
-          (<QRText>We are out of codes to sign up! Please check again later.</QRText>) :
-          (<QrContainer>
-            <QR size={200} value={connection_string} />
-            <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
-          </QrContainer>)
+          connection_string ?
+            (<QRText>We are out of codes to sign up! Please check again later.</QRText>) :
+            (
+              <QrContainer>
+                <QR size={200} value={connection_string} />
+                <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
+              </QrContainer>
+            )
         }
       </ModalContainer>
       <ButtonContainer>
         <IconButton
-            text={'Back'}
-            width={210}
-            height={48}
-            buttonType={'text'}
-            style={{ color: '#83878b', marginTop: '0px', textDecoration: 'none' }}
-            onClick={(e: any) => {
-              e.stopPropagation();
-              setStep(2);
-            }}
-            textStyle={{
-              fontSize: '15px',
-              fontWeight: '500',
-              color: '#5F6368'
-            }}
-            iconStyle={{
-              top: '14px'
-            }}
-            color={buttonColor}
+          text={'Back'}
+          width={210}
+          height={48}
+          buttonType={'text'}
+          style={{ color: '#83878b', marginTop: '0px', textDecoration: 'none' }}
+          onClick={(e: any) => {
+            e.stopPropagation();
+            setStep(2);
+          }}
+          textStyle={{
+            fontSize: '15px',
+            fontWeight: '500',
+            color: '#5F6368'
+          }}
+          iconStyle={{
+            top: '14px'
+          }}
+          color={buttonColor}
         />
       </ButtonContainer>
     </>
