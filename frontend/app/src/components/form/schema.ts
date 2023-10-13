@@ -688,31 +688,19 @@ export const wantedOtherSchema: FormField[] = [
   }
 ];
 
+const whitespace : FormField = {
+  name: 'space',
+  type: 'space',
+  label: 'some space'
+}
+
 export const wantedCodingTaskSchema: FormField[] = [
   {
-    name: 'org_uuid',
-    label: 'Organization(optional)',
-    type: 'select',
-    options: [],
-    validator: strValidatorNotRequired
+    name: 'basic_info_h',
+    type: 'header',
+    label: 'Basic Info'
   },
-  {
-    name: 'title',
-    label: 'Title',
-    type: 'hide'
-  },
-  {
-    name: 'created',
-    label: 'Created',
-    type: 'hide'
-  },
-  {
-    name: 'wanted_type',
-    label: 'Category',
-    type: 'select',
-    testId: 'Category',
-    options: helpType_wanted_coding_task_schema
-  },
+  whitespace,
   {
     name: 'one_sentence_summary',
     label: 'Bounty Title',
@@ -725,6 +713,25 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'text'
   },
   {
+    name: 'coding_languages',
+    label: 'Coding Language',
+    type: 'creatablemultiselect',
+    options: codingLanguages
+  },
+  {
+    name: 'wanted_type',
+    label: 'Category',
+    type: 'select',
+    testId: 'Category',
+    options: helpType_wanted_coding_task_schema
+  },
+  {
+    name: 'description_h',
+    label: 'Description',
+    type: 'header',
+  },
+  whitespace,
+  {
     name: 'github_description',
     label: 'Get Description From Github ',
     type: 'switch'
@@ -735,29 +742,22 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'textarea'
   },
   {
+    name: 'loomEmbedUrl',
+    label: 'Loom Video',
+    type: 'loom',
+    validator: strValidatorNotRequired
+  },
+  {
+    name: 'price_and_estimate_h',
+    label: 'Price and Estimate',
+    type: 'header'
+  },
+  whitespace,
+  {
     name: 'price',
     label: 'Price (Sats)',
     validator: nomValidator,
     type: 'number'
-  },
-  {
-    name: 'assignee',
-    label: 'Assignee',
-    type: 'searchableselect',
-    options: []
-  },
-  {
-    name: 'coding_languages',
-    label: 'Coding Language',
-    type: 'creatablemultiselect',
-    options: codingLanguages
-  },
-  {
-    name: 'tribe',
-    label: 'Tribe',
-    type: 'select',
-    options: [],
-    validator: strValidatorNotRequired
   },
   {
     name: 'estimated_session_length',
@@ -771,6 +771,13 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'date'
   },
   {
+    name: 'tribe',
+    label: 'Tribe',
+    type: 'select',
+    options: [],
+    validator: strValidatorNotRequired
+  },
+  {
     name: 'deliverables',
     label: 'Deliverables',
     type: 'textarea'
@@ -781,11 +788,19 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'switch'
   },
   {
-    name: 'loomEmbedUrl',
-    label: 'Loom Video',
-    type: 'loom',
-    validator: strValidatorNotRequired
+    name: 'assign_h',
+    label: 'Assign to Developer',
+    type: 'header',
   },
+  whitespace,
+  {
+    name: 'assignee',
+    label: 'Assignee',
+    type: 'searchableselect',
+    options: []
+  },
+  
+
   {
     name: 'type',
     label: 'Type',

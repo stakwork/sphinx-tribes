@@ -24,6 +24,7 @@ import {
 import { FormField, validator } from './utils';
 import { FormProps } from './interfaces';
 
+
 function Form(props: FormProps) {
   const {
     buttonsOnBottom,
@@ -592,8 +593,9 @@ function Form(props: FormProps) {
                 )}
               </>
             ) : (
+              // inner form of edit bounties>>edit bounty
               <SchemaOuterContainer>
-                <div className="SchemaInnerContainer">
+                <div className="SchemaInnerContainer" style={{marginTop:"20px", marginBottom: "50px"}}>
                   {schema.map((item: FormField) => (
                     <Input
                       {...item}
@@ -640,8 +642,15 @@ function Form(props: FormProps) {
 
             {/* make space at bottom for first sign up */}
             {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
+            {/* floating header buttons for edit bounty */}
             {!props?.newDesign && (
-              <BWrap style={buttonAlignment} color={color}>
+              <BWrap style={{
+                ...buttonAlignment, 
+                padding: '20px',
+                paddingTop: '10px', 
+                paddingBottom: '10px'
+              }} color={color}>
+                <h4 style={{color:'#3C3D3F'}}><b>Edit Bounty</b></h4>
                 {props?.close && buttonsOnBottom ? (
                   <Button
                     disabled={disableFormButtons || props.loading}
@@ -653,12 +662,14 @@ function Form(props: FormProps) {
                     text={'Cancel'}
                   />
                 ) : (
-                  <IconButton
-                    icon="arrow_back"
+                  <Button
                     onClick={() => {
                       if (props.close) props.close();
                     }}
-                    style={{ fontSize: 12, fontWeight: 600 }}
+                    color={'white'}
+                    width={100}
+                    text={'Cancel'}
+                    style={{ ...buttonStyle, marginRight: 10, marginLeft:'auto', width: '140px' }}
                   />
                 )}
 

@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
 type FormFieldType =
+  | 'header'
   | 'text'
   | 'textarea'
   | 'img'
