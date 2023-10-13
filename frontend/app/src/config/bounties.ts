@@ -12,7 +12,11 @@ export const languages = [
   'C#',
   'C++',
   'Java',
-  'Rust'
+  'Rust',
+  'Ruby',
+  'Python',
+  'Postgres',
+  'Elastic search'
 ];
 
 export const estimation = [
@@ -27,6 +31,7 @@ export const estimated_budget_15_min = ['USD $10', 'USD $20', 'USD $30', 'USD $4
 export const help_wanted_coding_task_schema = [
   'Web development',
   'Mobile development',
+  'Design',
   'Desktop app',
   'Dev ops',
   'Bitcoin / Lightning',
