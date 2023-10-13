@@ -76,16 +76,14 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
   const DisplayQRCode = () => (
     <>
       <ModalContainer>
-        {
-          !connection_string ?
-            (<QRText>We are out of codes to sign up! Please check again later.</QRText>) :
-            (
-              <QrContainer>
-                <QR size={200} value={connection_string} />
-                <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
-              </QrContainer>
-            )
-        }
+        {!connection_string ? (
+          <QRText>We are out of codes to sign up! Please check again later.</QRText>
+        ) : (
+          <QrContainer>
+            <QR size={200} value={connection_string} />
+            <QRText>Install the Sphinx app on your phone and then scan this QRcode</QRText>
+          </QrContainer>
+        )}
       </ModalContainer>
       <ButtonContainer>
         <IconButton
@@ -110,7 +108,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
         />
       </ButtonContainer>
     </>
-  )
+  );
 
   const StepOne = () => (
     <>
@@ -325,7 +323,15 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
   return (
     <BaseModal open onClose={closeModal}>
       <Box p={4} bgcolor={palette.grayish.G950} borderRadius={2} maxWidth={400} minWidth={350}>
-        {step === 1 ? <StepOne /> : step === 2 ? <StepTwo /> : step === 3 ? <StepThree /> : <DisplayQRCode />}
+        {step === 1 ? (
+          <StepOne />
+        ) : step === 2 ? (
+          <StepTwo />
+        ) : step === 3 ? (
+          <StepThree />
+        ) : (
+          <DisplayQRCode />
+        )}
       </Box>
     </BaseModal>
   );
