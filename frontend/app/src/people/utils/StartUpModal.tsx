@@ -77,7 +77,7 @@ const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps
     <>
       <ModalContainer>
         {
-          connection_string ?
+          !connection_string ?
             (<QRText>We are out of codes to sign up! Please check again later.</QRText>) :
             (
               <QrContainer>
