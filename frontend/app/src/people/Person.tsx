@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { random } from 'lodash';
 import { getHost } from '../config/host';
-import { Button, Divider, LazyImg, LazyImgBg } from '../components/common/index';
+import { Button, Divider, LazyImgBg } from '../components/common/index';
 import ConnectCard from './utils/ConnectCard';
 import { PersonProps } from './interfaces';
 
@@ -187,11 +186,7 @@ export default function Person(props: PersonProps) {
       <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
         <div>
           <div style={{ height: 210 }}>
-            <Img
-              style={{ height: '100%', width: '100%', borderRadius: 0 }}
-              src={img}
-              // src={img || getUserPlaceholder(owner_pubkey)}
-            />
+            <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={img} />
           </div>
           <div style={{ padding: 16 }}>
             <DTitle>{owner_alias}</DTitle>

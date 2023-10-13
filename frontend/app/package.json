@@ -16,6 +16,7 @@
     "lint": "eslint src --max-warnings 67 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
+    "prettier:check": "npx prettier --config .prettierrc.json --check ./src",
     "prepare": "cd ../.. && husky install frontend/app/.husky"
   },
   "resolutions": {
@@ -186,7 +187,8 @@
     "husky": "^8.0.3",
     "nock": "^13.3.0",
     "react-error-overlay": "6.0.9",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.3",
+    "prettier": "^3.0.3"
   },
   "jest": {
     "transformIgnorePatterns": [
