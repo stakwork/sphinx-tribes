@@ -60,7 +60,7 @@ const AndroidIosButtonConatiner = styled.div`
 const palette = colors.light;
 
 const StartUpModal = ({ closeModal, dataObject, buttonColor }: StartUpModalProps) => {
-  const { ui, _main } = useStores();
+  const { ui } = useStores();
   const [step, setStep] = useState(1);
   const [connection_string, setConnectionString] = useState('');
 
