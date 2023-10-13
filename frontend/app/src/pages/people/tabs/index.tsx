@@ -152,13 +152,13 @@ export const TabsPages = observer(() => {
             } else {
               count = hasExtras
                 ? person.extras[name].filter((f: any) => {
-                  if ('show' in f) {
-                    // show has a value
-                    if (!f.show) return false;
-                  }
-                  // if no value default to true
-                  return true;
-                }).length
+                    if ('show' in f) {
+                      // show has a value
+                      if (!f.show) return false;
+                    }
+                    // if no value default to true
+                    return true;
+                  }).length
                 : null;
             }
 

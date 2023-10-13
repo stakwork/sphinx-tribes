@@ -397,11 +397,16 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
   const schema = [...config.schema];
 
-  const addUserDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER'));
-  const viewReportDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT'));
-  const addBudgetDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET'));
-  const deleteUserDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER'));
-  const addRolesDisabled = (!isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES'));
+  const addUserDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
+  const viewReportDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+  const addBudgetDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET');
+  const deleteUserDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER');
+  const addRolesDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
 
   const initValues = {
     owner_pubkey: ''
@@ -442,7 +447,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       }
     }
   };
-
 
   const closeDeleteModal = () => setShowDeleteModal(false);
 
@@ -673,8 +677,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             endingIcon="open_in_new"
             onClick={() => window.open(`/org/bounties/${uuid}`, '_target')}
           />
-        </HeadButtonWrap >
-      </HeadWrap >
+        </HeadButtonWrap>
+      </HeadWrap>
       <ActionWrap>
         <BudgetWrap>
           {viewReportDisabled ? (
@@ -699,9 +703,9 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                 {orgBudget.toLocaleString()} <Grey>SATS</Grey>
               </Budget>
               <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
-            </ViewBudgetWrap >
+            </ViewBudgetWrap>
           )}
-        </BudgetWrap >
+        </BudgetWrap>
         <HeadButtonWrap forSmallScreen={true}>
           <Button
             disabled={viewReportDisabled}
@@ -719,7 +723,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             onClick={() => setIsOpenBudget(true)}
           />
         </HeadButtonWrap>
-      </ActionWrap >
+      </ActionWrap>
       <UserWrap>
         <UsersHeadWrap>
           <UsersHeader>USERS</UsersHeader>
@@ -771,349 +775,337 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                     }}
                   />
                 </IconWrap>
-              </UserAction >
-            </User >
+              </UserAction>
+            </User>
           ))}
-        </UsersList >
-      </UserWrap >
+        </UsersList>
+      </UserWrap>
       <DetailsWrap>
-        {
-          showDeleteModal && (
-            <DeleteTicketModal
-              closeModal={closeDeleteModal}
-              confirmDelete={confirmDelete}
-              text={'User'}
-              imgUrl={user?.img}
-              userDelete={true}
-            />
-          )
-        }
-        {
-          isOpen && (
-            <Modal
-              visible={isOpen}
-              style={{
-                height: '100%',
-                flexDirection: 'column'
-              }}
-              envStyle={{
-                marginTop: isMobile ? 64 : 0,
-                background: color.pureWhite,
-                zIndex: 20,
-                ...(config?.modalStyle ?? {}),
-                maxHeight: '100%',
-                borderRadius: '10px'
-              }}
-              overlayClick={closeHandler}
-              bigCloseImage={closeHandler}
-              bigCloseImageStyle={{
-                top: '-18px',
-                right: '-18px',
-                background: '#000',
-                borderRadius: '50%'
-              }}
+        {showDeleteModal && (
+          <DeleteTicketModal
+            closeModal={closeDeleteModal}
+            confirmDelete={confirmDelete}
+            text={'User'}
+            imgUrl={user?.img}
+            userDelete={true}
+          />
+        )}
+        {isOpen && (
+          <Modal
+            visible={isOpen}
+            style={{
+              height: '100%',
+              flexDirection: 'column'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeHandler}
+            bigCloseImage={closeHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <Formik
+              initialValues={initValues || {}}
+              onSubmit={onSubmit}
+              innerRef={formRef}
+              validationSchema={validator(schema)}
             >
-              <Formik
-                initialValues={initValues || {}}
-                onSubmit={onSubmit}
-                innerRef={formRef}
-                validationSchema={validator(schema)}
-              >
-                {({
-                  setFieldTouched,
-                  handleSubmit,
-                  values,
-                  setFieldValue,
-                  errors,
-                  initialValues
-                }: any) => (
-                  <Wrap newDesign={true}>
-                    <ModalTitle>Add new user</ModalTitle>
-                    <div className="SchemaInnerContainer">
-                      {schema.map((item: FormField) => (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          values={values}
-                          errors={errors}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e: any, f: any) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          borderType={'bottom'}
-                          imageIcon={true}
-                          style={
-                            item.name === 'github_description' && !values.ticket_url
-                              ? {
+              {({
+                setFieldTouched,
+                handleSubmit,
+                values,
+                setFieldValue,
+                errors,
+                initialValues
+              }: any) => (
+                <Wrap newDesign={true}>
+                  <ModalTitle>Add new user</ModalTitle>
+                  <div className="SchemaInnerContainer">
+                    {schema.map((item: FormField) => (
+                      <Input
+                        {...item}
+                        key={item.name}
+                        values={values}
+                        errors={errors}
+                        value={values[item.name]}
+                        error={errors[item.name]}
+                        initialValues={initialValues}
+                        deleteErrors={() => {
+                          if (errors[item.name]) delete errors[item.name];
+                        }}
+                        handleChange={(e: any) => {
+                          setFieldValue(item.name, e);
+                        }}
+                        setFieldValue={(e: any, f: any) => {
+                          setFieldValue(e, f);
+                        }}
+                        setFieldTouched={setFieldTouched}
+                        handleBlur={() => setFieldTouched(item.name, false)}
+                        handleFocus={() => setFieldTouched(item.name, true)}
+                        setDisableFormButtons={setDisableFormButtons}
+                        borderType={'bottom'}
+                        imageIcon={true}
+                        style={
+                          item.name === 'github_description' && !values.ticket_url
+                            ? {
                                 display: 'none'
                               }
-                              : undefined
-                          }
-                        />
-                      ))}
-                      <Button
-                        disabled={disableFormButtons || loading}
-                        onClick={() => {
-                          handleSubmit();
-                        }}
-                        loading={loading}
-                        style={{ width: '100%' }}
-                        color={'primary'}
-                        text={'Add user'}
+                            : undefined
+                        }
                       />
-                    </div>
-                  </Wrap>
-                )}
-              </Formik>
-            </Modal>
-          )
-        }
-        {
-          isOpenRoles && (
-            <Modal
-              visible={isOpenRoles}
-              style={{
-                height: '100%',
-                flexDirection: 'column'
-              }}
-              envStyle={{
-                marginTop: isMobile ? 64 : 0,
-                background: color.pureWhite,
-                zIndex: 20,
-                ...(config?.modalStyle ?? {}),
-                maxHeight: '100%',
-                borderRadius: '10px'
-              }}
-              overlayClick={closeRolesHandler}
-              bigCloseImage={closeRolesHandler}
-              bigCloseImageStyle={{
-                top: '-18px',
-                right: '-18px',
-                background: '#000',
-                borderRadius: '50%'
-              }}
-            >
-              <Wrap newDesign={true}>
-                <ModalTitle>Add user roles</ModalTitle>
-                <CheckUl>
-                  {bountyRolesData.map((role: any, i: number) => (
-                    <CheckLi key={i}>
-                      <Check
-                        checked={role.status}
-                        onChange={roleChange}
-                        type="checkbox"
-                        name={role.name}
-                        value={role.name}
-                      />
-                      <CheckLabel>{role.name}</CheckLabel>
-                    </CheckLi>
-                  ))}
-                </CheckUl>
-                <Button
-                  onClick={() => submitRoles()}
-                  style={{ width: '100%' }}
-                  color={'primary'}
-                  text={'Add roles'}
-                />
-              </Wrap>
-            </Modal>
-          )
-        }
-        {
-          isOpenBudget && (
-            <Modal
-              visible={isOpenBudget}
-              style={{
-                height: '100%',
-                flexDirection: 'column'
-              }}
-              envStyle={{
-                marginTop: isMobile ? 64 : 0,
-                background: color.pureWhite,
-                zIndex: 20,
-                ...(config?.modalStyle ?? {}),
-                maxHeight: '100%',
-                borderRadius: '10px'
-              }}
-              overlayClick={closeBudgetHandler}
-              bigCloseImage={closeBudgetHandler}
-              bigCloseImageStyle={{
-                top: '-18px',
-                right: '-18px',
-                background: '#000',
-                borderRadius: '50%'
-              }}
-            >
-              <Wrap newDesign={true}>
-                <ModalTitle>Add budget</ModalTitle>
-                {lnInvoice && ui.meInfo?.owner_pubkey && (
-                  <>
-                    <Invoice
-                      startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
-                      invoiceStatus={invoiceStatus}
-                      lnInvoice={lnInvoice}
-                      invoiceTime={pollMinutes}
-                    />
-                  </>
-                )}
-                {!lnInvoice && ui.meInfo?.owner_pubkey && (
-                  <>
-                    <InvoiceForm>
-                      <InvoiceLabel
-                        style={{
-                          display: 'block'
-                        }}
-                      >
-                        Amount (in sats)
-                      </InvoiceLabel>
-                      <InvoiceInput
-                        type="number"
-                        style={{
-                          width: '100%'
-                        }}
-                        value={amount}
-                        onChange={(e: any) => setAmount(Number(e.target.value))}
-                      />
-                    </InvoiceForm>
+                    ))}
                     <Button
-                      text={'Generate Invoice'}
+                      disabled={disableFormButtons || loading}
+                      onClick={() => {
+                        handleSubmit();
+                      }}
+                      loading={loading}
+                      style={{ width: '100%' }}
                       color={'primary'}
-                      style={{ paddingLeft: 25, margin: '12px 0 10px' }}
-                      img={'sphinx_white.png'}
-                      imgSize={27}
-                      height={48}
-                      width={'100%'}
-                      onClick={generateInvoice}
+                      text={'Add user'}
                     />
-                  </>
-                )}
-              </Wrap>
-            </Modal>
-          )
-        }
-        {
-          isOpenHistory && (
-            <Modal
-              visible={isOpenHistory}
-              style={{
-                height: '100%',
-                flexDirection: 'column'
-              }}
-              envStyle={{
-                marginTop: isMobile ? 64 : 0,
-                background: color.pureWhite,
-                zIndex: 20,
-                ...(config?.modalStyle ?? {}),
-                maxHeight: '100%',
-                borderRadius: '10px'
-              }}
-              overlayClick={closeHistoryHandler}
-              bigCloseImage={closeHistoryHandler}
-              bigCloseImageStyle={{
-                top: '-18px',
-                right: '-18px',
-                background: '#000',
-                borderRadius: '50%'
-              }}
-            >
-              <OrgWrap style={{ width: '300px' }}>
-                <ModalTitle>Payment history</ModalTitle>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Sender</th>
-                      <th>Recipient</th>
-                      <th>Amount</th>
-                      <th>Date</th>
-                      <th />
+                  </div>
+                </Wrap>
+              )}
+            </Formik>
+          </Modal>
+        )}
+        {isOpenRoles && (
+          <Modal
+            visible={isOpenRoles}
+            style={{
+              height: '100%',
+              flexDirection: 'column'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeRolesHandler}
+            bigCloseImage={closeRolesHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <Wrap newDesign={true}>
+              <ModalTitle>Add user roles</ModalTitle>
+              <CheckUl>
+                {bountyRolesData.map((role: any, i: number) => (
+                  <CheckLi key={i}>
+                    <Check
+                      checked={role.status}
+                      onChange={roleChange}
+                      type="checkbox"
+                      name={role.name}
+                      value={role.name}
+                    />
+                    <CheckLabel>{role.name}</CheckLabel>
+                  </CheckLi>
+                ))}
+              </CheckUl>
+              <Button
+                onClick={() => submitRoles()}
+                style={{ width: '100%' }}
+                color={'primary'}
+                text={'Add roles'}
+              />
+            </Wrap>
+          </Modal>
+        )}
+        {isOpenBudget && (
+          <Modal
+            visible={isOpenBudget}
+            style={{
+              height: '100%',
+              flexDirection: 'column'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeBudgetHandler}
+            bigCloseImage={closeBudgetHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <Wrap newDesign={true}>
+              <ModalTitle>Add budget</ModalTitle>
+              {lnInvoice && ui.meInfo?.owner_pubkey && (
+                <>
+                  <Invoice
+                    startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
+                    invoiceStatus={invoiceStatus}
+                    lnInvoice={lnInvoice}
+                    invoiceTime={pollMinutes}
+                  />
+                </>
+              )}
+              {!lnInvoice && ui.meInfo?.owner_pubkey && (
+                <>
+                  <InvoiceForm>
+                    <InvoiceLabel
+                      style={{
+                        display: 'block'
+                      }}
+                    >
+                      Amount (in sats)
+                    </InvoiceLabel>
+                    <InvoiceInput
+                      type="number"
+                      style={{
+                        width: '100%'
+                      }}
+                      value={amount}
+                      onChange={(e: any) => setAmount(Number(e.target.value))}
+                    />
+                  </InvoiceForm>
+                  <Button
+                    text={'Generate Invoice'}
+                    color={'primary'}
+                    style={{ paddingLeft: 25, margin: '12px 0 10px' }}
+                    img={'sphinx_white.png'}
+                    imgSize={27}
+                    height={48}
+                    width={'100%'}
+                    onClick={generateInvoice}
+                  />
+                </>
+              )}
+            </Wrap>
+          </Modal>
+        )}
+        {isOpenHistory && (
+          <Modal
+            visible={isOpenHistory}
+            style={{
+              height: '100%',
+              flexDirection: 'column'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeHistoryHandler}
+            bigCloseImage={closeHistoryHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <OrgWrap style={{ width: '300px' }}>
+              <ModalTitle>Payment history</ModalTitle>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sender</th>
+                    <th>Recipient</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {paymentsHistory.map((pay: PaymentHistory, i: number) => (
+                    <tr key={i}>
+                      <td className="ellipsis">{pay.sender_name}</td>
+                      <td className="ellipsis">{pay.receiver_name}</td>
+                      <td>{pay.amount} sats</td>
+                      <td>{moment(pay.created).format('DD/MM/YY')}</td>
+                      <td>
+                        <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
+                          View bounty
+                        </ViewBounty>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {paymentsHistory.map((pay: PaymentHistory, i: number) => (
-                      <tr key={i}>
-                        <td className="ellipsis">{pay.sender_name}</td>
-                        <td className="ellipsis">{pay.receiver_name}</td>
-                        <td>{pay.amount} sats</td>
-                        <td>{moment(pay.created).format('DD/MM/YY')}</td>
-                        <td>
-                          <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
-                            View bounty
-                          </ViewBounty>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </OrgWrap>
-            </Modal>
-          )
-        }
-        {
-          isOpenBudgetHistory && (
-            <Modal
-              visible={isOpenBudgetHistory}
-              style={{
-                height: '100%',
-                flexDirection: 'column'
-              }}
-              envStyle={{
-                marginTop: isMobile ? 64 : 0,
-                background: color.pureWhite,
-                zIndex: 20,
-                ...(config?.modalStyle ?? {}),
-                maxHeight: '100%',
-                borderRadius: '10px'
-              }}
-              overlayClick={closeBudgetHistoryHandler}
-              bigCloseImage={closeBudgetHistoryHandler}
-              bigCloseImageStyle={{
-                top: '-18px',
-                right: '-18px',
-                background: '#000',
-                borderRadius: '50%'
-              }}
-            >
-              <OrgWrap>
-                <ModalTitle>Budget history</ModalTitle>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Sender</th>
-                      <th>Amount</th>
-                      <th>Type</th>
-                      <th>Status</th>
-                      <th>Date</th>
+                  ))}
+                </tbody>
+              </table>
+            </OrgWrap>
+          </Modal>
+        )}
+        {isOpenBudgetHistory && (
+          <Modal
+            visible={isOpenBudgetHistory}
+            style={{
+              height: '100%',
+              flexDirection: 'column'
+            }}
+            envStyle={{
+              marginTop: isMobile ? 64 : 0,
+              background: color.pureWhite,
+              zIndex: 20,
+              ...(config?.modalStyle ?? {}),
+              maxHeight: '100%',
+              borderRadius: '10px'
+            }}
+            overlayClick={closeBudgetHistoryHandler}
+            bigCloseImage={closeBudgetHistoryHandler}
+            bigCloseImageStyle={{
+              top: '-18px',
+              right: '-18px',
+              background: '#000',
+              borderRadius: '50%'
+            }}
+          >
+            <OrgWrap>
+              <ModalTitle>Budget history</ModalTitle>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sender</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetsHistory.map((b: BudgetHistory, i: number) => (
+                    <tr key={i}>
+                      <td className="ellipsis">{b.sender_name}</td>
+                      <td>{b.amount} sats</td>
+                      <td>{b.payment_type}</td>
+                      <td>{b.status ? 'settled' : 'peending'}</td>
+                      <td>{moment(b.created).format('DD/MM/YY')}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {budgetsHistory.map((b: BudgetHistory, i: number) => (
-                      <tr key={i}>
-                        <td className="ellipsis">{b.sender_name}</td>
-                        <td>{b.amount} sats</td>
-                        <td>{b.payment_type}</td>
-                        <td>{b.status ? 'settled' : 'peending'}</td>
-                        <td>{moment(b.created).format('DD/MM/YY')}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </OrgWrap>
-            </Modal>
-          )
-        }
-      </DetailsWrap >
+                  ))}
+                </tbody>
+              </table>
+            </OrgWrap>
+          </Modal>
+        )}
+      </DetailsWrap>
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
       <Router history={history}>
         <Switch>
@@ -1122,7 +1114,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           </Route>
         </Switch>
       </Router>
-    </Container >
+    </Container>
   );
 };
 

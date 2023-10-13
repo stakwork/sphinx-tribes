@@ -254,10 +254,14 @@ const Organizations = (props: { person: Person }) => {
             </OrganizationBudgetText>
           </OrganizationTextWrap>
           <OrganizationActionWrap>
-            <ManageButton org={org} user_pubkey={user?.owner_pubkey ?? ''} action={() => {
-              setOrganization(org);
-              setDetailsOpen(true);
-            }} />
+            <ManageButton
+              org={org}
+              user_pubkey={user?.owner_pubkey ?? ''}
+              action={() => {
+                setOrganization(org);
+                setDetailsOpen(true);
+              }}
+            />
             <Button
               disabled={btnDisabled}
               color={!btnDisabled ? 'white' : 'grey'}
@@ -382,8 +386,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                  display: 'none'
-                                }
+                                    display: 'none'
+                                  }
                                 : undefined
                             }
                           />
@@ -405,10 +409,9 @@ const Organizations = (props: { person: Person }) => {
             </Modal>
           )}
         </>
-      )
-      }
+      )}
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
-    </Container >
+    </Container>
   );
 };
 
