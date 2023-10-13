@@ -26,6 +26,7 @@ const Content = styled.div`
   height: 100%;
   align-items: center;
   color: #000000;
+  padding-bottom: 60px;
   background: #f0f1f3;
   .desktop {
     position: relative;
