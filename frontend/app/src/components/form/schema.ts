@@ -688,11 +688,11 @@ export const wantedOtherSchema: FormField[] = [
   }
 ];
 
-const whitespace : FormField = {
+const whitespace: FormField = {
   name: 'space',
   type: 'space',
   label: 'some space'
-}
+};
 
 export const wantedCodingTaskSchema: FormField[] = [
   {
@@ -775,7 +775,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'searchableselect',
     options: []
   },
-  
 
   {
     name: 'type',

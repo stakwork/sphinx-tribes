@@ -24,7 +24,6 @@ import {
 import { FormField, validator } from './utils';
 import { FormProps } from './interfaces';
 
-
 function Form(props: FormProps) {
   const {
     buttonsOnBottom,
@@ -160,7 +159,7 @@ function Form(props: FormProps) {
 
   // check weather this is a multi-page form, filter by page
   let schema = props.paged ? props.schema?.filter((f: any) => f.page === page) : props.schema;
-  console.log("top of form");
+  console.log('top of form');
 
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema;
@@ -218,7 +217,7 @@ function Form(props: FormProps) {
 
         // returns the body of a form page
         // assuming two collumn layout
-        const GetFormFields = (schemaData: any, style: any={}) => (
+        const GetFormFields = (schemaData: any, style: any = {}) => (
           <div style={style}>
             <div className="LeftSchema">
               {schema
@@ -256,9 +255,7 @@ function Form(props: FormProps) {
                       setIsFocused({ [item.label]: true });
                     }}
                     setDisableFormButtons={setDisableFormButtons}
-                    extraHTML={
-                      (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                    }
+                    extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                     style={
                       item.name === 'github_description' && !values.ticket_url
                         ? {
@@ -305,9 +302,7 @@ function Form(props: FormProps) {
                       setIsFocused({ [item.label]: true });
                     }}
                     setDisableFormButtons={setDisableFormButtons}
-                    extraHTML={
-                      (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                    }
+                    extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
                     style={
                       item.type === 'loom' && values.ticket_url
                         ? {
@@ -319,7 +314,7 @@ function Form(props: FormProps) {
                 ))}
             </div>
           </div>
-        ) 
+        );
 
         return (
           <Wrap
@@ -527,9 +522,7 @@ function Form(props: FormProps) {
 
                 {schemaData.step !== 1 && (
                   <>
-                    <SchemaTagsContainer>
-                      {GetFormFields(schemaData)}
-                    </SchemaTagsContainer>
+                    <SchemaTagsContainer>{GetFormFields(schemaData)}</SchemaTagsContainer>
                     <BottomContainer color={color} assigneeName={assigneeName} valid={valid}>
                       <EuiText className="RequiredText">{schemaData?.extraText}</EuiText>
                       <div
@@ -601,37 +594,43 @@ function Form(props: FormProps) {
                     </BottomContainer>
                   </>
                 )}
-              </> 
+              </>
             ) : (
-              <div style={{
-                marginTop: '20px', marginBottom: '20px', 
-                paddingLeft: '20px', paddingRight: '10px',
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                color:'#3C3D3F'
-                }}>
+              <div
+                style={{
+                  marginTop: '20px',
+                  marginBottom: '20px',
+                  paddingLeft: '20px',
+                  paddingRight: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  color: '#3C3D3F'
+                }}
+              >
                 <div>
                   <h4>
                     <b>{BountyDetailsCreationData.step_2.heading}</b>
                   </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_2, {display: 'flex'})}
+                  {GetFormFields(BountyDetailsCreationData.step_2, { display: 'flex' })}
                 </div>
                 <div>
                   <h4>
                     <b>{BountyDetailsCreationData.step_3.heading}</b>
                   </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_3, {display: 'flex'})}
+                  {GetFormFields(BountyDetailsCreationData.step_3, { display: 'flex' })}
                 </div>
                 <div>
                   <h4>
                     <b>{BountyDetailsCreationData.step_4.heading}</b>
                   </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_4, {display: 'flex'})}
+                  {GetFormFields(BountyDetailsCreationData.step_4, { display: 'flex' })}
                 </div>
-                <div style={{marginBottom:'20px'}}>
+                <div style={{ marginBottom: '20px' }}>
                   <h4>
                     <b>{BountyDetailsCreationData.step_5.heading}</b>
                   </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_5, {display: 'flex'})}
+                  {GetFormFields(BountyDetailsCreationData.step_5, { display: 'flex' })}
                 </div>
               </div>
             )}
@@ -640,13 +639,18 @@ function Form(props: FormProps) {
             {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
             {/* floating header buttons for edit bounty */}
             {!props?.newDesign && (
-              <BWrap style={{
-                ...buttonAlignment, 
-                padding: '20px',
-                paddingTop: '10px', 
-                paddingBottom: '10px'
-              }} color={color}>
-                <h4 style={{color:'#3C3D3F'}}><b>Edit Bounty</b></h4>
+              <BWrap
+                style={{
+                  ...buttonAlignment,
+                  padding: '20px',
+                  paddingTop: '10px',
+                  paddingBottom: '10px'
+                }}
+                color={color}
+              >
+                <h4 style={{ color: '#3C3D3F' }}>
+                  <b>Edit Bounty</b>
+                </h4>
                 {props?.close && buttonsOnBottom ? (
                   <Button
                     disabled={disableFormButtons || props.loading}
@@ -665,7 +669,7 @@ function Form(props: FormProps) {
                     color={'white'}
                     width={100}
                     text={'Cancel'}
-                    style={{ ...buttonStyle, marginRight: 10, marginLeft:'auto', width: '140px' }}
+                    style={{ ...buttonStyle, marginRight: 10, marginLeft: 'auto', width: '140px' }}
                   />
                 )}
 

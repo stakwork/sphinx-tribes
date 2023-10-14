@@ -198,7 +198,7 @@ export const BottomContainer = styled.div<bottomButtonProps>`
 
 export const SchemaOuterContainer = styled.div`
   display: flex;
-  flexDirection: column;
+  flexdirection: column;
   justify-content: center;
   width: 100%;
   .SchemaInnerContainer {
