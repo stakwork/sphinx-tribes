@@ -696,12 +696,6 @@ const whitespace : FormField = {
 
 export const wantedCodingTaskSchema: FormField[] = [
   {
-    name: 'basic_info_h',
-    type: 'header',
-    label: 'Basic Info'
-  },
-  whitespace,
-  {
     name: 'one_sentence_summary',
     label: 'Bounty Title',
     type: 'text',
@@ -726,12 +720,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: helpType_wanted_coding_task_schema
   },
   {
-    name: 'description_h',
-    label: 'Description',
-    type: 'header',
-  },
-  whitespace,
-  {
     name: 'github_description',
     label: 'Get Description From Github ',
     type: 'switch'
@@ -747,12 +735,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'loom',
     validator: strValidatorNotRequired
   },
-  {
-    name: 'price_and_estimate_h',
-    label: 'Price and Estimate',
-    type: 'header'
-  },
-  whitespace,
   {
     name: 'price',
     label: 'Price (Sats)',
@@ -787,12 +769,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     label: 'Show to public',
     type: 'switch'
   },
-  {
-    name: 'assign_h',
-    label: 'Assign to Developer',
-    type: 'header',
-  },
-  whitespace,
   {
     name: 'assignee',
     label: 'Assignee',
