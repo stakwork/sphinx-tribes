@@ -401,6 +401,9 @@ export interface BountyHeaderProps {
 export interface DeleteTicketModalProps {
   closeModal: () => void;
   confirmDelete: () => void;
+  text?: string;
+  imgUrl?: string;
+  userDelete?: boolean;
 }
 
 export interface OfferViewProps {
