@@ -707,17 +707,17 @@ export const wantedCodingTaskSchema: FormField[] = [
     type: 'text'
   },
   {
-    name: 'coding_languages',
-    label: 'Coding Language',
-    type: 'creatablemultiselect',
-    options: codingLanguages
-  },
-  {
     name: 'wanted_type',
     label: 'Category',
     type: 'select',
     testId: 'Category',
     options: helpType_wanted_coding_task_schema
+  },
+  {
+    name: 'coding_languages',
+    label: 'Coding Language',
+    type: 'creatablemultiselect',
+    options: codingLanguages
   },
   {
     name: 'github_description',

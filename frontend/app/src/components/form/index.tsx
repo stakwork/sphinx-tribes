@@ -2,6 +2,7 @@ import { EuiText } from '@elastic/eui';
 import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { style } from '@mui/system';
 import api from '../../api';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/BountyCreationConstant';
@@ -218,8 +219,8 @@ function Form(props: FormProps) {
         // returns the body of a form page
         // assuming two collumn layout
         const GetFormFields = (schemaData: any, style: any = {}) => (
-          <div style={style}>
-            <div className="LeftSchema">
+          <>
+            <div className="LeftSchema" style={style}>
               {schema
                 .filter((item: any) => schemaData.schema.includes(item.name))
                 .map((item: FormField) => (
@@ -266,7 +267,7 @@ function Form(props: FormProps) {
                   />
                 ))}
             </div>
-            <div className="RightSchema">
+            <div className="RightSchema" style={style}>
               {schema
                 .filter((item: any) => schemaData.schema2.includes(item.name))
                 .map((item: FormField) => (
@@ -313,7 +314,7 @@ function Form(props: FormProps) {
                   />
                 ))}
             </div>
-          </div>
+          </>
         );
 
         return (
@@ -608,30 +609,21 @@ function Form(props: FormProps) {
                   color: '#3C3D3F'
                 }}
               >
-                <div>
-                  <h4>
-                    <b>{BountyDetailsCreationData.step_2.heading}</b>
-                  </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_2, { display: 'flex' })}
-                </div>
-                <div>
-                  <h4>
-                    <b>{BountyDetailsCreationData.step_3.heading}</b>
-                  </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_3, { display: 'flex' })}
-                </div>
-                <div>
-                  <h4>
-                    <b>{BountyDetailsCreationData.step_4.heading}</b>
-                  </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_4, { display: 'flex' })}
-                </div>
-                <div style={{ marginBottom: '20px' }}>
-                  <h4>
-                    <b>{BountyDetailsCreationData.step_5.heading}</b>
-                  </h4>
-                  {GetFormFields(BountyDetailsCreationData.step_5, { display: 'flex' })}
-                </div>
+                {[
+                  BountyDetailsCreationData.step_2,
+                  BountyDetailsCreationData.step_3,
+                  BountyDetailsCreationData.step_4,
+                  BountyDetailsCreationData.step_5
+                ].map((section: any) => (
+                  <div>
+                    <h4>
+                      <b>{section.heading}</b>
+                    </h4>
+                    <div style={{ display: 'flex' }}>
+                      {GetFormFields(section, { marginRight: '5px', marginLeft: '5px' })}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
