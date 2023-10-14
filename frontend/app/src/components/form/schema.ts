@@ -688,12 +688,6 @@ export const wantedOtherSchema: FormField[] = [
   }
 ];
 
-const whitespace: FormField = {
-  name: 'space',
-  type: 'space',
-  label: 'some space'
-};
-
 export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'one_sentence_summary',
