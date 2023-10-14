@@ -2,7 +2,6 @@ import { EuiText } from '@elastic/eui';
 import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { style } from '@mui/system';
 import api from '../../api';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/BountyCreationConstant';
