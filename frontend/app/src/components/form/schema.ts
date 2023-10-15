@@ -714,6 +714,13 @@ export const wantedCodingTaskSchema: FormField[] = [
     options: codingLanguages
   },
   {
+    name: 'org_uuid',
+    label: 'Organization(optional)',
+    type: 'select',
+    options: [],
+    validator: strValidatorNotRequired
+  },
+  {
     name: 'github_description',
     label: 'Get Description From Github ',
     type: 'switch'
