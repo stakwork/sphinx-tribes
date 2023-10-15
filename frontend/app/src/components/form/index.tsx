@@ -169,7 +169,7 @@ function Form(props: FormProps) {
 
   const buttonAlignment = buttonsOnBottom
     ? { zIndex: 20, bottom: 0, height: 108, justifyContent: 'center' }
-    : { top: 0 };
+    : { top: 0, height: '75px', padding: '20px 40px 20px 40px' };
   const formPad = buttonsOnBottom ? { paddingTop: 30 } : {};
 
   const buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {};
@@ -217,104 +217,115 @@ function Form(props: FormProps) {
 
         // returns the body of a form page
         // assuming two collumn layout
-        const GetFormFields = (schemaData: any, style: any = {}) => (
-          <>
-            <div className="LeftSchema" style={style}>
-              {schema
-                .filter((item: any) => schemaData.schema.includes(item.name))
-                .map((item: FormField) => (
-                  <Input
-                    {...item}
-                    key={item.name}
-                    newDesign={true}
-                    values={values}
-                    setAssigneefunction={item.name === 'assignee' && setAssigneeName}
-                    peopleList={peopleList}
-                    isFocused={isFocused}
-                    errors={errors}
-                    scrollToTop={scrollToTop}
-                    value={values[item.name]}
-                    error={errors[item.name]}
-                    initialValues={initialValues}
-                    deleteErrors={() => {
-                      if (errors[item.name]) delete errors[item.name];
-                    }}
-                    handleChange={(e: any) => {
-                      setFieldValue(item.name, e);
-                    }}
-                    setFieldValue={(e: any, f: any) => {
-                      setFieldValue(e, f);
-                    }}
-                    setFieldTouched={setFieldTouched}
-                    handleBlur={() => {
-                      setFieldTouched(item.name, false);
-                      setIsFocused({ [item.label]: false });
-                    }}
-                    handleFocus={() => {
-                      setFieldTouched(item.name, true);
-                      setIsFocused({ [item.label]: true });
-                    }}
-                    setDisableFormButtons={setDisableFormButtons}
-                    extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
-                    style={
-                      item.name === 'github_description' && !values.ticket_url
-                        ? {
-                            display: 'none'
+        const GetFormFields = (schemaData: any, style: any = {}) => {
+          return (
+            <>
+              <div className="LeftSchema" style={style}>
+                {schema
+                  .filter((item: any) => schemaData.schema.includes(item.name))
+                  .map((item: FormField) => (
+                    <Input
+                      {...item}
+                      key={item.name}
+                      newDesign={true}
+                      values={values}
+                      setAssigneefunction={item.name === 'assignee' && setAssigneeName}
+                      peopleList={peopleList}
+                      isFocused={isFocused}
+                      errors={errors}
+                      scrollToTop={scrollToTop}
+                      value={values[item.name]}
+                      error={errors[item.name]}
+                      initialValues={initialValues}
+                      deleteErrors={() => {
+                        if (errors[item.name]) delete errors[item.name];
+                      }}
+                      handleChange={(e: any) => {
+                        setFieldValue(item.name, e);
+                      }}
+                      setFieldValue={(e: any, f: any) => {
+                        setFieldValue(e, f);
+                      }}
+                      setFieldTouched={setFieldTouched}
+                      handleBlur={() => {
+                        setFieldTouched(item.name, false);
+                        setIsFocused({ [item.label]: false });
+                      }}
+                      handleFocus={() => {
+                        setFieldTouched(item.name, true);
+                        setIsFocused({ [item.label]: true });
+                      }}
+                      setDisableFormButtons={setDisableFormButtons}
+                      extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
+                      style={
+                        item.name === 'github_description' && !values.ticket_url
+                          ? {
+                              display: 'none'
+                            }
+                          : undefined
+                      }
+                    />
+                  ))}
+              </div>
+              {schemaData.step != 5 && (
+                <div className="RightSchema" style={style}>
+                  {schema
+                    .filter((item: any) => schemaData.schema2.includes(item.name))
+                    .map((item: FormField) => {
+                      const loomOffset =
+                        item.type === 'loom' && values.ticket_url
+                          ? {
+                              marginTop: '55px'
+                            }
+                          : undefined;
+
+                      return (
+                        <Input
+                          {...item}
+                          peopleList={peopleList}
+                          newDesign={true}
+                          key={item.name}
+                          values={values}
+                          testId={item.label}
+                          errors={errors}
+                          scrollToTop={scrollToTop}
+                          value={values[item.name]}
+                          error={errors[item.name]}
+                          initialValues={initialValues}
+                          deleteErrors={() => {
+                            if (errors[item.name]) delete errors[item.name];
+                          }}
+                          isFocused={isFocused}
+                          handleChange={(e: any) => {
+                            setFieldValue(item.name, e);
+                          }}
+                          setFieldValue={(e: any, f: any) => {
+                            setFieldValue(e, f);
+                          }}
+                          setFieldTouched={setFieldTouched}
+                          handleBlur={() => {
+                            setFieldTouched(item.name, false);
+                            setIsFocused({ [item.label]: false });
+                          }}
+                          handleFocus={() => {
+                            setFieldTouched(item.name, true);
+                            setIsFocused({ [item.label]: true });
+                          }}
+                          setDisableFormButtons={setDisableFormButtons}
+                          extraHTML={
+                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                           }
-                        : undefined
-                    }
-                  />
-                ))}
-            </div>
-            <div className="RightSchema" style={style}>
-              {schema
-                .filter((item: any) => schemaData.schema2.includes(item.name))
-                .map((item: FormField) => (
-                  <Input
-                    {...item}
-                    peopleList={peopleList}
-                    newDesign={true}
-                    key={item.name}
-                    values={values}
-                    testId={item.label}
-                    errors={errors}
-                    scrollToTop={scrollToTop}
-                    value={values[item.name]}
-                    error={errors[item.name]}
-                    initialValues={initialValues}
-                    deleteErrors={() => {
-                      if (errors[item.name]) delete errors[item.name];
-                    }}
-                    isFocused={isFocused}
-                    handleChange={(e: any) => {
-                      setFieldValue(item.name, e);
-                    }}
-                    setFieldValue={(e: any, f: any) => {
-                      setFieldValue(e, f);
-                    }}
-                    setFieldTouched={setFieldTouched}
-                    handleBlur={() => {
-                      setFieldTouched(item.name, false);
-                      setIsFocused({ [item.label]: false });
-                    }}
-                    handleFocus={() => {
-                      setFieldTouched(item.name, true);
-                      setIsFocused({ [item.label]: true });
-                    }}
-                    setDisableFormButtons={setDisableFormButtons}
-                    extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
-                    style={
-                      item.type === 'loom' && values.ticket_url
-                        ? {
-                            marginTop: '55px'
-                          }
-                        : undefined
-                    }
-                  />
-                ))}
-            </div>
-          </>
-        );
+                          style={{
+                            ...loomOffset
+                          }}
+                        />
+                      );
+                    })}
+                </div>
+              )}
+            </>
+          );
+        };
 
         return (
           <Wrap
@@ -598,27 +609,28 @@ function Form(props: FormProps) {
             ) : (
               <div
                 style={{
-                  marginTop: '20px',
-                  marginBottom: '20px',
-                  paddingLeft: '20px',
-                  paddingRight: '10px',
+                  // marginTop: '20px',
+                  // marginBottom: '20px',
+                  padding: '0px 40px 0px 40px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   color: '#3C3D3F'
                 }}
               >
+                {/* mapping each bounty creation step to the appropriate
+                section heading */}
                 {[
                   BountyDetailsCreationData.step_2,
                   BountyDetailsCreationData.step_3,
                   BountyDetailsCreationData.step_4,
                   BountyDetailsCreationData.step_5
                 ].map((section: any) => (
-                  <div>
-                    <h4>
+                  <div style={{ width: '100%' }}>
+                    <h4 style={{ marginTop: '20px' }}>
                       <b>{section.heading}</b>
                     </h4>
-                    <div style={{ display: 'flex' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
                       {GetFormFields(section, { marginRight: '5px', marginLeft: '5px' })}
                     </div>
                   </div>
@@ -630,15 +642,7 @@ function Form(props: FormProps) {
             {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
             {/* floating header buttons for edit bounty */}
             {!props?.newDesign && (
-              <BWrap
-                style={{
-                  ...buttonAlignment,
-                  padding: '20px',
-                  paddingTop: '10px',
-                  paddingBottom: '10px'
-                }}
-                color={color}
-              >
+              <BWrap style={buttonAlignment} color={color}>
                 <h4 style={{ color: '#3C3D3F' }}>
                   <b>Edit Bounty</b>
                 </h4>

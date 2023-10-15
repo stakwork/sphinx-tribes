@@ -117,12 +117,10 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
         background: color.pureWhite,
         ...focusedDesktopModalStyles,
         maxHeight: '100vh',
-        zIndex: 20,
-        overflow: 'hidden'
+        zIndex: 20
       }}
       style={{
-        background: 'rgba( 0 0 0 /75% )',
-        overflow: 'hidden'
+        background: 'rgba( 0 0 0 /75% )'
       }}
       overlayClick={goBack}
       bigCloseImage={goBack}
