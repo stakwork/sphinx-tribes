@@ -642,7 +642,7 @@ function Form(props: FormProps) {
             {/* floating header buttons for edit bounty */}
             {!props?.newDesign && (
               <BWrap style={buttonAlignment} color={color}>
-                <h4 style={{ color: '#3C3D3F' }}>
+                <h4 style={{ color: color.blue4 }}>
                   <b>Edit Bounty</b>
                 </h4>
                 {props?.close && buttonsOnBottom ? (
