@@ -1,377 +1,62 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
-import { OrgWrap, Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
-import moment from 'moment';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button } from 'components/common';
-import { useIsMobile } from 'hooks/uiHooks';
-import { Formik } from 'formik';
-import { FormField, validator } from 'components/form/utils';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
 import { satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
-import { Modal } from '../../components/common';
-import { colors } from '../../config/colors';
-import { nonWidgetConfigs } from '../utils/Constants';
-import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
-import Input from '../../components/form/inputs';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import DeleteTicketModal from './DeleteModal';
+import RolesModal from './orgnization/RolesModal';
+import HistoryModal from './orgnization/HistoryModal';
+import BudgetHistoryModal from './orgnization/BudgetHistoryModal';
+import AddUserModal from './orgnization/AddUserModal';
+import AddBudgetModal from './orgnization/AddBudgetModal';
+import WithdrawBudgetModal from './orgnization/WithdrawBudget';
 
-const color = colors['light'];
-
-const Container = styled.div`
-  width: 100%;
-  min-height: 100%;
-  background: white;
-  padding: 20px 0px;
-  padding-top: 0px;
-  z-index: 100;
-`;
-
-const HeadWrap = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 25px 40px;
-  border-bottom: 1px solid #ebedef;
-  @media only screen and (max-width: 800px) {
-    padding: 15px 0px;
-  }
-  @media only screen and (max-width: 700px) {
-    padding: 12px 0px;
-  }
-  @media only screen and (max-width: 500px) {
-    padding: 0px;
-    padding-bottom: 15px;
-    flex-direction: column;
-    align-items: start;
-  }
-`;
-
-const HeadNameWrap = styled.div`
-  display: flex;
-  align-items: center;
-  @media only screen and (max-width: 500px) {
-    margin-bottom: 20px;
-  }
-`;
-
-const OrgImg = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  margin-left: 20px;
-  @media only screen and (max-width: 700px) {
-    width: 42px;
-    height: 42px;
-  }
-  @media only screen and (max-width: 500px) {
-    width: 38px;
-    height: 38px;
-  }
-  @media only screen and (max-width: 470px) {
-    width: 35px;
-    height: 35px;
-  }
-`;
-
-const OrgName = styled.h3`
-  padding: 0px;
-  margin: 0px;
-  font-size: 1.3rem;
-  margin-left: 25px;
-  font-weight: 700;
-  margin-left: 20px;
-  @media only screen and (max-width: 800px) {
-    font-size: 1.05rem;
-  }
-  @media only screen and (max-width: 700px) {
-    font-size: 1rem;
-  }
-  @media only screen and (max-width: 600px) {
-    font-size: 0.9rem;
-  }
-  @media only screen and (max-width: 470px) {
-    font-size: 0.8rem;
-  }
-`;
-
-const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
-  margin-left: auto;
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  @media only screen and (max-width: 700px) {
-    gap: 10px;
-    margin-left: auto;
-  }
-  @media only screen and (max-width: 500px) {
-    gap: 8px;
-    margin-left: 0px;
-    width: 100vw;
-    margin-left: ${(p: any) => (p.forSmallScreen ? '50px' : '0px')};
-  }
-  @media only screen and (max-width: 470px) {
-    gap: 6px;
-  }
-`;
-
-const DetailsWrap = styled.div`
-  width: 100%;
-  min-height: 100%;
-  margin-top: 17px;
-  padding: 0px 20px;
-`;
-
-const ActionWrap = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 25px 40px;
-  border-bottom: 1px solid #ebedef;
-  @media only screen and (max-width: 700px) {
-    padding: 25px 0px;
-  }
-  @media only screen and (max-width: 500px) {
-    flex-direction: column;
-    width: 100%;
-    padding: 25px 0px;
-  }
-`;
-
-const BudgetWrap = styled.div`
-  padding: 25px 40px;
-  width: 55%;
-  display: flex;
-  flex-direction: column;
-  @media only screen and (max-width: 700px) {
-    width: 100%;
-    padding: 22px 0px;
-  }
-  @media only screen and (max-width: 500px) {
-    width: 100%;
-    padding: 20px 0px;
-  }
-`;
-
-const NoBudgetWrap = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  border: 1px solid #ebedef;
-`;
-
-const ViewBudgetWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
-const BudgetSmall = styled.h6`
-  padding: 0px;
-  font-size: 0.8rem;
-  color: #8e969c;
-  @media only screen and (max-width: 500px) {
-    font-size: 0.75rem;
-  }
-`;
-
-const BudgetSmallHead = styled.h6`
-  padding: 0px;
-  font-size: 0.7rem;
-  color: #8e969c;
-`;
-
-const Budget = styled.h4`
-  color: #3c3f41;
-  font-size: 1.15rem;
-  @media only screen and (max-width: 500px) {
-    font-size: 1rem;
-  }
-`;
-
-const Grey = styled.span`
-  color: #8e969c;
-`;
-
-const NoBudgetText = styled.p`
-  font-size: 0.85rem;
-  padding: 0px;
-  margin: 0px;
-  color: #8e969c;
-  width: 90%;
-  margin-left: auto;
-`;
-
-const UserWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 25px 40px;
-  @media only screen and (max-width: 700px) {
-    width: 100%;
-    padding: 20px 0px;
-  }
-  @media only screen and (max-width: 500px) {
-    padding: 20px 0px;
-  }
-`;
-
-const UsersHeadWrap = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  border-bottom: 1px solid #ebedef;
-  padding-top: 5px;
-  padding-bottom: 20px;
-  @media only screen and (max-width: 500px) {
-    width: 100%;
-  }
-`;
-
-const UsersHeader = styled.h4`
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0;
-  margin: 0;
-  @media only screen and (max-width: 500px) {
-    font-size: 0.8rem;
-    margin-right: 55%;
-  }
-`;
-
-const UsersList = styled.div`
-  @media only screen and (max-width: 500px) {
-    width: 100%;
-  }
-`;
-
-const UserImage = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-`;
-
-const User = styled.div`
-  padding: 15px 0px;
-  border-bottom: 1px solid #ebedef;
-  display: flex;
-  align-items: center;
-  @media only screen and (max-width: 500px) {
-    padding: 10px 0px;
-    width: 100%;
-  }
-`;
-
-const UserDetails = styled.div`
-  display: flex;
-  flex-gap: 12px;
-  flex-direction: column;
-  margin-left: 2%;
-  width: 30%;
-  @media only screen and (max-width: 500px) {
-    width: 60%;
-    margin-left: 5%;
-  }
-`;
-
-const UserName = styled.p`
-  padding: 0px;
-  margin: 0px;
-  font-size: 0.9rem;
-  text-transform: capitalize;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-`;
-
-const UserPubkey = styled.p`
-  padding: 0px;
-  margin: 0px;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  color: #5f6368;
-`;
-
-const UserAction = styled.div`
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-`;
-
-const IconWrap = styled.div`
-  :first-child {
-    margin-right: 40px;
-    @media only screen and (max-width: 700px) {
-      margin-right: 20px;
-    }
-    @media only screen and (max-width: 500px) {
-      margin-right: 8px;
-    }
-  }
-`;
-
-const ModalTitle = styled.h3`
-  font-size: 1.2rem;
-`;
-
-const CheckUl = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-`;
-
-const CheckLi = styled.li`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0px;
-  margin-bottom: 10px;
-`;
-
-const Check = styled.input`
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  padding: 0px;
-  margin-right: 10px;
-`;
-
-const CheckLabel = styled.label`
-  padding: 0px;
-  margin: 0px;
-`;
-
-const ViewBounty = styled.p`
-  padding: 0px;
-  margin: 0px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: green;
-  font-size: bold;
-`;
-
-const HeadButton = styled(Button)`
-  border-radius: 5px;
-`;
+import {
+  ActionWrap,
+  Budget,
+  BudgetSmall,
+  BudgetSmallHead,
+  BudgetWrap,
+  Container,
+  DetailsWrap,
+  Grey,
+  HeadButton,
+  HeadButtonWrap,
+  HeadNameWrap,
+  HeadWrap,
+  IconWrap,
+  NoBudgetText,
+  NoBudgetWrap,
+  OrgImg,
+  OrgName,
+  User,
+  UserAction,
+  UserDetails,
+  UserImage,
+  UserName,
+  UserPubkey,
+  UserWrap,
+  UsersHeadWrap,
+  UsersHeader,
+  UsersList,
+  ViewBudgetWrap
+} from './orgnization/style';
 
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
-  const isMobile = useIsMobile();
+
   const { main, ui } = useStores();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
+  const [isOpenWithdrawBudget, setIsOpenWithdrawBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
   const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -384,18 +69,10 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [userRoles, setUserRoles] = useState<any[]>([]);
   const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
   const [toasts, setToasts]: any = useState([]);
-  const [lnInvoice, setLnInvoice] = useState('');
   const [invoiceStatus, setInvoiceStatus] = useState(false);
-  const [amount, setAmount] = useState(1);
   const { path, url } = useRouteMatch();
 
-  const pollMinutes = 2;
-
-  const config = nonWidgetConfigs['organizationusers'];
-
-  const formRef = useRef(null);
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
-  const schema = [...config.schema];
 
   const addUserDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
@@ -407,10 +84,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER');
   const addRolesDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
-
-  const initValues = {
-    owner_pubkey: ''
-  };
+  const addWithdrawDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'WITHDRAW BUDGET');
 
   const { org } = props;
   const uuid = org?.uuid || '';
@@ -501,21 +176,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setBudgetsHistory(budgetHistories);
   }, [main, uuid]);
 
-  const generateInvoice = async () => {
-    const token = ui.meInfo?.websocketToken;
-    if (token) {
-      const data = await main.getBudgetInvoice({
-        amount: amount,
-        sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
-        org_uuid: uuid,
-        websocket_token: token,
-        payment_type: 'deposit'
-      });
-
-      setLnInvoice(data.response.invoice);
-    }
-  };
-
   const handleSettingsClick = async (user: any) => {
     setUser(user);
     setIsOpenRoles(true);
@@ -545,6 +205,10 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const closeBudgetHistoryHandler = () => {
     setIsOpenBudgetHistory(false);
+  };
+
+  const closeWithdrawBudgetHandler = () => {
+    setIsOpenWithdrawBudget(false);
   };
 
   const onSubmit = async (body: any) => {
@@ -603,7 +267,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       }
     } else if (res.msg === SOCKET_MSG.budget_success && res.invoice === main.lnInvoice) {
       addToast('Budget was added successfully', 'success');
-      setLnInvoice('');
       setInvoiceStatus(true);
       main.setLnInvoice('');
 
@@ -613,14 +276,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       main.getUserOrganizations(ui.selectedPerson);
       closeBudgetHandler();
     }
-  };
-
-  const viewBounty = async (bountyId: number) => {
-    ui.setBountyPerson(ui.meInfo?.id);
-
-    history.push({
-      pathname: `${url}/${bountyId}/${0}`
-    });
   };
 
   useEffect(() => {
@@ -714,7 +369,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenHistory(true)}
           />
-          <Button disabled={true} text="Withdraw" color="white" style={{ borderRadius: '5px' }} />
+          <Button
+            disabled={addWithdrawDisabled}
+            text="Withdraw"
+            color="white"
+            style={{ borderRadius: '5px' }}
+            onClick={() => setIsOpenWithdrawBudget(true)}
+          />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
@@ -791,319 +452,51 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           />
         )}
         {isOpen && (
-          <Modal
-            visible={isOpen}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeHandler}
-            bigCloseImage={closeHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <Formik
-              initialValues={initValues || {}}
-              onSubmit={onSubmit}
-              innerRef={formRef}
-              validationSchema={validator(schema)}
-            >
-              {({
-                setFieldTouched,
-                handleSubmit,
-                values,
-                setFieldValue,
-                errors,
-                initialValues
-              }: any) => (
-                <Wrap newDesign={true}>
-                  <ModalTitle>Add new user</ModalTitle>
-                  <div className="SchemaInnerContainer">
-                    {schema.map((item: FormField) => (
-                      <Input
-                        {...item}
-                        key={item.name}
-                        values={values}
-                        errors={errors}
-                        value={values[item.name]}
-                        error={errors[item.name]}
-                        initialValues={initialValues}
-                        deleteErrors={() => {
-                          if (errors[item.name]) delete errors[item.name];
-                        }}
-                        handleChange={(e: any) => {
-                          setFieldValue(item.name, e);
-                        }}
-                        setFieldValue={(e: any, f: any) => {
-                          setFieldValue(e, f);
-                        }}
-                        setFieldTouched={setFieldTouched}
-                        handleBlur={() => setFieldTouched(item.name, false)}
-                        handleFocus={() => setFieldTouched(item.name, true)}
-                        setDisableFormButtons={setDisableFormButtons}
-                        borderType={'bottom'}
-                        imageIcon={true}
-                        style={
-                          item.name === 'github_description' && !values.ticket_url
-                            ? {
-                                display: 'none'
-                              }
-                            : undefined
-                        }
-                      />
-                    ))}
-                    <Button
-                      disabled={disableFormButtons || loading}
-                      onClick={() => {
-                        handleSubmit();
-                      }}
-                      loading={loading}
-                      style={{ width: '100%' }}
-                      color={'primary'}
-                      text={'Add user'}
-                    />
-                  </div>
-                </Wrap>
-              )}
-            </Formik>
-          </Modal>
+          <AddUserModal
+            isOpen={isOpen}
+            close={closeHandler}
+            onSubmit={onSubmit}
+            disableFormButtons={disableFormButtons}
+            setDisableFormButtons={setDisableFormButtons}
+            loading={loading}
+          />
         )}
         {isOpenRoles && (
-          <Modal
-            visible={isOpenRoles}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeRolesHandler}
-            bigCloseImage={closeRolesHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <Wrap newDesign={true}>
-              <ModalTitle>Add user roles</ModalTitle>
-              <CheckUl>
-                {bountyRolesData.map((role: any, i: number) => (
-                  <CheckLi key={i}>
-                    <Check
-                      checked={role.status}
-                      onChange={roleChange}
-                      type="checkbox"
-                      name={role.name}
-                      value={role.name}
-                    />
-                    <CheckLabel>{role.name}</CheckLabel>
-                  </CheckLi>
-                ))}
-              </CheckUl>
-              <Button
-                onClick={() => submitRoles()}
-                style={{ width: '100%' }}
-                color={'primary'}
-                text={'Add roles'}
-              />
-            </Wrap>
-          </Modal>
+          <RolesModal
+            userRoles={userRoles}
+            bountyRolesData={bountyRolesData}
+            uuid={uuid} user={user}
+            addToast={addToast}
+            close={closeRolesHandler}
+            isOpen={isOpenRoles}
+            roleChange={roleChange}
+            submitRoles={submitRoles}
+          />
         )}
         {isOpenBudget && (
-          <Modal
-            visible={isOpenBudget}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeBudgetHandler}
-            bigCloseImage={closeBudgetHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <Wrap newDesign={true}>
-              <ModalTitle>Add budget</ModalTitle>
-              {lnInvoice && ui.meInfo?.owner_pubkey && (
-                <>
-                  <Invoice
-                    startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
-                    invoiceStatus={invoiceStatus}
-                    lnInvoice={lnInvoice}
-                    invoiceTime={pollMinutes}
-                  />
-                </>
-              )}
-              {!lnInvoice && ui.meInfo?.owner_pubkey && (
-                <>
-                  <InvoiceForm>
-                    <InvoiceLabel
-                      style={{
-                        display: 'block'
-                      }}
-                    >
-                      Amount (in sats)
-                    </InvoiceLabel>
-                    <InvoiceInput
-                      type="number"
-                      style={{
-                        width: '100%'
-                      }}
-                      value={amount}
-                      onChange={(e: any) => setAmount(Number(e.target.value))}
-                    />
-                  </InvoiceForm>
-                  <Button
-                    text={'Generate Invoice'}
-                    color={'primary'}
-                    style={{ paddingLeft: 25, margin: '12px 0 10px' }}
-                    img={'sphinx_white.png'}
-                    imgSize={27}
-                    height={48}
-                    width={'100%'}
-                    onClick={generateInvoice}
-                  />
-                </>
-              )}
-            </Wrap>
-          </Modal>
+          <AddBudgetModal isOpen={isOpenBudget} close={closeBudgetHandler} uuid={uuid} invoiceStatus={invoiceStatus} />
         )}
         {isOpenHistory && (
-          <Modal
-            visible={isOpenHistory}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeHistoryHandler}
-            bigCloseImage={closeHistoryHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <OrgWrap style={{ width: '300px' }}>
-              <ModalTitle>Payment history</ModalTitle>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sender</th>
-                    <th>Recipient</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {paymentsHistory.map((pay: PaymentHistory, i: number) => (
-                    <tr key={i}>
-                      <td className="ellipsis">{pay.sender_name}</td>
-                      <td className="ellipsis">{pay.receiver_name}</td>
-                      <td>{pay.amount} sats</td>
-                      <td>{moment(pay.created).format('DD/MM/YY')}</td>
-                      <td>
-                        <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
-                          View bounty
-                        </ViewBounty>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </OrgWrap>
-          </Modal>
+          <HistoryModal
+            url={url}
+            paymentsHistory={paymentsHistory}
+            close={closeHistoryHandler}
+            isOpen={isOpenHistory}
+          />
         )}
         {isOpenBudgetHistory && (
-          <Modal
-            visible={isOpenBudgetHistory}
-            style={{
-              height: '100%',
-              flexDirection: 'column'
-            }}
-            envStyle={{
-              marginTop: isMobile ? 64 : 0,
-              background: color.pureWhite,
-              zIndex: 20,
-              ...(config?.modalStyle ?? {}),
-              maxHeight: '100%',
-              borderRadius: '10px'
-            }}
-            overlayClick={closeBudgetHistoryHandler}
-            bigCloseImage={closeBudgetHistoryHandler}
-            bigCloseImageStyle={{
-              top: '-18px',
-              right: '-18px',
-              background: '#000',
-              borderRadius: '50%'
-            }}
-          >
-            <OrgWrap>
-              <ModalTitle>Budget history</ModalTitle>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sender</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {budgetsHistory.map((b: BudgetHistory, i: number) => (
-                    <tr key={i}>
-                      <td className="ellipsis">{b.sender_name}</td>
-                      <td>{b.amount} sats</td>
-                      <td>{b.payment_type}</td>
-                      <td>{b.status ? 'settled' : 'peending'}</td>
-                      <td>{moment(b.created).format('DD/MM/YY')}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </OrgWrap>
-          </Modal>
+          <BudgetHistoryModal
+            close={closeBudgetHistoryHandler}
+            isOpen={isOpenBudgetHistory}
+            budgetsHistory={budgetsHistory}
+          />
+        )}
+        {isOpenWithdrawBudget && (
+          <WithdrawBudgetModal
+            uuid={uuid}
+            isOpen={isOpenWithdrawBudget}
+            close={closeWithdrawBudgetHandler}
+          />
         )}
       </DetailsWrap>
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
