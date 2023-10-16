@@ -159,7 +159,6 @@ function Form(props: FormProps) {
 
   // check weather this is a multi-page form, filter by page
   let schema = props.paged ? props.schema?.filter((f: any) => f.page === page) : props.schema;
-  console.log('top of form');
 
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema;
@@ -643,7 +642,7 @@ function Form(props: FormProps) {
             {/* floating header buttons for edit bounty */}
             {!props?.newDesign && (
               <BWrap style={buttonAlignment} color={color}>
-                <h4 style={{ color: '#3C3D3F' }}>
+                <h4 style={{ color: color.blue4 }}>
                   <b>Edit Bounty</b>
                 </h4>
                 {props?.close && buttonsOnBottom ? (
