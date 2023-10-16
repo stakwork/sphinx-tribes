@@ -1085,7 +1085,6 @@ export class MainStore {
     return p;
   }
 
-  @memo()
   async getPersonById(id: number): Promise<Person> {
     const p = await api.get(`person/id/${id}`);
     this.setActivePerson(p);
