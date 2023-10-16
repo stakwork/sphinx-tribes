@@ -291,6 +291,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	hasRole := db.UserHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("You don't have appropriate permissions to pay bounties")
 		return
 	}
 

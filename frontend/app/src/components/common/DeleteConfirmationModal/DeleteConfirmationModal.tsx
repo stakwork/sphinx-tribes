@@ -30,7 +30,6 @@ export const DeleteConfirmationModal = ({
     <BaseModal backdrop="white" open onClose={closeHandler}>
       <Stack minWidth={350} p={4} alignItems="center" spacing={3}>
         {icon}
-
         {children}
         <Stack width="100%" direction="row" justifyContent="space-between">
           <IconButton width={120} height={44} color="white" text="Cancel" onClick={closeHandler} />

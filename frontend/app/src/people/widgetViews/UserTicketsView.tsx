@@ -16,6 +16,7 @@ const Container = styled.div`
   display: flex;
   flex-flow: row wrap;
   gap: 1rem;
+  align-items: center;
   flex: 1 1 100%;
 `;
 
@@ -126,23 +127,21 @@ const UserTickets = () => {
     );
 
   return (
-    <div data-testid="test">
-      <Container>
-        <PageLoadSpinner show={loading} />
-        <Router history={history}>
-          <Switch>
-            <Route path={`${path}/:wantedId/:wantedIndex`}>
-              <BountyModal basePath={url} />
-            </Route>
-          </Switch>
-        </Router>
-        {listItems}
-        <Spacer key={'spacer2'} />
-        {showDeleteModal && (
-          <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
-        )}
-      </Container>
-    </div>
+    <Container data-testid="test">
+      <PageLoadSpinner show={loading} />
+      <Router history={history}>
+        <Switch>
+          <Route path={`${path}/:wantedId/:wantedIndex`}>
+            <BountyModal basePath={url} />
+          </Route>
+        </Switch>
+      </Router>
+      {listItems}
+      <Spacer key={'spacer2'} />
+      {showDeleteModal && (
+        <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
+      )}
+    </Container>
   );
 };
 
