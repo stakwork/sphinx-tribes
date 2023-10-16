@@ -6,14 +6,14 @@ import { EuiGlobalToastList } from '@elastic/eui';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import moment from 'moment';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
-import { Button, IconButton } from 'components/common';
+import { Button } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { userHasRole } from 'helpers';
+import { satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import { Modal } from '../../components/common';
@@ -21,6 +21,8 @@ import { colors } from '../../config/colors';
 import { nonWidgetConfigs } from '../utils/Constants';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import Input from '../../components/form/inputs';
+import avatarIcon from '../../public/static/profile_avatar.svg';
+import DeleteTicketModal from './DeleteModal';
 
 const color = colors['light'];
 
@@ -29,7 +31,95 @@ const Container = styled.div`
   min-height: 100%;
   background: white;
   padding: 20px 0px;
+  padding-top: 0px;
   z-index: 100;
+`;
+
+const HeadWrap = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 25px 40px;
+  border-bottom: 1px solid #ebedef;
+  @media only screen and (max-width: 800px) {
+    padding: 15px 0px;
+  }
+  @media only screen and (max-width: 700px) {
+    padding: 12px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    padding: 0px;
+    padding-bottom: 15px;
+    flex-direction: column;
+    align-items: start;
+  }
+`;
+
+const HeadNameWrap = styled.div`
+  display: flex;
+  align-items: center;
+  @media only screen and (max-width: 500px) {
+    margin-bottom: 20px;
+  }
+`;
+
+const OrgImg = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-left: 20px;
+  @media only screen and (max-width: 700px) {
+    width: 42px;
+    height: 42px;
+  }
+  @media only screen and (max-width: 500px) {
+    width: 38px;
+    height: 38px;
+  }
+  @media only screen and (max-width: 470px) {
+    width: 35px;
+    height: 35px;
+  }
+`;
+
+const OrgName = styled.h3`
+  padding: 0px;
+  margin: 0px;
+  font-size: 1.3rem;
+  margin-left: 25px;
+  font-weight: 700;
+  margin-left: 20px;
+  @media only screen and (max-width: 800px) {
+    font-size: 1.05rem;
+  }
+  @media only screen and (max-width: 700px) {
+    font-size: 1rem;
+  }
+  @media only screen and (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+  @media only screen and (max-width: 470px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  @media only screen and (max-width: 700px) {
+    gap: 10px;
+    margin-left: auto;
+  }
+  @media only screen and (max-width: 500px) {
+    gap: 8px;
+    margin-left: 0px;
+    width: 100vw;
+    margin-left: ${(p: any) => (p.forSmallScreen ? '50px' : '0px')};
+  }
+  @media only screen and (max-width: 470px) {
+    gap: 6px;
+  }
 `;
 
 const DetailsWrap = styled.div`
@@ -39,86 +129,200 @@ const DetailsWrap = styled.div`
   padding: 0px 20px;
 `;
 
-const OrgInfoWrap = styled.div`
+const ActionWrap = styled.div`
   display: flex;
   align-items: center;
+  padding: 25px 40px;
+  border-bottom: 1px solid #ebedef;
+  @media only screen and (max-width: 700px) {
+    padding: 25px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    flex-direction: column;
+    width: 100%;
+    padding: 25px 0px;
+  }
 `;
 
-const DataCount = styled.div`
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-`;
-
-const DataText = styled.h3`
-  font-size: 1.3rem;
-  padding: 0px;
-  margin: 0px;
-  margin-right: 10px;
-`;
-
-const ViewHistoryText = styled.p`
-  padding: 0px;
-  margin: 0px;
-  margin-left: 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-`;
-
-const UsersTable = styled.div`
+const BudgetWrap = styled.div`
+  padding: 25px 40px;
+  width: 55%;
   display: flex;
   flex-direction: column;
-  margin-top: 25px;
+  @media only screen and (max-width: 700px) {
+    width: 100%;
+    padding: 22px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+    padding: 20px 0px;
+  }
 `;
 
-const TableRow = styled.div`
+const NoBudgetWrap = styled.div`
   display: flex;
   flex-direction: row;
-  padding: 10px;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #ebedef;
 `;
 
-const TableHead = styled.div`
+const ViewBudgetWrap = styled.div`
   display: flex;
-  flex-direction: row;
-  padding: 10px;
-  background: #d3d3d3;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const BudgetSmall = styled.h6`
+  padding: 0px;
+  font-size: 0.8rem;
+  color: #8e969c;
+  @media only screen and (max-width: 500px) {
+    font-size: 0.75rem;
+  }
+`;
+
+const BudgetSmallHead = styled.h6`
+  padding: 0px;
+  font-size: 0.7rem;
+  color: #8e969c;
+`;
+
+const Budget = styled.h4`
+  color: #3c3f41;
+  font-size: 1.15rem;
+  @media only screen and (max-width: 500px) {
+    font-size: 1rem;
+  }
+`;
+
+const Grey = styled.span`
+  color: #8e969c;
+`;
+
+const NoBudgetText = styled.p`
+  font-size: 0.85rem;
+  padding: 0px;
+  margin: 0px;
+  color: #8e969c;
+  width: 90%;
+  margin-left: auto;
+`;
+
+const UserWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 25px 40px;
+  @media only screen and (max-width: 700px) {
+    width: 100%;
+    padding: 20px 0px;
+  }
+  @media only screen and (max-width: 500px) {
+    padding: 20px 0px;
+  }
+`;
+
+const UsersHeadWrap = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid #ebedef;
+  padding-top: 5px;
+  padding-bottom: 20px;
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+  }
+`;
+
+const UsersHeader = styled.h4`
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0;
+  margin: 0;
+  @media only screen and (max-width: 500px) {
+    font-size: 0.8rem;
+    margin-right: 55%;
+  }
+`;
+
+const UsersList = styled.div`
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+  }
+`;
+
+const UserImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+`;
+
+const User = styled.div`
+  padding: 15px 0px;
+  border-bottom: 1px solid #ebedef;
+  display: flex;
+  align-items: center;
+  @media only screen and (max-width: 500px) {
+    padding: 10px 0px;
+    width: 100%;
+  }
+`;
+
+const UserDetails = styled.div`
+  display: flex;
+  flex-gap: 12px;
+  flex-direction: column;
+  margin-left: 2%;
+  width: 30%;
+  @media only screen and (max-width: 500px) {
+    width: 60%;
+    margin-left: 5%;
+  }
+`;
+
+const UserName = styled.p`
+  padding: 0px;
+  margin: 0px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+`;
+
+const UserPubkey = styled.p`
+  padding: 0px;
+  margin: 0px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  color: #5f6368;
+`;
+
+const UserAction = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+`;
+
+const IconWrap = styled.div`
+  :first-child {
+    margin-right: 40px;
+    @media only screen and (max-width: 700px) {
+      margin-right: 20px;
+    }
+    @media only screen and (max-width: 500px) {
+      margin-right: 8px;
+    }
+  }
 `;
 
 const ModalTitle = styled.h3`
   font-size: 1.2rem;
-`;
-
-const Th = styled.div`
-  font-size: 1.1rem;
-  font-weight: bold;
-  min-width: 25%;
-`;
-
-const ThKey = styled.div`
-  font-size: 1.1rem;
-  font-weight: bold;
-  min-width: 50%;
-`;
-
-const Td = styled.div`
-  font-size: 0.95rem;
-  min-width: 25%;
-  text-transform: capitalize;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const TdKey = styled.div`
-  font-size: 0.95rem;
-  min-width: 50%;
-  text-transform: capitalize;
-`;
-
-const Actions = styled.div`
-  font-size: 0.95rem;
-  min-width: 25%;
 `;
 
 const CheckUl = styled.ul`
@@ -157,6 +361,10 @@ const ViewBounty = styled.p`
   font-size: bold;
 `;
 
+const HeadButton = styled(Button)`
+  border-radius: 5px;
+`;
+
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const isMobile = useIsMobile();
@@ -166,7 +374,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
   const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
-  const [usersCount, setUsersCount] = useState<number>(0);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
   const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
@@ -189,11 +397,23 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
   const schema = [...config.schema];
 
+  const addUserDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
+  const viewReportDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+  const addBudgetDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET');
+  const deleteUserDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER');
+  const addRolesDisabled =
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
+
   const initValues = {
     owner_pubkey: ''
   };
 
-  const uuid = props.org?.uuid || '';
+  const { org } = props;
+  const uuid = org?.uuid || '';
 
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
@@ -209,13 +429,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setToasts([]);
   }
 
-  const getOrganizationUsersCount = useCallback(async () => {
-    if (uuid) {
-      const count = await main.getOrganizationUsersCount(uuid);
-      setUsersCount(count);
-    }
-  }, [main, uuid]);
-
   const getOrganizationUsers = useCallback(async () => {
     if (uuid) {
       const users = await main.getOrganizationUsers(uuid);
@@ -229,11 +442,23 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
       if (res.status === 200) {
         await getOrganizationUsers();
-        await getOrganizationUsersCount();
       } else {
         addToast('Error: could not delete user', 'danger');
       }
     }
+  };
+
+  const closeDeleteModal = () => setShowDeleteModal(false);
+
+  const confirmDelete = async () => {
+    try {
+      if (user) {
+        await deleteOrganizationUser(user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    closeDeleteModal();
   };
 
   const getBountyRoles = useCallback(async () => {
@@ -297,6 +522,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getUserRoles(user);
   };
 
+  const handleDeleteClick = async (user: any) => {
+    setUser(user);
+    setShowDeleteModal(true);
+  };
+
   const closeHandler = () => {
     setIsOpen(false);
   };
@@ -325,7 +555,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     const res = await main.addOrganizationUser(body);
     if (res.status === 200) {
       await getOrganizationUsers();
-      await getOrganizationUsersCount();
     } else {
       addToast('Error: could not add user', 'danger');
     }
@@ -381,6 +610,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       // get new organization budget
       getOrganizationBudget();
       getBudgetHistory();
+      main.getUserOrganizations(ui.selectedPerson);
       closeBudgetHandler();
     }
   };
@@ -395,14 +625,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   useEffect(() => {
     getOrganizationUsers();
-    getOrganizationUsersCount();
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
     getBudgetHistory();
   }, [
     getOrganizationUsers,
-    getOrganizationUsersCount,
     getBountyRoles,
     getOrganizationBudget,
     getPaymentsHistory,
@@ -422,102 +650,146 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-  }, [onHandle]);
+  }, []);
 
   return (
     <Container>
-      <MaterialIcon
-        onClick={() => props.close()}
-        icon={'arrow_back'}
-        style={{
-          fontSize: 30,
-          marginLeft: 15,
-          cursor: 'pointer'
-        }}
-      />
-      <DetailsWrap>
-        <OrgInfoWrap>
-          <DataCount>
-            <DataText>
-              User{usersCount > 1 && 's'} {usersCount}
-            </DataText>
-            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD USER')) && (
-              <IconButton
-                width={80}
-                height={isMobile ? 36 : 40}
-                text="Add"
-                onClick={() => setIsOpen(true)}
+      <HeadWrap>
+        <HeadNameWrap>
+          <MaterialIcon
+            onClick={() => props.close()}
+            icon={'arrow_back'}
+            style={{
+              fontSize: 25,
+              cursor: 'pointer'
+            }}
+          />
+          <OrgImg src={org?.img || avatarIcon} />
+          <OrgName>{org?.name}</OrgName>
+        </HeadNameWrap>
+        <HeadButtonWrap forSmallScreen={false}>
+          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+          <Button
+            disabled={!org?.bounty_count}
+            text="View Bounties"
+            color="white"
+            style={{ borderRadius: '5px' }}
+            endingIcon="open_in_new"
+            onClick={() => window.open(`/org/bounties/${uuid}`, '_target')}
+          />
+        </HeadButtonWrap>
+      </HeadWrap>
+      <ActionWrap>
+        <BudgetWrap>
+          {viewReportDisabled ? (
+            <NoBudgetWrap>
+              <MaterialIcon
+                icon={'lock'}
+                style={{
+                  fontSize: 30,
+                  cursor: 'pointer',
+                  color: '#ccc'
+                }}
               />
-            )}
-          </DataCount>
-          <DataCount>
-            <DataText>Budget {orgBudget} sats</DataText>
-            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET')) && (
-              <IconButton
-                width={80}
-                height={isMobile ? 36 : 40}
-                text="Add"
-                onClick={() => setIsOpenBudget(true)}
-              />
-            )}
-            {(isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT')) && (
-              <>
-                <ViewHistoryText onClick={() => setIsOpenBudgetHistory(true)}>
-                  Budget history
-                </ViewHistoryText>
-                <ViewHistoryText onClick={() => setIsOpenHistory(true)}>
-                  Payment history
-                </ViewHistoryText>
-              </>
-            )}
-          </DataCount>
-        </OrgInfoWrap>
-
-        <UsersTable>
-          <TableHead>
-            <Th>Unique name</Th>
-            <ThKey>Public key</ThKey>
-            <Th>User actions</Th>
-          </TableHead>
+              <NoBudgetText>
+                You have restricted permissions and are unable to view the budget. Reach out to the
+                organization admin to get them updated.
+              </NoBudgetText>
+            </NoBudgetWrap>
+          ) : (
+            <ViewBudgetWrap>
+              <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
+              <Budget>
+                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+              </Budget>
+              <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
+            </ViewBudgetWrap>
+          )}
+        </BudgetWrap>
+        <HeadButtonWrap forSmallScreen={true}>
+          <Button
+            disabled={viewReportDisabled}
+            text="History"
+            color="white"
+            style={{ borderRadius: '5px' }}
+            onClick={() => setIsOpenHistory(true)}
+          />
+          <Button disabled={true} text="Withdraw" color="white" style={{ borderRadius: '5px' }} />
+          <Button
+            disabled={addBudgetDisabled}
+            text="Deposit"
+            color="white"
+            style={{ borderRadius: '5px' }}
+            onClick={() => setIsOpenBudget(true)}
+          />
+        </HeadButtonWrap>
+      </ActionWrap>
+      <UserWrap>
+        <UsersHeadWrap>
+          <UsersHeader>USERS</UsersHeader>
+          <HeadButtonWrap forSmallScreen={false}>
+            <Button
+              disabled={addUserDisabled}
+              text="Add User"
+              color="white"
+              style={{
+                borderRadius: '5px'
+              }}
+              onClick={() => setIsOpen(true)}
+            />
+          </HeadButtonWrap>
+        </UsersHeadWrap>
+        <UsersList>
           {users.map((user: Person, i: number) => (
-            <TableRow key={i}>
-              <Td>{user.unique_name}</Td>
-              <TdKey>{user.owner_pubkey}</TdKey>
-              <Td>
-                <Actions>
-                  {(isOrganizationAdmin ||
-                    userHasRole(main.bountyRoles, userRoles, 'ADD ROLES')) && (
-                    <MaterialIcon
-                      onClick={() => handleSettingsClick(user)}
-                      icon={'settings'}
-                      style={{
-                        fontSize: 20,
-                        marginLeft: 10,
-                        cursor: 'pointer',
-                        color: 'green'
-                      }}
-                    />
-                  )}
-                  {(isOrganizationAdmin ||
-                    userHasRole(main.bountyRoles, userRoles, 'DELETE USER')) && (
-                    <MaterialIcon
-                      onClick={() => {
-                        deleteOrganizationUser(user);
-                      }}
-                      icon={'delete'}
-                      style={{
-                        fontSize: 20,
-                        marginLeft: 10,
-                        cursor: 'pointer',
-                        color: 'red'
-                      }}
-                    />
-                  )}
-                </Actions>
-              </Td>
-            </TableRow>
+            <User key={i}>
+              <UserImage src={user.img || avatarIcon} />
+              <UserDetails>
+                <UserName>{user.unique_name}</UserName>
+                <UserPubkey>{user.owner_pubkey}</UserPubkey>
+              </UserDetails>
+              <UserAction>
+                <IconWrap>
+                  <MaterialIcon
+                    disabled={addRolesDisabled}
+                    icon={'settings'}
+                    style={{
+                      fontSize: 24,
+                      cursor: 'pointer',
+                      color: '#ccc'
+                    }}
+                    onClick={() => handleSettingsClick(user)}
+                  />
+                </IconWrap>
+                <IconWrap>
+                  <MaterialIcon
+                    icon={'delete'}
+                    disabled={deleteUserDisabled}
+                    style={{
+                      fontSize: 24,
+                      cursor: 'pointer',
+                      color: '#ccc'
+                    }}
+                    onClick={() => {
+                      setUser(user);
+                      handleDeleteClick(user);
+                    }}
+                  />
+                </IconWrap>
+              </UserAction>
+            </User>
           ))}
-        </UsersTable>
+        </UsersList>
+      </UserWrap>
+      <DetailsWrap>
+        {showDeleteModal && (
+          <DeleteTicketModal
+            closeModal={closeDeleteModal}
+            confirmDelete={confirmDelete}
+            text={'User'}
+            imgUrl={user?.img}
+            userDelete={true}
+          />
+        )}
         {isOpen && (
           <Modal
             visible={isOpen}

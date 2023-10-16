@@ -11,7 +11,7 @@ function NoResults() {
       small
       style={{
         margin: 'auto',
-        marginTop: '25%'
+        marginTop: '10%'
       }}
       {...tabs['usertickets']?.noneSpace['noResult']}
     />
