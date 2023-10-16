@@ -295,19 +295,12 @@ type InvoicePayError struct {
 }
 
 type InvoiceSuccessResponse struct {
-	ChatId         uint       `json:"chatId"`
-	SenderId       uint       `json:"sender"`
-	Type           uint       `json:"type"`
-	Amount         uint       `json:"amount"`
-	AmountMsat     uint       `json:"amountMsat"`
-	PaymentHash    string     `json:"paymentHash"`
-	Date           *time.Time `json:"date"`
-	ExpirationDate *time.Time `json:"expirationDate"`
-	MessageContent string     `json:"messageContent"`
-	Status         bool       `json:"status"`
-	Created        *time.Time `json:"createdAt"`
-	Updated        *time.Time `json:"updatedAt"`
-	Tenant         uint       `json:"tenant"`
+	Success  bool                     `json:"success"`
+	Response InvoiceSuccessPaymentReq `json:"response"`
+}
+
+type InvoiceSuccessPaymentReq struct {
+	Payment_request string `json:"payment_request"`
 }
 
 type DeleteBountyAssignee struct {
