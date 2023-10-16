@@ -27,7 +27,7 @@ jobs:
           cd ..
           git add ./packrd/packed-packr.go
           cd app && git add .
-          git commit -m "Automatic build fixes" || echo -n
+          git commit -m "[skip ci] Automatic build fixes" || echo -n
           git push
 
 
