@@ -74,6 +74,8 @@ const B = styled.div<BProps>`
     trackBackgroundColor: 'rgba(0,0,0,0)'
   })}
 `;
+
+// selected bounty popup window
 function FocusedView(props: FocusViewProps) {
   const {
     goBack,
@@ -121,6 +123,7 @@ function FocusedView(props: FocusViewProps) {
     return false;
   }
 
+  // close bounty popup window
   function closeModal() {
     if (!manualGoBackOnly) {
       ui.setEditMe(false);
@@ -164,6 +167,7 @@ function FocusedView(props: FocusViewProps) {
     });
   };
 
+  // callback for deleting the open bounty
   async function deleteIt() {
     const delBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
     if (!delBounty) return;
