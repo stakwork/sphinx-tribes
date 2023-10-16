@@ -284,6 +284,32 @@ type InvoiceCheckResponse struct {
 	Amount          string `json:"amount"`
 }
 
+type InvoicePaySuccess struct {
+	Success  bool                 `json:"success"`
+	Response InvoiceCheckResponse `json:"response"`
+}
+
+type InvoicePayError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
+type InvoiceSuccessResponse struct {
+	ChatId         uint       `json:"chatId"`
+	SenderId       uint       `json:"sender"`
+	Type           uint       `json:"type"`
+	Amount         uint       `json:"amount"`
+	AmountMsat     uint       `json:"amountMsat"`
+	PaymentHash    string     `json:"paymentHash"`
+	Date           *time.Time `json:"date"`
+	ExpirationDate *time.Time `json:"expirationDate"`
+	MessageContent string     `json:"messageContent"`
+	Status         bool       `json:"status"`
+	Created        *time.Time `json:"createdAt"`
+	Updated        *time.Time `json:"updatedAt"`
+	Tenant         uint       `json:"tenant"`
+}
+
 type DeleteBountyAssignee struct {
 	Owner_pubkey string `json:"owner_pubkey"`
 	Created      string `json:"created"`

@@ -399,7 +399,6 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		// check if the orgnization bounty balance
 		// is greater than the amount
-
 		invoiceAmount := invoiceData.Response.Amount
 		amount, _ := utils.ConvertStringToUint(invoiceAmount)
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
@@ -409,6 +408,17 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode("Organization budget is not enough to withdraw the amount")
 			return
 		}
+		paymentSuccess, paymentError := PayLightningInvoice(request.PaymentRequest)
+		if paymentSuccess.Success {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(paymentSuccess)
+		} else {
+			w.WriteHeader(http.StatusNotModified)
+			json.NewEncoder(w).Encode(paymentError)
+		}
+	} else {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode("Could not pay lightning invoice")
 	}
 }
 
@@ -442,6 +452,50 @@ func GetLightningInvoice(payment_request string) (db.InvoiceResult, error) {
 	}
 
 	return db.InvoiceResult{}, nil
+}
+
+func PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+	bodyData := fmt.Sprintf(`{"payment_request": "%s"}`, payment_request)
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return db.InvoicePaySuccess{}, db.InvoicePayError{}
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	if res.StatusCode != 200 {
+		invoiceError := db.InvoicePayError{}
+		err = json.Unmarshal(body, &invoiceError)
+
+		if err != nil {
+			log.Printf("Reading Invoice pay error body failed: %s", err)
+			return db.InvoicePaySuccess{}, db.InvoicePayError{}
+		}
+
+		return db.InvoicePaySuccess{}, invoiceError
+	} else {
+		invoiceSuccess := db.InvoicePaySuccess{}
+		err = json.Unmarshal(body, &invoiceSuccess)
+
+		if err != nil {
+			log.Printf("Reading Invoice pay success body failed: %s", err)
+			return db.InvoicePaySuccess{}, db.InvoicePayError{}
+		}
+
+		return invoiceSuccess, db.InvoicePayError{}
+	}
 }
 
 func GetInvoiceData(w http.ResponseWriter, r *http.Request) {
