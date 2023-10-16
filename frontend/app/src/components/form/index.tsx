@@ -159,7 +159,6 @@ function Form(props: FormProps) {
 
   // check weather this is a multi-page form, filter by page
   let schema = props.paged ? props.schema?.filter((f: any) => f.page === page) : props.schema;
-  console.log('top of form');
 
   // replace schema with dynamic schema if there is one
   schema = dynamicSchema || schema;

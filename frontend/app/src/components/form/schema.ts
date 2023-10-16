@@ -690,6 +690,13 @@ export const wantedOtherSchema: FormField[] = [
 
 export const wantedCodingTaskSchema: FormField[] = [
   {
+    name: 'org_uuid',
+    label: 'Organization (optional)',
+    type: 'select',
+    options: [],
+    validator: strValidatorNotRequired
+  },
+  {
     name: 'one_sentence_summary',
     label: 'Bounty Title',
     type: 'text',
@@ -712,13 +719,6 @@ export const wantedCodingTaskSchema: FormField[] = [
     label: 'Coding Language',
     type: 'creatablemultiselect',
     options: codingLanguages
-  },
-  {
-    name: 'org_uuid',
-    label: 'Organization(optional)',
-    type: 'select',
-    options: [],
-    validator: strValidatorNotRequired
   },
   {
     name: 'github_description',
