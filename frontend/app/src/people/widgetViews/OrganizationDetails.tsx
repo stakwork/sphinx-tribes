@@ -16,7 +16,7 @@ import HistoryModal from './orgnization/HistoryModal';
 import BudgetHistoryModal from './orgnization/BudgetHistoryModal';
 import AddUserModal from './orgnization/AddUserModal';
 import AddBudgetModal from './orgnization/AddBudgetModal';
-import WithdrawBudgetModal from './orgnization/WithdrawBudget';
+import WithdrawBudgetModal from './orgnization/WithdrawBudgetModal';
 
 import {
   ActionWrap,
@@ -474,7 +474,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           />
         )}
         {isOpenBudget && (
-          <AddBudgetModal isOpen={isOpenBudget} close={closeBudgetHandler} uuid={uuid} invoiceStatus={invoiceStatus} />
+          <AddBudgetModal
+            isOpen={isOpenBudget}
+            close={closeBudgetHandler}
+            uuid={uuid}
+            invoiceStatus={invoiceStatus}
+          />
         )}
         {isOpenHistory && (
           <HistoryModal
