@@ -1173,13 +1173,26 @@ func (db database) AddAndUpdateBudget(budget BudgetStoreData) BudgetHistory {
 	return budgetHistory
 }
 
-func (db database) WithdrawBudget(org_uuid string, amount uint) {
+func (db database) WithdrawBudget(sender_pubkey string, org_uuid string, amount uint) {
 	// get organization budget and add payment to total budget
 	organizationBudget := db.GetOrganizationBudget(org_uuid)
 	totalBudget := organizationBudget.TotalBudget
 
 	organizationBudget.TotalBudget = totalBudget - amount
 	db.UpdateOrganizationBudget(organizationBudget)
+
+	now := time.Now()
+
+	budgetHistory := BudgetHistory{
+		OrgUuid:      org_uuid,
+		Amount:       amount,
+		Status:       true,
+		PaymentType:  "withdraw",
+		Created:      &now,
+		Updated:      &now,
+		SenderPubKey: sender_pubkey,
+	}
+	db.AddBudgetHistory(budgetHistory)
 }
 
 func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {

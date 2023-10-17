@@ -411,7 +411,7 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		paymentSuccess, paymentError := PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
 			// withdraw amount from organization budget
-			db.DB.WithdrawBudget(request.OrgUuid, amount)
+			db.DB.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {

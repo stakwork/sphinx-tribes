@@ -493,8 +493,8 @@ type BudgetStoreData struct {
 type BudgetPaymentType string
 
 const (
-	Add     BudgetPaymentType = "add"
-	Deposit BudgetPaymentType = "deposit"
+	Deposit  BudgetPaymentType = "deposit"
+	Withdraw BudgetPaymentType = "withdraw"
 )
 
 type BudgetHistory struct {
