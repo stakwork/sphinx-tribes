@@ -186,9 +186,9 @@
     "eslint-plugin-react": "^7.31.10",
     "husky": "^8.0.3",
     "nock": "^13.3.0",
+    "prettier": "^3.0.3",
     "react-error-overlay": "6.0.9",
-    "typescript": "^5.0.3",
-    "prettier": "^3.0.3"
+    "typescript": "^5.0.3"
   },
   "jest": {
     "transformIgnorePatterns": [
