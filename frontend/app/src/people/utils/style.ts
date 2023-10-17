@@ -38,7 +38,7 @@ export const InvoiceForm = styled.div`
 export const InvoiceLabel = styled.label`
   font-size: 0.8rem;
   font-weight: bold;
-  color: #B0B7BC;
+  color: #b0b7bc;
   font-size: 0.85rem;
 `;
 export const InvoiceInput = styled.input`

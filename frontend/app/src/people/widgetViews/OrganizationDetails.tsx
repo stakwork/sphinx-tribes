@@ -465,7 +465,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <RolesModal
             userRoles={userRoles}
             bountyRolesData={bountyRolesData}
-            uuid={uuid} user={user}
+            uuid={uuid}
+            user={user}
             addToast={addToast}
             close={closeRolesHandler}
             isOpen={isOpenRoles}

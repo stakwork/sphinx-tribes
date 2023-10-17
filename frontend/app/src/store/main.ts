@@ -211,7 +211,7 @@ export interface InvoiceDetails {
     payment_hash: string;
     preimage: string;
     amount: number;
-  }
+  };
 }
 
 export interface InvoiceError {
@@ -225,8 +225,8 @@ export interface BudgetWithdrawSuccess {
     success: boolean;
     response: {
       payment_request: string;
-    }
-  }
+    };
+  };
 }
 
 export class MainStore {
@@ -1998,10 +1998,11 @@ export class MainStore {
     org_uuid: string;
   }): Promise<BudgetWithdrawSuccess | InvoiceError> {
     try {
-      if (!uiStore.meInfo) return {
-        success: false,
-        error: 'Cannot make request',
-      };
+      if (!uiStore.meInfo)
+        return {
+          success: false,
+          error: 'Cannot make request'
+        };
       const info = uiStore.meInfo;
 
       const r: any = await fetch(`${TribesURL}/gobounties/budget/withdraw`, {
@@ -2018,7 +2019,7 @@ export class MainStore {
       console.log('Error gettHistories', e);
       return {
         success: false,
-        error: 'Error occured while withdrawing budget',
+        error: 'Error occured while withdrawing budget'
       };
     }
   }

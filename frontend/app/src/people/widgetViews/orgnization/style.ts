@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 import { Button } from 'components/common';
 
 export const ModalTitle = styled.h3`
@@ -40,7 +40,6 @@ export const ViewBounty = styled.p`
   color: green;
   font-size: bold;
 `;
-
 
 export const Container = styled.div`
   width: 100%;
