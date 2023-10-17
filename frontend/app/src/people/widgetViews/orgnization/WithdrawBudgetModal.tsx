@@ -204,10 +204,12 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
                         </InvoiceForm>
                         <Button
                             text={'Confirm'}
+                            disabled={!paymentRequest ? true : false}
                             style={{
                                 borderRadius: '8px',
                                 marginTop: '12px',
-                                background: '#9157F6'
+                                color: paymentRequest ? '#FFF' : 'rgba(142, 150, 156, 0.85)',
+                                background: paymentRequest ? '#9157F6' : 'rgba(0, 0, 0, 0.04)'
                             }}
                             height={48}
                             width={'100%'}
