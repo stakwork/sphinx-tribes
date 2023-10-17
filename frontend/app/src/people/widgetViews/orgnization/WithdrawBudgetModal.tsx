@@ -4,10 +4,14 @@ import { useIsMobile } from 'hooks/uiHooks';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import { useStores } from 'store';
 import styled from 'styled-components';
+import { BudgetWithdrawSuccess } from 'store/main';
+import { satToUsd } from 'helpers';
+import LighningDecoder from 'light-bolt11-decoder';
 import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import successIcon from '../../../public/static/withdraw_success.svg';
-import { ModalProps } from './interface';
+import errorIcon from '../../../public/static/error.svg';
+import { WithdrawModalProps } from './interface';
 import { Grey } from './style';
 
 const color = colors['light'];
@@ -19,49 +23,94 @@ const WithdrawModalTitle = styled.h3`
 `;
 
 const PaymentDetailsWrap = styled.div`
+  padding: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const WithdrawText = styled.p`
   color: #3C3F41;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
+  margin-bottom: 30px;
 `;
 
 const WithdrawAmount = styled.h3`
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #292C33;
+  padding: 0px;
+  margin: 0px;
 `;
 
 const DollarValue = styled.p`
   color: #8E969C;
   font-size: 0.9rem;
+  padding: 0px;
+  margin: 0px;
 `;
 
 const ActionButtonWrap = styled.div`
   display: flex;
+  margin-top: 40px;
 `;
 
 const SuccessImage = styled.img`
   width: 56px;
   height: 56px;
+  margin-bottom: 30px;
 `;
 
 const SuccessText = styled.p`
   color: #8E969C;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-top: 10px;
 `;
 
-const WithdrawBudgetModal = (props: ModalProps) => {
+const ErrorText = styled(SuccessText)`
+  color: #ED7474;
+`;
+
+const WithdrawBudgetModal = (props: WithdrawModalProps) => {
     const [paymentRequest, setPaymentRequest] = useState('');
-    const [paymentDetails, setPaymentDetails] = useState(true);
-    const [paymentSuccess, setPaymentSuccess] = useState(true)
+    const [amountInSats, setAmountInSats] = useState(0);
+    const [paymentSettled, setPaymentSettled] = useState(false);
+    const [paymentError, setPaymentError] = useState('');
 
     const isMobile = useIsMobile();
-    const { ui } = useStores();
-    const { isOpen, close } = props;
+    const { ui, main } = useStores();
+    const { isOpen, close, uuid, getOrganizationBudget } = props;
+
+    function isBudgetSuccess(object: any): object is BudgetWithdrawSuccess {
+        return 'response' in object;
+    }
+
+    const getAndSetDetails = async (paymentRequest: string) => {
+        const decoded = LighningDecoder.decode(paymentRequest);
+        const sats = decoded.sections[2].value / 1000;
+        setAmountInSats(sats);
+    }
 
     const withdrawBudget = async () => {
         const token = ui.meInfo?.websocketToken;
+        const body = {
+            org_uuid: uuid ?? '',
+            payment_request: paymentRequest,
+            websocket_token: token
+        }
+
+        const response = await main.withdrawBountyBudget(body);
+        if (isBudgetSuccess(response)) {
+            await getOrganizationBudget();
+            setPaymentSettled(true);
+        } else {
+            setPaymentError(response.error);
+        }
     };
+
+    const getInvoiceDetails = async (paymentRequest: string) => {
+        getAndSetDetails(paymentRequest);
+    }
 
     return (
         <Modal
@@ -86,44 +135,54 @@ const WithdrawBudgetModal = (props: ModalProps) => {
             }}
         >
             <Wrap newDesign={true}>
-                {paymentSuccess && (
+                {paymentSettled && (
                     <PaymentDetailsWrap>
                         <SuccessImage src={successIcon} />
-                        <WithdrawAmount>{100250} <Grey>SATS</Grey></WithdrawAmount>
+                        <WithdrawAmount>{amountInSats.toLocaleString()} <Grey>SATS</Grey></WithdrawAmount>
                         <SuccessText>Successfully Withdraw</SuccessText>
                     </PaymentDetailsWrap>
                 )}
-                {!paymentSuccess && paymentDetails && ui.meInfo?.owner_pubkey && (
+                {paymentError && (
+                    <PaymentDetailsWrap>
+                        <SuccessImage src={errorIcon} />
+                        <WithdrawAmount>{amountInSats.toLocaleString()} <Grey>SATS</Grey></WithdrawAmount>
+                        <ErrorText>{paymentError}</ErrorText>
+                    </PaymentDetailsWrap>
+                )}
+                {amountInSats > 0 && (!paymentSettled && !paymentError) && ui.meInfo?.owner_pubkey && (
                     <PaymentDetailsWrap>
                         <WithdrawText>
                             You are about to withdraw
                         </WithdrawText>
-                        <WithdrawAmount>{100250} <Grey>SATS</Grey></WithdrawAmount>
-                        <DollarValue>100.96 USD</DollarValue>
+                        <WithdrawAmount>{amountInSats.toLocaleString()} <Grey>SATS</Grey></WithdrawAmount>
+                        <DollarValue>{satToUsd(Number(amountInSats))} USD</DollarValue>
                         <ActionButtonWrap>
                             <Button
                                 text={'Cancel'}
                                 style={{
-                                    borderRadius: '10px',
+                                    borderRadius: '6px',
                                     background: '#FFFFFF',
                                     border: '1px solid #D0D5D8',
+                                    color: '#5F6368',
+                                    marginRight: '8px'
                                 }}
-                                height={48}
-                                onClick={withdrawBudget}
+                                height={42}
+                                onClick={close}
                             />
                             <Button
                                 text={'Withdraw'}
                                 style={{
-                                    borderRadius: '10px',
-                                    background: '#9157F6'
+                                    borderRadius: '6px',
+                                    background: '#9157F6',
+                                    marginLeft: '8px'
                                 }}
-                                height={48}
+                                height={42}
                                 onClick={withdrawBudget}
                             />
                         </ActionButtonWrap>
                     </PaymentDetailsWrap>
                 )}
-                {!paymentSuccess && !paymentDetails && ui.meInfo?.owner_pubkey && (
+                {!amountInSats && ui.meInfo?.owner_pubkey && (
                     <>
                         <WithdrawModalTitle>Withdraw</WithdrawModalTitle>
                         <InvoiceForm>
@@ -146,13 +205,13 @@ const WithdrawBudgetModal = (props: ModalProps) => {
                         <Button
                             text={'Confirm'}
                             style={{
-                                borderRadius: '10px',
+                                borderRadius: '8px',
                                 marginTop: '12px',
                                 background: '#9157F6'
                             }}
                             height={48}
                             width={'100%'}
-                            onClick={withdrawBudget}
+                            onClick={() => getInvoiceDetails(paymentRequest)}
                         />
                     </>
                 )}

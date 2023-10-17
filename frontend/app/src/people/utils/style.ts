@@ -43,7 +43,7 @@ export const InvoiceLabel = styled.label`
 `;
 export const InvoiceInput = styled.input`
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 0.5px solid black;
 `;
 export const OrganizationWrap = styled.div`

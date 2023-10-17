@@ -276,6 +276,11 @@ type InvoiceResult struct {
 	Response InvoiceCheckResponse `json:"response"`
 }
 
+type InvoiceError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
 type InvoiceCheckResponse struct {
 	Settled         bool   `json:"settled"`
 	Payment_request string `json:"payment_request"`

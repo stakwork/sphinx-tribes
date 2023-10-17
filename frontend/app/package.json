@@ -33,12 +33,14 @@
     "@material/react-material-icon": "^0.15.0",
     "@mui/base": "^5.0.0-beta.16",
     "@mui/system": "^5.14.10",
+    "add": "^2.0.6",
     "bootstrap": "^4.5.0",
     "clsx": "^2.0.0",
     "compose-function": "^3.0.3",
     "dateformat": "^3.0.3",
     "formik": "^2.2.6",
     "fuse.js": "^5.2.3",
+    "light-bolt11-decoder": "^3.0.0",
     "lodash": "^4.17.15",
     "memo-decorator": "^2.0.1",
     "mobx": "^6.8.0",
@@ -61,6 +63,7 @@
     "remark-rehype": "^10.1.0",
     "socket.io-client": "^4.6.1",
     "styled-components": "^5.1.0",
+    "yarn": "^1.22.19",
     "yup": "^0.32.9"
   },
   "eslintConfig": {
@@ -186,9 +189,9 @@
     "eslint-plugin-react": "^7.31.10",
     "husky": "^8.0.3",
     "nock": "^13.3.0",
+    "prettier": "^3.0.3",
     "react-error-overlay": "6.0.9",
-    "typescript": "^5.0.3",
-    "prettier": "^3.0.3"
+    "typescript": "^5.0.3"
   },
   "jest": {
     "transformIgnorePatterns": [

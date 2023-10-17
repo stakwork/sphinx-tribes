@@ -34,3 +34,7 @@ export interface AddUserModalProps extends ModalProps {
 export interface AddBudgetModalProps extends ModalProps {
     invoiceStatus: boolean;
 }
+
+export interface WithdrawModalProps extends ModalProps {
+    getOrganizationBudget: () => Promise<void>
+}

@@ -202,6 +202,33 @@ export interface Organization {
 export interface BountyRoles {
   name: string;
 }
+
+export interface InvoiceDetails {
+  success: boolean;
+  response: {
+    settled: boolean;
+    payment_request: string;
+    payment_hash: string;
+    preimage: string;
+    amount: number;
+  }
+}
+
+export interface InvoiceError {
+  success: boolean;
+  error: string;
+}
+
+export interface BudgetWithdrawSuccess {
+  success: boolean;
+  response: {
+    success: boolean;
+    response: {
+      payment_request: string;
+    }
+  }
+}
+
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -1943,6 +1970,56 @@ export class MainStore {
     } catch (e) {
       console.log('Error gettHistories', e);
       return [];
+    }
+  }
+
+  async getInvoiceDetails(payment_request: string): Promise<InvoiceDetails | InvoiceError> {
+    try {
+      const r: any = await fetch(`${TribesURL}/gobounties/invoice/${payment_request}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.log('Error gettHistories', e);
+      return {
+        success: false,
+        error: 'Could not get invoice data'
+      };
+    }
+  }
+
+  async withdrawBountyBudget(body: {
+    websocket_token?: string;
+    payment_request: string;
+    org_uuid: string;
+  }): Promise<BudgetWithdrawSuccess | InvoiceError> {
+    try {
+      if (!uiStore.meInfo) return {
+        success: false,
+        error: 'Cannot make request',
+      };
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/gobounties/budget/withdraw`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.log('Error gettHistories', e);
+      return {
+        success: false,
+        error: 'Error occured while withdrawing budget',
+      };
     }
   }
 }

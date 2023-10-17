@@ -501,6 +501,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             uuid={uuid}
             isOpen={isOpenWithdrawBudget}
             close={closeWithdrawBudgetHandler}
+            getOrganizationBudget={getOrganizationBudget}
           />
         )}
       </DetailsWrap>

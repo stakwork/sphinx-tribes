@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	decodepay "github.com/nbd-wtf/ln-decodepay"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -394,15 +395,14 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoiceData, err := GetLightningInvoice(request.PaymentRequest)
+	decodedInvoice, err := decodepay.Decodepay(request.PaymentRequest)
+	amountInt := decodedInvoice.MSatoshi / 1000
+	amount := uint(amountInt)
 
 	if err == nil {
 		// check if the orgnization bounty balance
 		// is greater than the amount
-		invoiceAmount := invoiceData.Response.Amount
-		amount, _ := utils.ConvertStringToUint(invoiceAmount)
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
-
 		if amount > orgBudget.TotalBudget {
 			w.WriteHeader(http.StatusForbidden)
 			json.NewEncoder(w).Encode("Organization budget is not enough to withdraw the amount")
@@ -410,19 +410,26 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		}
 		paymentSuccess, paymentError := PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
+			// withdraw amount from organization budget
+			db.DB.WithdrawBudget(request.OrgUuid, amount)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
-			w.WriteHeader(http.StatusNotModified)
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(paymentError)
 		}
 	} else {
 		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode("Could not pay lightning invoice")
+		json.NewEncoder(w).Encode(
+			db.InvoicePayError{
+				Success: false,
+				Error:   "Could not pay lightning invoice",
+			},
+		)
 	}
 }
 
-func GetLightningInvoice(payment_request string) (db.InvoiceResult, error) {
+func GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
 	url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, payment_request)
 
 	client := &http.Client{}
@@ -434,24 +441,36 @@ func GetLightningInvoice(payment_request string) (db.InvoiceResult, error) {
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
-		return db.InvoiceResult{}, err
+		return db.InvoiceResult{}, db.InvoiceError{}
 	}
 
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 
-	// Unmarshal result
-	invoiceRes := db.InvoiceResult{}
+	if res.StatusCode != 200 {
+		// Unmarshal result
+		invoiceErr := db.InvoiceError{}
+		err = json.Unmarshal(body, &invoiceErr)
 
-	err = json.Unmarshal(body, &invoiceRes)
+		if err != nil {
+			log.Printf("Reading Invoice body failed: %s", err)
+			return db.InvoiceResult{}, invoiceErr
+		}
 
-	if err != nil {
-		log.Printf("Reading Invoice body failed: %s", err)
-		return db.InvoiceResult{}, err
+		return db.InvoiceResult{}, invoiceErr
+	} else {
+		// Unmarshal result
+		invoiceRes := db.InvoiceResult{}
+		err = json.Unmarshal(body, &invoiceRes)
+
+		if err != nil {
+			log.Printf("Reading Invoice body failed: %s", err)
+			return invoiceRes, db.InvoiceError{}
+		}
+
+		return invoiceRes, db.InvoiceError{}
 	}
-
-	return db.InvoiceResult{}, nil
 }
 
 func PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
@@ -500,15 +519,14 @@ func PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.Invoi
 
 func GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 	paymentRequest := chi.URLParam(r, "paymentRequest")
+	invoiceData, invoiceErr := GetLightningInvoice(paymentRequest)
 
-	invoiceData, err := GetLightningInvoice(paymentRequest)
-
-	if err != nil {
+	if invoiceErr.Error != "" {
 		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode("Could not get invoice data")
+		json.NewEncoder(w).Encode(invoiceErr)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(invoiceData.Response)
+	json.NewEncoder(w).Encode(invoiceData)
 }
