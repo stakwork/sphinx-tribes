@@ -59,7 +59,7 @@ const BudgetHistoryModal = (props: BudgetHistoryModalProps) => {
                 <td className="ellipsis">{b.sender_name}</td>
                 <td>{b.amount} sats</td>
                 <td>{b.payment_type}</td>
-                <td>{b.status ? 'settled' : 'peending'}</td>
+                <td>{b.status ? 'settled' : 'pending'}</td>
                 <td>{moment(b.created).format('DD/MM/YY')}</td>
               </tr>
             ))}
