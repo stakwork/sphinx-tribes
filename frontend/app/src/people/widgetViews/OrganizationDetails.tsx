@@ -11,12 +11,12 @@ import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import DeleteTicketModal from './DeleteModal';
-import RolesModal from './orgnization/RolesModal';
-import HistoryModal from './orgnization/HistoryModal';
-import BudgetHistoryModal from './orgnization/BudgetHistoryModal';
-import AddUserModal from './orgnization/AddUserModal';
-import AddBudgetModal from './orgnization/AddBudgetModal';
-import WithdrawBudgetModal from './orgnization/WithdrawBudgetModal';
+import RolesModal from './organization/RolesModal';
+import HistoryModal from './organization/HistoryModal';
+import BudgetHistoryModal from './organization/BudgetHistoryModal';
+import AddUserModal from './organization/AddUserModal';
+import AddBudgetModal from './organization/AddBudgetModal';
+import WithdrawBudgetModal from './organization/WithdrawBudgetModal';
 
 import {
   ActionWrap,
@@ -47,7 +47,7 @@ import {
   UsersHeader,
   UsersList,
   ViewBudgetWrap
-} from './orgnization/style';
+} from './organization/style';
 
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);

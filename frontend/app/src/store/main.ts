@@ -1984,7 +1984,7 @@ export class MainStore {
       });
       return r.json();
     } catch (e) {
-      console.log('Error gettHistories', e);
+      console.error('Error getInvoiceDetails', e);
       return {
         success: false,
         error: 'Could not get invoice data'
@@ -2016,7 +2016,7 @@ export class MainStore {
       });
       return r.json();
     } catch (e) {
-      console.log('Error gettHistories', e);
+      console.error('Error withdrawBountyBudget', e);
       return {
         success: false,
         error: 'Error occured while withdrawing budget'

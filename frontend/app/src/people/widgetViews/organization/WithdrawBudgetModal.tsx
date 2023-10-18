@@ -85,16 +85,6 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
     return 'response' in object;
   }
 
-  const getAndSetDetails = async (paymentRequest: string) => {
-    try {
-      const decoded = LighningDecoder.decode(paymentRequest);
-      const sats = decoded.sections[2].value / 1000;
-      setAmountInSats(sats);
-    } catch (e) {
-      console.log(`Cannot decode lightning invoice: ${e}`);
-    }
-  };
-
   const withdrawBudget = async () => {
     const token = ui.meInfo?.websocketToken;
     const body = {
@@ -113,8 +103,17 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
   };
 
   const getInvoiceDetails = async (paymentRequest: string) => {
-    getAndSetDetails(paymentRequest);
+    try {
+      const decoded = LighningDecoder.decode(paymentRequest);
+      const sats = decoded.sections[2].value / 1000;
+      setAmountInSats(sats);
+    } catch (e) {
+      console.log(`Cannot decode lightning invoice: ${e}`);
+    }
   };
+
+  const displayWuthdraw = (!amountInSats && ui.meInfo?.owner_pubkey);
+  const displayInvoiceSats = (amountInSats > 0 && !paymentSettled && !paymentError && ui.meInfo?.owner_pubkey);
 
   return (
     <Modal
@@ -157,7 +156,7 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
             <ErrorText>{paymentError}</ErrorText>
           </PaymentDetailsWrap>
         )}
-        {amountInSats > 0 && !paymentSettled && !paymentError && ui.meInfo?.owner_pubkey && (
+        {displayInvoiceSats && (
           <PaymentDetailsWrap>
             <WithdrawText>You are about to withdraw</WithdrawText>
             <WithdrawAmount>
@@ -190,7 +189,7 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
             </ActionButtonWrap>
           </PaymentDetailsWrap>
         )}
-        {!amountInSats && ui.meInfo?.owner_pubkey && (
+        {displayWuthdraw && (
           <>
             <WithdrawModalTitle>Withdraw</WithdrawModalTitle>
             <InvoiceForm>
