@@ -21,6 +21,12 @@ const B = styled(EuiButton)`
   text-transform: none !important;
   text-decoration: none !important;
   transform: none !important;
+  @media only screen and (max-width: 700px) {
+    font-size: 12.5px;
+  }
+  @media only screen and (max-width: 500px) {
+    font-size: 11.5px;
+  }
 `;
 
 interface IconProps {

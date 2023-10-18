@@ -100,7 +100,7 @@ type Tabler interface {
 type Person struct {
 	ID               uint           `json:"id"`
 	Uuid             string         `json:"uuid"`
-	OwnerPubKey      string         `gorm:"uniqueIndex,unique"json:"owner_pubkey"`
+	OwnerPubKey      string         `gorm:"uniqueIndex,unique" json:"owner_pubkey"`
 	OwnerAlias       string         `json:"owner_alias"`
 	UniqueName       string         `json:"unique_name"`
 	Description      string         `json:"description"`
@@ -281,7 +281,7 @@ type InvoiceCheckResponse struct {
 	Payment_request string `json:"payment_request"`
 	Payment_hash    string `json:"payment_hash"`
 	Preimage        string `json:"preimage"`
-	Amount          uint   `json:"amount"`
+	Amount          string `json:"amount"`
 }
 
 type DeleteBountyAssignee struct {
@@ -407,6 +407,7 @@ type Organization struct {
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
+	Budget      uint       `json:"budget,omitempty"`
 }
 
 type OrganizationShort struct {

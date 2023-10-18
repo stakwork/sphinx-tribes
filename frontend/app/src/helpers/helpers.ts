@@ -1,24 +1,9 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export const formatPrice = (amount: number = 0) => amount;
+export const formatPrice = (amount = 0) => amount;
 
-export const formatSatPrice= (amount: number=0) =>
-{
-  const dollarUSLocale = Intl.NumberFormat('en-US');
-  return dollarUSLocale.format(amount)
-}
-
-export const getOriginalNumberValue = (formattedValue: string) => {
-  // Remove formatting (commas) from the formatted value
-  if (formattedValue){
-  const unformattedValue = formattedValue.replace(/,/g, '');
-  return Number(unformattedValue)}
-
-}
-
-export const satToUsd = (amount: number = 0) => {
+export const satToUsd = (amount = 0) => {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);
@@ -27,11 +12,8 @@ export const satToUsd = (amount: number = 0) => {
     return '. . .';
   }
 
-  
-  return formatSatPrice((Number(returnValue)))
-  
+  return returnValue;
 };
-
 
 export const DollarConverter = (e: any) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');

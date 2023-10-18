@@ -11,7 +11,9 @@ jobs:
       - ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.token }}
       - uses: actions/setup-go@v3
         with:
           go-version: '^1.18.3'
@@ -25,7 +27,7 @@ jobs:
           cd ..
           git add ./packrd/packed-packr.go
           cd app && git add .
-          git commit -m "Automatic build fixes" || echo -n
+          git commit -m "[skip ci] Automatic build fixes" || echo -n
           git push
 
 
