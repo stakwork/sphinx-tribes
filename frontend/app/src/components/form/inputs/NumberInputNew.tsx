@@ -82,9 +82,8 @@ export default function NumberInputNew({
           }
         }}
         onChange={(e: any) => {
-          e.target.value =  getOriginalNumberValue(e.target.value)
+          e.target.value = getOriginalNumberValue(e.target.value);
           if (!isNaN(Number(e.target.value))) {
-            
             handleChange(e.target.value);
             setTextValue(formatSatPrice(e.target.value));
           }
