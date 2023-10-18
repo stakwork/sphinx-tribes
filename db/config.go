@@ -61,6 +61,7 @@ func InitDB() {
 	db.AutoMigrate(&BountyBudget{})
 	db.AutoMigrate(&BudgetHistory{})
 	db.AutoMigrate(&PaymentHistory{})
+	db.AutoMigrate(&InvoiceList{})
 
 	people := DB.GetAllPeople()
 	for _, p := range people {

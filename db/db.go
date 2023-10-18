@@ -225,7 +225,6 @@ func (db database) UpdateTribeUniqueName(uuid string, u string) {
 	if uuid == "" {
 		return
 	}
-	// fmt.Println(u)
 	db.db.Model(&Tribe{}).Where("uuid = ?", uuid).Update("unique_name", u)
 }
 
@@ -1189,4 +1188,22 @@ func (db database) GetPaymentHistory(org_uuid string) []PaymentHistoryData {
 	payment := []PaymentHistoryData{}
 	db.db.Raw(`SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, sender.unique_name AS sender_name, receiver.unique_name as receiver_name FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`).Find(&payment)
 	return payment
+}
+
+func (db database) GetInvoice(payment_request string) InvoiceList {
+	ms := InvoiceList{}
+	db.db.Where("payment_request = ?", payment_request).Find(&ms)
+	return ms
+}
+
+func (db database) UpdateInvoice(payment_request string) InvoiceList {
+	ms := InvoiceList{}
+	db.db.Model(&Tribe{}).Where("payment_request = ?", payment_request).Update("status", true)
+	ms.Status = true
+	return ms
+}
+
+func (db database) AddInvoice(invoice InvoiceList) InvoiceList {
+	db.db.Create(&invoice)
+	return invoice
 }
