@@ -86,9 +86,13 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
   }
 
   const getAndSetDetails = async (paymentRequest: string) => {
-    const decoded = LighningDecoder.decode(paymentRequest);
-    const sats = decoded.sections[2].value / 1000;
-    setAmountInSats(sats);
+    try {
+      const decoded = LighningDecoder.decode(paymentRequest);
+      const sats = decoded.sections[2].value / 1000;
+      setAmountInSats(sats);
+    } catch (e) {
+      console.log(`Cannot decode lightning invoice: ${e}`);
+    }
   };
 
   const withdrawBudget = async () => {
