@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/typedef */
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
-export const formatPrice = (amount: number = 0) => {
-  return amount;
-};
+export const formatPrice = (amount = 0) => amount;
 
-export const satToUsd = (amount: number = 0) => {
+export const satToUsd = (amount = 0) => {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
   const returnValue = (amount / satExchange).toFixed(2);
@@ -15,6 +14,17 @@ export const satToUsd = (amount: number = 0) => {
   }
 
   return returnValue;
+};
+
+export const formatSatPrice = (amount = 0) => {
+  const dollarUSLocale = Intl.NumberFormat('en-US');
+  return dollarUSLocale.format(amount);
+};
+
+export const getOriginalNumberValue = (formattedValue: string = '') => {
+  // Remove formatting (commas) from the formatted value
+  const unformattedValue = formattedValue.replace(/,/g, '');
+  return Number(unformattedValue);
 };
 
 export const DollarConverter = (e: any) => {
@@ -119,20 +129,18 @@ export const calculateTimeLeft = (
   return timeLeft;
 };
 
-export const formatRelayPerson = (person: any): any => {
-  return {
-    owner_pubkey: person.owner_pubkey,
-    owner_alias: person.alias,
-    owner_contact_key: person.contact_key,
-    owner_route_hint: person.route_hint ?? '',
-    description: person.description,
-    extras: person.extras,
-    price_to_meet: person.price_to_meet,
-    img: person.img,
-    tags: [],
-    route_hint: person.route_hint
-  };
-};
+export const formatRelayPerson = (person: any): any => ({
+  owner_pubkey: person.owner_pubkey,
+  owner_alias: person.alias,
+  owner_contact_key: person.contact_key,
+  owner_route_hint: person.route_hint ?? '',
+  description: person.description,
+  extras: person.extras,
+  price_to_meet: person.price_to_meet,
+  img: person.img,
+  tags: [],
+  route_hint: person.route_hint
+});
 
 export type Roles =
   | 'ADD BOUNTY'
