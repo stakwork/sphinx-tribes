@@ -10,6 +10,13 @@ export const formatSatPrice= (amount: number=0) =>
   return dollarUSLocale.format(amount)
 }
 
+export const getOriginalNumberValue = (formattedValue: string) => {
+  // Remove formatting (commas) from the formatted value
+  const unformattedValue = formattedValue.replace(/,/g, '');
+  return Number(unformattedValue)
+
+}
+
 export const satToUsd = (amount: number = 0) => {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate ?? 0;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../../config/colors';
-import { satToUsd } from '../../../helpers';
+import { formatSatPrice, getOriginalNumberValue, satToUsd } from '../../../helpers';
 import type { Props } from './propsType';
 
 interface styledProps {
@@ -82,9 +82,11 @@ export default function NumberInputNew({
           }
         }}
         onChange={(e: any) => {
+          e.target.value =  getOriginalNumberValue(e.target.value)
           if (!isNaN(Number(e.target.value))) {
+            
             handleChange(e.target.value);
-            setTextValue(e.target.value);
+            setTextValue(formatSatPrice(e.target.value));
           }
         }}
       />
@@ -106,7 +108,7 @@ export default function NumberInputNew({
       >
         {labeltext}
       </label>
-      <div className="USD">{satToUsd(textValue)} USD</div>
+      <div className="USD">{satToUsd(getOriginalNumberValue(textValue))} USD</div>
     </InputOuterBox>
   );
 }
