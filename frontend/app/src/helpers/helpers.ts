@@ -12,8 +12,9 @@ export const formatSatPrice= (amount: number=0) =>
 
 export const getOriginalNumberValue = (formattedValue: string) => {
   // Remove formatting (commas) from the formatted value
+  if (formattedValue){
   const unformattedValue = formattedValue.replace(/,/g, '');
-  return Number(unformattedValue)
+  return Number(unformattedValue)}
 
 }
 
