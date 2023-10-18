@@ -32,6 +32,7 @@ function App() {
 
   const getBountyRoles = useCallback(async () => {
     await mainStore.getRoles();
+    await mainStore.getPeopleBounties();
   }, []);
 
   useEffect(() => {

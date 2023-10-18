@@ -33,7 +33,7 @@ export const PostModal: FC<PostModalProps> = observer(
       /*
       TODO : after getting the better way to reload the bounty, this code will be removed.
       */
-      history.push('/tickets');
+      history.push('/bounties');
       await window.location.reload();
     };
 

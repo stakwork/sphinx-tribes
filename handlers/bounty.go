@@ -55,7 +55,7 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyCount)
 }
 
-func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
+func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	if pubkey == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -71,7 +71,7 @@ func GetPersonCreatedWanteds(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPersonAssignedWanteds(w http.ResponseWriter, r *http.Request) {
+func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 	if pubkey == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -125,8 +125,12 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
+
+	if bounty.Show == false && bounty.ID != 0 {
+		db.DB.UpdateBountyBoolColumn(bounty, "show")
+	}
+
 	if bounty.Title != "" && bounty.Assignee == "" {
-		fmt.Println("Assigneee is EMpty")
 		db.DB.UpdateBountyNullColumn(bounty, "assignee")
 	}
 
@@ -222,7 +226,7 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				Created:          bounty.AssigneeCreated,
 				Updated:          bounty.AssigneeUpdated,
 				LastLogin:        bounty.LastLogin,
-				OwnerRouteHint:   bounty.OwnerRouteHint,
+				OwnerRouteHint:   bounty.AssigneeRouteHint,
 				OwnerContactKey:  bounty.OwnerContactKey,
 				PriceToMeet:      bounty.PriceToMeet,
 				TwitterConfirmed: bounty.TwitterConfirmed,
