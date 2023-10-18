@@ -71,6 +71,7 @@ func NewRouter() *http.Server {
 		r.Post("/badges", handlers.AddOrRemoveBadge)
 		r.Delete("/channel/{id}", handlers.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
+		r.Get("/poll/invoice/{paymentRequest}", handlers.PollInvoice)
 	})
 
 	r.Group(func(r chi.Router) {
