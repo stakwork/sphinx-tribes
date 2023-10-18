@@ -395,6 +395,16 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if user is the admin of the organization
+	// or has a withdraw bounty budget role
+	hasRole := db.UserHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
+		json.NewEncoder(w).Encode(errMsg)
+		return
+	}
+
 	decodedInvoice, err := decodepay.Decodepay(request.PaymentRequest)
 	amountInt := decodedInvoice.MSatoshi / 1000
 	amount := uint(amountInt)
