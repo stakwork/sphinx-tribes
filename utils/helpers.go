@@ -26,3 +26,14 @@ func ConvertStringToUint(number string) (uint, error) {
 
 	return uint(numberParse), nil
 }
+
+func ConvertStringToInt(number string) (int, error) {
+	numberParse, err := strconv.ParseInt(number, 10, 32)
+
+	if err != nil {
+		fmt.Println("could not parse string to uint")
+		return 0, err
+	}
+
+	return int(numberParse), nil
+}

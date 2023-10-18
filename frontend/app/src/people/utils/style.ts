@@ -36,12 +36,14 @@ export const InvoiceForm = styled.div`
   text-align: left;
 `;
 export const InvoiceLabel = styled.label`
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: bold;
+  color: #b0b7bc;
+  font-size: 0.85rem;
 `;
 export const InvoiceInput = styled.input`
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 0.5px solid black;
 `;
 export const OrganizationWrap = styled.div`
