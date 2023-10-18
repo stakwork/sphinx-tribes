@@ -515,6 +515,14 @@ type BountyPayRequest struct {
 	RouteHint       string `json:"route_hint,omitempty"`
 }
 
+type InvoiceList struct {
+	ID             uint       `json:"id"`
+	PaymentRequest string     `json:"payment_request"`
+	Status         bool       `json:"status"`
+	Created        *time.Time `json:"created"`
+	Updated        *time.Time `json:"updated"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
