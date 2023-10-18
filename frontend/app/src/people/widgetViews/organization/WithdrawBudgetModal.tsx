@@ -69,6 +69,7 @@ const SuccessText = styled.p`
 
 const ErrorText = styled(SuccessText)`
   color: #ed7474;
+  text-align: center;
 `;
 
 const WithdrawBudgetModal = (props: WithdrawModalProps) => {

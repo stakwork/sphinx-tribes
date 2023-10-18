@@ -405,7 +405,8 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
 		if amount > orgBudget.TotalBudget {
 			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode("Organization budget is not enough to withdraw the amount")
+			errMsg := formatPayError("Organization budget is not enough to withdraw the amount")
+			json.NewEncoder(w).Encode(errMsg)
 			return
 		}
 		paymentSuccess, paymentError := PayLightningInvoice(request.PaymentRequest)
@@ -420,12 +421,15 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode(
-			db.InvoicePayError{
-				Success: false,
-				Error:   "Could not pay lightning invoice",
-			},
-		)
+		errMsg := formatPayError("Could not pay lightning invoice")
+		json.NewEncoder(w).Encode(errMsg)
+	}
+}
+
+func formatPayError(errorMsg string) db.InvoicePayError {
+	return db.InvoicePayError{
+		Success: false,
+		Error:   errorMsg,
 	}
 }
 
