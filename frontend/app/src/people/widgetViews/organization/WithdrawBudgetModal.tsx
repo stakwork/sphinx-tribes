@@ -112,8 +112,9 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
     }
   };
 
-  const displayWuthdraw = (!amountInSats && ui.meInfo?.owner_pubkey);
-  const displayInvoiceSats = (amountInSats > 0 && !paymentSettled && !paymentError && ui.meInfo?.owner_pubkey);
+  const displayWuthdraw = !amountInSats && ui.meInfo?.owner_pubkey;
+  const displayInvoiceSats =
+    amountInSats > 0 && !paymentSettled && !paymentError && ui.meInfo?.owner_pubkey;
 
   return (
     <Modal
