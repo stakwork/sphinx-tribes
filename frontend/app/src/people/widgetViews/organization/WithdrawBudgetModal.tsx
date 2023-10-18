@@ -82,16 +82,16 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
   const { ui, main } = useStores();
   const { isOpen, close, uuid, getOrganizationBudget } = props;
 
-  function isBudgetSuccess(object: any): object is BudgetWithdrawSuccess {
-    return 'response' in object;
-  }
-
   const withdrawBudget = async () => {
     const token = ui.meInfo?.websocketToken;
     const body = {
       org_uuid: uuid ?? '',
       payment_request: paymentRequest,
       websocket_token: token
+    };
+
+    const isBudgetSuccess = (object: any): object is BudgetWithdrawSuccess => {
+      return 'response' in object;
     };
 
     const response = await main.withdrawBountyBudget(body);
