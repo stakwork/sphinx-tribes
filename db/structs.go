@@ -276,12 +276,36 @@ type InvoiceResult struct {
 	Response InvoiceCheckResponse `json:"response"`
 }
 
+type InvoiceError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
 type InvoiceCheckResponse struct {
 	Settled         bool   `json:"settled"`
 	Payment_request string `json:"payment_request"`
 	Payment_hash    string `json:"payment_hash"`
 	Preimage        string `json:"preimage"`
 	Amount          string `json:"amount"`
+}
+
+type InvoicePaySuccess struct {
+	Success  bool                 `json:"success"`
+	Response InvoiceCheckResponse `json:"response"`
+}
+
+type InvoicePayError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
+type InvoiceSuccessResponse struct {
+	Success  bool                     `json:"success"`
+	Response InvoiceSuccessPaymentReq `json:"response"`
+}
+
+type InvoiceSuccessPaymentReq struct {
+	Payment_request string `json:"payment_request"`
 }
 
 type DeleteBountyAssignee struct {
@@ -469,8 +493,8 @@ type BudgetStoreData struct {
 type BudgetPaymentType string
 
 const (
-	Add     BudgetPaymentType = "add"
-	Deposit BudgetPaymentType = "deposit"
+	Deposit  BudgetPaymentType = "deposit"
+	Withdraw BudgetPaymentType = "withdraw"
 )
 
 type BudgetHistory struct {
@@ -513,6 +537,12 @@ type BountyPayRequest struct {
 	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
 	RouteHint       string `json:"route_hint,omitempty"`
+}
+
+type WithdrawBudgetRequest struct {
+	PaymentRequest  string `json:"payment_request"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+	OrgUuid         string `json:"org_uuid"`
 }
 
 func (Person) TableName() string {
