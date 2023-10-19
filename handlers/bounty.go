@@ -409,9 +409,6 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 	amountInt := decodedInvoice.MSatoshi / 1000
 	amount := uint(amountInt)
 
-	fmt.Println("Decoded Invoice ==", decodedInvoice)
-	fmt.Println("Invoice Int AMOUNT ===", amountInt)
-
 	if err == nil {
 		// check if the orgnization bounty balance
 		// is greater than the amount
@@ -426,7 +423,6 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		if paymentSuccess.Success {
 			// withdraw amount from organization budget
 			db.DB.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
-			fmt.Println("After Withdraw budget ==", request.OrgUuid, amount)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
