@@ -252,9 +252,10 @@ const UsersList = styled.div`
 `;
 
 const UserImage = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
+  align-self: center;
 `;
 
 const User = styled.div`
@@ -323,12 +324,15 @@ const IconWrap = styled.div`
 
 const ModalTitle = styled.h3`
   font-size: 1.2rem;
+  color: ##3C3F41;
 `;
 
 const CheckUl = styled.ul`
   list-style: none;
   padding: 0;
   margin-top: 20px;
+  justifyContent: 'left',
+  width: 100%
 `;
 
 const CheckLi = styled.li`
@@ -365,6 +369,16 @@ const HeadButton = styled(Button)`
   border-radius: 5px;
 `;
 
+const UserRolesWrap = styled(Wrap)`
+  width: 100%;
+`;
+
+const UserRolesName = styled.p`
+  color: #8E969C;
+  margin: 5px 0px;
+`;
+
+// the view for all details about an organization
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const isMobile = useIsMobile();
@@ -885,7 +899,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             visible={isOpenRoles}
             style={{
               height: '100%',
-              flexDirection: 'column'
+              flexDirection: 'column',
             }}
             envStyle={{
               marginTop: isMobile ? 64 : 0,
@@ -893,7 +907,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               zIndex: 20,
               ...(config?.modalStyle ?? {}),
               maxHeight: '100%',
-              borderRadius: '10px'
+              borderRadius: '10px',
+              padding: '20px 60px 10px 60px'
             }}
             overlayClick={closeRolesHandler}
             bigCloseImage={closeRolesHandler}
@@ -904,11 +919,19 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
               borderRadius: '50%'
             }}
           >
-            <Wrap newDesign={true}>
-              <ModalTitle>Add user roles</ModalTitle>
+            <UserRolesWrap newDesign={true}>
+              <div style={{display:'flex', flexDirection: 'row'}}>
+                <div>
+                  <UserRolesName>{user?.unique_name}</UserRolesName>
+                  <ModalTitle>User Roles</ModalTitle>
+                </div>
+                <UserImage style={{height: '50px', width:'50px', marginLeft: 'auto'}} src={user?.img || avatarIcon} />
+              </div>
               <CheckUl>
-                {bountyRolesData.map((role: any, i: number) => (
-                  <CheckLi key={i}>
+                {bountyRolesData.map((role: any, i: number) => {
+                  const capitalizeWords:string = role.name.charAt(0).toUpperCase() + role.name.slice(1).toLocaleLowerCase();
+                  
+                  return (<CheckLi key={i}>
                     <Check
                       checked={role.status}
                       onChange={roleChange}
@@ -916,17 +939,17 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
                       name={role.name}
                       value={role.name}
                     />
-                    <CheckLabel>{role.name}</CheckLabel>
+                    <CheckLabel>{capitalizeWords}</CheckLabel>
                   </CheckLi>
-                ))}
+                )})}
               </CheckUl>
               <Button
                 onClick={() => submitRoles()}
-                style={{ width: '100%' }}
+                style={{ width: '150px', height: '50px', borderRadius: '5px', alignSelf: 'center' }}
                 color={'primary'}
-                text={'Add roles'}
+                text={'Update roles'}
               />
-            </Wrap>
+            </UserRolesWrap>
           </Modal>
         )}
         {isOpenBudget && (
