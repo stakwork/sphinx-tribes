@@ -244,6 +244,33 @@ function MobileView(props: CodingBountiesProps) {
     await main.getPeopleBounties();
   };
 
+  const handleSetAsPaid = async (e: any) => {
+    e.stopPropagation();
+    setUpdatingPayment(true);
+    await updatePaymentStatus(created || 0);
+    await setExtrasPropertyAndSaveMultiple('paid', {
+      award: awardDetails.name
+    });
+
+    setTimeout(() => {
+      setCreatorStep(0);
+      if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);
+      if (awardDetails?.name !== '') {
+        setIsPaidStatusBadgeInfo(true);
+      }
+      setUpdatingPayment(false);
+    }, 3000);
+  };
+
+  const handleSetAsUnpaid = async (e: any) => {
+    e.stopPropagation();
+    setUpdatingPayment(true);
+    await updatePaymentStatus(created || 0);
+    setLocalPaid('UNPAID');
+    setUpdatingPayment(false);
+  };
+
+
   useEffect(() => {
     const socket: WebSocket = createSocketInstance();
 
@@ -618,13 +645,7 @@ function MobileView(props: CodingBountiesProps) {
                           fontFamily: 'Barlow',
                           marginLeft: '30px'
                         }}
-                        onClick={async (e: any) => {
-                          e.stopPropagation();
-                          setUpdatingPayment(true);
-                          await updatePaymentStatus(created || 0);
-                          setLocalPaid('UNPAID');
-                          setUpdatingPayment(false);
-                        }}
+                        onClick={handleSetAsUnpaid}
                       />
                     ) : (
                       <IconButton
@@ -832,23 +853,7 @@ function MobileView(props: CodingBountiesProps) {
                   hovercolor={color.button_primary.hover}
                   activecolor={color.button_primary.active}
                   shadowcolor={color.button_primary.shadow}
-                  onClick={async (e: any) => {
-                    e.stopPropagation();
-                    setUpdatingPayment(true);
-                    await updatePaymentStatus(created || 0);
-                    await setExtrasPropertyAndSaveMultiple('paid', {
-                      award: awardDetails.name
-                    });
-
-                    setTimeout(() => {
-                      setCreatorStep(0);
-                      if (setIsPaidStatusPopOver) setIsPaidStatusPopOver(true);
-                      if (awardDetails?.name !== '') {
-                        setIsPaidStatusBadgeInfo(true);
-                      }
-                      setUpdatingPayment(false);
-                    }, 3000);
-                  }}
+                  onClick={handleSetAsPaid}
                 />
               </AwardBottomContainer>
             </AwardsContainer>
