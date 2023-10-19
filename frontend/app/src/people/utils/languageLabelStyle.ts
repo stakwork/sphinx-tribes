@@ -84,6 +84,30 @@ export const LanguageObject = [
     color: '#E05194'
   },
   {
+    label: 'Python',
+    border: '1px solid rgba(75, 100, 74, 0.1)',
+    background: 'rgba(75, 100, 74, 0.1)',
+    color: '#4B644A'
+  },
+  {
+    label: 'Ruby',
+    border: '1px solid rgba(255, 32, 110, 0.1)',
+    background: 'rgba(255, 32, 110, 0.1)',
+    color: '#FF206E'
+  },
+  {
+    label: 'Postgres',
+    border: '1px solid rgba(65, 234, 212, 0.1)',
+    background: 'rgba(65, 234, 212, 0.1)',
+    color: '#41EAD4'
+  },
+  {
+    label: 'Elastic search',
+    border: '1px solid rgba(251, 255, 18, 0.1)',
+    background: 'rgba(251, 255, 18, 0.1)',
+    color: '#FBFF12'
+  },
+  {
     label: 'No-code',
     border: '1px solid rgba(255, 141, 133, 0.1)',
     background: 'rgba(255, 141, 133, 0.1)',
@@ -112,6 +136,10 @@ export const coding_languages = [
   'C++',
   'Java',
   'Rust',
+  'Ruby',
+  'Python',
+  'Postgres',
+  'Elastic search',
   'Other'
 ];
 

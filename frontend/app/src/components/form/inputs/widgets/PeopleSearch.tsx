@@ -24,7 +24,6 @@ interface labelProps {
 const SearchOuterContainer = styled.div<styledProps>`
   min-height: 256x;
   max-height: 256x;
-  min-width: 292px;
   max-width: 292px;
   background: ${(p: any) => p?.color && p?.color?.pureWhite};
   display: flex;
@@ -112,7 +111,7 @@ const SearchOuterContainer = styled.div<styledProps>`
   }
 
   .OuterContainer {
-    width: 412px;
+    width: auto;
     background: ${(p: any) => p?.color && p.color.grayish.G950};
     box-shadow: inset 0px 2px 8px ${(p: any) => p?.color && p.color.black100};
     .PeopleList {
@@ -450,7 +449,6 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
           </EuiPopOverCheckbox>
         </EuiPopover>
       </div>
-
       <LabelsContainer
         style={{
           padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
