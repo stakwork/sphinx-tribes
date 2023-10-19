@@ -6,7 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import '@elastic/eui/dist/eui_theme_dark.css';
 import 'bootstrap/dist/css/bootstrap.css';
 
-GetColorLanguageOptions()
+GetColorLanguageOptions();
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

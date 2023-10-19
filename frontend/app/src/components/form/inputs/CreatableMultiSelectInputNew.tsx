@@ -87,7 +87,7 @@ const Label = styled.div<labelProps>`
   }
 `;
 const codingLanguages = GetValue(coding_languages);
-const colorLanguageOptions = GetColorLanguageOptions()
+const colorLanguageOptions = GetColorLanguageOptions();
 
 export default function CreatableMultiSelectInputNew({ error, label, handleChange }: Props) {
   let labeltext = label;

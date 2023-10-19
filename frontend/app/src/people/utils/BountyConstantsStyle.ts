@@ -1,17 +1,17 @@
-// This file holds definitions for the style properties of 
+// This file holds definitions for the style properties of
 // bounty constants. This includes status, award, and
 // language options.
 
-import { languages } from "config";
+import { languages } from 'config';
 
 export const status = ['Open', 'Assigned', 'Paid'];
 
 export const GetValue = (arr: string[]) =>
-arr.map((val: any) => ({
-  id: val,
-  label: val,
-  value: val
-}));
+  arr.map((val: any) => ({
+    id: val,
+    label: val,
+    value: val
+  }));
 
 export const awards = [
   {
@@ -80,52 +80,52 @@ export interface ColorOption {
 
 // define the colors for all language options
 export const colorLanguageOptions = {
-  'Lightning': {
+  Lightning: {
     border: '1px solid rgba(184, 37, 95, 0.1)',
     background: 'rgba(184, 37, 95, 0.1)',
     color: '#B8255F'
   },
-  'Javascript': {
+  Javascript: {
     border: '1px solid rgba(219, 64, 53, 0.1)',
     background: 'rgba(219, 64, 53, 0.1)',
     color: '#DB4035'
   },
-  'Typescript': {
+  Typescript: {
     border: '1px solid rgba(255, 153, 51, 0.1)',
     background: ' rgba(255, 153, 51, 0.1)',
     color: '#FF9933'
   },
-  'Node': {
+  Node: {
     border: '1px solid rgba(255, 191, 59, 0.1)',
     background: 'rgba(255, 191, 59, 0.1)',
     color: '#FFBF3B'
   },
-  'Golang': {
+  Golang: {
     border: '1px solid rgba(175, 184, 59, 0.1)',
     background: 'rgba(175, 184, 59, 0.1)',
     color: '#AFB83B'
   },
-  'Swift': {
+  Swift: {
     border: '1px solid rgba(126, 204, 73, 0.1)',
     background: 'rgba(126, 204, 73, 0.1)',
     color: '#7ECC49'
   },
-  'Kotlin': {
+  Kotlin: {
     border: '1px solid rgba(41, 148, 56, 0.1)',
     background: 'rgba(41, 148, 56, 0.1)',
     color: '#299438'
   },
-  'MySQL': {
+  MySQL: {
     border: '1px solid rgba(106, 204, 188, 0.1)',
     background: 'rgba(106, 204, 188, 0.1)',
     color: '#6ACCBC'
   },
-  'PHP': {
+  PHP: {
     border: '1px solid rgba(21, 143, 173, 0.1)',
     background: 'rgba(21, 143, 173, 0.1)',
     color: '#158FAD'
   },
-  'R': {
+  R: {
     border: '1px solid rgba(64, 115, 255, 0.1)',
     background: 'rgba(64, 115, 255, 0.1)',
     color: '#4073FF'
@@ -140,22 +140,22 @@ export const colorLanguageOptions = {
     background: 'rgba(175, 56, 235, 0.1)',
     color: '#AF38EB'
   },
-  'Java': {
+  Java: {
     border: '1px solid rgba(235, 150, 235, 0.1)',
     background: 'rgba(235, 150, 235, 0.1)',
     color: '#EB96EB'
   },
-  'Rust': {
+  Rust: {
     border: '1px solid rgba(224, 81, 148, 0.1)',
     background: 'rgba(224, 81, 148, 0.1)',
     color: '#E05194'
   },
-  'Ruby': {
+  Ruby: {
     border: '1px solid rgba(255, 32, 110, 0.1)',
     background: 'rgba(255, 32, 110, 0.1)',
     color: '#FF206E'
   },
-  'Postgres': {
+  Postgres: {
     border: '1px solid rgba(65, 234, 212, 0.1)',
     background: 'rgba(65, 234, 212, 0.1)',
     color: '#41EAD4'
@@ -165,12 +165,12 @@ export const colorLanguageOptions = {
     background: 'rgba(251, 255, 18, 0.1)',
     color: '#FBFF12'
   },
-  'Python': {
+  Python: {
     border: '1px solid rgba(75, 100, 74, 0.1)',
     background: 'rgba(75, 100, 74, 0.1)',
     color: '#4B644A'
   },
-  'Other': {
+  Other: {
     border: '1px solid rgba(21, 143, 173, 1)',
     background: 'rgba(21, 143, 173, 0.1)',
     color: '#158FAD'
@@ -188,7 +188,7 @@ export function GetColorLanguageOptions(): readonly ColorOption[] {
         background: colorLanguageOptions[lan].background,
         isFixed: true,
         isDisabled: false
-      }
+      };
     }
 
     return {
@@ -199,6 +199,6 @@ export function GetColorLanguageOptions(): readonly ColorOption[] {
       color: '#FF8D85',
       isFixed: true,
       isDisabled: false
-    }
-  })
+    };
+  });
 }
