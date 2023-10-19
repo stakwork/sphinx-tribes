@@ -12,7 +12,7 @@ import { useIsMobile } from '../../hooks';
 import { SearchBar } from '../../components/common/index';
 import { useStores } from '../../store';
 import { filterCount } from '../utils/ExtraFunctions';
-import { GetValue, coding_languages, status } from '../utils/languageLabelStyle';
+import { GetValue, coding_languages, status } from '../utils/BountyConstantsStyle';
 import { PostBounty } from './postBounty';
 
 const Status = GetValue(status);

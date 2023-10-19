@@ -3,7 +3,9 @@ import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { SelProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
-import { colourOptions } from '../../people/utils/languageLabelStyle';
+import { GetColorLanguageOptions } from '../../people/utils/BountyConstantsStyle';
+
+const colorLanguageOptions = GetColorLanguageOptions();
 
 interface styledProps {
   color?: any;
@@ -68,7 +70,7 @@ export default function Sel(props: SelProps) {
   const color = colors['light'];
 
   const opts =
-    colourOptions.map((o: any) => ({
+    colorLanguageOptions.map((o: any) => ({
       value: o.value,
       label: o.label,
       color: o.color,

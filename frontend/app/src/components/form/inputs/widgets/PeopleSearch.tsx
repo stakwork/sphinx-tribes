@@ -7,8 +7,8 @@ import { colors } from '../../../../config/colors';
 import {
   coding_languages,
   GetValue,
-  LanguageObject
-} from '../../../../people/utils/languageLabelStyle';
+  GetColorLanguageOptions
+} from '../../../../people/utils/BountyConstantsStyle';
 import { SvgMask } from '../../../../people/utils/SvgMask';
 import ImageButton from '../../../common/ImageButton';
 import { InvitePeopleSearchProps } from './interfaces';
@@ -279,6 +279,7 @@ const LoaderContainer = styled.div`
   align-items: center;
 `;
 const codingLanguages = GetValue(coding_languages);
+const colorLanguageOptions = GetColorLanguageOptions();
 
 const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const color = colors['light'];
@@ -306,7 +307,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   }, [inView, initialPeopleCount]);
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+    setLabels(colorLanguageOptions.filter((x: any) => checkboxIdToSelectedMap[x.label]));
     setPeopleData(
       (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList

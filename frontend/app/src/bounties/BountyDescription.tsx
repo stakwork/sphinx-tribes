@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isString } from 'lodash';
 import { colors } from '../config/colors';
-import { LanguageObject } from '../people/utils/languageLabelStyle';
+import { GetColorLanguageOptions } from '../people/utils/BountyConstantsStyle';
 import NameTag from '../people/utils/NameTag';
 import { BountiesDescriptionProps } from './interfaces';
+
+const colorLanguageOptions = GetColorLanguageOptions();
 
 interface codingLangProps {
   background?: string;
@@ -120,7 +122,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
   useEffect(() => {
     let res;
     if (props.codingLanguage.length > 0) {
-      res = LanguageObject?.filter((value: any) =>
+      res = colorLanguageOptions?.filter((value: any) =>
         !isString(props.codingLanguage)
           ? props.codingLanguage?.find((val: any) => val.label === value.label)
           : props.codingLanguage

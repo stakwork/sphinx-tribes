@@ -9,7 +9,7 @@ import { sendBadgeSchema } from '../../../components/form/schema';
 import { useIsMobile } from '../../../hooks';
 import { Button } from '../../../components/common';
 import { useStores } from '../../../store';
-import { LanguageObject, awards } from '../../utils/languageLabelStyle';
+import { GetColorLanguageOptions, awards } from '../../utils/BountyConstantsStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
 import { CodingLanguageLabel, WantedSummaryProps } from '../../interfaces';
@@ -17,6 +17,8 @@ import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
 import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
+
+const colorLanguageOptions = GetColorLanguageOptions();
 
 function useQuery() {
   const { search } = useLocation();
@@ -223,7 +225,7 @@ function WantedSummary(props: WantedSummaryProps) {
   useEffect(() => {
     let res;
     if (coding_languages?.length > 0) {
-      res = LanguageObject?.filter(
+      res = colorLanguageOptions?.filter(
         (value: any) => coding_languages?.find((val: string) => val === value.label)
       );
     }

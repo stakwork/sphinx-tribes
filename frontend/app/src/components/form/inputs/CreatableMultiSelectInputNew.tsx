@@ -6,8 +6,8 @@ import ImageButton from '../../common/ImageButton';
 import {
   coding_languages,
   GetValue,
-  LanguageObject
-} from '../../../people/utils/languageLabelStyle';
+  GetColorLanguageOptions
+} from '../../../people/utils/BountyConstantsStyle';
 import { SvgMask } from '../../../people/utils/SvgMask';
 import type { Props } from './propsType';
 
@@ -87,6 +87,7 @@ const Label = styled.div<labelProps>`
   }
 `;
 const codingLanguages = GetValue(coding_languages);
+const colorLanguageOptions = GetColorLanguageOptions()
 
 export default function CreatableMultiSelectInputNew({ error, label, handleChange }: Props) {
   let labeltext = label;
@@ -120,7 +121,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
   };
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+    setLabels(colorLanguageOptions.filter((x: any) => checkboxIdToSelectedMap[x.label]));
   }, [checkboxIdToSelectedMap]);
 
   return (
