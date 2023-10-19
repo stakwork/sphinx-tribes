@@ -270,7 +270,6 @@ function MobileView(props: CodingBountiesProps) {
     setUpdatingPayment(false);
   };
 
-
   useEffect(() => {
     const socket: WebSocket = createSocketInstance();
 
