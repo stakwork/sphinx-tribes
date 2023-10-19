@@ -54,7 +54,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     setConnectPersonBody(connectPerson?.person);
   }, [main.peopleBounties, bountyId, search]);
 
-  const goBack = () => {
+  const goBack = async () => {
+    await main.getPeopleBounties({ page: 1, resetPage: true });
     history.push('/bounties');
   };
 

@@ -12,7 +12,7 @@ import { useStores } from '../../../store';
 import { GetColorLanguageOptions, awards } from '../../utils/BountyConstantsStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
-import { CodingLanguageLabel, WantedSummaryProps } from '../../interfaces';
+import { CodingLanguageLabel, WantedSummaryProps, LocalPaymeentState } from '../../interfaces';
 import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
@@ -114,6 +114,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const [labels, setLabels] = useState<Array<CodingLanguageLabel>>([]);
   const [assigneeValue, setAssigneeValue] = useState(false);
+  const [localPaid, setLocalPaid] = useState<LocalPaymeentState>('UNKNOWN');
 
   const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue: any) => !assigneeValue);
 
@@ -331,6 +332,7 @@ function WantedSummary(props: WantedSummaryProps) {
       }
 
       setIsMarkPaidSaved(false);
+      setLocalPaid('PAID');
     }
   }
 
@@ -615,6 +617,8 @@ function WantedSummary(props: WantedSummaryProps) {
           nametag={nametag}
           org_uuid={org_uuid}
           id={id}
+          localPaid={localPaid}
+          setLocalPaid={setLocalPaid}
         />
       );
     }

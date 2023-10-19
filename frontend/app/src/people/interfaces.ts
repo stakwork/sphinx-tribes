@@ -243,6 +243,8 @@ export interface WantedSummaryProps {
   owner_id?: string;
 }
 
+export type LocalPaymeentState = 'UNKNOWN' | 'PAID' | 'UNPAID';
+
 export interface CodingBountiesProps {
   deliverables?: string;
   description: any;
@@ -303,6 +305,8 @@ export interface CodingBountiesProps {
   bounty_expires?: string;
   org_uuid?: string;
   id?: number;
+  localPaid: LocalPaymeentState;
+  setLocalPaid: (state: LocalPaymeentState) => void;
 }
 
 export interface CodingViewProps extends WantedSummaryProps {
@@ -401,6 +405,9 @@ export interface BountyHeaderProps {
 export interface DeleteTicketModalProps {
   closeModal: () => void;
   confirmDelete: () => void;
+  text?: string;
+  imgUrl?: string;
+  userDelete?: boolean;
 }
 
 export interface OfferViewProps {

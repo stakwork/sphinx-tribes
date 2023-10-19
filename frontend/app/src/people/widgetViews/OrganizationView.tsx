@@ -163,9 +163,9 @@ const SatsGap = styled.span`
 
 const AddOrgButton = styled(Button)`
   width: 100%;
-  borderradius: 10;
+  border-radius: 10px;
   height: 45;
-  margintop: 15;
+  margin-top: 15px;
 `;
 
 const Organizations = (props: { person: Person }) => {
