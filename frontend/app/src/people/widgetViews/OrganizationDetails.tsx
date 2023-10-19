@@ -323,7 +323,8 @@ const IconWrap = styled.div`
 `;
 
 const ModalTitle = styled.h3`
-  font-size: 1.2rem;
+  font-weight: 800;
+  font-size: 26
   color: ##3C3F41;
 `;
 
@@ -371,6 +372,11 @@ const HeadButton = styled(Button)`
 
 const UserRolesWrap = styled(Wrap)`
   width: 100%;
+`;
+
+const UserRolesHeader = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 
 const UserRolesName = styled.p`
@@ -740,7 +746,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       </ActionWrap>
       <UserWrap>
         <UsersHeadWrap>
-          <UsersHeader>USERS</UsersHeader>
+          <UsersHeader>Users</UsersHeader>
           <HeadButtonWrap forSmallScreen={false}>
             <Button
               disabled={addUserDisabled}
@@ -920,13 +926,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             }}
           >
             <UserRolesWrap newDesign={true}>
-              <div style={{display:'flex', flexDirection: 'row'}}>
+              <UserRolesHeader>
                 <div>
                   <UserRolesName>{user?.unique_name}</UserRolesName>
                   <ModalTitle>User Roles</ModalTitle>
                 </div>
-                <UserImage style={{height: '50px', width:'50px', marginLeft: 'auto'}} src={user?.img || avatarIcon} />
-              </div>
+                <UserImage style={{height: '80px', width:'auto', marginLeft: 'auto'}} src={user?.img || avatarIcon} />
+              </UserRolesHeader>
               <CheckUl>
                 {bountyRolesData.map((role: any, i: number) => {
                   const capitalizeWords:string = role.name.charAt(0).toUpperCase() + role.name.slice(1).toLocaleLowerCase();
