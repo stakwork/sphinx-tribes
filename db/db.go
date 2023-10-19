@@ -1179,6 +1179,7 @@ func (db database) WithdrawBudget(sender_pubkey string, org_uuid string, amount 
 	totalBudget := organizationBudget.TotalBudget
 
 	organizationBudget.TotalBudget = totalBudget - amount
+	fmt.Println("New Organization Total Budget ==", organizationBudget.TotalBudget)
 	db.UpdateOrganizationBudget(organizationBudget)
 
 	now := time.Now()
