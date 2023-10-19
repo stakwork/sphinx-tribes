@@ -1,5 +1,5 @@
 import { Modal } from 'components/common';
-import { usePerson } from 'hooks';
+import { useIsMobile, usePerson } from 'hooks';
 import { widgetConfigs } from 'people/utils/Constants';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
@@ -11,13 +11,19 @@ import FocusedView from '../FocusView';
 const config = widgetConfigs.wanted;
 export const BountyModal = ({ basePath }: BountyModalProps) => {
   const history = useHistory();
-  const { wantedId, wantedIndex } = useParams<{ wantedId: string; wantedIndex: string }>();
+  const { wantedId, wantedIndex, personPubkey } = useParams<{
+    wantedId: string;
+    wantedIndex: string;
+    personPubkey: string;
+  }>();
 
   const { ui, main } = useStores();
   const { canEdit, person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
 
-  const onGoBack = () => {
+  const onGoBack = async () => {
+    await main.getPersonCreatedBounties({}, personPubkey);
+    await main.getPersonAssignedBounties({}, personPubkey);
     ui.setBountyPerson(0);
     history.push({
       pathname: basePath
@@ -34,19 +40,33 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
 
     getBounty();
   }, [bounty, main, wantedId]);
+  const isMobile = useIsMobile();
+  if (isMobile) {
+    return (
+      <Modal visible={true} fill={true}>
+        <FocusedView
+          person={person}
+          personBody={person}
+          canEdit={false}
+          selectedIndex={Number(wantedIndex)}
+          config={config}
+          goBack={onGoBack}
+        />
+      </Modal>
+    );
+  }
 
   return (
     <Modal
       visible={true}
       style={{
-        minHeight: '100%',
-        height: 'auto'
+        background: 'rgba( 0 0 0 /75% )'
       }}
       envStyle={{
+        maxHeight: '100vh',
         marginTop: 0,
         borderRadius: 0,
         background: '#fff',
-        height: '100%',
         width: 'auto',
         minWidth: 500,
         maxWidth: '80%',
@@ -54,16 +74,23 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       }}
       overlayClick={onGoBack}
       bigCloseImage={onGoBack}
+      bigCloseImageStyle={{
+        top: '18px',
+        right: '-50px',
+        borderRadius: '50%'
+      }}
     >
       <FocusedView
         person={person}
-        canEdit={ui.bountyPerson ? person?.id === ui.bountyPerson : canEdit}
+        personBody={person}
+        canEdit={false}
         selectedIndex={Number(wantedIndex)}
         config={config}
         bounty={bounty}
         goBack={() => {
           onGoBack();
         }}
+        fromBountyPage={true}
       />
     </Modal>
   );
