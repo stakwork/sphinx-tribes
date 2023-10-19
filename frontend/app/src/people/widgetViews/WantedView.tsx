@@ -157,6 +157,8 @@ function WantedView(props: WantedViews2Props) {
                 price={price ?? 0}
                 sessionLength={estimated_session_length}
                 description={description}
+                name={name}
+                org_uuid={org_uuid}
               />
             </BountyBox>
           ) : (
