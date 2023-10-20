@@ -228,6 +228,27 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setIsLoading(false);
   };
 
+  const onSubmitEditOrg = async (body: any) => {
+    if (uuid)
+    {
+      const res = await main.editOrganization(uuid, body);
+      if (res.status === 200) {
+        
+      } else {
+        addToast('Error: could not update organization', 'danger');
+      }
+    }
+  };
+
+  const onDeleteOrg = async () => {
+    const res = {status: 200};
+    if (res.status === 200) {
+      addToast('Still need to implement this', 'danger');
+    } else {
+      addToast('Error: could not create organization', 'danger');
+    }
+  };
+
   const roleChange = (e: any) => {
     const rolesData = bountyRolesData.map((role: any) => {
       if (role.name === e.target.value) {
@@ -327,7 +348,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         <HeadButtonWrap forSmallScreen={false}>
           <HeadButton
             text="Edit"
-            disabled={false}
+            disabled={!isOrganizationAdmin}
             color="white"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenEditOrg(true)}
@@ -454,6 +475,9 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <EditOrgModal
             isOpen={isOpenEditOrg}
             close={() => setIsOpenEditOrg(false)}
+            onSubmit={onSubmitEditOrg}
+            onDelete={onDeleteOrg}
+            org={org}
           />
         )}
         {showDeleteModal && (
