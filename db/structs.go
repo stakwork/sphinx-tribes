@@ -515,12 +515,35 @@ type BountyPayRequest struct {
 	RouteHint       string `json:"route_hint,omitempty"`
 }
 
+type InvoiceType string
+
+const (
+	Keysend    InvoiceType = "keysend"
+	Budget     InvoiceType = "budget"
+	PayInvoice InvoiceType = "invoice"
+)
+
 type InvoiceList struct {
-	ID             uint       `json:"id"`
-	PaymentRequest string     `json:"payment_request"`
-	Status         bool       `json:"status"`
-	Created        *time.Time `json:"created"`
-	Updated        *time.Time `json:"updated"`
+	ID             uint        `json:"id"`
+	PaymentRequest string      `json:"payment_request"`
+	Status         bool        `json:"status"`
+	Type           InvoiceType `json:"type"`
+	OwnerPubkey    string      `json:"owner_pubkey"`
+	OrgUuid        string      `json:"org_uuid,omitempty"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+}
+
+type UserInvoiceData struct {
+	ID             uint   `json:"id"`
+	Amount         string `json:"amount"`
+	PaymentRequest string `json:"payment_request"`
+	Created        string `json:"created"`
+	UserPubkey     string `json:"user_pubkey"`
+	AssignedHours  uint   `json:"assigned_hours,omitempty"`
+	CommitmentFee  uint   `json:"commitment_fee,omitempty"`
+	BountyExpires  string `json:"bounty_expires,omitempty"`
+	RouteHint      string `json:"route_hint,omitempty"`
 }
 
 func (Person) TableName() string {
