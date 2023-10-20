@@ -152,6 +152,7 @@ const OrganizationActionWrap = styled.div`
     margin-left: 0;
     margin-top: 20px;
   }
+  cursor: pointer;
 `;
 
 const SatsGap = styled.span`
