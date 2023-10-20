@@ -18,7 +18,7 @@ const UserRolesHeader = styled.div`
 `;
 
 const UserRolesName = styled.p`
-  color: #8E969C;
+  color: #8e969c;
   margin: 5px 0px;
 `;
 
@@ -37,7 +37,7 @@ const RolesModal = (props: UserRolesModalProps) => {
       visible={isOpen}
       style={{
         height: '100%',
-        flexDirection: 'column',
+        flexDirection: 'column'
       }}
       envStyle={{
         marginTop: isMobile ? 64 : 0,
@@ -63,23 +63,29 @@ const RolesModal = (props: UserRolesModalProps) => {
             <UserRolesName>{user?.unique_name}</UserRolesName>
             <ModalTitle>User Roles</ModalTitle>
           </div>
-          <UserImage style={{height: '80px', width:'auto', marginLeft: 'auto'}} src={user?.img || avatarIcon} />
+          <UserImage
+            style={{ height: '80px', width: 'auto', marginLeft: 'auto' }}
+            src={user?.img || avatarIcon}
+          />
         </UserRolesHeader>
         <CheckUl>
           {bountyRolesData.map((role: any, i: number) => {
-            const capitalizeWords:string = role.name.charAt(0).toUpperCase() + role.name.slice(1).toLocaleLowerCase();
-            
-            return (<CheckLi key={i}>
-              <Check
-                checked={role.status}
-                onChange={roleChange}
-                type="checkbox"
-                name={role.name}
-                value={role.name}
-              />
-              <CheckLabel>{capitalizeWords}</CheckLabel>
-            </CheckLi>
-          )})}
+            const capitalizeWords: string =
+              role.name.charAt(0).toUpperCase() + role.name.slice(1).toLocaleLowerCase();
+
+            return (
+              <CheckLi key={i}>
+                <Check
+                  checked={role.status}
+                  onChange={roleChange}
+                  type="checkbox"
+                  name={role.name}
+                  value={role.name}
+                />
+                <CheckLabel>{capitalizeWords}</CheckLabel>
+              </CheckLi>
+            );
+          })}
         </CheckUl>
         <Button
           onClick={() => submitRoles()}
