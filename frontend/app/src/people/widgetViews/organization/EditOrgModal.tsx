@@ -9,7 +9,6 @@ import { FormField } from 'components/form/utils';
 import Input from '../../../components/form/inputs';
 import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
-import avatarIcon from '../../../public/static/profile_avatar.svg';
 import { ModalTitle } from './style';
 import { EditOrgModalProps } from './interface';
 
@@ -18,11 +17,6 @@ const color = colors['light'];
 const EditOrgColumns = styled.div`
   display: flex;
   flex-direction: row;
-`;
-
-const EditOrgName = styled.p`
-  color: #8e969c;
-  margin: 5px 0px;
 `;
 
 const EditOrgWrap = styled(Wrap)`
