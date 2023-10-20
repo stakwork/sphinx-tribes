@@ -2,9 +2,9 @@ import React from 'react';
 import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
-import { Button, Modal } from '../../../components/common';
+import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
-import { Check, CheckLabel, CheckLi, CheckUl, ModalTitle } from './style';
+import { ModalTitle } from './style';
 import { ModalProps } from './interface';
 
 const color = colors['light'];

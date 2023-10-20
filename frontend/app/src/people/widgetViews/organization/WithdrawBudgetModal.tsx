@@ -90,9 +90,9 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
       websocket_token: token
     };
 
-    const isBudgetSuccess = (object: any): object is BudgetWithdrawSuccess => {
-      return 'response' in object;
-    };
+    const isBudgetSuccess = (object: any): object is BudgetWithdrawSuccess => (
+      'response' in object
+    );
 
     const response = await main.withdrawBountyBudget(body);
     if (isBudgetSuccess(response)) {
