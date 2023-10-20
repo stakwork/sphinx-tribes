@@ -1207,3 +1207,20 @@ func (db database) AddInvoice(invoice InvoiceList) InvoiceList {
 	db.db.Create(&invoice)
 	return invoice
 }
+
+func (db database) AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData {
+	db.db.Create(&userData)
+	return userData
+}
+
+func (db database) GetUserInvoiceData(payment_request string) UserInvoiceData {
+	ms := UserInvoiceData{}
+	db.db.Where("payment_request = ?", payment_request).Find(&ms)
+	return ms
+}
+
+func (db database) DeleteUserInvoiceData(payment_request string) UserInvoiceData {
+	ms := UserInvoiceData{}
+	db.db.Where("payment_request = ?", payment_request).Delete(&ms)
+	return ms
+}
