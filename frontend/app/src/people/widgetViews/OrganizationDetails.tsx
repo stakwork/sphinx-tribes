@@ -229,11 +229,9 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const onSubmitEditOrg = async (body: any) => {
-    if (uuid)
-    {
+    if (uuid) {
       const res = await main.editOrganization(uuid, body);
       if (res.status === 200) {
-        
       } else {
         addToast('Error: could not update organization', 'danger');
       }
@@ -241,7 +239,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const onDeleteOrg = async () => {
-    const res = {status: 200};
+    const res = { status: 200 };
     if (res.status === 200) {
       addToast('Still need to implement this', 'danger');
     } else {

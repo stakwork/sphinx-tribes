@@ -1740,7 +1740,6 @@ export class MainStore {
     }
   }
 
-
   async getOrganizationUsersCount(uuid: string): Promise<number> {
     try {
       const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}/count`, {

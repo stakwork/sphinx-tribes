@@ -38,7 +38,7 @@ const FormWrapper = styled.div`
 
 const EditOrgTitle = styled(ModalTitle)`
   font-weight: 800;
-  font-size: 30px
+  font-size: 30px;
 `;
 
 const EditOrgModal = (props: EditOrgModalProps) => {
@@ -51,9 +51,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   const initValues = {
     name: org?.name,
     image: org?.img
-  }
+  };
 
-  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string>(org?.img || '');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,34 +76,34 @@ const EditOrgModal = (props: EditOrgModalProps) => {
 
   return (
     <Modal
-    visible={isOpen}
-    style={{
-      height: '100%',
-      flexDirection: 'column'
-    }}
-    envStyle={{
-      marginTop: isMobile ? 64 : 0,
-      background: color.pureWhite,
-      zIndex: 20,
-      ...(config?.modalStyle ?? {}),
-      maxHeight: '100%',
-      borderRadius: '10px',
-      padding: '20px 60px 10px 60px'
-    }}
-    overlayClick={close}
-    bigCloseImage={close}
-    bigCloseImageStyle={{
-      top: '-18px',
-      right: '-18px',
-      background: '#000',
-      borderRadius: '50%'
-    }}
-  >
+      visible={isOpen}
+      style={{
+        height: '100%',
+        flexDirection: 'column'
+      }}
+      envStyle={{
+        marginTop: isMobile ? 64 : 0,
+        background: color.pureWhite,
+        zIndex: 20,
+        ...(config?.modalStyle ?? {}),
+        maxHeight: '100%',
+        borderRadius: '10px',
+        padding: '20px 60px 10px 60px'
+      }}
+      overlayClick={close}
+      bigCloseImage={close}
+      bigCloseImageStyle={{
+        top: '-18px',
+        right: '-18px',
+        background: '#000',
+        borderRadius: '50%'
+      }}
+    >
       <EditOrgWrap newDesign={true}>
         <EditOrgTitle>Edit Organization</EditOrgTitle>
         <EditOrgColumns>
-          <div style={{display:'flex', flexDirection: 'column'}}>
-            <OrgImage src={selectedImage}/>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <OrgImage src={selectedImage} />
             <div>
               <input
                 type="file"
@@ -118,7 +118,13 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                   openFileDialog();
                 }}
                 loading={false}
-                style={{ width: 'auto', height: '40px', borderRadius: '5px', alignSelf: 'center', margin: '10px' }}
+                style={{
+                  width: 'auto',
+                  height: '40px',
+                  borderRadius: '5px',
+                  alignSelf: 'center',
+                  margin: '10px'
+                }}
                 color={'secondary'}
                 text={'Upload org image'}
               />
@@ -131,15 +137,23 @@ const EditOrgModal = (props: EditOrgModalProps) => {
               innerRef={formRef}
               validationSchema={validator(schema)}
             >
-              {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => (
+              {({
+                setFieldTouched,
+                handleSubmit,
+                values,
+                setFieldValue,
+                errors,
+                initialValues
+              }: any) => (
                 <Wrap newDesign={true}>
                   <div className="SchemaInnerContainer">
                     {schema.map((item: FormField) => {
-                      const githubdescription = item.name === 'github_description' && !values.ticket_url
-                        ? {
-                            display: 'none'
-                          }
-                        : undefined
+                      const githubdescription =
+                        item.name === 'github_description' && !values.ticket_url
+                          ? {
+                              display: 'none'
+                            }
+                          : undefined;
                       return (
                         <Input
                           {...item}
@@ -163,11 +177,10 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                           handleFocus={() => setFieldTouched(item.name, true)}
                           borderType={'bottom'}
                           imageIcon={true}
-                          style={
-                            {...githubdescription}
-                          }
+                          style={{ ...githubdescription }}
                         />
-                    )})}
+                      );
+                    })}
                   </div>
                   <Button
                     disabled={false}
@@ -175,7 +188,12 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                       handleSubmit();
                     }}
                     loading={false}
-                    style={{ width: '100%', height: '50px', borderRadius: '5px', alignSelf: 'center' }}
+                    style={{
+                      width: '100%',
+                      height: '50px',
+                      borderRadius: '5px',
+                      alignSelf: 'center'
+                    }}
                     color={'primary'}
                     text={'Save changes'}
                   />
@@ -190,9 +208,10 @@ const EditOrgModal = (props: EditOrgModalProps) => {
             onDelete();
           }}
           loading={false}
-          style={{ 
-            width: '200px', height: '50px', 
-            borderRadius: '5px', 
+          style={{
+            width: '200px',
+            height: '50px',
+            borderRadius: '5px',
             borderStyle: 'solid',
             alignSelf: 'center',
             borderWidth: '2px',
