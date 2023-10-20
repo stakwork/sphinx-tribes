@@ -52,7 +52,7 @@ export const Wanted = observer(() => {
 
   useEffect(() => {
     getUserTickets();
-  }, []);
+  }, [main]);
 
   if (!main.createdBounties?.length) {
     return (

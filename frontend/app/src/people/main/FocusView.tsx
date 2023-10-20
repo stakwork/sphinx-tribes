@@ -247,7 +247,7 @@ function FocusedView(props: FocusViewProps) {
     let newBody = cloneDeep(body);
 
     if (config && config.name === 'about') {
-      await main.saveProfile(newBody);
+      const res = await main.saveProfile(newBody);
       if (shouldCloseModal) {
         closeModal();
       }
