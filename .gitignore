@@ -2,7 +2,7 @@
 sphinx-tribes
 .env
 .env*
-.exe
+*.exe
 
 frontend/app/node_modules
 frontend/app/package-lock.json
