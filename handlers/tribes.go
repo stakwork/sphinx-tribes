@@ -14,6 +14,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func GetAllTribes(w http.ResponseWriter, r *http.Request) {
@@ -462,7 +463,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	pub_key := invoice.User_pubkey
 	owner_key := invoice.Owner_pubkey
-	amount := invoice.Amount
 	date := invoice.Created
 	memo := invoice.Memo
 	invoiceType := invoice.Type
@@ -516,6 +516,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.DB.AddInvoice(newInvoice)
+	amount := utils.GetInvoiceAmount(paymentRequest)
 
 	newInvoiceData := db.UserInvoiceData{
 		PaymentRequest: paymentRequest,
