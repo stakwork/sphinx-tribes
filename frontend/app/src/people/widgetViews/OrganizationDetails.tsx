@@ -49,20 +49,6 @@ import {
   ViewBudgetWrap
 } from './organization/style';
 
-const UserRolesWrap = styled(Wrap)`
-  width: 100%;
-`;
-
-const UserRolesHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
-const UserRolesName = styled.p`
-  color: #8E969C;
-  margin: 5px 0px;
-`;
-
 // the view for all details about an organization
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
