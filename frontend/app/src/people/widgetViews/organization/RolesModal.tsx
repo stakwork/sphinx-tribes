@@ -64,7 +64,7 @@ const RolesModal = (props: UserRolesModalProps) => {
             <ModalTitle>User Roles</ModalTitle>
           </div>
           <UserImage
-            style={{ height: '80px', width: 'auto', marginLeft: 'auto' }}
+            style={{ height: '80px', width: '80px', marginLeft: 'auto' }}
             src={user?.img || avatarIcon}
           />
         </UserRolesHeader>
