@@ -16,6 +16,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+// Keep for future reference
 func InitInvoiceCron() {
 	s := gocron.NewScheduler(time.UTC)
 	msg := make(map[string]interface{})
@@ -220,7 +221,7 @@ func InitInvoiceCron() {
 							socket.Conn.WriteJSON(msg)
 						}
 
-						db.DB.AddAndUpdateBudget(inv)
+						// db.DB.AddAndUpdateBudget(inv)
 						updateBudgetInvoiceCache(invoiceList, index)
 					}
 				}

@@ -463,17 +463,18 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	pub_key := invoice.User_pubkey
 	owner_key := invoice.Owner_pubkey
-	date := invoice.Created
+	date, _ := utils.ConvertStringToInt(invoice.Created)
 	memo := invoice.Memo
 	invoiceType := invoice.Type
 	assigedHours := invoice.Assigned_hours
 	commitmentFee := invoice.Commitment_fee
 	bountyExpires := invoice.Bounty_expires
 	routeHint := invoice.Route_hint
+	amount, _ := utils.ConvertStringToUint(invoice.Amount)
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
-	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
+	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, amount, memo)
 
 	jsonBody := []byte(bodyData)
 
@@ -516,7 +517,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.DB.AddInvoice(newInvoice)
-	amount := utils.GetInvoiceAmount(paymentRequest)
 
 	newInvoiceData := db.UserInvoiceData{
 		PaymentRequest: paymentRequest,
@@ -592,8 +592,6 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 		Status:       false,
 	}
 
-	db.DB.AddBudgetHistory(budgetHistoryData)
-
 	newInvoice := db.InvoiceList{
 		PaymentRequest: invoiceRes.Response.Invoice,
 		Type:           db.InvoiceType("budget"),
@@ -604,6 +602,7 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 		Status:         false,
 	}
 
+	db.DB.AddBudgetHistory(budgetHistoryData)
 	db.DB.AddInvoice(newInvoice)
 
 	w.WriteHeader(http.StatusOK)
