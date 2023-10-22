@@ -13,17 +13,37 @@ import { ModalTitle } from './style';
 
 const color = colors['light'];
 
+let interval;
+
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState(1);
   const [lnInvoice, setLnInvoice] = useState('');
 
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
-  const { isOpen, close, invoiceStatus, uuid } = props;
+  const { isOpen, close, invoiceStatus, uuid, successAction } = props;
 
   const config = nonWidgetConfigs['organizationusers'];
 
   const pollMinutes = 2;
+
+  async function startPolling(paymentRequest: string) {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            successAction();
+          }
+        }
+        i++;
+        if (i > 100) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) { }
+    }, 3000);
+  }
 
   const generateInvoice = async () => {
     const token = ui.meInfo?.websocketToken;
@@ -37,6 +57,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
       });
 
       setLnInvoice(data.response.invoice);
+      startPolling(data.response.invoice);
     }
   };
 

@@ -257,6 +257,18 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     }
   };
 
+  const successAction = () => {
+    addToast('Budget was added successfully', 'success');
+    setInvoiceStatus(true);
+    main.setLnInvoice('');
+
+    // get new organization budget
+    getOrganizationBudget();
+    getBudgetHistory();
+    main.getUserOrganizations(ui.selectedPerson);
+    closeBudgetHandler();
+  }
+
   const onHandle = (event: any) => {
     const res = JSON.parse(event.data);
     if (res.msg === SOCKET_MSG.user_connect) {
@@ -266,15 +278,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         ui.setMeInfo(user);
       }
     } else if (res.msg === SOCKET_MSG.budget_success && res.invoice === main.lnInvoice) {
-      addToast('Budget was added successfully', 'success');
-      setInvoiceStatus(true);
-      main.setLnInvoice('');
-
-      // get new organization budget
-      getOrganizationBudget();
-      getBudgetHistory();
-      main.getUserOrganizations(ui.selectedPerson);
-      closeBudgetHandler();
+      successAction();
     }
   };
 
@@ -480,6 +484,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             close={closeBudgetHandler}
             uuid={uuid}
             invoiceStatus={invoiceStatus}
+            successAction={successAction}
           />
         )}
         {isOpenHistory && (
