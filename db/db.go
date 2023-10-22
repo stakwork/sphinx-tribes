@@ -1140,9 +1140,9 @@ func (db database) GetOrganizationBudgetHistory(org_uuid string) []BudgetHistory
 	return budgetHistory
 }
 
-func (db database) AddAndUpdateBudget(budget BudgetStoreData) BudgetHistory {
-	created := budget.Created
-	org_uuid := budget.OrgUuid
+func (db database) AddAndUpdateBudget(invoice InvoiceList) BudgetHistory {
+	created := invoice.Created
+	org_uuid := invoice.OrgUuid
 
 	budgetHistory := db.GetBudgetHistoryByCreated(created, org_uuid)
 
@@ -1157,14 +1157,14 @@ func (db database) AddAndUpdateBudget(budget BudgetStoreData) BudgetHistory {
 			now := time.Now()
 			orgBudget := BountyBudget{
 				OrgUuid:     org_uuid,
-				TotalBudget: budget.Amount,
+				TotalBudget: budgetHistory.Amount,
 				Created:     &now,
 				Updated:     &now,
 			}
 			db.CreateOrganizationBudget(orgBudget)
 		} else {
 			totalBudget := organizationBudget.TotalBudget
-			organizationBudget.TotalBudget = totalBudget + budget.Amount
+			organizationBudget.TotalBudget = totalBudget + budgetHistory.Amount
 			db.UpdateOrganizationBudget(organizationBudget)
 		}
 	}

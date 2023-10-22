@@ -562,7 +562,7 @@ type UserInvoiceData struct {
 	ID             uint   `json:"id"`
 	Amount         uint   `json:"amount"`
 	PaymentRequest string `json:"payment_request"`
-	Created        string `json:"created"`
+	Created        int    `json:"created"`
 	UserPubkey     string `json:"user_pubkey"`
 	AssignedHours  uint   `json:"assigned_hours,omitempty"`
 	CommitmentFee  uint   `json:"commitment_fee,omitempty"`
