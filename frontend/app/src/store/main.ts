@@ -2022,6 +2022,25 @@ export class MainStore {
       };
     }
   }
+
+  async pollInvoice(payment_request: string): Promise<InvoiceDetails | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/poll/invoice/${payment_request}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error pollInvoice', e);
+    }
+  }
 }
 
 export const mainStore = new MainStore();

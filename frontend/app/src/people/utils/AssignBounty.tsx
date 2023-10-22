@@ -9,6 +9,8 @@ import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
 import { InvoiceInput, InvoiceLabel, InvoiceForm, B, N, ModalBottomText } from './style';
 
+let interval;
+
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
   const { person, created, visible } = props;
@@ -35,6 +37,33 @@ export default function AssignBounty(props: ConnectCardProps) {
     setToasts([]);
   };
 
+  async function startPolling(paymentRequest: string) {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            addToast();
+            setLnInvoice('');
+            setInvoiceStatus(true);
+            main.setLnInvoice('');
+
+            // get new wanted list
+            main.getPeopleBounties({ page: 1, resetPage: true });
+
+            props.dismiss();
+            if (props.dismissConnectModal) props.dismissConnectModal();
+          }
+        }
+        i++;
+        if (i > 100) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) { }
+    }, 3000);
+  }
+
   const generateInvoice = async () => {
     if (created && ui.meInfo?.websocketToken) {
       const data = await main.getLnInvoice({
@@ -53,6 +82,7 @@ export default function AssignBounty(props: ConnectCardProps) {
       });
 
       setLnInvoice(data.response.invoice);
+      startPolling(data.response.invoice);
     }
   };
 
