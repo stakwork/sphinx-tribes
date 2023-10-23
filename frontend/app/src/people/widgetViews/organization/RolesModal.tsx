@@ -59,7 +59,7 @@ const RolesModal = (props: UserRolesModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <UserRolesWrap newDesign={true} ref={elementRef} >
+      <UserRolesWrap newDesign={true} >
         <UserImage
           style={{ 
             height: '80px', width: '80px', marginLeft: 'auto',
