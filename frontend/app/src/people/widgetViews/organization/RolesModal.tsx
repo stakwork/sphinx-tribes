@@ -39,7 +39,7 @@ const RolesModal = (props: UserRolesModalProps) => {
       visible={isOpen}
       style={{
         height: '100%',
-        flexDirection: 'column',
+        flexDirection: 'column'
       }}
       envStyle={{
         marginTop: isMobile ? 64 : 0,
@@ -59,10 +59,12 @@ const RolesModal = (props: UserRolesModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <UserRolesWrap newDesign={true} >
+      <UserRolesWrap newDesign={true}>
         <UserImage
-          style={{ 
-            height: '80px', width: '80px', marginLeft: 'auto',
+          style={{
+            height: '80px',
+            width: '80px',
+            marginLeft: 'auto',
             position: 'fixed',
             left: '50%',
             top: `55px`,
@@ -71,12 +73,19 @@ const RolesModal = (props: UserRolesModalProps) => {
             borderRadius: '50%',
             borderWidth: '4px',
             borderColor: 'white'
-         }}
+          }}
           src={user?.img || avatarIcon}
         />
         <UserRolesName>{user?.unique_name}</UserRolesName>
-        <div style={{backgroundColor: '#EBEDEF', height: '1px', width: '100%', margin: '5px 0px 20px'}}></div>
-        <ModalTitle style={{ fontWeight: '800', fontSize: '26px'}}>User Roles</ModalTitle>
+        <div
+          style={{
+            backgroundColor: '#EBEDEF',
+            height: '1px',
+            width: '100%',
+            margin: '5px 0px 20px'
+          }}
+        ></div>
+        <ModalTitle style={{ fontWeight: '800', fontSize: '26px' }}>User Roles</ModalTitle>
         <CheckUl>
           {bountyRolesData.map((role: any, i: number) => {
             const capitalizeWords: string =
