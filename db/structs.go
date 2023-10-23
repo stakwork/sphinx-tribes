@@ -287,7 +287,7 @@ type InvoiceCheckResponse struct {
 	Payment_request string `json:"payment_request"`
 	Payment_hash    string `json:"payment_hash"`
 	Preimage        string `json:"preimage"`
-	Amount          uint   `json:"amount"`
+	Amount          string `json:"amount"`
 }
 
 type InvoicePaySuccess struct {
