@@ -13,30 +13,53 @@ import { ModalTitle } from './style';
 
 const color = colors['light'];
 
+let interval;
+
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState(1);
   const [lnInvoice, setLnInvoice] = useState('');
 
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
-  const { isOpen, close, invoiceStatus, uuid } = props;
+  const { isOpen, close, invoiceStatus, uuid, successAction } = props;
 
   const config = nonWidgetConfigs['organizationusers'];
 
   const pollMinutes = 2;
 
+  async function startPolling(paymentRequest: string) {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+            successAction();
+          }
+        }
+        i++;
+        if (i > 100) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) {
+        console.warn('AddBudgetModal Invoice Polling Error', e);
+      }
+    }, 3000);
+  }
+
   const generateInvoice = async () => {
-    const token = ui.meInfo?.websocketToken;
-    if (token && uuid) {
+    if (uuid) {
       const data = await main.getBudgetInvoice({
         amount: amount,
         sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
         org_uuid: uuid,
-        websocket_token: token,
         payment_type: 'deposit'
       });
 
       setLnInvoice(data.response.invoice);
+      startPolling(data.response.invoice);
     }
   };
 

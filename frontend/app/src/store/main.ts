@@ -1613,7 +1613,6 @@ export class MainStore {
     amount: number;
     org_uuid: string;
     sender_pubkey: string;
-    websocket_token: string;
     payment_type: string;
   }): Promise<LnInvoice> {
     try {
@@ -1623,7 +1622,6 @@ export class MainStore {
           amount: body.amount,
           org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
-          websocket_token: body.websocket_token,
           payment_type: body.payment_type
         },
         {
@@ -2020,6 +2018,25 @@ export class MainStore {
         success: false,
         error: 'Error occured while withdrawing budget'
       };
+    }
+  }
+
+  async pollInvoice(payment_request: string): Promise<InvoiceDetails | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/poll/invoice/${payment_request}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error pollInvoice', e);
     }
   }
 }
