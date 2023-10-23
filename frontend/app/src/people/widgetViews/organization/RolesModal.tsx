@@ -19,7 +19,9 @@ const UserRolesHeader = styled.div`
 
 const UserRolesName = styled.p`
   color: #8e969c;
-  margin: 5px 0px;
+  margin: auto;
+  margin-bottom: 20px;
+  margin-top: 10px;
 `;
 
 const UserRolesWrap = styled(Wrap)`
@@ -37,7 +39,7 @@ const RolesModal = (props: UserRolesModalProps) => {
       visible={isOpen}
       style={{
         height: '100%',
-        flexDirection: 'column'
+        flexDirection: 'column',
       }}
       envStyle={{
         marginTop: isMobile ? 64 : 0,
@@ -57,17 +59,24 @@ const RolesModal = (props: UserRolesModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <UserRolesWrap newDesign={true}>
-        <UserRolesHeader>
-          <div>
-            <UserRolesName>{user?.unique_name}</UserRolesName>
-            <ModalTitle>User Roles</ModalTitle>
-          </div>
-          <UserImage
-            style={{ height: '80px', width: '80px', marginLeft: 'auto' }}
-            src={user?.img || avatarIcon}
-          />
-        </UserRolesHeader>
+      <UserRolesWrap newDesign={true} ref={elementRef} >
+        <UserImage
+          style={{ 
+            height: '80px', width: '80px', marginLeft: 'auto',
+            position: 'fixed',
+            left: '50%',
+            top: `55px`,
+            transform: 'translate(-40px, -40px)',
+            borderStyle: 'solid',
+            borderRadius: '50%',
+            borderWidth: '4px',
+            borderColor: 'white'
+         }}
+          src={user?.img || avatarIcon}
+        />
+        <UserRolesName>{user?.unique_name}</UserRolesName>
+        <div style={{backgroundColor: '#EBEDEF', height: '1px', width: '100%', margin: '5px 0px 20px'}}></div>
+        <ModalTitle style={{ fontWeight: '800', fontSize: '26px'}}>User Roles</ModalTitle>
         <CheckUl>
           {bountyRolesData.map((role: any, i: number) => {
             const capitalizeWords: string =
@@ -89,7 +98,7 @@ const RolesModal = (props: UserRolesModalProps) => {
         </CheckUl>
         <Button
           onClick={() => submitRoles()}
-          style={{ width: '150px', height: '50px', borderRadius: '5px', alignSelf: 'center' }}
+          style={{ width: '100%', height: '50px', borderRadius: '6px', alignSelf: 'center' }}
           color={'primary'}
           text={'Update roles'}
         />
