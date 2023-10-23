@@ -42,6 +42,8 @@ import {
 } from './style';
 import { getTwitterLink } from './lib';
 
+let interval;
+
 function MobileView(props: CodingBountiesProps) {
   const {
     deliverables,
@@ -156,6 +158,30 @@ function MobileView(props: CodingBountiesProps) {
     setToasts([]);
   };
 
+  async function startPolling(paymentRequest: string) {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+
+            setLnInvoice('');
+            setLocalPaid('UNKNOWN');
+            setInvoiceStatus(true);
+          }
+        }
+        i++;
+        if (i > 100) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) {
+        console.warn('CodingBounty Invoice Polling Error', e);
+      }
+    }, 3000);
+  }
+
   const generateInvoice = async (price: number) => {
     if (created && ui.meInfo?.websocketToken) {
       const data = await main.getLnInvoice({
@@ -169,6 +195,7 @@ function MobileView(props: CodingBountiesProps) {
       });
 
       setLnInvoice(data.response.invoice);
+      startPolling(data.response.invoice);
     }
   };
 

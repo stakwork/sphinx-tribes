@@ -60,6 +60,7 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
       } catch (e) {}
     }, 3000);
   }
+
   async function getChallenge() {
     const res = await api.get('ask');
     if (res.challenge) {
