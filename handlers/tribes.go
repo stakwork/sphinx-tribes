@@ -594,7 +594,7 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 
 	newInvoice := db.InvoiceList{
 		PaymentRequest: invoiceRes.Response.Invoice,
-		Type:           db.InvoiceType("budget"),
+		Type:           db.InvoiceType("BUDGET"),
 		OwnerPubkey:    invoice.SenderPubKey,
 		OrgUuid:        invoice.OrgUuid,
 		Created:        &now,

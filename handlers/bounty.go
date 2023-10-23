@@ -585,64 +585,72 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 	if invoiceRes.Response.Settled {
 		// Todo if an invoice is settled
 		invoice := db.DB.GetInvoice(paymentRequest)
-		invData := db.DB.GetUserInvoiceData(invoice.PaymentRequest)
+		invData := db.DB.GetUserInvoiceData(paymentRequest)
+		dbInvoice := db.DB.GetInvoice(paymentRequest)
 
-		if invoice.Type == "budget" {
-			db.DB.AddAndUpdateBudget(invoice)
-		} else if invoice.Type == "payinvoice" {
-			bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
-
-			if err == nil {
-				bounty.Assignee = invData.UserPubkey
-				bounty.CommitmentFee = uint64(invData.CommitmentFee)
-				bounty.AssignedHours = uint8(invData.AssignedHours)
-				bounty.BountyExpires = invData.BountyExpires
-			}
-
-			db.DB.UpdateBounty(bounty)
-		} else if invoice.Type == "keysend" {
-			url := fmt.Sprintf("%s/payment", config.RelayUrl)
-
-			amount := invData.Amount
-
-			bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
-
-			jsonBody := []byte(bodyData)
-
-			client := &http.Client{}
-			req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-			req.Header.Set("x-user-token", config.RelayAuthKey)
-			req.Header.Set("Content-Type", "application/json")
-			res, _ := client.Do(req)
-
-			if err != nil {
-				log.Printf("Request Failed: %s", err)
-				return
-			}
-
-			defer res.Body.Close()
-
-			body, err = io.ReadAll(res.Body)
-
-			if res.StatusCode == 200 {
-				// Unmarshal result
-				keysendRes := db.KeysendSuccess{}
-				err = json.Unmarshal(body, &keysendRes)
-
+		// Make any change onl;y if the invoice has not been settled
+		if !dbInvoice.Status {
+			if invoice.Type == "BUDGET" {
+				db.DB.AddAndUpdateBudget(invoice)
+			} else if invoice.Type == "ASSIGN" {
 				bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
 
 				if err == nil {
-					bounty.Paid = true
+					bounty.Assignee = invData.UserPubkey
+					bounty.CommitmentFee = uint64(invData.CommitmentFee)
+					bounty.AssignedHours = uint8(invData.AssignedHours)
+					bounty.BountyExpires = invData.BountyExpires
+				} else {
+					fmt.Println("Fetch Assign bounty error ===", err)
 				}
 
 				db.DB.UpdateBounty(bounty)
-			} else {
-				// Unmarshal result
-				keysendError := db.KeysendError{}
-				err = json.Unmarshal(body, &keysendError)
-				log.Printf("Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, keysendError.Error)
+			} else if invoice.Type == "KEYSEND" {
+				url := fmt.Sprintf("%s/payment", config.RelayUrl)
+
+				amount := invData.Amount
+
+				bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+
+				jsonBody := []byte(bodyData)
+
+				client := &http.Client{}
+				req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+				req.Header.Set("x-user-token", config.RelayAuthKey)
+				req.Header.Set("Content-Type", "application/json")
+				res, _ := client.Do(req)
+
+				if err != nil {
+					log.Printf("Request Failed: %s", err)
+					return
+				}
+
+				defer res.Body.Close()
+
+				body, err = io.ReadAll(res.Body)
+
+				if res.StatusCode == 200 {
+					// Unmarshal result
+					keysendRes := db.KeysendSuccess{}
+					err = json.Unmarshal(body, &keysendRes)
+
+					bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
+
+					if err == nil {
+						bounty.Paid = true
+					}
+
+					db.DB.UpdateBounty(bounty)
+				} else {
+					// Unmarshal result
+					keysendError := db.KeysendError{}
+					err = json.Unmarshal(body, &keysendError)
+					log.Printf("Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, keysendError.Error)
+				}
 			}
+			// Update the invoice status
+			db.DB.UpdateInvoice(paymentRequest)
 		}
 
 	}

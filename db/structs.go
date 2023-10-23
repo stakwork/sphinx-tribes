@@ -281,12 +281,13 @@ type InvoiceError struct {
 	Error   string `json:"error"`
 }
 
+// TODO change amount back to string
 type InvoiceCheckResponse struct {
 	Settled         bool   `json:"settled"`
 	Payment_request string `json:"payment_request"`
 	Payment_hash    string `json:"payment_hash"`
 	Preimage        string `json:"preimage"`
-	Amount          string `json:"amount"`
+	Amount          uint   `json:"amount"`
 }
 
 type InvoicePaySuccess struct {
@@ -542,9 +543,9 @@ type BountyPayRequest struct {
 type InvoiceType string
 
 const (
-	Keysend    InvoiceType = "keysend"
-	Budget     InvoiceType = "budget"
-	PayInvoice InvoiceType = "invoice"
+	Keysend    InvoiceType = "KEYSEND"
+	Budget     InvoiceType = "BUDGET"
+	PayInvoice InvoiceType = "ASSIGN"
 )
 
 type InvoiceList struct {
