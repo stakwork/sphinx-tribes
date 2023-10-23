@@ -14,6 +14,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func GetAllTribes(w http.ResponseWriter, r *http.Request) {
@@ -462,19 +463,18 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	pub_key := invoice.User_pubkey
 	owner_key := invoice.Owner_pubkey
-	amount := invoice.Amount
-	date := invoice.Created
+	date, _ := utils.ConvertStringToInt(invoice.Created)
 	memo := invoice.Memo
 	invoiceType := invoice.Type
 	assigedHours := invoice.Assigned_hours
 	commitmentFee := invoice.Commitment_fee
 	bountyExpires := invoice.Bounty_expires
-	websocketToken := invoice.Websocket_token
 	routeHint := invoice.Route_hint
+	amount, _ := utils.ConvertStringToUint(invoice.Amount)
 
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
-	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
+	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, amount, memo)
 
 	jsonBody := []byte(bodyData)
 
@@ -504,26 +504,32 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var invoiceCache, _ = db.Store.GetInvoiceCache()
+	paymentRequest := invoiceRes.Response.Invoice
+	now := time.Now()
 
-	var invoiceData = db.InvoiceStoreData{
-		Amount:         amount,
-		Created:        date,
-		Invoice:        invoiceRes.Response.Invoice,
-		Owner_pubkey:   owner_key,
-		Host:           websocketToken,
-		User_pubkey:    pub_key,
-		Type:           invoiceType,
-		Assigned_hours: assigedHours,
-		Commitment_fee: commitmentFee,
-		Bounty_expires: bountyExpires,
-		Route_hint:     routeHint,
+	newInvoice := db.InvoiceList{
+		PaymentRequest: paymentRequest,
+		Type:           db.InvoiceType(invoiceType),
+		OwnerPubkey:    owner_key,
+		Created:        &now,
+		Updated:        &now,
+		Status:         false,
 	}
 
-	var invoiceList = append(invoiceCache, invoiceData)
+	db.DB.AddInvoice(newInvoice)
 
-	// save the invoice to store
-	db.Store.SetInvoiceCache(invoiceList)
+	newInvoiceData := db.UserInvoiceData{
+		PaymentRequest: paymentRequest,
+		Created:        date,
+		Amount:         amount,
+		UserPubkey:     pub_key,
+		AssignedHours:  assigedHours,
+		CommitmentFee:  commitmentFee,
+		BountyExpires:  bountyExpires,
+		RouteHint:      routeHint,
+	}
+
+	db.DB.AddUserInvoiceData(newInvoiceData)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
@@ -586,22 +592,18 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 		Status:       false,
 	}
 
-	db.DB.AddBudgetHistory(budgetHistoryData)
-
-	var invoiceCache, _ = db.Store.GetBudgetInvoiceCache()
-
-	websocketToken := invoice.Websocket_token
-	var invoiceData = db.BudgetStoreData{
-		Amount:       invoice.Amount,
-		Invoice:      invoiceRes.Response.Invoice,
-		OrgUuid:      invoice.OrgUuid,
-		SenderPubKey: invoice.SenderPubKey,
-		Host:         websocketToken,
-		Created:      &now,
+	newInvoice := db.InvoiceList{
+		PaymentRequest: invoiceRes.Response.Invoice,
+		Type:           db.InvoiceType("BUDGET"),
+		OwnerPubkey:    invoice.SenderPubKey,
+		OrgUuid:        invoice.OrgUuid,
+		Created:        &now,
+		Updated:        &now,
+		Status:         false,
 	}
-	var invoiceList = append(invoiceCache, invoiceData)
-	// save the budget invoice to store
-	db.Store.SetBudgetInvoiceCache(invoiceList)
+
+	db.DB.AddBudgetHistory(budgetHistoryData)
+	db.DB.AddInvoice(newInvoice)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
