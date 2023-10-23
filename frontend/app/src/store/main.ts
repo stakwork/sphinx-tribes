@@ -1613,7 +1613,6 @@ export class MainStore {
     amount: number;
     org_uuid: string;
     sender_pubkey: string;
-    websocket_token: string;
     payment_type: string;
   }): Promise<LnInvoice> {
     try {
@@ -1623,7 +1622,6 @@ export class MainStore {
           amount: body.amount,
           org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
-          websocket_token: body.websocket_token,
           payment_type: body.payment_type
         },
         {
