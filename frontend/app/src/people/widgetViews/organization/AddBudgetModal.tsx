@@ -32,8 +32,10 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
     interval = setInterval(async () => {
       try {
         const invoiceData = await main.pollInvoice(paymentRequest);
+
         if (invoiceData) {
           if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
             successAction();
           }
         }
@@ -41,18 +43,18 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) { }
+      } catch (e) {
+        console.warn('AddBudgetModal Invoice Polling Error', e);
+      }
     }, 3000);
   }
 
   const generateInvoice = async () => {
-    const token = ui.meInfo?.websocketToken;
-    if (token && uuid) {
+    if (uuid) {
       const data = await main.getBudgetInvoice({
         amount: amount,
         sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
         org_uuid: uuid,
-        websocket_token: token,
         payment_type: 'deposit'
       });
 

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ConnectCardProps } from 'people/interfaces';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import moment from 'moment';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
@@ -44,6 +43,8 @@ export default function AssignBounty(props: ConnectCardProps) {
         const invoiceData = await main.pollInvoice(paymentRequest);
         if (invoiceData) {
           if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+
             addToast();
             setLnInvoice('');
             setInvoiceStatus(true);
@@ -60,7 +61,9 @@ export default function AssignBounty(props: ConnectCardProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) { }
+      } catch (e) {
+        console.warn('AssignBounty Modal Invoice Polling Error', e);
+      }
     }, 3000);
   }
 
@@ -85,44 +88,6 @@ export default function AssignBounty(props: ConnectCardProps) {
       startPolling(data.response.invoice);
     }
   };
-
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
-      addToast();
-      setLnInvoice('');
-      setInvoiceStatus(true);
-      main.setLnInvoice('');
-
-      // get new wanted list
-      main.getPeopleBounties({ page: 1, resetPage: true });
-
-      props.dismiss();
-      if (props.dismissConnectModal) props.dismissConnectModal();
-    }
-  };
-
-  useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
-
-    socket.onopen = () => {
-      console.log('Socket connected');
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
-
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
 
   return (
     <div onClick={(e: any) => e.stopPropagation()}>

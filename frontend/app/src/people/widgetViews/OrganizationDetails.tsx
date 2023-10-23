@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button } from 'components/common';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
@@ -267,19 +266,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getBudgetHistory();
     main.getUserOrganizations(ui.selectedPerson);
     closeBudgetHandler();
-  }
-
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.budget_success && res.invoice === main.lnInvoice) {
-      successAction();
-    }
   };
 
   useEffect(() => {
@@ -295,21 +281,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getPaymentsHistory,
     getBudgetHistory
   ]);
-
-  useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
-    socket.onopen = () => {
-      console.log('Socket connected');
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
-
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
 
   return (
     <Container>

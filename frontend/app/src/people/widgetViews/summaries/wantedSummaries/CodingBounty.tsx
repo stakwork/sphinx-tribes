@@ -167,6 +167,8 @@ function MobileView(props: CodingBountiesProps) {
         const invoiceData = await main.pollInvoice(paymentRequest);
         if (invoiceData) {
           if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+
             setLnInvoice('');
             setLocalPaid('UNKNOWN');
             setInvoiceStatus(true);
@@ -176,7 +178,9 @@ function MobileView(props: CodingBountiesProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) { }
+      } catch (e) {
+        console.warn('CodingBounty Invoice Polling Error', e);
+      }
     }, 3000);
   }
 
@@ -321,8 +325,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-        ui.meInfo?.owner_alias &&
-        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+      ui.meInfo?.owner_alias &&
+      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */
