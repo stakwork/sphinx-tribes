@@ -1560,11 +1560,28 @@ export class MainStore {
     }
   }
 
+  @persist('object')
   @observable
-  lnInvoice = '';
+  keysendInvoice = '';
 
-  @action setLnInvoice(invoice: string) {
-    this.lnInvoice = invoice;
+  @action setKeysendInvoice(invoice: string) {
+    this.keysendInvoice = invoice;
+  }
+
+  @persist('object')
+  @observable
+  assignInvoice = '';
+
+  @action setAssignInvoice(invoice: string) {
+    this.assignInvoice = invoice;
+  }
+
+  @persist('object')
+  @observable
+  budgetInvoices: string[] = [];
+
+  @action setBudgetInvoice(invoice: string[]) {
+    this.budgetInvoices = invoice;
   }
 
   async getLnInvoice(body: {
@@ -1599,9 +1616,6 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       );
-      if (data.success) {
-        this.setLnInvoice(data.response.invoice);
-      }
       return data;
     } catch (e) {
       console.log('Error getLnInvoice', e);
@@ -1613,7 +1627,6 @@ export class MainStore {
     amount: number;
     org_uuid: string;
     sender_pubkey: string;
-    websocket_token: string;
     payment_type: string;
   }): Promise<LnInvoice> {
     try {
@@ -1623,16 +1636,12 @@ export class MainStore {
           amount: body.amount,
           org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
-          websocket_token: body.websocket_token,
           payment_type: body.payment_type
         },
         {
           'Content-Type': 'application/json'
         }
       );
-      if (data.success) {
-        this.setLnInvoice(data.response.invoice);
-      }
       return data;
     } catch (e) {
       return { success: false, response: { invoice: '' } };
@@ -1674,13 +1683,13 @@ export class MainStore {
 
   @action async getUserOrganizations(id: number): Promise<Organization[]> {
     try {
-      if (!uiStore.meInfo) return [];
-      const info = uiStore.meInfo;
+      const info = uiStore;
+      if (!info.selectedPerson) return [];
+
       const r: any = await fetch(`${TribesURL}/organizations/user/${id}`, {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -2020,6 +2029,25 @@ export class MainStore {
         success: false,
         error: 'Error occured while withdrawing budget'
       };
+    }
+  }
+
+  async pollInvoice(payment_request: string): Promise<InvoiceDetails | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/poll/invoice/${payment_request}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error pollInvoice', e);
     }
   }
 }

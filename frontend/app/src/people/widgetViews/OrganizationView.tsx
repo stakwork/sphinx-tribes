@@ -37,7 +37,6 @@ const OrganizationWrap = styled.div`
   background: white;
   padding: 25px 30px;
   border-radius: 6px;
-  cursor: pointer;
   @media only screen and (max-width: 800px) {
     padding: 15px 0px;
   }
@@ -122,7 +121,6 @@ const OrganizationContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  cursor: pointer;
   gap: 15px;
 `;
 
@@ -206,7 +204,7 @@ const Organizations = (props: { person: Person }) => {
 
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
-    if (ui.selectedPerson !== 0) {
+    if (ui.selectedPerson) {
       await main.getUserOrganizations(ui.selectedPerson);
       const user = await main.getPersonById(ui.selectedPerson);
       setUser(user);
@@ -255,14 +253,16 @@ const Organizations = (props: { person: Person }) => {
             </OrganizationBudgetText>
           </OrganizationTextWrap>
           <OrganizationActionWrap>
-            <ManageButton
-              org={org}
-              user_pubkey={user?.owner_pubkey ?? ''}
-              action={() => {
-                setOrganization(org);
-                setDetailsOpen(true);
-              }}
-            />
+            {ui.meInfo?.owner_pubkey && (
+              <ManageButton
+                org={org}
+                user_pubkey={user?.owner_pubkey ?? ''}
+                action={() => {
+                  setOrganization(org);
+                  setDetailsOpen(true);
+                }}
+              />
+            )}
             <Button
               disabled={btnDisabled}
               color={!btnDisabled ? 'white' : 'grey'}

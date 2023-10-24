@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button } from 'components/common';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { satToUsd, userHasRole } from 'helpers';
+import { isInvoiceExpired, satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -90,6 +89,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const { org } = props;
   const uuid = org?.uuid || '';
+
+  let interval;
 
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
@@ -258,26 +259,80 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     }
   };
 
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.budget_success && res.invoice === main.lnInvoice) {
-      addToast('Budget was added successfully', 'success');
-      setInvoiceStatus(true);
-      main.setLnInvoice('');
+  const successAction = () => {
+    addToast('Budget was added successfully', 'success');
+    setInvoiceStatus(true);
 
-      // get new organization budget
-      getOrganizationBudget();
-      getBudgetHistory();
-      main.getUserOrganizations(ui.selectedPerson);
-      closeBudgetHandler();
+    // get new organization budget
+    getOrganizationBudget();
+    getBudgetHistory();
+    main.getUserOrganizations(ui.selectedPerson);
+    closeBudgetHandler();
+  };
+
+  const deleteInvoice = (payReq: string, invoices: string[]): string[] => {
+    const index = invoices.indexOf(payReq);
+    invoices.splice(index, 1);
+    main.setBudgetInvoice(invoices);
+
+    return invoices;
+  };
+
+  const pollInvoices = () => {
+    let invoices = [...main.budgetInvoices];
+    if (invoices.length) {
+      interval = setInterval(async () => {
+        try {
+          for (const payReq of invoices) {
+            if (payReq) {
+              const expired = isInvoiceExpired(payReq);
+              const invoiceData = await main.pollInvoice(payReq);
+              if (invoiceData) {
+                if (invoiceData.success && invoiceData.response.settled) {
+                  invoices = deleteInvoice(payReq, invoices);
+
+                  getOrganizationBudget();
+                  getBudgetHistory();
+                } else if (expired) {
+                  invoices = deleteInvoice(payReq, main.budgetInvoices);
+                }
+              }
+
+              if (invoices.length === 0) {
+                clearInterval(interval);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Budget Invoices Polling Error', e);
+        }
+      }, 5000);
     }
   };
+
+  async function startPolling(paymentRequest: string) {
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+            successAction();
+          }
+        }
+      } catch (e) {
+        console.warn('AddBudget Modal Invoice Polling Error', e);
+      }
+    }, 5000);
+  }
+
+  useEffect(() => {
+    pollInvoices();
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
 
   useEffect(() => {
     getOrganizationUsers();
@@ -292,21 +347,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getPaymentsHistory,
     getBudgetHistory
   ]);
-
-  useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
-    socket.onopen = () => {
-      console.log('Socket connected');
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
-
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
 
   return (
     <Container>
@@ -481,6 +521,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             close={closeBudgetHandler}
             uuid={uuid}
             invoiceStatus={invoiceStatus}
+            startPolling={startPolling}
           />
         )}
         {isOpenHistory && (
