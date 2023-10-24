@@ -16,6 +16,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/users/{uuid}", handlers.GetOrganizationUsers)
 		r.Get("/users/{uuid}/count", handlers.GetOrganizationUsersCount)
 		r.Get("/bounties/{uuid}", handlers.GetOrganizationBounties)
+		r.Get("/user/{userId}", handlers.GetUserOrganizations)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
@@ -27,7 +28,6 @@ func OrganizationRoutes() chi.Router {
 
 		r.Get("/bounty/roles", handlers.GetBountyRoles)
 		r.Get("/users/role/{uuid}/{user}", handlers.GetUserRoles)
-		r.Get("/user/{userId}", handlers.GetUserOrganizations)
 		r.Get("/budget/{uuid}", handlers.GetOrganizationBudget)
 		r.Get("/budget/history/{uuid}", handlers.GetOrganizationBudgetHistory)
 		r.Get("/payments/{uuid}", handlers.GetPaymentHistory)
