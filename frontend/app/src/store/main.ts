@@ -1683,13 +1683,13 @@ export class MainStore {
 
   @action async getUserOrganizations(id: number): Promise<Organization[]> {
     try {
-      if (!uiStore.meInfo) return [];
-      const info = uiStore.meInfo;
+      const info = uiStore;
+      if (!info.selectedPerson) return [];
+
       const r: any = await fetch(`${TribesURL}/organizations/user/${id}`, {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
