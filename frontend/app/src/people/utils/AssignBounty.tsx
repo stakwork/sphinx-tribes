@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ConnectCardProps } from 'people/interfaces';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import moment from 'moment';
+import { isInvoiceExpired } from 'helpers';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
@@ -19,7 +20,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   const [lnInvoice, setLnInvoice] = useState('');
   const [invoiceStatus, setInvoiceStatus] = useState(false);
 
-  const pollMinutes = 2;
+  const pollMinutes = 5;
 
   const [toasts, setToasts]: any = useState([]);
 
@@ -36,39 +37,37 @@ export default function AssignBounty(props: ConnectCardProps) {
     setToasts([]);
   };
 
-  async function startPolling(paymentRequest: string) {
-    let i = 0;
-    interval = setInterval(async () => {
-      try {
-        const invoiceData = await main.pollInvoice(paymentRequest);
-        if (invoiceData) {
-          if (invoiceData.success && invoiceData.response.settled) {
-            clearInterval(interval);
+  const startPolling = useCallback(
+    async (paymentRequest: string) => {
+      interval = setInterval(async () => {
+        try {
+          const invoiceData = await main.pollInvoice(paymentRequest);
+          if (invoiceData) {
+            if (invoiceData.success && invoiceData.response.settled) {
+              clearInterval(interval);
 
-            addToast();
-            setLnInvoice('');
-            setInvoiceStatus(true);
-            main.setLnInvoice('');
+              addToast();
+              setLnInvoice('');
+              setInvoiceStatus(true);
+              main.setAssignInvoice('');
 
-            // get new wanted list
-            main.getPeopleBounties({ page: 1, resetPage: true });
+              // get new wanted list
+              main.getPeopleBounties({ page: 1, resetPage: true });
 
-            props.dismiss();
-            if (props.dismissConnectModal) props.dismissConnectModal();
+              props.dismiss();
+              if (props.dismissConnectModal) props.dismissConnectModal();
+            }
           }
+        } catch (e) {
+          console.warn('AssignBounty Modal Invoice Polling Error', e);
         }
-        i++;
-        if (i > 100) {
-          if (interval) clearInterval(interval);
-        }
-      } catch (e) {
-        console.warn('AssignBounty Modal Invoice Polling Error', e);
-      }
-    }, 3000);
-  }
+      }, 5000);
+    },
+    [main, props]
+  );
 
   const generateInvoice = async () => {
-    if (created && ui.meInfo?.websocketToken) {
+    if (created) {
       const data = await main.getLnInvoice({
         amount: 200 * bountyHours,
         memo: '',
@@ -84,10 +83,30 @@ export default function AssignBounty(props: ConnectCardProps) {
         ).toUTCString()
       });
 
-      setLnInvoice(data.response.invoice);
-      startPolling(data.response.invoice);
+      const paymentRequest = data.response.invoice;
+
+      if (paymentRequest) {
+        setLnInvoice(paymentRequest);
+        main.setAssignInvoice(paymentRequest);
+        startPolling(paymentRequest);
+      }
     }
   };
+
+  useEffect(() => {
+    if (main.assignInvoice !== '') {
+      const expired = isInvoiceExpired(main.assignInvoice);
+      if (!expired) {
+        startPolling(main.assignInvoice);
+      } else {
+        main.setAssignInvoice('');
+      }
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [main, startPolling]);
 
   return (
     <div onClick={(e: any) => e.stopPropagation()}>
