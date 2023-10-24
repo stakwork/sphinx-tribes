@@ -1223,11 +1223,7 @@ func (db database) GetInvoice(payment_request string) InvoiceList {
 
 func (db database) UpdateInvoice(payment_request string) InvoiceList {
 	ms := InvoiceList{}
-<<<<<<< HEAD
 	db.db.Model(&InvoiceList{}).Where("payment_request = ?", payment_request).Update("status", true)
-=======
-	db.db.Model(&Tribe{}).Where("payment_request = ?", payment_request).Update("status", true)
->>>>>>> master
 	ms.Status = true
 	return ms
 }
