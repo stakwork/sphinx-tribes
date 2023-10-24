@@ -84,16 +84,20 @@ const OrganizationTextWrap = styled.div`
   margin-left: 20px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+
   @media only screen and (max-width: 470px) {
     margin-left: 0px;
     margin-top: 15px;
     justify-content: center;
+    align-items: center;
   }
 `;
 
-const OrganizationText = styled.p`
+const OrganizationText = styled.p<{ user: string }>`
   font-size: 1rem;
   font-weight: bold;
+  margin-bottom: ${(p: any) => (p.user ? '14px' : '0px')};
   @media only screen and (max-width: 700px) {
     font-size: 0.85rem;
   }
@@ -244,12 +248,14 @@ const Organizations = (props: { person: Person }) => {
         <OrganizationData>
           <OrganizationImg src={org.img || avatarIcon} />
           <OrganizationTextWrap>
-            <OrganizationText>{org.name}</OrganizationText>
-            <OrganizationBudgetText>
-              {DollarConverter(org.budget ?? 0)}
-              <SatsGap>/</SatsGap>
-              {satToUsd(org.budget ?? 0)} USD
-            </OrganizationBudgetText>
+            <OrganizationText user={ui.meInfo?.owner_pubkey ?? ''}>{org.name}</OrganizationText>
+            {ui.meInfo?.owner_pubkey && (
+              <OrganizationBudgetText>
+                {DollarConverter(org.budget ?? 0)}
+                <SatsGap>/</SatsGap>
+                {satToUsd(org.budget ?? 0)} USD
+              </OrganizationBudgetText>
+            )}
           </OrganizationTextWrap>
           <OrganizationActionWrap>
             {ui.meInfo?.owner_pubkey && (
