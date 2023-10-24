@@ -1560,11 +1560,28 @@ export class MainStore {
     }
   }
 
+  @persist('object')
   @observable
-  lnInvoice = '';
+  keysendInvoice = '';
 
-  @action setLnInvoice(invoice: string) {
-    this.lnInvoice = invoice;
+  @action setKeysendInvoice(invoice: string) {
+    this.keysendInvoice = invoice;
+  }
+
+  @persist('object')
+  @observable
+  assignInvoice = '';
+
+  @action setAssignInvoice(invoice: string) {
+    this.assignInvoice = invoice;
+  }
+
+  @persist('object')
+  @observable
+  budgetInvoices: string[] = [];
+
+  @action setBudgetInvoice(invoice: string[]) {
+    this.budgetInvoices = invoice;
   }
 
   async getLnInvoice(body: {
@@ -1599,9 +1616,6 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       );
-      if (data.success) {
-        this.setLnInvoice(data.response.invoice);
-      }
       return data;
     } catch (e) {
       console.log('Error getLnInvoice', e);
@@ -1628,9 +1642,6 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       );
-      if (data.success) {
-        this.setLnInvoice(data.response.invoice);
-      }
       return data;
     } catch (e) {
       return { success: false, response: { invoice: '' } };
