@@ -285,18 +285,16 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           for (const payReq of invoices) {
             if (payReq) {
               const expired = isInvoiceExpired(payReq);
-              if (!expired) {
-                const invoiceData = await main.pollInvoice(payReq);
-                if (invoiceData) {
-                  if (invoiceData.success && invoiceData.response.settled) {
-                    invoices = deleteInvoice(payReq, invoices);
+              const invoiceData = await main.pollInvoice(payReq);
+              if (invoiceData) {
+                if (invoiceData.success && invoiceData.response.settled) {
+                  invoices = deleteInvoice(payReq, invoices);
 
-                    getOrganizationBudget();
-                    getBudgetHistory();
-                  }
+                  getOrganizationBudget();
+                  getBudgetHistory();
+                } else if (expired) {
+                  invoices = deleteInvoice(payReq, main.budgetInvoices);
                 }
-              } else {
-                invoices = deleteInvoice(payReq, main.budgetInvoices);
               }
 
               if (invoices.length === 0) {
