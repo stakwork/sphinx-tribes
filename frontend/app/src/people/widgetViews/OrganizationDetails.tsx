@@ -5,7 +5,7 @@ import { Button } from 'components/common';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { satToUsd, userHasRole } from 'helpers';
+import { isInvoiceExpired, satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -88,6 +88,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const { org } = props;
   const uuid = org?.uuid || '';
+
+  let interval;
 
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
@@ -259,7 +261,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const successAction = () => {
     addToast('Budget was added successfully', 'success');
     setInvoiceStatus(true);
-    main.setLnInvoice('');
 
     // get new organization budget
     getOrganizationBudget();
@@ -267,6 +268,72 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     main.getUserOrganizations(ui.selectedPerson);
     closeBudgetHandler();
   };
+
+  const deleteInvoice = (payReq: string, invoices: string[]): string[] => {
+    const index = invoices.indexOf(payReq);
+    invoices.splice(index, 1);
+    main.setBudgetInvoice(invoices);
+
+    return invoices;
+  };
+
+  const pollInvoices = () => {
+    let invoices = [...main.budgetInvoices];
+    if (invoices.length) {
+      interval = setInterval(async () => {
+        try {
+          for (const payReq of invoices) {
+            if (payReq) {
+              const expired = isInvoiceExpired(payReq);
+              if (!expired) {
+                const invoiceData = await main.pollInvoice(payReq);
+                if (invoiceData) {
+                  if (invoiceData.success && invoiceData.response.settled) {
+                    invoices = deleteInvoice(payReq, invoices);
+
+                    getOrganizationBudget();
+                    getBudgetHistory();
+                  }
+                }
+              } else {
+                invoices = deleteInvoice(payReq, main.budgetInvoices);
+              }
+
+              if (invoices.length === 0) {
+                clearInterval(interval);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Budget Invoices Polling Error', e);
+        }
+      }, 5000);
+    }
+  };
+
+  async function startPolling(paymentRequest: string) {
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+            successAction();
+          }
+        }
+      } catch (e) {
+        console.warn('AddBudget Modal Invoice Polling Error', e);
+      }
+    }, 5000);
+  }
+
+  useEffect(() => {
+    pollInvoices();
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
 
   useEffect(() => {
     getOrganizationUsers();
@@ -455,7 +522,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             close={closeBudgetHandler}
             uuid={uuid}
             invoiceStatus={invoiceStatus}
-            successAction={successAction}
+            startPolling={startPolling}
           />
         )}
         {isOpenHistory && (
