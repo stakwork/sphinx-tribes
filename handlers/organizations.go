@@ -355,22 +355,33 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	organizations := db.DB.GetUserCreatedOrganizations(user.OwnerPubKey)
 	// add bounty count to the organization
 	for index, value := range organizations {
-		bountyCount := db.DB.GetOrganizationBountyCount(value.Uuid)
-		budget := db.DB.GetOrganizationBudget(value.Uuid)
+		uuid := value.Uuid
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 
+		if hasRole {
+			budget := db.DB.GetOrganizationBudget(uuid)
+			organizations[index].Budget = budget.TotalBudget
+		} else {
+			organizations[index].Budget = 0
+		}
 		organizations[index].BountyCount = bountyCount
-		organizations[index].Budget = budget.TotalBudget
 	}
 
 	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
 	for _, value := range assignedOrganizations {
-		organization := db.DB.GetOrganizationByUuid(value.OrgUuid)
+		uuid := value.OrgUuid
+		organization := db.DB.GetOrganizationByUuid(uuid)
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 
-		bountyCount := db.DB.GetOrganizationBountyCount(value.OrgUuid)
-		budget := db.DB.GetOrganizationBudget(value.OrgUuid)
-
+		if hasRole {
+			budget := db.DB.GetOrganizationBudget(uuid)
+			organization.Budget = budget.TotalBudget
+		} else {
+			organization.Budget = 0
+		}
 		organization.BountyCount = bountyCount
-		organization.Budget = budget.TotalBudget
 
 		organizations = append(organizations, organization)
 	}
