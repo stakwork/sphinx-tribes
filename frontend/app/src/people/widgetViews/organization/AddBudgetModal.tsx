@@ -21,33 +21,11 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
 
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
-  const { isOpen, close, invoiceStatus, uuid, successAction } = props;
+  const { isOpen, close, invoiceStatus, uuid, startPolling } = props;
 
   const config = nonWidgetConfigs['organizationusers'];
 
   const pollMinutes = 2;
-
-  async function startPolling(paymentRequest: string) {
-    let i = 0;
-    interval = setInterval(async () => {
-      try {
-        const invoiceData = await main.pollInvoice(paymentRequest);
-
-        if (invoiceData) {
-          if (invoiceData.success && invoiceData.response.settled) {
-            clearInterval(interval);
-            successAction();
-          }
-        }
-        i++;
-        if (i > 100) {
-          if (interval) clearInterval(interval);
-        }
-      } catch (e) {
-        console.warn('AddBudgetModal Invoice Polling Error', e);
-      }
-    }, 3000);
-  }
 
   const generateInvoice = async () => {
     if (uuid) {
@@ -58,8 +36,15 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         payment_type: 'deposit'
       });
 
-      setLnInvoice(data.response.invoice);
-      startPolling(data.response.invoice);
+      const paymentRequest = data.response.invoice;
+
+      if (paymentRequest) {
+        setLnInvoice(paymentRequest);
+        startPolling(paymentRequest);
+
+        const invoices = [...main.budgetInvoices, paymentRequest];
+        main.setBudgetInvoice(invoices);
+      }
     }
   };
 
