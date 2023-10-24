@@ -1726,6 +1726,29 @@ export class MainStore {
     }
   }
 
+  async updateOrganization(body: Organization): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error addOrganization', e);
+      return false;
+    }
+  }
+
   async getOrganizationUsersCount(uuid: string): Promise<number> {
     try {
       const r: any = await fetch(`${TribesURL}/organizations/users/${uuid}/count`, {
