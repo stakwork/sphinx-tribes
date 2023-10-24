@@ -109,9 +109,7 @@ function MobileView(props: CodingBountiesProps) {
 
   if (localPaid === 'PAID') {
     bountyPaid = true;
-  }
-
-  if (localPaid === 'UNPAID') {
+  } else if (localPaid === 'UNPAID') {
     bountyPaid = false;
   }
 

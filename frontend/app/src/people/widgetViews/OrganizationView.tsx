@@ -37,7 +37,6 @@ const OrganizationWrap = styled.div`
   background: white;
   padding: 25px 30px;
   border-radius: 6px;
-  cursor: pointer;
   @media only screen and (max-width: 800px) {
     padding: 15px 0px;
   }
@@ -122,7 +121,6 @@ const OrganizationContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  cursor: pointer;
   gap: 15px;
 `;
 
