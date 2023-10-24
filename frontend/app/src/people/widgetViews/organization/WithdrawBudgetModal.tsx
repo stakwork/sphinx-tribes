@@ -6,6 +6,8 @@ import { useStores } from 'store';
 import styled from 'styled-components';
 import { BudgetWithdrawSuccess } from 'store/main';
 import { satToUsd } from 'helpers';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import LighningDecoder from 'light-bolt11-decoder';
 import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
