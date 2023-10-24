@@ -336,7 +336,14 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const handleCopyUrl = useCallback(() => {
     const el = document.createElement('input');
-    el.value = window.location.href;
+    let locationUrl = window.location.href;
+    if (locationUrl.includes('wanted')) {
+      const pathArray = window.location.pathname.split('/');
+      if (pathArray.length > 4) {
+        locationUrl = `${window.location.origin}/bounty/${pathArray[4]}`;
+      }
+    }
+    el.value = locationUrl;
     document.body.appendChild(el);
     el.select();
     document.execCommand('copy');
