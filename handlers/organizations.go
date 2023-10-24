@@ -339,16 +339,8 @@ func GetUserRoles(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	if userId == 0 {
 		fmt.Println("provide user id")
