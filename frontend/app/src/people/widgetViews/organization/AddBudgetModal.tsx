@@ -13,6 +13,8 @@ import { ModalTitle } from './style';
 
 const color = colors['light'];
 
+let interval;
+
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState(1);
   const [lnInvoice, setLnInvoice] = useState('');
