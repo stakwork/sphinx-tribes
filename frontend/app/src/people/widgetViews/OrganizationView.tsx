@@ -204,7 +204,7 @@ const Organizations = (props: { person: Person }) => {
 
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
-    if (ui.selectedPerson !== 0) {
+    if (ui.selectedPerson) {
       await main.getUserOrganizations(ui.selectedPerson);
       const user = await main.getPersonById(ui.selectedPerson);
       setUser(user);
@@ -252,14 +252,16 @@ const Organizations = (props: { person: Person }) => {
             </OrganizationBudgetText>
           </OrganizationTextWrap>
           <OrganizationActionWrap>
-            <ManageButton
-              org={org}
-              user_pubkey={user?.owner_pubkey ?? ''}
-              action={() => {
-                setOrganization(org);
-                setDetailsOpen(true);
-              }}
-            />
+            {ui.meInfo?.owner_pubkey && (
+              <ManageButton
+                org={org}
+                user_pubkey={user?.owner_pubkey ?? ''}
+                action={() => {
+                  setOrganization(org);
+                  setDetailsOpen(true);
+                }}
+              />
+            )}
             <Button
               disabled={btnDisabled}
               color={!btnDisabled ? 'white' : 'grey'}
