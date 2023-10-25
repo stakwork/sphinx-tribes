@@ -19,7 +19,7 @@ const ManageButton = (props: { user_pubkey: string; org: any; action: () => void
   const getUserRoles = useCallback(async () => {
     const userRoles = await main.getUserRoles(org.uuid, user_pubkey);
     setUserRoles(userRoles);
-  }, [org.uuid]);
+  }, [org.uuid, main, user_pubkey]);
 
   useEffect(() => {
     getUserRoles();

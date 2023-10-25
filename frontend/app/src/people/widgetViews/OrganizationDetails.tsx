@@ -5,7 +5,7 @@ import { Button } from 'components/common';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { isInvoiceExpired, satToUsd, userHasRole } from 'helpers';
+import { satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -48,6 +48,8 @@ import {
   ViewBudgetWrap
 } from './organization/style';
 
+let interval;
+
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
@@ -88,8 +90,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const { org } = props;
   const uuid = org?.uuid || '';
-
-  let interval;
 
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
@@ -261,6 +261,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const successAction = () => {
     addToast('Budget was added successfully', 'success');
     setInvoiceStatus(true);
+    main.setBudgetInvoice('');
 
     // get new organization budget
     getOrganizationBudget();
@@ -269,47 +270,39 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     closeBudgetHandler();
   };
 
-  const deleteInvoice = (payReq: string, invoices: string[]): string[] => {
-    const index = invoices.indexOf(payReq);
-    invoices.splice(index, 1);
-    main.setBudgetInvoice(invoices);
+  const pollInvoices = useCallback(async () => {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        await main.pollOrgBudgetInvoices(uuid);
+        getOrganizationBudget();
+        getBudgetHistory();
 
-    return invoices;
-  };
-
-  const pollInvoices = () => {
-    let invoices = [...main.budgetInvoices];
-    if (invoices.length) {
-      interval = setInterval(async () => {
-        try {
-          for (const payReq of invoices) {
-            if (payReq) {
-              const expired = isInvoiceExpired(payReq);
-              const invoiceData = await main.pollInvoice(payReq);
-              if (invoiceData) {
-                if (invoiceData.success && invoiceData.response.settled) {
-                  invoices = deleteInvoice(payReq, invoices);
-
-                  getOrganizationBudget();
-                  getBudgetHistory();
-                } else if (expired) {
-                  invoices = deleteInvoice(payReq, main.budgetInvoices);
-                }
-              }
-
-              if (invoices.length === 0) {
-                clearInterval(interval);
-              }
-            }
-          }
-        } catch (e) {
-          console.warn('Budget Invoices Polling Error', e);
+        const count = await main.organizationInvoiceCount(uuid);
+        if (count === 0) {
+          clearInterval(interval);
         }
-      }, 5000);
-    }
-  };
+
+        i++;
+        if (i > 10) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) {
+        console.warn('Poll invoices error', e);
+      }
+    }, 6000);
+  }, []);
+
+  useEffect(() => {
+    pollInvoices();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [pollInvoices]);
 
   async function startPolling(paymentRequest: string) {
+    let i = 0;
     interval = setInterval(async () => {
       try {
         const invoiceData = await main.pollInvoice(paymentRequest);
@@ -319,19 +312,16 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             successAction();
           }
         }
+
+        i++;
+        if (i > 22) {
+          if (interval) clearInterval(interval);
+        }
       } catch (e) {
         console.warn('AddBudget Modal Invoice Polling Error', e);
       }
     }, 5000);
   }
-
-  useEffect(() => {
-    pollInvoices();
-
-    return () => {
-      clearInterval(interval);
-    };
-  });
 
   useEffect(() => {
     getOrganizationUsers();
