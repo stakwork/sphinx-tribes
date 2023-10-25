@@ -1576,12 +1576,11 @@ export class MainStore {
     this.assignInvoice = invoice;
   }
 
-  @persist('object')
   @observable
-  budgetInvoices: string[] = [];
+  budgetInvoice = '';
 
-  @action setBudgetInvoice(invoice: string[]) {
-    this.budgetInvoices = invoice;
+  @action setBudgetInvoice(invoice: string) {
+    this.budgetInvoice = invoice;
   }
 
   async getLnInvoice(body: {
@@ -1681,10 +1680,17 @@ export class MainStore {
     this.organizations = organizations;
   }
 
+  @observable
+  dropDownOrganizations: Organization[] = [];
+
+  @action setDropDownOrganizations(organizations: Organization[]) {
+    this.dropDownOrganizations = organizations;
+  }
+
   @action async getUserOrganizations(id: number): Promise<Organization[]> {
     try {
       const info = uiStore;
-      if (!info.selectedPerson) return [];
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return [];
 
       const r: any = await fetch(`${TribesURL}/organizations/user/${id}`, {
         method: 'GET',
@@ -2068,6 +2074,44 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       });
+      return r.json();
+    } catch (e) {
+      console.error('Error pollInvoice', e);
+    }
+  }
+
+  async pollOrgBudgetInvoices(org_uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/organizations/poll/invoices/${org_uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r;
+    } catch (e) {
+      console.error('Error pollInvoice', e);
+    }
+  }
+
+  async organizationInvoiceCount(org_uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return 0;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/invoices/count/${org_uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
       return r.json();
     } catch (e) {
       console.error('Error pollInvoice', e);

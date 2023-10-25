@@ -545,6 +545,7 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	paymentRequest := chi.URLParam(r, "paymentRequest")
+	var err error
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -552,34 +553,12 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, paymentRequest)
+	invoiceRes, invoiceErr := GetLightningInvoice(paymentRequest)
 
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-
-	req.Header.Set("x-user-token", config.RelayAuthKey)
-	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
-
-	if err != nil {
-		log.Printf("Request Failed: %s", err)
-		w.WriteHeader(http.StatusNoContent)
-		json.NewEncoder(w).Encode("could not decode invoice")
-	}
-
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-
-	// Unmarshal result
-	invoiceRes := db.InvoiceResult{}
-
-	err = json.Unmarshal(body, &invoiceRes)
-
-	if err != nil {
-		log.Printf("Reading Invoice body failed: %s", err)
-		w.WriteHeader(http.StatusNoContent)
-		json.NewEncoder(w).Encode("could not decode invoice")
+	if invoiceErr.Error != "" {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(invoiceErr)
+		return
 	}
 
 	if invoiceRes.Response.Settled {
@@ -628,7 +607,7 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 				defer res.Body.Close()
 
-				body, err = io.ReadAll(res.Body)
+				body, _ := io.ReadAll(res.Body)
 
 				if res.StatusCode == 200 {
 					// Unmarshal result

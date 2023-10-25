@@ -113,7 +113,7 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid = false;
   }
 
-  const pollMinutes = 5;
+  const pollMinutes = 2;
 
   const bountyExpired = !bounty_expires
     ? false
@@ -136,6 +136,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const startPolling = useCallback(
     async (paymentRequest: string) => {
+      let i = 0;
       interval = setInterval(async () => {
         try {
           const invoiceData = await main.pollInvoice(paymentRequest);
@@ -150,6 +151,11 @@ function MobileView(props: CodingBountiesProps) {
               setInvoiceStatus(true);
               setKeysendStatus(true);
             }
+          }
+
+          i++;
+          if (i > 22) {
+            if (interval) clearInterval(interval);
           }
         } catch (e) {
           console.warn('CodingBounty Invoice Polling Error', e);
