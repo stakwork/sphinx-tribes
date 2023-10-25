@@ -20,7 +20,7 @@ export default function AssignBounty(props: ConnectCardProps) {
   const [lnInvoice, setLnInvoice] = useState('');
   const [invoiceStatus, setInvoiceStatus] = useState(false);
 
-  const pollMinutes = 5;
+  const pollMinutes = 2;
 
   const [toasts, setToasts]: any = useState([]);
 
@@ -39,6 +39,7 @@ export default function AssignBounty(props: ConnectCardProps) {
 
   const startPolling = useCallback(
     async (paymentRequest: string) => {
+      let i = 0;
       interval = setInterval(async () => {
         try {
           const invoiceData = await main.pollInvoice(paymentRequest);
@@ -57,6 +58,11 @@ export default function AssignBounty(props: ConnectCardProps) {
               props.dismiss();
               if (props.dismissConnectModal) props.dismissConnectModal();
             }
+          }
+
+          i++;
+          if (i > 22) {
+            if (interval) clearInterval(interval);
           }
         } catch (e) {
           console.warn('AssignBounty Modal Invoice Polling Error', e);

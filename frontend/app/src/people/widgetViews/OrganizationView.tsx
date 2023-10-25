@@ -10,7 +10,6 @@ import { Button } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
-import { DollarConverter, satToUsd } from 'helpers';
 import { Modal } from '../../components/common';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
@@ -18,7 +17,8 @@ import { widgetConfigs } from '../utils/Constants';
 import Input from '../../components/form/inputs';
 import { Person } from '../../store/main';
 import OrganizationDetails from './OrganizationDetails';
-import ManageButton from './ManageOrgButton';
+import ManageButton from './organization/ManageOrgButton';
+import OrganizationBudget from './organization/OrgBudget';
 
 const color = colors['light'];
 
@@ -80,47 +80,6 @@ const OrganizationImg = styled.img`
   }
 `;
 
-const OrganizationTextWrap = styled.div`
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  @media only screen and (max-width: 470px) {
-    margin-left: 0px;
-    margin-top: 15px;
-    justify-content: center;
-    align-items: center;
-  }
-`;
-
-const OrganizationText = styled.p<{ user: string }>`
-  font-size: 1rem;
-  font-weight: bold;
-  margin-bottom: ${(p: any) => (p.user ? '14px' : '0px')};
-  @media only screen and (max-width: 700px) {
-    font-size: 0.85rem;
-  }
-  @media only screen and (max-width: 500px) {
-    font-size: 0.79rem;
-  }
-  @media only screen and (max-width: 470px) {
-    font-size: 0.85rem;
-    text-align: center;
-  }
-`;
-
-const OrganizationBudgetText = styled.small`
-  margin-top: auto;
-  font-size: 0.9rem;
-  @media only screen and (max-width: 700px) {
-    font-size: 0.8rem;
-  }
-  @media only screen and (max-width: 500px) {
-    font-size: 0.75rem;
-  }
-`;
-
 const OrganizationContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -153,13 +112,6 @@ const OrganizationActionWrap = styled.div`
   @media only screen and (max-width: 470px) {
     margin-left: 0;
     margin-top: 20px;
-  }
-`;
-
-const SatsGap = styled.span`
-  margin: 0px 10px;
-  @media only screen and (max-width: 700px) {
-    margin: 0px 5px;
   }
 `;
 
@@ -247,16 +199,7 @@ const Organizations = (props: { person: Person }) => {
       <OrganizationWrap key={key}>
         <OrganizationData>
           <OrganizationImg src={org.img || avatarIcon} />
-          <OrganizationTextWrap>
-            <OrganizationText user={ui.meInfo?.owner_pubkey ?? ''}>{org.name}</OrganizationText>
-            {ui.meInfo?.owner_pubkey && (
-              <OrganizationBudgetText>
-                {DollarConverter(org.budget ?? 0)}
-                <SatsGap>/</SatsGap>
-                {satToUsd(org.budget ?? 0)} USD
-              </OrganizationBudgetText>
-            )}
-          </OrganizationTextWrap>
+          <OrganizationBudget org={org} user_pubkey={user?.owner_pubkey ?? ''} />
           <OrganizationActionWrap>
             {ui.meInfo?.owner_pubkey && (
               <ManageButton
