@@ -13,8 +13,6 @@ import { ModalTitle } from './style';
 
 const color = colors['light'];
 
-let interval;
-
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState(1);
   const [lnInvoice, setLnInvoice] = useState('');
@@ -42,8 +40,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         setLnInvoice(paymentRequest);
         startPolling(paymentRequest);
 
-        const invoices = [...main.budgetInvoices, paymentRequest];
-        main.setBudgetInvoice(invoices);
+        main.setBudgetInvoice(paymentRequest);
       }
     }
   };

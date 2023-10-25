@@ -109,8 +109,8 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  const userOrganizations = main.organizations.length
-    ? main.organizations.map((org: Organization) => ({
+  const userOrganizations = main.dropDownOrganizations.length
+    ? main.dropDownOrganizations.map((org: Organization) => ({
         label: toCapitalize(org.name),
         value: org.uuid
       }))
