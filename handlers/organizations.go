@@ -438,3 +438,54 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(paymentHistory)
 }
+
+func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	orgInvoices := db.DB.GetOrganizationInvoices(uuid)
+
+	for _, inv := range orgInvoices {
+		invoiceRes, invoiceErr := GetLightningInvoice(inv.PaymentRequest)
+
+		if invoiceErr.Error != "" {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(invoiceErr)
+			return
+		}
+
+		if invoiceRes.Response.Settled {
+			if !inv.Status && inv.Type == "BUDGET" {
+				db.DB.AddAndUpdateBudget(inv)
+				// Update the invoice status
+				db.DB.UpdateInvoice(inv.PaymentRequest)
+			}
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Polled invoices")
+}
+
+func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	invoiceCount := db.DB.GetOrganizationInvoicesCount(uuid)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceCount)
+}
