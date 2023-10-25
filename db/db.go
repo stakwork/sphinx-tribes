@@ -1221,6 +1221,20 @@ func (db database) GetInvoice(payment_request string) InvoiceList {
 	return ms
 }
 
+func (db database) GetOrganizationInvoices(org_uuid string) []InvoiceList {
+	ms := []InvoiceList{}
+	db.db.Where("org_uuid = ?", org_uuid).Where("status", false).Find(&ms)
+	return ms
+}
+
+func (db database) GetOrganizationInvoicesCount(org_uuid string) int64 {
+	var count int64
+	ms := InvoiceList{}
+
+	db.db.Model(&ms).Where("org_uuid = ?", org_uuid).Where("status", false).Count(&count)
+	return count
+}
+
 func (db database) UpdateInvoice(payment_request string) InvoiceList {
 	ms := InvoiceList{}
 	db.db.Model(&InvoiceList{}).Where("payment_request = ?", payment_request).Update("status", true)
