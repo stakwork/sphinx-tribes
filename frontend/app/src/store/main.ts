@@ -1738,7 +1738,7 @@ export class MainStore {
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations/${uuid}`, {
         method: 'PUT',
-    mode: 'cors',
+        mode: 'cors',
         body: JSON.stringify({
           ...body
         }),
@@ -1750,7 +1750,7 @@ export class MainStore {
 
       return r;
     } catch (e) {
-       console.log('Error editOrganization', e);
+      console.log('Error editOrganization', e);
       return false;
     }
   }
