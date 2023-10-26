@@ -35,6 +35,7 @@ require (
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/nbd-wtf/ln-decodepay v1.11.1 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/redis/go-redis/v9 v9.2.1 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/rs/xid v1.4.0
 	github.com/stretchr/testify v1.8.2
