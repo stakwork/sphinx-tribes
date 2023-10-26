@@ -5,14 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
-	decodepay "github.com/nbd-wtf/ln-decodepay"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -90,7 +88,7 @@ func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 
 func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	bounty := db.Bounty{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	r.Body.Close()
 	err = json.Unmarshal(body, &bounty)
@@ -405,9 +403,7 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decodedInvoice, err := decodepay.Decodepay(request.PaymentRequest)
-	amountInt := decodedInvoice.MSatoshi / 1000
-	amount := uint(amountInt)
+	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
 	if err == nil {
 		// check if the orgnization bounty balance
@@ -543,4 +539,101 @@ func GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceData)
+}
+
+func PollInvoice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	paymentRequest := chi.URLParam(r, "paymentRequest")
+	var err error
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	invoiceRes, invoiceErr := GetLightningInvoice(paymentRequest)
+
+	if invoiceErr.Error != "" {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(invoiceErr)
+		return
+	}
+
+	if invoiceRes.Response.Settled {
+		// Todo if an invoice is settled
+		invoice := db.DB.GetInvoice(paymentRequest)
+		invData := db.DB.GetUserInvoiceData(paymentRequest)
+		dbInvoice := db.DB.GetInvoice(paymentRequest)
+
+		// Make any change onl;y if the invoice has not been settled
+		if !dbInvoice.Status {
+			if invoice.Type == "BUDGET" {
+				db.DB.AddAndUpdateBudget(invoice)
+			} else if invoice.Type == "ASSIGN" {
+				bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
+
+				if err == nil {
+					bounty.Assignee = invData.UserPubkey
+					bounty.CommitmentFee = uint64(invData.CommitmentFee)
+					bounty.AssignedHours = uint8(invData.AssignedHours)
+					bounty.BountyExpires = invData.BountyExpires
+				} else {
+					fmt.Println("Fetch Assign bounty error ===", err)
+				}
+
+				db.DB.UpdateBounty(bounty)
+			} else if invoice.Type == "KEYSEND" {
+				url := fmt.Sprintf("%s/payment", config.RelayUrl)
+
+				amount := invData.Amount
+
+				bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+
+				jsonBody := []byte(bodyData)
+
+				client := &http.Client{}
+				req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+				req.Header.Set("x-user-token", config.RelayAuthKey)
+				req.Header.Set("Content-Type", "application/json")
+				res, _ := client.Do(req)
+
+				if err != nil {
+					log.Printf("Request Failed: %s", err)
+					return
+				}
+
+				defer res.Body.Close()
+
+				body, _ := io.ReadAll(res.Body)
+
+				if res.StatusCode == 200 {
+					// Unmarshal result
+					keysendRes := db.KeysendSuccess{}
+					err = json.Unmarshal(body, &keysendRes)
+
+					bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
+
+					if err == nil {
+						bounty.Paid = true
+					}
+
+					db.DB.UpdateBounty(bounty)
+				} else {
+					// Unmarshal result
+					keysendError := db.KeysendError{}
+					err = json.Unmarshal(body, &keysendError)
+					log.Printf("Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, keysendError.Error)
+				}
+			}
+			// Update the invoice status
+			db.DB.UpdateInvoice(paymentRequest)
+		}
+
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceRes)
 }

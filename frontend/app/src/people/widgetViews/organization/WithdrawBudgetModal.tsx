@@ -6,7 +6,7 @@ import { useStores } from 'store';
 import styled from 'styled-components';
 import { BudgetWithdrawSuccess } from 'store/main';
 import { satToUsd } from 'helpers';
-import LighningDecoder from 'light-bolt11-decoder';
+import lighningDecoder from 'light-bolt11-decoder';
 import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import successIcon from '../../../public/static/withdraw_success.svg';
@@ -103,7 +103,7 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
 
   const getInvoiceDetails = async (paymentRequest: string) => {
     try {
-      const decoded = LighningDecoder.decode(paymentRequest);
+      const decoded = lighningDecoder.decode(paymentRequest);
       const sats = decoded.sections[2].value / 1000;
       setAmountInSats(sats);
     } catch (e) {

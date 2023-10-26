@@ -281,6 +281,7 @@ type InvoiceError struct {
 	Error   string `json:"error"`
 }
 
+// TODO change amount back to string
 type InvoiceCheckResponse struct {
 	Settled         bool   `json:"settled"`
 	Payment_request string `json:"payment_request"`
@@ -537,6 +538,37 @@ type BountyPayRequest struct {
 	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
 	RouteHint       string `json:"route_hint,omitempty"`
+}
+
+type InvoiceType string
+
+const (
+	Keysend    InvoiceType = "KEYSEND"
+	Budget     InvoiceType = "BUDGET"
+	PayInvoice InvoiceType = "ASSIGN"
+)
+
+type InvoiceList struct {
+	ID             uint        `json:"id"`
+	PaymentRequest string      `json:"payment_request"`
+	Status         bool        `json:"status"`
+	Type           InvoiceType `json:"type"`
+	OwnerPubkey    string      `json:"owner_pubkey"`
+	OrgUuid        string      `json:"org_uuid,omitempty"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+}
+
+type UserInvoiceData struct {
+	ID             uint   `json:"id"`
+	Amount         uint   `json:"amount"`
+	PaymentRequest string `json:"payment_request"`
+	Created        int    `json:"created"`
+	UserPubkey     string `json:"user_pubkey"`
+	AssignedHours  uint   `json:"assigned_hours,omitempty"`
+	CommitmentFee  uint   `json:"commitment_fee,omitempty"`
+	BountyExpires  string `json:"bounty_expires,omitempty"`
+	RouteHint      string `json:"route_hint,omitempty"`
 }
 
 type WithdrawBudgetRequest struct {

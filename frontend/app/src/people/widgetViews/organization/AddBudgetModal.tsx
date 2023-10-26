@@ -19,24 +19,29 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
 
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
-  const { isOpen, close, invoiceStatus, uuid } = props;
+  const { isOpen, close, invoiceStatus, uuid, startPolling } = props;
 
   const config = nonWidgetConfigs['organizationusers'];
 
   const pollMinutes = 2;
 
   const generateInvoice = async () => {
-    const token = ui.meInfo?.websocketToken;
-    if (token && uuid) {
+    if (uuid) {
       const data = await main.getBudgetInvoice({
         amount: amount,
         sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
         org_uuid: uuid,
-        websocket_token: token,
         payment_type: 'deposit'
       });
 
-      setLnInvoice(data.response.invoice);
+      const paymentRequest = data.response.invoice;
+
+      if (paymentRequest) {
+        setLnInvoice(paymentRequest);
+        startPolling(paymentRequest);
+
+        main.setBudgetInvoice(paymentRequest);
+      }
     }
   };
 

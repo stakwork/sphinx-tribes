@@ -39,6 +39,7 @@ export interface AddUserModalProps extends ModalProps {
 
 export interface AddBudgetModalProps extends ModalProps {
   invoiceStatus: boolean;
+  startPolling: (inv: string) => void;
 }
 
 export interface WithdrawModalProps extends ModalProps {

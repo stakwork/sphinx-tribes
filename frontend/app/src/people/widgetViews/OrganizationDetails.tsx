@@ -50,6 +50,8 @@ import {
   ViewBudgetWrap
 } from './organization/style';
 
+let interval;
+
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
@@ -278,26 +280,70 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     }
   };
 
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.budget_success && res.invoice === main.lnInvoice) {
-      addToast('Budget was added successfully', 'success');
-      setInvoiceStatus(true);
-      main.setLnInvoice('');
+  const successAction = () => {
+    addToast('Budget was added successfully', 'success');
+    setInvoiceStatus(true);
+    main.setBudgetInvoice('');
 
-      // get new organization budget
-      getOrganizationBudget();
-      getBudgetHistory();
-      main.getUserOrganizations(ui.selectedPerson);
-      closeBudgetHandler();
-    }
+    // get new organization budget
+    getOrganizationBudget();
+    getBudgetHistory();
+    main.getUserOrganizations(ui.selectedPerson);
+    closeBudgetHandler();
   };
+
+  const pollInvoices = useCallback(async () => {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        await main.pollOrgBudgetInvoices(uuid);
+        getOrganizationBudget();
+        getBudgetHistory();
+
+        const count = await main.organizationInvoiceCount(uuid);
+        if (count === 0) {
+          clearInterval(interval);
+        }
+
+        i++;
+        if (i > 10) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) {
+        console.warn('Poll invoices error', e);
+      }
+    }, 6000);
+  }, []);
+
+  useEffect(() => {
+    pollInvoices();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [pollInvoices]);
+
+  async function startPolling(paymentRequest: string) {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        const invoiceData = await main.pollInvoice(paymentRequest);
+        if (invoiceData) {
+          if (invoiceData.success && invoiceData.response.settled) {
+            clearInterval(interval);
+            successAction();
+          }
+        }
+
+        i++;
+        if (i > 22) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) {
+        console.warn('AddBudget Modal Invoice Polling Error', e);
+      }
+    }, 5000);
+  }
 
   useEffect(() => {
     getOrganizationUsers();
@@ -312,21 +358,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getPaymentsHistory,
     getBudgetHistory
   ]);
-
-  useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
-    socket.onopen = () => {
-      console.log('Socket connected');
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
-
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
 
   return (
     <Container>
@@ -516,6 +547,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             close={closeBudgetHandler}
             uuid={uuid}
             invoiceStatus={invoiceStatus}
+            startPolling={startPolling}
           />
         )}
         {isOpenHistory && (
