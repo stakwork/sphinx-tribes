@@ -218,7 +218,7 @@ const Img = styled.div<ImageProps>`
 `;
 export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();
-  const { price_to_meet, extras, twitter_confirmed, owner_pubkey, owner_route_hint,  } = props;
+  const { price_to_meet, extras, twitter_confirmed, owner_pubkey, owner_route_hint } = props;
   const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
     extras || {};
 
