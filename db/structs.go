@@ -379,6 +379,7 @@ type Bounty struct {
 	EstimatedSessionLength  string         `json:"estimated_session_length"`
 	EstimatedCompletionDate string         `json:"estimated_completion_date"`
 	Updated                 *time.Time     `json:"updated"`
+	CompletionDate          *time.Time     `json:"completion_date"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
