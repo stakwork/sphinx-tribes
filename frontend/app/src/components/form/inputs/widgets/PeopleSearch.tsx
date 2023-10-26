@@ -2,6 +2,7 @@
 import { EuiCheckboxGroup, EuiLoadingSpinner, EuiPopover, EuiText } from '@elastic/eui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useStores } from 'store';
 import styled from 'styled-components';
 import { colors } from '../../../../config/colors';
 import {
@@ -290,6 +291,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
+  const { main, ui } = useStores();
 
   const { ref, inView } = useInView({
     triggerOnce: false,
@@ -305,18 +307,24 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   }, [inView, initialPeopleCount]);
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
-    setPeopleData(
-      (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
-        ? props?.peopleList
-        : props?.peopleList?.filter(
-            ({ extras }: any) =>
-              extras?.coding_languages?.some(
-                ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-              )
-          )
-      )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
-    );
+    async function updatePeopleData() {
+      setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+      let peopleList = props?.peopleList;
+      if (searchValue) {
+        peopleList = await main.getPeopleByNameAliasPubkey(searchValue);
+      }
+      setPeopleData(
+        Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
+          ? peopleList
+          : peopleList?.filter(
+              ({ extras }: any) =>
+                extras?.coding_languages?.some(
+                  ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+                )
+            )
+      );
+    }
+    updatePeopleData();
   }, [checkboxIdToSelectedMap, searchValue]);
 
   useEffect(() => {
