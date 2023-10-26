@@ -7,9 +7,7 @@ import (
 
 func IndexRoutes() chi.Router {
 	r := chi.NewRouter()
-
 	r.Get("/ping", frontend.PingRoute)
-
 	r.Group(func(r chi.Router) {
 		r.Get("/", frontend.IndexRoute)
 		r.Get("/static/*", frontend.StaticRoute)
@@ -36,11 +34,11 @@ func IndexRoutes() chi.Router {
 		r.Get("/p/{pubkey}/usertickets", frontend.IndexRoute)
 		r.Get("/p/{pubkey}/organizations", frontend.IndexRoute)
 		r.Get("/b", frontend.IndexRoute)
+		r.Get("/tickets", frontend.IndexRoute)
 		r.Get("/bounties", frontend.IndexRoute)
 		r.Get("/bounty/*", frontend.IndexRoute)
 		r.Get("/leaderboard", frontend.IndexRoute)
 		r.Get("/org/bounties/*", frontend.IndexRoute)
 	})
-
 	return r
 }

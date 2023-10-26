@@ -196,6 +196,7 @@ export interface Organization {
   updated: string;
   show: boolean;
   bounty_count?: number;
+  budget?: number;
 }
 
 export interface BountyRoles {
@@ -1084,7 +1085,6 @@ export class MainStore {
     return p;
   }
 
-  @memo()
   async getPersonById(id: number): Promise<Person> {
     const p = await api.get(`person/id/${id}`);
     this.setActivePerson(p);

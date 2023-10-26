@@ -19,7 +19,6 @@ export interface MeInfo {
   pubkey: string;
   uuid?: string;
   owner_pubkey?: string;
-  owner_route_hint?: string; 
   photo_url: string;
   alias: string;
   img?: string;

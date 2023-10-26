@@ -346,17 +346,17 @@ function WantedSummary(props: WantedSummaryProps) {
     const { location } = window;
     const { host } = location;
     // eslint-disable-next-line prefer-destructuring
-    const id = location.href.split('/')[4];
+    const id = location.href.split('/')[6];
 
     const el = document.createElement('input');
-    el.value = `${host}/bounty/${id}?created=${created}`;
+    el.value = `${host}/bounty/${id}`;
     document.body.appendChild(el);
     el.select();
 
     document.execCommand('copy');
     document.body.removeChild(el);
     setIsCopied(true);
-  }, [created]);
+  }, []);
 
   async function sendBadge(body: any) {
     const { recipient, badge } = body;

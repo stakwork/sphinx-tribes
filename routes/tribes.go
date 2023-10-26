@@ -7,7 +7,6 @@ import (
 
 func TribeRoutes() chi.Router {
 	r := chi.NewRouter()
-
 	r.Group(func(r chi.Router) {
 		r.Get("/", handlers.GetListedTribes)
 		r.Get("/app_url/{app_url}", handlers.GetTribesByAppUrl)
