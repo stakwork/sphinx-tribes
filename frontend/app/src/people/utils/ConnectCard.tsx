@@ -96,7 +96,8 @@ export default function ConnectCard(props: ConnectCardProps) {
 
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
   const ownerPubkey = person && person?.owner_pubkey ? `${person.owner_pubkey}` : ''
-  const routeHint = person && person?.route_hint ? `:${person.route_hint}` : ''
+  const routeHint = person && person?.owner_route_hint ? `:${person.owner_route_hint}` : ''
+  
 
   return (
     <div onClick={(e: any) => e.stopPropagation()}>
