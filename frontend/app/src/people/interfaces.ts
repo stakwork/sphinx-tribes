@@ -385,6 +385,7 @@ export interface AboutViewProps {
   owner_pubkey?: string;
   description?: string;
   canEdit?: boolean;
+  owner_route_hint?: string;
 }
 
 export interface BlogViewProps {
