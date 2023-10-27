@@ -105,7 +105,7 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
 
   const getInvoiceDetails = async (paymentRequest: string) => {
     try {
-      const decoded = lighningDecoder.decode(paymentRequest);
+      const decoded = LighningDecoder.decode(paymentRequest);
       const sats = decoded.sections[2].value / 1000;
       setAmountInSats(sats);
     } catch (e) {
