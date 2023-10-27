@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+var ctx = context.Background()
 var RedisClient *redis.Client
 
 func InitRedis() {
@@ -30,4 +32,20 @@ func InitRedis() {
 
 		RedisClient = redis.NewClient(opt)
 	}
+}
+
+func SetValue(key string, value string) {
+	rerr := RedisClient.Set(ctx, key, value, 0).Err()
+	if rerr != nil {
+		panic(rerr)
+	}
+}
+
+func GetValue(key string) string {
+	val, rerr := RedisClient.Get(ctx, key).Result()
+	if rerr != nil {
+		panic(rerr)
+	}
+
+	return val
 }
