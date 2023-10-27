@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/typedef */
+import lighningDecoder from 'light-bolt11-decoder';
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
@@ -21,10 +22,12 @@ export const formatSatPrice = (amount = 0) => {
   return dollarUSLocale.format(amount);
 };
 
-export const getOriginalNumberValue = (formattedValue: string = '') => {
+export const getOriginalNumberValue = (formattedValue: string) => {
   // Remove formatting (commas) from the formatted value
-  const unformattedValue = formattedValue.replace(/,/g, '');
-  return Number(unformattedValue);
+  if (formattedValue) {
+    const unformattedValue = formattedValue.replace(/,/g, '');
+    return Number(unformattedValue);
+  }
 };
 
 export const DollarConverter = (e: any) => {
@@ -185,4 +188,17 @@ export const toCapitalize = (word: string): string => {
 
   const result = capitalizeStrings.join(' ');
   return result;
+};
+
+export const isInvoiceExpired = (paymentRequest: string): boolean => {
+  // decode invoice to see if it has expired
+  const decoded = lighningDecoder.decode(paymentRequest);
+  const invoiceTimestamp = decoded.sections[4].value;
+  const expiry = decoded.sections[8].value;
+  const expired = invoiceTimestamp + expiry;
+
+  if (expired * 1000 > Date.now()) {
+    return false;
+  }
+  return true;
 };

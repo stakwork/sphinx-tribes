@@ -339,16 +339,8 @@ func GetUserRoles(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	if userId == 0 {
 		fmt.Println("provide user id")
@@ -363,22 +355,33 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	organizations := db.DB.GetUserCreatedOrganizations(user.OwnerPubKey)
 	// add bounty count to the organization
 	for index, value := range organizations {
-		bountyCount := db.DB.GetOrganizationBountyCount(value.Uuid)
-		budget := db.DB.GetOrganizationBudget(value.Uuid)
+		uuid := value.Uuid
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 
+		if hasRole {
+			budget := db.DB.GetOrganizationBudget(uuid)
+			organizations[index].Budget = budget.TotalBudget
+		} else {
+			organizations[index].Budget = 0
+		}
 		organizations[index].BountyCount = bountyCount
-		organizations[index].Budget = budget.TotalBudget
 	}
 
 	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
 	for _, value := range assignedOrganizations {
-		organization := db.DB.GetOrganizationByUuid(value.OrgUuid)
+		uuid := value.OrgUuid
+		organization := db.DB.GetOrganizationByUuid(uuid)
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 
-		bountyCount := db.DB.GetOrganizationBountyCount(value.OrgUuid)
-		budget := db.DB.GetOrganizationBudget(value.OrgUuid)
-
+		if hasRole {
+			budget := db.DB.GetOrganizationBudget(uuid)
+			organization.Budget = budget.TotalBudget
+		} else {
+			organization.Budget = 0
+		}
 		organization.BountyCount = bountyCount
-		organization.Budget = budget.TotalBudget
 
 		organizations = append(organizations, organization)
 	}
@@ -434,4 +437,55 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(paymentHistory)
+}
+
+func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	orgInvoices := db.DB.GetOrganizationInvoices(uuid)
+
+	for _, inv := range orgInvoices {
+		invoiceRes, invoiceErr := GetLightningInvoice(inv.PaymentRequest)
+
+		if invoiceErr.Error != "" {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(invoiceErr)
+			return
+		}
+
+		if invoiceRes.Response.Settled {
+			if !inv.Status && inv.Type == "BUDGET" {
+				db.DB.AddAndUpdateBudget(inv)
+				// Update the invoice status
+				db.DB.UpdateInvoice(inv.PaymentRequest)
+			}
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Polled invoices")
+}
+
+func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	invoiceCount := db.DB.GetOrganizationInvoicesCount(uuid)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceCount)
 }

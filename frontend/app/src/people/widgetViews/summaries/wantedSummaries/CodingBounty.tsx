@@ -1,10 +1,9 @@
 /* eslint-disable func-style */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
-import { calculateTimeLeft } from 'helpers';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { calculateTimeLeft, isInvoiceExpired } from 'helpers';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/RenderMarkdown';
@@ -41,6 +40,8 @@ import {
   BountyTime
 } from './style';
 import { getTwitterLink } from './lib';
+
+let interval;
 
 function MobileView(props: CodingBountiesProps) {
   const {
@@ -112,49 +113,57 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid = false;
   }
 
-  const pollMinutes = 1;
+  const pollMinutes = 2;
 
   const bountyExpired = !bounty_expires
     ? false
     : Date.now() > new Date(bounty_expires || '').getTime();
   const bountyTimeLeft = calculateTimeLeft(new Date(bounty_expires ?? ''), 'days');
 
-  const addToast = (type: string) => {
-    switch (type) {
-      case SOCKET_MSG.invoice_success: {
-        return setToasts([
-          {
-            id: '1',
-            title: 'Invoice has been paid',
-            color: 'success'
-          }
-        ]);
+  const addToast = () => {
+    return setToasts([
+      {
+        id: '1',
+        title: 'Invoice has been paid',
+        color: 'success'
       }
-      case SOCKET_MSG.keysend_error: {
-        return setToasts([
-          {
-            id: '2',
-            title: 'Keysend payment failed',
-            toastLifeTimeMs: 10000,
-            color: 'error'
-          }
-        ]);
-      }
-      case SOCKET_MSG.keysend_success: {
-        return setToasts([
-          {
-            id: '3',
-            title: 'Successful keysend payment',
-            color: 'success'
-          }
-        ]);
-      }
-    }
+    ]);
   };
 
   const removeToast = () => {
     setToasts([]);
   };
+
+  const startPolling = useCallback(
+    async (paymentRequest: string) => {
+      let i = 0;
+      interval = setInterval(async () => {
+        try {
+          const invoiceData = await main.pollInvoice(paymentRequest);
+          if (invoiceData) {
+            if (invoiceData.success && invoiceData.response.settled) {
+              clearInterval(interval);
+
+              setLnInvoice('');
+              addToast();
+              main.setKeysendInvoice('');
+              setLocalPaid('UNKNOWN');
+              setInvoiceStatus(true);
+              setKeysendStatus(true);
+            }
+          }
+
+          i++;
+          if (i > 22) {
+            if (interval) clearInterval(interval);
+          }
+        } catch (e) {
+          console.warn('CodingBounty Invoice Polling Error', e);
+        }
+      }, 5000);
+    },
+    [setLocalPaid, main]
+  );
 
   const generateInvoice = async (price: number) => {
     if (created && ui.meInfo?.websocketToken) {
@@ -168,9 +177,30 @@ function MobileView(props: CodingBountiesProps) {
         type: 'KEYSEND'
       });
 
-      setLnInvoice(data.response.invoice);
+      const paymentRequest = data.response.invoice;
+
+      if (paymentRequest) {
+        setLnInvoice(paymentRequest);
+        main.setKeysendInvoice(paymentRequest);
+        startPolling(paymentRequest);
+      }
     }
   };
+
+  useEffect(() => {
+    if (main.keysendInvoice !== '') {
+      const expired = isInvoiceExpired(main.keysendInvoice);
+      if (!expired) {
+        startPolling(main.keysendInvoice);
+      } else {
+        main.setKeysendInvoice('');
+      }
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [main, startPolling]);
 
   const makePayment = async () => {
     // If the bounty has a commitment fee, add the fee to the user payment
@@ -213,30 +243,6 @@ function MobileView(props: CodingBountiesProps) {
     }
   };
 
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.invoice_success && res.invoice === main.lnInvoice) {
-      addToast(SOCKET_MSG.invoice_success);
-      setLnInvoice('');
-      setLocalPaid('UNKNOWN');
-      setInvoiceStatus(true);
-    } else if (res.msg === SOCKET_MSG.keysend_success && res.invoice === main.lnInvoice) {
-      addToast(SOCKET_MSG.keysend_success);
-      if (org_uuid) {
-        setLocalPaid('UNKNOWN');
-        setKeysendStatus(true);
-      }
-    } else if (res.msg === SOCKET_MSG.keysend_error && res.invoice === main.lnInvoice) {
-      addToast(SOCKET_MSG.keysend_error);
-    }
-  };
-
   const updatePaymentStatus = async (created: number) => {
     await main.updateBountyPaymentStatus(created);
     await main.getPeopleBounties();
@@ -267,22 +273,6 @@ function MobileView(props: CodingBountiesProps) {
     setLocalPaid('UNPAID');
     setUpdatingPayment(false);
   };
-
-  useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
-
-    socket.onopen = () => {
-      console.log('Socket connected');
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
-
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
 
   const twitterHandler = () => {
     const twitterLink = getTwitterLink({

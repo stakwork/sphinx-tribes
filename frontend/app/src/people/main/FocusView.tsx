@@ -90,7 +90,8 @@ function FocusedView(props: FocusViewProps) {
     fromBountyPage,
     newDesign,
     setIsModalSideButton,
-    bounty
+    bounty,
+    setRemoveNextAndPrev
   } = props;
   const { ui, main } = useStores();
 
@@ -109,8 +110,8 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  const userOrganizations = main.organizations.length
-    ? main.organizations.map((org: Organization) => ({
+  const userOrganizations = main.dropDownOrganizations.length
+    ? main.dropDownOrganizations.map((org: Organization) => ({
         label: toCapitalize(org.name),
         value: org.uuid
       }))
@@ -388,6 +389,20 @@ function FocusedView(props: FocusViewProps) {
     return null;
   }
 
+  function handleEditAction() {
+    setEditable(false);
+    setEditMode(true);
+    setRemoveNextAndPrev && setRemoveNextAndPrev(true);
+  }
+
+  function handleFormClose() {
+    if (skipEditLayer && goBack) goBack();
+    else {
+      setEditMode(false);
+      setRemoveNextAndPrev && setRemoveNextAndPrev(false);
+    }
+  }
+
   // set user organizations
   if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
     config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
@@ -413,10 +428,7 @@ function FocusedView(props: FocusViewProps) {
               formRef={formRef}
               submitText={config && config.submitText}
               loading={loading}
-              close={() => {
-                if (skipEditLayer && goBack) goBack();
-                else setEditMode(false);
-              }}
+              close={handleFormClose}
               onSubmit={submitForm}
               scrollDiv={scrollDiv}
               schema={config && config.schema}
@@ -503,10 +515,7 @@ function FocusedView(props: FocusViewProps) {
             extraModalFunction={props?.extraModalFunction}
             deleteAction={canDeleteBounty ? deleteHandler : undefined}
             deletingState={deleting}
-            editAction={() => {
-              setEditable(false);
-              setEditMode(true);
-            }}
+            editAction={handleEditAction}
             setIsModalSideButton={setIsModalSideButton}
             setIsExtraStyle={props?.setIsExtraStyle}
           />
