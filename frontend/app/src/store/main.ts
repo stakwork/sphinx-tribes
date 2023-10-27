@@ -617,7 +617,7 @@ export class MainStore {
   async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
     const smallQueryLimit = 4;
     const query = this.appendQueryParams('people/search', smallQueryLimit, {
-      search: alias,
+      search: alias.toLowerCase(),
       sortBy: 'owner_alias'
     });
     const ps = await api.get(query);
