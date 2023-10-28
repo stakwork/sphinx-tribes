@@ -135,7 +135,9 @@ export interface PaymentHistory {
   receiver_name: string;
   receiver_pubkey: string;
   created: string;
+  updated: string;
   payment_type: string;
+  status: boolean;
 }
 
 export interface BudgetHistory {
