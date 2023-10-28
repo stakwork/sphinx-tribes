@@ -348,8 +348,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-        ui.meInfo?.owner_alias &&
-        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+      ui.meInfo?.owner_alias &&
+      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */
