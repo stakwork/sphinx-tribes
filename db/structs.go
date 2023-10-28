@@ -516,25 +516,22 @@ type BudgetHistoryData struct {
 }
 
 type PaymentHistory struct {
-	ID             uint       `json:"id"`
-	OrgUuid        string     `json:"org_uuid"`
-	SenderPubKey   string     `json:"sender_pubkey"`
-	ReceiverPubKey string     `json:"receiver_pubkey"`
-	Amount         uint       `json:"amount"`
-	BountyId       uint       `json:"bounty_id"`
-	Created        *time.Time `json:"created"`
+	ID             uint        `json:"id"`
+	Amount         uint        `json:"amount"`
+	BountyId       uint        `json:"bounty_id"`
+	PaymentType    PaymentType `json:"payment_type"`
+	OrgUuid        string      `json:"org_uuid"`
+	SenderPubKey   string      `json:"sender_pubkey"`
+	ReceiverPubKey string      `json:"receiver_pubkey"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+	Status         bool        `json:"status"`
 }
 
 type PaymentHistoryData struct {
-	ID             uint       `json:"id"`
-	OrgUuid        string     `json:"org_uuid"`
-	SenderName     string     `json:"sender_name"`
-	SenderPubKey   string     `json:"sender_pubkey"`
-	ReceiverName   string     `json:"receiver_name"`
-	ReceiverPubKey string     `json:"receiver_pubkey"`
-	Amount         uint       `json:"amount"`
-	BountyId       uint       `json:"bounty_id"`
-	Created        *time.Time `json:"created"`
+	PaymentHistory
+	SenderName   string `json:"sender_name"`
+	ReceiverName string `json:"receiver_name"`
 }
 
 type PaymentData struct {
