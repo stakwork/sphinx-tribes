@@ -166,7 +166,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   }, [main, uuid]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid);
+    const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
     setPaymentsHistory(paymentHistories);
   }, [main, uuid]);
 
@@ -249,14 +249,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const successAction = () => {
     addToast('Budget was added successfully', 'success');
+    closeBudgetHandler();
+
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
     // get new organization budget
     getOrganizationBudget();
     getPaymentsHistory();
-    main.getUserOrganizations(ui.selectedPerson);
-    closeBudgetHandler();
   };
 
   const pollInvoices = useCallback(async () => {
@@ -297,8 +297,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         const invoiceData = await main.pollInvoice(paymentRequest);
         if (invoiceData) {
           if (invoiceData.success && invoiceData.response.settled) {
-            clearInterval(interval);
             successAction();
+            clearInterval(interval);
           }
         }
 
