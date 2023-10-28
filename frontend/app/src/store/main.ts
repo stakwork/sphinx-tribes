@@ -1975,11 +1975,7 @@ export class MainStore {
     }
   }
 
-  async getPaymentHistories(
-    uuid: string,
-    page: number,
-    limit: number,
-  ): Promise<PaymentHistory[]> {
+  async getPaymentHistories(uuid: string, page: number, limit: number): Promise<PaymentHistory[]> {
     try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
