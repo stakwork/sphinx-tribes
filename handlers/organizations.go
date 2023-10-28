@@ -451,6 +451,9 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
+	keys := r.URL.Query()
+	page := keys.Get("page")
+	limit := keys.Get("limit")
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -467,46 +470,10 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get the organization payment history
-	paymentHistory := db.DB.GetPaymentHistory(uuid)
-	budgetHistory := db.DB.GetOrganizationBudgetHistory(uuid)
-
-	var paymentData []db.PaymentData
-
-	for _, payment := range paymentHistory {
-		payData := db.PaymentData{
-			ID:             payment.ID,
-			OrgUuid:        payment.OrgUuid,
-			PaymentType:    "payment",
-			SenderName:     payment.SenderName,
-			SenderPubKey:   payment.SenderPubKey,
-			ReceiverName:   payment.ReceiverName,
-			ReceiverPubKey: payment.ReceiverPubKey,
-			Amount:         payment.Amount,
-			Created:        payment.Created,
-			BountyId:       payment.BountyId,
-		}
-
-		paymentData = append(paymentData, payData)
-	}
-
-	for _, payment := range budgetHistory {
-		payData := db.PaymentData{
-			ID:             payment.ID,
-			OrgUuid:        payment.OrgUuid,
-			PaymentType:    payment.PaymentType,
-			SenderName:     payment.SenderName,
-			SenderPubKey:   payment.SenderPubKey,
-			ReceiverName:   "",
-			ReceiverPubKey: "",
-			Amount:         payment.Amount,
-			Created:        payment.Created,
-			BountyId:       0,
-		}
-		paymentData = append(paymentData, payData)
-	}
+	paymentHistory := db.DB.GetPaymentHistory(uuid, page, limit)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(paymentData)
+	json.NewEncoder(w).Encode(paymentHistory)
 }
 
 func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
