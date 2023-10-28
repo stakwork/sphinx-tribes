@@ -475,11 +475,11 @@ type BountyBudget struct {
 }
 
 type BudgetInvoiceRequest struct {
-	Amount          uint              `json:"amount"`
-	SenderPubKey    string            `json:"sender_pubkey"`
-	OrgUuid         string            `json:"org_uuid"`
-	PaymentType     BudgetPaymentType `json:"payment_type,omitempty"`
-	Websocket_token string            `json:"websocket_token,omitempty"`
+	Amount          uint        `json:"amount"`
+	SenderPubKey    string      `json:"sender_pubkey"`
+	OrgUuid         string      `json:"org_uuid"`
+	PaymentType     PaymentType `json:"payment_type,omitempty"`
+	Websocket_token string      `json:"websocket_token,omitempty"`
 }
 
 type BudgetStoreData struct {
@@ -491,22 +491,23 @@ type BudgetStoreData struct {
 	Created      *time.Time `json:"created"`
 }
 
-type BudgetPaymentType string
+type PaymentType string
 
 const (
-	Deposit  BudgetPaymentType = "deposit"
-	Withdraw BudgetPaymentType = "withdraw"
+	Deposit  PaymentType = "deposit"
+	Withdraw PaymentType = "withdraw"
+	Payment  PaymentType = "payment"
 )
 
 type BudgetHistory struct {
-	ID           uint              `json:"id"`
-	OrgUuid      string            `json:"org_uuid"`
-	Amount       uint              `json:"amount"`
-	SenderPubKey string            `json:"sender_pubkey"`
-	Created      *time.Time        `json:"created"`
-	Updated      *time.Time        `json:"updated"`
-	Status       bool              `json:"status"`
-	PaymentType  BudgetPaymentType `json:"payment_type"`
+	ID           uint        `json:"id"`
+	OrgUuid      string      `json:"org_uuid"`
+	Amount       uint        `json:"amount"`
+	SenderPubKey string      `json:"sender_pubkey"`
+	Created      *time.Time  `json:"created"`
+	Updated      *time.Time  `json:"updated"`
+	Status       bool        `json:"status"`
+	PaymentType  PaymentType `json:"payment_type"`
 }
 
 type BudgetHistoryData struct {
@@ -525,13 +526,28 @@ type PaymentHistory struct {
 }
 
 type PaymentHistoryData struct {
-	ID           uint       `json:"id"`
-	OrgUuid      string     `json:"org_uuid"`
-	SenderName   string     `json:"sender_name"`
-	ReceiverName string     `json:"receiver_name"`
-	Amount       uint       `json:"amount"`
-	BountyId     uint       `json:"bounty_id"`
-	Created      *time.Time `json:"created"`
+	ID             uint       `json:"id"`
+	OrgUuid        string     `json:"org_uuid"`
+	SenderName     string     `json:"sender_name"`
+	SenderPubKey   string     `json:"sender_pubkey"`
+	ReceiverName   string     `json:"receiver_name"`
+	ReceiverPubKey string     `json:"receiver_pubkey"`
+	Amount         uint       `json:"amount"`
+	BountyId       uint       `json:"bounty_id"`
+	Created        *time.Time `json:"created"`
+}
+
+type PaymentData struct {
+	ID             uint        `json:"id"`
+	OrgUuid        string      `json:"org_uuid"`
+	PaymentType    PaymentType `json:"payment_type"`
+	SenderName     string      `json:"sender_name"`
+	SenderPubKey   string      `json:"sender_pubkey"`
+	ReceiverName   string      `json:"receiver_name"`
+	ReceiverPubKey string      `json:"receiver_pubkey"`
+	Amount         uint        `json:"amount"`
+	BountyId       uint        `json:"bounty_id"`
+	Created        *time.Time  `json:"created"`
 }
 
 type BountyPayRequest struct {

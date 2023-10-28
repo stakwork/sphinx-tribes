@@ -402,7 +402,24 @@ func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// if not the orgnization admin
+	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Don't have access to view budget")
+		return
+	}
+
 	// get the organization budget
 	organizationBudget := db.DB.GetOrganizationBudget(uuid)
 
@@ -411,7 +428,18 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
+
+	// if not the orgnization admin
+	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Don't have access to view budget history")
+		return
+	}
+
 	// get the organization budget
 	organizationBudget := db.DB.GetOrganizationBudgetHistory(uuid)
 
@@ -424,6 +452,12 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	// if not the orgnization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
@@ -434,9 +468,45 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 
 	// get the organization payment history
 	paymentHistory := db.DB.GetPaymentHistory(uuid)
+	budgetHistory := db.DB.GetOrganizationBudgetHistory(uuid)
+
+	var paymentData []db.PaymentData
+
+	for _, payment := range paymentHistory {
+		payData := db.PaymentData{
+			ID:             payment.ID,
+			OrgUuid:        payment.OrgUuid,
+			PaymentType:    "payment",
+			SenderName:     payment.SenderName,
+			SenderPubKey:   payment.SenderPubKey,
+			ReceiverName:   payment.ReceiverName,
+			ReceiverPubKey: payment.ReceiverPubKey,
+			Amount:         payment.Amount,
+			Created:        payment.Created,
+			BountyId:       payment.BountyId,
+		}
+
+		paymentData = append(paymentData, payData)
+	}
+
+	for _, payment := range budgetHistory {
+		payData := db.PaymentData{
+			ID:             payment.ID,
+			OrgUuid:        payment.OrgUuid,
+			PaymentType:    payment.PaymentType,
+			SenderName:     payment.SenderName,
+			SenderPubKey:   payment.SenderPubKey,
+			ReceiverName:   "",
+			ReceiverPubKey: "",
+			Amount:         payment.Amount,
+			Created:        payment.Created,
+			BountyId:       0,
+		}
+		paymentData = append(paymentData, payData)
+	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(paymentHistory)
+	json.NewEncoder(w).Encode(paymentData)
 }
 
 func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
