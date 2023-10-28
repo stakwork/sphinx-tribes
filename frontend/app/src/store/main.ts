@@ -131,8 +131,11 @@ export interface PaymentHistory {
   amount: number;
   org_uuid: string;
   sender_name: string;
+  sender_pubkey: string;
   receiver_name: string;
+  receiver_pubkey: string;
   created: string;
+  payment_type: string;
 }
 
 export interface BudgetHistory {
