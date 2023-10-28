@@ -317,12 +317,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
-  }, [
-    getOrganizationUsers,
-    getBountyRoles,
-    getOrganizationBudget,
-    getPaymentsHistory
-  ]);
+  }, [getOrganizationUsers, getBountyRoles, getOrganizationBudget, getPaymentsHistory]);
 
   return (
     <Container>
