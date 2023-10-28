@@ -1211,7 +1211,7 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 
 func (db database) GetPaymentHistory(org_uuid string) []PaymentHistoryData {
 	payment := []PaymentHistoryData{}
-	db.db.Raw(`SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, sender.unique_name AS sender_name, receiver.unique_name as receiver_name FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`).Find(&payment)
+	db.db.Raw(`SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, sender.unique_name AS sender_name, sender.owner_pub_key AS sender_pubkey, receiver.unique_name as receiver_name, receiver.owner_pub_key as receiver_pubkey FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`).Find(&payment)
 	return payment
 }
 
