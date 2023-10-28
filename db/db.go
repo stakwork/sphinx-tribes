@@ -1205,7 +1205,11 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	// get organization budget and substract payment from total budget
 	organizationBudget := db.GetOrganizationBudget(payment.OrgUuid)
 	totalBudget := organizationBudget.TotalBudget
-	organizationBudget.TotalBudget = totalBudget - payment.Amount
+
+	// deduct amount if it's a bounty payment
+	if payment.PaymentType == "payment" {
+		organizationBudget.TotalBudget = totalBudget - payment.Amount
+	}
 
 	db.UpdateOrganizationBudget(organizationBudget)
 
@@ -1217,6 +1221,7 @@ func (db database) GetPaymentHistory(org_uuid string, p string, l string) []Paym
 
 	page := 0
 	limit := 0
+	limitQuery := ""
 
 	if p != "" {
 		page, _ = utils.ConvertStringToInt(p)
@@ -1226,7 +1231,13 @@ func (db database) GetPaymentHistory(org_uuid string, p string, l string) []Paym
 		limit, _ = utils.ConvertStringToInt(l)
 	}
 
-	db.db.Raw(`SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, payment.updated, payment.status, payment.payment_type, sender.unique_name AS sender_name, sender.owner_pub_key AS sender_pubkey, receiver.unique_name as receiver_name, receiver.owner_pub_key as receiver_pubkey FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`).Offset(page).Limit(limit).Find(&payment)
+	if page != 0 && limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, page)
+	}
+
+	query := `SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, payment.updated, payment.status, payment.payment_type, sender.unique_name AS sender_name, sender.owner_pub_key AS sender_pubkey, receiver.unique_name as receiver_name, receiver.owner_pub_key as receiver_pubkey FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`
+
+	db.db.Raw(query + " " + limitQuery).Find(&payment)
 
 	return payment
 }

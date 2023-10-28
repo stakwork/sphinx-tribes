@@ -1975,18 +1975,21 @@ export class MainStore {
     }
   }
 
-  async getPaymentHistories(uuid: string): Promise<PaymentHistory[]> {
+  async getPaymentHistories(uuid: string, page: number, limit: number): Promise<PaymentHistory[]> {
     try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/payments/${uuid}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'x-jwt': info.tribe_jwt,
-          'Content-Type': 'application/json'
+      const r: any = await fetch(
+        `${TribesURL}/organizations/payments/${uuid}?page=${page}&limit=${limit}`,
+        {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'x-jwt': info.tribe_jwt,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
       return r.json();
     } catch (e) {
