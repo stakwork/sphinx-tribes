@@ -1122,8 +1122,8 @@ func (db database) UpdateOrganizationBudget(budget BountyBudget) BountyBudget {
 	return budget
 }
 
-func (db database) GetBudgetHistoryByCreated(created *time.Time, org_uuid string) BudgetHistory {
-	ms := BudgetHistory{}
+func (db database) GetPaymentHistoryByCreated(created *time.Time, org_uuid string) PaymentHistory {
+	ms := PaymentHistory{}
 	db.db.Where("created = ?", created).Where("org_uuid = ? ", org_uuid).Find(&ms)
 	return ms
 }
@@ -1136,19 +1136,20 @@ func (db database) GetOrganizationBudget(org_uuid string) BountyBudget {
 
 func (db database) GetOrganizationBudgetHistory(org_uuid string) []BudgetHistoryData {
 	budgetHistory := []BudgetHistoryData{}
+
 	db.db.Raw(`SELECT budget.id, budget.org_uuid, budget.amount, budget.created, budget.updated, budget.payment_type, budget.status, budget.sender_pub_key, sender.unique_name AS sender_name FROM public.budget_histories AS budget LEFT OUTER JOIN public.people AS sender ON budget.sender_pub_key = sender.owner_pub_key WHERE budget.org_uuid = '` + org_uuid + `' ORDER BY budget.created DESC`).Find(&budgetHistory)
 	return budgetHistory
 }
 
-func (db database) AddAndUpdateBudget(invoice InvoiceList) BudgetHistory {
+func (db database) AddAndUpdateBudget(invoice InvoiceList) PaymentHistory {
 	created := invoice.Created
 	org_uuid := invoice.OrgUuid
 
-	budgetHistory := db.GetBudgetHistoryByCreated(created, org_uuid)
+	paymentHistory := db.GetPaymentHistoryByCreated(created, org_uuid)
 
-	if budgetHistory.OrgUuid != "" && budgetHistory.Amount != 0 {
-		budgetHistory.Status = true
-		db.db.Where("created = ?", created).Where("org_uuid = ? ", org_uuid).Updates(budgetHistory)
+	if paymentHistory.OrgUuid != "" && paymentHistory.Amount != 0 {
+		paymentHistory.Status = true
+		db.db.Where("created = ?", created).Where("org_uuid = ? ", org_uuid).Updates(paymentHistory)
 
 		// get organization budget and add payment to total budget
 		organizationBudget := db.GetOrganizationBudget(org_uuid)
@@ -1157,19 +1158,19 @@ func (db database) AddAndUpdateBudget(invoice InvoiceList) BudgetHistory {
 			now := time.Now()
 			orgBudget := BountyBudget{
 				OrgUuid:     org_uuid,
-				TotalBudget: budgetHistory.Amount,
+				TotalBudget: paymentHistory.Amount,
 				Created:     &now,
 				Updated:     &now,
 			}
 			db.CreateOrganizationBudget(orgBudget)
 		} else {
 			totalBudget := organizationBudget.TotalBudget
-			organizationBudget.TotalBudget = totalBudget + budgetHistory.Amount
+			organizationBudget.TotalBudget = totalBudget + paymentHistory.Amount
 			db.UpdateOrganizationBudget(organizationBudget)
 		}
 	}
 
-	return budgetHistory
+	return paymentHistory
 }
 
 func (db database) WithdrawBudget(sender_pubkey string, org_uuid string, amount uint) {
@@ -1184,16 +1185,18 @@ func (db database) WithdrawBudget(sender_pubkey string, org_uuid string, amount 
 
 	now := time.Now()
 
-	budgetHistory := BudgetHistory{
-		OrgUuid:      org_uuid,
-		Amount:       amount,
-		Status:       true,
-		PaymentType:  "withdraw",
-		Created:      &now,
-		Updated:      &now,
-		SenderPubKey: sender_pubkey,
+	budgetHistory := PaymentHistory{
+		OrgUuid:        org_uuid,
+		Amount:         amount,
+		Status:         true,
+		PaymentType:    "withdraw",
+		Created:        &now,
+		Updated:        &now,
+		SenderPubKey:   sender_pubkey,
+		ReceiverPubKey: "",
+		BountyId:       0,
 	}
-	db.AddBudgetHistory(budgetHistory)
+	db.AddPaymentHistory(budgetHistory)
 }
 
 func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
@@ -1209,9 +1212,22 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	return payment
 }
 
-func (db database) GetPaymentHistory(org_uuid string) []PaymentHistoryData {
+func (db database) GetPaymentHistory(org_uuid string, p string, l string) []PaymentHistoryData {
 	payment := []PaymentHistoryData{}
-	db.db.Raw(`SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, sender.unique_name AS sender_name, receiver.unique_name as receiver_name FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`).Find(&payment)
+
+	page := 0
+	limit := 0
+
+	if p != "" {
+		page, _ = utils.ConvertStringToInt(p)
+	}
+
+	if l != "" {
+		limit, _ = utils.ConvertStringToInt(l)
+	}
+
+	db.db.Raw(`SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, payment.updated, payment.status, payment.payment_type, sender.unique_name AS sender_name, sender.owner_pub_key AS sender_pubkey, receiver.unique_name as receiver_name, receiver.owner_pub_key as receiver_pubkey FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`).Offset(page).Limit(limit).Find(&payment)
+
 	return payment
 }
 
