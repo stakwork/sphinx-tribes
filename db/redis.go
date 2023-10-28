@@ -35,17 +35,31 @@ func InitRedis() {
 }
 
 func SetValue(key string, value string) {
-	rerr := RedisClient.Set(ctx, key, value, 0).Err()
-	if rerr != nil {
-		panic(rerr)
+	err := RedisClient.Set(ctx, key, value, 0).Err()
+	if err != nil {
+		fmt.Println("REDIS SET ERROR :", err)
 	}
 }
 
 func GetValue(key string) string {
-	val, rerr := RedisClient.Get(ctx, key).Result()
-	if rerr != nil {
-		panic(rerr)
+	val, err := RedisClient.Get(ctx, key).Result()
+	if err != nil {
+		fmt.Println("REDIS GET ERROR :", err)
 	}
 
 	return val
+}
+
+func SetMap(key string, values map[string]string) {
+	for k, v := range values {
+		err := RedisClient.HSet(ctx, key, k, v).Err()
+		if err != nil {
+			fmt.Println("REDIS SET MAP ERROR :", err)
+		}
+	}
+}
+
+func GetMap(key string) map[string]string {
+	values := RedisClient.HGetAll(ctx, key).Val()
+	return values
 }
