@@ -3,7 +3,7 @@ import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
 import moment from 'moment';
 import styled from 'styled-components';
-import { PaymentHistory } from 'store/main';
+import { PaymentHistory, OrgTransactionType } from 'store/main';
 import { useStores } from 'store';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
@@ -12,8 +12,6 @@ import ArrowRight from '../../../public/static/arrow-right.svg';
 import LinkIcon from '../../../public/static/link.svg';
 import { PaymentHistoryModalProps } from './interface';
 import UserInfo from './UserInfo';
-
-type OrgTransactionType = 'Deposit' | 'Payment' | 'Withdraw';
 
 const HistoryWrapper = styled.div`
   width: 61.125rem;
@@ -65,7 +63,7 @@ const Label = styled.label`
 const Table = styled.table`
   margin-top: 2rem;
   border-collapse: collapse;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   overflow-x: auto;
 `;
 
@@ -102,15 +100,15 @@ const ThRight = styled(TH)`
 const TR = styled.tr<{ type: OrgTransactionType }>`
   border-bottom: 1px solid
     ${(props: any) =>
-      props.type === 'Deposit'
+      props.type === 'deposit'
         ? 'rgba(73, 201, 152, 0.20)'
-        : props.type === 'Withdraw'
+        : props.type === 'withdraw'
         ? 'rgba(145, 87, 246, 0.15)'
         : 'rgba(0, 0, 0, 0.07)'};
   background-color: ${(props: any) =>
-    props.type === 'Deposit'
+    props.type === 'deposit'
       ? '#F6FFFA'
-      : props.type === 'Withdraw'
+      : props.type === 'withdraw'
       ? 'rgba(167, 108, 243, 0.05)'
       : ''};
 `;
@@ -132,12 +130,13 @@ const AmountSpan = styled.span`
 
 const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
   color: ${(props: any) =>
-    props.type === 'Deposit' ? '#49C998' : props.type === 'Withdraw' ? '#A76CF3' : '#3C3F41'};
+    props.type === 'deposit' ? '#49C998' : props.type === 'withdraw' ? '#A76CF3' : '#3C3F41'};
   font-size: 1rem;
   font-style: normal;
   font-weight: 600;
   line-height: 1rem;
   padding-left: 2.9rem;
+  text-transform: capitalize;
 `;
 
 const ArrowImage = styled.img`
@@ -189,6 +188,12 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
   };
 
   console.log(paymentsHistory);
+  const newPaymentHistory = paymentsHistory.map((history: PaymentHistory) => {
+    if (!history.payment_type) {
+      history.payment_type = 'payment';
+    }
+    return history;
+  });
 
   return (
     <Modal
@@ -217,7 +222,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
     >
       <HistoryWrapper>
         <ModalHeaderWrapper>
-          <ModalTitle>Payment history</ModalTitle>
+          <ModalTitle>Payment History</ModalTitle>
           <PaymentFilterWrapper>
             <PaymentType>
               <input id="payment" type={'checkbox'} /> <Label htmlFor="payment">Payments</Label>
@@ -244,37 +249,37 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
             </THeadRow>
           </thead>
           <tbody>
-            {paymentsHistory.map((pay: PaymentHistory, i: number) => (
-              <TR type={i === 0 ? 'Payment' : i === 1 ? 'Deposit' : 'Withdraw'} key={i}>
-                <TdLeft type={i === 0 ? 'Payment' : i === 1 ? 'Deposit' : 'Withdraw'}>
-                  {i === 0 ? 'Payment' : i === 1 ? 'Deposit' : 'Withdraw'}
-                </TdLeft>
+            {newPaymentHistory.map((pay: PaymentHistory, i: number) => (
+              <TR type={pay.payment_type || 'payment'} key={i}>
+                <TdLeft type={pay.payment_type}>{pay.payment_type || 'Payment'}</TdLeft>
                 <TD>{moment(pay.created).format('DD/MM/YY')}</TD>
                 <TD>
                   <AmountSpan>{pay.amount}</AmountSpan> sats
                 </TD>
                 <TD>
                   <UserInfo
-                    image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR9dAUM-b34F_a6DMw8D6fQ_Y0LUIAVzvfCw&usqp=CAU"
-                    pubkey="030841d1519f19c68e80efc5ef5af3460ca4bfa17486fda9baca878b9ef255358"
+                    image={pay.sender_img}
+                    pubkey={pay.sender_pubkey}
                     name={pay.sender_name}
                   />
                 </TD>
+                <TD>{pay.payment_type === 'payment' ? <ArrowImage src={ArrowRight} /> : null}</TD>
                 <TD>
-                  <ArrowImage src={ArrowRight} />
+                  {pay.payment_type === 'payment' ? (
+                    <UserInfo
+                      image={pay.receiver_img}
+                      pubkey={pay.receiver_pubkey}
+                      name={pay.receiver_name}
+                    />
+                  ) : null}
                 </TD>
                 <TD>
-                  <UserInfo
-                    image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR9dAUM-b34F_a6DMw8D6fQ_Y0LUIAVzvfCw&usqp=CAU"
-                    pubkey="030841d1519f19c68e80efc5ef5af3460ca4bfa17486fda9baca878b9ef255358"
-                    name={pay.receiver_name}
-                  />
-                </TD>
-                <TD>
-                  <ViewBountyContainer>
-                    <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty>
-                    <LinkImage src={LinkIcon} />
-                  </ViewBountyContainer>
+                  {pay.payment_type === 'payment' ? (
+                    <ViewBountyContainer>
+                      <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty>
+                      <LinkImage src={LinkIcon} />
+                    </ViewBountyContainer>
+                  ) : null}
                 </TD>
               </TR>
             ))}
