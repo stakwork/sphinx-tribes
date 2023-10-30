@@ -4,6 +4,7 @@ import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { calculateTimeLeft, isInvoiceExpired } from 'helpers';
+import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/RenderMarkdown';
@@ -113,21 +114,45 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid = false;
   }
 
-  const pollMinutes = 5;
+  const pollMinutes = 2;
 
   const bountyExpired = !bounty_expires
     ? false
     : Date.now() > new Date(bounty_expires || '').getTime();
   const bountyTimeLeft = calculateTimeLeft(new Date(bounty_expires ?? ''), 'days');
 
-  const addToast = () =>
-    setToasts([
-      {
-        id: '1',
-        title: 'Invoice has been paid',
-        color: 'success'
+  const addToast = (type: string) => {
+    switch (type) {
+      case SOCKET_MSG.invoice_success: {
+        return setToasts([
+          {
+            id: '1',
+            title: 'Invoice has been paid',
+            color: 'success'
+          }
+        ]);
       }
-    ]);
+      case SOCKET_MSG.keysend_error: {
+        return setToasts([
+          {
+            id: '2',
+            title: 'Keysend payment failed',
+            toastLifeTimeMs: 10000,
+            color: 'error'
+          }
+        ]);
+      }
+      case SOCKET_MSG.keysend_success: {
+        return setToasts([
+          {
+            id: '3',
+            title: 'Successful keysend payment',
+            color: 'success'
+          }
+        ]);
+      }
+    }
+  };
 
   const removeToast = () => {
     setToasts([]);
@@ -135,6 +160,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const startPolling = useCallback(
     async (paymentRequest: string) => {
+      let i = 0;
       interval = setInterval(async () => {
         try {
           const invoiceData = await main.pollInvoice(paymentRequest);
@@ -143,12 +169,17 @@ function MobileView(props: CodingBountiesProps) {
               clearInterval(interval);
 
               setLnInvoice('');
-              addToast();
+              addToast(SOCKET_MSG.invoice_success);
               main.setKeysendInvoice('');
               setLocalPaid('UNKNOWN');
               setInvoiceStatus(true);
               setKeysendStatus(true);
             }
+          }
+
+          i++;
+          if (i > 22) {
+            if (interval) clearInterval(interval);
           }
         } catch (e) {
           console.warn('CodingBounty Invoice Polling Error', e);
@@ -276,6 +307,44 @@ function MobileView(props: CodingBountiesProps) {
     });
     sendToRedirect(twitterLink);
   };
+
+  const onHandle = (event: any) => {
+    const res = JSON.parse(event.data);
+    if (res.msg === SOCKET_MSG.user_connect) {
+      const user = ui.meInfo;
+      if (user) {
+        user.websocketToken = res.body;
+        ui.setMeInfo(user);
+      }
+    } else if (res.msg === SOCKET_MSG.invoice_success) {
+      setLnInvoice('');
+      setLocalPaid('UNKNOWN');
+      setInvoiceStatus(true);
+      addToast(SOCKET_MSG.invoice_success);
+    } else if (res.msg === SOCKET_MSG.keysend_success) {
+      setLocalPaid('UNKNOWN');
+      setKeysendStatus(true);
+      addToast(SOCKET_MSG.keysend_success);
+    } else if (res.msg === SOCKET_MSG.keysend_error) {
+      addToast(SOCKET_MSG.keysend_error);
+    }
+  };
+
+  useEffect(() => {
+    const socket: WebSocket = createSocketInstance();
+    socket.onopen = () => {
+      console.log('Socket connected');
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      onHandle(event);
+    };
+
+    socket.onclose = () => {
+      console.log('Socket disconnected');
+    };
+  }, []);
+
   return (
     <div>
       {{ ...person }?.owner_alias &&

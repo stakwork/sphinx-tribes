@@ -48,7 +48,8 @@ import {
   ViewBudgetWrap
 } from './organization/style';
 
-// the view for all details about an organization
+let interval;
+  
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
@@ -58,11 +59,9 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenWithdrawBudget, setIsOpenWithdrawBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
-  const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
-  const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
@@ -91,8 +90,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const { org } = props;
   const uuid = org?.uuid || '';
-
-  let interval;
 
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
@@ -171,13 +168,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   }, [main, uuid]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid);
+    const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
     setPaymentsHistory(paymentHistories);
-  }, [main, uuid]);
-
-  const getBudgetHistory = useCallback(async () => {
-    const budgetHistories = await main.getBudgettHistories(uuid);
-    setBudgetsHistory(budgetHistories);
   }, [main, uuid]);
 
   const handleSettingsClick = async (user: any) => {
@@ -205,10 +197,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const closeHistoryHandler = () => {
     setIsOpenHistory(false);
-  };
-
-  const closeBudgetHistoryHandler = () => {
-    setIsOpenBudgetHistory(false);
   };
 
   const closeWithdrawBudgetHandler = () => {
@@ -263,64 +251,62 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const successAction = () => {
     addToast('Budget was added successfully', 'success');
+    closeBudgetHandler();
+
     setInvoiceStatus(true);
+    main.setBudgetInvoice('');
 
     // get new organization budget
     getOrganizationBudget();
-    getBudgetHistory();
-    main.getUserOrganizations(ui.selectedPerson);
-    closeBudgetHandler();
+    getPaymentsHistory();
   };
 
-  const deleteInvoice = (payReq: string, invoices: string[]): string[] => {
-    const index = invoices.indexOf(payReq);
-    invoices.splice(index, 1);
-    main.setBudgetInvoice(invoices);
+  const pollInvoices = useCallback(async () => {
+    let i = 0;
+    interval = setInterval(async () => {
+      try {
+        await main.pollOrgBudgetInvoices(uuid);
+        getOrganizationBudget();
+        getPaymentsHistory();
 
-    return invoices;
-  };
-
-  const pollInvoices = () => {
-    let invoices = [...main.budgetInvoices];
-    if (invoices.length) {
-      interval = setInterval(async () => {
-        try {
-          for (const payReq of invoices) {
-            if (payReq) {
-              const expired = isInvoiceExpired(payReq);
-              const invoiceData = await main.pollInvoice(payReq);
-              if (invoiceData) {
-                if (invoiceData.success && invoiceData.response.settled) {
-                  invoices = deleteInvoice(payReq, invoices);
-
-                  getOrganizationBudget();
-                  getBudgetHistory();
-                } else if (expired) {
-                  invoices = deleteInvoice(payReq, main.budgetInvoices);
-                }
-              }
-
-              if (invoices.length === 0) {
-                clearInterval(interval);
-              }
-            }
-          }
-        } catch (e) {
-          console.warn('Budget Invoices Polling Error', e);
+        const count = await main.organizationInvoiceCount(uuid);
+        if (count === 0) {
+          clearInterval(interval);
         }
-      }, 5000);
-    }
-  };
+
+        i++;
+        if (i > 10) {
+          if (interval) clearInterval(interval);
+        }
+      } catch (e) {
+        console.warn('Poll invoices error', e);
+      }
+    }, 6000);
+  }, []);
+
+  useEffect(() => {
+    pollInvoices();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [pollInvoices]);
 
   async function startPolling(paymentRequest: string) {
+    let i = 0;
     interval = setInterval(async () => {
       try {
         const invoiceData = await main.pollInvoice(paymentRequest);
         if (invoiceData) {
           if (invoiceData.success && invoiceData.response.settled) {
-            clearInterval(interval);
             successAction();
+            clearInterval(interval);
           }
+        }
+
+        i++;
+        if (i > 22) {
+          if (interval) clearInterval(interval);
         }
       } catch (e) {
         console.warn('AddBudget Modal Invoice Polling Error', e);
@@ -329,26 +315,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   }
 
   useEffect(() => {
-    pollInvoices();
-
-    return () => {
-      clearInterval(interval);
-    };
-  });
-
-  useEffect(() => {
     getOrganizationUsers();
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
-    getBudgetHistory();
-  }, [
-    getOrganizationUsers,
-    getBountyRoles,
-    getOrganizationBudget,
-    getPaymentsHistory,
-    getBudgetHistory
-  ]);
+  }, [getOrganizationUsers, getBountyRoles, getOrganizationBudget, getPaymentsHistory]);
 
   return (
     <Container>
@@ -537,13 +508,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             paymentsHistory={paymentsHistory}
             close={closeHistoryHandler}
             isOpen={isOpenHistory}
-          />
-        )}
-        {isOpenBudgetHistory && (
-          <BudgetHistoryModal
-            close={closeBudgetHistoryHandler}
-            isOpen={isOpenBudgetHistory}
-            budgetsHistory={budgetsHistory}
           />
         )}
         {isOpenWithdrawBudget && (

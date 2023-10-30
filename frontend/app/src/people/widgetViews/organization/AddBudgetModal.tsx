@@ -40,8 +40,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         setLnInvoice(paymentRequest);
         startPolling(paymentRequest);
 
-        const invoices = [...main.budgetInvoices, paymentRequest];
-        main.setBudgetInvoice(invoices);
+        main.setBudgetInvoice(paymentRequest);
       }
     }
   };

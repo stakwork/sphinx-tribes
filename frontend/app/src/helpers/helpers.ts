@@ -24,8 +24,10 @@ export const formatSatPrice = (amount = 0) => {
 
 export const getOriginalNumberValue = (formattedValue: string) => {
   // Remove formatting (commas) from the formatted value
-  const unformattedValue = formattedValue.replace(/,/g, '');
-  return Number(unformattedValue);
+  if (formattedValue) {
+    const unformattedValue = formattedValue.replace(/,/g, '');
+    return Number(unformattedValue);
+  }
 };
 
 export const DollarConverter = (e: any) => {
