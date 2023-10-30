@@ -9,8 +9,9 @@ import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import history from '../../../config/history';
 import ArrowRight from '../../../public/static/arrow-right.svg';
-import { ViewBounty } from './style';
+import LinkIcon from '../../../public/static/link.svg';
 import { PaymentHistoryModalProps } from './interface';
+import UserInfo from './UserInfo';
 
 type OrgTransactionType = 'Deposit' | 'Payment' | 'Withdraw';
 
@@ -18,11 +19,11 @@ const HistoryWrapper = styled.div`
   width: 61.125rem;
 `;
 
-const Table = styled.table`
-  margin-top: 2rem;
-  border-collapse: collapse;
-  margin-bottom: 2rem;
-  overflow-x: auto;
+const ModalHeaderWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 2.3rem;
+  padding: 0rem 2.9rem;
 `;
 
 const ModalTitle = styled.h2`
@@ -34,6 +35,13 @@ const ModalTitle = styled.h2`
   font-style: normal;
   font-weight: 800;
   line-height: 1.875rem;
+`;
+
+const Table = styled.table`
+  margin-top: 2rem;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  overflow-x: auto;
 `;
 
 const THeadRow = styled.tr`
@@ -93,6 +101,10 @@ const TD = styled.td`
   padding-bottom: 1.5rem;
 `;
 
+const AmountSpan = styled.span`
+  font-weight: 600;
+`;
+
 const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
   color: ${(props: any) =>
     props.type === 'Deposit' ? '#49C998' : props.type === 'Withdraw' ? '#A76CF3' : '#3C3F41'};
@@ -106,6 +118,31 @@ const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
 const ArrowImage = styled.img`
   width: 1.25rem;
   height: 1.25rem;
+  margin-right: 1.1rem;
+`;
+
+const LinkImage = styled.img`
+  width: 1.25rem;
+  height: 1.25rem;
+`;
+
+const ViewBountyContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+`;
+
+const ViewBounty = styled.p`
+  color: #5f6368;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Barlow;
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.00813rem;
+  margin-bottom: 0;
 `;
 
 const color = colors['light'];
@@ -126,8 +163,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
     });
   };
 
-  paymentsHistory[2] = { ...paymentsHistory[0] };
-  paymentsHistory[3] = { ...paymentsHistory[1] };
+  console.log(paymentsHistory);
 
   return (
     <Modal
@@ -155,7 +191,9 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
       }}
     >
       <HistoryWrapper>
-        <ModalTitle>Payment history</ModalTitle>
+        <ModalHeaderWrapper>
+          <ModalTitle>Payment history</ModalTitle>
+        </ModalHeaderWrapper>
         <Table>
           <thead>
             <THeadRow>
@@ -163,7 +201,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
               <TH>Date</TH>
               <TH>Amount</TH>
               <TH>Sender</TH>
-              <TH></TH>
+              <TH />
               <TH>Receiver</TH>
               <ThRight>Bounty</ThRight>
             </THeadRow>
@@ -175,14 +213,31 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
                   {i === 0 ? 'Payment' : i === 1 ? 'Deposit' : 'Withdraw'}
                 </TdLeft>
                 <TD>{moment(pay.created).format('DD/MM/YY')}</TD>
-                <TD>{pay.amount} sats</TD>
-                <TD className="ellipsis">{pay.sender_name}</TD>
+                <TD>
+                  <AmountSpan>{pay.amount}</AmountSpan> sats
+                </TD>
+                <TD>
+                  <UserInfo
+                    image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR9dAUM-b34F_a6DMw8D6fQ_Y0LUIAVzvfCw&usqp=CAU"
+                    pubkey="030841d1519f19c68e80efc5ef5af3460ca4bfa17486fda9baca878b9ef255358"
+                    name={pay.sender_name}
+                  />
+                </TD>
                 <TD>
                   <ArrowImage src={ArrowRight} />
                 </TD>
-                <TD className="ellipsis">{pay.receiver_name}</TD>
                 <TD>
-                  <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty>
+                  <UserInfo
+                    image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR9dAUM-b34F_a6DMw8D6fQ_Y0LUIAVzvfCw&usqp=CAU"
+                    pubkey="030841d1519f19c68e80efc5ef5af3460ca4bfa17486fda9baca878b9ef255358"
+                    name={pay.receiver_name}
+                  />
+                </TD>
+                <TD>
+                  <ViewBountyContainer>
+                    <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty>
+                    <LinkImage src={LinkIcon} />
+                  </ViewBountyContainer>
                 </TD>
               </TR>
             ))}
