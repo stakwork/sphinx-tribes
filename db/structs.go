@@ -367,7 +367,6 @@ type Bounty struct {
 	Price                   string         `json:"price"`
 	Title                   string         `json:"title"`
 	Tribe                   string         `json:"tribe"`
-	Created                 int64          `json:"created"`
 	Assignee                string         `json:"assignee"`
 	TicketUrl               string         `json:"ticket_url"`
 	OrgUuid                 string         `json:"org_uuid"`
@@ -378,8 +377,11 @@ type Bounty struct {
 	OneSentenceSummary      string         `json:"one_sentence_summary"`
 	EstimatedSessionLength  string         `json:"estimated_session_length"`
 	EstimatedCompletionDate string         `json:"estimated_completion_date"`
+	Created                 int64          `json:"created"`
 	Updated                 *time.Time     `json:"updated"`
-	CompletionDate          *time.Time     `json:"completion_date"`
+	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
+	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
+	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
@@ -589,6 +591,12 @@ type WithdrawBudgetRequest struct {
 	PaymentRequest  string `json:"payment_request"`
 	Websocket_token string `json:"websocket_token,omitempty"`
 	OrgUuid         string `json:"org_uuid"`
+}
+
+type PaymentDateRange struct {
+	StartDate   string      `json:"start_date"`
+	EndDate     string      `json:"end_date"`
+	PaymentType PaymentType `json:"payment_type,omitempty"`
 }
 
 func (Person) TableName() string {
