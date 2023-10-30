@@ -1994,6 +1994,7 @@ export class MainStore {
       );
 
       const data = await r.json();
+      console.log('Data ===', data);
       return data;
     } catch (e) {
       console.log('Error getPaymentHistories', e);
