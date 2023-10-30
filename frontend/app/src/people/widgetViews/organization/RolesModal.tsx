@@ -30,39 +30,33 @@ const UserRolesImage = styled(UserImage)`
   position: fixed;
   left: 50%;
   transform: translate(-40px, -90px);
-  borderStyle: solid;
-  borderRadius: 50%;
-  borderWidth: 4px;
-  borderColor: white
+  borderstyle: solid;
+  borderradius: 50%;
+  borderwidth: 4px;
+  bordercolor: white;
 `;
 
 const HLine = styled.div`
-  background-color: #EBEDEF;
+  background-color: #ebedef;
   height: 1px;
   width: 100%;
-  margin: 5px 0px 20px
+  margin: 5px 0px 20px;
 `;
 
 const s_RolesCategories = [
   {
     name: 'Manage organization',
-    roles: [ 'EDIT ORGANIZATION' ],
+    roles: ['EDIT ORGANIZATION'],
     status: false
   },
   {
     name: 'Manage bounties',
-    roles: [
-      'ADD BOUNTY',
-      'UPDATE BOUNTY',
-      'DELETE BOUNTY',
-      'PAY BOUNTY',
-      'ADD ROLES'
-    ],
+    roles: ['ADD BOUNTY', 'UPDATE BOUNTY', 'DELETE BOUNTY', 'PAY BOUNTY', 'ADD ROLES'],
     status: false
   },
   {
     name: 'Fund organization',
-    roles: [ 'ADD BUDGET' ],
+    roles: ['ADD BUDGET'],
     status: false
   },
   {
@@ -72,19 +66,15 @@ const s_RolesCategories = [
   },
   {
     name: 'View transaction history',
-    roles: [ 'VIEW REPORT' ],
+    roles: ['VIEW REPORT'],
     status: false
   },
   {
     name: 'Update members',
-    roles: [
-      'ADD USER',
-      'UPDATE USER',
-      'DELETE USER'
-    ],
+    roles: ['ADD USER', 'UPDATE USER', 'DELETE USER'],
     status: false
   }
-]
+];
 
 const RolesModal = (props: UserRolesModalProps) => {
   const isMobile = useIsMobile();
@@ -101,8 +91,6 @@ const RolesModal = (props: UserRolesModalProps) => {
         hasRoles = hasRoles || userHasRole(bountyRolesData, userRoles, element);
       });
 
-      console.log(bountyRolesData);
-
       cat.status = hasRoles;
       return cat;
     });
@@ -110,16 +98,15 @@ const RolesModal = (props: UserRolesModalProps) => {
   };
 
   useEffect(() => {
-    getRoles()
-  }, []);
+    getRoles();
+  }, [userRoles]);
 
   const rolesChange = (role: any, s: any) => {
     // set the backend roles status using the map 'rolesCategories'
-    role.roles.forEach((role: Roles) => roleChange(role, s))
+    role.roles.forEach((role: Roles) => roleChange(role, s));
     // set the checkbox status
     const newRoles = rolesCategories.map((r: any) => {
-      if (r === role)
-      {
+      if (r === role) {
         r.status = s.target.checked;
       }
       return r;
