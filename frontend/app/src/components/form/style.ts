@@ -111,10 +111,10 @@ export const SchemaTagsContainer = styled.div`
   height: 100%;
   padding: 0px 48px;
   .LeftSchema {
-    width: 292px;
+    width: auto;
   }
   .RightSchema {
-    width: 292px;
+    width: auto;
   }
 `;
 

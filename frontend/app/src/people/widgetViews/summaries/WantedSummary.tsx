@@ -12,7 +12,7 @@ import { useStores } from '../../../store';
 import { LanguageObject, awards } from '../../utils/languageLabelStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
-import { CodingLanguageLabel, WantedSummaryProps } from '../../interfaces';
+import { CodingLanguageLabel, WantedSummaryProps, LocalPaymeentState } from '../../interfaces';
 import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
@@ -112,6 +112,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
   const [labels, setLabels] = useState<Array<CodingLanguageLabel>>([]);
   const [assigneeValue, setAssigneeValue] = useState(false);
+  const [localPaid, setLocalPaid] = useState<LocalPaymeentState>('UNKNOWN');
 
   const assigneeHandlerOpen = () => setAssigneeValue((assigneeValue: any) => !assigneeValue);
 
@@ -329,12 +330,20 @@ function WantedSummary(props: WantedSummaryProps) {
       }
 
       setIsMarkPaidSaved(false);
+      setLocalPaid('PAID');
     }
   }
 
   const handleCopyUrl = useCallback(() => {
     const el = document.createElement('input');
-    el.value = window.location.href;
+    let locationUrl = window.location.href;
+    if (locationUrl.includes('wanted')) {
+      const pathArray = window.location.pathname.split('/');
+      if (pathArray.length > 4) {
+        locationUrl = `${window.location.origin}/bounty/${pathArray[4]}`;
+      }
+    }
+    el.value = locationUrl;
     document.body.appendChild(el);
     el.select();
     document.execCommand('copy');
@@ -613,6 +622,8 @@ function WantedSummary(props: WantedSummaryProps) {
           nametag={nametag}
           org_uuid={org_uuid}
           id={id}
+          localPaid={localPaid}
+          setLocalPaid={setLocalPaid}
         />
       );
     }

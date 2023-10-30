@@ -276,12 +276,37 @@ type InvoiceResult struct {
 	Response InvoiceCheckResponse `json:"response"`
 }
 
+type InvoiceError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
+// TODO change amount back to string
 type InvoiceCheckResponse struct {
 	Settled         bool   `json:"settled"`
 	Payment_request string `json:"payment_request"`
 	Payment_hash    string `json:"payment_hash"`
 	Preimage        string `json:"preimage"`
 	Amount          string `json:"amount"`
+}
+
+type InvoicePaySuccess struct {
+	Success  bool                 `json:"success"`
+	Response InvoiceCheckResponse `json:"response"`
+}
+
+type InvoicePayError struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
+type InvoiceSuccessResponse struct {
+	Success  bool                     `json:"success"`
+	Response InvoiceSuccessPaymentReq `json:"response"`
+}
+
+type InvoiceSuccessPaymentReq struct {
+	Payment_request string `json:"payment_request"`
 }
 
 type DeleteBountyAssignee struct {
@@ -450,11 +475,11 @@ type BountyBudget struct {
 }
 
 type BudgetInvoiceRequest struct {
-	Amount          uint              `json:"amount"`
-	SenderPubKey    string            `json:"sender_pubkey"`
-	OrgUuid         string            `json:"org_uuid"`
-	PaymentType     BudgetPaymentType `json:"payment_type,omitempty"`
-	Websocket_token string            `json:"websocket_token,omitempty"`
+	Amount          uint        `json:"amount"`
+	SenderPubKey    string      `json:"sender_pubkey"`
+	OrgUuid         string      `json:"org_uuid"`
+	PaymentType     PaymentType `json:"payment_type,omitempty"`
+	Websocket_token string      `json:"websocket_token,omitempty"`
 }
 
 type BudgetStoreData struct {
@@ -466,22 +491,23 @@ type BudgetStoreData struct {
 	Created      *time.Time `json:"created"`
 }
 
-type BudgetPaymentType string
+type PaymentType string
 
 const (
-	Add     BudgetPaymentType = "add"
-	Deposit BudgetPaymentType = "deposit"
+	Deposit  PaymentType = "deposit"
+	Withdraw PaymentType = "withdraw"
+	Payment  PaymentType = "payment"
 )
 
 type BudgetHistory struct {
-	ID           uint              `json:"id"`
-	OrgUuid      string            `json:"org_uuid"`
-	Amount       uint              `json:"amount"`
-	SenderPubKey string            `json:"sender_pubkey"`
-	Created      *time.Time        `json:"created"`
-	Updated      *time.Time        `json:"updated"`
-	Status       bool              `json:"status"`
-	PaymentType  BudgetPaymentType `json:"payment_type"`
+	ID           uint        `json:"id"`
+	OrgUuid      string      `json:"org_uuid"`
+	Amount       uint        `json:"amount"`
+	SenderPubKey string      `json:"sender_pubkey"`
+	Created      *time.Time  `json:"created"`
+	Updated      *time.Time  `json:"updated"`
+	Status       bool        `json:"status"`
+	PaymentType  PaymentType `json:"payment_type"`
 }
 
 type BudgetHistoryData struct {
@@ -490,29 +516,78 @@ type BudgetHistoryData struct {
 }
 
 type PaymentHistory struct {
-	ID             uint       `json:"id"`
-	OrgUuid        string     `json:"org_uuid"`
-	SenderPubKey   string     `json:"sender_pubkey"`
-	ReceiverPubKey string     `json:"receiver_pubkey"`
-	Amount         uint       `json:"amount"`
-	BountyId       uint       `json:"bounty_id"`
-	Created        *time.Time `json:"created"`
+	ID             uint        `json:"id"`
+	Amount         uint        `json:"amount"`
+	BountyId       uint        `json:"bounty_id"`
+	PaymentType    PaymentType `json:"payment_type"`
+	OrgUuid        string      `json:"org_uuid"`
+	SenderPubKey   string      `json:"sender_pubkey"`
+	ReceiverPubKey string      `json:"receiver_pubkey"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+	Status         bool        `json:"status"`
 }
 
 type PaymentHistoryData struct {
-	ID           uint       `json:"id"`
-	OrgUuid      string     `json:"org_uuid"`
-	SenderName   string     `json:"sender_name"`
-	ReceiverName string     `json:"receiver_name"`
-	Amount       uint       `json:"amount"`
-	BountyId     uint       `json:"bounty_id"`
-	Created      *time.Time `json:"created"`
+	PaymentHistory
+	SenderName   string `json:"sender_name"`
+	ReceiverName string `json:"receiver_name"`
+}
+
+type PaymentData struct {
+	ID             uint        `json:"id"`
+	OrgUuid        string      `json:"org_uuid"`
+	PaymentType    PaymentType `json:"payment_type"`
+	SenderName     string      `json:"sender_name"`
+	SenderPubKey   string      `json:"sender_pubkey"`
+	ReceiverName   string      `json:"receiver_name"`
+	ReceiverPubKey string      `json:"receiver_pubkey"`
+	Amount         uint        `json:"amount"`
+	BountyId       uint        `json:"bounty_id"`
+	Created        *time.Time  `json:"created"`
 }
 
 type BountyPayRequest struct {
 	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
 	RouteHint       string `json:"route_hint,omitempty"`
+}
+
+type InvoiceType string
+
+const (
+	Keysend    InvoiceType = "KEYSEND"
+	Budget     InvoiceType = "BUDGET"
+	PayInvoice InvoiceType = "ASSIGN"
+)
+
+type InvoiceList struct {
+	ID             uint        `json:"id"`
+	PaymentRequest string      `json:"payment_request"`
+	Status         bool        `json:"status"`
+	Type           InvoiceType `json:"type"`
+	OwnerPubkey    string      `json:"owner_pubkey"`
+	OrgUuid        string      `json:"org_uuid,omitempty"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+}
+
+type UserInvoiceData struct {
+	ID             uint   `json:"id"`
+	Amount         uint   `json:"amount"`
+	PaymentRequest string `json:"payment_request"`
+	Created        int    `json:"created"`
+	UserPubkey     string `json:"user_pubkey"`
+	AssignedHours  uint   `json:"assigned_hours,omitempty"`
+	CommitmentFee  uint   `json:"commitment_fee,omitempty"`
+	BountyExpires  string `json:"bounty_expires,omitempty"`
+	RouteHint      string `json:"route_hint,omitempty"`
+}
+
+type WithdrawBudgetRequest struct {
+	PaymentRequest  string `json:"payment_request"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+	OrgUuid         string `json:"org_uuid"`
 }
 
 func (Person) TableName() string {

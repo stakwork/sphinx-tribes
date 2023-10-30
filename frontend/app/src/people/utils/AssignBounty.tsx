@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ConnectCardProps } from 'people/interfaces';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import moment from 'moment';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { isInvoiceExpired } from 'helpers';
 import Invoice from '../widgetViews/summaries/wantedSummaries/Invoice';
 import { colors } from '../../config/colors';
 import { Button, Modal } from '../../components/common';
 import { InvoiceInput, InvoiceLabel, InvoiceForm, B, N, ModalBottomText } from './style';
+
+let interval;
 
 export default function AssignBounty(props: ConnectCardProps) {
   const color = colors['light'];
@@ -35,8 +37,43 @@ export default function AssignBounty(props: ConnectCardProps) {
     setToasts([]);
   };
 
+  const startPolling = useCallback(
+    async (paymentRequest: string) => {
+      let i = 0;
+      interval = setInterval(async () => {
+        try {
+          const invoiceData = await main.pollInvoice(paymentRequest);
+          if (invoiceData) {
+            if (invoiceData.success && invoiceData.response.settled) {
+              clearInterval(interval);
+
+              addToast();
+              setLnInvoice('');
+              setInvoiceStatus(true);
+              main.setAssignInvoice('');
+
+              // get new wanted list
+              main.getPeopleBounties({ page: 1, resetPage: true });
+
+              props.dismiss();
+              if (props.dismissConnectModal) props.dismissConnectModal();
+            }
+          }
+
+          i++;
+          if (i > 22) {
+            if (interval) clearInterval(interval);
+          }
+        } catch (e) {
+          console.warn('AssignBounty Modal Invoice Polling Error', e);
+        }
+      }, 5000);
+    },
+    [main, props]
+  );
+
   const generateInvoice = async () => {
-    if (created && ui.meInfo?.websocketToken) {
+    if (created) {
       const data = await main.getLnInvoice({
         amount: 200 * bountyHours,
         memo: '',
@@ -52,47 +89,30 @@ export default function AssignBounty(props: ConnectCardProps) {
         ).toUTCString()
       });
 
-      setLnInvoice(data.response.invoice);
-    }
-  };
+      const paymentRequest = data.response.invoice;
 
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
+      if (paymentRequest) {
+        setLnInvoice(paymentRequest);
+        main.setAssignInvoice(paymentRequest);
+        startPolling(paymentRequest);
       }
-    } else if (res.msg === SOCKET_MSG.assign_success && res.invoice === main.lnInvoice) {
-      addToast();
-      setLnInvoice('');
-      setInvoiceStatus(true);
-      main.setLnInvoice('');
-
-      // get new wanted list
-      main.getPeopleBounties({ page: 1, resetPage: true });
-
-      props.dismiss();
-      if (props.dismissConnectModal) props.dismissConnectModal();
     }
   };
 
   useEffect(() => {
-    const socket: WebSocket = createSocketInstance();
+    if (main.assignInvoice !== '') {
+      const expired = isInvoiceExpired(main.assignInvoice);
+      if (!expired) {
+        startPolling(main.assignInvoice);
+      } else {
+        main.setAssignInvoice('');
+      }
+    }
 
-    socket.onopen = () => {
-      console.log('Socket connected');
+    return () => {
+      clearInterval(interval);
     };
-
-    socket.onmessage = (event: MessageEvent) => {
-      onHandle(event);
-    };
-
-    socket.onclose = () => {
-      console.log('Socket disconnected');
-    };
-  }, []);
+  }, [main, startPolling]);
 
   return (
     <div onClick={(e: any) => e.stopPropagation()}>

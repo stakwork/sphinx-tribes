@@ -34,6 +34,7 @@ export interface FocusViewProps {
   style?: React.CSSProperties;
   setIsExtraStyle?: any;
   bounty?: PersonBounty[];
+  setRemoveNextAndPrev?: (boolean) => void;
 }
 
 export interface PeopleMobileeHeaderProps {
@@ -243,6 +244,8 @@ export interface WantedSummaryProps {
   owner_id?: string;
 }
 
+export type LocalPaymeentState = 'UNKNOWN' | 'PAID' | 'UNPAID';
+
 export interface CodingBountiesProps {
   deliverables?: string;
   description: any;
@@ -303,6 +306,8 @@ export interface CodingBountiesProps {
   bounty_expires?: string;
   org_uuid?: string;
   id?: number;
+  localPaid: LocalPaymeentState;
+  setLocalPaid: (state: LocalPaymeentState) => void;
 }
 
 export interface CodingViewProps extends WantedSummaryProps {
@@ -380,6 +385,7 @@ export interface AboutViewProps {
   owner_pubkey?: string;
   description?: string;
   canEdit?: boolean;
+  owner_route_hint?: string;
 }
 
 export interface BlogViewProps {

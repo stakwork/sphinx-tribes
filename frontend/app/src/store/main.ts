@@ -131,8 +131,13 @@ export interface PaymentHistory {
   amount: number;
   org_uuid: string;
   sender_name: string;
+  sender_pubkey: string;
   receiver_name: string;
+  receiver_pubkey: string;
   created: string;
+  updated: string;
+  payment_type: string;
+  status: boolean;
 }
 
 export interface BudgetHistory {
@@ -202,6 +207,33 @@ export interface Organization {
 export interface BountyRoles {
   name: string;
 }
+
+export interface InvoiceDetails {
+  success: boolean;
+  response: {
+    settled: boolean;
+    payment_request: string;
+    payment_hash: string;
+    preimage: string;
+    amount: number;
+  };
+}
+
+export interface InvoiceError {
+  success: boolean;
+  error: string;
+}
+
+export interface BudgetWithdrawSuccess {
+  success: boolean;
+  response: {
+    success: boolean;
+    response: {
+      payment_request: string;
+    };
+  };
+}
+
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -590,7 +622,7 @@ export class MainStore {
   async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
     const smallQueryLimit = 4;
     const query = this.appendQueryParams('people/search', smallQueryLimit, {
-      search: alias,
+      search: alias.toLowerCase(),
       sortBy: 'owner_alias'
     });
     const ps = await api.get(query);
@@ -1085,7 +1117,6 @@ export class MainStore {
     return p;
   }
 
-  @memo()
   async getPersonById(id: number): Promise<Person> {
     const p = await api.get(`person/id/${id}`);
     this.setActivePerson(p);
@@ -1534,11 +1565,27 @@ export class MainStore {
     }
   }
 
+  @persist('object')
   @observable
-  lnInvoice = '';
+  keysendInvoice = '';
 
-  @action setLnInvoice(invoice: string) {
-    this.lnInvoice = invoice;
+  @action setKeysendInvoice(invoice: string) {
+    this.keysendInvoice = invoice;
+  }
+
+  @persist('object')
+  @observable
+  assignInvoice = '';
+
+  @action setAssignInvoice(invoice: string) {
+    this.assignInvoice = invoice;
+  }
+
+  @observable
+  budgetInvoice = '';
+
+  @action setBudgetInvoice(invoice: string) {
+    this.budgetInvoice = invoice;
   }
 
   async getLnInvoice(body: {
@@ -1573,9 +1620,6 @@ export class MainStore {
           'Content-Type': 'application/json'
         }
       );
-      if (data.success) {
-        this.setLnInvoice(data.response.invoice);
-      }
       return data;
     } catch (e) {
       console.log('Error getLnInvoice', e);
@@ -1587,7 +1631,6 @@ export class MainStore {
     amount: number;
     org_uuid: string;
     sender_pubkey: string;
-    websocket_token: string;
     payment_type: string;
   }): Promise<LnInvoice> {
     try {
@@ -1597,16 +1640,12 @@ export class MainStore {
           amount: body.amount,
           org_uuid: body.org_uuid,
           sender_pubkey: body.sender_pubkey,
-          websocket_token: body.websocket_token,
           payment_type: body.payment_type
         },
         {
           'Content-Type': 'application/json'
         }
       );
-      if (data.success) {
-        this.setLnInvoice(data.response.invoice);
-      }
       return data;
     } catch (e) {
       return { success: false, response: { invoice: '' } };
@@ -1646,15 +1685,22 @@ export class MainStore {
     this.organizations = organizations;
   }
 
+  @observable
+  dropDownOrganizations: Organization[] = [];
+
+  @action setDropDownOrganizations(organizations: Organization[]) {
+    this.dropDownOrganizations = organizations;
+  }
+
   @action async getUserOrganizations(id: number): Promise<Organization[]> {
     try {
-      if (!uiStore.meInfo) return [];
-      const info = uiStore.meInfo;
+      const info = uiStore;
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return [];
+
       const r: any = await fetch(`${TribesURL}/organizations/user/${id}`, {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'x-jwt': info.tribe_jwt,
           'Content-Type': 'application/json'
         }
       });
@@ -1669,6 +1715,29 @@ export class MainStore {
   }
 
   @action async addOrganization(body: { name: string; img: string }): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return null;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          ...body
+        }),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.log('Error addOrganization', e);
+      return false;
+    }
+  }
+
+  async updateOrganization(body: Organization): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
@@ -1906,18 +1975,21 @@ export class MainStore {
     }
   }
 
-  async getPaymentHistories(uuid: string): Promise<PaymentHistory[]> {
+  async getPaymentHistories(uuid: string, page: number, limit: number): Promise<PaymentHistory[]> {
     try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/payments/${uuid}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'x-jwt': info.tribe_jwt,
-          'Content-Type': 'application/json'
+      const r: any = await fetch(
+        `${TribesURL}/organizations/payments/${uuid}?page=${page}&limit=${limit}`,
+        {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'x-jwt': info.tribe_jwt,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
       return r.json();
     } catch (e) {
@@ -1943,6 +2015,114 @@ export class MainStore {
     } catch (e) {
       console.log('Error gettHistories', e);
       return [];
+    }
+  }
+
+  async getInvoiceDetails(payment_request: string): Promise<InvoiceDetails | InvoiceError> {
+    try {
+      const r: any = await fetch(`${TribesURL}/gobounties/invoice/${payment_request}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error getInvoiceDetails', e);
+      return {
+        success: false,
+        error: 'Could not get invoice data'
+      };
+    }
+  }
+
+  async withdrawBountyBudget(body: {
+    websocket_token?: string;
+    payment_request: string;
+    org_uuid: string;
+  }): Promise<BudgetWithdrawSuccess | InvoiceError> {
+    try {
+      if (!uiStore.meInfo)
+        return {
+          success: false,
+          error: 'Cannot make request'
+        };
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/gobounties/budget/withdraw`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error withdrawBountyBudget', e);
+      return {
+        success: false,
+        error: 'Error occured while withdrawing budget'
+      };
+    }
+  }
+
+  async pollInvoice(payment_request: string): Promise<InvoiceDetails | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/poll/invoice/${payment_request}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error pollInvoice', e);
+    }
+  }
+
+  async pollOrgBudgetInvoices(org_uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const r: any = await fetch(`${TribesURL}/organizations/poll/invoices/${org_uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+      return r;
+    } catch (e) {
+      console.error('Error pollInvoice', e);
+    }
+  }
+
+  async organizationInvoiceCount(org_uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return 0;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/invoices/count/${org_uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.error('Error pollInvoice', e);
     }
   }
 }

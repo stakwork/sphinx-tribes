@@ -2,6 +2,7 @@
 import { EuiCheckboxGroup, EuiLoadingSpinner, EuiPopover, EuiText } from '@elastic/eui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useStores } from 'store';
 import styled from 'styled-components';
 import { colors } from '../../../../config/colors';
 import {
@@ -24,7 +25,6 @@ interface labelProps {
 const SearchOuterContainer = styled.div<styledProps>`
   min-height: 256x;
   max-height: 256x;
-  min-width: 292px;
   max-width: 292px;
   background: ${(p: any) => p?.color && p?.color?.pureWhite};
   display: flex;
@@ -112,7 +112,7 @@ const SearchOuterContainer = styled.div<styledProps>`
   }
 
   .OuterContainer {
-    width: 412px;
+    width: auto;
     background: ${(p: any) => p?.color && p.color.grayish.G950};
     box-shadow: inset 0px 2px 8px ${(p: any) => p?.color && p.color.black100};
     .PeopleList {
@@ -291,6 +291,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
+  const { main, ui } = useStores();
 
   const { ref, inView } = useInView({
     triggerOnce: false,
@@ -306,18 +307,24 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   }, [inView, initialPeopleCount]);
 
   useEffect(() => {
-    setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
-    setPeopleData(
-      (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
-        ? props?.peopleList
-        : props?.peopleList?.filter(
-            ({ extras }: any) =>
-              extras?.coding_languages?.some(
-                ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-              )
-          )
-      )?.filter((x: any) => x?.owner_alias.toLowerCase()?.includes(searchValue.toLowerCase()))
-    );
+    async function updatePeopleData() {
+      setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+      let peopleList = props?.peopleList;
+      if (searchValue) {
+        peopleList = await main.getPeopleByNameAliasPubkey(searchValue);
+      }
+      setPeopleData(
+        Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
+          ? peopleList
+          : peopleList?.filter(
+              ({ extras }: any) =>
+                extras?.coding_languages?.some(
+                  ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+                )
+            )
+      );
+    }
+    updatePeopleData();
   }, [checkboxIdToSelectedMap, searchValue]);
 
   useEffect(() => {
@@ -449,7 +456,6 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
           </EuiPopOverCheckbox>
         </EuiPopover>
       </div>
-
       <LabelsContainer
         style={{
           padding: !isPopoverOpen && labels.length > 0 ? '16px 0px 24px 0px' : ''
