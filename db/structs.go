@@ -532,6 +532,8 @@ type PaymentHistoryData struct {
 	PaymentHistory
 	SenderName   string `json:"sender_name"`
 	ReceiverName string `json:"receiver_name"`
+	SenderImg    string `json:"sender_img"`
+	ReceiverImg  string `json:"receiver_img"`
 }
 
 type PaymentData struct {

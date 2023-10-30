@@ -132,8 +132,10 @@ export interface PaymentHistory {
   org_uuid: string;
   sender_name: string;
   sender_pubkey: string;
+  sender_img: string;
   receiver_name: string;
   receiver_pubkey: string;
+  receiver_img: string;
   created: string;
   updated: string;
   payment_type: string;
@@ -1991,7 +1993,8 @@ export class MainStore {
         }
       );
 
-      return r.json();
+      const data = await r.json();
+      return data;
     } catch (e) {
       console.log('Error getPaymentHistories', e);
       return [];
