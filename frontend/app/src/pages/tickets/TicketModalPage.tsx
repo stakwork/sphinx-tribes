@@ -30,6 +30,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
+  const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
   const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
 
   const isMobile = useIsMobile();
@@ -130,10 +131,11 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
         right: '-50px',
         borderRadius: '50%'
       }}
-      prevArrowNew={prevArrHandler}
-      nextArrowNew={nextArrHandler}
+      prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
+      nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
     >
       <FocusedView
+        setRemoveNextAndPrev={setRemoveNextAndPrev}
         person={connectPersonBody}
         personBody={connectPersonBody}
         canEdit={false}
