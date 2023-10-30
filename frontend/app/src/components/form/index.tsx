@@ -218,8 +218,7 @@ function Form(props: FormProps) {
 
         // returns the body of a form page
         // assuming two collumn layout
-        const GetFormFields = (schemaData: any, style: any = {}) => {
-          return (
+        const GetFormFields = (schemaData: any, style: any = {}) => (
             <>
               <div className="LeftSchema" style={style}>
                 {schema
@@ -326,7 +325,6 @@ function Form(props: FormProps) {
               )}
             </>
           );
-        };
 
         return (
           <Wrap

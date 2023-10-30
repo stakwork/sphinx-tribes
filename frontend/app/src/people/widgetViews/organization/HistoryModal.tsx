@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
 import moment from 'moment';
@@ -173,7 +173,10 @@ const color = colors['light'];
 
 const HistoryModal = (props: PaymentHistoryModalProps) => {
   const isMobile = useIsMobile();
-  const { isOpen, close, url, paymentsHistory } = props;
+  const { isOpen, close, url } = props;
+  const [filter, setFilter] = useState({ payment: true, deposit: true, withdraw: true });
+  const [paymentsHistory, setPaymentHistory] = useState(props.paymentsHistory);
+  const [currentPaymentsHistory, setCurrentPaymentHistory] = useState(props.paymentsHistory);
 
   const { ui } = useStores();
 
@@ -187,13 +190,30 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
     });
   };
 
-  console.log(paymentsHistory);
-  const newPaymentHistory = paymentsHistory.map((history: PaymentHistory) => {
-    if (!history.payment_type) {
-      history.payment_type = 'payment';
-    }
-    return history;
-  });
+  const handleFilter = (txn: OrgTransactionType) => {
+    setFilter((value: any) => ({ ...value, [`${txn}`]: !value[txn] }));
+  };
+
+  useEffect(() => {
+    const payments = paymentsHistory.map((history: PaymentHistory) => {
+      if (!history.payment_type) {
+        history.payment_type = 'payment';
+      }
+      return history;
+    });
+    setPaymentHistory(payments);
+    setCurrentPaymentHistory(payments);
+  }, []);
+
+  useEffect(() => {
+    setCurrentPaymentHistory(
+      paymentsHistory.filter((history: PaymentHistory) => {
+        if (filter[history.payment_type]) {
+          return history;
+        }
+      })
+    );
+  }, [filter, paymentsHistory]);
 
   return (
     <Modal
@@ -225,13 +245,30 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
           <ModalTitle>Payment History</ModalTitle>
           <PaymentFilterWrapper>
             <PaymentType>
-              <input id="payment" type={'checkbox'} /> <Label htmlFor="payment">Payments</Label>
+              <input
+                id="payment"
+                type={'checkbox'}
+                checked={filter.payment}
+                onChange={() => handleFilter('payment')}
+              />{' '}
+              <Label htmlFor="payment">Payments</Label>
             </PaymentType>
             <PaymentType>
-              <input id="deposit" type={'checkbox'} /> <Label htmlFor="deposit">Deposit</Label>
+              <input
+                id="deposit"
+                type={'checkbox'}
+                checked={filter.deposit}
+                onChange={() => handleFilter('deposit')}
+              />{' '}
+              <Label htmlFor="deposit">Deposit</Label>
             </PaymentType>
             <PaymentType>
-              <input id="withdraw" type={'checkbox'} />{' '}
+              <input
+                id="withdraw"
+                type={'checkbox'}
+                checked={filter.withdraw}
+                onChange={() => handleFilter('withdraw')}
+              />{' '}
               <Label htmlFor="withdraw">Withdrawals</Label>
             </PaymentType>
           </PaymentFilterWrapper>
@@ -249,7 +286,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
             </THeadRow>
           </thead>
           <tbody>
-            {newPaymentHistory.map((pay: PaymentHistory, i: number) => (
+            {currentPaymentsHistory.map((pay: PaymentHistory, i: number) => (
               <TR type={pay.payment_type || 'payment'} key={i}>
                 <TdLeft type={pay.payment_type}>{pay.payment_type || 'Payment'}</TdLeft>
                 <TD>{moment(pay.created).format('DD/MM/YY')}</TD>

@@ -50,8 +50,7 @@ const Pubkey = styled.p`
   letter-spacing: 0.01375rem;
   margin-bottom: 0;
 `;
-const UserInfo = (props: PaymentHistoryUserInfo) => {
-  return (
+const UserInfo = (props: PaymentHistoryUserInfo) => (
     <UserInfoWrapper>
       <Wrapper>
         <Image src={props.image} />
@@ -62,6 +61,5 @@ const UserInfo = (props: PaymentHistoryUserInfo) => {
       </DetailWrapper>
     </UserInfoWrapper>
   );
-};
 
 export default UserInfo;
