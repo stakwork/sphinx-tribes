@@ -582,14 +582,16 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now()
-	var budgetHistoryData = db.BudgetHistory{
-		Amount:       invoice.Amount,
-		OrgUuid:      invoice.OrgUuid,
-		PaymentType:  invoice.PaymentType,
-		SenderPubKey: invoice.SenderPubKey,
-		Created:      &now,
-		Updated:      &now,
-		Status:       false,
+	var paymentHistory = db.PaymentHistory{
+		Amount:         invoice.Amount,
+		OrgUuid:        invoice.OrgUuid,
+		PaymentType:    invoice.PaymentType,
+		SenderPubKey:   invoice.SenderPubKey,
+		ReceiverPubKey: "",
+		Created:        &now,
+		Updated:        &now,
+		Status:         false,
+		BountyId:       0,
 	}
 
 	newInvoice := db.InvoiceList{
@@ -602,7 +604,7 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 		Status:         false,
 	}
 
-	db.DB.AddBudgetHistory(budgetHistoryData)
+	db.DB.AddPaymentHistory(paymentHistory)
 	db.DB.AddInvoice(newInvoice)
 
 	w.WriteHeader(http.StatusOK)
