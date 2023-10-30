@@ -49,7 +49,7 @@ import {
 } from './organization/style';
 
 let interval;
-  
+
 const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
