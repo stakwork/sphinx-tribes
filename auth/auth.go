@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	btcec "github.com/btcsuite/btcd/btcec/v2"
 	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/form3tech-oss/jwt-go"
@@ -200,4 +201,22 @@ func ParseTokenString(t string) (uint32, []byte, []byte, error) {
 		timeBuf := tBytes[:4]
 		return ts, timeBuf, sig, nil
 	}
+}
+
+func Sign(msg []byte, privKey *btcec.PrivateKey) ([]byte, error) {
+	if msg == nil {
+		//w.WriteHeader(http.StatusBadRequest)
+		return nil, errors.New("no msg")
+	}
+
+	msg = append(signedMsgPrefix, msg...)
+	digest := chainhash.DoubleHashB(msg)
+	// btcec.S256(), sig, digest
+
+	sigBytes, err := btcecdsa.SignCompact(privKey, digest, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return sigBytes, nil
 }
