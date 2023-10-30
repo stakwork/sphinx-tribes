@@ -2,6 +2,7 @@ import { EuiText } from '@elastic/eui';
 import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import api from '../../api';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/BountyCreationConstant';
@@ -47,6 +48,8 @@ function Form(props: FormProps) {
   const { main, ui } = useStores();
   const color = colors['light'];
   const [isFocused, setIsFocused] = useState({});
+  const history = useHistory();
+  const routeMatch = useRouteMatch();
 
   const [schemaData, setSchemaData] = useState(BountyDetailsCreationData.step_1);
   const [stepTracker, setStepTracker] = useState<number>(1);
@@ -674,6 +677,12 @@ function Form(props: FormProps) {
                           setFieldValue('type', dynamicSchemaName);
                         }
                         handleSubmit();
+                        const routePaths = routeMatch.path.split('/');
+                        if (routePaths.includes('bounty') && routePaths.includes(':bountyId')) {
+                          history.push('/bounties');
+                        } else {
+                          history.goBack();
+                        }
                       }}
                       loading={props.loading}
                       style={{ ...buttonStyle, width: '140px' }}
