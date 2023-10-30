@@ -416,7 +416,7 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
-	if err == nil {
+	if err == nil && amount > 0 {
 		// check if the orgnization bounty balance
 		// is greater than the amount
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
