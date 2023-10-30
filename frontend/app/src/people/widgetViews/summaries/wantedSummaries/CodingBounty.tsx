@@ -120,15 +120,13 @@ function MobileView(props: CodingBountiesProps) {
     : Date.now() > new Date(bounty_expires || '').getTime();
   const bountyTimeLeft = calculateTimeLeft(new Date(bounty_expires ?? ''), 'days');
 
-  const addToast = () => {
-    return setToasts([
+  const addToast = () => setToasts([
       {
         id: '1',
         title: 'Invoice has been paid',
         color: 'success'
       }
     ]);
-  };
 
   const removeToast = () => {
     setToasts([]);

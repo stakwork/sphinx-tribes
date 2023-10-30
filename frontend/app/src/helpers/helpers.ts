@@ -144,6 +144,7 @@ export const formatRelayPerson = (person: any): any => ({
 });
 
 export type Roles =
+  | 'EDIT ORGANIZATION'
   | 'ADD BOUNTY'
   | 'UPDATE BOUNTY'
   | 'DELETE BOUNTY'

@@ -5,7 +5,7 @@ import { Button } from 'components/common';
 import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { isInvoiceExpired, satToUsd, userHasRole } from 'helpers';
+import { isInvoiceExpired, satToUsd, userHasRole, Roles } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -74,6 +74,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
+  const editOrgDisabled = 
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
   const addUserDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
   const viewReportDisabled =
@@ -228,26 +230,26 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setIsLoading(false);
   };
 
-  const roleChange = (e: any) => {
+  const roleChange = (e: Roles, s: any) => {
     const rolesData = bountyRolesData.map((role: any) => {
-      if (role.name === e.target.value) {
-        role.status = !role.status;
+      if (role.name === e) {
+        role.status = s.target.checked;
       }
       return role;
     });
-
     setBountyRolesData(rolesData);
   };
 
   const submitRoles = async () => {
+    console.log(bountyRolesData);
     const roleData = bountyRolesData
-      .filter((r: any) => r.status)
-      .map((role: any) => ({
-        owner_pubkey: user?.owner_pubkey,
-        org_uuid: uuid,
-        role: role.name
-      }));
-
+    .filter((r: any) => r.status)
+    .map((role: any) => ({
+      owner_pubkey: user?.owner_pubkey,
+      org_uuid: uuid,
+      role: role.name
+    }));
+    
     if (uuid && user?.owner_pubkey) {
       const res = await main.addUserRoles(roleData, uuid, user.owner_pubkey);
       if (res.status === 200) {
@@ -364,7 +366,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <OrgName>{org?.name}</OrgName>
         </HeadNameWrap>
         <HeadButtonWrap forSmallScreen={false}>
-          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+          <HeadButton text="Edit" disabled={editOrgDisabled} color="white" style={{ borderRadius: '5px' }} />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"

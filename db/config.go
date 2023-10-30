@@ -74,6 +74,7 @@ func InitDB() {
 }
 
 const (
+	EditOrg		   = "EDIT ORGANIZATION"
 	AddBounty      = "ADD BOUNTY"
 	UpdateBounty   = "UPDATE BOUNTY"
 	DeleteBounty   = "DELETE BOUNTY"
