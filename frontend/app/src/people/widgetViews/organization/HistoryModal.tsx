@@ -24,6 +24,7 @@ const ModalHeaderWrapper = styled.div`
   align-items: center;
   margin-top: 2.3rem;
   padding: 0rem 2.9rem;
+  gap: 10.25rem;
 `;
 
 const ModalTitle = styled.h2`
@@ -35,6 +36,30 @@ const ModalTitle = styled.h2`
   font-style: normal;
   font-weight: 800;
   line-height: 1.875rem;
+`;
+
+const PaymentFilterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+`;
+
+const PaymentType = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+`;
+
+const Label = styled.label`
+  margin-bottom: 0;
+  color: #1e1f25;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Barlow;
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 2rem;
 `;
 
 const Table = styled.table`
@@ -193,6 +218,18 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
       <HistoryWrapper>
         <ModalHeaderWrapper>
           <ModalTitle>Payment history</ModalTitle>
+          <PaymentFilterWrapper>
+            <PaymentType>
+              <input id="payment" type={'checkbox'} /> <Label htmlFor="payment">Payments</Label>
+            </PaymentType>
+            <PaymentType>
+              <input id="deposit" type={'checkbox'} /> <Label htmlFor="deposit">Deposit</Label>
+            </PaymentType>
+            <PaymentType>
+              <input id="withdraw" type={'checkbox'} />{' '}
+              <Label htmlFor="withdraw">Withdrawals</Label>
+            </PaymentType>
+          </PaymentFilterWrapper>
         </ModalHeaderWrapper>
         <Table>
           <thead>
