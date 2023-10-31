@@ -18,7 +18,11 @@ import {
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
-import { extractRepoAndIssueFromIssueUrl, toCapitalize } from '../../helpers';
+import {
+  convertLocaleToNumber,
+  extractRepoAndIssueFromIssueUrl,
+  toCapitalize
+} from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own
 const BWrap = styled.div`
@@ -209,6 +213,11 @@ function FocusedView(props: FocusViewProps) {
     // if github repo
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
+      // convert the amount from string to number
+      if (newBody.price) {
+        newBody.price = convertLocaleToNumber(newBody.price).toString();
+      }
+
       if (
         newBody.ticket_url &&
         (newBody.type === 'wanted_coding_task' ||
