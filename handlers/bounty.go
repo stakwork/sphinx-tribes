@@ -285,6 +285,13 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if the bounty has been paid already to avoid double payment
+
+	if bounty.Paid {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode("Bounty has already been paid")
+	}
+
 	// check if user is the admin of the organization
 	// or has a pay bounty role
 	hasRole := db.UserHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
@@ -350,7 +357,11 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 			OrgUuid:        bounty.OrgUuid,
 			BountyId:       id,
 			Created:        &now,
+			Updated:        &now,
+			Status:         true,
+			PaymentType:    "payment",
 		}
+
 		db.DB.AddPaymentHistory(paymentHistory)
 		bounty.Paid = true
 		db.DB.UpdateBounty(bounty)
@@ -405,7 +416,7 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
-	if err == nil {
+	if err == nil && amount > 0 {
 		// check if the orgnization bounty balance
 		// is greater than the amount
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
