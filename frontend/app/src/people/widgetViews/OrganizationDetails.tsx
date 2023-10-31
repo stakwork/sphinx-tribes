@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
-import { EuiGlobalToastList, useColorPickerState } from '@elastic/eui';
-import { SOCKET_MSG, createSocketInstance } from 'config/socket';
+import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from 'components/common';
 import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
@@ -60,7 +59,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenWithdrawBudget, setIsOpenWithdrawBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
-  const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
   const [isOpenEditOrg, setIsOpenEditOrg] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
@@ -223,6 +221,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     if (uuid) {
       const res = await main.editOrganization(uuid, body);
       if (res.status === 200) {
+        console.log("trying to submit");
       } else {
         addToast('Error: could not update organization', 'danger');
       }
