@@ -131,8 +131,15 @@ export interface PaymentHistory {
   amount: number;
   org_uuid: string;
   sender_name: string;
+  sender_pubkey: string;
+  sender_img: string;
   receiver_name: string;
+  receiver_pubkey: string;
+  receiver_img: string;
   created: string;
+  updated: string;
+  payment_type: string;
+  status: boolean;
 }
 
 export interface BudgetHistory {
@@ -617,7 +624,7 @@ export class MainStore {
   async getPeopleByNameAliasPubkey(alias: string): Promise<Person[]> {
     const smallQueryLimit = 4;
     const query = this.appendQueryParams('people/search', smallQueryLimit, {
-      search: alias,
+      search: alias.toLowerCase(),
       sortBy: 'owner_alias'
     });
     const ps = await api.get(query);
@@ -1970,20 +1977,25 @@ export class MainStore {
     }
   }
 
-  async getPaymentHistories(uuid: string): Promise<PaymentHistory[]> {
+  async getPaymentHistories(uuid: string, page: number, limit: number): Promise<PaymentHistory[]> {
     try {
       if (!uiStore.meInfo) return [];
       const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/payments/${uuid}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'x-jwt': info.tribe_jwt,
-          'Content-Type': 'application/json'
+      const r: any = await fetch(
+        `${TribesURL}/organizations/payments/${uuid}?page=${page}&limit=${limit}`,
+        {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'x-jwt': info.tribe_jwt,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
-      return r.json();
+      const data = await r.json();
+      console.log('Data ===', data);
+      return data;
     } catch (e) {
       console.log('Error getPaymentHistories', e);
       return [];

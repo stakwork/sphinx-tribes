@@ -20,6 +20,7 @@ import InvitePeopleSearch from './widgets/PeopleSearch';
 import LoomVideoInputNew from './LoomVideoInputNew';
 import TextInputNew from './TextInputNew2';
 import NumberInputNew from './NumberInputNew';
+import NumberSatsInput from './NumberSatsInput';
 import TextAreaInputNew from './TextAreaInputNew';
 import CreatableMultiSelectInputNew from './CreatableMultiSelectInputNew';
 
@@ -168,6 +169,8 @@ export default function Input(props: any) {
         return <GalleryInput {...props} />;
       case 'number':
         return props?.newDesign ? <NumberInputNew {...props} /> : <NumberInput {...props} />;
+      case 'numbersats':
+        return <NumberSatsInput {...props} />;
       case 'loom':
         return props?.newDesign ? <LoomVideoInputNew {...props} /> : <LoomVideoInput {...props} />;
       case 'switch':

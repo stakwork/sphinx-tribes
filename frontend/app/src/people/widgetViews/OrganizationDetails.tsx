@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from 'components/common';
-import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
+import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
 import { satToUsd, userHasRole } from 'helpers';
@@ -12,7 +12,6 @@ import avatarIcon from '../../public/static/profile_avatar.svg';
 import DeleteTicketModal from './DeleteModal';
 import RolesModal from './organization/RolesModal';
 import HistoryModal from './organization/HistoryModal';
-import BudgetHistoryModal from './organization/BudgetHistoryModal';
 import AddUserModal from './organization/AddUserModal';
 import AddBudgetModal from './organization/AddBudgetModal';
 import WithdrawBudgetModal from './organization/WithdrawBudgetModal';
@@ -59,11 +58,9 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenWithdrawBudget, setIsOpenWithdrawBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
-  const [isOpenBudgetHistory, setIsOpenBudgetHistory] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
-  const [budgetsHistory, setBudgetsHistory] = useState<BudgetHistory[]>([]);
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
@@ -168,13 +165,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   }, [main, uuid]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid);
+    const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
     setPaymentsHistory(paymentHistories);
-  }, [main, uuid]);
-
-  const getBudgetHistory = useCallback(async () => {
-    const budgetHistories = await main.getBudgettHistories(uuid);
-    setBudgetsHistory(budgetHistories);
   }, [main, uuid]);
 
   const handleSettingsClick = async (user: any) => {
@@ -202,10 +194,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const closeHistoryHandler = () => {
     setIsOpenHistory(false);
-  };
-
-  const closeBudgetHistoryHandler = () => {
-    setIsOpenBudgetHistory(false);
   };
 
   const closeWithdrawBudgetHandler = () => {
@@ -260,14 +248,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const successAction = () => {
     addToast('Budget was added successfully', 'success');
+    closeBudgetHandler();
+
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
     // get new organization budget
     getOrganizationBudget();
-    getBudgetHistory();
-    main.getUserOrganizations(ui.selectedPerson);
-    closeBudgetHandler();
+    getPaymentsHistory();
   };
 
   const pollInvoices = useCallback(async () => {
@@ -276,7 +264,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       try {
         await main.pollOrgBudgetInvoices(uuid);
         getOrganizationBudget();
-        getBudgetHistory();
+        getPaymentsHistory();
 
         const count = await main.organizationInvoiceCount(uuid);
         if (count === 0) {
@@ -308,8 +296,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         const invoiceData = await main.pollInvoice(paymentRequest);
         if (invoiceData) {
           if (invoiceData.success && invoiceData.response.settled) {
-            clearInterval(interval);
             successAction();
+            clearInterval(interval);
           }
         }
 
@@ -328,14 +316,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
-    getBudgetHistory();
-  }, [
-    getOrganizationUsers,
-    getBountyRoles,
-    getOrganizationBudget,
-    getPaymentsHistory,
-    getBudgetHistory
-  ]);
+  }, [getOrganizationUsers, getBountyRoles, getOrganizationBudget, getPaymentsHistory]);
 
   return (
     <Container>
@@ -519,13 +500,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             paymentsHistory={paymentsHistory}
             close={closeHistoryHandler}
             isOpen={isOpenHistory}
-          />
-        )}
-        {isOpenBudgetHistory && (
-          <BudgetHistoryModal
-            close={closeBudgetHistoryHandler}
-            isOpen={isOpenBudgetHistory}
-            budgetsHistory={budgetsHistory}
           />
         )}
         {isOpenWithdrawBudget && (
