@@ -15,6 +15,8 @@ import UserInfo from './UserInfo';
 
 const HistoryWrapper = styled.div`
   width: 61.125rem;
+  height: 100%;
+  overflow: hidden;
 `;
 
 const ModalHeaderWrapper = styled.div`
@@ -23,6 +25,14 @@ const ModalHeaderWrapper = styled.div`
   margin-top: 2.3rem;
   padding: 0rem 2.9rem;
   gap: 10.25rem;
+
+  @media only screen and (max-width: 500px) {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    padding: 0rem 0.2rem;
+    margin-top: 1rem;
+  }
 `;
 
 const ModalTitle = styled.h2`
@@ -34,12 +44,24 @@ const ModalTitle = styled.h2`
   font-style: normal;
   font-weight: 800;
   line-height: 1.875rem;
+
+  @media only screen and (max-width: 500px) {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1rem;
+  }
 `;
 
 const PaymentFilterWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 3rem;
+  gap: 1.5rem;
+
+  @media only screen and (max-width: 500px) {
+    gap: 1rem;
+    flex-direction: row;
+    align-items: start;
+  }
 `;
 
 const PaymentType = styled.div`
@@ -54,17 +76,28 @@ const Label = styled.label`
   leading-trim: both;
   text-edge: cap;
   font-family: Barlow;
-  font-size: 0.8125rem;
+  font-size: 1rem;
   font-style: normal;
   font-weight: 500;
   line-height: 2rem;
 `;
 
+const TableWrapper = styled.div`
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 20rem;
+  margin-top: 1rem;
+`;
+
 const Table = styled.table`
   margin-top: 2rem;
   border-collapse: collapse;
-  margin-bottom: 3rem;
-  overflow-x: auto;
+  margin-bottom: 6rem;
+
+  @media only screen and (max-width: 500px) {
+    margin-top: 1rem;
+  }
 `;
 
 const THeadRow = styled.tr`
@@ -72,6 +105,10 @@ const THeadRow = styled.tr`
   background: #fff;
   box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
   padding: 1rem 2.9rem;
+
+  @media only screen and (max-width: 500px) {
+    padding: 0.3rem 0.5rem;
+  }
 `;
 
 const TH = styled.th`
@@ -91,10 +128,16 @@ const TH = styled.th`
 
 const ThLeft = styled(TH)`
   padding-left: 2.9rem;
+  @media only screen and (max-width: 500px) {
+    padding-left: 1.2rem;
+  }
 `;
 
 const ThRight = styled(TH)`
   padding-right: 2.9rem;
+  @media only screen and (max-width: 500px) {
+    padding-right: 1.2rem;
+  }
 `;
 
 const TR = styled.tr<{ type: OrgTransactionType }>`
@@ -122,6 +165,10 @@ const TD = styled.td`
   line-height: 1rem;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
+  @media only screen and (max-width: 500px) {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
 `;
 
 const AmountSpan = styled.span`
@@ -137,6 +184,9 @@ const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
   line-height: 1rem;
   padding-left: 2.9rem;
   text-transform: capitalize;
+  @media only screen and (max-width: 500px) {
+    padding-left: 1.2rem;
+  }
 `;
 
 const ArrowImage = styled.img`
@@ -221,7 +271,10 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
       style={{
         height: '100%',
         flexDirection: 'column',
-        width: '100%'
+        width: '100%',
+        alignItems: `${isMobile ? '' : 'center'}`,
+        justifyContent: `${isMobile ? '' : 'center'}`,
+        overflowY: 'hidden'
       }}
       envStyle={{
         marginTop: isMobile ? 64 : 0,
@@ -273,55 +326,59 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
             </PaymentType>
           </PaymentFilterWrapper>
         </ModalHeaderWrapper>
-        <Table>
-          <thead>
-            <THeadRow>
-              <ThLeft>Type</ThLeft>
-              <TH>Date</TH>
-              <TH>Amount</TH>
-              <TH>Sender</TH>
-              <TH />
-              <TH>Receiver</TH>
-              <ThRight>Bounty</ThRight>
-            </THeadRow>
-          </thead>
-          <tbody>
-            {currentPaymentsHistory.map((pay: PaymentHistory, i: number) => (
-              <TR type={pay.payment_type || 'payment'} key={i}>
-                <TdLeft type={pay.payment_type}>{pay.payment_type || 'Payment'}</TdLeft>
-                <TD>{moment(pay.created).format('DD/MM/YY')}</TD>
-                <TD>
-                  <AmountSpan>{pay.amount}</AmountSpan> sats
-                </TD>
-                <TD>
-                  <UserInfo
-                    image={pay.sender_img}
-                    pubkey={pay.sender_pubkey}
-                    name={pay.sender_name}
-                  />
-                </TD>
-                <TD>{pay.payment_type === 'payment' ? <ArrowImage src={ArrowRight} /> : null}</TD>
-                <TD>
-                  {pay.payment_type === 'payment' ? (
+        <TableWrapper>
+          <Table>
+            <thead>
+              <THeadRow>
+                <ThLeft>Type</ThLeft>
+                <TH>Date</TH>
+                <TH>Amount</TH>
+                <TH>Sender</TH>
+                <TH />
+                <TH>Receiver</TH>
+                <ThRight>Bounty</ThRight>
+              </THeadRow>
+            </thead>
+            <tbody>
+              {currentPaymentsHistory.map((pay: PaymentHistory, i: number) => (
+                <TR type={pay.payment_type || 'payment'} key={i}>
+                  <TdLeft type={pay.payment_type}>{pay.payment_type || 'Payment'}</TdLeft>
+                  <TD>{moment(pay.created).format('DD/MM/YY')}</TD>
+                  <TD>
+                    <AmountSpan>{pay.amount}</AmountSpan> sats
+                  </TD>
+                  <TD>
                     <UserInfo
-                      image={pay.receiver_img}
-                      pubkey={pay.receiver_pubkey}
-                      name={pay.receiver_name}
+                      image={pay.sender_img}
+                      pubkey={pay.sender_pubkey}
+                      name={pay.sender_name}
                     />
-                  ) : null}
-                </TD>
-                <TD>
-                  {pay.payment_type === 'payment' ? (
-                    <ViewBountyContainer>
-                      <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>View bounty</ViewBounty>
-                      <LinkImage src={LinkIcon} />
-                    </ViewBountyContainer>
-                  ) : null}
-                </TD>
-              </TR>
-            ))}
-          </tbody>
-        </Table>
+                  </TD>
+                  <TD>{pay.payment_type === 'payment' ? <ArrowImage src={ArrowRight} /> : null}</TD>
+                  <TD>
+                    {pay.payment_type === 'payment' ? (
+                      <UserInfo
+                        image={pay.receiver_img}
+                        pubkey={pay.receiver_pubkey}
+                        name={pay.receiver_name}
+                      />
+                    ) : null}
+                  </TD>
+                  <TD>
+                    {pay.payment_type === 'payment' ? (
+                      <ViewBountyContainer>
+                        <ViewBounty onClick={() => viewBounty(pay.bounty_id)}>
+                          View bounty
+                        </ViewBounty>
+                        <LinkImage src={LinkIcon} />
+                      </ViewBountyContainer>
+                    ) : null}
+                  </TD>
+                </TR>
+              ))}
+            </tbody>
+          </Table>
+        </TableWrapper>
       </HistoryWrapper>
     </Modal>
   );

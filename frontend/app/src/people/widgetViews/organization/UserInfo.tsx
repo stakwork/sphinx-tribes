@@ -51,15 +51,15 @@ const Pubkey = styled.p`
   margin-bottom: 0;
 `;
 const UserInfo = (props: PaymentHistoryUserInfo) => (
-    <UserInfoWrapper>
-      <Wrapper>
-        <Image src={props.image} />
-      </Wrapper>
-      <DetailWrapper>
-        <Name>{props.name}</Name>
-        <Pubkey>{props.pubkey.substring(0, 17)}...</Pubkey>
-      </DetailWrapper>
-    </UserInfoWrapper>
-  );
+  <UserInfoWrapper>
+    <Wrapper>
+      <Image src={props.image} />
+    </Wrapper>
+    <DetailWrapper>
+      <Name>{props.name}</Name>
+      <Pubkey>{props.pubkey.substring(0, 17)}...</Pubkey>
+    </DetailWrapper>
+  </UserInfoWrapper>
+);
 
 export default UserInfo;
