@@ -5,6 +5,7 @@ import moment from 'moment';
 import styled from 'styled-components';
 import { PaymentHistory, OrgTransactionType } from 'store/main';
 import { useStores } from 'store';
+import { formatSat } from 'people/utils/ExtraFunctions';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import history from '../../../config/history';
@@ -345,7 +346,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
                   <TdLeft type={pay.payment_type}>{pay.payment_type || 'Payment'}</TdLeft>
                   <TD>{moment(pay.created).format('DD/MM/YY')}</TD>
                   <TD>
-                    <AmountSpan>{pay.amount}</AmountSpan> sats
+                    <AmountSpan>{formatSat(pay.amount)}</AmountSpan> sats
                   </TD>
                   <TD>
                     <UserInfo
