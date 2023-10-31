@@ -1739,29 +1739,6 @@ export class MainStore {
     }
   }
 
-  @action async editOrganization(uuid: string, body: { name: string; img: string }): Promise<any> {
-    try {
-      if (!uiStore.meInfo) return null;
-      const info = uiStore.meInfo;
-      const r: any = await fetch(`${TribesURL}/organizations/${uuid}`, {
-        method: 'PUT',
-        mode: 'cors',
-        body: JSON.stringify({
-          ...body
-        }),
-        headers: {
-          'x-jwt': info.tribe_jwt,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      return r;
-    } catch (e) {
-      console.log('Error editOrganization', e);
-      return false;
-    }
-  }
-
   async updateOrganization(body: Organization): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;

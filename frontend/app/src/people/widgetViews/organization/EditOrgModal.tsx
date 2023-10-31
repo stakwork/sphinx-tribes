@@ -1,4 +1,5 @@
-import React, { useRef, useState, ChangeEvent } from 'react';
+import React, { useRef, useEffect, useState, ChangeEvent } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
 import styled from 'styled-components';
@@ -19,16 +20,59 @@ const EditOrgColumns = styled.div`
   flex-direction: row;
 `;
 
-const EditOrgWrap = styled(Wrap)`
-  width: 100%;
+const OrgImageOutline = styled.div`
+  width: 142px;
+  height: 142px; 
+  margin-top: 48px;
+  margin-bottom: 10px;
+  align-self: center;
+  cursor: pointer;
+  
+  border-style: dashed;
+  border-width: 2px;
+  border-color: #D0D5D8;
+  border-radius: 50%;
 `;
 
 const OrgImage = styled.img`
-  width: 150px;
-  height: 150px;
-  margin-top: 28px;
+  width: 126px;
+  height: 126px;
+  flex-shrink: 0;
   border-radius: 50%;
-  align-self: center;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-63px, -63px);
+`;
+
+const DragAndDrop = styled.input`
+  width: 126px;
+  height: 126px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-63px, -63px);
+`;
+
+const ResetOrgImage = styled.img`
+  width: 38.041px;
+  height: 38.041px;
+  flex-shrink: 0;
+
+  position: relative;
+  transform: translate(100px, -30px);
+
+  cursor: pointer;
+
+  :hover {
+    filter: brightness(.9);
+    transition: 0.2s;
+  }
+  :active {
+    filter: brightness(.7);
+  }
 `;
 
 const FormWrapper = styled.div`
@@ -37,8 +81,54 @@ const FormWrapper = styled.div`
 `;
 
 const EditOrgTitle = styled(ModalTitle)`
-  font-weight: 800;
+  color: var(--Text-2, var(--Hover-Icon-Color, #3C3F41));
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Barlow;
   font-size: 30px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 30px; /* 100% */
+`;
+
+const ImgImportText = styled.p`
+  margin-bottom: 5px;
+  color: var(--Main-bottom-icons, var(--Disabled-Icon-color, #5F6368));
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Roboto;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 17px; /* 130.769% */
+  letter-spacing: 0.13px;
+`;
+
+const FileTypeHint = styled.p`
+  margin-bottom: 5px;
+  color: var(--Placeholder-Text, var(--Disabled-Icon-color, #B0B7BC));
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Roboto;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 180% */
+`;
+
+const ImgBrowse = styled.a`
+  color: var(--Primary-blue, var(--Disabled-Icon-color, #618AFF));
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Roboto;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 17px;
+  letter-spacing: 0.13px;
+  cursor: pointer;
 `;
 
 const EditOrgModal = (props: EditOrgModalProps) => {
@@ -50,7 +140,8 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   const formRef = useRef(null);
   const initValues = {
     name: org?.name,
-    image: org?.img
+    image: org?.img,
+    show: org?.show
   };
 
   const [selectedImage, setSelectedImage] = useState<string>(org?.img || '');
@@ -68,11 +159,28 @@ const EditOrgModal = (props: EditOrgModalProps) => {
     }
   };
 
+  const [files, setFiles] = useState<({ preview: string; })[]>([]);
+  const {getRootProps, getInputProps} = useDropzone({
+    accept: 'image/*',
+    onDrop: (acceptedFiles: any) => {
+      setFiles(acceptedFiles.map((file: any) => Object.assign(file, {
+        preview: URL.createObjectURL(file)
+      })));
+      setSelectedImage(files[0].preview);
+    }
+  });
+
   const openFileDialog = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
+
+  const resetImg = (e: any) => {
+      setSelectedImage(org?.img || '');
+      files.forEach((file: any) => URL.revokeObjectURL(file.preview));
+      e.stopPropagation();
+  }
 
   return (
     <Modal
@@ -88,7 +196,13 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         ...(config?.modalStyle ?? {}),
         maxHeight: '100%',
         borderRadius: '10px',
-        padding: '20px 60px 10px 60px'
+        width: '551px',
+        height: '435px',
+        padding: '48px',
+        flexShrink: '0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start'
       }}
       overlayClick={close}
       bigCloseImage={close}
@@ -99,130 +213,121 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <EditOrgWrap newDesign={true}>
-        <EditOrgTitle>Edit Organization</EditOrgTitle>
-        <EditOrgColumns>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <EditOrgTitle>Edit Organization</EditOrgTitle>
+      <EditOrgColumns>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <OrgImageOutline {...getRootProps()}>
+            <DragAndDrop {...getInputProps()} />
             <OrgImage src={selectedImage} />
-            <div>
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFileInputChange}
-                ref={fileInputRef}
-              />
-              <Button
-                disabled={false}
-                onClick={() => {
-                  openFileDialog();
-                }}
-                loading={false}
-                style={{
-                  width: 'auto',
-                  height: '40px',
-                  borderRadius: '5px',
-                  alignSelf: 'center',
-                  margin: '10px'
-                }}
-                color={'secondary'}
-                text={'Upload org image'}
-              />
-            </div>
+            <ResetOrgImage 
+              onClick={resetImg} 
+              src={'/static/badges/ResetOrgProfile.svg'} 
+            />
+          </OrgImageOutline>
+          <div>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileInputChange}
+              ref={fileInputRef}
+            />
+            <ImgImportText>Drag and drop or <ImgBrowse onClick={openFileDialog}>Browse</ImgBrowse></ImgImportText>
+            <FileTypeHint>PNG, JPG or GIF,  Min. 300 x 300 px</FileTypeHint>
           </div>
-          <FormWrapper>
-            <Formik
-              initialValues={initValues || {}}
-              onSubmit={onSubmit}
-              innerRef={formRef}
-              validationSchema={validator(schema)}
-            >
-              {({
-                setFieldTouched,
-                handleSubmit,
-                values,
-                setFieldValue,
-                errors,
-                initialValues
-              }: any) => (
-                <Wrap newDesign={true}>
-                  <div className="SchemaInnerContainer">
-                    {schema.map((item: FormField) => {
-                      const githubdescription =
-                        item.name === 'github_description' && !values.ticket_url
-                          ? {
-                              display: 'none'
-                            }
-                          : undefined;
-                      return (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          values={values}
-                          errors={errors}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e: any, f: any) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          borderType={'bottom'}
-                          imageIcon={true}
-                          style={{ ...githubdescription }}
-                        />
-                      );
-                    })}
-                  </div>
-                  <Button
-                    disabled={false}
-                    onClick={() => {
-                      handleSubmit();
-                    }}
-                    loading={false}
-                    style={{
-                      width: '100%',
-                      height: '50px',
-                      borderRadius: '5px',
-                      alignSelf: 'center'
-                    }}
-                    color={'primary'}
-                    text={'Save changes'}
-                  />
-                </Wrap>
-              )}
-            </Formik>
-          </FormWrapper>
-        </EditOrgColumns>
-        <Button
-          disabled={false}
-          onClick={() => {
-            onDelete();
-          }}
-          loading={false}
-          style={{
-            width: '200px',
-            height: '50px',
-            borderRadius: '5px',
-            borderStyle: 'solid',
-            alignSelf: 'center',
-            borderWidth: '2px',
-            backgroundColor: 'white',
-            borderColor: '#ED7474',
-            color: '#ED7474'
-          }}
-          color={'#ED7474'}
-          text={'Delete organization'}
-        />
-      </EditOrgWrap>
+        </div>
+        <FormWrapper>
+          <Formik
+            initialValues={initValues || {}}
+            onSubmit={onSubmit}
+            innerRef={formRef}
+            validationSchema={validator(schema)}
+          >
+            {({
+              setFieldTouched,
+              handleSubmit,
+              values,
+              setFieldValue,
+              errors,
+              initialValues
+            }: any) => (
+              <Wrap newDesign={true}>
+                <div className="SchemaInnerContainer">
+                  {schema.map((item: FormField) => {
+                    const githubdescription =
+                      item.name === 'github_description' && !values.ticket_url
+                        ? {
+                            display: 'none'
+                          }
+                        : undefined;
+                    return (
+                      <Input
+                        {...item}
+                        key={item.name}
+                        values={values}
+                        errors={errors}
+                        value={values[item.name]}
+                        error={errors[item.name]}
+                        initialValues={initialValues}
+                        deleteErrors={() => {
+                          if (errors[item.name]) delete errors[item.name];
+                        }}
+                        handleChange={(e: any) => {
+                          setFieldValue(item.name, e);
+                        }}
+                        setFieldValue={(e: any, f: any) => {
+                          setFieldValue(e, f);
+                        }}
+                        setFieldTouched={setFieldTouched}
+                        handleBlur={() => setFieldTouched(item.name, false)}
+                        handleFocus={() => setFieldTouched(item.name, true)}
+                        borderType={'bottom'}
+                        imageIcon={true}
+                        style={{ ...githubdescription }}
+                      />
+                    );
+                  })}
+                </div>
+                <Button
+                  disabled={false}
+                  onClick={() => {
+                    handleSubmit();
+                  }}
+                  loading={false}
+                  style={{
+                    width: '100%',
+                    height: '50px',
+                    borderRadius: '5px',
+                    alignSelf: 'center'
+                  }}
+                  color={'primary'}
+                  text={'Save changes'}
+                />
+              </Wrap>
+            )}
+          </Formik>
+        </FormWrapper>
+      </EditOrgColumns>
+      <Button
+        disabled={false}
+        onClick={() => {
+          onDelete();
+        }}
+        loading={false}
+        style={{
+          width: '200px',
+          height: '50px',
+          borderRadius: '5px',
+          borderStyle: 'solid',
+          alignSelf: 'center',
+          borderWidth: '2px',
+          backgroundColor: 'white',
+          borderColor: '#ED7474',
+          color: '#ED7474'
+        }}
+        color={'#ED7474'}
+        text={'Delete organization'}
+      />
     </Modal>
   );
 };
