@@ -18,12 +18,19 @@ const color = colors['light'];
 const EditOrgColumns = styled.div`
   display: flex;
   flex-direction: row;
+  width: 100%
+`;
+
+const OrgEditImageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 40%
 `;
 
 const OrgImageOutline = styled.div`
   width: 142px;
   height: 142px; 
-  margin-top: 48px;
+  margin-top: 28px;
   margin-bottom: 10px;
   align-self: center;
   cursor: pointer;
@@ -78,6 +85,7 @@ const ResetOrgImage = styled.img`
 const FormWrapper = styled.div`
   margin-left: 30px;
   padding: 0px;
+  flex: 60%;  
 `;
 
 const EditOrgTitle = styled(ModalTitle)`
@@ -161,7 +169,6 @@ const EditOrgModal = (props: EditOrgModalProps) => {
 
   const [files, setFiles] = useState<({ preview: string; })[]>([]);
   const {getRootProps, getInputProps} = useDropzone({
-    accept: 'image/*',
     onDrop: (acceptedFiles: any) => {
       setFiles(acceptedFiles.map((file: any) => Object.assign(file, {
         preview: URL.createObjectURL(file)
@@ -215,9 +222,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
     >
       <EditOrgTitle>Edit Organization</EditOrgTitle>
       <EditOrgColumns>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <OrgEditImageWrapper>
           <OrgImageOutline {...getRootProps()}>
-            <DragAndDrop {...getInputProps()} />
+            <DragAndDrop type="file" accept="image/*" {...getInputProps()} />
             <OrgImage src={selectedImage} />
             <ResetOrgImage 
               onClick={resetImg} 
@@ -235,13 +242,14 @@ const EditOrgModal = (props: EditOrgModalProps) => {
             <ImgImportText>Drag and drop or <ImgBrowse onClick={openFileDialog}>Browse</ImgBrowse></ImgImportText>
             <FileTypeHint>PNG, JPG or GIF,  Min. 300 x 300 px</FileTypeHint>
           </div>
-        </div>
+        </OrgEditImageWrapper>
         <FormWrapper>
           <Formik
             initialValues={initValues || {}}
             onSubmit={onSubmit}
             innerRef={formRef}
             validationSchema={validator(schema)}
+            style={{width: '100%'}}
           >
             {({
               setFieldTouched,
@@ -251,15 +259,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
               errors,
               initialValues
             }: any) => (
-              <Wrap newDesign={true}>
+              <Wrap style={{width: '100%'}} newDesign={true}>
                 <div className="SchemaInnerContainer">
                   {schema.map((item: FormField) => {
-                    const githubdescription =
-                      item.name === 'github_description' && !values.ticket_url
-                        ? {
-                            display: 'none'
-                          }
-                        : undefined;
                     return (
                       <Input
                         {...item}
@@ -283,7 +285,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                         handleFocus={() => setFieldTouched(item.name, true)}
                         borderType={'bottom'}
                         imageIcon={true}
-                        style={{ ...githubdescription }}
+                        style={{width: '100%'}}
                       />
                     );
                   })}
@@ -315,11 +317,11 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         }}
         loading={false}
         style={{
-          width: '200px',
+          width: 'calc(60% - 18px)',
           height: '50px',
           borderRadius: '5px',
           borderStyle: 'solid',
-          alignSelf: 'center',
+          alignSelf: 'flex-end',
           borderWidth: '2px',
           backgroundColor: 'white',
           borderColor: '#ED7474',
