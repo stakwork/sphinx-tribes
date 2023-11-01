@@ -2,6 +2,7 @@ import { EuiText } from '@elastic/eui';
 import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import history from 'config/history';
 import api from '../../api';
 import { colors } from '../../config/colors';
 import { BountyDetailsCreationData } from '../../people/utils/BountyCreationConstant';
@@ -266,8 +267,8 @@ function Form(props: FormProps) {
                           style={
                             item.name === 'github_description' && !values.ticket_url
                               ? {
-                                display: 'none'
-                              }
+                                  display: 'none'
+                                }
                               : undefined
                           }
                         />
@@ -307,8 +308,8 @@ function Form(props: FormProps) {
                           style={
                             item.name === 'github_description' && !values.ticket_url
                               ? {
-                                display: 'none'
-                              }
+                                  display: 'none'
+                                }
                               : undefined
                           }
                         />
@@ -462,8 +463,8 @@ function Form(props: FormProps) {
                               style={
                                 item.name === 'github_description' && !values.ticket_url
                                   ? {
-                                    display: 'none'
-                                  }
+                                      display: 'none'
+                                    }
                                   : undefined
                               }
                             />
@@ -511,8 +512,8 @@ function Form(props: FormProps) {
                               style={
                                 item.type === 'loom' && values.ticket_url
                                   ? {
-                                    marginTop: '55px'
-                                  }
+                                      marginTop: '55px'
+                                    }
                                   : undefined
                               }
                             />
@@ -628,8 +629,8 @@ function Form(props: FormProps) {
                       style={
                         item.name === 'github_description' && !values.ticket_url
                           ? {
-                            display: 'none'
-                          }
+                              display: 'none'
+                            }
                           : undefined
                       }
                     />
@@ -674,6 +675,12 @@ function Form(props: FormProps) {
                           setFieldValue('type', dynamicSchemaName);
                         }
                         handleSubmit();
+                        if (
+                          window.location.href.includes('bounty') ||
+                          window.location.href.includes('ticket')
+                        ) {
+                          history.push('/bounties');
+                        }
                       }}
                       loading={props.loading}
                       style={{ ...buttonStyle, width: '140px' }}

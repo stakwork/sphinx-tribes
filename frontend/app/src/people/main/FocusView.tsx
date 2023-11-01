@@ -7,6 +7,7 @@ import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Organization } from 'store/main';
 import { Box } from '@mui/system';
+import history from 'config/history';
 import { useStores } from '../../store';
 import Form from '../../components/form';
 import {
@@ -295,9 +296,11 @@ function FocusedView(props: FocusViewProps) {
       newBody.owner_id = info.pubkey;
 
       await main.saveBounty(newBody);
+
       // Refresh the tickets page if a user eidts from the tickets tab
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedBounties({}, info.pubkey);
+        history.goBack();
       }
     } catch (e) {
       console.log('e', e);
