@@ -6,8 +6,8 @@ import {
   calculateTimeLeft,
   toCapitalize,
   userHasRole
-} from './helpers';
-import { uiStore } from '../store/ui';
+} from '../helpers';
+import { uiStore } from '../../store/ui';
 import crypto from 'crypto';
 import moment from 'moment';
 
