@@ -7,6 +7,7 @@ import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Organization } from 'store/main';
 import { Box } from '@mui/system';
+import history from 'config/history';
 import { useStores } from '../../store';
 import Form from '../../components/form';
 import {
@@ -18,7 +19,11 @@ import {
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
-import { extractRepoAndIssueFromIssueUrl, toCapitalize } from '../../helpers';
+import {
+  convertLocaleToNumber,
+  extractRepoAndIssueFromIssueUrl,
+  toCapitalize
+} from '../../helpers';
 
 // this is where we see others posts (etc) and edit our own
 const BWrap = styled.div`
@@ -90,7 +95,8 @@ function FocusedView(props: FocusViewProps) {
     fromBountyPage,
     newDesign,
     setIsModalSideButton,
-    bounty
+    bounty,
+    setRemoveNextAndPrev
   } = props;
   const { ui, main } = useStores();
 
@@ -109,8 +115,8 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  const userOrganizations = main.organizations.length
-    ? main.organizations.map((org: Organization) => ({
+  const userOrganizations = main.dropDownOrganizations.length
+    ? main.dropDownOrganizations.map((org: Organization) => ({
         label: toCapitalize(org.name),
         value: org.uuid
       }))
@@ -208,6 +214,11 @@ function FocusedView(props: FocusViewProps) {
     // if github repo
     const githubError = "Couldn't locate this Github issue. Make sure this repo is public.";
     try {
+      // convert the amount from string to number
+      if (newBody.price) {
+        newBody.price = convertLocaleToNumber(newBody.price).toString();
+      }
+
       if (
         newBody.ticket_url &&
         (newBody.type === 'wanted_coding_task' ||
@@ -247,7 +258,7 @@ function FocusedView(props: FocusViewProps) {
     let newBody = cloneDeep(body);
 
     if (config && config.name === 'about') {
-      const res = await main.saveProfile(newBody);
+      await main.saveProfile(newBody);
       if (shouldCloseModal) {
         closeModal();
       }
@@ -285,9 +296,11 @@ function FocusedView(props: FocusViewProps) {
       newBody.owner_id = info.pubkey;
 
       await main.saveBounty(newBody);
+
       // Refresh the tickets page if a user eidts from the tickets tab
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedBounties({}, info.pubkey);
+        history.goBack();
       }
     } catch (e) {
       console.log('e', e);
@@ -388,6 +401,20 @@ function FocusedView(props: FocusViewProps) {
     return null;
   }
 
+  function handleEditAction() {
+    setEditable(false);
+    setEditMode(true);
+    setRemoveNextAndPrev && setRemoveNextAndPrev(true);
+  }
+
+  function handleFormClose() {
+    if (skipEditLayer && goBack) goBack();
+    else {
+      setEditMode(false);
+      setRemoveNextAndPrev && setRemoveNextAndPrev(false);
+    }
+  }
+
   // set user organizations
   if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
     config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
@@ -413,10 +440,7 @@ function FocusedView(props: FocusViewProps) {
               formRef={formRef}
               submitText={config && config.submitText}
               loading={loading}
-              close={() => {
-                if (skipEditLayer && goBack) goBack();
-                else setEditMode(false);
-              }}
+              close={handleFormClose}
               onSubmit={submitForm}
               scrollDiv={scrollDiv}
               schema={config && config.schema}
@@ -503,10 +527,7 @@ function FocusedView(props: FocusViewProps) {
             extraModalFunction={props?.extraModalFunction}
             deleteAction={canDeleteBounty ? deleteHandler : undefined}
             deletingState={deleting}
-            editAction={() => {
-              setEditable(false);
-              setEditMode(true);
-            }}
+            editAction={handleEditAction}
             setIsModalSideButton={setIsModalSideButton}
             setIsExtraStyle={props?.setIsExtraStyle}
           />

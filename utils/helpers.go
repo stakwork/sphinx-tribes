@@ -5,6 +5,8 @@ import (
 	"encoding/base32"
 	"fmt"
 	"strconv"
+
+	decodepay "github.com/nbd-wtf/ln-decodepay"
 )
 
 func GetRandomToken(length int) string {
@@ -36,4 +38,17 @@ func ConvertStringToInt(number string) (int, error) {
 	}
 
 	return int(numberParse), nil
+}
+
+func GetInvoiceAmount(paymentRequest string) uint {
+	decodedInvoice, err := decodepay.Decodepay(paymentRequest)
+
+	if err != nil {
+		fmt.Println("Could not Decode Invoice", err)
+		return 0
+	}
+	amountInt := decodedInvoice.MSatoshi / 1000
+	amount := uint(amountInt)
+
+	return amount
 }

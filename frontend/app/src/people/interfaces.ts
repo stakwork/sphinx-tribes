@@ -34,6 +34,7 @@ export interface FocusViewProps {
   style?: React.CSSProperties;
   setIsExtraStyle?: any;
   bounty?: PersonBounty[];
+  setRemoveNextAndPrev?: (boolean) => void;
 }
 
 export interface PeopleMobileeHeaderProps {
@@ -384,6 +385,7 @@ export interface AboutViewProps {
   owner_pubkey?: string;
   description?: string;
   canEdit?: boolean;
+  owner_route_hint?: string;
 }
 
 export interface BlogViewProps {

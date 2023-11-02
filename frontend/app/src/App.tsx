@@ -24,6 +24,13 @@ function App() {
     } else {
       await mainStore.getUserOrganizations(uiStore.meInfo?.id || 0);
     }
+
+    // this is to make sure the organizations dropdown on bounty page
+    // is always for the user
+    if (uiStore.meInfo?.id) {
+      const orgs = await mainStore.getUserOrganizations(uiStore.meInfo?.id);
+      mainStore.setDropDownOrganizations(orgs);
+    }
   }, [uiStore.selectedPerson]);
 
   useEffect(() => {

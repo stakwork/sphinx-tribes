@@ -739,8 +739,8 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'price',
     label: 'Price (Sats)',
-    validator: nomValidator,
-    type: 'number'
+    validator: strValidator,
+    type: 'numbersats'
   },
   {
     name: 'estimated_session_length',
