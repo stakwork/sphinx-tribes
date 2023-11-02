@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, ChangeEvent } from 'react';
+import React, { useRef, useState, ChangeEvent } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
@@ -12,32 +12,33 @@ import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import { ModalTitle } from './style';
 import { EditOrgModalProps } from './interface';
+import DeleteOrgWindow from './DeleteOrgWindow';
 
 const color = colors['light'];
 
 const EditOrgColumns = styled.div`
   display: flex;
   flex-direction: row;
-  width: 100%
+  width: 100%;
 `;
 
 const OrgEditImageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 40%
+  flex: 40%;
 `;
 
 const OrgImageOutline = styled.div`
   width: 142px;
-  height: 142px; 
+  height: 142px;
   margin-top: 28px;
   margin-bottom: 10px;
   align-self: center;
   cursor: pointer;
-  
+
   border-style: dashed;
   border-width: 2px;
-  border-color: #D0D5D8;
+  border-color: #d0d5d8;
   border-radius: 50%;
 `;
 
@@ -74,22 +75,20 @@ const ResetOrgImage = styled.img`
   cursor: pointer;
 
   :hover {
-    filter: brightness(.9);
+    filter: brightness(0.9);
     transition: 0.2s;
   }
   :active {
-    filter: brightness(.7);
+    filter: brightness(0.7);
   }
 `;
 
 const FormWrapper = styled.div`
-  margin-left: 30px;
-  padding: 0px;
-  flex: 60%;  
+  flex: 60%;
 `;
 
 const EditOrgTitle = styled(ModalTitle)`
-  color: var(--Text-2, var(--Hover-Icon-Color, #3C3F41));
+  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
   leading-trim: both;
   text-edge: cap;
   font-family: Barlow;
@@ -101,7 +100,7 @@ const EditOrgTitle = styled(ModalTitle)`
 
 const ImgImportText = styled.p`
   margin-bottom: 5px;
-  color: var(--Main-bottom-icons, var(--Disabled-Icon-color, #5F6368));
+  color: var(--Main-bottom-icons, var(--Disabled-Icon-color, #5f6368));
   text-align: center;
   leading-trim: both;
   text-edge: cap;
@@ -115,7 +114,7 @@ const ImgImportText = styled.p`
 
 const FileTypeHint = styled.p`
   margin-bottom: 5px;
-  color: var(--Placeholder-Text, var(--Disabled-Icon-color, #B0B7BC));
+  color: var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc));
   text-align: center;
   leading-trim: both;
   text-edge: cap;
@@ -127,7 +126,7 @@ const FileTypeHint = styled.p`
 `;
 
 const ImgBrowse = styled.a`
-  color: var(--Primary-blue, var(--Disabled-Icon-color, #618AFF));
+  color: var(--Primary-blue, var(--Disabled-Icon-color, #618aff));
   leading-trim: both;
   text-edge: cap;
   font-family: Roboto;
@@ -139,9 +138,17 @@ const ImgBrowse = styled.a`
   cursor: pointer;
 `;
 
+const HLine = styled.div`
+  background-color: #ebedef;
+  height: 1px;
+  width: 100%;
+  margin: 5px 0px 20px;
+`;
+
 const EditOrgModal = (props: EditOrgModalProps) => {
   const isMobile = useIsMobile();
   const { isOpen, close, onSubmit, onDelete, org } = props;
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   const config = widgetConfigs.organizations;
   const schema = [...config.schema];
@@ -167,12 +174,16 @@ const EditOrgModal = (props: EditOrgModalProps) => {
     }
   };
 
-  const [files, setFiles] = useState<({ preview: string; })[]>([]);
-  const {getRootProps, getInputProps} = useDropzone({
+  const [files, setFiles] = useState<{ preview: string }[]>([]);
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: any) => {
-      setFiles(acceptedFiles.map((file: any) => Object.assign(file, {
-        preview: URL.createObjectURL(file)
-      })));
+      setFiles(
+        acceptedFiles.map((file: any) =>
+          Object.assign(file, {
+            preview: URL.createObjectURL(file)
+          })
+        )
+      );
       setSelectedImage(files[0].preview);
     }
   });
@@ -184,153 +195,159 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   };
 
   const resetImg = (e: any) => {
-      setSelectedImage(org?.img || '');
-      files.forEach((file: any) => URL.revokeObjectURL(file.preview));
-      e.stopPropagation();
-  }
+    setSelectedImage(org?.img || '');
+    files.forEach((file: any) => URL.revokeObjectURL(file.preview));
+    e.stopPropagation();
+  };
 
   return (
-    <Modal
-      visible={isOpen}
-      style={{
-        height: '100%',
-        flexDirection: 'column'
-      }}
-      envStyle={{
-        marginTop: isMobile ? 64 : 0,
-        background: color.pureWhite,
-        zIndex: 20,
-        ...(config?.modalStyle ?? {}),
-        maxHeight: '100%',
-        borderRadius: '10px',
-        width: '551px',
-        height: '435px',
-        padding: '48px',
-        flexShrink: '0',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start'
-      }}
-      overlayClick={close}
-      bigCloseImage={close}
-      bigCloseImageStyle={{
-        top: '-18px',
-        right: '-18px',
-        background: '#000',
-        borderRadius: '50%'
-      }}
-    >
-      <EditOrgTitle>Edit Organization</EditOrgTitle>
-      <EditOrgColumns>
-        <OrgEditImageWrapper>
-          <OrgImageOutline {...getRootProps()}>
-            <DragAndDrop type="file" accept="image/*" {...getInputProps()} />
-            <OrgImage src={selectedImage} />
-            <ResetOrgImage 
-              onClick={resetImg} 
-              src={'/static/badges/ResetOrgProfile.svg'} 
-            />
-          </OrgImageOutline>
-          <div>
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileInputChange}
-              ref={fileInputRef}
-            />
-            <ImgImportText>Drag and drop or <ImgBrowse onClick={openFileDialog}>Browse</ImgBrowse></ImgImportText>
-            <FileTypeHint>PNG, JPG or GIF,  Min. 300 x 300 px</FileTypeHint>
-          </div>
-        </OrgEditImageWrapper>
-        <FormWrapper>
-          <Formik
-            initialValues={initValues || {}}
-            onSubmit={onSubmit}
-            innerRef={formRef}
-            validationSchema={validator(schema)}
-            style={{width: '100%'}}
-          >
-            {({
-              setFieldTouched,
-              handleSubmit,
-              values,
-              setFieldValue,
-              errors,
-              initialValues
-            }: any) => (
-              <Wrap style={{width: '100%'}} newDesign={true}>
-                <div className="SchemaInnerContainer">
-                  {schema.map((item: FormField) => {
-                    return (
-                      <Input
-                        {...item}
-                        key={item.name}
-                        values={values}
-                        errors={errors}
-                        value={values[item.name]}
-                        error={errors[item.name]}
-                        initialValues={initialValues}
-                        deleteErrors={() => {
-                          if (errors[item.name]) delete errors[item.name];
-                        }}
-                        handleChange={(e: any) => {
-                          setFieldValue(item.name, e);
-                        }}
-                        setFieldValue={(e: any, f: any) => {
-                          setFieldValue(e, f);
-                        }}
-                        setFieldTouched={setFieldTouched}
-                        handleBlur={() => setFieldTouched(item.name, false)}
-                        handleFocus={() => setFieldTouched(item.name, true)}
-                        borderType={'bottom'}
-                        imageIcon={true}
-                        style={{width: '100%'}}
-                      />
-                    );
-                  })}
-                </div>
-                <Button
-                  disabled={false}
-                  onClick={() => {
-                    handleSubmit();
-                  }}
-                  loading={false}
-                  style={{
-                    width: '100%',
-                    height: '50px',
-                    borderRadius: '5px',
-                    alignSelf: 'center'
-                  }}
-                  color={'primary'}
-                  text={'Save changes'}
-                />
-              </Wrap>
-            )}
-          </Formik>
-        </FormWrapper>
-      </EditOrgColumns>
-      <Button
-        disabled={false}
-        onClick={() => {
-          onDelete();
-        }}
-        loading={false}
+    <>
+      <Modal
+        visible={isOpen}
         style={{
-          width: 'calc(60% - 18px)',
-          height: '50px',
-          borderRadius: '5px',
-          borderStyle: 'solid',
-          alignSelf: 'flex-end',
-          borderWidth: '2px',
-          backgroundColor: 'white',
-          borderColor: '#ED7474',
-          color: '#ED7474'
+          height: '100%',
+          flexDirection: 'column'
         }}
-        color={'#ED7474'}
-        text={'Delete organization'}
-      />
-    </Modal>
+        envStyle={{
+          marginTop: isMobile ? 64 : 0,
+          background: color.pureWhite,
+          zIndex: 0,
+          ...(config?.modalStyle ?? {}),
+          maxHeight: '100%',
+          borderRadius: '10px',
+          width: isMobile ? '100%' : '551px',
+          minWidth: '20px',
+          height: isMobile ? 'auto' : '435px',
+          padding: '48px',
+          flexShrink: '0',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start'
+        }}
+        overlayClick={close}
+        bigCloseImage={close}
+        bigCloseImageStyle={{
+          top: isMobile ? '26px' : '-18px',
+          right: isMobile ? '26px' : '-18px',
+          background: '#000',
+          borderRadius: '50%'
+        }}
+      >
+        <EditOrgTitle>Edit Organization</EditOrgTitle>
+        <EditOrgColumns style={{ flexDirection: isMobile ? 'column' : 'row' }}>
+          <OrgEditImageWrapper>
+            <OrgImageOutline {...getRootProps()}>
+              <DragAndDrop type="file" accept="image/*" {...getInputProps()} />
+              <OrgImage src={selectedImage} />
+              <ResetOrgImage onClick={resetImg} src={'/static/badges/ResetOrgProfile.svg'} />
+            </OrgImageOutline>
+            <div>
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFileInputChange}
+                ref={fileInputRef}
+              />
+              <ImgImportText>
+                Drag and drop or <ImgBrowse onClick={openFileDialog}>Browse</ImgBrowse>
+              </ImgImportText>
+              <FileTypeHint>PNG, JPG or GIF, Min. 300 x 300 px</FileTypeHint>
+            </div>
+          </OrgEditImageWrapper>
+          <FormWrapper style={{ marginLeft: isMobile ? '0px' : '28px' }}>
+            <Formik
+              initialValues={initValues || {}}
+              onSubmit={onSubmit}
+              innerRef={formRef}
+              validationSchema={validator(schema)}
+              style={{ width: '100%' }}
+            >
+              {({
+                setFieldTouched,
+                handleSubmit,
+                values,
+                setFieldValue,
+                errors,
+                initialValues
+              }: any) => (
+                <Wrap style={{ width: '100%' }} newDesign={true}>
+                  <div className="SchemaInnerContainer">
+                    {schema.map((item: FormField) => {
+                      return (
+                        <Input
+                          {...item}
+                          key={item.name}
+                          values={values}
+                          errors={errors}
+                          value={values[item.name]}
+                          error={errors[item.name]}
+                          initialValues={initialValues}
+                          deleteErrors={() => {
+                            if (errors[item.name]) delete errors[item.name];
+                          }}
+                          handleChange={(e: any) => {
+                            setFieldValue(item.name, e);
+                          }}
+                          setFieldValue={(e: any, f: any) => {
+                            setFieldValue(e, f);
+                          }}
+                          setFieldTouched={setFieldTouched}
+                          handleBlur={() => setFieldTouched(item.name, false)}
+                          handleFocus={() => setFieldTouched(item.name, true)}
+                          borderType={'bottom'}
+                          imageIcon={true}
+                          style={{ width: '100%' }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <Button
+                    disabled={false}
+                    onClick={() => handleSubmit()}
+                    loading={false}
+                    style={{
+                      width: '100%',
+                      height: '50px',
+                      borderRadius: '5px',
+                      alignSelf: 'center'
+                    }}
+                    color={'primary'}
+                    text={'Save changes'}
+                  />
+                </Wrap>
+              )}
+            </Formik>
+          </FormWrapper>
+        </EditOrgColumns>
+        <HLine style={{ width: '551px', transform: 'translate(-48px, 0px' }} />
+        <Button
+          disabled={false}
+          onClick={() => {
+            setShowDeleteModal(true);
+          }}
+          loading={false}
+          style={{
+            width: isMobile ? '100%' : 'calc(60% - 18px)',
+            height: '50px',
+            borderRadius: '5px',
+            borderStyle: 'solid',
+            alignSelf: 'flex-end',
+            borderWidth: '2px',
+            backgroundColor: 'white',
+            borderColor: '#ED7474',
+            color: '#ED7474'
+          }}
+          color={'#ED7474'}
+          text={'Delete organization'}
+        />
+        {showDeleteModal ? (
+          <DeleteOrgWindow onDeleteOrg={onDelete} close={() => setShowDeleteModal(false)} />
+        ) : (
+          <></>
+        )}
+      </Modal>
+    </>
   );
 };
 

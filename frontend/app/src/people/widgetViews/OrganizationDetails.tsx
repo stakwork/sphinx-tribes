@@ -50,7 +50,11 @@ import {
 
 let interval;
 
-const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
+const OrganizationDetails = (props: {
+  close: () => void;
+  org: Organization | undefined;
+  resetOrg: (Organization) => void;
+}) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
   const { main, ui } = useStores();
@@ -218,8 +222,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const onSubmitEditOrg = async (body: any) => {
-    if (!org)
-    {
+    if (!org) {
       addToast('Invalid organization update', 'danger');
       return;
     }
@@ -235,16 +238,19 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       show: body?.show != undefined ? body.show : org.show,
       bounty_count: org.bounty_count,
       budget: org.budget
-    }
+    };
 
+    console.log(newOrg);
     const res = await main.updateOrganization(newOrg);
     if (res.status === 200) {
       addToast('Sucessfully updated organization', 'success');
+      // update the org ui
+      props.resetOrg(newOrg);
     } else {
       addToast('Error: could not update organization', 'danger');
     }
   };
-  
+
   const onDeleteOrg = async () => {
     const res = { status: 200 };
     if (res.status === 200) {
