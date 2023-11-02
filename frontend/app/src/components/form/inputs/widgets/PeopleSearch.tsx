@@ -308,7 +308,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
 
   useEffect(() => {
     async function updatePeopleData() {
-      setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+      setLabels(coding_languages.filter((x: any) => checkboxIdToSelectedMap[x.label]));
       let peopleList = props?.peopleList;
       if (searchValue) {
         peopleList = await main.getPeopleByNameAliasPubkey(searchValue);

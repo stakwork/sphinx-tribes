@@ -12,7 +12,7 @@ export interface ColorOption {
 export const coding_languages: ColorOption[] = [
   {
     value: 'lightning',
-    label: 'Lightnint',
+    label: 'Lightning',
     border: '1px solid rgba(184, 37, 95, 0.1)',
     background: 'rgba(184, 37, 95, 0.1)',
     color: '#B8255F'
