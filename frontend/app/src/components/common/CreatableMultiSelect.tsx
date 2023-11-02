@@ -2,10 +2,10 @@ import React from 'react';
 import CreatableSelect from 'react-select/creatable';
 import styled from 'styled-components';
 import { SelProps } from 'components/interfaces';
+import { coding_languages } from 'config';
 import { colors } from '../../config/colors';
-import { GetColorLanguageOptions } from '../../people/utils/BountyConstantsStyle';
 
-const colorLanguageOptions = GetColorLanguageOptions();
+const colorLanguageOptions = coding_languages;
 
 interface styledProps {
   color?: any;

@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
+import { awards } from 'config';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import Form from '../../../components/form';
@@ -9,7 +10,6 @@ import { sendBadgeSchema } from '../../../components/form/schema';
 import { useIsMobile } from '../../../hooks';
 import { Button } from '../../../components/common';
 import { useStores } from '../../../store';
-import { GetColorLanguageOptions, awards } from '../../utils/BountyConstantsStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
 import { CodingLanguageLabel, WantedSummaryProps, LocalPaymeentState } from '../../interfaces';
@@ -17,8 +17,6 @@ import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
 import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
-
-const colorLanguageOptions = GetColorLanguageOptions();
 
 function useQuery() {
   const { search } = useLocation();
@@ -226,7 +224,7 @@ function WantedSummary(props: WantedSummaryProps) {
   useEffect(() => {
     let res;
     if (coding_languages?.length > 0) {
-      res = colorLanguageOptions?.filter(
+      res = coding_languages?.filter(
         (value: any) => coding_languages?.find((val: string) => val === value.label)
       );
     }

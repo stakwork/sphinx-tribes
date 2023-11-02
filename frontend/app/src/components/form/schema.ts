@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import {
-  languages,
-  estimation,
+  coding_languages,
+  time_estimation,
   estimated_budget_15_min,
   help_wanted_coding_task_schema,
   help_wanted_other_schema
@@ -31,8 +31,8 @@ const GetValue = (arr: any) =>
     value: val
   }));
 
-const codingLanguages = GetValue(languages);
-const estimated_time = GetValue(estimation);
+const codingLanguages = GetValue(coding_languages);
+const estimated_time = GetValue(time_estimation);
 const helpType_wanted_coding_task_schema = GetValue(help_wanted_coding_task_schema);
 const helpType_wanted_other_schema = GetValue(help_wanted_other_schema);
 const estimated_budget_15_min_options = GetValue(estimated_budget_15_min);

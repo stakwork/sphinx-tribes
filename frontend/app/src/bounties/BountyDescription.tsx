@@ -2,12 +2,12 @@ import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isString } from 'lodash';
+import { coding_languages } from 'config';
 import { colors } from '../config/colors';
-import { GetColorLanguageOptions } from '../people/utils/BountyConstantsStyle';
 import NameTag from '../people/utils/NameTag';
 import { BountiesDescriptionProps } from './interfaces';
 
-const colorLanguageOptions = GetColorLanguageOptions();
+const colorLanguageOptions = coding_languages;
 
 interface codingLangProps {
   background?: string;

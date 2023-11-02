@@ -7,16 +7,20 @@ import { observer } from 'mobx-react-lite';
 import IconButton from 'components/common/IconButton2';
 import { useHistory } from 'react-router-dom';
 import { BountyHeaderProps } from 'people/interfaces';
+import { ColorOption, GetValue, coding_languages, status } from 'config';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { SearchBar } from '../../components/common/index';
 import { useStores } from '../../store';
 import { filterCount } from '../utils/ExtraFunctions';
-import { GetValue, coding_languages, status } from '../utils/BountyConstantsStyle';
 import { PostBounty } from './postBounty';
 
 const Status = GetValue(status);
-const Coding_Languages = GetValue(coding_languages);
+const Coding_Languages = coding_languages.map((val: ColorOption) => ({
+  id: val.value,
+  value: val.value,
+  label: val.label
+}));
 
 interface styledProps {
   color?: any;

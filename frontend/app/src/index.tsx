@@ -1,12 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { GetColorLanguageOptions } from 'people/utils/BountyConstantsStyle';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import '@elastic/eui/dist/eui_theme_dark.css';
 import 'bootstrap/dist/css/bootstrap.css';
-
-GetColorLanguageOptions();
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

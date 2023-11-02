@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
+import { coding_languages, ColorOption } from 'config';
 import { colors } from '../../../config/colors';
 import ImageButton from '../../common/ImageButton';
-import {
-  coding_languages,
-  GetValue,
-  GetColorLanguageOptions
-} from '../../../people/utils/BountyConstantsStyle';
 import { SvgMask } from '../../../people/utils/SvgMask';
 import type { Props } from './propsType';
 
@@ -86,8 +82,12 @@ const Label = styled.div<labelProps>`
     color: ${(p: any) => p?.value && p?.value.color};
   }
 `;
-const codingLanguages = GetValue(coding_languages);
-const colorLanguageOptions = GetColorLanguageOptions();
+const codingLanguages = coding_languages.map((val: ColorOption) => ({
+  id: val.value,
+  value: val.value,
+  label: val.label
+}));
+const colorLanguageOptions = coding_languages;
 
 export default function CreatableMultiSelectInputNew({ error, label, handleChange }: Props) {
   let labeltext = label;

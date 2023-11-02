@@ -3,12 +3,8 @@ import { EuiCheckboxGroup, EuiLoadingSpinner, EuiPopover, EuiText } from '@elast
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
+import { ColorOption, coding_languages } from 'config';
 import { colors } from '../../../../config/colors';
-import {
-  coding_languages,
-  GetValue,
-  GetColorLanguageOptions
-} from '../../../../people/utils/BountyConstantsStyle';
 import { SvgMask } from '../../../../people/utils/SvgMask';
 import ImageButton from '../../../common/ImageButton';
 import { InvitePeopleSearchProps } from './interfaces';
@@ -277,8 +273,11 @@ const LoaderContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
-const codingLanguages = GetValue(coding_languages);
-const colorLanguageOptions = GetColorLanguageOptions();
+const codingLanguageNames = coding_languages.map((val: ColorOption) => ({
+  id: val.value,
+  value: val.value,
+  label: val.label
+}));
 
 const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const color = colors['light'];
@@ -306,7 +305,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   }, [inView, initialPeopleCount]);
 
   useEffect(() => {
-    setLabels(colorLanguageOptions.filter((x: any) => checkboxIdToSelectedMap[x.label]));
+    setLabels(coding_languages.filter((x: any) => checkboxIdToSelectedMap[x.label]));
     setPeopleData(
       (Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
         ? props?.peopleList
@@ -440,7 +439,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
         >
           <EuiPopOverCheckbox className="CheckboxOuter" color={color}>
             <EuiCheckboxGroup
-              options={codingLanguages}
+              options={codingLanguageNames}
               idToSelectedMap={checkboxIdToSelectedMap}
               onChange={(id: any) => {
                 onChange(id);
