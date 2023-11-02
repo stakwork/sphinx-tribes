@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useIsMobile } from 'hooks';
 import { Button } from '../../../components/common';
 
 const DeleteWrap = styled.div`
@@ -64,49 +65,58 @@ const DeleteText = styled.p`
   line-height: 24px; /* 120% */
 `;
 
-const DeleteOrgWindow = (props: { onDeleteOrg: () => void; close: () => void }) => (
-  <DeleteWrap>
-    <DeleteConfirmation>
-      <DeleteIcon src="/static/Delete.svg" alt="delete icon"></DeleteIcon>
-      <DeleteText style={{ marginTop: '26px' }}>Are you sure you want to</DeleteText>
-      <DeleteText style={{ fontWeight: 'bold', marginBottom: '36px' }}>
-        Delete this Organization?
-      </DeleteText>
-      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-        <Button
-          disabled={false}
-          onClick={() => props.close()}
-          loading={false}
-          style={{
-            width: '120',
-            height: '40px',
-            borderRadius: '6px',
-            alignSelf: 'flex-start',
-            border: '1px solid var(--Input-Outline-1, #D0D5D8)',
-            background: 'var(--White, #FFF)',
-            boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.06)'
-          }}
-          color={'#5F6368'}
-          text={'Cancel'}
-        />
-        <Button
-          disabled={false}
-          onClick={() => props.onDeleteOrg()}
-          loading={false}
-          style={{
-            width: '120',
-            height: '40px',
-            marginLeft: 'auto',
-            borderRadius: '6px',
-            background: 'var(--Primary-Red, #ED7474)',
-            boxShadow: '0px 2px 10px 0px rgba(237, 116, 116, 0.50)'
-          }}
-          color={'primary'}
-          text={'Delete'}
-        />
-      </div>
-    </DeleteConfirmation>
-  </DeleteWrap>
-);
+const DeleteOrgWindow = (props: { onDeleteOrg: () => void; close: () => void }) => {
+  const isMobile = useIsMobile();
+
+  return (
+    <DeleteWrap
+      style={{
+        width: isMobile ? '100%' : '551px',
+        height: isMobile ? '100%' : '435px'
+      }}
+    >
+      <DeleteConfirmation>
+        <DeleteIcon src="/static/Delete.svg" alt="delete icon"></DeleteIcon>
+        <DeleteText style={{ marginTop: '26px' }}>Are you sure you want to</DeleteText>
+        <DeleteText style={{ fontWeight: 'bold', marginBottom: '36px' }}>
+          Delete this Organization?
+        </DeleteText>
+        <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+          <Button
+            disabled={false}
+            onClick={() => props.close()}
+            loading={false}
+            style={{
+              width: '120',
+              height: '40px',
+              borderRadius: '6px',
+              alignSelf: 'flex-start',
+              border: '1px solid var(--Input-Outline-1, #D0D5D8)',
+              background: 'var(--White, #FFF)',
+              boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.06)'
+            }}
+            color={'#5F6368'}
+            text={'Cancel'}
+          />
+          <Button
+            disabled={false}
+            onClick={() => props.onDeleteOrg()}
+            loading={false}
+            style={{
+              width: '120',
+              height: '40px',
+              marginLeft: 'auto',
+              borderRadius: '6px',
+              background: 'var(--Primary-Red, #ED7474)',
+              boxShadow: '0px 2px 10px 0px rgba(237, 116, 116, 0.50)'
+            }}
+            color={'primary'}
+            text={'Delete'}
+          />
+        </div>
+      </DeleteConfirmation>
+    </DeleteWrap>
+  );
+};
 
 export default DeleteOrgWindow;
