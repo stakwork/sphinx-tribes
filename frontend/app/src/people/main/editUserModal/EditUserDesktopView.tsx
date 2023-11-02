@@ -1,7 +1,7 @@
 import { Modal } from 'components/common';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import FocusedView from '../FocusView';
+import AboutFocusView from '../AboutFocusView';
 import { useUserEdit } from './useEditUser';
 import { formConfig } from './config';
 
@@ -26,7 +26,7 @@ export const EditUserDesktopView = observer(() => {
       overlayClick={closeHandler}
       bigClose={closeHandler}
     >
-      <FocusedView
+      <AboutFocusView
         person={person}
         canEdit={canEdit}
         selectedIndex={0}
