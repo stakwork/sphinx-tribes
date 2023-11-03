@@ -291,7 +291,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
-  const { main, ui } = useStores();
+  const { main } = useStores();
 
   const { ref, inView } = useInView({
     triggerOnce: false,
@@ -317,11 +317,11 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
         Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
           ? peopleList
           : peopleList?.filter(
-              ({ extras }: any) =>
-                extras?.coding_languages?.some(
-                  ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-                )
-            )
+            ({ extras }: any) =>
+              extras?.coding_languages?.some(
+                ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+              )
+          )
       );
     }
     updatePeopleData();

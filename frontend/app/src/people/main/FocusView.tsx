@@ -8,7 +8,7 @@ import { Organization } from 'store/main';
 import { Box } from '@mui/system';
 import history from 'config/history';
 import { useStores } from '../../store';
-import Form from '../../components/form';
+import Form from '../../components/form/bounty';
 import {
   Button,
   IconButton,
@@ -62,9 +62,9 @@ function FocusedView(props: FocusViewProps) {
 
   const userOrganizations = main.dropDownOrganizations.length
     ? main.dropDownOrganizations.map((org: Organization) => ({
-        label: toCapitalize(org.name),
-        value: org.uuid
-      }))
+      label: toCapitalize(org.name),
+      value: org.uuid
+    }))
     : [];
 
   function isNotHttps(url: string | undefined) {
@@ -357,8 +357,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />
@@ -380,7 +380,7 @@ function FocusedView(props: FocusViewProps) {
                     if (goBack) goBack();
                   }}
                   style={{
-                    fontSize: 12,
+                    fontSize: 3,
                     fontWeight: 600
                   }}
                 />
