@@ -317,11 +317,11 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
         Object.keys(checkboxIdToSelectedMap).every((key: any) => !checkboxIdToSelectedMap[key])
           ? peopleList
           : peopleList?.filter(
-            ({ extras }: any) =>
-              extras?.coding_languages?.some(
-                ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
-              )
-          )
+              ({ extras }: any) =>
+                extras?.coding_languages?.some(
+                  ({ value }: any) => checkboxIdToSelectedMap[value] ?? false
+                )
+            )
       );
     }
     updatePeopleData();

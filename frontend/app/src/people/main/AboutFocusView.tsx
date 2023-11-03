@@ -66,7 +66,7 @@ const AboutFocusView = (props: FocusViewProps) => {
     }
   }
 
-  let initialValues: any = {};
+  const initialValues: any = {};
 
   const personInfo = canEdit ? ui.meInfo : person;
 
@@ -137,8 +137,8 @@ const AboutFocusView = (props: FocusViewProps) => {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />
