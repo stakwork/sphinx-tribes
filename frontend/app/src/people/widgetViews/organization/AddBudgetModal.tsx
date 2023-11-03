@@ -13,7 +13,6 @@ const color = colors['light'];
 
 const ModelWrapper = styled.div`
   width: 100%;
-  padding: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,7 +30,8 @@ const InvoiceFormHeading = styled.h2`
 `;
 
 const InvoiceForm = styled.div`
-  width: 100%;
+  width: 16rem;
+  margin: 3rem;
 `;
 
 const InvoiceLabel = styled.label`
@@ -179,7 +179,9 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         zIndex: 20,
         ...(config?.modalStyle ?? {}),
         maxHeight: '100%',
-        borderRadius: '10px'
+        borderRadius: '10px',
+        minWidth: '22rem',
+        minHeight: '20rem'
       }}
       overlayClick={close}
       bigCloseImage={close}

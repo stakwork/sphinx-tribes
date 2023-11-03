@@ -19,39 +19,33 @@ const QRWrap = styled.div`
 const Row = styled.div`
   display: flex;
   justify-content: space-between;
-  height: 48px;
   align-items: center;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 48px;
-  /* identical to box height, or 320% */
-
-  display: flex;
-  align-items: center;
-
-  /* Secondary Text 4 */
-
-  color: #8e969c;
   cursor: pointer;
 `;
 
-const Copy = styled.div`
-  font-family: Roboto;
+const Value = styled.p`
+  color: #5f6368;
+  text-overflow: ellipsis;
+  font-family: Barlow;
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0.01625rem;
+  margin-bottom: 0;
+`;
+
+const Copy = styled.p`
+  color: #5d8fdd;
+  text-align: right;
+  font-family: Barlow;
+  font-size: 0.75rem;
   font-style: normal;
   font-weight: 500;
-  font-size: 11px;
-  line-height: 13px;
-  display: flex;
-  align-items: center;
-  text-align: right;
-  letter-spacing: 0.04em;
+  line-height: normal;
+  letter-spacing: 0.03rem;
   text-transform: uppercase;
-
-  /* Primary blue */
-
-  color: #618aff;
+  margin-bottom: 0;
 `;
 
 export default function QrBar(props: QRBarProps) {
@@ -66,6 +60,10 @@ export default function QrBar(props: QRBarProps) {
       }
     ]);
   }
+
+  const formatRequest = (request: string) => {
+    return `${request.substring(0, 23)}...`;
+  };
 
   function removeToast() {
     setToasts([]);
@@ -86,11 +84,7 @@ export default function QrBar(props: QRBarProps) {
       <QRWrap
         style={{
           display: 'flex',
-          alignItems: 'center',
-          width: '70%',
-          overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis'
+          alignItems: 'center'
         }}
       >
         {!simple && (
@@ -99,16 +93,7 @@ export default function QrBar(props: QRBarProps) {
             style={{ fontSize: 20, color: '#B0B7BC', marginRight: 10 }}
           />
         )}
-
-        <div
-          style={{
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {value}
-        </div>
+        <Value>{formatRequest(value)}</Value>
       </QRWrap>
 
       <Copy
