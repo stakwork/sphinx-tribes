@@ -18,7 +18,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   }>();
 
   const { ui, main } = useStores();
-  const { canEdit, person } = usePerson(ui.selectedPerson);
+  const { person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
 
   const onGoBack = async () => {
@@ -83,7 +83,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       <FocusedView
         person={person}
         personBody={person}
-        canEdit={canEdit}
+        canEdit={false}
         selectedIndex={Number(wantedIndex)}
         config={config}
         bounty={bounty}

@@ -3,6 +3,7 @@ import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import history from 'config/history';
+import { useIsMobile } from 'hooks';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import { BountyDetailsCreationData } from '../../../people/utils/BountyCreationConstant';
@@ -20,7 +21,8 @@ import {
   CreateBountyHeaderContainer,
   SchemaOuterContainer,
   SchemaTagsContainer,
-  Wrap
+  Wrap,
+  EditBountyText
 } from '../style';
 import { FormField, validator } from '../utils';
 import { FormProps } from '../interfaces';
@@ -35,6 +37,8 @@ function Form(props: FormProps) {
     initialValues
   } = props;
   const page = 1;
+  const isMobile = useIsMobile();
+
   const [loading, setLoading] = useState(true);
   const [dynamicInitialValues, setDynamicInitialValues]: any = useState(null);
   const [dynamicSchema, setDynamicSchema]: any = useState(null);
@@ -253,8 +257,8 @@ function Form(props: FormProps) {
                       style={
                         item.name === 'github_description' && !values.ticket_url
                           ? {
-                            display: 'none'
-                          }
+                              display: 'none'
+                            }
                           : undefined
                       }
                     />
@@ -268,8 +272,8 @@ function Form(props: FormProps) {
                       const loomOffset =
                         item.type === 'loom' && values.ticket_url
                           ? {
-                            marginTop: '55px'
-                          }
+                              marginTop: '55px'
+                            }
                           : undefined;
 
                       return (
@@ -476,8 +480,8 @@ function Form(props: FormProps) {
                               style={
                                 item.name === 'github_description' && !values.ticket_url
                                   ? {
-                                    display: 'none'
-                                  }
+                                      display: 'none'
+                                    }
                                   : undefined
                               }
                             />
@@ -525,8 +529,8 @@ function Form(props: FormProps) {
                               style={
                                 item.type === 'loom' && values.ticket_url
                                   ? {
-                                    marginTop: '55px'
-                                  }
+                                      marginTop: '55px'
+                                    }
                                   : undefined
                               }
                             />
@@ -607,42 +611,87 @@ function Form(props: FormProps) {
               </>
             ) : (
               <SchemaOuterContainer>
-                <div
-                  style={{
-                    padding: '0px 40px 0px 40px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    color: '#3C3D3F'
-                  }}
-                >
-                  {/* mapping each bounty creation step to the appropriate
-                section heading */}
-                  {[
-                    BountyDetailsCreationData.step_2,
-                    BountyDetailsCreationData.step_3,
-                    BountyDetailsCreationData.step_4,
-                    BountyDetailsCreationData.step_5
-                  ].map((section: any) => (
-                    <div style={{ width: '100%' }}>
-                      <h4 style={{ marginTop: '20px' }}>
-                        <b>{section.heading}</b>
-                      </h4>
-                      <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        {GetFormFields(section, { marginRight: '5px', marginLeft: '5px' })}
+                {isMobile ? (
+                  <div className="SchemaInnerContainer">
+                    {schema.map((item: FormField) => (
+                      <Input
+                        {...item}
+                        key={item.name}
+                        values={values}
+                        errors={errors}
+                        scrollToTop={scrollToTop}
+                        value={values[item.name]}
+                        error={errors[item.name]}
+                        initialValues={initialValues}
+                        deleteErrors={() => {
+                          if (errors[item.name]) delete errors[item.name];
+                        }}
+                        handleChange={(e: any) => {
+                          setFieldValue(item.name, e);
+                        }}
+                        setFieldValue={(e: any, f: any) => {
+                          setFieldValue(e, f);
+                        }}
+                        setFieldTouched={setFieldTouched}
+                        isFocused={isFocused}
+                        handleBlur={() => {
+                          setFieldTouched(item.name, false);
+                          setIsFocused({ [item.label]: false });
+                        }}
+                        handleFocus={() => {
+                          setFieldTouched(item.name, true);
+                          setIsFocused({ [item.label]: true });
+                        }}
+                        setDisableFormButtons={setDisableFormButtons}
+                        extraHTML={
+                          (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                        }
+                        style={
+                          item.name === 'github_description' && !values.ticket_url
+                            ? {
+                                display: 'none'
+                              }
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      padding: '0px 40px 0px 40px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      color: '#3C3D3F'
+                    }}
+                  >
+                    {/* mapping each bounty creation step to the appropriate
+                      section heading */}
+                    {[
+                      BountyDetailsCreationData.step_2,
+                      BountyDetailsCreationData.step_3,
+                      BountyDetailsCreationData.step_4,
+                      BountyDetailsCreationData.step_5
+                    ].map((section: any) => (
+                      <div style={{ width: '100%' }}>
+                        <h4 style={{ marginTop: '20px' }}>
+                          <b>{section.heading}</b>
+                        </h4>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                          {GetFormFields(section, { marginRight: '5px', marginLeft: '5px' })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </SchemaOuterContainer>
             )}
             {/* make space at bottom for first sign up */}
             {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
             {!props?.newDesign && (
               <BWrap style={buttonAlignment} color={color}>
-                <h4 style={{ color: color.blue4 }}>
-                  <b>Edit Bounty</b>
-                </h4>
+                <EditBountyText>Edit Bounty</EditBountyText>
                 <Button
                   disabled={disableFormButtons || props.loading}
                   onClick={() => {
