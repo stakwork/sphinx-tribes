@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { useStores } from '../../store';
-import Form from '../../components/form';
+import Form from '../../components/form/about';
 
 import { B } from './style';
 
@@ -55,7 +55,7 @@ const AboutFocusView = (props: FocusViewProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   async function submitForm(body: any, shouldCloseModal: boolean = true) {
-    let newBody = cloneDeep(body);
+    const newBody = cloneDeep(body);
 
     if (config && config.name === 'about') {
       await main.saveProfile(newBody);
@@ -137,8 +137,8 @@ const AboutFocusView = (props: FocusViewProps) => {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                    }
+                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                  }
                   : {}
               }
             />

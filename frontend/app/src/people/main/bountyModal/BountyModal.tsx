@@ -83,7 +83,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       <FocusedView
         person={person}
         personBody={person}
-        canEdit={false}
+        canEdit={canEdit}
         selectedIndex={Number(wantedIndex)}
         config={config}
         bounty={bounty}

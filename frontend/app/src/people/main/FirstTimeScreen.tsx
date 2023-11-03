@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useStores } from '../../store';
 import { Modal } from '../../components/common';
 import { firstScreenSchema } from '../../components/form/schema';
-import FocusedView from './FocusView';
+import AboutFocusedView from './AboutFocusView';
 
 const B = styled.div`
   font-weight: bold;
@@ -54,7 +54,7 @@ export default function FirstTimeScreen() {
       }}
     >
       <div style={{ height: '100%', padding: 20, paddingTop: 0, width: '100%' }}>
-        <FocusedView
+        <AboutFocusedView
           formHeader={formHeader}
           isFirstTimeScreen={true}
           buttonsOnBottom={true}
