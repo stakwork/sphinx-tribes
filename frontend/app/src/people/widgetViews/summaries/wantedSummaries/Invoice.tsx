@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import lighningDecoder from 'light-bolt11-decoder';
+import moment from 'moment';
 import QR from 'people/utils/QR';
 import QrBar from 'people/utils/QrBar';
 import { calculateTimeLeft } from '../../../../helpers';
@@ -8,7 +10,7 @@ import { QrWrap } from './style';
 const InvoiceWrap = styled.div`
   display: flex;
   flex-direction: column;
-  width: 12.5rem;
+  width: 13.5rem;
   margin-left: 4.75rem;
   margin-right: 4.75rem;
 `;
@@ -62,18 +64,25 @@ export default function Invoice(props: {
   lnInvoice: string;
   invoiceTime: number;
 }) {
-  const [timeLimit] = useState(props.startDate);
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(timeLimit, 'minutes'));
+  const decoded = lighningDecoder.decode(props.lnInvoice);
+  const expiry = decoded.sections[8].value;
+  const timeCreated = decoded.sections[4].value;
+  const endTime = new Date((timeCreated + expiry) * 1000);
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(endTime, 'hours'));
 
   useEffect(() => {
     const invoiceTimeout = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft(timeLimit, 'minutes'));
+      setTimeLeft(calculateTimeLeft(endTime, 'hours'));
     }, 1000);
 
     if (props.invoiceStatus) {
       clearTimeout(invoiceTimeout);
     }
   }, [timeLeft, props.invoiceStatus]);
+
+  if (timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
+    console.log('Set status as expired');
+  }
 
   return (
     <>
@@ -87,12 +96,12 @@ export default function Invoice(props: {
               <CountDownText>Invoice Expires in</CountDownText>
             </CountDownTextWrapper>
             <CountDownTimer>
-              {timeLeft.minutes}:{timeLeft.seconds}
+              {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
             </CountDownTimer>
           </CountDownTimerWrap>
 
           <QrWrap>
-            <QR size={200} value={props.lnInvoice} />
+            <QR size={216} value={props.lnInvoice} />
             <QrBar value={props.lnInvoice} simple style={{ marginTop: '0.94rem' }} />
           </QrWrap>
         </InvoiceWrap>

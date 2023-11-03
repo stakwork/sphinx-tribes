@@ -111,7 +111,7 @@ export const sendToRedirect = (url: string) => {
 
 export const calculateTimeLeft = (
   timeLimit: Date,
-  type: 'minutes' | 'days'
+  type: 'minutes' | 'days' | 'hours'
 ): {
   days?: number;
   hours?: number;
@@ -129,6 +129,14 @@ export const calculateTimeLeft = (
       hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
       minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
       seconds: Math.floor((difference % (1000 * 60)) / 1000)
+    };
+  } else if (difference > 0 && type === 'hours') {
+    const timeInSecs = Math.floor(difference / 1000);
+
+    timeLeft = {
+      hours: Math.floor(timeInSecs / 3600),
+      minutes: Math.floor((timeInSecs % 3600) / 60),
+      seconds: Math.floor((timeInSecs % 3600) % 60)
     };
   } else {
     timeLeft = {
