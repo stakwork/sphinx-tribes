@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
@@ -10,6 +10,7 @@ import { colors } from '../../../config/colors';
 import Invoice from '../summaries/wantedSummaries/Invoice';
 import { AddBudgetModalProps, InvoiceState } from './interface';
 import ExpiredInvoice from './ExpiredInvoice';
+import PaidInvoice from './PiadInvoice';
 
 const color = colors['light'];
 
@@ -130,6 +131,7 @@ const Button = styled.button`
     box-shadow: none;
   }
 `;
+
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState('');
   const [lnInvoice, setLnInvoice] = useState('');
@@ -168,6 +170,13 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
     const numericValue = inputValue.replace(/[^0-9]/g, '');
     setAmount(numericValue);
   };
+
+  useEffect(() => {
+    if (invoiceStatus) {
+      setInvoiceState('PAID');
+      props.setInvoiceStatus(false);
+    }
+  }, [invoiceStatus]);
 
   return (
     <Modal
@@ -233,6 +242,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         {invoiceState === 'EXPIRED' && (
           <ExpiredInvoice setInvoiceState={setInvoiceState} setLnInvoice={setLnInvoice} />
         )}
+        {invoiceState === 'PAID' && <PaidInvoice amount={Number(amount)} />}
       </ModelWrapper>
     </Modal>
   );

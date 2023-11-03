@@ -247,9 +247,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const successAction = () => {
-    addToast('Budget was added successfully', 'success');
-    closeBudgetHandler();
-
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
@@ -492,6 +489,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             uuid={uuid}
             invoiceStatus={invoiceStatus}
             startPolling={startPolling}
+            setInvoiceStatus={setInvoiceStatus}
           />
         )}
         {isOpenHistory && (
