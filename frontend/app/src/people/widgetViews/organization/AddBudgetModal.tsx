@@ -233,7 +233,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
                 </InvoiceInputWrapper>
                 <UsdValue>{satToUsd(Number(amount))} USD</UsdValue>
               </InvoiceWrapper>
-              <Button disabled={!amount} onClick={generateInvoice}>
+              <Button disabled={!Number(amount)} onClick={generateInvoice}>
                 Generate Invoice
               </Button>
             </InvoiceForm>
