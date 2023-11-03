@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import lighningDecoder from 'light-bolt11-decoder';
-import moment from 'moment';
+import { InvoiceState } from 'people/widgetViews/organization/interface';
 import QR from 'people/utils/QR';
 import QrBar from 'people/utils/QrBar';
 import { calculateTimeLeft } from '../../../../helpers';
@@ -63,6 +63,7 @@ export default function Invoice(props: {
   invoiceStatus: boolean;
   lnInvoice: string;
   invoiceTime: number;
+  setInvoiceState?: (state: InvoiceState) => void;
 }) {
   const decoded = lighningDecoder.decode(props.lnInvoice);
   const expiry = decoded.sections[8].value;
@@ -78,15 +79,21 @@ export default function Invoice(props: {
     if (props.invoiceStatus) {
       clearTimeout(invoiceTimeout);
     }
-  }, [timeLeft, props.invoiceStatus]);
 
-  if (timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
-    console.log('Set status as expired');
-  }
+    if (timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
+      if (props.setInvoiceState) {
+        props.setInvoiceState('EXPIRED');
+      }
+    }
+
+    return () => {
+      if (invoiceTimeout) clearTimeout(invoiceTimeout);
+    };
+  }, [timeLeft, props.invoiceStatus]);
 
   return (
     <>
-      {timeLeft.seconds >= 0 || timeLeft.minutes >= 0 ? (
+      {timeLeft.seconds >= 0 || timeLeft.minutes >= 0 || timeLeft.hours! >= 0 ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
             <CountDownTextWrapper>

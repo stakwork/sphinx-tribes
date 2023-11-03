@@ -8,7 +8,9 @@ import { satToUsd } from 'helpers';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import Invoice from '../summaries/wantedSummaries/Invoice';
-import { AddBudgetModalProps } from './interface';
+import { AddBudgetModalProps, InvoiceState } from './interface';
+import ExpiredInvoice from './ExpiredInvoice';
+
 const color = colors['light'];
 
 const ModelWrapper = styled.div`
@@ -131,6 +133,7 @@ const Button = styled.button`
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState('');
   const [lnInvoice, setLnInvoice] = useState('');
+  const [invoiceState, setInvoiceState] = useState<InvoiceState>(null);
 
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -154,7 +157,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
       if (paymentRequest) {
         setLnInvoice(paymentRequest);
         startPolling(paymentRequest);
-
+        setInvoiceState('PENDING');
         main.setBudgetInvoice(paymentRequest);
       }
     }
@@ -193,13 +196,14 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
       }}
     >
       <ModelWrapper>
-        {lnInvoice && ui.meInfo?.owner_pubkey && (
+        {lnInvoice && invoiceState === 'PENDING' && ui.meInfo?.owner_pubkey && (
           <>
             <Invoice
               startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
               invoiceStatus={invoiceStatus}
               lnInvoice={lnInvoice}
               invoiceTime={pollMinutes}
+              setInvoiceState={setInvoiceState}
             />
           </>
         )}
@@ -225,6 +229,9 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
               </Button>
             </InvoiceForm>
           </>
+        )}
+        {invoiceState === 'EXPIRED' && (
+          <ExpiredInvoice setInvoiceState={setInvoiceState} setLnInvoice={setLnInvoice} />
         )}
       </ModelWrapper>
     </Modal>

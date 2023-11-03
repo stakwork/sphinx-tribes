@@ -39,3 +39,5 @@ export interface AddBudgetModalProps extends ModalProps {
 export interface WithdrawModalProps extends ModalProps {
   getOrganizationBudget: () => Promise<void>;
 }
+
+export type InvoiceState = 'PENDING' | 'PAID' | 'EXPIRED' | null;
