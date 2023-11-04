@@ -209,6 +209,7 @@ export const SchemaOuterContainer = styled.div`
 `;
 
 export const AboutSchemaInner = styled.div`
+  min-width: 100%;
   @media only screen and (max-width: 700px) {
     padding: 0px 25px;
   }
