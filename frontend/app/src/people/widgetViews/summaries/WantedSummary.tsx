@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
-import Form from '../../../components/form';
+import Form from '../../../components/form/bounty';
 import { sendBadgeSchema } from '../../../components/form/schema';
 import { useIsMobile } from '../../../hooks';
 import { Button } from '../../../components/common';
