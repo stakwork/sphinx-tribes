@@ -10,15 +10,13 @@ import { QrWrap } from './style';
 const InvoiceWrap = styled.div`
   display: flex;
   flex-direction: column;
-  width: 13.5rem;
-  margin-left: 4.75rem;
-  margin-right: 4.75rem;
 `;
 
 const CountDownTimerWrap = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.3rem;
   margin-bottom: 0.94rem;
 `;
 
@@ -35,7 +33,7 @@ const CountDownText = styled.p`
   font-weight: 500;
   line-height: normal;
   margin-bottom: 0;
-  margin-left: 0.37rem;
+  margin-left: 0.27rem;
 `;
 
 const CountDownIconContainer = styled.div`
@@ -64,6 +62,7 @@ export default function Invoice(props: {
   lnInvoice: string;
   invoiceTime: number;
   setInvoiceState?: (state: InvoiceState) => void;
+  qrSize?: number;
 }) {
   const decoded = lighningDecoder.decode(props.lnInvoice);
   const expiry = decoded.sections[8].value;
@@ -108,7 +107,7 @@ export default function Invoice(props: {
           </CountDownTimerWrap>
 
           <QrWrap>
-            <QR size={216} value={props.lnInvoice} />
+            <QR size={props.qrSize || 200} value={props.lnInvoice} />
             <QrBar value={props.lnInvoice} simple style={{ marginTop: '0.94rem' }} />
           </QrWrap>
         </InvoiceWrap>

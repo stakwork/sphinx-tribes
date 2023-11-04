@@ -132,6 +132,15 @@ const Button = styled.button`
   }
 `;
 
+const InvoiceQrWrapper = styled.div`
+  width: 13.5rem;
+  margin-left: 4.75rem;
+  margin-right: 4.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const AddBudgetModal = (props: AddBudgetModalProps) => {
   const [amount, setAmount] = useState('');
   const [lnInvoice, setLnInvoice] = useState('');
@@ -206,15 +215,16 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
     >
       <ModelWrapper>
         {lnInvoice && invoiceState === 'PENDING' && ui.meInfo?.owner_pubkey && (
-          <>
+          <InvoiceQrWrapper>
             <Invoice
               startDate={new Date(moment().add(pollMinutes, 'minutes').format().toString())}
               invoiceStatus={invoiceStatus}
               lnInvoice={lnInvoice}
               invoiceTime={pollMinutes}
               setInvoiceState={setInvoiceState}
+              qrSize={216}
             />
-          </>
+          </InvoiceQrWrapper>
         )}
         {!lnInvoice && ui.meInfo?.owner_pubkey && (
           <>
