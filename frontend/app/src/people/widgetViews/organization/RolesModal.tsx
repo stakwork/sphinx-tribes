@@ -99,7 +99,7 @@ const RolesModal = (props: UserRolesModalProps) => {
 
   useEffect(() => {
     getRoles();
-  }, [userRoles]);
+  }, [userRoles, getRoles]);
 
   const rolesChange = (role: any, s: any) => {
     // set the backend roles status using the map 'rolesCategories'

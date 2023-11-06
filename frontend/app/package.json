@@ -50,7 +50,7 @@
     "moment": "^2.29.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-dropzone": "^11.3.2",
+    "react-dropzone": "^14.2.3",
     "react-intersection-observer": "^9.4.1",
     "react-markdown": "^8.0.3",
     "react-qr-svg": "^2.2.2",
@@ -189,7 +189,7 @@
     "eslint-plugin-react": "^7.31.10",
     "husky": "^8.0.3",
     "nock": "^13.3.0",
-    "prettier": "^3.0.3",
+    "prettier": "3.0.3",
     "react-error-overlay": "6.0.9",
     "ts-jest": "^29.1.1",
     "typescript": "^5.0.3"
