@@ -235,7 +235,7 @@ const OrganizationDetails = (props: {
       img: body.img || org.img,
       created: org.created,
       updated: org.updated,
-      show: body?.show != undefined ? body.show : org.show,
+      show: body?.show !== undefined ? body.show : org.show,
       bounty_count: org.bounty_count,
       budget: org.budget
     };
@@ -261,7 +261,6 @@ const OrganizationDetails = (props: {
   };
 
   const roleChange = (e: Roles, s: any) => {
-
     const rolesData = bountyRolesData.map((role: any) => {
       if (role.name === e) {
         role.status = s.target.checked;
@@ -382,7 +381,7 @@ const OrganizationDetails = (props: {
           <HeadButton
             text="Edit"
             color="white"
-            disabled={!isOrganizationAdmin}
+            disabled={editOrgDisabled}
             onClick={() => setIsOpenEditOrg(true)}
             style={{ borderRadius: '5px' }}
           />
