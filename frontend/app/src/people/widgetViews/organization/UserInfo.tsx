@@ -5,6 +5,34 @@ import { PaymentHistoryUserInfo } from './interface';
 const UserInfoWrapper = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
+  cursor: pointer;
+
+  :hover .tooltipText {
+    visibility: visible;
+    opacity: 1;
+  }
+`;
+
+const ToolTipWrapper = styled.div`
+  visibility: hidden;
+  width: 19rem;
+  background-color: #eee;
+  color: #1a1a1a;
+  overflow-wrap: break-word;
+  font-size: 0.75rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  position: absolute;
+  box-shadow:
+    0px 4px 6px -2px rgba(16, 24, 40, 0.03),
+    0px 12px 16px -4px rgba(16, 24, 40, 0.08);
+  z-index: 1;
+  top: 100%;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
 `;
 
 const Wrapper = styled.div`
@@ -52,10 +80,10 @@ const Pubkey = styled.p`
 `;
 const UserInfo = (props: PaymentHistoryUserInfo) => {
   const formatName = (name: string) => {
-    if (name.length < 30) {
+    if (name.length <= 30) {
       return name;
     }
-    return name.substring(0, 18);
+    return `${name.substring(0, 18)}...`;
   };
   return (
     <UserInfoWrapper>
@@ -63,6 +91,9 @@ const UserInfo = (props: PaymentHistoryUserInfo) => {
         <Image src={props.image} />
       </Wrapper>
       <DetailWrapper>
+        {props.name.length > 30 ? (
+          <ToolTipWrapper className="tooltipText">{props.name}</ToolTipWrapper>
+        ) : null}
         <Name>{formatName(props.name)}</Name>
         <Pubkey>{props.pubkey.substring(0, 17)}...</Pubkey>
       </DetailWrapper>
