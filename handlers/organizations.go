@@ -46,7 +46,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 
 	existing := db.DB.GetOrganizationByUuid(org.Uuid)
 	if existing.ID == 0 { // new!
-		if org.ID != 0 { // cant try to "edit" if not exists already
+		if org.ID != 0 { // can't try to "edit" if it does not exist already
 			fmt.Println("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -69,13 +69,13 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		if org.ID == 0 {
-			// cant create that already exists
+			// can't create that already exists
 			fmt.Println("can't create existing organization")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
-		if org.ID != existing.ID { // cant edit someone else's
+		if org.ID != existing.ID { // can't edit someone else's
 			fmt.Println("cant edit another organization")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -315,7 +315,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// check if user already exists
 	userExists := db.DB.GetOrganizationUser(user, uuid)
 
-	// if not the orgnization admin
+	// if not the organization admin
 	if userExists.OwnerPubKey != user || userExists.OrgUuid != uuid {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User does not exists in the organization")
@@ -412,7 +412,7 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if not the orgnization admin
+	// if not the organization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -432,7 +432,7 @@ func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 
-	// if not the orgnization admin
+	// if not the organization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -461,7 +461,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if not the orgnization admin
+	// if not the organization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
