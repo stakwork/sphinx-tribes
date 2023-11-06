@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../../config/colors';
-import { formatSatPrice, getOriginalNumberValue, satToUsd } from '../../../helpers';
 import type { Props } from './propsType';
+import { FieldEnv } from '.';
 
 interface styledProps {
   color?: any;
@@ -13,7 +13,7 @@ const InputOuterBox = styled.div<styledProps>`
   position: relative;
   margin-bottom: 16px;
   .inputText {
-    height: 40px;
+    height: 45px;
     width: 292px;
     font-size: 14px;
     color: ${(p: any) => p.color && p.color.pureBlack};
@@ -52,13 +52,16 @@ export default function NumberInputNew({
   value,
   handleChange,
   handleBlur,
-  handleFocus
+  handleFocus,
+  borderType
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext}*`;
+
   const color = colors['light'];
   const [isError, setIsError] = useState<boolean>(false);
   const [textValue, setTextValue] = useState(value);
+  const [active, setActive] = useState<boolean>(false);
 
   useEffect(() => {
     if (textValue) {
@@ -68,46 +71,34 @@ export default function NumberInputNew({
 
   return (
     <InputOuterBox color={color} borderColor={isError ? color.red2 : color.grayish.G600}>
-      <input
-        className="inputText"
-        id={'text'}
-        type={'text'}
-        value={textValue}
-        placeholder={'0'}
-        onFocus={handleFocus}
-        onBlur={() => {
-          handleBlur();
-          if (error) {
-            setIsError(true);
-          }
+      <FieldEnv
+        color={color}
+        onClick={() => {
+          setActive(true);
         }}
-        onChange={(e: any) => {
-          e.target.value = getOriginalNumberValue(e.target.value);
-          if (!isNaN(Number(e.target.value))) {
-            handleChange(e.target.value);
-            setTextValue(formatSatPrice(e.target.value));
-          }
-        }}
-      />
-      <label
-        htmlFor={'text'}
-        className="text"
-        onClick={handleFocus}
-        style={{
-          position: 'absolute',
-          left: 18,
-          fontFamily: 'Barlow',
-          top: -9,
-          fontSize: 12,
-          color: color.grayish.G300,
-          background: color.pureWhite,
-          fontWeight: '500',
-          transition: 'all 0.5s'
-        }}
+        className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
+        border={borderType}
+        label={labeltext}
       >
-        {labeltext}
-      </label>
-      <div className="USD">{satToUsd(getOriginalNumberValue(textValue))} USD</div>
+        <input
+          className="inputText"
+          id={'number'}
+          type={'number'}
+          value={textValue}
+          placeholder={'0'}
+          onFocus={handleFocus}
+          onBlur={() => {
+            handleBlur();
+            if (error) {
+              setIsError(true);
+            }
+          }}
+          onChange={(e: any) => {
+            handleChange(e.target.value);
+            setTextValue(e.target.value);
+          }}
+        />
+      </FieldEnv>
     </InputOuterBox>
   );
 }

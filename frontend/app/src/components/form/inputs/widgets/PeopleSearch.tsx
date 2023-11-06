@@ -291,7 +291,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
-  const { main, ui } = useStores();
+  const { main } = useStores();
 
   const { ref, inView } = useInView({
     triggerOnce: false,

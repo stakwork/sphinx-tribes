@@ -20,6 +20,7 @@ import InvitePeopleSearch from './widgets/PeopleSearch';
 import LoomVideoInputNew from './LoomVideoInputNew';
 import TextInputNew from './TextInputNew2';
 import NumberInputNew from './NumberInputNew';
+import NumberSatsInput from './NumberSatsInput';
 import TextAreaInputNew from './TextAreaInputNew';
 import CreatableMultiSelectInputNew from './CreatableMultiSelectInputNew';
 
@@ -137,15 +138,12 @@ margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')};
 
 `;
 export const FieldTextArea = styled(EuiTextArea)<styledProps>`
-  // min-height: ${(p: any) => p?.height && p.height} !important;
-  // max-height: ${(p: any) => p?.width && p.height} !important;
   width: ${(p: any) => p?.color && p.color.width};
   background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
   background: ${(p: any) => p?.color && p.color.pureWhite} !important;
   max-width: 900px;
   color: ${(p: any) => p?.color && p.color.pureBlack} !important;
   box-shadow: none !important;
-  // border-bottom: ${(p: any) => p?.color && `1px solid ${p.color.grayish.G600}`};
   line-height: 17.6px;
 `;
 export default function Input(props: any) {
@@ -168,6 +166,8 @@ export default function Input(props: any) {
         return <GalleryInput {...props} />;
       case 'number':
         return props?.newDesign ? <NumberInputNew {...props} /> : <NumberInput {...props} />;
+      case 'numbersats':
+        return <NumberSatsInput {...props} />;
       case 'loom':
         return props?.newDesign ? <LoomVideoInputNew {...props} /> : <LoomVideoInput {...props} />;
       case 'switch':

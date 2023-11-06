@@ -7,6 +7,7 @@ type FormFieldType =
   | 'imgcanvas'
   | 'gallery'
   | 'number'
+  | 'numbersats'
   | 'hidden'
   | 'widgets'
   | 'widget'
