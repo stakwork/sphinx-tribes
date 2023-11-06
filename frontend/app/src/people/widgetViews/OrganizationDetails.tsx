@@ -74,8 +74,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const editOrgDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
-  const addUserDisabled =
-    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
   const viewReportDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
   const addBudgetDisabled =
@@ -228,7 +226,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const submitRoles = async () => {
-    console.log(bountyRolesData);
     const roleData = bountyRolesData
       .filter((r: any) => r.status)
       .map((role: any) => ({
@@ -408,7 +405,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <UsersHeader>Users</UsersHeader>
           <HeadButtonWrap forSmallScreen={false}>
             <Button
-              disabled={addUserDisabled}
+              disabled={editOrgDisabled}
               text="Add User"
               color="white"
               style={{
