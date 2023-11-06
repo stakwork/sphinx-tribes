@@ -50,16 +50,24 @@ const Pubkey = styled.p`
   letter-spacing: 0.01375rem;
   margin-bottom: 0;
 `;
-const UserInfo = (props: PaymentHistoryUserInfo) => (
-  <UserInfoWrapper>
-    <Wrapper>
-      <Image src={props.image} />
-    </Wrapper>
-    <DetailWrapper>
-      <Name>{props.name}</Name>
-      <Pubkey>{props.pubkey.substring(0, 17)}...</Pubkey>
-    </DetailWrapper>
-  </UserInfoWrapper>
-);
+const UserInfo = (props: PaymentHistoryUserInfo) => {
+  const formatName = (name: string) => {
+    if (name.length < 30) {
+      return name;
+    }
+    return name.substring(0, 18);
+  };
+  return (
+    <UserInfoWrapper>
+      <Wrapper>
+        <Image src={props.image} />
+      </Wrapper>
+      <DetailWrapper>
+        <Name>{formatName(props.name)}</Name>
+        <Pubkey>{props.pubkey.substring(0, 17)}...</Pubkey>
+      </DetailWrapper>
+    </UserInfoWrapper>
+  );
+};
 
 export default UserInfo;

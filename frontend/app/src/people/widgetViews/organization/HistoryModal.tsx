@@ -38,8 +38,6 @@ const ModalHeaderWrapper = styled.div`
 
 const ModalTitle = styled.h2`
   color: #3c3f41;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 1.625rem;
   font-style: normal;
@@ -74,8 +72,6 @@ const PaymentType = styled.div`
 const Label = styled.label`
   margin-bottom: 0;
   color: #1e1f25;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 1rem;
   font-style: normal;
@@ -114,8 +110,6 @@ const THeadRow = styled.tr`
 
 const TH = styled.th`
   color: #8e969c;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 0.8rem;
   font-style: normal;
@@ -210,8 +204,6 @@ const ViewBountyContainer = styled.div`
 
 const ViewBounty = styled.p`
   color: #5f6368;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 0.8125rem;
   font-style: normal;
