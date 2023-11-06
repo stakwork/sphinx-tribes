@@ -11,7 +11,7 @@ export interface ModalProps {
 export interface UserRolesModalProps extends ModalProps {
   bountyRolesData: BountyRoles[];
   userRoles: any[];
-  roleChange: (e: any) => void;
+  roleChange: (e: any, s: any) => void;
   submitRoles: () => void;
 }
 
