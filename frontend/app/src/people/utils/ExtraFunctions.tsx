@@ -7,3 +7,12 @@ export const filterCount = (filterValues: any) => {
   }
   return count;
 };
+
+export const formatSat = (sat: number) => {
+  if (sat === 0 || !sat) {
+    return '0';
+  }
+  const satsWithComma = sat.toLocaleString();
+  const splittedSat = satsWithComma.split(',');
+  return splittedSat.join(' ');
+};
