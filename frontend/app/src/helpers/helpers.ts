@@ -32,9 +32,9 @@ export const convertToLocaleString = (value: number): string => {
 };
 
 export const convertLocaleToNumber = (localeString: string): number => {
-  let numString = localeString.replace(/\D/g, '');
+  const numString = localeString.replace(/\D/g, '');
 
-  let num = parseInt(numString);
+  const num = parseInt(numString);
   return num;
 };
 
