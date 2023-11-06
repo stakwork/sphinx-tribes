@@ -9,6 +9,7 @@ import (
 var Host string
 var JwtKey string
 var RelayUrl string
+var MemeUrl string
 var RelayAuthKey string
 var RelayNodeKey string
 
@@ -20,6 +21,7 @@ func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
 	RelayUrl = os.Getenv("RELAY_URL")
+	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
 	RelayAuthKey = os.Getenv("RELAY_NODE_KEY")
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -528,7 +529,46 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
-	// TOPDO
+	// Parsing uploaded file
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "Unable to parse file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	fmt.Println("FIle  ===", header.Filename)
+
+	// Saving the file
+	dst, err := os.Create("uploads/" + header.Filename)
+	fmt.Println("FILE +++", dst)
+	if err != nil {
+		http.Error(w, "Unable to save file 1", http.StatusInternalServerError)
+		return
+	}
+
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, "Unable to save file 2", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("File uploaded successfully"))
+
+	// buf := bytes.NewBuffer(nil)
+	// if _, err := io.Copy(buf, file); err != nil {
+	// 	fmt.Println("Error ===", err)
+	// }
+
+	// err = os.WriteFile("/uploads/"+header.Filename, buf.Bytes(), 0644)
+	// if err != nil {
+	// 	fmt.Println("WRITE FILE ERROR", err)
+	// }
+	// TODO
+
+	// Upload the file
 	// Send to meme server ask endpoint to get a challenge
 	// GET /ask
 	// Send to RELAY to sign the chaallenge
@@ -542,5 +582,4 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	// NODE PUBKEY fROM LND NODE
 
 	// WHEN UT RETURNS SEND THE IMAGE TO MEME SERVER PUBLIC
-
 }
