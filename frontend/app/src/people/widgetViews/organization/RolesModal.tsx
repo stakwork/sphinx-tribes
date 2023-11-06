@@ -128,7 +128,7 @@ const RolesModal = (props: UserRolesModalProps) => {
         ...(config?.modalStyle ?? {}),
         maxHeight: '100%',
         borderRadius: '10px',
-        padding: '20px 60px 10px 60px'
+        padding: '20px 60px 20px 60px'
       }}
       overlayClick={close}
       bigCloseImage={close}
