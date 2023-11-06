@@ -5,7 +5,7 @@ import { Button } from 'components/common';
 import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { satToUsd, userHasRole } from 'helpers';
+import { satToUsd, userHasRole, Roles } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -72,7 +72,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
-  const addUserDisabled =
+  const editOrgDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
   const viewReportDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
@@ -215,14 +215,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setIsLoading(false);
   };
 
-  const roleChange = (e: any) => {
+  const roleChange = (e: Roles, s: any) => {
     const rolesData = bountyRolesData.map((role: any) => {
-      if (role.name === e.target.value) {
-        role.status = !role.status;
+      if (role.name === e) {
+        role.status = s.target.checked;
       }
       return role;
     });
-
     setBountyRolesData(rolesData);
   };
 
@@ -334,7 +333,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <OrgName>{org?.name}</OrgName>
         </HeadNameWrap>
         <HeadButtonWrap forSmallScreen={false}>
-          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+          <HeadButton
+            text="Edit"
+            disabled={editOrgDisabled}
+            color="white"
+            style={{ borderRadius: '5px' }}
+          />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"
@@ -398,10 +402,10 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       </ActionWrap>
       <UserWrap>
         <UsersHeadWrap>
-          <UsersHeader>USERS</UsersHeader>
+          <UsersHeader>Users</UsersHeader>
           <HeadButtonWrap forSmallScreen={false}>
             <Button
-              disabled={addUserDisabled}
+              disabled={editOrgDisabled}
               text="Add User"
               color="white"
               style={{
