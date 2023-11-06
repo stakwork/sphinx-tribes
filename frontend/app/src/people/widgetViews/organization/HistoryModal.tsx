@@ -296,7 +296,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
                 type={'checkbox'}
                 checked={filter.payment}
                 onChange={() => handleFilter('payment')}
-              />{' '}
+              />
               <Label htmlFor="payment">Payments</Label>
             </PaymentType>
             <PaymentType>
@@ -305,7 +305,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
                 type={'checkbox'}
                 checked={filter.deposit}
                 onChange={() => handleFilter('deposit')}
-              />{' '}
+              />
               <Label htmlFor="deposit">Deposit</Label>
             </PaymentType>
             <PaymentType>
@@ -314,7 +314,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
                 type={'checkbox'}
                 checked={filter.withdraw}
                 onChange={() => handleFilter('withdraw')}
-              />{' '}
+              />
               <Label htmlFor="withdraw">Withdrawals</Label>
             </PaymentType>
           </PaymentFilterWrapper>
