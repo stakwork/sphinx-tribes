@@ -827,11 +827,6 @@ export const organizationSchema: FormField[] = [
     validator: strValidator
   },
   {
-    name: 'img',
-    label: 'Image url',
-    type: 'text'
-  },
-  {
     name: 'show',
     label: 'Show to public',
     type: 'switch'

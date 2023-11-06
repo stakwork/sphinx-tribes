@@ -1,4 +1,4 @@
-import { BountyRoles, BudgetHistory, PaymentHistory, Person } from 'store/main';
+import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -6,6 +6,12 @@ export interface ModalProps {
   uuid?: string;
   user?: Person;
   addToast?: (text: string, color: 'danger' | 'success') => void;
+}
+
+export interface EditOrgModalProps extends ModalProps {
+  org?: Organization;
+  onSubmit: (body: any) => void;
+  onDelete: () => void;
 }
 
 export interface UserRolesModalProps extends ModalProps {

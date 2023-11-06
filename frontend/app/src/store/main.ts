@@ -1745,6 +1745,7 @@ export class MainStore {
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations`, {
         method: 'POST',
+
         mode: 'cors',
         body: JSON.stringify({
           ...body
