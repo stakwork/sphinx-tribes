@@ -131,107 +131,21 @@ function Form(props: FormProps) {
       innerRef={props.formRef}
       validationSchema={validator(schema)}
     >
-      {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => {
-        return (
-          <Wrap ref={refBody}>
-            {props.isFirstTimeScreen && schema ? (
-              <>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%'
-                  }}
-                >
-                  <div style={{ marginRight: '40px' }}>
-                    {schema
-                      .filter((item: FormField) => item.type === 'img')
-                      .map((item: FormField) => (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          values={values}
-                          errors={errors}
-                          scrollToTop={scrollToTop}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e: any, f: any) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          extraHTML={
-                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                          }
-                          borderType={'bottom'}
-                          imageIcon={true}
-                          style={
-                            item.name === 'github_description' && !values.ticket_url
-                              ? {
-                                  display: 'none'
-                                }
-                              : undefined
-                          }
-                        />
-                      ))}
-                  </div>
-
-                  <div style={{ width: '100%' }}>
-                    {schema
-                      .filter((item: FormField) => item.type !== 'img')
-                      .map((item: FormField) => (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          values={values}
-                          errors={errors}
-                          scrollToTop={scrollToTop}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e: any, f: any) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          setDisableFormButtons={setDisableFormButtons}
-                          extraHTML={
-                            (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
-                          }
-                          borderType={'bottom'}
-                          style={
-                            item.name === 'github_description' && !values.ticket_url
-                              ? {
-                                  display: 'none'
-                                }
-                              : undefined
-                          }
-                        />
-                      ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <AboutSchemaInner>
-                <SchemaOuterContainer>
-                  <div className="SchemaInnerContainer">
-                    {schema.map((item: FormField) => (
+      {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => (
+        <Wrap ref={refBody}>
+          {props.isFirstTimeScreen && schema ? (
+            <>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}
+              >
+                <div style={{ marginRight: '40px' }}>
+                  {schema
+                    .filter((item: FormField) => item.type === 'img')
+                    .map((item: FormField) => (
                       <Input
                         {...item}
                         key={item.name}
@@ -251,19 +165,14 @@ function Form(props: FormProps) {
                           setFieldValue(e, f);
                         }}
                         setFieldTouched={setFieldTouched}
-                        isFocused={isFocused}
-                        handleBlur={() => {
-                          setFieldTouched(item.name, false);
-                          setIsFocused({ [item.label]: false });
-                        }}
-                        handleFocus={() => {
-                          setFieldTouched(item.name, true);
-                          setIsFocused({ [item.label]: true });
-                        }}
+                        handleBlur={() => setFieldTouched(item.name, false)}
+                        handleFocus={() => setFieldTouched(item.name, true)}
                         setDisableFormButtons={setDisableFormButtons}
                         extraHTML={
                           (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                         }
+                        borderType={'bottom'}
+                        imageIcon={true}
                         style={
                           item.name === 'github_description' && !values.ticket_url
                             ? {
@@ -273,145 +182,232 @@ function Form(props: FormProps) {
                         }
                       />
                     ))}
-                  </div>
-                </SchemaOuterContainer>
-              </AboutSchemaInner>
-            )}
-            {/* make space at bottom for first sign up */}
-            {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
-            {!props?.newDesign && (
-              <BWrap style={buttonAlignment} color={color}>
-                {props?.close && buttonsOnBottom ? (
+                </div>
+
+                <div style={{ width: '100%' }}>
+                  {schema
+                    .filter((item: FormField) => item.type !== 'img')
+                    .map((item: FormField) => (
+                      <Input
+                        {...item}
+                        key={item.name}
+                        values={values}
+                        errors={errors}
+                        scrollToTop={scrollToTop}
+                        value={values[item.name]}
+                        error={errors[item.name]}
+                        initialValues={initialValues}
+                        deleteErrors={() => {
+                          if (errors[item.name]) delete errors[item.name];
+                        }}
+                        handleChange={(e: any) => {
+                          setFieldValue(item.name, e);
+                        }}
+                        setFieldValue={(e: any, f: any) => {
+                          setFieldValue(e, f);
+                        }}
+                        setFieldTouched={setFieldTouched}
+                        handleBlur={() => setFieldTouched(item.name, false)}
+                        handleFocus={() => setFieldTouched(item.name, true)}
+                        setDisableFormButtons={setDisableFormButtons}
+                        extraHTML={
+                          (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
+                        }
+                        borderType={'bottom'}
+                        style={
+                          item.name === 'github_description' && !values.ticket_url
+                            ? {
+                                display: 'none'
+                              }
+                            : undefined
+                        }
+                      />
+                    ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <AboutSchemaInner>
+              <SchemaOuterContainer>
+                <div className="SchemaInnerContainer">
+                  {schema.map((item: FormField) => (
+                    <Input
+                      {...item}
+                      key={item.name}
+                      values={values}
+                      errors={errors}
+                      scrollToTop={scrollToTop}
+                      value={values[item.name]}
+                      error={errors[item.name]}
+                      initialValues={initialValues}
+                      deleteErrors={() => {
+                        if (errors[item.name]) delete errors[item.name];
+                      }}
+                      handleChange={(e: any) => {
+                        setFieldValue(item.name, e);
+                      }}
+                      setFieldValue={(e: any, f: any) => {
+                        setFieldValue(e, f);
+                      }}
+                      setFieldTouched={setFieldTouched}
+                      isFocused={isFocused}
+                      handleBlur={() => {
+                        setFieldTouched(item.name, false);
+                        setIsFocused({ [item.label]: false });
+                      }}
+                      handleFocus={() => {
+                        setFieldTouched(item.name, true);
+                        setIsFocused({ [item.label]: true });
+                      }}
+                      setDisableFormButtons={setDisableFormButtons}
+                      extraHTML={(props.extraHTML && props.extraHTML[item.name]) || item.extraHTML}
+                      style={
+                        item.name === 'github_description' && !values.ticket_url
+                          ? {
+                              display: 'none'
+                            }
+                          : undefined
+                      }
+                    />
+                  ))}
+                </div>
+              </SchemaOuterContainer>
+            </AboutSchemaInner>
+          )}
+          {/* make space at bottom for first sign up */}
+          {buttonsOnBottom && !smallForm && <div style={{ height: 48, minHeight: 48 }} />}
+          {!props?.newDesign && (
+            <BWrap style={buttonAlignment} color={color}>
+              {props?.close && buttonsOnBottom ? (
+                <Button
+                  disabled={disableFormButtons || props.loading}
+                  onClick={() => {
+                    if (props.close) props.close();
+                  }}
+                  style={{ ...buttonStyle, marginRight: 10, width: '140px' }}
+                  color={'white'}
+                  text={'Cancel'}
+                />
+              ) : (
+                <IconButton
+                  icon="arrow_back"
+                  onClick={() => {
+                    if (props.close) props.close();
+                  }}
+                  style={{ fontSize: 12, fontWeight: 600 }}
+                />
+              )}
+
+              {readOnly ? (
+                <div />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <Button
                     disabled={disableFormButtons || props.loading}
                     onClick={() => {
-                      if (props.close) props.close();
+                      if (dynamicSchemaName) {
+                        // inject type in body
+                        setFieldValue('type', dynamicSchemaName);
+                      }
+                      handleSubmit();
+                      if (
+                        window.location.href.includes('bounty') ||
+                        window.location.href.includes('ticket')
+                      ) {
+                        history.push('/bounties');
+                      }
                     }}
-                    style={{ ...buttonStyle, marginRight: 10, width: '140px' }}
-                    color={'white'}
-                    text={'Cancel'}
+                    loading={props.loading}
+                    style={{ ...buttonStyle, width: '140px' }}
+                    color={'primary'}
+                    text={'Save'}
                   />
-                ) : (
-                  <IconButton
-                    icon="arrow_back"
-                    onClick={() => {
-                      if (props.close) props.close();
-                    }}
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                  />
-                )}
 
-                {readOnly ? (
-                  <div />
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Button
+                  {props.delete && (
+                    <IconButton
                       disabled={disableFormButtons || props.loading}
                       onClick={() => {
-                        if (dynamicSchemaName) {
-                          // inject type in body
-                          setFieldValue('type', dynamicSchemaName);
-                        }
-                        handleSubmit();
-                        if (
-                          window.location.href.includes('bounty') ||
-                          window.location.href.includes('ticket')
-                        ) {
-                          history.push('/bounties');
-                        }
+                        if (props.delete) props.delete();
                       }}
+                      icon={'delete'}
                       loading={props.loading}
-                      style={{ ...buttonStyle, width: '140px' }}
-                      color={'primary'}
-                      text={'Save'}
+                      style={{ marginLeft: 10 }}
+                      color={'clear'}
                     />
-
-                    {props.delete && (
-                      <IconButton
-                        disabled={disableFormButtons || props.loading}
-                        onClick={() => {
-                          if (props.delete) props.delete();
-                        }}
-                        icon={'delete'}
-                        loading={props.loading}
-                        style={{ marginLeft: 10 }}
-                        color={'clear'}
-                      />
-                    )}
-                  </div>
-                )}
-              </BWrap>
-            )}
-            {/*  if schema is AboutMe */}
-            {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id !== 0 && (
-              <>
+                  )}
+                </div>
+              )}
+            </BWrap>
+          )}
+          {/*  if schema is AboutMe */}
+          {!props.isFirstTimeScreen && isAboutMeForm && ui.meInfo?.id !== 0 && (
+            <>
+              <SchemaOuterContainer>
+                <div
+                  className="SchemaInnerContainer"
+                  style={{
+                    cursor: 'pointer',
+                    marginTop: 20,
+                    fontSize: 12,
+                    minHeight: 30,
+                    height: 30
+                  }}
+                  onClick={() => setShowSettings(!showSettings)}
+                >
+                  Advanced Settings {showSettings ? '-' : '+'}
+                </div>
+              </SchemaOuterContainer>
+              {showSettings && (
                 <SchemaOuterContainer>
-                  <div
-                    className="SchemaInnerContainer"
-                    style={{
-                      cursor: 'pointer',
-                      marginTop: 20,
-                      fontSize: 12,
-                      minHeight: 30,
-                      height: 30
-                    }}
-                    onClick={() => setShowSettings(!showSettings)}
-                  >
-                    Advanced Settings {showSettings ? '-' : '+'}
+                  <div style={{ minHeight: 50, height: 50 }} className="SchemaInnerContainer">
+                    <Button
+                      text={'Delete my account'}
+                      color={'link2'}
+                      width="fit-content"
+                      onClick={() => setShowDeleteWarn(true)}
+                    />
                   </div>
                 </SchemaOuterContainer>
-                {showSettings && (
-                  <SchemaOuterContainer>
-                    <div style={{ minHeight: 50, height: 50 }} className="SchemaInnerContainer">
-                      <Button
-                        text={'Delete my account'}
-                        color={'link2'}
-                        width="fit-content"
-                        onClick={() => setShowDeleteWarn(true)}
-                      />
-                    </div>
-                  </SchemaOuterContainer>
-                )}
+              )}
 
-                <Modal visible={showDeleteWarn}>
-                  <div style={{ padding: 40, textAlign: 'center' }}>
-                    <div style={{ fontSize: 30, marginBottom: 10 }}>Danger zone</div>
-                    <p>
-                      Are you sure? Doing so will delete your profile and <b>all of your posts.</b>
-                    </p>
+              <Modal visible={showDeleteWarn}>
+                <div style={{ padding: 40, textAlign: 'center' }}>
+                  <div style={{ fontSize: 30, marginBottom: 10 }}>Danger zone</div>
+                  <p>
+                    Are you sure? Doing so will delete your profile and <b>all of your posts.</b>
+                  </p>
 
-                    <div
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: 20
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: 20
+                    }}
+                  >
+                    <Button
+                      text={'Nevermind'}
+                      color={'white'}
+                      onClick={() => {
+                        setShowSettings(false);
+                        setShowDeleteWarn(false);
                       }}
-                    >
-                      <Button
-                        text={'Nevermind'}
-                        color={'white'}
-                        onClick={() => {
-                          setShowSettings(false);
-                          setShowDeleteWarn(false);
-                        }}
-                      />
-                      <div style={{ height: 20 }} />
-                      <Button
-                        text={'Delete everything'}
-                        color={'danger'}
-                        onClick={() => main.deleteProfile()}
-                      />
-                    </div>
+                    />
+                    <div style={{ height: 20 }} />
+                    <Button
+                      text={'Delete everything'}
+                      color={'danger'}
+                      onClick={() => main.deleteProfile()}
+                    />
                   </div>
-                </Modal>
-              </>
-            )}
-          </Wrap>
-        );
-      }}
+                </div>
+              </Modal>
+            </>
+          )}
+        </Wrap>
+      )}
     </Formik>
   );
 }

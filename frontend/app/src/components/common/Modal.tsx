@@ -149,7 +149,6 @@ export default function Modal(props: ModalProps) {
         dismountCallback={dismountCallback}
         isMounted={visible ? true : false}
         style={{
-          ...style,
           position: 'absolute',
           top: 0,
           left: 0,
@@ -160,7 +159,8 @@ export default function Modal(props: ModalProps) {
           alignItems: 'center',
           justifyContent: 'center',
           overflowY: 'auto',
-          overflowX: 'hidden'
+          overflowX: 'hidden',
+          ...style
         }}
       >
         <Env

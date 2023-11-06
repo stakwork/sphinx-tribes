@@ -45,3 +45,9 @@ export interface AddBudgetModalProps extends ModalProps {
 export interface WithdrawModalProps extends ModalProps {
   getOrganizationBudget: () => Promise<void>;
 }
+
+export interface PaymentHistoryUserInfo {
+  pubkey: string;
+  name: string;
+  image: string;
+}
