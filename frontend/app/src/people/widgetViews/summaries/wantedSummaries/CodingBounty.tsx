@@ -343,7 +343,7 @@ function MobileView(props: CodingBountiesProps) {
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-  }, [onHandle]);
+  }, []);
 
   return (
     <div>

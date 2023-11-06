@@ -74,7 +74,7 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
 
   useEffect(() => {
     getChallenge();
-  }, [getChallenge]);
+  }, []);
 
   useEffect(() => {
     if (challenge && ts) {
@@ -82,7 +82,7 @@ export default function SphinxAppLoginDeeplink(props: AuthProps) {
       el.href = qrString;
       el.click();
     }
-  }, [challenge, ts, qrString]);
+  }, [challenge, ts]);
 
   return (
     <ConfirmWrap>

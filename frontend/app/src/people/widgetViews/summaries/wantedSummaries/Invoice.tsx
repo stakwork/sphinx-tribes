@@ -21,7 +21,7 @@ export default function Invoice(props: {
     if (props.invoiceStatus) {
       clearTimeout(invoiceTimeout);
     }
-  }, [timeLeft, props.invoiceStatus, timeLimit]);
+  }, [timeLeft, props.invoiceStatus]);
 
   return (
     <div style={{ marginTop: '30px' }}>
