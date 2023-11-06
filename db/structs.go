@@ -592,6 +592,11 @@ type WithdrawBudgetRequest struct {
 	OrgUuid         string `json:"org_uuid"`
 }
 
+type MemeChallenge struct {
+	Id        int    `json:"id"`
+	Challenge string `json:"challenge"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

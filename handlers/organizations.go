@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
@@ -556,6 +558,30 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte("File uploaded successfully"))
+
+	url := fmt.Sprintf("%s/ask", config.MemeUrl)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	// Unmarshal result
+	memeChallenge := db.MemeChallenge{}
+	err = json.Unmarshal(body, &memeChallenge)
+
+	if err != nil {
+		log.Printf("Reading Invoice body failed: %s", err)
+	}
 
 	// buf := bytes.NewBuffer(nil)
 	// if _, err := io.Copy(buf, file); err != nil {
