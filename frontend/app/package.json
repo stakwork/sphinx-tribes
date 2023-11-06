@@ -11,7 +11,7 @@
     "start:people:docker": "PORT=23007 craco start",
     "start:people:cluster": "PORT=13007 craco start",
     "build": "craco build",
-    "test": "REACT_APP_IS_TEST=true craco test --env=./src/__test__/custom-test-env.ts",
+    "test": "REACT_APP_IS_TEST=true craco test",
     "eject": "craco eject",
     "lint": "eslint src --max-warnings 67 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",

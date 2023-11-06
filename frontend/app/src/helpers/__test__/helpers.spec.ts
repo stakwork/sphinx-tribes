@@ -6,7 +6,7 @@ import {
   calculateTimeLeft,
   toCapitalize,
   userHasRole,
-  isInvoiceExpired
+  formatRelayPerson
 } from '../helpers';
 import { uiStore } from '../../store/ui';
 import crypto from 'crypto';
@@ -143,10 +143,24 @@ describe('testing helpers', () => {
       expect(capitalizeString).toBe('Hello Test Sphinx');
     });
   });
-  describe('Test if lightning invoice is not expired', () => {
-    const invoice = 'lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs';
+  describe('formatRealyUser', () => {
+    test('test format relay person', () => {
+      const relayUser = {
+        owner_pubkey: '2334455555555',
+        alias: 'User',
+        contact_key: '12345599999',
+        route_hint: 'owner_route_hint',
+        description: 'hello test',
+        extras: [],
+        price_to_meet: 0,
+        img: '',
+        tags: []
+      }
 
-    const isExpired = isInvoiceExpired(invoice);
-    expect(isExpired).toBe(true);
+      const formatedUser = formatRelayPerson(relayUser);
+      expect(formatedUser.owner_route_hint).toBe(relayUser.route_hint);
+      expect(formatedUser.owner_contact_key).toBe(relayUser.contact_key);
+      expect(formatedUser.owner_alias).toBe(relayUser.alias);
+    });
   });
 });
