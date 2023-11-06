@@ -526,3 +526,21 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceCount)
 }
+
+func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
+	// TOPDO
+	// Send to meme server ask endpoint to get a challenge
+	// GET /ask
+	// Send to RELAY to sign the chaallenge
+	// GET http://localhost:3001/signer/${r.challenge}
+
+	// POST TO MEME SERVER TO GET TO GET TOKEN
+	// POST /verify"
+	// form: { id: r.id, sig: r2.response.sig, pubkey: node.pubkey },
+	// ID FROM CHALLENGE
+	// SIG FROM RELAY
+	// NODE PUBKEY fROM LND NODE
+
+	// WHEN UT RETURNS SEND THE IMAGE TO MEME SERVER PUBLIC
+
+}

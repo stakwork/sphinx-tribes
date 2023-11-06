@@ -10,6 +10,7 @@ var Host string
 var JwtKey string
 var RelayUrl string
 var RelayAuthKey string
+var RelayNodeKey string
 
 // these are constants for the store
 var InvoiceList = "INVOICELIST"
@@ -20,6 +21,7 @@ func InitConfig() {
 	JwtKey = os.Getenv("LN_JWT_KEY")
 	RelayUrl = os.Getenv("RELAY_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
+	RelayAuthKey = os.Getenv("RELAY_NODE_KEY")
 
 	if Host == "" {
 		Host = "https://people.sphinx.chat"
