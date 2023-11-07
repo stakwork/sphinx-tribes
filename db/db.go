@@ -66,7 +66,7 @@ func (db database) CreateChannel(c Channel) (Channel, error) {
 
 }
 
-// check that update owner_pub_key does in fact throw error
+// check that update owner_pub_key does in fact throws an error
 func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	if b.OwnerPubKey == "" {
 		return Bot{}, errors.New("no pub key")
@@ -103,7 +103,7 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	return b, nil
 }
 
-// check that update owner_pub_key does in fact throw error
+// check that update owner_pub_key does in fact throws an error
 func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.OwnerPubKey == "" {
 		return Person{}, errors.New("no pub key")
@@ -1202,7 +1202,7 @@ func (db database) WithdrawBudget(sender_pubkey string, org_uuid string, amount 
 func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	db.db.Create(&payment)
 
-	// get organization budget and substract payment from total budget
+	// get organization budget and subtract payment from total budget
 	organizationBudget := db.GetOrganizationBudget(payment.OrgUuid)
 	totalBudget := organizationBudget.TotalBudget
 
