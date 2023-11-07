@@ -146,17 +146,17 @@ const RolesModal = (props: UserRolesModalProps) => {
         <ModalTitle style={{ fontWeight: '800', fontSize: '26px' }}>User Roles</ModalTitle>
         <CheckUl>
           {rolesCategories.map((role: any, i: number) => (
-              <CheckLi key={i}>
-                <Check
-                  checked={role.status}
-                  onChange={(s: any) => rolesChange(role, s)}
-                  type="checkbox"
-                  name={role.name}
-                  value={role.name}
-                />
-                <CheckLabel>{role.name}</CheckLabel>
-              </CheckLi>
-            ))}
+            <CheckLi key={i}>
+              <Check
+                checked={role.status}
+                onChange={(s: any) => rolesChange(role, s)}
+                type="checkbox"
+                name={role.name}
+                value={role.name}
+              />
+              <CheckLabel>{role.name}</CheckLabel>
+            </CheckLi>
+          ))}
         </CheckUl>
         <Button
           onClick={() => submitRoles()}

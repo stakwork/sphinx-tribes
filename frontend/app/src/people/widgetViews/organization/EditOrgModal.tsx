@@ -274,31 +274,31 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                 <Wrap style={{ width: '100%' }} newDesign={true}>
                   <div className="SchemaInnerContainer">
                     {schema.map((item: FormField) => (
-                        <Input
-                          {...item}
-                          key={item.name}
-                          values={values}
-                          errors={errors}
-                          value={values[item.name]}
-                          error={errors[item.name]}
-                          initialValues={initialValues}
-                          deleteErrors={() => {
-                            if (errors[item.name]) delete errors[item.name];
-                          }}
-                          handleChange={(e: any) => {
-                            setFieldValue(item.name, e);
-                          }}
-                          setFieldValue={(e: any, f: any) => {
-                            setFieldValue(e, f);
-                          }}
-                          setFieldTouched={setFieldTouched}
-                          handleBlur={() => setFieldTouched(item.name, false)}
-                          handleFocus={() => setFieldTouched(item.name, true)}
-                          borderType={'bottom'}
-                          imageIcon={true}
-                          style={{ width: '100%' }}
-                        />
-                      ))}
+                      <Input
+                        {...item}
+                        key={item.name}
+                        values={values}
+                        errors={errors}
+                        value={values[item.name]}
+                        error={errors[item.name]}
+                        initialValues={initialValues}
+                        deleteErrors={() => {
+                          if (errors[item.name]) delete errors[item.name];
+                        }}
+                        handleChange={(e: any) => {
+                          setFieldValue(item.name, e);
+                        }}
+                        setFieldValue={(e: any, f: any) => {
+                          setFieldValue(e, f);
+                        }}
+                        setFieldTouched={setFieldTouched}
+                        handleBlur={() => setFieldTouched(item.name, false)}
+                        handleFocus={() => setFieldTouched(item.name, true)}
+                        borderType={'bottom'}
+                        imageIcon={true}
+                        style={{ width: '100%' }}
+                      />
+                    ))}
                   </div>
                   <Button
                     disabled={false}

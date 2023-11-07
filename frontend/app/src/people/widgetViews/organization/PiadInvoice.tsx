@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { formatSat } from 'people/utils/ExtraFunctions';
 
 const Wrapper = styled.div`
   display: flex;
@@ -19,8 +20,6 @@ const ImgWrapper = styled.div`
 const AmountText = styled.h2`
   color: #292c33;
   text-align: center;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 1.875rem;
   font-style: normal;
@@ -39,8 +38,6 @@ const AmountUnit = styled.span`
 const Text = styled.p`
   color: #8e969c;
   text-align: center;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 1.0625rem;
   font-style: normal;
@@ -51,17 +48,17 @@ const Text = styled.p`
 `;
 
 const PaidInvoice = (props: { amount: number }) => (
-    <>
-      <Wrapper>
-        <ImgWrapper>
-          <img src="/static/success.svg" alt="success" />
-        </ImgWrapper>
-        <AmountText>
-          {props.amount.toLocaleString()} <AmountUnit>SATS</AmountUnit>
-        </AmountText>
-        <Text>Successfully Deposited</Text>
-      </Wrapper>
-    </>
-  );
+  <>
+    <Wrapper>
+      <ImgWrapper>
+        <img src="/static/success.svg" alt="success" />
+      </ImgWrapper>
+      <AmountText>
+        {formatSat(props.amount)} <AmountUnit>SATS</AmountUnit>
+      </AmountText>
+      <Text>Successfully Deposited</Text>
+    </Wrapper>
+  </>
+);
 
 export default PaidInvoice;

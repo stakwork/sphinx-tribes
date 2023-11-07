@@ -95,7 +95,7 @@ export default function Invoice(props: {
           <CountDownTimerWrap>
             <CountDownTextWrapper>
               <CountDownIconContainer>
-                <img src="/static/count_down.svg" alt="count down"/>
+                <img src="/static/count_down.svg" alt="count down" />
               </CountDownIconContainer>
               <CountDownText>Invoice Expires in</CountDownText>
             </CountDownTextWrapper>
