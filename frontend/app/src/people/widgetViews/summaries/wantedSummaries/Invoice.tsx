@@ -46,8 +46,6 @@ const CountDownIconContainer = styled.div`
 
 const CountDownTimer = styled.p`
   color: #3c3f41;
-  leading-trim: both;
-  text-edge: cap;
   font-family: Barlow;
   font-size: 0.9375rem;
   font-style: normal;
@@ -88,7 +86,7 @@ export default function Invoice(props: {
     return () => {
       if (invoiceTimeout) clearTimeout(invoiceTimeout);
     };
-  }, [timeLeft, props.invoiceStatus]);
+  }, [timeLeft, props.invoiceStatus, props]);
 
   return (
     <>
@@ -97,7 +95,7 @@ export default function Invoice(props: {
           <CountDownTimerWrap>
             <CountDownTextWrapper>
               <CountDownIconContainer>
-                <img src="/static/count_down.svg" />
+                <img src="/static/count_down.svg" alt="count down"/>
               </CountDownIconContainer>
               <CountDownText>Invoice Expires in</CountDownText>
             </CountDownTextWrapper>

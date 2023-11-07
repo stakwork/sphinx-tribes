@@ -202,6 +202,16 @@ export const SchemaOuterContainer = styled.div`
   width: 100%;
   .SchemaInnerContainer {
     width: 70%;
+    @media only screen and (max-width: 700px) {
+      width: auto;
+    }
+  }
+`;
+
+export const AboutSchemaInner = styled.div`
+  min-width: 100%;
+  @media only screen and (max-width: 700px) {
+    padding: 0px 25px;
   }
 `;
 
@@ -329,5 +339,13 @@ export const BountyContainer = styled.div<styledProps>`
         margin-left: 18px;
       }
     }
+  }
+`;
+
+export const EditBountyText = styled.h4`
+  color: #3c3d3f;
+  font-weight: 700;
+  @media only screen and (max-width: 500px) {
+    font-size: 1.1rem;
   }
 `;

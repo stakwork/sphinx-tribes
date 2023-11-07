@@ -1,4 +1,4 @@
-import { BountyRoles, BudgetHistory, PaymentHistory, Person } from 'store/main';
+import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -8,10 +8,16 @@ export interface ModalProps {
   addToast?: (text: string, color: 'danger' | 'success') => void;
 }
 
+export interface EditOrgModalProps extends ModalProps {
+  org?: Organization;
+  onSubmit: (body: any) => void;
+  onDelete: () => void;
+}
+
 export interface UserRolesModalProps extends ModalProps {
   bountyRolesData: BountyRoles[];
   userRoles: any[];
-  roleChange: (e: any) => void;
+  roleChange: (e: any, s: any) => void;
   submitRoles: () => void;
 }
 
@@ -42,3 +48,9 @@ export interface WithdrawModalProps extends ModalProps {
 }
 
 export type InvoiceState = 'PENDING' | 'PAID' | 'EXPIRED' | null;
+
+export interface PaymentHistoryUserInfo {
+  pubkey: string;
+  name: string;
+  image: string;
+}

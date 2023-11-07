@@ -18,7 +18,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   }>();
 
   const { ui, main } = useStores();
-  const { canEdit, person } = usePerson(ui.selectedPerson);
+  const { person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
 
   const onGoBack = async () => {

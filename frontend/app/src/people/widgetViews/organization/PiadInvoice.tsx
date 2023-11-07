@@ -50,8 +50,7 @@ const Text = styled.p`
   margin-bottom: 0;
 `;
 
-const PaidInvoice = (props: { amount: number }) => {
-  return (
+const PaidInvoice = (props: { amount: number }) => (
     <>
       <Wrapper>
         <ImgWrapper>
@@ -64,6 +63,5 @@ const PaidInvoice = (props: { amount: number }) => {
       </Wrapper>
     </>
   );
-};
 
 export default PaidInvoice;

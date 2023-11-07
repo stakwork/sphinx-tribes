@@ -61,9 +61,7 @@ export default function QrBar(props: QRBarProps) {
     ]);
   }
 
-  const formatRequest = (request: string) => {
-    return `${request.substring(0, 23)}...`;
-  };
+  const formatRequest = (request: string) => `${request.substring(0, 23)}...`;
 
   function removeToast() {
     setToasts([]);
