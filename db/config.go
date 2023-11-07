@@ -197,12 +197,12 @@ func RolesCheck(userRoles []UserRoles, check string) bool {
 	rolesMap := GetRolesMap()
 	userRolesMap := GetUserRolesMap(userRoles)
 
-	// check if roles exists in config
+	// check if roles exist in config
 	_, ok := rolesMap[check]
 	_, ok1 := userRolesMap[check]
 
-	// if any of the roles does not exists return false
-	// if any of the roles does not exists user roles return false
+	// if any of the roles does not exist, return false
+	// if any of the roles does not exist, user roles return false
 	if !ok {
 		return false
 	} else if !ok1 {
