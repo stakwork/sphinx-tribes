@@ -90,7 +90,7 @@ const ViewProfileButton = styled.div<BountyProfileViewProps>`
   display: flex;
   flex-direction: row;
   .text {
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-style: normal;
     font-weight: 500;
     font-size: 13px;

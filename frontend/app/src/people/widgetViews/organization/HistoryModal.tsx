@@ -38,7 +38,7 @@ const ModalHeaderWrapper = styled.div`
 
 const ModalTitle = styled.h2`
   color: #3c3f41;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1.625rem;
   font-style: normal;
   font-weight: 800;
@@ -72,7 +72,7 @@ const PaymentType = styled.div`
 const Label = styled.label`
   margin-bottom: 0;
   color: #1e1f25;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1rem;
   font-style: normal;
   font-weight: 500;
@@ -110,7 +110,7 @@ const THeadRow = styled.tr`
 
 const TH = styled.th`
   color: #8e969c;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.8rem;
   font-style: normal;
   font-weight: 500;
@@ -153,7 +153,7 @@ const TR = styled.tr<{ type: OrgTransactionType }>`
 
 const TD = styled.td`
   color: #5f6368;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;
@@ -204,7 +204,7 @@ const ViewBountyContainer = styled.div`
 
 const ViewBounty = styled.p`
   color: #5f6368;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.8125rem;
   font-style: normal;
   font-weight: 500;

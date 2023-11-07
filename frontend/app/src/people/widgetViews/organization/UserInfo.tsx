@@ -56,7 +56,7 @@ const Image = styled.img`
 
 const Name = styled.p`
   color: #3c3f41;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.8125rem;
   font-style: normal;
   font-weight: 500;
@@ -70,7 +70,7 @@ const Pubkey = styled.p`
   color: #8e969c;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.6875rem;
   font-style: normal;
   font-weight: 400;

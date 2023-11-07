@@ -26,7 +26,7 @@ const PriceContainer = styled.div<PriceContainerProps>`
     align-items: center;
   }
   .PriceStaticText {
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -51,11 +51,11 @@ const SessionContainer = styled.div<PriceContainerProps>`
     font-size: 13px;
     font-weight: 700;
     color: ${(p: any) => (p.session_text_color ? p.session_text_color : '')};
-    font-family: Barlow;
+    font-family: 'Barlow';
   }
   .EST_Text {
     font-weight: 400;
-    font-family: Barlow;
+    font-family: 'Barlow';
   }
   .EST_Value {
     font-family: Roboto;
