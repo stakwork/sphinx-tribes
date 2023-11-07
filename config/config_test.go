@@ -9,6 +9,10 @@ func TestInitConfig(t *testing.T) {
 		t.Error("Could not load default host")
 	}
 
+	if MemeUrl != "https://memes.sphinx.chat" {
+		t.Error("Could not load default meme url")
+	}
+
 	if JwtKey == "" {
 		t.Error("Could not load random jwtKey")
 	}

@@ -537,6 +537,7 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
+	dirName := "uploads"
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		http.Error(w, "Unable to parse file", http.StatusBadRequest)
@@ -544,8 +545,11 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	// Check if uploads directory exists or create it
+	CreateUploadsDirectory(dirName)
+
 	// Saving the file
-	dst, err := os.Create("uploads/" + header.Filename)
+	dst, err := os.Create(dirName + "/" + header.Filename)
 
 	if err != nil {
 		http.Error(w, "Unable to save file 1", http.StatusInternalServerError)
@@ -733,5 +737,12 @@ func DeleteImageFromUploadsFolder(filePath string) {
 	e := os.Remove(filePath)
 	if e != nil {
 		log.Printf("Could not delete Image %s %s", filePath, e)
+	}
+}
+
+func CreateUploadsDirectory(dirName string) {
+	if _, err := os.Open(dirName); os.IsNotExist(err) {
+		fmt.Println("The directory named", dirName, "does not exist")
+		os.Mkdir(dirName, 0755)
 	}
 }
