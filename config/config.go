@@ -23,15 +23,20 @@ func InitConfig() {
 	RelayUrl = os.Getenv("RELAY_URL")
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
-	RelayAuthKey = os.Getenv("RELAY_NODE_KEY")
+	RelayNodeKey = os.Getenv("RELAY_NODE_KEY")
 
 	if Host == "" {
 		Host = "https://people.sphinx.chat"
 	}
 
+	if MemeUrl == "" {
+		MemeUrl = "https://memes.sphinx.chat"
+	}
+
 	if JwtKey == "" {
 		JwtKey = GenerateRandomString()
 	}
+
 }
 
 func GenerateRandomString() string {

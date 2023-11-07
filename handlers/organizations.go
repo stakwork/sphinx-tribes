@@ -1,13 +1,19 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"time"
+
+	"net/url"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
@@ -531,7 +537,6 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
-	// Parsing uploaded file
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		http.Error(w, "Unable to parse file", http.StatusBadRequest)
@@ -539,11 +544,9 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	fmt.Println("FIle  ===", header.Filename)
-
 	// Saving the file
 	dst, err := os.Create("uploads/" + header.Filename)
-	fmt.Println("FILE +++", dst)
+
 	if err != nil {
 		http.Error(w, "Unable to save file 1", http.StatusInternalServerError)
 		return
@@ -557,7 +560,31 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("File uploaded successfully"))
+	challenge := GetMemeChallenge()
+	signer := SignChallenge(challenge.Challenge)
+	mErr, mToken := GetMemeToken(challenge.Id, signer.Response.Sig)
+
+	if mErr != "" {
+		msg := "Could not get meme token"
+		fmt.Println(msg, mErr)
+		w.WriteHeader(http.StatusNoContent)
+		json.NewEncoder(w).Encode(msg)
+	} else {
+		memeImgUrl := UploadMemeImage(file, mToken.Token, header.Filename)
+		if memeImgUrl == "" {
+			msg := "Could not get meme image"
+			fmt.Println(msg)
+			w.WriteHeader(http.StatusNoContent)
+			json.NewEncoder(w).Encode(msg)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(memeImgUrl)
+		}
+	}
+}
+
+func GetMemeChallenge() db.MemeChallenge {
+	memeChallenge := db.MemeChallenge{}
 
 	url := fmt.Sprintf("%s/ask", config.MemeUrl)
 
@@ -576,36 +603,135 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(res.Body)
 
 	// Unmarshal result
-	memeChallenge := db.MemeChallenge{}
 	err = json.Unmarshal(body, &memeChallenge)
 
 	if err != nil {
 		log.Printf("Reading Invoice body failed: %s", err)
 	}
 
-	// buf := bytes.NewBuffer(nil)
-	// if _, err := io.Copy(buf, file); err != nil {
-	// 	fmt.Println("Error ===", err)
-	// }
+	return memeChallenge
+}
 
-	// err = os.WriteFile("/uploads/"+header.Filename, buf.Bytes(), 0644)
-	// if err != nil {
-	// 	fmt.Println("WRITE FILE ERROR", err)
-	// }
-	// TODO
+func SignChallenge(challenge string) db.RelaySignerResponse {
+	url := fmt.Sprintf("%s/signer/%s", config.RelayUrl, challenge)
 
-	// Upload the file
-	// Send to meme server ask endpoint to get a challenge
-	// GET /ask
-	// Send to RELAY to sign the chaallenge
-	// GET http://localhost:3001/signer/${r.challenge}
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 
-	// POST TO MEME SERVER TO GET TO GET TOKEN
-	// POST /verify"
-	// form: { id: r.id, sig: r2.response.sig, pubkey: node.pubkey },
-	// ID FROM CHALLENGE
-	// SIG FROM RELAY
-	// NODE PUBKEY fROM LND NODE
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
 
-	// WHEN UT RETURNS SEND THE IMAGE TO MEME SERVER PUBLIC
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	signerResponse := db.RelaySignerResponse{}
+
+	// Unmarshal result
+	err = json.Unmarshal(body, &signerResponse)
+
+	if err != nil {
+		log.Printf("Reading Challenge body failed: %s", err)
+	}
+
+	return signerResponse
+}
+
+func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
+	memeUrl := fmt.Sprintf("%s/verify", config.MemeUrl)
+
+	formData := url.Values{
+		"id":     {id},
+		"sig":    {sig},
+		"pubkey": {config.RelayNodeKey},
+	}
+
+	res, err := http.PostForm(memeUrl, formData)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return "", db.MemeTokenSuccess{}
+	}
+
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+
+	if res.StatusCode == 200 {
+		tokenSuccess := db.MemeTokenSuccess{}
+
+		// Unmarshal result
+		err = json.Unmarshal(body, &tokenSuccess)
+
+		if err != nil {
+			log.Printf("Reading token success body failed: %s", err)
+		}
+
+		return "", tokenSuccess
+	} else {
+		var tokenError string
+
+		// Unmarshal result
+		err = json.Unmarshal(body, &tokenError)
+
+		if err != nil {
+			log.Printf("Reading token error body failed: %s %d", err, res.StatusCode)
+		}
+
+		return tokenError, db.MemeTokenSuccess{}
+	}
+}
+
+func UploadMemeImage(file multipart.File, token string, fileName string) string {
+	url := fmt.Sprintf("%s/public", config.MemeUrl)
+	filePath := path.Join("./uploads", fileName)
+	fileW, _ := os.Open(filePath)
+	defer file.Close()
+
+	fileBody := &bytes.Buffer{}
+	writer := multipart.NewWriter(fileBody)
+	part, _ := writer.CreateFormFile("file", filepath.Base(filePath))
+	io.Copy(part, fileW)
+	writer.Close()
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPost, url, fileBody)
+	req.Header.Set("Authorization", "BEARER "+token)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	res, err := client.Do(req)
+
+	// Delete image from uploads folder
+	DeleteImageFromUploadsFolder(filePath)
+
+	if err != nil {
+		fmt.Println("meme request Error ===", err)
+		return ""
+	}
+
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+
+	if err == nil {
+		memeSuccess := db.Meme{}
+		// Unmarshal result
+		err = json.Unmarshal(body, &memeSuccess)
+		if err != nil {
+			log.Printf("Reading meme error body failed: %s", err)
+		} else {
+			return config.MemeUrl + "/public/" + memeSuccess.Muid
+		}
+	}
+
+	return ""
+}
+
+func DeleteImageFromUploadsFolder(filePath string) {
+	e := os.Remove(filePath)
+	if e != nil {
+		log.Printf("Could not delete Image %s %s", filePath, e)
+	}
 }
