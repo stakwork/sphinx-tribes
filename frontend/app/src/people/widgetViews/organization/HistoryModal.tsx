@@ -23,7 +23,7 @@ const HistoryWrapper = styled.div`
 const ModalHeaderWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 2.3rem;
+  margin-top: 2.31rem;
   padding: 0rem 2.9rem;
   gap: 10.25rem;
 
@@ -43,6 +43,7 @@ const ModalTitle = styled.h2`
   font-style: normal;
   font-weight: 800;
   line-height: 1.875rem;
+  margin-bottom: 0;
 
   @media only screen and (max-width: 500px) {
     font-size: 1rem;
@@ -54,7 +55,7 @@ const ModalTitle = styled.h2`
 const PaymentFilterWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 3rem;
 
   @media only screen and (max-width: 500px) {
     gap: 1rem;
@@ -66,14 +67,14 @@ const PaymentFilterWrapper = styled.div`
 const PaymentType = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.75rem;
 `;
 
 const Label = styled.label`
   margin-bottom: 0;
   color: #1e1f25;
   font-family: 'Barlow';
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-style: normal;
   font-weight: 500;
   line-height: 2rem;
@@ -84,17 +85,16 @@ const TableWrapper = styled.div`
   width: 100%;
   height: 100%;
   margin-bottom: 20rem;
-  margin-top: 1rem;
-`;
-
-const Table = styled.table`
-  margin-top: 2rem;
-  border-collapse: collapse;
-  margin-bottom: 6rem;
+  margin-top: 2.56rem;
 
   @media only screen and (max-width: 500px) {
     margin-top: 1rem;
   }
+`;
+
+const Table = styled.table`
+  border-collapse: collapse;
+  margin-bottom: 6rem;
 `;
 
 const THeadRow = styled.tr`
@@ -111,7 +111,7 @@ const THeadRow = styled.tr`
 const TH = styled.th`
   color: #8e969c;
   font-family: 'Barlow';
-  font-size: 0.8rem;
+  font-size: 0.625rem;
   font-style: normal;
   font-weight: 500;
   line-height: 1rem;
@@ -154,12 +154,13 @@ const TR = styled.tr<{ type: OrgTransactionType }>`
 const TD = styled.td`
   color: #5f6368;
   font-family: 'Barlow';
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-style: normal;
   font-weight: 400;
   line-height: 1rem;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
+  padding-right: 2.7rem;
   @media only screen and (max-width: 500px) {
     padding-left: 1.2rem;
     padding-right: 1.2rem;
@@ -173,8 +174,8 @@ const AmountSpan = styled.span`
 const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
   color: ${(props: any) =>
     props.type === 'deposit' ? '#49C998' : props.type === 'withdraw' ? '#A76CF3' : '#3C3F41'};
-  font-size: 1rem;
   font-style: normal;
+  font-family: ${(props: any) => (props.type === 'payment' ? 'Barlow' : 'Roboto')};
   font-weight: 600;
   line-height: 1rem;
   padding-left: 2.9rem;
@@ -187,7 +188,6 @@ const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
 const ArrowImage = styled.img`
   width: 1.25rem;
   height: 1.25rem;
-  margin-right: 1.1rem;
 `;
 
 const LinkImage = styled.img`
