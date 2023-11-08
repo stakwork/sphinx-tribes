@@ -1,24 +1,21 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import styled from 'styled-components';
 import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import NoResults from 'people/utils/OrgNoResults';
 import { useStores } from 'store';
 import { Organization } from 'store/main';
-import { Wrap } from 'components/form/style';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
-import { Formik } from 'formik';
-import { FormField, validator } from 'components/form/utils';
 import { Modal } from '../../components/common';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
 import { widgetConfigs } from '../utils/Constants';
-import Input from '../../components/form/inputs';
 import { Person } from '../../store/main';
 import OrganizationDetails from './OrganizationDetails';
 import ManageButton from './organization/ManageOrgButton';
 import OrganizationBudget from './organization/OrgBudget';
+import AddOrganization from './organization/AddOrganization';
 
 const color = colors['light'];
 
@@ -115,44 +112,28 @@ const OrganizationActionWrap = styled.div`
   }
 `;
 
-const AddOrgButton = styled(Button)`
-  width: 100%;
-  border-radius: 10px;
-  height: 45;
-  margin-top: 15px;
-`;
-
 const Organizations = (props: { person: Person }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
   const [organization, setOrganization] = useState<Organization>();
-  const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [toasts, setToasts]: any = useState([]);
   const [user, setUser] = useState<Person>();
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const config = widgetConfigs['organizations'];
-  const formRef = useRef(null);
   const isMyProfile = ui?.meInfo?.pubkey === props?.person?.owner_pubkey;
 
-  const schema = [...config.schema];
 
-  const initValues = {
-    name: '',
-    img: '',
-    show: false
-  };
-
-  function addToast(title: string) {
-    setToasts([
-      {
-        id: '1',
-        title,
-        color: 'danger'
-      }
-    ]);
-  }
+  // function addToast(title: string) {
+  //   setToasts([
+  //     {
+  //       id: '1',
+  //       title,
+  //       color: 'danger'
+  //     }
+  //   ]);
+  // }
 
   function removeToast() {
     setToasts([]);
@@ -180,18 +161,18 @@ const Organizations = (props: { person: Person }) => {
     setDetailsOpen(false);
   };
 
-  const onSubmit = async (body: any) => {
-    setIsLoading(true);
-    body.owner_pubkey = ui.meInfo?.owner_pubkey;
-    const res = await main.addOrganization(body);
-    if (res.status === 200) {
-      await getUserOrganizations();
-    } else {
-      addToast('Error: could not create organization');
-    }
-    closeHandler();
-    setIsLoading(false);
-  };
+  // const onSubmit = async (body: any) => {
+  //   setIsLoading(true);
+  //   body.owner_pubkey = ui.meInfo?.owner_pubkey;
+  //   const res = await main.addOrganization(body);
+  //   if (res.status === 200) {
+  //     await getUserOrganizations();
+  //   } else {
+  //     addToast('Error: could not create organization');
+  //   }
+  //   closeHandler();
+  //   setIsLoading(false);
+  // };
 
   // renders org as list item
   const orgUi = (org: any, key: number) => {
@@ -287,7 +268,9 @@ const Organizations = (props: { person: Person }) => {
                 zIndex: 20,
                 ...(config?.modalStyle ?? {}),
                 maxHeight: '100%',
-                borderRadius: '10px'
+                borderRadius: '10px',
+                minWidth: isMobile ? '100%' : '34.4375rem',
+                minHeight: isMobile ? '100%' : '22.1875rem;'
               }}
               overlayClick={closeHandler}
               bigCloseImage={closeHandler}
@@ -298,7 +281,8 @@ const Organizations = (props: { person: Person }) => {
                 borderRadius: '50%'
               }}
             >
-              <Formik
+              <AddOrganization />
+              {/* <Formik
                 initialValues={initValues || {}}
                 onSubmit={onSubmit}
                 innerRef={formRef}
@@ -362,7 +346,7 @@ const Organizations = (props: { person: Person }) => {
                     </div>
                   </Wrap>
                 )}
-              </Formik>
+              </Formik> */}
             </Modal>
           )}
         </>
