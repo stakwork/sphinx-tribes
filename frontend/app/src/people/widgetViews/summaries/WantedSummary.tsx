@@ -337,6 +337,7 @@ function WantedSummary(props: WantedSummaryProps) {
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(`${window.location.origin}${bountyPath}`);
     setIsCopied(true);
+    
     setTimeout(() => {
       // UI Enhancement: Show "Copied" for 3 seconds, then reset
       setIsCopied(false);
