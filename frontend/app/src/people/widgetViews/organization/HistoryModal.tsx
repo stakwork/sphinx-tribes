@@ -287,7 +287,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
       bigCloseImage={close}
       bigCloseImageStyle={{
         top: '1.6rem',
-        right: '-20px',
+        right: `${isMobile ? '0rem' : '-1.25rem'}`,
         background: '#000',
         borderRadius: '50%'
       }}
