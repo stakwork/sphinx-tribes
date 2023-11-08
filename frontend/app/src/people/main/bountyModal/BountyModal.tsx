@@ -9,7 +9,7 @@ import { PersonBounty } from 'store/main';
 import FocusedView from '../FocusView';
 
 const config = widgetConfigs.wanted;
-export const BountyModal = ({ basePath }: BountyModalProps) => {
+export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProps) => {
   const history = useHistory();
   const { wantedId, wantedIndex, personPubkey } = useParams<{
     wantedId: string;
@@ -20,6 +20,8 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   const { ui, main } = useStores();
   const { person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
+
+  const personToDisplay = fromPage === 'usertickets' ? bountyOwner : person;
 
   const onGoBack = async () => {
     await main.getPersonCreatedBounties({}, personPubkey);
@@ -81,7 +83,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       }}
     >
       <FocusedView
-        person={person}
+        person={personToDisplay}
         personBody={person}
         canEdit={false}
         selectedIndex={Number(wantedIndex)}
