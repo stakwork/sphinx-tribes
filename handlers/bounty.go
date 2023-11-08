@@ -87,6 +87,9 @@ func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
 	bounty := db.Bounty{}
 	body, err := io.ReadAll(r.Body)
 
@@ -111,16 +114,19 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Type is a required field")
 		return
 	}
+
 	if bounty.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Title is a required field")
 		return
 	}
+
 	if bounty.Description == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Description is a required field")
 		return
 	}
+
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
@@ -131,6 +137,20 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 
 	if bounty.Title != "" && bounty.Assignee == "" {
 		db.DB.UpdateBountyNullColumn(bounty, "assignee")
+	}
+
+	if bounty.Title != "" && bounty.ID != 0 {
+		// get bounty from DB
+		dbBounty := db.DB.GetBounty(bounty.ID)
+
+		// trying to update
+		// check if bounty belongs to user
+		if pubKeyFromAuth != dbBounty.OwnerID {
+			fmt.Println("Cannot edit another user's bounty")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Cannot edit another user's bounty")
+			return
+		}
 	}
 
 	b, err := db.DB.CreateOrEditBounty(bounty)
@@ -364,6 +384,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 		db.DB.AddPaymentHistory(paymentHistory)
 		bounty.Paid = true
+		bounty.PaidDate = &now
 		db.DB.UpdateBounty(bounty)
 
 		msg["msg"] = "keysend_success"
