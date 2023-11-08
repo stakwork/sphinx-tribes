@@ -97,6 +97,12 @@ const Table = styled.table`
   margin-bottom: 6rem;
 `;
 
+const THead = styled.thead`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+`;
+
 const THeadRow = styled.tr`
   border-bottom: 1px solid #dde1e5;
   background: #fff;
@@ -321,7 +327,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
         </ModalHeaderWrapper>
         <TableWrapper>
           <Table>
-            <thead>
+            <THead>
               <THeadRow>
                 <ThLeft>Type</ThLeft>
                 <TH>Date</TH>
@@ -331,7 +337,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
                 <TH>Receiver</TH>
                 <ThRight>Bounty</ThRight>
               </THeadRow>
-            </thead>
+            </THead>
             <tbody>
               {currentPaymentsHistory.map((pay: PaymentHistory, i: number) => (
                 <TR type={pay.payment_type || 'payment'} key={i}>
