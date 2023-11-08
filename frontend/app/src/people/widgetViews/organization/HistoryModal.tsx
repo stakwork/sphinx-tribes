@@ -336,7 +336,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
               {currentPaymentsHistory.map((pay: PaymentHistory, i: number) => (
                 <TR type={pay.payment_type || 'payment'} key={i}>
                   <TdLeft type={pay.payment_type}>{pay.payment_type || 'Payment'}</TdLeft>
-                  <TD>{moment(pay.created).format('DD/MM/YY')}</TD>
+                  <TD>{moment(pay.created).format('MM/DD/YY')}</TD>
                   <TD>
                     <AmountSpan>{formatSat(pay.amount)}</AmountSpan> sats
                   </TD>
