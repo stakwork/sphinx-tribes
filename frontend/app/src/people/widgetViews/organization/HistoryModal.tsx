@@ -280,8 +280,8 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
       overlayClick={close}
       bigCloseImage={close}
       bigCloseImageStyle={{
-        top: '-18px',
-        right: '-18px',
+        top: '1.6rem',
+        right: '-20px',
         background: '#000',
         borderRadius: '50%'
       }}
