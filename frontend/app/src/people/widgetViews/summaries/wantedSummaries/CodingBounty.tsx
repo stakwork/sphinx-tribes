@@ -336,8 +336,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-        ui.meInfo?.owner_alias &&
-        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+      ui.meInfo?.owner_alias &&
+      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */
@@ -602,31 +602,27 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so longF
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!invoiceStatus && assignee &&
-                      assignee.owner_alias.length < 30 && (
-                        <>
-                          {bounty_expires && !bountyExpired && (
-                            <BountyTime>
-                              Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
-                              {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs{' '}
-                              {bountyTimeLeft.seconds}
-                            </BountyTime>
-                          )}
-                          {bountyExpired && (
-                            <BountyTime>Bounty commitment has expired</BountyTime>
-                          )}
-                          <Button
-                            iconSize={14}
-                            width={220}
-                            height={48}
-                            onClick={makePayment}
-                            style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                            text="Pay Bounty"
-                            ButtonTextStyle={{ padding: 0 }}
-                          />
-                        </>
-                      )
-                    }
+                    {!invoiceStatus && assignee && assignee.owner_alias.length < 30 && (
+                      <>
+                        {bounty_expires && !bountyExpired && (
+                          <BountyTime>
+                            Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
+                            {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs{' '}
+                            {bountyTimeLeft.seconds}
+                          </BountyTime>
+                        )}
+                        {bountyExpired && <BountyTime>Bounty commitment has expired</BountyTime>}
+                        <Button
+                          iconSize={14}
+                          width={220}
+                          height={48}
+                          onClick={makePayment}
+                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
+                          text="Pay Bounty"
+                          ButtonTextStyle={{ padding: 0 }}
+                        />
+                      </>
+                    )}
                   </BountyPriceContainer>
                   <div className="buttonSet">
                     <ButtonSet
