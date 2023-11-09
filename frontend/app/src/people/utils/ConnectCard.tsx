@@ -40,7 +40,7 @@ const W = styled.div<styledProps>`
   border-radius: 80px;
 `;
 const N = styled.div<styledProps>`
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-style: normal;
   font-weight: 500;
   font-size: 17px;
@@ -50,7 +50,7 @@ const N = styled.div<styledProps>`
 `;
 
 const D = styled.div<styledProps>`
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-style: normal;
   font-size: 20px;
   line-height: 26px;

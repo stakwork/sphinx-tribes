@@ -10,7 +10,7 @@ export const B = styled.small`
   margin-bottom: 10px;
 `;
 export const N = styled.div<styledProps>`
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-style: normal;
   font-weight: 500;
   font-size: 17px;
