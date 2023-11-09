@@ -592,6 +592,43 @@ type WithdrawBudgetRequest struct {
 	OrgUuid         string `json:"org_uuid"`
 }
 
+type MemeChallenge struct {
+	Id        string `json:"id"`
+	Challenge string `json:"challenge"`
+}
+
+type SignerResponse struct {
+	Sig string `json:"sig"`
+}
+
+type RelaySignerResponse struct {
+	Success  bool           `json:"success"`
+	Response SignerResponse `json:"response"`
+}
+
+type MemeTokenSuccess struct {
+	Token string `json:"token"`
+}
+
+type Meme struct {
+	Muid        string      `json:"muid"`
+	OwnerPubKey string      `json:"owner_pub_key"`
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Price       int64       `json:"price"`
+	Tags        StringArray `json:"tags"`
+	Filename    string      `json:"filename"`
+	Ttl         int64       `json:"ttl"`
+	Size        int64       `json:"size"`
+	Mime        string      `json:"mime"`
+	Created     *time.Time  `json:"created"`
+	Updated     *time.Time  `json:"updates"`
+	Width       int         `json:"width"`
+	Height      int         `json:"height"`
+	Template    bool        `json:"template"`
+	Expiry      *time.Time  `json:"expiry"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
