@@ -5,8 +5,7 @@ import {
   satToUsd,
   calculateTimeLeft,
   toCapitalize,
-  userHasRole,
-  isInvoiceExpired
+  userHasRole
 } from '../helpers';
 import { uiStore } from '../../store/ui';
 import crypto from 'crypto';

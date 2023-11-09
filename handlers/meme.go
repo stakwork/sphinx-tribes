@@ -33,7 +33,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	dst, err := os.Create(dirName + "/" + header.Filename)
 
 	if err != nil {
-		http.Error(w, "Unable to save file 1", http.StatusInternalServerError)
+		http.Error(w, "Unable to create file", http.StatusInternalServerError)
 		return
 	}
 
@@ -41,7 +41,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 
 	_, err = io.Copy(dst, file)
 	if err != nil {
-		http.Error(w, "Unable to save file 2", http.StatusInternalServerError)
+		http.Error(w, "Unable to copy saved file", http.StatusInternalServerError)
 		return
 	}
 
@@ -55,16 +55,17 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		json.NewEncoder(w).Encode(msg)
 	} else {
-		memeImgUrl := UploadMemeImage(file, mToken.Token, header.Filename)
-		if memeImgUrl == "" {
-			msg := "Could not get meme image"
-			fmt.Println(msg)
-			w.WriteHeader(http.StatusNoContent)
-			json.NewEncoder(w).Encode(msg)
-		} else {
+		err, memeImgUrl := UploadMemeImage(file, mToken.Token, header.Filename)
+		if err != nil {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(memeImgUrl)
+			return
 		}
+
+		msg := "Could not get meme image"
+		fmt.Println(msg)
+		w.WriteHeader(http.StatusNoContent)
+		json.NewEncoder(w).Encode(msg)
 	}
 }
 
@@ -171,7 +172,7 @@ func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
 	}
 }
 
-func UploadMemeImage(file multipart.File, token string, fileName string) string {
+func UploadMemeImage(file multipart.File, token string, fileName string) (error, string) {
 	url := fmt.Sprintf("%s/public", config.MemeUrl)
 	filePath := path.Join("./uploads", fileName)
 	fileW, _ := os.Open(filePath)
@@ -194,7 +195,7 @@ func UploadMemeImage(file multipart.File, token string, fileName string) string 
 
 	if err != nil {
 		fmt.Println("meme request Error ===", err)
-		return ""
+		return err, ""
 	}
 
 	defer res.Body.Close()
@@ -207,11 +208,11 @@ func UploadMemeImage(file multipart.File, token string, fileName string) string 
 		if err != nil {
 			log.Printf("Reading meme error body failed: %s", err)
 		} else {
-			return config.MemeUrl + "/public/" + memeSuccess.Muid
+			return nil, config.MemeUrl + "/public/" + memeSuccess.Muid
 		}
 	}
 
-	return ""
+	return err, ""
 }
 
 func DeleteImageFromUploadsFolder(filePath string) {
