@@ -54,3 +54,10 @@ export interface PaymentHistoryUserInfo {
   name: string;
   image: string;
 }
+
+export interface Toast {
+  id: string;
+  color: 'success' | 'primary' | 'warning' | 'danger' | undefined;
+  text: string;
+  title: string;
+}

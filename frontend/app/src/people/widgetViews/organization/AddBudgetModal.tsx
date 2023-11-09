@@ -5,10 +5,11 @@ import { nonWidgetConfigs } from 'people/utils/Constants';
 import { useStores } from 'store';
 import moment from 'moment';
 import { satToUsd } from 'helpers';
+import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import Invoice from '../summaries/wantedSummaries/Invoice';
-import { AddBudgetModalProps, InvoiceState } from './interface';
+import { AddBudgetModalProps, InvoiceState, Toast } from './interface';
 import ExpiredInvoice from './ExpiredInvoice';
 import PaidInvoice from './PiadInvoice';
 
@@ -149,27 +150,65 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
   const { isOpen, close, invoiceStatus, uuid, startPolling } = props;
+  const [isLoading, setIsLoading] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const config = nonWidgetConfigs['organizationusers'];
 
   const pollMinutes = 2;
 
+  function addSuccessToast() {
+    setToasts([
+      {
+        id: '1',
+        title: 'Create Invoice',
+        color: 'success',
+        text: 'Invoice Created Successfully'
+      }
+    ]);
+  }
+
+  function addErrorToast(text: string) {
+    setToasts([
+      {
+        id: '2',
+        title: 'Create Invoice',
+        color: 'danger',
+        text
+      }
+    ]);
+  }
+
+  function removeToast() {
+    setToasts([]);
+  }
+
   const generateInvoice = async () => {
     if (uuid) {
-      const data = await main.getBudgetInvoice({
-        amount: Number(amount),
-        sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
-        org_uuid: uuid,
-        payment_type: 'deposit'
-      });
+      try {
+        setIsLoading(true);
+        const data = await main.getBudgetInvoice({
+          amount: Number(amount),
+          sender_pubkey: ui.meInfo?.owner_pubkey ?? '',
+          org_uuid: uuid,
+          payment_type: 'deposit'
+        });
 
-      const paymentRequest = data.response.invoice;
+        const paymentRequest = data.response.invoice;
 
-      if (paymentRequest) {
-        setLnInvoice(paymentRequest);
-        startPolling(paymentRequest);
-        setInvoiceState('PENDING');
-        main.setBudgetInvoice(paymentRequest);
+        if (paymentRequest) {
+          setLnInvoice(paymentRequest);
+          startPolling(paymentRequest);
+          setInvoiceState('PENDING');
+          main.setBudgetInvoice(paymentRequest);
+          addSuccessToast();
+          return;
+        }
+        addErrorToast('Error occured while creating invoice');
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        addErrorToast('Error occured while creating invoice');
       }
     }
   };
@@ -243,8 +282,8 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
                 </InvoiceInputWrapper>
                 <UsdValue>{satToUsd(Number(amount))} USD</UsdValue>
               </InvoiceWrapper>
-              <Button disabled={!Number(amount)} onClick={generateInvoice}>
-                Generate Invoice
+              <Button disabled={!Number(amount) || isLoading} onClick={generateInvoice}>
+                {isLoading ? <EuiLoadingSpinner size="m" /> : 'Generate Invoice'}
               </Button>
             </InvoiceForm>
           </>
@@ -254,6 +293,7 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
         )}
         {invoiceState === 'PAID' && <PaidInvoice amount={Number(amount)} />}
       </ModelWrapper>
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={3000} />
     </Modal>
   );
 };
