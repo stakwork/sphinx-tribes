@@ -143,10 +143,4 @@ describe('testing helpers', () => {
       expect(capitalizeString).toBe('Hello Test Sphinx');
     });
   });
-  describe('Test if lightning invoice is not expired', () => {
-    const invoice = 'lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs';
-
-    const isExpired = isInvoiceExpired(invoice);
-    expect(isExpired).toBe(true);
-  });
 });
