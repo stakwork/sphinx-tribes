@@ -77,20 +77,22 @@ export default function Invoice(props: {
       clearTimeout(invoiceTimeout);
     }
 
-    if (timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
-      if (props.setInvoiceState) {
-        props.setInvoiceState('EXPIRED');
-      }
-    }
-
     return () => {
       if (invoiceTimeout) clearTimeout(invoiceTimeout);
     };
   }, [timeLeft, props.invoiceStatus, props]);
 
+  useEffect(() => {
+    if ((!timeLeft.hours || timeLeft.hours < 1) && timeLeft.minutes < 1 && timeLeft.seconds < 1) {
+      if (props.setInvoiceState) {
+        props.setInvoiceState('EXPIRED');
+      }
+    }
+  }, [timeLeft, props]);
+
   return (
     <>
-      {timeLeft.seconds >= 0 || timeLeft.minutes >= 0 || timeLeft.hours! >= 0 ? (
+      {timeLeft.seconds >= 0 || timeLeft.minutes >= 0 || (timeLeft.hours && timeLeft.hours >= 0) ? (
         <InvoiceWrap>
           <CountDownTimerWrap>
             <CountDownTextWrapper>
@@ -100,7 +102,8 @@ export default function Invoice(props: {
               <CountDownText>Invoice Expires in</CountDownText>
             </CountDownTextWrapper>
             <CountDownTimer>
-              {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
+              {timeLeft.hours ? `${timeLeft.hours}:` : null}
+              {timeLeft.minutes}:{timeLeft.seconds > 9 ? timeLeft.seconds : `0${timeLeft.seconds}`}
             </CountDownTimer>
           </CountDownTimerWrap>
 
