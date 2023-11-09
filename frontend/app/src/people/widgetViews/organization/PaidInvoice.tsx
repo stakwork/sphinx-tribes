@@ -48,17 +48,15 @@ const Text = styled.p`
 `;
 
 const PaidInvoice = (props: { amount: number }) => (
-  <>
-    <Wrapper>
-      <ImgWrapper>
-        <img src="/static/success.svg" alt="success" />
-      </ImgWrapper>
-      <AmountText>
-        {formatSat(props.amount)} <AmountUnit>SATS</AmountUnit>
-      </AmountText>
-      <Text>Successfully Deposited</Text>
-    </Wrapper>
-  </>
+  <Wrapper>
+    <ImgWrapper>
+      <img src="/static/success.svg" alt="success" />
+    </ImgWrapper>
+    <AmountText>
+      {formatSat(props.amount)} <AmountUnit>SATS</AmountUnit>
+    </AmountText>
+    <Text>Successfully Deposited</Text>
+  </Wrapper>
 );
 
 export default PaidInvoice;

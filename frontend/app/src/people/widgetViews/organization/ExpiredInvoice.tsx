@@ -62,15 +62,13 @@ const ExpiredInvoice = (props: {
     props.setLnInvoice('');
   };
   return (
-    <>
-      <Container>
-        <ImgWrapper>
-          <img src="/static/expired_invoice.svg" />
-        </ImgWrapper>
-        <Text>Invoice Expired</Text>
-        <Button onClick={handleTryAgain}>Try Again</Button>
-      </Container>
-    </>
+    <Container>
+      <ImgWrapper>
+        <img src="/static/expired_invoice.svg" alt="expired" />
+      </ImgWrapper>
+      <Text>Invoice Expired</Text>
+      <Button onClick={handleTryAgain}>Try Again</Button>
+    </Container>
   );
 };
 

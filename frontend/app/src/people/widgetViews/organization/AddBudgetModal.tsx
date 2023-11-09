@@ -11,7 +11,7 @@ import { colors } from '../../../config/colors';
 import Invoice from '../summaries/wantedSummaries/Invoice';
 import { AddBudgetModalProps, InvoiceState, Toast } from './interface';
 import ExpiredInvoice from './ExpiredInvoice';
-import PaidInvoice from './PiadInvoice';
+import PaidInvoice from './PaidInvoice';
 
 const color = colors['light'];
 
