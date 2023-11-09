@@ -297,7 +297,7 @@ export const CodingLabels = styled.div<codingLangProps>`
   margin-right: 4px;
   .LanguageText {
     font-size: 13px;
-    fontweight: 500;
+    font-weight: 500;
     text-align: center;
     font-family: 'Barlow';
     line-height: 16px;

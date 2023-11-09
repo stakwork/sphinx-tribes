@@ -291,9 +291,6 @@ const OrganizationDetails = (props: {
   };
 
   const successAction = () => {
-    addToast('Budget was added successfully', 'success');
-    closeBudgetHandler();
-
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
@@ -551,6 +548,7 @@ const OrganizationDetails = (props: {
             uuid={uuid}
             invoiceStatus={invoiceStatus}
             startPolling={startPolling}
+            setInvoiceStatus={setInvoiceStatus}
           />
         )}
         {isOpenHistory && (
