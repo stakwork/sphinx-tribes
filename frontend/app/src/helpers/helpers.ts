@@ -22,12 +22,20 @@ export const formatSatPrice = (amount = 0) => {
   return dollarUSLocale.format(amount);
 };
 
-export const getOriginalNumberValue = (formattedValue: string) => {
-  // Remove formatting (commas) from the formatted value
-  if (formattedValue) {
-    const unformattedValue = formattedValue.replace(/,/g, '');
-    return Number(unformattedValue);
+export const convertToLocaleString = (value: number): string => {
+  if (value) {
+    const formattedValue = Number(value).toLocaleString();
+    return formattedValue;
+  } else {
+    return '0';
   }
+};
+
+export const convertLocaleToNumber = (localeString: string): number => {
+  const numString = localeString.replace(/\D/g, '');
+
+  const num = parseInt(numString);
+  return num;
 };
 
 export const DollarConverter = (e: any) => {

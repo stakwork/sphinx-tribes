@@ -264,7 +264,13 @@ const Organizations = (props: { person: Person }) => {
   return (
     <Container>
       <PageLoadSpinner show={loading} />
-      {detailsOpen && <OrganizationDetails close={closeDetails} org={organization} />}
+      {detailsOpen && (
+        <OrganizationDetails
+          close={closeDetails}
+          org={organization}
+          resetOrg={(newOrg: Organization) => setOrganization(newOrg)}
+        />
+      )}
       {!detailsOpen && (
         <>
           {renderOrganizations()}

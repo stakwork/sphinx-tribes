@@ -61,12 +61,12 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		person.Created = &now
 		person.Uuid = xid.New().String()
 	} else { // editing! needs ID
-		if person.ID == 0 { // cant create that already exists
-			fmt.Println("cant create existing")
+		if person.ID == 0 { // can't create if already exists
+			fmt.Println("can't create, already existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		if person.ID != existing.ID { // cant edit someone else's
+		if person.ID != existing.ID { // can't edit someone else's
 			fmt.Println("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -214,7 +214,7 @@ func ProcessTwitterConfirmationsLoop() {
 					username, _ := twitValue["value"].(string)
 					if username != "" {
 						pubkey, err := utils.ConfirmIdentityTweet(username)
-						// fmt.Println("TWitter err", err)
+						// fmt.Println("Twitter err", err)
 						if err == nil && pubkey != "" {
 							if p.OwnerPubKey == pubkey {
 								db.DB.UpdateTwitterConfirmed(p.ID, true)
@@ -264,7 +264,7 @@ func ProcessGithubIssuesLoop() {
 			fullissuename := owner + "/" + reponame + "/" + issnum
 
 			// scan original github issue and replace existing or add, if no new info then don't update
-			// does githubissue already have a status here, and is it different?
+			// does github issue already have a status here, and is it different?
 			if _, ok5 := p.GithubIssues[fullissuename]; ok5 {
 
 				if w, ok6 := p.GithubIssues[fullissuename].(map[string]interface{}); ok6 {

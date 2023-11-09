@@ -301,7 +301,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if the orgnization bounty balance
+	// check if the organization bounty balance
 	// is greater than the amount
 	orgBudget := db.DB.GetOrganizationBudget(bounty.OrgUuid)
 	if orgBudget.TotalBudget < amount {
@@ -416,8 +416,8 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
-	if err == nil {
-		// check if the orgnization bounty balance
+	if err == nil && amount > 0 {
+		// check if the organization bounty balance
 		// is greater than the amount
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
 		if amount > orgBudget.TotalBudget {
@@ -578,7 +578,7 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 		invData := db.DB.GetUserInvoiceData(paymentRequest)
 		dbInvoice := db.DB.GetInvoice(paymentRequest)
 
-		// Make any change onl;y if the invoice has not been settled
+		// Make any change only if the invoice has not been settled
 		if !dbInvoice.Status {
 			if invoice.Type == "BUDGET" {
 				db.DB.AddAndUpdateBudget(invoice)

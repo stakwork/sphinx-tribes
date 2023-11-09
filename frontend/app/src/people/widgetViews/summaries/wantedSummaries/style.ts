@@ -191,7 +191,7 @@ export const DescriptionBox = styled.div<colorProps>`
   max-height: calc(100% - 160px);
   overflow-y: scroll;
   overflow-wrap: anywhere;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-weight: 400;
   font-size: 15px;
   line-height: 25px;
@@ -299,7 +299,7 @@ export const CodingLabels = styled.div<codingLangProps>`
     font-size: 13px;
     fontweight: 500;
     text-align: center;
-    font-family: Barlow;
+    font-family: 'Barlow';
     line-height: 16px;
   }
 `;
@@ -428,7 +428,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
       flex-direction: row;
       align-items: center;
       .InputContainerLeadingText {
-        font-family: Barlow;
+        font-family: 'Barlow';
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
@@ -445,7 +445,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
         color: ${(p: any) => p.color && p.color.pureBlack};
       }
       .InputContainerEndingText {
-        font-family: Barlow;
+        font-family: 'Barlow';
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
@@ -457,7 +457,7 @@ export const AdjustAmountContainer = styled.div<colorProps>`
       }
     }
     .USDText {
-      font-family: Barlow;
+      font-family: 'Barlow';
       font-style: normal;
       font-weight: 500;
       font-size: 13px;
@@ -570,7 +570,7 @@ export const AwardsContainer = styled.div<colorProps>`
     }
     .awardLabelText {
       margin-left: 15px;
-      font-family: Barlow;
+      font-family: 'Barlow';
       font-weight: 500;
       font-size: 13px;
       line-height: 15px;
@@ -615,7 +615,7 @@ export const PaidStatusPopover = styled.div<colorProps>`
       height: 31px;
     }
     .PaidStatus {
-      font-family: Barlow;
+      font-family: 'Barlow';
       font-style: normal;
       font-weight: 700;
       font-size: 17px;

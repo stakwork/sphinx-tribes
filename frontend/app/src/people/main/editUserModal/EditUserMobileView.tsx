@@ -1,7 +1,7 @@
 import { Modal } from 'components/common';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import FocusedView from '../FocusView';
+import AboutFocusView from '../AboutFocusView';
 import { formConfig } from './config';
 import { useUserEdit } from './useEditUser';
 
@@ -10,7 +10,7 @@ export const EditUserMobileView = observer(() => {
 
   return (
     <Modal fill visible={modals.userEditModal}>
-      <FocusedView
+      <AboutFocusView
         person={person}
         canEdit={canEdit}
         selectedIndex={1}
