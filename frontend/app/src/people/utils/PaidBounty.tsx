@@ -18,7 +18,7 @@ const BountyContainer = styled.div<PaidBountyProps>`
   display: flex;
   flex-direction: row;
   width: 100%;
-  font-family: Barlow;
+  font-family: 'Barlow';
   height: 160px !important;
   background: ${(p: any) => p.Bounty_Container_Background};
   border: 2px solid ${(p: any) => p.color.grayish.G950};

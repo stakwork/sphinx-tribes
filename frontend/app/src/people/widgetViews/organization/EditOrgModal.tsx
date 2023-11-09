@@ -89,9 +89,7 @@ const FormWrapper = styled.div`
 
 const EditOrgTitle = styled(ModalTitle)`
   color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 30px;
   font-style: normal;
   font-weight: 800;
@@ -102,9 +100,7 @@ const ImgImportText = styled.p`
   margin-bottom: 5px;
   color: var(--Main-bottom-icons, var(--Disabled-Icon-color, #5f6368));
   text-align: center;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Roboto;
+  font-family: 'Roboto';
   font-size: 13px;
   font-style: normal;
   font-weight: 400;
@@ -116,9 +112,7 @@ const FileTypeHint = styled.p`
   margin-bottom: 5px;
   color: var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc));
   text-align: center;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Roboto;
+  font-family: 'Roboto';
   font-size: 10px;
   font-style: normal;
   font-weight: 400;
@@ -127,9 +121,7 @@ const FileTypeHint = styled.p`
 
 const ImgBrowse = styled.a`
   color: var(--Primary-blue, var(--Disabled-Icon-color, #618aff));
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Roboto;
+  font-family: 'Roboto';
   font-size: 13px;
   font-style: normal;
   font-weight: 400;

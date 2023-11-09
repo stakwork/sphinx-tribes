@@ -43,22 +43,18 @@ const DeleteIcon = styled.img`
 `;
 
 const DeleteText = styled.p`
-  margin: 5px
+  margin: 5px;
 
-  color: var(--Text-2, var(--Hover-Icon-Color, #3C3F41));
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
+  font-family: 'Barlow';
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
   line-height: 24px;
 
-  color: var(--Text-2, var(--Hover-Icon-Color, #3C3F41));
+  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
   text-align: center;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 20px;
   font-style: normal;
   font-weight: 400;
