@@ -23,9 +23,7 @@ const ModelWrapper = styled.div`
 `;
 const InvoiceFormHeading = styled.h2`
   color: #3c3f41;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1.875rem;
   font-style: normal;
   font-weight: 800;
@@ -40,9 +38,7 @@ const InvoiceForm = styled.div`
 
 const InvoiceLabel = styled.label`
   color: #5f6368;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1rem;
   font-style: normal;
   font-weight: 500;
@@ -69,9 +65,7 @@ const InvoiceInputWrapper = styled.div`
 const CurrencyUnit = styled.p`
   color: #b0b7bc;
   text-align: right;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.9375rem;
   font-style: normal;
   font-weight: 400;
@@ -83,9 +77,7 @@ const Input = styled.input`
   border: none;
   outline: none;
   color: #3c3f41;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1.25rem;
   font-style: normal;
   font-weight: 400;
@@ -99,9 +91,7 @@ const Input = styled.input`
 
 const UsdValue = styled.p`
   color: #909baa;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.8125rem;
   font-style: normal;
   font-weight: 500;
@@ -115,7 +105,7 @@ const Button = styled.button`
   padding: 1rem;
   border-radius: 0.375rem;
   margin-top: 1.25rem;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.9375rem;
   font-style: normal;
   font-weight: 500;

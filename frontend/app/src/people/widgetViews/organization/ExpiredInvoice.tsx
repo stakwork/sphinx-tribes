@@ -24,9 +24,7 @@ const Text = styled.p`
   margin-top: 2rem;
   color: #ed7474;
   text-align: center;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 1.375rem;
   font-style: normal;
   font-weight: 500;
@@ -43,9 +41,7 @@ const Button = styled.button`
   background: #fff;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
   color: #5f6368;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 500;

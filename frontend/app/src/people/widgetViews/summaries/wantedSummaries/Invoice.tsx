@@ -27,7 +27,7 @@ const CountDownTextWrapper = styled.div`
 
 const CountDownText = styled.p`
   color: #3c3f41;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.9375rem;
   font-style: normal;
   font-weight: 500;
@@ -46,7 +46,7 @@ const CountDownIconContainer = styled.div`
 
 const CountDownTimer = styled.p`
   color: #3c3f41;
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-size: 0.9375rem;
   font-style: normal;
   font-weight: 700;
