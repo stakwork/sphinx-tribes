@@ -138,17 +138,17 @@ const ThRight = styled(TH)`
 const TR = styled.tr<{ type: OrgTransactionType }>`
   border-bottom: 1px solid
     ${(props: any) =>
-    props.type === 'deposit'
-      ? 'rgba(73, 201, 152, 0.20)'
-      : props.type === 'withdraw'
+      props.type === 'deposit'
+        ? 'rgba(73, 201, 152, 0.20)'
+        : props.type === 'withdraw'
         ? 'rgba(145, 87, 246, 0.15)'
         : 'rgba(0, 0, 0, 0.07)'};
   background-color: ${(props: any) =>
     props.type === 'deposit'
       ? '#F6FFFA'
       : props.type === 'withdraw'
-        ? 'rgba(167, 108, 243, 0.05)'
-        : ''};
+      ? 'rgba(167, 108, 243, 0.05)'
+      : ''};
 `;
 
 const TD = styled.td`
@@ -170,7 +170,7 @@ const AmountSpan = styled.span`
   font-weight: 600;
 `;
 
-const TdLeft = styled(TD) <{ type: OrgTransactionType }>`
+const TdLeft = styled(TD)<{ type: OrgTransactionType }>`
   color: ${(props: any) =>
     props.type === 'deposit' ? '#49C998' : props.type === 'withdraw' ? '#A76CF3' : '#3C3F41'};
   font-size: 1rem;

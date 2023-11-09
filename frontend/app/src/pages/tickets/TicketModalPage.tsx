@@ -60,12 +60,11 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     setActiveBounty(bounty);
     setVisible(visible);
-
   }, [bountyId, search, main.peopleBountiesj]);
 
   useEffect(() => {
     getBounty();
-  }, [getBounty])
+  }, [getBounty]);
 
   const goBack = async () => {
     setVisible(false);

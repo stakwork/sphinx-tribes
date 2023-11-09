@@ -62,9 +62,9 @@ function FocusedView(props: FocusViewProps) {
 
   const userOrganizations = main.dropDownOrganizations.length
     ? main.dropDownOrganizations.map((org: Organization) => ({
-      label: toCapitalize(org.name),
-      value: org.uuid
-    }))
+        label: toCapitalize(org.name),
+        value: org.uuid
+      }))
     : [];
 
   function isNotHttps(url: string | undefined) {
@@ -106,7 +106,8 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  const canDeleteBounty = bounty && bounty.length ? !(bounty[0]?.body?.paid || bounty[0]?.body?.assignee.id) : false;
+  const canDeleteBounty =
+    bounty && bounty.length ? !(bounty[0]?.body?.paid || bounty[0]?.body?.assignee.id) : false;
 
   const { openAfterDeleteNotification } = useAfterDeleteNotification();
 
@@ -360,8 +361,8 @@ function FocusedView(props: FocusViewProps) {
               extraHTML={
                 ui.meInfo.verification_signature
                   ? {
-                    twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
-                  }
+                      twitter: `<span>Post this to your twitter account to verify:</span><br/><strong>Sphinx Verification: ${ui.meInfo.verification_signature}</strong>`
+                    }
                   : {}
               }
             />
