@@ -5,7 +5,7 @@ import { Button } from 'components/common';
 import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { satToUsd, userHasRole } from 'helpers';
+import { satToUsd, userHasRole, Roles } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -15,6 +15,7 @@ import HistoryModal from './organization/HistoryModal';
 import AddUserModal from './organization/AddUserModal';
 import AddBudgetModal from './organization/AddBudgetModal';
 import WithdrawBudgetModal from './organization/WithdrawBudgetModal';
+import EditOrgModal from './organization/EditOrgModal';
 
 import {
   ActionWrap,
@@ -49,15 +50,20 @@ import {
 
 let interval;
 
-const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
+const OrganizationDetails = (props: {
+  close: () => void;
+  org: Organization | undefined;
+  resetOrg: (Organization) => void;
+}) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
   const { main, ui } = useStores();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false);
   const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenWithdrawBudget, setIsOpenWithdrawBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
+  const [isOpenEditOrg, setIsOpenEditOrg] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
@@ -72,7 +78,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
-  const addUserDisabled =
+  const editOrgDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
   const viewReportDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
@@ -180,8 +186,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setShowDeleteModal(true);
   };
 
-  const closeHandler = () => {
-    setIsOpen(false);
+  const closeAddUserHandler = () => {
+    setIsOpenAddUser(false);
   };
 
   const closeRolesHandler = () => {
@@ -200,7 +206,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setIsOpenWithdrawBudget(false);
   };
 
-  const onSubmit = async (body: any) => {
+  const onSubmitUser = async (body: any) => {
     setIsLoading(true);
 
     body.org_uuid = uuid;
@@ -211,18 +217,56 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     } else {
       addToast('Error: could not add user', 'danger');
     }
-    closeHandler();
+    closeAddUserHandler();
     setIsLoading(false);
   };
 
-  const roleChange = (e: any) => {
+  const onSubmitEditOrg = async (body: any) => {
+    if (!org) {
+      addToast('Invalid organization update', 'danger');
+      return;
+    }
+
+    const newOrg = {
+      id: org.id,
+      uuid: org.uuid,
+      name: body.name || org.name,
+      owner_pubkey: org.owner_pubkey,
+      img: body.img || org.img,
+      created: org.created,
+      updated: org.updated,
+      show: body?.show !== undefined ? body.show : org.show,
+      bounty_count: org.bounty_count,
+      budget: org.budget
+    };
+
+    console.log(newOrg);
+    const res = await main.updateOrganization(newOrg);
+    if (res.status === 200) {
+      addToast('Sucessfully updated organization', 'success');
+      // update the org ui
+      props.resetOrg(newOrg);
+    } else {
+      addToast('Error: could not update organization', 'danger');
+    }
+  };
+
+  const onDeleteOrg = async () => {
+    const res = { status: 200 };
+    if (res.status === 200) {
+      addToast('Still need to implement this', 'danger');
+    } else {
+      addToast('Error: could not create organization', 'danger');
+    }
+  };
+
+  const roleChange = (e: Roles, s: any) => {
     const rolesData = bountyRolesData.map((role: any) => {
-      if (role.name === e.target.value) {
-        role.status = !role.status;
+      if (role.name === e) {
+        role.status = s.target.checked;
       }
       return role;
     });
-
     setBountyRolesData(rolesData);
   };
 
@@ -334,7 +378,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <OrgName>{org?.name}</OrgName>
         </HeadNameWrap>
         <HeadButtonWrap forSmallScreen={false}>
-          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+          <HeadButton
+            text="Edit"
+            color="white"
+            disabled={editOrgDisabled}
+            onClick={() => setIsOpenEditOrg(true)}
+            style={{ borderRadius: '5px' }}
+          />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"
@@ -401,13 +451,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <UsersHeader>Users</UsersHeader>
           <HeadButtonWrap forSmallScreen={false}>
             <Button
-              disabled={addUserDisabled}
+              disabled={editOrgDisabled}
               text="Add User"
               color="white"
               style={{
                 borderRadius: '5px'
               }}
-              onClick={() => setIsOpen(true)}
+              onClick={() => setIsOpenAddUser(true)}
             />
           </HeadButtonWrap>
         </UsersHeadWrap>
@@ -453,6 +503,15 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         </UsersList>
       </UserWrap>
       <DetailsWrap>
+        {isOpenEditOrg && (
+          <EditOrgModal
+            isOpen={isOpenEditOrg}
+            close={() => setIsOpenEditOrg(false)}
+            onSubmit={onSubmitEditOrg}
+            onDelete={onDeleteOrg}
+            org={org}
+          />
+        )}
         {showDeleteModal && (
           <DeleteTicketModal
             closeModal={closeDeleteModal}
@@ -462,11 +521,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             userDelete={true}
           />
         )}
-        {isOpen && (
+        {isOpenAddUser && (
           <AddUserModal
-            isOpen={isOpen}
-            close={closeHandler}
-            onSubmit={onSubmit}
+            isOpen={isOpenAddUser}
+            close={closeAddUserHandler}
+            onSubmit={onSubmitUser}
             disableFormButtons={disableFormButtons}
             setDisableFormButtons={setDisableFormButtons}
             loading={loading}
