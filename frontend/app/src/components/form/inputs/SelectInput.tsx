@@ -44,7 +44,7 @@ const OuterContainer = styled.div<styledProps>`
       margin-top: -10px;
       padding-left: 10px;
       height: 14px;
-      transition: all 0.4s;      
+      transition: all 0.4s;
       label {
         color: ${(p: any) => p?.color && p?.color.grayish.G300} !important;
         background: ${(p: any) => p?.color && p?.color.pureWhite};
@@ -54,17 +54,15 @@ const OuterContainer = styled.div<styledProps>`
         font-weight: 500;
         margin-left: 6px;
       }
-      
     }
-    
   }
   .euiFormRow_active {
     padding: 1px 0;
     border: 1px solid ${(p: any) => p?.color && p?.color.blue2};
-    }
   }
-  .euiFormControlLayoutCustomIcon{
-    color: ${(p: any) => p.color && p.color.text2_4} 
+
+  .euiFormControlLayoutCustomIcon {
+    color: ${(p: any) => p.color && p.color.text2_4};
   }
 `;
 export default function SelectInput({

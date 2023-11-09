@@ -74,7 +74,7 @@ const SearchOuterContainer = styled.div<styledProps>`
           object-fit: cover;
         }
         .PeopleName {
-          font-family: Barlow;
+          font-family: 'Barlow';
           font-style: normal;
           font-weight: 500;
           font-size: 13px;

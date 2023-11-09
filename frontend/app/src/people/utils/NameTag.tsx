@@ -31,7 +31,7 @@ const Img = styled.div<ImageProps>`
 `;
 
 const Name = styled.div<NameProps>`
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-style: normal;
   font-weight: normal;
   font-size: ${(p: any) => (p.textSize ? `${p.textSize}px` : '13px')};
@@ -46,7 +46,7 @@ const Name = styled.div<NameProps>`
 `;
 
 const Date = styled.div`
-  font-family: Barlow;
+  font-family: 'Barlow';
   font-style: normal;
   font-weight: normal;
   font-size: 13px;
