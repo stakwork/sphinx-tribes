@@ -13,7 +13,7 @@ const TextContainer = styled.div<styledProps>`
     padding-top: 13px;
     font-size: 13px;
     color: ${(p: any) => p?.color && p?.color.grayish.G300};
-    font-family: Barlow;
+    font-family: 'Barlow';
   }
 
   .label-float input {
@@ -23,7 +23,7 @@ const TextContainer = styled.div<styledProps>`
     min-width: 290px;
     padding: 9.5px 20px;
     font-size: 13px;
-    font-family: Barlow;
+    font-family: 'Barlow';
     transition: all 0.1s linear;
     -webkit-transition: all 0.1s linear;
     -moz-transition: all 0.1s linear;
