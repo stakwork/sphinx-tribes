@@ -86,7 +86,7 @@ If you would like to enable Relay for invoice creation and keysend payment add t
 
 ### Enable Meme Image Upload
 
-If you would like to enable Meme image upload for organization's add the meme env keyd and values to the .env file
+If you would like to enable Meme image upload for organization's add the meme env key and values to the .env file
 
 ```
     MEME_URL=
