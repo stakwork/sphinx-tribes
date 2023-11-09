@@ -90,7 +90,7 @@ const OrganizationDetails = (props: {
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
   const addWithdrawDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'WITHDRAW BUDGET');
-  const vieStatsDisabled =
+  const viewStatsDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
 
   const { org } = props;
@@ -172,14 +172,14 @@ const OrganizationDetails = (props: {
       const organizationBudget = await main.getOrganizationBudget(uuid);
       setOrgBudget(organizationBudget.total_budget);
     }
-  }, [main, uuid, vieStatsDisabled]);
+  }, [main, uuid, viewStatsDisabled]);
 
   const getPaymentsHistory = useCallback(async () => {
     if (!viewReportDisabled) {
       const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
       setPaymentsHistory(paymentHistories);
     }
-  }, [main, uuid, vieStatsDisabled]);
+  }, [main, uuid, viewStatsDisabled]);
 
   const handleSettingsClick = async (user: any) => {
     setUser(user);
