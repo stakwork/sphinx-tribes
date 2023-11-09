@@ -41,6 +41,8 @@ const Wrapper = styled.div`
   justify-content: center;
   flex-direction: column;
   margin-right: 0.9rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
 `;
 
 const DetailWrapper = styled.div`
@@ -52,6 +54,7 @@ const Image = styled.img`
   height: 2rem;
   width: 2rem;
   border-radius: 50%;
+  object-fit: cover;
 `;
 
 const Name = styled.p`
