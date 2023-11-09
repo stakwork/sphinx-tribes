@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, DragEvent, ChangeEvent } from 'react';
 import styled from 'styled-components';
+import { useStores } from 'store';
+import { EuiLoadingSpinner } from '@elastic/eui';
 
 const AddOrgWrapper = styled.div`
   padding: 3rem;
@@ -168,6 +170,13 @@ const OrgInput = styled.input`
   }
 `;
 
+const SelectedImg = styled.img`
+  width: 7.875rem;
+  height: 7.875rem;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
 const OrgButton = styled.button`
   width: 100%;
   height: 3rem;
@@ -193,32 +202,112 @@ const OrgButton = styled.button`
   }
 `;
 
-const AddOrganization = () => {
-  console.log('Happy to get here');
+const InputFile = styled.input`
+  display: none;
+`;
+
+const AddOrganization = (props: {
+  closeHandler: () => void;
+  getUserOrganizations: () => void;
+  owner_pubkey: string | undefined;
+}) => {
+  const [orgName, setOrgName] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { main } = useStores();
+
+  const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOrgName(e.target.value);
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const fileList = event.target.files;
+
+    if (fileList) {
+      setSelectedFile(fileList[0]);
+    }
+  };
+
+  const handleBrowse = () => {
+    const fileInput = document.getElementById('file-input');
+    fileInput?.click();
+  };
+
+  const addOrganization = async () => {
+    setIsLoading(true);
+    const formData = new FormData();
+    if (selectedFile) {
+      formData.append('img', selectedFile);
+    }
+    formData.append('owner_pubkey', props.owner_pubkey || '');
+    formData.append('name', orgName);
+    formData.append('public', 'true');
+
+    const res = await main.addOrganization(formData);
+    if (res.status === 200) {
+      await props.getUserOrganizations();
+      //Add toast
+      props.closeHandler();
+    } else {
+      //Add toast
+      console.log('Error occured');
+    }
+    setIsLoading(false);
+  };
+
   return (
     <AddOrgWrapper>
       <AddOrgHeader>Add New Organization</AddOrgHeader>
       <OrgDetailsContainer>
         <OrgImgOutterContainer>
-          <ImgDashContainer>
-          <UploadImageContainer>
-            <img src="/static/upload.svg" alt="upload"/>
-          </UploadImageContainer>
+          <ImgDashContainer onDragOver={handleDragOver} onDrop={handleDrop}>
+            <UploadImageContainer>
+              <img src="/static/upload.svg" alt="upload" />
+            </UploadImageContainer>
             <ImgContainer>
-              <ImgText>LOGO</ImgText>
+              {selectedFile ? (
+                <SelectedImg src={URL.createObjectURL(selectedFile)} alt="selected file" />
+              ) : (
+                <ImgText>LOGO</ImgText>
+              )}
             </ImgContainer>
           </ImgDashContainer>
           <ImgTextContainer>
+            <InputFile
+              type="file"
+              id="file-input"
+              accept=".jpg, .jpeg, .png, .gif"
+              onChange={handleFileChange}
+            />
             <ImgInstructionText>
-              Drag and drop or <ImgInstructionSpan>Browse</ImgInstructionSpan>
+              Drag and drop or{' '}
+              <ImgInstructionSpan onClick={handleBrowse}>Browse</ImgInstructionSpan>
             </ImgInstructionText>
             <ImgDetailInfo>PNG, JPG or GIF, Min. 300 x 300 px</ImgDetailInfo>
           </ImgTextContainer>
         </OrgImgOutterContainer>
         <OrgInputContainer>
           <OrgLabel>Organization Name</OrgLabel>
-          <OrgInput placeholder="My Organization..." />
-          <OrgButton disabled={false}>Add Organization</OrgButton>
+          <OrgInput
+            placeholder="My Organization..."
+            value={orgName}
+            onChange={handleOrgNameChange}
+          />
+          <OrgButton disabled={!orgName} onClick={addOrganization}>
+            {isLoading ? <EuiLoadingSpinner size="m" /> : 'Add Organization'}
+          </OrgButton>
         </OrgInputContainer>
       </OrgDetailsContainer>
     </AddOrgWrapper>

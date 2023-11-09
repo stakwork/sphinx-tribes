@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import NoResults from 'people/utils/OrgNoResults';
@@ -124,7 +124,6 @@ const Organizations = (props: { person: Person }) => {
   const config = widgetConfigs['organizations'];
   const isMyProfile = ui?.meInfo?.pubkey === props?.person?.owner_pubkey;
 
-
   // function addToast(title: string) {
   //   setToasts([
   //     {
@@ -160,19 +159,6 @@ const Organizations = (props: { person: Person }) => {
   const closeDetails = () => {
     setDetailsOpen(false);
   };
-
-  // const onSubmit = async (body: any) => {
-  //   setIsLoading(true);
-  //   body.owner_pubkey = ui.meInfo?.owner_pubkey;
-  //   const res = await main.addOrganization(body);
-  //   if (res.status === 200) {
-  //     await getUserOrganizations();
-  //   } else {
-  //     addToast('Error: could not create organization');
-  //   }
-  //   closeHandler();
-  //   setIsLoading(false);
-  // };
 
   // renders org as list item
   const orgUi = (org: any, key: number) => {
@@ -270,7 +256,7 @@ const Organizations = (props: { person: Person }) => {
                 maxHeight: '100%',
                 borderRadius: '10px',
                 minWidth: isMobile ? '100%' : '34.4375rem',
-                minHeight: isMobile ? '100%' : '22.1875rem;'
+                minHeight: isMobile ? '100%' : '22.1875rem'
               }}
               overlayClick={closeHandler}
               bigCloseImage={closeHandler}
@@ -281,72 +267,11 @@ const Organizations = (props: { person: Person }) => {
                 borderRadius: '50%'
               }}
             >
-              <AddOrganization />
-              {/* <Formik
-                initialValues={initValues || {}}
-                onSubmit={onSubmit}
-                innerRef={formRef}
-                validationSchema={validator(schema)}
-              >
-                {({
-                  setFieldTouched,
-                  handleSubmit,
-                  values,
-                  setFieldValue,
-                  errors,
-                  initialValues
-                }: any) => (
-                  <Wrap newDesign={true}>
-                    <h5>Add new organization</h5>
-                    <div className="SchemaInnerContainer">
-                      {schema.length &&
-                        schema.map((item: FormField) => (
-                          <Input
-                            {...item}
-                            key={item.name}
-                            values={values}
-                            errors={errors}
-                            value={values[item.name]}
-                            error={errors[item.name]}
-                            initialValues={initialValues}
-                            deleteErrors={() => {
-                              if (errors[item.name]) delete errors[item.name];
-                            }}
-                            handleChange={(e: any) => {
-                              setFieldValue(item.name, e);
-                            }}
-                            setFieldValue={(e: any, f: any) => {
-                              setFieldValue(e, f);
-                            }}
-                            setFieldTouched={setFieldTouched}
-                            handleBlur={() => setFieldTouched(item.name, false)}
-                            handleFocus={() => setFieldTouched(item.name, true)}
-                            setDisableFormButtons={setDisableFormButtons}
-                            borderType={'bottom'}
-                            imageIcon={true}
-                            style={
-                              item.name === 'github_description' && !values.ticket_url
-                                ? {
-                                    display: 'none'
-                                  }
-                                : undefined
-                            }
-                          />
-                        ))}
-
-                      <AddOrgButton
-                        disabled={disableFormButtons || loading}
-                        onClick={() => {
-                          handleSubmit();
-                        }}
-                        loading={loading}
-                        color={'primary'}
-                        text={'Add Organization'}
-                      />
-                    </div>
-                  </Wrap>
-                )}
-              </Formik> */}
+              <AddOrganization
+                closeHandler={closeHandler}
+                getUserOrganizations={getUserOrganizations}
+                owner_pubkey={ui.meInfo?.owner_pubkey}
+              />
             </Modal>
           )}
         </>

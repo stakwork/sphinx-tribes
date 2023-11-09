@@ -1718,19 +1718,17 @@ export class MainStore {
     }
   }
 
-  @action async addOrganization(body: { name: string; img: string }): Promise<any> {
+  @action async addOrganization(body: FormData): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations`, {
         method: 'POST',
         mode: 'cors',
-        body: JSON.stringify({
-          ...body
-        }),
+        body,
         headers: {
           'x-jwt': info.tribe_jwt,
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data'
         }
       });
 
