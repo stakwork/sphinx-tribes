@@ -255,18 +255,6 @@ function MobileView(props: CodingBountiesProps) {
     }
   };
 
-  const removeBountyAssignee = async () => {
-    const data = await main.deleteBountyAssignee({
-      owner_pubkey: person.owner_pubkey,
-      created: created ? created?.toString() : ''
-    });
-
-    if (data) {
-      // get new wanted list
-      main.getPeopleBounties({ page: 1, resetPage: true });
-    }
-  };
-
   const updatePaymentStatus = async (created: number) => {
     await main.updateBountyPaymentStatus(created);
     await main.getPeopleBounties();
@@ -348,8 +336,8 @@ function MobileView(props: CodingBountiesProps) {
   return (
     <div>
       {{ ...person }?.owner_alias &&
-      ui.meInfo?.owner_alias &&
-      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+        ui.meInfo?.owner_alias &&
+        { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
         /*
          * creator view
          */
@@ -614,17 +602,18 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so longF
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!bountyExpired &&
-                      !invoiceStatus &&
-                      assignee &&
+                    {!invoiceStatus && assignee &&
                       assignee.owner_alias.length < 30 && (
                         <>
-                          {bounty_expires && (
+                          {bounty_expires && !bountyExpired && (
                             <BountyTime>
                               Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
                               {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs{' '}
                               {bountyTimeLeft.seconds}
                             </BountyTime>
+                          )}
+                          {bountyExpired && (
+                            <BountyTime>Bounty commitment has expired</BountyTime>
                           )}
                           <Button
                             iconSize={14}
@@ -636,21 +625,8 @@ function MobileView(props: CodingBountiesProps) {
                             ButtonTextStyle={{ padding: 0 }}
                           />
                         </>
-                      )}
-                    {bountyExpired && (
-                      <>
-                        <BountyTime>Bounty Commitment sats has expired</BountyTime>
-                        <Button
-                          iconSize={14}
-                          width={220}
-                          height={48}
-                          onClick={removeBountyAssignee}
-                          style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                          text="Remove Assignee"
-                          ButtonTextStyle={{ padding: 0 }}
-                        />
-                      </>
-                    )}
+                      )
+                    }
                   </BountyPriceContainer>
                   <div className="buttonSet">
                     <ButtonSet

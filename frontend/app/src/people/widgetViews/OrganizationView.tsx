@@ -161,7 +161,9 @@ const Organizations = (props: { person: Person }) => {
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
     if (ui.selectedPerson) {
-      await main.getUserOrganizations(ui.selectedPerson);
+      const orgs = await main.getUserOrganizations(ui.selectedPerson);
+      main.setDropDownOrganizations(orgs);
+
       const user = await main.getPersonById(ui.selectedPerson);
       setUser(user);
     }
@@ -343,8 +345,8 @@ const Organizations = (props: { person: Person }) => {
                             style={
                               item.name === 'github_description' && !values.ticket_url
                                 ? {
-                                    display: 'none'
-                                  }
+                                  display: 'none'
+                                }
                                 : undefined
                             }
                           />
