@@ -72,6 +72,7 @@ func NewRouter() *http.Server {
 		r.Delete("/channel/{id}", handlers.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Get("/poll/invoice/{paymentRequest}", handlers.PollInvoice)
+		r.Post("/meme_upload", handlers.MemeImageUpload)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -80,7 +81,6 @@ func NewRouter() *http.Server {
 		r.Get("/refresh_jwt", handlers.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
 		r.Post("/budgetinvoices", handlers.GenerateBudgetInvoice)
-		r.Post("/meme_upload", handlers.MemeImageUpload)
 	})
 
 	PORT := os.Getenv("PORT")
