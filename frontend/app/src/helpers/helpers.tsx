@@ -1,7 +1,6 @@
-import { uiStore } from 'stores/uiStore';
-import * as extendedHelpers from './helpers-extended';
+import { uiStore } from '../store/ui';
 
-const satToUsd = (amount: number = 0) => {
+export const satToUsd = (amount: number = 0) => {
   if (!amount) amount = 0;
   const satExchange = uiStore.usdToSatsExchangeRate;
   const returnValue = (amount / satExchange).toFixed(2);
@@ -13,4 +12,4 @@ const satToUsd = (amount: number = 0) => {
   return returnValue;
 };
 
-export default { ...extendedHelpers, satToUsd };
+export * from './helpers-extended';
