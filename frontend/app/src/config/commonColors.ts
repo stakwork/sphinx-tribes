@@ -5,7 +5,13 @@ export const commonColors = {
   },
   success: {
     background: '#49C998',
-    color: '#fff'
+    color: '#fff',
+    boxShadow: '0px 2px 10px 0px rgba(73, 201, 152, 0.50)'
+  },
+  withdraw: {
+    background: '#9157F6',
+    color: '#fff',
+    boxShadow: '0px 2px 10px 0px rgba(145, 87, 246, 0.50)'
   },
   white: {
     background: '#fff',
