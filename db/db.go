@@ -1118,7 +1118,9 @@ func (db database) CreateOrganizationBudget(budget BountyBudget) BountyBudget {
 }
 
 func (db database) UpdateOrganizationBudget(budget BountyBudget) BountyBudget {
-	db.db.Where("org_uuid = ?", budget.OrgUuid).Updates(budget)
+	db.db.Model(&BountyBudget{}).Where("org_uuid = ?", budget.OrgUuid).Updates(map[string]interface{}{
+		"total_budget": budget.TotalBudget,
+	})
 	return budget
 }
 
