@@ -777,7 +777,7 @@ export class MainStore {
     // if we don't pass the params, we should use previous params for invalidate query
     const query2 = this.appendQueryParams(
       'gobounties/all',
-      queryLimit,
+      params?.limit ? params.limit : queryLimit,
       params ? queryParams : this.getWantedsPrevParams
     );
 

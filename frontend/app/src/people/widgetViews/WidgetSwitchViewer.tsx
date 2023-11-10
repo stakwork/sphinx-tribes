@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { useIsMobile } from 'hooks/uiHooks';
@@ -75,6 +75,16 @@ function WidgetSwitchViewer(props: any) {
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
   const [currentItems, setCurrentItems] = useState<number>(10);
+  const [bounty, setBounty] = useState<any>([]);
+
+  useEffect(() => {
+    (async () => {
+      const page = 1;
+      const params = { page: page, limit: 1000 }; // Adjust the limit if needed
+      const bounties = await main.getPeopleBounties(params);
+      setBounty(bounties);
+    })();
+  }, [bounty, setBounty]);
 
   const panelStyles = isMobile
     ? {
@@ -103,7 +113,7 @@ function WidgetSwitchViewer(props: any) {
     offer: peopleOffers
   };
 
-  const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
+  const activeList = bounty.filter(({ body }: any) => {
     const value = { ...body };
     return (
       bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
