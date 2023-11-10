@@ -1,0 +1,34 @@
+name: Tests 
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    name: Craco
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn --cwd ./frontend/app install
+      - name: Tests
+        run: NODE_OPTIONS="--max_old_space_size=8192" yarn --cwd ./frontend/app run test
+      - name: Set up Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+      - name: Go Test
+        run: go test -v ./...
+
+  test-jest:
+    name: Jest
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn --cwd ./frontend/app install
+      - name: Tests
+        run: NODE_OPTIONS="--max_old_space_size=8192" yarn --cwd ./frontend/app run test-jest
+

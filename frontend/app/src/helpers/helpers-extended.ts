@@ -1,21 +1,8 @@
 /* eslint-disable @typescript-eslint/typedef */
 import LighningDecoder from 'light-bolt11-decoder';
 import { getHost } from '../config/host';
-import { uiStore } from '../store/ui';
 
 export const formatPrice = (amount = 0) => amount;
-
-export const satToUsd = (amount = 0) => {
-  if (!amount) amount = 0;
-  const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
-  const returnValue = (amount / satExchange).toFixed(2);
-
-  if (returnValue === 'Infinity' || isNaN(parseFloat(returnValue))) {
-    return '. . .';
-  }
-
-  return returnValue;
-};
 
 export const formatSatPrice = (amount = 0) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');
