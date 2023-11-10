@@ -100,7 +100,7 @@ export const OrgName = styled.h3`
   padding: 0px;
   margin: 0px;
   font-size: 1.5rem;
-  color: #3C3F41;
+  color: #3c3f41;
   margin-left: 25px;
   font-weight: 700;
   margin-left: 20px;
@@ -216,12 +216,12 @@ export const BudgetSmallHead = styled.h6`
 `;
 
 export const Budget = styled.h4`
-  color: #3C3F41;
+  color: #3c3f41;
   font-size: 1.0625rem;
   font-weight: 600;
 
   &.budget-small {
-    border-left: 1px solid #EBEDEF;
+    border-left: 1px solid #ebedef;
     padding-left: 22px;
     margin-left: 22px;
   }
@@ -264,7 +264,7 @@ export const UsersHeadWrap = styled.div`
   width: 100%;
   padding: 20px 60px;
   padding-right: 40px;
-  border-bottom: 1px solid #DDE1E5;
+  border-bottom: 1px solid #dde1e5;
   @media only screen and (max-width: 500px) {
     width: 100%;
     padding: 0 30px;
@@ -277,7 +277,7 @@ export const UsersHeader = styled.h4`
   font-weight: 700;
   padding: 0;
   margin: 0;
-  color: #3C3F41;
+  color: #3c3f41;
   @media only screen and (max-width: 500px) {
     font-size: 0.8rem;
     margin-right: 55%;
@@ -287,7 +287,7 @@ export const UsersHeader = styled.h4`
 export const UsersList = styled.div`
   padding: 0 60px;
   padding-right: 40px;
-  border-bottom: 1px solid #DDE1E5;
+  border-bottom: 1px solid #dde1e5;
 
   @media only screen and (max-width: 500px) {
     width: 100%;
@@ -333,7 +333,7 @@ export const UserName = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  color: #3C3F41;
+  color: #3c3f41;
 `;
 
 export const UserPubkey = styled.p`

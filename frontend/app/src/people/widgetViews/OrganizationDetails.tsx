@@ -364,13 +364,15 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             </NoBudgetWrap>
           ) : (
             <ViewBudgetWrap>
-                <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-                <ViewBudgetTextWrap>
-                  <Budget>
-                    {orgBudget.toLocaleString()} <Grey>SATS</Grey>
-                  </Budget>
-                  <Budget className="budget-small">{satToUsd(orgBudget)} <Grey>USD</Grey></Budget>
-                </ViewBudgetTextWrap>
+              <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
+              <ViewBudgetTextWrap>
+                <Budget>
+                  {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+                </Budget>
+                <Budget className="budget-small">
+                  {satToUsd(orgBudget)} <Grey>USD</Grey>
+                </Budget>
+              </ViewBudgetTextWrap>
             </ViewBudgetWrap>
           )}
         </BudgetWrap>
