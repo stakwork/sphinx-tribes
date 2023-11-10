@@ -26,6 +26,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
   const onGoBack = async () => {
     await main.getPersonCreatedBounties({}, personPubkey);
     await main.getPersonAssignedBounties({}, personPubkey);
+
     ui.setBountyPerson(0);
     history.push({
       pathname: basePath
@@ -34,6 +35,10 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
 
   useEffect(() => {
     async function getBounty() {
+      /** check for the bounty length, else the request
+       * will be made continously which will lead to an
+       * infinite loop and crash the app
+       */
       if (wantedId && !bounty.length) {
         const bounty = await main.getBountyById(Number(wantedId));
         setBounty(bounty);
@@ -43,6 +48,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
     getBounty();
   }, [bounty, main, wantedId]);
   const isMobile = useIsMobile();
+
   if (isMobile) {
     return (
       <Modal visible={true} fill={true}>

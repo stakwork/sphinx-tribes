@@ -252,7 +252,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
     });
     setPaymentHistory(payments);
     setCurrentPaymentHistory(payments);
-  }, []);
+  }, [paymentsHistory]);
 
   useEffect(() => {
     setCurrentPaymentHistory(
