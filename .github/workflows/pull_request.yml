@@ -52,3 +52,16 @@ jobs:
         run: yarn --cwd ./frontend/app install
       - name: Prettier 
         run: CI=false yarn --cwd ./frontend/app run prettier:check 
+
+
+  test-jest:
+    name: Test Job
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn --cwd ./frontend/app install
+      - name: Tests
+        run: NODE_OPTIONS="--max_old_space_size=8192" yarn --cwd ./frontend/app run test-jest
+
