@@ -41,6 +41,22 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	created := chi.URLParam(r, "created")
+	if created == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetBountyDataByCreated(created)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
 func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	personKey := chi.URLParam(r, "personKey")
 	tabType := chi.URLParam(r, "tabType")
