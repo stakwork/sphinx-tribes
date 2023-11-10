@@ -8,7 +8,7 @@ export const ModalTitle = styled.h3`
 export const CheckUl = styled.ul`
   list-style: none;
   padding: 0;
-  margin-top: 20px;
+  margin-bottom: 20px;
 `;
 
 export const CheckLi = styled.li`

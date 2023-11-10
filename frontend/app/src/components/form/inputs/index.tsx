@@ -87,7 +87,7 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
       z-index: 10;
       position: ${(p: any) => p?.isTop && 'absolute'};
       top: ${(p: any) => p?.isTop && '-20px'} !important;
-      font-family: Barlow;
+      font-family: 'Barlow';
       font-style: normal;
       font-weight: 500;
       font-size: 14px;
@@ -97,56 +97,50 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
   }
 `;
 export const FieldText = styled(EuiFieldText)<styledProps>`
-background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
-max-width:900px;
-background:${(p: any) => p?.color && p.color.pureWhite} !important;
-color:${(p: any) => (p.readOnly ? `${p.color.grayish.G60A}` : `${p.color.pureBlack}`)} !important;
-box-shadow: none !important;
-height: ${(p: any) => (p?.isTextField ? '12px' : '')}  ;
-margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')}; 
+  background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
+  max-width: 900px;
+  background: ${(p: any) => p?.color && p.color.pureWhite} !important;
+  color: ${(p: any) =>
+    p.readOnly ? `${p.color.grayish.G60A}` : `${p.color.pureBlack}`} !important;
+  box-shadow: none !important;
+  height: ${(p: any) => (p?.isTextField ? '12px' : '')};
+  margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')};
 
-.euiFormRow__labelWrapper .euiFormControlLayout--group{
-    background-color:${(p: any) => p?.color && p.color.pureWhite} !important;
-    background:${(p: any) => p?.color && p.color.pureWhite} !important;
-    box-shadow:none !important;
-}
+  .euiFormRow__labelWrapper .euiFormControlLayout--group {
+    background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
+    background: ${(p: any) => p?.color && p.color.pureWhite} !important;
+    box-shadow: none !important;
+  }
 
-.euiFormRow__fieldWrapper .euiFormControlLayout {
-    background-color:${(p: any) => p?.color && p.color.pureWhite} !important;
-    background:${(p: any) => p?.color && p.color.pureWhite} !important;
-    box-shadow:none !important;
-    
-}
+  .euiFormRow__fieldWrapper .euiFormControlLayout {
+    background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
+    background: ${(p: any) => p?.color && p.color.pureWhite} !important;
+    box-shadow: none !important;
+  }
 
-.euiFormLabel euiFormControlLayout__prepend{
-    background-color:${(p: any) => p?.color && p.color.pureWhite} !important;
-    background:${(p: any) => p?.color && p.color.pureWhite} !important;
-    box-shadow:none !important;
-    color: ${(p: any) => p?.color && p.color.grayish.G71} !important;s
-    display:none !important;
+  .euiFormLabel euiFormControlLayout__prepend {
+    background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
+    background: ${(p: any) => p?.color && p.color.pureWhite} !important;
+    box-shadow: none !important;
+    color: ${(p: any) => p?.color && p.color.grayish.G71} !important;
+    display: none !important;
     line-height: 1rem;
-}
+  }
 
-.euiFormControlLayout--group {
+  .euiFormControlLayout--group {
     background-color: #ffffff00 !important;
     transition: none !important;
     display: none !important;
-    max-width:900px;
-    
-}
-
-
+    max-width: 900px;
+  }
 `;
 export const FieldTextArea = styled(EuiTextArea)<styledProps>`
-  // min-height: ${(p: any) => p?.height && p.height} !important;
-  // max-height: ${(p: any) => p?.width && p.height} !important;
   width: ${(p: any) => p?.color && p.color.width};
   background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
   background: ${(p: any) => p?.color && p.color.pureWhite} !important;
   max-width: 900px;
   color: ${(p: any) => p?.color && p.color.pureBlack} !important;
   box-shadow: none !important;
-  // border-bottom: ${(p: any) => p?.color && `1px solid ${p.color.grayish.G600}`};
   line-height: 17.6px;
 `;
 export default function Input(props: any) {

@@ -7,6 +7,7 @@ import { Spacer } from 'people/main/Body';
 import styled from 'styled-components';
 import { BountyModal } from 'people/main/bountyModal/BountyModal';
 import PageLoadSpinner from 'people/utils/PageLoadSpinner';
+import { Person } from 'store/main';
 import history from '../../config/history';
 import { colors } from '../../config/colors';
 import WantedView from './WantedView';
@@ -50,6 +51,7 @@ const UserTickets = () => {
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
   const [loading, setIsLoading] = useState<boolean>(false);
+  const [bountyOwner, setBountyOwner] = useState<Person>();
 
   function onPanelClick(id: number, index: number) {
     history.push({
@@ -111,6 +113,7 @@ const UserTickets = () => {
               onPanelClick={() => {
                 onPanelClick(body.id, i);
                 ui.setBountyPerson(person?.id);
+                setBountyOwner(person);
               }}
               person={person}
               showModal={showModal}
@@ -132,7 +135,7 @@ const UserTickets = () => {
       <Router history={history}>
         <Switch>
           <Route path={`${path}/:wantedId/:wantedIndex`}>
-            <BountyModal basePath={url} />
+            <BountyModal fromPage={'usertickets'} bountyOwner={bountyOwner} basePath={url} />
           </Route>
         </Switch>
       </Router>

@@ -23,7 +23,7 @@ const S = styled(EuiSuperSelect as any)<styleProps>`
   .euiPanel {
     background: ${(p: any) => p?.color && p?.color.pureWhite};
   }
-  . button {
+  .button {
     background: ${(p: any) => p?.color && p?.color.pureWhite} !important;
     background-color: ${(p: any) => p?.color && p?.color.pureWhite} !important;
   }

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import styled, { css } from 'styled-components';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
@@ -9,7 +8,7 @@ import { Organization } from 'store/main';
 import { Box } from '@mui/system';
 import history from 'config/history';
 import { useStores } from '../../store';
-import Form from '../../components/form';
+import Form from '../../components/form/bounty';
 import {
   Button,
   IconButton,
@@ -24,61 +23,7 @@ import {
   extractRepoAndIssueFromIssueUrl,
   toCapitalize
 } from '../../helpers';
-
-// this is where we see others posts (etc) and edit our own
-const BWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 10px;
-  min-height: 42px;
-  position: absolute;
-  left: 0px;
-  border-bottom: 1px solid rgb(221, 225, 229);
-  background: #ffffff;
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.07);
-  z-index: 100;
-`;
-
-const EnvWithScrollBar = ({ thumbColor, trackBackgroundColor }: any) => css`
-                scrollbar-color: ${thumbColor} ${trackBackgroundColor}; // Firefox support
-                scrollbar-width: thin;
-
-                &::-webkit-scrollbar {
-                    width: 6px;
-                height: 100%;
-  }
-
-                &::-webkit-scrollbar-thumb {
-                    background - color: ${thumbColor};
-                background-clip: content-box;
-                border-radius: 5px;
-                border: 1px solid ${trackBackgroundColor};
-  }
-
-                &::-webkit-scrollbar-corner,
-                &::-webkit-scrollbar-track {
-                    background - color: ${trackBackgroundColor};
-  }
-}
-
-                `;
-interface BProps {
-  hide: boolean;
-}
-const B = styled.div<BProps>`
-  display: ${(p: any) => (p.hide ? 'none' : 'flex')};
-  justify-content: ${(p: any) => (p.hide ? 'none' : 'center')};
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-  box-sizing: border-box;
-  ${EnvWithScrollBar({
-    thumbColor: '#5a606c',
-    trackBackgroundColor: 'rgba(0,0,0,0)'
-  })}
-`;
+import { B, BWrap } from './style';
 
 // selected bounty popup window
 function FocusedView(props: FocusViewProps) {
@@ -161,8 +106,8 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  const currentBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
-  const canDeleteBounty = !(currentBounty?.body?.paid || currentBounty?.body?.assignee.id);
+  const canDeleteBounty =
+    bounty && bounty.length ? !(bounty[0]?.body?.paid || bounty[0]?.body?.assignee.id) : false;
 
   const { openAfterDeleteNotification } = useAfterDeleteNotification();
 
@@ -175,21 +120,22 @@ function FocusedView(props: FocusViewProps) {
 
   // callback for deleting the open bounty
   async function deleteIt() {
-    const delBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
-    if (!delBounty) return;
-    setDeleting(true);
-    try {
-      if (delBounty.body.created) {
-        await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
-        afterDeleteHandler(delBounty.body.title, delBounty.body.ticket_url);
-        closeModal();
-        if (props?.deleteExtraFunction) props?.deleteExtraFunction();
+    if (bounty && bounty.length) {
+      const delBounty = bounty[0];
+      setDeleting(true);
+      try {
+        if (delBounty.body.created) {
+          await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
+          afterDeleteHandler(delBounty.body.title, delBounty.body.ticket_url);
+          closeModal();
+          if (props?.deleteExtraFunction) props?.deleteExtraFunction();
+        }
+      } catch (e) {
+        console.log('e', e);
       }
-    } catch (e) {
-      console.log('e', e);
+      setDeleting(false);
+      if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
     }
-    setDeleting(false);
-    if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
   const { openDeleteConfirmation } = useDeleteConfirmationModal();
@@ -257,14 +203,6 @@ function FocusedView(props: FocusViewProps) {
   async function submitForm(body: any, shouldCloseModal: boolean = true) {
     let newBody = cloneDeep(body);
 
-    if (config && config.name === 'about') {
-      await main.saveProfile(newBody);
-      if (shouldCloseModal) {
-        closeModal();
-      }
-      return;
-    }
-
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -316,77 +254,49 @@ function FocusedView(props: FocusViewProps) {
   let initialValues: any = {};
 
   const personInfo = canEdit ? ui.meInfo : person;
-  const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
 
   // set initials here
   if (personInfo) {
-    if (config && config.name === 'about') {
-      initialValues.id = personInfo.id || 0;
-      initialValues.pubkey = personInfo.pubkey;
-      initialValues.owner_pubkey = personInfo.pubkey;
-      initialValues.alert = personInfo.extras?.alert || false;
-      initialValues.owner_alias = personInfo.owner_alias || '';
-      initialValues.img = personInfo.img || '';
-      initialValues.price_to_meet = personInfo.price_to_meet || 0;
-      initialValues.description = personInfo.description || '';
-      initialValues.loomEmbedUrl = personInfo.loomEmbedUrl || '';
-      // below are extras,
-      initialValues.twitter =
-        (personInfo.extras?.twitter && personInfo.extras?.twitter[0]?.value) || '';
-      initialValues.email = (personInfo.extras?.email && personInfo.extras?.email[0]?.value) || '';
-      initialValues.github =
-        (personInfo.extras?.github && personInfo.extras?.github[0]?.value) || '';
-      initialValues.facebook =
-        (personInfo.extras?.facebook && personInfo.extras?.facebook[0]?.value) || '';
-      // extras with multiple items
-      initialValues.coding_languages = personInfo.extras?.coding_languages || [];
-      initialValues.tribes = personInfo.extras?.tribes || [];
-      initialValues.repos = personInfo.extras?.repos || [];
-      initialValues.lightning =
-        (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
-      initialValues.amboss =
-        (personInfo.extras?.amboss && personInfo.extras?.amboss[0]?.value) || '';
-    } else {
-      // if there is a selected index, fill in values
-      if (selectedBounty && selectedIndex >= 0) {
-        const wanted = selectedBounty.body;
-        initialValues.estimated_completion_date = wanted?.estimated_completion_date
-          ? moment(wanted?.estimated_completion_date)
-          : '';
+    // if there is a selected index, fill in values
+    if (bounty && bounty.length && selectedIndex >= 0) {
+      const selectedBounty = bounty[0];
+      const wanted = selectedBounty.body;
+      initialValues.estimated_completion_date = wanted?.estimated_completion_date
+        ? moment(wanted?.estimated_completion_date)
+        : '';
 
-        if (wanted.type) {
-          const thisDynamicSchema = dynamicSchemasByType[wanted.type];
-          const newValues = thisDynamicSchema.map((s: any) => {
-            if (s.name === 'estimated_completion_date') {
-              return {
-                [s.name]: wanted['estimated_completion_date'] || new Date()
-              };
-            } else if (s.name === 'one_sentence_summary') {
-              return {
-                [s.name]: wanted['one_sentence_summary'] || wanted['title']
-              };
-            } else if (s.name === 'coding_languages') {
-              const coding_languages =
-                wanted['coding_languages'] && wanted['coding_languages'].length
-                  ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
-                  : [];
-              return {
-                [s.name]: coding_languages
-              };
-            }
+      if (wanted.type) {
+        const thisDynamicSchema = dynamicSchemasByType[wanted.type];
+        const newValues = thisDynamicSchema.map((s: any) => {
+          if (s.name === 'estimated_completion_date') {
             return {
-              [s.name]: wanted[s.name]
+              [s.name]: wanted['estimated_completion_date'] || new Date()
             };
-          });
+          } else if (s.name === 'one_sentence_summary') {
+            return {
+              [s.name]: wanted['one_sentence_summary'] || wanted['title']
+            };
+          } else if (s.name === 'coding_languages') {
+            const coding_languages =
+              wanted['coding_languages'] && wanted['coding_languages'].length
+                ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
+                : [];
+            return {
+              [s.name]: coding_languages
+            };
+          }
+          return {
+            [s.name]: wanted[s.name]
+          };
+        });
 
-          const valueMap = Object.assign({}, ...newValues);
-          initialValues = { ...initialValues, ...valueMap };
-        } else {
-          const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
-          dynamicSchema?.defaultSchema?.forEach((s: any) => {
-            initialValues[s.name] = wanted[s.name];
-          });
-        }
+        const valueMap = Object.assign({}, ...newValues);
+        initialValues = { ...initialValues, ...valueMap };
+      } else {
+        const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
+        dynamicSchema?.defaultSchema?.forEach((s: any) => {
+          initialValues[s.name] = wanted[s.name];
+        });
       }
     }
   }
@@ -394,9 +304,12 @@ function FocusedView(props: FocusViewProps) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-    const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
-    if (selectedIndex >= 0 && selectedBounty) {
-      return selectedBounty.body;
+    if (bounty) {
+      const selectedBounty = bounty[0];
+
+      if (selectedIndex >= 0 && selectedBounty && selectedBounty.body) {
+        return selectedBounty.body;
+      }
     }
     return null;
   }
@@ -471,7 +384,7 @@ function FocusedView(props: FocusViewProps) {
                     if (goBack) goBack();
                   }}
                   style={{
-                    fontSize: 12,
+                    fontSize: 3,
                     fontWeight: 600
                   }}
                 />

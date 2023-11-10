@@ -12,15 +12,13 @@ const Img = styled.div<ImageProps>`
   background-image: url('${(p: any) => p.src}');
   background-position: center;
   background-size: cover;
-  height: 55px;
-  width: 55px;
-  border-radius: 50%;
+  width: 4.6875rem;
+  height: 4.728rem;
 `;
 
 const Icon = styled.div`
-  height: 55px;
-  width: 55px;
-  border-radius: 50%;
+  width: 4.6875rem;
+  height: 4.728rem;
   display: flex;
   align-items: center;
 `;
@@ -34,7 +32,7 @@ export default function QR(props: QRProps) {
         <MaterialIcon icon={'person_add'} style={{ fontSize: 36, marginLeft: 7 }} />
       </Icon>
     ) : (
-      <Img src={'/static/sphinx.png'} />
+      <Img src={'/static/sphinx.svg'} />
     );
 
   return (
@@ -64,21 +62,23 @@ export default function QR(props: QRProps) {
         {centerIcon}
       </div>
 
-      <div
-        style={{
-          position: 'absolute',
-          zIndex: 8,
-          height: props.size,
-          width: props.size,
-          top: 0,
-          left: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}
-      >
-        <div style={{ background: color.pureWhite, height: 75, width: 75 }} />
-      </div>
+      {type === 'connect' && (
+        <div
+          style={{
+            position: 'absolute',
+            zIndex: 8,
+            height: props.size,
+            width: props.size,
+            top: 0,
+            left: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <div style={{ background: color.pureWhite, height: 75, width: 75 }} />
+        </div>
+      )}
     </div>
   );
 }

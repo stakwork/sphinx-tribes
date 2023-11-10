@@ -166,7 +166,9 @@ const Organizations = (props: { person: Person }) => {
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
     if (ui.selectedPerson) {
-      await main.getUserOrganizations(ui.selectedPerson);
+      const orgs = await main.getUserOrganizations(ui.selectedPerson);
+      main.setDropDownOrganizations(orgs);
+
       const user = await main.getPersonById(ui.selectedPerson);
       setUser(user);
     }
@@ -198,6 +200,7 @@ const Organizations = (props: { person: Person }) => {
     setIsLoading(false);
   };
 
+  // renders org as list item
   const orgUi = (org: any, key: number) => {
     const btnDisabled = (!org.bounty_count && org.bount_count !== 0) || !org.uuid;
     return (
@@ -234,6 +237,7 @@ const Organizations = (props: { person: Person }) => {
     );
   };
 
+  // renders list of orgs with header
   const renderOrganizations = () => {
     if (main.organizations.length) {
       return (
@@ -267,7 +271,13 @@ const Organizations = (props: { person: Person }) => {
   return (
     <Container>
       <PageLoadSpinner show={loading} />
-      {detailsOpen && <OrganizationDetails close={closeDetails} org={organization} />}
+      {detailsOpen && (
+        <OrganizationDetails
+          close={closeDetails}
+          org={organization}
+          resetOrg={(newOrg: Organization) => setOrganization(newOrg)}
+        />
+      )}
       {!detailsOpen && (
         <>
           {renderOrganizations()}
