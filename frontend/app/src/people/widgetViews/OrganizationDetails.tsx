@@ -19,7 +19,6 @@ import WithdrawBudgetModal from './organization/WithdrawBudgetModal';
 import {
   ActionWrap,
   Budget,
-  BudgetSmall,
   BudgetSmallHead,
   BudgetWrap,
   Container,
@@ -44,7 +43,8 @@ import {
   UsersHeadWrap,
   UsersHeader,
   UsersList,
-  ViewBudgetWrap
+  ViewBudgetWrap,
+  ViewBudgetTextWrap
 } from './organization/style';
 
 let interval;
@@ -364,11 +364,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             </NoBudgetWrap>
           ) : (
             <ViewBudgetWrap>
-              <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-              <Budget>
-                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
-              </Budget>
-              <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
+                <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
+                <ViewBudgetTextWrap>
+                  <Budget>
+                    {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+                  </Budget>
+                  <Budget className="budget-small">{satToUsd(orgBudget)} <Grey>USD</Grey></Budget>
+                </ViewBudgetTextWrap>
             </ViewBudgetWrap>
           )}
         </BudgetWrap>
@@ -383,14 +385,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <Button
             disabled={addWithdrawDisabled}
             text="Withdraw"
-            color="white"
+            color="withdraw"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenWithdrawBudget(true)}
           />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
-            color="white"
+            color="success"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenBudget(true)}
           />

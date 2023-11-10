@@ -45,15 +45,14 @@ export const Container = styled.div`
   width: 100%;
   min-height: 100%;
   background: white;
-  padding: 20px 0px;
-  padding-top: 0px;
   z-index: 100;
 `;
 
 export const HeadWrap = styled.div`
   display: flex;
   align-items: center;
-  padding: 25px 40px;
+  padding: 25px 10px;
+  padding-right: 40px;
   border-bottom: 1px solid #ebedef;
   @media only screen and (max-width: 800px) {
     padding: 15px 0px;
@@ -66,6 +65,7 @@ export const HeadWrap = styled.div`
     padding-bottom: 15px;
     flex-direction: column;
     align-items: start;
+    padding: 20px 30px;
   }
 `;
 
@@ -99,7 +99,8 @@ export const OrgImg = styled.img`
 export const OrgName = styled.h3`
   padding: 0px;
   margin: 0px;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
+  color: #3C3F41;
   margin-left: 25px;
   font-weight: 700;
   margin-left: 20px;
@@ -131,6 +132,8 @@ export const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
     margin-left: 0px;
     width: 100vw;
     margin-left: ${(p: any) => (p.forSmallScreen ? '50px' : '0px')};
+    flex-wrap: wrap;
+    display: flex;
   }
   @media only screen and (max-width: 470px) {
     gap: 6px;
@@ -140,27 +143,27 @@ export const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
 export const DetailsWrap = styled.div`
   width: 100%;
   min-height: 100%;
-  margin-top: 17px;
   padding: 0px 20px;
 `;
 
 export const ActionWrap = styled.div`
   display: flex;
   align-items: center;
-  padding: 25px 40px;
+  padding-right: 40px;
   border-bottom: 1px solid #ebedef;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
   @media only screen and (max-width: 700px) {
     padding: 25px 0px;
   }
   @media only screen and (max-width: 500px) {
     flex-direction: column;
     width: 100%;
-    padding: 25px 0px;
+    padding: 20px 30px;
   }
 `;
 
 export const BudgetWrap = styled.div`
-  padding: 25px 40px;
+  padding: 25px 60px;
   width: 55%;
   display: flex;
   flex-direction: column;
@@ -171,6 +174,7 @@ export const BudgetWrap = styled.div`
   @media only screen and (max-width: 500px) {
     width: 100%;
     padding: 20px 0px;
+    padding-top: 0;
   }
 `;
 
@@ -188,6 +192,13 @@ export const ViewBudgetWrap = styled.div`
   width: 100%;
 `;
 
+export const ViewBudgetTextWrap = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin-top: 12px;
+`;
+
 export const BudgetSmall = styled.h6`
   padding: 0px;
   font-size: 0.8rem;
@@ -199,13 +210,22 @@ export const BudgetSmall = styled.h6`
 
 export const BudgetSmallHead = styled.h6`
   padding: 0px;
-  font-size: 0.7rem;
+  font-size: 0.625rem;
   color: #8e969c;
+  margin: 0;
 `;
 
 export const Budget = styled.h4`
-  color: #3c3f41;
-  font-size: 1.15rem;
+  color: #3C3F41;
+  font-size: 1.0625rem;
+  font-weight: 600;
+
+  &.budget-small {
+    border-left: 1px solid #EBEDEF;
+    padding-left: 22px;
+    margin-left: 22px;
+  }
+
   @media only screen and (max-width: 500px) {
     font-size: 1rem;
   }
@@ -213,6 +233,7 @@ export const Budget = styled.h4`
 
 export const Grey = styled.span`
   color: #8e969c;
+  font-weight: 400;
 `;
 
 export const NoBudgetText = styled.p`
@@ -227,7 +248,7 @@ export const NoBudgetText = styled.p`
 export const UserWrap = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 25px 40px;
+  background-color: rgb(240, 241, 243);
   @media only screen and (max-width: 700px) {
     width: 100%;
     padding: 20px 0px;
@@ -241,19 +262,22 @@ export const UsersHeadWrap = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid #ebedef;
-  padding-top: 5px;
-  padding-bottom: 20px;
+  padding: 20px 60px;
+  padding-right: 40px;
+  border-bottom: 1px solid #DDE1E5;
   @media only screen and (max-width: 500px) {
     width: 100%;
+    padding: 0 30px;
+    padding-bottom: 20px;
   }
 `;
 
 export const UsersHeader = styled.h4`
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 700;
   padding: 0;
   margin: 0;
+  color: #3C3F41;
   @media only screen and (max-width: 500px) {
     font-size: 0.8rem;
     margin-right: 55%;
@@ -261,8 +285,13 @@ export const UsersHeader = styled.h4`
 `;
 
 export const UsersList = styled.div`
+  padding: 0 60px;
+  padding-right: 40px;
+  border-bottom: 1px solid #DDE1E5;
+
   @media only screen and (max-width: 500px) {
     width: 100%;
+    padding: 0 30px;
   }
 `;
 
@@ -285,7 +314,6 @@ export const User = styled.div`
 
 export const UserDetails = styled.div`
   display: flex;
-  flex-gap: 12px;
   flex-direction: column;
   margin-left: 2%;
   width: 30%;
@@ -298,13 +326,14 @@ export const UserDetails = styled.div`
 export const UserName = styled.p`
   padding: 0px;
   margin: 0px;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   text-transform: capitalize;
-  font-weight: bold;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  color: #3C3F41;
 `;
 
 export const UserPubkey = styled.p`

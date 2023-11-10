@@ -12,7 +12,7 @@ const B = styled(EuiButton)`
   font-weight: bold;
   border: none;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 18px;
   display: flex;
   align-items: center;
