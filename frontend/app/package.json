@@ -194,41 +194,5 @@
     "react-error-overlay": "6.0.9",
     "ts-jest": "^29.1.1",
     "typescript": "^5.0.3"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "./src/components/**/*.js",
-      "./src/helpers/**/*.ts",
-      "./src/leaderboard/**/*.ts",
-      "./src/pages/**/*.ts",
-      "./src/people/**/*.ts",
-      "./src/tribes/**/*.ts"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "lines": 0
-      },
-      "./src/people/utils/": {
-        "lines": 0
-      },
-      "./src/helpers/": {
-        "lines": 66
-      }
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-		"globals": {
-    "window": { "location": {"host": "localhost"}},
-"testEnvironment": "jsdom"
-
-  }
   }
 }
