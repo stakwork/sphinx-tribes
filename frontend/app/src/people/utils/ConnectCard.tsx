@@ -129,7 +129,7 @@ export default function ConnectCard(props: ConnectCardProps) {
                 <QrBar value={`${ownerPubkey}${routeHint}`} simple style={{ marginTop: 11 }} />
               )}
             </>
-         
+
             <a href={qrString}>
               <Button
                 text={'Connect with Sphinx'}
