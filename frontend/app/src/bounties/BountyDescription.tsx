@@ -97,7 +97,7 @@ const CodingLabels = styled.div<codingLangProps>`
     font-size: 13px;
     fontweight: 500;
     text-align: center;
-    font-family: Barlow;
+    font-family: 'Barlow';
     line-height: 16px;
   }
 `;

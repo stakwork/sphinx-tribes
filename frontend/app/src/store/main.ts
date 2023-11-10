@@ -125,6 +125,8 @@ export interface PersonBounty {
   commitment_fee?: number;
 }
 
+export type OrgTransactionType = 'deposit' | 'payment' | 'withdraw';
+
 export interface PaymentHistory {
   id: number;
   bounty_id: number;
@@ -138,7 +140,7 @@ export interface PaymentHistory {
   receiver_img: string;
   created: string;
   updated: string;
-  payment_type: string;
+  payment_type: OrgTransactionType;
   status: boolean;
 }
 
@@ -1745,6 +1747,7 @@ export class MainStore {
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations`, {
         method: 'POST',
+
         mode: 'cors',
         body: JSON.stringify({
           ...body
@@ -1994,7 +1997,6 @@ export class MainStore {
       );
 
       const data = await r.json();
-      console.log('Data ===', data);
       return data;
     } catch (e) {
       console.log('Error getPaymentHistories', e);

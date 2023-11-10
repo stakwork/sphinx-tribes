@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/typedef */
-import lighningDecoder from 'light-bolt11-decoder';
+import LighningDecoder from 'light-bolt11-decoder';
 import { getHost } from '../config/host';
 import { uiStore } from '../store/ui';
 
@@ -32,9 +32,9 @@ export const convertToLocaleString = (value: number): string => {
 };
 
 export const convertLocaleToNumber = (localeString: string): number => {
-  let numString = localeString.replace(/\D/g, '');
+  const numString = localeString.replace(/\D/g, '');
 
-  let num = parseInt(numString);
+  const num = parseInt(numString);
   return num;
 };
 
@@ -154,6 +154,7 @@ export const formatRelayPerson = (person: any): any => ({
 });
 
 export type Roles =
+  | 'EDIT ORGANIZATION'
   | 'ADD BOUNTY'
   | 'UPDATE BOUNTY'
   | 'DELETE BOUNTY'
@@ -200,7 +201,7 @@ export const toCapitalize = (word: string): string => {
 
 export const isInvoiceExpired = (paymentRequest: string): boolean => {
   // decode invoice to see if it has expired
-  const decoded = lighningDecoder.decode(paymentRequest);
+  const decoded = LighningDecoder.decode(paymentRequest);
   const invoiceTimestamp = decoded.sections[4].value;
   const expiry = decoded.sections[8].value;
   const expired = invoiceTimestamp + expiry;

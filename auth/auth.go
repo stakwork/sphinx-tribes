@@ -179,7 +179,7 @@ func EncodeJwt(pubkey string) (string, error) {
 func ParseTokenString(t string) (uint32, []byte, []byte, error) {
 	token := t
 	forceUtf8 := false
-	// this signifies its forced utf8 sig (for CLN SignMessage)
+	// this signifies it's forced utf8 sig (for CLN SignMessage)
 	if strings.HasPrefix(t, ".") {
 		token = t[1:]
 		forceUtf8 = true

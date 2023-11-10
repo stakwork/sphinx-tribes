@@ -48,7 +48,7 @@ const D = styled.div<styledProps>`
   align-items: center;
   .DText {
     font-size: 16px;
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-weight: 500;
   }
   .ImageOuterContainer {
@@ -122,7 +122,7 @@ const FilterContainer = styled.div<styledProps>`
     }
   }
   .filterText {
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
@@ -188,7 +188,7 @@ const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   border-right: 1px solid ${(p: any) => p.color && p.color.grayish.G700};
   user-select: none;
   .leftBoxHeading {
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-style: normal;
     font-weight: 700;
     font-size: 12px;
@@ -241,7 +241,7 @@ const PopOverRightBox = styled.div<styledProps>`
   max-height: 304px;
   padding: 15px 0px 20px 21px;
   .rightBoxHeading {
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-style: normal;
     font-weight: 700;
     font-size: 12px;
