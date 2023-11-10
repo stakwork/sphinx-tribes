@@ -124,6 +124,9 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &orgUser)
 
+	// get orgnanization
+	org := db.DB.GetOrganizationByUuid(orgUser.OrgUuid)
+
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -133,6 +136,13 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if the user is the organization admin
+	if pubKeyFromAuth == org.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot add organization admin as a user")
 		return
 	}
 
@@ -274,8 +284,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.AddRoles)
-	userRoles := db.DB.GetUserRoles(uuid, pubKeyFromAuth)
-	isUser := db.CheckUser(userRoles, pubKeyFromAuth)
+	isUser := db.CheckUser(roles, pubKeyFromAuth)
 
 	if isUser {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -286,13 +295,13 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// check if the user added his pubkey to the route
 	if pubKeyFromAuth == user {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("cannot add roles for self")
+		json.NewEncoder(w).Encode("auth pubkey cannot be the same with user's")
 		return
 	}
 
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("user cannot add roles")
+		json.NewEncoder(w).Encode("user does not have adequate permissions to add roles")
 		return
 	}
 
@@ -304,6 +313,15 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode("not a valid user role")
+			return
+		}
+
+		// check if the user has the role he his trying to add to another user
+		okUser := db.UserHasAccess(pubKeyFromAuth, uuid, role.Role)
+		// if the user does not have any of the roles he wants to add return an error
+		if !okUser {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("cannot add a role you don't have")
 			return
 		}
 

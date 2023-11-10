@@ -166,14 +166,18 @@ const OrganizationDetails = (props: {
   };
 
   const getOrganizationBudget = useCallback(async () => {
-    const organizationBudget = await main.getOrganizationBudget(uuid);
-    setOrgBudget(organizationBudget.total_budget);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const organizationBudget = await main.getOrganizationBudget(uuid);
+      setOrgBudget(organizationBudget.total_budget);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
-    setPaymentsHistory(paymentHistories);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
+      setPaymentsHistory(paymentHistories);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const handleSettingsClick = async (user: any) => {
     setUser(user);
