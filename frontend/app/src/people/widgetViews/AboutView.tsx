@@ -258,7 +258,7 @@ export const AboutView = observer((props: AboutViewProps) => {
 
       <Divider />
       <Row>
-        <div>Price to Connect:</div>
+        <div>Price to Join:</div>
         <div style={{ fontWeight: 'bold', color: '#000' }}>{price_to_meet}</div>
       </Row>
 
