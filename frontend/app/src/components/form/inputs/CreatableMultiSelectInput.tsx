@@ -12,9 +12,9 @@ interface styledProps {
 
 const ExtraText = styled.div`
 padding: 2px 10px 25px 10px;
-max - width: calc(100 % - 20px);
-word -break: break-all;
-font - size: 14px;
+max-width: calc(100 % - 20px);
+word-break: break-all;
+font-size: 14px;
 `;
 
 const E = styled.div<styledProps>`
@@ -22,12 +22,12 @@ position: absolute;
 right: 10px;
 top: 0px;
 display: flex;
-height: 100 %;
-justify - content: center;
-align - items: center;
+height: 100%;
+justify-content: center;
+align-items: center;
 color: ${(p: any) => p?.color && p.color.blue3};
-pointer - events: none;
-user - select: none;
+pointer-events: none;
+user-select: none;
 `;
 const R = styled.div`
   position: relative;

@@ -184,8 +184,9 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
             idToSelectedMap={checkboxIdToSelectedMap}
             onChange={(id: any) => {
               onChange(id);
-              setData([...data, { value: id, label: id }]);
-              handleChange(data);
+              const newData = [...data, { value: id, label: id }]
+              handleChange(newData);
+              setData(newData);
             }}
           />
         </EuiPopOverCheckbox>
