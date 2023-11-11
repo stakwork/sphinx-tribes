@@ -252,15 +252,13 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
     });
     setPaymentHistory(payments);
     setCurrentPaymentHistory(payments);
-  }, [paymentsHistory]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setCurrentPaymentHistory(
-      paymentsHistory.filter((history: PaymentHistory) => {
-        if (filter[history.payment_type]) {
-          return history;
-        }
-      })
+      paymentsHistory.filter((history: PaymentHistory) => filter[history.payment_type])
     );
   }, [filter, paymentsHistory]);
 

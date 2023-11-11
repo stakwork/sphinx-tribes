@@ -174,7 +174,7 @@ const OrganizationDetails = (props: {
 
   const getPaymentsHistory = useCallback(async () => {
     if (!viewReportDisabled) {
-      const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
+      const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
       setPaymentsHistory(paymentHistories);
     }
   }, [main, uuid, viewReportDisabled]);
