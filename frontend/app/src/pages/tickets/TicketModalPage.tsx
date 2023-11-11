@@ -4,7 +4,7 @@ import { useIsMobile } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { PersonBounty } from 'store/main';
@@ -29,8 +29,6 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
-
-  const isVisible = useRef(false);
 
   const isMobile = useIsMobile();
 
@@ -59,11 +57,10 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     setConnectPersonBody(connectPerson);
 
     const visible = bounty && bounty.length > 0;
-    isVisible.current = visible;
 
     setActiveBounty(bounty);
     setVisible(visible);
-  }, [bountyId, search, main.peopleBounties, visible]);
+  }, [bountyId, search]);
 
   useEffect(() => {
     getBounty();
@@ -71,7 +68,6 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
-    isVisible.current = false;
     await main.getPeopleBounties({ page: 1, resetPage: true });
     history.push('/bounties');
   };
