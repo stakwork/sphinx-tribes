@@ -175,7 +175,13 @@ const OrganizationDetails = (props: {
   const getPaymentsHistory = useCallback(async () => {
     if (!viewReportDisabled) {
       const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
-      setPaymentsHistory(paymentHistories);
+      const payments = paymentHistories.map((history: PaymentHistory) => {
+        if (!history.payment_type) {
+          history.payment_type = 'payment';
+        }
+        return history;
+      });
+      setPaymentsHistory(payments);
     }
   }, [main, uuid, viewReportDisabled]);
 
@@ -309,7 +315,6 @@ const OrganizationDetails = (props: {
       try {
         await main.pollOrgBudgetInvoices(uuid);
         getOrganizationBudget();
-        getPaymentsHistory();
 
         const count = await main.organizationInvoiceCount(uuid);
         if (count === 0) {
@@ -317,7 +322,7 @@ const OrganizationDetails = (props: {
         }
 
         i++;
-        if (i > 10) {
+        if (i > 5) {
           if (interval) clearInterval(interval);
         }
       } catch (e) {
