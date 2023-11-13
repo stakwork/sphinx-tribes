@@ -4,16 +4,29 @@ import {
     bountyHeaderLanguageFilter 
 } from '../filterValidation';
 
-beforeAll(() => {
-    
-});
-
-afterAll(() => {
-});
-
 describe('testing helpers', () => {
     describe('bountyHeaderFilter', () => {
-
+        test('o/t/t', () => {
+            expect(bountyHeaderFilter({ Open: true }, true, true)).toEqual(false);
+        });
+        test('a/t/t', () => {
+            expect(bountyHeaderFilter({ Assigned: true }, true, true)).toEqual(true);
+        });
+        test('p/t/t', () => {
+            expect(bountyHeaderFilter({ Paid: true }, true, true)).toEqual(true);
+        });
+        test('/t/t', () => {
+            expect(bountyHeaderFilter({}, true, true)).toEqual(true);
+        });
+        test('o/f/t', () => {
+            expect(bountyHeaderFilter({ Open: true }, false, true)).toEqual(false);
+        }); 
+        test('a/f/t', () => {
+            expect(bountyHeaderFilter({ Assigned: true }, false, true)).toEqual(true);
+        }); 
+        test('p/f/t', () => {
+            expect(bountyHeaderFilter({ Paid: true }, false, true)).toEqual(false);
+        }); 
     });
     describe('bountyHeaderLanguageFilter', () => {
         test('match', () => {
