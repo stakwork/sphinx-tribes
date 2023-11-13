@@ -63,6 +63,7 @@ const UploadImageContainer = styled.div`
   position: absolute;
   bottom: 0;
   right: 0;
+  cursor: pointer;
 `;
 
 const ImgDashContainer = styled.div`
@@ -312,7 +313,7 @@ const AddOrganization = (props: {
       <OrgDetailsContainer>
         <OrgImgOutterContainer>
           <ImgDashContainer onDragOver={handleDragOver} onDrop={handleDrop}>
-            <UploadImageContainer>
+            <UploadImageContainer onClick={handleBrowse}>
               <img src="/static/upload.svg" alt="upload" />
             </UploadImageContainer>
             <ImgContainer>
