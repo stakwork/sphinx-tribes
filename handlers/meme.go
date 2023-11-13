@@ -56,7 +56,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(msg)
 	} else {
 		err, memeImgUrl := UploadMemeImage(file, mToken.Token, header.Filename)
-		if err != nil {
+		if err == nil {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(memeImgUrl)
 			return
