@@ -1753,6 +1753,27 @@ export class MainStore {
     }
   }
 
+  async getUserOrganizationByUuid(uuid: string): Promise<Organization | undefined> {
+    try {
+      const info = uiStore;
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return undefined;
+
+      const r: any = await fetch(`${TribesURL}/organizations/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      return await data;
+    } catch (e) {
+      console.log('Error getOrganizationByUuid', e);
+      return undefined;
+    }
+  }
+
   @action async addOrganization(body: { name: string; img: string }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;

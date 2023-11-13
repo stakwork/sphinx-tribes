@@ -145,25 +145,31 @@ const OrganizationDetails = (props: {
       name: role.name,
       status: false
     }));
+
     setBountyRolesData(bountyRolesData);
   }, [main.bountyRoles]);
 
-  const getUserRoles = async (user: any) => {
-    if (uuid && user.owner_pubkey) {
-      const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
-      setUserRoles(userRoles);
+  const getUserRoles = useCallback(
+    async (user: any) => {
+      if (uuid && user.owner_pubkey) {
+        const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
+        setUserRoles(userRoles);
 
-      // set all values to false, so every user data will be fresh
-      const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
+        // set all values to false, so every user data will be fresh
+        const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
+        userRoles.forEach((userRole: any) => {
+          const index = rolesData.findIndex((role: any) => role.name === userRole.role);
 
-      userRoles.forEach((userRole: any) => {
-        const index = rolesData.findIndex((role: any) => role.name === userRole.role);
-        rolesData[index]['status'] = true;
-      });
+          if (index !== -1) {
+            rolesData[index]['status'] = true;
+          }
+        });
 
-      setBountyRolesData(rolesData);
-    }
-  };
+        setBountyRolesData(rolesData);
+      }
+    },
+    [uuid, main]
+  );
 
   const getOrganizationBudget = useCallback(async () => {
     if (!viewReportDisabled) {
@@ -250,7 +256,6 @@ const OrganizationDetails = (props: {
       budget: org.budget
     };
 
-    console.log(newOrg);
     const res = await main.updateOrganization(newOrg);
     if (res.status === 200) {
       addToast('Sucessfully updated organization', 'success');
@@ -366,7 +371,16 @@ const OrganizationDetails = (props: {
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
-  }, [getOrganizationUsers, getBountyRoles, getOrganizationBudget, getPaymentsHistory]);
+    if (uuid && ui.meInfo) {
+      getUserRoles(ui.meInfo);
+    }
+  }, [
+    getOrganizationUsers,
+    getBountyRoles,
+    getOrganizationBudget,
+    getPaymentsHistory,
+    getUserRoles
+  ]);
 
   return (
     <Container>
