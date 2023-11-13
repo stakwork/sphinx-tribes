@@ -960,6 +960,41 @@ export class MainStore {
     }
   }
 
+  async getBountyByCreated(created: number): Promise<PersonBounty[]> {
+    try {
+      const ps2 = await api.get(`gobounties/created/${created}`);
+      const ps3: any[] = [];
+
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getBountyById: ', e);
+      return [];
+    }
+  }
+
   async getOrganizationBounties(uuid: string, queryParams?: any): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
     try {
@@ -1715,6 +1750,27 @@ export class MainStore {
     } catch (e) {
       console.log('Error getUserOrganizations', e);
       return [];
+    }
+  }
+
+  async getUserOrganizationByUuid(uuid: string): Promise<Organization | undefined> {
+    try {
+      const info = uiStore;
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return undefined;
+
+      const r: any = await fetch(`${TribesURL}/organizations/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      return await data;
+    } catch (e) {
+      console.log('Error getOrganizationByUuid', e);
+      return undefined;
     }
   }
 

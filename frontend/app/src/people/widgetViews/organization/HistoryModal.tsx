@@ -224,7 +224,6 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
   const isMobile = useIsMobile();
   const { isOpen, close, url } = props;
   const [filter, setFilter] = useState({ payment: true, deposit: true, withdraw: true });
-  const [paymentsHistory, setPaymentHistory] = useState(props.paymentsHistory);
   const [currentPaymentsHistory, setCurrentPaymentHistory] = useState(props.paymentsHistory);
 
   const { ui } = useStores();
@@ -244,25 +243,11 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
   };
 
   useEffect(() => {
-    const payments = paymentsHistory.map((history: PaymentHistory) => {
-      if (!history.payment_type) {
-        history.payment_type = 'payment';
-      }
-      return history;
-    });
-    setPaymentHistory(payments);
-    setCurrentPaymentHistory(payments);
-  }, []);
-
-  useEffect(() => {
+    const paymentsHistory = [...props.paymentsHistory];
     setCurrentPaymentHistory(
-      paymentsHistory.filter((history: PaymentHistory) => {
-        if (filter[history.payment_type]) {
-          return history;
-        }
-      })
+      paymentsHistory.filter((history: PaymentHistory) => filter[history.payment_type])
     );
-  }, [filter, paymentsHistory]);
+  }, [filter]);
 
   return (
     <Modal

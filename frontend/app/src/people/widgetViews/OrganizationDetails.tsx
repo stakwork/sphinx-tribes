@@ -20,7 +20,6 @@ import EditOrgModal from './organization/EditOrgModal';
 import {
   ActionWrap,
   Budget,
-  BudgetSmall,
   BudgetSmallHead,
   BudgetWrap,
   Container,
@@ -45,7 +44,8 @@ import {
   UsersHeadWrap,
   UsersHeader,
   UsersList,
-  ViewBudgetWrap
+  ViewBudgetWrap,
+  ViewBudgetTextWrap
 } from './organization/style';
 
 let interval;
@@ -145,35 +145,51 @@ const OrganizationDetails = (props: {
       name: role.name,
       status: false
     }));
+
     setBountyRolesData(bountyRolesData);
   }, [main.bountyRoles]);
 
-  const getUserRoles = async (user: any) => {
-    if (uuid && user.owner_pubkey) {
-      const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
-      setUserRoles(userRoles);
+  const getUserRoles = useCallback(
+    async (user: any) => {
+      if (uuid && user.owner_pubkey) {
+        const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
+        setUserRoles(userRoles);
 
-      // set all values to false, so every user data will be fresh
-      const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
+        // set all values to false, so every user data will be fresh
+        const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
+        userRoles.forEach((userRole: any) => {
+          const index = rolesData.findIndex((role: any) => role.name === userRole.role);
 
-      userRoles.forEach((userRole: any) => {
-        const index = rolesData.findIndex((role: any) => role.name === userRole.role);
-        rolesData[index]['status'] = true;
-      });
+          if (index !== -1) {
+            rolesData[index]['status'] = true;
+          }
+        });
 
-      setBountyRolesData(rolesData);
-    }
-  };
+        setBountyRolesData(rolesData);
+      }
+    },
+    [uuid, main]
+  );
 
   const getOrganizationBudget = useCallback(async () => {
-    const organizationBudget = await main.getOrganizationBudget(uuid);
-    setOrgBudget(organizationBudget.total_budget);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const organizationBudget = await main.getOrganizationBudget(uuid);
+      setOrgBudget(organizationBudget.total_budget);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
-    setPaymentsHistory(paymentHistories);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
+      const payments = paymentHistories.map((history: PaymentHistory) => {
+        if (!history.payment_type) {
+          history.payment_type = 'payment';
+        }
+        return history;
+      });
+      setPaymentsHistory(payments);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const handleSettingsClick = async (user: any) => {
     setUser(user);
@@ -240,7 +256,6 @@ const OrganizationDetails = (props: {
       budget: org.budget
     };
 
-    console.log(newOrg);
     const res = await main.updateOrganization(newOrg);
     if (res.status === 200) {
       addToast('Sucessfully updated organization', 'success');
@@ -291,9 +306,6 @@ const OrganizationDetails = (props: {
   };
 
   const successAction = () => {
-    addToast('Budget was added successfully', 'success');
-    closeBudgetHandler();
-
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
@@ -308,7 +320,6 @@ const OrganizationDetails = (props: {
       try {
         await main.pollOrgBudgetInvoices(uuid);
         getOrganizationBudget();
-        getPaymentsHistory();
 
         const count = await main.organizationInvoiceCount(uuid);
         if (count === 0) {
@@ -316,7 +327,7 @@ const OrganizationDetails = (props: {
         }
 
         i++;
-        if (i > 10) {
+        if (i > 5) {
           if (interval) clearInterval(interval);
         }
       } catch (e) {
@@ -360,7 +371,16 @@ const OrganizationDetails = (props: {
     getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
-  }, [getOrganizationUsers, getBountyRoles, getOrganizationBudget, getPaymentsHistory]);
+    if (uuid && ui.meInfo) {
+      getUserRoles(ui.meInfo);
+    }
+  }, [
+    getOrganizationUsers,
+    getBountyRoles,
+    getOrganizationBudget,
+    getPaymentsHistory,
+    getUserRoles
+  ]);
 
   return (
     <Container>
@@ -415,10 +435,14 @@ const OrganizationDetails = (props: {
           ) : (
             <ViewBudgetWrap>
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-              <Budget>
-                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
-              </Budget>
-              <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
+              <ViewBudgetTextWrap>
+                <Budget>
+                  {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+                </Budget>
+                <Budget className="budget-small">
+                  {satToUsd(orgBudget)} <Grey>USD</Grey>
+                </Budget>
+              </ViewBudgetTextWrap>
             </ViewBudgetWrap>
           )}
         </BudgetWrap>
@@ -433,14 +457,14 @@ const OrganizationDetails = (props: {
           <Button
             disabled={addWithdrawDisabled}
             text="Withdraw"
-            color="white"
+            color="withdraw"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenWithdrawBudget(true)}
           />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
-            color="white"
+            color="success"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenBudget(true)}
           />
@@ -551,6 +575,7 @@ const OrganizationDetails = (props: {
             uuid={uuid}
             invoiceStatus={invoiceStatus}
             startPolling={startPolling}
+            setInvoiceStatus={setInvoiceStatus}
           />
         )}
         {isOpenHistory && (

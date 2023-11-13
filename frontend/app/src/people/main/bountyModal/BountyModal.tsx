@@ -9,7 +9,7 @@ import { PersonBounty } from 'store/main';
 import FocusedView from '../FocusView';
 
 const config = widgetConfigs.wanted;
-export const BountyModal = ({ basePath }: BountyModalProps) => {
+export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProps) => {
   const history = useHistory();
   const { wantedId, wantedIndex, personPubkey } = useParams<{
     wantedId: string;
@@ -21,9 +21,12 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
   const { person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
 
+  const personToDisplay = fromPage === 'usertickets' ? bountyOwner : person;
+
   const onGoBack = async () => {
     await main.getPersonCreatedBounties({}, personPubkey);
     await main.getPersonAssignedBounties({}, personPubkey);
+
     ui.setBountyPerson(0);
     history.push({
       pathname: basePath
@@ -32,6 +35,10 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
 
   useEffect(() => {
     async function getBounty() {
+      /** check for the bounty length, else the request
+       * will be made continously which will lead to an
+       * infinite loop and crash the app
+       */
       if (wantedId && !bounty.length) {
         const bounty = await main.getBountyById(Number(wantedId));
         setBounty(bounty);
@@ -41,6 +48,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
     getBounty();
   }, [bounty, main, wantedId]);
   const isMobile = useIsMobile();
+
   if (isMobile) {
     return (
       <Modal visible={true} fill={true}>
@@ -81,7 +89,7 @@ export const BountyModal = ({ basePath }: BountyModalProps) => {
       }}
     >
       <FocusedView
-        person={person}
+        person={personToDisplay}
         personBody={person}
         canEdit={false}
         selectedIndex={Number(wantedIndex)}

@@ -28,6 +28,11 @@ const Container = styled.div`
   min-width: 100%;
   min-height: 100%;
   flex: 1 1 100%;
+  margin: -20px -30px;
+
+  .organizations {
+    padding: 20px 30px;
+  }
 `;
 
 const OrganizationWrap = styled.div`
@@ -161,7 +166,9 @@ const Organizations = (props: { person: Person }) => {
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
     if (ui.selectedPerson) {
-      await main.getUserOrganizations(ui.selectedPerson);
+      const orgs = await main.getUserOrganizations(ui.selectedPerson);
+      main.setDropDownOrganizations(orgs);
+
       const user = await main.getPersonById(ui.selectedPerson);
       setUser(user);
     }
@@ -234,7 +241,7 @@ const Organizations = (props: { person: Person }) => {
   const renderOrganizations = () => {
     if (main.organizations.length) {
       return (
-        <>
+        <div className="organizations">
           <OrgHeadWrap>
             <OrgText>Organizations</OrgText>
             {isMyProfile && (
@@ -250,7 +257,7 @@ const Organizations = (props: { person: Person }) => {
           <OrganizationContainer>
             {main.organizations.map((org: Organization, i: number) => orgUi(org, i))}
           </OrganizationContainer>
-        </>
+        </div>
       );
     } else {
       return (
