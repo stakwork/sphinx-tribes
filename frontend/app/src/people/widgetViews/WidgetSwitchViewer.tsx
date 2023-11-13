@@ -99,13 +99,11 @@ function WidgetSwitchViewer(props: any) {
         justifyContent: 'center'
       };
 
-
   const { selectedWidget, onPanelClick } = props;
 
   if (!selectedWidget) {
     return <div style={{ height: 200 }} />;
   }
-
 
   const activeList = bounty.filter(({ body }: any) => {
     const value = { ...body };
