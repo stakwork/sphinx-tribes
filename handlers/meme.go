@@ -13,11 +13,21 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
 func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	dirName := "uploads"
 	file, header, err := r.FormFile("file")
 	if err != nil {
@@ -56,7 +66,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(msg)
 	} else {
 		err, memeImgUrl := UploadMemeImage(file, mToken.Token, header.Filename)
-		if err != nil {
+		if err == nil {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(memeImgUrl)
 			return
