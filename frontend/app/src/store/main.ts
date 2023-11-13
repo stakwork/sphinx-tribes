@@ -1753,17 +1753,19 @@ export class MainStore {
     }
   }
 
-  @action async addOrganization(body: FormData): Promise<any> {
+  @action async addOrganization(body: { name: string; img: string }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations`, {
         method: 'POST',
         mode: 'cors',
-        body,
+        body: JSON.stringify({
+          ...body
+        }),
         headers: {
           'x-jwt': info.tribe_jwt,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
 
@@ -1772,6 +1774,21 @@ export class MainStore {
       console.log('Error addOrganization', e);
       return false;
     }
+  }
+
+  async uploadFile(body: FormData): Promise<null | Response> {
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    const r: any = await fetch(`${TribesURL}/meme_upload`, {
+      method: 'POST',
+      mode: 'cors',
+      body,
+      headers: {
+        'x-jwt': info.tribe_jwt
+      }
+    });
+
+    return r;
   }
 
   async updateOrganization(body: Organization): Promise<any> {

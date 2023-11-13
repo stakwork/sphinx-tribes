@@ -1,7 +1,8 @@
 import React, { useState, DragEvent, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
-import { EuiLoadingSpinner } from '@elastic/eui';
+import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
+import { Toast } from './interface';
 
 const AddOrgWrapper = styled.div`
   padding: 3rem;
@@ -215,6 +216,7 @@ const AddOrganization = (props: {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { main } = useStores();
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOrgName(e.target.value);
@@ -240,31 +242,68 @@ const AddOrganization = (props: {
     }
   };
 
+  function addSuccessToast() {
+    setToasts([
+      {
+        id: '1',
+        title: 'Create Organization',
+        color: 'success',
+        text: 'Organization created successfully'
+      }
+    ]);
+  }
+
+  function addErrorToast(text: string) {
+    setToasts([
+      {
+        id: '2',
+        title: 'Create Organization',
+        color: 'danger',
+        text
+      }
+    ]);
+  }
+
+  function removeToast() {
+    setToasts([]);
+  }
+
   const handleBrowse = () => {
     const fileInput = document.getElementById('file-input');
     fileInput?.click();
   };
 
   const addOrganization = async () => {
-    setIsLoading(true);
-    const formData = new FormData();
-    if (selectedFile) {
-      formData.append('img', selectedFile);
-    }
-    formData.append('owner_pubkey', props.owner_pubkey || '');
-    formData.append('name', orgName);
-    formData.append('public', 'true');
+    try {
+      setIsLoading(true);
+      let img_url = '';
+      const formData = new FormData();
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+        const file = await main.uploadFile(formData);
+        if (file && file.ok) {
+          img_url = await file.json();
+        }
+      }
+      const body = { owner_pubkey: props.owner_pubkey || '', name: orgName, img: img_url };
 
-    const res = await main.addOrganization(formData);
-    if (res.status === 200) {
-      await props.getUserOrganizations();
-      //Add toast
-      props.closeHandler();
-    } else {
-      //Add toast
-      console.log('Error occured');
+      const res = await main.addOrganization(body);
+      if (res.status === 200) {
+        addSuccessToast();
+        setTimeout(async () => {
+          await props.getUserOrganizations();
+          setIsLoading(false);
+          props.closeHandler();
+        }, 500);
+      } else {
+        addErrorToast(await res.json());
+        setIsLoading(false);
+      }
+    } catch (error) {
+      addErrorToast('Error occured while creating organization');
+      console.log('Error occured', error);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -310,6 +349,7 @@ const AddOrganization = (props: {
           </OrgButton>
         </OrgInputContainer>
       </OrgDetailsContainer>
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={3000} />
     </AddOrgWrapper>
   );
 };
