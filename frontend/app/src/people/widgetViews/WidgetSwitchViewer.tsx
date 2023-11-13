@@ -99,7 +99,6 @@ function WidgetSwitchViewer(props: any) {
         justifyContent: 'center'
       };
 
-  const { peoplePosts, peopleBounties, peopleOffers } = main;
 
   const { selectedWidget, onPanelClick } = props;
 
@@ -107,11 +106,6 @@ function WidgetSwitchViewer(props: any) {
     return <div style={{ height: 200 }} />;
   }
 
-  const listSource = {
-    post: peoplePosts,
-    wanted: peopleBounties,
-    offer: peopleOffers
-  };
 
   const activeList = bounty.filter(({ body }: any) => {
     const value = { ...body };
