@@ -17,7 +17,7 @@ const B = styled(EuiButton)`
   display: flex;
   align-items: center;
   text-align: center;
-  box-shadow: none !important;
+  box-shadow: none;
   text-transform: none !important;
   text-decoration: none !important;
   transform: none !important;

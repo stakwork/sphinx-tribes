@@ -28,7 +28,10 @@ const Container = styled.div`
   margin: -20px -30px;
 
   .organizations {
-    padding: 20px 30px;
+    padding: 1.25rem 2.5rem;
+    @media only screen and (max-width: 800px) {
+      padding: 1.25rem;
+    }
   }
 `;
 
@@ -37,18 +40,48 @@ const OrganizationWrap = styled.div`
   flex-direction: row;
   width: 100%;
   background: white;
-  padding: 25px 30px;
-  border-radius: 6px;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
   @media only screen and (max-width: 800px) {
-    padding: 15px 0px;
+    padding: 1rem 0px;
   }
   @media only screen and (max-width: 700px) {
-    padding: 12px 0px;
+    padding: 0.75rem 0px;
     margin-bottom: 10px;
   }
   @media only screen and (max-width: 500px) {
     padding: 0px;
   }
+`;
+
+const ButtonIconLeft = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  column-gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  color: #5f6368;
+  font-family: 'Barlow';
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 0rem;
+  letter-spacing: 0.00875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d0d5d8;
+  background: #fff;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+
+  :disabled {
+    cursor: not-allowed;
+  }
+`;
+
+const IconImg = styled.img`
+  width: 1.25rem;
+  height: 1.25rem;
 `;
 
 const OrganizationData = styled.div`
@@ -66,19 +99,21 @@ const OrganizationData = styled.div`
 `;
 
 const OrganizationImg = styled.img`
-  width: 65px;
-  height: 65px;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
   @media only screen and (max-width: 700px) {
     width: 55px;
     height: 55px;
   }
   @media only screen and (max-width: 500px) {
-    width: 48px;
-    height: 48px;
+    width: 3rem;
+    height: 3rem;
   }
   @media only screen and (max-width: 470px) {
-    width: 60px;
-    height: 60px;
+    width: 3.75rem;
+    height: 3.75rem;
   }
 `;
 
@@ -86,7 +121,7 @@ const OrganizationContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 15px;
+  gap: 1rem;
 `;
 
 const OrgHeadWrap = styled.div`
@@ -97,8 +132,12 @@ const OrgHeadWrap = styled.div`
 `;
 
 const OrgText = styled.div`
-  font-size: 1.4rem;
-  font-weight: bold;
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.1875rem;
   @media only screen and (max-width: 700px) {
     font-size: 1.1rem;
   }
@@ -186,18 +225,13 @@ const Organizations = (props: { person: Person }) => {
                 }}
               />
             )}
-            <Button
+            <ButtonIconLeft
               disabled={btnDisabled}
-              color={!btnDisabled ? 'white' : 'grey'}
-              text="View Bounties"
-              endingIcon="open_in_new"
               onClick={() => window.open(`/org/bounties/${org.uuid}`, '_target')}
-              style={{
-                height: 40,
-                color: '#000000',
-                borderRadius: 10
-              }}
-            />
+            >
+              View Bounties
+              <IconImg src="/static/open_in_new_grey.svg" alt="open_in_new_tab" />
+            </ButtonIconLeft>
           </OrganizationActionWrap>
         </OrganizationData>
       </OrganizationWrap>
