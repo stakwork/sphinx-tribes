@@ -3,12 +3,8 @@ import { uiStore } from '../../../store/ui';
 // import crypto from 'crypto';
 // import moment from 'moment';
 
-beforeAll(() => {
+beforeAll(() => {});
 
-});
+afterAll(() => {});
 
-afterAll(() => {
-});
-
-describe('testing helpers', () => {
-});
+describe('testing helpers', () => {});
