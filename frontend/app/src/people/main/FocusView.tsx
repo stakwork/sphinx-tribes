@@ -106,8 +106,8 @@ function FocusedView(props: FocusViewProps) {
     [main, isTorSave]
   );
 
-  const currentBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
-  const canDeleteBounty = !(currentBounty?.body?.paid || currentBounty?.body?.assignee.id);
+  const canDeleteBounty =
+    bounty && bounty.length ? !(bounty[0]?.body?.paid || bounty[0]?.body?.assignee.id) : false;
 
   const { openAfterDeleteNotification } = useAfterDeleteNotification();
 
@@ -120,21 +120,22 @@ function FocusedView(props: FocusViewProps) {
 
   // callback for deleting the open bounty
   async function deleteIt() {
-    const delBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
-    if (!delBounty) return;
-    setDeleting(true);
-    try {
-      if (delBounty.body.created) {
-        await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
-        afterDeleteHandler(delBounty.body.title, delBounty.body.ticket_url);
-        closeModal();
-        if (props?.deleteExtraFunction) props?.deleteExtraFunction();
+    if (bounty && bounty.length) {
+      const delBounty = bounty[0];
+      setDeleting(true);
+      try {
+        if (delBounty.body.created) {
+          await main.deleteBounty(delBounty.body.created, delBounty.body.owner_id);
+          afterDeleteHandler(delBounty.body.title, delBounty.body.ticket_url);
+          closeModal();
+          if (props?.deleteExtraFunction) props?.deleteExtraFunction();
+        }
+      } catch (e) {
+        console.log('e', e);
       }
-    } catch (e) {
-      console.log('e', e);
+      setDeleting(false);
+      if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
     }
-    setDeleting(false);
-    if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
   }
 
   const { openDeleteConfirmation } = useDeleteConfirmationModal();
@@ -253,12 +254,12 @@ function FocusedView(props: FocusViewProps) {
   let initialValues: any = {};
 
   const personInfo = canEdit ? ui.meInfo : person;
-  const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
 
   // set initials here
   if (personInfo) {
     // if there is a selected index, fill in values
-    if (selectedBounty && selectedIndex >= 0) {
+    if (bounty && bounty.length && selectedIndex >= 0) {
+      const selectedBounty = bounty[0];
       const wanted = selectedBounty.body;
       initialValues.estimated_completion_date = wanted?.estimated_completion_date
         ? moment(wanted?.estimated_completion_date)
@@ -303,9 +304,12 @@ function FocusedView(props: FocusViewProps) {
   const noShadow: any = !isMobile ? { boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)' } : {};
 
   function getExtras(): any {
-    const selectedBounty = bounty && bounty.length ? bounty[0] : main.peopleBounties[selectedIndex];
-    if (selectedIndex >= 0 && selectedBounty) {
-      return selectedBounty.body;
+    if (bounty) {
+      const selectedBounty = bounty[0];
+
+      if (selectedIndex >= 0 && selectedBounty && selectedBounty.body) {
+        return selectedBounty.body;
+      }
     }
     return null;
   }

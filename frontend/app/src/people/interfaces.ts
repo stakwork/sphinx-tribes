@@ -11,6 +11,8 @@ export interface AuthProps {
 
 export interface BountyModalProps {
   basePath: string;
+  bountyOwner?: Person;
+  fromPage?: 'usertickets' | 'bounties' | 'organization';
 }
 
 export interface FocusViewProps {

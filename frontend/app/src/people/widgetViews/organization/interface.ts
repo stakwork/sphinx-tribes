@@ -40,14 +40,24 @@ export interface AddUserModalProps extends ModalProps {
 export interface AddBudgetModalProps extends ModalProps {
   invoiceStatus: boolean;
   startPolling: (inv: string) => void;
+  setInvoiceStatus: (status: boolean) => void;
 }
 
 export interface WithdrawModalProps extends ModalProps {
   getOrganizationBudget: () => Promise<void>;
 }
 
+export type InvoiceState = 'PENDING' | 'PAID' | 'EXPIRED' | null;
+
 export interface PaymentHistoryUserInfo {
   pubkey: string;
   name: string;
   image: string;
+}
+
+export interface Toast {
+  id: string;
+  color: 'success' | 'primary' | 'warning' | 'danger' | undefined;
+  text: string;
+  title: string;
 }

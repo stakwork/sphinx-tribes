@@ -673,8 +673,8 @@ function Form(props: FormProps) {
                       BountyDetailsCreationData.step_3,
                       BountyDetailsCreationData.step_4,
                       BountyDetailsCreationData.step_5
-                    ].map((section: any) => (
-                      <div style={{ width: '100%' }}>
+                    ].map((section: any, index: number) => (
+                      <div style={{ width: '100%' }} key={index}>
                         <h4 style={{ marginTop: '20px' }}>
                           <b>{section.heading}</b>
                         </h4>

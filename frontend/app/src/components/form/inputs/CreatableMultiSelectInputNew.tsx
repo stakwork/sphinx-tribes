@@ -18,6 +18,11 @@ interface labelProps {
   value?: any;
 }
 
+interface Data {
+  value: string;
+  label: string;
+}
+
 const EuiPopOverCheckbox = styled.div<styledProps>`
   height: 180px;
   padding: 10px 0px 0px 20px;
@@ -88,7 +93,7 @@ const Label = styled.div<labelProps>`
 `;
 const codingLanguages = GetValue(coding_languages);
 
-export default function CreatableMultiSelectInputNew({ error, label, handleChange }: Props) {
+export default function CreatableMultiSelectInputNew({ error, label, handleChange, value }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext} (INCORRECT FORMAT)`;
   const color = colors['light'];
@@ -98,7 +103,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
   const closePopover = () => setIsPopoverOpen(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [labels, setLabels] = useState<any>([]);
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<Data[]>((Array.isArray(value) && [...value]) || []);
 
   const onChange = (optionId: any) => {
     let trueCount = 0;
@@ -114,8 +119,19 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
           [optionId]: !checkboxIdToSelectedMap[optionId]
         }
       };
+      let newData: Data[] = [];
+      if (newCheckboxIdToSelectedMap[optionId]) {
+        newData = [...data, { value: optionId, label: optionId }];
+      } else {
+        const oldData: Data[] = [...data];
+        const index = data.findIndex((currentData: Data) => currentData.value === optionId);
+        oldData.splice(index, 1);
+        newData = [...oldData];
+      }
 
       setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+      handleChange(newData);
+      setData(newData);
     }
   };
 
@@ -123,6 +139,16 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
     setLabels(LanguageObject.filter((x: any) => checkboxIdToSelectedMap[x.label]));
   }, [checkboxIdToSelectedMap]);
 
+  useEffect(() => {
+    if (Array.isArray(value)) {
+      const newValue = {};
+      for (let i = 0; i < value.length; i++) {
+        newValue[value[i].value] = true;
+      }
+      setCheckboxIdToSelectedMap(newValue);
+      setData([...value]);
+    }
+  }, []);
   return (
     <div
       style={{
@@ -184,8 +210,6 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
             idToSelectedMap={checkboxIdToSelectedMap}
             onChange={(id: any) => {
               onChange(id);
-              setData([...data, { value: id, label: id }]);
-              handleChange(data);
             }}
           />
         </EuiPopOverCheckbox>

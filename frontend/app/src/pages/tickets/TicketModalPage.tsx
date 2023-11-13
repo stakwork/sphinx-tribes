@@ -4,18 +4,13 @@ import { useIsMobile } from 'hooks';
 import { observer } from 'mobx-react-lite';
 import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { PersonBounty } from 'store/main';
 
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
-
-const findPerson = (search: any) => (item: any) => {
-  const { person, body } = item;
-  return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
-};
 
 type Props = {
   setConnectPerson: (p: any) => void;
@@ -32,6 +27,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
   const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
+  const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
+  const [visible, setVisible] = useState(false);
 
   const isMobile = useIsMobile();
 
@@ -43,19 +40,34 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     };
   }, [location.search]);
 
-  useEffect(() => {
-    const activeIndex = bountyId
-      ? main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
-      : (main.peopleBounties ?? []).findIndex(findPerson(search));
-    const connectPerson = (main.peopleBounties ?? [])[activeIndex];
+  const getBounty = useCallback(async () => {
+    let bounty;
+
+    if (bountyId) {
+      bounty = await main.getBountyById(Number(bountyId));
+    } else if (search && search.created) {
+      bounty = await main.getBountyByCreated(Number(search.created));
+    }
+
+    const activeIndex = bounty && bounty.length ? bounty[0].body.id : 0;
+    const connectPerson = bounty && bounty.length ? bounty[0].person : [];
 
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
+    setConnectPersonBody(connectPerson);
 
-    setConnectPersonBody(connectPerson?.person);
-  }, [main.peopleBounties, bountyId, search]);
+    const visible = bounty && bounty.length > 0;
+
+    setActiveBounty(bounty);
+    setVisible(visible);
+  }, [bountyId, search]);
+
+  useEffect(() => {
+    getBounty();
+  }, [getBounty]);
 
   const goBack = async () => {
+    setVisible(false);
     await main.getPeopleBounties({ page: 1, resetPage: true });
     history.push('/bounties');
   };
@@ -78,6 +90,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       }
     }
   };
+
   const nextArrHandler = () => {
     if (activeListIndex + 1 > main.peopleBounties?.length) return;
 
@@ -99,59 +112,69 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   if (isMobile) {
     return (
-      <Modal visible={activeListIndex !== -1 && (bountyId || search.created)} fill={true}>
-        <FocusedView
-          person={connectPersonBody}
-          personBody={connectPersonBody}
-          canEdit={false}
-          selectedIndex={publicFocusIndex}
-          config={widgetConfigs.wanted}
-          goBack={goBack}
-        />
-      </Modal>
+      <>
+        {visible && (
+          <Modal visible={visible} fill={true}>
+            <FocusedView
+              person={connectPersonBody}
+              personBody={connectPersonBody}
+              canEdit={false}
+              selectedIndex={publicFocusIndex}
+              config={widgetConfigs.wanted}
+              bounty={activeBounty}
+              goBack={goBack}
+            />
+          </Modal>
+        )}
+      </>
     );
   }
 
   return (
-    <Modal
-      visible={activeListIndex !== -1 && (bountyId || search.created)}
-      envStyle={{
-        background: color.pureWhite,
-        ...focusedDesktopModalStyles,
-        maxHeight: '100vh',
-        zIndex: 20
-      }}
-      style={{
-        background: 'rgba( 0 0 0 /75% )'
-      }}
-      overlayClick={goBack}
-      bigCloseImage={goBack}
-      bigCloseImageStyle={{
-        top: '18px',
-        right: '-50px',
-        borderRadius: '50%'
-      }}
-      prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
-      nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
-    >
-      <FocusedView
-        setRemoveNextAndPrev={setRemoveNextAndPrev}
-        person={connectPersonBody}
-        personBody={connectPersonBody}
-        canEdit={false}
-        selectedIndex={publicFocusIndex}
-        config={widgetConfigs.wanted}
-        goBack={goBack}
-        fromBountyPage={true}
-        extraModalFunction={() => {
-          goBack();
-          if (ui.meInfo) {
-            setConnectPerson(connectPersonBody);
-          } else {
-            modals.setStartupModal(true);
-          }
-        }}
-      />
-    </Modal>
+    <>
+      {visible && (
+        <Modal
+          visible={visible}
+          envStyle={{
+            background: color.pureWhite,
+            ...focusedDesktopModalStyles,
+            maxHeight: '100vh',
+            zIndex: 20
+          }}
+          style={{
+            background: 'rgba( 0 0 0 /75% )'
+          }}
+          overlayClick={goBack}
+          bigCloseImage={goBack}
+          bigCloseImageStyle={{
+            top: '18px',
+            right: '-50px',
+            borderRadius: '50%'
+          }}
+          prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
+          nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
+        >
+          <FocusedView
+            setRemoveNextAndPrev={setRemoveNextAndPrev}
+            person={connectPersonBody}
+            personBody={connectPersonBody}
+            canEdit={false}
+            selectedIndex={publicFocusIndex}
+            config={widgetConfigs.wanted}
+            goBack={goBack}
+            bounty={activeBounty}
+            fromBountyPage={true}
+            extraModalFunction={() => {
+              goBack();
+              if (ui.meInfo) {
+                setConnectPerson(connectPersonBody);
+              } else {
+                modals.setStartupModal(true);
+              }
+            }}
+          />
+        </Modal>
+      )}
+    </>
   );
 });

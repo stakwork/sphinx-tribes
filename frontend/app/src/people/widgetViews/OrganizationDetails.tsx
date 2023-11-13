@@ -20,7 +20,6 @@ import EditOrgModal from './organization/EditOrgModal';
 import {
   ActionWrap,
   Budget,
-  BudgetSmall,
   BudgetSmallHead,
   BudgetWrap,
   Container,
@@ -45,7 +44,8 @@ import {
   UsersHeadWrap,
   UsersHeader,
   UsersList,
-  ViewBudgetWrap
+  ViewBudgetWrap,
+  ViewBudgetTextWrap
 } from './organization/style';
 
 let interval;
@@ -166,14 +166,24 @@ const OrganizationDetails = (props: {
   };
 
   const getOrganizationBudget = useCallback(async () => {
-    const organizationBudget = await main.getOrganizationBudget(uuid);
-    setOrgBudget(organizationBudget.total_budget);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const organizationBudget = await main.getOrganizationBudget(uuid);
+      setOrgBudget(organizationBudget.total_budget);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
-    setPaymentsHistory(paymentHistories);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
+      const payments = paymentHistories.map((history: PaymentHistory) => {
+        if (!history.payment_type) {
+          history.payment_type = 'payment';
+        }
+        return history;
+      });
+      setPaymentsHistory(payments);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const handleSettingsClick = async (user: any) => {
     setUser(user);
@@ -291,9 +301,6 @@ const OrganizationDetails = (props: {
   };
 
   const successAction = () => {
-    addToast('Budget was added successfully', 'success');
-    closeBudgetHandler();
-
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
@@ -308,7 +315,6 @@ const OrganizationDetails = (props: {
       try {
         await main.pollOrgBudgetInvoices(uuid);
         getOrganizationBudget();
-        getPaymentsHistory();
 
         const count = await main.organizationInvoiceCount(uuid);
         if (count === 0) {
@@ -316,7 +322,7 @@ const OrganizationDetails = (props: {
         }
 
         i++;
-        if (i > 10) {
+        if (i > 5) {
           if (interval) clearInterval(interval);
         }
       } catch (e) {
@@ -415,10 +421,14 @@ const OrganizationDetails = (props: {
           ) : (
             <ViewBudgetWrap>
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-              <Budget>
-                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
-              </Budget>
-              <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
+              <ViewBudgetTextWrap>
+                <Budget>
+                  {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+                </Budget>
+                <Budget className="budget-small">
+                  {satToUsd(orgBudget)} <Grey>USD</Grey>
+                </Budget>
+              </ViewBudgetTextWrap>
             </ViewBudgetWrap>
           )}
         </BudgetWrap>
@@ -433,14 +443,14 @@ const OrganizationDetails = (props: {
           <Button
             disabled={addWithdrawDisabled}
             text="Withdraw"
-            color="white"
+            color="withdraw"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenWithdrawBudget(true)}
           />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
-            color="white"
+            color="success"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenBudget(true)}
           />
@@ -551,6 +561,7 @@ const OrganizationDetails = (props: {
             uuid={uuid}
             invoiceStatus={invoiceStatus}
             startPolling={startPolling}
+            setInvoiceStatus={setInvoiceStatus}
           />
         )}
         {isOpenHistory && (

@@ -100,19 +100,19 @@ const Status = styled.div`
   justify-content: center;
 `;
 const StatusText = styled.div`
-                        display:flex;
-                        justify-content:center;
-                        align-items:center;
-                        // height:26px;
-                        color:#B0B7BC;
-                        font-size: 10px;
-                        padding 0 10px;
-                        cursor: pointer;
-                        
-                        &:hover{
-                            color:#618AFF99;
-                        }
-                        `;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // height:26px;
+  color: #b0b7bc;
+  font-size: 10px;
+  padding: 0 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: #618aff99;
+  }
+`;
 const Counter = styled.div``;
 
 interface ImageProps {
