@@ -35,6 +35,7 @@ export const bountyHeaderFilter = (
 };
 
 export const bountyHeaderLanguageFilter = (codingLanguage: any, filterLanguage: any) => {
+
   if (Object.keys(filterLanguage)?.every((key: any) => !filterLanguage[key])) {
     return true;
   } else return codingLanguage?.some(({ value }: any) => filterLanguage[value]) ?? false;
