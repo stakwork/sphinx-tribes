@@ -140,7 +140,7 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if the user is the organization admin
-	if pubKeyFromAuth == org.OwnerPubKey {
+	if orgUser.OwnerPubKey == org.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Cannot add organization admin as a user")
 		return
