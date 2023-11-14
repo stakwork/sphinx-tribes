@@ -232,7 +232,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
   const viewBounty = async (bountyId: number) => {
     ui.setBountyPerson(ui.meInfo?.id);
 
-   window.open(`/bounty/${bountyId}`, '_target')
+    window.open(`/bounty/${bountyId}`, '_blank');
   };
 
   const handleFilter = (txn: OrgTransactionType) => {
