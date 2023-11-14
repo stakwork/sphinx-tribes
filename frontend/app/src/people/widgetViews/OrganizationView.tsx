@@ -134,12 +134,13 @@ const Organizations = (props: { person: Person }) => {
   const [organization, setOrganization] = useState<Organization>();
   const [disableFormButtons, setDisableFormButtons] = useState(false);
   const [toasts, setToasts]: any = useState([]);
-  const [user, setUser] = useState<Person>();
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const config = widgetConfigs['organizations'];
   const formRef = useRef(null);
   const isMyProfile = ui?.meInfo?.pubkey === props?.person?.owner_pubkey;
+
+  const user_pubkey = ui.meInfo?.owner_pubkey;
 
   const schema = [...config.schema];
 
@@ -168,9 +169,6 @@ const Organizations = (props: { person: Person }) => {
     if (ui.selectedPerson) {
       const orgs = await main.getUserOrganizations(ui.selectedPerson);
       main.setDropDownOrganizations(orgs);
-
-      const user = await main.getPersonById(ui.selectedPerson);
-      setUser(user);
     }
     setIsLoading(false);
   }, [main, ui.selectedPerson]);
@@ -207,12 +205,12 @@ const Organizations = (props: { person: Person }) => {
       <OrganizationWrap key={key}>
         <OrganizationData>
           <OrganizationImg src={org.img || avatarIcon} />
-          <OrganizationBudget org={org} user_pubkey={user?.owner_pubkey ?? ''} />
+          <OrganizationBudget org={org} user_pubkey={user_pubkey ?? ''} />
           <OrganizationActionWrap>
-            {ui.meInfo?.owner_pubkey && (
+            {user_pubkey && (
               <ManageButton
                 org={org}
-                user_pubkey={user?.owner_pubkey ?? ''}
+                user_pubkey={user_pubkey ?? ''}
                 action={() => {
                   setOrganization(org);
                   setDetailsOpen(true);
