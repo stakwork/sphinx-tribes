@@ -181,13 +181,15 @@ const OrganizationDetails = (props: {
   const getPaymentsHistory = useCallback(async () => {
     if (!viewReportDisabled) {
       const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
-      const payments = paymentHistories.map((history: PaymentHistory) => {
-        if (!history.payment_type) {
-          history.payment_type = 'payment';
-        }
-        return history;
-      });
-      setPaymentsHistory(payments);
+      if (Array.isArray(paymentHistories)) {
+        const payments = paymentHistories.map((history: PaymentHistory) => {
+          if (!history.payment_type) {
+            history.payment_type = 'payment';
+          }
+          return history;
+        });
+        setPaymentsHistory(payments);
+      }
     }
   }, [main, uuid, viewReportDisabled]);
 
@@ -437,7 +439,7 @@ const OrganizationDetails = (props: {
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
               <ViewBudgetTextWrap>
                 <Budget>
-                  {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+                  {orgBudget ? orgBudget.toLocaleString() : 0} <Grey>SATS</Grey>
                 </Budget>
                 <Budget className="budget-small">
                   {satToUsd(orgBudget)} <Grey>USD</Grey>
@@ -486,44 +488,47 @@ const OrganizationDetails = (props: {
           </HeadButtonWrap>
         </UsersHeadWrap>
         <UsersList>
-          {users.map((user: Person, i: number) => (
-            <User key={i}>
-              <UserImage src={user.img || avatarIcon} />
-              <UserDetails>
-                <UserName>{user.unique_name}</UserName>
-                <UserPubkey>{user.owner_pubkey}</UserPubkey>
-              </UserDetails>
-              <UserAction>
-                <IconWrap>
-                  <MaterialIcon
-                    disabled={addRolesDisabled}
-                    icon={'settings'}
-                    style={{
-                      fontSize: 24,
-                      cursor: 'pointer',
-                      color: '#ccc'
-                    }}
-                    onClick={() => handleSettingsClick(user)}
-                  />
-                </IconWrap>
-                <IconWrap>
-                  <MaterialIcon
-                    icon={'delete'}
-                    disabled={deleteUserDisabled}
-                    style={{
-                      fontSize: 24,
-                      cursor: 'pointer',
-                      color: '#ccc'
-                    }}
-                    onClick={() => {
-                      setUser(user);
-                      handleDeleteClick(user);
-                    }}
-                  />
-                </IconWrap>
-              </UserAction>
-            </User>
-          ))}
+          {users.map((user: Person, i: number) => {
+            const isUser = user.owner_pubkey === ui.meInfo?.owner_pubkey;
+            return (
+              <User key={i}>
+                <UserImage src={user.img || avatarIcon} />
+                <UserDetails>
+                  <UserName>{user.unique_name}</UserName>
+                  <UserPubkey>{user.owner_pubkey}</UserPubkey>
+                </UserDetails>
+                <UserAction>
+                  <IconWrap>
+                    <MaterialIcon
+                      disabled={isUser || addRolesDisabled}
+                      icon={'settings'}
+                      style={{
+                        fontSize: 24,
+                        cursor: 'pointer',
+                        color: '#ccc'
+                      }}
+                      onClick={() => handleSettingsClick(user)}
+                    />
+                  </IconWrap>
+                  <IconWrap>
+                    <MaterialIcon
+                      icon={'delete'}
+                      disabled={isUser || deleteUserDisabled}
+                      style={{
+                        fontSize: 24,
+                        cursor: 'pointer',
+                        color: '#ccc'
+                      }}
+                      onClick={() => {
+                        setUser(user);
+                        handleDeleteClick(user);
+                      }}
+                    />
+                  </IconWrap>
+                </UserAction>
+              </User>
+            );
+          })}
         </UsersList>
       </UserWrap>
       <DetailsWrap>
