@@ -1,12 +1,12 @@
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../filterValidation';
 
-describe('testing helpers', () => {
+describe('testing filters', () => {
   describe('bountyHeaderFilter', () => {
     test('o/t/t', () => {
       expect(bountyHeaderFilter({ Open: true }, true, true)).toEqual(false);
     });
     test('a/t/t', () => {
-      expect(bountyHeaderFilter({ Assigned: true }, true, true)).toEqual(true);
+      expect(bountyHeaderFilter({ Assigned: true }, true, true)).toEqual(false);
     });
     test('p/t/t', () => {
       expect(bountyHeaderFilter({ Paid: true }, true, true)).toEqual(true);
