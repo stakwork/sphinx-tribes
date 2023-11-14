@@ -55,9 +55,13 @@ const OrganizationDetails = (props: {
   org: Organization | undefined;
   resetOrg: (Organization) => void;
 }) => {
-  const [loading, setIsLoading] = useState<boolean>(false);
-
   const { main, ui } = useStores();
+  const roleData = main.bountyRoles.map((role: any) => ({
+    name: role.name,
+    status: false
+  }));
+
+  const [loading, setIsLoading] = useState<boolean>(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false);
   const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
@@ -71,7 +75,7 @@ const OrganizationDetails = (props: {
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
   const [userRoles, setUserRoles] = useState<any[]>([]);
-  const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
+  const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>(roleData);
   const [toasts, setToasts]: any = useState([]);
   const [invoiceStatus, setInvoiceStatus] = useState(false);
   const { path, url } = useRouteMatch();
@@ -140,32 +144,26 @@ const OrganizationDetails = (props: {
     closeDeleteModal();
   };
 
-  const getBountyRoles = useCallback(async () => {
-    const bountyRolesData = main.bountyRoles.map((role: any) => ({
-      name: role.name,
-      status: false
-    }));
-
-    setBountyRolesData(bountyRolesData);
-  }, [main.bountyRoles]);
-
   const getUserRoles = useCallback(
     async (user: any) => {
       if (uuid && user.owner_pubkey) {
         const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
         setUserRoles(userRoles);
 
-        // set all values to false, so every user data will be fresh
-        const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
-        userRoles.forEach((userRole: any) => {
-          const index = rolesData.findIndex((role: any) => role.name === userRole.role);
-
-          if (index !== -1) {
-            rolesData[index]['status'] = true;
-          }
-        });
-
-        setBountyRolesData(rolesData);
+        if (userRoles.length) {
+          // set all values to false, so every user data will be fresh
+          const rolesData = bountyRolesData.map((data: any) => ({
+            name: data.name,
+            status: false
+          }));
+          userRoles.forEach((userRole: any) => {
+            const index = rolesData.findIndex((role: any) => role.name === userRole.role);
+            if (index !== -1) {
+              rolesData[index]['status'] = true;
+            }
+          });
+          setBountyRolesData(rolesData);
+        }
       }
     },
     [uuid, main]
@@ -181,13 +179,15 @@ const OrganizationDetails = (props: {
   const getPaymentsHistory = useCallback(async () => {
     if (!viewReportDisabled) {
       const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
-      const payments = paymentHistories.map((history: PaymentHistory) => {
-        if (!history.payment_type) {
-          history.payment_type = 'payment';
-        }
-        return history;
-      });
-      setPaymentsHistory(payments);
+      if (Array.isArray(paymentHistories)) {
+        const payments = paymentHistories.map((history: PaymentHistory) => {
+          if (!history.payment_type) {
+            history.payment_type = 'payment';
+          }
+          return history;
+        });
+        setPaymentsHistory(payments);
+      }
     }
   }, [main, uuid, viewReportDisabled]);
 
@@ -368,19 +368,12 @@ const OrganizationDetails = (props: {
 
   useEffect(() => {
     getOrganizationUsers();
-    getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
     if (uuid && ui.meInfo) {
       getUserRoles(ui.meInfo);
     }
-  }, [
-    getOrganizationUsers,
-    getBountyRoles,
-    getOrganizationBudget,
-    getPaymentsHistory,
-    getUserRoles
-  ]);
+  }, [getOrganizationUsers, getOrganizationBudget, getPaymentsHistory, getUserRoles]);
 
   return (
     <Container>
@@ -437,7 +430,7 @@ const OrganizationDetails = (props: {
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
               <ViewBudgetTextWrap>
                 <Budget>
-                  {orgBudget.toLocaleString()} <Grey>SATS</Grey>
+                  {orgBudget ? orgBudget.toLocaleString() : 0} <Grey>SATS</Grey>
                 </Budget>
                 <Budget className="budget-small">
                   {satToUsd(orgBudget)} <Grey>USD</Grey>
@@ -486,44 +479,47 @@ const OrganizationDetails = (props: {
           </HeadButtonWrap>
         </UsersHeadWrap>
         <UsersList>
-          {users.map((user: Person, i: number) => (
-            <User key={i}>
-              <UserImage src={user.img || avatarIcon} />
-              <UserDetails>
-                <UserName>{user.unique_name}</UserName>
-                <UserPubkey>{user.owner_pubkey}</UserPubkey>
-              </UserDetails>
-              <UserAction>
-                <IconWrap>
-                  <MaterialIcon
-                    disabled={addRolesDisabled}
-                    icon={'settings'}
-                    style={{
-                      fontSize: 24,
-                      cursor: 'pointer',
-                      color: '#ccc'
-                    }}
-                    onClick={() => handleSettingsClick(user)}
-                  />
-                </IconWrap>
-                <IconWrap>
-                  <MaterialIcon
-                    icon={'delete'}
-                    disabled={deleteUserDisabled}
-                    style={{
-                      fontSize: 24,
-                      cursor: 'pointer',
-                      color: '#ccc'
-                    }}
-                    onClick={() => {
-                      setUser(user);
-                      handleDeleteClick(user);
-                    }}
-                  />
-                </IconWrap>
-              </UserAction>
-            </User>
-          ))}
+          {users.map((user: Person, i: number) => {
+            const isUser = user.owner_pubkey === ui.meInfo?.owner_pubkey;
+            return (
+              <User key={i}>
+                <UserImage src={user.img || avatarIcon} />
+                <UserDetails>
+                  <UserName>{user.unique_name}</UserName>
+                  <UserPubkey>{user.owner_pubkey}</UserPubkey>
+                </UserDetails>
+                <UserAction>
+                  <IconWrap>
+                    <MaterialIcon
+                      disabled={isUser || addRolesDisabled}
+                      icon={'settings'}
+                      style={{
+                        fontSize: 24,
+                        cursor: 'pointer',
+                        color: '#ccc'
+                      }}
+                      onClick={() => handleSettingsClick(user)}
+                    />
+                  </IconWrap>
+                  <IconWrap>
+                    <MaterialIcon
+                      icon={'delete'}
+                      disabled={isUser || deleteUserDisabled}
+                      style={{
+                        fontSize: 24,
+                        cursor: 'pointer',
+                        color: '#ccc'
+                      }}
+                      onClick={() => {
+                        setUser(user);
+                        handleDeleteClick(user);
+                      }}
+                    />
+                  </IconWrap>
+                </UserAction>
+              </User>
+            );
+          })}
         </UsersList>
       </UserWrap>
       <DetailsWrap>

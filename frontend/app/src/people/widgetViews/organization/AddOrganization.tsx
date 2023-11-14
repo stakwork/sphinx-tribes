@@ -302,7 +302,7 @@ const AddOrganization = (props: {
       }
     } catch (error) {
       addErrorToast('Error occured while creating organization');
-      console.log('Error occured', error);
+      console.error('Error occured', error);
       setIsLoading(false);
     }
   };

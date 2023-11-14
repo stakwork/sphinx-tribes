@@ -322,7 +322,7 @@ function Header() {
   function goToEditSelf() {
     const path = location.pathname;
     if (ui.meInfo?.id) {
-      history.push(`/p/${ui.meInfo.owner_pubkey}/badges`);
+      history.push(`/p/${ui.meInfo.owner_pubkey}/organizations`);
       if (path.includes('/p')) {
         window.location.reload();
       }

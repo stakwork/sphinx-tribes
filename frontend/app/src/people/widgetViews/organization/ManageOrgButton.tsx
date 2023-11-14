@@ -34,8 +34,12 @@ const ManageButton = (props: { user_pubkey: string; org: any; action: () => void
     userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
 
   const getUserRoles = useCallback(async () => {
-    const userRoles = await main.getUserRoles(org.uuid, user_pubkey);
-    setUserRoles(userRoles);
+    try {
+      const userRoles = await main.getUserRoles(org.uuid, user_pubkey);
+      setUserRoles(userRoles);
+    } catch (e) {
+      console.error('User roles error', e);
+    }
   }, [org.uuid, main, user_pubkey]);
 
   useEffect(() => {
