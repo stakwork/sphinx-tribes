@@ -90,6 +90,9 @@ const (
 
 var ConfigBountyRoles []BountyRoles = []BountyRoles{
 	{
+		Name: EditOrg,
+	},
+	{
 		Name: AddBounty,
 	},
 	{
