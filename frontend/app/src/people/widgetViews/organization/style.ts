@@ -373,3 +373,9 @@ export const IconWrap = styled.div`
 export const HeadButton = styled(Button)`
   border-radius: 5px;
 `;
+
+export const RouteHintText = styled.p`
+  font-size: 0.9rem;
+  text-align: center;
+  color: #9157f6;
+`;
