@@ -1,6 +1,5 @@
-import React, { useRef, useState, ChangeEvent } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Wrap } from 'components/form/style';
+import React, { useRef, useState, ChangeEvent, DragEvent } from 'react';
+import { useStores } from 'store';
 import { useIsMobile } from 'hooks/uiHooks';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -10,7 +9,20 @@ import { FormField } from 'components/form/utils';
 import Input from '../../../components/form/inputs';
 import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
-import { ModalTitle } from './style';
+import {
+  ImgContainer,
+  ImgDashContainer,
+  ImgDetailInfo,
+  ImgInstructionSpan,
+  ImgInstructionText,
+  ImgText,
+  ImgTextContainer,
+  InputFile,
+  ModalTitle,
+  OrgInputContainer,
+  SelectedImg,
+  UploadImageContainer
+} from './style';
 import { EditOrgModalProps } from './interface';
 import DeleteOrgWindow from './DeleteOrgWindow';
 
@@ -28,106 +40,24 @@ const OrgEditImageWrapper = styled.div`
   flex: 40%;
 `;
 
-const OrgImageOutline = styled.div`
-  width: 142px;
-  height: 142px;
-  margin-top: 28px;
-  margin-bottom: 10px;
-  align-self: center;
-  cursor: pointer;
-
-  border-style: dashed;
-  border-width: 2px;
-  border-color: #d0d5d8;
-  border-radius: 50%;
-`;
-
-const OrgImage = styled.img`
-  width: 126px;
-  height: 126px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  position: relative;
-  left: 50%;
-  top: 50%;
-  transform: translate(-63px, -63px);
-`;
-
-const DragAndDrop = styled.input`
-  width: 126px;
-  height: 126px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  position: relative;
-  left: 50%;
-  top: 50%;
-  transform: translate(-63px, -63px);
-`;
-
-const ResetOrgImage = styled.img`
-  width: 38.041px;
-  height: 38.041px;
-  flex-shrink: 0;
-
-  position: relative;
-  transform: translate(100px, -30px);
-
-  cursor: pointer;
-
-  :hover {
-    filter: brightness(0.9);
-    transition: 0.2s;
-  }
-  :active {
-    filter: brightness(0.7);
-  }
-`;
-
 const FormWrapper = styled.div`
   flex: 60%;
 `;
 
 const EditOrgTitle = styled(ModalTitle)`
-  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
+  color: #3c3f41;
   font-family: 'Barlow';
-  font-size: 30px;
+  font-size: 1.875rem;
   font-style: normal;
   font-weight: 800;
-  line-height: 30px; /* 100% */
-`;
+  line-height: 1.875rem;
+  margin-bottom: 3rem;
 
-const ImgImportText = styled.p`
-  margin-bottom: 5px;
-  color: var(--Main-bottom-icons, var(--Disabled-Icon-color, #5f6368));
-  text-align: center;
-  font-family: 'Roboto';
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 17px; /* 130.769% */
-  letter-spacing: 0.13px;
-`;
-
-const FileTypeHint = styled.p`
-  margin-bottom: 5px;
-  color: var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc));
-  text-align: center;
-  font-family: 'Roboto';
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 18px; /* 180% */
-`;
-
-const ImgBrowse = styled.a`
-  color: var(--Primary-blue, var(--Disabled-Icon-color, #618aff));
-  font-family: 'Roboto';
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 17px;
-  letter-spacing: 0.13px;
-  cursor: pointer;
+  @media only screen and (max-width: 500px) {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 1.2rem;
+  }
 `;
 
 const HLine = styled.div`
@@ -139,8 +69,10 @@ const HLine = styled.div`
 
 const EditOrgModal = (props: EditOrgModalProps) => {
   const isMobile = useIsMobile();
-  const { isOpen, close, onSubmit, onDelete, org } = props;
+  const { isOpen, close, onDelete, org, addToast } = props;
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const { main } = useStores();
+  const [loading, setLoading] = useState(false);
 
   const config = widgetConfigs.organizations;
   const schema = [...config.schema];
@@ -152,7 +84,53 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   };
 
   const [selectedImage, setSelectedImage] = useState<string>(org?.img || '');
+  const [rawSelectedFile, setRawSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const onSubmitEditOrg = async (body: any) => {
+    if (!org) {
+      addToast('Invalid organization update', 'danger');
+      return;
+    }
+    setLoading(true);
+    try {
+      let img = '';
+      const formData = new FormData();
+      if (rawSelectedFile) {
+        formData.append('file', rawSelectedFile);
+        const file = await main.uploadFile(formData);
+        if (file && file.ok) {
+          img = await file.json();
+        }
+      }
+
+      const newOrg = {
+        id: org.id,
+        uuid: org.uuid,
+        name: body.name || org.name,
+        owner_pubkey: org.owner_pubkey,
+        img: img || org.img,
+        created: org.created,
+        updated: org.updated,
+        show: body?.show !== undefined ? body.show : org.show,
+        bounty_count: org.bounty_count,
+        budget: org.budget
+      };
+
+      const res = await main.updateOrganization(newOrg);
+      if (res.status === 200) {
+        addToast('Sucessfully updated organization', 'success');
+        // update the org ui
+        props.resetOrg(newOrg);
+        close();
+      } else {
+        addToast('Error: could not update organization', 'danger');
+      }
+    } catch (error) {
+      addToast('Error: could not update organization', 'danger');
+    }
+    setLoading(false);
+  };
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -160,36 +138,33 @@ const EditOrgModal = (props: EditOrgModalProps) => {
       // Display the selected image
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
+      setRawSelectedFile(file);
     } else {
       // Handle the case where the user cancels the file dialog
       setSelectedImage('');
     }
   };
 
-  const [files, setFiles] = useState<{ preview: string }[]>([]);
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: (acceptedFiles: any) => {
-      setFiles(
-        acceptedFiles.map((file: any) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file)
-          })
-        )
-      );
-      setSelectedImage(files[0].preview);
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      setRawSelectedFile(file);
     }
-  });
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  // const [files, setFiles] = useState<{ preview: string }[]>([]);
 
   const openFileDialog = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
-  };
-
-  const resetImg = (e: any) => {
-    setSelectedImage(org?.img || '');
-    files.forEach((file: any) => URL.revokeObjectURL(file.preview));
-    e.stopPropagation();
   };
 
   return (
@@ -207,10 +182,10 @@ const EditOrgModal = (props: EditOrgModalProps) => {
           ...(config?.modalStyle ?? {}),
           maxHeight: '100%',
           borderRadius: '10px',
-          width: isMobile ? '100%' : '551px',
+          width: isMobile ? '100%' : '34.4375rem',
           minWidth: '20px',
-          height: isMobile ? 'auto' : '435px',
-          padding: '48px',
+          height: isMobile ? 'auto' : '27.1875rem',
+          padding: '3rem 3rem 1.5rem 3rem',
           flexShrink: '0',
           display: 'flex',
           flexDirection: 'column',
@@ -228,29 +203,37 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         <EditOrgTitle>Edit Organization</EditOrgTitle>
         <EditOrgColumns style={{ flexDirection: isMobile ? 'column' : 'row' }}>
           <OrgEditImageWrapper>
-            <OrgImageOutline {...getRootProps()}>
-              <DragAndDrop type="file" accept="image/*" {...getInputProps()} />
-              <OrgImage src={selectedImage} />
-              <ResetOrgImage onClick={resetImg} src={'/static/badges/ResetOrgProfile.svg'} />
-            </OrgImageOutline>
-            <div>
-              <input
+            <ImgDashContainer onDragOver={handleDragOver} onDrop={handleDrop}>
+              <UploadImageContainer onClick={openFileDialog}>
+                <img src="/static/badges/ResetOrgProfile.svg" alt="upload" />
+              </UploadImageContainer>
+              <ImgContainer>
+                {selectedImage ? (
+                  <SelectedImg src={selectedImage} alt="selected file" />
+                ) : (
+                  <ImgText>LOGO</ImgText>
+                )}
+              </ImgContainer>
+            </ImgDashContainer>
+            <ImgTextContainer>
+              <InputFile
                 type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
+                id="file-input"
+                accept=".jpg, .jpeg, .png, .gif"
                 onChange={handleFileInputChange}
                 ref={fileInputRef}
               />
-              <ImgImportText>
-                Drag and drop or <ImgBrowse onClick={openFileDialog}>Browse</ImgBrowse>
-              </ImgImportText>
-              <FileTypeHint>PNG, JPG or GIF, Min. 300 x 300 px</FileTypeHint>
-            </div>
+              <ImgInstructionText>
+                Drag and drop or{' '}
+                <ImgInstructionSpan onClick={openFileDialog}>Browse</ImgInstructionSpan>
+              </ImgInstructionText>
+              <ImgDetailInfo>PNG, JPG or GIF, Min. 300 x 300 px</ImgDetailInfo>
+            </ImgTextContainer>
           </OrgEditImageWrapper>
           <FormWrapper style={{ marginLeft: isMobile ? '0px' : '28px' }}>
             <Formik
               initialValues={initValues || {}}
-              onSubmit={onSubmit}
+              onSubmit={onSubmitEditOrg}
               innerRef={formRef}
               validationSchema={validator(schema)}
               style={{ width: '100%' }}
@@ -263,7 +246,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                 errors,
                 initialValues
               }: any) => (
-                <Wrap style={{ width: '100%' }} newDesign={true}>
+                <OrgInputContainer>
                   <div className="SchemaInnerContainer">
                     {schema.map((item: FormField) => (
                       <Input
@@ -295,7 +278,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                   <Button
                     disabled={false}
                     onClick={() => handleSubmit()}
-                    loading={false}
+                    loading={loading}
                     style={{
                       width: '100%',
                       height: '50px',
@@ -305,7 +288,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                     color={'primary'}
                     text={'Save changes'}
                   />
-                </Wrap>
+                </OrgInputContainer>
               )}
             </Formik>
           </FormWrapper>
@@ -323,7 +306,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
             borderRadius: '5px',
             borderStyle: 'solid',
             alignSelf: 'flex-end',
-            borderWidth: '2px',
+            borderWidth: '1px',
             backgroundColor: 'white',
             borderColor: '#ED7474',
             color: '#ED7474'

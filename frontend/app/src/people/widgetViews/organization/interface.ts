@@ -10,8 +10,9 @@ export interface ModalProps {
 
 export interface EditOrgModalProps extends ModalProps {
   org?: Organization;
-  onSubmit: (body: any) => void;
   onDelete: () => void;
+  resetOrg: (Organization: any) => void;
+  addToast: (title: string, color: 'danger' | 'success') => void;
 }
 
 export interface UserRolesModalProps extends ModalProps {
