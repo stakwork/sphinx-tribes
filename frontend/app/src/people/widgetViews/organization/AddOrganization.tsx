@@ -3,6 +3,20 @@ import styled from 'styled-components';
 import { useStores } from 'store';
 import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import { Toast } from './interface';
+import {
+  ImgDashContainer,
+  ImgDetailInfo,
+  ImgInstructionSpan,
+  ImgInstructionText,
+  ImgText,
+  ImgTextContainer,
+  InputFile,
+  OrgInput,
+  OrgInputContainer,
+  OrgLabel,
+  SelectedImg,
+  UploadImageContainer
+} from './style';
 
 const AddOrgWrapper = styled.div`
   padding: 3rem;
@@ -39,43 +53,10 @@ const OrgDetailsContainer = styled.div`
   }
 `;
 
-const OrgInputContainer = styled.div`
-  width: 16rem;
-  display: flex;
-  flex-direction: column;
-  @media only screen and (max-width: 500px) {
-    width: 100%;
-    margin-top: 1rem;
-  }
-`;
 const OrgImgOutterContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const UploadImageContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.37756rem;
-  height: 2.37756rem;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  cursor: pointer;
-`;
-
-const ImgDashContainer = styled.div`
-  width: 8.875rem;
-  height: 8.875rem;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px dashed #d0d5d8;
-  padding: 0.5rem;
-  position: relative;
 `;
 
 const ImgContainer = styled.div`
@@ -86,97 +67,6 @@ const ImgContainer = styled.div`
   justify-content: center;
   align-items: center;
   background-color: #ebedf1;
-`;
-const ImgText = styled.h3`
-  color: #b0b7bc;
-  text-align: center;
-  font-family: 'Barlow';
-  font-size: 1.875rem;
-  font-style: normal;
-  font-weight: 800;
-  line-height: 1.0625rem;
-  letter-spacing: 0.01875rem;
-  text-transform: uppercase;
-  opacity: 0.5;
-  margin-bottom: 0;
-`;
-
-const ImgTextContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin-top: 1rem;
-`;
-
-const ImgInstructionText = styled.p`
-  color: #5f6368;
-  text-align: center;
-  font-family: 'Roboto';
-  font-size: 0.8125rem;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1.0625rem;
-  letter-spacing: 0.00813rem;
-  margin-bottom: 0;
-`;
-
-const ImgInstructionSpan = styled.span`
-  color: #618aff;
-  cursor: pointer;
-`;
-
-const ImgDetailInfo = styled.p`
-  color: #b0b7bc;
-  text-align: center;
-  font-family: 'Roboto';
-  font-size: 0.625rem;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1.125rem;
-  margin-bottom: 0;
-  margin-top: 1rem;
-`;
-
-const OrgLabel = styled.label`
-  color: #5f6368;
-  font-family: 'Barlow';
-  font-size: 0.8125rem;
-  font-style: normal;
-  font-weight: 500;
-  /* line-height: 2.1875rem; */
-  margin-bottom: 0.75rem;
-`;
-
-const OrgInput = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  border: 2px solid #82b4ff;
-  outline: none;
-  caret-color: #618aff;
-  color: #3c3f41;
-  font-family: 'Barlow';
-  font-size: 0.9375rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 2.1875rem;
-  width: 100%;
-
-  ::placeholder {
-    color: #b0b7bc;
-    font-family: 'Barlow';
-    font-size: 0.9375rem;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 2.1875rem;
-  }
-`;
-
-const SelectedImg = styled.img`
-  width: 7.875rem;
-  height: 7.875rem;
-  border-radius: 50%;
-  object-fit: cover;
 `;
 
 const OrgButton = styled.button`
@@ -202,10 +92,6 @@ const OrgButton = styled.button`
     color: rgba(142, 150, 156, 0.85);
     box-shadow: none;
   }
-`;
-
-const InputFile = styled.input`
-  display: none;
 `;
 
 const AddOrganization = (props: {

@@ -237,35 +237,6 @@ const OrganizationDetails = (props: {
     setIsLoading(false);
   };
 
-  const onSubmitEditOrg = async (body: any) => {
-    if (!org) {
-      addToast('Invalid organization update', 'danger');
-      return;
-    }
-
-    const newOrg = {
-      id: org.id,
-      uuid: org.uuid,
-      name: body.name || org.name,
-      owner_pubkey: org.owner_pubkey,
-      img: body.img || org.img,
-      created: org.created,
-      updated: org.updated,
-      show: body?.show !== undefined ? body.show : org.show,
-      bounty_count: org.bounty_count,
-      budget: org.budget
-    };
-
-    const res = await main.updateOrganization(newOrg);
-    if (res.status === 200) {
-      addToast('Sucessfully updated organization', 'success');
-      // update the org ui
-      props.resetOrg(newOrg);
-    } else {
-      addToast('Error: could not update organization', 'danger');
-    }
-  };
-
   const onDeleteOrg = async () => {
     const res = { status: 200 };
     if (res.status === 200) {
@@ -527,9 +498,10 @@ const OrganizationDetails = (props: {
           <EditOrgModal
             isOpen={isOpenEditOrg}
             close={() => setIsOpenEditOrg(false)}
-            onSubmit={onSubmitEditOrg}
             onDelete={onDeleteOrg}
             org={org}
+            resetOrg={props.resetOrg}
+            addToast={addToast}
           />
         )}
         {showDeleteModal && (
