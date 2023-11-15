@@ -353,6 +353,11 @@ export const UserAction = styled.div`
   margin-left: auto;
 `;
 
+export const ActionBtn = styled.button`
+  border: 0px;
+  padding: 0px;
+`;
+
 export const IconWrap = styled.div`
   :first-child {
     margin-right: 40px;

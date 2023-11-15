@@ -15,10 +15,7 @@ export interface EditOrgModalProps extends ModalProps {
 }
 
 export interface UserRolesModalProps extends ModalProps {
-  bountyRolesData: BountyRoles[];
-  userRoles: any[];
-  roleChange: (e: any, s: any) => void;
-  submitRoles: () => void;
+  submitRoles: (roles: BountyRoles[]) => void;
 }
 
 export interface PaymentHistoryModalProps extends ModalProps {
@@ -60,4 +57,12 @@ export interface Toast {
   color: 'success' | 'primary' | 'warning' | 'danger' | undefined;
   text: string;
   title: string;
+}
+
+export interface UserListProps {
+  users: Person[];
+  org: Organization | undefined;
+  userRoles: any[];
+  handleSettingsClick: (user: Person) => void;
+  handleDeleteClick: (user: Person) => void;
 }

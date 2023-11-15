@@ -5,7 +5,7 @@ import { Button } from 'components/common';
 import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
-import { satToUsd, userHasRole, Roles } from 'helpers';
+import { satToUsd, userHasRole } from 'helpers';
 import { BountyModal } from 'people/main/bountyModal';
 import history from '../../config/history';
 import avatarIcon from '../../public/static/profile_avatar.svg';
@@ -16,6 +16,7 @@ import AddUserModal from './organization/AddUserModal';
 import AddBudgetModal from './organization/AddBudgetModal';
 import WithdrawBudgetModal from './organization/WithdrawBudgetModal';
 import EditOrgModal from './organization/EditOrgModal';
+import Users from './organization/UsersList';
 
 import {
   ActionWrap,
@@ -29,21 +30,13 @@ import {
   HeadButtonWrap,
   HeadNameWrap,
   HeadWrap,
-  IconWrap,
   NoBudgetText,
   NoBudgetWrap,
   OrgImg,
   OrgName,
-  User,
-  UserAction,
-  UserDetails,
-  UserImage,
-  UserName,
-  UserPubkey,
   UserWrap,
   UsersHeadWrap,
   UsersHeader,
-  UsersList,
   ViewBudgetWrap,
   ViewBudgetTextWrap
 } from './organization/style';
@@ -56,10 +49,6 @@ const OrganizationDetails = (props: {
   resetOrg: (Organization) => void;
 }) => {
   const { main, ui } = useStores();
-  const roleData = main.bountyRoles.map((role: any) => ({
-    name: role.name,
-    status: false
-  }));
 
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false);
@@ -75,7 +64,6 @@ const OrganizationDetails = (props: {
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
   const [userRoles, setUserRoles] = useState<any[]>([]);
-  const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>(roleData);
   const [toasts, setToasts]: any = useState([]);
   const [invoiceStatus, setInvoiceStatus] = useState(false);
   const { path, url } = useRouteMatch();
@@ -88,10 +76,6 @@ const OrganizationDetails = (props: {
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
   const addBudgetDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET');
-  const deleteUserDisabled =
-    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER');
-  const addRolesDisabled =
-    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
   const addWithdrawDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'WITHDRAW BUDGET');
 
@@ -146,24 +130,10 @@ const OrganizationDetails = (props: {
 
   const getUserRoles = useCallback(
     async (user: any) => {
-      if (uuid && user.owner_pubkey) {
-        const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
+      const pubkey = user.owner_pubkey;
+      if (uuid && pubkey) {
+        const userRoles = await await main.getUserRoles(uuid, pubkey);
         setUserRoles(userRoles);
-
-        if (userRoles.length) {
-          // set all values to false, so every user data will be fresh
-          const rolesData = bountyRolesData.map((data: any) => ({
-            name: data.name,
-            status: false
-          }));
-          userRoles.forEach((userRole: any) => {
-            const index = rolesData.findIndex((role: any) => role.name === userRole.role);
-            if (index !== -1) {
-              rolesData[index]['status'] = true;
-            }
-          });
-          setBountyRolesData(rolesData);
-        }
       }
     },
     [uuid, main]
@@ -275,18 +245,8 @@ const OrganizationDetails = (props: {
     }
   };
 
-  const roleChange = (e: Roles, s: any) => {
-    const rolesData = bountyRolesData.map((role: any) => {
-      if (role.name === e) {
-        role.status = s.target.checked;
-      }
-      return role;
-    });
-    setBountyRolesData(rolesData);
-  };
-
-  const submitRoles = async () => {
-    const roleData = bountyRolesData
+  const submitRoles = async (bountyRoles: BountyRoles[]) => {
+    const roleData = bountyRoles
       .filter((r: any) => r.status)
       .map((role: any) => ({
         owner_pubkey: user?.owner_pubkey,
@@ -478,49 +438,13 @@ const OrganizationDetails = (props: {
             />
           </HeadButtonWrap>
         </UsersHeadWrap>
-        <UsersList>
-          {users.map((user: Person, i: number) => {
-            const isUser = user.owner_pubkey === ui.meInfo?.owner_pubkey;
-            return (
-              <User key={i}>
-                <UserImage src={user.img || avatarIcon} />
-                <UserDetails>
-                  <UserName>{user.unique_name}</UserName>
-                  <UserPubkey>{user.owner_pubkey}</UserPubkey>
-                </UserDetails>
-                <UserAction>
-                  <IconWrap>
-                    <MaterialIcon
-                      disabled={isUser || addRolesDisabled}
-                      icon={'settings'}
-                      style={{
-                        fontSize: 24,
-                        cursor: 'pointer',
-                        color: '#ccc'
-                      }}
-                      onClick={() => handleSettingsClick(user)}
-                    />
-                  </IconWrap>
-                  <IconWrap>
-                    <MaterialIcon
-                      icon={'delete'}
-                      disabled={isUser || deleteUserDisabled}
-                      style={{
-                        fontSize: 24,
-                        cursor: 'pointer',
-                        color: '#ccc'
-                      }}
-                      onClick={() => {
-                        setUser(user);
-                        handleDeleteClick(user);
-                      }}
-                    />
-                  </IconWrap>
-                </UserAction>
-              </User>
-            );
-          })}
-        </UsersList>
+        <Users
+          org={org}
+          handleDeleteClick={handleDeleteClick}
+          handleSettingsClick={handleSettingsClick}
+          userRoles={userRoles}
+          users={users}
+        />
       </UserWrap>
       <DetailsWrap>
         {isOpenEditOrg && (
@@ -553,14 +477,11 @@ const OrganizationDetails = (props: {
         )}
         {isOpenRoles && (
           <RolesModal
-            userRoles={userRoles}
-            bountyRolesData={bountyRolesData}
             uuid={uuid}
             user={user}
             addToast={addToast}
             close={closeRolesHandler}
             isOpen={isOpenRoles}
-            roleChange={roleChange}
             submitRoles={submitRoles}
           />
         )}
