@@ -4,7 +4,6 @@ import FirstTimeScreen from 'people/main/FirstTimeScreen';
 import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
@@ -51,7 +50,6 @@ function BodyComponent() {
 
   const color = colors['light'];
 
-  const history = useHistory();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -95,7 +93,7 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    history.replace(`/bounty/${item.id}`);
+    window.open(`/bounty/${item.id}`, '_blank');
   };
 
   if (loading) {

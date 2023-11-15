@@ -110,9 +110,8 @@ export const Wanted = observer(() => {
               isMobile={false}
               onClick={() => {
                 ui.setBountyPerson(person?.id);
-                history.push({
-                  pathname: `${url}/${w.body.id}/${i}`
-                });
+                
+                window.open(`${url}/${w.body.id}/${i}`, '_blank')
               }}
             >
               <WantedView {...w.body} person={person} />

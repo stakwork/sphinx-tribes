@@ -54,9 +54,7 @@ const UserTickets = () => {
   const [bountyOwner, setBountyOwner] = useState<Person>();
 
   function onPanelClick(id: number, index: number) {
-    history.push({
-      pathname: `${url}/${id}/${index}`
-    });
+     window.open(`${url}/${id}/${index}`, '_blank')
   }
 
   const deleteTicket = async (payload: any) => {
