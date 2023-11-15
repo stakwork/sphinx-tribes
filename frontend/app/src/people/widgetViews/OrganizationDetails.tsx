@@ -47,6 +47,7 @@ const OrganizationDetails = (props: {
   close: () => void;
   org: Organization | undefined;
   resetOrg: (Organization) => void;
+  getOrganizations: () => Promise<void>;
 }) => {
   const { main, ui } = useStores();
 
@@ -79,7 +80,7 @@ const OrganizationDetails = (props: {
   const addWithdrawDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'WITHDRAW BUDGET');
 
-  const { org } = props;
+  const { org, close, getOrganizations } = props;
   const uuid = org?.uuid || '';
 
   function addToast(title: string, color: 'danger' | 'success') {
@@ -237,11 +238,15 @@ const OrganizationDetails = (props: {
   };
 
   const onDeleteOrg = async () => {
-    const res = { status: 200 };
+    const res = await main.organizationDelete(uuid);
     if (res.status === 200) {
-      addToast('Still need to implement this', 'danger');
+      addToast('Deleted organization', 'success');
+      if (ui.meInfo) {
+        getOrganizations();
+        close();
+      }
     } else {
-      addToast('Error: could not create organization', 'danger');
+      addToast('Error: could not delete organization', 'danger');
     }
   };
 

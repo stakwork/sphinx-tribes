@@ -16,6 +16,7 @@ export interface EditOrgModalProps extends ModalProps {
 
 export interface UserRolesModalProps extends ModalProps {
   submitRoles: (roles: BountyRoles[]) => void;
+  addToast: (title: string, color: 'danger' | 'success') => void;
 }
 
 export interface PaymentHistoryModalProps extends ModalProps {

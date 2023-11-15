@@ -80,7 +80,7 @@ const s_RolesCategories = [
 const RolesModal = (props: UserRolesModalProps) => {
   const { main } = useStores();
   const isMobile = useIsMobile();
-  const { isOpen, close, user, uuid } = props;
+  const { isOpen, close, user, uuid, addToast } = props;
 
   const roleData = main.bountyRoles.map((role: any) => ({
     name: role.name,
@@ -183,7 +183,7 @@ const RolesModal = (props: UserRolesModalProps) => {
       if (res.status === 200) {
         await main.getUserRoles(uuid, user.owner_pubkey);
       } else {
-        // addToast('Error: could not add user roles', 'danger');
+        addToast('Error: could not add user roles', 'danger');
       }
       close();
     }

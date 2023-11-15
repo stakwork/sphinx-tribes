@@ -432,6 +432,7 @@ type Organization struct {
 	Created     *time.Time `json:"created"`
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`
+	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
 }
