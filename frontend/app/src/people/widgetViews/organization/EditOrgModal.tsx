@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import { validator } from 'components/form/utils';
 import { widgetConfigs } from 'people/utils/Constants';
 import { FormField } from 'components/form/utils';
+import { useStores } from 'store';
 import Input from '../../../components/form/inputs';
 import { Button, Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
@@ -138,6 +139,8 @@ const HLine = styled.div`
 `;
 
 const EditOrgModal = (props: EditOrgModalProps) => {
+  const { ui } = useStores();
+
   const isMobile = useIsMobile();
   const { isOpen, close, onSubmit, onDelete, org } = props;
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -153,6 +156,8 @@ const EditOrgModal = (props: EditOrgModalProps) => {
 
   const [selectedImage, setSelectedImage] = useState<string>(org?.img || '');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -312,7 +317,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         </EditOrgColumns>
         <HLine style={{ width: '551px', transform: 'translate(-48px, 0px' }} />
         <Button
-          disabled={false}
+          disabled={!isOrganizationAdmin}
           onClick={() => {
             setShowDeleteModal(true);
           }}
