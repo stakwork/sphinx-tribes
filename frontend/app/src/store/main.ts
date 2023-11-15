@@ -1797,6 +1797,21 @@ export class MainStore {
     }
   }
 
+  async uploadFile(body: FormData): Promise<null | Response> {
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    const r: any = await fetch(`${TribesURL}/meme_upload`, {
+      method: 'POST',
+      mode: 'cors',
+      body,
+      headers: {
+        'x-jwt': info.tribe_jwt
+      }
+    });
+
+    return r;
+  }
+
   async updateOrganization(body: Organization): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
