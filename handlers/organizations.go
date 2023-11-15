@@ -393,15 +393,18 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
 		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 
-		if hasRole {
-			budget := db.DB.GetOrganizationBudget(uuid)
-			organization.Budget = budget.TotalBudget
-		} else {
-			organization.Budget = 0
-		}
-		organization.BountyCount = bountyCount
+		// don't add deleted organizations to the list
+		if !organization.Deleted {
+			if hasRole {
+				budget := db.DB.GetOrganizationBudget(uuid)
+				organization.Budget = budget.TotalBudget
+			} else {
+				organization.Budget = 0
+			}
+			organization.BountyCount = bountyCount
 
-		organizations = append(organizations, organization)
+			organizations = append(organizations, organization)
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -543,4 +546,31 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	invoiceCount := db.DB.GetOrganizationInvoicesCount(uuid)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceCount)
+}
+
+func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	organization := db.DB.GetOrganizationByUuid(uuid)
+
+	if pubKeyFromAuth != organization.OwnerPubKey {
+		msg := "only org admin can delete an organization"
+		fmt.Println(msg)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	// soft delete organization
+	org := db.DB.ChangeOrganizationDeleteStatus(uuid, true)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(org)
 }
