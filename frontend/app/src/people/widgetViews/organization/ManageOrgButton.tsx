@@ -1,7 +1,24 @@
-import { Button } from 'components/common';
 import { userHasRole } from 'helpers';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStores } from 'store';
+import styled from 'styled-components';
+
+const Button = styled.button`
+  padding: 0.5rem 1rem;
+  width: 7rem;
+  height: 2.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--Input-Outline-1, #d0d5d8);
+  background: #fff;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+  color: #5f6368;
+  font-family: 'Barlow';
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 0rem;
+  letter-spacing: 0.00875rem;
+`;
 
 const ManageButton = (props: { user_pubkey: string; org: any; action: () => void }) => {
   const [userRoles, setUserRoles] = useState<any[]>([]);
@@ -29,23 +46,7 @@ const ManageButton = (props: { user_pubkey: string; org: any; action: () => void
     getUserRoles();
   }, [getUserRoles]);
 
-  return (
-    <>
-      {hasAccess && (
-        <Button
-          text="Manage"
-          color="white"
-          style={{
-            width: 112,
-            height: 40,
-            color: '#000000',
-            borderRadius: 10
-          }}
-          onClick={action}
-        />
-      )}
-    </>
-  );
+  return <>{hasAccess && <Button onClick={action}>Manage</Button>}</>;
 };
 
 export default ManageButton;

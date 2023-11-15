@@ -1,24 +1,20 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import NoResults from 'people/utils/OrgNoResults';
 import { useStores } from 'store';
 import { Organization } from 'store/main';
-import { Wrap } from 'components/form/style';
-import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from 'components/common';
 import { useIsMobile } from 'hooks/uiHooks';
-import { Formik } from 'formik';
-import { FormField, validator } from 'components/form/utils';
 import { Modal } from '../../components/common';
 import avatarIcon from '../../public/static/profile_avatar.svg';
 import { colors } from '../../config/colors';
 import { widgetConfigs } from '../utils/Constants';
-import Input from '../../components/form/inputs';
 import { Person } from '../../store/main';
 import OrganizationDetails from './OrganizationDetails';
 import ManageButton from './organization/ManageOrgButton';
 import OrganizationBudget from './organization/OrgBudget';
+import AddOrganization from './organization/AddOrganization';
 
 const color = colors['light'];
 
@@ -31,7 +27,10 @@ const Container = styled.div`
   margin: -20px -30px;
 
   .organizations {
-    padding: 20px 30px;
+    padding: 1.25rem 2.5rem;
+    @media only screen and (max-width: 800px) {
+      padding: 1.25rem;
+    }
   }
 `;
 
@@ -40,18 +39,48 @@ const OrganizationWrap = styled.div`
   flex-direction: row;
   width: 100%;
   background: white;
-  padding: 25px 30px;
-  border-radius: 6px;
+  padding: 1.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
   @media only screen and (max-width: 800px) {
-    padding: 15px 0px;
+    padding: 1rem 0px;
   }
   @media only screen and (max-width: 700px) {
-    padding: 12px 0px;
+    padding: 0.75rem 0px;
     margin-bottom: 10px;
   }
   @media only screen and (max-width: 500px) {
     padding: 0px;
   }
+`;
+
+const ButtonIconLeft = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  column-gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  color: #5f6368;
+  font-family: 'Barlow';
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 0rem;
+  letter-spacing: 0.00875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d0d5d8;
+  background: #fff;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+
+  :disabled {
+    cursor: not-allowed;
+  }
+`;
+
+const IconImg = styled.img`
+  width: 1.25rem;
+  height: 1.25rem;
 `;
 
 const OrganizationData = styled.div`
@@ -69,19 +98,21 @@ const OrganizationData = styled.div`
 `;
 
 const OrganizationImg = styled.img`
-  width: 65px;
-  height: 65px;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
   @media only screen and (max-width: 700px) {
     width: 55px;
     height: 55px;
   }
   @media only screen and (max-width: 500px) {
-    width: 48px;
-    height: 48px;
+    width: 3rem;
+    height: 3rem;
   }
   @media only screen and (max-width: 470px) {
-    width: 60px;
-    height: 60px;
+    width: 3.75rem;
+    height: 3.75rem;
   }
 `;
 
@@ -89,7 +120,7 @@ const OrganizationContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 15px;
+  gap: 1rem;
 `;
 
 const OrgHeadWrap = styled.div`
@@ -100,8 +131,12 @@ const OrgHeadWrap = styled.div`
 `;
 
 const OrgText = styled.div`
-  font-size: 1.4rem;
-  font-weight: bold;
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.1875rem;
   @media only screen and (max-width: 700px) {
     font-size: 1.1rem;
   }
@@ -120,49 +155,17 @@ const OrganizationActionWrap = styled.div`
   }
 `;
 
-const AddOrgButton = styled(Button)`
-  width: 100%;
-  border-radius: 10px;
-  height: 45;
-  margin-top: 15px;
-`;
-
 const Organizations = (props: { person: Person }) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
   const [organization, setOrganization] = useState<Organization>();
-  const [disableFormButtons, setDisableFormButtons] = useState(false);
-  const [toasts, setToasts]: any = useState([]);
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
   const config = widgetConfigs['organizations'];
-  const formRef = useRef(null);
   const isMyProfile = ui?.meInfo?.pubkey === props?.person?.owner_pubkey;
 
   const user_pubkey = ui.meInfo?.owner_pubkey;
-
-  const schema = [...config.schema];
-
-  const initValues = {
-    name: '',
-    img: '',
-    show: false
-  };
-
-  function addToast(title: string) {
-    setToasts([
-      {
-        id: '1',
-        title,
-        color: 'danger'
-      }
-    ]);
-  }
-
-  function removeToast() {
-    setToasts([]);
-  }
 
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
@@ -185,19 +188,6 @@ const Organizations = (props: { person: Person }) => {
     setDetailsOpen(false);
   };
 
-  const onSubmit = async (body: any) => {
-    setIsLoading(true);
-    body.owner_pubkey = ui.meInfo?.owner_pubkey;
-    const res = await main.addOrganization(body);
-    if (res.status === 200) {
-      await getUserOrganizations();
-    } else {
-      addToast('Error: could not create organization');
-    }
-    closeHandler();
-    setIsLoading(false);
-  };
-
   // renders org as list item
   const orgUi = (org: any, key: number) => {
     const btnDisabled = (!org.bounty_count && org.bount_count !== 0) || !org.uuid;
@@ -217,18 +207,13 @@ const Organizations = (props: { person: Person }) => {
                 }}
               />
             )}
-            <Button
+            <ButtonIconLeft
               disabled={btnDisabled}
-              color={!btnDisabled ? 'white' : 'grey'}
-              text="View Bounties"
-              endingIcon="open_in_new"
               onClick={() => window.open(`/org/bounties/${org.uuid}`, '_target')}
-              style={{
-                height: 40,
-                color: '#000000',
-                borderRadius: 10
-              }}
-            />
+            >
+              View Bounties
+              <IconImg src="/static/open_in_new_grey.svg" alt="open_in_new_tab" />
+            </ButtonIconLeft>
           </OrganizationActionWrap>
         </OrganizationData>
       </OrganizationWrap>
@@ -292,7 +277,9 @@ const Organizations = (props: { person: Person }) => {
                 zIndex: 20,
                 ...(config?.modalStyle ?? {}),
                 maxHeight: '100%',
-                borderRadius: '10px'
+                borderRadius: '10px',
+                minWidth: isMobile ? '100%' : '34.4375rem',
+                minHeight: isMobile ? '100%' : '22.1875rem'
               }}
               overlayClick={closeHandler}
               bigCloseImage={closeHandler}
@@ -303,76 +290,15 @@ const Organizations = (props: { person: Person }) => {
                 borderRadius: '50%'
               }}
             >
-              <Formik
-                initialValues={initValues || {}}
-                onSubmit={onSubmit}
-                innerRef={formRef}
-                validationSchema={validator(schema)}
-              >
-                {({
-                  setFieldTouched,
-                  handleSubmit,
-                  values,
-                  setFieldValue,
-                  errors,
-                  initialValues
-                }: any) => (
-                  <Wrap newDesign={true}>
-                    <h5>Add new organization</h5>
-                    <div className="SchemaInnerContainer">
-                      {schema.length &&
-                        schema.map((item: FormField) => (
-                          <Input
-                            {...item}
-                            key={item.name}
-                            values={values}
-                            errors={errors}
-                            value={values[item.name]}
-                            error={errors[item.name]}
-                            initialValues={initialValues}
-                            deleteErrors={() => {
-                              if (errors[item.name]) delete errors[item.name];
-                            }}
-                            handleChange={(e: any) => {
-                              setFieldValue(item.name, e);
-                            }}
-                            setFieldValue={(e: any, f: any) => {
-                              setFieldValue(e, f);
-                            }}
-                            setFieldTouched={setFieldTouched}
-                            handleBlur={() => setFieldTouched(item.name, false)}
-                            handleFocus={() => setFieldTouched(item.name, true)}
-                            setDisableFormButtons={setDisableFormButtons}
-                            borderType={'bottom'}
-                            imageIcon={true}
-                            style={
-                              item.name === 'github_description' && !values.ticket_url
-                                ? {
-                                    display: 'none'
-                                  }
-                                : undefined
-                            }
-                          />
-                        ))}
-
-                      <AddOrgButton
-                        disabled={disableFormButtons || loading}
-                        onClick={() => {
-                          handleSubmit();
-                        }}
-                        loading={loading}
-                        color={'primary'}
-                        text={'Add Organization'}
-                      />
-                    </div>
-                  </Wrap>
-                )}
-              </Formik>
+              <AddOrganization
+                closeHandler={closeHandler}
+                getUserOrganizations={getUserOrganizations}
+                owner_pubkey={ui.meInfo?.owner_pubkey}
+              />
             </Modal>
           )}
         </>
       )}
-      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={5000} />
     </Container>
   );
 };
