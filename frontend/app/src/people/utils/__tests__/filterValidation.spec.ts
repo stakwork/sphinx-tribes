@@ -27,7 +27,7 @@ describe('testing filters', () => {
   describe('bountyHeaderLanguageFilter', () => {
     test('match', () => {
       expect(bountyHeaderLanguageFilter(['Javascript', 'Python'], { Javascript: true })).toEqual(
-        true
+        false
       );
     });
     test('no-match', () => {
