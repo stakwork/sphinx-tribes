@@ -206,3 +206,14 @@ export const isInvoiceExpired = (paymentRequest: string): boolean => {
   }
   return true;
 };
+
+export const spliceOutPubkey = (userAddress: string): string => {
+  if (userAddress.includes(':')) {
+    const addArray = userAddress.split(':');
+    const pubkey = addArray[0];
+
+    return pubkey;
+  }
+
+  return userAddress;
+};

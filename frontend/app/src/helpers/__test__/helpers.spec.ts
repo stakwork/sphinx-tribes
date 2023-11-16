@@ -4,7 +4,8 @@ import {
   randomString,
   calculateTimeLeft,
   toCapitalize,
-  userHasRole
+  userHasRole,
+  spliceOutPubkey
 } from '../helpers-extended';
 import { uiStore } from '../../store/ui';
 import crypto from 'crypto';
@@ -137,6 +138,15 @@ describe('testing helpers', () => {
     test('test to capitalize string', () => {
       const capitalizeString = toCapitalize('hello test sphinx');
       expect(capitalizeString).toBe('Hello Test Sphinx');
+    });
+  });
+  describe('spliceOutPubkey', () => {
+    test('test that it returns pubkey from a pubkey:route_hint string', () => {
+      const pubkey = '12344444444444444';
+      const routeHint = '899900000000000000:88888888';
+      const userAddress = `${pubkey}:${routeHint}`;
+      const pub = spliceOutPubkey(userAddress);
+      expect(pub).toBe(pubkey);
     });
   });
 });
