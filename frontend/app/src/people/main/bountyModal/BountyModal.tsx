@@ -1,7 +1,7 @@
 import { Modal } from 'components/common';
 import { useIsMobile, usePerson } from 'hooks';
 import { widgetConfigs } from 'people/utils/Constants';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { BountyModalProps } from 'people/interfaces';
@@ -20,6 +20,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
   const { ui, main } = useStores();
   const { person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
+  const [afterEdit, setAfterEdit] = useState(false);
 
   const personToDisplay = fromPage === 'usertickets' ? bountyOwner : person;
 
@@ -33,20 +34,31 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
     });
   };
 
-  useEffect(() => {
-    async function getBounty() {
+  const getBounty = useCallback(
+    async (afterEdit?: boolean) => {
       /** check for the bounty length, else the request
        * will be made continously which will lead to an
        * infinite loop and crash the app
        */
-      if (wantedId && !bounty.length) {
+      if ((wantedId && !bounty.length) || afterEdit) {
         const bounty = await main.getBountyById(Number(wantedId));
         setBounty(bounty);
       }
-    }
+    },
+    [bounty, main, wantedId]
+  );
 
+  useEffect(() => {
     getBounty();
-  }, [bounty, main, wantedId]);
+  }, [getBounty]);
+
+  useEffect(() => {
+    if (afterEdit) {
+      getBounty(afterEdit);
+      setAfterEdit(false);
+    }
+  }, [afterEdit, getBounty]);
+
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -59,6 +71,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
           selectedIndex={Number(wantedIndex)}
           config={config}
           goBack={onGoBack}
+          setAfterEdit={setAfterEdit}
         />
       </Modal>
     );
@@ -99,6 +112,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
           onGoBack();
         }}
         fromBountyPage={true}
+        setAfterEdit={setAfterEdit}
       />
     </Modal>
   );

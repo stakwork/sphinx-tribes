@@ -706,13 +706,16 @@ function Form(props: FormProps) {
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Button
                       disabled={disableFormButtons || props.loading}
-                      onClick={() => {
+                      onClick={async () => {
                         if (dynamicSchemaName) {
                           // inject type in body
                           setFieldValue('type', dynamicSchemaName);
                         }
-                        handleSubmit();
-                        history.push('/bounties');
+                        await handleSubmit(true);
+                        setTimeout(() => {
+                          props.setLoading && props.setLoading(false);
+                          props.onEditSuccess && props.onEditSuccess();
+                        }, 500);
                       }}
                       loading={props.loading}
                       style={{ ...buttonStyle, width: '140px' }}

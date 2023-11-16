@@ -6,7 +6,6 @@ import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Organization } from 'store/main';
 import { Box } from '@mui/system';
-import history from 'config/history';
 import { useStores } from '../../store';
 import Form from '../../components/form/bounty';
 import {
@@ -41,7 +40,8 @@ function FocusedView(props: FocusViewProps) {
     newDesign,
     setIsModalSideButton,
     bounty,
-    setRemoveNextAndPrev
+    setRemoveNextAndPrev,
+    setAfterEdit
   } = props;
   const { ui, main } = useStores();
 
@@ -200,9 +200,8 @@ function FocusedView(props: FocusViewProps) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-  async function submitForm(body: any, shouldCloseModal: boolean = true) {
+  async function submitForm(body: any, notEdit?: boolean) {
     let newBody = cloneDeep(body);
-
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
@@ -238,7 +237,6 @@ function FocusedView(props: FocusViewProps) {
       // Refresh the tickets page if a user eidts from the tickets tab
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedBounties({}, info.pubkey);
-        history.goBack();
       }
     } catch (e) {
       console.log('e', e);
@@ -246,7 +244,9 @@ function FocusedView(props: FocusViewProps) {
 
     if (props?.onSuccess) props.onSuccess();
 
-    setLoading(false);
+    if (notEdit === true) {
+      setLoading(false);
+    }
     if (ui?.meInfo?.hasOwnProperty('url') && !isNotHttps(ui?.meInfo?.url) && props?.ReCallBounties)
       props?.ReCallBounties();
   }
@@ -320,6 +320,13 @@ function FocusedView(props: FocusViewProps) {
     setRemoveNextAndPrev && setRemoveNextAndPrev(true);
   }
 
+  function handleEditFinish() {
+    setEditable(true);
+    setEditMode(false);
+    setRemoveNextAndPrev && setRemoveNextAndPrev(false);
+    setAfterEdit && setAfterEdit(true);
+  }
+
   function handleFormClose() {
     if (skipEditLayer && goBack) goBack();
     else {
@@ -365,6 +372,8 @@ function FocusedView(props: FocusViewProps) {
                     }
                   : {}
               }
+              onEditSuccess={handleEditFinish}
+              setLoading={setLoading}
             />
           )}
         </B>

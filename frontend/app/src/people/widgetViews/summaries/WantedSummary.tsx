@@ -154,7 +154,7 @@ function WantedSummary(props: WantedSummaryProps) {
         created: created
       };
 
-      formSubmit && formSubmit(newValue);
+      formSubmit && formSubmit(newValue, true);
     },
     [
       coding_languages,
@@ -192,7 +192,7 @@ function WantedSummary(props: WantedSummaryProps) {
       type: type,
       created: created
     };
-    formSubmit && formSubmit(newValue, false);
+    formSubmit && formSubmit(newValue, true);
   }, [
     coding_languages,
     created,
