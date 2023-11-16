@@ -247,7 +247,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
     setCurrentPaymentHistory(
       paymentsHistory.filter((history: PaymentHistory) => filter[history.payment_type])
     );
-  }, [filter]);
+  }, [filter, props.paymentsHistory]);
 
   return (
     <Modal

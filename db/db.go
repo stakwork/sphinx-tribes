@@ -1005,7 +1005,7 @@ func (db database) GetOrganizations(r *http.Request) []Organization {
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
 	// return if like owner_alias, unique_name, or equals pubkey
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Find(&ms)
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Where("deleted != ?", false).Find(&ms)
 	return ms
 }
 
@@ -1105,7 +1105,7 @@ func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
 
 func (db database) GetUserCreatedOrganizations(pubkey string) []Organization {
 	ms := []Organization{}
-	db.db.Where("owner_pub_key = ?", pubkey).Find(&ms)
+	db.db.Where("owner_pub_key = ?", pubkey).Where("deleted != ?", true).Find(&ms)
 	return ms
 }
 
@@ -1298,5 +1298,13 @@ func (db database) GetUserInvoiceData(payment_request string) UserInvoiceData {
 func (db database) DeleteUserInvoiceData(payment_request string) UserInvoiceData {
 	ms := UserInvoiceData{}
 	db.db.Where("payment_request = ?", payment_request).Delete(&ms)
+	return ms
+}
+
+func (db database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) Organization {
+	ms := Organization{}
+	db.db.Model(&ms).Where("uuid", org_uuid).Updates(map[string]interface{}{
+		"deleted": status,
+	})
 	return ms
 }

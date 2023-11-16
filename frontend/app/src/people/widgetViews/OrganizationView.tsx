@@ -259,6 +259,7 @@ const Organizations = (props: { person: Person }) => {
           close={closeDetails}
           org={organization}
           resetOrg={(newOrg: Organization) => setOrganization(newOrg)}
+          getOrganizations={getUserOrganizations}
         />
       )}
       {!detailsOpen && (
