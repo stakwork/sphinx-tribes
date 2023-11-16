@@ -512,7 +512,7 @@ export const OrgInput = styled.input`
     font-weight: 400;
     line-height: 2.1875rem;
   }
- `
+`;
 export const RouteHintText = styled.p`
   font-size: 0.9rem;
   text-align: center;
