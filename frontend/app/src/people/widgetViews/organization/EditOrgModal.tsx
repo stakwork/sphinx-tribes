@@ -28,20 +28,35 @@ import DeleteOrgWindow from './DeleteOrgWindow';
 
 const color = colors['light'];
 
-const EditOrgColumns = styled.div`
+const EditOrgWrapper = styled.div`
+  padding: 3rem 3rem 1.5rem 3rem;
   display: flex;
-  flex-direction: row;
-  width: 100%;
+  flex-direction: column;
+  position: relative;
+
+  @media only screen and (max-width: 500px) {
+    padding: 1.2rem;
+    width: 100%;
+  }
+`;
+
+const EditOrgColumns = styled.div`
+  margin-top: 2rem;
+  display: flex;
+  gap: 3.56rem;
+  align-items: center;
+  justify-content: center;
+  @media only screen and (max-width: 500px) {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
 `;
 
 const OrgEditImageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 40%;
-`;
-
-const FormWrapper = styled.div`
-  flex: 60%;
+  align-items: center;
 `;
 
 const EditOrgTitle = styled(ModalTitle)`
@@ -51,12 +66,11 @@ const EditOrgTitle = styled(ModalTitle)`
   font-style: normal;
   font-weight: 800;
   line-height: 1.875rem;
-  margin-bottom: 3rem;
+  margin-bottom: 0;
 
   @media only screen and (max-width: 500px) {
     text-align: center;
     font-size: 1.4rem;
-    margin-bottom: 1.2rem;
   }
 `;
 
@@ -64,7 +78,8 @@ const HLine = styled.div`
   background-color: #ebedef;
   height: 1px;
   width: 100%;
-  margin: 5px 0px 20px;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
 `;
 
 const EditOrgModal = (props: EditOrgModalProps) => {
@@ -162,8 +177,6 @@ const EditOrgModal = (props: EditOrgModalProps) => {
     event.preventDefault();
   };
 
-  // const [files, setFiles] = useState<{ preview: string }[]>([]);
-
   const openFileDialog = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -185,14 +198,8 @@ const EditOrgModal = (props: EditOrgModalProps) => {
           ...(config?.modalStyle ?? {}),
           maxHeight: '100%',
           borderRadius: '10px',
-          width: isMobile ? '100%' : '34.4375rem',
-          minWidth: '20px',
-          height: isMobile ? 'auto' : '27.1875rem',
-          padding: '3rem 3rem 1.5rem 3rem',
-          flexShrink: '0',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start'
+          minWidth: isMobile ? '100%' : '34.4375rem',
+          minHeight: isMobile ? '100%' : '22.1875rem'
         }}
         overlayClick={close}
         bigCloseImage={close}
@@ -203,37 +210,37 @@ const EditOrgModal = (props: EditOrgModalProps) => {
           borderRadius: '50%'
         }}
       >
-        <EditOrgTitle>Edit Organization</EditOrgTitle>
-        <EditOrgColumns style={{ flexDirection: isMobile ? 'column' : 'row' }}>
-          <OrgEditImageWrapper>
-            <ImgDashContainer onDragOver={handleDragOver} onDrop={handleDrop}>
-              <UploadImageContainer onClick={openFileDialog}>
-                <img src="/static/badges/ResetOrgProfile.svg" alt="upload" />
-              </UploadImageContainer>
-              <ImgContainer>
-                {selectedImage ? (
-                  <SelectedImg src={selectedImage} alt="selected file" />
-                ) : (
-                  <ImgText>LOGO</ImgText>
-                )}
-              </ImgContainer>
-            </ImgDashContainer>
-            <ImgTextContainer>
-              <InputFile
-                type="file"
-                id="file-input"
-                accept=".jpg, .jpeg, .png, .gif"
-                onChange={handleFileInputChange}
-                ref={fileInputRef}
-              />
-              <ImgInstructionText>
-                Drag and drop or{' '}
-                <ImgInstructionSpan onClick={openFileDialog}>Browse</ImgInstructionSpan>
-              </ImgInstructionText>
-              <ImgDetailInfo>PNG, JPG or GIF, Min. 300 x 300 px</ImgDetailInfo>
-            </ImgTextContainer>
-          </OrgEditImageWrapper>
-          <FormWrapper style={{ marginLeft: isMobile ? '0px' : '28px' }}>
+        <EditOrgWrapper>
+          <EditOrgTitle>Edit Organization</EditOrgTitle>
+          <EditOrgColumns>
+            <OrgEditImageWrapper>
+              <ImgDashContainer onDragOver={handleDragOver} onDrop={handleDrop}>
+                <UploadImageContainer onClick={openFileDialog}>
+                  <img src="/static/badges/ResetOrgProfile.svg" alt="upload" />
+                </UploadImageContainer>
+                <ImgContainer>
+                  {selectedImage ? (
+                    <SelectedImg src={selectedImage} alt="selected file" />
+                  ) : (
+                    <ImgText>LOGO</ImgText>
+                  )}
+                </ImgContainer>
+              </ImgDashContainer>
+              <ImgTextContainer>
+                <InputFile
+                  type="file"
+                  id="file-input"
+                  accept=".jpg, .jpeg, .png, .gif"
+                  onChange={handleFileInputChange}
+                  ref={fileInputRef}
+                />
+                <ImgInstructionText>
+                  Drag and drop or{' '}
+                  <ImgInstructionSpan onClick={openFileDialog}>Browse</ImgInstructionSpan>
+                </ImgInstructionText>
+                <ImgDetailInfo>PNG, JPG or GIF, Min. 300 x 300 px</ImgDetailInfo>
+              </ImgTextContainer>
+            </OrgEditImageWrapper>
             <Formik
               initialValues={initValues || {}}
               onSubmit={onSubmitEditOrg}
@@ -294,34 +301,34 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                 </OrgInputContainer>
               )}
             </Formik>
-          </FormWrapper>
-        </EditOrgColumns>
-        <HLine style={{ width: '551px', transform: 'translate(-48px, 0px' }} />
-        <Button
-          disabled={!isOrganizationAdmin}
-          onClick={() => {
-            setShowDeleteModal(true);
-          }}
-          loading={false}
-          style={{
-            width: isMobile ? '100%' : 'calc(60% - 18px)',
-            height: '50px',
-            borderRadius: '5px',
-            borderStyle: 'solid',
-            alignSelf: 'flex-end',
-            borderWidth: '1px',
-            backgroundColor: 'white',
-            borderColor: '#ED7474',
-            color: '#ED7474'
-          }}
-          color={'#ED7474'}
-          text={'Delete organization'}
-        />
-        {showDeleteModal ? (
-          <DeleteOrgWindow onDeleteOrg={onDelete} close={() => setShowDeleteModal(false)} />
-        ) : (
-          <></>
-        )}
+          </EditOrgColumns>
+          <HLine />
+          <Button
+            disabled={!isOrganizationAdmin}
+            onClick={() => {
+              setShowDeleteModal(true);
+            }}
+            loading={false}
+            style={{
+              width: isMobile ? '100%' : 'calc(60% - 18px)',
+              height: '50px',
+              borderRadius: '5px',
+              borderStyle: 'solid',
+              alignSelf: 'flex-end',
+              borderWidth: '1px',
+              backgroundColor: 'white',
+              borderColor: '#ED7474',
+              color: '#ED7474'
+            }}
+            color={'#ED7474'}
+            text={'Delete organization'}
+          />
+          {showDeleteModal ? (
+            <DeleteOrgWindow onDeleteOrg={onDelete} close={() => setShowDeleteModal(false)} />
+          ) : (
+            <></>
+          )}
+        </EditOrgWrapper>
       </Modal>
     </>
   );
