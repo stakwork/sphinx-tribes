@@ -1,13 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
 import { Formik } from 'formik';
 import { FormField, validator } from 'components/form/utils';
+import { spliceOutPubkey } from 'helpers';
 import { Button, Modal } from '../../../components/common';
 import Input from '../../../components/form/inputs';
 import { colors } from '../../../config/colors';
-import { ModalTitle } from './style';
+import { ModalTitle, RouteHintText } from './style';
 import { AddUserModalProps } from './interface';
 
 const color = colors['light'];
@@ -15,6 +16,17 @@ const color = colors['light'];
 const AddUserModal = (props: AddUserModalProps) => {
   const isMobile = useIsMobile();
   const { isOpen, close, onSubmit, loading, disableFormButtons, setDisableFormButtons } = props;
+  const [displayHint, setDisplayHint] = useState(false);
+
+  const hintText = 'Route hint detected and removed';
+
+  const checkDisplayHint = (address: string) => {
+    if (address.includes(':')) {
+      setDisplayHint(true);
+    } else {
+      setDisplayHint(false);
+    }
+  };
 
   const config = nonWidgetConfigs['organizationusers'];
 
@@ -59,6 +71,7 @@ const AddUserModal = (props: AddUserModalProps) => {
         {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => (
           <Wrap newDesign={true}>
             <ModalTitle>Add new user</ModalTitle>
+            {displayHint && <RouteHintText>{hintText}</RouteHintText>}
             <div className="SchemaInnerContainer">
               {schema.map((item: FormField) => (
                 <Input
@@ -73,7 +86,9 @@ const AddUserModal = (props: AddUserModalProps) => {
                     if (errors[item.name]) delete errors[item.name];
                   }}
                   handleChange={(e: any) => {
-                    setFieldValue(item.name, e);
+                    checkDisplayHint(e);
+                    const pubkey = spliceOutPubkey(e);
+                    setFieldValue(item.name, pubkey);
                   }}
                   setFieldValue={(e: any, f: any) => {
                     setFieldValue(e, f);

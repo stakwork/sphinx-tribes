@@ -206,6 +206,7 @@ export interface Organization {
   show: boolean;
   bounty_count?: number;
   budget?: number;
+  deleted?: boolean;
 }
 
 export interface BountyRoles {
@@ -2200,6 +2201,25 @@ export class MainStore {
       return r.json();
     } catch (e) {
       console.error('Error pollInvoice', e);
+    }
+  }
+
+  async organizationDelete(org_uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return 0;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/delete/${org_uuid}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.error('organizationDelete', e);
     }
   }
 }
