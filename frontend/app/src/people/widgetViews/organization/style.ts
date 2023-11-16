@@ -353,6 +353,11 @@ export const UserAction = styled.div`
   margin-left: auto;
 `;
 
+export const ActionBtn = styled.button`
+  border: 0px;
+  padding: 0px;
+`;
+
 export const IconWrap = styled.div`
   :first-child {
     margin-right: 40px;
@@ -507,4 +512,9 @@ export const OrgInput = styled.input`
     font-weight: 400;
     line-height: 2.1875rem;
   }
+ `
+export const RouteHintText = styled.p`
+  font-size: 0.9rem;
+  text-align: center;
+  color: #9157f6;
 `;
