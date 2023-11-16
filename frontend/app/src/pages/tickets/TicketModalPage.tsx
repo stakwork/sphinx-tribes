@@ -64,7 +64,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   useEffect(() => {
     getBounty();
-  }, [getBounty]);
+  }, [getBounty, removeNextAndPrev]);
 
   const goBack = async () => {
     setVisible(false);

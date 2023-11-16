@@ -16,4 +16,6 @@ export interface FormProps {
   loading?: boolean;
   delete?: () => void;
   submitText?: string;
+  onEditSuccess?: () => void;
+  setLoading?: (value: boolean) => void;
 }
