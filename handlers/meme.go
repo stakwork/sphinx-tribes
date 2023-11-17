@@ -141,11 +141,15 @@ func SignChallenge(challenge string) db.RelaySignerResponse {
 func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
 	memeUrl := fmt.Sprintf("%s/verify", config.MemeUrl)
 
+	fmt.Println("MEME URL ===", memeUrl)
+
 	formData := url.Values{
 		"id":     {id},
 		"sig":    {sig},
 		"pubkey": {config.RelayNodeKey},
 	}
+
+	fmt.Println("TOKEN DATA ===", formData)
 
 	res, err := http.PostForm(memeUrl, formData)
 
@@ -169,6 +173,7 @@ func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
 
 		return "", tokenSuccess
 	} else {
+		fmt.Println("MEME TOKEN ERROR === ", err)
 		var tokenError string
 
 		// Unmarshal result
