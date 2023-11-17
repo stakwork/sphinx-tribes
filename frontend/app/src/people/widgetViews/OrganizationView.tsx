@@ -170,8 +170,8 @@ const Organizations = (props: { person: Person }) => {
   const getUserOrganizations = useCallback(async () => {
     setIsLoading(true);
     if (ui.selectedPerson) {
-      const orgs = await main.getUserOrganizations(ui.selectedPerson);
-      main.setDropDownOrganizations(orgs);
+      await main.getUserOrganizations(ui.selectedPerson);
+      await main.getUserDropdownOrganizations(ui.selectedPerson);
     }
     setIsLoading(false);
   }, [main, ui.selectedPerson]);
