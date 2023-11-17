@@ -5,9 +5,9 @@ import {
   calculateTimeLeft,
   toCapitalize,
   userHasRole,
-  spliceOutPubkey
+  spliceOutPubkey,
+  userHasManageBountyRoles
 } from '../helpers-extended';
-import { uiStore } from '../../store/ui';
 import crypto from 'crypto';
 import moment from 'moment';
 
@@ -132,6 +132,67 @@ describe('testing helpers', () => {
       ];
       const hasRole = userHasRole(testRoles, userRole, 'ADD BOUNTY');
       expect(hasRole).toBe(true);
+    });
+
+    test('test user has manage bounty roles', () => {
+      const testRoles = [
+        {
+          name: 'ADD BOUNTY'
+        },
+        {
+          name: 'UPDATE BOUNTY'
+        },
+        {
+          name: 'PAY BOUNTY'
+        },
+        {
+          name: 'DELETE BOUNTY'
+        }
+      ];
+
+      const userRole = [
+        {
+          role: 'ADD BOUNTY'
+        },
+        {
+          role: 'DELETE BOUNTY'
+        },
+        {
+          role: 'PAY BOUNTY'
+        },
+        {
+          role: 'UPDATE BOUNTY'
+        }
+      ];
+      const hasRole = userHasManageBountyRoles(testRoles, userRole);
+      expect(hasRole).toBe(true);
+    });
+    test('test user dose not have manage bounty roles', () => {
+      const testRoles = [
+        {
+          name: 'ADD BOUNTY'
+        },
+        {
+          name: 'DELETE BOUNTY'
+        },
+        {
+          name: 'PAY BOUNTY'
+        },
+        {
+          name: 'UPDATE BOUNTY'
+        }
+      ];
+
+      const userRole = [
+        {
+          role: 'ADD BOUNTY'
+        },
+        {
+          role: 'DELETE BOUNTY'
+        }
+      ];
+      const hasRole = userHasManageBountyRoles(testRoles, userRole);
+      expect(hasRole).toBe(false);
     });
   });
   describe('toCapitalize', () => {
