@@ -17,6 +17,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/users/{uuid}/count", handlers.GetOrganizationUsersCount)
 		r.Get("/bounties/{uuid}", handlers.GetOrganizationBounties)
 		r.Get("/user/{userId}", handlers.GetUserOrganizations)
+		r.Get("/user/dropdown/{userId}", handlers.GetUserDropdownOrganizations)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)

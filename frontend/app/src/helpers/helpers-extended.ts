@@ -162,7 +162,13 @@ export type Roles =
   | 'WITHDRAW BUDGET'
   | 'VIEW REPORT';
 
-export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): boolean => {
+export const ManageBountiesGroup = ['ADD BOUNTY', 'UPDATE BOUNTY', 'DELETE BOUNTY', 'PAY BOUNTY'];
+
+export const userHasRole = (
+  bountyRoles: any[],
+  userRoles: any[],
+  role: Roles | string
+): boolean => {
   if (bountyRoles.length) {
     const bountyRolesMap = {};
     const userRolesMap = {};
@@ -182,6 +188,22 @@ export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): 
     return false;
   }
   return false;
+};
+
+export const userHasManageBountyRoles = (bountyRoles: any[], userRoles: any[]): boolean => {
+  let manageLength = ManageBountiesGroup.length;
+  if (bountyRoles.length) {
+    ManageBountiesGroup.forEach((role: string) => {
+      const hasRole = userHasRole(bountyRoles, userRoles, role);
+      if (hasRole) {
+        manageLength--;
+      }
+    });
+  }
+  if (manageLength !== 0) {
+    return false;
+  }
+  return true;
 };
 
 export const toCapitalize = (word: string): string => {
