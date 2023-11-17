@@ -127,6 +127,8 @@ var ConfigBountyRoles []BountyRoles = []BountyRoles{
 	},
 }
 
+var ManageBountiesGroup = []string{AddBounty, UpdateBounty, DeleteBounty, PayBounty}
+
 var Updatables = []string{
 	"name", "description", "tags", "img",
 	"owner_alias", "price_to_join", "price_per_message",
@@ -230,6 +232,27 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
 		hasRole = RolesCheck(userRoles, role)
 		return hasRole
+	}
+	return true
+}
+
+func UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
+	var manageRolesCount = len(ManageBountiesGroup)
+	org := DB.GetOrganizationByUuid(uuid)
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+
+		for _, role := range ManageBountiesGroup {
+			// check for the manage bounty roles
+			hasRole := RolesCheck(userRoles, role)
+			if hasRole {
+				manageRolesCount--
+			}
+		}
+
+		if manageRolesCount != 0 {
+			return false
+		}
 	}
 	return true
 }
