@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
-import { isInvoiceExpired, userHasRole } from 'helpers';
+import { isInvoiceExpired, userHasManageBountyRoles } from 'helpers';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
@@ -103,7 +103,7 @@ function MobileView(props: CodingBountiesProps) {
   const [lnInvoice, setLnInvoice] = useState('');
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
-  const [userHasPayRole, setUserHasPayRole] = useState(false);
+  const [userBountyRole, setUserBountyRole] = useState(false);
   const [canEdit, setCanEdit] = useState(true);
 
   const userPubkey = ui.meInfo?.owner_pubkey;
@@ -339,13 +339,13 @@ function MobileView(props: CodingBountiesProps) {
         const isOrganizationAdmin = organization.owner_pubkey === userPubkey;
 
         const canPayBounty =
-          isOrganizationAdmin || userHasRole(main.bountyRoles, userRoles, 'PAY BOUNTY');
+          isOrganizationAdmin || userHasManageBountyRoles(main.bountyRoles, userRoles);
 
         if (!isOrganizationAdmin) {
           setCanEdit(false);
         }
 
-        setUserHasPayRole(canPayBounty);
+        setUserBountyRole(canPayBounty);
       }
     }
   }, [main, org_uuid, userPubkey]);
@@ -358,8 +358,8 @@ function MobileView(props: CodingBountiesProps) {
     { ...person }?.owner_alias &&
     ui.meInfo?.owner_alias &&
     { ...person }?.owner_alias === ui.meInfo?.owner_alias;
-  const hasAccess = isOwner || userHasPayRole;
-  const payBountyDisable = !isOwner && !userHasPayRole;
+  const hasAccess = isOwner || userBountyRole;
+  const payBountyDisable = !isOwner && !userBountyRole;
 
   return (
     <div>

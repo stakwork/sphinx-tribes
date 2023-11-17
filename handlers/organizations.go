@@ -370,21 +370,7 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 
 	// get the organizations created by the user, then get all the organizations
 	// the user has been added to, loop through to get the organization
-	organizations := db.DB.GetUserCreatedOrganizations(user.OwnerPubKey)
-	// add bounty count to the organization
-	for index, value := range organizations {
-		uuid := value.Uuid
-		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
-		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-
-		if hasRole {
-			budget := db.DB.GetOrganizationBudget(uuid)
-			organizations[index].Budget = budget.TotalBudget
-		} else {
-			organizations[index].Budget = 0
-		}
-		organizations[index].BountyCount = bountyCount
-	}
+	organizations := GetCreatedOrganizations(user.OwnerPubKey)
 
 	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
 	for _, value := range assignedOrganizations {
@@ -409,6 +395,67 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(organizations)
+}
+
+func GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
+	userIdParam := chi.URLParam(r, "userId")
+	userId, _ := utils.ConvertStringToUint(userIdParam)
+
+	if userId == 0 {
+		fmt.Println("provide user id")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	user := db.DB.GetPerson(userId)
+
+	// get the organizations created by the user, then get all the organizations
+	// the user has been added to, loop through to get the organization
+	organizations := GetCreatedOrganizations(user.OwnerPubKey)
+
+	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
+	for _, value := range assignedOrganizations {
+		uuid := value.OrgUuid
+		organization := db.DB.GetOrganizationByUuid(uuid)
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasBountyRoles := db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
+
+		// don't add deleted organizations to the list
+		if !organization.Deleted && hasBountyRoles {
+			if hasRole {
+				budget := db.DB.GetOrganizationBudget(uuid)
+				organization.Budget = budget.TotalBudget
+			} else {
+				organization.Budget = 0
+			}
+			organization.BountyCount = bountyCount
+
+			organizations = append(organizations, organization)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizations)
+}
+
+func GetCreatedOrganizations(pubkey string) []db.Organization {
+	organizations := db.DB.GetUserCreatedOrganizations(pubkey)
+	// add bounty count to the organization
+	for index, value := range organizations {
+		uuid := value.Uuid
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(pubkey, uuid, db.ViewReport)
+
+		if hasRole {
+			budget := db.DB.GetOrganizationBudget(uuid)
+			organizations[index].Budget = budget.TotalBudget
+		} else {
+			organizations[index].Budget = 0
+		}
+		organizations[index].BountyCount = bountyCount
+	}
+	return organizations
 }
 
 func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
