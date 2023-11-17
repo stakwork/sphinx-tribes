@@ -3,7 +3,7 @@ import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
 import styled from 'styled-components';
-import { userHasRole, Roles } from 'helpers';
+import { userHasRole, Roles, ManageBountiesGroup } from 'helpers';
 import { useStores } from 'store';
 import avatarIcon from '../../../public/static/profile_avatar.svg';
 import { Button, Modal } from '../../../components/common';
@@ -52,7 +52,7 @@ const s_RolesCategories = [
   },
   {
     name: 'Manage bounties',
-    roles: ['ADD BOUNTY', 'UPDATE BOUNTY', 'DELETE BOUNTY', 'PAY BOUNTY', 'ADD ROLES'],
+    roles: ManageBountiesGroup,
     status: false
   },
   {
@@ -72,7 +72,7 @@ const s_RolesCategories = [
   },
   {
     name: 'Update members',
-    roles: ['ADD USER', 'UPDATE USER', 'DELETE USER'],
+    roles: ['ADD USER', 'UPDATE USER', 'DELETE USER', 'ADD ROLES'],
     status: false
   }
 ];

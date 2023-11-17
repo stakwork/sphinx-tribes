@@ -1754,6 +1754,28 @@ export class MainStore {
     }
   }
 
+  @action async getUserDropdownOrganizations(id: number): Promise<Organization[]> {
+    try {
+      const info = uiStore;
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return [];
+
+      const r: any = await fetch(`${TribesURL}/organizations/user/dropdown/${id}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      this.setDropDownOrganizations(data);
+      return await data;
+    } catch (e) {
+      console.log('Error getUserDropdownOrganizations', e);
+      return [];
+    }
+  }
+
   async getUserOrganizationByUuid(uuid: string): Promise<Organization | undefined> {
     try {
       const info = uiStore;
