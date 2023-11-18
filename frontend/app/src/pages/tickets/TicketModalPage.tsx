@@ -72,8 +72,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       await main.getPeopleBounties({ page: 1, resetPage: true });
       history.push('/bounties')
     }
-    else { 
-       history.goBack();
+    else {
+      history.goBack();
     }
   };
 

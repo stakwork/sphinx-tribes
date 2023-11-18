@@ -98,7 +98,7 @@ function BodyComponent() {
   const onPanelClick = (person: any, item: any) => {
     if (matchPath(location.pathname, { path: '/org/bounties/:uuid' })) {
       history.push(`/org/bounty/${item.id}`);
-    } else { 
+    } else {
       history.replace(`/bounty/${item.id}`);
     }
   };
