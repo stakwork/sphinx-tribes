@@ -70,9 +70,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     setVisible(false);
     if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
       await main.getPeopleBounties({ page: 1, resetPage: true });
-      history.push('/bounties')
-    }
-    else {
+      history.push('/bounties');
+    } else {
       history.goBack();
     }
   };
