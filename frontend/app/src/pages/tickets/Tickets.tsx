@@ -5,7 +5,7 @@ import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { matchPath, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
@@ -53,6 +53,7 @@ function BodyComponent() {
 
   const history = useHistory();
   const isMobile = useIsMobile();
+  const location = useLocation();
 
   useEffect(() => {
     (async () => {
@@ -66,7 +67,7 @@ function BodyComponent() {
       }
       setLoading(false);
     })();
-  }, [main]);
+  }, [main, uuid]);
 
   useEffect(() => {
     if (ui.meInfo) {
@@ -95,7 +96,11 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    history.replace(`/bounty/${item.id}`);
+    if (matchPath(location.pathname, { path: '/org/bounties/:uuid' })) {
+      history.push(`/org/bounty/${item.id}`);
+    } else { 
+      history.replace(`/bounty/${item.id}`);
+    }
   };
 
   if (loading) {
