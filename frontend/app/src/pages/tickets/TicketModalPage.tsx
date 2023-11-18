@@ -60,7 +60,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     setActiveBounty(bounty);
     setVisible(visible);
-  }, [bountyId, search]);
+  }, [bountyId, main, search]);
 
   useEffect(() => {
     getBounty();
