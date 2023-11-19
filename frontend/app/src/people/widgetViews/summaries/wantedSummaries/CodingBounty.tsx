@@ -1,6 +1,6 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
-import { EuiText, EuiFieldText, EuiGlobalToastList, shade } from '@elastic/eui';
+import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { isInvoiceExpired, userHasManageBountyRoles } from 'helpers';
