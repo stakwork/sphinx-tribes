@@ -1,6 +1,6 @@
 /* eslint-disable func-style */
 import React, { useCallback, useEffect, useState } from 'react';
-import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
+import { EuiText, EuiFieldText, EuiGlobalToastList, shade } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { isInvoiceExpired, userHasManageBountyRoles } from 'helpers';
@@ -115,6 +115,9 @@ function MobileView(props: CodingBountiesProps) {
   } else if (localPaid === 'UNPAID') {
     bountyPaid = false;
   }
+
+  const showPayBounty =
+    !bountyPaid && !invoiceStatus && assignee && assignee.owner_alias.length < 30;
 
   const pollMinutes = 2;
 
@@ -630,7 +633,7 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so longF
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!invoiceStatus && assignee && assignee.owner_alias.length < 30 && (
+                    {showPayBounty && (
                       <>
                         <Button
                           disabled={payBountyDisable}
