@@ -116,6 +116,9 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid = false;
   }
 
+  const showPayBounty =
+    !bountyPaid && !invoiceStatus && assignee && assignee.owner_alias.length < 30;
+
   const pollMinutes = 2;
 
   const addToast = (type: string) => {
@@ -630,7 +633,7 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so longF
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!invoiceStatus && assignee && assignee.owner_alias.length < 30 && (
+                    {showPayBounty && (
                       <>
                         <Button
                           disabled={payBountyDisable}
