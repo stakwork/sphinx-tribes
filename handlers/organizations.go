@@ -539,9 +539,23 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 
 	// get the organization payment history
 	paymentHistory := db.DB.GetPaymentHistory(uuid, page, limit)
+	paymentHistoryData := []db.PaymentHistoryData{}
+
+	for _, payment := range paymentHistory {
+		sender := db.DB.GetPersonByPubkey(payment.SenderPubKey)
+		receiver := db.DB.GetPersonByPubkey(payment.ReceiverPubKey)
+		paymentData := db.PaymentHistoryData{
+			PaymentHistory: payment,
+			SenderName:     sender.UniqueName,
+			SenderImg:      sender.Img,
+			ReceiverName:   receiver.UniqueName,
+			ReceiverImg:    receiver.Img,
+		}
+		paymentHistoryData = append(paymentHistoryData, paymentData)
+	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(paymentHistory)
+	json.NewEncoder(w).Encode(paymentHistoryData)
 }
 
 func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
