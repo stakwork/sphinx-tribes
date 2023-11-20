@@ -451,7 +451,7 @@ function MobileView(props: CodingBountiesProps) {
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
-                      {canEdit && (
+                      {!bountyPaid && canEdit && (
                         <div className="CreatorDescriptionExtraButton">
                           <ImageButton
                             buttonText={'Edit'}
