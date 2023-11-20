@@ -248,7 +248,14 @@ function MobileView(props: CodingBountiesProps) {
 
         await main.makeBountyPayment(body);
       } else {
-        generateInvoice(price || 0);
+        return setToasts([
+          {
+            id: `${Math.random()}`,
+            title: 'Insufficient funds in the organization.',
+            color: 'danger',
+            toastLifeTimeMs: 10000
+          }
+        ]);
       }
     } else {
       generateInvoice(price || 0);
@@ -1210,6 +1217,7 @@ function MobileView(props: CodingBountiesProps) {
           </AssigneeProfile>
         </NormalUser>
       )}
+      <EuiGlobalToastList dismissToast={removeToast} toastLifeTimeMs={6000} />
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </div>
   );
