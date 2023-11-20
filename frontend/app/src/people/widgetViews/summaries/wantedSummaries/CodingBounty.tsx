@@ -1217,7 +1217,6 @@ function MobileView(props: CodingBountiesProps) {
           </AssigneeProfile>
         </NormalUser>
       )}
-      <EuiGlobalToastList dismissToast={removeToast} toastLifeTimeMs={6000} />
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </div>
   );
