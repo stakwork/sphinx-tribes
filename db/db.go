@@ -1226,29 +1226,28 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	return payment
 }
 
-func (db database) GetPaymentHistory(org_uuid string, p string, l string) []PaymentHistoryData {
-	payment := []PaymentHistoryData{}
-	// Todo Rewrite Pagination for join statements
+func (db database) GetPaymentHistory(org_uuid string, p string, l string) []PaymentHistory {
+	payment := []PaymentHistory{}
 
-	// page := 0
-	// limit := 0
-	// limitQuery := ""
+	page := 0
+	limit := 0
+	limitQuery := ""
 
-	// if p != "" {
-	// 	page, _ = utils.ConvertStringToInt(p)
-	// }
+	if p != "" {
+		page, _ = utils.ConvertStringToInt(p)
+	}
 
-	// if l != "" {
-	// 	limit, _ = utils.ConvertStringToInt(l)
-	// }
+	if l != "" {
+		limit, _ = utils.ConvertStringToInt(l)
+	}
 
-	// if page != 0 && limit != 0 {
-	// 	limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, page)
-	// }
+	if page != 0 && limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, page)
+	}
 
-	query := `SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, payment.updated, payment.status, payment.payment_type, sender.unique_name as sender_name, sender.img as sender_img, payment.sender_pub_key as sender_pubkey, receiver.unique_name as receiver_name, payment.receiver_pub_key as receiver_pubkey, receiver.img as receiver_img FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`
+	query := `SELECT * FROM public.payment_histories WHERE org_uuid = '` + org_uuid + `' ORDER BY created DESC`
 
-	db.db.Raw(query).Find(&payment)
+	db.db.Raw(query + " " + limitQuery).Find(&payment)
 
 	return payment
 }
