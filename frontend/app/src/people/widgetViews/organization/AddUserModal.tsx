@@ -1,42 +1,169 @@
-import React, { useRef, useState } from 'react';
-import { Wrap } from 'components/form/style';
+import React, { useState } from 'react';
 import { useIsMobile } from 'hooks/uiHooks';
+import styled from 'styled-components';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import { useStores } from 'store';
 import { nonWidgetConfigs } from 'people/utils/Constants';
-import { Formik } from 'formik';
-import { FormField, validator } from 'components/form/utils';
-import { spliceOutPubkey } from 'helpers';
-import { Button, Modal } from '../../../components/common';
-import Input from '../../../components/form/inputs';
+import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
-import { ModalTitle, RouteHintText } from './style';
 import { AddUserModalProps } from './interface';
 
 const color = colors['light'];
 
+interface SmallBtnProps {
+  selected: boolean;
+}
+
+interface UserProps {
+  inactive: boolean;
+}
+
+const AddUserContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const AddUserHeaderContainer = styled.div`
+  display: flex;
+  padding: 1.875rem;
+  flex-direction: column;
+`;
+
+const AddUserHeader = styled.h2`
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 1.625rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  margin-bottom: 1.25rem;
+`;
+
+const SearchUserInput = styled.input`
+  padding: 0.9375rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #dde1e5;
+  background: #fff;
+  width: 100%;
+  color: #292c33;
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 400;
+
+  ::placeholder {
+    color: #8e969c;
+  }
+`;
+
+const UsersListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.875rem;
+  background-color: #f2f3f5;
+  height: 16rem;
+  overflow-y: auto;
+`;
+
+const UserContianer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+`;
+
+const UserInfo = styled.div<UserProps>`
+  display: flex;
+  align-items: center;
+  opacity: ${(p: any) => (p.inactive ? 0.3 : 1)};
+`;
+
+const UserImg = styled.img`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  margin-right: 0.63rem;
+  object-fit: cover;
+`;
+
+const Username = styled.p`
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1rem;
+  margin-bottom: 0;
+`;
+
+const SmallBtn = styled.button<SmallBtnProps>`
+  width: 5.375rem;
+  height: 2rem;
+  padding: 0.625rem;
+  border-radius: 0.375rem;
+  background: ${(p: any) => (p.selected ? '#618AFF' : '#dde1e5')};
+  color: ${(p: any) => (p.selected ? '#FFF' : '#5f6368')};
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 0rem; /* 0% */
+  letter-spacing: 0.00813rem;
+  border: none;
+`;
+
+const FooterContainer = styled.div`
+  display: flex;
+  padding: 1.125rem 1.875rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const AddUserBtn = styled.button`
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  border-radius: 0.375rem;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 0rem;
+  letter-spacing: 0.00938rem;
+  background: #618aff;
+  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);
+  border: none;
+  color: #fff;
+  &:disabled {
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(142, 150, 156, 0.85);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;
 const AddUserModal = (props: AddUserModalProps) => {
   const isMobile = useIsMobile();
-  const { isOpen, close, onSubmit, loading, disableFormButtons, setDisableFormButtons } = props;
-  const [displayHint, setDisplayHint] = useState(false);
-
-  const hintText = 'Route hint detected and removed';
-
-  const checkDisplayHint = (address: string) => {
-    if (address.includes(':')) {
-      setDisplayHint(true);
-    } else {
-      setDisplayHint(false);
-    }
-  };
+  const { isOpen, close, onSubmit, loading } = props;
+  const { main } = useStores();
+  const people: any = (main.people && main.people.filter((f: any) => !f.hide)) || [];
+  const [selectedPubkey, setSelectedPubkey] = useState<string>();
 
   const config = nonWidgetConfigs['organizationusers'];
 
-  const schema = [...config.schema];
+  function handleSelectUser(pubkey: string) {
+    setSelectedPubkey(pubkey);
+  }
 
-  const formRef = useRef(null);
-
-  const initValues = {
-    owner_pubkey: ''
-  };
+  function checkIsActive(pubkey: string) {
+    if (selectedPubkey && pubkey !== selectedPubkey) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   return (
     <Modal
@@ -51,7 +178,8 @@ const AddUserModal = (props: AddUserModalProps) => {
         zIndex: 20,
         ...(config?.modalStyle ?? {}),
         maxHeight: '100%',
-        borderRadius: '10px'
+        borderRadius: '10px',
+        minWidth: '22rem'
       }}
       overlayClick={close}
       bigCloseImage={close}
@@ -62,66 +190,36 @@ const AddUserModal = (props: AddUserModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <Formik
-        initialValues={initValues || {}}
-        onSubmit={onSubmit}
-        innerRef={formRef}
-        validationSchema={validator(schema)}
-      >
-        {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => (
-          <Wrap newDesign={true}>
-            <ModalTitle>Add new user</ModalTitle>
-            {displayHint && <RouteHintText>{hintText}</RouteHintText>}
-            <div className="SchemaInnerContainer">
-              {schema.map((item: FormField) => (
-                <Input
-                  {...item}
-                  key={item.name}
-                  values={values}
-                  errors={errors}
-                  value={values[item.name]}
-                  error={errors[item.name]}
-                  initialValues={initialValues}
-                  deleteErrors={() => {
-                    if (errors[item.name]) delete errors[item.name];
-                  }}
-                  handleChange={(e: any) => {
-                    checkDisplayHint(e);
-                    const pubkey = spliceOutPubkey(e);
-                    setFieldValue(item.name, pubkey);
-                  }}
-                  setFieldValue={(e: any, f: any) => {
-                    setFieldValue(e, f);
-                  }}
-                  setFieldTouched={setFieldTouched}
-                  handleBlur={() => setFieldTouched(item.name, false)}
-                  handleFocus={() => setFieldTouched(item.name, true)}
-                  setDisableFormButtons={setDisableFormButtons}
-                  borderType={'bottom'}
-                  imageIcon={true}
-                  style={
-                    item.name === 'github_description' && !values.ticket_url
-                      ? {
-                          display: 'none'
-                        }
-                      : undefined
-                  }
-                />
-              ))}
-              <Button
-                disabled={disableFormButtons || loading}
-                onClick={() => {
-                  handleSubmit();
-                }}
-                loading={loading}
-                style={{ width: '100%' }}
-                color={'primary'}
-                text={'Add user'}
-              />
-            </div>
-          </Wrap>
-        )}
-      </Formik>
+      <AddUserContainer>
+        <AddUserHeaderContainer>
+          <AddUserHeader>Add New User</AddUserHeader>
+          <SearchUserInput placeholder="Type to search ..." />
+        </AddUserHeaderContainer>
+        <UsersListContainer>
+          {people.map((person: any, index: number) => (
+            <UserContianer key={index}>
+              <UserInfo inactive={checkIsActive(person.owner_pubkey)}>
+                <UserImg src={person.img} alt="user" />
+                <Username>{person.owner_alias}</Username>
+              </UserInfo>
+              <SmallBtn
+                selected={person.owner_pubkey === selectedPubkey}
+                onClick={() => handleSelectUser(person.owner_pubkey)}
+              >
+                Add
+              </SmallBtn>
+            </UserContianer>
+          ))}
+        </UsersListContainer>
+        <FooterContainer>
+          <AddUserBtn
+            onClick={() => onSubmit({ owner_pubkey: selectedPubkey })}
+            disabled={!selectedPubkey}
+          >
+            {loading ? <EuiLoadingSpinner size="s" /> : 'Add User'}
+          </AddUserBtn>
+        </FooterContainer>
+      </AddUserContainer>
     </Modal>
   );
 };
