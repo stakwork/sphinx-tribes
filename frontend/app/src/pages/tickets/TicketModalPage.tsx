@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { matchPath, useHistory, useLocation, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import { PersonBounty } from 'store/main';
 
@@ -60,7 +60,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     setActiveBounty(bounty);
     setVisible(visible);
-  }, [bountyId, search]);
+  }, [bountyId, main, search]);
 
   useEffect(() => {
     getBounty();
@@ -68,8 +68,12 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
-    await main.getPeopleBounties({ page: 1, resetPage: true });
-    history.push('/bounties');
+    if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
+      await main.getPeopleBounties({ page: 1, resetPage: true });
+      history.push('/bounties');
+    } else {
+      history.goBack();
+    }
   };
 
   const prevArrHandler = () => {
