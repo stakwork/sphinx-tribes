@@ -248,7 +248,14 @@ function MobileView(props: CodingBountiesProps) {
 
         await main.makeBountyPayment(body);
       } else {
-        generateInvoice(price || 0);
+        return setToasts([
+          {
+            id: `${Math.random()}`,
+            title: 'Insufficient funds in the organization.',
+            color: 'danger',
+            toastLifeTimeMs: 10000
+          }
+        ]);
       }
     } else {
       generateInvoice(price || 0);
