@@ -78,6 +78,14 @@ export interface Person {
   bounty_expires?: number;
 }
 
+export interface OrganizationUser {
+  id: number;
+  owner_pubkey: string;
+  org_uuid: string;
+  created: string;
+  updated: string;
+}
+
 export interface PersonFlex {
   id?: number;
   unique_name?: string;
@@ -1884,6 +1892,27 @@ export class MainStore {
     } catch (e) {
       console.log('Error getOrganizationUsers', e);
       return [];
+    }
+  }
+
+  async getOrganizationUser(uuid: string): Promise<OrganizationUser | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/foruser/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const user = await r.json();
+      return user;
+    } catch (e) {
+      console.log('Error getOrganizationUser', e);
+      return undefined;
     }
   }
 
