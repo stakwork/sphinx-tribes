@@ -59,7 +59,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 
 		if orgName.Name == name {
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Organization name alreday exists")
+			json.NewEncoder(w).Encode("Organization name already exists")
 			return
 		} else {
 			org.Created = &now
