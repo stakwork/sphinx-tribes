@@ -27,6 +27,7 @@ func OrganizationRoutes() chi.Router {
 		r.Delete("/users/{uuid}", handlers.DeleteOrganizationUser)
 		r.Post("/users/role/{uuid}/{user}", handlers.AddUserRoles)
 
+		r.Get("/foruser/{uuid}", handlers.GetOrganizationUser)
 		r.Get("/bounty/roles", handlers.GetBountyRoles)
 		r.Get("/users/role/{uuid}/{user}", handlers.GetUserRoles)
 		r.Get("/budget/{uuid}", handlers.GetOrganizationBudget)
