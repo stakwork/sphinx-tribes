@@ -1,6 +1,6 @@
-import { userHasRole } from 'helpers';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStores } from 'store';
+import { OrganizationUser } from 'store/main';
 import styled from 'styled-components';
 
 const Button = styled.button`
@@ -21,22 +21,21 @@ const Button = styled.button`
 `;
 
 const ManageButton = (props: { user_pubkey: string; org: any; action: () => void }) => {
-  const [userRoles, setUserRoles] = useState<any[]>([]);
+  const [organizationUser, setOrganizationUser] = useState<OrganizationUser | undefined>();
   const { main, ui } = useStores();
 
   const { user_pubkey, org, action } = props;
 
   const isOrganizationAdmin = org?.owner_pubkey === ui.meInfo?.owner_pubkey;
+  const pubkey = organizationUser?.owner_pubkey;
+  const isUser = pubkey !== '' && ui.meInfo?.owner_pubkey === pubkey;
 
-  const hasAccess =
-    isOrganizationAdmin ||
-    userHasRole(main.bountyRoles, userRoles, 'ADD USER') ||
-    userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+  const hasAccess = isOrganizationAdmin || isUser;
 
   const getUserRoles = useCallback(async () => {
     try {
-      const userRoles = await main.getUserRoles(org.uuid, user_pubkey);
-      setUserRoles(userRoles);
+      const user = await main.getOrganizationUser(org.uuid);
+      setOrganizationUser(user);
     } catch (e) {
       console.error('User roles error', e);
     }
