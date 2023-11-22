@@ -40,6 +40,7 @@ import {
   ViewBudgetWrap,
   ViewBudgetTextWrap
 } from './organization/style';
+import AssignUserRoles from './organization/AssignUserRole';
 
 let interval;
 
@@ -68,6 +69,7 @@ const OrganizationDetails = (props: {
   const [toasts, setToasts]: any = useState([]);
   const [invoiceStatus, setInvoiceStatus] = useState(false);
   const { path, url } = useRouteMatch();
+  const [isOpenAssignRoles, setIsOpenAssignRoles] = useState<boolean>(false);
 
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
@@ -86,7 +88,7 @@ const OrganizationDetails = (props: {
   function addToast(title: string, color: 'danger' | 'success') {
     setToasts([
       {
-        id: '1',
+        id: `${Math.random()}`,
         title,
         color
       }
@@ -101,6 +103,7 @@ const OrganizationDetails = (props: {
     if (uuid) {
       const users = await main.getOrganizationUsers(uuid);
       setUsers(users);
+      return users;
     }
   }, [main, uuid]);
 
@@ -193,6 +196,10 @@ const OrganizationDetails = (props: {
     setIsOpenWithdrawBudget(false);
   };
 
+  const closeAssignRolesHandler = () => {
+    setIsOpenAssignRoles(false);
+  };
+
   const onSubmitUser = async (body: any) => {
     setIsLoading(true);
 
@@ -200,7 +207,13 @@ const OrganizationDetails = (props: {
 
     const res = await main.addOrganizationUser(body);
     if (res.status === 200) {
-      await getOrganizationUsers();
+      addToast('User added to organization successfully', 'success');
+      const recentUsers = await getOrganizationUsers();
+      const user = recentUsers?.filter((user: Person) => user.owner_pubkey === body.owner_pubkey);
+      if (user?.length === 1) {
+        setUser(user[0]);
+        setIsOpenAssignRoles(true);
+      }
     } else {
       addToast('Error: could not add user', 'danger');
     }
@@ -450,6 +463,17 @@ const OrganizationDetails = (props: {
             disableFormButtons={disableFormButtons}
             setDisableFormButtons={setDisableFormButtons}
             loading={loading}
+          />
+        )}
+        {isOpenAssignRoles && (
+          <AssignUserRoles
+            close={closeAssignRolesHandler}
+            isOpen={isOpenAssignRoles}
+            loading={loading}
+            onSubmit={submitRoles}
+            user={user}
+            setLoading={setIsLoading}
+            addToast={addToast}
           />
         )}
         {isOpenRoles && (

@@ -164,6 +164,45 @@ export type Roles =
 
 export const ManageBountiesGroup = ['ADD BOUNTY', 'UPDATE BOUNTY', 'DELETE BOUNTY', 'PAY BOUNTY'];
 
+export interface RolesCategory {
+  name: string;
+  roles: string[];
+  status: boolean;
+}
+
+export const s_RolesCategories = [
+  {
+    name: 'Manage organization',
+    roles: ['EDIT ORGANIZATION'],
+    status: false
+  },
+  {
+    name: 'Manage bounties',
+    roles: ManageBountiesGroup,
+    status: false
+  },
+  {
+    name: 'Fund organization',
+    roles: ['ADD BUDGET'],
+    status: false
+  },
+  {
+    name: 'Withdraw from organization',
+    roles: ['WITHDRAW BUDGET'],
+    status: false
+  },
+  {
+    name: 'View transaction history',
+    roles: ['VIEW REPORT'],
+    status: false
+  },
+  {
+    name: 'Update members',
+    roles: ['ADD USER', 'UPDATE USER', 'DELETE USER', 'ADD ROLES'],
+    status: false
+  }
+];
+
 export const userHasRole = (
   bountyRoles: any[],
   userRoles: any[],
