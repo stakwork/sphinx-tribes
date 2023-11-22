@@ -192,7 +192,7 @@ export default function Person(props: PersonProps) {
             <DTitle>{owner_alias}</DTitle>
             {description && (
               <DDescription>{description}</DDescription>
-            )}
+             )}
           </div>
         </div>
         <div>
