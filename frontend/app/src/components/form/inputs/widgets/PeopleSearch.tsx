@@ -146,7 +146,7 @@ const SearchOuterContainer = styled.div<styledProps>`
             object-fit: cover;
           }
           .PeopleName {
-            font-family: Barlow;
+            font-family: 'Barlow';
             font-style: normal;
             font-weight: 500;
             font-size: 13px;
@@ -162,7 +162,7 @@ const SearchOuterContainer = styled.div<styledProps>`
         justify-content: center;
         align-items: center;
         .no_result_text {
-          font-family: Barlow;
+          font-family: 'Barlow';
           font-size: 16px;
           font-weight: 600;
           color: ${(p: any) => p?.color && p?.color?.grayish.G50};
@@ -261,7 +261,7 @@ const InvitedButton = styled.div<styledProps>`
     background: ${(p: any) => p.color && p.color.button_secondary.active};
   }
   .nextText {
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-size: 13px;
     font-weight: 500;
     line-height: 15px;
@@ -291,7 +291,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
   const [initialPeopleCount, setInitialPeopleCount] = useState<number>(20);
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: boolean) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
-  const { main, ui } = useStores();
+  const { main } = useStores();
 
   const { ref, inView } = useInView({
     triggerOnce: false,

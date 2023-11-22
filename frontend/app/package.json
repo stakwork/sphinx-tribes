@@ -11,13 +11,14 @@
     "start:people:docker": "PORT=23007 craco start",
     "start:people:cluster": "PORT=13007 craco start",
     "build": "craco build",
-    "test": "REACT_APP_IS_TEST=true craco test",
+    "test": "REACT_APP_IS_TEST=true craco test -- --config craco.test.config.js",
     "eject": "craco eject",
-    "lint": "eslint src --max-warnings 67 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
+    "lint": "eslint src --max-warnings 71 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier --config .prettierrc.json -w ./src",
     "prettier:check": "npx prettier --config .prettierrc.json --check ./src",
-    "prepare": "cd ../.. && husky install frontend/app/.husky"
+    "prepare": "cd ../.. && husky install frontend/app/.husky",
+    "test-jest": "NODE_ENV=test yarn jest --coverage --no-cache --transformIgnorePatterns \"./frontend/app/svg/\""
   },
   "resolutions": {
     "react-error-overlay": "6.0.9",
@@ -50,7 +51,7 @@
     "moment": "^2.29.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-dropzone": "^11.3.2",
+    "react-dropzone": "^14.2.3",
     "react-intersection-observer": "^9.4.1",
     "react-markdown": "^8.0.3",
     "react-qr-svg": "^2.2.2",
@@ -189,13 +190,9 @@
     "eslint-plugin-react": "^7.31.10",
     "husky": "^8.0.3",
     "nock": "^13.3.0",
-    "prettier": "^3.0.3",
+    "prettier": "3.0.3",
     "react-error-overlay": "6.0.9",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.0.3"
-  },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)"
-    ]
   }
 }

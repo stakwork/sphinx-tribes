@@ -8,7 +8,7 @@ export const ModalTitle = styled.h3`
 export const CheckUl = styled.ul`
   list-style: none;
   padding: 0;
-  margin-top: 20px;
+  margin-bottom: 20px;
 `;
 
 export const CheckLi = styled.li`
@@ -45,15 +45,14 @@ export const Container = styled.div`
   width: 100%;
   min-height: 100%;
   background: white;
-  padding: 20px 0px;
-  padding-top: 0px;
   z-index: 100;
 `;
 
 export const HeadWrap = styled.div`
   display: flex;
   align-items: center;
-  padding: 25px 40px;
+  padding: 25px 10px;
+  padding-right: 40px;
   border-bottom: 1px solid #ebedef;
   @media only screen and (max-width: 800px) {
     padding: 15px 0px;
@@ -66,6 +65,7 @@ export const HeadWrap = styled.div`
     padding-bottom: 15px;
     flex-direction: column;
     align-items: start;
+    padding: 20px 30px;
   }
 `;
 
@@ -99,7 +99,8 @@ export const OrgImg = styled.img`
 export const OrgName = styled.h3`
   padding: 0px;
   margin: 0px;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
+  color: #3c3f41;
   margin-left: 25px;
   font-weight: 700;
   margin-left: 20px;
@@ -131,6 +132,8 @@ export const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
     margin-left: 0px;
     width: 100vw;
     margin-left: ${(p: any) => (p.forSmallScreen ? '50px' : '0px')};
+    flex-wrap: wrap;
+    display: flex;
   }
   @media only screen and (max-width: 470px) {
     gap: 6px;
@@ -140,27 +143,27 @@ export const HeadButtonWrap = styled.div<{ forSmallScreen: boolean }>`
 export const DetailsWrap = styled.div`
   width: 100%;
   min-height: 100%;
-  margin-top: 17px;
   padding: 0px 20px;
 `;
 
 export const ActionWrap = styled.div`
   display: flex;
   align-items: center;
-  padding: 25px 40px;
+  padding-right: 40px;
   border-bottom: 1px solid #ebedef;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
   @media only screen and (max-width: 700px) {
     padding: 25px 0px;
   }
   @media only screen and (max-width: 500px) {
     flex-direction: column;
     width: 100%;
-    padding: 25px 0px;
+    padding: 20px 30px;
   }
 `;
 
 export const BudgetWrap = styled.div`
-  padding: 25px 40px;
+  padding: 25px 60px;
   width: 55%;
   display: flex;
   flex-direction: column;
@@ -171,6 +174,7 @@ export const BudgetWrap = styled.div`
   @media only screen and (max-width: 500px) {
     width: 100%;
     padding: 20px 0px;
+    padding-top: 0;
   }
 `;
 
@@ -188,6 +192,13 @@ export const ViewBudgetWrap = styled.div`
   width: 100%;
 `;
 
+export const ViewBudgetTextWrap = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin-top: 12px;
+`;
+
 export const BudgetSmall = styled.h6`
   padding: 0px;
   font-size: 0.8rem;
@@ -199,13 +210,22 @@ export const BudgetSmall = styled.h6`
 
 export const BudgetSmallHead = styled.h6`
   padding: 0px;
-  font-size: 0.7rem;
+  font-size: 0.625rem;
   color: #8e969c;
+  margin: 0;
 `;
 
 export const Budget = styled.h4`
   color: #3c3f41;
-  font-size: 1.15rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+
+  &.budget-small {
+    border-left: 1px solid #ebedef;
+    padding-left: 22px;
+    margin-left: 22px;
+  }
+
   @media only screen and (max-width: 500px) {
     font-size: 1rem;
   }
@@ -213,6 +233,7 @@ export const Budget = styled.h4`
 
 export const Grey = styled.span`
   color: #8e969c;
+  font-weight: 400;
 `;
 
 export const NoBudgetText = styled.p`
@@ -227,7 +248,7 @@ export const NoBudgetText = styled.p`
 export const UserWrap = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 25px 40px;
+  background-color: rgb(240, 241, 243);
   @media only screen and (max-width: 700px) {
     width: 100%;
     padding: 20px 0px;
@@ -241,19 +262,22 @@ export const UsersHeadWrap = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid #ebedef;
-  padding-top: 5px;
-  padding-bottom: 20px;
+  padding: 20px 60px;
+  padding-right: 40px;
+  border-bottom: 1px solid #dde1e5;
   @media only screen and (max-width: 500px) {
     width: 100%;
+    padding: 0 30px;
+    padding-bottom: 20px;
   }
 `;
 
 export const UsersHeader = styled.h4`
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 700;
   padding: 0;
   margin: 0;
+  color: #3c3f41;
   @media only screen and (max-width: 500px) {
     font-size: 0.8rem;
     margin-right: 55%;
@@ -261,8 +285,13 @@ export const UsersHeader = styled.h4`
 `;
 
 export const UsersList = styled.div`
+  padding: 0 60px;
+  padding-right: 40px;
+  border-bottom: 1px solid #dde1e5;
+
   @media only screen and (max-width: 500px) {
     width: 100%;
+    padding: 0 30px;
   }
 `;
 
@@ -285,7 +314,6 @@ export const User = styled.div`
 
 export const UserDetails = styled.div`
   display: flex;
-  flex-gap: 12px;
   flex-direction: column;
   margin-left: 2%;
   width: 30%;
@@ -298,13 +326,14 @@ export const UserDetails = styled.div`
 export const UserName = styled.p`
   padding: 0px;
   margin: 0px;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   text-transform: capitalize;
-  font-weight: bold;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  color: #3c3f41;
 `;
 
 export const UserPubkey = styled.p`
@@ -324,6 +353,11 @@ export const UserAction = styled.div`
   margin-left: auto;
 `;
 
+export const ActionBtn = styled.button`
+  border: 0px;
+  padding: 0px;
+`;
+
 export const IconWrap = styled.div`
   :first-child {
     margin-right: 40px;
@@ -338,4 +372,149 @@ export const IconWrap = styled.div`
 
 export const HeadButton = styled(Button)`
   border-radius: 5px;
+`;
+
+export const ImgText = styled.h3`
+  color: #b0b7bc;
+  text-align: center;
+  font-family: 'Barlow';
+  font-size: 1.875rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.0625rem;
+  letter-spacing: 0.01875rem;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 0;
+`;
+
+export const ImgDashContainer = styled.div`
+  width: 8.875rem;
+  height: 8.875rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #d0d5d8;
+  padding: 0.5rem;
+  position: relative;
+`;
+
+export const UploadImageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.37756rem;
+  height: 2.37756rem;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+`;
+
+export const ImgContainer = styled.div`
+  width: 7.875rem;
+  height: 7.875rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ebedf1;
+`;
+
+export const SelectedImg = styled.img`
+  width: 7.875rem;
+  height: 7.875rem;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+export const ImgTextContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 1rem;
+`;
+
+export const InputFile = styled.input`
+  display: none;
+`;
+
+export const ImgInstructionText = styled.p`
+  color: #5f6368;
+  text-align: center;
+  font-family: 'Roboto';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.0625rem;
+  letter-spacing: 0.00813rem;
+  margin-bottom: 0;
+`;
+
+export const ImgInstructionSpan = styled.span`
+  color: #618aff;
+  cursor: pointer;
+`;
+
+export const ImgDetailInfo = styled.p`
+  color: #b0b7bc;
+  text-align: center;
+  font-family: 'Roboto';
+  font-size: 0.625rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.125rem;
+  margin-bottom: 0;
+  margin-top: 1rem;
+`;
+
+export const OrgInputContainer = styled.div`
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+  @media only screen and (max-width: 500px) {
+    width: 100%;
+    margin-top: 1rem;
+  }
+`;
+
+export const OrgLabel = styled.label`
+  color: #5f6368;
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 500;
+  /* line-height: 2.1875rem; */
+  margin-bottom: 0.75rem;
+`;
+
+export const OrgInput = styled.input`
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 2px solid #82b4ff;
+  outline: none;
+  caret-color: #618aff;
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 2.1875rem;
+  width: 100%;
+
+  ::placeholder {
+    color: #b0b7bc;
+    font-family: 'Barlow';
+    font-size: 0.9375rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 2.1875rem;
+  }
+`;
+export const RouteHintText = styled.p`
+  font-size: 0.9rem;
+  text-align: center;
+  color: #9157f6;
 `;

@@ -4,7 +4,7 @@ import { useStores } from 'store';
 import styled from 'styled-components';
 
 const OrganizationTextWrap = styled.div`
-  margin-left: 20px;
+  margin-left: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -18,9 +18,14 @@ const OrganizationTextWrap = styled.div`
 `;
 
 const OrganizationText = styled.p<{ hasAccess: boolean }>`
-  font-size: 1rem;
-  font-weight: bold;
+  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
+  font-family: 'Barlow';
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.1875rem; /* 95% */
   margin-bottom: ${(p: any) => (p.hasAccess ? '14px' : '0px')};
+  text-transform: capitalize;
   @media only screen and (max-width: 700px) {
     font-size: 0.85rem;
   }
@@ -34,6 +39,14 @@ const OrganizationText = styled.p<{ hasAccess: boolean }>`
 `;
 
 const OrganizationBudgetText = styled.small`
+  color: #5f6368;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 0.00938rem;
+  text-transform: uppercase;
   margin-top: auto;
   font-size: 0.9rem;
   @media only screen and (max-width: 700px) {
@@ -45,10 +58,14 @@ const OrganizationBudgetText = styled.small`
 `;
 
 const SatsGap = styled.span`
-  margin: 0px 10px;
+  margin: 0px 0.625rem;
   @media only screen and (max-width: 700px) {
-    margin: 0px 5px;
+    margin: 0px 0.3125rem;
   }
+`;
+
+const CurrencyUnit = styled.span`
+  color: #8e969c;
 `;
 
 const OrganizationBudget = (props: { user_pubkey: string; org: any }) => {
@@ -79,8 +96,11 @@ const OrganizationBudget = (props: { user_pubkey: string; org: any }) => {
       {hasAccess && (
         <OrganizationBudgetText>
           {DollarConverter(org.budget ?? 0)}
-          <SatsGap>/</SatsGap>
-          {satToUsd(org.budget ?? 0)} USD
+          <CurrencyUnit>
+            {' SAT'}
+            <SatsGap>/</SatsGap>
+            {satToUsd(org.budget ?? 0)} USD
+          </CurrencyUnit>
         </OrganizationBudgetText>
       )}
     </OrganizationTextWrap>

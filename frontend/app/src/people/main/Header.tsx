@@ -182,7 +182,7 @@ const GetSphinxsBtn = styled.button`
   font-size: 14px;
   line-height: 19px;
   color: #ffffff;
-  font-family: Barlow;
+  font-family: 'Barlow';
 
   &:hover {
     background: #5881f8;
@@ -322,7 +322,7 @@ function Header() {
   function goToEditSelf() {
     const path = location.pathname;
     if (ui.meInfo?.id) {
-      history.push(`/p/${ui.meInfo.owner_pubkey}/badges`);
+      history.push(`/p/${ui.meInfo.owner_pubkey}/organizations`);
       if (path.includes('/p')) {
         window.location.reload();
       }

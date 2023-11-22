@@ -83,7 +83,7 @@ export const PostModal: FC<PostModalProps> = observer(
               maxHeight: '100%',
               borderRadius: '10px'
             }}
-            overlayClick={closeHandler}
+            overlayClick={undefined}
             bigCloseImage={closeHandler}
             bigCloseImageStyle={{
               top: '-18px',

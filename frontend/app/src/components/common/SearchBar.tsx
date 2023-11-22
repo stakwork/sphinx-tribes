@@ -34,7 +34,7 @@ const Container = styled.div<InputProps>`
     padding-right: 30px;
     font-style: normal;
     font-weight: 500;
-    font-family: Barlow;
+    font-family: 'Barlow';
     font-size: 16px;
     line-height: 14px;
     height: 35px;

@@ -382,6 +382,7 @@ type Bounty struct {
 	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
 	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
 	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
+	PaidDate                *time.Time     `json:"paid_date,omitempty"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
@@ -434,6 +435,7 @@ type Organization struct {
 	Created     *time.Time `json:"created"`
 	Updated     *time.Time `json:"updated"`
 	Show        bool       `json:"show"`
+	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
 }
@@ -599,6 +601,43 @@ type PaymentDateRange struct {
 	StartDate   string      `json:"start_date"`
 	EndDate     string      `json:"end_date"`
 	PaymentType PaymentType `json:"payment_type,omitempty"`
+}
+
+type MemeChallenge struct {
+	Id        string `json:"id"`
+	Challenge string `json:"challenge"`
+}
+
+type SignerResponse struct {
+	Sig string `json:"sig"`
+}
+
+type RelaySignerResponse struct {
+	Success  bool           `json:"success"`
+	Response SignerResponse `json:"response"`
+}
+
+type MemeTokenSuccess struct {
+	Token string `json:"token"`
+}
+
+type Meme struct {
+	Muid        string      `json:"muid"`
+	OwnerPubKey string      `json:"owner_pub_key"`
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Price       int64       `json:"price"`
+	Tags        StringArray `json:"tags"`
+	Filename    string      `json:"filename"`
+	Ttl         int64       `json:"ttl"`
+	Size        int64       `json:"size"`
+	Mime        string      `json:"mime"`
+	Created     *time.Time  `json:"created"`
+	Updated     *time.Time  `json:"updates"`
+	Width       int         `json:"width"`
+	Height      int         `json:"height"`
+	Template    bool        `json:"template"`
+	Expiry      *time.Time  `json:"expiry"`
 }
 
 func (Person) TableName() string {

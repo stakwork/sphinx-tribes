@@ -56,10 +56,11 @@ func BuildSearchQuery(key string, term string) (string, string) {
 
 func BuildKeysendBodyData(amount uint, receiver_pubkey string, route_hint string) string {
 	var bodyData string
+	memoText := "memotext added for notification"
 	if route_hint != "" {
-		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "route_hint": "%s"}`, amount, receiver_pubkey, route_hint)
+		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "route_hint": "%s", "text": "%s"}`, amount, receiver_pubkey, route_hint, memoText)
 	} else {
-		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s"}`, amount, receiver_pubkey)
+		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "%s"}`, amount, receiver_pubkey, memoText)
 	}
 
 	return bodyData

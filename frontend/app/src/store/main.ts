@@ -78,6 +78,14 @@ export interface Person {
   bounty_expires?: number;
 }
 
+export interface OrganizationUser {
+  id: number;
+  owner_pubkey: string;
+  org_uuid: string;
+  created: string;
+  updated: string;
+}
+
 export interface PersonFlex {
   id?: number;
   unique_name?: string;
@@ -125,6 +133,8 @@ export interface PersonBounty {
   commitment_fee?: number;
 }
 
+export type OrgTransactionType = 'deposit' | 'payment' | 'withdraw';
+
 export interface PaymentHistory {
   id: number;
   bounty_id: number;
@@ -138,7 +148,7 @@ export interface PaymentHistory {
   receiver_img: string;
   created: string;
   updated: string;
-  payment_type: string;
+  payment_type: OrgTransactionType;
   status: boolean;
 }
 
@@ -204,6 +214,7 @@ export interface Organization {
   show: boolean;
   bounty_count?: number;
   budget?: number;
+  deleted?: boolean;
 }
 
 export interface BountyRoles {
@@ -926,6 +937,41 @@ export class MainStore {
   async getBountyById(id: number): Promise<PersonBounty[]> {
     try {
       const ps2 = await api.get(`gobounties/id/${id}`);
+      const ps3: any[] = [];
+
+      if (ps2 && ps2.length) {
+        for (let i = 0; i < ps2.length; i++) {
+          const bounty = { ...ps2[i].bounty };
+          let assignee;
+          let organization;
+          const owner = { ...ps2[i].owner };
+
+          if (bounty.assignee) {
+            assignee = { ...ps2[i].assignee };
+          }
+
+          if (bounty.org_uuid) {
+            organization = { ...ps2[i].organization };
+          }
+
+          ps3.push({
+            body: { ...bounty, assignee: assignee || '' },
+            person: { ...owner, wanteds: [] } || { wanteds: [] },
+            organization: { ...organization }
+          });
+        }
+      }
+
+      return ps3;
+    } catch (e) {
+      console.log('fetch failed getBountyById: ', e);
+      return [];
+    }
+  }
+
+  async getBountyByCreated(created: number): Promise<PersonBounty[]> {
+    try {
+      const ps2 = await api.get(`gobounties/created/${created}`);
       const ps3: any[] = [];
 
       if (ps2 && ps2.length) {
@@ -1716,6 +1762,49 @@ export class MainStore {
     }
   }
 
+  @action async getUserDropdownOrganizations(id: number): Promise<Organization[]> {
+    try {
+      const info = uiStore;
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return [];
+
+      const r: any = await fetch(`${TribesURL}/organizations/user/dropdown/${id}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      this.setDropDownOrganizations(data);
+      return await data;
+    } catch (e) {
+      console.log('Error getUserDropdownOrganizations', e);
+      return [];
+    }
+  }
+
+  async getUserOrganizationByUuid(uuid: string): Promise<Organization | undefined> {
+    try {
+      const info = uiStore;
+      if (!info.selectedPerson && !uiStore.meInfo?.id) return undefined;
+
+      const r: any = await fetch(`${TribesURL}/organizations/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await r.json();
+      return await data;
+    } catch (e) {
+      console.log('Error getOrganizationByUuid', e);
+      return undefined;
+    }
+  }
+
   @action async addOrganization(body: { name: string; img: string }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
@@ -1739,12 +1828,28 @@ export class MainStore {
     }
   }
 
+  async uploadFile(body: FormData): Promise<null | Response> {
+    if (!uiStore.meInfo) return null;
+    const info = uiStore.meInfo;
+    const r: any = await fetch(`${TribesURL}/meme_upload`, {
+      method: 'POST',
+      mode: 'cors',
+      body,
+      headers: {
+        'x-jwt': info.tribe_jwt
+      }
+    });
+
+    return r;
+  }
+
   async updateOrganization(body: Organization): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/organizations`, {
         method: 'POST',
+
         mode: 'cors',
         body: JSON.stringify({
           ...body
@@ -1787,6 +1892,27 @@ export class MainStore {
     } catch (e) {
       console.log('Error getOrganizationUsers', e);
       return [];
+    }
+  }
+
+  async getOrganizationUser(uuid: string): Promise<OrganizationUser | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/foruser/${uuid}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const user = await r.json();
+      return user;
+    } catch (e) {
+      console.log('Error getOrganizationUser', e);
+      return undefined;
     }
   }
 
@@ -2126,6 +2252,25 @@ export class MainStore {
       return r.json();
     } catch (e) {
       console.error('Error pollInvoice', e);
+    }
+  }
+
+  async organizationDelete(org_uuid: string): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return 0;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/organizations/delete/${org_uuid}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.error('organizationDelete', e);
     }
   }
 }
