@@ -11,7 +11,7 @@ import { useFuse, useScroll } from '../hooks';
 import { colors } from '../config/colors';
 import FadeLeft from '../components/animated/FadeLeft';
 import { useIsMobile } from '../hooks';
-import Form from '../components/form';
+import Form from '../components/form/bounty';
 import { botSchema } from '../components/form/schema';
 import Bot from './Bot';
 import BotView from './BotView';

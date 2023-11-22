@@ -74,6 +74,7 @@ func InitDB() {
 }
 
 const (
+	EditOrg        = "EDIT ORGANIZATION"
 	AddBounty      = "ADD BOUNTY"
 	UpdateBounty   = "UPDATE BOUNTY"
 	DeleteBounty   = "DELETE BOUNTY"
@@ -88,6 +89,9 @@ const (
 )
 
 var ConfigBountyRoles []BountyRoles = []BountyRoles{
+	{
+		Name: EditOrg,
+	},
 	{
 		Name: AddBounty,
 	},
@@ -122,6 +126,8 @@ var ConfigBountyRoles []BountyRoles = []BountyRoles{
 		Name: ViewReport,
 	},
 }
+
+var ManageBountiesGroup = []string{AddBounty, UpdateBounty, DeleteBounty, PayBounty}
 
 var Updatables = []string{
 	"name", "description", "tags", "img",
@@ -196,12 +202,12 @@ func RolesCheck(userRoles []UserRoles, check string) bool {
 	rolesMap := GetRolesMap()
 	userRolesMap := GetUserRolesMap(userRoles)
 
-	// check if roles exists in config
+	// check if roles exist in config
 	_, ok := rolesMap[check]
 	_, ok1 := userRolesMap[check]
 
-	// if any of the roles does not exists return false
-	// if any of the roles does not exists user roles return false
+	// if any of the roles does not exist, return false
+	// if any of the roles does not exist, user roles return false
 	if !ok {
 		return false
 	} else if !ok1 {
@@ -226,6 +232,27 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
 		hasRole = RolesCheck(userRoles, role)
 		return hasRole
+	}
+	return true
+}
+
+func UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
+	var manageRolesCount = len(ManageBountiesGroup)
+	org := DB.GetOrganizationByUuid(uuid)
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+
+		for _, role := range ManageBountiesGroup {
+			// check for the manage bounty roles
+			hasRole := RolesCheck(userRoles, role)
+			if hasRole {
+				manageRolesCount--
+			}
+		}
+
+		if manageRolesCount != 0 {
+			return false
+		}
 	}
 	return true
 }

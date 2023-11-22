@@ -20,7 +20,7 @@ const B = styled(EuiButton)<ButtonHoverProps>`
   border: none;
   font-weight: 500;
   font-size: 15px;
-  font-family: Barlow;
+  font-family: 'Barlow';
   line-height: 18px;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@ const T = styled(EuiButton)`
 
   font-weight: 500;
   font-size: 15px;
-  font-family: Barlow;
+  font-family: 'Barlow';
   line-height: 18px;
   display: flex;
   align-items: center;

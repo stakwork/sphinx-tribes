@@ -84,6 +84,15 @@ If you would like to enable Relay for invoice creation and keysend payment add t
     RELAY_AUTH_KEY=
 ```
 
+### Enable Meme Image Upload
+
+If you would like to enable Meme image upload for organization's add the meme env key and value to the .env file,
+Meme image upload works with Relay enabled, so a running Relay is required for Meme to work.
+
+```
+    MEME_URL=
+```
+
 ### For Contributions
 
 Read the contribution doc [here](./Contribution.md)

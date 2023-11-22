@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { Button } from 'components/common';
-import { BountyRoles, BudgetHistory, Organization, PaymentHistory, Person } from 'store/main';
+import { BountyRoles, Organization, PaymentHistory, Person } from 'store/main';
 import MaterialIcon from '@material/react-material-icon';
 import { Route, Router, Switch, useRouteMatch } from 'react-router-dom';
 import { satToUsd, userHasRole } from 'helpers';
@@ -12,15 +12,15 @@ import avatarIcon from '../../public/static/profile_avatar.svg';
 import DeleteTicketModal from './DeleteModal';
 import RolesModal from './organization/RolesModal';
 import HistoryModal from './organization/HistoryModal';
-import BudgetHistoryModal from './organization/BudgetHistoryModal';
 import AddUserModal from './organization/AddUserModal';
 import AddBudgetModal from './organization/AddBudgetModal';
 import WithdrawBudgetModal from './organization/WithdrawBudgetModal';
+import EditOrgModal from './organization/EditOrgModal';
+import Users from './organization/UsersList';
 
 import {
   ActionWrap,
   Budget,
-  BudgetSmall,
   BudgetSmallHead,
   BudgetWrap,
   Container,
@@ -30,35 +30,34 @@ import {
   HeadButtonWrap,
   HeadNameWrap,
   HeadWrap,
-  IconWrap,
   NoBudgetText,
   NoBudgetWrap,
   OrgImg,
   OrgName,
-  User,
-  UserAction,
-  UserDetails,
-  UserImage,
-  UserName,
-  UserPubkey,
   UserWrap,
   UsersHeadWrap,
   UsersHeader,
-  UsersList,
-  ViewBudgetWrap
+  ViewBudgetWrap,
+  ViewBudgetTextWrap
 } from './organization/style';
 
 let interval;
 
-const OrganizationDetails = (props: { close: () => void; org: Organization | undefined }) => {
-  const [loading, setIsLoading] = useState<boolean>(false);
-
+const OrganizationDetails = (props: {
+  close: () => void;
+  org: Organization | undefined;
+  resetOrg: (Organization) => void;
+  getOrganizations: () => Promise<void>;
+}) => {
   const { main, ui } = useStores();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const [loading, setIsLoading] = useState<boolean>(false);
+  const [isOpenAddUser, setIsOpenAddUser] = useState<boolean>(false);
   const [isOpenRoles, setIsOpenRoles] = useState<boolean>(false);
   const [isOpenBudget, setIsOpenBudget] = useState<boolean>(false);
   const [isOpenWithdrawBudget, setIsOpenWithdrawBudget] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
+  const [isOpenEditOrg, setIsOpenEditOrg] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [orgBudget, setOrgBudget] = useState<number>(0);
   const [paymentsHistory, setPaymentsHistory] = useState<PaymentHistory[]>([]);
@@ -66,27 +65,22 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   const [users, setUsers] = useState<Person[]>([]);
   const [user, setUser] = useState<Person>();
   const [userRoles, setUserRoles] = useState<any[]>([]);
-  const [bountyRolesData, setBountyRolesData] = useState<BountyRoles[]>([]);
   const [toasts, setToasts]: any = useState([]);
   const [invoiceStatus, setInvoiceStatus] = useState(false);
   const { path, url } = useRouteMatch();
 
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
-  const addUserDisabled =
+  const editOrgDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
   const viewReportDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
   const addBudgetDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD BUDGET');
-  const deleteUserDisabled =
-    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'DELETE USER');
-  const addRolesDisabled =
-    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD ROLES');
   const addWithdrawDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'WITHDRAW BUDGET');
 
-  const { org } = props;
+  const { org, close, getOrganizations } = props;
   const uuid = org?.uuid || '';
 
   function addToast(title: string, color: 'danger' | 'success') {
@@ -135,40 +129,38 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     closeDeleteModal();
   };
 
-  const getBountyRoles = useCallback(async () => {
-    const bountyRolesData = main.bountyRoles.map((role: any) => ({
-      name: role.name,
-      status: false
-    }));
-    setBountyRolesData(bountyRolesData);
-  }, [main.bountyRoles]);
-
-  const getUserRoles = async (user: any) => {
-    if (uuid && user.owner_pubkey) {
-      const userRoles = await main.getUserRoles(uuid, user.owner_pubkey);
-      setUserRoles(userRoles);
-
-      // set all values to false, so every user data will be fresh
-      const rolesData = bountyRolesData.map((data: any) => ({ name: data.name, status: false }));
-
-      userRoles.forEach((userRole: any) => {
-        const index = rolesData.findIndex((role: any) => role.name === userRole.role);
-        rolesData[index]['status'] = true;
-      });
-
-      setBountyRolesData(rolesData);
-    }
-  };
+  const getUserRoles = useCallback(
+    async (user: any) => {
+      const pubkey = user.owner_pubkey;
+      if (uuid && pubkey) {
+        const userRoles = await await main.getUserRoles(uuid, pubkey);
+        setUserRoles(userRoles);
+      }
+    },
+    [uuid, main]
+  );
 
   const getOrganizationBudget = useCallback(async () => {
-    const organizationBudget = await main.getOrganizationBudget(uuid);
-    setOrgBudget(organizationBudget.total_budget);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const organizationBudget = await main.getOrganizationBudget(uuid);
+      setOrgBudget(organizationBudget.total_budget);
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const getPaymentsHistory = useCallback(async () => {
-    const paymentHistories = await main.getPaymentHistories(uuid, 1, 20);
-    setPaymentsHistory(paymentHistories);
-  }, [main, uuid]);
+    if (!viewReportDisabled) {
+      const paymentHistories = await main.getPaymentHistories(uuid, 1, 2000);
+      if (Array.isArray(paymentHistories)) {
+        const payments = paymentHistories.map((history: PaymentHistory) => {
+          if (!history.payment_type) {
+            history.payment_type = 'payment';
+          }
+          return history;
+        });
+        setPaymentsHistory(payments);
+      }
+    }
+  }, [main, uuid, viewReportDisabled]);
 
   const handleSettingsClick = async (user: any) => {
     setUser(user);
@@ -181,8 +173,8 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setShowDeleteModal(true);
   };
 
-  const closeHandler = () => {
-    setIsOpen(false);
+  const closeAddUserHandler = () => {
+    setIsOpenAddUser(false);
   };
 
   const closeRolesHandler = () => {
@@ -201,7 +193,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     setIsOpenWithdrawBudget(false);
   };
 
-  const onSubmit = async (body: any) => {
+  const onSubmitUser = async (body: any) => {
     setIsLoading(true);
 
     body.org_uuid = uuid;
@@ -212,23 +204,25 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
     } else {
       addToast('Error: could not add user', 'danger');
     }
-    closeHandler();
+    closeAddUserHandler();
     setIsLoading(false);
   };
 
-  const roleChange = (e: any) => {
-    const rolesData = bountyRolesData.map((role: any) => {
-      if (role.name === e.target.value) {
-        role.status = !role.status;
+  const onDeleteOrg = async () => {
+    const res = await main.organizationDelete(uuid);
+    if (res.status === 200) {
+      addToast('Deleted organization', 'success');
+      if (ui.meInfo) {
+        getOrganizations();
+        close();
       }
-      return role;
-    });
-
-    setBountyRolesData(rolesData);
+    } else {
+      addToast('Error: could not delete organization', 'danger');
+    }
   };
 
-  const submitRoles = async () => {
-    const roleData = bountyRolesData
+  const submitRoles = async (bountyRoles: BountyRoles[]) => {
+    const roleData = bountyRoles
       .filter((r: any) => r.status)
       .map((role: any) => ({
         owner_pubkey: user?.owner_pubkey,
@@ -248,9 +242,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
   };
 
   const successAction = () => {
-    addToast('Budget was added successfully', 'success');
-    closeBudgetHandler();
-
     setInvoiceStatus(true);
     main.setBudgetInvoice('');
 
@@ -265,7 +256,6 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       try {
         await main.pollOrgBudgetInvoices(uuid);
         getOrganizationBudget();
-        getPaymentsHistory();
 
         const count = await main.organizationInvoiceCount(uuid);
         if (count === 0) {
@@ -273,7 +263,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         }
 
         i++;
-        if (i > 10) {
+        if (i > 5) {
           if (interval) clearInterval(interval);
         }
       } catch (e) {
@@ -314,10 +304,12 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
 
   useEffect(() => {
     getOrganizationUsers();
-    getBountyRoles();
     getOrganizationBudget();
     getPaymentsHistory();
-  }, [getOrganizationUsers, getBountyRoles, getOrganizationBudget, getPaymentsHistory]);
+    if (uuid && ui.meInfo) {
+      getUserRoles(ui.meInfo);
+    }
+  }, [getOrganizationUsers, getOrganizationBudget, getPaymentsHistory, getUserRoles]);
 
   return (
     <Container>
@@ -335,7 +327,13 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <OrgName>{org?.name}</OrgName>
         </HeadNameWrap>
         <HeadButtonWrap forSmallScreen={false}>
-          <HeadButton text="Edit" disabled={true} color="white" style={{ borderRadius: '5px' }} />
+          <HeadButton
+            text="Edit"
+            color="white"
+            disabled={editOrgDisabled}
+            onClick={() => setIsOpenEditOrg(true)}
+            style={{ borderRadius: '5px' }}
+          />
           <Button
             disabled={!org?.bounty_count}
             text="View Bounties"
@@ -366,10 +364,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           ) : (
             <ViewBudgetWrap>
               <BudgetSmallHead>YOUR BALANCE</BudgetSmallHead>
-              <Budget>
-                {orgBudget.toLocaleString()} <Grey>SATS</Grey>
-              </Budget>
-              <BudgetSmall>{satToUsd(orgBudget)} USD</BudgetSmall>
+              <ViewBudgetTextWrap>
+                <Budget>
+                  {orgBudget ? orgBudget.toLocaleString() : 0} <Grey>SATS</Grey>
+                </Budget>
+                <Budget className="budget-small">
+                  {satToUsd(orgBudget)} <Grey>USD</Grey>
+                </Budget>
+              </ViewBudgetTextWrap>
             </ViewBudgetWrap>
           )}
         </BudgetWrap>
@@ -384,14 +386,14 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
           <Button
             disabled={addWithdrawDisabled}
             text="Withdraw"
-            color="white"
+            color="withdraw"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenWithdrawBudget(true)}
           />
           <Button
             disabled={addBudgetDisabled}
             text="Deposit"
-            color="white"
+            color="success"
             style={{ borderRadius: '5px' }}
             onClick={() => setIsOpenBudget(true)}
           />
@@ -399,61 +401,38 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
       </ActionWrap>
       <UserWrap>
         <UsersHeadWrap>
-          <UsersHeader>USERS</UsersHeader>
+          <UsersHeader>Users</UsersHeader>
           <HeadButtonWrap forSmallScreen={false}>
             <Button
-              disabled={addUserDisabled}
+              disabled={editOrgDisabled}
               text="Add User"
               color="white"
               style={{
                 borderRadius: '5px'
               }}
-              onClick={() => setIsOpen(true)}
+              onClick={() => setIsOpenAddUser(true)}
             />
           </HeadButtonWrap>
         </UsersHeadWrap>
-        <UsersList>
-          {users.map((user: Person, i: number) => (
-            <User key={i}>
-              <UserImage src={user.img || avatarIcon} />
-              <UserDetails>
-                <UserName>{user.unique_name}</UserName>
-                <UserPubkey>{user.owner_pubkey}</UserPubkey>
-              </UserDetails>
-              <UserAction>
-                <IconWrap>
-                  <MaterialIcon
-                    disabled={addRolesDisabled}
-                    icon={'settings'}
-                    style={{
-                      fontSize: 24,
-                      cursor: 'pointer',
-                      color: '#ccc'
-                    }}
-                    onClick={() => handleSettingsClick(user)}
-                  />
-                </IconWrap>
-                <IconWrap>
-                  <MaterialIcon
-                    icon={'delete'}
-                    disabled={deleteUserDisabled}
-                    style={{
-                      fontSize: 24,
-                      cursor: 'pointer',
-                      color: '#ccc'
-                    }}
-                    onClick={() => {
-                      setUser(user);
-                      handleDeleteClick(user);
-                    }}
-                  />
-                </IconWrap>
-              </UserAction>
-            </User>
-          ))}
-        </UsersList>
+        <Users
+          org={org}
+          handleDeleteClick={handleDeleteClick}
+          handleSettingsClick={handleSettingsClick}
+          userRoles={userRoles}
+          users={users}
+        />
       </UserWrap>
       <DetailsWrap>
+        {isOpenEditOrg && (
+          <EditOrgModal
+            isOpen={isOpenEditOrg}
+            close={() => setIsOpenEditOrg(false)}
+            onDelete={onDeleteOrg}
+            org={org}
+            resetOrg={props.resetOrg}
+            addToast={addToast}
+          />
+        )}
         {showDeleteModal && (
           <DeleteTicketModal
             closeModal={closeDeleteModal}
@@ -463,11 +442,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             userDelete={true}
           />
         )}
-        {isOpen && (
+        {isOpenAddUser && (
           <AddUserModal
-            isOpen={isOpen}
-            close={closeHandler}
-            onSubmit={onSubmit}
+            isOpen={isOpenAddUser}
+            close={closeAddUserHandler}
+            onSubmit={onSubmitUser}
             disableFormButtons={disableFormButtons}
             setDisableFormButtons={setDisableFormButtons}
             loading={loading}
@@ -475,14 +454,11 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
         )}
         {isOpenRoles && (
           <RolesModal
-            userRoles={userRoles}
-            bountyRolesData={bountyRolesData}
             uuid={uuid}
             user={user}
             addToast={addToast}
             close={closeRolesHandler}
             isOpen={isOpenRoles}
-            roleChange={roleChange}
             submitRoles={submitRoles}
           />
         )}
@@ -493,6 +469,7 @@ const OrganizationDetails = (props: { close: () => void; org: Organization | und
             uuid={uuid}
             invoiceStatus={invoiceStatus}
             startPolling={startPolling}
+            setInvoiceStatus={setInvoiceStatus}
           />
         )}
         {isOpenHistory && (

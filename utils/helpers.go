@@ -43,7 +43,7 @@ func ConvertStringToInt(number string) (int, error) {
 func GetInvoiceAmount(paymentRequest string) uint {
 	decodedInvoice, err := decodepay.Decodepay(paymentRequest)
 
-	if err == nil {
+	if err != nil {
 		fmt.Println("Could not Decode Invoice", err)
 		return 0
 	}

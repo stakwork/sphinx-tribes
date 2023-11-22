@@ -41,6 +41,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="/org/bounties/:uuid">
           <TicketsPage />
         </Route>
+        <Route path="/org/bounty/:bountyId">
+          <TicketsPage />
+        </Route>
         <Route path="/leaderboard">
           <LeaderboardPage />
         </Route>

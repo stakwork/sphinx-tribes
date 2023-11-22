@@ -1,33 +1,28 @@
 /* eslint-disable @typescript-eslint/typedef */
-import lighningDecoder from 'light-bolt11-decoder';
+import LighningDecoder from 'light-bolt11-decoder';
 import { getHost } from '../config/host';
-import { uiStore } from '../store/ui';
 
 export const formatPrice = (amount = 0) => amount;
-
-export const satToUsd = (amount = 0) => {
-  if (!amount) amount = 0;
-  const satExchange = uiStore.usdToSatsExchangeRate ?? 0;
-  const returnValue = (amount / satExchange).toFixed(2);
-
-  if (returnValue === 'Infinity' || isNaN(parseFloat(returnValue))) {
-    return '. . .';
-  }
-
-  return returnValue;
-};
 
 export const formatSatPrice = (amount = 0) => {
   const dollarUSLocale = Intl.NumberFormat('en-US');
   return dollarUSLocale.format(amount);
 };
 
-export const getOriginalNumberValue = (formattedValue: string) => {
-  // Remove formatting (commas) from the formatted value
-  if (formattedValue) {
-    const unformattedValue = formattedValue.replace(/,/g, '');
-    return Number(unformattedValue);
+export const convertToLocaleString = (value: number): string => {
+  if (value) {
+    const formattedValue = Number(value).toLocaleString();
+    return formattedValue;
+  } else {
+    return '0';
   }
+};
+
+export const convertLocaleToNumber = (localeString: string): number => {
+  const numString = localeString.replace(/\D/g, '');
+
+  const num = parseInt(numString);
+  return num;
 };
 
 export const DollarConverter = (e: any) => {
@@ -103,7 +98,7 @@ export const sendToRedirect = (url: string) => {
 
 export const calculateTimeLeft = (
   timeLimit: Date,
-  type: 'minutes' | 'days'
+  type: 'minutes' | 'days' | 'hours'
 ): {
   days?: number;
   hours?: number;
@@ -121,6 +116,14 @@ export const calculateTimeLeft = (
       hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
       minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
       seconds: Math.floor((difference % (1000 * 60)) / 1000)
+    };
+  } else if (difference > 0 && type === 'hours') {
+    const timeInSecs = Math.floor(difference / 1000);
+
+    timeLeft = {
+      hours: Math.floor(timeInSecs / 3600),
+      minutes: Math.floor((timeInSecs % 3600) / 60),
+      seconds: Math.floor((timeInSecs % 3600) % 60)
     };
   } else {
     timeLeft = {
@@ -146,6 +149,7 @@ export const formatRelayPerson = (person: any): any => ({
 });
 
 export type Roles =
+  | 'EDIT ORGANIZATION'
   | 'ADD BOUNTY'
   | 'UPDATE BOUNTY'
   | 'DELETE BOUNTY'
@@ -158,7 +162,13 @@ export type Roles =
   | 'WITHDRAW BUDGET'
   | 'VIEW REPORT';
 
-export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): boolean => {
+export const ManageBountiesGroup = ['ADD BOUNTY', 'UPDATE BOUNTY', 'DELETE BOUNTY', 'PAY BOUNTY'];
+
+export const userHasRole = (
+  bountyRoles: any[],
+  userRoles: any[],
+  role: Roles | string
+): boolean => {
   if (bountyRoles.length) {
     const bountyRolesMap = {};
     const userRolesMap = {};
@@ -180,6 +190,22 @@ export const userHasRole = (bountyRoles: any[], userRoles: any[], role: Roles): 
   return false;
 };
 
+export const userHasManageBountyRoles = (bountyRoles: any[], userRoles: any[]): boolean => {
+  let manageLength = ManageBountiesGroup.length;
+  if (bountyRoles.length) {
+    ManageBountiesGroup.forEach((role: string) => {
+      const hasRole = userHasRole(bountyRoles, userRoles, role);
+      if (hasRole) {
+        manageLength--;
+      }
+    });
+  }
+  if (manageLength !== 0) {
+    return false;
+  }
+  return true;
+};
+
 export const toCapitalize = (word: string): string => {
   if (!word.length) return word;
 
@@ -192,7 +218,7 @@ export const toCapitalize = (word: string): string => {
 
 export const isInvoiceExpired = (paymentRequest: string): boolean => {
   // decode invoice to see if it has expired
-  const decoded = lighningDecoder.decode(paymentRequest);
+  const decoded = LighningDecoder.decode(paymentRequest);
   const invoiceTimestamp = decoded.sections[4].value;
   const expiry = decoded.sections[8].value;
   const expired = invoiceTimestamp + expiry;
@@ -201,4 +227,15 @@ export const isInvoiceExpired = (paymentRequest: string): boolean => {
     return false;
   }
   return true;
+};
+
+export const spliceOutPubkey = (userAddress: string): string => {
+  if (userAddress.includes(':')) {
+    const addArray = userAddress.split(':');
+    const pubkey = addArray[0];
+
+    return pubkey;
+  }
+
+  return userAddress;
 };

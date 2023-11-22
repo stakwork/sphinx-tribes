@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
-import Form from '../../../components/form';
+import Form from '../../../components/form/bounty';
 import { sendBadgeSchema } from '../../../components/form/schema';
 import { useIsMobile } from '../../../hooks';
 import { Button } from '../../../components/common';
@@ -53,8 +53,8 @@ function WantedSummary(props: WantedSummaryProps) {
     org_uuid,
     id
   } = props;
-
   const titleString = one_sentence_summary || title || '';
+  const bountyPath = `/bounty/${id}`;
 
   const isMobile = useIsMobile();
   const { main, ui } = useStores();
@@ -154,7 +154,7 @@ function WantedSummary(props: WantedSummaryProps) {
         created: created
       };
 
-      formSubmit && formSubmit(newValue);
+      formSubmit && formSubmit(newValue, true);
     },
     [
       coding_languages,
@@ -192,7 +192,7 @@ function WantedSummary(props: WantedSummaryProps) {
       type: type,
       created: created
     };
-    formSubmit && formSubmit(newValue, false);
+    formSubmit && formSubmit(newValue, true);
   }, [
     coding_languages,
     created,
@@ -334,38 +334,15 @@ function WantedSummary(props: WantedSummaryProps) {
     }
   }
 
-  const handleCopyUrl = useCallback(() => {
-    const el = document.createElement('input');
-    let locationUrl = window.location.href;
-    if (locationUrl.includes('wanted')) {
-      const pathArray = window.location.pathname.split('/');
-      if (pathArray.length > 4) {
-        locationUrl = `${window.location.origin}/bounty/${pathArray[4]}`;
-      }
-    }
-    el.value = locationUrl;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(`${window.location.origin}${bountyPath}`);
     setIsCopied(true);
-  }, []);
 
-  const handleCopyUrlProfilePage = useCallback(() => {
-    const { location } = window;
-    const { host } = location;
-    // eslint-disable-next-line prefer-destructuring
-    const id = location.href.split('/')[6];
-
-    const el = document.createElement('input');
-    el.value = `${host}/bounty/${id}`;
-    document.body.appendChild(el);
-    el.select();
-
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    setIsCopied(true);
-  }, []);
+    setTimeout(() => {
+      // UI Enhancement: Show "Copied" for 3 seconds, then reset
+      setIsCopied(false);
+    }, 3000);
+  };
 
   async function sendBadge(body: any) {
     const { recipient, badge } = body;
@@ -550,19 +527,7 @@ function WantedSummary(props: WantedSummaryProps) {
         );
       }
     }
-
     if (isMobile) {
-      let handleCopy;
-
-      handleCopy = handleCopyUrlProfilePage;
-
-      const { location } = window;
-      const { href } = location;
-
-      if (href.includes('tickets')) {
-        handleCopy = handleCopyUrl;
-      }
-
       return (
         <CodingMobile
           {...props}
@@ -571,7 +536,7 @@ function WantedSummary(props: WantedSummaryProps) {
           assigneeLabel={assigneeLabel}
           actionButtons={actionButtons}
           // status={status}
-          handleCopyUrl={handleCopy}
+          handleCopyUrl={handleCopyUrl}
           isCopied={isCopied}
           titleString={titleString}
         />
@@ -639,7 +604,6 @@ function WantedSummary(props: WantedSummaryProps) {
           assignee={assignee}
           loomEmbedUrl={loomEmbedUrl}
           titleString={titleString}
-          handleCopyUrl={handleCopyUrlProfilePage}
           isCopied={isCopied}
         />
       </div>

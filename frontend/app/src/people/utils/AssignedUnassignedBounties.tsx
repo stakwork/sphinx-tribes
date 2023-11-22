@@ -26,7 +26,7 @@ const BountyContainer = styled.div<containerProps>`
   display: flex;
   flex-direction: row;
   width: 1100px !important;
-  font-family: Barlow;
+  font-family: 'Barlow';
   min-height: 160px;
   max-height: auto;
   background: transparent;
@@ -100,7 +100,7 @@ const UnassignedPersonProfile = styled.div<containerProps>`
   .ProfileText {
     font-size: 15px;
     font-weight: 500;
-    font-family: Barlow;
+    font-family: 'Barlow';
     color: ${(p: any) => (p.grayish_G200 ? p.grayish_G200 : '')};
     margin-bottom: -13px;
     line-height: 18px;

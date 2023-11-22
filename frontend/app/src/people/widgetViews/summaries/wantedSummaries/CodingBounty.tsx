@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
-import { calculateTimeLeft, isInvoiceExpired } from 'helpers';
+import { isInvoiceExpired, userHasManageBountyRoles, userHasRole } from 'helpers';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
@@ -37,8 +37,7 @@ import {
   TitleBox,
   CodingLabels,
   AutoCompleteContainer,
-  AwardBottomContainer,
-  BountyTime
+  AwardBottomContainer
 } from './style';
 import { getTwitterLink } from './lib';
 
@@ -90,8 +89,6 @@ function MobileView(props: CodingBountiesProps) {
     createdURL,
     created,
     loomEmbedUrl,
-    bounty_expires,
-    commitment_fee,
     org_uuid,
     id,
     localPaid,
@@ -105,6 +102,10 @@ function MobileView(props: CodingBountiesProps) {
   const [lnInvoice, setLnInvoice] = useState('');
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
+  const [userBountyRole, setUserBountyRole] = useState(false);
+  const [canEdit, setCanEdit] = useState(true);
+
+  const userPubkey = ui.meInfo?.owner_pubkey;
 
   let bountyPaid = paid || invoiceStatus || keysendStatus;
 
@@ -114,12 +115,10 @@ function MobileView(props: CodingBountiesProps) {
     bountyPaid = false;
   }
 
-  const pollMinutes = 2;
+  const showPayBounty =
+    !bountyPaid && !invoiceStatus && assignee && assignee.owner_alias.length < 30;
 
-  const bountyExpired = !bounty_expires
-    ? false
-    : Date.now() > new Date(bounty_expires || '').getTime();
-  const bountyTimeLeft = calculateTimeLeft(new Date(bounty_expires ?? ''), 'days');
+  const pollMinutes = 2;
 
   const addToast = (type: string) => {
     switch (type) {
@@ -228,9 +227,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const makePayment = async () => {
     // If the bounty has a commitment fee, add the fee to the user payment
-    const price = Number(
-      commitment_fee && props.price ? commitment_fee + props.price : props?.price
-    );
+    const price = Number(props.price);
     // if there is an organization and the organization's
     // buudget is sufficient keysend to the user immediately
     // without generating an invoice, else generate an invoice
@@ -248,22 +245,17 @@ function MobileView(props: CodingBountiesProps) {
 
         await main.makeBountyPayment(body);
       } else {
-        generateInvoice(price || 0);
+        return setToasts([
+          {
+            id: `${Math.random()}`,
+            title: 'Insufficient funds in the organization.',
+            color: 'danger',
+            toastLifeTimeMs: 10000
+          }
+        ]);
       }
     } else {
       generateInvoice(price || 0);
-    }
-  };
-
-  const removeBountyAssignee = async () => {
-    const data = await main.deleteBountyAssignee({
-      owner_pubkey: person.owner_pubkey,
-      created: created ? created?.toString() : ''
-    });
-
-    if (data) {
-      // get new wanted list
-      main.getPeopleBounties({ page: 1, resetPage: true });
     }
   };
 
@@ -345,11 +337,38 @@ function MobileView(props: CodingBountiesProps) {
     };
   }, []);
 
+  const getOrganization = useCallback(async () => {
+    if (org_uuid && userPubkey) {
+      const userRoles = await main.getUserRoles(org_uuid, userPubkey);
+      const organization = await main.getUserOrganizationByUuid(org_uuid);
+      if (organization) {
+        const isOrganizationAdmin = organization.owner_pubkey === userPubkey;
+        const userAccess =
+          userHasManageBountyRoles(main.bountyRoles, userRoles) &&
+          userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+        const canPayBounty = isOrganizationAdmin || userAccess;
+        if (!isOrganizationAdmin) {
+          setCanEdit(false);
+        }
+        setUserBountyRole(canPayBounty);
+      }
+    }
+  }, [main, org_uuid, userPubkey]);
+
+  useEffect(() => {
+    getOrganization();
+  }, [getOrganization]);
+
+  const isOwner =
+    { ...person }?.owner_alias &&
+    ui.meInfo?.owner_alias &&
+    { ...person }?.owner_alias === ui.meInfo?.owner_alias;
+  const hasAccess = isOwner || userBountyRole;
+  const payBountyDisable = !isOwner && !userBountyRole;
+
   return (
     <div>
-      {{ ...person }?.owner_alias &&
-      ui.meInfo?.owner_alias &&
-      { ...person }?.owner_alias === ui.meInfo?.owner_alias ? (
+      {hasAccess ? (
         /*
          * creator view
          */
@@ -434,33 +453,35 @@ function MobileView(props: CodingBountiesProps) {
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
-                      <div className="CreatorDescriptionExtraButton">
-                        <ImageButton
-                          buttonText={'Edit'}
-                          ButtonContainerStyle={{
-                            width: '117px',
-                            height: '40px'
-                          }}
-                          leadingImageSrc={'/static/editIcon.svg'}
-                          leadingImageContainerStyle={{
-                            left: 320
-                          }}
-                          buttonAction={props?.editAction}
-                        />
-                        <ImageButton
-                          buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
-                          ButtonContainerStyle={{
-                            width: '117px',
-                            height: '40px'
-                          }}
-                          leadingImageSrc={'/static/Delete.svg'}
-                          leadingImageContainerStyle={{
-                            left: 450
-                          }}
-                          disabled={!props?.deleteAction}
-                          buttonAction={props?.deleteAction}
-                        />
-                      </div>
+                      {!bountyPaid && canEdit && (
+                        <div className="CreatorDescriptionExtraButton">
+                          <ImageButton
+                            buttonText={'Edit'}
+                            ButtonContainerStyle={{
+                              width: '117px',
+                              height: '40px'
+                            }}
+                            leadingImageSrc={'/static/editIcon.svg'}
+                            leadingImageContainerStyle={{
+                              left: 320
+                            }}
+                            buttonAction={props?.editAction}
+                          />
+                          <ImageButton
+                            buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
+                            ButtonContainerStyle={{
+                              width: '117px',
+                              height: '40px'
+                            }}
+                            leadingImageSrc={'/static/Delete.svg'}
+                            leadingImageContainerStyle={{
+                              left: 450
+                            }}
+                            disabled={!props?.deleteAction}
+                            buttonAction={props?.deleteAction}
+                          />
+                        </div>
+                      )}
                     </div>
                     <TitleBox color={color}>{titleString}</TitleBox>
                     <LanguageContainer>
@@ -614,39 +635,16 @@ function MobileView(props: CodingBountiesProps) {
                      * which make them so longF
                      * A non LNAUTh user alias is shorter
                      */}
-                    {!bountyExpired &&
-                      !invoiceStatus &&
-                      assignee &&
-                      assignee.owner_alias.length < 30 && (
-                        <>
-                          {bounty_expires && (
-                            <BountyTime>
-                              Bounty time remains: Days {bountyTimeLeft.days} Hrs{' '}
-                              {bountyTimeLeft.hours} Mins {bountyTimeLeft.minutes} Secs{' '}
-                              {bountyTimeLeft.seconds}
-                            </BountyTime>
-                          )}
-                          <Button
-                            iconSize={14}
-                            width={220}
-                            height={48}
-                            onClick={makePayment}
-                            style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                            text="Pay Bounty"
-                            ButtonTextStyle={{ padding: 0 }}
-                          />
-                        </>
-                      )}
-                    {bountyExpired && (
+                    {showPayBounty && (
                       <>
-                        <BountyTime>Bounty Commitment sats has expired</BountyTime>
                         <Button
+                          disabled={payBountyDisable}
                           iconSize={14}
                           width={220}
                           height={48}
-                          onClick={removeBountyAssignee}
+                          onClick={makePayment}
                           style={{ marginTop: '30px', marginBottom: '-20px', textAlign: 'left' }}
-                          text="Remove Assignee"
+                          text="Pay Bounty"
                           ButtonTextStyle={{ padding: 0 }}
                         />
                       </>
