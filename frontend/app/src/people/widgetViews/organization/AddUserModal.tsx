@@ -32,16 +32,8 @@ const AddUserModal = (props: AddUserModalProps) => {
 
   const config = nonWidgetConfigs['organizationusers'];
 
-  function handleSelectUser(pubkey: string) {
-    setSelectedPubkey(pubkey);
-  }
-
   function checkIsActive(pubkey: string) {
-    if (selectedPubkey && pubkey !== selectedPubkey) {
-      return true;
-    } else {
-      return false;
-    }
+    return !!(selectedPubkey && pubkey !== selectedPubkey);
   }
 
   return (
@@ -83,7 +75,7 @@ const AddUserModal = (props: AddUserModalProps) => {
               </UserInfo>
               <SmallBtn
                 selected={person.owner_pubkey === selectedPubkey}
-                onClick={() => handleSelectUser(person.owner_pubkey)}
+                onClick={() => setSelectedPubkey(person.owner_pubkey)}
               >
                 Add
               </SmallBtn>
