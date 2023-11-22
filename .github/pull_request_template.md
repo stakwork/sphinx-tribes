@@ -16,4 +16,4 @@ Please delete options that are not relevant.
 - [ ] I have performed a self-review of my code
 - [ ] I have tested on Chrome and Firefox
 - [ ] I have tested on a mobile device
-- [ ] It has been deployed to people-test.sphinx.chat and tested by others
+- [ ] I have provided a screenshot or recording of changes in my PR if there were updates to the frontend

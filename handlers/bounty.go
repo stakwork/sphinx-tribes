@@ -41,6 +41,22 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	created := chi.URLParam(r, "created")
+	if created == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetBountyDataByCreated(created)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
 func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	personKey := chi.URLParam(r, "personKey")
 	tabType := chi.URLParam(r, "tabType")
@@ -87,6 +103,9 @@ func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
 	bounty := db.Bounty{}
 	body, err := io.ReadAll(r.Body)
 
@@ -111,16 +130,19 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Type is a required field")
 		return
 	}
+
 	if bounty.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Title is a required field")
 		return
 	}
+
 	if bounty.Description == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Description is a required field")
 		return
 	}
+
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
@@ -131,6 +153,20 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 
 	if bounty.Title != "" && bounty.Assignee == "" {
 		db.DB.UpdateBountyNullColumn(bounty, "assignee")
+	}
+
+	if bounty.Title != "" && bounty.ID != 0 {
+		// get bounty from DB
+		dbBounty := db.DB.GetBounty(bounty.ID)
+
+		// trying to update
+		// check if bounty belongs to user
+		if pubKeyFromAuth != dbBounty.OwnerID {
+			fmt.Println("Cannot edit another user's bounty")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Cannot edit another user's bounty")
+			return
+		}
 	}
 
 	b, err := db.DB.CreateOrEditBounty(bounty)
@@ -301,7 +337,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if the orgnization bounty balance
+	// check if the organization bounty balance
 	// is greater than the amount
 	orgBudget := db.DB.GetOrganizationBudget(bounty.OrgUuid)
 	if orgBudget.TotalBudget < amount {
@@ -364,6 +400,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 		db.DB.AddPaymentHistory(paymentHistory)
 		bounty.Paid = true
+		bounty.PaidDate = &now
 		db.DB.UpdateBounty(bounty)
 
 		msg["msg"] = "keysend_success"
@@ -416,8 +453,8 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
-	if err == nil {
-		// check if the orgnization bounty balance
+	if err == nil && amount > 0 {
+		// check if the organization bounty balance
 		// is greater than the amount
 		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
 		if amount > orgBudget.TotalBudget {
@@ -578,7 +615,7 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 		invData := db.DB.GetUserInvoiceData(paymentRequest)
 		dbInvoice := db.DB.GetInvoice(paymentRequest)
 
-		// Make any change onl;y if the invoice has not been settled
+		// Make any change only if the invoice has not been settled
 		if !dbInvoice.Status {
 			if invoice.Type == "BUDGET" {
 				db.DB.AddAndUpdateBudget(invoice)

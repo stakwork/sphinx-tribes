@@ -1,15 +1,23 @@
 package config
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
 var Host string
 var JwtKey string
 var RelayUrl string
+var MemeUrl string
 var RelayAuthKey string
+var RelayNodeKey string
 
 // these are constants for the store
 var InvoiceList = "INVOICELIST"
@@ -19,15 +27,26 @@ func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
 	RelayUrl = os.Getenv("RELAY_URL")
+	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
+
+	// only make this call if there is a Relay auth key
+	if RelayAuthKey != "" {
+		RelayNodeKey = GetNodePubKey()
+	}
 
 	if Host == "" {
 		Host = "https://people.sphinx.chat"
 	}
 
+	if MemeUrl == "" {
+		MemeUrl = "https://memes.sphinx.chat"
+	}
+
 	if JwtKey == "" {
 		JwtKey = GenerateRandomString()
 	}
+
 }
 
 func GenerateRandomString() string {
@@ -44,4 +63,170 @@ func GenerateRandomString() string {
 	}
 
 	return string(b)
+}
+
+type PropertyMap map[string]interface{}
+
+type Feature map[string]PropertyMap
+
+type NodeGetInfoResponse struct {
+	Uris                   []string      `json:"uris"`
+	Chains                 []PropertyMap `json:"chains"`
+	Features               Feature       `json:"features"`
+	IdentityPubkey         string        `json:"identity_pubkey"`
+	Alias                  string        `json:"alias"`
+	NumPendingChannels     uint          `json:"num_pending_channels"`
+	NumActiveChannels      uint          `json:"num_active_channels"`
+	NumInactiveChannels    uint          `json:"num_inactive_channels"`
+	NumPeers               uint          `json:"num_peers"`
+	BlockHeight            uint          `json:"block_height"`
+	BlockHash              string        `json:"block_hash"`
+	SyncedToChain          bool          `json:"synced_to_chain"`
+	Testnet                bool          `json:"testnet"`
+	BestHeaderTimestamp    string        `json:"best_header_timestamp"`
+	Version                string        `json:"version"`
+	Color                  string        `json:"color"`
+	SyncedToGraph          bool          `json:"synced_to_graph"`
+	CommitHash             string        `json:"commit_hash"`
+	RequireHtlcInterceptor bool          `json:"require_htlc_interceptor"`
+}
+
+type NodeGetInfo struct {
+	Success  bool                `json:"success"`
+	Response NodeGetInfoResponse `json:"response"`
+}
+
+type Contact struct {
+	Id                uint   `json:"id"`
+	RouteHint         string `json:"route_hint"`
+	PublicKey         string `json:"public_key"`
+	NodeAlias         string `json:"node_alias,omitempty"`
+	Alias             string `json:"alias"`
+	PhotoUrl          string `json:"photo_url,omitempty"`
+	PrivatePhoto      int    `json:"private_photo"`
+	IsOwner           uint   `json:"is_owner"`
+	Deleted           int    `json:"deleted"`
+	RemoteId          string `json:"remote_id,omitempty"`
+	Status            int    `json:"status,omitempty"`
+	ContactKey        string `json:"contact_key"`
+	DeviceId          string `json:"device_id"`
+	CreatedAt         string `json:"created_at"`
+	UpdatedAt         string `json:"updated_at"`
+	FromGroup         int    `json:"from_group"`
+	NotificationSound string `json:"notification_sound,omitempty"`
+	LastActive        string `json:"last_active"`
+	TipAmount         string `json:"tip_amount,omitempty"`
+	Tenant            uint   `json:"tenant"`
+	PriceToMeet       string `json:"price_to_meet,omitempty"`
+	Unmet             string `json:"unmet"`
+	Blocked           string `json:"blocked"`
+	HmacKey           string `json:"hmac_key"`
+	PersonUuid        string `json:"person_uuid,omitempty"`
+	LastTimestamp     uint   `json:"last_timestamp"`
+	IsAdmin           int    `json:"is_admin"`
+	PushKitToken      string `json:"push_kit_token,omitempty"`
+	Prune             string `json:"prune,omitempty"`
+	AdminToken        string `json:"admin_token,omitempty"`
+}
+
+type Chat struct {
+	Id                 uint          `json:"id"`
+	Uuid               string        `json:"uuid"`
+	Name               string        `json:"name"`
+	PhotoUrl           string        `json:"photo_url"`
+	Type               int           `json:"type"`
+	Status             int           `json:"status"`
+	ContactIds         []int         `json:"contact_id"`
+	IsMuted            int           `json:"is_muted"`
+	CreatedAt          string        `json:"created_at"`
+	UpdatedAt          string        `json:"updated_at"`
+	Deleted            int           `json:"deleted"`
+	GroupKey           string        `json:"group_key"`
+	Host               string        `json:"host"`
+	PriceToJoin        int           `json:"price_to_join"`
+	PricePerMessage    string        `json:"price_per_message,omitempty"`
+	EscrowAmount       int           `json:"escrow_amount,omitempty"`
+	EscrowMillis       int           `json:"escrow_millis,omitempty"`
+	Unlisted           int           `json:"unlisted"`
+	Private            int           `json:"private"`
+	OwnerPubkey        string        `json:"owner_pubkey"`
+	Seen               int           `json:"seen"`
+	AppUrl             string        `json:"app_url,omitempty"`
+	FeedUrl            string        `json:"feed_url,omitempty"`
+	FeedType           string        `json:"feed_type,omitempty"`
+	Meta               string        `json:"meta,omitempty"`
+	MyPhotoUrl         string        `json:"my_photo_url,omitempty"`
+	MyALias            string        `json:"my_alias,omitempty"`
+	Tenant             uint          `json:"tenant"`
+	SkipBroadcastJoins int           `json:"skip_broadcast_joins"`
+	Pin                string        `json:"pin,omitempty"`
+	Notify             int           `json:"notify"`
+	ProfileFilters     string        `json:"profile_filters,omitempty"`
+	CallRecording      string        `json:"call_recording,omitempty"`
+	MemeServerLocation string        `json:"meme_server_location,omitempty"`
+	JitsiServer        string        `json:"jitsi_server,omitempty"`
+	StakworkApiKey     string        `json:"stakwork_api_key"`
+	StakworkWebhook    string        `json:"stakwork_webhook"`
+	DefaultJoin        int           `json:"default_join"`
+	Preview            string        `json:"preview,omitempty"`
+	PendingContactIds  []interface{} `json:"pending_contact_ids,omitempty"`
+}
+
+type ContactResponse struct {
+	Contacts      []Contact     `json:"contacts"`
+	Chats         []Chat        `json:"chats"`
+	Subscriptions []interface{} `json:"subscriptions,omitempty"`
+}
+
+type ProxyContacts struct {
+	Success  bool            `json:"success"`
+	Response ContactResponse `json:"response"`
+}
+
+func GetNodePubKey() string {
+	var pubkey string
+	var url string
+	var isProxy bool = false
+
+	if strings.Contains(RelayUrl, "swarm") {
+		url = fmt.Sprintf("%s/contacts", RelayUrl)
+		isProxy = true
+	} else {
+		url = fmt.Sprintf("%s/getinfo", RelayUrl)
+	}
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	req.Header.Set("x-user-token", RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+	}
+
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+
+	if isProxy {
+		proxyContacts := ProxyContacts{}
+		err = json.Unmarshal(body, &proxyContacts)
+		if err != nil {
+			log.Printf("Reading Proxy Contacts Info body failed: %s", err)
+		}
+		contacts := proxyContacts.Response.Contacts
+		if len(contacts) > 0 {
+			pubkey = contacts[0].PublicKey
+		}
+	} else {
+		nodeInfo := NodeGetInfo{}
+		// Unmarshal result
+		err = json.Unmarshal(body, &nodeInfo)
+		if err != nil {
+			log.Printf("Reading Relay Node Info body failed: %s", err)
+		}
+		pubkey = nodeInfo.Response.IdentityPubkey
+	}
+	return pubkey
 }
