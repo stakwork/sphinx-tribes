@@ -8,7 +8,6 @@ import { useStores } from 'store';
 import { formatSat } from 'people/utils/ExtraFunctions';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
-import history from '../../../config/history';
 import ArrowRight from '../../../public/static/arrow-right.svg';
 import LinkIcon from '../../../public/static/link.svg';
 import { PaymentHistoryModalProps } from './interface';
@@ -222,7 +221,7 @@ const color = colors['light'];
 
 const HistoryModal = (props: PaymentHistoryModalProps) => {
   const isMobile = useIsMobile();
-  const { isOpen, close, url } = props;
+  const { isOpen, close } = props;
   const [filter, setFilter] = useState({ payment: true, deposit: true, withdraw: true });
   const [currentPaymentsHistory, setCurrentPaymentHistory] = useState(props.paymentsHistory);
 
@@ -233,9 +232,7 @@ const HistoryModal = (props: PaymentHistoryModalProps) => {
   const viewBounty = async (bountyId: number) => {
     ui.setBountyPerson(ui.meInfo?.id);
 
-    history.push({
-      pathname: `${url}/${bountyId}/${0}`
-    });
+    window.open(`/bounty/${bountyId}`, '_blank');
   };
 
   const handleFilter = (txn: OrgTransactionType) => {

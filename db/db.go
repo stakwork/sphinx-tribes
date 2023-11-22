@@ -1065,9 +1065,7 @@ func (db database) GetOrganizationBountyCount(uuid string) int64 {
 
 func (db database) GetOrganizationUser(pubkey string, org_uuid string) OrganizationUsers {
 	ms := OrganizationUsers{}
-
 	db.db.Where("org_uuid = ?", org_uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
-
 	return ms
 }
 
@@ -1077,9 +1075,9 @@ func (db database) CreateOrganizationUser(orgUser OrganizationUsers) Organizatio
 	return orgUser
 }
 
-func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData) OrganizationUsersData {
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Delete(&OrganizationUsers{})
-
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData, org string) OrganizationUsersData {
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("org_uuid = ?", org).Delete(&OrganizationUsers{})
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("org_uuid = ?", org).Delete(&UserRoles{})
 	return orgUser
 }
 
