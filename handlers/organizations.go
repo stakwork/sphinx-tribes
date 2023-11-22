@@ -46,7 +46,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 
 	existing := db.DB.GetOrganizationByUuid(org.Uuid)
 	if existing.ID == 0 { // new!
-		if org.ID != 0 { // cant try to "edit" if not exists already
+		if org.ID != 0 { // can't try to "edit" if it does not exist already
 			fmt.Println("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -59,7 +59,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 
 		if orgName.Name == name {
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Organization name alreday exists")
+			json.NewEncoder(w).Encode("Organization name already exists")
 			return
 		} else {
 			org.Created = &now
@@ -69,13 +69,13 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		if org.ID == 0 {
-			// cant create that already exists
+			// can't create that already exists
 			fmt.Println("can't create existing organization")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
-		if org.ID != existing.ID { // cant edit someone else's
+		if org.ID != existing.ID { // can't edit someone else's
 			fmt.Println("cant edit another organization")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -124,6 +124,9 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &orgUser)
 
+	// get orgnanization
+	org := db.DB.GetOrganizationByUuid(orgUser.OrgUuid)
+
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -133,6 +136,13 @@ func CreateOrganizationUser(w http.ResponseWriter, r *http.Request) {
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if the user is the organization admin
+	if orgUser.OwnerPubKey == org.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot add organization admin as a user")
 		return
 	}
 
@@ -185,6 +195,23 @@ func GetOrganizationUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(orgUsers)
 }
 
+func GetOrganizationUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "uuid")
+	orgUser := db.DB.GetOrganizationUser(pubKeyFromAuth, uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(orgUser)
+}
+
 func GetOrganizationUsersCount(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	count := db.DB.GetOrganizationUsersCount(uuid)
@@ -229,7 +256,7 @@ func DeleteOrganizationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.DeleteOrganizationUser(orgUser)
+	db.DB.DeleteOrganizationUser(orgUser, orgUser.OrgUuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(orgUser)
@@ -274,8 +301,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 
 	// if not the orgnization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.AddRoles)
-	userRoles := db.DB.GetUserRoles(uuid, pubKeyFromAuth)
-	isUser := db.CheckUser(userRoles, pubKeyFromAuth)
+	isUser := db.CheckUser(roles, pubKeyFromAuth)
 
 	if isUser {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -286,13 +312,13 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// check if the user added his pubkey to the route
 	if pubKeyFromAuth == user {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("cannot add roles for self")
+		json.NewEncoder(w).Encode("auth pubkey cannot be the same with user's")
 		return
 	}
 
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("user cannot add roles")
+		json.NewEncoder(w).Encode("user does not have adequate permissions to add roles")
 		return
 	}
 
@@ -307,6 +333,15 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// check if the user has the role he his trying to add to another user
+		okUser := db.UserHasAccess(pubKeyFromAuth, uuid, role.Role)
+		// if the user does not have any of the roles he wants to add return an error
+		if !okUser {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("cannot add a role you don't have")
+			return
+		}
+
 		// add created time for insert
 		role.Created = &now
 		insertRoles = append(insertRoles, role)
@@ -315,7 +350,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// check if user already exists
 	userExists := db.DB.GetOrganizationUser(user, uuid)
 
-	// if not the orgnization admin
+	// if not the organization admin
 	if userExists.OwnerPubKey != user || userExists.OrgUuid != uuid {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User does not exists in the organization")
@@ -352,12 +387,82 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 
 	// get the organizations created by the user, then get all the organizations
 	// the user has been added to, loop through to get the organization
-	organizations := db.DB.GetUserCreatedOrganizations(user.OwnerPubKey)
+	organizations := GetCreatedOrganizations(user.OwnerPubKey)
+
+	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
+	for _, value := range assignedOrganizations {
+		uuid := value.OrgUuid
+		organization := db.DB.GetOrganizationByUuid(uuid)
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+
+		// don't add deleted organizations to the list
+		if !organization.Deleted {
+			if hasRole {
+				budget := db.DB.GetOrganizationBudget(uuid)
+				organization.Budget = budget.TotalBudget
+			} else {
+				organization.Budget = 0
+			}
+			organization.BountyCount = bountyCount
+
+			organizations = append(organizations, organization)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizations)
+}
+
+func GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
+	userIdParam := chi.URLParam(r, "userId")
+	userId, _ := utils.ConvertStringToUint(userIdParam)
+
+	if userId == 0 {
+		fmt.Println("provide user id")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	user := db.DB.GetPerson(userId)
+
+	// get the organizations created by the user, then get all the organizations
+	// the user has been added to, loop through to get the organization
+	organizations := GetCreatedOrganizations(user.OwnerPubKey)
+
+	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
+	for _, value := range assignedOrganizations {
+		uuid := value.OrgUuid
+		organization := db.DB.GetOrganizationByUuid(uuid)
+		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
+		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasBountyRoles := db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
+
+		// don't add deleted organizations to the list
+		if !organization.Deleted && hasBountyRoles {
+			if hasRole {
+				budget := db.DB.GetOrganizationBudget(uuid)
+				organization.Budget = budget.TotalBudget
+			} else {
+				organization.Budget = 0
+			}
+			organization.BountyCount = bountyCount
+
+			organizations = append(organizations, organization)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizations)
+}
+
+func GetCreatedOrganizations(pubkey string) []db.Organization {
+	organizations := db.DB.GetUserCreatedOrganizations(pubkey)
 	// add bounty count to the organization
 	for index, value := range organizations {
 		uuid := value.Uuid
 		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
-		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasRole := db.UserHasAccess(pubkey, uuid, db.ViewReport)
 
 		if hasRole {
 			budget := db.DB.GetOrganizationBudget(uuid)
@@ -367,27 +472,7 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 		}
 		organizations[index].BountyCount = bountyCount
 	}
-
-	assignedOrganizations := db.DB.GetUserAssignedOrganizations(user.OwnerPubKey)
-	for _, value := range assignedOrganizations {
-		uuid := value.OrgUuid
-		organization := db.DB.GetOrganizationByUuid(uuid)
-		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
-		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-
-		if hasRole {
-			budget := db.DB.GetOrganizationBudget(uuid)
-			organization.Budget = budget.TotalBudget
-		} else {
-			organization.Budget = 0
-		}
-		organization.BountyCount = bountyCount
-
-		organizations = append(organizations, organization)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(organizations)
+	return organizations
 }
 
 func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
@@ -412,7 +497,7 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if not the orgnization admin
+	// if not the organization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -432,7 +517,7 @@ func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 
-	// if not the orgnization admin
+	// if not the organization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -461,7 +546,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if not the orgnization admin
+	// if not the organization admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -471,9 +556,23 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 
 	// get the organization payment history
 	paymentHistory := db.DB.GetPaymentHistory(uuid, page, limit)
+	paymentHistoryData := []db.PaymentHistoryData{}
+
+	for _, payment := range paymentHistory {
+		sender := db.DB.GetPersonByPubkey(payment.SenderPubKey)
+		receiver := db.DB.GetPersonByPubkey(payment.ReceiverPubKey)
+		paymentData := db.PaymentHistoryData{
+			PaymentHistory: payment,
+			SenderName:     sender.UniqueName,
+			SenderImg:      sender.Img,
+			ReceiverName:   receiver.UniqueName,
+			ReceiverImg:    receiver.Img,
+		}
+		paymentHistoryData = append(paymentHistoryData, paymentData)
+	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(paymentHistory)
+	json.NewEncoder(w).Encode(paymentHistoryData)
 }
 
 func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
@@ -525,4 +624,31 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	invoiceCount := db.DB.GetOrganizationInvoicesCount(uuid)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceCount)
+}
+
+func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	uuid := chi.URLParam(r, "uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	organization := db.DB.GetOrganizationByUuid(uuid)
+
+	if pubKeyFromAuth != organization.OwnerPubKey {
+		msg := "only org admin can delete an organization"
+		fmt.Println(msg)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	// soft delete organization
+	org := db.DB.ChangeOrganizationDeleteStatus(uuid, true)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(org)
 }

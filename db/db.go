@@ -66,7 +66,7 @@ func (db database) CreateChannel(c Channel) (Channel, error) {
 
 }
 
-// check that update owner_pub_key does in fact throw error
+// check that update owner_pub_key does in fact throws an error
 func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	if b.OwnerPubKey == "" {
 		return Bot{}, errors.New("no pub key")
@@ -103,7 +103,7 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	return b, nil
 }
 
-// check that update owner_pub_key does in fact throw error
+// check that update owner_pub_key does in fact throws an error
 func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.OwnerPubKey == "" {
 		return Person{}, errors.New("no pub key")
@@ -478,7 +478,7 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 func (db database) GetAssignedBounties(pubkey string) ([]BountyData, error) {
 	ms := []BountyData{}
 
-	err := db.db.Raw(`SELECT body.*, body.id as bounty_id, body.description as bounty_description, body.created as bounty_created, body.updated as bounty_updated, body.org_uuid, person.*, person.owner_alias as assignee_alias, person.id as assignee_id, person.description as assignee_description, person.created as assignee_created, person.updated as assignee_updated,  person.owner_route_hint as assignee_route_hint, owner.id as bounty_owner_id, owner.uuid as owner_uuid, owner.owner_pub_key as owner_key, owner.owner_alias as owner_alias, owner.description as owner_description, owner.price_to_meet as owner_price_to_meet, owner.unique_name as owner_unique_name, owner.tags as owner_tags, owner.img as owner_img, owner.created as owner_created, owner.updated as owner_updated, owner.last_login as owner_last_login, owner.owner_route_hint as owner_route_hint, owner.owner_contact_key as owner_contact_key, org.name as organization_name, org.uuid as organization_uuid, org.img as organization_img FROM public.bounty AS body LEFT OUTER JOIN public.people AS person ON body.assignee = person.owner_pub_key LEFT OUTER JOIN public.people as owner ON body.owner_id = owner.owner_pub_key LEFT OUTER JOIN public.organizations as org ON body.org_uuid = org.uuid WHERE body.assignee = '` + pubkey + `' ORDER BY body.id DESC`).Find(&ms).Error
+	err := db.db.Raw(`SELECT body.*, body.id as bounty_id, body.description as bounty_description, body.created as bounty_created, body.updated as bounty_updated, body.org_uuid, person.*, person.owner_alias as assignee_alias, person.id as assignee_id, person.description as assignee_description, person.created as assignee_created, person.updated as assignee_updated,  person.owner_route_hint as assignee_route_hint, owner.id as bounty_owner_id, owner.uuid as owner_uuid, owner.owner_pub_key as owner_key, owner.owner_alias as owner_alias, owner.description as owner_description, owner.price_to_meet as owner_price_to_meet, owner.unique_name as owner_unique_name, owner.tags as owner_tags, owner.img as owner_img, owner.created as owner_created, owner.updated as owner_updated, owner.last_login as owner_last_login, owner.owner_route_hint as owner_route_hint, owner.owner_contact_key as owner_contact_key, org.name as organization_name, org.uuid as organization_uuid, org.img as organization_img FROM public.bounty AS body LEFT OUTER JOIN public.people AS person ON body.assignee = person.owner_pub_key LEFT OUTER JOIN public.people as owner ON body.owner_id = owner.owner_pub_key LEFT OUTER JOIN public.organizations as org ON body.org_uuid = org.uuid WHERE body.assignee = '` + pubkey + `' AND body.show != false ORDER BY body.id DESC`).Find(&ms).Error
 
 	return ms, err
 }
@@ -495,6 +495,14 @@ func (db database) GetBountyById(id string) ([]BountyData, error) {
 	ms := []BountyData{}
 
 	err := db.db.Raw(`SELECT body.*, body.id as bounty_id, body.description as bounty_description, body.created as bounty_created, body.updated as bounty_updated, body.org_uuid,  person.*, person.owner_alias as assignee_alias, person.id as assignee_id, person.description as assignee_description, person.created as assignee_created, person.updated as assignee_updated, person.owner_route_hint as assignee_route_hint, owner.id as bounty_owner_id, owner.uuid as owner_uuid, owner.owner_pub_key as owner_key, owner.owner_alias as owner_alias, owner.description as owner_description, owner.price_to_meet as owner_price_to_meet, owner.unique_name as owner_unique_name, owner.tags as owner_tags, owner.img as owner_img, owner.created as owner_created, owner.updated as owner_updated, owner.last_login as owner_last_login, owner.owner_route_hint as owner_route_hint, owner.owner_contact_key as owner_contact_key, org.name as organization_name, org.uuid as organization_uuid, org.img as organization_img FROM public.bounty AS body LEFT OUTER JOIN public.people AS person ON body.assignee = person.owner_pub_key LEFT OUTER JOIN public.people as owner ON body.owner_id = owner.owner_pub_key LEFT OUTER JOIN public.organizations as org ON body.org_uuid = org.uuid WHERE body.id = '` + id + `' ORDER BY body.id DESC`).Find(&ms).Error
+
+	return ms, err
+}
+
+func (db database) GetBountyDataByCreated(created string) ([]BountyData, error) {
+	ms := []BountyData{}
+
+	err := db.db.Raw(`SELECT body.*, body.id as bounty_id, body.description as bounty_description, body.created as bounty_created, body.updated as bounty_updated, body.org_uuid,  person.*, person.owner_alias as assignee_alias, person.id as assignee_id, person.description as assignee_description, person.created as assignee_created, person.updated as assignee_updated, person.owner_route_hint as assignee_route_hint, owner.id as bounty_owner_id, owner.uuid as owner_uuid, owner.owner_pub_key as owner_key, owner.owner_alias as owner_alias, owner.description as owner_description, owner.price_to_meet as owner_price_to_meet, owner.unique_name as owner_unique_name, owner.tags as owner_tags, owner.img as owner_img, owner.created as owner_created, owner.updated as owner_updated, owner.last_login as owner_last_login, owner.owner_route_hint as owner_route_hint, owner.owner_contact_key as owner_contact_key, org.name as organization_name, org.uuid as organization_uuid, org.img as organization_img FROM public.bounty AS body LEFT OUTER JOIN public.people AS person ON body.assignee = person.owner_pub_key LEFT OUTER JOIN public.people as owner ON body.owner_id = owner.owner_pub_key LEFT OUTER JOIN public.organizations as org ON body.org_uuid = org.uuid WHERE body.created = '` + created + `' ORDER BY body.id DESC`).Find(&ms).Error
 
 	return ms, err
 }
@@ -997,7 +1005,7 @@ func (db database) GetOrganizations(r *http.Request) []Organization {
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
 	// return if like owner_alias, unique_name, or equals pubkey
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Find(&ms)
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Where("deleted != ?", false).Find(&ms)
 	return ms
 }
 
@@ -1038,7 +1046,7 @@ func (db database) CreateOrEditOrganization(m Organization) (Organization, error
 func (db database) GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error) {
 	ms := []OrganizationUsersData{}
 
-	err := db.db.Raw(`SELECT org.org_uuid, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.org_uuid = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
+	err := db.db.Raw(`SELECT org.org_uuid, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.org_uuid = '` + uuid + `' OR org.organization = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
 
 	return ms, err
 }
@@ -1057,9 +1065,7 @@ func (db database) GetOrganizationBountyCount(uuid string) int64 {
 
 func (db database) GetOrganizationUser(pubkey string, org_uuid string) OrganizationUsers {
 	ms := OrganizationUsers{}
-
 	db.db.Where("org_uuid = ?", org_uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
-
 	return ms
 }
 
@@ -1069,9 +1075,9 @@ func (db database) CreateOrganizationUser(orgUser OrganizationUsers) Organizatio
 	return orgUser
 }
 
-func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData) OrganizationUsersData {
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Delete(&OrganizationUsers{})
-
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData, org string) OrganizationUsersData {
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("org_uuid = ?", org).Delete(&OrganizationUsers{})
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("org_uuid = ?", org).Delete(&UserRoles{})
 	return orgUser
 }
 
@@ -1097,7 +1103,7 @@ func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
 
 func (db database) GetUserCreatedOrganizations(pubkey string) []Organization {
 	ms := []Organization{}
-	db.db.Where("owner_pub_key = ?", pubkey).Find(&ms)
+	db.db.Where("owner_pub_key = ?", pubkey).Where("deleted != ?", true).Find(&ms)
 	return ms
 }
 
@@ -1118,7 +1124,9 @@ func (db database) CreateOrganizationBudget(budget BountyBudget) BountyBudget {
 }
 
 func (db database) UpdateOrganizationBudget(budget BountyBudget) BountyBudget {
-	db.db.Where("org_uuid = ?", budget.OrgUuid).Updates(budget)
+	db.db.Model(&BountyBudget{}).Where("org_uuid = ?", budget.OrgUuid).Updates(map[string]interface{}{
+		"total_budget": budget.TotalBudget,
+	})
 	return budget
 }
 
@@ -1202,7 +1210,7 @@ func (db database) WithdrawBudget(sender_pubkey string, org_uuid string, amount 
 func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	db.db.Create(&payment)
 
-	// get organization budget and substract payment from total budget
+	// get organization budget and subtract payment from total budget
 	organizationBudget := db.GetOrganizationBudget(payment.OrgUuid)
 	totalBudget := organizationBudget.TotalBudget
 
@@ -1216,8 +1224,8 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	return payment
 }
 
-func (db database) GetPaymentHistory(org_uuid string, p string, l string) []PaymentHistoryData {
-	payment := []PaymentHistoryData{}
+func (db database) GetPaymentHistory(org_uuid string, p string, l string) []PaymentHistory {
+	payment := []PaymentHistory{}
 
 	page := 0
 	limit := 0
@@ -1235,7 +1243,7 @@ func (db database) GetPaymentHistory(org_uuid string, p string, l string) []Paym
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, page)
 	}
 
-	query := `SELECT payment.id, payment.org_uuid, payment.amount, payment.bounty_id as bounty_id, payment.created, payment.updated, payment.status, payment.payment_type, sender.unique_name as sender_name, sender.img as sender_img, payment.sender_pub_key, receiver.unique_name as receiver_name, payment.receiver_pub_key, receiver.img as receiver_img FROM public.payment_histories AS payment LEFT OUTER JOIN public.people AS sender ON payment.sender_pub_key = sender.owner_pub_key LEFT OUTER JOIN public.people AS receiver ON payment.receiver_pub_key = receiver.owner_pub_key WHERE payment.org_uuid = '` + org_uuid + `' ORDER BY payment.created DESC`
+	query := `SELECT * FROM public.payment_histories WHERE org_uuid = '` + org_uuid + `' ORDER BY created DESC`
 
 	db.db.Raw(query + " " + limitQuery).Find(&payment)
 
@@ -1288,5 +1296,13 @@ func (db database) GetUserInvoiceData(payment_request string) UserInvoiceData {
 func (db database) DeleteUserInvoiceData(payment_request string) UserInvoiceData {
 	ms := UserInvoiceData{}
 	db.db.Where("payment_request = ?", payment_request).Delete(&ms)
+	return ms
+}
+
+func (db database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) Organization {
+	ms := Organization{}
+	db.db.Model(&ms).Where("uuid", org_uuid).Updates(map[string]interface{}{
+		"deleted": status,
+	})
 	return ms
 }
