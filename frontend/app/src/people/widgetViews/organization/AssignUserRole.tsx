@@ -1,6 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useIsMobile } from 'hooks/uiHooks';
-import styled from 'styled-components';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from 'store';
 import { RolesCategory, s_RolesCategories } from 'helpers/helpers-extended';
@@ -8,6 +7,19 @@ import { nonWidgetConfigs } from 'people/utils/Constants';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import { AssignUserModalProps } from './interface';
+import {
+  AssignRoleUserImage,
+  AssignRoleUsername,
+  AssignUserContainer,
+  AssingUserBtn,
+  Checkbox,
+  Label,
+  RoleContainer,
+  RolesContainer,
+  UserInfoContainer,
+  UserRolesContainer,
+  UserRolesTitle
+} from './style';
 
 interface BackendRoles {
   name: string;
@@ -15,113 +27,6 @@ interface BackendRoles {
 }
 
 const color = colors['light'];
-
-const AssignUserContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-`;
-
-const UserInfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: -2.5rem;
-  left: 0;
-  right: 0;
-`;
-
-const UserImage = styled.img`
-  width: 5rem;
-  height: 5rem;
-  border-radius: 50%;
-  background: #dde1e5;
-  border: 4px solid #fff;
-  object-fit: cover;
-`;
-
-const Username = styled.p`
-  color: #3c3f41;
-  text-align: center;
-  font-family: 'Barlow';
-  font-size: 1.25rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 1.625rem;
-  margin-top: 0.69rem;
-  margin-bottom: 0;
-  text-transform: capitalize;
-`;
-
-const UserRolesContainer = styled.div`
-  padding: 3.25rem 3rem 3rem 3rem;
-  margin-top: 3.25rem;
-`;
-
-const UserRolesTitle = styled.h2`
-  color: #3c3f41;
-  font-family: 'Barlow';
-  font-size: 1.625rem;
-  font-style: normal;
-  font-weight: 800;
-  line-height: 1.625rem;
-  margin-bottom: 2.81rem;
-`;
-
-const RolesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const RoleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const Checkbox = styled.input`
-  margin-right: 1rem;
-  width: 1rem;
-  height: 1rem;
-`;
-
-const Label = styled.label`
-  margin-bottom: 0;
-  color: #1e1f25;
-  font-family: 'Barlow';
-  font-size: 0.9375rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 1.125rem;
-`;
-
-const AssingUserBtn = styled.button`
-  height: 3rem;
-  padding: 0.5rem 1rem;
-  width: 100%;
-  border-radius: 0.375rem;
-  font-family: 'Barlow';
-  font-size: 0.9375rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 0rem;
-  letter-spacing: 0.00938rem;
-  background: #618aff;
-  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);
-  border: none;
-  margin-top: 3rem;
-  color: #fff;
-  &:disabled {
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    background: rgba(0, 0, 0, 0.04);
-    color: rgba(142, 150, 156, 0.85);
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-`;
 
 const AssignUserRoles = (props: AssignUserModalProps) => {
   const { isOpen, close, loading, user, setLoading, onSubmit, addToast } = props;
@@ -237,8 +142,8 @@ const AssignUserRoles = (props: AssignUserModalProps) => {
     >
       <AssignUserContainer>
         <UserInfoContainer>
-          <UserImage src={user?.img} alt="profile" />
-          <Username>{user?.owner_alias}</Username>
+          <AssignRoleUserImage src={user?.img} alt="profile" />
+          <AssignRoleUsername>{user?.owner_alias}</AssignRoleUsername>
         </UserInfoContainer>
         <UserRolesContainer>
           <UserRolesTitle>User Roles</UserRolesTitle>
