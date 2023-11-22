@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useIsMobile } from 'hooks/uiHooks';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from 'store';
+import { Person } from 'store/main';
 import { nonWidgetConfigs } from 'people/utils/Constants';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
@@ -26,15 +27,26 @@ const color = colors['light'];
 const AddUserModal = (props: AddUserModalProps) => {
   const isMobile = useIsMobile();
   const { isOpen, close, onSubmit, loading } = props;
-  const { main } = useStores();
-  const people: any = (main.people && main.people.filter((f: any) => !f.hide)) || [];
+  const { main, ui } = useStores();
   const [selectedPubkey, setSelectedPubkey] = useState<string>();
+  const [searchTerm, setSearchName] = useState<string>('');
+  const [people, setPeople] = useState<Person[]>(
+    (main.people && main.people.filter((f: any) => !f.hide)) || []
+  );
+  const currentUserPubkey = ui.meInfo?.owner_pubkey;
 
   const config = nonWidgetConfigs['organizationusers'];
 
   function checkIsActive(pubkey: string) {
     return !!(selectedPubkey && pubkey !== selectedPubkey);
   }
+
+  const handleSearchUser = async (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    setSearchName(name);
+    const persons = await main.getPeopleByNameAliasPubkey(name);
+    setPeople(persons.filter((person: Person) => person.owner_pubkey !== currentUserPubkey));
+  };
 
   return (
     <Modal
@@ -64,23 +76,31 @@ const AddUserModal = (props: AddUserModalProps) => {
       <AddUserContainer>
         <AddUserHeaderContainer>
           <AddUserHeader>Add New User</AddUserHeader>
-          <SearchUserInput placeholder="Type to search ..." />
+          <SearchUserInput
+            value={searchTerm}
+            onChange={handleSearchUser}
+            placeholder="Type to search ..."
+          />
         </AddUserHeaderContainer>
         <UsersListContainer>
-          {people.map((person: any, index: number) => (
-            <UserContianer key={index}>
-              <UserInfo inactive={checkIsActive(person.owner_pubkey)}>
-                <UserImg src={person.img} alt="user" />
-                <Username>{person.owner_alias}</Username>
-              </UserInfo>
-              <SmallBtn
-                selected={person.owner_pubkey === selectedPubkey}
-                onClick={() => setSelectedPubkey(person.owner_pubkey)}
-              >
-                Add
-              </SmallBtn>
-            </UserContianer>
-          ))}
+          {people.length > 0 ? (
+            people.map((person: any, index: number) => (
+              <UserContianer key={index}>
+                <UserInfo inactive={checkIsActive(person.owner_pubkey)}>
+                  <UserImg src={person.img} alt="user" />
+                  <Username>{person.owner_alias}</Username>
+                </UserInfo>
+                <SmallBtn
+                  selected={person.owner_pubkey === selectedPubkey}
+                  onClick={() => setSelectedPubkey(person.owner_pubkey)}
+                >
+                  Add
+                </SmallBtn>
+              </UserContianer>
+            ))
+          ) : (
+            <p>No user with such alias</p>
+          )}
         </UsersListContainer>
         <FooterContainer>
           <AddUserBtn
