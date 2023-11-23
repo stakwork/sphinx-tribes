@@ -1,6 +1,6 @@
 import crypto from 'crypto';
-import { handleDisplayRole } from 'helpers/helpers';
 import moment from 'moment';
+import { handleDisplayRole } from '../helpers';
 import {
   extractGithubIssueFromUrl,
   extractRepoAndIssueFromIssueUrl,
