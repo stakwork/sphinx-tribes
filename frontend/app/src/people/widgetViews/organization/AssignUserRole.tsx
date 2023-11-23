@@ -4,6 +4,7 @@ import { EuiLoadingSpinner } from '@elastic/eui';
 import { useStores } from 'store';
 import { RolesCategory, s_RolesCategories } from 'helpers/helpers-extended';
 import { nonWidgetConfigs } from 'people/utils/Constants';
+import { handleDisplayRole } from 'helpers';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import { AssignUserModalProps } from './interface';
@@ -45,23 +46,7 @@ const AssignUserRoles = (props: AssignUserModalProps) => {
   const [displayedRoles, setDisplayedRoles] = useState(s_RolesCategories);
 
   useEffect(() => {
-    // Set default data roles for first assign user
-    const defaultRole = {
-      'Manage bounties': true,
-      'Fund organization': true,
-      'Withdraw from organization': true,
-      'View transaction history': true
-    };
-
-    const tempDataRole: { [id: string]: boolean } = {};
-
-    const newDisplayedRoles = displayedRoles.map((role: RolesCategory) => {
-      if (defaultRole[role.name]) {
-        role.status = true;
-        role.roles.forEach((dataRole: string) => (tempDataRole[dataRole] = true));
-      }
-      return role;
-    });
+    const { newDisplayedRoles, tempDataRole } = handleDisplayRole(displayedRoles);
 
     setRolesData((prev: BackendRoles[]) =>
       prev.map((role: BackendRoles) => {

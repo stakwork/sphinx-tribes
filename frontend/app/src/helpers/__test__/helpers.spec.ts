@@ -1,3 +1,6 @@
+import crypto from 'crypto';
+import { handleDisplayRole } from 'helpers/helpers';
+import moment from 'moment';
 import {
   extractGithubIssueFromUrl,
   extractRepoAndIssueFromIssueUrl,
@@ -6,10 +9,9 @@ import {
   toCapitalize,
   userHasRole,
   spliceOutPubkey,
-  userHasManageBountyRoles
+  userHasManageBountyRoles,
+  RolesCategory
 } from '../helpers-extended';
-import crypto from 'crypto';
-import moment from 'moment';
 
 beforeAll(() => {
   // for test randomString
@@ -208,6 +210,55 @@ describe('testing helpers', () => {
       const userAddress = `${pubkey}:${routeHint}`;
       const pub = spliceOutPubkey(userAddress);
       expect(pub).toBe(pubkey);
+    });
+  });
+
+  describe('format roles', () => {
+    test('should correctly set the default data roles for the first assigned user', () => {
+      const displayedRoles: RolesCategory[] = [];
+      const result = handleDisplayRole(displayedRoles);
+      expect(result.newDisplayedRoles).toEqual([]);
+      expect(result.tempDataRole).toEqual({});
+    });
+
+    test('should correctly update the status of a role if it is present in the default roles', () => {
+      const displayedRoles: RolesCategory[] = [
+        { name: 'Manage bounties', roles: [], status: false },
+        { name: 'Fund organization', roles: [], status: false },
+        { name: 'Withdraw from organization', roles: [], status: false },
+        { name: 'View transaction history', roles: [], status: false }
+      ];
+      const result = handleDisplayRole(displayedRoles);
+      expect(result.newDisplayedRoles).toEqual([
+        { name: 'Manage bounties', roles: [], status: true },
+        { name: 'Fund organization', roles: [], status: true },
+        { name: 'Withdraw from organization', roles: [], status: true },
+        { name: 'View transaction history', roles: [], status: true }
+      ]);
+      expect(result.tempDataRole).toEqual({});
+    });
+
+    test('should correctly update the tempDataRole object with the data roles of a role if it is present in the default roles', () => {
+      const displayedRoles: RolesCategory[] = [
+        { name: 'Manage bounties', roles: ['role1', 'role2'], status: false },
+        { name: 'Fund organization', roles: ['role3'], status: false },
+        { name: 'Withdraw from organization', roles: ['role4'], status: false },
+        { name: 'View transaction history', roles: ['role5'], status: false }
+      ];
+      const result = handleDisplayRole(displayedRoles);
+      expect(result.newDisplayedRoles).toEqual([
+        { name: 'Manage bounties', roles: ['role1', 'role2'], status: true },
+        { name: 'Fund organization', roles: ['role3'], status: true },
+        { name: 'Withdraw from organization', roles: ['role4'], status: true },
+        { name: 'View transaction history', roles: ['role5'], status: true }
+      ]);
+      expect(result.tempDataRole).toEqual({
+        role1: true,
+        role2: true,
+        role3: true,
+        role4: true,
+        role5: true
+      });
     });
   });
 });
