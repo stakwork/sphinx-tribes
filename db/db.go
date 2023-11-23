@@ -33,7 +33,7 @@ func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 		m.Name = "name"
 	}
 	if m.Description == "" {
-		m.Description = "description"
+		m.Description = ""
 	}
 	if m.Tags == nil {
 		m.Tags = []string{}
