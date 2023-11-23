@@ -8,7 +8,7 @@ import {
 } from '../../config/bounties';
 import { FormField } from './utils';
 
-const strValidator = Yup.string().trim().required('Required');
+ const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
 const repoStrValidator = Yup.string()
   .trim()
@@ -698,19 +698,17 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'one_sentence_summary',
-    label: 'Bounty Title',
+    label: 'Bounty Title *',
     type: 'text',
-    validator: strValidator
   },
   {
     name: 'ticket_url',
     label: 'Github Issue URL',
     type: 'text',
-    validator: strValidator
   },
   {
     name: 'wanted_type',
-    label: 'Category',
+    label: 'Category *',
     type: 'select',
     testId: 'Category',
     options: helpType_wanted_coding_task_schema
