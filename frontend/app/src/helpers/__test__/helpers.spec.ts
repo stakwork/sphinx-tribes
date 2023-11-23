@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import moment from 'moment';
-import { handleDisplayRole } from '../helpers';
 import {
   extractGithubIssueFromUrl,
   extractRepoAndIssueFromIssueUrl,
@@ -10,7 +9,8 @@ import {
   userHasRole,
   spliceOutPubkey,
   userHasManageBountyRoles,
-  RolesCategory
+  RolesCategory,
+  handleDisplayRole
 } from '../helpers-extended';
 
 beforeAll(() => {
