@@ -127,7 +127,10 @@ const AssignUserRoles = (props: AssignUserModalProps) => {
     >
       <AssignUserContainer>
         <UserInfoContainer>
-          <AssignRoleUserImage src={user?.img} alt="profile" />
+          <AssignRoleUserImage
+            src={user?.img || main.getUserAvatarPlaceholder(user?.owner_pubkey || '')}
+            alt="profile"
+          />
           <AssignRoleUsername>{user?.owner_alias}</AssignRoleUsername>
         </UserInfoContainer>
         <UserRolesContainer>
