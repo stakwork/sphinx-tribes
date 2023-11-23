@@ -705,7 +705,8 @@ export const wantedCodingTaskSchema: FormField[] = [
   {
     name: 'ticket_url',
     label: 'Github Issue URL',
-    type: 'text'
+    type: 'text',
+    validator: strValidator
   },
   {
     name: 'wanted_type',
