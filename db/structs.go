@@ -640,6 +640,15 @@ type Meme struct {
 	Expiry      *time.Time  `json:"expiry"`
 }
 
+type BountyMetrics struct {
+	BountiesPosted         int64
+	BountiesPaid           int64
+	BountiesPaidPercentage uint
+	SatsPosted             uint
+	SatsPaid               uint
+	SatsPaidPercentage     uint
+}
+
 func (Person) TableName() string {
 	return "people"
 }
