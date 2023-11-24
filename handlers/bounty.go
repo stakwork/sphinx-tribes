@@ -143,6 +143,11 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if bounty.Assignee != "" {
+		now := time.Now()
+		bounty.AssignedDate = &now
+	}
+
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
@@ -401,6 +406,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		db.DB.AddPaymentHistory(paymentHistory)
 		bounty.Paid = true
 		bounty.PaidDate = &now
+		bounty.PaidDateDifference = utils.GetDateDaysDifference(bounty.Created, &now)
 		db.DB.UpdateBounty(bounty)
 
 		msg["msg"] = "keysend_success"
