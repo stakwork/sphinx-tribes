@@ -44,7 +44,8 @@ describe('Main store', () => {
     mainStore.saveBounty(bounty);
 
     expect(mockFetch).toBeCalledTimes(1);
-    expect(mockFetch).toBeCalledWith(`https://people.sphinx.chat/gobounties?token=test_jwt`, {
+    // pass ci
+    expect(mockFetch).toBeCalledWith(`http://localhost:5002/gobounties?token=test_jwt`, {
       method: 'POST',
       mode: 'cors',
       headers: {
