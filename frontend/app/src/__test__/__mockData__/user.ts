@@ -24,7 +24,7 @@ export const user: MeInfo = {
   },
   owner_alias: 'Vladimir',
   owner_pubkey: 'test_pub_key',
-  img: '',
+  img: '/static/avatarPlaceholders/placeholder_34.jpg',
   twitter_confirmed: false,
   isSuperAdmin: false,
   websocketToken: 'test_websocketToken'
