@@ -118,6 +118,8 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	totalSatsPosted := db.DB.TotalSatsPosted(request)
 	totalSatsPaid := db.DB.TotalSatsPaid(request)
 	satsPaidPercentage := db.DB.SatsPaidPercentage(request)
+	avgPaidDays := db.DB.AveragePaidTime(request)
+	avgCompletedDays := db.DB.AverageCompletedTime(request)
 
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,
@@ -126,6 +128,8 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		SatsPosted:             totalSatsPosted,
 		SatsPaid:               totalSatsPaid,
 		SatsPaidPercentage:     satsPaidPercentage,
+		AveragePaid:            avgPaidDays,
+		AverageCompleted:       avgCompletedDays,
 	}
 
 	w.WriteHeader(http.StatusOK)
