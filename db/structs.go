@@ -355,36 +355,37 @@ type Client struct {
 }
 
 type Bounty struct {
-	ID                      uint           `json:"id"`
-	OwnerID                 string         `json:"owner_id"`
-	Paid                    bool           `json:"paid"`
-	Show                    bool           `gorm:"default:false" json:"show"`
-	Type                    string         `json:"type"`
-	Award                   string         `json:"award"`
-	AssignedHours           uint8          `json:"assigned_hours"`
-	BountyExpires           string         `json:"bounty_expires"`
-	CommitmentFee           uint64         `json:"commitment_fee"`
-	Price                   string         `json:"price"`
-	Title                   string         `json:"title"`
-	Tribe                   string         `json:"tribe"`
-	Assignee                string         `json:"assignee"`
-	TicketUrl               string         `json:"ticket_url"`
-	OrgUuid                 string         `json:"org_uuid"`
-	Description             string         `json:"description"`
-	WantedType              string         `json:"wanted_type"`
-	Deliverables            string         `json:"deliverables"`
-	GithubDescription       bool           `json:"github_description"`
-	OneSentenceSummary      string         `json:"one_sentence_summary"`
-	EstimatedSessionLength  string         `json:"estimated_session_length"`
-	EstimatedCompletionDate string         `json:"estimated_completion_date"`
-	Created                 int64          `json:"created"`
-	Updated                 *time.Time     `json:"updated"`
-	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
-	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
-	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
-	PaidDate                *time.Time     `json:"paid_date,omitempty"`
-	PaidDateDifference      int64          `json:"paid_date_difference,omitempty"`
-	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
+	ID                       uint           `json:"id"`
+	OwnerID                  string         `json:"owner_id"`
+	Paid                     bool           `json:"paid"`
+	Show                     bool           `gorm:"default:false" json:"show"`
+	Type                     string         `json:"type"`
+	Award                    string         `json:"award"`
+	AssignedHours            uint8          `json:"assigned_hours"`
+	BountyExpires            string         `json:"bounty_expires"`
+	CommitmentFee            uint64         `json:"commitment_fee"`
+	Price                    string         `json:"price"`
+	Title                    string         `json:"title"`
+	Tribe                    string         `json:"tribe"`
+	Assignee                 string         `json:"assignee"`
+	TicketUrl                string         `json:"ticket_url"`
+	OrgUuid                  string         `json:"org_uuid"`
+	Description              string         `json:"description"`
+	WantedType               string         `json:"wanted_type"`
+	Deliverables             string         `json:"deliverables"`
+	GithubDescription        bool           `json:"github_description"`
+	OneSentenceSummary       string         `json:"one_sentence_summary"`
+	EstimatedSessionLength   string         `json:"estimated_session_length"`
+	EstimatedCompletionDate  string         `json:"estimated_completion_date"`
+	Created                  int64          `json:"created"`
+	Updated                  *time.Time     `json:"updated"`
+	AssignedDate             *time.Time     `json:"assigned_date,omitempty"`
+	CompletionDate           *time.Time     `json:"completion_date,omitempty"`
+	MarkAsPaidDate           *time.Time     `json:"mark_as_paid_date,omitempty"`
+	PaidDate                 *time.Time     `json:"paid_date,omitempty"`
+	PaidDateDifference       int64          `gorm:"type:bigint;not null default:'0'" json:"paid_date_difference,omitempty"`
+	CompletionDateDifference int64          `gorm:"type:bigint;not null default:'0'" json:"completion_date_difference,omitempty"`
+	CodingLanguages          pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
 type BountyData struct {
@@ -648,6 +649,8 @@ type BountyMetrics struct {
 	SatsPosted             uint  `json:"sats_posted"`
 	SatsPaid               uint  `json:"sats_paid"`
 	SatsPaidPercentage     uint  `json:"sats_paid_percentage"`
+	AveragePaid            uint  `json:"average_paid"`
+	AverageCompleted       uint  `json:"average_completed"`
 }
 
 func (Person) TableName() string {
