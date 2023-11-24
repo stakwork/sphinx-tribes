@@ -383,6 +383,7 @@ type Bounty struct {
 	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
 	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
 	PaidDate                *time.Time     `json:"paid_date,omitempty"`
+	PaidDateDifference      int64          `json:"paid_date_difference,omitempty"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
@@ -641,12 +642,12 @@ type Meme struct {
 }
 
 type BountyMetrics struct {
-	BountiesPosted         int64
-	BountiesPaid           int64
-	BountiesPaidPercentage uint
-	SatsPosted             uint
-	SatsPaid               uint
-	SatsPaidPercentage     uint
+	BountiesPosted         int64 `json:"bounties_posted"`
+	BountiesPaid           int64 `json:"bounties_paid"`
+	BountiesPaidPercentage uint  `json:"bounties_paid_average"`
+	SatsPosted             uint  `json:"sats_posted"`
+	SatsPaid               uint  `json:"sats_paid"`
+	SatsPaidPercentage     uint  `json:"sats_paid_percentage"`
 }
 
 func (Person) TableName() string {
