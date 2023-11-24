@@ -12,6 +12,11 @@ import { PersonBounty } from 'store/main';
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
 
+const findPerson = (search: any) => (item: any) => {
+  const { person, body } = item;
+  return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
+};
+
 type Props = {
   setConnectPerson: (p: any) => void;
 };
@@ -49,8 +54,10 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       bounty = await main.getBountyByCreated(Number(search.created));
     }
 
-    const activeIndex = bounty && bounty.length ? bounty[0].body.id : 0;
-    const connectPerson = bounty && bounty.length ? bounty[0].person : [];
+    const activeIndex = bountyId
+      ? main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
+      : (main.peopleBounties ?? []).findIndex(findPerson(search));
+    const connectPerson = (main.peopleBounties ?? [])[activeIndex];
 
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
@@ -61,6 +68,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     setActiveBounty(bounty);
     setVisible(visible);
   }, [bountyId, main, search]);
+
 
   useEffect(() => {
     getBounty();
