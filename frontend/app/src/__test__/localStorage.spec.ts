@@ -1,5 +1,4 @@
-
-import { localStorageMock } from '../__test__/__mockData__/localStorage'
+import { localStorageMock } from '../__test__/__mockData__/localStorage';
 describe('Local Storage', () => {
   beforeEach(() => {
     Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -42,4 +41,3 @@ describe('Local Storage', () => {
     expect(localStorageMock.getItem(key2)).toBeUndefined();
   });
 });
-

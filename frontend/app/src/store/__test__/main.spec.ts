@@ -10,26 +10,26 @@ const mockHeaders = jest.fn();
 const origFetch = global.fetch;
 
 beforeAll(() => {
-    global.fetch = mockFetch;
-    global.Headers = mockHeaders;
-})
+  global.fetch = mockFetch;
+  global.Headers = mockHeaders;
+});
 
 afterAll(() => {
-    global.fetch = origFetch;
-    jest.clearAllMocks();
+  global.fetch = origFetch;
+  jest.clearAllMocks();
 });
 
 describe('Main store', () => {
   beforeEach(async () => {
-    uiStore.setMeInfo(user)
-    localStorageMock.setItem('ui', JSON.stringify(uiStore))
+    uiStore.setMeInfo(user);
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
   });
 
-  it("should call endpoint on saveBounty", () => {
+  it('should call endpoint on saveBounty', () => {
     const mainStore = new MainStore();
     const bounty = {
-      title: "title",
-      description: "description",
+      title: 'title',
+      description: 'description',
       amount: 100,
       owner_pubkey: user.owner_pubkey,
       owner_alias: user.alias,
@@ -40,22 +40,20 @@ describe('Main store', () => {
       img: user.img,
       tags: [],
       route_hint: user.route_hint
-    }
-    mainStore.saveBounty(bounty)
-
+    };
+    mainStore.saveBounty(bounty);
 
     expect(mockFetch).toBeCalledTimes(1);
     expect(mockFetch).toBeCalledWith(`https://people.sphinx.chat/gobounties?token=test_jwt`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-            'x-jwt': 'test_jwt',
-            'Content-Type': 'application/json'
-        },
-        body: expect.anything(),
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'x-jwt': 'test_jwt',
+        'Content-Type': 'application/json'
+      },
+      body: expect.anything()
     });
   });
-
 
   it('should save user profile', async () => {
     const mainStore = new MainStore();
@@ -70,11 +68,10 @@ describe('Main store', () => {
       img: user.img,
       tags: [],
       route_hint: user.route_hint
-    }
-    mainStore.saveProfile(person)
+    };
+    mainStore.saveProfile(person);
 
     expect(toJS(uiStore.meInfo)).toEqual(user);
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
   });
 });
-
