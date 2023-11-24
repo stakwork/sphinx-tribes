@@ -1,41 +1,51 @@
-import React, { useRef, useState } from 'react';
-import { Wrap } from 'components/form/style';
+import React, { ChangeEvent, useState } from 'react';
 import { useIsMobile } from 'hooks/uiHooks';
+import { EuiLoadingSpinner } from '@elastic/eui';
+import { useStores } from 'store';
+import { Person } from 'store/main';
 import { nonWidgetConfigs } from 'people/utils/Constants';
-import { Formik } from 'formik';
-import { FormField, validator } from 'components/form/utils';
-import { spliceOutPubkey } from 'helpers';
-import { Button, Modal } from '../../../components/common';
-import Input from '../../../components/form/inputs';
+import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
-import { ModalTitle, RouteHintText } from './style';
 import { AddUserModalProps } from './interface';
+import {
+  AddUserBtn,
+  AddUserContainer,
+  AddUserHeader,
+  AddUserHeaderContainer,
+  FooterContainer,
+  SearchUserInput,
+  SmallBtn,
+  UserContianer,
+  UserImg,
+  UserInfo,
+  Username,
+  UsersListContainer
+} from './style';
 
 const color = colors['light'];
 
 const AddUserModal = (props: AddUserModalProps) => {
   const isMobile = useIsMobile();
-  const { isOpen, close, onSubmit, loading, disableFormButtons, setDisableFormButtons } = props;
-  const [displayHint, setDisplayHint] = useState(false);
-
-  const hintText = 'Route hint detected and removed';
-
-  const checkDisplayHint = (address: string) => {
-    if (address.includes(':')) {
-      setDisplayHint(true);
-    } else {
-      setDisplayHint(false);
-    }
-  };
+  const { isOpen, close, onSubmit, loading } = props;
+  const { main, ui } = useStores();
+  const [selectedPubkey, setSelectedPubkey] = useState<string>();
+  const [searchTerm, setSearchName] = useState<string>('');
+  const [people, setPeople] = useState<Person[]>(
+    (main.people && main.people.filter((f: any) => !f.hide)) || []
+  );
+  const currentUserPubkey = ui.meInfo?.owner_pubkey;
 
   const config = nonWidgetConfigs['organizationusers'];
 
-  const schema = [...config.schema];
+  function checkIsActive(pubkey: string) {
+    return !!(selectedPubkey && pubkey !== selectedPubkey);
+  }
 
-  const formRef = useRef(null);
-
-  const initValues = {
-    owner_pubkey: ''
+  const handleSearchUser = async (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    setSearchName(name);
+    const persons = await main.getPeopleByNameAliasPubkey(name);
+    setPeople(persons.filter((person: Person) => person.owner_pubkey !== currentUserPubkey));
   };
 
   return (
@@ -51,7 +61,8 @@ const AddUserModal = (props: AddUserModalProps) => {
         zIndex: 20,
         ...(config?.modalStyle ?? {}),
         maxHeight: '100%',
-        borderRadius: '10px'
+        borderRadius: '10px',
+        minWidth: '22rem'
       }}
       overlayClick={close}
       bigCloseImage={close}
@@ -62,66 +73,44 @@ const AddUserModal = (props: AddUserModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <Formik
-        initialValues={initValues || {}}
-        onSubmit={onSubmit}
-        innerRef={formRef}
-        validationSchema={validator(schema)}
-      >
-        {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, initialValues }: any) => (
-          <Wrap newDesign={true}>
-            <ModalTitle>Add new user</ModalTitle>
-            {displayHint && <RouteHintText>{hintText}</RouteHintText>}
-            <div className="SchemaInnerContainer">
-              {schema.map((item: FormField) => (
-                <Input
-                  {...item}
-                  key={item.name}
-                  values={values}
-                  errors={errors}
-                  value={values[item.name]}
-                  error={errors[item.name]}
-                  initialValues={initialValues}
-                  deleteErrors={() => {
-                    if (errors[item.name]) delete errors[item.name];
-                  }}
-                  handleChange={(e: any) => {
-                    checkDisplayHint(e);
-                    const pubkey = spliceOutPubkey(e);
-                    setFieldValue(item.name, pubkey);
-                  }}
-                  setFieldValue={(e: any, f: any) => {
-                    setFieldValue(e, f);
-                  }}
-                  setFieldTouched={setFieldTouched}
-                  handleBlur={() => setFieldTouched(item.name, false)}
-                  handleFocus={() => setFieldTouched(item.name, true)}
-                  setDisableFormButtons={setDisableFormButtons}
-                  borderType={'bottom'}
-                  imageIcon={true}
-                  style={
-                    item.name === 'github_description' && !values.ticket_url
-                      ? {
-                          display: 'none'
-                        }
-                      : undefined
-                  }
-                />
-              ))}
-              <Button
-                disabled={disableFormButtons || loading}
-                onClick={() => {
-                  handleSubmit();
-                }}
-                loading={loading}
-                style={{ width: '100%' }}
-                color={'primary'}
-                text={'Add user'}
-              />
-            </div>
-          </Wrap>
-        )}
-      </Formik>
+      <AddUserContainer>
+        <AddUserHeaderContainer>
+          <AddUserHeader>Add New User</AddUserHeader>
+          <SearchUserInput
+            value={searchTerm}
+            onChange={handleSearchUser}
+            placeholder="Type to search ..."
+          />
+        </AddUserHeaderContainer>
+        <UsersListContainer>
+          {people.length > 0 ? (
+            people.map((person: any, index: number) => (
+              <UserContianer key={index}>
+                <UserInfo inactive={checkIsActive(person.owner_pubkey)}>
+                  <UserImg src={person.img} alt="user" />
+                  <Username>{person.owner_alias}</Username>
+                </UserInfo>
+                <SmallBtn
+                  selected={person.owner_pubkey === selectedPubkey}
+                  onClick={() => setSelectedPubkey(person.owner_pubkey)}
+                >
+                  Add
+                </SmallBtn>
+              </UserContianer>
+            ))
+          ) : (
+            <p>No user with such alias</p>
+          )}
+        </UsersListContainer>
+        <FooterContainer>
+          <AddUserBtn
+            onClick={() => onSubmit({ owner_pubkey: selectedPubkey })}
+            disabled={!selectedPubkey}
+          >
+            {loading ? <EuiLoadingSpinner size="s" /> : 'Add User'}
+          </AddUserBtn>
+        </FooterContainer>
+      </AddUserContainer>
     </Modal>
   );
 };
