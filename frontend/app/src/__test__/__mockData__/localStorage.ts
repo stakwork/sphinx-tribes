@@ -20,8 +20,8 @@ export const localStorageMock = (function () {
 
     getAll() {
       return store;
-    },
+    }
   };
 })();
 
-Object.defineProperty(window, "localStorage", { value: localStorageMock });
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
