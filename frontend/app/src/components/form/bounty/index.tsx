@@ -478,7 +478,7 @@ function Form(props: FormProps) {
                                 (props.extraHTML && props.extraHTML[item.name]) || item.extraHTML
                               }
                               style={
-                                item.name === 'github_description' && !values.ticket_url 
+                                item.name === 'github_description' && !values.ticket_url
                                   ? {
                                       display: 'none'
                                     }
@@ -486,9 +486,9 @@ function Form(props: FormProps) {
                               }
                               label={
                                 item.name === 'description' && !values.ticket_url
-                                  ?  'Description *'
+                                  ? 'Description *'
                                   : item.label
-                              }                                                 
+                              }
                             />
                           ))}
                       </div>
