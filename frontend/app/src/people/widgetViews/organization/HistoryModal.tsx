@@ -146,14 +146,14 @@ const TR = styled.tr<{ type: OrgTransactionType }>`
       props.type === 'deposit'
         ? 'rgba(73, 201, 152, 0.20)'
         : props.type === 'withdraw'
-          ? 'rgba(145, 87, 246, 0.15)'
-          : 'rgba(0, 0, 0, 0.07)'};
+        ? 'rgba(145, 87, 246, 0.15)'
+        : 'rgba(0, 0, 0, 0.07)'};
   background-color: ${(props: any) =>
     props.type === 'deposit'
       ? '#F6FFFA'
       : props.type === 'withdraw'
-        ? 'rgba(167, 108, 243, 0.05)'
-        : ''};
+      ? 'rgba(167, 108, 243, 0.05)'
+      : ''};
 `;
 
 const TD = styled.td`
