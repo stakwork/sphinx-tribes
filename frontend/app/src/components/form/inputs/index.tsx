@@ -64,8 +64,8 @@ export const FieldEnv = styled(EuiFormRow as any)<fieldEnvProps>`
     p.border === 'bottom'
       ? ''
       : p?.isTop
-        ? `1px solid ${p?.color && p.color.pureWhite}`
-        : `1px solid ${p?.color && p.color.grayish.G600}`};
+      ? `1px solid ${p?.color && p.color.pureWhite}`
+      : `1px solid ${p?.color && p.color.grayish.G600}`};
   border-bottom: ${(p: any) => (p.border === 'bottom' ? `1px solid ${p.color.grayish.G600}` : '')};
   box-sizing: border-box;
   border-radius: ${(p: any) => (p.border === 'bottom' ? '0px' : '4px')};
