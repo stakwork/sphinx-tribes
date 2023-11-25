@@ -484,6 +484,11 @@ function Form(props: FormProps) {
                                     }
                                   : undefined
                               }
+                              label={
+                                item.name === 'description' && !values.ticket_url
+                                  ? 'Description *'
+                                  : item.label
+                              }
                             />
                           ))}
                       </div>
