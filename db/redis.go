@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/stakwork/sphinx-tribes/utils"
@@ -34,8 +35,8 @@ func InitRedis() {
 	}
 }
 
-func SetValue(key string, value string) {
-	err := RedisClient.Set(ctx, key, value, 0).Err()
+func SetValue(key string, value interface{}) {
+	err := RedisClient.Set(ctx, key, value, 6*time.Hour).Err()
 	if err != nil {
 		fmt.Println("REDIS SET ERROR :", err)
 	}
@@ -57,6 +58,7 @@ func SetMap(key string, values map[string]interface{}) {
 			fmt.Println("REDIS SET MAP ERROR :", err)
 		}
 	}
+	RedisClient.Expire(ctx, key, 6*time.Hour)
 }
 
 func GetMap(key string) map[string]string {
