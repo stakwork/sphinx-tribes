@@ -18,7 +18,8 @@ const hosts: { [k: string]: AppMode } = {
   'people.sphinx.chat': AppMode.COMMUNITY,
   'people-test.sphinx.chat': AppMode.COMMUNITY,
   'community-test.sphinx.chat': AppMode.COMMUNITY,
-  'community.sphinx.chat': AppMode.COMMUNITY
+  'community.sphinx.chat': AppMode.COMMUNITY,
+  'bounties.sphinx.chat': AppMode.COMMUNITY
 };
 
 function getMode(): AppMode {

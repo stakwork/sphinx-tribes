@@ -3,7 +3,7 @@ import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
 import { nonWidgetConfigs } from 'people/utils/Constants';
 import styled from 'styled-components';
-import { userHasRole, Roles, ManageBountiesGroup } from 'helpers';
+import { userHasRole, Roles, s_RolesCategories } from 'helpers';
 import { useStores } from 'store';
 import avatarIcon from '../../../public/static/profile_avatar.svg';
 import { Button, Modal } from '../../../components/common';
@@ -31,10 +31,10 @@ const UserRolesImage = styled(UserImage)`
   position: fixed;
   left: 50%;
   transform: translate(-40px, -90px);
-  borderstyle: solid;
-  borderradius: 50%;
-  borderwidth: 4px;
-  bordercolor: white;
+  border-style: solid;
+  border-radius: 50%;
+  border-width: 4px;
+  border-color: white;
 `;
 
 const HLine = styled.div`
@@ -43,39 +43,6 @@ const HLine = styled.div`
   width: 100%;
   margin: 5px 0px 20px;
 `;
-
-const s_RolesCategories = [
-  {
-    name: 'Manage organization',
-    roles: ['EDIT ORGANIZATION'],
-    status: false
-  },
-  {
-    name: 'Manage bounties',
-    roles: ManageBountiesGroup,
-    status: false
-  },
-  {
-    name: 'Fund organization',
-    roles: ['ADD BUDGET'],
-    status: false
-  },
-  {
-    name: 'Withdraw from organization',
-    roles: ['WITHDRAW BUDGET'],
-    status: false
-  },
-  {
-    name: 'View transaction history',
-    roles: ['VIEW REPORT'],
-    status: false
-  },
-  {
-    name: 'Update members',
-    roles: ['ADD USER', 'UPDATE USER', 'DELETE USER', 'ADD ROLES'],
-    status: false
-  }
-];
 
 const RolesModal = (props: UserRolesModalProps) => {
   const { main } = useStores();

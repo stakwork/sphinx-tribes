@@ -698,9 +698,8 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'one_sentence_summary',
-    label: 'Bounty Title',
-    type: 'text',
-    validator: strValidator
+    label: 'Bounty Title *',
+    type: 'text'
   },
   {
     name: 'ticket_url',
@@ -709,7 +708,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'wanted_type',
-    label: 'Category',
+    label: 'Category *',
     type: 'select',
     testId: 'Category',
     options: helpType_wanted_coding_task_schema
