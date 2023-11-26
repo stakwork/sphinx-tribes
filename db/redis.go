@@ -50,7 +50,7 @@ func GetValue(key string) string {
 	return val
 }
 
-func SetMap(key string, values map[string]string) {
+func SetMap(key string, values map[string]interface{}) {
 	for k, v := range values {
 		err := RedisClient.HSet(ctx, key, k, v).Err()
 		if err != nil {
