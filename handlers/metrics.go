@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/ambelovsky/go-structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 )
@@ -112,6 +113,19 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	metricsKey := fmt.Sprintf("metrics - %s - %s", request.StartDate, request.EndDate)
+	/**
+	check redis if cache id available for the date range
+	or add to redis
+	*/
+
+	redisMetrics := db.GetMap(metricsKey)
+	if len(redisMetrics) != 0 {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(redisMetrics)
+		return
+	}
+
 	totalBountiesPosted := db.DB.TotalBountiesPosted(request)
 	totalBountiesPaid := db.DB.TotalPaidBounties(request)
 	bountiesPaidPercentage := db.DB.BountiesPaidPercentage(request)
@@ -131,6 +145,9 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		AveragePaid:            avgPaidDays,
 		AverageCompleted:       avgCompletedDays,
 	}
+
+	metricsMap := structs.Map(bountyMetrics)
+	db.SetMap(metricsKey, metricsMap)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyMetrics)
