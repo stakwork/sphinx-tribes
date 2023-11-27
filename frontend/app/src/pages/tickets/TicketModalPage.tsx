@@ -29,7 +29,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
-
+  const [bountyDeleted, setBountyDeleted] = useState(false);
   const isMobile = useIsMobile();
 
   const search = useMemo(() => {
@@ -51,7 +51,10 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const activeIndex = bounty && bounty.length ? bounty[0].body.id : 0;
     const connectPerson = bounty && bounty.length ? bounty[0].person : [];
-
+    if (bounty && bounty.length === 0) {
+      setBountyDeleted(true);
+      return;
+    }
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
     setConnectPersonBody(connectPerson);
@@ -68,6 +71,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
+    setBountyDeleted(false);
     if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
       await main.getPeopleBounties({ page: 1, resetPage: true });
       history.push('/bounties');
@@ -117,26 +121,89 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   if (isMobile) {
     return (
       <>
-        {visible && (
-          <Modal visible={visible} fill={true}>
-            <FocusedView
-              person={connectPersonBody}
-              personBody={connectPersonBody}
-              canEdit={false}
-              selectedIndex={publicFocusIndex}
-              config={widgetConfigs.wanted}
-              bounty={activeBounty}
-              goBack={goBack}
-            />
-          </Modal>
+        {bountyDeleted ? (
+          <Modal visible={bountyDeleted} fill={true}>  
+          <div>
+          <p>This bounty has been deleted.</p>
+          
+        </div>
+          <FocusedView
+          person={connectPersonBody}
+          personBody={connectPersonBody}
+          canEdit={false}
+          selectedIndex={publicFocusIndex}
+          config={widgetConfigs.wanted}
+          bounty={activeBounty}
+          goBack={goBack}
+        />
+         
+        </Modal>
+        ) : (
+          visible && (
+            <Modal visible={visible} fill={true}>
+              <FocusedView
+                person={connectPersonBody}
+                personBody={connectPersonBody}
+                canEdit={false}
+                selectedIndex={publicFocusIndex}
+                config={widgetConfigs.wanted}
+                bounty={activeBounty}
+                goBack={goBack}
+              />
+            </Modal>
+          )
         )}
       </>
     );
   }
-
+  
   return (
     <>
-      {visible && (
+    {bountyDeleted ? (
+      <Modal
+      visible={bountyDeleted}
+      envStyle={{
+          background: color.pureWhite,
+          ...focusedDesktopModalStyles,
+          maxHeight: '100vh',
+          zIndex: 20
+        }}
+        style={{
+          background: 'rgba( 0 0 0 /75% )'
+        }}
+        overlayClick={goBack}
+        bigCloseImage={goBack}
+        bigCloseImageStyle={{
+          top: '18px',
+          right: '-50px',
+          borderRadius: '50%'
+        }}
+      >
+          <FocusedView
+            setRemoveNextAndPrev={setRemoveNextAndPrev}
+            person={connectPersonBody}
+            personBody={connectPersonBody}
+            canEdit={false}
+            selectedIndex={publicFocusIndex}
+            config={widgetConfigs.wanted}
+            goBack={goBack}
+            bounty={activeBounty}
+            fromBountyPage={true}
+            extraModalFunction={() => {
+              goBack();
+              if (ui.meInfo) {
+                setConnectPerson(connectPersonBody);
+              } else {
+                modals.setStartupModal(true);
+              }
+            }}
+          />
+      <div className="img">bounty
+  </div>
+
+      </Modal>
+    ):(
+      visible && (
         <Modal
           visible={visible}
           envStyle={{
@@ -178,7 +245,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
             }}
           />
         </Modal>
-      )}
+      ) )}
     </>
   );
 });
