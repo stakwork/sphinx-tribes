@@ -85,17 +85,17 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     }
   };
 
-  const directionHandler = (person: any, body: any) => { 
+  const directionHandler = (person: any, body: any) => {
     if (person && body) {
       if (bountyId) {
         if (bountyPathMatch) {
-          history.replace(`/bounty/${body.id}`)
+          history.replace(`/bounty/${body.id}`);
         } else {
-          history.replace(`/org/bounty/${body.id}`)
+          history.replace(`/org/bounty/${body.id}`);
         }
       }
     }
-  }
+  };
 
   const prevArrHandler = () => {
     if (activeListIndex === 0) return;
