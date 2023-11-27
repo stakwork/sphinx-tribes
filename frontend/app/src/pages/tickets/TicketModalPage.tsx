@@ -57,7 +57,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     const activeIndex = bountyId
       ? main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
       : (main.peopleBounties ?? []).findIndex(findPerson(search));
-    const connectPerson = (main.peopleBounties ?? [])[activeIndex];
+    const connectPerson = bounty && bounty.length ? bounty[0].person : [];
 
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
@@ -73,9 +73,11 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     getBounty();
   }, [getBounty, removeNextAndPrev]);
 
+  const bountyPathMatch = matchPath(location.pathname, { path: '/bounty/:bountyId' });
+
   const goBack = async () => {
     setVisible(false);
-    if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
+    if (bountyPathMatch) {
       await main.getPeopleBounties({ page: 1, resetPage: true });
       history.push('/bounties');
     } else {
@@ -83,42 +85,30 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     }
   };
 
+  const directionHandler = (person: any, body: any) => { 
+    if (person && body) {
+      if (bountyId) {
+        if (bountyPathMatch) {
+          history.replace(`/bounty/${body.id}`)
+        } else {
+          history.replace(`/org/bounty/${body.id}`)
+        }
+      }
+    }
+  }
+
   const prevArrHandler = () => {
     if (activeListIndex === 0) return;
 
     const { person, body } = main.peopleBounties[activeListIndex - 1];
-    if (person && body) {
-      if (bountyId) history.replace(`/bounty/${body.id}`);
-      else {
-        history.replace({
-          pathname: history?.location?.pathname,
-          search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-          state: {
-            owner_id: person?.owner_pubkey,
-            created: body?.created
-          }
-        });
-      }
-    }
+    directionHandler(person, body);
   };
 
   const nextArrHandler = () => {
     if (activeListIndex + 1 > main.peopleBounties?.length) return;
 
     const { person, body } = main.peopleBounties[activeListIndex + 1];
-    if (person && body) {
-      if (bountyId) history.replace(`/bounty/${body.id}`);
-      else {
-        history.replace({
-          pathname: history?.location?.pathname,
-          search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-          state: {
-            owner_id: person?.owner_pubkey,
-            created: body?.created
-          }
-        });
-      }
-    }
+    directionHandler(person, body);
   };
 
   if (isMobile) {
