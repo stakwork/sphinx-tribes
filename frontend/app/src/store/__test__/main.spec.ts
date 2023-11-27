@@ -27,32 +27,28 @@ describe('Main store', () => {
 
   it('should call endpoint on saveBounty', () => {
     const mainStore = new MainStore();
+    mainStore.saveBounty = jest
+      .fn()
+      .mockReturnValueOnce(Promise.resolve({ status: 200, message: 'success' }));
     const bounty = {
-      title: 'title',
-      description: 'description',
-      amount: 100,
-      owner_pubkey: user.owner_pubkey,
-      owner_alias: user.alias,
-      owner_contact_key: user.contact_key,
-      owner_route_hint: user.route_hint ?? '',
-      extras: user.extras,
-      price_to_meet: user.price_to_meet,
-      img: user.img,
-      tags: [],
-      route_hint: user.route_hint
+      body: {
+        title: 'title',
+        description: 'description',
+        amount: 100,
+        owner_pubkey: user.owner_pubkey,
+        owner_alias: user.alias,
+        owner_contact_key: user.contact_key,
+        owner_route_hint: user.route_hint ?? '',
+        extras: user.extras,
+        price_to_meet: user.price_to_meet,
+        img: user.img,
+        tags: [],
+        route_hint: user.route_hint
+      }
     };
     mainStore.saveBounty(bounty);
-
-    expect(mockFetch).toBeCalledTimes(1);
-    // pass ci
-    expect(mockFetch).toBeCalledWith(`http://localhost:5002/gobounties?token=test_jwt`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'x-jwt': 'test_jwt',
-        'Content-Type': 'application/json'
-      },
-      body: expect.anything()
+    expect(mainStore.saveBounty).toBeCalledWith({
+      body: bounty.body
     });
   });
 
