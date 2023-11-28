@@ -29,8 +29,8 @@ const Panel = styled.a<PanelProps>`
   :hover {
     box-shadow: ${(p: any) =>
       p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
-    text-decoration: none !important;  
-}
+    text-decoration: none !important;
+  }
   :active {
     box-shadow: none !important;
   }
