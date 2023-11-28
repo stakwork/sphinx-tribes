@@ -35,7 +35,7 @@ const Panel = styled.a<PanelProps>`
   border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
 
   &:hover {
-    text-decoration: none !important;  
+    text-decoration: none !important;
   }
 `;
 

@@ -54,7 +54,7 @@ const OrganizationWrap = styled.a`
   }
 
   &:hover {
-    text-decoration: none !important;  
+    text-decoration: none !important;
   }
 `;
 
