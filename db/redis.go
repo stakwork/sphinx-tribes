@@ -15,7 +15,6 @@ var RedisClient *redis.Client
 
 func InitRedis() {
 	redisURL := os.Getenv("REDIS_URL")
-	fmt.Println("redis url :", redisURL)
 
 	if redisURL == "" {
 		dbInt, _ := utils.ConvertStringToInt(os.Getenv("REDIS_DB"))

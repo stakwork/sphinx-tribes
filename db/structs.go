@@ -364,7 +364,7 @@ type Bounty struct {
 	AssignedHours            uint8          `json:"assigned_hours"`
 	BountyExpires            string         `json:"bounty_expires"`
 	CommitmentFee            uint64         `json:"commitment_fee"`
-	Price                    string         `json:"price"`
+	Price                    uint           `json:"price"`
 	Title                    string         `json:"title"`
 	Tribe                    string         `json:"tribe"`
 	Assignee                 string         `json:"assignee"`
