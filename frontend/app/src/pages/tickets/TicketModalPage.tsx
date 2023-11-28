@@ -1,4 +1,5 @@
 import { Modal } from 'components/common';
+import { AlreadyDeleted } from 'components/common/AfterDeleteNotification/AlreadyDeleted';
 import { colors } from 'config';
 import { useIsMobile } from 'hooks';
 import { observer } from 'mobx-react-lite';
@@ -29,7 +30,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
-  const [bountyDeleted, setBountyDeleted] = useState(false);
+  const [isDeleted, setisDeleted] = useState(false);
   const isMobile = useIsMobile();
 
   const search = useMemo(() => {
@@ -51,16 +52,13 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const activeIndex = bounty && bounty.length ? bounty[0].body.id : 0;
     const connectPerson = bounty && bounty.length ? bounty[0].person : [];
-    if (bounty && bounty.length === 0) {
-      setBountyDeleted(true);
-      return;
-    }
     setPublicFocusIndex(activeIndex);
     setActiveListIndex(activeIndex);
     setConnectPersonBody(connectPerson);
 
     const visible = bounty && bounty.length > 0;
-
+    const isDeleted = bounty && bounty.length === 0;
+    setisDeleted(isDeleted);
     setActiveBounty(bounty);
     setVisible(visible);
   }, [bountyId, main, search]);
@@ -71,7 +69,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
-    setBountyDeleted(false);
+    setisDeleted(false);
     if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
       await main.getPeopleBounties({ page: 1, resetPage: true });
       history.push('/bounties');
@@ -121,23 +119,15 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   if (isMobile) {
     return (
       <>
-        {bountyDeleted ? (
-          <Modal visible={bountyDeleted} fill={true}>  
-          <div>
-          <p>This bounty has been deleted.</p>
-          
-        </div>
-          <FocusedView
-          person={connectPersonBody}
-          personBody={connectPersonBody}
-          canEdit={false}
-          selectedIndex={publicFocusIndex}
-          config={widgetConfigs.wanted}
-          bounty={activeBounty}
-          goBack={goBack}
-        />
-         
-        </Modal>
+        {isDeleted ? (
+          <Modal visible={isDeleted} fill={true}>
+            <AlreadyDeleted
+              onClose={function (): void {
+                throw new Error('Function not implemented.');
+              }}
+              isDeleted={true}
+            />
+          </Modal>
         ) : (
           visible && (
             <Modal visible={visible} fill={true}>
@@ -156,56 +146,12 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       </>
     );
   }
-  
+
   return (
     <>
-    {bountyDeleted ? (
-      <Modal
-      visible={bountyDeleted}
-      envStyle={{
-          background: color.pureWhite,
-          ...focusedDesktopModalStyles,
-          maxHeight: '100vh',
-          zIndex: 20
-        }}
-        style={{
-          background: 'rgba( 0 0 0 /75% )'
-        }}
-        overlayClick={goBack}
-        bigCloseImage={goBack}
-        bigCloseImageStyle={{
-          top: '18px',
-          right: '-50px',
-          borderRadius: '50%'
-        }}
-      >
-          <FocusedView
-            setRemoveNextAndPrev={setRemoveNextAndPrev}
-            person={connectPersonBody}
-            personBody={connectPersonBody}
-            canEdit={false}
-            selectedIndex={publicFocusIndex}
-            config={widgetConfigs.wanted}
-            goBack={goBack}
-            bounty={activeBounty}
-            fromBountyPage={true}
-            extraModalFunction={() => {
-              goBack();
-              if (ui.meInfo) {
-                setConnectPerson(connectPersonBody);
-              } else {
-                modals.setStartupModal(true);
-              }
-            }}
-          />
-      <div className="img">bounty
-  </div>
-
-      </Modal>
-    ):(
-      visible && (
+      {isDeleted ? (
         <Modal
-          visible={visible}
+          visible={isDeleted}
           envStyle={{
             background: color.pureWhite,
             ...focusedDesktopModalStyles,
@@ -222,30 +168,54 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
             right: '-50px',
             borderRadius: '50%'
           }}
-          prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
-          nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
         >
-          <FocusedView
-            setRemoveNextAndPrev={setRemoveNextAndPrev}
-            person={connectPersonBody}
-            personBody={connectPersonBody}
-            canEdit={false}
-            selectedIndex={publicFocusIndex}
-            config={widgetConfigs.wanted}
-            goBack={goBack}
-            bounty={activeBounty}
-            fromBountyPage={true}
-            extraModalFunction={() => {
-              goBack();
-              if (ui.meInfo) {
-                setConnectPerson(connectPersonBody);
-              } else {
-                modals.setStartupModal(true);
-              }
-            }}
-          />
+          <AlreadyDeleted onClose={goBack} isDeleted={true} />
         </Modal>
-      ) )}
+      ) : (
+        visible && (
+          <Modal
+            visible={visible}
+            envStyle={{
+              background: color.pureWhite,
+              ...focusedDesktopModalStyles,
+              maxHeight: '100vh',
+              zIndex: 20
+            }}
+            style={{
+              background: 'rgba( 0 0 0 /75% )'
+            }}
+            overlayClick={goBack}
+            bigCloseImage={goBack}
+            bigCloseImageStyle={{
+              top: '18px',
+              right: '-50px',
+              borderRadius: '50%'
+            }}
+            prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
+            nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
+          >
+            <FocusedView
+              setRemoveNextAndPrev={setRemoveNextAndPrev}
+              person={connectPersonBody}
+              personBody={connectPersonBody}
+              canEdit={false}
+              selectedIndex={publicFocusIndex}
+              config={widgetConfigs.wanted}
+              goBack={goBack}
+              bounty={activeBounty}
+              fromBountyPage={true}
+              extraModalFunction={() => {
+                goBack();
+                if (ui.meInfo) {
+                  setConnectPerson(connectPersonBody);
+                } else {
+                  modals.setStartupModal(true);
+                }
+              }}
+            />
+          </Modal>
+        )
+      )}
     </>
   );
 });
