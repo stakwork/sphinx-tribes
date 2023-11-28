@@ -22,7 +22,7 @@ export interface MeInfo {
   owner_route_hint?: string;
   photo_url: string;
   alias: string;
-  img?: string;
+  img: string;
   owner_alias?: string;
   github_issues?: any[];
   route_hint: string;
@@ -211,6 +211,7 @@ export const emptyMeData: MeData = {
   contact_key: '',
   price_to_meet: 0,
   photo_url: '',
+  img: '',
   url: '',
   jwt: '',
   tribe_jwt: '',
@@ -228,6 +229,7 @@ export const emptyMeInfo: MeInfo = {
   price_to_meet: 0,
   photo_url: '',
   url: '',
+  img: '',
   jwt: '',
   tribe_jwt: '',
   description: '',
