@@ -69,6 +69,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
+
     setisDeleted(false);
     if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
       await main.getPeopleBounties({ page: 1, resetPage: true });
@@ -76,6 +77,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     } else {
       history.goBack();
     }
+
   };
 
   const prevArrHandler = () => {

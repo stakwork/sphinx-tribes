@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import Select from 'react-select';
 import { SelProps } from 'components/interfaces';
 
-// @ts-ignore
 const S = styled(Select)`
 background:#ffffff00;
 border: 1px solid #E0E0E0;

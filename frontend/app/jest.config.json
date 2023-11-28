@@ -26,11 +26,18 @@
       "node"
     ],
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": "ts-jest",
+      "^.+\\.svg$": "<rootDir>/svgTransform.js" 
     },
+    "transformIgnorePatterns": [
+        "/node_modules/(?!core)"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleDirectories": ["node_modules", "<rootDir>"],
 		"globals": {
-    "window": { "location": {"host": "localhost"}},
-"testEnvironment": "jsdom"
-
-  }
+      "window": { "location": {"host": "localhost"}},
+      "testEnvironment": "jsdom"
+    }
   }
