@@ -1,6 +1,24 @@
 package db
 
-import "math"
+import (
+	"fmt"
+	"math"
+	"net/http"
+
+	"github.com/stakwork/sphinx-tribes/utils"
+)
+
+func (db database) TotalPeopleByDateRange(r PaymentDateRange) int64 {
+	var count int64
+	db.db.Model(&Person{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	return count
+}
+
+func (db database) TotalOrganizationsByDateRange(r PaymentDateRange) int64 {
+	var count int64
+	db.db.Model(&Organization{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	return count
+}
 
 func (db database) TotalPaymentsByDateRange(r PaymentDateRange) uint {
 	var sum uint
@@ -8,29 +26,32 @@ func (db database) TotalPaymentsByDateRange(r PaymentDateRange) uint {
 	return sum
 }
 
-func (db database) TotalSatsPaid(r PaymentDateRange) uint {
+func (db database) TotalSatsPosted(r PaymentDateRange) uint {
 	var sum uint
-	db.db.Model(&Bounty{}).Where("paid_date >= ?", r.StartDate).Where("paid_date <= ?", r.EndDate).Select("SUM(amount)").Row().Scan(&sum)
+	db.db.Model(&Bounty{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(price)").Row().Scan(&sum)
 	return sum
 }
 
-func (db database) TotalSatsPosted(r PaymentDateRange) uint {
+func (db database) TotalSatsPaid(r PaymentDateRange) uint {
 	var sum uint
-	db.db.Model(&Bounty{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(amount)").Row().Scan(&sum)
+	db.db.Model(&Bounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(price)").Row().Scan(&sum)
 	return sum
 }
 
 func (db database) SatsPaidPercentage(r PaymentDateRange) uint {
 	satsPosted := DB.TotalSatsPosted(r)
 	satsPaid := DB.TotalSatsPaid(r)
-	value := satsPosted * 100 / satsPaid
-	paidPercentage := math.Round(float64(value))
-	return uint(paidPercentage)
+	if satsPaid != 0 && satsPosted != 0 {
+		value := (satsPaid * 100) / satsPosted
+		paidPercentage := math.Round(float64(value))
+		return uint(paidPercentage)
+	}
+	return 0
 }
 
 func (db database) TotalPaidBounties(r PaymentDateRange) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Where("paid_date >= ?", r.StartDate).Where("paid_date <= ?", r.EndDate).Count(&count)
+	db.db.Model(&Bounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
 	return count
 }
 
@@ -43,21 +64,12 @@ func (db database) TotalBountiesPosted(r PaymentDateRange) int64 {
 func (db database) BountiesPaidPercentage(r PaymentDateRange) uint {
 	bountiesPosted := DB.TotalBountiesPosted(r)
 	bountiesPaid := DB.TotalPaidBounties(r)
-	value := bountiesPaid * 100 / bountiesPosted
-	paidPercentage := math.Round(float64(value))
-	return uint(paidPercentage)
-}
-
-func (db database) TotalPeopleByDateRange(r PaymentDateRange) int64 {
-	var count int64
-	db.db.Model(&Person{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
-	return count
-}
-
-func (db database) TotalOrganizationsByDateRange(r PaymentDateRange) int64 {
-	var count int64
-	db.db.Model(&Organization{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
-	return count
+	if bountiesPaid != 0 && bountiesPosted != 0 {
+		value := bountiesPaid * 100 / bountiesPosted
+		paidPercentage := math.Round(float64(value))
+		return uint(paidPercentage)
+	}
+	return 0
 }
 
 func (db database) PaidDifferenceSum(r PaymentDateRange) uint {
@@ -77,9 +89,12 @@ func (db database) PaidDifferenceCount(r PaymentDateRange) int64 {
 func (db database) AveragePaidTime(r PaymentDateRange) uint {
 	paidSum := DB.PaidDifferenceSum(r)
 	paidCount := DB.PaidDifferenceCount(r)
-	avg := paidSum / uint(paidCount)
-	avgDays := math.Round(float64(avg))
-	return uint(avgDays)
+	if paidCount != 0 && paidSum != 0 {
+		avg := paidSum / uint(paidCount)
+		avgDays := math.Round(float64(avg))
+		return uint(avgDays)
+	}
+	return 0
 }
 
 func (db database) CompletedDifferenceSum(r PaymentDateRange) uint {
@@ -99,7 +114,33 @@ func (db database) CompletesDifferenceCount(r PaymentDateRange) int64 {
 func (db database) AverageCompletedTime(r PaymentDateRange) uint {
 	paidSum := DB.PaidDifferenceSum(r)
 	paidCount := DB.PaidDifferenceCount(r)
-	avg := paidSum / uint(paidCount)
-	avgDays := math.Round(float64(avg))
-	return uint(avgDays)
+	if paidCount != 0 && paidSum != 0 {
+		avg := paidSum / uint(paidCount)
+		avgDays := math.Round(float64(avg))
+		return uint(avgDays)
+	}
+	return 0
+}
+
+func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []Bounty {
+	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(re)
+
+	orderQuery := ""
+	limitQuery := ""
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + "body." + sortBy + " " + direction
+	} else {
+		orderQuery = " ORDER BY " + "body." + sortBy + "" + "DESC"
+	}
+	if limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	}
+
+	query := `SELECT * public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
+	allQuery := query + " " + " " + orderQuery + " " + limitQuery
+
+	b := []Bounty{}
+	db.db.Raw(allQuery).Scan(&b)
+	return b
 }

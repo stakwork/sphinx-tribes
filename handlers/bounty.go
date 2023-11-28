@@ -334,7 +334,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bounty := db.DB.GetBounty(id)
-	amount, _ := utils.ConvertStringToUint(bounty.Price)
+	amount := bounty.Price
 
 	if bounty.ID != id {
 		w.WriteHeader(http.StatusNotFound)
