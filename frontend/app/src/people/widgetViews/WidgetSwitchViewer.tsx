@@ -20,7 +20,7 @@ interface PanelProps {
   isAssignee?: boolean;
 }
 
-const Panel = styled.div<PanelProps>`
+const Panel = styled.a<PanelProps>`
   margin-top: 5px;
   background: ${(p: any) => p.color && p.color.pureWhite};
   color: ${(p: any) => p.color && p.color.pureBlack};
@@ -29,7 +29,8 @@ const Panel = styled.div<PanelProps>`
   :hover {
     box-shadow: ${(p: any) =>
       p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
-  }
+    text-decoration: none !important;  
+}
   :active {
     box-shadow: none !important;
   }
@@ -167,6 +168,7 @@ function WidgetSwitchViewer(props: any) {
         // if this person has entries for this widget
         return (
           <Panel
+            href={`/bounty/${body.id}`}
             color={color}
             isMobile={isMobile}
             key={person?.owner_pubkey + i + body?.created}
