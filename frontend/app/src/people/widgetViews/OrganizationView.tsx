@@ -34,7 +34,7 @@ const Container = styled.div`
   }
 `;
 
-const OrganizationWrap = styled.div`
+const OrganizationWrap = styled.a`
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -51,6 +51,10 @@ const OrganizationWrap = styled.div`
   }
   @media only screen and (max-width: 500px) {
     padding: 0px;
+  }
+
+  &:hover {
+    text-decoration: none !important;  
   }
 `;
 
@@ -192,7 +196,7 @@ const Organizations = (props: { person: Person }) => {
   const orgUi = (org: any, key: number) => {
     const btnDisabled = (!org.bounty_count && org.bount_count !== 0) || !org.uuid;
     return (
-      <OrganizationWrap key={key}>
+      <OrganizationWrap key={key} href={`/org/bounties/${org.uuid}`}>
         <OrganizationData>
           <OrganizationImg src={org.img || avatarIcon} />
           <OrganizationBudget org={org} user_pubkey={user_pubkey ?? ''} />
