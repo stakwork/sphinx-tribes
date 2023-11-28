@@ -72,7 +72,7 @@ export const AlreadyDeleted = ({ onClose, bountyLink, bountyTitle }: AlreadyDele
           >
             This bounty has been <br />
             <Box component="span" fontWeight={700}>
-              Deleted
+              deleted
             </Box>
           </Box>
           <br />
