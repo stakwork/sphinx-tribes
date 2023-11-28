@@ -1046,7 +1046,7 @@ func (db database) CreateOrEditOrganization(m Organization) (Organization, error
 func (db database) GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error) {
 	ms := []OrganizationUsersData{}
 
-	err := db.db.Raw(`SELECT org.org_uuid, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.org_uuid = '` + uuid + `' OR org.organization = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
+	err := db.db.Raw(`SELECT org.org_uuid, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.org_uuid = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
 
 	return ms, err
 }

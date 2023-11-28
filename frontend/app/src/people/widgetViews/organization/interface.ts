@@ -68,3 +68,11 @@ export interface UserListProps {
   handleSettingsClick: (user: Person) => void;
   handleDeleteClick: (user: Person) => void;
 }
+
+export interface AssignUserModalProps extends ModalProps {
+  loading: boolean;
+  onSubmit: (body: any) => void;
+  user?: Person;
+  setLoading: (value: boolean) => void;
+  addToast: (title: string, color: 'danger' | 'success') => void;
+}

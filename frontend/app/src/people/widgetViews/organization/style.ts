@@ -1,6 +1,14 @@
 import styled from 'styled-components';
 import { Button } from 'components/common';
 
+interface SmallBtnProps {
+  selected: boolean;
+}
+
+interface UserProps {
+  inactive: boolean;
+}
+
 export const ModalTitle = styled.h3`
   font-size: 1.2rem;
 `;
@@ -517,4 +525,238 @@ export const RouteHintText = styled.p`
   font-size: 0.9rem;
   text-align: center;
   color: #9157f6;
+`;
+
+export const AddUserContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+export const AddUserHeaderContainer = styled.div`
+  display: flex;
+  padding: 1.875rem;
+  flex-direction: column;
+`;
+
+export const AddUserHeader = styled.h2`
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 1.625rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  margin-bottom: 1.25rem;
+`;
+
+export const SearchUserInput = styled.input`
+  padding: 0.9375rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #dde1e5;
+  background: #fff;
+  width: 100%;
+  color: #292c33;
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 400;
+
+  ::placeholder {
+    color: #8e969c;
+  }
+`;
+
+export const UsersListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.875rem;
+  background-color: #f2f3f5;
+  height: 16rem;
+  overflow-y: auto;
+`;
+
+export const UserContianer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+`;
+
+export const UserInfo = styled.div<UserProps>`
+  display: flex;
+  align-items: center;
+  opacity: ${(p: any) => (p.inactive ? 0.3 : 1)};
+`;
+
+export const UserImg = styled.img`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  margin-right: 0.63rem;
+  object-fit: cover;
+`;
+
+export const Username = styled.p`
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1rem;
+  margin-bottom: 0;
+`;
+
+export const SmallBtn = styled.button<SmallBtnProps>`
+  width: 5.375rem;
+  height: 2rem;
+  padding: 0.625rem;
+  border-radius: 0.375rem;
+  background: ${(p: any) => (p.selected ? '#618AFF' : '#dde1e5')};
+  color: ${(p: any) => (p.selected ? '#FFF' : '#5f6368')};
+  font-family: 'Barlow';
+  font-size: 0.8125rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 0rem; /* 0% */
+  letter-spacing: 0.00813rem;
+  border: none;
+`;
+
+export const FooterContainer = styled.div`
+  display: flex;
+  padding: 1.125rem 1.875rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const AddUserBtn = styled.button`
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  border-radius: 0.375rem;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 0rem;
+  letter-spacing: 0.00938rem;
+  background: #618aff;
+  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);
+  border: none;
+  color: #fff;
+  &:disabled {
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(142, 150, 156, 0.85);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;
+
+export const AssignUserContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+`;
+
+export const UserInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -2.5rem;
+  left: 0;
+  right: 0;
+`;
+
+export const AssignRoleUserImage = styled.img`
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: #dde1e5;
+  border: 4px solid #fff;
+  object-fit: cover;
+`;
+
+export const AssignRoleUsername = styled.p`
+  color: #3c3f41;
+  text-align: center;
+  font-family: 'Barlow';
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.625rem;
+  margin-top: 0.69rem;
+  margin-bottom: 0;
+  text-transform: capitalize;
+`;
+
+export const UserRolesContainer = styled.div`
+  padding: 3.25rem 3rem 3rem 3rem;
+  margin-top: 3.25rem;
+`;
+
+export const UserRolesTitle = styled.h2`
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 1.625rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.625rem;
+  margin-bottom: 2.81rem;
+`;
+
+export const RolesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const RoleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+export const Checkbox = styled.input`
+  margin-right: 1rem;
+  width: 1rem;
+  height: 1rem;
+`;
+
+export const Label = styled.label`
+  margin-bottom: 0;
+  color: #1e1f25;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.125rem;
+`;
+
+export const AssingUserBtn = styled.button`
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  border-radius: 0.375rem;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 0rem;
+  letter-spacing: 0.00938rem;
+  background: #618aff;
+  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);
+  border: none;
+  margin-top: 3rem;
+  color: #fff;
+  &:disabled {
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(142, 150, 156, 0.85);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
 `;
