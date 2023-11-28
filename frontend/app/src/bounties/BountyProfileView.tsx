@@ -133,7 +133,6 @@ const BountyProfileView = (props: BountiesProfileProps) => {
             ...props.UserImageStyle
           }}
         >
-          style={{ width: '100%' }}
           <LazyImg
             width={'100%'}
             height={'100%'}
