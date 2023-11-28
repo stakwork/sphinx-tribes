@@ -186,6 +186,10 @@ function FocusedView(props: FocusViewProps) {
           newBody.description = description;
         }
 
+        if (newBody.price) {
+          newBody.price = Number(newBody.price);
+        }
+
         // body.description = description;
         newBody.title = newBody.one_sentence_summary;
 
