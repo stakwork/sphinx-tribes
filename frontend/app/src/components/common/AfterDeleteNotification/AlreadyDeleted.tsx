@@ -82,7 +82,7 @@ export const AlreadyDeleted = ({
             component={EuiText}
             mb={{ xs: '250px', sm: '230px' }}
           >
-            This Bounty has been <br />
+            This bounty has been <br />
             <Box component="span" fontWeight={700}>
               Deleted
             </Box>
