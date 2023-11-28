@@ -12,10 +12,11 @@ func MetricsRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
-		r.Post("/payment_metrics", handlers.PaymentMetrics)
-		r.Post("/people_created", handlers.PeopleMetrics)
-		r.Post("/organization_created", handlers.OrganizationtMetrics)
-		r.Post("/bounty_metrics", handlers.BountyMetrics)
+		r.Post("/payment", handlers.PaymentMetrics)
+		r.Post("/people", handlers.PeopleMetrics)
+		r.Post("/organization", handlers.OrganizationtMetrics)
+		r.Post("/bounty", handlers.BountyMetrics)
+		r.Post("/bounties", handlers.MetricsBounties)
 	})
 	return r
 }
