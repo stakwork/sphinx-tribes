@@ -196,7 +196,7 @@ const Organizations = (props: { person: Person }) => {
   const orgUi = (org: any, key: number) => {
     const btnDisabled = (!org.bounty_count && org.bount_count !== 0) || !org.uuid;
     return (
-      <OrganizationWrap key={key} href={`/org/bounties/${org.uuid}`}>
+      <OrganizationWrap key={key}>
         <OrganizationData>
           <OrganizationImg src={org.img || avatarIcon} />
           <OrganizationBudget org={org} user_pubkey={user_pubkey ?? ''} />
