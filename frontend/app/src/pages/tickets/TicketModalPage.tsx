@@ -85,7 +85,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
         history.replace(`/bounty/${body.id}`);
       }
     }
-  }
+  };
 
   const prevArrHandler = () => {
     if (activeListIndex === 0) return;
