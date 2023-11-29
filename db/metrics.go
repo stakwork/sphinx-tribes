@@ -104,7 +104,7 @@ func (db database) CompletedDifferenceSum(r PaymentDateRange) uint {
 	return sum
 }
 
-func (db database) CompletesDifferenceCount(r PaymentDateRange) int64 {
+func (db database) CompletedDifferenceCount(r PaymentDateRange) int64 {
 	var count int64
 	db.db.Model(&Bounty{}).Where("completion_date_difference != ?",
 		"").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
@@ -112,8 +112,8 @@ func (db database) CompletesDifferenceCount(r PaymentDateRange) int64 {
 }
 
 func (db database) AverageCompletedTime(r PaymentDateRange) uint {
-	paidSum := DB.PaidDifferenceSum(r)
-	paidCount := DB.PaidDifferenceCount(r)
+	paidSum := DB.CompletedDifferenceSum(r)
+	paidCount := DB.CompletedDifferenceCount(r)
 	if paidCount != 0 && paidSum != 0 {
 		avg := paidSum / uint(paidCount)
 		avgDays := math.Round(float64(avg))
