@@ -33,7 +33,7 @@ func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 		m.Name = "name"
 	}
 	if m.Description == "" {
-		m.Description = "description"
+		m.Description = ""
 	}
 	if m.Tags == nil {
 		m.Tags = []string{}
@@ -1046,7 +1046,7 @@ func (db database) CreateOrEditOrganization(m Organization) (Organization, error
 func (db database) GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error) {
 	ms := []OrganizationUsersData{}
 
-	err := db.db.Raw(`SELECT org.org_uuid, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.org_uuid = '` + uuid + `' OR org.organization = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
+	err := db.db.Raw(`SELECT org.org_uuid, org.created as user_created, person.* FROM public.organization_users AS org LEFT OUTER JOIN public.people AS person ON org.owner_pub_key = person.owner_pub_key WHERE org.org_uuid = '` + uuid + `' ORDER BY org.created DESC`).Find(&ms).Error
 
 	return ms, err
 }
@@ -1065,9 +1065,7 @@ func (db database) GetOrganizationBountyCount(uuid string) int64 {
 
 func (db database) GetOrganizationUser(pubkey string, org_uuid string) OrganizationUsers {
 	ms := OrganizationUsers{}
-
 	db.db.Where("org_uuid = ?", org_uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
-
 	return ms
 }
 
@@ -1077,9 +1075,9 @@ func (db database) CreateOrganizationUser(orgUser OrganizationUsers) Organizatio
 	return orgUser
 }
 
-func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData) OrganizationUsersData {
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Delete(&OrganizationUsers{})
-
+func (db database) DeleteOrganizationUser(orgUser OrganizationUsersData, org string) OrganizationUsersData {
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("org_uuid = ?", org).Delete(&OrganizationUsers{})
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("org_uuid = ?", org).Delete(&UserRoles{})
 	return orgUser
 }
 

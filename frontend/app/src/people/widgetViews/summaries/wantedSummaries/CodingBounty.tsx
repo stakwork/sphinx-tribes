@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
-import { isInvoiceExpired, userHasManageBountyRoles } from 'helpers';
+import { isInvoiceExpired, userHasManageBountyRoles, userHasRole } from 'helpers';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
@@ -89,7 +89,6 @@ function MobileView(props: CodingBountiesProps) {
     createdURL,
     created,
     loomEmbedUrl,
-    commitment_fee,
     org_uuid,
     id,
     localPaid,
@@ -228,9 +227,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const makePayment = async () => {
     // If the bounty has a commitment fee, add the fee to the user payment
-    const price = Number(
-      commitment_fee && props.price ? commitment_fee + props.price : props?.price
-    );
+    const price = Number(props.price);
     // if there is an organization and the organization's
     // buudget is sufficient keysend to the user immediately
     // without generating an invoice, else generate an invoice
@@ -344,17 +341,15 @@ function MobileView(props: CodingBountiesProps) {
     if (org_uuid && userPubkey) {
       const userRoles = await main.getUserRoles(org_uuid, userPubkey);
       const organization = await main.getUserOrganizationByUuid(org_uuid);
-
       if (organization) {
         const isOrganizationAdmin = organization.owner_pubkey === userPubkey;
-
-        const canPayBounty =
-          isOrganizationAdmin || userHasManageBountyRoles(main.bountyRoles, userRoles);
-
+        const userAccess =
+          userHasManageBountyRoles(main.bountyRoles, userRoles) &&
+          userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+        const canPayBounty = isOrganizationAdmin || userAccess;
         if (!isOrganizationAdmin) {
           setCanEdit(false);
         }
-
         setUserBountyRole(canPayBounty);
       }
     }

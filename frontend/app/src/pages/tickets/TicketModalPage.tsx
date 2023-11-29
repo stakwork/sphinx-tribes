@@ -73,29 +73,19 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     getBounty();
   }, [getBounty, removeNextAndPrev]);
 
-  const bountyPathMatch = matchPath(location.pathname, { path: '/bounty/:bountyId' });
-
   const goBack = async () => {
     setVisible(false);
-    if (bountyPathMatch) {
-      await main.getPeopleBounties({ page: 1, resetPage: true });
-      history.push('/bounties');
-    } else {
-      history.goBack();
-    }
+    await main.getPeopleBounties({ page: 1, resetPage: true });
+    history.goBack();
   };
 
   const directionHandler = (person: any, body: any) => {
     if (person && body) {
       if (bountyId) {
-        if (bountyPathMatch) {
-          history.replace(`/bounty/${body.id}`);
-        } else {
-          history.replace(`/org/bounty/${body.id}`);
-        }
+        history.replace(`/bounty/${body.id}`);
       }
     }
-  };
+  }
 
   const prevArrHandler = () => {
     if (activeListIndex === 0) return;
