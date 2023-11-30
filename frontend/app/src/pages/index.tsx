@@ -4,6 +4,7 @@ import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
+import { AdminPage } from 'admin/admin';
 import BotsBody from '../bots/Body';
 import PeopleHeader from '../people/main/Header';
 import TokenRefresh from '../people/utils/TokenRefresh';
@@ -14,7 +15,6 @@ import { Modals } from './Modals';
 import { People } from './people';
 import { TicketsPage } from './tickets';
 import { LeaderboardPage } from './leaderboard';
-import { AdminPage } from 'admin/admin';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
