@@ -14,6 +14,7 @@ import { Modals } from './Modals';
 import { People } from './people';
 import { TicketsPage } from './tickets';
 import { LeaderboardPage } from './leaderboard';
+import { AdminPage } from 'admin/admin';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
@@ -43,6 +44,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         </Route>
         <Route path="/leaderboard">
           <LeaderboardPage />
+        </Route>
+        <Route path="/admin">
+          <AdminPage />
         </Route>
         <Route path="*">
           <Body />
