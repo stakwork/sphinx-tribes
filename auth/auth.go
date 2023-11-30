@@ -83,6 +83,79 @@ func PubKeyContext(next http.Handler) http.Handler {
 	})
 }
 
+// PubKeyContext parses pukey from signed timestamp
+func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			token = r.Header.Get("x-jwt")
+		}
+
+		if token == "" {
+			fmt.Println("[auth] no token")
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		isJwt := strings.Contains(token, ".") && !strings.HasPrefix(token, ".")
+
+		if isJwt {
+			claims, err := DecodeJwt(token)
+
+			if err != nil {
+				fmt.Println("Failed to parse JWT")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
+				fmt.Println("Token has expired")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			pubkey := fmt.Sprintf("%v", claims["pubkey"])
+			if !AdminCheck(pubkey) {
+				fmt.Println("Not a super admin")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ContextKey, claims["pubkey"])
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			pubkey, err := VerifyTribeUUID(token, true)
+
+			if pubkey == "" || err != nil {
+				fmt.Println("[auth] no pubkey || err != nil")
+				if err != nil {
+					fmt.Println(err)
+				}
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			if !AdminCheck(pubkey) {
+				fmt.Println("Not a super admin")
+				http.Error(w, http.StatusText(401), 401)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ContextKey, pubkey)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		}
+	})
+}
+
+func AdminCheck(pubkey string) bool {
+	for _, val := range config.SuperAdmins {
+		if val == pubkey {
+			return true
+		}
+	}
+	return false
+}
+
 // VerifyTribeUUID takes base64 uuid and returns hex pubkey
 func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
 
