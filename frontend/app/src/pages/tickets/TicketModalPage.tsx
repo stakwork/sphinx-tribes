@@ -67,7 +67,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
     const visible = bounty && bounty.length > 0;
     const isDeleted = bounty && bounty.length === 0;
-    setisDeleted(isDeleted)
+    setisDeleted(isDeleted);
     setActiveBounty(bounty);
     setVisible(visible);
   }, [bountyId, main, search]);
@@ -108,94 +108,94 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   if (isMobile) {
     return (
       <>
+        {isDeleted ? (
+          <Modal visible={isDeleted} fill={true}>
+            <AlreadyDeleted
+              onClose={function (): void {
+                throw new Error('Function not implemented.');
+              }}
+              isDeleted={true}
+            />
+          </Modal>
+        ) : (
+          visible && (
+            <Modal visible={visible} fill={true}>
+              <FocusedView
+                person={connectPersonBody}
+                personBody={connectPersonBody}
+                canEdit={false}
+                selectedIndex={publicFocusIndex}
+                config={widgetConfigs.wanted}
+                bounty={activeBounty}
+                goBack={goBack}
+              />
+            </Modal>
+          )
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
       {isDeleted ? (
-        <Modal visible={isDeleted} fill={true}>
-          <AlreadyDeleted
-            onClose={function (): void {
-              throw new Error('Function not implemented.');
-            }}
-            isDeleted={true}
-          />
+        <Modal
+          visible={isDeleted}
+          envStyle={{
+            background: color.pureWhite,
+            ...focusedDesktopModalStyles,
+
+            right: '-50px',
+            borderRadius: '50%'
+          }}
+        >
+          <AlreadyDeleted onClose={goBack} isDeleted={true} />
         </Modal>
       ) : (
         visible && (
-          <Modal visible={visible} fill={true}>
+          <Modal
+            visible={visible}
+            envStyle={{
+              background: color.pureWhite,
+              ...focusedDesktopModalStyles,
+              maxHeight: '100vh',
+              zIndex: 20
+            }}
+            style={{
+              background: 'rgba( 0 0 0 /75% )'
+            }}
+            overlayClick={goBack}
+            bigCloseImage={goBack}
+            bigCloseImageStyle={{
+              top: '18px',
+              right: '-50px',
+              borderRadius: '50%'
+            }}
+            prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
+            nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
+          >
             <FocusedView
+              setRemoveNextAndPrev={setRemoveNextAndPrev}
               person={connectPersonBody}
               personBody={connectPersonBody}
               canEdit={false}
               selectedIndex={publicFocusIndex}
               config={widgetConfigs.wanted}
-              bounty={activeBounty}
               goBack={goBack}
+              bounty={activeBounty}
+              fromBountyPage={true}
+              extraModalFunction={() => {
+                goBack();
+                if (ui.meInfo) {
+                  setConnectPerson(connectPersonBody);
+                } else {
+                  modals.setStartupModal(true);
+                }
+              }}
             />
           </Modal>
         )
       )}
     </>
-  );
-}
-
-return (
-  <>
-    {isDeleted ? (
-      <Modal
-        visible={isDeleted}
-        envStyle={{
-          background: color.pureWhite,
-          ...focusedDesktopModalStyles,
-
-          right: '-50px',
-          borderRadius: '50%'
-        }}
-      >
-        <AlreadyDeleted onClose={goBack} isDeleted={true} />
-      </Modal>
-    ) : (
-      visible && (
-        <Modal
-          visible={visible}
-          envStyle={{
-            background: color.pureWhite,
-            ...focusedDesktopModalStyles,
-            maxHeight: '100vh',
-            zIndex: 20
-          }}
-          style={{
-            background: 'rgba( 0 0 0 /75% )'
-          }}
-          overlayClick={goBack}
-          bigCloseImage={goBack}
-          bigCloseImageStyle={{
-            top: '18px',
-            right: '-50px',
-            borderRadius: '50%'
-          }}
-          prevArrowNew={removeNextAndPrev ? undefined : prevArrHandler}
-          nextArrowNew={removeNextAndPrev ? undefined : nextArrHandler}
-        >
-          <FocusedView
-            setRemoveNextAndPrev={setRemoveNextAndPrev}
-            person={connectPersonBody}
-            personBody={connectPersonBody}
-            canEdit={false}
-            selectedIndex={publicFocusIndex}
-            config={widgetConfigs.wanted}
-            goBack={goBack}
-            bounty={activeBounty}
-            fromBountyPage={true}
-            extraModalFunction={() => {
-              goBack();
-              if (ui.meInfo) {
-                setConnectPerson(connectPersonBody);
-              } else {
-                modals.setStartupModal(true);
-              }
-            }}
-          />
-        </Modal>
-      )
-    )}
-  </>
   );
 });
