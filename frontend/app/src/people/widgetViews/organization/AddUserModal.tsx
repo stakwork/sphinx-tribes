@@ -94,7 +94,7 @@ const AddUserModal = (props: AddUserModalProps) => {
                   selected={person.owner_pubkey === selectedPubkey}
                   onClick={() => setSelectedPubkey(person.owner_pubkey)}
                 >
-                  Add
+                  Select
                 </SmallBtn>
               </UserContianer>
             ))
