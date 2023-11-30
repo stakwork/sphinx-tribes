@@ -6,6 +6,7 @@ import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { matchPath, useHistory, useLocation, useParams } from 'react-router-dom';
+import { AlreadyDeleted } from 'components/common/AfterDeleteNotification/AlreadyDeleted';
 import { useStores } from 'store';
 import { PersonBounty } from 'store/main';
 
@@ -34,6 +35,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
+  const [isDeleted, setisDeleted] = useState(false);
 
   const isMobile = useIsMobile();
 
@@ -64,7 +66,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     setConnectPersonBody(connectPerson);
 
     const visible = bounty && bounty.length > 0;
-
+    const isDeleted = bounty && bounty.length === 0;
+    setisDeleted(isDeleted)
     setActiveBounty(bounty);
     setVisible(visible);
   }, [bountyId, main, search]);
@@ -75,6 +78,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
+    setisDeleted(false);
     await main.getPeopleBounties({ page: 1, resetPage: true });
     history.goBack();
   };
@@ -104,7 +108,17 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   if (isMobile) {
     return (
       <>
-        {visible && (
+      {isDeleted ? (
+        <Modal visible={isDeleted} fill={true}>
+          <AlreadyDeleted
+            onClose={function (): void {
+              throw new Error('Function not implemented.');
+            }}
+            isDeleted={true}
+          />
+        </Modal>
+      ) : (
+        visible && (
           <Modal visible={visible} fill={true}>
             <FocusedView
               person={connectPersonBody}
@@ -116,14 +130,29 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
               goBack={goBack}
             />
           </Modal>
-        )}
+        )
+      )}
       </>
-    );
-  }
+  );
+}
 
-  return (
-    <>
-      {visible && (
+return (
+  <>
+    {isDeleted ? (
+      <Modal
+        visible={isDeleted}
+        envStyle={{
+          background: color.pureWhite,
+          ...focusedDesktopModalStyles,
+
+          right: '-50px',
+          borderRadius: '50%'
+        }}
+      >
+        <AlreadyDeleted onClose={goBack} isDeleted={true} />
+      </Modal>
+    ) : (
+      visible && (
         <Modal
           visible={visible}
           envStyle={{
@@ -165,7 +194,8 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
             }}
           />
         </Modal>
-      )}
-    </>
+      )
+    )}
+  </>
   );
 });
