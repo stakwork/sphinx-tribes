@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import FocusedView from 'people/main/FocusView';
 import { widgetConfigs } from 'people/utils/Constants';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { matchPath, useHistory, useLocation, useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { AlreadyDeleted } from 'components/common/AfterDeleteNotification/AlreadyDeleted';
 import { useStores } from 'store';
 import { PersonBounty } from 'store/main';
@@ -132,7 +132,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
           </Modal>
         )
       )}
-      </>
+    </>
   );
 }
 
