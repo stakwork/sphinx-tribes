@@ -10,7 +10,7 @@ func MetricsRoutes() chi.Router {
 	r := chi.NewRouter()
 
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
+		r.Use(auth.PubKeyContextSuperAdmin)
 
 		r.Post("/payment", handlers.PaymentMetrics)
 		r.Post("/people", handlers.PeopleMetrics)
