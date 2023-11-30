@@ -5,7 +5,7 @@ import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { matchPath, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
@@ -74,7 +74,13 @@ function BodyComponent() {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
   }, [main, ui.meInfo]);
-
+  useEffect(() => {
+    setCheckboxIdToSelectedMap({
+      Open: true,
+      Assigned: false,
+      Paid: false
+    });
+  }, [loading]);
   const onChangeStatus = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
