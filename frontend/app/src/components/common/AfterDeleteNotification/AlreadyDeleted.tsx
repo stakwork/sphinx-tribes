@@ -11,7 +11,7 @@ export type AlreadyDeletedProps = {
   bountyTitle?: string;
   isDeleted: boolean;
 };
-export const AlreadyDeleted = ({ onClose, bountyLink, bountyTitle }: AlreadyDeletedProps) => {
+export const AlreadyDeleted = ({ onClose, bountyTitle }: AlreadyDeletedProps) => {
   const closeHandler = () => {
     onClose();
   };
