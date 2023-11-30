@@ -434,16 +434,16 @@ export const aboutSchema: FormField[] = [
     prepend: 'https://github.com/',
     page: 1
   },
-  // {
-  //   name: 'repos',
-  //   label: 'Github Repository Links',
-  //   widget: true,
-  //   type: 'creatablemultiselect',
-  //   options: [],
-  //   note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
-  //   validator: repoArrayStrValidator, // look for 1 slash
-  //   page: 1
-  // },
+  {
+    name: 'repos',
+    label: 'Github Repository Links',
+    widget: true,
+    type: 'text',
+    options: [],
+    note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
+    validator: repoArrayStrValidator, // look for 1 slash
+    page: 1
+  },
   {
     name: 'lightning',
     label: 'Lightning address',
