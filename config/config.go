@@ -49,6 +49,8 @@ func InitConfig() {
 
 }
 
+var SuperAdmins []string = []string{""}
+
 func GenerateRandomString() string {
 	const charset = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
