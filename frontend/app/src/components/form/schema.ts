@@ -441,7 +441,7 @@ export const aboutSchema: FormField[] = [
     type: 'text',
     options: [],
     note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
-    validator: repoArrayStrValidator, // look for 1 slash
+    //validator: repoArrayStrValidator, // look for 1 slash
     page: 1
   },
   {
