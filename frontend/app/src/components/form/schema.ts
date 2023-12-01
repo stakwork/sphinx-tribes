@@ -10,15 +10,6 @@ import { FormField } from './utils';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
-const repoStrValidator = Yup.string()
-  .trim()
-  .matches(/^[^/]+\/[^/]+$/, 'Incorrect format')
-  .required('Required');
-const repoArrayStrValidator = Yup.array().of(
-  Yup.object().shape({
-    value: repoStrValidator
-  })
-);
 const badgeObjectStrValidator = Yup.object().shape({
   value: strValidator
 });
