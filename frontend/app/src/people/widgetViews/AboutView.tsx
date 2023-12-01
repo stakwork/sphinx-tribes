@@ -219,7 +219,7 @@ const Img = styled.div<ImageProps>`
 export const AboutView = observer((props: AboutViewProps) => {
   const history = useHistory();
   const { price_to_meet, extras, twitter_confirmed, owner_pubkey, owner_route_hint } = props;
-  const { twitter, github, coding_languages, tribes, repos, lightning, amboss, email } =
+  const { twitter, github, coding_languages, tribes, lightning, amboss, email } =
     extras || {};
 
   let tag = '';
@@ -318,23 +318,6 @@ export const AboutView = observer((props: AboutViewProps) => {
               <CodeBadge key={i}>{c.label}</CodeBadge>
             ))}
           </GrowRow>
-        </>
-      )}
-
-      {repos && repos.length > 0 && (
-        <>
-          <Divider />
-          <T style={{ height: 20 }}>My Repos</T>
-          <Grow>
-            {repos.map((r: any, i: number) => (
-              <ItemRow key={`${i}myrepo`} style={{ width: 'fit-content' }}>
-                <Img src={'/static/github_logo.png'} style={{ opacity: 0.6 }} />
-                <a href={`https://github.com/${r?.label}`} target="_blank" rel="noreferrer">
-                  {r?.label}
-                </a>
-              </ItemRow>
-            ))}
-          </Grow>
         </>
       )}
 
