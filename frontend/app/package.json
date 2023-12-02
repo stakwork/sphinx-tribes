@@ -35,6 +35,7 @@
     "@mui/base": "^5.0.0-beta.16",
     "@mui/system": "^5.14.10",
     "add": "^2.0.6",
+    "axios": "^1.6.2",
     "bootstrap": "^4.5.0",
     "clsx": "^2.0.0",
     "compose-function": "^3.0.3",

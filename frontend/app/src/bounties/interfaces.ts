@@ -41,3 +41,4 @@ export interface BountiesProfileProps {
     background: string;
   };
 }
+

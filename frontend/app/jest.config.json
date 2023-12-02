@@ -6,7 +6,8 @@
       "./src/leaderboard/**/*.ts",
       "./src/pages/**/*.ts",
       "./src/people/**/*.ts",
-      "./src/tribes/**/*.ts"
+      "./src/tribes/**/*.ts",
+      "./src/__test__/**/*.ts"
     ],
     "coverageThreshold": {
       "global": {
