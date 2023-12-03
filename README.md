@@ -111,6 +111,16 @@ else add these variables to the env to enable Redis
     REDIS_PASS =
 ```
 
+### Add SuperAdmins to access admin dashboard
+
+Add comma separated public keys to the SUPER_ADMINS env var in the .env file,
+any user public key added to this comaa separated strings will have access to the admin dashboard
+e.g '{pubkey}, {pubkey}, {pubkey}'
+
+```
+SUPER_ADMINS
+```
+
 ### For Contributions
 
 Read the contribution doc [here](./Contribution.md)
