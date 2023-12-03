@@ -12,6 +12,11 @@ import { PersonBounty } from 'store/main';
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
 
+const findPerson = (search: any) => (item: any) => {
+  const { person, body } = item;
+  return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
+};
+
 type Props = {
   setConnectPerson: (p: any) => void;
 };
@@ -49,7 +54,9 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       bounty = await main.getBountyByCreated(Number(search.created));
     }
 
-    const activeIndex = bounty && bounty.length ? bounty[0].body.id : 0;
+    const activeIndex = bountyId
+      ? main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
+      : (main.peopleBounties ?? []).findIndex(findPerson(search));
     const connectPerson = bounty && bounty.length ? bounty[0].person : [];
 
     setPublicFocusIndex(activeIndex);
@@ -68,11 +75,15 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const goBack = async () => {
     setVisible(false);
-    if (matchPath(location.pathname, { path: '/bounty/:bountyId' })) {
-      await main.getPeopleBounties({ page: 1, resetPage: true });
-      history.push('/bounties');
-    } else {
-      history.goBack();
+    await main.getPeopleBounties({ page: 1, resetPage: true });
+    history.goBack();
+  };
+
+  const directionHandler = (person: any, body: any) => {
+    if (person && body) {
+      if (bountyId) {
+        history.replace(`/bounty/${body.id}`);
+      }
     }
   };
 
@@ -80,38 +91,14 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     if (activeListIndex === 0) return;
 
     const { person, body } = main.peopleBounties[activeListIndex - 1];
-    if (person && body) {
-      if (bountyId) history.replace(`/bounty/${body.id}`);
-      else {
-        history.replace({
-          pathname: history?.location?.pathname,
-          search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-          state: {
-            owner_id: person?.owner_pubkey,
-            created: body?.created
-          }
-        });
-      }
-    }
+    directionHandler(person, body);
   };
 
   const nextArrHandler = () => {
     if (activeListIndex + 1 > main.peopleBounties?.length) return;
 
     const { person, body } = main.peopleBounties[activeListIndex + 1];
-    if (person && body) {
-      if (bountyId) history.replace(`/bounty/${body.id}`);
-      else {
-        history.replace({
-          pathname: history?.location?.pathname,
-          search: `?owner_id=${person?.owner_pubkey}&created=${body?.created}`,
-          state: {
-            owner_id: person?.owner_pubkey,
-            created: body?.created
-          }
-        });
-      }
-    }
+    directionHandler(person, body);
   };
 
   if (isMobile) {
