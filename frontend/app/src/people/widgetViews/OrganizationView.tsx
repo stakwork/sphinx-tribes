@@ -34,7 +34,7 @@ const Container = styled.div`
   }
 `;
 
-const OrganizationWrap = styled.div`
+const OrganizationWrap = styled.a`
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -51,6 +51,10 @@ const OrganizationWrap = styled.div`
   }
   @media only screen and (max-width: 500px) {
     padding: 0px;
+  }
+
+  &:hover {
+    text-decoration: none !important;
   }
 `;
 
