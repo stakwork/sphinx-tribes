@@ -174,6 +174,36 @@ func MetricsBounties(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metricBounties := db.DB.GetBountiesByDateRange(request, r)
+	var metricBountiesData []db.BountyData
+
+	for _, bounty := range metricBounties {
+		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
+		bountyData := db.BountyData{
+			Bounty:              bounty,
+			BountyId:            bounty.ID,
+			Person:              bountyOwner,
+			BountyCreated:       bounty.Created,
+			BountyDescription:   bounty.Description,
+			BountyUpdated:       bounty.Updated,
+			AssigneeId:          bountyAssignee.ID,
+			AssigneeAlias:       bountyAssignee.OwnerAlias,
+			AssigneeDescription: bountyAssignee.Description,
+			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:       bountyOwner.ID,
+			OwnerUuid:           bountyOwner.Uuid,
+			OwnerDescription:    bountyOwner.Description,
+			OwnerUniqueName:     bountyOwner.UniqueName,
+			OwnerImg:            bountyOwner.Img,
+			OrganizationName:    organization.Name,
+			OrganizationImg:     organization.Img,
+			OrganizationUuid:    organization.Uuid,
+		}
+
+		metricBountiesData = append(metricBountiesData, bountyData)
+	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(metricBounties)
+	json.NewEncoder(w).Encode(metricBountiesData)
 }
