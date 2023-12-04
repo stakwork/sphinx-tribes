@@ -466,9 +466,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	date, _ := utils.ConvertStringToInt(invoice.Created)
 	memo := invoice.Memo
 	invoiceType := invoice.Type
-	assigedHours := invoice.Assigned_hours
-	commitmentFee := invoice.Commitment_fee
-	bountyExpires := invoice.Bounty_expires
 	routeHint := invoice.Route_hint
 	amount, _ := utils.ConvertStringToUint(invoice.Amount)
 
@@ -523,9 +520,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		Created:        date,
 		Amount:         amount,
 		UserPubkey:     pub_key,
-		AssignedHours:  assigedHours,
-		CommitmentFee:  commitmentFee,
-		BountyExpires:  bountyExpires,
 		RouteHint:      routeHint,
 	}
 
