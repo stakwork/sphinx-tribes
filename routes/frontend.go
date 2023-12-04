@@ -40,6 +40,7 @@ func IndexRoutes() chi.Router {
 		r.Get("/bounty/*", frontend.IndexRoute)
 		r.Get("/leaderboard", frontend.IndexRoute)
 		r.Get("/org/bounties/*", frontend.IndexRoute)
+		r.Get("/admin", frontend.IndexRoute)
 	})
 	return r
 }
