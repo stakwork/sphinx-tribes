@@ -12,6 +12,7 @@ import (
 
 var ctx = context.Background()
 var RedisClient *redis.Client
+var expireTime = 6 * time.Hour
 
 func InitRedis() {
 	redisURL := os.Getenv("REDIS_URL")
@@ -35,7 +36,7 @@ func InitRedis() {
 }
 
 func SetValue(key string, value interface{}) {
-	err := RedisClient.Set(ctx, key, value, 6*time.Hour).Err()
+	err := RedisClient.Set(ctx, key, value, expireTime).Err()
 	if err != nil {
 		fmt.Println("REDIS SET ERROR :", err)
 	}
@@ -57,7 +58,7 @@ func SetMap(key string, values map[string]interface{}) {
 			fmt.Println("REDIS SET MAP ERROR :", err)
 		}
 	}
-	RedisClient.Expire(ctx, key, 6*time.Hour)
+	RedisClient.Expire(ctx, key, expireTime)
 }
 
 func GetMap(key string) map[string]string {
