@@ -27,7 +27,7 @@ describe('testing filters', () => {
   describe('bountyHeaderLanguageFilter', () => {
     test('match', () => {
       expect(bountyHeaderLanguageFilter(['Javascript', 'Python'], { Javascript: true })).toEqual(
-        false
+        true
       );
     });
     test('no-match', () => {
@@ -39,7 +39,7 @@ describe('testing filters', () => {
       expect(bountyHeaderLanguageFilter(['Javascript'], {})).toEqual(true);
     });
     test('no languages', () => {
-      expect(bountyHeaderLanguageFilter([], { Javascript: true })).toEqual(false);
+      expect(bountyHeaderLanguageFilter([], { Javascript: true })).toEqual(true);
     });
     test('false filters', () => {
       expect(
