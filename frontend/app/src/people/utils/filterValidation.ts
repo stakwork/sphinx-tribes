@@ -35,11 +35,15 @@ export const bountyHeaderFilter = (
 };
 
 export const bountyHeaderLanguageFilter = (codingLanguage: any, filterLanguage: any) => {
-  const selectedLanguages: string[] = Object.keys(filterLanguage).filter((key: string) => filterLanguage[key]);
+  const selectedLanguages: string[] = Object.keys(filterLanguage).filter(
+    (key: string) => filterLanguage[key]
+  );
   if (!Array.isArray(selectedLanguages) || selectedLanguages.length === 0) {
     return true; // No filter selected, show all bounties
   } else {
     // Use "and" logic - all selected skills must match- thus using every
-    return selectedLanguages.every((selectedLanguage: string) => codingLanguage.includes(selectedLanguage));
+    return selectedLanguages.every((selectedLanguage: string) =>
+      codingLanguage.includes(selectedLanguage)
+    );
   }
 };
