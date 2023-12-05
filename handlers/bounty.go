@@ -162,10 +162,22 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
-			fmt.Println("Cannot edit another user's bounty")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Cannot edit another user's bounty")
-			return
+			if bounty.OrgUuid != "" {
+				hasBountyRoles := db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+				if !hasBountyRoles {
+					msg := "You don't have a=the right permission ton update bounty"
+					fmt.Println(msg)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(msg)
+					return
+				}
+			} else {
+				msg := "Cannot edit another user's bounty"
+				fmt.Println(msg)
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(msg)
+				return
+			}
 		}
 	}
 
@@ -619,19 +631,6 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 		if !dbInvoice.Status {
 			if invoice.Type == "BUDGET" {
 				db.DB.AddAndUpdateBudget(invoice)
-			} else if invoice.Type == "ASSIGN" {
-				bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
-
-				if err == nil {
-					bounty.Assignee = invData.UserPubkey
-					bounty.CommitmentFee = uint64(invData.CommitmentFee)
-					bounty.AssignedHours = uint8(invData.AssignedHours)
-					bounty.BountyExpires = invData.BountyExpires
-				} else {
-					fmt.Println("Fetch Assign bounty error ===", err)
-				}
-
-				db.DB.UpdateBounty(bounty)
 			} else if invoice.Type == "KEYSEND" {
 				url := fmt.Sprintf("%s/payment", config.RelayUrl)
 

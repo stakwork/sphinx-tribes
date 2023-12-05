@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { ConnectCardProps } from 'people/interfaces';
 import { Button, Modal } from '../../components/common';
@@ -6,7 +6,6 @@ import { makeConnectQR } from '../../helpers';
 import { colors } from '../../config/colors';
 import QR from './QR';
 import QrBar from './QrBar';
-import AssignBounty from './AssignBounty';
 
 interface styledProps {
   color?: any;
@@ -88,11 +87,7 @@ const ModalBottomText = styled.div<styledProps>`
 `;
 export default function ConnectCard(props: ConnectCardProps) {
   const color = colors['light'];
-  const { visible, created, person } = props;
-
-  const [openAssignModal, setAssignModal] = useState<boolean>(false);
-  const closeAssignModal = () => setAssignModal(false);
-  const showAssignModal = () => setAssignModal(true);
+  const { visible, person } = props;
 
   const qrString = person && person?.owner_pubkey ? makeConnectQR(person?.owner_pubkey) : '';
   const ownerPubkey = person && person?.owner_pubkey ? `${person.owner_pubkey}` : '';
@@ -100,7 +95,6 @@ export default function ConnectCard(props: ConnectCardProps) {
 
   return (
     <div onClick={(e: any) => e.stopPropagation()}>
-      {openAssignModal && <></>}
       <Modal
         style={props.modalStyle}
         overlayClick={() => {
@@ -129,16 +123,6 @@ export default function ConnectCard(props: ConnectCardProps) {
                 <QrBar value={`${ownerPubkey}${routeHint}`} simple style={{ marginTop: 11 }} />
               )}
             </>
-            <Button
-              text={'Assign to self'}
-              color={'primary'}
-              style={{ paddingLeft: 25, margin: '12px 0 10px' }}
-              img={'sphinx_white.png'}
-              imgSize={27}
-              height={48}
-              width={'100%'}
-              onClick={showAssignModal}
-            />
 
             <a href={qrString}>
               <Button
@@ -157,18 +141,6 @@ export default function ConnectCard(props: ConnectCardProps) {
           <img src="/static/scan_qr.svg" alt="scan" />
           <div className="bottomText">Scan or paste in Sphinx</div>
         </ModalBottomText>
-        <>
-          {openAssignModal && (
-            <AssignBounty
-              dismiss={() => closeAssignModal()}
-              modalStyle={{ top: -64, height: 'calc(100% + 64px)' }}
-              person={person}
-              visible={openAssignModal}
-              created={created}
-              dismissConnectModal={props.dismiss}
-            />
-          )}
-        </>
       </Modal>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiIcon } from '@elastic/eui';
 import { MultiSelect } from '../../common';
@@ -12,7 +12,7 @@ interface styledProps {
 
 const ExtraText = styled.div`
   padding: 2px 10px 25px 10px;
-  max-width: calc(100% - 20px);
+  max-width: calc(100 % - 20px);
   word-break: break-all;
   font-size: 14px;
 `;
@@ -25,7 +25,7 @@ const E = styled.div<styledProps>`
   height: 100%;
   justify-content: center;
   align-items: center;
-  color: ${(p: any) => p.color && p.color.blue3};
+  color: ${(p: any) => p?.color && p.color.blue3};
   pointer-events: none;
   user-select: none;
 `;
@@ -46,9 +46,16 @@ export default function MultiSelectInput({
   if (error) labeltext = `${labeltext} (${error})`;
   const color = colors['light'];
 
+  const [isTop, setIsTop] = useState<boolean>(false);
+
   return (
     <>
-      <FieldEnv label={labeltext} color={color}>
+      <FieldEnv
+        color={color}
+        label={labeltext}
+        isTop={isTop || value?.length > 0}
+        isFill={value?.length > 0}
+      >
         <R>
           <MultiSelect
             selectStyle={{ border: 'none' }}
@@ -57,7 +64,9 @@ export default function MultiSelectInput({
             value={value}
             onChange={(e: any) => {
               handleChange(e);
+              setIsTop(true);
             }}
+            setIsTop={setIsTop}
           />
           {error && (
             <E color={color}>
