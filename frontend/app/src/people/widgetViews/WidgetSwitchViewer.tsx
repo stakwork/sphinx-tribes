@@ -104,13 +104,13 @@ function WidgetSwitchViewer(props: any) {
     offer: peopleOffers
   };
 
-  const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
-    const value = { ...body };
-    return (
-      bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-      bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
-    );
-  });
+const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
+  const value = { ...body };
+  return (
+    bountyHeaderFilter(props?.checkboxIdToSelectedMap,value?.paid,!!value?.assignee)&&
+    bountyHeaderLanguageFilter(value?.coding_languages,props?.checkboxIdToSelectedMapLanguage)
+  );
+});
 
   const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(
     (f: any) => f.dynamicSchemas
