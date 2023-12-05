@@ -162,10 +162,22 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
-			fmt.Println("Cannot edit another user's bounty")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Cannot edit another user's bounty")
-			return
+			if bounty.OrgUuid != "" {
+				hasBountyRoles := db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+				if !hasBountyRoles {
+					msg := "You don't have a=the right permission ton update bounty"
+					fmt.Println(msg)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(msg)
+					return
+				}
+			} else {
+				msg := "Cannot edit another user's bounty"
+				fmt.Println(msg)
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(msg)
+				return
+			}
 		}
 	}
 
