@@ -347,7 +347,6 @@ function MobileView(props: CodingBountiesProps) {
           userHasManageBountyRoles(main.bountyRoles, userRoles) &&
           userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
         const canPayBounty = isOrganizationAdmin || userAccess;
-        console.log('Can Pay Bounty ===', canPayBounty);
         setUserBountyRole(canPayBounty);
       }
     }
