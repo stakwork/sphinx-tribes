@@ -39,7 +39,7 @@ describe('testing filters', () => {
       expect(bountyHeaderLanguageFilter(['Javascript'], {})).toEqual(true);
     });
     test('no languages', () => {
-      expect(bountyHeaderLanguageFilter([], { Javascript: true })).toEqual(true);
+      expect(bountyHeaderLanguageFilter([], { Javascript: true })).toEqual(false);
     });
     test('false filters', () => {
       expect(
