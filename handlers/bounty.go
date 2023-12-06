@@ -167,10 +167,22 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
-			fmt.Println("Cannot edit another user's bounty")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Cannot edit another user's bounty")
-			return
+			if bounty.OrgUuid != "" {
+				hasBountyRoles := db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+				if !hasBountyRoles {
+					msg := "You don't have a=the right permission ton update bounty"
+					fmt.Println(msg)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(msg)
+					return
+				}
+			} else {
+				msg := "Cannot edit another user's bounty"
+				fmt.Println(msg)
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(msg)
+				return
+			}
 		}
 	}
 
@@ -228,7 +240,6 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 		if bounty.Paid {
 			bounty.CompletionDate = &now
 			bounty.MarkAsPaidDate = &now
-			bounty.CompletionDateDifference = utils.GetDateDaysDifference(bounty.Created, &now)
 		}
 		db.DB.UpdateBountyPayment(bounty)
 	}
@@ -422,8 +433,6 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		bounty.Paid = true
 		bounty.PaidDate = &now
 		bounty.CompletionDate = &now
-		bounty.PaidDateDifference = utils.GetDateDaysDifference(bounty.Created, &now)
-		bounty.CompletionDateDifference = utils.GetDateDaysDifference(bounty.Created, &now)
 		db.DB.UpdateBounty(bounty)
 
 		msg["msg"] = "keysend_success"
