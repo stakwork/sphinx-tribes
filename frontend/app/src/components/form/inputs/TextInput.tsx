@@ -110,7 +110,7 @@ export default function TextInput({
               handleFocus(e);
               setActive(true);
             }}
-            prepend={prepend}
+            prepend={active ? prepend : ''}
             style={padStyle}
             isTextField={true}
           />

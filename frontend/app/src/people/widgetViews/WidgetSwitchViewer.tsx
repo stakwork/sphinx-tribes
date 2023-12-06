@@ -108,7 +108,7 @@ function WidgetSwitchViewer(props: any) {
     const value = { ...body };
     return (
       bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-      bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
+      bountyHeaderLanguageFilter(value?.coding_languages, props?.checkboxIdToSelectedMapLanguage)
     );
   });
 
