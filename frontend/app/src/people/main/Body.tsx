@@ -121,7 +121,6 @@ function BodyComponent() {
 
   useEffect(() => {
     setFilterResult(filterByCodingLanguage(main.people, checkboxIdToSelectedMapLanguage));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkboxIdToSelectedMapLanguage]);
 
   // update search
