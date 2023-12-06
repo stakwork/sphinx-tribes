@@ -103,7 +103,7 @@ function MobileView(props: CodingBountiesProps) {
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
   const [userBountyRole, setUserBountyRole] = useState(false);
-  const [canEdit, setCanEdit] = useState(true);
+  const canEdit = ui.meInfo?.owner_pubkey === person.owner_pubkey;
 
   const userPubkey = ui.meInfo?.owner_pubkey;
 
@@ -347,9 +347,6 @@ function MobileView(props: CodingBountiesProps) {
           userHasManageBountyRoles(main.bountyRoles, userRoles) &&
           userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
         const canPayBounty = isOrganizationAdmin || userAccess;
-        if (!isOrganizationAdmin) {
-          setCanEdit(false);
-        }
         setUserBountyRole(canPayBounty);
       }
     }

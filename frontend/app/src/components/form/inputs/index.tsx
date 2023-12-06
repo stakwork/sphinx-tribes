@@ -104,7 +104,7 @@ export const FieldText = styled(EuiFieldText)<styledProps>`
     p.readOnly ? `${p.color.grayish.G60A}` : `${p.color.pureBlack}`} !important;
   box-shadow: none !important;
   height: ${(p: any) => (p?.isTextField ? '12px' : '')};
-  margin-top: ${(p: any) => (p?.isTextField ? '2px' : '')};
+  margin-top: ${(p: any) => (p?.isTextField ? '8px' : '')};
 
   .euiFormRow__labelWrapper .euiFormControlLayout--group {
     background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;

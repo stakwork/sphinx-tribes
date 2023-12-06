@@ -4,6 +4,7 @@ import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
+import { AdminPage } from 'admin/admin';
 import BotsBody from '../bots/Body';
 import PeopleHeader from '../people/main/Header';
 import TokenRefresh from '../people/utils/TokenRefresh';
@@ -48,6 +49,9 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         </Route>
         <Route path="/leaderboard">
           <LeaderboardPage />
+        </Route>
+        <Route path="/admin">
+          <AdminPage />
         </Route>
         <Route path="*">
           <Body />

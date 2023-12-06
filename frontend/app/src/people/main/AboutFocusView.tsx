@@ -93,7 +93,6 @@ const AboutFocusView = (props: FocusViewProps) => {
       // extras with multiple items
       initialValues.coding_languages = personInfo.extras?.coding_languages || [];
       initialValues.tribes = personInfo.extras?.tribes || [];
-      initialValues.repos = personInfo.extras?.repos || [];
       initialValues.lightning =
         (personInfo.extras?.lightning && personInfo.extras?.lightning[0]?.value) || '';
       initialValues.amboss =
