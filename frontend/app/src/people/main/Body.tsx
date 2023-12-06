@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import styled from 'styled-components';
 import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui';
+import PeopleHeader from 'people/widgetViews/PeopleHeader';
+import { Person as PersonType } from 'store/main';
 import { SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
@@ -24,6 +26,7 @@ const Body = styled.div<{ isMobile: boolean }>`
   & > .header {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
     padding: 10px 0;
   }
   & > .content {
@@ -50,6 +53,8 @@ function BodyComponent() {
   const [loading, setLoading] = useState(true);
   const screenWidth = useScreenWidth();
   const [openStartUpModel, setOpenStartUpModel] = useState<boolean>(false);
+  const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const [filterResult, setFilterResult] = useState<PersonType[]>(main.people);
   const closeModal = () => setOpenStartUpModel(false);
   const { peoplePageNumber } = ui;
   const history = useHistory();
@@ -71,6 +76,16 @@ function BodyComponent() {
   const loadBackwardFunc = () => loadMore(-1);
   const { loadingBottom, handleScroll } = usePageScroll(loadForwardFunc, loadBackwardFunc);
 
+  const onChangeLanguage = (optionId: any) => {
+    const newCheckboxIdToSelectedMapLanguage = {
+      ...checkboxIdToSelectedMapLanguage,
+      ...{
+        [optionId]: !checkboxIdToSelectedMapLanguage[optionId],
+      },
+    };
+    setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
+  };
+
   const toastsEl = (
     <EuiGlobalToastList
       toasts={ui.toasts}
@@ -84,6 +99,30 @@ function BodyComponent() {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
   }, [main, ui.meInfo]);
+
+  interface CodingLanguage {
+    [language: string]: boolean;
+  }
+
+  const filterByCodingLanguage = (users: PersonType[], codingLanguages: CodingLanguage) => {
+    const requiredLanguages = Object.keys(codingLanguages).filter(
+      (key: string) => codingLanguages[key],
+    );
+
+    return users.filter((user: PersonType) => {
+      const userCodingLanguages = (user.extras.coding_languages ?? []).map(
+        (t: { [key: string]: string }) => t.value,
+      );
+      return requiredLanguages?.every((requiredLanguage: string) =>
+        userCodingLanguages.includes(requiredLanguage),
+      );
+    });
+  };
+
+  useEffect(() => {
+    setFilterResult(filterByCodingLanguage(main.people, checkboxIdToSelectedMapLanguage));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkboxIdToSelectedMapLanguage]);
 
   // update search
   useEffect(() => {
@@ -116,6 +155,11 @@ function BodyComponent() {
       }}
     >
       <div className="header">
+        <PeopleHeader
+          onChangeLanguage={onChangeLanguage}
+          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+        />
+
         <SearchTextInput
           small
           name="search"
@@ -126,7 +170,7 @@ function BodyComponent() {
             width: isMobile ? '95vw' : 240,
             height: 40,
             border: `1px solid ${color.grayish.G600}`,
-            background: color.grayish.G600
+            background: color.grayish.G600,
           }}
           onChange={(e: any) => {
             ui.setSearchText(e);
@@ -134,7 +178,7 @@ function BodyComponent() {
         />
       </div>
       <div className="content">
-        {(people ?? []).map((t: any) => (
+        {(ui.searchText ? people : filterResult).map((t: any) => (
           <Person
             {...t}
             key={t.owner_pubkey}
@@ -144,7 +188,7 @@ function BodyComponent() {
             select={selectPerson}
           />
         ))}
-        {!people.length && <NoResults />}
+        {!(ui.searchText ? people : filterResult)?.length && <NoResults />}
         <PageLoadSpinner noAnimate show={loadingBottom} />
       </div>
 
