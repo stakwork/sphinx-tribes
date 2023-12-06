@@ -14,12 +14,17 @@ import { Modals } from './Modals';
 import { People } from './people';
 import { TicketsPage } from './tickets';
 import { LeaderboardPage } from './leaderboard';
+import { SuperAdmin } from './superadmin/index'
+
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
     <MainLayout header={<PeopleHeader />}>
       <TokenRefresh />
       <Switch>
+        <Route path="/superadmin">
+            <SuperAdmin />
+        </Route>
         <Route path="/t/">
           <Body />
         </Route>
@@ -47,6 +52,7 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
         <Route path="*">
           <Body />
         </Route>
+       
       </Switch>
     </MainLayout>
   ),
