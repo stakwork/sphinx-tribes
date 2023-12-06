@@ -1,6 +1,6 @@
 
-import { style } from "@mui/system";
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import styled from "styled-components";
 import paginationarrow1 from "../Header/icons/paginationarrow1.svg"
 import paginationarrow2 from "../Header/icons/paginationarrow2.svg"
@@ -382,7 +382,7 @@ export const MyTable: React.FC<TableProps> = ({bounties, selectedButtonIndex  }:
         <PaginationButtons selected={selectedButtonIndex === 7}>7</PaginationButtons>
         <img src={paginationarrow2} alt="" />
       </FlexDiv>
-    </PaginatonSection>
+      </PaginatonSection>
     </>
   );
 
