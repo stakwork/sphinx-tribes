@@ -118,12 +118,12 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	check redis if cache id available for the date range
 	or add to redis
 	*/
-	redisMetrics := db.GetMap(metricsKey)
-	if len(redisMetrics) != 0 {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(redisMetrics)
-		return
-	}
+	// redisMetrics := db.GetMap(metricsKey)
+	// if len(redisMetrics) != 0 {
+	// 	w.WriteHeader(http.StatusOK)
+	// 	json.NewEncoder(w).Encode(redisMetrics)
+	// 	return
+	// }
 
 	totalBountiesPosted := db.DB.TotalBountiesPosted(request)
 	totalBountiesPaid := db.DB.TotalPaidBounties(request)

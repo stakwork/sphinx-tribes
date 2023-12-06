@@ -8,6 +8,8 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+var SecondsToDateConversion = 60 * 60 * 24
+
 func (db database) TotalPeopleByDateRange(r PaymentDateRange) int64 {
 	var count int64
 	db.db.Model(&Person{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
@@ -72,51 +74,59 @@ func (db database) BountiesPaidPercentage(r PaymentDateRange) uint {
 	return 0
 }
 
-func (db database) PaidDifferenceSum(r PaymentDateRange) uint {
-	var sum uint
-	db.db.Model(&Bounty{}).Where("paid_date_difference != ?",
-		"").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(paid_date_difference)").Row().Scan(&sum)
-	return sum
+func (db database) PaidDifference(r PaymentDateRange) []DateDifference {
+	ms := []DateDifference{}
+
+	db.db.Raw(`SELECT EXTRACT(EPOCH FROM (paid_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE paid_date IS NOT NULL AND created >= '` + r.StartDate + `' AND created <= '` + r.EndDate + `' `).Find(&ms)
+	return ms
 }
 
 func (db database) PaidDifferenceCount(r PaymentDateRange) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Where("paid_date_difference != ?",
-		"").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	list := db.PaidDifference(r)
+	count = int64(len(list))
 	return count
 }
 
 func (db database) AveragePaidTime(r PaymentDateRange) uint {
-	paidSum := DB.PaidDifferenceSum(r)
+	paidList := DB.PaidDifference(r)
 	paidCount := DB.PaidDifferenceCount(r)
-	if paidCount != 0 && paidSum != 0 {
-		avg := paidSum / uint(paidCount)
-		avgDays := math.Round(float64(avg))
-		return uint(avgDays)
+	var paidSum uint
+	for _, diff := range paidList {
+		paidSum = uint(math.Round(diff.Diff))
 	}
-	return 0
+	return CalculateAverageDays(paidCount, paidSum)
 }
 
-func (db database) CompletedDifferenceSum(r PaymentDateRange) uint {
-	var sum uint
-	db.db.Model(&Bounty{}).Where("completion_date_difference != ?",
-		"").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(completion_date_difference)").Row().Scan(&sum)
-	return sum
+func (db database) CompletedDifference(r PaymentDateRange) []DateDifference {
+	ms := []DateDifference{}
+
+	db.db.Raw(`SELECT EXTRACT(EPOCH FROM (completion_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE completion_date IS NOT NULL AND created >= '` + r.StartDate + `' AND created <= '` + r.EndDate + `' `).Find(&ms)
+	return ms
 }
 
 func (db database) CompletedDifferenceCount(r PaymentDateRange) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Where("completion_date_difference != ?",
-		"").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	list := db.CompletedDifference(r)
+	count = int64(len(list))
 	return count
 }
 
 func (db database) AverageCompletedTime(r PaymentDateRange) uint {
-	paidSum := DB.CompletedDifferenceSum(r)
+	paidList := DB.CompletedDifference(r)
 	paidCount := DB.CompletedDifferenceCount(r)
+	var paidSum uint
+	for _, diff := range paidList {
+		paidSum = uint(math.Round(diff.Diff))
+	}
+	return CalculateAverageDays(paidCount, paidSum)
+}
+
+func CalculateAverageDays(paidCount int64, paidSum uint) uint {
 	if paidCount != 0 && paidSum != 0 {
 		avg := paidSum / uint(paidCount)
-		avgDays := math.Round(float64(avg))
+		avgSeconds := math.Round(float64(avg))
+		avgDays := math.Round(avgSeconds / float64(SecondsToDateConversion))
 		return uint(avgDays)
 	}
 	return 0
