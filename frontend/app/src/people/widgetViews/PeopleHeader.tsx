@@ -181,7 +181,7 @@ const PeopleHeader = ({ onChangeLanguage, checkboxIdToSelectedMapLanguage }: Peo
     minWidth: '300px',
     minHeight: '304px',
     marginTop: '0px',
-    marginLeft: '20px',
+    marginLeft: '20px'
   };
 
   return (
@@ -194,14 +194,14 @@ const PeopleHeader = ({ onChangeLanguage, checkboxIdToSelectedMapLanguage }: Peo
                 className="materialIconImage"
                 icon="tune"
                 style={{
-                  color: isPopoverOpen ? color.grayish.G10 : '',
+                  color: isPopoverOpen ? color.grayish.G10 : ''
                 }}
               />
             </div>
             <EuiText
               className="filterText"
               style={{
-                color: isPopoverOpen ? color.grayish.G10 : '',
+                color: isPopoverOpen ? color.grayish.G10 : ''
               }}
             >
               Filter
@@ -218,7 +218,7 @@ const PeopleHeader = ({ onChangeLanguage, checkboxIdToSelectedMapLanguage }: Peo
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'row'
           }}
         >
           <PopOverBox color={color}>

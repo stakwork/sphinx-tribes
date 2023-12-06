@@ -80,8 +80,8 @@ function BodyComponent() {
     const newCheckboxIdToSelectedMapLanguage = {
       ...checkboxIdToSelectedMapLanguage,
       ...{
-        [optionId]: !checkboxIdToSelectedMapLanguage[optionId],
-      },
+        [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
+      }
     };
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
   };
@@ -106,15 +106,15 @@ function BodyComponent() {
 
   const filterByCodingLanguage = (users: PersonType[], codingLanguages: CodingLanguage) => {
     const requiredLanguages = Object.keys(codingLanguages).filter(
-      (key: string) => codingLanguages[key],
+      (key: string) => codingLanguages[key]
     );
 
     return users.filter((user: PersonType) => {
       const userCodingLanguages = (user.extras.coding_languages ?? []).map(
-        (t: { [key: string]: string }) => t.value,
+        (t: { [key: string]: string }) => t.value
       );
       return requiredLanguages?.every((requiredLanguage: string) =>
-        userCodingLanguages.includes(requiredLanguage),
+        userCodingLanguages.includes(requiredLanguage)
       );
     });
   };
@@ -169,7 +169,7 @@ function BodyComponent() {
             width: isMobile ? '95vw' : 240,
             height: 40,
             border: `1px solid ${color.grayish.G600}`,
-            background: color.grayish.G600,
+            background: color.grayish.G600
           }}
           onChange={(e: any) => {
             ui.setSearchText(e);
