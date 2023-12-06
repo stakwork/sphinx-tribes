@@ -47,22 +47,18 @@ export const InvoiceInput = styled.input`
   border: 0.5px solid black;
 `;
 export const OrganizationWrap = styled.div`
-  margin-left: 0px;
-  cursor: pointer;
-  padding: 0px;
-  background: white;
-  padding: 2px 10px;
-  max-width: 180px;
-  text-align: center;
-  border-radius: 0px;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  align-self: center;
+  padding: 2px 8px;
+  border: 1px solid #DDE1E5;
+  border-radius: 4px;
 `;
 export const OrganizationText = styled.span`
-  font-weight: bold;
-  font-size: 0.9rem;
+  font-weight: 500;
+  font-size: 0.8125rem;
   text-transform: capitalize;
-  color: #20c997;
+  color: #5F6368;
 `;
