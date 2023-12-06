@@ -32,3 +32,11 @@ jobs:
       - name: Tests
         run: NODE_OPTIONS="--max_old_space_size=8192" yarn --cwd ./frontend/app run test-jest
 
+  test-go:
+    name: Go 
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Tests 
+        run: go test ./config ./auth ./db ./handlers ./routes ./utils 
