@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { EuiLoadingSpinner, EuiGlobalToastList } from '@elastic/eui';
 import PeopleHeader from 'people/widgetViews/PeopleHeader';
 import { Person as PersonType } from 'store/main';
+import filterByCodingLanguage from 'people/utils/filterPeople';
 import { SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
@@ -99,25 +100,6 @@ function BodyComponent() {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
   }, [main, ui.meInfo]);
-
-  interface CodingLanguage {
-    [language: string]: boolean;
-  }
-
-  const filterByCodingLanguage = (users: PersonType[], codingLanguages: CodingLanguage) => {
-    const requiredLanguages = Object.keys(codingLanguages).filter(
-      (key: string) => codingLanguages[key]
-    );
-
-    return users.filter((user: PersonType) => {
-      const userCodingLanguages = (user.extras.coding_languages ?? []).map(
-        (t: { [key: string]: string }) => t.value
-      );
-      return requiredLanguages?.every((requiredLanguage: string) =>
-        userCodingLanguages.includes(requiredLanguage)
-      );
-    });
-  };
 
   useEffect(() => {
     setFilterResult(filterByCodingLanguage(main.people, checkboxIdToSelectedMapLanguage));
