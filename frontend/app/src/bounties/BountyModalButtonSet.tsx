@@ -43,7 +43,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
           </div>
         </ButtonContainer>
       )}
-      {props?.replitLink && (
+      {/* {props?.replitLink && (                           commented out reason-> #1059
         <ButtonContainer
           topMargin={'16px'}
           onClick={() => {
@@ -76,7 +76,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
             />
           </div>
         </ButtonContainer>
-      )}
+      )} */}
       {props.tribe && (
         <ButtonContainer
           topMargin={'16px'}

@@ -102,17 +102,17 @@ const CodingLabels = styled.div<codingLangProps>`
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
-  const [replitLink, setReplitLink] = useState('');
+  // const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
 
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
-      setReplitLink(
-        props?.description.match(
-          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
-        )
-      );
+      // setReplitLink(
+      //   props?.description.match(
+      //     /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
+      //   )
+      // );
       setDescriptionImage(found && found.length > 0 && found[0]);
     }
   }, [props]);
@@ -166,7 +166,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
               {props.title?.length > 80 ? '...' : ''}
             </EuiText>
           </div>
-          {descriptionImage && (
+          {/* {descriptionImage && (                  commented out reason-> #1059
             <div className="DescriptionImage">
               <img
                 src={descriptionImage}
@@ -176,10 +176,10 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
                 width={'100%'}
               />
             </div>
-          )}
+          )} */}
         </Description>
         <LanguageContainer>
-          {replitLink && (
+          {/* {replitLink && (                       commented out reason-> #1059
             <div onClick={() => window.open(replitLink[0])} style={{ display: 'flex' }}>
               <CodingLabels
                 key={0}
@@ -198,7 +198,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
                 <EuiText className="LanguageText">Replit</EuiText>
               </CodingLabels>
             </div>
-          )}
+          )} */}
           {dataValue &&
             dataValue?.length > 0 &&
             dataValue?.map((lang: any, index: number) => (
