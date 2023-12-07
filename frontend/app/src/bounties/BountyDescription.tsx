@@ -107,7 +107,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
   const [dataValue, setDataValue] = useState([]);
   const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
-  
+
   useEffect(() => {
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
@@ -159,16 +159,14 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
                   src={props.img || '/static/person_placeholder.png'}
                   style={{ borderRadius: '50%', width: '20px', height: '20px' }}
                 />
-                <OrganizationText>
-                  {props.name}
-                </OrganizationText>
+                <OrganizationText>{props.name}</OrganizationText>
                 <img
                   className="buttonImage"
                   src={'/static/github_ticket.svg'}
                   alt={'github_ticket'}
                   height={'10px'}
                   width={'10px'}
-                  style={{ transform: 'translateY(1px)'}}
+                  style={{ transform: 'translateY(1px)' }}
                 />
               </OrganizationWrap>
             </Link>

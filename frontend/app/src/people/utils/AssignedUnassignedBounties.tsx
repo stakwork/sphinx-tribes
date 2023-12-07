@@ -119,7 +119,7 @@ const Bounties = (props: BountiesProps) => {
     person,
     onPanelClick,
     widget,
-    created,
+    created
   } = props;
 
   const color = colors['light'];
