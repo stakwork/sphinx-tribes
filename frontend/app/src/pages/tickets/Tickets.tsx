@@ -5,38 +5,12 @@ import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
+import { Body, Backdrop } from './style';
 
 // avoid hook within callback warning by renaming hooks
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Backdrop = styled.div`
-  position: fixed;
-  z-index: 1;
-  background: rgba(0, 0, 0, 70%);
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-export const Spacer = styled.div`
-  display: flex;
-  min-height: 10px;
-  min-width: 100%;
-  height: 10px;
-  width: 100%;
-`;
 
 function BodyComponent() {
   const { main, ui } = useStores();

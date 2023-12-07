@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import ConnectCard from 'people/utils/ConnectCard';
-import { TicketModalPage } from './TicketModalPage';
-import Tickets from './Tickets';
+import { TicketModalPage } from '../TicketModalPage';
+import OrgTickets from './OrgTickets';
 
-export const TicketsPage = () => {
+export const OrgTicketsPage = () => {
   const [connectPerson, setConnectPerson] = useState<any>(null);
   return (
     <>
-      <Tickets />
+      <OrgTickets />
       <TicketModalPage setConnectPerson={setConnectPerson} />
       {connectPerson && (
         <ConnectCard
