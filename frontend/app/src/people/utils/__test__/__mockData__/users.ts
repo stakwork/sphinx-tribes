@@ -7,7 +7,7 @@ export const users: Person[] = [
     alias: '',
     contact_key: 'test_owner_contact_key',
     owner_route_hint: 'test_owner_route_hint',
-    unique_name: 'Ekep Obasi',
+    unique_name: 'test 1',
     tags: [],
     photo_url: '',
     route_hint: 'test_hint:1099567661057',
@@ -21,7 +21,7 @@ export const users: Person[] = [
       wanted: [],
       coding_languages: [{ label: 'Typescript', value: 'Typescript' }]
     },
-    owner_alias: 'Ekep Obasi',
+    owner_alias: 'test 1',
     owner_pubkey: 'test_pub_key',
     img: '/static/avatarPlaceholders/placeholder_34.jpg'
   },
