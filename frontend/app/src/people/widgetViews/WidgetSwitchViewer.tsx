@@ -238,7 +238,7 @@ function WidgetSwitchViewer(props: any) {
     ) : (
       <NoResults />
     );
-  const showLoadMore = totalBounties > currentItems && activeList.length > 1;
+  const showLoadMore = totalBounties > currentItems && activeList.length >= queryLimit;
   return (
     <>
       {listItems}
