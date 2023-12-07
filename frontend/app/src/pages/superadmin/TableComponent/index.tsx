@@ -1,170 +1,34 @@
 
 
-import React from 'react';
+import React,{useState} from 'react';
 import styled from "styled-components";
 import paginationarrow1 from "../Header/icons/paginationarrow1.svg"
 import paginationarrow2 from "../Header/icons/paginationarrow2.svg"
-
-
-const TableContainer = styled.div`
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
- 
-`;
-
-const HeaderContainer = styled.div`
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding-right: 40px;
-  padding-left: 20px;
-`;
-
-const PaginatonSection = styled.div`
-  background-color: #fff;
-  height: 64px;
-  flex-shrink: 0;
-  align-self: stretch;
-  border-radius: 8px;
-  padding:1em;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-
-`;
-
-const TableRow = styled.tr`
-  border: 1px solid #ddd;
-  &:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-`;
-
-const TableData = styled.td`
-  padding: 12px;
-  text-align: left;
-  white-space: wrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
-  font-size: 14px;
-  padding-right: 2em;
-  padding-left: 2em;
-`;
-
-const TableData2 = styled.td`
-  padding: 12px;
-  white-space: wrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
-  font-size: 14px;
-  padding-right: 3em;
-  padding-left: 2em;
-`;
-
-const TableHeaderData = styled.th`
-  padding: 12px;
-  text-align: left;
-  padding-left: 26px; /* Reduce padding-left */
-  color: var(--Main-bottom-icons, #5F6368);
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  letter-spacing: 0.72px;
-  text-transform: uppercase;
-`;
-
-const TableHeaderDataRight = styled.th`
-  padding: 12px;
-  text-align: right;
-  padding-right: 40px; /* Reduce padding-right */
- /* Adjust padding-left */
-  color: var(--Main-bottom-icons, #5F6368);
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  letter-spacing: 0.72px;
-  text-transform: uppercase;
-`;
-
-const BountyHeader = styled.div`
-  background: #FFF;
-  display: flex;
-  height: 66px;
-  justify-content: space-between;
-  text-align:center;
-  align-items: center;
-  gap: 10px;
-  padding-left: 1em;
-  padding-right: 2em;
-`;
-
-const Options = styled.div`
-  font-size: 15px;
-  cursor: pointer;
-  outline: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-const StyledSelect = styled.select`
-  color: var(--Text-2, var(--Hover-Icon-Color, #3C3F41));
-  font-family: Barlow;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  border-radius: 4px;
-  cursor: pointer;
-  outline: none;
-  border: none;
-
-`;
-
-
-const LeadingTitle =styled.h2`
-  color: var(--Primary-Text-1, var(--Press-Icon-Color, #292C33));
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 600;
-  display:flex;
-  gap:6px;
-  line-height: normal;
-`
-const AlternativeTitle =styled.h2`
-  color: var(--Main-bottom-icons, #5F6368);
-  leading-trim: both;
-  text-edge: cap;
-  font-family: Barlow;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-`
-
+import copy from "../Header/icons/copy.svg"
+import {
+  TableContainer,
+  HeaderContainer,
+  PaginatonSection,
+  Header,
+  Table,
+  TableRow,
+  TableData,
+  TableDataCenter,
+  TableData2,
+  TableHeaderData,
+  TableHeaderDataCenter,
+  TableHeaderDataRight,
+  BountyHeader,
+  Options,
+  StyledSelect,
+  LeadingTitle,
+  AlternativeTitle,
+  Label,
+  FlexDiv,
+  PaginationButtons,
+  PageContainer,
+  // Import other styled components as needed
+} from "./TableStyle"
 
 interface Bounty {
   id: number;
@@ -180,42 +44,8 @@ interface Bounty {
   status: string;
 }
 
-const Label = styled.label`
-  margin-top:6px;
-  color: var(--Main-bottom-icons, var(--Hover-Icon-Color, #5F6368));
-  font-family: Barlow;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-`  
-
-
-const FlexDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-`
-
-interface PaginationButtonProps {
-  selected: boolean;
-}
-
-const PaginationButtons = styled.button<PaginationButtonProps>`
-  border-radius: 3px;
-  background: ${(props:any) => (props.selected ? 'var(--Primary-blue, #618AFF)' : 'transparent')};
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  outline:none;
-  border:none;
-  color:${(props:any) => (props.selected ? 'white' : 'gray')};
-`
-
 interface TableProps {
   bounties: Bounty[];
-  selectedButtonIndex: number;
 }
 
 interface ImageWithTextProps {
@@ -293,13 +123,46 @@ export const ImageWithText = ({ image, text }: ImageWithTextProps) => {
     );
 
 
-export const MyTable: React.FC<TableProps> = ({bounties, selectedButtonIndex  }:TableProps) => (
+export const MyTable = ({
+  bounties,
+  }:TableProps) => {
+    
+    const [currentPage , setCurrentPage] = useState(1);
+    const pageSize = 10;
+
+    const dataNumber: number[] = [];
+    
+    for (let i = 1; i <= Math.ceil(bounties.length / pageSize); i++) {
+      dataNumber.push(i);
+    }
+
   
-    <>
+    const currentPageData = () => {
+      const indexOfLastPost = currentPage * pageSize;
+      const indexOfFirstPost = indexOfLastPost - pageSize;
+      const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
+      return currentPosts;
+    };
+
+    const paginateNext = () => {
+      console.log("clicked")
+      if (currentPage < bounties?.length / pageSize) {
+        setCurrentPage(currentPage + 1);
+      }
+    };
+    const paginatePrev = () => {
+      console.log("clicked")
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    };
+  
+    return (
+      <>
       <HeaderContainer>
         <Header>
           <BountyHeader>
-            
+             <img src={copy} alt="" />
             <LeadingTitle>  {bounties.length} <AlternativeTitle> {bounties.length === 1 ? "Bounty" : "Bounties"}</AlternativeTitle> </LeadingTitle>
   
           </BountyHeader>
@@ -332,18 +195,18 @@ export const MyTable: React.FC<TableProps> = ({bounties, selectedButtonIndex  }:
           <TableRow>
             <TableHeaderData>Bounty</TableHeaderData>
             <TableHeaderData>Date</TableHeaderData>
-            <TableHeaderData>#DTGP</TableHeaderData>
+            <TableHeaderDataCenter>#DTGP</TableHeaderDataCenter>
             <TableHeaderData>Assignee</TableHeaderData>
             <TableHeaderData>Provider</TableHeaderData>
             <TableHeaderData>Organization</TableHeaderData>
             <TableHeaderDataRight>Status</TableHeaderDataRight>
           </TableRow>
           <tbody>
-            {bounties?.map((bounty:any) => (
+            {currentPageData()?.map((bounty:any) => (
               <TableRow key={bounty?.id}>
                 <TableData>{bounty?.title}</TableData>
                 <TableData>{bounty?.date}</TableData>
-                <TableData>{bounty?.dtgp}</TableData>
+                <TableDataCenter>{bounty?.dtgp}</TableDataCenter>
                 <TableData>
                   <ImageWithText
                     text={bounty?.assignee}
@@ -372,18 +235,26 @@ export const MyTable: React.FC<TableProps> = ({bounties, selectedButtonIndex  }:
       </TableContainer>
       <PaginatonSection>
       <FlexDiv>
-        <img src={paginationarrow1} alt="" />
-        <PaginationButtons selected={selectedButtonIndex === 1}>1</PaginationButtons>
-        <PaginationButtons selected={selectedButtonIndex === 2}>2</PaginationButtons>
-        <PaginationButtons selected={selectedButtonIndex === 3}>3</PaginationButtons>
-        <PaginationButtons selected={selectedButtonIndex === 4}>4</PaginationButtons>
-        <PaginationButtons selected={selectedButtonIndex === 5}>5</PaginationButtons>
-        <PaginationButtons selected={selectedButtonIndex === 6}>6</PaginationButtons>
-        <PaginationButtons selected={selectedButtonIndex === 7}>7</PaginationButtons>
-        <img src={paginationarrow2} alt="" />
+      {bounties.length > pageSize ? 
+        <PageContainer>
+          <img src={paginationarrow1} alt="" onClick={() => paginatePrev()} />
+          {dataNumber.map((number: number) => (
+            <PaginationButtons
+              key={number}
+              onClick={() => setCurrentPage(number)}
+              active={number === currentPage}
+            >
+              {number}
+            </PaginationButtons>
+          ))}
+          <img src={paginationarrow2} alt="" onClick={() => paginateNext()} />
+        </PageContainer>
+        : null }
+    
       </FlexDiv>
       </PaginatonSection>
-    </>
-  );
+      </>
+    )
+  }
 
 
