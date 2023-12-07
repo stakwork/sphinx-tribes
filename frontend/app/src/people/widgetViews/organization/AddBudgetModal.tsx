@@ -12,6 +12,7 @@ import Invoice from '../summaries/wantedSummaries/Invoice';
 import { AddBudgetModalProps, InvoiceState, Toast } from './interface';
 import ExpiredInvoice from './ExpiredInvoice';
 import PaidInvoice from './PaidInvoice';
+import { BudgetButton } from './style';
 
 const color = colors['light'];
 
@@ -98,29 +99,6 @@ const UsdValue = styled.p`
   line-height: normal;
   margin-top: 0.6rem;
   margin-bottom: 0;
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 1rem;
-  border-radius: 0.375rem;
-  margin-top: 1.25rem;
-  font-family: 'Barlow';
-  font-size: 0.9375rem;
-  font-style: normal;
-  font-weight: 500;
-  letter-spacing: 0.00938rem;
-  background: #49c998;
-  box-shadow: 0px 2px 10px 0px rgba(73, 201, 152, 0.5);
-  border: none;
-  color: #fff;
-  &:disabled {
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    background: rgba(0, 0, 0, 0.04);
-    color: rgba(142, 150, 156, 0.85);
-    cursor: not-allowed;
-    box-shadow: none;
-  }
 `;
 
 const InvoiceQrWrapper = styled.div`
@@ -272,9 +250,9 @@ const AddBudgetModal = (props: AddBudgetModalProps) => {
                 </InvoiceInputWrapper>
                 <UsdValue>{satToUsd(Number(amount))} USD</UsdValue>
               </InvoiceWrapper>
-              <Button disabled={!Number(amount) || isLoading} onClick={generateInvoice}>
+              <BudgetButton disabled={!Number(amount) || isLoading} onClick={generateInvoice}>
                 {isLoading ? <EuiLoadingSpinner size="m" /> : 'Generate Invoice'}
-              </Button>
+              </BudgetButton>
             </InvoiceForm>
           </>
         )}
