@@ -172,6 +172,7 @@ function WidgetSwitchViewer(props: any) {
 
     await main.getPeopleBounties({ limit: queryLimit, page: currentPage });
   };
+
   const listItems =
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {

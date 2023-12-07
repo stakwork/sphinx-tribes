@@ -761,7 +761,6 @@ export class MainStore {
 
   @persist('list')
   peopleBounties: PersonBounty[] = [];
-
   @action setPeopleBounties(bounties: PersonBounty[]) {
     this.peopleBounties = bounties;
   }
