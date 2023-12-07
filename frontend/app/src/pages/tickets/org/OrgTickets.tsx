@@ -5,14 +5,13 @@ import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { colors } from '../../config/colors';
-import { useIsMobile } from '../../hooks';
-import { useStores } from '../../store';
-import { Body, Backdrop } from './style';
+import { useParams } from 'react-router-dom';
+import { colors } from '../../../config/colors';
+import { useIsMobile } from '../../../hooks';
+import { useStores } from '../../../store';
+import { Body, Backdrop } from '../style';
 
-// avoid hook within callback warning by renaming hooks
-
-function BodyComponent() {
+function OrgBodyComponent() {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -20,6 +19,7 @@ function BodyComponent() {
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
 
   const color = colors['light'];
 
@@ -31,10 +31,12 @@ function BodyComponent() {
       await main.getOpenGithubIssues();
       await main.getBadgeList();
       await main.getPeople();
-      await main.getPeopleBounties({ page: 1, resetPage: true });
+      if (uuid) {
+        await main.getOrganizationBounties(uuid, { page: 1, resetPage: true });
+      }
       setLoading(false);
     })();
-  }, [main]);
+  }, [main, uuid]);
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
@@ -201,4 +203,4 @@ function BodyComponent() {
   );
 }
 
-export default observer(BodyComponent);
+export default observer(OrgBodyComponent);
