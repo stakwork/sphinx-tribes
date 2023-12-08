@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { isString } from 'lodash';
 import { OrganizationText, OrganizationWrap } from 'people/utils/style';
 import { Link } from 'react-router-dom';
+import { useStores } from 'store';
+import { Organization } from 'store/main';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/languageLabelStyle';
 import NameTag from '../people/utils/NameTag';
@@ -102,13 +104,34 @@ const CodingLabels = styled.div<codingLangProps>`
     line-height: 16px;
   }
 `;
+
+const Img = styled.div<{
+  readonly src: string;
+}>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+`;
+
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
   const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
+  const [org, setOrg] = useState<Organization | undefined>(undefined);
+  const { main } = useStores();
+
+  const fetchOrg = async () => {
+    if (!props.org_uuid) return;
+    const org = await main.getUserOrganizationByUuid(props.org_uuid);
+    setOrg(org);
+  }
 
   useEffect(() => {
+    fetchOrg()
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
       setReplitLink(
@@ -154,10 +177,9 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
           {props.org_uuid && props.name && (
             <Link to={`/org/bounties/${props.org_uuid}`} target="_blank">
               <OrganizationWrap>
-                <img
-                  alt={`${props.name} logo`}
-                  src={props.img || '/static/person_placeholder.png'}
-                  style={{ borderRadius: '50%', width: '20px', height: '20px' }}
+                <Img
+                  title={`${props.name} logo`}
+                  src={org?.img || '/static/person_placeholder.png'}
                 />
                 <OrganizationText>{props.name}</OrganizationText>
                 <img
