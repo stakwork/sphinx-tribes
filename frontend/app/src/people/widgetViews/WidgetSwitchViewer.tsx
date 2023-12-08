@@ -6,7 +6,7 @@ import { queryLimit } from 'store/main';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
-import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
+import { bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/Constants';
@@ -170,7 +170,11 @@ function WidgetSwitchViewer(props: any) {
     setPage(currentPage);
     setCurrentItems(currentItems + queryLimit);
 
-    await main.getPeopleBounties({ limit: queryLimit, page: currentPage });
+    await main.getPeopleBounties({
+      limit: queryLimit,
+      page: currentPage,
+      ...props.checkboxIdToSelectedMap
+    });
   };
 
   const listItems =

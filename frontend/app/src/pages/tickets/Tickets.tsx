@@ -37,7 +37,7 @@ function BodyComponent() {
       await main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
       setLoading(false);
     })();
-  }, [main, checkboxIdToSelectedMap]);
+  }, [main]);
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
@@ -53,7 +53,7 @@ function BodyComponent() {
     }
   }, [main, ui.meInfo]);
 
-  const onChangeStatus = (optionId: any) => {
+  const onChangeStatus = async (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
       ...{
@@ -61,6 +61,7 @@ function BodyComponent() {
       }
     };
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+    await main.getPeopleBounties({ page: 1, resetPage: true, ...newCheckboxIdToSelectedMap });
   };
 
   const onChangeLanguage = (optionId: any) => {
