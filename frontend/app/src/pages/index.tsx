@@ -4,6 +4,7 @@ import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
+import { AdminPage } from 'admin/admin';
 import BotsBody from '../bots/Body';
 import PeopleHeader from '../people/main/Header';
 import TokenRefresh from '../people/utils/TokenRefresh';
@@ -13,6 +14,7 @@ import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
 import { People } from './people';
 import { TicketsPage } from './tickets';
+import { OrgTicketsPage } from './tickets/org';
 import { LeaderboardPage } from './leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
@@ -39,13 +41,13 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
           <TicketsPage />
         </Route>
         <Route path="/org/bounties/:uuid">
-          <TicketsPage />
-        </Route>
-        <Route path="/org/bounty/:bountyId">
-          <TicketsPage />
+          <OrgTicketsPage />
         </Route>
         <Route path="/leaderboard">
           <LeaderboardPage />
+        </Route>
+        <Route path="/admin">
+          <AdminPage />
         </Route>
         <Route path="*">
           <Body />

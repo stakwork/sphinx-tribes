@@ -57,15 +57,21 @@ func GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetBountyCount(w http.ResponseWriter, r *http.Request) {
+func GetUserBountyCount(w http.ResponseWriter, r *http.Request) {
 	personKey := chi.URLParam(r, "personKey")
 	tabType := chi.URLParam(r, "tabType")
 
 	if personKey == "" || tabType == "" {
 		w.WriteHeader(http.StatusNotFound)
 	}
-	bountyCount := db.DB.GetBountiesCount(personKey, tabType)
+	bountyCount := db.DB.GetUserBountiesCount(personKey, tabType)
 
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyCount)
+}
+
+func GetBountyCount(w http.ResponseWriter, r *http.Request) {
+	bountyCount := db.DB.GetBountiesCount()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyCount)
 }
@@ -162,10 +168,22 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
-			fmt.Println("Cannot edit another user's bounty")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Cannot edit another user's bounty")
-			return
+			if bounty.OrgUuid != "" {
+				hasBountyRoles := db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+				if !hasBountyRoles {
+					msg := "You don't have a=the right permission ton update bounty"
+					fmt.Println(msg)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(msg)
+					return
+				}
+			} else {
+				msg := "Cannot edit another user's bounty"
+				fmt.Println(msg)
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(msg)
+				return
+			}
 		}
 	}
 
@@ -216,14 +234,19 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
-func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
+func generateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
 	for i := 0; i < len(bounties); i++ {
 		bounty := bounties[i]
+
+		owner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
 		b := db.BountyResponse{
 			Bounty: db.Bounty{
-				ID:                      bounty.BountyId,
+				ID:                      bounty.ID,
 				OwnerID:                 bounty.OwnerID,
 				Paid:                    bounty.Paid,
 				Show:                    bounty.Show,
@@ -235,10 +258,10 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				Price:                   bounty.Price,
 				Title:                   bounty.Title,
 				Tribe:                   bounty.Tribe,
-				Created:                 bounty.BountyCreated,
+				Created:                 bounty.Created,
 				Assignee:                bounty.Assignee,
 				TicketUrl:               bounty.TicketUrl,
-				Description:             bounty.BountyDescription,
+				Description:             bounty.Description,
 				WantedType:              bounty.WantedType,
 				Deliverables:            bounty.Deliverables,
 				GithubDescription:       bounty.GithubDescription,
@@ -246,47 +269,47 @@ func generateBountyResponse(bounties []db.BountyData) []db.BountyResponse {
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
 				OrgUuid:                 bounty.OrgUuid,
-				Updated:                 bounty.BountyUpdated,
+				Updated:                 bounty.Updated,
 				CodingLanguages:         bounty.CodingLanguages,
 			},
 			Assignee: db.Person{
-				ID:               bounty.AssigneeId,
-				Uuid:             bounty.Uuid,
-				OwnerPubKey:      bounty.OwnerPubKey,
-				OwnerAlias:       bounty.AssigneeAlias,
-				UniqueName:       bounty.UniqueName,
-				Description:      bounty.AssigneeDescription,
-				Tags:             bounty.Tags,
-				Img:              bounty.Img,
-				Created:          bounty.AssigneeCreated,
-				Updated:          bounty.AssigneeUpdated,
-				LastLogin:        bounty.LastLogin,
-				OwnerRouteHint:   bounty.AssigneeRouteHint,
-				OwnerContactKey:  bounty.OwnerContactKey,
-				PriceToMeet:      bounty.PriceToMeet,
-				TwitterConfirmed: bounty.TwitterConfirmed,
+				ID:               assignee.ID,
+				Uuid:             assignee.Uuid,
+				OwnerPubKey:      assignee.OwnerPubKey,
+				OwnerAlias:       assignee.OwnerAlias,
+				UniqueName:       assignee.UniqueName,
+				Description:      assignee.Description,
+				Tags:             assignee.Tags,
+				Img:              assignee.Img,
+				Created:          assignee.Created,
+				Updated:          assignee.Updated,
+				LastLogin:        assignee.LastLogin,
+				OwnerRouteHint:   assignee.OwnerRouteHint,
+				OwnerContactKey:  assignee.OwnerContactKey,
+				PriceToMeet:      assignee.PriceToMeet,
+				TwitterConfirmed: assignee.TwitterConfirmed,
 			},
 			Owner: db.Person{
-				ID:               bounty.BountyOwnerId,
-				Uuid:             bounty.OwnerUuid,
-				OwnerPubKey:      bounty.OwnerKey,
-				OwnerAlias:       bounty.OwnerAlias,
-				UniqueName:       bounty.OwnerUniqueName,
-				Description:      bounty.OwnerDescription,
-				Tags:             bounty.OwnerTags,
-				Img:              bounty.OwnerImg,
-				Created:          bounty.OwnerCreated,
-				Updated:          bounty.OwnerUpdated,
-				LastLogin:        bounty.OwnerLastLogin,
-				OwnerRouteHint:   bounty.OwnerRouteHint,
-				OwnerContactKey:  bounty.OwnerContactKey,
-				PriceToMeet:      bounty.OwnerPriceToMeet,
-				TwitterConfirmed: bounty.OwnerTwitterConfirmed,
+				ID:               owner.ID,
+				Uuid:             owner.Uuid,
+				OwnerPubKey:      assignee.OwnerPubKey,
+				OwnerAlias:       owner.OwnerAlias,
+				UniqueName:       owner.UniqueName,
+				Description:      owner.Description,
+				Tags:             owner.Tags,
+				Img:              owner.Img,
+				Created:          owner.Created,
+				Updated:          owner.Updated,
+				LastLogin:        owner.LastLogin,
+				OwnerRouteHint:   owner.OwnerRouteHint,
+				OwnerContactKey:  owner.OwnerContactKey,
+				PriceToMeet:      owner.PriceToMeet,
+				TwitterConfirmed: owner.TwitterConfirmed,
 			},
 			Organization: db.OrganizationShort{
-				Name: bounty.OrganizationName,
-				Uuid: bounty.OrganizationUuid,
-				Img:  bounty.OrganizationImg,
+				Name: organization.Name,
+				Uuid: organization.Uuid,
+				Img:  organization.Img,
 			},
 		}
 		bountyResponse = append(bountyResponse, b)
@@ -619,19 +642,6 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 		if !dbInvoice.Status {
 			if invoice.Type == "BUDGET" {
 				db.DB.AddAndUpdateBudget(invoice)
-			} else if invoice.Type == "ASSIGN" {
-				bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
-
-				if err == nil {
-					bounty.Assignee = invData.UserPubkey
-					bounty.CommitmentFee = uint64(invData.CommitmentFee)
-					bounty.AssignedHours = uint8(invData.AssignedHours)
-					bounty.BountyExpires = invData.BountyExpires
-				} else {
-					fmt.Println("Fetch Assign bounty error ===", err)
-				}
-
-				db.DB.UpdateBounty(bounty)
 			} else if invoice.Type == "KEYSEND" {
 				url := fmt.Sprintf("%s/payment", config.RelayUrl)
 

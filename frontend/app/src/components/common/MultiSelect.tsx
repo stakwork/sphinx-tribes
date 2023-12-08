@@ -8,7 +8,6 @@ interface styledProps {
   color?: any;
 }
 
-// @ts-ignore
 const S = styled(Select)<styledProps>`
 background:#ffffff00;
 border: 1px solid ${(p: any) => p.color && p.color.grayish.G750};

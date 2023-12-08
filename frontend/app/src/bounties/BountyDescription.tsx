@@ -107,10 +107,10 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
 
   useEffect(() => {
     if (props.description) {
-      const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+      const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))(?![^`]*`)/);
       setReplitLink(
         props?.description.match(
-          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
+          /https?:\/\/(?:www\.)?(?:replit\.[a-zA-Z0-9()]{1,256}|replit\.it)\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
         )
       );
       setDescriptionImage(found && found.length > 0 && found[0]);

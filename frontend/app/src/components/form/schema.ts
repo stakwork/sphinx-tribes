@@ -10,15 +10,6 @@ import { FormField } from './utils';
 
 const strValidator = Yup.string().trim().required('Required');
 const strValidatorNotRequired = Yup.string().trim();
-const repoStrValidator = Yup.string()
-  .trim()
-  .matches(/^[^/]+\/[^/]+$/, 'Incorrect format')
-  .required('Required');
-const repoArrayStrValidator = Yup.array().of(
-  Yup.object().shape({
-    value: repoStrValidator
-  })
-);
 const badgeObjectStrValidator = Yup.object().shape({
   value: strValidator
 });
@@ -432,16 +423,6 @@ export const aboutSchema: FormField[] = [
     widget: true,
     type: 'text',
     prepend: 'https://github.com/',
-    page: 1
-  },
-  {
-    name: 'repos',
-    label: 'Github Repository Links',
-    widget: true,
-    type: 'creatablemultiselect',
-    options: [],
-    note: 'Enter in this format: ownerName/repoName, (e.g. stakwork/sphinx-tribes).',
-    validator: repoArrayStrValidator, // look for 1 slash
     page: 1
   },
   {

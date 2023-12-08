@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { useIsMobile } from 'hooks/uiHooks';
+import { queryLimit } from 'store/main';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
@@ -20,7 +21,7 @@ interface PanelProps {
   isAssignee?: boolean;
 }
 
-const Panel = styled.div<PanelProps>`
+const Panel = styled.a<PanelProps>`
   margin-top: 5px;
   background: ${(p: any) => p.color && p.color.pureWhite};
   color: ${(p: any) => p.color && p.color.pureBlack};
@@ -29,6 +30,7 @@ const Panel = styled.div<PanelProps>`
   :hover {
     box-shadow: ${(p: any) =>
       p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
+    text-decoration: none !important;
   }
   :active {
     box-shadow: none !important;
@@ -74,7 +76,9 @@ function WidgetSwitchViewer(props: any) {
   const [deletePayload, setDeletePayload] = useState<object>({});
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
-  const [currentItems, setCurrentItems] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
+  const [currentItems, setCurrentItems] = useState<number>(queryLimit);
+  const [totalBounties, setTotalBounties] = useState<number>(queryLimit);
 
   const panelStyles = isMobile
     ? {
@@ -107,7 +111,7 @@ function WidgetSwitchViewer(props: any) {
     const value = { ...body };
     return (
       bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-      bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
+      bountyHeaderLanguageFilter(value?.coding_languages, props?.checkboxIdToSelectedMapLanguage)
     );
   });
 
@@ -152,6 +156,23 @@ function WidgetSwitchViewer(props: any) {
     closeModal();
   };
 
+  const getTotalBountiesCount = useCallback(async () => {
+    const totalBounties = await main.getTotalBountyCount();
+    setTotalBounties(totalBounties);
+  }, [main]);
+
+  useEffect(() => {
+    getTotalBountiesCount();
+  }, [getTotalBountiesCount]);
+
+  const nextBounties = async () => {
+    const currentPage = page + 1;
+    setPage(currentPage);
+    setCurrentItems(currentItems + queryLimit);
+
+    await main.getPeopleBounties({ limit: queryLimit, page: currentPage });
+  };
+
   const listItems =
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
@@ -167,6 +188,7 @@ function WidgetSwitchViewer(props: any) {
         // if this person has entries for this widget
         return (
           <Panel
+            href={`/bounty/${body.id}`}
             color={color}
             isMobile={isMobile}
             key={person?.owner_pubkey + i + body?.created}
@@ -217,7 +239,7 @@ function WidgetSwitchViewer(props: any) {
     ) : (
       <NoResults />
     );
-
+  const showLoadMore = totalBounties > currentItems && activeList.length >= queryLimit;
   return (
     <>
       {listItems}
@@ -226,7 +248,7 @@ function WidgetSwitchViewer(props: any) {
       {showDeleteModal && (
         <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
       )}
-      {activeList?.length > currentItems && (
+      {showLoadMore && (
         <LoadMoreContainer
           color={color}
           style={{
@@ -236,12 +258,7 @@ function WidgetSwitchViewer(props: any) {
             alignItems: 'center'
           }}
         >
-          <div
-            className="LoadMoreButton"
-            onClick={() => {
-              setCurrentItems(currentItems + 10);
-            }}
-          >
+          <div className="LoadMoreButton" onClick={() => nextBounties()}>
             Load More
           </div>
         </LoadMoreContainer>
