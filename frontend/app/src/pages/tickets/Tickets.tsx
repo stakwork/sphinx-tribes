@@ -11,14 +11,17 @@ import { useStores } from '../../store';
 import { Body, Backdrop } from './style';
 
 // avoid hook within callback warning by renaming hooks
-
 function BodyComponent() {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const selectedWidget = 'wanted';
   const [scrollValue, setScrollValue] = useState<boolean>(false);
-  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({
+    Open: true,
+    Assigned: false,
+    Paid: false
+  });
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
 
   const color = colors['light'];
@@ -31,10 +34,10 @@ function BodyComponent() {
       await main.getOpenGithubIssues();
       await main.getBadgeList();
       await main.getPeople();
-      await main.getPeopleBounties({ page: 1, resetPage: true });
+      await main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
       setLoading(false);
     })();
-  }, [main]);
+  }, [main, checkboxIdToSelectedMap]);
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
