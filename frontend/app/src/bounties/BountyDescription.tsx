@@ -128,10 +128,10 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
     if (!props.org_uuid) return;
     const org = await main.getUserOrganizationByUuid(props.org_uuid);
     setOrg(org);
-  }
+  };
 
   useEffect(() => {
-    fetchOrg()
+    fetchOrg();
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))(?![^`]*`)/);
       setReplitLink(
