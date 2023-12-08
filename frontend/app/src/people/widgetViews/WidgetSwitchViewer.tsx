@@ -109,7 +109,6 @@ function WidgetSwitchViewer(props: any) {
 
   const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
-    // bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
     return bountyHeaderLanguageFilter(
       value?.coding_languages,
       props?.checkboxIdToSelectedMapLanguage
