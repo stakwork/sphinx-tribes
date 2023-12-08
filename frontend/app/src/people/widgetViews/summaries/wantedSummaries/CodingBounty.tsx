@@ -923,7 +923,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             >
               <AutoCompleteContainer color={color}>
-                <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
+                <EuiText className="autoCompleteHeaderText">Assign Developer</EuiText>
                 <InvitePeopleSearch
                   peopleList={peopleList}
                   isProvidingHandler={true}
