@@ -3,8 +3,9 @@ import { observer } from 'mobx-react-lite';
 import FirstTimeScreen from 'people/main/FirstTimeScreen';
 import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+import { queryLimit } from 'store/main';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
@@ -23,6 +24,9 @@ function BodyComponent() {
     Paid: false
   });
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const [page, setPage] = useState<number>(1);
+  const [currentItems, setCurrentItems] = useState<number>(queryLimit);
+  const [totalBounties, setTotalBounties] = useState(0);
 
   const color = colors['light'];
 
@@ -37,7 +41,7 @@ function BodyComponent() {
       await main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
       setLoading(false);
     })();
-  }, [main]);
+  }, [main, checkboxIdToSelectedMap]);
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
@@ -53,7 +57,23 @@ function BodyComponent() {
     }
   }, [main, ui.meInfo]);
 
-  const onChangeStatus = async (optionId: any) => {
+  const getTotalBounties = useCallback(
+    async (statusData: any) => {
+      const totalBounties = await main.getTotalBountyCount(
+        statusData.Open,
+        statusData.Assigned,
+        statusData.Paid
+      );
+      setTotalBounties(totalBounties);
+    },
+    [main]
+  );
+
+  useEffect(() => {
+    getTotalBounties(checkboxIdToSelectedMap);
+  }, [getTotalBounties]);
+
+  const onChangeStatus = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
       ...{
@@ -61,7 +81,10 @@ function BodyComponent() {
       }
     };
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
-    await main.getPeopleBounties({ page: 1, resetPage: true, ...newCheckboxIdToSelectedMap });
+    getTotalBounties(newCheckboxIdToSelectedMap);
+    // set data to default
+    setCurrentItems(queryLimit);
+    setPage(1);
   };
 
   const onChangeLanguage = (optionId: any) => {
@@ -133,6 +156,11 @@ function BodyComponent() {
             fromBountyPage={true}
             selectedWidget={selectedWidget}
             loading={loading}
+            totalBounties={totalBounties}
+            currentItems={currentItems}
+            setCurrentItems={setCurrentItems}
+            page={page}
+            setPage={setPage}
           />
         </div>
 
@@ -195,6 +223,11 @@ function BodyComponent() {
                 fromBountyPage={true}
                 selectedWidget={selectedWidget}
                 loading={loading}
+                totalBounties={totalBounties}
+                currentItems={currentItems}
+                setCurrentItems={setCurrentItems}
+                page={page}
+                setPage={setPage}
               />
             </div>
           </div>
