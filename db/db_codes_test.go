@@ -28,9 +28,7 @@ func TestCodeGet(t *testing.T) {
 	defer db.Close()
 
 	gorm.Open("postgres", db)
-
 	rows := sqlmock.NewRows([]string{"connection_string", "date_created", "is_used", "date_created"}).AddRow(code.ID, code.ConnectionString, code.IsUsed, code.DateCreated)
-
 	mock.ExpectQuery(regexp.QuoteMeta(
 		`SELECT connection_string, date_created FROM connectioncodes WHERE is_used = ? ORDER BY id DESC LIMIT 1`)).
 		WithArgs(false).
