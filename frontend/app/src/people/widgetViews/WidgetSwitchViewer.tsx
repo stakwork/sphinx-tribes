@@ -201,7 +201,7 @@ function WidgetSwitchViewer(props: any) {
               padding: 0,
               overflow: 'hidden',
               background: 'transparent',
-              minHeight: body.org_uuid ? '185px' : !isMobile ? '160px' : '',
+              minHeight: !isMobile ? '160px' : '',
               maxHeight: 'auto',
               boxShadow: 'none'
             }}
