@@ -1,12 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PaidBountiesProps } from 'people/interfaces';
-import { Link } from 'react-router-dom';
 import BountyDescription from '../../bounties/BountyDescription';
 import BountyPrice from '../../bounties/BountyPrice';
 import BountyProfileView from '../../bounties/BountyProfileView';
 import { colors } from '../../config/colors';
-import { OrganizationWrap, OrganizationText } from './style';
 
 interface PaidBountyProps {
   Price_User_Container_Border?: string;
@@ -39,17 +37,9 @@ const PriceUserContainer = styled.div<PaidBountyProps>`
 `;
 const PaidBounty = (props: PaidBountiesProps) => {
   const color = colors['light'];
-  const { org_uuid, name } = props;
 
   return (
     <>
-      {org_uuid && name && (
-        <OrganizationWrap>
-          <Link to={`/org/bounties/${org_uuid}`} target="_blank">
-            <OrganizationText>{name}</OrganizationText>
-          </Link>
-        </OrganizationWrap>
-      )}
       <BountyContainer
         onClick={props.onPanelClick}
         Bounty_Container_Background={color.pureWhite}

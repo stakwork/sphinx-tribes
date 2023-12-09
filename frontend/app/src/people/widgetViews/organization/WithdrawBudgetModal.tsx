@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Wrap } from 'components/form/style';
 import { useIsMobile } from 'hooks/uiHooks';
 import { InvoiceForm, InvoiceInput, InvoiceLabel } from 'people/utils/style';
 import { useStores } from 'store';
@@ -14,7 +13,7 @@ import { colors } from '../../../config/colors';
 import successIcon from '../../../public/static/withdraw_success.svg';
 import errorIcon from '../../../public/static/error.svg';
 import { WithdrawModalProps } from './interface';
-import { Grey } from './style';
+import { BudgetButton, Grey } from './style';
 
 const color = colors['light'];
 
@@ -74,6 +73,13 @@ const ErrorText = styled(SuccessText)`
   text-align: center;
 `;
 
+const Wrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 50px;
+`;
+
 const WithdrawBudgetModal = (props: WithdrawModalProps) => {
   const [paymentRequest, setPaymentRequest] = useState('');
   const [amountInSats, setAmountInSats] = useState(0);
@@ -128,7 +134,11 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
       envStyle={{
         marginTop: isMobile ? 64 : 0,
         background: color.pureWhite,
-        zIndex: 20
+        zIndex: 20,
+        maxHeight: '100%',
+        borderRadius: '10px',
+        minWidth: '22rem',
+        minHeight: '20rem'
       }}
       overlayClick={close}
       bigCloseImage={close}
@@ -139,7 +149,7 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
         borderRadius: '50%'
       }}
     >
-      <Wrap newDesign={true}>
+      <Wrapper>
         {paymentSettled && (
           <PaymentDetailsWrap>
             <SuccessImage src={successIcon} />
@@ -211,8 +221,7 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
                 onChange={(e: any) => setPaymentRequest(e.target.value)}
               />
             </InvoiceForm>
-            <Button
-              text={'Confirm'}
+            <BudgetButton
               disabled={!paymentRequest ? true : false}
               style={{
                 borderRadius: '8px',
@@ -220,13 +229,13 @@ const WithdrawBudgetModal = (props: WithdrawModalProps) => {
                 color: paymentRequest ? '#FFF' : 'rgba(142, 150, 156, 0.85)',
                 background: paymentRequest ? '#9157F6' : 'rgba(0, 0, 0, 0.04)'
               }}
-              height={48}
-              width={'100%'}
               onClick={() => getInvoiceDetails(paymentRequest)}
-            />
+            >
+              Confirm
+            </BudgetButton>
           </>
         )}
-      </Wrap>
+      </Wrapper>
     </Modal>
   );
 };
