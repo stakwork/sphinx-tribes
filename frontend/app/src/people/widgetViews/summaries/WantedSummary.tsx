@@ -86,7 +86,7 @@ function WantedSummary(props: WantedSummaryProps) {
     if (description) {
       setReplitLink(
         description.match(
-          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
+          /https?:\/\/(?:www\.)?(?:replit\.[a-zA-Z0-9()]{1,256}|replit\.it)\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
         )
       );
     }
@@ -139,6 +139,7 @@ function WantedSummary(props: WantedSummaryProps) {
       setAssignedPerson(value);
       assigneeHandlerOpen();
       const newValue = {
+        id,
         title: titleString,
         wanted_type: wanted_type,
         one_sentence_summary: one_sentence_summary,
@@ -178,6 +179,7 @@ function WantedSummary(props: WantedSummaryProps) {
 
     setAssignedPerson(null);
     const newValue = {
+      id,
       title: titleString,
       wanted_type: wanted_type,
       one_sentence_summary: one_sentence_summary,

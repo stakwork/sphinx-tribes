@@ -10,7 +10,7 @@ import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
 import { getUserAvatarPlaceholder } from './lib';
 
-export const queryLimit = 100;
+export const queryLimit = 10;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -761,7 +761,6 @@ export class MainStore {
 
   @persist('list')
   peopleBounties: PersonBounty[] = [];
-
   @action setPeopleBounties(bounties: PersonBounty[]) {
     this.peopleBounties = bounties;
   }
@@ -770,7 +769,7 @@ export class MainStore {
 
   async getPeopleBounties(params?: QueryParams): Promise<PersonBounty[]> {
     const queryParams: QueryParams = {
-      limit: 100,
+      limit: queryLimit,
       sortBy: 'created',
       search: uiStore.searchText ?? '',
       page: 1,
@@ -1059,10 +1058,19 @@ export class MainStore {
   async getBountyCount(personKey: string, tabType: string): Promise<number> {
     try {
       const count = await api.get(`gobounties/count/${personKey}/${tabType}`);
-
       return count;
     } catch (e) {
-      console.log('fetch failed getCreatedBounties: ', e);
+      console.log('fetch failed getBountyCount: ', e);
+      return 0;
+    }
+  }
+
+  async getTotalBountyCount(): Promise<number> {
+    try {
+      const count = await api.get(`gobounties/count`);
+      return await count;
+    } catch (e) {
+      console.log('fetch failed getTotalBountyCount: ', e);
       return 0;
     }
   }
