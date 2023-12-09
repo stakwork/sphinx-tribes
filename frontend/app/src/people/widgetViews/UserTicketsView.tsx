@@ -111,7 +111,6 @@ const UserTickets = () => {
         // if this person has entries for this widget
         return (
           <Panel href={`${url}/${body.id}/${i}`} isMobile={isMobile} key={i + body?.created}>
-            container
             <WantedView
               colors={color}
               showName
