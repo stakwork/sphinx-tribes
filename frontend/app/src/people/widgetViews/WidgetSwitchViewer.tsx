@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { useIsMobile } from 'hooks/uiHooks';
@@ -76,9 +76,11 @@ function WidgetSwitchViewer(props: any) {
   const [deletePayload, setDeletePayload] = useState<object>({});
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
-  const [page, setPage] = useState<number>(1);
-  const [currentItems, setCurrentItems] = useState<number>(queryLimit);
-  const [totalBounties, setTotalBounties] = useState<number>(queryLimit);
+  const { currentItems, setCurrentItems, totalBounties, page: propsPage, setPage } = props;
+
+  const items = currentItems ?? 0;
+  const bountiesTotal = totalBounties ?? 0;
+  const page = propsPage ?? 0;
 
   const panelStyles = isMobile
     ? {
@@ -156,20 +158,15 @@ function WidgetSwitchViewer(props: any) {
     closeModal();
   };
 
-  const getTotalBountiesCount = useCallback(async () => {
-    const totalBounties = await main.getTotalBountyCount();
-    setTotalBounties(totalBounties);
-  }, [main]);
-
-  useEffect(() => {
-    getTotalBountiesCount();
-  }, [getTotalBountiesCount]);
-
   const nextBounties = async () => {
     const currentPage = page + 1;
-    setPage(currentPage);
-    setCurrentItems(currentItems + queryLimit);
+    if (setPage) {
+      setPage(currentPage);
+    }
 
+    if (setCurrentItems) {
+      setCurrentItems(currentItems + queryLimit);
+    }
     await main.getPeopleBounties({
       limit: queryLimit,
       page: currentPage,
@@ -243,7 +240,7 @@ function WidgetSwitchViewer(props: any) {
     ) : (
       <NoResults />
     );
-  const showLoadMore = totalBounties > currentItems && activeList.length >= queryLimit;
+  const showLoadMore = bountiesTotal > items && activeList.length >= queryLimit;
   return (
     <>
       {listItems}
