@@ -437,9 +437,35 @@ func (db database) GetUserBountiesCount(personKey string, tabType string) int64 
 	return count
 }
 
-func (db database) GetBountiesCount() int64 {
+func (db database) GetBountiesCount(r *http.Request) int64 {
+	keys := r.URL.Query()
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	openQuery := ""
+	assignedQuery := ""
+	paidQuery := ""
+
+	if open != "" && open == "true" {
+		openQuery = "AND assignee = ''"
+		assignedQuery = ""
+	}
+	if assingned != "" && assingned == "true" {
+		if open != "" && open == "true" {
+			assignedQuery = "OR assignee != ''"
+		} else {
+			assignedQuery = "AND assignee != ''"
+		}
+	}
+	if paid != "" && paid == "true" {
+		paidQuery = "AND paid = true"
+	}
+
 	var count int64
-	db.db.Model(&Bounty{}).Where("show != ?", false).Count(&count)
+
+	query := "SELECT COUNT(*) FROM bounty WHERE show != false"
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery
+	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
 
