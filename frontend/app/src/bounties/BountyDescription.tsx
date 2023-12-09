@@ -2,6 +2,10 @@ import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isString } from 'lodash';
+import { OrganizationText, OrganizationWrap } from 'people/utils/style';
+import { Link } from 'react-router-dom';
+import { useStores } from 'store';
+import { Organization } from 'store/main';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/languageLabelStyle';
 import NameTag from '../people/utils/NameTag';
@@ -26,12 +30,13 @@ const BountyDescriptionContainer = styled.div<bounty_description_props>`
   min-width: 519px;
   max-width: 519px;
   padding-left: 17px;
+  padding-right: 17px;
 `;
 
 const Header = styled.div`
   display: flex;
   flex-direction: row;
-  align-item: center;
+  justify-content: space-between;
   height: 32px;
   margin-top: 16px;
   .NameContainer {
@@ -43,7 +48,7 @@ const Header = styled.div`
 const Description = styled.div<bounty_description_props>`
   display: flex;
   flex-direction: row;
-  align-item: center;
+  align-items: center;
   justify-content: space-between;
   .DescriptionContainer {
     display: flex;
@@ -93,24 +98,45 @@ const CodingLabels = styled.div<codingLangProps>`
   margin-right: 4px;
   .LanguageText {
     font-size: 13px;
-    fontweight: 500;
+    font-weight: 500;
     text-align: center;
     font-family: 'Barlow';
     line-height: 16px;
   }
 `;
+
+const Img = styled.div<{
+  readonly src: string;
+}>`
+  background-image: url('${(p: any) => p.src}');
+  background-position: center;
+  background-size: cover;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+`;
+
 const BountyDescription = (props: BountiesDescriptionProps) => {
   const color = colors['light'];
   const [dataValue, setDataValue] = useState([]);
   const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
+  const [org, setOrg] = useState<Organization | undefined>(undefined);
+  const { main } = useStores();
+
+  const fetchOrg = async () => {
+    if (!props.org_uuid) return;
+    const org = await main.getUserOrganizationByUuid(props.org_uuid);
+    setOrg(org);
+  };
 
   useEffect(() => {
+    fetchOrg();
     if (props.description) {
-      const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/);
+      const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))(?![^`]*`)/);
       setReplitLink(
         props?.description.match(
-          /https?:\/\/(www\.)?[replit]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
+          /https?:\/\/(?:www\.)?(?:replit\.[a-zA-Z0-9()]{1,256}|replit\.it)\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
         )
       );
       setDescriptionImage(found && found.length > 0 && found[0]);
@@ -148,6 +174,25 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
               org_uuid={props.uuid}
             />
           </div>
+          {props.org_uuid && props.name && (
+            <Link to={`/org/bounties/${props.org_uuid}`} target="_blank">
+              <OrganizationWrap>
+                <Img
+                  title={`${props.name} logo`}
+                  src={org?.img || '/static/person_placeholder.png'}
+                />
+                <OrganizationText>{props.name}</OrganizationText>
+                <img
+                  className="buttonImage"
+                  src={'/static/github_ticket.svg'}
+                  alt={'github_ticket'}
+                  height={'10px'}
+                  width={'10px'}
+                  style={{ transform: 'translateY(1px)' }}
+                />
+              </OrganizationWrap>
+            </Link>
+          )}
         </Header>
         <Description isPaid={props?.isPaid} color={color}>
           <div

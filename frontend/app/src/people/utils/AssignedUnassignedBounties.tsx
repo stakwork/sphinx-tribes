@@ -1,6 +1,5 @@
 import { EuiText } from '@elastic/eui';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { BountiesProps } from 'people/interfaces';
@@ -12,7 +11,6 @@ import BountyProfileView from '../../bounties/BountyProfileView';
 import IconButton from '../../components/common/IconButton2';
 import ConnectCard from './ConnectCard';
 import StartUpModal from './StartUpModal';
-import { OrganizationWrap, OrganizationText } from './style';
 
 interface containerProps {
   unAssignedBackgroundImage?: string;
@@ -121,9 +119,7 @@ const Bounties = (props: BountiesProps) => {
     person,
     onPanelClick,
     widget,
-    created,
-    org_uuid,
-    name
+    created
   } = props;
 
   const color = colors['light'];
@@ -137,13 +133,6 @@ const Bounties = (props: BountiesProps) => {
   const { ui } = useStores();
   return (
     <>
-      {org_uuid && name && (
-        <OrganizationWrap>
-          <Link to={`/org/bounties/${org_uuid}`} target="_blank">
-            <OrganizationText>{name}</OrganizationText>
-          </Link>
-        </OrganizationWrap>
-      )}
       {!!assignee?.owner_pubkey && !!assignee?.owner_alias ? (
         <BountyContainer
           onClick={onPanelClick}

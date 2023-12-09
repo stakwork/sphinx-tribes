@@ -50,7 +50,11 @@ function MobileView(props: any) {
   const color = colors['light'];
 
   return (
-    <div style={{ position: 'relative' }} onClick={onPanelClick} key={titleString}>
+    <div
+      style={{ borderBottom: '2px solid #EBEDEF', position: 'relative' }}
+      onClick={onPanelClick}
+      key={titleString}
+    >
       {paid && (
         <Img
           src={'/static/paid_ribbon.svg'}

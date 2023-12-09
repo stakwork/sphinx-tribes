@@ -539,7 +539,7 @@ const InvitePeopleSearch = (props: InvitePeopleSearchProps) => {
                 </InvitedButton>
               ) : (
                 <ImageButton
-                  buttonText={props.newDesign ? 'Assign' : 'Invite'}
+                  buttonText={props.newDesign ? 'Assign' : 'Assign'}
                   ButtonContainerStyle={{
                     width: '86px',
                     height: '30px',

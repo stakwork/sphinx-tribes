@@ -15,6 +15,7 @@ export interface BountiesDescriptionProps {
   created?: number;
   name?: string;
   uuid?: string;
+  org_uuid?: string;
 }
 
 export interface BountiesPriceProps {

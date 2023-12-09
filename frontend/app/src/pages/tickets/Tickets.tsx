@@ -5,39 +5,12 @@ import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
+import { Body, Backdrop } from './style';
 
 // avoid hook within callback warning by renaming hooks
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Backdrop = styled.div`
-  position: fixed;
-  z-index: 1;
-  background: rgba(0, 0, 0, 70%);
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-export const Spacer = styled.div`
-  display: flex;
-  min-height: 10px;
-  min-width: 100%;
-  height: 10px;
-  width: 100%;
-`;
 
 function BodyComponent() {
   const { main, ui } = useStores();
@@ -47,27 +20,21 @@ function BodyComponent() {
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
-  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
 
   const color = colors['light'];
 
   const history = useHistory();
   const isMobile = useIsMobile();
-  const location = useLocation();
 
   useEffect(() => {
     (async () => {
       await main.getOpenGithubIssues();
       await main.getBadgeList();
       await main.getPeople();
-      if (uuid) {
-        await main.getOrganizationBounties(uuid, { page: 1, resetPage: true });
-      } else {
-        await main.getPeopleBounties({ page: 1, resetPage: true });
-      }
+      await main.getPeopleBounties({ page: 1, resetPage: true });
       setLoading(false);
     })();
-  }, [main, uuid]);
+  }, [main]);
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
@@ -129,7 +96,7 @@ function BodyComponent() {
     />
   );
 
-  if (isMobile) {
+  if (!loading && isMobile) {
     return (
       <Body>
         <div
@@ -169,65 +136,68 @@ function BodyComponent() {
       </Body>
     );
   }
+
   return (
-    <Body
-      onScroll={(e: any) => {
-        setScrollValue(e?.currentTarget?.scrollTop >= 20);
-      }}
-      style={{
-        background: color.grayish.G950,
-        height: 'calc(100% - 65px)'
-      }}
-    >
-      <div
-        style={{
-          minHeight: '32px'
+    !loading && (
+      <Body
+        onScroll={(e: any) => {
+          setScrollValue(e?.currentTarget?.scrollTop >= 20);
         }}
-      />
-
-      <BountyHeader
-        selectedWidget={selectedWidget}
-        scrollValue={scrollValue}
-        onChangeStatus={onChangeStatus}
-        onChangeLanguage={onChangeLanguage}
-        checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-        checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-      />
-
-      <>
+        style={{
+          background: color.grayish.G950,
+          height: 'calc(100% - 65px)'
+        }}
+      >
         <div
           style={{
-            width: '100%',
-            display: 'flex',
-            flexWrap: 'wrap',
-            height: '100%',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            padding: '0px 20px 20px 20px'
+            minHeight: '32px'
           }}
-        >
+        />
+
+        <BountyHeader
+          selectedWidget={selectedWidget}
+          scrollValue={scrollValue}
+          onChangeStatus={onChangeStatus}
+          onChangeLanguage={onChangeLanguage}
+          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+        />
+
+        <>
           <div
             style={{
               width: '100%',
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              height: '100%'
+              flexWrap: 'wrap',
+              height: '100%',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              padding: '0px 20px 20px 20px'
             }}
           >
-            <WidgetSwitchViewer
-              checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-              checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-              onPanelClick={onPanelClick}
-              fromBountyPage={true}
-              selectedWidget={selectedWidget}
-              loading={loading}
-            />
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                height: '100%'
+              }}
+            >
+              <WidgetSwitchViewer
+                checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+                checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+                onPanelClick={onPanelClick}
+                fromBountyPage={true}
+                selectedWidget={selectedWidget}
+                loading={loading}
+              />
+            </div>
           </div>
-        </div>
-      </>
-      {toastsEl}
-    </Body>
+        </>
+        {toastsEl}
+      </Body>
+    )
   );
 }
 

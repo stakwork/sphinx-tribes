@@ -14,6 +14,7 @@ import { MainLayout } from './MainLayout';
 import { Modals } from './Modals';
 import { People } from './people';
 import { TicketsPage } from './tickets';
+import { OrgTicketsPage } from './tickets/org';
 import { LeaderboardPage } from './leaderboard';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
@@ -40,7 +41,7 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
           <TicketsPage />
         </Route>
         <Route path="/org/bounties/:uuid">
-          <TicketsPage />
+          <OrgTicketsPage />
         </Route>
         <Route path="/leaderboard">
           <LeaderboardPage />
