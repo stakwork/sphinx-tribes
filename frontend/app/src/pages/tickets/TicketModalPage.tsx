@@ -38,7 +38,6 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [isDeleted, setisDeleted] = useState(false);
 
   const isMobile = useIsMobile();
-  const { uuid } = useParams<{ uuid: string }>();
 
   const search = useMemo(() => {
     const s = new URLSearchParams(location.search);

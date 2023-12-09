@@ -1065,9 +1065,11 @@ export class MainStore {
     }
   }
 
-  async getTotalBountyCount(): Promise<number> {
+  async getTotalBountyCount(open: boolean, assigned: boolean, paid: boolean): Promise<number> {
     try {
-      const count = await api.get(`gobounties/count`);
+      const count = await api.get(
+        `gobounties/count?Open=${open}&Assigned=${assigned}&Paid=${paid}`
+      );
       return await count;
     } catch (e) {
       console.log('fetch failed getTotalBountyCount: ', e);
