@@ -71,7 +71,7 @@ func GetUserBountyCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBountyCount(w http.ResponseWriter, r *http.Request) {
-	bountyCount := db.DB.GetBountiesCount()
+	bountyCount := db.DB.GetBountiesCount(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyCount)
 }
