@@ -14,11 +14,11 @@ export const MainLayout: FC<MainLayoutProps> = ({
   children?: React.ReactNode;
 }) => {
   const c = colors['light'];
-  const location = useLocation(); 
+  const location = useLocation();
 
   return (
     <>
-      {location.pathname === '/superadmin' ? (
+      {location.pathname === '/admin' || location.pathname === '/superadmin' ? (
         <div className="app" style={{ background: c.background }}>
           {children}
         </div>

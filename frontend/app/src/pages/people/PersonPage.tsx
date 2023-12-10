@@ -9,7 +9,7 @@ import { useStores } from 'store';
 import styled from 'styled-components';
 import { TabsPages } from './tabs';
 
-const getHtml = (owner_pubkey: string = '', img: string = '') => `
+const getHtml = (owner_pubkey:any = '', img:any = '') => `
 <sphinx-widget pubkey=${owner_pubkey}
   amount="500"
   title="Support Me"

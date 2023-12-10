@@ -8,7 +8,6 @@ function addMethod(m: string): (url: string, data?: any, incomingHeaders?: any) 
       : `https://${host}/`;
 
   const func = async function (url: string, data: any, incomingHeaders: any) {
-
     try {
       const headers: { [key: string]: string } = {};
       const opts: { [key: string]: any } = { mode: 'cors' };

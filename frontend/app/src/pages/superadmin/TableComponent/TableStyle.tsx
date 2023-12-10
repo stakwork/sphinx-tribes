@@ -1,4 +1,3 @@
-
 import styled from 'styled-components';
 
 export const TableContainer = styled.div`
@@ -41,16 +40,49 @@ export const TableRow = styled.tr`
   }
 `;
 
+export const TableDataRow = styled.tr`
+  height: 80px;
+  border: 1px solid #ddd;
+  &:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+`;
+
 export const TableData = styled.td`
-  padding: 12px;
   text-align: left;
   white-space: wrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 400px;
+  width: 350.588px;
   font-size: 14px;
-  padding-right: 2em;
-  padding-left: 2em;
+  padding-left: 50px;
+  color: var(--Primary-Text-1, var(--Press-Icon-Color, #292c33));
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+`;
+
+export const BountyData = styled.td`
+  text-align: left;
+  white-space: wrap;
+  width: 350.588px;
+  font-size: 14px;
+  padding-left: 50px;
+  color: var(--Primary-Text-1, var(--Press-Icon-Color, #292c33));
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+`;
+
+export const TableDataAlternative = styled.td`
+  padding-left: 50px;
+  text-align: left;
+  color: var(--Primary-Text-1, var(--Press-Icon-Color, #292c33));
+  font-family: Barlow;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
 `;
 
 export const TableDataCenter = styled.td`
@@ -70,17 +102,33 @@ export const TableData2 = styled.td`
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 14px;
-  padding-right: 3em;
-  padding-top: 22px;
   display: flex;
   justify-content: end;
+`;
+
+export const TableData3 = styled.td`
+  padding-right: 35px;
 `;
 
 export const TableHeaderData = styled.th`
   padding: 12px;
   text-align: left;
-  padding-left: 26px;
-  color: var(--Main-bottom-icons, #5F6368);
+  padding-left: 52px;
+  color: var(--Main-bottom-icons, #5f6368);
+  font-family: Barlow;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0.72px;
+  text-transform: uppercase;
+`;
+
+export const TableHeaderDataAlternative = styled.th`
+  padding: 12px;
+  text-align: left;
+  padding-left: 52px;
+  color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
   font-size: 12px;
   font-style: normal;
@@ -93,7 +141,7 @@ export const TableHeaderData = styled.th`
 export const TableHeaderDataCenter = styled.th`
   padding: 12px;
   text-align: center;
-  color: var(--Main-bottom-icons, #5F6368);
+  color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
   font-size: 12px;
   font-style: normal;
@@ -107,7 +155,7 @@ export const TableHeaderDataRight = styled.th`
   padding: 12px;
   text-align: right;
   padding-right: 40px;
-  color: var(--Main-bottom-icons, #5F6368);
+  color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
   font-size: 12px;
   font-style: normal;
@@ -118,15 +166,15 @@ export const TableHeaderDataRight = styled.th`
 `;
 
 export const BountyHeader = styled.div`
-  background: #FFF;
+  background: #fff;
   display: flex;
   height: 66px;
   justify-content: space-between;
   text-align: center;
   align-items: center;
   gap: 10px;
-  padding-left: 1em;
-  padding-right: 2em;
+  padding-left: 32px;
+  padding-right: 47px;
 `;
 
 export const Options = styled.div`
@@ -137,10 +185,11 @@ export const Options = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  padding-right: 2px;
 `;
 
 export const StyledSelect = styled.select`
-  color: var(--Text-2, var(--Hover-Icon-Color, #3C3F41));
+  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
   font-family: Barlow;
   font-size: 15px;
   font-style: normal;
@@ -149,12 +198,27 @@ export const StyledSelect = styled.select`
   border-radius: 4px;
   cursor: pointer;
   outline: none;
+  width: 60px;
+  border: none;
+`;
+
+export const StyledSelect2 = styled.select`
+  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
+  font-family: Barlow;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  width: 45px;
   border: none;
 `;
 
 export const LeadingTitle = styled.h2`
-  color: var(--Primary-Text-1, var(--Press-Icon-Color, #292C33));
- 
+  color: var(--Primary-Text-1, var(--Press-Icon-Color, #292c33));
+
   font-family: Barlow;
   font-size: 15px;
   font-style: normal;
@@ -166,7 +230,7 @@ export const LeadingTitle = styled.h2`
 `;
 
 export const AlternativeTitle = styled.h2`
-  color: var(--Main-bottom-icons, #5F6368);
+  color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
   font-size: 15px;
   font-style: normal;
@@ -175,25 +239,26 @@ export const AlternativeTitle = styled.h2`
 `;
 
 export const Label = styled.label`
-  margin-top: 6px;
-  color: var(--Main-bottom-icons, var(--Hover-Icon-Color, #5F6368));
+  margin-top: 7px;
+  color: var(--Main-bottom-icons, var(--Hover-Icon-Color, #5f6368));
   font-family: Barlow;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  margin-left: 15px;
 `;
 
 export const FlexDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 `;
 
 interface PaginationButtonsProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    active: boolean;
-  }
+  active: boolean;
+}
 
 export const PaginationButtons = styled.button<PaginationButtonsProps>`
   border-radius: 3px;

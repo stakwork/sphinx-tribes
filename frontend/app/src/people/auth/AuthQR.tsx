@@ -54,7 +54,9 @@ function AuthQR(props: AuthProps) {
         if (i > 100) {
           if (interval) clearInterval(interval);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(e, 'Error');
+      }
     }, 3000);
   }
   async function getChallenge() {

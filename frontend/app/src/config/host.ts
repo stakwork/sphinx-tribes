@@ -4,7 +4,7 @@ const externalDockerHosts = ['localhost:23007', 'localhost:23000'];
 export function getHost(): string {
   const host = window.location.host.includes('localhost') ? 'localhost:5002' : window.location.host;
   return host;
-  // return "localhost:8000"
+  // return 'localhost:8000';
 }
 
 export function getHostIncludingDockerHosts() {
