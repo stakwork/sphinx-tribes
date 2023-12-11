@@ -968,6 +968,16 @@ export class MainStore {
     }
   }
 
+  async getBountyIndexById(id: number): Promise<number> {
+    try {
+      const req = await api.get(`gobounties/index/${id}`);
+      return req;
+    } catch (e) {
+      console.log('fetch failed getBountyIndexById: ', e);
+      return 0;
+    }
+  }
+
   async getBountyByCreated(created: number): Promise<PersonBounty[]> {
     try {
       const ps2 = await api.get(`gobounties/created/${created}`);
