@@ -198,9 +198,13 @@ func GetNodePubKey() string {
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+	}
+
 	req.Header.Set("x-user-token", RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
+	res, err := client.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
@@ -208,6 +212,10 @@ func GetNodePubKey() string {
 
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+	}
 
 	if isProxy {
 		proxyContacts := ProxyContacts{}
