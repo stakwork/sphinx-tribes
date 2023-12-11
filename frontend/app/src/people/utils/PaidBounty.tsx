@@ -50,6 +50,7 @@ const PaidBounty = (props: PaidBountiesProps) => {
           title={props.title}
           codingLanguage={props.codingLanguage}
           isPaid={true}
+          org_img={props.img}
         />
         <PriceUserContainer Price_User_Container_Border={color.primaryColor.P400}>
           <BountyPrice
