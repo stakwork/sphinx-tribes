@@ -11,6 +11,7 @@ import { uiStore } from './ui';
 import { getUserAvatarPlaceholder } from './lib';
 
 export const queryLimit = 10;
+export const peopleQueryLimit = 500;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -699,7 +700,7 @@ export class MainStore {
   })
   private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
     const params = { ...queryParams, search };
-    const query = this.appendQueryParams('people', queryLimit, {
+    const query = this.appendQueryParams('people', peopleQueryLimit, {
       ...params,
       sortBy: 'last_login'
     });
