@@ -546,6 +546,12 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 	return ms, err
 }
 
+func (db database) GetBountyIndexById(id string) int64 {
+	var index int64
+	db.db.Raw(`SELECT position FROM(SELECT *, row_number() over( ORDER BY id DESC) as position FROM public.bounty) result WHERE id = '` + id + `' OR created = '` + id + `'`).Scan(&index)
+	return index
+}
+
 func (db database) GetBountyDataByCreated(created string) ([]Bounty, error) {
 	ms := []Bounty{}
 	err := db.db.Raw(`SELECT * FROM public.bounty WHERE created = '` + created + `'`).Find(&ms).Error
