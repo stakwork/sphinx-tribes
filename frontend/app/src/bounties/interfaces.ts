@@ -16,6 +16,7 @@ export interface BountiesDescriptionProps {
   name?: string;
   uuid?: string;
   org_uuid?: string;
+  org_img?: string;
 }
 
 export interface BountiesPriceProps {
