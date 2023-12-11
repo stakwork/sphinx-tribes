@@ -4,8 +4,6 @@ import styled from 'styled-components';
 import { isString } from 'lodash';
 import { OrganizationText, OrganizationWrap } from 'people/utils/style';
 import { Link } from 'react-router-dom';
-import { useStores } from 'store';
-import { Organization } from 'store/main';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/languageLabelStyle';
 import NameTag from '../people/utils/NameTag';
@@ -121,17 +119,8 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
   const [dataValue, setDataValue] = useState([]);
   const [replitLink, setReplitLink] = useState('');
   const [descriptionImage, setDescriptionImage] = useState('');
-  const [org, setOrg] = useState<Organization | undefined>(undefined);
-  const { main } = useStores();
-
-  const fetchOrg = async () => {
-    if (!props.org_uuid) return;
-    const org = await main.getUserOrganizationByUuid(props.org_uuid);
-    setOrg(org);
-  };
 
   useEffect(() => {
-    fetchOrg();
     if (props.description) {
       const found = props?.description.match(/(https?:\/\/.*\.(?:png|jpg|jpeg|gif))(?![^`]*`)/);
       setReplitLink(
@@ -179,7 +168,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
               <OrganizationWrap>
                 <Img
                   title={`${props.name} logo`}
-                  src={org?.img || '/static/person_placeholder.png'}
+                  src={props.org_img || '/static/person_placeholder.png'}
                 />
                 <OrganizationText>{props.name}</OrganizationText>
                 <img

@@ -148,6 +148,7 @@ const Bounties = (props: BountiesProps) => {
               {...props}
               title={title}
               img={person.img}
+              org_img={props.img}
               codingLanguage={codingLanguage}
               created={created}
             />
@@ -184,6 +185,7 @@ const Bounties = (props: BountiesProps) => {
                 {...person}
                 {...props}
                 img={person.img}
+                org_img={props.img}
                 title={title}
                 codingLanguage={codingLanguage}
                 widget={widget}
