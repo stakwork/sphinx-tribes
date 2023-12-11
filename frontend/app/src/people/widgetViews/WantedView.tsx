@@ -48,6 +48,7 @@ function WantedView(props: WantedViews2Props) {
     show = true,
     paid = false
   } = props;
+
   const titleString = one_sentence_summary || title || '';
   const isMobile = useIsMobile();
   const { ui, main } = useStores();
@@ -157,6 +158,7 @@ function WantedView(props: WantedViews2Props) {
                 description={description}
                 name={name}
                 org_uuid={org_uuid}
+                img={img}
               />
             </BountyBox>
           ) : (
@@ -199,6 +201,9 @@ function WantedView(props: WantedViews2Props) {
         paid={paid}
         isMine={isMine}
         titleString={titleString}
+        name={name}
+        org_uuid={org_uuid}
+        img={img}
       />
     );
   };

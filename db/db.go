@@ -447,7 +447,7 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	paidQuery := ""
 
 	if open != "" && open == "true" {
-		openQuery = "AND assignee = ''"
+		openQuery = "AND assignee = '' AND paid != true"
 		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
@@ -458,7 +458,11 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 		}
 	}
 	if paid != "" && paid == "true" {
-		paidQuery = "AND paid = true"
+		if open != "" && open == "true" && assingned != "" && assingned == "true" {
+			paidQuery = "OR paid = true"
+		} else {
+			paidQuery = "AND paid = true"
+		}
 	}
 
 	var count int64
@@ -497,7 +501,7 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 		searchQuery = fmt.Sprintf("WHERE LOWER(title) LIKE %s", "'%"+search+"%'")
 	}
 	if open != "" && open == "true" {
-		openQuery = "AND assignee = ''"
+		openQuery = "AND assignee = '' AND paid != true"
 		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
@@ -508,7 +512,11 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 		}
 	}
 	if paid != "" && paid == "true" {
-		paidQuery = "AND paid = true"
+		if open != "" && open == "true" && assingned != "" && assingned == "true" {
+			paidQuery = "OR paid = true"
+		} else {
+			paidQuery = "AND paid = true"
+		}
 	}
 
 	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
@@ -592,7 +600,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+search+"%'")
 	}
 	if open != "" && open == "true" {
-		openQuery = "AND assignee = ''"
+		openQuery = "AND assignee = '' AND paid != true"
 		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
@@ -603,7 +611,11 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		}
 	}
 	if paid != "" && paid == "true" {
-		paidQuery = "AND paid = true"
+		if open != "" && open == "true" && assingned != "" && assingned == "true" {
+			paidQuery = "OR paid = true"
+		} else {
+			paidQuery = "AND paid = true"
+		}
 	}
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
