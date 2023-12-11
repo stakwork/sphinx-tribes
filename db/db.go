@@ -458,7 +458,7 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 		}
 	}
 	if paid != "" && paid == "true" {
-		if open != "" && open == "true" && assingned != "" && assingned == "true" {
+		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
 		} else {
 			paidQuery = "AND paid = true"
@@ -512,7 +512,7 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 		}
 	}
 	if paid != "" && paid == "true" {
-		if open != "" && open == "true" && assingned != "" && assingned == "true" {
+		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
 		} else {
 			paidQuery = "AND paid = true"
@@ -611,7 +611,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		}
 	}
 	if paid != "" && paid == "true" {
-		if open != "" && open == "true" && assingned != "" && assingned == "true" {
+		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
 		} else {
 			paidQuery = "AND paid = true"
