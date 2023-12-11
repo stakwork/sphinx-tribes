@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { useIsMobile } from 'hooks/uiHooks';
@@ -6,7 +6,7 @@ import { queryLimit } from 'store/main';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
-import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
+import { bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/Constants';
@@ -76,9 +76,11 @@ function WidgetSwitchViewer(props: any) {
   const [deletePayload, setDeletePayload] = useState<object>({});
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
-  const [page, setPage] = useState<number>(1);
-  const [currentItems, setCurrentItems] = useState<number>(queryLimit);
-  const [totalBounties, setTotalBounties] = useState<number>(queryLimit);
+  const { currentItems, setCurrentItems, totalBounties, page: propsPage, setPage } = props;
+
+  const items = currentItems ?? 0;
+  const bountiesTotal = totalBounties ?? 0;
+  const page = propsPage ?? 0;
 
   const panelStyles = isMobile
     ? {
@@ -109,9 +111,9 @@ function WidgetSwitchViewer(props: any) {
 
   const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
-    return (
-      bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-      bountyHeaderLanguageFilter(value?.coding_languages, props?.checkboxIdToSelectedMapLanguage)
+    return bountyHeaderLanguageFilter(
+      value?.coding_languages,
+      props?.checkboxIdToSelectedMapLanguage
     );
   });
 
@@ -156,21 +158,20 @@ function WidgetSwitchViewer(props: any) {
     closeModal();
   };
 
-  const getTotalBountiesCount = useCallback(async () => {
-    const totalBounties = await main.getTotalBountyCount();
-    setTotalBounties(totalBounties);
-  }, [main]);
-
-  useEffect(() => {
-    getTotalBountiesCount();
-  }, [getTotalBountiesCount]);
-
   const nextBounties = async () => {
     const currentPage = page + 1;
-    setPage(currentPage);
-    setCurrentItems(currentItems + queryLimit);
+    if (setPage) {
+      setPage(currentPage);
+    }
 
-    await main.getPeopleBounties({ limit: queryLimit, page: currentPage });
+    if (setCurrentItems) {
+      setCurrentItems(currentItems + queryLimit);
+    }
+    await main.getPeopleBounties({
+      limit: queryLimit,
+      page: currentPage,
+      ...props.checkboxIdToSelectedMap
+    });
   };
 
   const listItems =
@@ -200,7 +201,7 @@ function WidgetSwitchViewer(props: any) {
               padding: 0,
               overflow: 'hidden',
               background: 'transparent',
-              minHeight: body.org_uuid ? '185px' : !isMobile ? '160px' : '',
+              minHeight: !isMobile ? '160px' : '',
               maxHeight: 'auto',
               boxShadow: 'none'
             }}
@@ -239,7 +240,7 @@ function WidgetSwitchViewer(props: any) {
     ) : (
       <NoResults />
     );
-  const showLoadMore = totalBounties > currentItems && activeList.length >= queryLimit;
+  const showLoadMore = bountiesTotal > items && activeList.length >= queryLimit;
   return (
     <>
       {listItems}

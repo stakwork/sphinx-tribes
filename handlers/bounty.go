@@ -41,6 +41,16 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetBountyIndexById(w http.ResponseWriter, r *http.Request) {
+	bountyId := chi.URLParam(r, "bountyId")
+	if bountyId == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bountyIndex := db.DB.GetBountyIndexById(bountyId)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyIndex)
+}
+
 func GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	created := chi.URLParam(r, "created")
 	if created == "" {
@@ -71,7 +81,7 @@ func GetUserBountyCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBountyCount(w http.ResponseWriter, r *http.Request) {
-	bountyCount := db.DB.GetBountiesCount()
+	bountyCount := db.DB.GetBountiesCount(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyCount)
 }

@@ -437,9 +437,35 @@ func (db database) GetUserBountiesCount(personKey string, tabType string) int64 
 	return count
 }
 
-func (db database) GetBountiesCount() int64 {
+func (db database) GetBountiesCount(r *http.Request) int64 {
+	keys := r.URL.Query()
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	openQuery := ""
+	assignedQuery := ""
+	paidQuery := ""
+
+	if open != "" && open == "true" {
+		openQuery = "AND assignee = ''"
+		assignedQuery = ""
+	}
+	if assingned != "" && assingned == "true" {
+		if open != "" && open == "true" {
+			assignedQuery = "OR assignee != ''"
+		} else {
+			assignedQuery = "AND assignee != ''"
+		}
+	}
+	if paid != "" && paid == "true" {
+		paidQuery = "AND paid = true"
+	}
+
 	var count int64
-	db.db.Model(&Bounty{}).Where("show != ?", false).Count(&count)
+
+	query := "SELECT COUNT(*) FROM bounty WHERE show != false"
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery
+	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
 
@@ -447,11 +473,18 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
 	ms := []Bounty{}
 
 	orderQuery := ""
 	limitQuery := ""
 	searchQuery := ""
+	openQuery := ""
+	assignedQuery := ""
+	paidQuery := ""
+
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
@@ -463,10 +496,24 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	if search != "" {
 		searchQuery = fmt.Sprintf("WHERE LOWER(title) LIKE %s", "'%"+search+"%'")
 	}
+	if open != "" && open == "true" {
+		openQuery = "AND assignee = ''"
+		assignedQuery = ""
+	}
+	if assingned != "" && assingned == "true" {
+		if open != "" && open == "true" {
+			assignedQuery = "OR assignee != ''"
+		} else {
+			assignedQuery = "AND assignee != ''"
+		}
+	}
+	if paid != "" && paid == "true" {
+		paidQuery = "AND paid = true"
+	}
 
-	rawQuery := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
-
-	theQuery := db.db.Raw(rawQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery)
+	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
 		// pull out the tags and add them in here
@@ -499,6 +546,12 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 	return ms, err
 }
 
+func (db database) GetBountyIndexById(id string) int64 {
+	var index int64
+	db.db.Raw(`SELECT position FROM(SELECT *, row_number() over( ORDER BY id DESC) as position FROM public.bounty) result WHERE id = '` + id + `' OR created = '` + id + `'`).Scan(&index)
+	return index
+}
+
 func (db database) GetBountyDataByCreated(created string) ([]Bounty, error) {
 	ms := []Bounty{}
 	err := db.db.Raw(`SELECT * FROM public.bounty WHERE created = '` + created + `'`).Find(&ms).Error
@@ -514,12 +567,18 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
 
 	ms := []Bounty{}
 
 	orderQuery := ""
 	limitQuery := ""
 	searchQuery := ""
+	openQuery := ""
+	assignedQuery := ""
+	paidQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -532,10 +591,24 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	if search != "" {
 		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+search+"%'")
 	}
+	if open != "" && open == "true" {
+		openQuery = "AND assignee = ''"
+		assignedQuery = ""
+	}
+	if assingned != "" && assingned == "true" {
+		if open != "" && open == "true" {
+			assignedQuery = "OR assignee != ''"
+		} else {
+			assignedQuery = "AND assignee != ''"
+		}
+	}
+	if paid != "" && paid == "true" {
+		paidQuery = "AND paid = true"
+	}
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 

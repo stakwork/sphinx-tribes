@@ -11,6 +11,7 @@ import { uiStore } from './ui';
 import { getUserAvatarPlaceholder } from './lib';
 
 export const queryLimit = 10;
+export const peopleQueryLimit = 500;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -699,7 +700,7 @@ export class MainStore {
   })
   private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
     const params = { ...queryParams, search };
-    const query = this.appendQueryParams('people', queryLimit, {
+    const query = this.appendQueryParams('people', peopleQueryLimit, {
       ...params,
       sortBy: 'last_login'
     });
@@ -968,6 +969,16 @@ export class MainStore {
     }
   }
 
+  async getBountyIndexById(id: number): Promise<number> {
+    try {
+      const req = await api.get(`gobounties/index/${id}`);
+      return req;
+    } catch (e) {
+      console.log('fetch failed getBountyIndexById: ', e);
+      return 0;
+    }
+  }
+
   async getBountyByCreated(created: number): Promise<PersonBounty[]> {
     try {
       const ps2 = await api.get(`gobounties/created/${created}`);
@@ -1065,9 +1076,11 @@ export class MainStore {
     }
   }
 
-  async getTotalBountyCount(): Promise<number> {
+  async getTotalBountyCount(open: boolean, assigned: boolean, paid: boolean): Promise<number> {
     try {
-      const count = await api.get(`gobounties/count`);
+      const count = await api.get(
+        `gobounties/count?Open=${open}&Assigned=${assigned}&Paid=${paid}`
+      );
       return await count;
     } catch (e) {
       console.log('fetch failed getTotalBountyCount: ', e);
