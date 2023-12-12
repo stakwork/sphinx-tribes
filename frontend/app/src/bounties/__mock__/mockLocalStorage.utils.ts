@@ -2,15 +2,15 @@ const mockLocalStorage = (() => {
   let store = {};
 
   return {
-    getItem(key:string) {
+    getItem(key: string) {
       return store[key] || null;
     },
 
-    setItem(key:string, value:string) {
+    setItem(key: string, value: string) {
       store[key] = typeof value === 'string' ? value : JSON.stringify(value);
     },
 
-    removeItem(key:string) {
+    removeItem(key: string) {
       delete store[key];
     },
 
@@ -20,7 +20,7 @@ const mockLocalStorage = (() => {
 
     getAll() {
       return store;
-    },
+    }
   };
 })();
 

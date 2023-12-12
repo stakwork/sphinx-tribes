@@ -1,1 +1,1 @@
-export * from './helpers.tsx';
+export * from './helpers';

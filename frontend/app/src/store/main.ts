@@ -5,7 +5,7 @@ import { uniqBy } from 'lodash';
 import api from '../api';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { getHostIncludingDockerHosts } from '../config/host';
-import { randomString } from '../helpers';
+import { randomString } from '../helpers/helpers-extended';
 import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
 import { getUserAvatarPlaceholder } from './lib';
@@ -1422,6 +1422,7 @@ export class MainStore {
 
   async deleteBounty(created: number, owner_pubkey: string): Promise<void> {
     const info = uiStore.meInfo as any;
+    console.log(uiStore.meInfo);
     if (!info) {
       console.log('Youre not logged in');
       return;

@@ -1,14 +1,5 @@
 {
     "collectCoverage": true,
-    "collectCoverageFrom": [
-      "./src/components/**/*.js",
-      "./src/helpers/**/*.ts",
-      "./src/leaderboard/**/*.ts",
-      "./src/pages/**/*.ts",
-      "./src/people/**/*.ts",
-      "./src/tribes/**/*.ts",
-      "./src/__test__/**/*.ts"
-    ],
     "coverageThreshold": {
       "global": {
         "lines": 3.4 
@@ -18,6 +9,12 @@
       },
       "./src/helpers/": {
         "lines": 77
+      },
+      "./src/bounties/": {
+        "lines": 73
+      },
+      "./src/tribes/": {
+        "lines": 100
       }
     },
     "moduleFileExtensions": [
