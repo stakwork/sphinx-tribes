@@ -536,9 +536,6 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
-	keys := r.URL.Query()
-	page := keys.Get("page")
-	limit := keys.Get("limit")
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -555,7 +552,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get the organization payment history
-	paymentHistory := db.DB.GetPaymentHistory(uuid, page, limit)
+	paymentHistory := db.DB.GetPaymentHistory(uuid, r)
 	paymentHistoryData := []db.PaymentHistoryData{}
 
 	for _, payment := range paymentHistory {
