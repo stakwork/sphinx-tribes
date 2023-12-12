@@ -11,13 +11,13 @@
     ],
     "coverageThreshold": {
       "global": {
-        "lines": 0
+        "lines": 3.4 
       },
       "./src/people/utils/": {
-        "lines": 0
+        "lines": 54 
       },
       "./src/helpers/": {
-        "lines": 66
+        "lines": 77
       }
     },
     "moduleFileExtensions": [
@@ -27,11 +27,18 @@
       "node"
     ],
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": "ts-jest",
+      "^.+\\.svg$": "<rootDir>/svgTransform.js" 
     },
+    "transformIgnorePatterns": [
+        "/node_modules/(?!core)"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleDirectories": ["node_modules", "<rootDir>"],
 		"globals": {
-    "window": { "location": {"host": "localhost"}},
-"testEnvironment": "jsdom"
-
-  }
+      "window": { "location": {"host": "localhost"}},
+      "testEnvironment": "jsdom"
+    }
   }

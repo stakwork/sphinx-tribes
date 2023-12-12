@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { useIsMobile } from 'hooks/uiHooks';
+import { queryLimit } from 'store/main';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
-import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../utils/filterValidation';
+import { bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/Constants';
@@ -20,7 +21,7 @@ interface PanelProps {
   isAssignee?: boolean;
 }
 
-const Panel = styled.div<PanelProps>`
+const Panel = styled.a<PanelProps>`
   margin-top: 5px;
   background: ${(p: any) => p.color && p.color.pureWhite};
   color: ${(p: any) => p.color && p.color.pureBlack};
@@ -29,6 +30,7 @@ const Panel = styled.div<PanelProps>`
   :hover {
     box-shadow: ${(p: any) =>
       p.isAssignee ? `0px 1px 6px ${p.color.black100}` : 'none'} !important;
+    text-decoration: none !important;
   }
   :active {
     box-shadow: none !important;
@@ -74,7 +76,11 @@ function WidgetSwitchViewer(props: any) {
   const [deletePayload, setDeletePayload] = useState<object>({});
   const closeModal = () => setShowDeleteModal(false);
   const showModal = () => setShowDeleteModal(true);
-  const [currentItems, setCurrentItems] = useState<number>(10);
+  const { currentItems, setCurrentItems, totalBounties, page: propsPage, setPage } = props;
+
+  const items = currentItems ?? 0;
+  const bountiesTotal = totalBounties ?? 0;
+  const page = propsPage ?? 0;
 
   const panelStyles = isMobile
     ? {
@@ -105,9 +111,9 @@ function WidgetSwitchViewer(props: any) {
 
   const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
-    return (
-      bountyHeaderFilter(props?.checkboxIdToSelectedMap, value?.paid, !!value?.assignee) &&
-      bountyHeaderLanguageFilter(value?.codingLanguage, props?.checkboxIdToSelectedMapLanguage)
+    return bountyHeaderLanguageFilter(
+      value?.coding_languages,
+      props?.checkboxIdToSelectedMapLanguage
     );
   });
 
@@ -152,6 +158,22 @@ function WidgetSwitchViewer(props: any) {
     closeModal();
   };
 
+  const nextBounties = async () => {
+    const currentPage = page + 1;
+    if (setPage) {
+      setPage(currentPage);
+    }
+
+    if (setCurrentItems) {
+      setCurrentItems(currentItems + queryLimit);
+    }
+    await main.getPeopleBounties({
+      limit: queryLimit,
+      page: currentPage,
+      ...props.checkboxIdToSelectedMap
+    });
+  };
+
   const listItems =
     activeList && activeList.length ? (
       activeList.slice(0, currentItems).map((item: any, i: number) => {
@@ -167,6 +189,7 @@ function WidgetSwitchViewer(props: any) {
         // if this person has entries for this widget
         return (
           <Panel
+            href={`/bounty/${body.id}`}
             color={color}
             isMobile={isMobile}
             key={person?.owner_pubkey + i + body?.created}
@@ -178,7 +201,7 @@ function WidgetSwitchViewer(props: any) {
               padding: 0,
               overflow: 'hidden',
               background: 'transparent',
-              minHeight: body.org_uuid ? '185px' : !isMobile ? '160px' : '',
+              minHeight: !isMobile ? '160px' : '',
               maxHeight: 'auto',
               boxShadow: 'none'
             }}
@@ -217,7 +240,7 @@ function WidgetSwitchViewer(props: any) {
     ) : (
       <NoResults />
     );
-
+  const showLoadMore = bountiesTotal > items && activeList.length >= queryLimit;
   return (
     <>
       {listItems}
@@ -226,7 +249,7 @@ function WidgetSwitchViewer(props: any) {
       {showDeleteModal && (
         <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
       )}
-      {activeList?.length > currentItems && (
+      {showLoadMore && (
         <LoadMoreContainer
           color={color}
           style={{
@@ -236,12 +259,7 @@ function WidgetSwitchViewer(props: any) {
             alignItems: 'center'
           }}
         >
-          <div
-            className="LoadMoreButton"
-            onClick={() => {
-              setCurrentItems(currentItems + 10);
-            }}
-          >
+          <div className="LoadMoreButton" onClick={() => nextBounties()}>
             Load More
           </div>
         </LoadMoreContainer>

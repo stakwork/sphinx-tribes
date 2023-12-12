@@ -3,77 +3,75 @@ import { observer } from 'mobx-react-lite';
 import FirstTimeScreen from 'people/main/FirstTimeScreen';
 import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { matchPath, useLocation, useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import { queryLimit } from 'store/main';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
+import { Body, Backdrop } from './style';
 
 // avoid hook within callback warning by renaming hooks
-const Body = styled.div`
-  flex: 1;
-  height: calc(100% - 105px);
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Backdrop = styled.div`
-  position: fixed;
-  z-index: 1;
-  background: rgba(0, 0, 0, 70%);
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-export const Spacer = styled.div`
-  display: flex;
-  min-height: 10px;
-  min-width: 100%;
-  height: 10px;
-  width: 100%;
-`;
-
 function BodyComponent() {
   const { main, ui } = useStores();
   const [loading, setLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const selectedWidget = 'wanted';
   const [scrollValue, setScrollValue] = useState<boolean>(false);
-  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({});
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({
+    Open: true,
+    Assigned: false,
+    Paid: false
+  });
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
-  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
+  const [page, setPage] = useState<number>(1);
+  const [currentItems, setCurrentItems] = useState<number>(queryLimit);
+  const [totalBounties, setTotalBounties] = useState(0);
 
   const color = colors['light'];
 
   const history = useHistory();
   const isMobile = useIsMobile();
-  const location = useLocation();
 
   useEffect(() => {
     (async () => {
       await main.getOpenGithubIssues();
       await main.getBadgeList();
       await main.getPeople();
-      if (uuid) {
-        await main.getOrganizationBounties(uuid, { page: 1, resetPage: true });
-      } else {
-        await main.getPeopleBounties({ page: 1, resetPage: true });
-      }
+      await main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
       setLoading(false);
     })();
-  }, [main, uuid]);
+  }, [main, checkboxIdToSelectedMap]);
+
+  useEffect(() => {
+    setCheckboxIdToSelectedMap({
+      Open: true,
+      Assigned: false,
+      Paid: false
+    });
+  }, [loading]);
 
   useEffect(() => {
     if (ui.meInfo) {
       main.getTribesByOwner(ui.meInfo.owner_pubkey || '');
     }
   }, [main, ui.meInfo]);
+
+  const getTotalBounties = useCallback(
+    async (statusData: any) => {
+      const totalBounties = await main.getTotalBountyCount(
+        statusData.Open,
+        statusData.Assigned,
+        statusData.Paid
+      );
+      setTotalBounties(totalBounties);
+    },
+    [main]
+  );
+
+  useEffect(() => {
+    getTotalBounties(checkboxIdToSelectedMap);
+  }, [getTotalBounties]);
 
   const onChangeStatus = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
@@ -83,6 +81,10 @@ function BodyComponent() {
       }
     };
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+    getTotalBounties(newCheckboxIdToSelectedMap);
+    // set data to default
+    setCurrentItems(queryLimit);
+    setPage(1);
   };
 
   const onChangeLanguage = (optionId: any) => {
@@ -96,11 +98,7 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    if (matchPath(location.pathname, { path: '/org/bounties/:uuid' })) {
-      history.push(`/org/bounty/${item.id}`);
-    } else {
-      history.replace(`/bounty/${item.id}`);
-    }
+    history.push(`/bounty/${item.id}`);
   };
 
   if (loading) {
@@ -125,7 +123,7 @@ function BodyComponent() {
     />
   );
 
-  if (isMobile) {
+  if (!loading && isMobile) {
     return (
       <Body>
         <div
@@ -158,6 +156,11 @@ function BodyComponent() {
             fromBountyPage={true}
             selectedWidget={selectedWidget}
             loading={loading}
+            totalBounties={totalBounties}
+            currentItems={currentItems}
+            setCurrentItems={setCurrentItems}
+            page={page}
+            setPage={setPage}
           />
         </div>
 
@@ -165,65 +168,73 @@ function BodyComponent() {
       </Body>
     );
   }
+
   return (
-    <Body
-      onScroll={(e: any) => {
-        setScrollValue(e?.currentTarget?.scrollTop >= 20);
-      }}
-      style={{
-        background: color.grayish.G950,
-        height: 'calc(100% - 65px)'
-      }}
-    >
-      <div
-        style={{
-          minHeight: '32px'
+    !loading && (
+      <Body
+        onScroll={(e: any) => {
+          setScrollValue(e?.currentTarget?.scrollTop >= 20);
         }}
-      />
-
-      <BountyHeader
-        selectedWidget={selectedWidget}
-        scrollValue={scrollValue}
-        onChangeStatus={onChangeStatus}
-        onChangeLanguage={onChangeLanguage}
-        checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-        checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-      />
-
-      <>
+        style={{
+          background: color.grayish.G950,
+          height: 'calc(100% - 65px)'
+        }}
+      >
         <div
           style={{
-            width: '100%',
-            display: 'flex',
-            flexWrap: 'wrap',
-            height: '100%',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            padding: '0px 20px 20px 20px'
+            minHeight: '32px'
           }}
-        >
+        />
+
+        <BountyHeader
+          selectedWidget={selectedWidget}
+          scrollValue={scrollValue}
+          onChangeStatus={onChangeStatus}
+          onChangeLanguage={onChangeLanguage}
+          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+        />
+
+        <>
           <div
             style={{
               width: '100%',
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              height: '100%'
+              flexWrap: 'wrap',
+              height: '100%',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              padding: '0px 20px 20px 20px'
             }}
           >
-            <WidgetSwitchViewer
-              checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-              checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-              onPanelClick={onPanelClick}
-              fromBountyPage={true}
-              selectedWidget={selectedWidget}
-              loading={loading}
-            />
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                height: '100%'
+              }}
+            >
+              <WidgetSwitchViewer
+                checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+                checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
+                onPanelClick={onPanelClick}
+                fromBountyPage={true}
+                selectedWidget={selectedWidget}
+                loading={loading}
+                totalBounties={totalBounties}
+                currentItems={currentItems}
+                setCurrentItems={setCurrentItems}
+                page={page}
+                setPage={setPage}
+              />
+            </div>
           </div>
-        </div>
-      </>
-      {toastsEl}
-    </Body>
+        </>
+        {toastsEl}
+      </Body>
+    )
   );
 }
 

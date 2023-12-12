@@ -24,7 +24,7 @@ const Container = styled.div`
 interface PanelProps {
   isMobile: boolean;
 }
-const Panel = styled.div<PanelProps>`
+const Panel = styled.a<PanelProps>`
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -35,6 +35,10 @@ const Panel = styled.div<PanelProps>`
   padding: 20px;
   box-shadow: ${(p: any) => (p.isMobile ? 'none' : '0px 0px 6px rgb(0 0 0 / 7%)')};
   border-bottom: ${(p: any) => (p.isMobile ? '2px solid #EBEDEF' : 'none')};
+
+  &:hover {
+    text-decoration: none !important;
+  }
 `;
 
 const UserTickets = () => {
@@ -106,7 +110,7 @@ const UserTickets = () => {
         const body = { ...item.body };
         // if this person has entries for this widget
         return (
-          <Panel isMobile={isMobile} key={i + body?.created}>
+          <Panel href={`${url}/${body.id}/${i}`} isMobile={isMobile} key={i + body?.created}>
             <WantedView
               colors={color}
               showName

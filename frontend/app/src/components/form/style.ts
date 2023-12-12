@@ -15,7 +15,7 @@ export const Wrap = styled.div<WrapProps>`
   height: inherit;
   flex-direction: column;
   align-content: center;
-  min-width: 230px;
+  min-width: 600px;
 `;
 
 export const OrgWrap = styled.div<WrapProps>`
