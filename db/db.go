@@ -1322,6 +1322,8 @@ func (db database) GetPaymentHistory(org_uuid string, p string, l string) []Paym
 		limit, _ = utils.ConvertStringToInt(l)
 	}
 
+	fmt.Println("LIMIT DATA ===", limit, page)
+
 	if page != 0 && limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, page)
 	}
