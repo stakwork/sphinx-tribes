@@ -64,11 +64,11 @@ func StripSuperAdmins(adminStrings string) []string {
 				if splitArray[i] == "," {
 					continue
 				} else {
-					superAdmins = append(superAdmins, splitArray[i])
+					superAdmins = append(superAdmins, strings.TrimSpace(splitArray[i]))
 				}
 			}
 		} else {
-			superAdmins = append(superAdmins, adminStrings)
+			superAdmins = append(superAdmins, strings.TrimSpace(adminStrings))
 		}
 	}
 	return superAdmins
