@@ -1,8 +1,11 @@
 package config
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
+	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,8 +48,6 @@ func TestGenerateRandomString(t *testing.T) {
 func TestGetNodePubKey(t *testing.T) {
 	defer gock.Off()
 
-	//response := map[string]string{"identity_pubkey": "1234"}
-	//success := map[string]bool{"success": true}
 	response := NodeGetInfoResponse{IdentityPubkey: "1234"}
 	nodeGetInfo := NodeGetInfo{Success: true, Response: response}
 
