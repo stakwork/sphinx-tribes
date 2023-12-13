@@ -2,9 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/h2non/gock"
 	"os"
 	"testing"
+
+	"github.com/h2non/gock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInitConfig(t *testing.T) {
@@ -46,8 +48,6 @@ func TestGenerateRandomString(t *testing.T) {
 func TestGetNodePubKey(t *testing.T) {
 	defer gock.Off()
 
-	//response := map[string]string{"identity_pubkey": "1234"}
-	//success := map[string]bool{"success": true}
 	response := NodeGetInfoResponse{IdentityPubkey: "1234"}
 	nodeGetInfo := NodeGetInfo{Success: true, Response: response}
 
@@ -65,4 +65,22 @@ func TestGetNodePubKey(t *testing.T) {
 		t.Error("Node pubkey is incorrect")
 	}
 
+}
+
+func TestStripSuperAdmins(t *testing.T) {
+	testAdminList := "hello, hi, yes, now"
+	admins := StripSuperAdmins(testAdminList)
+	assert.Equal(t, len(admins), 4)
+
+	testAdminNocomma := "hello"
+	adminsNoComma := StripSuperAdmins(testAdminNocomma)
+	assert.Equal(t, len(adminsNoComma), 1)
+
+	testNoAdmins := ""
+	noAdmins := StripSuperAdmins(testNoAdmins)
+	assert.Equal(t, len(noAdmins), 0)
+
+	test2Admins := "hello, hi"
+	admins2 := StripSuperAdmins(test2Admins)
+	assert.Equal(t, len(admins2), 2)
 }
