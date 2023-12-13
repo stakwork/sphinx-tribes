@@ -18,6 +18,7 @@ var RelayUrl string
 var MemeUrl string
 var RelayAuthKey string
 var RelayNodeKey string
+var SuperAdmins []string = []string{""}
 
 // these are constants for the store
 var InvoiceList = "INVOICELIST"
@@ -29,6 +30,9 @@ func InitConfig() {
 	RelayUrl = os.Getenv("RELAY_URL")
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
+	AdminStrings := os.Getenv("ADMINS")
+	// Add to super admins
+	SuperAdmins = StripSuperAdmins(AdminStrings)
 
 	// only make this call if there is a Relay auth key
 	if RelayAuthKey != "" {
@@ -46,7 +50,28 @@ func InitConfig() {
 	if JwtKey == "" {
 		JwtKey = GenerateRandomString()
 	}
+}
 
+func StripSuperAdmins(adminStrings string) []string {
+	superAdmins := []string{}
+	if adminStrings != "" {
+		if strings.Contains(adminStrings, ",") {
+			splitArray := strings.Split(adminStrings, ",")
+			splitLength := len(splitArray)
+
+			for i := 0; i < splitLength; i++ {
+				// append indexes, and skip all the commas
+				if splitArray[i] == "," {
+					continue
+				} else {
+					superAdmins = append(superAdmins, strings.TrimSpace(splitArray[i]))
+				}
+			}
+		} else {
+			superAdmins = append(superAdmins, strings.TrimSpace(adminStrings))
+		}
+	}
+	return superAdmins
 }
 
 func GenerateRandomString() string {

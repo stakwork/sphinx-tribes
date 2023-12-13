@@ -364,10 +364,9 @@ type Bounty struct {
 	AssignedHours           uint8          `json:"assigned_hours"`
 	BountyExpires           string         `json:"bounty_expires"`
 	CommitmentFee           uint64         `json:"commitment_fee"`
-	Price                   string         `json:"price"`
+	Price                   uint           `json:"price"`
 	Title                   string         `json:"title"`
 	Tribe                   string         `json:"tribe"`
-	Created                 int64          `json:"created"`
 	Assignee                string         `json:"assignee"`
 	TicketUrl               string         `json:"ticket_url"`
 	OrgUuid                 string         `json:"org_uuid"`
@@ -378,8 +377,12 @@ type Bounty struct {
 	OneSentenceSummary      string         `json:"one_sentence_summary"`
 	EstimatedSessionLength  string         `json:"estimated_session_length"`
 	EstimatedCompletionDate string         `json:"estimated_completion_date"`
+	Created                 int64          `json:"created"`
 	Updated                 *time.Time     `json:"updated"`
-	PaidDate                *time.Time     `json:"paid_date"`
+	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
+	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
+	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
+	PaidDate                *time.Time     `json:"paid_date,omitempty"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
@@ -594,6 +597,12 @@ type WithdrawBudgetRequest struct {
 	OrgUuid         string `json:"org_uuid"`
 }
 
+type PaymentDateRange struct {
+	StartDate   string      `json:"start_date"`
+	EndDate     string      `json:"end_date"`
+	PaymentType PaymentType `json:"payment_type,omitempty"`
+}
+
 type MemeChallenge struct {
 	Id        string `json:"id"`
 	Challenge string `json:"challenge"`
@@ -629,6 +638,21 @@ type Meme struct {
 	Height      int         `json:"height"`
 	Template    bool        `json:"template"`
 	Expiry      *time.Time  `json:"expiry"`
+}
+
+type DateDifference struct {
+	Diff float64 `json:"diff"`
+}
+
+type BountyMetrics struct {
+	BountiesPosted         int64 `json:"bounties_posted"`
+	BountiesPaid           int64 `json:"bounties_paid"`
+	BountiesPaidPercentage uint  `json:"bounties_paid_average"`
+	SatsPosted             uint  `json:"sats_posted"`
+	SatsPaid               uint  `json:"sats_paid"`
+	SatsPaidPercentage     uint  `json:"sats_paid_percentage"`
+	AveragePaid            uint  `json:"average_paid"`
+	AverageCompleted       uint  `json:"average_completed"`
 }
 
 func (Person) TableName() string {

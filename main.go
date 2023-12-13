@@ -26,6 +26,7 @@ func main() {
 	}
 
 	db.InitDB()
+	db.InitRedis()
 	db.InitCache()
 	db.InitRoles()
 	// Config has to be inited before JWT, if not it will lead to NO JWT error

@@ -93,6 +93,34 @@ Meme image upload works with Relay enabled, so a running Relay is required for M
     MEME_URL=
 ```
 
+### Add REDIS for cache
+
+- Create a Redis instance
+- Create a .env file and populate the .env files with these variables
+
+If you have a Redis url add the REDIS_URL variable to .env
+
+```REDIS_URL = ```
+
+else add these variables to the env to enable Redis
+
+```
+    REDIS_HOST =
+    REDIS_DB =
+    REDIS_USER =
+    REDIS_PASS =
+```
+
+### Add SuperAdmins to access admin dashboard
+
+Add comma separated public keys to the SUPER_ADMINS env var in the .env file,
+any user public key added to this comaa separated strings will have access to the admin dashboard
+e.g '{pubkey}, {pubkey}, {pubkey}'
+
+```
+ADMINS
+```
+
 ### For Contributions
 
 Read the contribution doc [here](./Contribution.md)
