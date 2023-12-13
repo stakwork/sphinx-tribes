@@ -1307,29 +1307,17 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	return payment
 }
 
-func (db database) GetPaymentHistory(org_uuid string, p string, l string) []PaymentHistory {
+func (db database) GetPaymentHistory(org_uuid string, r *http.Request) []PaymentHistory {
 	payment := []PaymentHistory{}
 
-	page := 0
-	limit := 0
+	offset, limit, _, _, _ := utils.GetPaginationParams(r)
 	limitQuery := ""
 
-	if p != "" {
-		page, _ = utils.ConvertStringToInt(p)
-	}
+	limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 
-	if l != "" {
-		limit, _ = utils.ConvertStringToInt(l)
-	}
-
-	if page != 0 && limit != 0 {
-		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, page)
-	}
-
-	query := `SELECT * FROM public.payment_histories WHERE org_uuid = '` + org_uuid + `' ORDER BY created DESC`
+	query := `SELECT * FROM payment_histories WHERE org_uuid = '` + org_uuid + `' ORDER BY created DESC`
 
 	db.db.Raw(query + " " + limitQuery).Find(&payment)
-
 	return payment
 }
 
