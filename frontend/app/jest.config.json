@@ -10,13 +10,13 @@
     ],
     "coverageThreshold": {
       "global": {
-        "lines": 0
+        "lines": 3.4 
       },
       "./src/people/utils/": {
-        "lines": 0
+        "lines": 54 
       },
       "./src/helpers/": {
-        "lines": 66
+        "lines": 77
       }
     },
     "moduleFileExtensions": [
