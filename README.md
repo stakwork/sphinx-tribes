@@ -118,7 +118,7 @@ any user public key added to this comaa separated strings will have access to th
 e.g '{pubkey}, {pubkey}, {pubkey}'
 
 ```
-SUPER_ADMINS
+ADMINS
 ```
 
 ### For Contributions
