@@ -30,7 +30,7 @@ func InitConfig() {
 	RelayUrl = os.Getenv("RELAY_URL")
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
-	AdminStrings := os.Getenv("SUPER_ADMINS")
+	AdminStrings := os.Getenv("ADMINS")
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
 
