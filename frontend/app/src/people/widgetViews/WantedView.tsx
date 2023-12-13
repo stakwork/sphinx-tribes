@@ -20,7 +20,6 @@ const BountyBox = styled.div<styledProps>`
   min-height: 160px;
   max-height: auto;
   width: 1100px;
-  box-shadow: 0px 1px 6px ${(p: any) => p?.color && p?.color.black100};
   border: none;
 `;
 
@@ -159,6 +158,7 @@ function WantedView(props: WantedViews2Props) {
                 description={description}
                 name={name}
                 org_uuid={org_uuid}
+                img={img}
               />
             </BountyBox>
           ) : (
@@ -201,6 +201,9 @@ function WantedView(props: WantedViews2Props) {
         paid={paid}
         isMine={isMine}
         titleString={titleString}
+        name={name}
+        org_uuid={org_uuid}
+        img={img}
       />
     );
   };

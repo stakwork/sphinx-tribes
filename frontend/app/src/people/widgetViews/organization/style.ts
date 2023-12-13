@@ -760,3 +760,26 @@ export const AssingUserBtn = styled.button`
     box-shadow: none;
   }
 `;
+
+export const BudgetButton = styled.button`
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-top: 1.25rem;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.00938rem;
+  background: #49c998;
+  box-shadow: 0px 2px 10px 0px rgba(73, 201, 152, 0.5);
+  border: none;
+  color: #fff;
+  &:disabled {
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(0, 0, 0, 0.04);
+    color: rgba(142, 150, 156, 0.85);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;

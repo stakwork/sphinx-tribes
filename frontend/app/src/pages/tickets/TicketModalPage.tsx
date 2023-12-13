@@ -13,11 +13,6 @@ import { PersonBounty } from 'store/main';
 const color = colors['light'];
 const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
 
-const findPerson = (search: any) => (item: any) => {
-  const { person, body } = item;
-  return search.owner_id === person.owner_pubkey && search.created === `${body.created}`;
-};
-
 type Props = {
   setConnectPerson: (p: any) => void;
 };
@@ -49,26 +44,27 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const getBounty = useCallback(async () => {
     let bounty;
+    let bountyIndex = 0;
 
     if (bountyId) {
       bounty = await main.getBountyById(Number(bountyId));
+      bountyIndex = await main.getBountyIndexById(Number(bountyId));
     } else if (search && search.created) {
       bounty = await main.getBountyByCreated(Number(search.created));
+      bountyIndex = await main.getBountyIndexById(Number(search.created));
     }
 
-    const activeIndex = bountyId
-      ? main.peopleBounties.findIndex((bounty: PersonBounty) => bounty.body.id === Number(bountyId))
-      : (main.peopleBounties ?? []).findIndex(findPerson(search));
     const connectPerson = bounty && bounty.length ? bounty[0].person : [];
 
-    setPublicFocusIndex(activeIndex);
-    setActiveListIndex(activeIndex);
+    setPublicFocusIndex(bountyIndex);
+    setActiveListIndex(bountyIndex);
     setConnectPersonBody(connectPerson);
 
     const visible = bounty && bounty.length > 0;
     const isDeleted = bounty && bounty.length === 0;
     setisDeleted(isDeleted);
     setActiveBounty(bounty);
+
     setVisible(visible);
   }, [bountyId, main, search]);
 
@@ -79,7 +75,6 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const goBack = async () => {
     setVisible(false);
     setisDeleted(false);
-    await main.getPeopleBounties({ page: 1, resetPage: true });
     history.goBack();
   };
 
