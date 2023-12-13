@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"fmt"
 	"strconv"
+	"time"
 
 	decodepay "github.com/nbd-wtf/ln-decodepay"
 )
@@ -51,4 +52,11 @@ func GetInvoiceAmount(paymentRequest string) uint {
 	amount := uint(amountInt)
 
 	return amount
+}
+
+func GetDateDaysDifference(createdDate int64, paidDate *time.Time) int64 {
+	firstDate := time.Unix(createdDate, 0)
+	difference := paidDate.Sub(*&firstDate)
+	days := int64(difference.Hours() / 24)
+	return days
 }
