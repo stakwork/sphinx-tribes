@@ -104,7 +104,6 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
       }}
     >
       <p
-        className="helloworld"
         style={{
           color: '#fff',
           textTransform: 'uppercase',
