@@ -725,3 +725,9 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
 }
+
+func GetFilterCount(w http.ResponseWriter, r *http.Request) {
+	filterCount := db.DB.GetFilterStatusCount()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(filterCount)
+}
