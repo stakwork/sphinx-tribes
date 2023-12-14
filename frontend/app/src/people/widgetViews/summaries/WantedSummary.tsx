@@ -527,21 +527,6 @@ function WantedSummary(props: WantedSummaryProps) {
         );
       }
     }
-    if (isMobile) {
-      return (
-        <CodingMobile
-          {...props}
-          labels={labels}
-          nametag={nametag}
-          assigneeLabel={assigneeLabel}
-          actionButtons={actionButtons}
-          // status={status}
-          handleCopyUrl={handleCopyUrl}
-          isCopied={isCopied}
-          titleString={titleString}
-        />
-      );
-    }
 
     // desktop view
     if (fromBountyPage) {
@@ -589,6 +574,9 @@ function WantedSummary(props: WantedSummaryProps) {
           id={id}
           localPaid={localPaid}
           setLocalPaid={setLocalPaid}
+          isMobile={isMobile}
+          actionButtons={actionButtons}
+          assigneeLabel={assigneeLabel}
         />
       );
     }
@@ -598,8 +586,8 @@ function WantedSummary(props: WantedSummaryProps) {
         <CodingDesktop
           {...props}
           labels={labels}
-          actionButtons={actionButtons}
           nametag={nametag}
+          actionButtons={actionButtons}
           assigneeLabel={assigneeLabel}
           assignee={assignee}
           loomEmbedUrl={loomEmbedUrl}

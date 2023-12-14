@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
 import { Person, PersonBounty } from '../store/main';
 import { MeData } from '../store/ui';
@@ -218,20 +218,20 @@ export interface GithubStatusPillProps {
 
 export interface WantedSummaryProps {
   description: any;
-  priceMin: number;
+  priceMin?: number;
   ticket_url: string;
   person: any;
   created?: number | undefined;
   repo: string;
   issue: string;
-  price: number;
+  price?: number;
   type: string;
   tribe: string;
   paid: boolean;
   badgeRecipient: string;
-  loomEmbedUrl: string;
+  loomEmbedUrl?: string;
   coding_languages: string[];
-  estimated_session_length: string;
+  estimated_session_length?: string;
   assignee: Person;
   fromBountyPage: string;
   wanted_type: string;
@@ -249,7 +249,7 @@ export interface WantedSummaryProps {
 
 export type LocalPaymeentState = 'UNKNOWN' | 'PAID' | 'UNPAID';
 
-export interface CodingBountiesProps {
+export interface CodingBountiesProps extends WantedSummaryProps {
   deliverables?: string;
   description: any;
   ticket_url: string;
@@ -311,6 +311,9 @@ export interface CodingBountiesProps {
   id?: number;
   localPaid: LocalPaymeentState;
   setLocalPaid: (state: LocalPaymeentState) => void;
+  isMobile?: boolean;
+  assigneeLabel?: { [key: string]: any };
+  actionButtons?: boolean | JSX.Element;
 }
 
 export interface CodingViewProps extends WantedSummaryProps {
@@ -331,6 +334,9 @@ export interface CodingViewProps extends WantedSummaryProps {
   status?: string;
   handleCopyUrl?: () => void;
   isCopied?: boolean;
+  payBounty?: ReactNode;
+  markUnpaid?: ReactNode;
+  showPayBounty?: boolean;
   // owner_id: string;
 }
 
