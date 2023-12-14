@@ -473,6 +473,24 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	return count
 }
 
+func (db database) GetFilterStatusCount() FilterStattuCount {
+	var openCount int64
+	var assignedCount int64
+	var paidCount int64
+
+	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee = '' AND paid != true").Scan(&openCount)
+	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee != ''").Scan(&assignedCount)
+	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND paid = true").Scan(&paidCount)
+
+	ms := FilterStattuCount{
+		Open:     openCount,
+		Assigned: assignedCount,
+		Paid:     paidCount,
+	}
+
+	return ms
+}
+
 func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []Bounty {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
