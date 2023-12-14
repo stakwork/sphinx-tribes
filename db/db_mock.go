@@ -545,6 +545,10 @@ func (db database) CreateConnectionCode(c ConnectionCodes) (ConnectionCodes, err
 		now := time.Now()
 		c.DateCreated = &now
 	}
+	if c.ID == 1 {
+		errorMsg := errors.New("Error Reaching DB")
+		return c, errorMsg
+	}
 	return c, nil
 }
 
