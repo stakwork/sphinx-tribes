@@ -369,6 +369,8 @@ function MobileView(props: CodingBountiesProps) {
   const payBountyDisable = !isOwner && !userBountyRole;
 
   if (isMobile) {
+    console.log('is mobile')
+
     return (
       <CodingMobile
         {...props}
@@ -423,8 +425,8 @@ function MobileView(props: CodingBountiesProps) {
                 fontSize: '15px',
                 marginLeft: '30px'
               }}
-              hovercolor={color.button_primary.hover}
-              shadowcolor={color.button_primary.shadow}
+              hovercolor={color.button_secondary.hover}
+              shadowcolor={color.button_secondary.shadow}
               onClick={makePayment}
             />
           </>
