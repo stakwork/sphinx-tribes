@@ -15,3 +15,7 @@
 - Folders should be named in camel case i.e (peopleData)
 - Typescript files should be named in camel case also
 - Only the index.tsx files should be named in small letters
+
+### Prettier Fixing
+
+- Make sure you run ```yarn run prettier``` to fix prettier error before submitting
