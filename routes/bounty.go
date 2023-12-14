@@ -16,6 +16,7 @@ func BountyRoutes() chi.Router {
 		r.Get("/count/{personKey}/{tabType}", handlers.GetUserBountyCount)
 		r.Get("/count", handlers.GetBountyCount)
 		r.Get("/invoice/{paymentRequest}", handlers.GetInvoiceData)
+		r.Get("/filter/count", handlers.GetFilterCount)
 
 	})
 	r.Group(func(r chi.Router) {
