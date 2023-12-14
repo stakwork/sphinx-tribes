@@ -10,7 +10,8 @@ import { TribesURL } from '../config/host';
 import { uiStore } from './ui';
 import { getUserAvatarPlaceholder } from './lib';
 
-export const queryLimit = 100;
+export const queryLimit = 10;
+export const peopleQueryLimit = 500;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -699,7 +700,7 @@ export class MainStore {
   })
   private async fetchPeople(search: string, queryParams?: any): Promise<Person[]> {
     const params = { ...queryParams, search };
-    const query = this.appendQueryParams('people', queryLimit, {
+    const query = this.appendQueryParams('people', peopleQueryLimit, {
       ...params,
       sortBy: 'last_login'
     });
@@ -761,7 +762,6 @@ export class MainStore {
 
   @persist('list')
   peopleBounties: PersonBounty[] = [];
-
   @action setPeopleBounties(bounties: PersonBounty[]) {
     this.peopleBounties = bounties;
   }
@@ -770,7 +770,7 @@ export class MainStore {
 
   async getPeopleBounties(params?: QueryParams): Promise<PersonBounty[]> {
     const queryParams: QueryParams = {
-      limit: 100,
+      limit: queryLimit,
       sortBy: 'created',
       search: uiStore.searchText ?? '',
       page: 1,
@@ -969,6 +969,16 @@ export class MainStore {
     }
   }
 
+  async getBountyIndexById(id: number): Promise<number> {
+    try {
+      const req = await api.get(`gobounties/index/${id}`);
+      return req;
+    } catch (e) {
+      console.log('fetch failed getBountyIndexById: ', e);
+      return 0;
+    }
+  }
+
   async getBountyByCreated(created: number): Promise<PersonBounty[]> {
     try {
       const ps2 = await api.get(`gobounties/created/${created}`);
@@ -1059,10 +1069,21 @@ export class MainStore {
   async getBountyCount(personKey: string, tabType: string): Promise<number> {
     try {
       const count = await api.get(`gobounties/count/${personKey}/${tabType}`);
-
       return count;
     } catch (e) {
-      console.log('fetch failed getCreatedBounties: ', e);
+      console.log('fetch failed getBountyCount: ', e);
+      return 0;
+    }
+  }
+
+  async getTotalBountyCount(open: boolean, assigned: boolean, paid: boolean): Promise<number> {
+    try {
+      const count = await api.get(
+        `gobounties/count?Open=${open}&Assigned=${assigned}&Paid=${paid}`
+      );
+      return await count;
+    } catch (e) {
+      console.log('fetch failed getTotalBountyCount: ', e);
       return 0;
     }
   }

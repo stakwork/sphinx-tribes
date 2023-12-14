@@ -413,6 +413,11 @@ export interface BountyHeaderProps {
   checkboxIdToSelectedMapLanguage: any;
 }
 
+export interface PeopleHeaderProps {
+  onChangeLanguage: (number) => void;
+  checkboxIdToSelectedMapLanguage: any;
+}
+
 export interface DeleteTicketModalProps {
   closeModal: () => void;
   confirmDelete: () => void;

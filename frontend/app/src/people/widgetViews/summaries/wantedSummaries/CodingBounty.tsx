@@ -107,7 +107,6 @@ function MobileView(props: CodingBountiesProps) {
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
   const [userBountyRole, setUserBountyRole] = useState(false);
-  const [canEdit, setCanEdit] = useState(true);
 
   const userPubkey = ui.meInfo?.owner_pubkey;
 
@@ -344,6 +343,7 @@ function MobileView(props: CodingBountiesProps) {
   const getOrganization = useCallback(async () => {
     if (org_uuid && userPubkey) {
       const userRoles = await main.getUserRoles(org_uuid, userPubkey);
+
       const organization = await main.getUserOrganizationByUuid(org_uuid);
       if (organization) {
         const isOrganizationAdmin = organization.owner_pubkey === userPubkey;
@@ -351,9 +351,6 @@ function MobileView(props: CodingBountiesProps) {
           userHasManageBountyRoles(main.bountyRoles, userRoles) &&
           userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
         const canPayBounty = isOrganizationAdmin || userAccess;
-        if (!isOrganizationAdmin) {
-          setCanEdit(false);
-        }
         setUserBountyRole(canPayBounty);
       }
     }
@@ -367,6 +364,7 @@ function MobileView(props: CodingBountiesProps) {
     { ...person }?.owner_alias &&
     ui.meInfo?.owner_alias &&
     { ...person }?.owner_alias === ui.meInfo?.owner_alias;
+
   const hasAccess = isOwner || userBountyRole;
   const payBountyDisable = !isOwner && !userBountyRole;
 
@@ -522,7 +520,7 @@ function MobileView(props: CodingBountiesProps) {
                   <div className="CreatorDescriptionOuterContainerCreatorView">
                     <div className="CreatorDescriptionInnerContainerCreatorView">
                       <div>{nametag}</div>
-                      {!bountyPaid && canEdit && (
+                      {!bountyPaid && userBountyRole && (
                         <div className="CreatorDescriptionExtraButton">
                           <ImageButton
                             buttonText={'Edit'}
@@ -994,7 +992,7 @@ function MobileView(props: CodingBountiesProps) {
               }}
             >
               <AutoCompleteContainer color={color}>
-                <EuiText className="autoCompleteHeaderText">Invite Developer</EuiText>
+                <EuiText className="autoCompleteHeaderText">Assign Developer</EuiText>
                 <InvitePeopleSearch
                   peopleList={peopleList}
                   isProvidingHandler={true}

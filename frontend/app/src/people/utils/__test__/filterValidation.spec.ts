@@ -1,4 +1,6 @@
 import { bountyHeaderFilter, bountyHeaderLanguageFilter } from '../filterValidation';
+import filterByCodingLanguage from '../filterPeople';
+import { users } from '../__test__/__mockData__/users';
 
 describe('testing filters', () => {
   describe('bountyHeaderFilter', () => {
@@ -27,7 +29,7 @@ describe('testing filters', () => {
   describe('bountyHeaderLanguageFilter', () => {
     test('match', () => {
       expect(bountyHeaderLanguageFilter(['Javascript', 'Python'], { Javascript: true })).toEqual(
-        false
+        true
       );
     });
     test('no-match', () => {
@@ -45,6 +47,23 @@ describe('testing filters', () => {
       expect(
         bountyHeaderLanguageFilter(['Javascript'], { Javascript: false, Python: false })
       ).toEqual(true);
+    });
+  });
+  describe('peopleHeaderCodingLanguageFilters', () => {
+    test('match', () => {
+      expect(filterByCodingLanguage(users, { Typescript: true })).toStrictEqual([users[0]]);
+    });
+    test('no_match', () => {
+      expect(filterByCodingLanguage(users, { Rust: true })).toStrictEqual([]);
+    });
+    test('no filters', () => {
+      expect(filterByCodingLanguage(users, {})).toEqual(users);
+    });
+    test('false filters', () => {
+      expect(filterByCodingLanguage(users, { PHP: false, MySQL: false })).toStrictEqual(users);
+    });
+    test('no users', () => {
+      expect(filterByCodingLanguage([], { Typescript: true })).toStrictEqual([]);
     });
   });
 });

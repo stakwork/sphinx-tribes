@@ -9,9 +9,7 @@ func TestSetCache(t *testing.T) {
 	var value = "Trial"
 
 	InitCache()
-
 	Store.SetCache(key, value)
-
 	cacheValue, err := Store.GetCache(key)
 
 	if err != nil {
@@ -30,7 +28,6 @@ func TestDeleteCache(t *testing.T) {
 	InitCache()
 
 	Store.SetCache(key, value)
-
 	cacheValue, err := Store.GetCache(key)
 
 	if err != nil {
@@ -42,7 +39,6 @@ func TestDeleteCache(t *testing.T) {
 	}
 
 	Store.DeleteCache(key)
-
 	_, errD := Store.GetCache(key)
 
 	if errD == nil {
@@ -60,9 +56,7 @@ func TestSetLnCache(t *testing.T) {
 	}
 
 	InitCache()
-
 	Store.SetLnCache(key, value)
-
 	cacheValue, err := Store.GetLnCache(key)
 
 	if err != nil {
