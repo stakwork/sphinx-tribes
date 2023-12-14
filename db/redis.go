@@ -12,7 +12,7 @@ import (
 
 var ctx = context.Background()
 var RedisClient *redis.Client
-var RedisError interface{}
+var RedisError error
 var expireTime = 6 * time.Hour
 
 func InitRedis() {
@@ -34,7 +34,7 @@ func InitRedis() {
 		}
 		RedisClient = redis.NewClient(opt)
 	}
-	if err := RedisClient.Ping(ctx); err != nil {
+	if err := RedisClient.Ping(ctx).Err(); err != nil {
 		RedisError = err
 		fmt.Println("Could Not Connect To Redis", err)
 	}
