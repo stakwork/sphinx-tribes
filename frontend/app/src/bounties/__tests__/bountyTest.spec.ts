@@ -111,7 +111,7 @@ describe('Bounty Tests', () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
 
     const postRequestContent = [
-      "https://people.sphinx.chat/gobounties?token=undefined",
+      'https://people.sphinx.chat/gobounties?token=undefined',
       {
         body: JSON.stringify(newBounty),
         headers: { 'Content-Type': 'application/json', 'x-jwt': undefined },
@@ -194,48 +194,45 @@ describe('Bounty Tests', () => {
   });
 
   it('should delete a bounty from localStorage', async () => {
-  const bountyIdToDelete = mockBounties[0].bounty.id;
-  const publicKeyToDelete = mockBounties[0].owner.owner_pubkey;
-  mockedApi.del = jest.fn().mockResolvedValue({});
-  await mainStore.deleteBounty(bountyIdToDelete, publicKeyToDelete);
+    const bountyIdToDelete = mockBounties[0].bounty.id;
+    const publicKeyToDelete = mockBounties[0].owner.owner_pubkey;
+    mockedApi.del = jest.fn().mockResolvedValue({});
+    await mainStore.deleteBounty(bountyIdToDelete, publicKeyToDelete);
 
-  const deleteRequestContent = [
-     "https://people.sphinx.chat/gobounties?token=undefined",
-     {
-       body: JSON.stringify(newBounty),
-       headers: { 'Content-Type': 'application/json', 'x-jwt': undefined },
-       method: 'POST',
-       mode: 'cors'
-     }
-   ];
+    const deleteRequestContent = [
+      'https://people.sphinx.chat/gobounties?token=undefined',
+      {
+        body: JSON.stringify(newBounty),
+        headers: { 'Content-Type': 'application/json', 'x-jwt': undefined },
+        method: 'POST',
+        mode: 'cors'
+      }
+    ];
 
-   expect(global.fetch).toHaveBeenCalledTimes(1);
-   expect(global.fetch).toHaveBeenCalledWith(...deleteRequestContent);
-   const deletedBounty = JSON.parse(mockLocalStorage.getItem(`bounty_${bountyIdToDelete}`));
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(...deleteRequestContent);
+    const deletedBounty = JSON.parse(mockLocalStorage.getItem(`bounty_${bountyIdToDelete}`));
 
     expect(deletedBounty).toBeNull();
-});
+  });
 
-   it('should fetch and persist people bounties to localStorage', async () => {
-
+  it('should fetch and persist people bounties to localStorage', async () => {
     await mainStore.getPeopleBounties();
 
     const storedBounties = JSON.parse(mockLocalStorage.getItem('peopleBounties'));
 
     const peopleRequestContent = [
-     "https://people.sphinx.chat/gobounties?token=undefined",
-     {
-       body: JSON.stringify(newBounty),
-       headers: { 'Content-Type': 'application/json', 'x-jwt': undefined },
-       method: 'POST',
-       mode: 'cors'
-     }
-   ];
+      'https://people.sphinx.chat/gobounties?token=undefined',
+      {
+        body: JSON.stringify(newBounty),
+        headers: { 'Content-Type': 'application/json', 'x-jwt': undefined },
+        method: 'POST',
+        mode: 'cors'
+      }
+    ];
 
     expect(storedBounties).toBeDefined();
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(...peopleRequestContent)
-
+    expect(global.fetch).toHaveBeenCalledWith(...peopleRequestContent);
   });
-
 });
