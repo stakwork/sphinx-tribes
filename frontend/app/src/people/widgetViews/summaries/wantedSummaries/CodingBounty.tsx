@@ -369,8 +369,6 @@ function MobileView(props: CodingBountiesProps) {
   const payBountyDisable = !isOwner && !userBountyRole;
 
   if (isMobile) {
-    console.log('is mobile')
-
     return (
       <CodingMobile
         {...props}
