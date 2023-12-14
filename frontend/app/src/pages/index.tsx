@@ -17,16 +17,12 @@ import { TicketsPage } from './tickets';
 import { OrgTicketsPage } from './tickets/org';
 import { LeaderboardPage } from './leaderboard';
 import { SuperAdmin } from './superadmin/index';
-import { Auth } from './superadmin/Auth/index';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
     <MainLayout header={<PeopleHeader />}>
       <TokenRefresh />
       <Switch>
-        <Route path="/superadmin">
-          <SuperAdmin />
-        </Route>
         <Route path="/t/">
           <Body />
         </Route>
@@ -52,7 +48,7 @@ const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
           <LeaderboardPage />
         </Route>
         <Route path="/admin">
-          <Auth />
+          <SuperAdmin />
         </Route>
         <Route path="*">
           <Body />
