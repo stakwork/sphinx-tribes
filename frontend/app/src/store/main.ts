@@ -248,6 +248,12 @@ export interface BudgetWithdrawSuccess {
   };
 }
 
+export interface FilterStatusCount {
+  assigned: number;
+  paid: number;
+  open: number;
+}
+
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -2183,6 +2189,26 @@ export class MainStore {
       return {
         success: false,
         error: 'Could not get invoice data'
+      };
+    }
+  }
+
+  async getFilterStatusCount(): Promise<FilterStatusCount> {
+    try {
+      const r: any = await fetch(`${TribesURL}/gobounties/filter/count`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return r.json();
+    } catch (e) {
+      console.error('Error getFilterStatusCount', e);
+      return {
+        paid: 0,
+        assigned: 0,
+        open: 0
       };
     }
   }
