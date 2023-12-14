@@ -655,6 +655,12 @@ type BountyMetrics struct {
 	AverageCompleted       uint  `json:"average_completed"`
 }
 
+type FilterStattuCount struct {
+	Open     int64 `json:"open"`
+	Assigned int64 `json:"assigned"`
+	Paid     int64 `json:"paid"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
