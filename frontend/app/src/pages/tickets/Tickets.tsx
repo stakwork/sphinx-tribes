@@ -98,7 +98,7 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    // history.push(`/bounty/${item.id}`);
+    history.push(`/bounty/${item.id}`);
   };
 
   if (loading) {
