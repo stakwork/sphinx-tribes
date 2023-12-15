@@ -189,7 +189,6 @@ function WidgetSwitchViewer(props: any) {
         // if this person has entries for this widget
         return (
           <Panel
-            href={`/bounty/${body.id}`}
             color={color}
             isMobile={isMobile}
             key={person?.owner_pubkey + i + body?.created}
