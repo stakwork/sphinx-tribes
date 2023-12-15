@@ -782,3 +782,9 @@ func (db database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) 
 	ms := Organization{}
 	return ms
 }
+
+func (db database) GetFilterStatusCount() FilterStattuCount {
+	ms := FilterStattuCount{}
+
+	return ms
+}
