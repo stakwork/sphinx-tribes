@@ -162,7 +162,7 @@ function FocusedView(props: FocusViewProps) {
     try {
       // convert the amount from string to number
       if (newBody.price) {
-        newBody.price = convertLocaleToNumber(newBody.price).toString();
+        newBody.price = convertLocaleToNumber(newBody.price);
       }
 
       if (
