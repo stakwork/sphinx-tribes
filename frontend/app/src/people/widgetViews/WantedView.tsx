@@ -46,7 +46,8 @@ function WantedView(props: WantedViews2Props) {
     org_uuid,
     onPanelClick,
     show = true,
-    paid = false
+    paid = false,
+    id
   } = props;
 
   const titleString = one_sentence_summary || title || '';
@@ -181,6 +182,7 @@ function WantedView(props: WantedViews2Props) {
                 name={name}
                 org_uuid={org_uuid}
                 img={img}
+                id={id}
               />
             </BountyBox>
           )}
