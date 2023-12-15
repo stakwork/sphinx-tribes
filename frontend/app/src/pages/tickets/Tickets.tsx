@@ -98,7 +98,7 @@ function BodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    history.push(`/bounty/${item.id}`);
+    // history.push(`/bounty/${item.id}`);
   };
 
   if (loading) {
@@ -217,9 +217,9 @@ function BodyComponent() {
               }}
             >
               <WidgetSwitchViewer
+                onPanelClick={onPanelClick}
                 checkboxIdToSelectedMap={checkboxIdToSelectedMap}
                 checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-                onPanelClick={onPanelClick}
                 fromBountyPage={true}
                 selectedWidget={selectedWidget}
                 loading={loading}

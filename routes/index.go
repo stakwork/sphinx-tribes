@@ -74,6 +74,7 @@ func NewRouter() *http.Server {
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Get("/poll/invoice/{paymentRequest}", handlers.PollInvoice)
 		r.Post("/meme_upload", handlers.MemeImageUpload)
+		r.Get("/admin/auth", handlers.GetIsAdmin)
 	})
 
 	r.Group(func(r chi.Router) {
