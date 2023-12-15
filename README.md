@@ -75,8 +75,8 @@ line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
     // you may need to install cover with this command first
     // go get golang.org/x/tools/cmd/cover
     go test ./... -tags mock -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out <min coverage amount> 
-		// To get code coverage in html format do the following after running the code above
-		go tool cover -html="coverage.out"
+    // To get code coverage in html format do the following after running the code above
+    go tool cover -html="coverage.out"
 ```
 
 ### Enable Relay
