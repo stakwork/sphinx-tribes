@@ -217,9 +217,9 @@ function BodyComponent() {
               }}
             >
               <WidgetSwitchViewer
+                onPanelClick={onPanelClick}
                 checkboxIdToSelectedMap={checkboxIdToSelectedMap}
                 checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-                onPanelClick={onPanelClick}
                 fromBountyPage={true}
                 selectedWidget={selectedWidget}
                 loading={loading}

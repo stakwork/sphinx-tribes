@@ -139,15 +139,15 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	limitQuery := ""
 
 	if sortBy != "" && direction != "" {
-		orderQuery = "ORDER BY " + "body." + sortBy + " " + direction
+		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = " ORDER BY " + "body." + sortBy + "" + "DESC"
+		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
 	}
 	if limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
-	query := `SELECT * public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
+	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
 	allQuery := query + " " + " " + orderQuery + " " + limitQuery
 
 	b := []Bounty{}

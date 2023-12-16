@@ -30,6 +30,21 @@ func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func GetIsAdmin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	isAdmin := auth.AdminCheck(pubKeyFromAuth)
+
+	if !isAdmin {
+		fmt.Println("Not a super admin")
+		http.Error(w, http.StatusText(401), 401)
+		return
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("Log in successful")
+	}
+}
+
 func CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	code := db.ConnectionCodes{}
 	now := time.Now()
