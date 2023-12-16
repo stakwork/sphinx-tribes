@@ -12,7 +12,7 @@ import history from '../../config/history';
 import { colors } from '../../config/colors';
 import WantedView from './WantedView';
 import DeleteTicketModal from './DeleteModal';
-import { LoadMoreContainer } from './WidgetSwitchViewer'; 
+import { LoadMoreContainer } from './WidgetSwitchViewer';
 
 const Container = styled.div`
   display: flex;
@@ -87,7 +87,6 @@ const UserTickets = () => {
     }
   };
 
-
   const confirmDelete = async () => {
     try {
       if (deletePayload) {
@@ -154,7 +153,7 @@ const UserTickets = () => {
       {listItems}
       {userTickets.length > visibleItems && (
         <LoadMoreContainer
-          color={color} 
+          color={color}
           style={{
             width: '100%',
             display: 'flex',
