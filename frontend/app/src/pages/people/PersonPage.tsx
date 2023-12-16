@@ -67,12 +67,11 @@ export const PersonPage = observer(() => {
     })();
   }, [main, personPubkey, ui]);
 
-
   return (
     <Content>
       {!isMobile && (
         <div className="desktop">
-          {!canEdit && !loading && <PeopleList />}
+          {!loading && !canEdit && <PeopleList />}
           <UserInfo setShowSupport={setShowSupport} />
           <TabsPages />
         </div>

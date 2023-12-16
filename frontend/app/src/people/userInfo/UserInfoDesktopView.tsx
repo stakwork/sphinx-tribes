@@ -77,60 +77,60 @@ export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) 
         </RowWrap>
       </Head>
 
-        {/* only see buttons on other people's profile */}
-        {canEdit ? (
-          <RowWrap
-            style={{
-              marginBottom: 30,
-              marginTop: 25,
-              justifyContent: 'space-around'
-            }}
-          >
-            <Button
-              text="Edit Profile"
-              onClick={onEdit}
-              color="widget"
-              height={42}
-              style={{ fontSize: 13, background: '#f2f3f5' }}
-              leadingIcon={'edit'}
-              iconSize={15}
-            />
-            <Button
-              text="Sign out"
-              onClick={logout}
-              height={42}
-              style={{ fontSize: 13, color: '#3c3f41' }}
-              iconStyle={{ color: '#8e969c' }}
-              iconSize={15}
-              color="white"
-              leadingIcon="logout"
-            />
-          </RowWrap>
-        ) : (
-          <RowWrap
-            style={{
-              marginBottom: 30,
-              marginTop: 25,
-              justifyContent: 'space-between'
-            }}
-          >
-            <Button
-              text="Connect"
-              onClick={() => setShowQR(true)}
-              color="primary"
-              height={42}
-              width={120}
-            />
+      {/* only see buttons on other people's profile */}
+      {canEdit ? (
+        <RowWrap
+          style={{
+            marginBottom: 30,
+            marginTop: 25,
+            justifyContent: 'space-around'
+          }}
+        >
+          <Button
+            text="Edit Profile"
+            onClick={onEdit}
+            color="widget"
+            height={42}
+            style={{ fontSize: 13, background: '#f2f3f5' }}
+            leadingIcon={'edit'}
+            iconSize={15}
+          />
+          <Button
+            text="Sign out"
+            onClick={logout}
+            height={42}
+            style={{ fontSize: 13, color: '#3c3f41' }}
+            iconStyle={{ color: '#8e969c' }}
+            iconSize={15}
+            color="white"
+            leadingIcon="logout"
+          />
+        </RowWrap>
+      ) : (
+        <RowWrap
+          style={{
+            marginBottom: 30,
+            marginTop: 25,
+            justifyContent: 'space-between'
+          }}
+        >
+          <Button
+            text="Connect"
+            onClick={() => setShowQR(true)}
+            color="primary"
+            height={42}
+            width={120}
+          />
 
-            <Button
-              text="Send Tip"
-              color="link"
-              height={42}
-              width={120}
-              onClick={() => setShowSupport(true)}
-            />
-          </RowWrap>
-        )}
+          <Button
+            text="Send Tip"
+            color="link"
+            height={42}
+            width={120}
+            onClick={() => setShowSupport(true)}
+          />
+        </RowWrap>
+      )}
 
       <AboutView canEdit={canEdit} {...person} />
       <ConnectCard
