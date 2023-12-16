@@ -75,6 +75,7 @@ export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) 
         <RowWrap>
           <Name>{owner_alias}</Name>
         </RowWrap>
+      </Head>
 
         {/* only see buttons on other people's profile */}
         {canEdit ? (
@@ -130,7 +131,7 @@ export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) 
             />
           </RowWrap>
         )}
-      </Head>
+
       <AboutView canEdit={canEdit} {...person} />
       <ConnectCard
         dismiss={() => setShowQR(false)}

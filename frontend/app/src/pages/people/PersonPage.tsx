@@ -54,23 +54,25 @@ export const PersonPage = observer(() => {
   const isMobile = useIsMobile();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const [showSupport, setShowSupport] = useState(false);
+  const personId = ui.selectedPerson;
+  const { person, canEdit } = usePerson(personId);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const p = await main.getPersonByPubkey(personPubkey);
       ui.setSelectedPerson(p?.id);
       ui.setSelectingPerson(p?.id);
+      setLoading(false);
     })();
   }, [main, personPubkey, ui]);
 
-  const personId = ui.selectedPerson;
-  const { person, canEdit } = usePerson(personId);
 
   return (
     <Content>
       {!isMobile && (
         <div className="desktop">
-          {!canEdit && <PeopleList />}
+          {!canEdit && !loading && <PeopleList />}
           <UserInfo setShowSupport={setShowSupport} />
           <TabsPages />
         </div>
