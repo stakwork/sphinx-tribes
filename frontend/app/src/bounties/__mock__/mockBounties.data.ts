@@ -317,63 +317,63 @@ export const mockBountiesMutated = [
 ];
 
 export const expectedBountyResponses = [
-      {
-        body: {
-          assigned_hours: 0,
-          assignee: '',
-          award: '',
-          bounty_expires: '',
-          coding_languages: ['Lightning'],
-          commitment_fee: 0,
-          created: 1702398254,
-          deliverables: 'test',
-          description: 'test',
-          estimated_completion_date: '',
-          estimated_session_length: '',
-          github_description: false,
-          id: 892,
-          one_sentence_summary: '',
-          org_uuid: 'ck13rgua5fdkhph1po4g',
-          owner_id: '03bfe6723c06fb2b7546df1e8ca1a17ae5c504615da32c945425ccbe8d3ca6260d',
-          paid: false,
-          paid_date: null,
-          price: '1',
-          show: true,
-          ticket_url: '',
-          title: 'test',
-          tribe: 'None',
-          type: 'freelance_job_request',
-          updated: '2023-12-12T16:24:14.585187Z',
-          wanted_type: 'Mobile development'
-        },
-        organization: {
-          img: 'https://memes.sphinx.chat/public/l-_K9mJatGvz16Ixw1lPHtG9Om8QWtZtiRS_aIQme9c=',
-          name: 'test after jwt',
-          uuid: 'ck13rgua5fdkhph1po4g'
-        },
-        person: {
-          created: '2021-11-15T19:09:46.356248Z',
-          deleted: false,
-          description: 'This is the real kevkevin I like to code alot',
-          extras: null,
-          github_issues: null,
-          id: 38,
-          img: 'https://memes.sphinx.chat/public/1jPjjDsrwRoBPzahpWjR8QE5DjQ726MsUSrCOjflSmo=',
-          last_login: 1702065128,
-          new_ticket_time: 0,
-          owner_alias: 'kevkevin',
-          owner_contact_key:
-            'MIIBCgKCAQEAxtkwpxx8RjdVhgzx4oUYkmJQttvFzwI+lCWYgngMi/4o8OgUF9eVvW8zSY0t9A1KEY2MdEOTGjv9QiesoN7hmkgTdUqDQd1LIsU4vBtwPVWyJs0d6VEdMySN9veN68S7Fu+S20e5gygj17X8cffoEwLNDPi0dsTgojAC/uggE98zJvHmEd/Ob/W3ADQD68DQErCejvqXK2557GtsDNo35iIN9KlOPLRmvG3S/oV4pIyj5Z/6uMEXlok2b/mtvP0E4ClMP77j9QPs7mQarQ03XM0iRC2Ru/Qg/xWBTeqmYv5zfD8hmtzakBVyMSrHNZKZjSnURVNVpFaEXoB4wBqcvQIDAQAB',
-          owner_pubkey: '',
-          owner_route_hint: '',
-          price_to_meet: 21,
-          tags: [],
-          twitter_confirmed: true,
-          unique_name: 'umbreltest',
-          unlisted: false,
-          updated: '2023-12-04T19:48:05.641056Z',
-          uuid: 'cd9dm5ua5fdtsj2c2nbg',
-          wanteds: []
-        }
-      }
+  {
+    body: {
+      assigned_hours: 0,
+      assignee: '',
+      award: '',
+      bounty_expires: '',
+      coding_languages: ['Lightning'],
+      commitment_fee: 0,
+      created: 1702398254,
+      deliverables: 'test',
+      description: 'test',
+      estimated_completion_date: '',
+      estimated_session_length: '',
+      github_description: false,
+      id: 892,
+      one_sentence_summary: '',
+      org_uuid: 'ck13rgua5fdkhph1po4g',
+      owner_id: '03bfe6723c06fb2b7546df1e8ca1a17ae5c504615da32c945425ccbe8d3ca6260d',
+      paid: false,
+      paid_date: null,
+      price: '1',
+      show: true,
+      ticket_url: '',
+      title: 'test',
+      tribe: 'None',
+      type: 'freelance_job_request',
+      updated: '2023-12-12T16:24:14.585187Z',
+      wanted_type: 'Mobile development'
+    },
+    organization: {
+      img: 'https://memes.sphinx.chat/public/l-_K9mJatGvz16Ixw1lPHtG9Om8QWtZtiRS_aIQme9c=',
+      name: 'test after jwt',
+      uuid: 'ck13rgua5fdkhph1po4g'
+    },
+    person: {
+      created: '2021-11-15T19:09:46.356248Z',
+      deleted: false,
+      description: 'This is the real kevkevin I like to code alot',
+      extras: null,
+      github_issues: null,
+      id: 38,
+      img: 'https://memes.sphinx.chat/public/1jPjjDsrwRoBPzahpWjR8QE5DjQ726MsUSrCOjflSmo=',
+      last_login: 1702065128,
+      new_ticket_time: 0,
+      owner_alias: 'kevkevin',
+      owner_contact_key:
+        'MIIBCgKCAQEAxtkwpxx8RjdVhgzx4oUYkmJQttvFzwI+lCWYgngMi/4o8OgUF9eVvW8zSY0t9A1KEY2MdEOTGjv9QiesoN7hmkgTdUqDQd1LIsU4vBtwPVWyJs0d6VEdMySN9veN68S7Fu+S20e5gygj17X8cffoEwLNDPi0dsTgojAC/uggE98zJvHmEd/Ob/W3ADQD68DQErCejvqXK2557GtsDNo35iIN9KlOPLRmvG3S/oV4pIyj5Z/6uMEXlok2b/mtvP0E4ClMP77j9QPs7mQarQ03XM0iRC2Ru/Qg/xWBTeqmYv5zfD8hmtzakBVyMSrHNZKZjSnURVNVpFaEXoB4wBqcvQIDAQAB',
+      owner_pubkey: '',
+      owner_route_hint: '',
+      price_to_meet: 21,
+      tags: [],
+      twitter_confirmed: true,
+      unique_name: 'umbreltest',
+      unlisted: false,
+      updated: '2023-12-04T19:48:05.641056Z',
+      uuid: 'cd9dm5ua5fdtsj2c2nbg',
+      wanteds: []
+    }
+  }
 ];

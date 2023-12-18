@@ -1,6 +1,10 @@
 import { mainStore } from '../../store/main';
 import api from '../../api';
-import mockBounties, { newBounty, mockBountiesMutated, expectedBountyResponses } from '../__mock__/mockBounties.data';
+import mockBounties, {
+  newBounty,
+  mockBountiesMutated,
+  expectedBountyResponses
+} from '../__mock__/mockBounties.data';
 import mockLocalStorage from '../__mock__/mockLocalStorage.utils';
 
 jest.mock('../../api', () => ({
@@ -54,7 +58,7 @@ describe('Bounty Tests', () => {
     const mockBounty = mockBounties[0];
     mockedApi.get = jest.fn().mockResolvedValue([mockBounty]);
     const bounty = await mainStore.getBountyById(mockBounty.bounty.id);
-    const expectedBountyResponse = expectedBountyResponses
+    const expectedBountyResponse = expectedBountyResponses;
     expect(bounty).toEqual(expectedBountyResponse);
   });
 
