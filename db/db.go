@@ -455,14 +455,16 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	}
 	if assingned != "" && assingned == "true" {
 		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != ''"
+			assignedQuery = "OR assignee != '' AND paid = false"
 		} else {
-			assignedQuery = "AND assignee != ''"
+			assignedQuery = "AND assignee != '' AND paid = false"
 		}
 	}
 	if paid != "" && paid == "true" {
 		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
+		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
+			assignedQuery = ""
 		} else {
 			paidQuery = "AND paid = true"
 		}
@@ -527,14 +529,16 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	}
 	if assingned != "" && assingned == "true" {
 		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != ''"
+			assignedQuery = "OR assignee != '' AND paid = false"
 		} else {
-			assignedQuery = "AND assignee != ''"
+			assignedQuery = "AND assignee != '' AND paid = false"
 		}
 	}
 	if paid != "" && paid == "true" {
 		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
+		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
+			assignedQuery = ""
 		} else {
 			paidQuery = "AND paid = true"
 		}
@@ -626,19 +630,20 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	}
 	if assingned != "" && assingned == "true" {
 		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != ''"
+			assignedQuery = "OR assignee != '' AND paid != true"
 		} else {
-			assignedQuery = "AND assignee != ''"
+			assignedQuery = "AND assignee != '' AND paid != true"
 		}
 	}
 	if paid != "" && paid == "true" {
 		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
+		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
+			assignedQuery = ""
 		} else {
 			paidQuery = "AND paid = true"
 		}
 	}
-
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
 	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
