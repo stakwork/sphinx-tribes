@@ -1,4 +1,3 @@
-import { style } from '@mui/system';
 import styled from 'styled-components';
 
 export const Wrapper = styled.section`

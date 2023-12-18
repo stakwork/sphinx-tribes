@@ -18,16 +18,10 @@ export const MainLayout: FC<MainLayoutProps> = ({
 
   return (
     <>
-      {location.pathname === '/admin' || location.pathname === '/superadmin' ? (
-        <div className="app" style={{ background: c.background }}>
-          {children}
-        </div>
-      ) : (
-        <div className="app" style={{ background: c.background }}>
-          {header}
-          {children}
-        </div>
-      )}
+      <div className="app" style={{ background: c.background }}>
+        {header}
+        {children}
+      </div>
     </>
   );
 };

@@ -1,11 +1,7 @@
 import React from 'react';
 import {
-  NavWrapper,
   AlternateWrapper,
   ButtonWrapper,
-  Title,
-  Button,
-  AlternateTitle,
   ExportButton,
   ExportText,
   Month,
@@ -16,7 +12,6 @@ import {
   RightWrapper,
   Container
 } from './HeaderStyles';
-import signout from './icons/signout.svg';
 import arrowback from './icons/arrowback.svg';
 import arrowforward from './icons/arrowforward.svg';
 import './Header.css';
@@ -29,16 +24,6 @@ const DateFilterObject = {
 
 export const Header = () => (
   <Container>
-    <NavWrapper>
-      <Title>
-        Bounties
-        <AlternateTitle>Super Admin</AlternateTitle>
-      </Title>
-      <Button>
-        Sign out
-        <img className="signout" src={signout} alt="Sign Out" />
-      </Button>
-    </NavWrapper>
     <AlternateWrapper>
       <LeftWrapper>
         <ButtonWrapper>
