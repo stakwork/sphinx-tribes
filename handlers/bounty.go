@@ -321,7 +321,7 @@ func generateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 			Owner: db.Person{
 				ID:               owner.ID,
 				Uuid:             owner.Uuid,
-				OwnerPubKey:      assignee.OwnerPubKey,
+				OwnerPubKey:      owner.OwnerPubKey,
 				OwnerAlias:       owner.OwnerAlias,
 				UniqueName:       owner.UniqueName,
 				Description:      owner.Description,

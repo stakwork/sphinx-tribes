@@ -1,9 +1,9 @@
-import { EuiText } from '@elastic/eui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { BountiesProps } from 'people/interfaces';
 import { Link } from 'react-router-dom';
+import { EuiText } from '@elastic/eui';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import BountyDescription from '../../bounties/BountyDescription';
@@ -139,6 +139,9 @@ const Bounties = (props: BountiesProps) => {
   const showConnectModal = () => setConnectModal(true);
 
   const { ui } = useStores();
+
+  const isUser = ui.meInfo?.owner_pubkey === person.owner_pubkey;
+
   return (
     <>
       {!!assignee?.owner_pubkey && !!assignee?.owner_alias ? (
@@ -223,16 +226,12 @@ const Bounties = (props: BountiesProps) => {
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>
               <div className="UnassignedPersonalDetailContainer">
-                <EuiText className="ProfileText">Do your skills match?</EuiText>
+                {!isUser && <EuiText className="ProfileText">Do your skills match?</EuiText>}
                 <IconButton
-                  text={
-                    ui.meInfo?.owner_pubkey === person.owner_pubkey ? 'Assign User' : 'I can help'
-                  }
+                  text={isUser ? 'Assign Hunter' : 'I can help'}
                   onClick={(e: any) => {
                     if (ui.meInfo) {
-                      ui.meInfo?.owner_pubkey === person.owner_pubkey
-                        ? onPanelClick()
-                        : showConnectModal();
+                      isUser ? onPanelClick() : showConnectModal();
                       e.stopPropagation();
                     } else {
                       e.stopPropagation();
