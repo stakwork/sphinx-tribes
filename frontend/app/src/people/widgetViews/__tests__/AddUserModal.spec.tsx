@@ -1,12 +1,11 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import AddUserModal from '../organization/AddUserModal'
 import {AddUserModalProps} from '../organization/interface'
 
-
 describe('Width of Modal remains the same before and after input', () => {
 
-    const MockProps: AddUserModalProps = {
+  const MockProps: AddUserModalProps = {
     loading: false,
     onSubmit: jest.fn(),
     disableFormButtons: false,
@@ -15,19 +14,20 @@ describe('Width of Modal remains the same before and after input', () => {
     close: jest.fn(),
   };
 
-  const { getByTestId, getByText } = render(<AddUserModal {...MockProps} />);
-  const modal = getByText('Add New User');
+  it('should retain the same width before and after inputting text', () => {
+  
+    render(<AddUserModal {...MockProps} />);
+   
+    const modal = screen.getByRole('dialog');
+    
+    const initialWidth = modal.offsetWidth;
+  
+    const input = screen.getByRole('textbox');
 
-  const getModalMaxWidth = () => {
-    const modalStyle = window.getComputedStyle(modal);
-    return modalStyle.getPropertyValue('max-width');
-  };
-
-  const maxWidthBeforeInput = getModalMaxWidth();
-  const searchInput = getByTestId('search-input');
-
-  fireEvent.change(searchInput, { target: { value: 'Saif' } });
-
-  const maxWidthAfterInput = getModalMaxWidth();
-  expect(maxWidthBeforeInput).toEqual(maxWidthAfterInput);
+    fireEvent.change(input, { target: { value: 'Saif' } });
+    
+    const widthAfterInput = modal.offsetWidth;
+  
+    expect(initialWidth).toBe(widthAfterInput);
+  });
 });
