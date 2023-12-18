@@ -8,7 +8,7 @@ export function getHost(): string {
 
 export function getHostIncludingDockerHosts() {
   if (externalDockerHosts.includes(window.location.host)) {
-    return 'tribes.sphinx.5002';
+    return 'tribes.sphinx:5002';
   } else if (internalDockerHosts.includes(window.location.host)) {
     return window.location.host;
   } else {
