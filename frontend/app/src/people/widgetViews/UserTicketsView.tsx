@@ -12,6 +12,7 @@ import history from '../../config/history';
 import { colors } from '../../config/colors';
 import WantedView from './WantedView';
 import DeleteTicketModal from './DeleteModal';
+import { LoadMoreContainer } from './WidgetSwitchViewer';
 
 const Container = styled.div`
   display: flex;
@@ -49,7 +50,13 @@ const UserTickets = () => {
   const { path, url } = useRouteMatch();
 
   const [userTickets, setUserTickets] = useState<any>([]);
-  const [currentItems] = useState<number>(10);
+  const [currentItems] = useState<number>(20);
+  const [visibleItems, setVisibleItems] = useState<number>(currentItems);
+
+  const loadMore = () => {
+    setVisibleItems((prevVisibleItems: number) => prevVisibleItems + currentItems);
+  };
+
   const [deletePayload, setDeletePayload] = useState<object>({});
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const closeModal = () => setShowDeleteModal(false);
@@ -105,7 +112,7 @@ const UserTickets = () => {
 
   const listItems =
     userTickets && userTickets.length ? (
-      userTickets.slice(0, currentItems).map((item: any, i: number) => {
+      userTickets.slice(0, visibleItems).map((item: any, i: number) => {
         const person = main.people.find((p: any) => p.owner_pubkey === item.body.owner_id);
         const body = { ...item.body };
         // if this person has entries for this widget
@@ -144,6 +151,22 @@ const UserTickets = () => {
         </Switch>
       </Router>
       {listItems}
+      {userTickets.length > visibleItems && (
+        <LoadMoreContainer
+          color={color}
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '20px 0'
+          }}
+        >
+          <div className="LoadMoreButton" onClick={loadMore}>
+            Load More
+          </div>
+        </LoadMoreContainer>
+      )}
       <Spacer key={'spacer2'} />
       {showDeleteModal && (
         <DeleteTicketModal closeModal={closeModal} confirmDelete={confirmDelete} />
