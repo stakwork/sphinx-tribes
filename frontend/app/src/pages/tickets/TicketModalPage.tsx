@@ -122,6 +122,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
                 selectedIndex={publicFocusIndex}
                 config={widgetConfigs.wanted}
                 bounty={activeBounty}
+                fromBountyPage={true}
                 goBack={goBack}
               />
             </Modal>
