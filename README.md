@@ -72,7 +72,11 @@ line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 ### Run Test
 
 ```
-    go test ./...
+    // you may need to install cover with this command first
+    // go get golang.org/x/tools/cmd/cover
+    go test ./... -tags mock -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out <min coverage amount> 
+    // To get code coverage in html format do the following after running the code above
+    go tool cover -html="coverage.out"
 ```
 
 ### Enable Relay
@@ -91,6 +95,34 @@ Meme image upload works with Relay enabled, so a running Relay is required for M
 
 ```
     MEME_URL=
+```
+
+### Add REDIS for cache
+
+- Create a Redis instance
+- Create a .env file and populate the .env files with these variables
+
+If you have a Redis url add the REDIS_URL variable to .env
+
+```REDIS_URL = ```
+
+else add these variables to the env to enable Redis
+
+```
+    REDIS_HOST =
+    REDIS_DB =
+    REDIS_USER =
+    REDIS_PASS =
+```
+
+### Add SuperAdmins to access admin dashboard
+
+Add comma separated public keys to the SUPER_ADMINS env var in the .env file,
+any user public key added to this comaa separated strings will have access to the admin dashboard
+e.g '{pubkey}, {pubkey}, {pubkey}'
+
+```
+ADMINS
 ```
 
 ### For Contributions

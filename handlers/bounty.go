@@ -159,6 +159,11 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if bounty.Assignee != "" {
+		now := time.Now()
+		bounty.AssignedDate = &now
+	}
+
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
@@ -209,8 +214,15 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteBounty(w http.ResponseWriter, r *http.Request) {
-	//ctx := r.Context()
-	//pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	created := chi.URLParam(r, "created")
 	pubkey := chi.URLParam(r, "pubkey")
 
@@ -238,6 +250,13 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	bounty, _ := db.DB.GetBountyByCreated(uint(created))
 	if bounty.ID != 0 && bounty.Created == int64(created) {
 		bounty.Paid = !bounty.Paid
+		now := time.Now()
+		// if setting paid as true by mark as paid
+		// set completion date and mark as paid
+		if bounty.Paid {
+			bounty.CompletionDate = &now
+			bounty.MarkAsPaidDate = &now
+		}
 		db.DB.UpdateBountyPayment(bounty)
 	}
 	w.WriteHeader(http.StatusOK)
@@ -347,7 +366,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bounty := db.DB.GetBounty(id)
-	amount, _ := utils.ConvertStringToUint(bounty.Price)
+	amount := bounty.Price
 
 	if bounty.ID != id {
 		w.WriteHeader(http.StatusNotFound)
@@ -430,10 +449,11 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 			Status:         true,
 			PaymentType:    "payment",
 		}
-
 		db.DB.AddPaymentHistory(paymentHistory)
+
 		bounty.Paid = true
 		bounty.PaidDate = &now
+		bounty.CompletionDate = &now
 		db.DB.UpdateBounty(bounty)
 
 		msg["msg"] = "keysend_success"
@@ -704,4 +724,10 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
+}
+
+func GetFilterCount(w http.ResponseWriter, r *http.Request) {
+	filterCount := db.DB.GetFilterStatusCount()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(filterCount)
 }

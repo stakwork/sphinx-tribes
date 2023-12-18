@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { BountiesProps } from 'people/interfaces';
+import { Link } from 'react-router-dom';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import BountyDescription from '../../bounties/BountyDescription';
@@ -107,6 +108,13 @@ const UnassignedPersonProfile = styled.div<containerProps>`
   }
 `;
 
+const BountyLink = styled(Link)`
+  text-decoration: none;
+  :hover {
+    text-decoration: none;
+  }
+`;
+
 const Bounties = (props: BountiesProps) => {
   const {
     assignee,
@@ -134,75 +142,79 @@ const Bounties = (props: BountiesProps) => {
   return (
     <>
       {!!assignee?.owner_pubkey && !!assignee?.owner_alias ? (
-        <BountyContainer
-          onClick={onPanelClick}
-          assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
-          color={color}
-          style={{
-            backgroundPositionY: '-2px'
-          }}
-        >
-          <div className="BountyDescriptionContainer">
-            <BountyDescription
-              {...person}
-              {...props}
-              title={title}
-              img={person.img}
-              org_img={props.img}
-              codingLanguage={codingLanguage}
-              created={created}
-            />
-          </div>
-          <div className="BountyPriceContainer">
-            <BountyPrice
-              priceMin={priceMin}
-              priceMax={priceMax}
-              price={price}
-              sessionLength={sessionLength}
-              style={{
-                minWidth: '213px',
-                maxWidth: '213px',
-                borderRight: `1px solid ${color.primaryColor.P200}`
-              }}
-            />
-            <BountyProfileView
-              assignee={assignee}
-              status={'ASSIGNED'}
-              canViewProfile={true}
-              statusStyle={{
-                width: '55px',
-                height: '16px',
-                background: color.statusAssigned
-              }}
-            />
-          </div>
-        </BountyContainer>
-      ) : (
-        <BountyContainer color={color}>
-          <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
-            <div style={{ display: 'flex', flexDirection: 'row' }} onClick={onPanelClick}>
+        <BountyLink to={`/bounty/${props.id}`}>
+          <BountyContainer
+            assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
+            color={color}
+            style={{
+              backgroundPositionY: '-2px'
+            }}
+          >
+            <div className="BountyDescriptionContainer">
               <BountyDescription
                 {...person}
                 {...props}
+                title={title}
                 img={person.img}
                 org_img={props.img}
-                title={title}
                 codingLanguage={codingLanguage}
-                widget={widget}
                 created={created}
               />
+            </div>
+            <div className="BountyPriceContainer">
               <BountyPrice
                 priceMin={priceMin}
                 priceMax={priceMax}
                 price={price}
                 sessionLength={sessionLength}
                 style={{
-                  borderLeft: `1px solid ${color.grayish.G700}`,
-                  maxWidth: '245px',
-                  minWidth: '245px'
+                  minWidth: '213px',
+                  maxWidth: '213px',
+                  borderRight: `1px solid ${color.primaryColor.P200}`
+                }}
+              />
+              <BountyProfileView
+                assignee={assignee}
+                status={'ASSIGNED'}
+                canViewProfile={true}
+                statusStyle={{
+                  width: '55px',
+                  height: '16px',
+                  background: color.statusAssigned
                 }}
               />
             </div>
+          </BountyContainer>
+        </BountyLink>
+      ) : (
+        <BountyContainer color={color}>
+          <DescriptionPriceContainer unAssignedBackgroundImage='url("/static/unassigned_bounty_bg.svg")'>
+            <BountyLink to={`/bounty/${props.id}`}>
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <BountyDescription
+                  {...person}
+                  {...props}
+                  img={person.img}
+                  org_img={props.img}
+                  title={title}
+                  codingLanguage={codingLanguage}
+                  widget={widget}
+                  created={created}
+                />
+                <BountyPrice
+                  priceMin={priceMin}
+                  priceMax={priceMax}
+                  price={price}
+                  sessionLength={sessionLength}
+                  style={{
+                    borderLeft: `1px solid ${color.grayish.G700}`,
+                    maxWidth: '245px',
+                    minWidth: '245px'
+                  }}
+                />
+              </div>
+            </BountyLink>
+
             <UnassignedPersonProfile
               unassigned_border={color.grayish.G300}
               grayish_G200={color.grayish.G200}

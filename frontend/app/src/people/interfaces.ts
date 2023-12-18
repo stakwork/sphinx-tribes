@@ -75,6 +75,7 @@ export interface BountiesProps {
   name?: string;
   uuid?: string;
   img?: string;
+  id?: number;
 }
 
 export interface BadgesProps {
@@ -369,6 +370,7 @@ export interface WantedViewsProps {
   name?: string;
   img?: string;
   org_uuid?: string;
+  id?: number;
 }
 
 export interface WantedViews2Props extends WantedViewsProps {
