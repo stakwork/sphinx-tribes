@@ -1428,7 +1428,6 @@ export class MainStore {
 
   async deleteBounty(created: number, owner_pubkey: string): Promise<void> {
     const info = uiStore.meInfo as any;
-    console.log(uiStore.meInfo);
     if (!info) {
       console.log('Youre not logged in');
       return;
