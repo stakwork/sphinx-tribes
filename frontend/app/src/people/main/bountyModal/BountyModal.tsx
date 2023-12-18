@@ -72,6 +72,8 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
           config={config}
           goBack={onGoBack}
           setAfterEdit={setAfterEdit}
+          bounty={bounty}
+          fromBountyPage={true}
         />
       </Modal>
     );
