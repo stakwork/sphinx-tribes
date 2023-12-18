@@ -1,11 +1,12 @@
 import React, { FC, PropsWithChildren } from 'react';
+import { useLocation } from 'react-router-dom';
 import { colors } from '../config/colors';
 
-export type MainLayotProps = PropsWithChildren<{
+export type MainLayoutProps = PropsWithChildren<{
   header: React.ReactElement;
 }>;
 
-export const MainLayout: FC<MainLayotProps> = ({
+export const MainLayout: FC<MainLayoutProps> = ({
   header,
   children
 }: {
@@ -13,10 +14,14 @@ export const MainLayout: FC<MainLayotProps> = ({
   children?: React.ReactNode;
 }) => {
   const c = colors['light'];
+  const location = useLocation();
+
   return (
-    <div className="app" style={{ background: c.background }}>
-      {header}
-      {children}
-    </div>
+    <>
+      <div className="app" style={{ background: c.background }}>
+        {header}
+        {children}
+      </div>
+    </>
   );
 };
