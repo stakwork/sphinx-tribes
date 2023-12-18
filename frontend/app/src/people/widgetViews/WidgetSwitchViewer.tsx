@@ -37,7 +37,7 @@ const Panel = styled.a<PanelProps>`
   }
 `;
 
-const LoadMoreContainer = styled.div<PanelProps>`
+export const LoadMoreContainer = styled.div<PanelProps>`
   width: 100%;
   display: flex;
   justify-content: center;
