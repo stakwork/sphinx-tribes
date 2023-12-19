@@ -254,6 +254,17 @@ export interface FilterStatusCount {
   open: number;
 }
 
+export interface BountyMetrics {
+  bounties_posted: number;
+  bounties_paid: number;
+  bounties_paid_percentage: number;
+  sats_posted: number;
+  sats_paid: number;
+  sats_paid_percentage: number;
+  average_paid: number;
+  average_completed: number;
+}
+
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -2318,6 +2329,60 @@ export class MainStore {
       return r;
     } catch (e) {
       console.error('organizationDelete', e);
+    }
+  }
+
+  async getBountyMetrics(start_date: number, end_date: number): Promise<BountyMetrics | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date,
+        end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/bounty_stats`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.error('getBountyMetrics', e);
+      return undefined;
+    }
+  }
+
+  async getBountiesByRange(start_date: number, end_date: number): Promise<any | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date,
+        end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/bounties`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.error('getBountyMetrics', e);
+      return undefined;
     }
   }
 }
