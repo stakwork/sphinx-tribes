@@ -167,6 +167,7 @@ export interface PaidBountiesProps {
   widget: any;
   created: number;
   name?: string;
+  org_img?: string; //added to fix issue 1082
 }
 
 export interface QRProps {

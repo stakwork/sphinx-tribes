@@ -159,7 +159,7 @@ function WantedView(props: WantedViews2Props) {
                 description={description}
                 name={name}
                 org_uuid={org_uuid}
-                img={img}
+                org_img={img} //added to fix 1082
               />
             </BountyBox>
           ) : (
