@@ -62,7 +62,7 @@ const AddUserModal = (props: AddUserModalProps) => {
         ...(config?.modalStyle ?? {}),
         maxHeight: '100%',
         borderRadius: '10px',
-        maxWidth: '22rem'
+        minWidth: '22rem'
       }}
       overlayClick={close}
       bigCloseImage={close}
