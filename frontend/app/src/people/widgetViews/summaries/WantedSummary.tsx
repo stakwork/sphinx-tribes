@@ -13,7 +13,6 @@ import { LanguageObject, awards } from '../../utils/languageLabelStyle';
 import NameTag from '../../utils/NameTag';
 import { sendToRedirect } from '../../../helpers';
 import { CodingLanguageLabel, WantedSummaryProps, LocalPaymeentState } from '../../interfaces';
-import CodingMobile from './wantedSummaries/CodingMobile';
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
 import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
@@ -138,6 +137,7 @@ function WantedSummary(props: WantedSummaryProps) {
       setIsAssigned(true);
       setAssignedPerson(value);
       assigneeHandlerOpen();
+
       const newValue = {
         id,
         title: titleString,
