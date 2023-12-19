@@ -489,6 +489,11 @@ function Form(props: FormProps) {
                                   ? 'Description *'
                                   : item.label
                               }
+                              placeholder={
+                                isDescriptionValid //checks if the description is taken from github. If yes, then the placeholder is empty
+                                  ? ''
+                                  : 'Provide some context and be as detailed as possible. The more information you provide the better. This will allow the hunter to have a fuller picture of the amount of work that is required to complete the task. Screenshots and screen recordings help a lot too!'
+                              }
                             />
                           ))}
                       </div>

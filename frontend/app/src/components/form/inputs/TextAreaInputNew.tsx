@@ -31,6 +31,13 @@ const InputOuterBox = styled.div<styledProps>`
       border: 1px solid ${(p: any) => p.color.blue2 && p.color.blue2} !important;
     }
   }
+  textarea::placeholder {
+    position: relative;
+    top: 14px;
+    font-style: italic;
+    font-size: 12px;
+    color: #999;
+  }
 `;
 export default function TextAreaInputNew({
   error,
@@ -39,17 +46,22 @@ export default function TextAreaInputNew({
   handleChange,
   handleBlur,
   handleFocus,
-  isFocused
+  isFocused,
+  placeholder
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext}*`;
   const color = colors['light'];
   const [isError, setIsError] = useState<boolean>(false);
   const [textValue, setTextValue] = useState(value);
+  const [showPlaceholder, setShowPlaceholder] = useState(!textValue);
 
   useEffect(() => {
     if (textValue) {
       setIsError(false);
+      setShowPlaceholder(false);
+    } else {
+      setShowPlaceholder(true);
     }
   }, [textValue]);
 
@@ -57,13 +69,20 @@ export default function TextAreaInputNew({
     <InputOuterBox color={color} borderColor={isError ? color.red2 : color.grayish.G600}>
       <textarea
         className="inputText"
+        placeholder={showPlaceholder ? placeholder : ''} //displays the placeholder only when the textValue is empty
         id={'text'}
         value={textValue}
-        onFocus={handleFocus}
+        onFocus={() => {
+          handleFocus();
+          setShowPlaceholder(false);
+        }}
         onBlur={() => {
           handleBlur();
           if (error) {
             setIsError(true);
+          }
+          if (!textValue) {
+            setShowPlaceholder(true);
           }
         }}
         onChange={(e: any) => {
