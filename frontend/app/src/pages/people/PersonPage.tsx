@@ -54,12 +54,14 @@ export const PersonPage = observer(() => {
   const isMobile = useIsMobile();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const [showSupport, setShowSupport] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const p = await main.getPersonByPubkey(personPubkey);
       ui.setSelectedPerson(p?.id);
       ui.setSelectingPerson(p?.id);
+      setLoading(false);
     })();
   }, [main, personPubkey, ui]);
 
@@ -70,7 +72,7 @@ export const PersonPage = observer(() => {
     <Content>
       {!isMobile && (
         <div className="desktop">
-          {!canEdit && <PeopleList />}
+          {!loading && !canEdit && <PeopleList />}
           <UserInfo setShowSupport={setShowSupport} />
           <TabsPages />
         </div>
