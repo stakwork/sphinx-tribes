@@ -265,6 +265,18 @@ export interface BountyMetrics {
   average_completed: number;
 }
 
+export interface BountyStatus {
+  Open: boolean;
+  Assigned: boolean;
+  Paid: boolean;
+}
+
+export const defaultBountyStatus: BountyStatus = {
+  Open: true,
+  Assigned: false,
+  Paid: false
+};
+
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -781,6 +793,13 @@ export class MainStore {
   peopleBounties: PersonBounty[] = [];
   @action setPeopleBounties(bounties: PersonBounty[]) {
     this.peopleBounties = bounties;
+  }
+
+  @persist('object')
+  bountiesStatus: BountyStatus = defaultBountyStatus;
+
+  @action setBountiesStatus(status: BountyStatus) {
+    this.bountiesStatus = status;
   }
 
   getWantedsPrevParams?: QueryParams = {};
@@ -1429,7 +1448,7 @@ export class MainStore {
       });
 
       if (response.status) {
-        this.getPeopleBounties({ resetPage: true });
+        this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
       }
       return;
     } catch (e) {
@@ -1456,7 +1475,7 @@ export class MainStore {
         }
       });
       if (response.status) {
-        await this.getPeopleBounties({ resetPage: true });
+        await this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
       }
       return;
     } catch (e) {
@@ -1638,6 +1657,37 @@ export class MainStore {
 
   @action setLnToken(token: string) {
     this.lnToken = token;
+  }
+
+  @persist('object')
+  @observable
+  isSuperAdmin = false;
+
+  @action setIsSuperAdmin(isAdmin: boolean) {
+    this.isSuperAdmin = isAdmin;
+  }
+
+  @action async getSuperAdmin(): Promise<void> {
+    try {
+      if (!uiStore.meInfo) return;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/admin/auth`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (r.status !== 200) {
+        this.setIsSuperAdmin(false);
+        return;
+      }
+      this.setIsSuperAdmin(true);
+    } catch (e) {
+      console.log('Error getUserOrganizations', e);
+    }
   }
 
   @action async getLnAuth(): Promise<LnAuthData> {
