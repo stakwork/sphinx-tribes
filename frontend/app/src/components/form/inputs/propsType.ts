@@ -5,6 +5,7 @@ export interface Props {
   label: string;
   type?: string;
   handleChange: any;
+  placeholder?: string;
   handleBlur: any;
   handleFocus: any;
   readOnly: boolean;
