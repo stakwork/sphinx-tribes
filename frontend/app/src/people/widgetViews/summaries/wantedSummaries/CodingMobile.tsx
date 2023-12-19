@@ -30,8 +30,10 @@ export default function MobileView(props: CodingViewProps) {
     nametag,
     assigneeLabel,
     labels,
-    actionButtons,
-    status
+    status,
+    payBounty,
+    showPayBounty,
+    markUnpaid
   } = props;
 
   const color = colors['light'];
@@ -129,6 +131,7 @@ export default function MobileView(props: CodingViewProps) {
         </div>
 
         <div style={{ height: 10 }} />
+        {showPayBounty && payBounty}
         <ButtonRow style={{ margin: '10px 0' }}>
           <ViewGithub {...props} />
           <ViewTribe {...props} />
@@ -137,7 +140,7 @@ export default function MobileView(props: CodingViewProps) {
           <ShareOnTwitter {...props} />
         </ButtonRow>
 
-        {actionButtons}
+        {markUnpaid}
 
         <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
 

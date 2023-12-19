@@ -40,6 +40,7 @@ import {
   AwardBottomContainer
 } from './style';
 import { getTwitterLink } from './lib';
+import CodingMobile from './CodingMobile';
 
 let interval;
 
@@ -92,7 +93,10 @@ function MobileView(props: CodingBountiesProps) {
     org_uuid,
     id,
     localPaid,
-    setLocalPaid
+    setLocalPaid,
+    isMobile,
+    actionButtons,
+    assigneeLabel
   } = props;
   const color = colors['light'];
 
@@ -299,29 +303,29 @@ function MobileView(props: CodingBountiesProps) {
     sendToRedirect(twitterLink);
   };
 
-  const onHandle = (event: any) => {
-    const res = JSON.parse(event.data);
-    if (res.msg === SOCKET_MSG.user_connect) {
-      const user = ui.meInfo;
-      if (user) {
-        user.websocketToken = res.body;
-        ui.setMeInfo(user);
-      }
-    } else if (res.msg === SOCKET_MSG.invoice_success) {
-      setLnInvoice('');
-      setLocalPaid('UNKNOWN');
-      setInvoiceStatus(true);
-      addToast(SOCKET_MSG.invoice_success);
-    } else if (res.msg === SOCKET_MSG.keysend_success) {
-      setLocalPaid('UNKNOWN');
-      setKeysendStatus(true);
-      addToast(SOCKET_MSG.keysend_success);
-    } else if (res.msg === SOCKET_MSG.keysend_error) {
-      addToast(SOCKET_MSG.keysend_error);
-    }
-  };
-
   useEffect(() => {
+    const onHandle = (event: any) => {
+      const res = JSON.parse(event.data);
+      if (res.msg === SOCKET_MSG.user_connect) {
+        const user = ui.meInfo;
+        if (user) {
+          user.websocketToken = res.body;
+          ui.setMeInfo(user);
+        }
+      } else if (res.msg === SOCKET_MSG.invoice_success) {
+        setLnInvoice('');
+        setLocalPaid('UNKNOWN');
+        setInvoiceStatus(true);
+        addToast(SOCKET_MSG.invoice_success);
+      } else if (res.msg === SOCKET_MSG.keysend_success) {
+        setLocalPaid('UNKNOWN');
+        setKeysendStatus(true);
+        addToast(SOCKET_MSG.keysend_success);
+      } else if (res.msg === SOCKET_MSG.keysend_error) {
+        addToast(SOCKET_MSG.keysend_error);
+      }
+    };
+
     const socket: WebSocket = createSocketInstance();
     socket.onopen = () => {
       console.log('Socket connected');
@@ -334,7 +338,7 @@ function MobileView(props: CodingBountiesProps) {
     socket.onclose = () => {
       console.log('Socket disconnected');
     };
-  }, []);
+  }, [setLocalPaid, ui]);
 
   const getOrganization = useCallback(async () => {
     if (org_uuid && userPubkey) {
@@ -363,6 +367,71 @@ function MobileView(props: CodingBountiesProps) {
 
   const hasAccess = isOwner || userBountyRole;
   const payBountyDisable = !isOwner && !userBountyRole;
+
+  if (isMobile) {
+    return (
+      <CodingMobile
+        {...props}
+        labels={labels}
+        nametag={nametag}
+        actionButtons={actionButtons}
+        assigneeLabel={assigneeLabel}
+        assignee={assignee}
+        handleCopyUrl={handleCopyUrl}
+        isCopied={isCopied}
+        titleString={titleString}
+        showPayBounty={showPayBounty}
+        markUnpaid={
+          <IconButton
+            width={'100%'}
+            height={48}
+            style={{
+              bottom: '10px',
+              border: `1px solid ${color.primaryColor.P400}`,
+              background: color.pureWhite,
+              color: color.borderGreen1
+            }}
+            text={'Mark Unpaid'}
+            loading={saving === 'paid' || updatingPayment}
+            endingImg={'/static/mark_unpaid.svg'}
+            textStyle={{
+              width: '130px',
+              display: 'flex',
+              justifyContent: 'center',
+              fontFamily: 'Barlow',
+              marginLeft: '30px',
+              fontSize: '15px'
+            }}
+            onClick={handleSetAsUnpaid}
+          />
+        }
+        payBounty={
+          <>
+            <IconButton
+              width={'100%'}
+              height={48}
+              disabled={payBountyDisable}
+              style={{
+                bottom: '10px'
+              }}
+              text={'Pay Bounty'}
+              loading={saving === 'paid' || updatingPayment}
+              textStyle={{
+                display: 'flex',
+                justifyContent: 'center',
+                fontFamily: 'Barlow',
+                fontSize: '15px',
+                marginLeft: '30px'
+              }}
+              hovercolor={color.button_secondary.hover}
+              shadowcolor={color.button_secondary.shadow}
+              onClick={makePayment}
+            />
+          </>
+        }
+      />
+    );
+  }
 
   return (
     <div>
