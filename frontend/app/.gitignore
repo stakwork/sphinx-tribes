@@ -24,3 +24,7 @@ yarn-error.log*
 
 yarn.lock
 package-lock.json
+
+# config in frontend
+./src/config/host.ts
+./src/config/ModeDispatcher.tsx
