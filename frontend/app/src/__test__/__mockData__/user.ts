@@ -14,7 +14,7 @@ export const user: MeInfo = {
   price_to_meet: 0,
   jwt: 'test_jwt',
   tribe_jwt: 'test_jwt',
-  url: 'https://mockApi.com',
+  url: 'http://localhost:5002',
   description: 'description',
   verification_signature: 'test_verification_signature',
   extras: {

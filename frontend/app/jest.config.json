@@ -1,41 +1,72 @@
 {
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "lines": 3.4 
-      },
-      "./src/people/utils/": {
-        "lines": 54 
-      },
-      "./src/helpers/": {
-        "lines": 77
-      },
-      "./src/bounties/": {
-        "lines": 73
-      },
-      "./src/tribes/": {
-        "lines": 100
-      }
+  "collectCoverage": true,
+  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}"],
+  "coverageThreshold": {
+    "global": {
+      "lines": 13
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.svg$": "<rootDir>/svgTransform.js" 
+    "./src/api/": {
+      "lines": 52
     },
-    "transformIgnorePatterns": [
-        "/node_modules/(?!core)"
-    ],
-    "modulePaths": [
-      "<rootDir>"
-    ],
-    "moduleDirectories": ["node_modules", "<rootDir>"],
-		"globals": {
-      "window": { "location": {"host": "localhost"}},
-      "testEnvironment": "jsdom"
+    "./src/bots/": {
+      "lines": 0
+    },
+    "./src/bounties/": {
+      "lines": 0
+    },
+    "./src/components/": {
+      "lines": 25
+    },
+    "./src/config/": {
+      "lines": 57
+    },
+    "./src/helpers/": {
+      "lines": 74
+    },
+    "./src/hooks/": {
+      "lines": 0
+    },
+    "./src/leaderboard/": {
+      "lines": 46
+    },
+    "./src/pages/": {
+      "lines": 0
+    },
+    "./src/people/": {
+      "lines": 4
+    },
+    "./src/store/": {
+      "lines": 24
+    },
+    "./src/tribes/": {
+      "lines": 6
     }
-  }
+  },
+  "moduleFileExtensions": ["ts", "js", "json", "node", "tsx", "jsx"],
+  "preset": "ts-jest",
+  "transform": {
+    "^.+\\.(ts|tsx)?$": "ts-jest",
+    "^.+\\.(js|jsx)$": "babel-jest",
+    "^.+\\.svg$": "<rootDir>/svgTransform.js"
+  },
+  "transformIgnorePatterns": [
+    "/node_modules/(?!core)",
+    "/node_modules/(?!remark-gfm)",
+    "/node_modules/(?!@testing-library/jest-dom)"
+  ],
+  "modulePaths": ["<rootDir>"],
+  "moduleNameMapper": {
+    "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
+  },
+  "moduleDirectories": ["node_modules", "<rootDir>"],
+  "globals": {
+    "window": { "location": { "host": "localhost" } },
+    "testEnvironment": "jsdom"
+  },
+  "testEnvironment": "jsdom",
+	"automock": false,
+  "resetMocks": false,
+  "setupFiles": [
+    "./setupJest.js"
+  ]
+}
