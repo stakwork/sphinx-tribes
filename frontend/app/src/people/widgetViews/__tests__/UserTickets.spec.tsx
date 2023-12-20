@@ -2,12 +2,13 @@ import '@testing-library/jest-dom';
 import { render, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
-import { setupStore } from '__test__/__mockData__/setupStore';
-import { user } from '__test__/__mockData__/user';
-import { mockUsehistory } from '__test__/__mockFn__/useHistory';
+import { setupStore } from '../../../__test__/__mockData__/setupStore';
+import { user } from '../../../__test__/__mockData__/user';
+
+import { mockUsehistory } from '../../../__test__/__mockFn__/useHistory';
 import routeData from 'react-router';
-import { people } from '__test__/__mockData__/persons';
-import { userAssignedTickets } from '__test__/__mockData__/userTickets';
+import { people } from '../../../__test__/__mockData__/persons';
+import { userAssignedBounties } from '../../../__test__/__mockData__/userTickets';
 import UserTicketsView from '../UserTicketsView';
 
 beforeAll(() => {
@@ -26,7 +27,8 @@ describe('UserTicketsView Component', () => {
     (global as any).fetch = originFetch;
   });
 
-  nock(user.url);
+  nock(user.url).get('/person/id/1').reply(200, {});
+
   test('placeholder', () => {});
 
   /*test('display no assigned tickets when the api request fails, or user has no assigned tickets', async () => {
