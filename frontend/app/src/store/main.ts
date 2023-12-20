@@ -254,6 +254,29 @@ export interface FilterStatusCount {
   open: number;
 }
 
+export interface BountyMetrics {
+  bounties_posted: number;
+  bounties_paid: number;
+  bounties_paid_percentage: number;
+  sats_posted: number;
+  sats_paid: number;
+  sats_paid_percentage: number;
+  average_paid: number;
+  average_completed: number;
+}
+
+export interface BountyStatus {
+  Open: boolean;
+  Assigned: boolean;
+  Paid: boolean;
+}
+
+export const defaultBountyStatus: BountyStatus = {
+  Open: true,
+  Assigned: false,
+  Paid: false
+};
+
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
@@ -770,6 +793,13 @@ export class MainStore {
   peopleBounties: PersonBounty[] = [];
   @action setPeopleBounties(bounties: PersonBounty[]) {
     this.peopleBounties = bounties;
+  }
+
+  @persist('object')
+  bountiesStatus: BountyStatus = defaultBountyStatus;
+
+  @action setBountiesStatus(status: BountyStatus) {
+    this.bountiesStatus = status;
   }
 
   getWantedsPrevParams?: QueryParams = {};
@@ -1418,7 +1448,7 @@ export class MainStore {
       });
 
       if (response.status) {
-        this.getPeopleBounties({ resetPage: true });
+        this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
       }
       return;
     } catch (e) {
@@ -1445,7 +1475,7 @@ export class MainStore {
         }
       });
       if (response.status) {
-        await this.getPeopleBounties({ resetPage: true });
+        await this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
       }
       return;
     } catch (e) {
@@ -1627,6 +1657,37 @@ export class MainStore {
 
   @action setLnToken(token: string) {
     this.lnToken = token;
+  }
+
+  @persist('object')
+  @observable
+  isSuperAdmin = false;
+
+  @action setIsSuperAdmin(isAdmin: boolean) {
+    this.isSuperAdmin = isAdmin;
+  }
+
+  @action async getSuperAdmin(): Promise<void> {
+    try {
+      if (!uiStore.meInfo) return;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/admin/auth`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (r.status !== 200) {
+        this.setIsSuperAdmin(false);
+        return;
+      }
+      this.setIsSuperAdmin(true);
+    } catch (e) {
+      console.log('Error getUserOrganizations', e);
+    }
   }
 
   @action async getLnAuth(): Promise<LnAuthData> {
@@ -2318,6 +2379,60 @@ export class MainStore {
       return r;
     } catch (e) {
       console.error('organizationDelete', e);
+    }
+  }
+
+  async getBountyMetrics(start_date: number, end_date: number): Promise<BountyMetrics | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date,
+        end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/bounty_stats`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.error('getBountyMetrics', e);
+      return undefined;
+    }
+  }
+
+  async getBountiesByRange(start_date: number, end_date: number): Promise<any | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date,
+        end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/bounties`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r;
+    } catch (e) {
+      console.error('getBountyMetrics', e);
+      return undefined;
     }
   }
 }

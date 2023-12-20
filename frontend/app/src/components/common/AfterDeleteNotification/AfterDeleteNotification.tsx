@@ -2,7 +2,7 @@ import React from 'react';
 
 import { EuiText } from '@elastic/eui';
 import { Box, Stack } from '@mui/system';
-import { colors } from 'config';
+import { colors } from '../../../config';
 import { BaseModal } from '../BaseModal';
 import { ButtonContainer } from '../ButtonContainer';
 import { useCreateModal } from '../useCreateModal';

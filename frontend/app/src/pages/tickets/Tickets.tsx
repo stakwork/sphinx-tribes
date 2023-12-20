@@ -5,7 +5,7 @@ import BountyHeader from 'people/widgetViews/BountyHeader';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { queryLimit } from 'store/main';
+import { queryLimit, defaultBountyStatus } from 'store/main';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { useStores } from '../../store';
@@ -18,11 +18,7 @@ function BodyComponent() {
   const [showDropdown, setShowDropdown] = useState(false);
   const selectedWidget = 'wanted';
   const [scrollValue, setScrollValue] = useState<boolean>(false);
-  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({
-    Open: true,
-    Assigned: false,
-    Paid: false
-  });
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState(defaultBountyStatus);
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
   const [page, setPage] = useState<number>(1);
   const [currentItems, setCurrentItems] = useState<number>(queryLimit);
@@ -81,6 +77,8 @@ function BodyComponent() {
       }
     };
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+    // set to store
+    main.setBountiesStatus(newCheckboxIdToSelectedMap);
     getTotalBounties(newCheckboxIdToSelectedMap);
     // set data to default
     setCurrentItems(queryLimit);

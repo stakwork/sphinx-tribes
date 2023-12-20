@@ -2,8 +2,8 @@
 import { EuiCheckboxGroup, EuiLoadingSpinner, EuiPopover, EuiText } from '@elastic/eui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useStores } from 'store';
 import styled from 'styled-components';
+import { useStores } from '../../../../store';
 import { colors } from '../../../../config/colors';
 import {
   coding_languages,

@@ -1,13 +1,13 @@
 import { EuiAvatar, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import { colors } from 'config';
 import { observer } from 'mobx-react-lite';
-import ConnectCard from 'people/utils/ConnectCard';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useStores } from 'store';
-import { Person } from 'store/main';
 import styled from 'styled-components';
+import { colors } from '../../config';
+import ConnectCard from '../../people/utils/ConnectCard';
+import { useStores } from '../../store';
+import { Person } from '../../store/main';
 const UserItemContainer = styled.div`
   display: flex;
   gap: 1rem;
