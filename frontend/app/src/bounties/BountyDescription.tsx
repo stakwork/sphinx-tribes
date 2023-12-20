@@ -158,7 +158,7 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
               widget={props.widget}
               owner_alias={props.owner_alias}
               isPaid={props?.isPaid}
-              org_img={props.img}
+              org_img={props.org_img}
               org_name={props.name}
               org_uuid={props.uuid}
             />

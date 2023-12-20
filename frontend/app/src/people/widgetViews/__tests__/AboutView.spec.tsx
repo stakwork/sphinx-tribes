@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
-import { setupStore } from '__test__/__mockData__/setupStore';
-import { user } from '__test__/__mockData__/user';
-import { mockUsehistory } from '__test__/__mockFn__/useHistory';
+import { setupStore } from '../../../__test__/__mockData__/setupStore';
+import { user } from '../../../__test__/__mockData__/user';
+import { mockUsehistory } from '../../../__test__/__mockFn__/useHistory';
 import { AboutView } from '../AboutView';
 
 beforeAll(() => {
@@ -13,8 +13,11 @@ beforeAll(() => {
   mockUsehistory();
 });
 
+/**
+ * @jest-environment jsdom
+ */
 describe('AboutView Component', () => {
-  nock(user.url);
+  nock(user.url).get('/person/id/1').reply(200, {});
   test('display about view with extras', () => {
     const description = 'test description';
     const extras = {

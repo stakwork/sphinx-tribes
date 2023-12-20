@@ -1,8 +1,8 @@
 /* eslint-disable prefer-destructuring */
-import api from 'api';
 import { orderBy } from 'lodash';
 import memo from 'memo-decorator';
 import { makeAutoObservable } from 'mobx';
+import api from '../api';
 
 export type LeaderItem = {
   owner_pubkey: string;

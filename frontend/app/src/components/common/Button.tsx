@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { EuiButton, EuiLoadingSpinner } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import { commonColors } from 'config/commonColors';
 import { ButtonProps } from 'components/interfaces';
+import { commonColors } from '../../config/commonColors';
 
 const B = styled(EuiButton)`
   position: relative;
