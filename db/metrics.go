@@ -134,9 +134,37 @@ func CalculateAverageDays(paidCount int64, paidSum uint) uint {
 
 func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []Bounty {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(re)
+	keys := re.URL.Query()
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
 
+	openQuery := ""
+	assignedQuery := ""
+	paidQuery := ""
 	orderQuery := ""
 	limitQuery := ""
+
+	if open != "" && open == "true" {
+		openQuery = "AND assignee = '' AND paid != true"
+		assignedQuery = ""
+	}
+	if assingned != "" && assingned == "true" {
+		if open != "" && open == "true" {
+			assignedQuery = "OR assignee != '' AND paid = false"
+		} else {
+			assignedQuery = "AND assignee != '' AND paid = false"
+		}
+	}
+	if paid != "" && paid == "true" {
+		if open != "" && open == "true" || assingned != "" && assingned == "true" {
+			paidQuery = "OR paid = true"
+		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
+			assignedQuery = ""
+		} else {
+			paidQuery = "AND paid = true"
+		}
+	}
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -148,8 +176,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	}
 
 	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
-	allQuery := query + " " + " " + orderQuery + " " + limitQuery
-
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + orderQuery + " " + limitQuery
 	b := []Bounty{}
 	db.db.Raw(allQuery).Scan(&b)
 	return b
