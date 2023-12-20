@@ -44,7 +44,7 @@ function FocusedView(props: FocusViewProps) {
     setAfterEdit
   } = props;
   const { ui, main } = useStores();
-
+  const { ownerTribes } = main;
   const skipEditLayer = selectedIndex < 0 || config.skipEditLayer ? true : false;
 
   const [loading, setLoading] = useState(false);
@@ -140,6 +140,93 @@ function FocusedView(props: FocusViewProps) {
 
   const { openDeleteConfirmation } = useDeleteConfirmationModal();
 
+  // eslint-disable-next-line @typescript-eslint/typedef
+  function mergeFormWithMeData(v) {
+    // Initialize a variable to store the merged data, starting with a default value of null.
+    let fullMeData: any = null;
+  
+    // Check if ui.meInfo exists.
+    if (ui.meInfo) {
+      // If ui.meInfo exists, create a shallow copy of it and assign it to fullMeData.
+      fullMeData = { ...ui.meInfo };
+  
+      // Check if extras property doesn't exist in fullMeData; if not, initialize it as an empty object.
+      if (!fullMeData.extras) fullMeData.extras = {};
+  
+      // Check if the current configuration name is 'about'.
+      if (config.name === 'about') {
+        // Iterate over the schema array in the config.
+        // eslint-disable-next-line @typescript-eslint/typedef
+        config?.schema?.forEach((s) => {
+          // Check if a widget is defined in the schema and if extras exist.
+          if (s.widget && fullMeData.extras) {
+            // Handle specific cases for certain widget names.
+            if (s.name === 'tribes') {
+              // Process tribes widget.
+              const submitTribes: any = [];
+  
+              // Iterate over the values of the tribes widget.
+              // eslint-disable-next-line @typescript-eslint/typedef
+              v[s.name] && v[s.name].forEach((t) => {
+                  // Find the corresponding tribe information in the ownerTribes array.
+                  // eslint-disable-next-line @typescript-eslint/typedef
+                  const fullTribeInfo = ownerTribes && ownerTribes?.find((f) => f.unique_name === t.value);
+  
+                  // Exclude sensitive details and push the modified tribe data to submitTribes.
+                  if (fullTribeInfo)
+                    submitTribes.push({
+                      name: fullTribeInfo.name,
+                      unique_name: fullTribeInfo.unique_name,
+                      img: fullTribeInfo.img,
+                      description: fullTribeInfo.description,
+                      ...t
+                    });
+                });
+  
+              // Assign the modified tribes data to fullMeData.extras[tribes].
+              fullMeData.extras[s.name] = submitTribes;
+            } else if (s.name === 'repos' || s.name === 'coding_languages') {
+              // Handle multiple values widgets (e.g., repos, coding_languages).
+              fullMeData.extras[s.name] = v[s.name];
+            } else {
+              // For other widgets, assign a single value wrapped in an array.
+              fullMeData.extras[s.name] = [{ value: v[s.name] }];
+            }
+          } else {
+            // For non-widget properties, directly assign the value to fullMeData.
+            fullMeData[s.name] = v[s.name];
+          }
+        });
+      }
+      // If the configuration name is not 'about'.
+      else {
+        // Add a timestamp to the data if 'created' property doesn't exist.
+        if (!v.created) v.created = moment().unix();
+  
+        // Check if extras property doesn't exist in fullMeData; if not, initialize it as an empty object.
+        if (!fullMeData.extras) fullMeData.extras = {};
+  
+        // Check if selectedIndex is greater than -1, indicating editing an existing widget.
+        if (selectedIndex > -1) {
+          // Mutate the existing widget in fullMeData.extras[config.name].
+          fullMeData.extras[config.name][selectedIndex] = v;
+        } else {
+          // If creating a new widget.
+          if (fullMeData.extras[config.name]) {
+            // If not the first of its kind, unshift the new widget to the beginning of the array.
+            fullMeData.extras[config.name].unshift(v);
+          } else {
+            // If the first of its kind, initialize an array with the new widget.
+            fullMeData.extras[config.name] = [v];
+          }
+        }
+      }
+    }
+  
+    // Return the merged data.
+    return fullMeData;
+  }
+  
   const deleteHandler = () => {
     openDeleteConfirmation({
       onDelete: deleteIt,
@@ -213,6 +300,8 @@ function FocusedView(props: FocusViewProps) {
       alert(e);
       return;
     }
+
+    newBody = mergeFormWithMeData(newBody);
 
     if (!newBody) return; // avoid saving bad state
     if (!newBody.description) {
@@ -465,3 +554,4 @@ function FocusedView(props: FocusViewProps) {
 }
 
 export default observer(FocusedView);
+
