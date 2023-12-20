@@ -7,4 +7,8 @@ beforeAll(() => {});
 
 afterAll(() => {});
 
-describe('testing helpers', () => {});
+describe('testing helpers', () => {
+  test('test', () => {
+    expect(true).toBe(true);
+  });
+});
