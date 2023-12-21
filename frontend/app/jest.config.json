@@ -1,6 +1,6 @@
 {
   "collectCoverage": true,
-  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}"],
+  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}", "!src/**/*.spec.tsx", "!src/**/*.spec.ts"],
   "coverageThreshold": {
     "global": {
       "lines": 13
@@ -30,7 +30,7 @@
       "lines": 46
     },
     "./src/pages/": {
-      "lines": 0
+      "lines": 4.37
     },
     "./src/people/": {
       "lines": 4
