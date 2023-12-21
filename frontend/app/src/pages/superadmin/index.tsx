@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { MyTable } from './TableComponent';
-import { bounties } from './TableComponent/mockBountyData';
-import { Header } from './Header';
-import { Statistics } from './Statistics';
+import { MyTable } from './tableComponent';
+import { bounties } from './tableComponent/mockBountyData';
+import { Header } from './header';
+import { Statistics } from './statistics';
 
 const Container = styled.body`
   height: 100vh; /* Set a fixed height for the container */
