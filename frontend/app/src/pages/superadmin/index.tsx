@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
 import { MyTable } from './tableComponent';
@@ -19,10 +19,10 @@ export const SuperAdmin = () => {
   const { main, ui } = useStores();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
-  const getIsSuperAdmin = async () => {
+  const getIsSuperAdmin = useCallback(async () => {
     const admin = await main.getSuperAdmin();
     setIsSuperAdmin(admin);
-  };
+  }, [main]);
 
   useEffect(() => {
     if (ui.meInfo?.tribe_jwt) {
