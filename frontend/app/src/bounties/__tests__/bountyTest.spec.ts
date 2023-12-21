@@ -5,7 +5,7 @@ import mockBounties, {
   mockBountiesMutated,
   expectedBountyResponses
 } from '../__mock__/mockBounties.data';
-import mockLocalStorage from '../__mock__/mockLocalStorage.utils';
+import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 
 jest.mock('../../api', () => ({
   __esModule: true,
@@ -16,7 +16,7 @@ const mockedApi = api as jest.Mocked<typeof api>;
 
 describe('Bounty Tests', () => {
   beforeAll(() => {
-    Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
+    Object.defineProperty(window, 'localStorage', { value: localStorageMock });
   });
 
   beforeEach(() => {
@@ -80,15 +80,14 @@ describe('Bounty Tests', () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(...deleteRequestContent);
-    const deletedBounty = JSON.parse(mockLocalStorage.getItem(`bounty_${bountyIdToDelete}`));
+    const rawDeletedBounty = localStorageMock.getItem(`bounty_${bountyIdToDelete}`);
+    const deletedBounty = rawDeletedBounty ? JSON.parse(rawDeletedBounty) : null;
 
     expect(deletedBounty).toBeNull();
   });
 
   it('should fetch and persist people bounties to localStorage', async () => {
     await mainStore.getPeopleBounties();
-
-    const storedBounties = JSON.parse(mockLocalStorage.getItem('peopleBounties'));
 
     const peopleRequestContent = [
       'http://localhost:5002/gobounties?token=undefined',
@@ -100,6 +99,8 @@ describe('Bounty Tests', () => {
       }
     ];
 
+    const rawStoredBounties = localStorageMock.getItem('peopleBounties');
+    const storedBounties = rawStoredBounties ? JSON.parse(rawStoredBounties) : null;
     expect(storedBounties).toBeDefined();
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(...peopleRequestContent);
