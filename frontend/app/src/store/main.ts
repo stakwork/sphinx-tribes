@@ -1667,9 +1667,9 @@ export class MainStore {
     this.isSuperAdmin = isAdmin;
   }
 
-  @action async getSuperAdmin(): Promise<void> {
+  @action async getSuperAdmin(): Promise<boolean> {
     try {
-      if (!uiStore.meInfo) return;
+      if (!uiStore.meInfo) return false;
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/admin/auth`, {
         method: 'GET',
@@ -1682,11 +1682,13 @@ export class MainStore {
 
       if (r.status !== 200) {
         this.setIsSuperAdmin(false);
-        return;
+        return false;
       }
       this.setIsSuperAdmin(true);
+      return true;
     } catch (e) {
-      console.log('Error getUserOrganizations', e);
+      console.log('Error getSuperAdmin', e);
+      return false;
     }
   }
 
