@@ -74,9 +74,9 @@ export default function GithubStatusPill(props: GithubStatusPillProps) {
 
   return (
     <div style={{ display: 'flex', ...style }}>
-      <Pill isOpen={isOpen}>
-        <div>{isOpen ? 'Open' : 'Closed'}</div>
-      </Pill>
+     <Pill isOpen={isOpen}>
+        {/* <div>{isOpen ? 'Open' : 'Closed'}</div> */}
+     </Pill> 
       <W>
         <Assignee>{assigneText}</Assignee>
       </W>
