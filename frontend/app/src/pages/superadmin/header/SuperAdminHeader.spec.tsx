@@ -19,9 +19,9 @@ beforeAll(() => {
 describe('AboutView Component', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
   test('display about view with extras', () => {
-    const hardCodedDateRange = "01 Oct - 31 Dec 2023"
-    const exportCSVText= "Export CSV"
-    const initDateRange= "7 days"
+    const hardCodedDateRange = '01 Oct - 31 Dec 2023';
+    const exportCSVText = 'Export CSV';
+    const initDateRange = '7 days';
 
     render(<Header />);
     expect(screen.queryByText(hardCodedDateRange)).toBeInTheDocument();
@@ -29,4 +29,3 @@ describe('AboutView Component', () => {
     expect(screen.queryByText(initDateRange)).toBeInTheDocument();
   });
 });
-
