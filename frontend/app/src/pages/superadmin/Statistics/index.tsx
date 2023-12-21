@@ -1,13 +1,13 @@
 import React from 'react';
-import copy from '../Header/icons/copy.svg';
-import copygray from '../Header/icons/copygray.svg';
-import bountiesposted from '../Header/icons/bountiesposted.svg';
-import bountiespaid from '../Header/icons/bountiespaid.svg';
-import clockloader from '../Header/icons/clockloder.svg';
-import coin from '../Header/icons/coin.svg';
-import satoshiesposted from '../Header/icons/satoshiesposted.svg';
-import satoshiespaid from '../Header/icons/satoshiespaid.svg';
-import calendar from '../Header/icons/calendar.svg';
+import copy from '../header/icons/copy.svg';
+import copygray from '../header/icons/copygray.svg';
+import bountiesposted from '../header/icons/bountiesposted.svg';
+import bountiespaid from '../header/icons/bountiespaid.svg';
+import clockloader from '../header/icons/clockloder.svg';
+import coin from '../header/icons/coin.svg';
+import satoshiesposted from '../header/icons/satoshiesposted.svg';
+import satoshiespaid from '../header/icons/satoshiespaid.svg';
+import calendar from '../header/icons/calendar.svg';
 import {
   Wrapper,
   Card,
@@ -26,7 +26,6 @@ import {
 import './StatStyles.css';
 
 export const Statistics = () => {
-  console.log('super admin');
   return (
     <>
       <Wrapper>
