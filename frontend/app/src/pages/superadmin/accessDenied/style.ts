@@ -62,4 +62,3 @@ export const DeniedSmall = styled.p`
     font-size: 0.83rem;
   }
 `;
-
