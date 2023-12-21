@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import paginationarrow1 from '../Header/icons/paginationarrow1.svg';
-import paginationarrow2 from '../Header/icons/paginationarrow2.svg';
+import paginationarrow1 from '../header/icons/paginationarrow1.svg';
+import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 
-import copygray from '../Header/icons/copygray.svg';
+import copygray from '../header/icons/copygray.svg';
 import {
   TableContainer,
   HeaderContainer,
