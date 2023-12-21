@@ -26,7 +26,6 @@ import {
 import './StatStyles.css';
 
 export const Statistics = () => {
-  console.log('super admin');
   return (
     <>
       <Wrapper>

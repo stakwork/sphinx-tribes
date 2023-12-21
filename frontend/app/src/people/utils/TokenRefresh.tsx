@@ -31,12 +31,6 @@ function TokenRefresh() {
     };
   }, []);
 
-  useEffect(() => {
-    if (ui.meInfo?.tribe_jwt) {
-      main.getSuperAdmin();
-    }
-  }, [main, ui]);
-
   return (
     <>
       <Modal visible={show}>
