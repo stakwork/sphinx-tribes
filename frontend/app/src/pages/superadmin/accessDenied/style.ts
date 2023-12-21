@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { Button } from 'components/common';
 
 export const Container = styled.div`
   width: 100vw;
@@ -64,7 +63,3 @@ export const DeniedSmall = styled.p`
   }
 `;
 
-export const DeniedButton = styled.button`
-  height: 45px;
-  border-radius: 6px;
-`;
