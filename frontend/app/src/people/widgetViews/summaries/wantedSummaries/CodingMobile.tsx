@@ -33,7 +33,8 @@ export default function MobileView(props: CodingViewProps) {
     status,
     payBounty,
     showPayBounty,
-    markUnpaid
+    markUnpaid,
+    paid
   } = props;
 
   const color = colors['light'];
@@ -51,7 +52,7 @@ export default function MobileView(props: CodingViewProps) {
             flexDirection: 'row'
           }}
         >
-          <GithubStatusPill status={status} assignee={assignee} />
+          {!paid && <GithubStatusPill status={status} assignee={assignee} />}
           {assigneeLabel}
           {ticketUrl && (
             <GithubIconMobile
