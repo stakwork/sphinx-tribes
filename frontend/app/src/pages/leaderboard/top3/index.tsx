@@ -3,12 +3,12 @@ import { PriceOuterContainer } from 'components/common';
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from 'config';
 import { DollarConverter } from 'helpers';
-import { LeaderItem } from 'leaderboard/store';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStores } from 'store';
 import { Person } from 'store/main';
 import styled from 'styled-components';
+import { LeaderItem } from '../store';
 
 const color = colors.light;
 const ItemContainer = styled.div`

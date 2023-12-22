@@ -4,10 +4,10 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { colors } from '../../config';
-import ConnectCard from '../../people/utils/ConnectCard';
-import { useStores } from '../../store';
-import { Person } from '../../store/main';
+import { colors } from '../../../config';
+import ConnectCard from '../../../people/utils/ConnectCard';
+import { useStores } from '../../../store';
+import { Person } from '../../../store/main';
 const UserItemContainer = styled.div`
   display: flex;
   gap: 1rem;
