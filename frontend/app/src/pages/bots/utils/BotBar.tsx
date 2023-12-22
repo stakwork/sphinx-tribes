@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Button } from '../../components/common';
+import { Button } from '../../../components/common';
 
 export default function BotBar(props: { value: string }) {
   const { value } = props;
