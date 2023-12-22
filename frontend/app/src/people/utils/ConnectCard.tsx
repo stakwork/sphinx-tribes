@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ConnectCardProps } from 'people/interfaces';
-import { Button, Modal } from '../../components/common';
+import { Button, Modal, QR } from '../../components/common';
 import { makeConnectQR } from '../../helpers';
 import { colors } from '../../config/colors';
-import QR from './QR';
 import QrBar from './QrBar';
 
 interface styledProps {
