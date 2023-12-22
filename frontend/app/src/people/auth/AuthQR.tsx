@@ -8,7 +8,7 @@ import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
 import { getHost } from '../../config/host';
-import QR from '../utils/QR';
+import { QR } from '../../components/common';
 
 const ConfirmWrap = styled.div`
   display: flex;

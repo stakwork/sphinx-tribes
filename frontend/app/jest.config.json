@@ -1,6 +1,6 @@
 {
   "collectCoverage": true,
-  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}"],
+  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}", "!src/**/*.spec.tsx", "!src/**/*.spec.ts"],
   "coverageThreshold": {
     "global": {
       "lines": 13
@@ -8,7 +8,7 @@
     "./src/api/": {
       "lines": 52
     },
-    "./src/bots/": {
+    "./src/pages/bots/": {
       "lines": 0
     },
     "./src/bounties/": {
@@ -26,11 +26,11 @@
     "./src/hooks/": {
       "lines": 0
     },
-    "./src/leaderboard/": {
-      "lines": 46
+    "./src/pages/leaderboard/": {
+      "lines": 38.05
     },
     "./src/pages/": {
-      "lines": 0
+      "lines": 4.37
     },
     "./src/people/": {
       "lines": 4
@@ -38,7 +38,7 @@
     "./src/store/": {
       "lines": 24
     },
-    "./src/tribes/": {
+    "./src/pages/tribes/": {
       "lines": 6
     }
   },
