@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { persist } from 'mobx-persist';
 import { Extras } from '../components/form/inputs/widgets/interfaces';
-import tags from '../pages/tribes/tags';
+import tags from '../tribes/tags';
 import { mainStore } from './main';
 import { getUserAvatarPlaceholder } from './lib';
 

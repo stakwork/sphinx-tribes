@@ -21,6 +21,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
   const { person } = usePerson(ui.selectedPerson);
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
   const [afterEdit, setAfterEdit] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const personToDisplay = fromPage === 'usertickets' ? bountyOwner : person;
 
@@ -41,8 +42,14 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
        * infinite loop and crash the app
        */
       if ((wantedId && !bounty.length) || afterEdit) {
-        const bounty = await main.getBountyById(Number(wantedId));
-        setBounty(bounty);
+        try {
+          const bountyData = await main.getBountyById(Number(wantedId));
+          setBounty(bountyData);
+        } catch (error) {
+          console.error('Error fetching bounty:', error);
+        } finally {
+          setLoading(false); // Set loading to false after data is fetched (success or failure)
+        }
       }
     },
     [bounty, main, wantedId]
@@ -60,6 +67,11 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
   }, [afterEdit, getBounty]);
 
   const isMobile = useIsMobile();
+
+  if (loading) {
+    // Render loading indicator or return null
+    return null;
+  }
 
   if (isMobile) {
     return (

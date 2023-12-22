@@ -14,7 +14,7 @@ import {
 } from './HeaderStyles';
 import arrowback from './icons/arrowback.svg';
 import arrowforward from './icons/arrowforward.svg';
-//import './Header.css';
+import './Header.css';
 
 const DateFilterObject = {
   7: '7 days',
