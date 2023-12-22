@@ -30,7 +30,6 @@ export default function MobileView(props: CodingViewProps) {
     nametag,
     assigneeLabel,
     labels,
-    status,
     payBounty,
     showPayBounty,
     markUnpaid
@@ -51,7 +50,7 @@ export default function MobileView(props: CodingViewProps) {
             flexDirection: 'row'
           }}
         >
-          <StatusPill status={status} assignee={assignee} />
+          <StatusPill assignee={assignee} />
           {assigneeLabel}
           {ticketUrl && (
             <GithubIconMobile

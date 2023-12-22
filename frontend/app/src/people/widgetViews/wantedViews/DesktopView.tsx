@@ -34,7 +34,6 @@ function DesktopView(props: WantedViewsProps) {
     labels,
     isClosed,
     onPanelClick,
-    status,
     isCodingTask,
     show,
     paid,
@@ -87,7 +86,6 @@ function DesktopView(props: WantedViewsProps) {
           >
             {isCodingTask ? (
               <StatusPill
-                status={status}
                 assignee={assignee}
                 style={{
                   marginTop: 10

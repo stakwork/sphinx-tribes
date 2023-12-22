@@ -26,7 +26,6 @@ export default function DesktopView(props: CodingViewProps) {
     assigneeLabel,
     nametag,
     actionButtons,
-    status,
     owner_id,
     created
   } = props;
@@ -60,7 +59,7 @@ export default function DesktopView(props: CodingViewProps) {
           <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
             <Title>{titleString}</Title>
             <div style={{ display: 'flex', marginTop: 12 }}>
-              <StatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
+              <StatusPill assignee={assignee} style={{ marginRight: 25 }} />
               {assigneeLabel}
               {ticketUrl && (
                 <GithubIcon

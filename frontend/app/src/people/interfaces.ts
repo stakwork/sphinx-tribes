@@ -213,7 +213,6 @@ export interface PersonProps extends Person {
 }
 
 export interface StatusPillProps {
-  status?: string;
   assignee?: Person;
   style?: React.CSSProperties;
 }

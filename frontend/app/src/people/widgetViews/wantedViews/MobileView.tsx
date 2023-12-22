@@ -38,7 +38,6 @@ function MobileView(props: any) {
     saving,
     labels,
     isClosed,
-    status,
     isCodingTask,
     show,
     paid,
@@ -104,7 +103,6 @@ function MobileView(props: any) {
           >
             {isCodingTask && (
               <StatusPill
-                status={status}
                 assignee={assignee}
                 style={{
                   marginTop: 10
