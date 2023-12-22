@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Divider } from '../components/common/index';
+import { Divider } from '../../components/common/index';
 import { BotProps } from './interfaces';
 const Wrap = styled.div`
   cursor: pointer;
