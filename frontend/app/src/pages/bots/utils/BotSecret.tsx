@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
-import { BotSecretProps } from 'bots/interfaces';
-import { Button } from '../../components/common';
-import { useStores } from '../../store';
+import { BotSecretProps } from '../interfaces';
+import { Button } from '../../../components/common';
+import { useStores } from '../../../store';
 
 const Head = styled.div`
   display: flex;

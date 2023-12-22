@@ -8,7 +8,7 @@
     "./src/api/": {
       "lines": 52
     },
-    "./src/bots/": {
+    "./src/pages/bots/": {
       "lines": 0
     },
     "./src/bounties/": {
