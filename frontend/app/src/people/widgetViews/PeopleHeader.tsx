@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
 import { colors } from 'config';
-import { filterCount } from 'people/utils/ExtraFunctions';
+import { filterCount } from '../../helpers';
 import { GetValue, coding_languages } from '../utils/languageLabelStyle';
 
 interface styledProps {
