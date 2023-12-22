@@ -212,7 +212,7 @@ export interface PersonProps extends Person {
   description: string;
 }
 
-export interface GithubStatusPillProps {
+export interface StatusPillProps {
   status?: string;
   assignee?: Person;
   style?: React.CSSProperties;

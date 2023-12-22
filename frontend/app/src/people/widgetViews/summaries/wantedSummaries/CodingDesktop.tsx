@@ -3,7 +3,7 @@ import React from 'react';
 import { EuiText } from '@elastic/eui';
 import { CodingViewProps } from 'people/interfaces';
 import { Divider, Paragraph, Title } from '../../../../components/common';
-import GithubStatusPill from '../../parts/StatusPill';
+import StatusPill from '../../parts/StatusPill';
 import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
 import { colors } from '../../../../config/colors';
 import { renderMarkdown } from '../../../utils/RenderMarkdown';
@@ -60,7 +60,7 @@ export default function DesktopView(props: CodingViewProps) {
           <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
             <Title>{titleString}</Title>
             <div style={{ display: 'flex', marginTop: 12 }}>
-              <GithubStatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
+              <StatusPill status={status} assignee={assignee} style={{ marginRight: 25 }} />
               {assigneeLabel}
               {ticketUrl && (
                 <GithubIcon

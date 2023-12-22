@@ -1,4 +1,4 @@
-import { GithubStatusPillProps } from 'people/interfaces';
+import { StatusPillProps } from 'people/interfaces';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -55,7 +55,7 @@ const W = styled.div`
   display: flex;
   align-items: center;
 `;
-export default function GithubStatusPill(props: GithubStatusPillProps) {
+export default function StatusPill(props: StatusPillProps) {
   const { status, assignee, style } = props;
 
   const [assigneText, setAssigneText] = useState('');

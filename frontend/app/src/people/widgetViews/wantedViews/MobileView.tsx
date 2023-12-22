@@ -2,7 +2,7 @@
 import React from 'react';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
-import GithubStatusPill from '../parts/StatusPill';
+import StatusPill from '../parts/StatusPill';
 import { colors } from '../../../config/colors';
 import NameTag from '../../utils/NameTag';
 import { useStores } from '../../../store';
@@ -103,7 +103,7 @@ function MobileView(props: any) {
             }}
           >
             {isCodingTask && (
-              <GithubStatusPill
+              <StatusPill
                 status={status}
                 assignee={assignee}
                 style={{
