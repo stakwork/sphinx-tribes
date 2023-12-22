@@ -37,7 +37,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
 
   const getBounty = useCallback(
     async (afterEdit?: boolean) => {
-       /** check for the bounty length, else the request
+      /** check for the bounty length, else the request
        * will be made continously which will lead to an
        * infinite loop and crash the app
        */
@@ -46,7 +46,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
           const bountyData = await main.getBountyById(Number(wantedId));
           setBounty(bountyData);
         } catch (error) {
-          console.error("Error fetching bounty:", error);
+          console.error('Error fetching bounty:', error);
         } finally {
           setLoading(false); // Set loading to false after data is fetched (success or failure)
         }
