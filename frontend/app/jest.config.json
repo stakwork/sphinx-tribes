@@ -38,7 +38,7 @@
     "./src/store/": {
       "lines": 24
     },
-    "./src/tribes/": {
+    "./src/pages/tribes/": {
       "lines": 6
     }
   },
