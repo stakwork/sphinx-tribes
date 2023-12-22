@@ -1,9 +1,9 @@
 import { EuiText } from '@elastic/eui';
 import React from 'react';
 import styled from 'styled-components';
-import { PriceOuterContainer } from '../../components/common';
-import { colors } from '../../config';
-import { DollarConverter } from '../../helpers';
+import { PriceOuterContainer } from '../../../components/common';
+import { colors } from '../../../config';
+import { DollarConverter } from '../../../helpers';
 import { UserInfo } from '../userInfo';
 import { LeaderItem } from '../store';
 

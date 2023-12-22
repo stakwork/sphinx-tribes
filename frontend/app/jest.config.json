@@ -26,8 +26,8 @@
     "./src/hooks/": {
       "lines": 0
     },
-    "./src/leaderboard/": {
-      "lines": 46
+    "./src/pages/leaderboard/": {
+      "lines": 38.05
     },
     "./src/pages/": {
       "lines": 4.37
