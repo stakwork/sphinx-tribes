@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
-import { useStores } from '../store';
+import { useStores } from '../../store';
 
 function Header() {
   const { ui } = useStores();
