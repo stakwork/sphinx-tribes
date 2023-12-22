@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { formatSat } from 'people/utils/ExtraFunctions';
+import { formatSat } from '../../../helpers';
 
 const Wrapper = styled.div`
   display: flex;
