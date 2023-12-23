@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { getHost } from '../config/host';
-import { Button, Divider, LazyImgBg } from '../components/common/index';
-import ConnectCard from './utils/ConnectCard';
-import { PersonProps } from './interfaces';
+import { getHost } from '../../config/host';
+import { Button, Divider, LazyImgBg } from '../../components/common';
+import ConnectCard from '../../people/utils/ConnectCard';
+import { PersonProps } from '../../people/interfaces';
 
 const Wrap = styled.div`
   cursor: pointer;
