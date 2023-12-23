@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
-import { AuthProps } from 'people/interfaces';
-import { formatRelayPerson } from 'helpers';
+import { AuthProps } from '../../people/interfaces';
+import { formatRelayPerson } from '../../helpers';
 import api from '../../api';
 import { useStores } from '../../store';
 import type { MeInfo } from '../../store/ui';
