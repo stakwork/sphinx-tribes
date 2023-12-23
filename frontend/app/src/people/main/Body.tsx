@@ -10,7 +10,7 @@ import { SearchTextInput } from '../../components/common';
 import { colors } from '../../config/colors';
 import { useFuse, useIsMobile, usePageScroll, useScreenWidth } from '../../hooks';
 import { useStores } from '../../store';
-import Person from '../Person';
+import Person from '../../pages/people/Person';
 import NoResults from '../utils/NoResults';
 import PageLoadSpinner from '../utils/PageLoadSpinner';
 import StartUpModal from '../utils/StartUpModal';

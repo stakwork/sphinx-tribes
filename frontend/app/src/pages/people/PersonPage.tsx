@@ -1,12 +1,12 @@
 import { Modal } from 'components/common';
 import { useIsMobile, usePerson } from 'hooks';
 import { observer } from 'mobx-react-lite';
-import { PeopleList } from 'people/peopleList';
 import { UserInfo } from 'people/userInfo';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
+import { PeopleList } from './peopleList';
 import { TabsPages } from './tabs';
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
