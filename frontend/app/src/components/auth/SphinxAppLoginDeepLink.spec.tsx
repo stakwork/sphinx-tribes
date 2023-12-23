@@ -21,12 +21,9 @@ describe('SphinxAppLoginDeepLink', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
   nock(user.url).get('/ask').reply(200, {});
   test('display text', async () => {
-    render(
-      <SphinxAppLoginDeepLink />
-    );
+    render(<SphinxAppLoginDeepLink />);
 
     //Expect text to be there
     expect(screen.queryByText('Opening Sphinx...')).toBeInTheDocument();
   });
 });
-

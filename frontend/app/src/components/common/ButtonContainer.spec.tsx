@@ -20,12 +20,9 @@ beforeAll(() => {
 describe('ButtonContainer', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
   test('is rendered', async () => {
-    const { container } = render(
-      <ButtonContainer />
-    );
+    const { container } = render(<ButtonContainer />);
 
     //Expect text to be there
     expect(container).toBeTruthy();
   });
 });
-
