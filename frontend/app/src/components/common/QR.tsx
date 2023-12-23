@@ -28,7 +28,7 @@ export default function QR(props: QRProps) {
 
   const centerIcon =
     type === 'connect' ? (
-      <Icon>
+      <Icon data-testid={"testid-connectimg"}>
         <MaterialIcon icon={'person_add'} style={{ fontSize: 36, marginLeft: 7 }} />
       </Icon>
     ) : (
@@ -38,6 +38,7 @@ export default function QR(props: QRProps) {
   return (
     <div style={{ position: 'relative' }}>
       <QRCode
+        data-testid={"testid-qrcode"}
         bgColor={color.pureWhite}
         fgColor={color.pureBlack}
         level={'Q'}
