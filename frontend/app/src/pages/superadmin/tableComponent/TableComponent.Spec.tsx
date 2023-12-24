@@ -21,7 +21,6 @@ const mockBounties = [
 
 it('renders elements from TableProps in the document', () => {
   const { getByText } = render(<MyTable bounties={mockBounties} />);
-
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
 });
 
@@ -92,13 +91,11 @@ it('renders "Organization" in the document', () => {
 
 it('renders each element in the table in the document', () => {
   const { getByText } = render(<MyTable bounties={mockBounties} />);
-
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
-
 });
+
 it('renders each element in the table in the document', () => {
   const { getByText } = render(<MyTable bounties={mockBounties} />);
-
   mockBounties.forEach((bounty) => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(bounty.date)).toBeInTheDocument();
