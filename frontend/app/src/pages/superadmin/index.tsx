@@ -1,6 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+/**
+ * Commented out all superadmin restrictions for now
+ * To enable colaborations
+ */
+
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useStores } from 'store';
+// import { useStores } from 'store';
 import { MyTable } from './tableComponent';
 import { bounties } from './tableComponent/mockBountyData';
 import { Header } from './header';
@@ -15,19 +20,19 @@ const Container = styled.body`
 `;
 
 export const SuperAdmin = () => {
-  const { main, ui } = useStores();
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  // const { main, ui } = useStores();
+  const [isSuperAdmin] = useState(true);
 
-  const getIsSuperAdmin = useCallback(async () => {
-    const admin = await main.getSuperAdmin();
-    setIsSuperAdmin(admin);
-  }, [main]);
+  // const getIsSuperAdmin = useCallback(async () => {
+  //   const admin = await main.getSuperAdmin();
+  //   setIsSuperAdmin(admin);
+  // }, [main]);
 
-  useEffect(() => {
-    if (ui.meInfo?.tribe_jwt) {
-      getIsSuperAdmin();
-    }
-  }, [main, ui, getIsSuperAdmin]);
+  // useEffect(() => {
+  //   if (ui.meInfo?.tribe_jwt) {
+  //     getIsSuperAdmin();
+  //   }
+  // }, [main, ui, getIsSuperAdmin]);
 
   return (
     <>
