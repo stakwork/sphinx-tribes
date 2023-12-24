@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AdminAccessDenied from './index.tsx';
 
 describe('AdminAccessDenied', () => {
-  test("renders Access Denied message, You don\'t have access message, and Go Back button", () => {
+  test("renders Access Denied message, You don't have access message, and Go Back button", () => {
     render(<AdminAccessDenied />);
 
     const accessDeniedText = screen.getByText(/Access Denied/i);
