@@ -11,7 +11,7 @@ const Pill = styled.div<PillProps>`
   align-items: center;
   font-size: 12px;
   font-weight: 300;
-  background: ${(p: any) => (p.isOpen ? '#49C998' : p.isClosed ? '#000000' : '#8256D0')};
+  background: ${(p: any) => (p.isOpen ? '#618aff' : p.isClosed ? '#8256D0' : '#49C998')};
   border-radius: 30px;
   border: 1px solid transparent;
   text-transform: capitalize;
@@ -74,7 +74,7 @@ export default function StatusPill(props: StatusPillProps) {
   return (
     <div style={{ display: 'flex', ...style }}>
       <Pill isOpen={isOpen} isClosed={isClosed}>
-        <div>{isOpen ? 'Open' : isClosed ? 'Closed' : 'Assigned'}</div>
+        <div>{isOpen ? 'Open' : isClosed ? 'Complete' : 'Assigned'}</div>
       </Pill>
       <W>
         <Assignee>{assigneText}</Assignee>
