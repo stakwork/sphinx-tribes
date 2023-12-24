@@ -59,7 +59,7 @@ export default function DesktopView(props: CodingViewProps) {
           <SectionPad style={{ minHeight: 160, maxHeight: 160 }}>
             <Title>{titleString}</Title>
             <div style={{ display: 'flex', marginTop: 12 }}>
-              <StatusPill assignee={assignee} style={{ marginRight: 25 }} />
+              <StatusPill assignee={assignee} style={{ marginRight: 25 }} paid={paid} />
               {assigneeLabel}
               {ticketUrl && (
                 <GithubIcon

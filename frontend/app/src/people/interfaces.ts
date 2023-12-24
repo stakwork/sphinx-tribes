@@ -215,6 +215,7 @@ export interface PersonProps extends Person {
 export interface StatusPillProps {
   assignee?: Person;
   style?: React.CSSProperties;
+  paid?: boolean;
 }
 
 export interface WantedSummaryProps {

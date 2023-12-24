@@ -107,6 +107,7 @@ function MobileView(props: any) {
                 style={{
                   marginTop: 10
                 }}
+                paid={paid}
               />
             )}
             {{ ...assignee }.owner_alias && (
