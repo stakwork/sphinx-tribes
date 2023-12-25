@@ -573,6 +573,7 @@ export const UsersListContainer = styled.div`
   background-color: #f2f3f5;
   height: 16rem;
   overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 export const UserContianer = styled.div`
