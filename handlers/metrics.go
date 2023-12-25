@@ -235,7 +235,7 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 
 	metricBounties := db.DB.GetBountiesByDateRange(request, r)
 	metricBountiesData := GetMetricsBountiesData(metricBounties)
-	result := ConvertMetricsToMap(metricBountiesData)
+	result := ConvertMetricsToCSV(metricBountiesData)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -273,7 +273,7 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 	return metricBountiesData
 }
 
-func ConvertMetricsToMap(metricBountiesData []db.BountyData) [][]string {
+func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
 	var metricsData []map[string]interface{}
 	data, err := json.Marshal(metricBountiesData) // Convert to a json string
 	if err != nil {
