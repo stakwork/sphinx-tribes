@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 
@@ -50,6 +51,7 @@ interface Bounty {
 
 interface TableProps {
   bounties: Bounty[];
+  headerIsFrozen: boolean;
 }
 
 interface ImageWithTextProps {
@@ -131,7 +133,7 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   </>
 );
 
-export const MyTable = ({ bounties }: TableProps) => {
+export const MyTable = ({ bounties, headerIsFrozen }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
@@ -149,13 +151,11 @@ export const MyTable = ({ bounties }: TableProps) => {
   };
 
   const paginateNext = () => {
-    console.log('clicked');
     if (currentPage < bounties?.length / pageSize) {
       setCurrentPage(currentPage + 1);
     }
   };
   const paginatePrev = () => {
-    console.log('clicked');
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -163,14 +163,13 @@ export const MyTable = ({ bounties }: TableProps) => {
 
   return (
     <>
-      <HeaderContainer>
+      <HeaderContainer freeze={!headerIsFrozen}>
         <Header>
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {' '}
-              {bounties.length}{' '}
-              <AlternativeTitle> {bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
+              {bounties.length}
+              <AlternativeTitle> {bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
             </LeadingTitle>
           </BountyHeader>
           <Options>

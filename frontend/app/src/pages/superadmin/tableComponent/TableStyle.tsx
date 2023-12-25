@@ -1,16 +1,36 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+type FreezeProps = {
+  freeze: boolean;
+};
+
+const applyFreezeHeaderStyles = ({ freeze = false }: FreezeProps) =>
+  freeze &&
+  css`
+    position: fixed;
+    top: 124px;
+    left: 0;
+    padding: 0 2.5rem 0 1rem;
+    background-color: #fff;
+    z-index: 99999999;
+    width: 100%;
+    border-radius: 0;
+  `;
 
 export const TableContainer = styled.div`
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-export const HeaderContainer = styled.div`
+export const HeaderContainer = styled.div<FreezeProps>`
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding-right: 40px;
   padding-left: 20px;
+  transition: all 0.1ms ease-in;
+
+  ${applyFreezeHeaderStyles}
 `;
 
 export const PaginatonSection = styled.div`
@@ -31,6 +51,7 @@ export const Header = styled.div`
 export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
+  position: relative;
 `;
 
 export const TableRow = styled.tr`
@@ -72,6 +93,7 @@ export const BountyData = styled.td`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  position: relative;
 `;
 
 export const TableDataAlternative = styled.td`
@@ -112,8 +134,8 @@ export const TableData3 = styled.td`
 
 export const TableHeaderData = styled.th`
   padding: 12px;
-  text-align: left;
   padding-left: 52px;
+  text-align: left;
   color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
   font-size: 12px;

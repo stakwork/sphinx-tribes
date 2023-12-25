@@ -10,6 +10,7 @@ export const NavWrapper = styled.div`
   border-bottom: 1px solid var(--Divider-2, #dde1e5);
   background: var(--Body, #fff);
 `;
+
 export const AlternateWrapper = styled.div`
   background: #fff;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
@@ -19,7 +20,13 @@ export const AlternateWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  position: fixed;
+  top: 62px;
+  left: 0;
+  width: 100%;
+  z-index: 9999999;
 `;
+
 export const LeftWrapper = styled.div`
   display: flex;
   align-items: flex-start;
@@ -31,6 +38,7 @@ export const ButtonWrapper = styled.div`
   align-items: flex-start;
   gap: 8px;
 `;
+
 export const RightWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -48,6 +56,7 @@ export const Title = styled.h4`
   display: flex;
   gap: 6px;
 `;
+
 export const Button = styled.h5`
   color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
   text-align: center;
@@ -67,6 +76,7 @@ export const AlternateTitle = styled.h4`
   font-weight: 400;
   line-height: 14px;
 `;
+
 export const ExportButton = styled.button`
   width: 112px;
   padding: 8px 16px;
@@ -80,6 +90,7 @@ export const ExportButton = styled.button`
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
   margin-right: 10px;
 `;
+
 export const ExportText = styled.p`
   color: var(--Main-bottom-icons, #5f6368);
   text-align: center;
@@ -113,6 +124,7 @@ export const ArrowButton = styled.button`
   width: 40px;
   height: 40px;
 `;
+
 export const DropDown = styled.div`
   display: flex;
   width: 137px;
@@ -128,6 +140,7 @@ export const DropDown = styled.div`
   color: white;
   font-size: 14px;
 `;
+
 export const Select = styled.select`
   background: var(--Primary-blue, #618aff);
   box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);

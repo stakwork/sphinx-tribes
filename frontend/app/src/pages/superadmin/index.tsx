@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
+import { useInViewPort } from 'hooks';
 import { MyTable } from './tableComponent';
 import { bounties } from './tableComponent/mockBountyData';
 import { Header } from './header';
@@ -13,11 +14,17 @@ const Container = styled.body`
   width: 1366px;
   align-items: center;
   margin: 0px auto;
+  padding: 4.5rem 0;
 `;
 
 export const SuperAdmin = () => {
   const { main, ui } = useStores();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  const [inView, ref] = useInViewPort({
+    rootMargin: '0px',
+    threshold: 0.1
+  });
 
   const getIsSuperAdmin = useCallback(async () => {
     const admin = await main.getSuperAdmin();
@@ -32,13 +39,13 @@ export const SuperAdmin = () => {
 
   return (
     <>
-      {!isSuperAdmin ? (
+      {isSuperAdmin ? (
         <AdminAccessDenied />
       ) : (
         <Container>
           <Header />
-          <Statistics />
-          <MyTable bounties={bounties} />
+          <Statistics freezeHeaderRef={ref} />
+          <MyTable bounties={bounties} headerIsFrozen={inView} />
         </Container>
       )}
     </>
