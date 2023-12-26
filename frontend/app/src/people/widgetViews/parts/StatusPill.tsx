@@ -64,12 +64,7 @@ export default function StatusPill(props: StatusPillProps) {
   const isClosed = paid ? true : false;
 
   useEffect(() => {
-    const assignedText =
-      assignee && !assignee?.owner_alias
-        ? 'Not assigned'
-        : assignee
-        ? 'Assigned to '
-        : 'Completed by ';
+    const assignedText = assignee && !assignee?.owner_alias ? 'Not assigned' : assignee ? '' : '';
     setAssigneText(assignedText);
   }, [assignee]);
 

@@ -37,7 +37,6 @@ function MobileView(props: any) {
     setExtrasPropertyAndSave,
     saving,
     labels,
-    isClosed,
     isCodingTask,
     show,
     paid,
