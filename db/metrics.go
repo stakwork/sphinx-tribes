@@ -171,7 +171,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	} else {
 		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
 	}
-	if limit != 0 {
+	if limit > 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 

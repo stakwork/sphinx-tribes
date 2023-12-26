@@ -7,11 +7,14 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/stakwork/sphinx-tribes/config"
 )
 
 func TestGetAdminPubkeys(t *testing.T) {
-
-	os.Setenv("ADMIN_PUBKEYS", "test")
+	// set the admins and init the config to update superadmins
+	os.Setenv("ADMINS", "test")
+	config.InitConfig()
 
 	req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
 	if err != nil {

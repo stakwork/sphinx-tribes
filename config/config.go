@@ -233,6 +233,7 @@ func GetNodePubKey() string {
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
+		return ""
 	}
 
 	defer res.Body.Close()
