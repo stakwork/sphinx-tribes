@@ -16,7 +16,7 @@ import {
   ViewTribe,
   ViewGithub
 } from './Components';
-import { ButtonRow, Pad, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } from './style';
+import { ButtonRow, Pad, Img, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } from './style';
 
 export default function MobileView(props: CodingViewProps) {
   const {
@@ -32,128 +32,145 @@ export default function MobileView(props: CodingViewProps) {
     labels,
     payBounty,
     showPayBounty,
-    markUnpaid
+    markUnpaid,
+    paid
   } = props;
 
   const color = colors['light'];
 
   return (
-    <div style={{ padding: 20, overflow: 'auto', height: 'calc(100% - 60px)' }}>
-      <Pad>
-        {nametag}
-
-        <T>{titleString}</T>
-
-        <div
+    <>
+      {paid && (
+        <Img
+          src={'/static/paid_ribbon.svg'}
           style={{
-            display: 'flex',
-            flexDirection: 'row'
+            position: 'absolute',
+            top: -1,
+            right: 0,
+            width: 64,
+            height: 72,
+            zIndex: 100,
+            pointerEvents: 'none'
           }}
-        >
-          <StatusPill assignee={assignee} />
-          {assigneeLabel}
-          {ticketUrl && (
-            <GithubIconMobile
-              onClick={(e: any) => {
-                e.stopPropagation();
-                window.open(ticketUrl, '_blank');
-              }}
-            >
-              <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
-            </GithubIconMobile>
-          )}
-          {loomEmbedUrl && (
-            <LoomIconMobile
-              onClick={(e: any) => {
-                e.stopPropagation();
-                window.open(loomEmbedUrl, '_blank');
-              }}
-            >
-              <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
-            </LoomIconMobile>
-          )}
-        </div>
+        />
+      )}
+      <div style={{ padding: 20, overflow: 'auto', height: 'calc(100% - 60px)' }}>
+        <Pad>
+          {nametag}
 
-        <EuiText
-          style={{
-            fontSize: '13px',
-            color: color.grayish.G100,
-            fontWeight: '500'
-          }}
-        >
-          {estimated_session_length && 'Session:'}{' '}
-          <span
+          <T>{titleString}</T>
+
+          <div
             style={{
-              fontWeight: '500',
-              color: color.pureBlack
+              display: 'flex',
+              flexDirection: 'row'
             }}
           >
-            {estimated_session_length ?? ''}
-          </span>
-        </EuiText>
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            marginTop: '10px',
-            minHeight: '60px'
-          }}
-        >
-          {(labels ?? []).map((x: any) => (
-            <>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  height: '22px',
-                  width: 'fit-content',
-                  backgroundColor: color.grayish.G1000,
-                  border: `1px solid ${color.grayish.G70}`,
-                  padding: '3px 10px',
-                  borderRadius: '20px',
-                  marginRight: '3px',
-                  boxShadow: `1px 1px ${color.grayish.G70}`
+            <StatusPill assignee={assignee} paid={paid} />
+            {assigneeLabel}
+            {ticketUrl && (
+              <GithubIconMobile
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  window.open(ticketUrl, '_blank');
                 }}
               >
+                <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
+              </GithubIconMobile>
+            )}
+            {loomEmbedUrl && (
+              <LoomIconMobile
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  window.open(loomEmbedUrl, '_blank');
+                }}
+              >
+                <img height={'100%'} width={'100%'} src="/static/loom.png" alt="loomVideo" />
+              </LoomIconMobile>
+            )}
+          </div>
+
+          <EuiText
+            style={{
+              fontSize: '13px',
+              color: color.grayish.G100,
+              fontWeight: '500'
+            }}
+          >
+            {estimated_session_length && 'Session:'}{' '}
+            <span
+              style={{
+                fontWeight: '500',
+                color: color.pureBlack
+              }}
+            >
+              {estimated_session_length ?? ''}
+            </span>
+          </EuiText>
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              marginTop: '10px',
+              minHeight: '60px'
+            }}
+          >
+            {(labels ?? []).map((x: any) => (
+              <>
                 <div
                   style={{
-                    fontSize: '10px',
-                    color: color.black300
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    height: '22px',
+                    width: 'fit-content',
+                    backgroundColor: color.grayish.G1000,
+                    border: `1px solid ${color.grayish.G70}`,
+                    padding: '3px 10px',
+                    borderRadius: '20px',
+                    marginRight: '3px',
+                    boxShadow: `1px 1px ${color.grayish.G70}`
                   }}
                 >
-                  {x.label}
+                  <div
+                    style={{
+                      fontSize: '10px',
+                      color: color.black300
+                    }}
+                  >
+                    {x.label}
+                  </div>
                 </div>
-              </div>
-            </>
-          ))}
-        </div>
+              </>
+            ))}
+          </div>
 
-        <div style={{ height: 10 }} />
-        {showPayBounty && payBounty}
-        <ButtonRow style={{ margin: '10px 0' }}>
-          <ViewGithub {...props} />
-          <ViewTribe {...props} />
-          <AddToFavorites {...props} />
-          <CopyLink {...props} />
-          <ShareOnTwitter {...props} />
-        </ButtonRow>
+          <div style={{ height: 10 }} />
+          {showPayBounty && payBounty}
+          <ButtonRow style={{ margin: '10px 0' }}>
+            <ViewGithub {...props} />
+            <ViewTribe {...props} />
+            <AddToFavorites {...props} />
+            <CopyLink {...props} />
+            <ShareOnTwitter {...props} />
+          </ButtonRow>
 
-        {markUnpaid}
+          {markUnpaid}
 
-        <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
+          <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
 
-        <Divider />
-        <Y>
-          <P color={color}>
-            <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
-            <B color={color}>{satToUsd(price || 0)}</B> USD
-          </P>
-          <Heart />
-        </Y>
-        <Divider style={{ marginBottom: 20 }} />
-        <D color={color}>{renderMarkdown(description)}</D>
-      </Pad>
-    </div>
+          <Divider />
+          <Y>
+            <P color={color}>
+              <B color={color}>{formatPrice(price || 0)}</B> SAT /{' '}
+              <B color={color}>{satToUsd(price || 0)}</B> USD
+            </P>
+            <Heart />
+          </Y>
+          <Divider style={{ marginBottom: 20 }} />
+          <D color={color}>{renderMarkdown(description)}</D>
+        </Pad>
+      </div>
+    </>
   );
 }

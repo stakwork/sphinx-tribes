@@ -90,6 +90,7 @@ function DesktopView(props: WantedViewsProps) {
                 style={{
                   marginTop: 10
                 }}
+                paid={paid}
               />
             ) : (
               <div
