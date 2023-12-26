@@ -1368,17 +1368,7 @@ export class MainStore {
 
     try {
       if (this.lnToken) {
-        const r = await fetch(`${TribesURL}/person`, {
-          method: 'POST',
-          body: JSON.stringify({
-            ...body
-          }),
-          mode: 'cors',
-          headers: {
-            'x-jwt': info.tribe_jwt,
-            'Content-Type': 'application/json'
-          }
-        });
+        const r = await this.saveBountyPerson(body);
         if (!r) return;
         // first time profile makers will need this on first login
         if (r.status === 200) {
@@ -1399,6 +1389,8 @@ export class MainStore {
           }
         }
 
+        // save to tribes
+        await this.saveBountyPerson(body);
         const updateSelf = { ...info, ...body };
         await this.getSelf(updateSelf);
 
@@ -1412,6 +1404,26 @@ export class MainStore {
     } catch (e) {
       console.log('Error saveProfile: ', e);
     }
+  }
+
+  async saveBountyPerson(body: any): Promise<Response | undefined> {
+    if (!uiStore.meInfo) return undefined;
+    const info = uiStore.meInfo;
+    if (!body) return; // avoid saving bad state
+
+    const r = await fetch(`${TribesURL}/person`, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...body
+      }),
+      mode: 'cors',
+      headers: {
+        'x-jwt': info.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return r;
   }
 
   async saveBounty(body: any): Promise<void> {

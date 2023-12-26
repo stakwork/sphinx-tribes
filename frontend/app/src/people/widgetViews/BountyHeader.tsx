@@ -11,7 +11,7 @@ import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { SearchBar } from '../../components/common/index';
 import { useStores } from '../../store';
-import { filterCount } from '../utils/ExtraFunctions';
+import { filterCount } from '../../helpers';
 import { GetValue, coding_languages, status } from '../utils/languageLabelStyle';
 import { PostBounty } from './postBounty';
 

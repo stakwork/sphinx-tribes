@@ -10,7 +10,9 @@ import {
   spliceOutPubkey,
   userHasManageBountyRoles,
   RolesCategory,
-  handleDisplayRole
+  handleDisplayRole,
+  formatSat,
+  filterCount
 } from '../helpers-extended';
 
 beforeAll(() => {
@@ -259,6 +261,16 @@ describe('testing helpers', () => {
         role4: true,
         role5: true
       });
+    });
+
+    test('formatSat', () => {
+      expect(formatSat(10000)).toBe('10 000');
+      expect(formatSat(0)).toBe('0');
+    });
+    test('filterCount', () => {
+      expect(filterCount({ thing1: 0, thing2: 1 })).toBe(1);
+      expect(filterCount({ thing1: 1, thing2: 1 })).toBe(2);
+      expect(filterCount({})).toBe(0);
     });
   });
 });

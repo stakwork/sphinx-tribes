@@ -1,6 +1,7 @@
 import { StatusPillProps } from 'people/interfaces';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+
 interface PillProps {
   readonly isOpen: boolean;
   readonly isClosed: boolean;
@@ -35,6 +36,7 @@ const Pill = styled.div<PillProps>`
   border-radius: 2px;
 `;
 
+
 const Assignee = styled.div`
   display: flex;
   justify-content: center;
@@ -56,11 +58,13 @@ const W = styled.div`
   align-items: center;
 `;
 export default function StatusPill(props: StatusPillProps) {
+
   const { paid, assignee, style } = props;
 
   const [assigneText, setAssigneText] = useState('');
   const isOpen = !assignee ? true : false;
   const isClosed = paid ? true : false;
+
 
   useEffect(() => {
     const assignedText =
@@ -71,11 +75,13 @@ export default function StatusPill(props: StatusPillProps) {
         : 'Completed by ';
     setAssigneText(assignedText);
   }, [assignee]);
+
   return (
     <div style={{ display: 'flex', ...style }}>
       <Pill isOpen={isOpen} isClosed={isClosed}>
         <div>{isOpen ? 'Open' : isClosed ? 'Complete' : 'Assigned'}</div>
       </Pill>
+
       <W>
         <Assignee>{assigneText}</Assignee>
       </W>
