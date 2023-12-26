@@ -40,7 +40,6 @@ export const PostModal: FC<PostModalProps> = observer(
       */
       const number = await getBountyData();
       history.push(`/bounty/${number}`);
-      
     };
 
     const closeHandler = () => {
