@@ -275,14 +275,12 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 
 func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
 	var metricsData []map[string]interface{}
-	data, err := json.Marshal(metricBountiesData) // Convert to a json string
+	data, err := json.Marshal(metricBountiesData)
 	if err != nil {
 		fmt.Println("Could not convert metrics structs Array to JSON")
 		return [][]string{}
 	}
-
-	err = json.Unmarshal(data, &metricsData) // Convert to a map
+	err = json.Unmarshal(data, &metricsData)
 	result := jsonconv.ToCsv(metricsData, nil)
-
 	return result
 }
