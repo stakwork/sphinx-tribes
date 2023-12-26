@@ -36,7 +36,6 @@ const Pill = styled.div<PillProps>`
   border-radius: 2px;
 `;
 
-
 const Assignee = styled.div`
   display: flex;
   justify-content: center;
@@ -58,13 +57,11 @@ const W = styled.div`
   align-items: center;
 `;
 export default function StatusPill(props: StatusPillProps) {
-
   const { paid, assignee, style } = props;
 
   const [assigneText, setAssigneText] = useState('');
   const isOpen = !assignee ? true : false;
   const isClosed = paid ? true : false;
-
 
   useEffect(() => {
     const assignedText =
