@@ -127,7 +127,7 @@ ADMINS
 
 ### For Contributions
 
-Read the contribution doc [here](./Contribution.md)
+Read the contribution doc [here](./docs/Contribution.md)
 
 ### Stakwork Youtube vidoes download for tribes feed
 
