@@ -2,7 +2,7 @@
 import React from 'react';
 import { EuiText } from '@elastic/eui';
 import { CodingViewProps } from 'people/interfaces';
-import GithubStatusPill from '../../parts/StatusPill';
+import StatusPill from '../../parts/StatusPill';
 import { Divider } from '../../../../components/common';
 import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
 import { colors } from '../../../../config/colors';
@@ -30,7 +30,6 @@ export default function MobileView(props: CodingViewProps) {
     nametag,
     assigneeLabel,
     labels,
-    status,
     payBounty,
     showPayBounty,
     markUnpaid
@@ -51,7 +50,7 @@ export default function MobileView(props: CodingViewProps) {
             flexDirection: 'row'
           }}
         >
-          <GithubStatusPill status={status} assignee={assignee} />
+          <StatusPill assignee={assignee} />
           {assigneeLabel}
           {ticketUrl && (
             <GithubIconMobile
