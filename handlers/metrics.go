@@ -9,6 +9,7 @@ import (
 	"github.com/ambelovsky/go-structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/tuan78/jsonconv"
 )
 
 func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
@@ -178,36 +179,8 @@ func MetricsBounties(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metricBounties := db.DB.GetBountiesByDateRange(request, r)
-	var metricBountiesData []db.BountyData
+	metricBountiesData := GetMetricsBountiesData(metricBounties)
 
-	for _, bounty := range metricBounties {
-		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
-		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
-		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
-
-		bountyData := db.BountyData{
-			Bounty:              bounty,
-			BountyId:            bounty.ID,
-			Person:              bountyOwner,
-			BountyCreated:       bounty.Created,
-			BountyDescription:   bounty.Description,
-			BountyUpdated:       bounty.Updated,
-			AssigneeId:          bountyAssignee.ID,
-			AssigneeAlias:       bountyAssignee.OwnerAlias,
-			AssigneeDescription: bountyAssignee.Description,
-			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:       bountyOwner.ID,
-			OwnerUuid:           bountyOwner.Uuid,
-			OwnerDescription:    bountyOwner.Description,
-			OwnerUniqueName:     bountyOwner.UniqueName,
-			OwnerImg:            bountyOwner.Img,
-			OrganizationName:    organization.Name,
-			OrganizationImg:     organization.Img,
-			OrganizationUuid:    organization.Uuid,
-		}
-
-		metricBountiesData = append(metricBountiesData, bountyData)
-	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(metricBountiesData)
 }
@@ -236,4 +209,78 @@ func MetricsBountiesCount(w http.ResponseWriter, r *http.Request) {
 	MetricsBountiesCount := db.DB.GetBountiesByDateRangeCount(request, r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(MetricsBountiesCount)
+}
+
+func MetricsCsv(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	request := db.PaymentDateRange{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &request)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("Request body not accepted")
+		return
+	}
+
+	metricBounties := db.DB.GetBountiesByDateRange(request, r)
+	metricBountiesData := GetMetricsBountiesData(metricBounties)
+	result := ConvertMetricsToCSV(metricBountiesData)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
+func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
+	var metricBountiesData []db.BountyData
+	for _, bounty := range metricBounties {
+		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
+		bountyData := db.BountyData{
+			Bounty:              bounty,
+			BountyId:            bounty.ID,
+			Person:              bountyOwner,
+			BountyCreated:       bounty.Created,
+			BountyDescription:   bounty.Description,
+			BountyUpdated:       bounty.Updated,
+			AssigneeId:          bountyAssignee.ID,
+			AssigneeAlias:       bountyAssignee.OwnerAlias,
+			AssigneeDescription: bountyAssignee.Description,
+			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:       bountyOwner.ID,
+			OwnerUuid:           bountyOwner.Uuid,
+			OwnerDescription:    bountyOwner.Description,
+			OwnerUniqueName:     bountyOwner.UniqueName,
+			OwnerImg:            bountyOwner.Img,
+			OrganizationName:    organization.Name,
+			OrganizationImg:     organization.Img,
+			OrganizationUuid:    organization.Uuid,
+		}
+		metricBountiesData = append(metricBountiesData, bountyData)
+	}
+	return metricBountiesData
+}
+
+func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
+	var metricsData []map[string]interface{}
+	data, err := json.Marshal(metricBountiesData)
+	if err != nil {
+		fmt.Println("Could not convert metrics structs Array to JSON")
+		return [][]string{}
+	}
+	err = json.Unmarshal(data, &metricsData)
+	result := jsonconv.ToCsv(metricsData, nil)
+	return result
 }
