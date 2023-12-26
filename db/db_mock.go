@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+var bountyCache map[string]Bounty
+var organizationCache map[string]Organization
+var userRolesCache map[string]map[string][]UserRoles
+
 func (db database) GetConnectionCode() ConnectionCodesShort {
 	c := ConnectionCodesShort{}
 	c.ConnectionString = "test"
@@ -37,13 +41,14 @@ func (db database) AddUuidToPerson(id uint, uuid string) {
 }
 
 func (db database) GetOrganizationByUuid(uuid string) Organization {
-	ms := Organization{}
-
-	return ms
+	return organizationCache[uuid]
 }
 func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
-	ms := []UserRoles{}
-	return ms
+	orgRoles := userRolesCache[uuid]
+	if orgRoles == nil {
+		return nil
+	}
+	return orgRoles[pubkey]
 }
 func (db database) GetPersonByPubkey(pubkey string) Person {
 	m := Person{}
@@ -334,8 +339,12 @@ func (db database) GetCreatedBounties(pubkey string) ([]Bounty, error) {
 }
 
 func (db database) GetBountyById(id string) ([]Bounty, error) {
-	ms := []Bounty{}
-	return ms, nil
+	var bounty Bounty
+	var present bool
+	if bounty, present = bountyCache[id]; !present {
+		return nil, nil
+	}
+	return []Bounty{bounty}, nil
 }
 
 func (db database) GetBountyIndexById(id string) int64 {
@@ -362,7 +371,10 @@ func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 	if b.OwnerID == "" {
 		return Bounty{}, errors.New("no pub key")
 	}
-
+	if bountyCache == nil {
+		bountyCache = make(map[string]Bounty)
+	}
+	bountyCache[strconv.Itoa(int(b.ID))] = b
 	return b, nil
 }
 
@@ -635,7 +647,10 @@ func (db database) CreateOrEditOrganization(m Organization) (Organization, error
 	if m.OwnerPubKey == "" {
 		return Organization{}, errors.New("no pub key")
 	}
-
+	if organizationCache == nil {
+		organizationCache = make(map[string]Organization)
+	}
+	organizationCache[m.Uuid] = m
 	return m, nil
 }
 
@@ -675,7 +690,14 @@ func (db database) GetBountyRoles() []BountyRoles {
 
 func (db database) CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles {
 	// delete roles and create new ones
-
+	if userRolesCache == nil {
+		userRolesCache = make(map[string]map[string][]UserRoles)
+	}
+	_, orgRolePresent := userRolesCache[uuid]
+	if !orgRolePresent {
+		userRolesCache[uuid] = make(map[string][]UserRoles)
+	}
+	userRolesCache[uuid][pubkey] = roles
 	return roles
 }
 
