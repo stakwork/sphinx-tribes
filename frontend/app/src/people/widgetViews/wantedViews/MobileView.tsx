@@ -37,7 +37,6 @@ function MobileView(props: any) {
     setExtrasPropertyAndSave,
     saving,
     labels,
-    isClosed,
     isCodingTask,
     show,
     paid,
@@ -66,7 +65,7 @@ function MobileView(props: any) {
           }}
         />
       )}
-      <Wrap isClosed={isClosed} style={{ padding: 15 }}>
+      <Wrap style={{ padding: 15 }}>
         <Body style={{ width: '100%' }} color={color}>
           <div
             style={{
@@ -107,6 +106,7 @@ function MobileView(props: any) {
                 style={{
                   marginTop: 10
                 }}
+                paid={paid}
               />
             )}
             {{ ...assignee }.owner_alias && (
