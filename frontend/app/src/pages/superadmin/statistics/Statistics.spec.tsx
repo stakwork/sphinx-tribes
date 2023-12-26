@@ -38,12 +38,12 @@ describe('Statistics Component', () => {
     ];
 
     render(<Statistics />);
-    const bountiesPaid = screen.getAllByText('Bounties Paid');
-    if (bountiesPaid) {
+     const bountiesPaid = screen.getAllByText('Bounties Paid'); 
+     if(bountiesPaid){
       expect(bountiesPaid[0]).toBeInTheDocument();
-    }
-    for (let i = 0; i < hardcodedWords.length; i++) {
-      expect(screen.queryByText(hardcodedWords[i])).toBeInTheDocument();
-    }
+     }
+     for (let i = 0; i < hardcodedWords.length; i++) {
+      expect(screen.queryByText(hardcodedWords[i])).toBeInTheDocument(); 
+    } 
   });
 });
