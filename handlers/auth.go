@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -15,16 +13,11 @@ import (
 )
 
 func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
-	adminPubKeys := os.Getenv("ADMIN_PUBKEYS")
-	admins := strings.Split(adminPubKeys, ",")
 	type PubKeysReturn struct {
 		Pubkeys []string `json:"pubkeys"`
 	}
-	pubkeys := PubKeysReturn{}
-	if adminPubKeys != "" {
-		for _, admin := range admins {
-			pubkeys.Pubkeys = append(pubkeys.Pubkeys, admin)
-		}
+	pubkeys := PubKeysReturn{
+		Pubkeys: config.SuperAdmins,
 	}
 	json.NewEncoder(w).Encode(pubkeys)
 	w.WriteHeader(http.StatusOK)

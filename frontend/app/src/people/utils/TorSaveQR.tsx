@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from '../../components/common';
-import QR from './QR';
+import { Button, QR } from '../../components/common';
 
 export interface TorSaveQRProps {
   url: string;

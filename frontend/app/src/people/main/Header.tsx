@@ -8,7 +8,7 @@ import { useStores } from '../../store';
 import { useIsMobile } from '../../hooks';
 import { Modal, Button } from '../../components/common';
 
-import SignIn from '../auth/SignIn';
+import SignIn from '../../components/auth/SignIn';
 import api from '../../api';
 import TorSaveQR from '../utils/TorSaveQR';
 import IconButton from '../../components/common/IconButton2';
@@ -320,12 +320,8 @@ function Header() {
   }, []);
 
   function goToEditSelf() {
-    const path = location.pathname;
     if (ui.meInfo?.id) {
       history.push(`/p/${ui.meInfo.owner_pubkey}/organizations`);
-      if (path.includes('/p')) {
-        window.location.reload();
-      }
       ui.setSelectedPerson(ui.meInfo.id);
       ui.setSelectingPerson(ui.meInfo.id);
     }

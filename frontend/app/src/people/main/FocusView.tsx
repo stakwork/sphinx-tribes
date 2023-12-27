@@ -206,6 +206,7 @@ function FocusedView(props: FocusViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   async function submitForm(body: any, notEdit?: boolean) {
     let newBody = cloneDeep(body);
+
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {

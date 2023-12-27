@@ -1368,17 +1368,7 @@ export class MainStore {
 
     try {
       if (this.lnToken) {
-        const r = await fetch(`${TribesURL}/person`, {
-          method: 'POST',
-          body: JSON.stringify({
-            ...body
-          }),
-          mode: 'cors',
-          headers: {
-            'x-jwt': info.tribe_jwt,
-            'Content-Type': 'application/json'
-          }
-        });
+        const r = await this.saveBountyPerson(body);
         if (!r) return;
         // first time profile makers will need this on first login
         if (r.status === 200) {
@@ -1399,6 +1389,8 @@ export class MainStore {
           }
         }
 
+        // save to tribes
+        await this.saveBountyPerson(body);
         const updateSelf = { ...info, ...body };
         await this.getSelf(updateSelf);
 
@@ -1412,6 +1404,26 @@ export class MainStore {
     } catch (e) {
       console.log('Error saveProfile: ', e);
     }
+  }
+
+  async saveBountyPerson(body: any): Promise<Response | undefined> {
+    if (!uiStore.meInfo) return undefined;
+    const info = uiStore.meInfo;
+    if (!body) return; // avoid saving bad state
+
+    const r = await fetch(`${TribesURL}/person`, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...body
+      }),
+      mode: 'cors',
+      headers: {
+        'x-jwt': info.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return r;
   }
 
   async saveBounty(body: any): Promise<void> {
@@ -1667,9 +1679,9 @@ export class MainStore {
     this.isSuperAdmin = isAdmin;
   }
 
-  @action async getSuperAdmin(): Promise<void> {
+  @action async getSuperAdmin(): Promise<boolean> {
     try {
-      if (!uiStore.meInfo) return;
+      if (!uiStore.meInfo) return false;
       const info = uiStore.meInfo;
       const r: any = await fetch(`${TribesURL}/admin/auth`, {
         method: 'GET',
@@ -1682,11 +1694,13 @@ export class MainStore {
 
       if (r.status !== 200) {
         this.setIsSuperAdmin(false);
-        return;
+        return false;
       }
       this.setIsSuperAdmin(true);
+      return true;
     } catch (e) {
-      console.log('Error getUserOrganizations', e);
+      console.log('Error getSuperAdmin', e);
+      return false;
     }
   }
 

@@ -212,10 +212,10 @@ export interface PersonProps extends Person {
   description: string;
 }
 
-export interface GithubStatusPillProps {
-  status?: string;
+export interface StatusPillProps {
   assignee?: Person;
   style?: React.CSSProperties;
+  paid?: boolean;
 }
 
 export interface WantedSummaryProps {
@@ -339,6 +339,7 @@ export interface CodingViewProps extends WantedSummaryProps {
   payBounty?: ReactNode;
   markUnpaid?: ReactNode;
   showPayBounty?: boolean;
+  paid: boolean;
   // owner_id: string;
 }
 

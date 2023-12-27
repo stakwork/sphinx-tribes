@@ -2,7 +2,7 @@
 import React from 'react';
 import { EuiButtonIcon, EuiText } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
-import GithubStatusPill from '../parts/StatusPill';
+import StatusPill from '../parts/StatusPill';
 import { colors } from '../../../config/colors';
 import NameTag from '../../utils/NameTag';
 import { useStores } from '../../../store';
@@ -37,8 +37,6 @@ function MobileView(props: any) {
     setExtrasPropertyAndSave,
     saving,
     labels,
-    isClosed,
-    status,
     isCodingTask,
     show,
     paid,
@@ -67,7 +65,7 @@ function MobileView(props: any) {
           }}
         />
       )}
-      <Wrap isClosed={isClosed} style={{ padding: 15 }}>
+      <Wrap style={{ padding: 15 }}>
         <Body style={{ width: '100%' }} color={color}>
           <div
             style={{
@@ -103,12 +101,12 @@ function MobileView(props: any) {
             }}
           >
             {isCodingTask && (
-              <GithubStatusPill
-                status={status}
+              <StatusPill
                 assignee={assignee}
                 style={{
                   marginTop: 10
                 }}
+                paid={paid}
               />
             )}
             {{ ...assignee }.owner_alias && (

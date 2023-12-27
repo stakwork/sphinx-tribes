@@ -11,6 +11,7 @@ import CreatableMultiSelect from './CreatableMultiSelect';
 import TextInput from './TextInput';
 import SearchableSelect from './SearchableSelect';
 import { Portal } from './Portal';
+import QR from './QR';
 
 export { PriceOuterContainer } from './PriceOuterContainer';
 export { LazyImg, LazyImgBg } from './LazyImg';
@@ -38,5 +39,6 @@ export {
   MultiSelect,
   CreatableMultiSelect,
   Portal,
-  SearchBar
+  SearchBar,
+  QR
 };
