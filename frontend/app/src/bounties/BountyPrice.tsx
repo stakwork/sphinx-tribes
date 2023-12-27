@@ -1,7 +1,7 @@
 import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { PriceOuterContainer } from 'components/common';
+import { PriceOuterContainer } from '../components/common';
 import { colors } from '../config/colors';
 import { DollarConverter, satToUsd } from '../helpers';
 import { BountiesPriceProps } from './interfaces';
