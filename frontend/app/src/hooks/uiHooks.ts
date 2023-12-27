@@ -1,5 +1,5 @@
-import { mobileWidht } from 'config';
 import { useState, useEffect } from 'react';
+import { mobileWidht } from '../config';
 
 function getIsMobile() {
   return window.innerWidth < mobileWidht;
