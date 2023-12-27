@@ -1,9 +1,10 @@
-import { GithubStatusPillProps } from 'people/interfaces';
+import { StatusPillProps } from 'people/interfaces';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 interface PillProps {
   readonly isOpen: boolean;
+  readonly isClosed: boolean;
 }
 const Pill = styled.div<PillProps>`
   display: flex;
@@ -11,7 +12,7 @@ const Pill = styled.div<PillProps>`
   align-items: center;
   font-size: 12px;
   font-weight: 300;
-  background: ${(p: any) => (p.isOpen ? '#49C998' : '#8256D0')};
+  background: ${(p: any) => (p.isOpen ? '#618aff' : p.isClosed ? '#8256D0' : '#49C998')};
   border-radius: 30px;
   border: 1px solid transparent;
   text-transform: capitalize;
@@ -55,28 +56,24 @@ const W = styled.div`
   display: flex;
   align-items: center;
 `;
-export default function GithubStatusPill(props: GithubStatusPillProps) {
-  const { status, assignee, style } = props;
+export default function StatusPill(props: StatusPillProps) {
+  const { paid, assignee, style } = props;
 
   const [assigneText, setAssigneText] = useState('');
-
-  const isOpen = status === 'open' || !status;
+  const isOpen = !assignee ? true : false;
+  const isClosed = paid ? true : false;
 
   useEffect(() => {
-    const assignedText =
-      assignee && !assignee?.owner_alias
-        ? 'Not assigned'
-        : isOpen
-        ? 'Assigned to '
-        : 'Completed by ';
+    const assignedText = assignee && !assignee?.owner_alias ? 'Not assigned' : assignee ? '' : '';
     setAssigneText(assignedText);
-  }, [isOpen, assignee]);
+  }, [assignee]);
 
   return (
     <div style={{ display: 'flex', ...style }}>
-      <Pill isOpen={isOpen}>
-        <div>{isOpen ? 'Open' : 'Closed'}</div>
+      <Pill isOpen={isOpen} isClosed={isClosed}>
+        <div>{isOpen ? 'Open' : isClosed ? 'Complete' : 'Assigned'}</div>
       </Pill>
+
       <W>
         <Assignee>{assigneText}</Assignee>
       </W>

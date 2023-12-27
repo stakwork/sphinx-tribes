@@ -5,7 +5,7 @@ import moment from 'moment';
 import styled from 'styled-components';
 import { PaymentHistory, OrgTransactionType } from 'store/main';
 import { useStores } from 'store';
-import { formatSat } from 'people/utils/ExtraFunctions';
+import { formatSat } from '../../../helpers';
 import { Modal } from '../../../components/common';
 import { colors } from '../../../config/colors';
 import ArrowRight from '../../../public/static/arrow-right.svg';

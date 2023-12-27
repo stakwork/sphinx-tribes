@@ -1,45 +1,45 @@
 {
   "collectCoverage": true,
-  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}"],
+  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}", "!src/**/*.spec.tsx", "!src/**/*.spec.ts"],
   "coverageThreshold": {
     "global": {
-      "lines": 13
+      "lines": 22.31
     },
     "./src/api/": {
-      "lines": 52
+      "lines": 52.63
     },
-    "./src/bots/": {
+    "./src/pages/bots/": {
       "lines": 0
     },
     "./src/bounties/": {
-      "lines": 0
+      "lines": 5.55
     },
     "./src/components/": {
-      "lines": 25
+      "lines": 25.62
     },
     "./src/config/": {
-      "lines": 57
+      "lines": 57.14
     },
     "./src/helpers/": {
-      "lines": 74
+      "lines": 78.16
     },
     "./src/hooks/": {
       "lines": 0
     },
-    "./src/leaderboard/": {
-      "lines": 46
+    "./src/pages/leaderboard/": {
+      "lines": 38.05
     },
     "./src/pages/": {
-      "lines": 0
+      "lines": 6.3
     },
     "./src/people/": {
-      "lines": 4
+      "lines": 4.85
     },
     "./src/store/": {
-      "lines": 24
+      "lines": 33.63
     },
-    "./src/tribes/": {
-      "lines": 6
+    "./src/pages/tribes/": {
+      "lines": 6.35
     }
   },
   "moduleFileExtensions": ["ts", "js", "json", "node", "tsx", "jsx"],

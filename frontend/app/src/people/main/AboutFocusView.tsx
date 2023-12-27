@@ -53,12 +53,62 @@ const AboutFocusView = (props: FocusViewProps) => {
     [main, isTorSave]
   );
 
+  function formatAboutBody(newBody: any): any {
+    const requestData = {
+      ...newBody,
+      extras: {
+        ...newBody?.extras,
+        alert: newBody.alert,
+        tribes: newBody.tribes,
+        coding_languages: newBody.coding_languages,
+        lightning: [
+          {
+            value: newBody.lightning,
+            label: newBody.lightning
+          }
+        ],
+        amboss: [
+          {
+            value: newBody.amboss,
+            label: newBody.amboss
+          }
+        ],
+        email: [
+          {
+            value: newBody.email,
+            label: newBody.email
+          }
+        ],
+        facebook: [
+          {
+            value: newBody.facebook,
+            label: newBody.facebook
+          }
+        ],
+        twitter: [
+          {
+            value: newBody.twitter,
+            label: newBody.twitter
+          }
+        ],
+        github: [
+          {
+            value: newBody.github,
+            label: newBody.github
+          }
+        ]
+      }
+    };
+    return requestData;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   async function submitForm(body: any, shouldCloseModal: boolean = true) {
     const newBody = cloneDeep(body);
 
     if (config && config.name === 'about') {
-      await main.saveProfile(newBody);
+      const requestData = formatAboutBody(newBody);
+      await main.saveProfile(requestData);
       if (shouldCloseModal) {
         closeModal();
       }

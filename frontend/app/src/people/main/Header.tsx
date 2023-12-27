@@ -8,7 +8,7 @@ import { useStores } from '../../store';
 import { useIsMobile } from '../../hooks';
 import { Modal, Button } from '../../components/common';
 
-import SignIn from '../auth/SignIn';
+import SignIn from '../../components/auth/SignIn';
 import api from '../../api';
 import TorSaveQR from '../utils/TorSaveQR';
 import IconButton from '../../components/common/IconButton2';

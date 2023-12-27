@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { colors } from '../../../config/colors';
@@ -29,12 +29,17 @@ export const PostModal: FC<PostModalProps> = observer(
     const canEdit = id === ui.meInfo?.id;
     const config = widgetConfigs[widget];
 
+    const getBountyData = useCallback(async () => {
+      const response = await main.getPeopleBounties();
+      return response[0].body.id;
+    }, [main]);
+
     const ReCallBounties = async () => {
       /*
       TODO : after getting the better way to reload the bounty, this code will be removed.
       */
-      history.push('/bounties');
-      await window.location.reload();
+      const number = await getBountyData();
+      history.push(`/bounty/${number}`);
     };
 
     const closeHandler = () => {

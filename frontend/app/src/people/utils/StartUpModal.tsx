@@ -1,14 +1,12 @@
 import { Box } from '@mui/system';
-import { BaseModal } from 'components/common';
+import { BaseModal, QR, IconButton } from 'components/common';
 import { colors } from 'config';
 import { observer } from 'mobx-react-lite';
 import { StartUpModalProps } from 'people/interfaces';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import api from '../../api';
-import IconButton from '../../components/common/IconButton2';
 import { useStores } from '../../store';
-import QR from './QR';
 
 const ModalContainer = styled.div`
   max-height: auto;

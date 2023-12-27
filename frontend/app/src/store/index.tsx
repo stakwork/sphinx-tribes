@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { create } from 'mobx-persist';
 import { configure } from 'mobx';
-import { leaderboardStore } from '../leaderboard';
+import { leaderboardStore } from '../pages/leaderboard/store';
 import { appEnv } from '../config/env';
 import { uiStore } from './ui';
 import { mainStore } from './main';
