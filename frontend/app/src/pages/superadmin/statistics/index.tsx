@@ -23,7 +23,7 @@ import {
   VerticaGrayLineSecondary,
   VerticaGrayLineAleternative
 } from './StatisticsStyles';
-import './StatStyles.css';
+// import './StatStyles.css';
 
 export const Statistics = () => {
   return (
