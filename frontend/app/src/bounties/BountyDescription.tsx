@@ -164,7 +164,13 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
             />
           </div>
           {props.org_uuid && props.name && (
-            <Link onClick={(e:any) => {e.stopPropagation()}} to={`/org/bounties/${props.org_uuid}`} target="_blank">
+            <Link
+              onClick={(e: any) => {
+                e.stopPropagation();
+              }}
+              to={`/org/bounties/${props.org_uuid}`}
+              target="_blank"
+            >
               <OrganizationWrap>
                 <Img
                   title={`${props.name} logo`}
