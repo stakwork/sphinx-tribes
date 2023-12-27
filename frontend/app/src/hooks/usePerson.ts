@@ -1,5 +1,5 @@
-import { useStores } from 'store';
-import { Person } from 'store/main';
+import { Person } from '../store/main';
+import { useStores } from '../store';
 
 export const usePerson = (id: any) => {
   const { main, ui } = useStores();

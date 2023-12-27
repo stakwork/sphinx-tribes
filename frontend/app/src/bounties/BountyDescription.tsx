@@ -2,8 +2,8 @@ import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isString } from 'lodash';
-import { OrganizationText, OrganizationWrap } from 'people/utils/style';
 import { Link } from 'react-router-dom';
+import { OrganizationText, OrganizationWrap } from '../people/utils/style';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/languageLabelStyle';
 import NameTag from '../people/utils/NameTag';
@@ -164,7 +164,13 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
             />
           </div>
           {props.org_uuid && props.name && (
-            <Link to={`/org/bounties/${props.org_uuid}`} target="_blank">
+            <Link
+              onClick={(e: any) => {
+                e.stopPropagation();
+              }}
+              to={`/org/bounties/${props.org_uuid}`}
+              target="_blank"
+            >
               <OrganizationWrap>
                 <Img
                   title={`${props.name} logo`}
