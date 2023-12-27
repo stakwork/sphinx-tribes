@@ -31,18 +31,18 @@ export const AddToFavorites = (props: any) => {
 };
 
 export const ViewGithub = (props: any) => {
-  const { ticketUrl, repo, issue } = props;
+  const { ticket_url, repo, issue } = props;
 
-  if (ticketUrl) {
+  if (ticket_url) {
     return (
       <Button
-        text={'Original Ticket'}
+        text={'Github Ticket'}
         color={'white'}
         endingIcon={'launch'}
         iconSize={14}
         style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
         onClick={() => {
-          const repoUrl = ticketUrl ? ticketUrl : `https://github.com/${repo}/issues/${issue}`;
+          const repoUrl = ticket_url ? ticket_url : `https://github.com/${repo}/issues/${issue}`;
           sendToRedirect(repoUrl);
         }}
       />

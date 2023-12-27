@@ -27,7 +27,7 @@ function MobileView(props: any) {
     price,
     person,
     created,
-    ticketUrl,
+    ticket_url,
     assignee,
     estimated_session_length,
     loomEmbedUrl,
@@ -80,7 +80,7 @@ function MobileView(props: any) {
               {...person}
               created={created}
               widget={'wanted'}
-              ticketUrl={ticketUrl}
+              ticketUrl={ticket_url}
               loomEmbedUrl={loomEmbedUrl}
               style={{
                 margin: 0
