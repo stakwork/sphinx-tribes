@@ -15,6 +15,21 @@ const applyFreezeHeaderStyles = ({ freeze = false }: FreezeProps) =>
     z-index: 99999999;
     width: 100%;
     border-radius: 0;
+    box-shadow: none;
+  `;
+
+const applyFreezeTableHeaderStyles = ({ freeze = false }: FreezeProps) =>
+  freeze &&
+  css`
+    position: sticky;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    z-index: 99999999;
+    box-shadow:
+      inset 0 1px 0 #ddd,
+      inset 0 -1px 0 #ddd;
   `;
 
 export const TableContainer = styled.div`
@@ -54,11 +69,13 @@ export const Table = styled.table`
   position: relative;
 `;
 
-export const TableRow = styled.tr`
+export const TableRow = styled.tr<FreezeProps>`
   border: 1px solid #ddd;
   &:nth-child(even) {
     background-color: #f9f9f9;
   }
+
+  ${applyFreezeTableHeaderStyles}
 `;
 
 export const TableDataRow = styled.tr`

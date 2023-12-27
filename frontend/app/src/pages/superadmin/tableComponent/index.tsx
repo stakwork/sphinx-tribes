@@ -195,7 +195,7 @@ export const MyTable = ({ bounties, headerIsFrozen }: TableProps) => {
       </HeaderContainer>
       <TableContainer>
         <Table>
-          <TableRow>
+          <TableRow freeze={!headerIsFrozen}>
             <TableHeaderData>Bounty</TableHeaderData>
             <TableHeaderData>Date</TableHeaderData>
             <TableHeaderDataCenter>#DTGP</TableHeaderDataCenter>
