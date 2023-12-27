@@ -69,11 +69,11 @@ export default function MobileView(props: CodingViewProps) {
           >
             <StatusPill assignee={assignee} paid={paid} />
             {assigneeLabel}
-            {ticketUrl && (
+            {ticket_url && (
               <GithubIconMobile
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  window.open(ticketUrl, '_blank');
+                  window.open(ticket_url, '_blank');
                 }}
               >
                 <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
@@ -146,22 +146,22 @@ export default function MobileView(props: CodingViewProps) {
             ))}
           </div>
 
-        <div style={{ height: 10 }} />
-        {showPayBounty && payBounty}
-        <ButtonRow style={{ margin: '10px 0' }}>
-          <ViewGithub {...props} />
-          <ViewTribe {...props} />
-          <AddToFavorites {...props} />
-          <CopyLink {...props} />
-          <ShareOnTwitter
-            issueCreated={created}
-            ownerPubkey={owner_id}
-            labels={labels}
-            titleString={titleString}
-          />
-        </ButtonRow>
+          <div style={{ height: 10 }} />
+          {showPayBounty && payBounty}
+          <ButtonRow style={{ margin: '10px 0' }}>
+            <ViewGithub {...props} />
+            <ViewTribe {...props} />
+            <AddToFavorites {...props} />
+            <CopyLink {...props} />
+            <ShareOnTwitter
+              issueCreated={created}
+              ownerPubkey={owner_id}
+              labels={labels}
+              titleString={titleString}
+            />
+          </ButtonRow>
 
-        <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
+          <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
 
           <Divider />
           <Y>
