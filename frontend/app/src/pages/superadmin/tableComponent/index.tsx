@@ -137,15 +137,13 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
 export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
-  const pageSize = 2;
-
-  const dataNumber: number[] = [];
+  const [activeTabs, setActiveTabs] = useState<number[]>([]);
+  const pageSize = 20;
+  const visibleTabs = 7;
 
   const { main } = useStores();
 
-  for (let i = 1; i <= Math.ceil(totalBounties / pageSize); i++) {
-    dataNumber.push(i);
-  }
+  const paginationLimit = Math.floor(totalBounties / pageSize) + 1;
 
   const currentPageData = () => {
     const indexOfLastPost = currentPage * pageSize;
@@ -155,13 +153,40 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
   };
 
   const paginateNext = () => {
-    if (currentPage < totalBounties / pageSize) {
-      setCurrentPage(currentPage + 1);
+    const activeTab = paginationLimit > visibleTabs;
+    const activePage = currentPage < totalBounties / pageSize;
+    if (activePage && activeTab) {
+      const dataNumber: number[] = activeTabs;
+
+      let nextPage: number;
+      if (currentPage < visibleTabs) {
+        nextPage = visibleTabs + 1;
+        setCurrentPage(nextPage);
+      } else {
+        nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
+      }
+
+      dataNumber.push(nextPage);
+      dataNumber.shift();
     }
   };
   const paginatePrev = () => {
-    if (currentPage > 1) {
+    const firtsTab = activeTabs[0];
+    const lastTab = activeTabs[6];
+    if (firtsTab > 1) {
+      const dataNumber: number[] = activeTabs;
+      let nextPage: number;
+      if (lastTab > visibleTabs) {
+        nextPage = lastTab - visibleTabs;
+      } else {
+        nextPage = currentPage - 1;
+      }
+
       setCurrentPage(currentPage - 1);
+      dataNumber.pop();
+      const newActivetabs = [nextPage, ...dataNumber];
+      setActiveTabs(newActivetabs);
     }
   };
 
@@ -172,9 +197,22 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
     }
   }, [main, startDate, endDate]);
 
+  const getActiveTabs = useCallback(() => {
+    const dataNumber: number[] = [];
+    for (let i = 1; i <= Math.ceil(paginationLimit); i++) {
+      if (i > visibleTabs) break;
+      dataNumber.push(i);
+    }
+    setActiveTabs(dataNumber);
+  }, []);
+
   useEffect(() => {
     getTotalBounties();
   }, [getTotalBounties]);
+
+  useEffect(() => {
+    getActiveTabs();
+  }, [getActiveTabs]);
 
   return (
     <>
@@ -248,13 +286,13 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
           {totalBounties > pageSize ? (
             <PageContainer>
               <img src={paginationarrow1} alt="" onClick={() => paginatePrev()} />
-              {dataNumber.map((number: number) => (
+              {activeTabs.map((page: number) => (
                 <PaginationButtons
-                  key={number}
-                  onClick={() => setCurrentPage(number)}
-                  active={number === currentPage}
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  active={page === currentPage}
                 >
-                  {number}
+                  {page}
                 </PaginationButtons>
               ))}
               <img src={paginationarrow2} alt="" onClick={() => paginateNext()} />
