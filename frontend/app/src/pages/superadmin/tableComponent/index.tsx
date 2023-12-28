@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useStores } from 'store';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 
@@ -50,6 +51,8 @@ interface Bounty {
 
 interface TableProps {
   bounties: Bounty[];
+  startDate?: number;
+  endDate?: number;
 }
 
 interface ImageWithTextProps {
@@ -131,13 +134,16 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   </>
 );
 
-export const MyTable = ({ bounties }: TableProps) => {
+export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const [totalBounties, setTotalBounties] = useState(0);
+  const pageSize = 2;
 
   const dataNumber: number[] = [];
 
-  for (let i = 1; i <= Math.ceil(bounties.length / pageSize); i++) {
+  const { main } = useStores();
+
+  for (let i = 1; i <= Math.ceil(totalBounties / pageSize); i++) {
     dataNumber.push(i);
   }
 
@@ -149,17 +155,26 @@ export const MyTable = ({ bounties }: TableProps) => {
   };
 
   const paginateNext = () => {
-    console.log('clicked');
-    if (currentPage < bounties?.length / pageSize) {
+    if (currentPage < totalBounties / pageSize) {
       setCurrentPage(currentPage + 1);
     }
   };
   const paginatePrev = () => {
-    console.log('clicked');
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  const getTotalBounties = useCallback(async () => {
+    if (startDate && endDate) {
+      const totalBounties = await main.getBountiesCountByRange(String(startDate), String(endDate));
+      setTotalBounties(totalBounties);
+    }
+  }, [main, startDate, endDate]);
+
+  useEffect(() => {
+    getTotalBounties();
+  }, [getTotalBounties]);
 
   return (
     <>
@@ -230,7 +245,7 @@ export const MyTable = ({ bounties }: TableProps) => {
       </TableContainer>
       <PaginatonSection>
         <FlexDiv>
-          {bounties.length > pageSize ? (
+          {totalBounties > pageSize ? (
             <PageContainer>
               <img src={paginationarrow1} alt="" onClick={() => paginatePrev()} />
               {dataNumber.map((number: number) => (

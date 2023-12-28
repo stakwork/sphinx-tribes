@@ -2449,6 +2449,33 @@ export class MainStore {
       return undefined;
     }
   }
+
+  async getBountiesCountByRange(start_date: string, end_date: string): Promise<number> {
+    try {
+      if (!uiStore.meInfo) return 0;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date,
+        end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/bounties/count`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.error('getBountyMetrics', e);
+      return 0;
+    }
+  }
 }
 
 export const mainStore = new MainStore();
