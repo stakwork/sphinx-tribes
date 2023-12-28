@@ -533,6 +533,9 @@ function MobileView(props: CodingBountiesProps) {
                               left: 320
                             }}
                             buttonAction={props?.editAction}
+                            buttonTextStyle={{
+                              paddingRight: '50px'
+                            }}
                           />
                           <ImageButton
                             buttonText={!props.deletingState ? 'Delete' : 'Deleting'}
@@ -546,6 +549,9 @@ function MobileView(props: CodingBountiesProps) {
                             }}
                             disabled={!props?.deleteAction}
                             buttonAction={props?.deleteAction}
+                            buttonTextStyle={{
+                              paddingRight: '45px'
+                            }}
                           />
                         </div>
                       )}
@@ -658,7 +664,8 @@ function MobileView(props: CodingBountiesProps) {
                           }}
                           buttonTextStyle={{
                             color: color.grayish.G50,
-                            width: '114px'
+                            width: '114px',
+                            paddingLeft: '20px'
                           }}
                           endImageSrc={'/static/addIcon.svg'}
                           endingImageContainerStyle={{

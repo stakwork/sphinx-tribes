@@ -6,6 +6,8 @@ import styled from 'styled-components';
 interface ButtonContainerProps {
   topMargin?: string;
   disabled?: boolean;
+  paddingLeft?: string;
+  paddingRight?: string;
 }
 
 const ButtonContainer = styled.div<ButtonContainerProps>`
@@ -14,10 +16,8 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-
   pointer-events: ${({ disabled }: ButtonContainerProps) => (disabled ? 'none' : 'all')};
   cursor: pointer;
-
   opacity: ${({ disabled }: ButtonContainerProps) => (disabled ? 0.8 : 1)};
   margin-top: ${(p: any) => p?.topMargin};
   background: #ffffff;
@@ -25,7 +25,6 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   border-radius: 30px;
   user-select: none;
   .ImageContainer {
-    position: absolute;
     min-height: 48px;
     min-width: 48px;
     right: 37px;
@@ -34,10 +33,8 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
     justify-content: center;
   }
   .leadingImageContainer {
-    position: absolute;
-    min-height: 48px;
-    min-width: 48px;
-    left: 300px;
+    padding-left: 20px;
+    padding-right: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
