@@ -27,7 +27,7 @@ export const SuperAdmin = () => {
 
   const [inView, ref] = useInViewPort({
     rootMargin: '0px',
-    threshold: 0.1
+    threshold: 0.25
   });
 
   // const getIsSuperAdmin = useCallback(async () => {
