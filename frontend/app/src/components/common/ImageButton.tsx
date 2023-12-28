@@ -25,7 +25,6 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
   border-radius: 30px;
   user-select: none;
   .ImageContainer {
-    /* position: absolute; */
     min-height: 48px;
     min-width: 48px;
     right: 37px;
@@ -34,9 +33,6 @@ const ButtonContainer = styled.div<ButtonContainerProps>`
     justify-content: center;
   }
   .leadingImageContainer {
-    /* position: absolute; */
-    /* min-height: 48px;
-    min-width: 48px; */
     padding-left: 20px;
     padding-right: 15px;
     display: flex;
