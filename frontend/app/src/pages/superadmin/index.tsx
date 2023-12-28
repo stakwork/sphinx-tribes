@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 // import { useStores } from 'store';
+import moment from 'moment';
 import { MyTable } from './tableComponent';
 import { bounties } from './tableComponent/mockBountyData';
 import { Header } from './header';
@@ -20,8 +21,16 @@ const Container = styled.body`
 `;
 
 export const SuperAdmin = () => {
+  //Todo: Remove all comments when metrcis development is done
   // const { main, ui } = useStores();
   const [isSuperAdmin] = useState(true);
+
+  /**
+   * Todo use the same date range,
+   * and status for all child components
+   * */
+  const [endDate] = useState(moment().unix());
+  const [startDate] = useState(moment().subtract(30, 'days').unix());
 
   // const getIsSuperAdmin = useCallback(async () => {
   //   const admin = await main.getSuperAdmin();
@@ -42,7 +51,7 @@ export const SuperAdmin = () => {
         <Container>
           <Header />
           <Statistics />
-          <MyTable bounties={bounties} />
+          <MyTable bounties={bounties} startDate={startDate} endDate={endDate} />
         </Container>
       )}
     </>
