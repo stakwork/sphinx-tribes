@@ -21,7 +21,7 @@ import { ButtonRow, Pad, Img, GithubIconMobile, T, Y, P, D, B, LoomIconMobile } 
 export default function MobileView(props: CodingViewProps) {
   const {
     description,
-    ticketUrl,
+    ticket_url,
     price,
     loomEmbedUrl,
     estimated_session_length,
@@ -32,6 +32,8 @@ export default function MobileView(props: CodingViewProps) {
     labels,
     payBounty,
     showPayBounty,
+    owner_id,
+    created,
     markUnpaid,
     paid
   } = props;
@@ -57,7 +59,6 @@ export default function MobileView(props: CodingViewProps) {
       <div style={{ padding: 20, overflow: 'auto', height: 'calc(100% - 60px)' }}>
         <Pad>
           {nametag}
-
           <T>{titleString}</T>
 
           <div
@@ -68,11 +69,11 @@ export default function MobileView(props: CodingViewProps) {
           >
             <StatusPill assignee={assignee} paid={paid} />
             {assigneeLabel}
-            {ticketUrl && (
+            {ticket_url && (
               <GithubIconMobile
                 onClick={(e: any) => {
                   e.stopPropagation();
-                  window.open(ticketUrl, '_blank');
+                  window.open(ticket_url, '_blank');
                 }}
               >
                 <img height={'100%'} width={'100%'} src="/static/github_logo.png" alt="github" />
@@ -152,10 +153,15 @@ export default function MobileView(props: CodingViewProps) {
             <ViewTribe {...props} />
             <AddToFavorites {...props} />
             <CopyLink {...props} />
-            <ShareOnTwitter {...props} />
+            <ShareOnTwitter
+              issueCreated={created}
+              ownerPubkey={owner_id}
+              labels={labels}
+              titleString={titleString}
+            />
           </ButtonRow>
 
-          {markUnpaid}
+          {!!paid ? markUnpaid : null}
 
           <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
 
