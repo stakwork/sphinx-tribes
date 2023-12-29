@@ -399,7 +399,7 @@ function MobileView(props: CodingBountiesProps) {
                 background: paidStatus ? color.green1 : color.pureWhite,
                 color: paidStatus ? color.white100 : color.borderGreen1
               }}
-              text={paidStatus ? 'Mark Unpaid' : 'Mark Paid'}
+              text={paidStatus ? 'Mark As Unpaid' : 'Mark As Paid'}
               loading={saving === 'paid' || updatingPayment}
               endingImg={'/static/mark_unpaid.svg'}
               textStyle={{
@@ -765,7 +765,7 @@ function MobileView(props: CodingBountiesProps) {
                           background: color.pureWhite,
                           color: color.borderGreen1
                         }}
-                        text={isMarkPaidSaved ? 'Mark Unpaid' : 'Mark Paid'}
+                        text={isMarkPaidSaved ? 'Mark As Unpaid' : 'Mark As Paid'}
                         loading={saving === 'paid' || updatingPayment}
                         endingImg={'/static/mark_unpaid.svg'}
                         textStyle={{
@@ -786,7 +786,7 @@ function MobileView(props: CodingBountiesProps) {
                           bottom: '0',
                           marginLeft: '36px'
                         }}
-                        text={'Mark Paid'}
+                        text={'Mark As Paid'}
                         loading={saving === 'paid'}
                         endingImg={'/static/mark_paid.svg'}
                         textStyle={{
@@ -969,7 +969,7 @@ function MobileView(props: CodingBountiesProps) {
                     bottom: '0',
                     marginLeft: '36px'
                   }}
-                  text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark Paid'}
+                  text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark As Paid'}
                   loading={isMarkPaidSaved || updatingPayment}
                   endingImg={'/static/mark_paid.svg'}
                   textStyle={{
