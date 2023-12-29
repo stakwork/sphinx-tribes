@@ -2423,7 +2423,7 @@ export class MainStore {
     }
   }
 
-  async getBountiesByRange(start_date: number, end_date: number): Promise<any | undefined> {
+  async getBountiesByRange(start_date: string, end_date: string): Promise<any | undefined> {
     try {
       if (!uiStore.meInfo) return undefined;
       const info = uiStore.meInfo;
@@ -2443,7 +2443,7 @@ export class MainStore {
         }
       });
 
-      return r;
+      return r.json();
     } catch (e) {
       console.error('getBountyMetrics', e);
       return undefined;

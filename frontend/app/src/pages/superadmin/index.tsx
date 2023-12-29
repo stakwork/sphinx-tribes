@@ -3,12 +3,11 @@
  * To enable colaborations
  */
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-// import { useStores } from 'store';
+import { useStores } from 'store';
 import moment from 'moment';
 import { MyTable } from './tableComponent';
-import { bounties } from './tableComponent/mockBountyData';
 import { Header } from './header';
 import { Statistics } from './statistics';
 import AdminAccessDenied from './accessDenied';
@@ -22,8 +21,9 @@ const Container = styled.body`
 
 export const SuperAdmin = () => {
   //Todo: Remove all comments when metrcis development is done
-  // const { main, ui } = useStores();
+  const { main } = useStores();
   const [isSuperAdmin] = useState(true);
+  const [bounties, setBounties] = useState<any[]>([]);
 
   /**
    * Todo use the same date range,
@@ -42,6 +42,17 @@ export const SuperAdmin = () => {
   //     getIsSuperAdmin();
   //   }
   // }, [main, ui, getIsSuperAdmin]);
+
+  const getBounties = useCallback(async () => {
+    if (startDate && endDate) {
+      const bounties = await main.getBountiesByRange(String(startDate), String(endDate));
+      setBounties(bounties);
+    }
+  }, [main, startDate, endDate]);
+
+  useEffect(() => {
+    getBounties();
+  }, [getBounties]);
 
   return (
     <>
