@@ -2,7 +2,6 @@ import { EuiText } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isString } from 'lodash';
-import { Link } from 'react-router-dom';
 import { OrganizationText, OrganizationWrap } from '../people/utils/style';
 import { colors } from '../config/colors';
 import { LanguageObject } from '../people/utils/languageLabelStyle';
@@ -144,6 +143,13 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
     setDataValue(res);
   }, [props.codingLanguage]);
 
+  const handleOrgPage = (event:any, orgUuid:any) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const orgPageUrl = `/org/bounties/${orgUuid}`;
+    window.open(orgPageUrl, '_blank');
+  };
+
   return (
     <>
       <BountyDescriptionContainer style={{ ...props.style }}>
@@ -164,29 +170,23 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
             />
           </div>
           {props.org_uuid && props.name && (
-            <Link
-              onClick={(e: any) => {
-                e.stopPropagation();
-              }}
-              to={`/org/bounties/${props.org_uuid}`}
-              target="_blank"
-            >
-              <OrganizationWrap>
-                <Img
-                  title={`${props.name} logo`}
-                  src={props.org_img || '/static/person_placeholder.png'}
-                />
-                <OrganizationText>{props.name}</OrganizationText>
-                <img
-                  className="buttonImage"
-                  src={'/static/github_ticket.svg'}
-                  alt={'github_ticket'}
-                  height={'10px'}
-                  width={'10px'}
-                  style={{ transform: 'translateY(1px)' }}
-                />
-              </OrganizationWrap>
-            </Link>
+              <div onClick={(event: any) => handleOrgPage(event, props.org_uuid)}>
+                <OrganizationWrap>
+                  <Img
+                      title={`${props.name} logo`}
+                      src={props.org_img || '/static/person_placeholder.png'}
+                  />
+                  <OrganizationText>{props.name}</OrganizationText>
+                  <img
+                      className="buttonImage"
+                      src={'/static/github_ticket.svg'}
+                      alt={'github_ticket'}
+                      height={'10px'}
+                      width={'10px'}
+                      style={{transform: 'translateY(1px)'}}
+                  />
+                </OrganizationWrap>
+              </div>
           )}
         </Header>
         <Description isPaid={props?.isPaid} color={color}>
