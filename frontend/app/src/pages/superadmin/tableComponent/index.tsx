@@ -5,8 +5,8 @@ import moment from 'moment';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';
-
 import copygray from '../header/icons/copygray.svg';
+
 import {
   TableContainer,
   HeaderContainer,

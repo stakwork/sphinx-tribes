@@ -23,7 +23,7 @@ export const SuperAdmin = () => {
   //Todo: Remove all comments when metrcis development is done
   const { main } = useStores();
   const [isSuperAdmin] = useState(true);
-  const [apibounties, setBounties] = useState<any[]>([]);
+  const [bounties, setBounties] = useState<any[]>([]);
 
   /**
    * Todo use the same date range,
@@ -62,7 +62,7 @@ export const SuperAdmin = () => {
         <Container>
           <Header />
           <Statistics />
-          <MyTable bounties={apibounties} startDate={startDate} endDate={endDate} />
+          <MyTable bounties={bounties} startDate={startDate} endDate={endDate} />
         </Container>
       )}
     </>
