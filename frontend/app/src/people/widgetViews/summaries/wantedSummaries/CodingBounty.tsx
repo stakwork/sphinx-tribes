@@ -389,7 +389,7 @@ function MobileView(props: CodingBountiesProps) {
         titleString={titleString}
         showPayBounty={showPayBounty}
         markUnpaid={
-          (hasAccess) && (
+          hasAccess && (
             <IconButton
               width={'100%'}
               height={48}
@@ -415,7 +415,7 @@ function MobileView(props: CodingBountiesProps) {
           )
         }
         payBounty={
-          (hasAccess) && (
+          hasAccess && (
             <IconButton
               width={'100%'}
               height={48}
