@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">22.72% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>5/22</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">27.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>5/18</span>
             </div>
         
             
@@ -99,12 +99,10 @@
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
 <a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -113,32 +111,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import Fuse from 'fuse.js';</span>
-<span class="cstat-no" title="statement not covered" >import { useStores } from '../store';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Fuse from 'fuse.js';
+import { useStores } from '../store';
 &nbsp;
-const fuseOptions = <span class="cstat-no" title="statement not covered" >{</span>
+const fuseOptions = {
   keys: ['name', 'description'],
   shouldSort: true,
   includeMatches: true,
@@ -149,7 +149,7 @@ const fuseOptions = <span class="cstat-no" title="statement not covered" >{</spa
   minMatchCharLength: 1
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >u</span>seFuse(</span>array: any, <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>keys: string[] = []) {</span>
+export function <span class="fstat-no" title="function not covered" >useFuse(</span>array: any, <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>keys: string[] = []) {</span>
   const { ui } = <span class="cstat-no" title="statement not covered" >useStores();</span>
   let theArray = <span class="cstat-no" title="statement not covered" >array;</span>
 &nbsp;
@@ -162,7 +162,7 @@ const fuseOptions = <span class="cstat-no" title="statement not covered" >{</spa
 <span class="cstat-no" title="statement not covered" >  return theArray;</span>
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >u</span>seLocalFuse(</span>searchText: string, array: any, <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>keys: string[] = []) {</span>
+export function <span class="fstat-no" title="function not covered" >useLocalFuse(</span>searchText: string, array: any, <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>keys: string[] = []) {</span>
   let theArray = <span class="cstat-no" title="statement not covered" >array;</span>
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (searchText) {</span>
     const fuse = <span class="cstat-no" title="statement not covered" >new Fuse(array, { ...fuseOptions, keys });</span>
@@ -178,7 +178,7 @@ const fuseOptions = <span class="cstat-no" title="statement not covered" >{</spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-20T17:11:38.550Z
+                at 2023-12-29T19:19:10.952Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
