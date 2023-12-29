@@ -395,6 +395,7 @@ type BountyData struct {
 	Person
 	AssigneeAlias         string         `json:"assignee_alias"`
 	AssigneeId            uint           `json:"assignee_id"`
+	AssigneeImg           string         `json:"assignee_img"`
 	AssigneeCreated       *time.Time     `json:"assignee_created"`
 	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
 	AssigneeDescription   string         `json:"assignee_description"`
