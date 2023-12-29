@@ -5,7 +5,6 @@ import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import PeopleHeader from '../people/main/Header';
-import TokenRefresh from '../people/utils/TokenRefresh';
 import BotsBody from './bots/Body';
 import Body from './tribes/Body';
 import Header from './tribes/Header';
@@ -20,7 +19,6 @@ import { SuperAdmin } from './superadmin/index';
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
     <MainLayout header={<PeopleHeader />}>
-      <TokenRefresh />
       <Switch>
         <Route path="/t/">
           <Body />
