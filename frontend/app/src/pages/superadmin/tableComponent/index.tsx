@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
+import moment from 'moment';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
-
+import defaultPic from '../../../public/static/profile_avatar.svg';
 import copygray from '../header/icons/copygray.svg';
+
 import {
   TableContainer,
   HeaderContainer,
@@ -259,25 +261,48 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             <TableHeaderDataRight>Status</TableHeaderDataRight>
           </TableRow>
           <tbody>
-            {currentPageData()?.map((bounty: any) => (
-              <TableDataRow key={bounty?.id}>
-                <BountyData className="avg">{bounty?.title}</BountyData>
-                <TableData>{bounty?.date}</TableData>
-                <TableDataCenter>{bounty?.dtgp}</TableDataCenter>
-                <TableDataAlternative>
-                  <ImageWithText text={bounty?.assignee} image={bounty?.assigneeImage} />
-                </TableDataAlternative>
-                <TableDataAlternative className="address">
-                  <ImageWithText text={bounty?.provider} image={bounty?.providerImage} />
-                </TableDataAlternative>
-                <TableData className="organization">
-                  <ImageWithText text={bounty?.organization} image={bounty?.organizationImage} />
-                </TableData>
-                <TableData3>
-                  <TextInColorBox status={bounty?.status} />
-                </TableData3>
-              </TableDataRow>
-            ))}
+            {currentPageData()?.map((bounty: any) => {
+              const bounty_status =
+                bounty?.paid && bounty.assignee
+                  ? 'completed'
+                  : bounty.assignee && !bounty.paid
+                  ? 'assigned'
+                  : 'open';
+
+              const created = moment.unix(bounty.bounty_created).format('YYYY-MM-DD');
+              const time_to_pay = bounty.paid_date
+                ? moment(bounty.paid_date).diff(created, 'days')
+                : 0;
+
+              return (
+                <TableDataRow key={bounty?.id}>
+                  <BountyData className="avg">{bounty?.title}</BountyData>
+                  <TableData>{created}</TableData>
+                  <TableDataCenter>{time_to_pay}</TableDataCenter>
+                  <TableDataAlternative>
+                    <ImageWithText
+                      text={bounty?.assignee}
+                      image={bounty?.assignee_img || defaultPic}
+                    />
+                  </TableDataAlternative>
+                  <TableDataAlternative className="address">
+                    <ImageWithText
+                      text={bounty?.owner_pubkey}
+                      image={bounty?.providerImage || defaultPic}
+                    />
+                  </TableDataAlternative>
+                  <TableData className="organization">
+                    <ImageWithText
+                      text={bounty?.organization}
+                      image={bounty?.organization_img || defaultPic}
+                    />
+                  </TableData>
+                  <TableData3>
+                    <TextInColorBox status={bounty_status} />
+                  </TableData3>
+                </TableDataRow>
+              );
+            })}
           </tbody>
         </Table>
       </TableContainer>
