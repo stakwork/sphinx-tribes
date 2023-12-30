@@ -191,7 +191,7 @@ export default function Person(props: PersonProps) {
           <div style={{ padding: 16 }}>
             <DTitle>{owner_alias}</DTitle>
             {description && description !== 'description' &&(
-              <DDescription>{description === 'description' ? '' : description}</DDescription>
+                <DDescription>{description}</DDescription>
             )}
           </div>
         </div>
