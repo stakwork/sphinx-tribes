@@ -57,7 +57,7 @@
     "/node_modules/(?!remark-gfm)",
     "/node_modules/(?!@testing-library/jest-dom)"
   ],
-  "modulePaths": ["<rootDir>"],
+  "modulePaths": ["<rootDir>/src"],
   "moduleNameMapper": {
     "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
   },
