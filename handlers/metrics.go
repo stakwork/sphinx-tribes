@@ -256,6 +256,7 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 			BountyDescription:   bounty.Description,
 			BountyUpdated:       bounty.Updated,
 			AssigneeId:          bountyAssignee.ID,
+			AssigneeImg:         bountyAssignee.Img,
 			AssigneeAlias:       bountyAssignee.OwnerAlias,
 			AssigneeDescription: bountyAssignee.Description,
 			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,

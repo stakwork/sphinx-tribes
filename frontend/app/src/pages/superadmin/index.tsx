@@ -3,11 +3,11 @@
  * To enable colaborations
  */
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-// import { useStores } from 'store';
+import { useStores } from 'store';
+import moment from 'moment';
 import { MyTable } from './tableComponent';
-import { bounties } from './tableComponent/mockBountyData';
 import { Header } from './header';
 import { Statistics } from './statistics';
 import AdminAccessDenied from './accessDenied';
@@ -20,8 +20,17 @@ const Container = styled.body`
 `;
 
 export const SuperAdmin = () => {
-  // const { main, ui } = useStores();
+  //Todo: Remove all comments when metrcis development is done
+  const { main } = useStores();
   const [isSuperAdmin] = useState(true);
+  const [bounties, setBounties] = useState<any[]>([]);
+
+  /**
+   * Todo use the same date range,
+   * and status for all child components
+   * */
+  const [endDate] = useState(moment().unix());
+  const [startDate] = useState(moment().subtract(30, 'days').unix());
 
   // const getIsSuperAdmin = useCallback(async () => {
   //   const admin = await main.getSuperAdmin();
@@ -34,6 +43,17 @@ export const SuperAdmin = () => {
   //   }
   // }, [main, ui, getIsSuperAdmin]);
 
+  const getBounties = useCallback(async () => {
+    if (startDate && endDate) {
+      const bounties = await main.getBountiesByRange(String(startDate), String(endDate));
+      setBounties(bounties);
+    }
+  }, [main, startDate, endDate]);
+
+  useEffect(() => {
+    getBounties();
+  }, [getBounties]);
+
   return (
     <>
       {!isSuperAdmin ? (
@@ -42,7 +62,7 @@ export const SuperAdmin = () => {
         <Container>
           <Header />
           <Statistics />
-          <MyTable bounties={bounties} />
+          <MyTable bounties={bounties} startDate={startDate} endDate={endDate} />
         </Container>
       )}
     </>
