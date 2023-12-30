@@ -5,7 +5,6 @@ import React from 'react';
 import MobileView from './CodingBounty';
 
 describe('MobileView component', () => {
-
   beforeEach(() => {
     // IntersectionObserver isn't available in test environment
     const mockIntersectionObserver = jest.fn();
@@ -26,7 +25,7 @@ describe('MobileView component', () => {
     person: {
       owner_pubkey: 'DefaultOwnerPubKey',
       owner_route_hint: 'DefaultRouteHint',
-      owner_alias: 'DefaultOwnerAlias',
+      owner_alias: 'DefaultOwnerAlias'
     } as any,
     setIsPaidStatusPopOver: jest.fn(),
     creatorStep: 1,
@@ -36,16 +35,16 @@ describe('MobileView component', () => {
     isPaidStatusPopOver: false,
     isPaidStatusBadgeInfo: false,
     awardDetails: {
-      name: 'Default Award',
+      name: 'Default Award'
       // Add other awardDetails properties as needed
     },
     isAssigned: false,
-    dataValue: { 'a': 'a' },
+    dataValue: { a: 'a' },
     assigneeValue: false,
     assignedPerson: {
       owner_pubkey: 'DefaultOwnerPubKey',
       owner_route_hint: 'DefaultRouteHint',
-      owner_alias: 'DefaultOwnerAlias',
+      owner_alias: 'DefaultOwnerAlias'
     } as any,
     changeAssignedPerson: jest.fn(),
     sendToRedirect: jest.fn(),
@@ -97,7 +96,7 @@ describe('MobileView component', () => {
   };
 
   it('should render titleString on the screen', () => {
-    render(<MobileView   {...defaultProps} titleString="Test Title" />);
+    render(<MobileView {...defaultProps} titleString="Test Title" />);
     const titleElement = screen.getByText('Test Title');
     expect(titleElement).toBeInTheDocument();
   });
@@ -114,24 +113,24 @@ describe('MobileView component', () => {
     expect(deliverablesElement).toBeInTheDocument();
   });
 
-  it("I can help button is rendered on the screen", () => {
-    render(<MobileView   {...defaultProps}/>);
+  it('I can help button is rendered on the screen', () => {
+    render(<MobileView {...defaultProps} />);
 
-    const iCanHelp = screen.getByText("I can help");
+    const iCanHelp = screen.getByText('I can help');
     expect(iCanHelp).toBeInTheDocument();
   });
 
-  it("correct price is rendered on the screen", () => {
-    render(<MobileView   {...defaultProps}/>);
+  it('correct price is rendered on the screen', () => {
+    render(<MobileView {...defaultProps} />);
 
-    const bountyPrice = screen.getByText(${defaultProps.bountyPrice});
+    const bountyPrice = screen.getByText('${defaultProps.bountyPrice}');
     expect(bountyPrice).toBeInTheDocument();
   });
 
-  it("share with twitter button is rendered on the screen", () => {
-    render(<MobileView   {...defaultProps}/>);
+  it('share with twitter button is rendered on the screen', () => {
+    render(<MobileView {...defaultProps} />);
 
-    const iCanHelp = screen.getByText("Share to Twitter");
+    const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
 });
