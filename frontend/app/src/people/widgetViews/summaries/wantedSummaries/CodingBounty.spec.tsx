@@ -6,7 +6,6 @@ import MobileView from './CodingBounty';
 
 describe('MobileView component', () => {
   beforeEach(() => {
-    // IntersectionObserver isn't available in test environment
     const mockIntersectionObserver = jest.fn();
     mockIntersectionObserver.mockReturnValue({
       observe: () => null,
@@ -36,7 +35,6 @@ describe('MobileView component', () => {
     isPaidStatusBadgeInfo: false,
     awardDetails: {
       name: 'Default Award'
-      // Add other awardDetails properties as needed
     },
     isAssigned: false,
     dataValue: { a: 'a' },
