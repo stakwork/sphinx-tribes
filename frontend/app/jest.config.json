@@ -1,6 +1,6 @@
 {
   "collectCoverage": true,
-  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}", "!src/**/*.spec.tsx", "!src/**/*.spec.ts"],
+  "collectCoverageFrom": ["./src/*/.{ts,jxs,tsx,js}", "!src/*/.spec.tsx", "!src/*/.spec.ts"],
   "coverageThreshold": {
     "global": {
       "lines": 22.31
@@ -54,7 +54,7 @@
     "/node_modules/(?!remark-gfm)",
     "/node_modules/(?!@testing-library/jest-dom)"
   ],
-  "modulePaths": ["<rootDir>"],
+  "modulePaths": ["<rootDir>/src"],
   "moduleNameMapper": {
     "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
   },

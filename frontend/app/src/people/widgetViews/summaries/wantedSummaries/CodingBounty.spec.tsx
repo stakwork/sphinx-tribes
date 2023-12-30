@@ -1,10 +1,23 @@
-import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { CodingBountiesProps } from 'people/interfaces';
+import React from 'react';
 import MobileView from './CodingBounty';
 
 describe('MobileView component', () => {
-  const defaultProps = {
+
+  beforeEach(() => {
+    // IntersectionObserver isn't available in test environment
+    const mockIntersectionObserver = jest.fn();
+    mockIntersectionObserver.mockReturnValue({
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null
+    });
+    window.IntersectionObserver = mockIntersectionObserver;
+  });
+
+  const defaultProps: CodingBountiesProps = {
     deliverables: 'Default Deliverables',
     description: 'Default Description',
     titleString: 'Default Title',
@@ -27,13 +40,13 @@ describe('MobileView component', () => {
       // Add other awardDetails properties as needed
     },
     isAssigned: false,
-    dataValue: {},
+    dataValue: { 'a': 'a' },
     assigneeValue: false,
     assignedPerson: {
-        owner_pubkey: 'DefaultOwnerPubKey',
-        owner_route_hint: 'DefaultRouteHint',
-        owner_alias: 'DefaultOwnerAlias',
-      } as any,
+      owner_pubkey: 'DefaultOwnerPubKey',
+      owner_route_hint: 'DefaultRouteHint',
+      owner_alias: 'DefaultOwnerAlias',
+    } as any,
     changeAssignedPerson: jest.fn(),
     sendToRedirect: jest.fn(),
     handleCopyUrl: jest.fn(),
@@ -47,6 +60,7 @@ describe('MobileView component', () => {
     peopleList: [],
     setIsPaidStatusBadgeInfo: jest.fn(),
     bountyPrice: 100,
+    price: 100,
     selectedAward: 'DefaultSelectedAward',
     handleAwards: jest.fn(),
     repo: 'DefaultRepo',
@@ -62,52 +76,62 @@ describe('MobileView component', () => {
     id: 987654321,
     localPaid: 'UNKNOWN' as any,
     setLocalPaid: jest.fn(),
-    isMobile: true,
+    isMobile: false,
     actionButtons: false,
     assigneeLabel: {},
-    setExtrasPropertyAndSave : jest.fn(),
-    setIsModalSideButton : jest.fn(),
-    setIsExtraStyle : jest.fn(),
-    coding_languages:['language'],
-    type :'',
-     badgeRecipient: '',
-      fromBountyPage:'',
-       wanted_type:'',
-        one_sentence_summary:'',
-         github_description:'',
-          show:false,
-           formSubmit:jest.fn()
-    
+    setExtrasPropertyAndSave: jest.fn(),
+    setIsModalSideButton: jest.fn(),
+    setIsExtraStyle: jest.fn(),
+    coding_languages: ['language'],
+    type: '',
+    badgeRecipient: '',
+    fromBountyPage: '',
+    wanted_type: '',
+    one_sentence_summary: '',
+    github_description: '',
+    show: false,
+    formSubmit: jest.fn(),
+    ticket_url: '',
+    assignee: undefined as any,
+    title: ''
   };
 
   it('should render titleString on the screen', () => {
-    render(<MobileView   ticket_url={''} assignee={defaultProps.person as any} title={''} {...defaultProps} titleString="Test Title" />);
+    render(<MobileView   {...defaultProps} titleString="Test Title" />);
     const titleElement = screen.getByText('Test Title');
     expect(titleElement).toBeInTheDocument();
   });
 
   it('should render description on the screen', () => {
-    render(<MobileView   ticket_url={''} assignee={defaultProps.person as any} title={''} {...defaultProps} description="Test Description" />);
+    render(<MobileView {...defaultProps} description="Test Description" />);
     const descriptionElement = screen.getByText('Test Description');
     expect(descriptionElement).toBeInTheDocument();
   });
 
   it('should render deliverables on the screen', () => {
-    render(<MobileView   ticket_url={''} assignee={defaultProps.person as any} title={''} {...defaultProps} deliverables="Test Deliverables" />);
+    render(<MobileView {...defaultProps} deliverables="Test Deliverables" />);
     const deliverablesElement = screen.getByText('Test Deliverables');
     expect(deliverablesElement).toBeInTheDocument();
   });
 
-  // Add more test cases as needed for other functionality
+  it("I can help button is rendered on the screen", () => {
+    render(<MobileView   {...defaultProps}/>);
 
-  // Example test for button click
-//   it('should call handleSetAsPaid when the "Set as Paid" button is clicked', () => {
-//     const handleSetAsPaidMock = jest.fn();
-//     render(<MobileView {...defaultProps} handleSetAsPaid={handleSetAsPaidMock} />);
-//     const setAsPaidButton = screen.getByText('Set as Paid');
-//     userEvent.click(setAsPaidButton);
-//     expect(handleSetAsPaidMock).toHaveBeenCalled();
-//   });
+    const iCanHelp = screen.getByText("I can help");
+    expect(iCanHelp).toBeInTheDocument();
+  });
 
-  // Add more test cases for other user interactions
+  it("correct price is rendered on the screen", () => {
+    render(<MobileView   {...defaultProps}/>);
+
+    const bountyPrice = screen.getByText(${defaultProps.bountyPrice});
+    expect(bountyPrice).toBeInTheDocument();
+  });
+
+  it("share with twitter button is rendered on the screen", () => {
+    render(<MobileView   {...defaultProps}/>);
+
+    const iCanHelp = screen.getByText("Share to Twitter");
+    expect(iCanHelp).toBeInTheDocument();
+  });
 });
