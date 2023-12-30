@@ -7,7 +7,6 @@ import { Router } from 'react-router-dom';
 import { uiStore } from 'store/ui';
 import './App.css';
 import { ThemeProvider, createTheme } from '@mui/system';
-import TokenRefresh from 'people/utils/TokenRefresh';
 import { ModeDispatcher } from './config/ModeDispatcher';
 import { Pages } from './pages';
 import { mainStore } from './store/main';
@@ -61,7 +60,6 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <TokenRefresh />
       <Router history={history}>
         <ModeDispatcher>{(mode: any) => <Pages mode={mode} />}</ModeDispatcher>
       </Router>
