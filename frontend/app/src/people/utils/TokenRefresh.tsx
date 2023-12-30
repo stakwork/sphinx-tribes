@@ -29,7 +29,7 @@ function TokenRefresh() {
     return function cleanup() {
       clearTimeout(timeout);
     };
-  }, []);
+  }, [main, ui]);
 
   return (
     <>
