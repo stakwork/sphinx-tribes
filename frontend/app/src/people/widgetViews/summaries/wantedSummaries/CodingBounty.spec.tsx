@@ -121,7 +121,7 @@ describe('MobileView component', () => {
   it('correct price is rendered on the screen', () => {
     render(<MobileView {...defaultProps} />);
 
-    const bountyPrice = screen.getByText('${defaultProps.bountyPrice}');
+    const bountyPrice = screen.getByText(`${defaultProps.bountyPrice}`);
     expect(bountyPrice).toBeInTheDocument();
   });
 
