@@ -24,7 +24,6 @@ const hosts: { [k: string]: AppMode } = {
 
 function getMode(): AppMode {
   const { host } = window.location;
-
   return hosts[host] || AppMode.TRIBES;
 }
 
