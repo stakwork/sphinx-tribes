@@ -37,11 +37,15 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if pubKeyFromAuth != org.OwnerPubKey {
-		fmt.Println(pubKeyFromAuth)
-		fmt.Println(org.OwnerPubKey)
-		fmt.Println("mismatched pubkey")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		hasRole := db.UserHasAccess(pubKeyFromAuth, org.Uuid, db.EditOrg)
+		if !hasRole {
+			fmt.Println(pubKeyFromAuth)
+			fmt.Println(org.OwnerPubKey)
+			fmt.Println("mismatched pubkey")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("Don't have access to Edit Org")
+			return
+		}
 	}
 
 	existing := db.DB.GetOrganizationByUuid(org.Uuid)
