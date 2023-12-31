@@ -3,9 +3,15 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/handlers/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -168,4 +174,111 @@ func TestCreateOrEditBounty(t *testing.T) {
 		assert.Equal(t, "bounty_type", bounties[0].Type)
 		assert.Equal(t, "first bounty", bounties[0].Title)
 	})
+}
+
+func TestPayLightningInvoice(t *testing.T) {
+	expectedUrl := fmt.Sprintf("%s/invoices", config.RelayUrl)
+	expectedBody := `{"payment_request": "req-id"}`
+
+	t.Run("validate request url, body and headers", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		handler := NewBountyHandler(mockHttpClient)
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(nil, errors.New("some-error")).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.Empty(t, invoicePayErr)
+		assert.Empty(t, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("put on invoice request failed with error status and invalid json", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		handler := NewBountyHandler(mockHttpClient)
+		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 500,
+			Body:       r,
+		}, nil)
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.False(t, invoicePayErr.Success)
+		assert.Empty(t, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("put on invoice request failed with error status", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		handler := NewBountyHandler(mockHttpClient)
+		r := io.NopCloser(bytes.NewReader([]byte(`{"error": "internal server error"}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 500,
+			Body:       r,
+		}, nil).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.Equal(t, invoicePayErr.Error, "internal server error")
+		assert.Empty(t, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("put on invoice request succeed with invalid json", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		handler := NewBountyHandler(mockHttpClient)
+		r := io.NopCloser(bytes.NewReader([]byte(`"invalid json"`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.False(t, success.Success)
+		assert.Empty(t, invoicePayErr)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("should unmarshal the response properly after success", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		handler := NewBountyHandler(mockHttpClient)
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "settled": true, "payment_request": "req", "payment_hash": "hash", "preimage": "random-string", "amount": "1000"}}`)))
+		expectedSuccessMsg := db.InvoicePaySuccess{
+			Success: true,
+			Response: db.InvoiceCheckResponse{
+				Settled:         true,
+				Payment_request: "req",
+				Payment_hash:    "hash",
+				Preimage:        "random-string",
+				Amount:          "1000",
+			},
+		}
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.Empty(t, invoicePayErr)
+		assert.EqualValues(t, expectedSuccessMsg, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
 }

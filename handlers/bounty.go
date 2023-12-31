@@ -17,6 +17,16 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+type bountyHandler struct {
+	httpClient HttpClient
+}
+
+func NewBountyHandler(httpClient HttpClient) *bountyHandler {
+	return &bountyHandler{
+		httpClient: httpClient,
+	}
+}
+
 func GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	bounties := db.DB.GetAllBounties(r)
 	var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
@@ -474,7 +484,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -516,7 +526,7 @@ func BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(errMsg)
 			return
 		}
-		paymentSuccess, paymentError := PayLightningInvoice(request.PaymentRequest)
+		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
 			// withdraw amount from organization budget
 			db.DB.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
@@ -584,17 +594,16 @@ func GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceEr
 	}
 }
 
-func PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
+func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 	bodyData := fmt.Sprintf(`{"payment_request": "%s"}`, payment_request)
 	jsonBody := []byte(bodyData)
 
-	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonBody))
 
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
-	res, err := client.Do(req)
+	res, err := h.httpClient.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
