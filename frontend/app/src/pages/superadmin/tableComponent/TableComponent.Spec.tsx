@@ -96,7 +96,7 @@ it('renders each element in the table in the document', () => {
 
 it('renders each element in the table in the document', () => {
   const { getByText } = render(<MyTable bounties={mockBounties} />);
-  mockBounties.forEach((bounty) => {
+  mockBounties.forEach((bounty: any) => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(bounty.date)).toBeInTheDocument();
     expect(getByText(String(bounty.dtgp))).toBeInTheDocument();

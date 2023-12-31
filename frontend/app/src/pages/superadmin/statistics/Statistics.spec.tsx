@@ -37,7 +37,19 @@ describe('Statistics Component', () => {
       'Paid'
     ];
 
-    render(<Statistics />);
+    const mockMetrics = {
+      bounties_posted: 200,
+      bounties_paid: 78,
+      bounties_paid_average: 90,
+      sats_posted: 1,
+      sats_paid: 1,
+      sats_paid_percentage: 1,
+      average_paid: 1,
+      average_completed: 1
+      // Add other properties as needed
+    };
+
+    render(<Statistics metrics={mockMetrics} />);
     const bountiesPaid = screen.getAllByText('Bounties Paid');
     if (bountiesPaid) {
       expect(bountiesPaid[0]).toBeInTheDocument();

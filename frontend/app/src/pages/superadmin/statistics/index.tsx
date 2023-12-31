@@ -1,4 +1,5 @@
 import React from 'react';
+import { BountyMetrics } from 'store/main';
 import copy from '../header/icons/copy.svg';
 import copygray from '../header/icons/copygray.svg';
 import bountiesposted from '../header/icons/bountiesposted.svg';
@@ -25,7 +26,14 @@ import {
 } from './StatisticsStyles';
 // import './StatStyles.css';
 
-export const Statistics = () => {
+interface StatisticsProps {
+  metrics: BountyMetrics | undefined;
+}
+
+export const Statistics = ({ metrics }: StatisticsProps) => {
+  const a = 1;
+  console.log(a);
+  console.log(metrics, 'asas');
   return (
     <>
       <Wrapper>
@@ -39,7 +47,7 @@ export const Statistics = () => {
             <VerticaGrayLine />
             <img className="logoAlign" src={bountiesposted} alt="" width="27.09px" height="20px" />
             <div>
-              <Title>200</Title>
+              <Title>{metrics?.bounties_posted}</Title>
               <Subheading>Total Bounties Posted</Subheading>
             </div>
           </DivWrapper>
@@ -47,7 +55,7 @@ export const Statistics = () => {
             <VerticaGrayLineAleternative />
             <img className="logoAlign" src={copygray} alt="" width="27.09px" height="20px" />
             <div>
-              <Title>78</Title>
+              <Title>65</Title>
               <Subheading className="BounA">Bounties Assigned</Subheading>
             </div>
           </DivWrapper>
@@ -55,7 +63,7 @@ export const Statistics = () => {
             <VerticaGrayLine />
             <img className="logoAlign" src={bountiespaid} alt="" width="20" height="20" />
             <div>
-              <Title>136</Title>
+              <Title>{metrics?.bounties_paid}</Title>
               <Subheading>Bounties Paid</Subheading>
             </div>
           </DivWrapper>
@@ -63,7 +71,7 @@ export const Statistics = () => {
             <VerticaGrayLineSecondary />
             <img className="ClocklogoAlign" src={clockloader} alt="" width="24px" height="24px" />
             <div>
-              <TitleBlue>100%</TitleBlue>
+              <TitleBlue>{metrics?.bounties_paid_average}%</TitleBlue>
               <Subheading>Bounties Paid</Subheading>
             </div>
           </DivWrapper>
@@ -77,7 +85,7 @@ export const Statistics = () => {
             <VerticaGrayLine />
             <img className="logoAlign" src={satoshiesposted} alt="" width="23px" height="17" />
             <div>
-              <Title>22536</Title>
+              <Title>{metrics?.sats_posted}</Title>
               <Subheading>Total Sats Posted</Subheading>
             </div>
           </DivWrapper>
@@ -85,7 +93,7 @@ export const Statistics = () => {
             <VerticaGrayLineAleternative />
             <img className="logoAlign" src={satoshiespaid} alt="" width="23px" height="17px" />
             <div>
-              <Title>13625</Title>
+              <Title>{metrics?.sats_paid}</Title>
               <Subheading>Sats Paid</Subheading>
             </div>
           </DivWrapper>
@@ -101,7 +109,7 @@ export const Statistics = () => {
             <VerticaGrayLineSecondary />
             <img className="ClocklogoAlign" src={clockloader} alt="" width="24px" height="24px" />
             <div>
-              <TitleGreen>48%</TitleGreen>
+              <TitleGreen>{metrics?.sats_paid_percentage}%</TitleGreen>
               <Subheading>Paid</Subheading>
             </div>
           </DivWrapper>
