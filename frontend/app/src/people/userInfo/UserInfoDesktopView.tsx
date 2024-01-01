@@ -8,7 +8,7 @@ import { AboutWrap, Head, Img, Name, RowWrap } from './styles';
 import { useUserInfo } from './hooks';
 
 export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) => {
-  const { canEdit, goBack, userImg, owner_alias, person, onEdit } = useUserInfo();
+  const { canEdit, goBack, userImg, owner_alias, logout, person, onEdit } = useUserInfo();
   const [showQR, setShowQR] = useState(false);
   return (
     <AboutWrap
@@ -93,6 +93,16 @@ export const UserInfoDesktopView = observer(({ setShowSupport }: UserInfoProps) 
               style={{ fontSize: 13, background: '#f2f3f5' }}
               leadingIcon={'edit'}
               iconSize={15}
+            />
+            <Button
+              text="Sign out"
+              onClick={logout}
+              height={42}
+              style={{ fontSize: 13, color: '#3c3f41' }}
+              iconStyle={{ color: '#8e969c' }}
+              iconSize={15}
+              color="white"
+              leadingIcon="logout"
             />
           </RowWrap>
         ) : (

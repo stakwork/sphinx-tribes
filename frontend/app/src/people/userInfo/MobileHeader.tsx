@@ -2,7 +2,7 @@ import { Button, IconButton } from 'components/common';
 import { PeopleMobileeHeaderProps } from 'people/interfaces';
 import React from 'react';
 
-export const HeaderMobile = ({ goBack, canEdit, onEdit }: PeopleMobileeHeaderProps) => (
+export const HeaderMobile = ({ goBack, canEdit, logout, onEdit }: PeopleMobileeHeaderProps) => (
   <div
     style={{
       position: 'absolute',
@@ -30,6 +30,22 @@ export const HeaderMobile = ({ goBack, canEdit, onEdit }: PeopleMobileeHeaderPro
           }}
           leadingIcon={'edit'}
           iconSize={15}
+        />
+        <Button
+          text="Sign out"
+          onClick={logout}
+          height={42}
+          style={{
+            fontSize: 13,
+            color: '#3c3f41',
+            border: 'none',
+            margin: 0,
+            padding: 0
+          }}
+          iconStyle={{ color: '#8e969c' }}
+          iconSize={20}
+          color="white"
+          leadingIcon="logout"
         />
       </>
     ) : (
