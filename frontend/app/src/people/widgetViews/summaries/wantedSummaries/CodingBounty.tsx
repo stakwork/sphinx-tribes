@@ -18,6 +18,7 @@ import BountyPrice from '../../../../bounties/BountyPrice';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { CodingBountiesProps } from '../../../interfaces';
 import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
+import { paidString, unpaidString } from '../constants';
 import Invoice from './Invoice';
 import {
   AssigneeProfile,
@@ -399,7 +400,7 @@ function MobileView(props: CodingBountiesProps) {
                 background: paidStatus ? color.green1 : color.pureWhite,
                 color: paidStatus ? color.white100 : color.borderGreen1
               }}
-              text={paidStatus ? 'Mark as Unpaid' : 'Mark as Paid'}
+              text={paidStatus ? unpaidString : paidString}
               loading={saving === 'paid' || updatingPayment}
               endingImg={'/static/mark_unpaid.svg'}
               textStyle={{
@@ -765,7 +766,7 @@ function MobileView(props: CodingBountiesProps) {
                           background: color.pureWhite,
                           color: color.borderGreen1
                         }}
-                        text={isMarkPaidSaved ? 'Mark as Unpaid' : 'Mark as Paid'}
+                        text={isMarkPaidSaved ? unpaidString : paidString}
                         loading={saving === 'paid' || updatingPayment}
                         endingImg={'/static/mark_unpaid.svg'}
                         textStyle={{
@@ -786,7 +787,7 @@ function MobileView(props: CodingBountiesProps) {
                           bottom: '0',
                           marginLeft: '36px'
                         }}
-                        text={'Mark as Paid'}
+                        text={paidString}
                         loading={saving === 'paid'}
                         endingImg={'/static/mark_paid.svg'}
                         textStyle={{
@@ -969,7 +970,7 @@ function MobileView(props: CodingBountiesProps) {
                     bottom: '0',
                     marginLeft: '36px'
                   }}
-                  text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark As Paid'}
+                  text={selectedAward === '' ? 'Skip and Mark Paid' : paidString}
                   loading={isMarkPaidSaved || updatingPayment}
                   endingImg={'/static/mark_paid.svg'}
                   textStyle={{
