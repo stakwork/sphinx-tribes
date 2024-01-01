@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useRef ,useEffect } from 'react';
 import moment from 'moment';
 import {
   AlternateWrapper,
@@ -9,20 +9,15 @@ import {
   ArrowButton,
   DropDown,
   LeftWrapper,
-  Select,
   RightWrapper,
-  Container
+  Container,
+  Option,
+  CustomButton
 } from './HeaderStyles';
 import arrowback from './icons/arrowback.svg';
 import arrowforward from './icons/arrowforward.svg';
+import expand_more from './icons/expand_more.svg';
 //import './Header.css';
-
-const DateFilterObject = {
-  7: 'Last 7 days',
-  30: 'Last 30 days',
-  45: 'Last 45 days'
-};
-
 interface HeaderProps {
   startDate?: number;
   endDate?: number;
@@ -30,8 +25,8 @@ interface HeaderProps {
   setEndDate: (newDate: number) => void;
 }
 export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderProps) => {
+  const [showSelector , setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
-
   const formatUnixDate = (unixDate: number, includeYear: boolean = true) => {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
     return moment.unix(unixDate).format(formatString);
@@ -51,7 +46,6 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
       const newStartDate = moment.unix(startDate).add(dateDiff, 'days').unix();
       const newEndDate = moment.unix(endDate).add(dateDiff, 'days').unix();
 
-      // Ensure the end date does not go beyond today
       const todayUnix = moment().startOf('day').unix();
       const cappedEndDate = Math.min(newEndDate, todayUnix);
 
@@ -60,8 +54,8 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
     }
   };
 
-  const handleDropDownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = Number(event.target.value);
+  const handleDropDownChange = (option:number) => {
+    const selectedValue = Number(option);
     setDateDiff(selectedValue);
 
     if (startDate && endDate) {
@@ -69,14 +63,12 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
       let newStartDate;
 
       if (selectedValue === 7) {
-        newStartDate = currentEndDate.clone().subtract(7, 'days').unix();
+        newStartDate = currentEndDate.clone().subtract(option, 'days').unix();
       } else if (selectedValue === 30) {
-        newStartDate = currentEndDate.clone().subtract(30, 'days').unix();
-      } else if (selectedValue === 45) {
-        newStartDate = currentEndDate.clone().subtract(45, 'days').unix();
+        newStartDate = currentEndDate.clone().subtract(option, 'days').unix();
+      } else if (selectedValue === 90) {
+        newStartDate = currentEndDate.clone().subtract(option, 'days').unix();
       }
-
-      // Ensure the new start date does not go beyond the current end date
       newStartDate = Math.max(
         newStartDate,
         currentEndDate.clone().subtract(selectedValue, 'days').unix()
@@ -87,10 +79,24 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   };
 
   const currentDateUnix = moment().unix();
-  console.log(startDate, endDate, 'date');
+  const optionRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (optionRef.current && !optionRef.current.contains(event.target as Node)) {
+        setShowSelector(!showSelector);
+      }
+    };
+
+    window.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      window.removeEventListener('click', handleOutsideClick);
+    };
+  }, [showSelector]);
 
   return (
-    <Container>
+    <Container  >
       <AlternateWrapper>
         <LeftWrapper>
           {startDate && endDate ? (
@@ -119,15 +125,22 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
           <ExportButton>
             <ExportText>Export CSV</ExportText>
           </ExportButton>
-          <DropDown>
-            <Select value={dateDiff} onChange={handleDropDownChange}>
-              {Object.entries(DateFilterObject).map(([key, value]: any) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-            </Select>
+          <DropDown  onClick={() => {setShowSelector(!showSelector)}}>
+            Last {dateDiff} Days
+            <div><img src={expand_more} alt="a"/></div>
+            {showSelector ?
+              <Option ref={optionRef} >
+                <ul>
+                  <li onClick={() => handleDropDownChange(7)}>7 Days</li>
+                  <li onClick={() => handleDropDownChange(30)}>30 Days</li>  
+                  <li onClick={() => handleDropDownChange(90)}>90 Days</li>
+                  <li><CustomButton>Custom</CustomButton></li>
+                </ul>
+              </Option>
+              : null
+            }
           </DropDown>
+         
         </RightWrapper>
       </AlternateWrapper>
     </Container>
