@@ -1,4 +1,4 @@
-import React, { useState ,useRef ,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import {
   AlternateWrapper,
@@ -25,7 +25,7 @@ interface HeaderProps {
   setEndDate: (newDate: number) => void;
 }
 export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderProps) => {
-  const [showSelector , setShowSelector] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
   const formatUnixDate = (unixDate: number, includeYear: boolean = true) => {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
@@ -54,7 +54,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
     }
   };
 
-  const handleDropDownChange = (option:number) => {
+  const handleDropDownChange = (option: number) => {
     const selectedValue = Number(option);
     setDateDiff(selectedValue);
 
@@ -96,7 +96,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   }, [showSelector]);
 
   return (
-    <Container  >
+    <Container>
       <AlternateWrapper>
         <LeftWrapper>
           {startDate && endDate ? (
@@ -125,22 +125,28 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
           <ExportButton>
             <ExportText>Export CSV</ExportText>
           </ExportButton>
-          <DropDown  onClick={() => {setShowSelector(!showSelector)}}>
+          <DropDown
+            onClick={() => {
+              setShowSelector(!showSelector);
+            }}
+          >
             Last {dateDiff} Days
-            <div><img src={expand_more} alt="a"/></div>
-            {showSelector ?
-              <Option ref={optionRef} >
+            <div>
+              <img src={expand_more} alt="a" />
+            </div>
+            {showSelector ? (
+              <Option ref={optionRef}>
                 <ul>
                   <li onClick={() => handleDropDownChange(7)}>7 Days</li>
-                  <li onClick={() => handleDropDownChange(30)}>30 Days</li>  
+                  <li onClick={() => handleDropDownChange(30)}>30 Days</li>
                   <li onClick={() => handleDropDownChange(90)}>90 Days</li>
-                  <li><CustomButton>Custom</CustomButton></li>
+                  <li>
+                    <CustomButton>Custom</CustomButton>
+                  </li>
                 </ul>
               </Option>
-              : null
-            }
+            ) : null}
           </DropDown>
-         
         </RightWrapper>
       </AlternateWrapper>
     </Container>

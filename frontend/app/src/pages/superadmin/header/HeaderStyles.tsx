@@ -139,7 +139,7 @@ export const Select = styled.select`
 
 export const Option = styled.div`
   position: absolute;
-  z-index:1;
+  z-index: 1;
   top: 130px;
   right: 48px;
   width: 169px;
@@ -150,32 +150,30 @@ export const Option = styled.div`
   align-items: center;
   gap: 16px;
   border-radius: 6px;
-  background: #FFF;
+  background: #fff;
   box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.25);
- 
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  color: grey;
 
-}
-
-li {
-  padding:4px;
-  cursor: pointer;
-  color: grey;
-  font-family: 'Barlow', sans-serif;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 18px;
-
-  &:hover {
-    
-    color: #3C3F41;
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: grey;
   }
-}
+
+  li {
+    padding: 4px;
+    cursor: pointer;
+    color: grey;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+
+    &:hover {
+      color: #3c3f41;
+    }
+  }
 `;
 
 export const CustomButton = styled.button`
@@ -186,14 +184,13 @@ export const CustomButton = styled.button`
   justify-content: center;
   align-items: center;
   gap: 6px;
-  border:none;
-  outline:none;
+  border: none;
+  outline: none;
   border-radius: 6px;
-  background: var(--Primary-blue, #618AFF);
-  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.50);
-  color:white;
-
-`
+  background: var(--Primary-blue, #618aff);
+  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);
+  color: white;
+`;
 
 export const Flex = styled.div`
   display: flex;
