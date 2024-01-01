@@ -10,9 +10,9 @@ const filterByCodingLanguage = (users: Person[], codingLanguages: CodingLanguage
   );
 
   return users.filter((user: Person) => {
-    const userCodingLanguages = (user.extras.coding_languages ?? []).map(
-      (t: { [key: string]: string }) => t.value
-    );
+    const userCodingLanguages = (
+      user.extras && user.extras.coding_languages ? user.extras.coding_languages : []
+    ).map((t: { [key: string]: string }) => t.value);
     return requiredLanguages?.every((requiredLanguage: string) =>
       userCodingLanguages.includes(requiredLanguage)
     );
