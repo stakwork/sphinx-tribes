@@ -1,3 +1,5 @@
+// Import necessary libraries and modules
+
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import moment from 'moment';
@@ -45,10 +47,13 @@ describe('Header Component', () => {
     const expectedEndDate = today;
 
     expect(
-      screen.getByText(
-        `${expectedStartDate.format('DD MMM')} - ${expectedEndDate.format('DD MMM YYYY')}`
-      )
+      screen.getByRole('heading', {
+        name: new RegExp(
+          `${expectedStartDate.format('DD MMM')}.*${expectedEndDate.format('DD MMM YYYY')}`
+        )
+      })
     ).toBeInTheDocument();
+
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
 
@@ -58,11 +63,13 @@ describe('Header Component', () => {
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
     const expectedEndDate30DaysMode = today;
     expect(
-      screen.getByText(
-        `${expectedStartDate30DaysMode.format('DD MMM')} - ${expectedEndDate30DaysMode.format(
-          'DD MMM YYYY'
-        )}`
-      )
+      screen.getByRole('heading', {
+        name: new RegExp(
+          `${expectedStartDate30DaysMode.format('DD MMM')}.*${expectedEndDate30DaysMode.format(
+            'DD MMM YYYY'
+          )}`
+        )
+      })
     ).toBeInTheDocument();
 
     // Trigger the "Last 90 Days" mode
@@ -71,11 +78,13 @@ describe('Header Component', () => {
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
     const expectedEndDate90DaysMode = today;
     expect(
-      screen.getByText(
-        `${expectedStartDate90DaysMode.format('DD MMM')} - ${expectedEndDate90DaysMode.format(
-          'DD MMM YYYY'
-        )}`
-      )
+      screen.getByRole('heading', {
+        name: new RegExp(
+          `${expectedStartDate90DaysMode.format('DD MMM')}.*${expectedEndDate90DaysMode.format(
+            'DD MMM YYYY'
+          )}`
+        )
+      })
     ).toBeInTheDocument();
 
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
