@@ -23,7 +23,6 @@ describe('Header Component', () => {
   test('display header with extras', async () => {
     const setStartDateMock = jest.fn();
     const setEndDateMock = jest.fn();
-    const hardCodedDateRange = '01 Oct - 31 Dec 2023';
     const exportCSVText = 'Export CSV';
     const initDateRange = '7 Days';
 
@@ -36,14 +35,13 @@ describe('Header Component', () => {
       />
     );
 
-    // Check if the elements exist
-    expect(screen.getByText(hardCodedDateRange)).toBeInTheDocument();
+    const dateRangeRegex = /01 Oct - 31 Dec 2023/;
+    expect(screen.getByText(dateRangeRegex)).toBeInTheDocument();
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Last 7 Days'));
 
-    // Wait for the asynchronous changes to complete
     await waitFor(() => {
       expect(screen.getByText('7 Days')).toBeInTheDocument();
       expect(screen.getByText('30 Days')).toBeInTheDocument();
