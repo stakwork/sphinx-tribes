@@ -46,7 +46,6 @@ describe('Statistics Component', () => {
       sats_paid_percentage: 1,
       average_paid: 1,
       average_completed: 1
-      // Add other properties as needed
     };
 
     render(<Statistics metrics={mockMetrics} />);
@@ -55,7 +54,7 @@ describe('Statistics Component', () => {
       expect(bountiesPaid[0]).toBeInTheDocument();
     }
     for (let i = 0; i < hardcodedWords.length; i++) {
-      expect(screen.queryByText(hardcodedWords[i])).toBeInTheDocument();
+      expect(screen.getByText(hardcodedWords[i])).toBeInTheDocument();
     }
   });
 });

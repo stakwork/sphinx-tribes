@@ -102,7 +102,6 @@ export const SuperAdmin = () => {
     getMetrics();
   }, [getMetrics]);
 
-  console.log(bountyMetrics, 'asa');
   return (
     <>
       {!isSuperAdmin ? (

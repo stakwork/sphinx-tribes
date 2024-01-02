@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import moment from 'moment';
 import nock from 'nock';
 import React from 'react';
@@ -20,7 +20,7 @@ beforeAll(() => {
 describe('Header Component', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
 
-  test('display header with extras', () => {
+  test('display header with extras', async () => {
     const setStartDateMock = jest.fn();
     const setEndDateMock = jest.fn();
     const hardCodedDateRange = '01 Oct - 31 Dec 2023';
@@ -36,16 +36,20 @@ describe('Header Component', () => {
       />
     );
 
-    expect(screen.queryByText(hardCodedDateRange)).toBeInTheDocument();
-    expect(screen.queryByText(exportCSVText)).toBeInTheDocument();
-    expect(screen.queryByText(initDateRange)).toBeInTheDocument();
+    // Check if the elements exist
+    expect(screen.getByText(hardCodedDateRange)).toBeInTheDocument();
+    expect(screen.getByText(exportCSVText)).toBeInTheDocument();
+    expect(screen.getByText(initDateRange)).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Last 7 Days'));
 
-    expect(screen.getByText('7 Days')).toBeInTheDocument();
-    expect(screen.getByText('30 Days')).toBeInTheDocument();
-    expect(screen.getByText('90 Days')).toBeInTheDocument();
-    expect(screen.getByText('Custom')).toBeInTheDocument();
+    // Wait for the asynchronous changes to complete
+    await waitFor(() => {
+      expect(screen.getByText('7 Days')).toBeInTheDocument();
+      expect(screen.getByText('30 Days')).toBeInTheDocument();
+      expect(screen.getByText('90 Days')).toBeInTheDocument();
+      expect(screen.getByText('Custom')).toBeInTheDocument();
+    });
 
     fireEvent.click(screen.getByText('30 Days'));
 
@@ -54,7 +58,7 @@ describe('Header Component', () => {
 
     expect(setStartDateMock).toHaveBeenCalledWith(expectedStartDate);
     expect(setEndDateMock).toHaveBeenCalledWith(expectedEndDate);
-    expect(screen.queryByText(exportCSVText)).toBeInTheDocument();
-    expect(screen.queryByText(initDateRange)).toBeInTheDocument();
+    expect(screen.getByText(exportCSVText)).toBeInTheDocument();
+    expect(screen.getByText(initDateRange)).toBeInTheDocument();
   });
 });
