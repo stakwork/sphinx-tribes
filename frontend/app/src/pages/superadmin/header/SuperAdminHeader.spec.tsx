@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event'; // Import userEvent
 import moment from 'moment';
 import nock from 'nock';
 import React from 'react';
@@ -55,10 +56,12 @@ describe('Header Component', () => {
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText(initDateRange));
+    userEvent.click(screen.getByText(initDateRange));
 
-    await screen.findByText('30 Days');
-    fireEvent.click(screen.getByText('Last 30 Days'));
+    const dropdownOption30Days = await screen.findByText('30 Days');
+    expect(dropdownOption30Days).toBeInTheDocument();
+
+    userEvent.click(dropdownOption30Days);
 
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
     const expectedEndDate30DaysMode = today;
@@ -69,11 +72,9 @@ describe('Header Component', () => {
       )}`
     );
 
-    expect(screen.getByText('Last 30 Days')).toHaveClass('selected');
-    fireEvent.click(screen.getByText('Last 30 Days'));
+    expect(screen.getByText('30 Days')).toHaveClass('selected');
 
-    await screen.findByText('90 Days');
-    fireEvent.click(screen.getByText('Last 90 Days'));
+    userEvent.click(screen.getByText('90 Days'));
 
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
     const expectedEndDate90DaysMode = today;
@@ -84,6 +85,6 @@ describe('Header Component', () => {
       )}`
     );
 
-    expect(screen.getByText('Last 90 Days')).toHaveClass('selected');
+    expect(screen.getByText('90 Days')).toHaveClass('selected');
   });
 });
