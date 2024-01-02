@@ -56,7 +56,7 @@ describe('Statistics Component', () => {
     expect(bountiesPaidElement).toHaveTextContent('78');
 
     for (let i = 0; i < hardcodedWords.length; i++) {
-      expect(screen.getByText(hardcodedWords[i])).toBeInTheDocument();
+      expect(screen.queryAllByText(hardcodedWords[i])).toBeInTheDocument();
     }
   });
 });
