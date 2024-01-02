@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'; // Import userEvent
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import moment from 'moment';
 import nock from 'nock';
 import React from 'react';
@@ -61,7 +61,7 @@ describe('Header Component', () => {
     const dropdownOption30Days = await screen.findByText('30 Days');
     expect(dropdownOption30Days).toBeInTheDocument();
 
-    userEvent.click(dropdownOption30Days);
+    await userEvent.click(dropdownOption30Days);
 
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
     const expectedEndDate30DaysMode = today;
@@ -74,7 +74,7 @@ describe('Header Component', () => {
 
     expect(screen.getByText('30 Days')).toHaveClass('selected');
 
-    userEvent.click(screen.getByText('90 Days'));
+    await userEvent.click(screen.getByText('90 Days'));
 
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
     const expectedEndDate90DaysMode = today;

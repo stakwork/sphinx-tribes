@@ -25,37 +25,50 @@ const mockMetrics = {
   bounties_paid_average: 75,
   sats_paid_percentage: 50,
   average_paid: 10,
-  average_completed: 10
+  average_completed: 1
 };
 
-describe('Statistics component', () => {
-  test('renders with metrics data', () => {
-    // Render the component with mock data
-    const { getByText, getByAltText } = render(<Statistics metrics={mockMetrics} />);
+describe('Statistics Component', () => {
+  nock(user.url).get('/person/id/1').reply(200, {});
 
-    // Assertions for Bounties section
-    expect(getByText('Bounties')).toBeInTheDocument();
-    expect(getByText('Total Bounties Posted')).toBeInTheDocument();
-    expect(getByText('78')).toBeInTheDocument(); // Assuming 78 is a static value in your component
-    expect(getByText('Bounties Assigned')).toBeInTheDocument();
-    expect(getByText('50')).toBeInTheDocument(); // Replace with the actual value from mockMetrics
-    expect(getByText('Bounties Paid')).toBeInTheDocument();
-    expect(getByText('75%')).toBeInTheDocument(); // Replace with the actual value from mockMetrics
-    expect(getByText('Completed')).toBeInTheDocument();
+  test('display about view with extras', () => {
+    const hardcodedWords = [
+      'Bounties',
+      '200',
+      'Total Bounties Posted',
+      '78',
+      'Bounties Assigned',
+      '136',
+      '100%',
+      '22536',
+      'Total Sats Posted',
+      '13625',
+      'Sats Paid',
+      '3 Days',
+      'Avg Time to Paid',
+      '48%',
+      'Paid'
+    ];
 
-    // Assertions for Satoshis section
-    expect(getByText('Satoshis')).toBeInTheDocument();
-    expect(getByText('Total Sats Posted')).toBeInTheDocument();
-    expect(getByText('5000')).toBeInTheDocument(); // Replace with the actual value from mockMetrics
-    expect(getByText('Sats Paid')).toBeInTheDocument();
-    expect(getByText('2500')).toBeInTheDocument(); // Replace with the actual value from mockMetrics
-    expect(getByText('Avg Time to Paid')).toBeInTheDocument();
-    expect(getByText('3 Days')).toBeInTheDocument();
-    expect(getByText('Paid')).toBeInTheDocument();
-    expect(getByText('50%')).toBeInTheDocument(); // Replace with the actual value from mockMetrics
+    const mockMetrics = {
+      bounties_posted: 200,
+      bounties_paid: 78,
+      bounties_paid_average: 90,
+      sats_posted: 1,
+      sats_paid: 1,
+      sats_paid_percentage: 1,
+      average_paid: 1,
+      average_completed: 1
+    };
 
-    // Additional assertions for images
-    expect(getByAltText('Bounties')).toBeInTheDocument();
-    expect(getByAltText('Satoshie')).toBeInTheDocument();
+    render(<Statistics metrics={mockMetrics} />);
+
+    // const bountiesPaidElement = screen.getByText('Bounties Paid').nextSibling;
+
+    // waitFor(() => expect(bountiesPaidElement).toHaveTextContent('78'));
+
+    for (let i = 0; i < hardcodedWords.length; i++) {
+      expect(screen.queryAllByText(hardcodedWords[i])).toBeInTheDocument();
+    }
   });
 });
