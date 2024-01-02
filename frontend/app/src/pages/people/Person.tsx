@@ -142,7 +142,7 @@ export default function Person(props: PersonProps) {
             </div>
             <R style={{ width: hideActions ? 'calc(100% - 80px)' : 'calc(100% - 116px)' }}>
               <Title style={{ fontSize: hideActions ? 17 : 20, margin: 0 }}>{owner_alias}</Title>
-              {description && (
+              {description && description !== 'description' && (
                 <Description
                   lineRows={hideActions ? 1 : 2}
                   style={{
@@ -190,8 +190,8 @@ export default function Person(props: PersonProps) {
           </div>
           <div style={{ padding: 16 }}>
             <DTitle>{owner_alias}</DTitle>
-            {description && (
-              <DDescription>{description === 'description' ? '' : description}</DDescription>
+            {description && description !== 'description' && (
+              <DDescription>{description}</DDescription>
             )}
           </div>
         </div>
