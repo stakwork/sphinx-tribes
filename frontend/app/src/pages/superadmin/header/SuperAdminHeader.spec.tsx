@@ -1,4 +1,3 @@
-// Import necessary libraries and modules
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import moment from 'moment';
@@ -25,7 +24,7 @@ describe('Header Component', () => {
 
   nock(user.url).get('/person/id/1').reply(200, {});
 
-  test('displays header with extras', () => {
+  test('displays header with extras', async () => {
     const setStartDateMock = jest.fn();
     const setEndDateMock = jest.fn();
     const exportCSVText = 'Export CSV';
@@ -40,7 +39,6 @@ describe('Header Component', () => {
       />
     );
 
-    // Initial state expectations
     const today = moment().startOf('day');
     const expectedStartDate = today.clone().subtract(7, 'days');
     const expectedEndDate = today;
@@ -57,7 +55,8 @@ describe('Header Component', () => {
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
 
-    // Trigger the "Last 30 Days" mode
+    fireEvent.click(screen.getByText(initDateRange));
+    await screen.findByText('Last 30 Days');
     fireEvent.click(screen.getByText('Last 30 Days'));
 
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
@@ -69,7 +68,10 @@ describe('Header Component', () => {
       )}`
     );
 
-    // Trigger the "Last 90 Days" mode
+    expect(screen.getByText('Last 30 Days')).toHaveClass('selected');
+
+    fireEvent.click(screen.getByText('Last 30 Days'));
+    await screen.findByText('Last 90 Days');
     fireEvent.click(screen.getByText('Last 90 Days'));
 
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
@@ -81,7 +83,6 @@ describe('Header Component', () => {
       )}`
     );
 
-    expect(screen.getByText(exportCSVText)).toBeInTheDocument();
-    expect(screen.getByText(initDateRange)).toBeInTheDocument();
+    expect(screen.getByText('Last 90 Days')).toHaveClass('selected');
   });
 });

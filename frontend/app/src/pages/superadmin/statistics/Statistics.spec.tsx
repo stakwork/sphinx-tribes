@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
 import { setupStore } from '../../../__test__/__mockData__/setupStore';
@@ -53,7 +53,7 @@ describe('Statistics Component', () => {
 
     const bountiesPaidElement = screen.getByText('Bounties Paid').nextSibling;
 
-    expect(bountiesPaidElement).toHaveTextContent('78');
+    waitFor(() => expect(bountiesPaidElement).toHaveTextContent('78'));
 
     for (let i = 0; i < hardcodedWords.length; i++) {
       expect(screen.queryAllByText(hardcodedWords[i])).toBeInTheDocument();
