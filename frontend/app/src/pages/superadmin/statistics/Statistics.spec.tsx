@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { queryByText, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
 import { setupStore } from '../../../__test__/__mockData__/setupStore';
@@ -18,6 +18,7 @@ beforeAll(() => {
  */
 describe('Statistics Component', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
+
   test('display about view with extras', () => {
     const hardcodedWords = [
       'Bounties',
@@ -49,10 +50,11 @@ describe('Statistics Component', () => {
     };
 
     render(<Statistics metrics={mockMetrics} />);
-    const bountiesPaid = screen.getAllByText('Bounties Paid');
-    if (bountiesPaid) {
-      expect(bountiesPaid[0]).toBeInTheDocument();
-    }
+
+    const bountiesPaidElement = screen.getByText('Bounties Paid').nextSibling;
+
+    expect(bountiesPaidElement).toHaveTextContent('78');
+
     for (let i = 0; i < hardcodedWords.length; i++) {
       expect(screen.getByText(hardcodedWords[i])).toBeInTheDocument();
     }
