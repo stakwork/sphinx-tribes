@@ -56,7 +56,8 @@ describe('Header Component', () => {
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
 
     fireEvent.click(screen.getByText(initDateRange));
-    await screen.findByText('Last 30 Days');
+
+    await screen.findByText('30 Days');
     fireEvent.click(screen.getByText('Last 30 Days'));
 
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
@@ -69,9 +70,9 @@ describe('Header Component', () => {
     );
 
     expect(screen.getByText('Last 30 Days')).toHaveClass('selected');
-
     fireEvent.click(screen.getByText('Last 30 Days'));
-    await screen.findByText('Last 90 Days');
+
+    await screen.findByText('90 Days');
     fireEvent.click(screen.getByText('Last 90 Days'));
 
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
