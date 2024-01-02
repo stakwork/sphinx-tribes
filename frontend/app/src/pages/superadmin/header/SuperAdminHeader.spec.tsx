@@ -50,12 +50,11 @@ describe('Header Component', () => {
 
     expect(monthElement).toBeInTheDocument();
 
-    expect(monthElement).toHaveTextContent(
+    const expectedDateRangeRegex = new RegExp(
       `${expectedStartDate.format('DD MMM')} - ${expectedEndDate.format('DD MMM YYYY')}`
     );
 
-    expect(screen.getByText(exportCSVText)).toBeInTheDocument();
-    expect(screen.getByText(initDateRange)).toBeInTheDocument();
+    expect(monthElement).toHaveTextContent(expectedDateRangeRegex);
 
     // Trigger the "Last 30 Days" mode
     fireEvent.click(screen.getByText('Last 30 Days'));
@@ -63,11 +62,13 @@ describe('Header Component', () => {
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
     const expectedEndDate30DaysMode = today;
 
-    expect(monthElement).toHaveTextContent(
+    const expectedDateRange30DaysModeRegex = new RegExp(
       `${expectedStartDate30DaysMode.format('DD MMM')} - ${expectedEndDate30DaysMode.format(
         'DD MMM YYYY'
       )}`
     );
+
+    expect(monthElement).toHaveTextContent(expectedDateRange30DaysModeRegex);
 
     // Trigger the "Last 90 Days" mode
     fireEvent.click(screen.getByText('Last 90 Days'));
@@ -75,11 +76,13 @@ describe('Header Component', () => {
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
     const expectedEndDate90DaysMode = today;
 
-    expect(monthElement).toHaveTextContent(
+    const expectedDateRange90DaysModeRegex = new RegExp(
       `${expectedStartDate90DaysMode.format('DD MMM')} - ${expectedEndDate90DaysMode.format(
         'DD MMM YYYY'
       )}`
     );
+
+    expect(monthElement).toHaveTextContent(expectedDateRange90DaysModeRegex);
 
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
