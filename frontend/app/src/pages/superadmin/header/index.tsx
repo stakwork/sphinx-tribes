@@ -98,7 +98,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   return (
     <Container>
       <AlternateWrapper>
-        <LeftWrapper>
+        <LeftWrapper data-testid="leftWrapper">
           {startDate && endDate ? (
             <>
               <ButtonWrapper>
@@ -115,7 +115,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
                   <img src={arrowforward} alt="" />
                 </ArrowButton>
               </ButtonWrapper>
-              <Month>
+              <Month data-testid="month">
                 {formatUnixDate(startDate, false)} - {formatUnixDate(endDate)}
               </Month>
             </>

@@ -1,7 +1,6 @@
 // Import necessary libraries and modules
-
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import moment from 'moment';
 import nock from 'nock';
 import React from 'react';
@@ -46,12 +45,16 @@ describe('Header Component', () => {
     const expectedStartDate = today.clone().subtract(7, 'days');
     const expectedEndDate = today;
 
+    const leftWrapperElement = screen.getByTestId('leftWrapper');
+    const monthElement = within(leftWrapperElement).getByTestId('month');
+
+    expect(monthElement).toBeInTheDocument();
+
     expect(
-      screen.getByText(
-        `${expectedStartDate.format('DD MMM')} - ${expectedEndDate.format('DD MMM YYYY')}`,
-        { selector: 'h4' }
-      )
-    ).toBeInTheDocument();
+      monthElement
+    ).toHaveTextContent(
+      `${expectedStartDate.format('DD MMM')} - ${expectedEndDate.format('DD MMM YYYY')}`
+    );
 
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
@@ -63,13 +66,12 @@ describe('Header Component', () => {
     const expectedEndDate30DaysMode = today;
 
     expect(
-      screen.getByText(
-        `${expectedStartDate30DaysMode.format('DD MMM')} - ${expectedEndDate30DaysMode.format(
-          'DD MMM YYYY'
-        )}`,
-        { selector: 'h4' }
-      )
-    ).toBeInTheDocument();
+      monthElement
+    ).toHaveTextContent(
+      `${expectedStartDate30DaysMode.format('DD MMM')} - ${expectedEndDate30DaysMode.format(
+        'DD MMM YYYY'
+      )}`
+    );
 
     // Trigger the "Last 90 Days" mode
     fireEvent.click(screen.getByText('Last 90 Days'));
@@ -78,13 +80,12 @@ describe('Header Component', () => {
     const expectedEndDate90DaysMode = today;
 
     expect(
-      screen.getByText(
-        `${expectedStartDate90DaysMode.format('DD MMM')} - ${expectedEndDate90DaysMode.format(
-          'DD MMM YYYY'
-        )}`,
-        { selector: 'h4' }
-      )
-    ).toBeInTheDocument();
+      monthElement
+    ).toHaveTextContent(
+      `${expectedStartDate90DaysMode.format('DD MMM')} - ${expectedEndDate90DaysMode.format(
+        'DD MMM YYYY'
+      )}`
+    );
 
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
     expect(screen.getByText(initDateRange)).toBeInTheDocument();
