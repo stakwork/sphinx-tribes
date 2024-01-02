@@ -50,9 +50,7 @@ describe('Header Component', () => {
 
     expect(monthElement).toBeInTheDocument();
 
-    expect(
-      monthElement
-    ).toHaveTextContent(
+    expect(monthElement).toHaveTextContent(
       `${expectedStartDate.format('DD MMM')} - ${expectedEndDate.format('DD MMM YYYY')}`
     );
 
@@ -65,9 +63,7 @@ describe('Header Component', () => {
     const expectedStartDate30DaysMode = today.clone().subtract(30, 'days');
     const expectedEndDate30DaysMode = today;
 
-    expect(
-      monthElement
-    ).toHaveTextContent(
+    expect(monthElement).toHaveTextContent(
       `${expectedStartDate30DaysMode.format('DD MMM')} - ${expectedEndDate30DaysMode.format(
         'DD MMM YYYY'
       )}`
@@ -79,9 +75,7 @@ describe('Header Component', () => {
     const expectedStartDate90DaysMode = today.clone().subtract(90, 'days');
     const expectedEndDate90DaysMode = today;
 
-    expect(
-      monthElement
-    ).toHaveTextContent(
+    expect(monthElement).toHaveTextContent(
       `${expectedStartDate90DaysMode.format('DD MMM')} - ${expectedEndDate90DaysMode.format(
         'DD MMM YYYY'
       )}`
