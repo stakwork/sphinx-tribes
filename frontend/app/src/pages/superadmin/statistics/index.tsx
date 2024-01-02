@@ -68,7 +68,7 @@ export const Statistics = ({ metrics }: StatisticsProps) => (
           <img className="ClocklogoAlign" src={clockloader} alt="" width="24px" height="24px" />
           <div>
             <TitleBlue>{metrics?.bounties_paid_average}%</TitleBlue>
-            <Subheading>Bounties Paid</Subheading>
+            <Subheading>Completed</Subheading>
           </div>
         </DivWrapper>
       </Card>
