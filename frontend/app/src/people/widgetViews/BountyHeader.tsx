@@ -614,6 +614,11 @@ const BountyHeader = ({
                 </PopOverRightBox>
               </div>
             </EuiPopover>
+            {filterCountNumber > 0 && (
+              <FilterCount color={color}>
+                <EuiText className="filterCountText">{filterCountNumber}</EuiText>
+              </FilterCount>
+            )}
           </LargeActionContainer>
           <ShortActionContainer>
             <PostBounty widget={selectedWidget} />
