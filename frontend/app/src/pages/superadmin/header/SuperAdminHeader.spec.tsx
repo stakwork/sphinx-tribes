@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, within, waitFor, act } from '@testing-library/react'; // Import act
-import { useState } from 'react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, within, act } from '@testing-library/react';
 import moment from 'moment';
 import nock from 'nock';
 import React from 'react';
@@ -11,7 +9,7 @@ import { mockUsehistory } from '../../../__test__/__mockFn__/useHistory';
 import { Header } from './';
 
 beforeAll(() => {
-  // nock.disableNetConnect();
+  nock.disableNetConnect();
   setupStore();
   mockUsehistory();
 });
