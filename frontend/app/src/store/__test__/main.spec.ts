@@ -6,8 +6,10 @@ import { uiStore } from '../ui';
 import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
-import mockBounties, { expectedBountyResponses, newBounty } from '../../bounties/__mock__/mockBounties.data';
-
+import mockBounties, {
+  expectedBountyResponses,
+  newBounty
+} from '../../bounties/__mock__/mockBounties.data';
 
 let fetchStub: sinon.SinonStub;
 
@@ -79,7 +81,7 @@ describe('Main store', () => {
   //deleteBounty
   it('should send request delete request with correct body and url', async () => {
     const url = `${TribesURL}/gobounties/pub_key/1111`;
-    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=created&search=&page=1&resetPage=true&Open=true&Assigned=false&Paid=false`
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=created&search=&page=1&resetPage=true&Open=true&Assigned=false&Paid=false`;
     const expectedRequestOptions: RequestInit = {
       method: 'DELETE',
       mode: 'cors',
@@ -88,14 +90,18 @@ describe('Main store', () => {
         'Content-Type': 'application/json'
       }
     };
-    fetchStub.withArgs(url, expectedRequestOptions).returns(Promise.resolve({
-      status: 200
-    })as any);
-    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(Promise.resolve({
-      status: 200,
-      ok: true,
-      json: (): Promise<any> => Promise.resolve([mockBounties[0]])
-    }) as any);
+    fetchStub.withArgs(url, expectedRequestOptions).returns(
+      Promise.resolve({
+        status: 200
+      }) as any
+    );
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
 
     const store = new MainStore();
     await store.deleteBounty(1111, 'pub_key');
@@ -139,9 +145,11 @@ describe('Main store', () => {
         'Content-Type': 'application/json'
       }
     };
-    fetchStub.withArgs(url, expectedRequestOptions).returns(Promise.resolve({
-      status: 200
-    })as any);
+    fetchStub.withArgs(url, expectedRequestOptions).returns(
+      Promise.resolve({
+        status: 200
+      }) as any
+    );
 
     const store = new MainStore();
     const res = await store.deleteBountyAssignee({ owner_pubkey: 'pub_key', created: '1111' });
@@ -184,9 +192,11 @@ describe('Main store', () => {
         'Content-Type': 'application/json'
       }
     };
-    fetchStub.withArgs(url, expectedRequestOptions).returns(Promise.resolve({
-      status: 200
-    })as any);
+    fetchStub.withArgs(url, expectedRequestOptions).returns(
+      Promise.resolve({
+        status: 200
+      }) as any
+    );
 
     const store = new MainStore();
     const res = await store.updateBountyPaymentStatus(1111);
@@ -217,11 +227,13 @@ describe('Main store', () => {
   //getBountyById
   it('should successfully return requested bounty', async () => {
     const url = `http://${getHost()}/gobounties/id/1111`;
-    fetchStub.withArgs(url, sinon.match.any).returns(Promise.resolve({
-      status: 200,
-      ok: true,
-      json: () => Promise.resolve([mockBounties[0]])
-    })as any);
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
 
     const store = new MainStore();
     const res = await store.getBountyById(1111);
@@ -232,26 +244,30 @@ describe('Main store', () => {
 
   it('should return empty array if failed to fetch bounty', async () => {
     const url = `http://${getHost()}/gobounties/id/1111`;
-    fetchStub.withArgs(url, sinon.match.any).returns(Promise.resolve({
-      status: 404,
-      ok: false,
-    })as any);
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 404,
+        ok: false
+      }) as any
+    );
 
     const store = new MainStore();
     const res = await store.getBountyById(1111);
 
     expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
-    expect(res.length).toEqual(0)
+    expect(res.length).toEqual(0);
   });
 
   //getBountyIndexById
   it('should successfully return index of requested bounty', async () => {
     const url = `http://${getHost()}/gobounties/index/1111`;
-    fetchStub.withArgs(url, sinon.match.any).returns(Promise.resolve({
-      status: 200,
-      ok: true,
-      json: () => Promise.resolve(1)
-    })as any);
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve(1)
+      }) as any
+    );
 
     const store = new MainStore();
     const res = await store.getBountyIndexById(1111);
@@ -262,10 +278,12 @@ describe('Main store', () => {
 
   it('should return 0 if failed to fetch index', async () => {
     const url = `http://${getHost()}/gobounties/index/1111`;
-    fetchStub.withArgs(url, sinon.match.any).returns(Promise.resolve({
-      status: 400,
-      ok: false,
-    })as any);
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 400,
+        ok: false
+      }) as any
+    );
 
     const store = new MainStore();
     const res = await store.getBountyIndexById(1111);
