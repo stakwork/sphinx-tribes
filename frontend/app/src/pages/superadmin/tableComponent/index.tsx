@@ -37,6 +37,7 @@ import {
 } from './TableStyle';
 
 import './styles.css';
+
 interface Bounty {
   id: number;
   title: string;
@@ -207,7 +208,7 @@ export const MyTable = ({ bounties, startDate, endDate, headerIsFrozen }: TableP
       dataNumber.push(i);
     }
     setActiveTabs(dataNumber);
-  }, []);
+  }, [paginationLimit]);
 
   useEffect(() => {
     getTotalBounties();
