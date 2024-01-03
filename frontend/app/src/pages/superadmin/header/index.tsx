@@ -126,6 +126,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
             <ExportText>Export CSV</ExportText>
           </ExportButton>
           <DropDown
+            data-testid="DropDown"
             onClick={() => {
               setShowSelector(!showSelector);
             }}
