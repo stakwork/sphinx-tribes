@@ -8,6 +8,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	dbMocks "github.com/stakwork/sphinx-tribes/db/mocks"
 	"github.com/stakwork/sphinx-tribes/handlers/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -182,7 +183,8 @@ func TestPayLightningInvoice(t *testing.T) {
 
 	t.Run("validate request url, body and headers", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
-		handler := NewBountyHandler(mockHttpClient)
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
 		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 			bodyByt, _ := io.ReadAll(req.Body)
 			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
@@ -197,7 +199,8 @@ func TestPayLightningInvoice(t *testing.T) {
 
 	t.Run("put on invoice request failed with error status and invalid json", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
-		handler := NewBountyHandler(mockHttpClient)
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
 		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
 		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 			bodyByt, _ := io.ReadAll(req.Body)
@@ -216,7 +219,8 @@ func TestPayLightningInvoice(t *testing.T) {
 
 	t.Run("put on invoice request failed with error status", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
-		handler := NewBountyHandler(mockHttpClient)
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
 		r := io.NopCloser(bytes.NewReader([]byte(`{"error": "internal server error"}`)))
 		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 			bodyByt, _ := io.ReadAll(req.Body)
@@ -235,7 +239,8 @@ func TestPayLightningInvoice(t *testing.T) {
 
 	t.Run("put on invoice request succeed with invalid json", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
-		handler := NewBountyHandler(mockHttpClient)
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
 		r := io.NopCloser(bytes.NewReader([]byte(`"invalid json"`)))
 		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 			bodyByt, _ := io.ReadAll(req.Body)
@@ -254,7 +259,8 @@ func TestPayLightningInvoice(t *testing.T) {
 
 	t.Run("should unmarshal the response properly after success", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
-		handler := NewBountyHandler(mockHttpClient)
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
 		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "settled": true, "payment_request": "req", "payment_hash": "hash", "preimage": "random-string", "amount": "1000"}}`)))
 		expectedSuccessMsg := db.InvoicePaySuccess{
 			Success: true,

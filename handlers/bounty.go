@@ -19,11 +19,13 @@ import (
 
 type bountyHandler struct {
 	httpClient HttpClient
+	db         db.Database
 }
 
-func NewBountyHandler(httpClient HttpClient) *bountyHandler {
+func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
 		httpClient: httpClient,
+		db:         db,
 	}
 }
 
