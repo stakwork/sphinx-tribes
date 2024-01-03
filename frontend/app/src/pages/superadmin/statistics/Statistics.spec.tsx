@@ -22,7 +22,7 @@ const mockMetrics = {
   bounties_paid: 50,
   sats_posted: 5000,
   sats_paid: 2500,
-  bounties_paid_average: 75,
+  bounties_paid_average: 78,
   sats_paid_percentage: 50,
   average_paid: 10,
   average_completed: 1
@@ -31,7 +31,31 @@ const mockMetrics = {
 describe('Statistics Component', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
 
-  test('display about view with extras', () => {
-    render(<Statistics metrics={mockMetrics} />);
+  it('renders without crashing', () => {
+    const { container } = render(<Statistics metrics={mockMetrics} />);
+    expect(container.firstChild).toBeInTheDocument();
+  });
+
+  it('renders bounties metrics correctly', () => {
+    const { getByText } = render(<Statistics metrics={mockMetrics} />);
+    expect(getByText('Bounties')).toBeInTheDocument();
+    expect(getByText('100')).toBeInTheDocument();
+    expect(getByText('Total Bounties Posted')).toBeInTheDocument();
+    expect(getByText('50')).toBeInTheDocument();
+    expect(getByText('Bounties Assigned')).toBeInTheDocument();
+    expect(getByText('78')).toBeInTheDocument();
+    expect(getByText('Bounties Paid')).toBeInTheDocument();
+    expect(getByText('Completed')).toBeInTheDocument();
+  });
+
+  it('renders satoshis metrics correctly', () => {
+    const { getByText } = render(<Statistics metrics={mockMetrics} />);
+    expect(getByText('Satoshis')).toBeInTheDocument();
+    expect(getByText('Total Sats Posted')).toBeInTheDocument();
+    expect(getByText('Sats Paid')).toBeInTheDocument();
+    expect(getByText('Avg Time to Paid')).toBeInTheDocument();
+    expect(getByText('Paid')).toBeInTheDocument();
+    expect(getByText('5000')).toBeInTheDocument();
+    expect(getByText('2500')).toBeInTheDocument();
   });
 });
