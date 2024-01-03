@@ -2,7 +2,7 @@ import { toJS } from 'mobx';
 import sinon from 'sinon';
 import { people } from '../../__test__/__mockData__/persons';
 import { user } from '../../__test__/__mockData__/user';
-import { uiStore } from '../ui';
+import { emptyMeInfo, uiStore } from '../ui';
 import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
@@ -284,7 +284,8 @@ describe('Main store', () => {
     expect(res).toEqual(0);
   });
 
-  it('should set all query params, page, limit, search when fetching bounties', async () => {
+  it('should set all query params, page, limit, search when fetching bounties, user logged out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
       Promise.resolve({
@@ -308,7 +309,8 @@ describe('Main store', () => {
     expect(bounties).toEqual([expectedBountyResponses[0]]);
   });
 
-  it('should reset exisiting bounty if reset flag is passed', async () => {
+  it('should reset exisiting bounty if reset flag is passed, signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=2&resetPage=true`;
     const mockBounty = { ...mockBounties[0] };
     mockBounty.bounty.id = 2;
@@ -338,7 +340,8 @@ describe('Main store', () => {
     expect(bounties).toEqual([expectedResponse]);
   });
 
-  it('should add to exisiting bounty if next page is fetched', async () => {
+  it('should add to exisiting bounty if next page is fetched, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=2&resetPage=false`;
     const mockBounty = { ...mockBounties[0] };
     mockBounty.bounty.id = 2;
@@ -372,7 +375,8 @@ describe('Main store', () => {
     expect(bounties).toEqual([expectedResponse]);
   });
 
-  it('should successfully fetch people', async () => {
+  it('should successfully fetch people, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/people?resetPage=true&search=&limit=500&page=1&sortBy=last_login`;
     const mockPeople = { ...people[1] };
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
@@ -401,7 +405,7 @@ describe('Main store', () => {
     expect(res[0]).toEqual(mockPeople);
   });
 
-  it('should hide current user', async () => {
+  it('should hide current user, user signed in', async () => {
     const allBountiesUrl = `http://${getHost()}/people?resetPage=false&search=&limit=500&page=2&sortBy=last_login`;
     const mockPeople = { ...people[0] };
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
@@ -426,7 +430,8 @@ describe('Main store', () => {
     expect(res).toBeTruthy();
   });
 
-  it('should fetch and store organization bounties successfully', async () => {
+  it('should fetch and store organization bounties successfully, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
       Promise.resolve({
@@ -450,7 +455,8 @@ describe('Main store', () => {
     expect(bounties).toEqual([expectedBountyResponses[0]]);
   });
 
-  it('should reset exisiting organization bounty if reset flag is passed', async () => {
+  it('should reset exisiting organization bounty if reset flag is passed, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
     const mockBounty = { ...mockBounties[0] };
     mockBounty.bounty.id = 2;
@@ -480,7 +486,8 @@ describe('Main store', () => {
     expect(bounties).toEqual([expectedResponse]);
   });
 
-  it('should add to exisiting bounty if reset flag is not passed', async () => {
+  it('should add to exisiting bounty if reset flag is not passed, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
     const mockBounty = { ...mockBounties[0] };
     mockBounty.bounty.id = 2;
