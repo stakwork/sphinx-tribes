@@ -1,15 +1,12 @@
-import { throws } from 'assert';
 import { toJS } from 'mobx';
 import sinon from 'sinon';
+import { people } from '../../__test__/__mockData__/persons';
 import { user } from '../../__test__/__mockData__/user';
 import { uiStore } from '../ui';
 import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
-import mockBounties, {
-  expectedBountyResponses,
-  newBounty
-} from '../../bounties/__mock__/mockBounties.data';
+import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
 
 let fetchStub: sinon.SinonStub;
 
@@ -78,7 +75,6 @@ describe('Main store', () => {
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
   });
 
-  //deleteBounty
   it('should send request delete request with correct body and url', async () => {
     const url = `${TribesURL}/gobounties/pub_key/1111`;
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=created&search=&page=1&resetPage=true&Open=true&Assigned=false&Paid=false`;
@@ -130,7 +126,6 @@ describe('Main store', () => {
     expect(store.peopleBounties.length).toEqual(0);
   });
 
-  //deleteBountyAssignee
   it('should not return false if asignee removed successfully', async () => {
     const url = `${TribesURL}/gobounties/assignee`;
     const expectedRequestOptions: RequestInit = {
@@ -181,7 +176,6 @@ describe('Main store', () => {
     expect(res).toBeFalsy();
   });
 
-  //updateBountyPaymentStatus
   it('should successfully update bounty payment status', async () => {
     const url = `${TribesURL}/gobounties/paymentstatus/1111`;
     const expectedRequestOptions: RequestInit = {
@@ -224,7 +218,6 @@ describe('Main store', () => {
     expect(res).toBeFalsy();
   });
 
-  //getBountyById
   it('should successfully return requested bounty', async () => {
     const url = `http://${getHost()}/gobounties/id/1111`;
     fetchStub.withArgs(url, sinon.match.any).returns(
@@ -258,7 +251,6 @@ describe('Main store', () => {
     expect(res.length).toEqual(0);
   });
 
-  //getBountyIndexById
   it('should successfully return index of requested bounty', async () => {
     const url = `http://${getHost()}/gobounties/index/1111`;
     fetchStub.withArgs(url, sinon.match.any).returns(
@@ -290,5 +282,235 @@ describe('Main store', () => {
 
     expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
     expect(res).toEqual(0);
+  });
+
+  it('should set all query params, page, limit, search when fetching bounties', async () => {
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bounties = await store.getPeopleBounties({
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 1,
+      sortBy: 'updatedat'
+    });
+
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(bounties).toEqual([expectedBountyResponses[0]]);
+  });
+
+  it('should reset exisiting bounty if reset flag is passed', async () => {
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=2&resetPage=true`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    store.setPeopleBounties([expectedBountyResponses[0] as any]);
+    expect(store.peopleBounties.length).toEqual(1);
+
+    const bounties = await store.getPeopleBounties({
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedResponse]);
+    expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should add to exisiting bounty if next page is fetched', async () => {
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=2&resetPage=false`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bountyAlreadyPresent = { ...expectedBountyResponses[0] } as any;
+    bountyAlreadyPresent.body.id = 1;
+    store.setPeopleBounties([bountyAlreadyPresent]);
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties[0].body.id).not.toEqual(2);
+
+    const bounties = await store.getPeopleBounties({
+      resetPage: false,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(2);
+    expect(store.peopleBounties[1]).toEqual(expectedResponse);
+    expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should successfully fetch people', async () => {
+    const allBountiesUrl = `http://${getHost()}/people?resetPage=true&search=&limit=500&page=1&sortBy=last_login`;
+    const mockPeople = { ...people[1] };
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockPeople }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    store.setPeople([people[0]]);
+    expect(store._people.length).toEqual(1);
+    expect(store._people[0]).toEqual(people[0]);
+
+    const res = await store.getPeople({
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 1,
+      sortBy: 'updatedat'
+    });
+
+    expect(store._people.length).toEqual(1);
+    expect(store._people[0]).toEqual(mockPeople);
+    expect(res[0]).toEqual(mockPeople);
+  });
+
+  it('should hide current user', async () => {
+    const allBountiesUrl = `http://${getHost()}/people?resetPage=false&search=&limit=500&page=2&sortBy=last_login`;
+    const mockPeople = { ...people[0] };
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockPeople }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.getPeople({
+      resetPage: false,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    expect(store._people.length).toEqual(1);
+    expect(store._people[0].hide).toEqual(true);
+    expect(res).toBeTruthy();
+  });
+
+  it('should fetch and store organization bounties successfully', async () => {
+    const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bounties = await store.getOrganizationBounties('1111', {
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(bounties).toEqual([expectedBountyResponses[0]]);
+  });
+
+  it('should reset exisiting organization bounty if reset flag is passed', async () => {
+    const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    store.setPeopleBounties([expectedBountyResponses[0] as any]);
+    expect(store.peopleBounties.length).toEqual(1);
+
+    const bounties = await store.getOrganizationBounties('1111', {
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedResponse]);
+    expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should add to exisiting bounty if reset flag is not passed', async () => {
+    const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bountyAlreadyPresent = { ...expectedBountyResponses[0] } as any;
+    bountyAlreadyPresent.body.id = 1;
+    store.setPeopleBounties([bountyAlreadyPresent]);
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties[0].body.id).not.toEqual(2);
+
+    const bounties = await store.getOrganizationBounties('1111', {
+      resetPage: false,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(2);
+    expect(store.peopleBounties[1]).toEqual(expectedResponse);
+    expect(bounties).toEqual([expectedResponse]);
   });
 });
