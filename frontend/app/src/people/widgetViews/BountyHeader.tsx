@@ -177,6 +177,28 @@ const FilterCount = styled.div<styledProps>`
   }
 `;
 
+const MobileFilterCount = styled.div<styledProps>`
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  margin-left: -8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  background: ${(p: any) => p?.color && p.color.blue1};
+  .filterCountText {
+    font-family: 'Barlow';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: ${(p: any) => p.color && p.color.pureWhite};
+  }
+`;
+
 const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   width: 147px;
   height: 312px;
@@ -615,9 +637,9 @@ const BountyHeader = ({
               </div>
             </EuiPopover>
             {filterCountNumber > 0 && (
-              <FilterCount color={color}>
+              <MobileFilterCount color={color}>
                 <EuiText className="filterCountText">{filterCountNumber}</EuiText>
-              </FilterCount>
+              </MobileFilterCount>
             )}
           </LargeActionContainer>
           <ShortActionContainer>
