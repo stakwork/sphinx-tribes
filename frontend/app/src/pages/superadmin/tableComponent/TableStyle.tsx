@@ -15,7 +15,7 @@ export const HeaderContainer = styled.div`
 
 export const PaginatonSection = styled.div`
   background-color: #fff;
-  height: 64px;
+  height: 150px;
   flex-shrink: 0;
   align-self: stretch;
   border-radius: 8px;
