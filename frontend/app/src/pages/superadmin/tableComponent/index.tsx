@@ -55,6 +55,7 @@ interface TableProps {
   bounties: Bounty[];
   startDate?: number;
   endDate?: number;
+  headerIsFrozen: boolean;
 }
 
 interface ImageWithTextProps {
@@ -136,7 +137,7 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   </>
 );
 
-export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
+export const MyTable = ({ bounties, startDate, endDate, headerIsFrozen }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
   const [activeTabs, setActiveTabs] = useState<number[]>([]);
@@ -218,7 +219,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
 
   return (
     <>
-      <HeaderContainer>
+      <HeaderContainer freeze={!headerIsFrozen}>
         <Header>
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
@@ -251,7 +252,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
       </HeaderContainer>
       <TableContainer>
         <Table>
-          <TableRow>
+          <TableRow freeze={!headerIsFrozen}>
             <TableHeaderData>Bounty</TableHeaderData>
             <TableHeaderData>Date</TableHeaderData>
             <TableHeaderDataCenter>#DTGP</TableHeaderDataCenter>
