@@ -142,6 +142,6 @@ it('it renders with filter status states', async () => {
 
   const dropdown = getByLabelText('Status:');
   fireEvent.select(dropdown);
-  await userEvent.click(getByText("Open"));
+  await userEvent.click(getByText('Open'));
   expect(dropdownValue).toBe('open');
 });
