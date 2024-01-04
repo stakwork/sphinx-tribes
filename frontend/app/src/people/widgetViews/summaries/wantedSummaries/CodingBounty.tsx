@@ -113,7 +113,6 @@ function MobileView(props: CodingBountiesProps) {
 
   const [paymentLoading, setPaymentLoading] = useState(false);
 
-
   const userPubkey = ui.meInfo?.owner_pubkey;
 
   let bountyPaid = paid || invoiceStatus || keysendStatus;
