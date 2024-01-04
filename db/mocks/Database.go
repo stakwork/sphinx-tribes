@@ -765,6 +765,20 @@ func (_m *Database) GetChannelsByTribe(tribe_uuid string) []db.Channel {
 	return r0
 }
 
+// GetConnectionCode provides a mock function with given fields:
+func (_m *Database) GetConnectionCode() db.ConnectionCodesShort {
+	ret := _m.Called()
+
+	var r0 db.ConnectionCodesShort
+	if rf, ok := ret.Get(0).(func() db.ConnectionCodesShort); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(db.ConnectionCodesShort)
+	}
+
+	return r0
+}
+
 // GetCreatedBounties provides a mock function with given fields: pubkey
 func (_m *Database) GetCreatedBounties(pubkey string) ([]db.Bounty, error) {
 	ret := _m.Called(pubkey)
@@ -1713,6 +1727,20 @@ func (_m *Database) UpdateTribeUniqueName(uuid string, u string) {
 // UpdateTwitterConfirmed provides a mock function with given fields: id, confirmed
 func (_m *Database) UpdateTwitterConfirmed(id uint, confirmed bool) {
 	_m.Called(id, confirmed)
+}
+
+// UserHasManageBountyRoles provides a mock function with given fields: pubKeyFromAuth, uuid
+func (_m *Database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
+	ret := _m.Called(pubKeyFromAuth, uuid)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
+		r0 = rf(pubKeyFromAuth, uuid)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
 }
 
 // WithdrawBudget provides a mock function with given fields: sender_pubkey, org_uuid, amount

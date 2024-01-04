@@ -72,6 +72,7 @@ type Database interface {
 	CountDevelopers() int64
 	CountBounties() uint64
 	GetPeopleListShort(count uint32) *[]PersonInShort
+	GetConnectionCode() ConnectionCodesShort
 	CreateConnectionCode(c ConnectionCodes) (ConnectionCodes, error)
 	GetLnUser(lnKey string) int64
 	CreateLnUser(lnKey string) (Person, error)
@@ -110,4 +111,5 @@ type Database interface {
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
 	ChangeOrganizationDeleteStatus(org_uuid string, status bool) Organization
 	GetFilterStatusCount() FilterStattuCount
+	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
 }
