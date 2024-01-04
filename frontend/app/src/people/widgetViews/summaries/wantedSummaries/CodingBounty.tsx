@@ -107,6 +107,7 @@ function MobileView(props: CodingBountiesProps) {
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
   const [userBountyRole, setUserBountyRole] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   const userPubkey = ui.meInfo?.owner_pubkey;
 
@@ -228,7 +229,12 @@ function MobileView(props: CodingBountiesProps) {
     };
   }, [main, startPolling]);
 
+  const recallBounties = async () => {
+    await main.getPeopleBounties({ resetPage: true, ...main.bountiesStatus });
+  };
+
   const makePayment = async () => {
+    setPaymentLoading(true);
     // If the bounty has a commitment fee, add the fee to the user payment
     const price = Number(props.price);
     // if there is an organization and the organization's
@@ -237,17 +243,26 @@ function MobileView(props: CodingBountiesProps) {
     if (org_uuid) {
       const organizationBudget = await main.getOrganizationBudget(org_uuid);
       const budget = organizationBudget.total_budget;
-      if (Number(budget) >= Number(price)) {
-        // make keysend payment
-        const body = {
-          id: id || 0,
-          websocket_token: ui.meInfo?.websocketToken || '',
-          receiver_pubkey: assignee.owner_pubkey,
-          route_hint: assignee.owner_route_hint ?? ''
-        };
 
-        await main.makeBountyPayment(body);
+      const bounty = await main.getBountyById(id ?? 0);
+      if (bounty.length && Number(budget) >= Number(price)) {
+        const b = bounty[0];
+
+        if (!b.body.paid) {
+          // make keysend payment
+          const body = {
+            id: id || 0,
+            websocket_token: ui.meInfo?.websocketToken || '',
+            receiver_pubkey: assignee.owner_pubkey,
+            route_hint: assignee.owner_route_hint ?? ''
+          };
+
+          await main.makeBountyPayment(body);
+          setPaymentLoading(false);
+          recallBounties();
+        }
       } else {
+        setPaymentLoading(false);
         return setToasts([
           {
             id: `${Math.random()}`,
@@ -264,7 +279,7 @@ function MobileView(props: CodingBountiesProps) {
 
   const updatePaymentStatus = async (created: number) => {
     await main.updateBountyPaymentStatus(created);
-    await main.getPeopleBounties();
+    recallBounties();
   };
 
   const handleSetAsPaid = async (e: any) => {
@@ -291,6 +306,7 @@ function MobileView(props: CodingBountiesProps) {
     await updatePaymentStatus(created || 0);
     setLocalPaid('UNPAID');
     setUpdatingPayment(false);
+    recallBounties();
   };
 
   const twitterHandler = () => {
@@ -410,7 +426,7 @@ function MobileView(props: CodingBountiesProps) {
             <IconButton
               width={'100%'}
               height={48}
-              disabled={payBountyDisable}
+              disabled={paymentLoading || payBountyDisable}
               style={{
                 bottom: '10px'
               }}
@@ -712,7 +728,7 @@ function MobileView(props: CodingBountiesProps) {
                     {showPayBounty && (
                       <>
                         <Button
-                          disabled={payBountyDisable}
+                          disabled={paymentLoading || payBountyDisable}
                           iconSize={14}
                           width={220}
                           height={48}
