@@ -257,7 +257,7 @@ export interface FilterStatusCount {
 export interface BountyMetrics {
   bounties_posted: number;
   bounties_paid: number;
-  bounties_paid_percentage: number;
+  bounties_paid_average: number;
   sats_posted: number;
   sats_paid: number;
   sats_paid_percentage: number;
@@ -2396,7 +2396,7 @@ export class MainStore {
     }
   }
 
-  async getBountyMetrics(start_date: number, end_date: number): Promise<BountyMetrics | undefined> {
+  async getBountyMetrics(start_date: string, end_date: string): Promise<BountyMetrics | undefined> {
     try {
       if (!uiStore.meInfo) return undefined;
       const info = uiStore.meInfo;
@@ -2416,7 +2416,7 @@ export class MainStore {
         }
       });
 
-      return r;
+      return r.json();
     } catch (e) {
       console.error('getBountyMetrics', e);
       return undefined;
