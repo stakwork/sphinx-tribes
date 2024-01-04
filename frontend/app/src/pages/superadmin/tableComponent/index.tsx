@@ -121,12 +121,12 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
             status === 'open'
               ? '#618AFF'
               : status === 'paid'
-              ? '#5F6368'
-              : status === 'assigned'
-              ? '#49C998'
-              : status === 'completed'
-              ? '#9157F6'
-              : 'transparent',
+                ? '#5F6368'
+                : status === 'assigned'
+                  ? '#49C998'
+                  : status === 'completed'
+                    ? '#9157F6'
+                    : 'transparent',
           borderRadius: '2px',
           marginBottom: '0'
         }}
@@ -267,8 +267,8 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
                 bounty?.paid && bounty.assignee
                   ? 'completed'
                   : bounty.assignee && !bounty.paid
-                  ? 'assigned'
-                  : 'open';
+                    ? 'assigned'
+                    : 'open';
 
               const created = moment.unix(bounty.bounty_created).format('YYYY-MM-DD');
               const time_to_pay = bounty.paid_date

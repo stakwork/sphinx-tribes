@@ -1,6 +1,6 @@
 import React from 'react';
 /* eslint-disable func-style */
-import '@material/react-material-icon/dist/material-icon.css';
+// import '@material/react-material-icon/dist/material-icon.css';
 import { AppMode } from 'config';
 import { Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';

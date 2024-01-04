@@ -1,5 +1,4 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { useLocation } from 'react-router-dom';
 import { colors } from '../config/colors';
 
 export type MainLayoutProps = PropsWithChildren<{
