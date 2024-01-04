@@ -2476,6 +2476,28 @@ export class MainStore {
       return 0;
     }
   }
+
+  async getIsAdmin(): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return false;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/admin/auth`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (r.status === 200) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Error pollInvoice', e);
+    }
+  }
 }
 
 export const mainStore = new MainStore();
