@@ -384,7 +384,6 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if the bounty has been paid already to avoid double payment
-
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")

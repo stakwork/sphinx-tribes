@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStores } from 'store';
+import { BountyStatus, defaultBountyStatus } from 'store/main';
 import moment from 'moment';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
@@ -56,6 +57,10 @@ interface TableProps {
   bounties: Bounty[];
   startDate?: number;
   endDate?: number;
+  bountyStatus?: BountyStatus;
+  setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
+  dropdownValue?: string;
+  setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface ImageWithTextProps {
@@ -137,7 +142,15 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   </>
 );
 
-export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
+export const MyTable = ({
+  bounties,
+  startDate,
+  endDate,
+  bountyStatus,
+  setBountyStatus,
+  dropdownValue,
+  setDropdownValue
+}: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
   const [activeTabs, setActiveTabs] = useState<number[]>([]);
@@ -151,8 +164,50 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
   const currentPageData = () => {
     const indexOfLastPost = currentPage * pageSize;
     const indexOfFirstPost = indexOfLastPost - pageSize;
-    const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
-    return currentPosts;
+    if (bounties) {
+      const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
+      return currentPosts;
+    }
+  };
+
+  const updateBountyStatus = (e: any) => {
+    const { value } = e.target;
+    if (bountyStatus && setBountyStatus && setDropdownValue) {
+      switch (value) {
+        case 'open': {
+          const newStatus = { ...defaultBountyStatus, Open: true };
+          setBountyStatus(newStatus);
+          break;
+        }
+        case 'in-progress': {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false,
+            Assigned: true
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+        case 'completed': {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false,
+            Paid: true
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+        default: {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+      }
+      setDropdownValue(value);
+    }
   };
 
   const paginateNext = () => {
@@ -217,6 +272,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
     getActiveTabs();
   }, [getActiveTabs]);
 
+  const bountiesLength = bounties && bounties.length;
   return (
     <>
       <HeaderContainer>
@@ -225,8 +281,8 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
               {' '}
-              {bounties.length}{' '}
-              <AlternativeTitle> {bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
+              {bountiesLength}{' '}
+              <AlternativeTitle> {bountiesLength === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
             </LeadingTitle>
           </BountyHeader>
           <Options>
@@ -240,8 +296,8 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             </FlexDiv>
             <FlexDiv>
               <Label>Status:</Label>
-              <StyledSelect2 id="statusFilter">
-                <option value="All">All</option>
+              <StyledSelect2 id="statusFilter" value={dropdownValue} onChange={updateBountyStatus}>
+                <option value="all">All</option>
                 <option value="open">Open</option>
                 <option value="in-progress">In Progress</option>
                 <option value="completed">Completed</option>

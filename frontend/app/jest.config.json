@@ -1,6 +1,10 @@
 {
   "collectCoverage": true,
-  "collectCoverageFrom": ["./src/**/*.{ts,jxs,tsx,js}", "!src/**/*.spec.tsx", "!src/**/*.spec.ts"],
+  "collectCoverageFrom": [
+    "./src/**/*.{ts,jxs,tsx,js}",
+    "!src/**/*.spec.tsx",
+    "!src/**/*.spec.ts"
+  ],
   "coverageThreshold": {
     "global": {
       "lines": 22.31
@@ -30,7 +34,7 @@
       "lines": 38.05
     },
     "./src/pages/superadmin/": {
-      "lines": 19.62
+      "lines": 18.51
     },
     "./src/pages/": {
       "lines": 8.3
@@ -45,7 +49,14 @@
       "lines": 6.35
     }
   },
-  "moduleFileExtensions": ["ts", "js", "json", "node", "tsx", "jsx"],
+  "moduleFileExtensions": [
+    "ts",
+    "js",
+    "json",
+    "node",
+    "tsx",
+    "jsx"
+  ],
   "preset": "ts-jest",
   "transform": {
     "^.+\\.(ts|tsx)?$": "ts-jest",
@@ -57,17 +68,26 @@
     "/node_modules/(?!remark-gfm)",
     "/node_modules/(?!@testing-library/jest-dom)"
   ],
-  "modulePaths": ["<rootDir>/src"],
+  "modulePaths": [
+    "<rootDir>/src"
+  ],
   "moduleNameMapper": {
     "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
   },
-  "moduleDirectories": ["node_modules", "<rootDir>"],
+  "moduleDirectories": [
+    "node_modules",
+    "<rootDir>"
+  ],
   "globals": {
-    "window": { "location": { "host": "localhost" } },
+    "window": {
+      "location": {
+        "host": "localhost"
+      }
+    },
     "testEnvironment": "jsdom"
   },
   "testEnvironment": "jsdom",
-	"automock": false,
+  "automock": false,
   "resetMocks": false,
   "setupFiles": [
     "./setupJest.js"

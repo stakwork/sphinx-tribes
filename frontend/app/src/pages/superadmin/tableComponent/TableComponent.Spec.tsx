@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MyTable } from './index.tsx';
+import { BountyStatus } from 'store/main.ts';
 
 const mockBounties = [
   {
@@ -110,6 +111,34 @@ it('renders each element in the table in the document', () => {
 
 it('renders each element in the table in the document', () => {
   const { getByText } = render(<MyTable bounties={mockBounties} />);
+  mockBounties.forEach((bounty: Bounty) => {
+    expect(getByText(bounty.title)).toBeInTheDocument();
+    expect(getByText(bounty.date)).toBeInTheDocument();
+    expect(getByText(String(bounty.dtgp))).toBeInTheDocument();
+    expect(getByText(bounty.assignee)).toBeInTheDocument();
+    expect(getByText(bounty.provider)).toBeInTheDocument();
+    expect(getByText(bounty.organization)).toBeInTheDocument();
+  });
+});
+
+it('it renders with filter status states', () => {
+  const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
+    Open: false,
+    Assigned: false,
+    Paid: false
+  });
+  const [dropdownValue, setDropdownValue] = useState('all');
+
+  const { getByText } = render(
+    <MyTable
+      bounties={mockBounties}
+      dropdownValue={dropdownValue}
+      setDropdownValue={setDropdownValue}
+      bountyStatus={bountyStatus}
+      setBountyStatus={setBountyStatus}
+    />
+  );
+
   mockBounties.forEach((bounty: Bounty) => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(bounty.date)).toBeInTheDocument();

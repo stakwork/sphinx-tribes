@@ -2423,17 +2423,30 @@ export class MainStore {
     }
   }
 
-  async getBountiesByRange(start_date: string, end_date: string): Promise<any | undefined> {
+  async getBountiesByRange(
+    date_range: {
+      start_date: string;
+      end_date: string;
+    },
+    params?: QueryParams
+  ): Promise<any | undefined> {
     try {
       if (!uiStore.meInfo) return undefined;
       const info = uiStore.meInfo;
 
-      const body = {
-        start_date,
-        end_date
+      const queryParams: QueryParams = {
+        ...params
       };
 
-      const r: any = await fetch(`${TribesURL}/metrics/bounties`, {
+      // if we don't pass the params, we should use previous params for invalidate query
+      const query = this.appendQueryParams('metrics/bounties', 20, queryParams);
+
+      const body = {
+        start_date: date_range.start_date,
+        end_date: date_range.end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/${query}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(body),
