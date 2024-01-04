@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 import { act, render, waitFor } from '@testing-library/react';
-import { person } from '_test/mockData_/persons';
-import { setupStore } from '_test/mockData_/setupStore';
-import { user } from '_test/mockData_/user';
-import { mockUsehistory } from '_test/mockFn_/useHistory';
-import mockBounties from 'bounties/_mock_/mockBounties.data';
+import { person } from '__test__/__mockData__/persons';
+import { setupStore } from '__test__/__mockData__/setupStore';
+import { user } from '__test__/__mockData__/user';
+import { mockUsehistory } from '__test__/__mockFn___/useHistory';
+import mockBounties from 'bounties/__mock__/mockBounties.data';
 import nock from 'nock';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
@@ -21,18 +21,18 @@ beforeAll(() => {
  * @jest-environment jsdom
  */
 describe('UserTickets', () => {
-  nock(user.url).get('/person/id/1').reply(200, {user});
+  nock(user.url).get('/person/id/1').reply(200, { user });
   nock(user.url).get('/ask').reply(200, {});
 
   it('renders no tickets if none assigned', async () => {
-    jest.spyOn(mainStore, 'getPersonAssignedBounties').mockReturnValue(Promise.resolve([]))
+    jest.spyOn(mainStore, 'getPersonAssignedBounties').mockReturnValue(Promise.resolve([]));
     await act(async () => {
       const { getByText } = render(
         <MemoryRouter initialEntries={['/p/1234/usertickets']}>
           <Route path="/p/:personPubkey/usertickets" component={UserTickets} />
         </MemoryRouter>
       );
-    
+
       await waitFor(() => getByText('No Assigned Tickets Yet'));
 
       expect(getByText('No Assigned Tickets Yet')).toBeInTheDocument();
@@ -46,14 +46,16 @@ describe('UserTickets', () => {
       owner_id: person.owner_pubkey,
       title: 'test bounty here'
     } as any;
-    jest.spyOn(mainStore, 'getPersonAssignedBounties').mockReturnValue(Promise.resolve([userBounty]))
+    jest
+      .spyOn(mainStore, 'getPersonAssignedBounties')
+      .mockReturnValue(Promise.resolve([userBounty]));
     await act(async () => {
       const { getByText } = render(
         <MemoryRouter initialEntries={['/p/1234/usertickets']}>
           <Route path="/p/:personPubkey/usertickets" component={UserTickets} />
         </MemoryRouter>
       );
-    
+
       await waitFor(() => getByText(userBounty.body.title));
 
       expect(getByText(userBounty.body.title)).toBeInTheDocument();
@@ -68,14 +70,16 @@ describe('UserTickets', () => {
       title: 'test bounty here',
       description: 'custom ticket for testing'
     } as any;
-    jest.spyOn(mainStore, 'getPersonAssignedBounties').mockReturnValue(Promise.resolve([userBounty]))
+    jest
+      .spyOn(mainStore, 'getPersonAssignedBounties')
+      .mockReturnValue(Promise.resolve([userBounty]));
     await act(async () => {
       const { getByText } = render(
         <MemoryRouter initialEntries={['/p/1234/usertickets']}>
           <Route path="/p/:personPubkey/usertickets" component={UserTickets} />
         </MemoryRouter>
       );
-    
+
       await waitFor(() => getByText(userBounty.body.title));
       await waitFor(() => getByText(userBounty.body.description));
 
@@ -91,14 +95,16 @@ describe('UserTickets', () => {
       owner_id: person.owner_pubkey,
       price: 100
     } as any;
-    jest.spyOn(mainStore, 'getPersonAssignedBounties').mockReturnValue(Promise.resolve([userBounty]))
+    jest
+      .spyOn(mainStore, 'getPersonAssignedBounties')
+      .mockReturnValue(Promise.resolve([userBounty]));
     await act(async () => {
       const { getByText } = render(
         <MemoryRouter initialEntries={['/p/1234/usertickets']}>
           <Route path="/p/:personPubkey/usertickets" component={UserTickets} />
         </MemoryRouter>
       );
-    
+
       await waitFor(() => getByText('100'));
 
       expect(getByText('100')).toBeInTheDocument();
@@ -112,14 +118,16 @@ describe('UserTickets', () => {
       owner_id: person.owner_pubkey,
       estimated_session_length: '< 3hrs'
     } as any;
-    jest.spyOn(mainStore, 'getPersonAssignedBounties').mockReturnValue(Promise.resolve([userBounty]))
+    jest
+      .spyOn(mainStore, 'getPersonAssignedBounties')
+      .mockReturnValue(Promise.resolve([userBounty]));
     await act(async () => {
       const { getByText } = render(
         <MemoryRouter initialEntries={['/p/1234/usertickets']}>
           <Route path="/p/:personPubkey/usertickets" component={UserTickets} />
         </MemoryRouter>
       );
-    
+
       await waitFor(() => getByText(userBounty.body.estimated_session_length));
 
       expect(getByText(userBounty.body.estimated_session_length)).toBeInTheDocument();
