@@ -77,6 +77,7 @@ export const DivWrapper = styled.div`
   margin-top: 30px;
   margin-bottom: 45px;
   position: relative;
+  z-index: 0;
 `;
 
 export const LeadingText = styled.h2`

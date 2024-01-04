@@ -235,7 +235,17 @@ function FocusedView(props: FocusViewProps) {
         newBody.title = body.title;
       }
       newBody.one_sentence_summary = '';
-      newBody.owner_id = info.pubkey;
+
+      if (!newBody.id && !newBody.owner_id) {
+        newBody.owner_id = info.pubkey;
+      }
+
+      // For editing a bounty, get the pubkey of the bounty creator
+      const bounty = await main.getBountyById(Number(newBody.id));
+      if (newBody.id && bounty.length) {
+        const b = bounty[0];
+        newBody.owner_id = b.body.owner_id;
+      }
 
       await main.saveBounty(newBody);
 

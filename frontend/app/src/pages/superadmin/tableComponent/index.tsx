@@ -37,6 +37,7 @@ import {
 } from './TableStyle';
 
 import './styles.css';
+
 interface Bounty {
   id: number;
   title: string;
@@ -206,7 +207,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
       dataNumber.push(i);
     }
     setActiveTabs(dataNumber);
-  }, []);
+  }, [paginationLimit]);
 
   useEffect(() => {
     getTotalBounties();
@@ -264,7 +265,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             {currentPageData()?.map((bounty: any) => {
               const bounty_status =
                 bounty?.paid && bounty.assignee
-                  ? 'completed'
+                  ? 'paid'
                   : bounty.assignee && !bounty.paid
                   ? 'assigned'
                   : 'open';
