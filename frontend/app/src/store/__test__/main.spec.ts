@@ -105,7 +105,7 @@ describe('Main store', () => {
 
     await mainStore.addOrganizationUser(organizationUser);
 
-    expect(mockFetch).toBeCalledWith('${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0', {
+    expect(mockFetch).toBeCalledWith(`${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0`, {
       method: 'POST',
       headers: expectedHeaders,
       body: JSON.stringify(organizationUser),
