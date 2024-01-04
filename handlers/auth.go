@@ -12,6 +12,14 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
+type authHandler struct {
+	db db.Database
+}
+
+func NewAuthHandler(db db.Database) *authHandler {
+	return &authHandler{db: db}
+}
+
 func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	type PubKeysReturn struct {
 		Pubkeys []string `json:"pubkeys"`
@@ -38,7 +46,7 @@ func GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
+func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	code := db.ConnectionCodes{}
 	now := time.Now()
 
@@ -56,18 +64,17 @@ func CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.DB.CreateConnectionCode(code)
+	_, err = ah.db.CreateConnectionCode(code)
 
 	if err != nil {
 		fmt.Println("=> ERR create connection code", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
 }
 
-func GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
-	connectionCode := db.DB.GetConnectionCode()
+func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
+	connectionCode := ah.db.GetConnectionCode()
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(connectionCode)
