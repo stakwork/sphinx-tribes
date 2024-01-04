@@ -1,5 +1,7 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
+import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from './index.tsx';
 
@@ -117,5 +119,17 @@ it('renders each element in the table in the document', () => {
     expect(getByText(bounty.assignee)).toBeInTheDocument();
     expect(getByText(bounty.provider)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
+  });
+
+  it('should navigate to the correct URL when a bounty is clicked', () => {
+    const history = createMemoryHistory();
+    const { getByText } = render(
+      <Router history={history}>
+        <MyTable bounties={mockBounties} />
+      </Router>
+    );
+    const bountyTitle = getByText('Sample Bounty');
+    fireEvent.click(bountyTitle);
+    expect(history.location.pathname).toBe('/bounty/1');
   });
 });
