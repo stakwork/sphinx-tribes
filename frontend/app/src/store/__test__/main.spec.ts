@@ -10,17 +10,23 @@ import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/m
 
 let fetchStub: sinon.SinonStub;
 
+const mockFetch = jest.fn();
+const mockHeaders = jest.fn();
+
+const origFetch = global.fetch;
+
 beforeAll(() => {
   fetchStub = sinon.stub(global, 'fetch');
+  global.fetch = mockFetch;
+  global.Headers = mockHeaders;
 });
 
 afterAll(() => {
+  global.fetch = origFetch;
   jest.clearAllMocks();
 });
 
-const getOrganizationUsersEndpoint = (orgUUID: string): string => {
-  return `https://community.sphinx.chat/organizations/users/${orgUUID}`;
-};
+const getOrganizationUsersEndpoint = (orgUUID: string): string => `${TribesURL}/organizations/users/${orgUUID}`;
 
 describe('Main store', () => {
   beforeEach(async () => {
@@ -99,7 +105,7 @@ describe('Main store', () => {
     await mainStore.addOrganizationUser(organizationUser);
 
     expect(mockFetch).toBeCalledWith(
-      'https://community.sphinx.chat/organizations/users/cmas9gatu2rvqiev4ur0',
+      '${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0',
       {
         method: 'POST',
         headers: expectedHeaders,
@@ -149,7 +155,7 @@ describe('Main store', () => {
     const organizationUser = await mainStore.getOrganizationUser(userUUID);
 
     expect(mockFetch).toBeCalledWith(
-      `https://community.sphinx.chat/organizations/foruser/${userUUID}`,
+      `${TribesURL}/organizations/foruser/${userUUID}`,
       expect.objectContaining({
         method: 'GET',
         mode: 'cors',
@@ -182,7 +188,7 @@ describe('Main store', () => {
     const organizationsCount = await mainStore.getOrganizationUsersCount(orgUUID);
 
     expect(mockFetch).toBeCalledWith(
-      `https://community.sphinx.chat/organizations/users/${orgUUID}/count`,
+      `${TribesURL}/organizations/users/${orgUUID}/count`,
       expect.objectContaining({
         method: 'GET',
         mode: 'cors'
@@ -235,7 +241,7 @@ describe('Main store', () => {
     const deleteResponse = await mainStore.deleteOrganizationUser(deleteRequestBody, orgUserUUID);
 
     expect(mockFetch).toBeCalledWith(
-      `https://community.sphinx.chat/organizations/users/${orgUserUUID}`,
+      `${TribesURL}/organizations/users/${orgUserUUID}`,
       expect.objectContaining({
         method: 'DELETE',
         mode: 'cors',
