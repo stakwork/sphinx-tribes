@@ -1,21 +1,20 @@
 import { toJS } from 'mobx';
+import sinon from 'sinon';
+import { people } from '../../__test__/__mockData__/persons';
 import { user } from '../../__test__/__mockData__/user';
-import { uiStore } from '../ui';
+import { emptyMeInfo, uiStore } from '../ui';
 import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
+import { TribesURL, getHost } from '../../config';
+import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
 
-const mockFetch = jest.fn();
-const mockHeaders = jest.fn();
-
-const origFetch = global.fetch;
+let fetchStub: sinon.SinonStub;
 
 beforeAll(() => {
-  global.fetch = mockFetch;
-  global.Headers = mockHeaders;
+  fetchStub = sinon.stub(global, 'fetch');
 });
 
 afterAll(() => {
-  global.fetch = origFetch;
   jest.clearAllMocks();
 });
 
@@ -23,6 +22,10 @@ describe('Main store', () => {
   beforeEach(async () => {
     uiStore.setMeInfo(user);
     localStorageMock.setItem('ui', JSON.stringify(uiStore));
+  });
+
+  afterEach(() => {
+    fetchStub.reset();
   });
 
   it('should call endpoint on saveBounty', () => {
@@ -70,5 +73,214 @@ describe('Main store', () => {
 
     expect(toJS(uiStore.meInfo)).toEqual(user);
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+  });
+
+  it('should send request delete request with correct body and url', async () => {
+    const url = `${TribesURL}/gobounties/pub_key/1111`;
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=created&search=&page=1&resetPage=true&Open=true&Assigned=false&Paid=false`;
+    const expectedRequestOptions: RequestInit = {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'x-jwt': user.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    };
+    fetchStub.withArgs(url, expectedRequestOptions).returns(
+      Promise.resolve({
+        status: 200
+      }) as any
+    );
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
+
+    const store = new MainStore();
+    await store.deleteBounty(1111, 'pub_key');
+
+    expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+  });
+
+  it('should not panic if failed to delete bounty', async () => {
+    const url = `${TribesURL}/gobounties/pub_key/1111`;
+    const expectedRequestOptions: RequestInit = {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'x-jwt': user.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    };
+    fetchStub.withArgs(url, expectedRequestOptions).throwsException();
+
+    const store = new MainStore();
+    await store.deleteBounty(1111, 'pub_key');
+
+    expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
+    expect(store.peopleBounties.length).toEqual(0);
+  });
+
+  it('should not return false if asignee removed successfully', async () => {
+    const url = `${TribesURL}/gobounties/assignee`;
+    const expectedRequestOptions: RequestInit = {
+      method: 'DELETE',
+      mode: 'cors',
+      body: JSON.stringify({
+        owner_pubkey: 'pub_key',
+        created: '1111'
+      }),
+      headers: {
+        'x-jwt': user.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    };
+    fetchStub.withArgs(url, expectedRequestOptions).returns(
+      Promise.resolve({
+        status: 200
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.deleteBountyAssignee({ owner_pubkey: 'pub_key', created: '1111' });
+
+    expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
+    expect(res).not.toBeFalsy();
+  });
+
+  it('should  return false if failed to remove asignee ', async () => {
+    const url = `${TribesURL}/gobounties/assignee`;
+    const expectedRequestOptions: RequestInit = {
+      method: 'DELETE',
+      mode: 'cors',
+      body: JSON.stringify({
+        owner_pubkey: 'pub_key',
+        created: '1111'
+      }),
+      headers: {
+        'x-jwt': user.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    };
+    fetchStub.withArgs(url, expectedRequestOptions).throwsException();
+
+    const store = new MainStore();
+    const res = await store.deleteBountyAssignee({ owner_pubkey: 'pub_key', created: '1111' });
+
+    expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
+    expect(res).toBeFalsy();
+  });
+
+  it('should successfully update bounty payment status', async () => {
+    const url = `${TribesURL}/gobounties/paymentstatus/1111`;
+    const expectedRequestOptions: RequestInit = {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'x-jwt': user.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    };
+    fetchStub.withArgs(url, expectedRequestOptions).returns(
+      Promise.resolve({
+        status: 200
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.updateBountyPaymentStatus(1111);
+
+    expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
+    expect(res).not.toBeFalsy();
+  });
+
+  it('should return false if failed to update bounty status', async () => {
+    const url = `${TribesURL}/gobounties/paymentstatus/1111`;
+    const expectedRequestOptions: RequestInit = {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'x-jwt': user.tribe_jwt,
+        'Content-Type': 'application/json'
+      }
+    };
+    fetchStub.withArgs(url, expectedRequestOptions).throwsException();
+
+    const store = new MainStore();
+    const res = await store.updateBountyPaymentStatus(1111);
+
+    expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
+    expect(res).toBeFalsy();
+  });
+
+  it('should successfully return requested bounty', async () => {
+    const url = `http://${getHost()}/gobounties/id/1111`;
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.getBountyById(1111);
+
+    expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
+    expect(res).toEqual([expectedBountyResponses[0]]);
+  });
+
+  it('should return empty array if failed to fetch bounty', async () => {
+    const url = `http://${getHost()}/gobounties/id/1111`;
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 404,
+        ok: false
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.getBountyById(1111);
+
+    expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
+    expect(res.length).toEqual(0);
+  });
+
+  it('should successfully return index of requested bounty', async () => {
+    const url = `http://${getHost()}/gobounties/index/1111`;
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve(1)
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.getBountyIndexById(1111);
+
+    expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
+    expect(res).toEqual(1);
+  });
+
+  it('should return 0 if failed to fetch index', async () => {
+    const url = `http://${getHost()}/gobounties/index/1111`;
+    fetchStub.withArgs(url, sinon.match.any).returns(
+      Promise.resolve({
+        status: 400,
+        ok: false
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.getBountyIndexById(1111);
+
+    expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
+    expect(res).toEqual(0);
   });
 });
