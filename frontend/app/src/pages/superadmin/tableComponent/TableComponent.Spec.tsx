@@ -1,7 +1,9 @@
-import React from 'react';
-import { render } from '@testing-library/react';
+import React, { useState } from 'react';
+import { render, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { MyTable } from './index.tsx';
+import { BountyStatus } from 'store/main.ts';
 
 const mockBounties = [
   {
@@ -118,4 +120,28 @@ it('renders each element in the table in the document', () => {
     expect(getByText(bounty.provider)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
+});
+
+it('it renders with filter status states', async () => {
+  const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
+    Open: false,
+    Assigned: false,
+    Paid: false
+  });
+  const [dropdownValue, setDropdownValue] = useState('all');
+
+  const { getByText, getByLabelText } = render(
+    <MyTable
+      bounties={mockBounties}
+      dropdownValue={dropdownValue}
+      setDropdownValue={setDropdownValue}
+      bountyStatus={bountyStatus}
+      setBountyStatus={setBountyStatus}
+    />
+  );
+
+  const dropdown = getByLabelText('Status:');
+  fireEvent.select(dropdown);
+  await userEvent.click(getByText('Open'));
+  expect(dropdownValue).toBe('open');
 });
