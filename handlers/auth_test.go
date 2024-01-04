@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
-	"github.com/stakwork/sphinx-tribes/db/mocks"
+	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"net/http"

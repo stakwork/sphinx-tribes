@@ -39,7 +39,7 @@ line 10 in `frontend/app/src/config/ModeDispatcher.tsx` change `'localhost:3000'
 
 line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 
-### Run Golang backemd
+### Run Golang backend
 
 - Create a .env file and populate the env file with thgitese variables
 
@@ -68,6 +68,33 @@ line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 ```
 
 - Build and run the Golang server
+
+
+### Mocking interfaces for unit testing golang backend
+We are using [mockery](https://vektra.github.io/mockery/latest/) to autogenerate mocks of an interface in our unit tests. Download using this [link](https://vektra.github.io/mockery/latest/).
+
+#### When adding a new function to the interface which is already mocked follow the below steps:
+1. Update the corresponding interface with the function signature, for example if you are adding new function to the ```database``` structure make sure the interface file ```db/interface.go``` is updated with the function signature.
+2. run the command ```mockery``` to update the mocks.
+
+
+#### To create mocks for a new interface make follow the steps below:
+
+1. Add the new entry in the ```.mockery.yml``` file like this
+```yml
+with-expecter: true
+dir: "mocks"
+packages:
+    github.com/stakwork/sphinx-tribes/db:
+        interfaces:
+            Database:
+    github.com/stakwork/sphinx-tribes/*your-package-name*:
+        interfaces:
+            *your-interface-1*:
+            *your-interface-2*:
+```
+2. run the command ```mockery``` to update the mocks.
+
 
 ### Run Test
 

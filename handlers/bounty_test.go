@@ -6,19 +6,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi"
-	"github.com/stakwork/sphinx-tribes/auth"
-	"github.com/stakwork/sphinx-tribes/config"
-	"github.com/stakwork/sphinx-tribes/db"
-	dbMocks "github.com/stakwork/sphinx-tribes/db/mocks"
-	"github.com/stakwork/sphinx-tribes/handlers/mocks"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
+	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/handlers/mocks"
+	dbMocks "github.com/stakwork/sphinx-tribes/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateOrEditBounty(t *testing.T) {
