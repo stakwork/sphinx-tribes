@@ -3,7 +3,7 @@ import { act, render, waitFor } from '@testing-library/react';
 import { person } from '__test__/__mockData__/persons';
 import { setupStore } from '__test__/__mockData__/setupStore';
 import { user } from '__test__/__mockData__/user';
-import { mockUsehistory } from '__test__/__mockFn___/useHistory';
+import { mockUsehistory } from '__test__/__mockFn__/useHistory';
 import mockBounties from 'bounties/__mock__/mockBounties.data';
 import nock from 'nock';
 import React from 'react';
