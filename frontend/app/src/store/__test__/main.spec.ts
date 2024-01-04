@@ -26,7 +26,8 @@ afterAll(() => {
   jest.clearAllMocks();
 });
 
-const getOrganizationUsersEndpoint = (orgUUID: string): string => `${TribesURL}/organizations/users/${orgUUID}`;
+const getOrganizationUsersEndpoint = (orgUUID: string): string =>
+  `${TribesURL}/organizations/users/${orgUUID}`;
 
 describe('Main store', () => {
   beforeEach(async () => {
@@ -104,15 +105,12 @@ describe('Main store', () => {
 
     await mainStore.addOrganizationUser(organizationUser);
 
-    expect(mockFetch).toBeCalledWith(
-      '${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0',
-      {
-        method: 'POST',
-        headers: expectedHeaders,
-        body: JSON.stringify(organizationUser),
-        mode: 'cors'
-      }
-    );
+    expect(mockFetch).toBeCalledWith('${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0', {
+      method: 'POST',
+      headers: expectedHeaders,
+      body: JSON.stringify(organizationUser),
+      mode: 'cors'
+    });
   });
 
   it('should call endpoint on getOrganizationUsers', async () => {
