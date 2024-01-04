@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { MyTable } from './index.tsx';
 import { BountyStatus } from 'store/main.ts';
@@ -121,7 +122,7 @@ it('renders each element in the table in the document', () => {
   });
 });
 
-it('it renders with filter status states', () => {
+it('it renders with filter status states', async () => {
   const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
     Open: false,
     Assigned: false,
@@ -129,7 +130,7 @@ it('it renders with filter status states', () => {
   });
   const [dropdownValue, setDropdownValue] = useState('all');
 
-  const { getByText } = render(
+  const { getByText, getByLabelText } = render(
     <MyTable
       bounties={mockBounties}
       dropdownValue={dropdownValue}
@@ -139,12 +140,8 @@ it('it renders with filter status states', () => {
     />
   );
 
-  mockBounties.forEach((bounty: Bounty) => {
-    expect(getByText(bounty.title)).toBeInTheDocument();
-    expect(getByText(bounty.date)).toBeInTheDocument();
-    expect(getByText(String(bounty.dtgp))).toBeInTheDocument();
-    expect(getByText(bounty.assignee)).toBeInTheDocument();
-    expect(getByText(bounty.provider)).toBeInTheDocument();
-    expect(getByText(bounty.organization)).toBeInTheDocument();
-  });
+  const dropdown = getByLabelText('Status:');
+  fireEvent.select(dropdown);
+  await userEvent.click(getByText("Open"));
+  expect(dropdownValue).toBe('open');
 });
