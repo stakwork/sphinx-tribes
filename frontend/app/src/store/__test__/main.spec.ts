@@ -284,7 +284,6 @@ describe('Main store', () => {
     expect(res).toEqual(0);
   });
 
-  
   it('should set all query params, page, limit, search when fetching bounties, user logged out', async () => {
     uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
