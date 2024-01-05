@@ -34,7 +34,7 @@ export default function MobileView(props: CodingViewProps) {
     showPayBounty,
     owner_id,
     created,
-    markPaidOrUnpaid ,
+    markPaidOrUnpaid,
     paid
   } = props;
 
