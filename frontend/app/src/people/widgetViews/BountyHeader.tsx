@@ -179,7 +179,7 @@ const FilterCount = styled.div<styledProps>`
 
 const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   width: 147px;
-  height: 312px;
+  height: 372px;
   padding: 15px 18px;
   border-right: 1px solid ${(p: any) => p.color && p.color.grayish.G700};
   user-select: none;
