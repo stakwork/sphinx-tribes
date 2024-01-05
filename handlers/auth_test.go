@@ -2,13 +2,19 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
+	"github.com/stakwork/sphinx-tribes/config"
+	"github.com/stakwork/sphinx-tribes/db"
+	mocks "github.com/stakwork/sphinx-tribes/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/stakwork/sphinx-tribes/config"
+	"time"
 )
 
 func TestGetAdminPubkeys(t *testing.T) {
@@ -38,74 +44,103 @@ func TestGetAdminPubkeys(t *testing.T) {
 }
 
 func TestCreateConnectionCode(t *testing.T) {
-	// Want to test successful requesst here
-	var jsonStr = []byte(`{"id":0,"connection_string":"string","is_used":false,"date_created":"2015-09-15T11:50:00Z"}`)
-	req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(jsonStr))
-	if err != nil {
-		t.Fatal(err)
-	}
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(CreateConnectionCode)
 
-	handler.ServeHTTP(rr, req)
+	mockDb := mocks.NewDatabase(t)
+	aHandler := NewAuthHandler(mockDb)
+	t.Run("should create connection code successful", func(t *testing.T) {
+		codeToBeInserted := db.ConnectionCodes{
+			ConnectionString: "custom connection string",
+		}
+		mockDb.On("CreateConnectionCode", mock.MatchedBy(func(code db.ConnectionCodes) bool {
+			return code.IsUsed == false && code.ConnectionString == codeToBeInserted.ConnectionString
+		})).Return(codeToBeInserted, nil).Once()
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
+		body, _ := json.Marshal(codeToBeInserted)
+		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
 
-	expected := ``
-	if strings.TrimRight(rr.Body.String(), "\n") != expected {
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
 
-		t.Errorf("handler returned unexpected body: expected %s pubkeys %s is there a space after?", expected, rr.Body.String())
-	}
+	t.Run("should return error if failed to add connection code", func(t *testing.T) {
+		codeToBeInserted := db.ConnectionCodes{
+			ConnectionString: "custom connection string",
+		}
+		mockDb.On("CreateConnectionCode", mock.MatchedBy(func(code db.ConnectionCodes) bool {
+			return code.IsUsed == false && code.ConnectionString == codeToBeInserted.ConnectionString
+		})).Return(codeToBeInserted, errors.New("failed to create connection")).Once()
 
-	// Want to get 406 malformed error code here
-	var jsonStr2 = []byte(`{"id":0,"connection_string":"string","is_used":false,"date_created":"5T11:50:00Z"}`)
-	req2, err2 := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(jsonStr2))
-	if err2 != nil {
-		t.Fatal(err2)
-	}
-	rr2 := httptest.NewRecorder()
-	handler.ServeHTTP(rr2, req2)
-	if status := rr2.Code; status != http.StatusNotAcceptable {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
+		body, _ := json.Marshal(codeToBeInserted)
+		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
 
-	// Want to get xxx malformed error code here, using id == 1 as in mock this will simulate failed db response
-	var jsonStr3 = []byte(`{"id":1,"connection_string":"string","is_used":false,"date_created":"2016-09-15T11:50:00Z"}`)
-	req3, err3 := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(jsonStr3))
-	if err3 != nil {
-		t.Fatal(err3)
-	}
-	rr3 := httptest.NewRecorder()
-	handler.ServeHTTP(rr3, req3)
-	if status := rr3.Code; status != http.StatusBadRequest {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should return error for malformed request body", func(t *testing.T) {
+		body := []byte(`{"id":0,"connection_string":"string","is_used":false,"date_created":"5T11:50:00Z"}`)
+		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should return error for invalid json", func(t *testing.T) {
+		body := []byte(`{"id":0,"connection_string":"string"`)
+		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
 }
 
 func TestGetConnectionCode(t *testing.T) {
-	req, err := http.NewRequest("GET", "/connectioncodes", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(GetConnectionCode)
+	mockDb := mocks.NewDatabase(t)
+	aHandler := NewAuthHandler(mockDb)
 
-	handler.ServeHTTP(rr, req)
+	t.Run("should return connection code from db", func(t *testing.T) {
+		creationDate, _ := time.Parse(time.RFC3339, "2000-01-01T00:00:00Z")
+		existingConnectionCode := db.ConnectionCodesShort{
+			ConnectionString: "test",
+			DateCreated:      &creationDate,
+		}
+		mockDb.On("GetConnectionCode").Return(existingConnectionCode).Once()
+		req, err := http.NewRequest("GET", "/connectioncodes", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetConnectionCode)
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
+		handler.ServeHTTP(rr, req)
 
-	expected := `{"connection_string":"test","date_created":null}`
-	if strings.TrimRight(rr.Body.String(), "\n") != expected {
-
-		t.Errorf("handler returned unexpected body: expected %s pubkeys %s is there a space after?", expected, rr.Body.String())
-	}
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"connection_string":"test","date_created":"2000-01-01T00:00:00Z"}`
+		assert.EqualValues(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
 
 }
