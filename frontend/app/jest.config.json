@@ -3,7 +3,9 @@
   "collectCoverageFrom": [
     "./src/**/*.{ts,jxs,tsx,js}",
     "!src/**/*.spec.tsx",
-    "!src/**/*.spec.ts"
+    "!src/**/*.spec.ts",
+    "!src/**/*.Spec.tsx",
+    "!src/**/*.Spec.ts"
   ],
   "coverageThreshold": {
     "global": {
