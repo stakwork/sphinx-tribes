@@ -14,6 +14,14 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+type organizationHandler struct {
+	db db.Database
+}
+
+func NewOrganizationHandler(db db.Database) *organizationHandler {
+	return &organizationHandler{db: db}
+}
+
 func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -418,7 +426,7 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(organizations)
 }
 
-func GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
 
@@ -440,7 +448,7 @@ func GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
 		organization := db.DB.GetOrganizationByUuid(uuid)
 		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
 		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-		hasBountyRoles := db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
+		hasBountyRoles := oh.db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted organizations to the list
 		if !organization.Deleted && hasBountyRoles {
