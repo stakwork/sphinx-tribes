@@ -408,7 +408,7 @@ function MobileView(props: CodingBountiesProps) {
         isCopied={isCopied}
         titleString={titleString}
         showPayBounty={showPayBounty}
-        markUnpaid={
+        markPaidOrUnpaid={
           hasAccess && (
             <IconButton
               width={'100%'}

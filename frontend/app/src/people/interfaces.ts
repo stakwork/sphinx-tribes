@@ -247,7 +247,7 @@ export interface WantedSummaryProps {
   org_uuid?: string;
   id?: number;
   owner_id?: string;
-  markPaidOrUnpaid?: boolean;
+  markPaidOrUnpaid?: ReactNode;
 }
 
 export type LocalPaymeentState = 'UNKNOWN' | 'PAID' | 'UNPAID';
