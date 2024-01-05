@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
 import styled from 'styled-components';
 import { useStores } from 'store';
 import { BountyStatus, defaultBountyStatus } from 'store/main';
@@ -158,10 +157,17 @@ export const MyTable = ({
   const [activeTabs, setActiveTabs] = useState<number[]>([]);
   const pageSize = 20;
   const visibleTabs = 7;
-  const history = useHistory();
 
   const onBountyClick = (item: any) => {
-    history.push(`/bounty/${item}`);
+    const newWindow = window.open(`/bounty/${item}`, '_blank');
+    if (newWindow) {
+      // The new window was opened successfully
+      newWindow.opener = null; // Detach the new window from the current window
+    } else {
+      // The new window couldn't be opened (possibly blocked by a popup blocker)
+      // You might want to handle this case accordingly
+      console.error('Unable to open new window.');
+    }
   };
 
   const { main } = useStores();
