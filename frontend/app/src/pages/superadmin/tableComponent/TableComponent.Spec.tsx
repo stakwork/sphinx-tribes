@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { render, fireEvent } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
 import userEvent from '@testing-library/user-event';
+import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from './index.tsx';
 import { BountyStatus } from 'store/main.ts';
@@ -147,14 +149,26 @@ it('renders each element in the table in the document', () => {
     expect(getByText(bounty.status)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
+});
 
-  it('renders correct color box for different bounty statuses', () => {
-    const { getAllByTestId } = render(<MyTable bounties={mockBounties} />);
-    const statusElements = getAllByTestId('bounty-status');
-    expect(statusElements[0]).toHaveStyle('background-color: #618AFF');
-    expect(statusElements[1]).toHaveStyle('background-color: #49C998');
-    expect(statusElements[2]).toHaveStyle('background-color: #5F6368');
-  });
+it('should navigate to the correct URL when a bounty is clicked', () => {
+  const history = createMemoryHistory();
+  const { getByText } = render(
+    <Router history={history}>
+      <MyTable bounties={mockBounties} />
+    </Router>
+  );
+  const bountyTitle = getByText('Sample Bounty');
+  fireEvent.click(bountyTitle);
+  expect(history.location.pathname).toBe('/bounty/1');
+});
+
+it('renders correct color box for different bounty statuses', () => {
+  const { getAllByTestId } = render(<MyTable bounties={mockBounties} />);
+  const statusElements = getAllByTestId('bounty-status');
+  expect(statusElements[0]).toHaveStyle('background-color: #618AFF');
+  expect(statusElements[1]).toHaveStyle('background-color: #49C998');
+  expect(statusElements[2]).toHaveStyle('background-color: #5F6368');
 });
 
 it('it renders with filter status states', async () => {
