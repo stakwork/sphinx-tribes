@@ -1,0 +1,9 @@
+with-expecter: true
+dir: "mocks"
+filename: "{{.InterfaceName}}.go"
+mockname: "{{.InterfaceName}}"
+packages:
+    github.com/stakwork/sphinx-tribes/db:
+      interfaces:
+        Database:
+        
