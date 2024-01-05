@@ -15,7 +15,7 @@ export const HeaderContainer = styled.div`
 
 export const PaginatonSection = styled.div`
   background-color: #fff;
-  height: 64px;
+  height: 150px;
   flex-shrink: 0;
   align-self: stretch;
   border-radius: 8px;
@@ -72,6 +72,10 @@ export const BountyData = styled.td`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  cursor: pointer;
+  &:hover {
+    color: var(--Primary-Text-1, var(--Press-Icon-Color, #000000));
+  }
 `;
 
 export const TableDataAlternative = styled.td`
