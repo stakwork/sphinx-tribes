@@ -71,7 +71,24 @@ line 5 in `frontend/app/src/config/host.ts` return `"people.sphinx.chat"`
 
 
 ### Mocking interfaces for unit testing golang backend
-We are using [mockery](https://vektra.github.io/mockery/latest/) to autogenerate mocks of an interface in our unit tests. Download using this [link](https://vektra.github.io/mockery/latest/).
+We are using [mockery](https://vektra.github.io/mockery/latest/) to autogenerate mocks of an interface in our unit tests.
+
+#### Installing mockery
+There are multiple options to install mockery. Use any one of the following to download.
+##### Download the mockery binary
+Use the release page link [mockery releases](https://github.com/vektra/mockery/releases/tag/v2.39.1) to download the artifact for your respective device.
+##### Using go install
+If you have go already installed on your device you can use the go install command to download mockery.
+```sh
+go install github.com/vektra/mockery/v2@v2.39.1
+```
+
+##### Using homebrew
+If you are on mac you can use homebrew to download mockery
+```zsh
+brew install mockery
+brew upgrade mockery
+```
 
 #### When adding a new function to the interface which is already mocked follow the below steps:
 1. Update the corresponding interface with the function signature, for example if you are adding new function to the ```database``` structure make sure the interface file ```db/interface.go``` is updated with the function signature.
