@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
+import userEvent from '@testing-library/user-event';
 import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from './index.tsx';
+import { BountyStatus } from 'store/main.ts';
 
 const mockBounties = [
   {
@@ -132,4 +134,28 @@ it('renders each element in the table in the document', () => {
     fireEvent.click(bountyTitle);
     expect(history.location.pathname).toBe('/bounty/1');
   });
+});
+
+it('it renders with filter status states', async () => {
+  const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
+    Open: false,
+    Assigned: false,
+    Paid: false
+  });
+  const [dropdownValue, setDropdownValue] = useState('all');
+
+  const { getByText, getByLabelText } = render(
+    <MyTable
+      bounties={mockBounties}
+      dropdownValue={dropdownValue}
+      setDropdownValue={setDropdownValue}
+      bountyStatus={bountyStatus}
+      setBountyStatus={setBountyStatus}
+    />
+  );
+
+  const dropdown = getByLabelText('Status:');
+  fireEvent.select(dropdown);
+  await userEvent.click(getByText('Open'));
+  expect(dropdownValue).toBe('open');
 });
