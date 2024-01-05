@@ -10,20 +10,17 @@ import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/m
 
 let fetchStub: sinon.SinonStub;
 
-const mockFetch = jest.fn();
-const mockHeaders = jest.fn();
-
 const origFetch = global.fetch;
 
 beforeAll(() => {
   fetchStub = sinon.stub(global, 'fetch');
-  global.fetch = mockFetch;
-  global.Headers = mockHeaders;
+  fetchStub.returns(Promise.resolve({ status: 200, json: () => Promise.resolve({}) })); // Mock a default behavior
 });
 
 afterAll(() => {
   global.fetch = origFetch;
-  jest.clearAllMocks();
+
+  sinon.restore();
 });
 
 const getOrganizationUsersEndpoint = (orgUUID: string): string =>
@@ -91,7 +88,7 @@ describe('Main store', () => {
 
     const mockApiResponse = { status: 200, message: 'success' };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
     const organizationUser = {
       owner_pubkey: user.owner_pubkey || '',
@@ -105,12 +102,16 @@ describe('Main store', () => {
 
     await mainStore.addOrganizationUser(organizationUser);
 
-    expect(mockFetch).toBeCalledWith(`${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0`, {
-      method: 'POST',
-      headers: expectedHeaders,
-      body: JSON.stringify(organizationUser),
-      mode: 'cors'
-    });
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(organizationUser),
+        mode: 'cors'
+      })
+    );
   });
 
   it('should call endpoint on getOrganizationUsers', async () => {
@@ -118,12 +119,12 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest
-        .fn()
-        .mockResolvedValue([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }])
+      json: sinon
+        .stub()
+        .resolves([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }])
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
     const orgUUID = 'cmas9gatu2rvqiev4ur0';
 
@@ -131,8 +132,7 @@ describe('Main store', () => {
 
     const users = await mainStore.getOrganizationUsers(orgUUID);
 
-    expect(mockFetch).toBeCalledWith(endpoint, expect.anything());
-
+    sinon.assert.calledWithMatch(fetchStub, endpoint, sinon.match.any);
     expect(users).toEqual([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }]);
   });
 
@@ -141,20 +141,21 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest.fn().mockResolvedValue({
+      json: sinon.stub().resolves({
         uuid: 'cm3eulatu2rvqi9o75ug'
       })
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
     const userUUID = 'cm3eulatu2rvqi9o75ug';
 
     const organizationUser = await mainStore.getOrganizationUser(userUUID);
 
-    expect(mockFetch).toBeCalledWith(
+    sinon.assert.calledWithMatch(
+      fetchStub,
       `${TribesURL}/organizations/foruser/${userUUID}`,
-      expect.objectContaining({
+      sinon.match({
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -174,20 +175,21 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest.fn().mockResolvedValue({
+      json: sinon.stub().resolves({
         count: 2
       })
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
     const orgUUID = 'cmas9gatu2rvqiev4ur0';
 
     const organizationsCount = await mainStore.getOrganizationUsersCount(orgUUID);
 
-    expect(mockFetch).toBeCalledWith(
+    sinon.assert.calledWithMatch(
+      fetchStub,
       `${TribesURL}/organizations/users/${orgUUID}/count`,
-      expect.objectContaining({
+      sinon.match({
         method: 'GET',
         mode: 'cors'
       })
@@ -201,12 +203,12 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest.fn().mockResolvedValue({
+      json: sinon.stub().resolves({
         message: 'success'
       })
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
     const orgUserUUID = 'cldl1g04nncmf23du7kg';
     const deleteRequestBody = {
@@ -238,13 +240,14 @@ describe('Main store', () => {
 
     const deleteResponse = await mainStore.deleteOrganizationUser(deleteRequestBody, orgUserUUID);
 
-    expect(mockFetch).toBeCalledWith(
+    sinon.assert.calledWithMatch(
+      fetchStub,
       `${TribesURL}/organizations/users/${orgUserUUID}`,
-      expect.objectContaining({
+      sinon.match({
         method: 'DELETE',
         mode: 'cors',
         body: JSON.stringify(deleteRequestBody),
-        headers: expect.objectContaining({
+        headers: sinon.match({
           'x-jwt': 'test_jwt',
           'Content-Type': 'application/json'
         })
