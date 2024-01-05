@@ -18,6 +18,32 @@ const mockBounties = [
     organization: 'Org 1',
     organizationImage: 'org-image-1.jpg',
     status: 'open'
+  },
+  {
+    id: 2,
+    title: 'Bounty 2',
+    date: '2023-01-02',
+    dtgp: 200,
+    assignee: 'Assignee 2',
+    assigneeImage: 'assignee-image-2.jpg',
+    provider: 'Provider 2',
+    providerImage: 'provider-image-2.jpg',
+    organization: 'Org 2',
+    organizationImage: 'org-image-2.jpg',
+    status: 'assigned'
+  },
+  {
+    id: 3,
+    title: 'Bounty 3',
+    date: '2023-01-03',
+    dtgp: 300,
+    assignee: 'Assignee 3',
+    assigneeImage: 'assignee-image-3.jpg',
+    provider: 'Provider 3',
+    providerImage: 'provider-image-3.jpg',
+    organization: 'Org 3',
+    organizationImage: 'org-image-3.jpg',
+    status: 'paid'
   }
 ];
 
@@ -118,7 +144,16 @@ it('renders each element in the table in the document', () => {
     expect(getByText(String(bounty.dtgp))).toBeInTheDocument();
     expect(getByText(bounty.assignee)).toBeInTheDocument();
     expect(getByText(bounty.provider)).toBeInTheDocument();
+    expect(getByText(bounty.status)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
+  });
+
+  it('renders correct color box for different bounty statuses', () => {
+    const { getAllByTestId } = render(<MyTable bounties={mockBounties} />);
+    const statusElements = getAllByTestId('bounty-status');
+    expect(statusElements[0]).toHaveStyle('background-color: #618AFF');
+    expect(statusElements[1]).toHaveStyle('background-color: #49C998');
+    expect(statusElements[2]).toHaveStyle('background-color: #5F6368');
   });
 });
 

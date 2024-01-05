@@ -113,6 +113,7 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
         display: 'flex',
         justifyContent: 'flex-end'
       }}
+      data-testid="bounty-status"
     >
       <p
         style={{
