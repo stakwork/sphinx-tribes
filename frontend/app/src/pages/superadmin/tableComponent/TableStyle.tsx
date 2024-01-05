@@ -106,6 +106,10 @@ export const BountyData = styled.td`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  cursor: pointer;
+  &:hover {
+    color: var(--Primary-Text-1, var(--Press-Icon-Color, #000000));
+  }
 `;
 
 export const TableDataAlternative = styled.td`

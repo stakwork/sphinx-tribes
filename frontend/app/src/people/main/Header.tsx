@@ -235,6 +235,7 @@ function Header() {
   const isMobile = useIsMobile();
   const [isOpenPostModal, setIsOpenPostModal] = useState(false);
   const [isOpenStartUpModel, setIsOpenStartupModal] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const tabs = [
     {
@@ -258,6 +259,25 @@ function Header() {
       path: '/b'
     }
   ];
+
+  if (isAdmin) {
+    tabs.unshift({
+      label: 'Admin',
+      name: 'admin',
+      path: '/admin'
+    });
+  }
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const isAdminResponse = await main.getIsAdmin();
+        setIsAdmin(isAdminResponse);
+      } catch (e: any) {
+        console.log('e', e);
+      }
+    })();
+  }, [ui.meInfo]);
 
   const [showWelcome, setShowWelcome] = useState(false);
 
