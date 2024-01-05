@@ -161,11 +161,8 @@ export const MyTable = ({
   const onBountyClick = (item: any) => {
     const newWindow = window.open(`/bounty/${item}`, '_blank');
     if (newWindow) {
-      // The new window was opened successfully
-      newWindow.opener = null; // Detach the new window from the current window
+      newWindow.opener = null;
     } else {
-      // The new window couldn't be opened (possibly blocked by a popup blocker)
-      // You might want to handle this case accordingly
       console.error('Unable to open new window.');
     }
   };
