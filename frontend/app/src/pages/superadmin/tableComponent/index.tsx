@@ -274,7 +274,6 @@ export const MyTable = ({
   }, [getActiveTabs]);
 
   const bountiesLength = bounties && bounties.length;
-  const a = `/bounty/${1024}`;
   return (
     <>
       <HeaderContainer>
