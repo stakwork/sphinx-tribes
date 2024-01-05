@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -365,6 +366,9 @@ func generateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 }
 
 func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
+	var m sync.Mutex
+	m.Lock()
+
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	idParam := chi.URLParam(r, "id")
@@ -488,6 +492,8 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 			socket.Conn.WriteJSON(msg)
 		}
 	}
+
+	m.Unlock()
 }
 
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
