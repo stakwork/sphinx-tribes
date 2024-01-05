@@ -9,12 +9,18 @@ import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
 
 let fetchStub: sinon.SinonStub;
+let mockApiResponseData: any[];
 
 const origFetch = global.fetch;
 
 beforeAll(() => {
   fetchStub = sinon.stub(global, 'fetch');
   fetchStub.returns(Promise.resolve({ status: 200, json: () => Promise.resolve({}) })); // Mock a default behavior
+  mockApiResponseData = [
+    { uuid: 'cm3eulatu2rvqi9o75ug' },
+    { uuid: 'cldl1g04nncmf23du7kg' },
+    { orgUUID: 'cmas9gatu2rvqiev4ur0' }
+  ];
 });
 
 afterAll(() => {
@@ -22,9 +28,6 @@ afterAll(() => {
 
   sinon.restore();
 });
-
-const getOrganizationUsersEndpoint = (orgUUID: string): string =>
-  `${TribesURL}/organizations/users/${orgUUID}`;
 
 describe('Main store', () => {
   beforeEach(async () => {
@@ -92,7 +95,7 @@ describe('Main store', () => {
 
     const organizationUser = {
       owner_pubkey: user.owner_pubkey || '',
-      org_uuid: 'cmas9gatu2rvqiev4ur0'
+      org_uuid: mockApiResponseData[2]
     };
 
     const expectedHeaders = {
@@ -104,7 +107,7 @@ describe('Main store', () => {
 
     sinon.assert.calledWith(
       fetchStub,
-      `${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0`,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2]}`,
       sinon.match({
         method: 'POST',
         headers: expectedHeaders,
@@ -119,21 +122,17 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: sinon
-        .stub()
-        .resolves([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }])
+      json: sinon.stub().resolves(mockApiResponseData.slice(0, 1))
     };
 
     fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const orgUUID = 'cmas9gatu2rvqiev4ur0';
+    const endpoint = `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}`;
 
-    const endpoint = getOrganizationUsersEndpoint(orgUUID);
-
-    const users = await mainStore.getOrganizationUsers(orgUUID);
+    const users = await mainStore.getOrganizationUsers(mockApiResponseData[2].orgUUID);
 
     sinon.assert.calledWithMatch(fetchStub, endpoint, sinon.match.any);
-    expect(users).toEqual([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }]);
+    expect(users).toEqual(mockApiResponseData.slice(0, 1));
   });
 
   it('should call endpoint on getOrganizationUser', async () => {
@@ -142,19 +141,17 @@ describe('Main store', () => {
     const mockApiResponse = {
       status: 200,
       json: sinon.stub().resolves({
-        uuid: 'cm3eulatu2rvqi9o75ug'
+        uuid: mockApiResponseData[0].uuid
       })
     };
 
     fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const userUUID = 'cm3eulatu2rvqi9o75ug';
-
-    const organizationUser = await mainStore.getOrganizationUser(userUUID);
+    const organizationUser = await mainStore.getOrganizationUser(mockApiResponseData[0].uuid);
 
     sinon.assert.calledWithMatch(
       fetchStub,
-      `${TribesURL}/organizations/foruser/${userUUID}`,
+      `${TribesURL}/organizations/foruser/${mockApiResponseData[0].uuid}`,
       sinon.match({
         method: 'GET',
         mode: 'cors',
@@ -166,7 +163,7 @@ describe('Main store', () => {
     );
 
     expect(organizationUser).toEqual({
-      uuid: 'cm3eulatu2rvqi9o75ug'
+      uuid: mockApiResponseData[0].uuid
     });
   });
 
@@ -182,13 +179,13 @@ describe('Main store', () => {
 
     fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const orgUUID = 'cmas9gatu2rvqiev4ur0';
-
-    const organizationsCount = await mainStore.getOrganizationUsersCount(orgUUID);
+    const organizationsCount = await mainStore.getOrganizationUsersCount(
+      mockApiResponseData[2].orgUUID
+    );
 
     sinon.assert.calledWithMatch(
       fetchStub,
-      `${TribesURL}/organizations/users/${orgUUID}/count`,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}/count`,
       sinon.match({
         method: 'GET',
         mode: 'cors'
@@ -210,12 +207,12 @@ describe('Main store', () => {
 
     fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const orgUserUUID = 'cldl1g04nncmf23du7kg';
+    const orgUserUUID = mockApiResponseData[1].uuid;
     const deleteRequestBody = {
-      org_uuid: 'cmas9gatu2rvqiev4ur0',
+      org_uuid: mockApiResponseData[2].orgUUID,
       user_created: '2024-01-03T22:07:39.504494Z',
       id: 263,
-      uuid: 'cm3eulatu2rvqi9o75ug',
+      uuid: mockApiResponseData[0].uuid,
       owner_pubkey: '02af1ea854c7dc8634d08732d95c6057e6e08e01723da4f561d711a60aea708c00',
       owner_alias: 'Nayan',
       unique_name: 'nayan',
