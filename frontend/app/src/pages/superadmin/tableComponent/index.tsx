@@ -158,15 +158,6 @@ export const MyTable = ({
   const pageSize = 20;
   const visibleTabs = 7;
 
-  const onBountyClick = (item: any) => {
-    const newWindow = window.open(`/bounty/${item}`, '_blank');
-    if (newWindow) {
-      newWindow.opener = null;
-    } else {
-      console.error('Unable to open new window.');
-    }
-  };
-
   const { main } = useStores();
 
   const paginationLimit = Math.floor(totalBounties / pageSize) + 1;
@@ -283,6 +274,7 @@ export const MyTable = ({
   }, [getActiveTabs]);
 
   const bountiesLength = bounties && bounties.length;
+  const a = `/bounty/${1024}`;
   return (
     <>
       <HeaderContainer>
@@ -343,8 +335,15 @@ export const MyTable = ({
 
               return (
                 <TableDataRow key={bounty?.id}>
-                  <BountyData onClick={() => onBountyClick(bounty.bounty_id)} className="avg">
-                    {bounty?.title}
+                  <BountyData className="avg">
+                    <a
+                      style={{ textDecoration: 'inherit', color: 'inherit' }}
+                      href={`/bounty/${bounty.bounty_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {bounty?.title}
+                    </a>
                   </BountyData>
                   <TableData>{created}</TableData>
                   <TableDataCenter>{time_to_pay}</TableDataCenter>
