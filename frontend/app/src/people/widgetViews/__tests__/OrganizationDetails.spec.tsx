@@ -1,17 +1,30 @@
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
-import { organization } from '__test__/__mockData__/organization';
 import { person } from '__test__/__mockData__/persons';
 import { user } from '__test__/__mockData__/user';
 import nock from 'nock';
 import React from 'react';
-import { mainStore } from 'store/main';
+import { Organization, mainStore } from 'store/main';
 import OrganizationDetails from '../OrganizationDetails';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useRouteMatch: () => ({ url: '', path: '' })
 }));
+
+const organization: Organization = {
+  id: 'clrqpq84nncuuf32kh2g',
+  name: 'test organization',
+  show: true,
+  uuid: 'c360e930-f94d-4c07-9980-69fc428a994e',
+  bounty_count: 1,
+  budget: 100000,
+  owner_pubkey: 'clrqpq84nncuuf32kh2g',
+  img: 'https://memes.sphinx.chat/public/3bt5n-7mGLgC6jGBBwKwLyZdJY6IUVZke8p2nLUsPhU=',
+  created: '2023-12-12T00:44:25.83042Z',
+  updated: '2023-12-12T01:12:39.970648Z',
+  deleted: false
+};
 
 /**
  * @jest-environment jsdom
