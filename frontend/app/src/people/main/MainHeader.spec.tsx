@@ -24,6 +24,7 @@ describe('Header Component', () => {
     const getSphinxButton = getByText('Get Sphinx');
     fireEvent.click(getSphinxButton);
 
-    expect(openSpy).toHaveBeenCalledWith('https://buy.sphinx.chat/', '_blank');
+    // expect(openSpy).toHaveBeenCalledWith('https://buy.sphinx.chat/', '_blank');
+    expect(window.location.origin).toEqual('https://buy.sphinx.chat/');
   });
 });
