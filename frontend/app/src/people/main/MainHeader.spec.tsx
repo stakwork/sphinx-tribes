@@ -23,11 +23,6 @@ describe('Header Component', () => {
 
     const getSphinxButton = getByText('Get Sphinx');
     fireEvent.click(getSphinxButton);
-
-    await waitFor(() => {
-      expect(mockWindowOpen).toHaveBeenCalledWith('https://buy.sphinx.chat/');
-    });
-
-    mockWindowOpen.mockRestore();
+    expect(mockWindowOpen).toHaveBeenCalledWith('https://buy.sphinx.chat/', '_blank');
   });
 });
