@@ -206,7 +206,6 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
               {props.title?.length > 80 ? '...' : ''}
             </EuiText>
           </div>
-          
         </Description>
         <LanguageContainer>
           {replitLink && (
