@@ -12,7 +12,7 @@ describe('Header Component', () => {
     );
     const getSphinxButton = getByText('Get Sphinx');
     fireEvent.click(getSphinxButton);
-   
+
     expect(window).toEqual('https://buy.sphinx.chat/');
   });
 });
