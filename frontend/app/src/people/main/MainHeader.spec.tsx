@@ -1,13 +1,13 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { render, fireEvent } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom'; // Import the BrowserRouter
 import '@testing-library/jest-dom';
 import Header from './Header';
 
 let openSpy;
 
 beforeEach(() => {
-  openSpy = jest.spyOn(window, 'open').mockImplementation(() => {});
+  openSpy = jest.spyOn(window, 'open');
 });
 
 afterEach(() => {
@@ -15,7 +15,7 @@ afterEach(() => {
 });
 
 describe('Header Component', () => {
-  test('Clicking on "Get Sphinx" button should open a new window with the given URL', async () => {
+  test('Clicking on "Get Sphinx" button should open a new window with the given URL', () => {
     const { getByText } = render(
       <Router>
         <Header />
@@ -24,6 +24,6 @@ describe('Header Component', () => {
     const getSphinxButton = getByText('Get Sphinx');
     fireEvent.click(getSphinxButton);
 
-    await waitFor(() => expect(openSpy).toHaveBeenCalledWith('https://buy.sphinx.chat/', '_blank'));
+    expect(openSpy).toHaveBeenCalledWith('https://buy.sphinx.chat/', '_blank');
   });
 });
