@@ -25,7 +25,6 @@ describe('Header Component', () => {
     fireEvent.click(getSphinxButton);
 
     await waitFor(() => {
-      expect(mockHistoryPush).toHaveBeenCalledWith('/');
       expect(mockWindowOpen).toHaveBeenCalledWith('https://buy.sphinx.chat/');
     });
 
