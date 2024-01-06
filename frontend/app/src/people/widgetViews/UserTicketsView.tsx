@@ -122,7 +122,7 @@ const UserTickets = () => {
               colors={color}
               showName
               onPanelClick={(e: any) => {
-                  e.preventDefault();
+                e.preventDefault();
                 onPanelClick(body.id, i);
                 ui.setBountyPerson(person?.id);
                 setBountyOwner(person);
