@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import Header from './Header';
 
 describe('Header Component', () => {
@@ -11,10 +12,14 @@ describe('Header Component', () => {
 
     jest.mock('react-router-dom', () => ({
       ...jest.requireActual('react-router-dom'),
-      useHistory: mockUseHistory,
+      useHistory: mockUseHistory
     }));
 
-    const { getByText } = render(<Header />);
+    const { getByText } = render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    );
 
     const getSphinxButton = getByText('Get Sphinx');
     fireEvent.click(getSphinxButton);
