@@ -913,6 +913,16 @@ export class MainStore {
             organization: { ...organization }
           });
         }
+        // Sort based on the "paid" property
+        ps3.sort((a: any, b: any) => {
+          const isPaidA = a.body.paid || false;
+          const isPaidB = b.body.paid || false;
+          // Sort by unpaid bounties first
+          if (!isPaidA && isPaidB) return -1;
+          if (isPaidA && !isPaidB) return 1;
+          // If both are paid or both are unpaid, maintain their original order
+          return 0;
+        });
       }
 
       return ps3;
