@@ -14,5 +14,5 @@ jobs:
       - name: Install modules
         run: yarn --cwd ./frontend/app install
       - name: Prettier 
-        run: CI=false yarn --cwd ./frontend/app run prettier:check
+        run: CI=false yarn --cwd ./frontend/app run prettier:check 
 
