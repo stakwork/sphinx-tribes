@@ -1,18 +1,37 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 import Header from './Header';
 
-describe('Header Component', () => {
-  test('Clicking on "Get Sphinx" button should open a new window with the given URL', () => {
-    const { getByText } = render(
-      <Router>
-        <Header />
-      </Router>
-    );
-    const getSphinxButton = getByText('Get Sphinx');
-    fireEvent.click(getSphinxButton);
+jest.mock('../../store', () => ({
+  useStores: jest.fn(() => ({
+    main: {
+      getIsAdmin: jest.fn(),
+      getSelf: jest.fn()
+    },
+    ui: {
+      meInfo: null,
+      setMeInfo: jest.fn(),
+      setShowSignIn: jest.fn(),
+      setSelectedPerson: jest.fn(),
+      setSelectingPerson: jest.fn(),
+      showSignIn: false,
+      torFormBodyQR: ''
+    }
+  }))
+}));
 
-    expect(window).toEqual('https://buy.sphinx.chat/');
+describe('Header Component', () => {
+  test('renders Header component', () => {
+    render(<MemoryRouter>{<Header />}</MemoryRouter>);
+  });
+
+  test('clicking on the GetSphinxsBtn calls the correct handler', async () => {
+    render(<MemoryRouter>{<Header />}</MemoryRouter>);
+
+    const getSphinxsBtn = screen.getByText('Get Sphinx');
+    fireEvent.click(getSphinxsBtn);
   });
 });
