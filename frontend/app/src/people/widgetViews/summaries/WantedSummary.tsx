@@ -152,8 +152,7 @@ function WantedSummary(props: WantedSummaryProps) {
         estimated_session_length: estimated_session_length,
         show: show,
         type: type,
-        created: created,
-        org_uuid
+        created: created
       };
 
       formSubmit && formSubmit(newValue, true);
@@ -193,8 +192,7 @@ function WantedSummary(props: WantedSummaryProps) {
       estimated_session_length: estimated_session_length,
       show: show,
       type: type,
-      created: created,
-      org_uuid
+      created: created
     };
     formSubmit && formSubmit(newValue, true);
   }, [
