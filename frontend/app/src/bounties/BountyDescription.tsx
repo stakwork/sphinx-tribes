@@ -206,17 +206,6 @@ const BountyDescription = (props: BountiesDescriptionProps) => {
               {props.title?.length > 80 ? '...' : ''}
             </EuiText>
           </div>
-          {descriptionImage && (
-            <div className="DescriptionImage">
-              <img
-                src={descriptionImage}
-                alt={'desc'}
-                style={{ objectFit: 'cover' }}
-                height={'100%'}
-                width={'100%'}
-              />
-            </div>
-          )}
         </Description>
         <LanguageContainer>
           {replitLink && (
