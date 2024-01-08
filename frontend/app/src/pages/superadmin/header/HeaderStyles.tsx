@@ -19,6 +19,11 @@ export const AlternateWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  position: fixed;
+  top: 62px;
+  left: 0;
+  width: 100%;
+  z-index: 9999999;
 `;
 export const LeftWrapper = styled.div`
   display: flex;

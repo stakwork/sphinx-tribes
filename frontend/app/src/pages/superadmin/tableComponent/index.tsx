@@ -57,6 +57,7 @@ interface TableProps {
   bounties: Bounty[];
   startDate?: number;
   endDate?: number;
+  headerIsFrozen?: boolean;
   bountyStatus?: BountyStatus;
   setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
   dropdownValue?: string;
@@ -150,6 +151,7 @@ export const MyTable = ({
   bountyStatus,
   setBountyStatus,
   dropdownValue,
+  headerIsFrozen,
   setDropdownValue
 }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -276,7 +278,7 @@ export const MyTable = ({
   const bountiesLength = bounties && bounties.length;
   return (
     <>
-      <HeaderContainer>
+      <HeaderContainer freeze={!headerIsFrozen}>
         <Header>
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
@@ -309,7 +311,7 @@ export const MyTable = ({
       </HeaderContainer>
       <TableContainer>
         <Table>
-          <TableRow>
+          <TableRow freeze={!headerIsFrozen}>
             <TableHeaderData>Bounty</TableHeaderData>
             <TableHeaderData>Date</TableHeaderData>
             <TableHeaderDataCenter>#DTGP</TableHeaderDataCenter>
