@@ -885,8 +885,8 @@ export class MainStore {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
-      ...queryParams,
-      sortBy: 'created'
+      sortBy: 'created',
+      ...queryParams
     });
     try {
       const ps2 = await api.get(query);
@@ -913,16 +913,6 @@ export class MainStore {
             organization: { ...organization }
           });
         }
-        // Sort based on the "paid" property
-        ps3.sort((a: any, b: any) => {
-          const isPaidA = a.body.paid || false;
-          const isPaidB = b.body.paid || false;
-          // Sort by unpaid bounties first
-          if (!isPaidA && isPaidB) return -1;
-          if (isPaidA && !isPaidB) return 1;
-          // If both are paid or both are unpaid, maintain their original order
-          return 0;
-        });
       }
 
       return ps3;
