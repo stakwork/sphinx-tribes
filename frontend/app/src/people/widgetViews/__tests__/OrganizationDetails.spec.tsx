@@ -29,7 +29,7 @@ const organization: Organization = {
 /**
  * @jest-environment jsdom
  */
-describe('OrganizationDetail', () => {
+describe('OrganizationDetails', () => {
   nock.disableNetConnect();
   nock(user.url).get('/person/id/1').reply(200, { user });
   nock(user.url).get('/ask').reply(200, {});
@@ -172,7 +172,7 @@ describe('OrganizationDetail', () => {
     });
   });
 
-  it('should disabled histroy and withdraw button if user is not admin', async () => {
+  it('should disable history and withdraw button if user is not admin', async () => {
     mainStore.setBountyRoles([
       { name: 'EDIT ORGANIZATION' },
       { name: 'VIEW REPORT' },
