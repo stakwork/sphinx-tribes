@@ -98,10 +98,15 @@ describe('HistoryModal component', () => {
 
     // Check for each transaction type
     mockPaymentsHistory.forEach((payment: PaymentHistory) => {
-      expect(getByText(`${payment.amount} sats`)).toBeInTheDocument();
-      expect(getByText(payment.sender_name)).toBeInTheDocument();
+      expect(getAllByText(`${payment.amount} sats`).length).toBeGreaterThan(0);
+      expect(getAllByText('01/01/2022').length).toBeGreaterThan(0);
+
+      const senderNames = getAllByText(payment.sender_name);
+      expect(senderNames.length).toBeGreaterThan(0);
+
       if (payment.payment_type === 'payment') {
-        expect(getByText(payment.receiver_name)).toBeInTheDocument();
+        const receiverNames = getAllByText(payment.receiver_name);
+        expect(receiverNames.length).toBeGreaterThan(0);
       }
     });
   });
