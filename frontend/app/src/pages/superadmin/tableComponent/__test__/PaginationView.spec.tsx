@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { MyTable } from '../index';
 import { bounties } from '../mockBountyData.ts';
 
-//jest.mock('../styles.css');
+jest.mock('../styles.css');
 
 describe('MyTable Component', () => {
   it('should render pagination when bounties length is greater than pageSize', () => {
