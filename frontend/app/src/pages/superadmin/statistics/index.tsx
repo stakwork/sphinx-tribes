@@ -28,7 +28,7 @@ import {
 
 interface StatisticsProps {
   metrics: BountyMetrics | undefined;
-  freezeHeaderRef?: React.MutableRefObject<null>;
+  freezeHeaderRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
 export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
