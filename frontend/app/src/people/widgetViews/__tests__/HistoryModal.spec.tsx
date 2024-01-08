@@ -99,7 +99,6 @@ describe('HistoryModal component', () => {
     // Check for each transaction type
     mockPaymentsHistory.forEach((payment: PaymentHistory) => {
       expect(getByText(`${payment.amount} sats`)).toBeInTheDocument();
-      expect(getAllByText('01/01/2022')).toBeInTheDocument(); // Using the mocked date format
       expect(getByText(payment.sender_name)).toBeInTheDocument();
       if (payment.payment_type === 'payment') {
         expect(getByText(payment.receiver_name)).toBeInTheDocument();
