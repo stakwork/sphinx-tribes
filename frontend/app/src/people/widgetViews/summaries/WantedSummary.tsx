@@ -398,7 +398,7 @@ function WantedSummary(props: WantedSummaryProps) {
       iconSize={14}
       style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
       endingIcon={'paid'}
-      text={paid ? unpaidString : paidString }
+      text={paid ? unpaidString : paidString}
       loading={saving === 'paid'}
       onClick={(e: any) => {
         e.stopPropagation();
