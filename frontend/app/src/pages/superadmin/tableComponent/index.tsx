@@ -311,7 +311,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
         <FlexDiv>
           {totalBounties > pageSize ? (
             <PageContainer>
-              <img src={paginationarrow1} alt="" onClick={() => paginatePrev()} />
+              <img src={paginationarrow1} alt="pagination arrow 1" onClick={() => paginatePrev()} />
               {activeTabs.map((page: number) => (
                 <PaginationButtons
                   key={page}
@@ -321,7 +321,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
                   {page}
                 </PaginationButtons>
               ))}
-              <img src={paginationarrow2} alt="" onClick={() => paginateNext()} />
+              <img src={paginationarrow2} alt="pagination arrow 2" onClick={() => paginateNext()} />
             </PageContainer>
           ) : null}
         </FlexDiv>
