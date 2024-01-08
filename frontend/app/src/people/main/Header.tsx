@@ -339,7 +339,7 @@ function Header() {
   }, []);
 
   function goToEditSelf() {
-    if (ui.meInfo?.id) {
+    if (ui.meInfo?.id && !location.pathname.includes(`/p/${ui.meInfo.owner_pubkey}`)) {
       history.push(`/p/${ui.meInfo.owner_pubkey}/organizations`);
       ui.setSelectedPerson(ui.meInfo.id);
       ui.setSelectingPerson(ui.meInfo.id);
