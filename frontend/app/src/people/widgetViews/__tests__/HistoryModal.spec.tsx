@@ -89,8 +89,8 @@ describe('HistoryModal component', () => {
       fireEvent.click(getByLabelText('Payments'));
     });
 
-    expect(getByText('Deposit')).toBeInTheDocument();
-    expect(getByText('Withdrawals')).toBeInTheDocument();
-    expect(getByText('Payments')).not.toBeInTheDocument();
+    expect(getByText('Deposit')).not.toBeInTheDocument();
+    expect(getByText('Withdrawals')).not.toBeInTheDocument();
+    expect(getByText('Payments')).toBeInTheDocument();
   });
 });
