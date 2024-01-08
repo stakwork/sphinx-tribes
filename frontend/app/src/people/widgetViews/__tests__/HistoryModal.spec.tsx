@@ -25,7 +25,7 @@ describe('HistoryModal', () => {
   it('fetches and displays the payment history', async () => {
     render(<HistoryModal {...props} />);
 
-    await waitFor(() => screen.getByText('Payment 1'));
+    await waitFor(() => screen.getByText('Payment 1', { exact: false }));
 
     expect(screen.getByText('Payment 1')).toBeInTheDocument();
     expect(screen.getByText('$100')).toBeInTheDocument();
@@ -39,8 +39,8 @@ describe('HistoryModal', () => {
 
   it('changes the text after click', () => {
     const { getByLabelText } = render(<HistoryModal {...props} />);
-    expect(getByLabelText(/off/i)).toBeTruthy();
-    fireEvent.click(getByLabelText(/off/i));
-    expect(getByLabelText(/on/i)).toBeTruthy();
+    expect(getByLabelText(/Payments/i)).toBeTruthy();
+    fireEvent.click(getByLabelText(/Payments/i));
+    expect(getByLabelText(/Deposit/i)).toBeTruthy();
   });
 });
