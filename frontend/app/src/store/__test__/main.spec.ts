@@ -9,25 +9,25 @@ import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
 
 let fetchStub: sinon.SinonStub;
-
-const mockFetch = jest.fn();
-const mockHeaders = jest.fn();
+let mockApiResponseData: any[];
 
 const origFetch = global.fetch;
 
 beforeAll(() => {
   fetchStub = sinon.stub(global, 'fetch');
-  global.fetch = mockFetch;
-  global.Headers = mockHeaders;
+  fetchStub.returns(Promise.resolve({ status: 200, json: () => Promise.resolve({}) })); // Mock a default behavior
+  mockApiResponseData = [
+    { uuid: 'cm3eulatu2rvqi9o75ug' },
+    { uuid: 'cldl1g04nncmf23du7kg' },
+    { orgUUID: 'cmas9gatu2rvqiev4ur0' }
+  ];
 });
 
 afterAll(() => {
   global.fetch = origFetch;
-  jest.clearAllMocks();
-});
 
-const getOrganizationUsersEndpoint = (orgUUID: string): string =>
-  `${TribesURL}/organizations/users/${orgUUID}`;
+  sinon.restore();
+});
 
 describe('Main store', () => {
   beforeEach(async () => {
@@ -91,11 +91,11 @@ describe('Main store', () => {
 
     const mockApiResponse = { status: 200, message: 'success' };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
     const organizationUser = {
       owner_pubkey: user.owner_pubkey || '',
-      org_uuid: 'cmas9gatu2rvqiev4ur0'
+      org_uuid: mockApiResponseData[2]
     };
 
     const expectedHeaders = {
@@ -105,12 +105,16 @@ describe('Main store', () => {
 
     await mainStore.addOrganizationUser(organizationUser);
 
-    expect(mockFetch).toBeCalledWith(`${TribesURL}/organizations/users/cmas9gatu2rvqiev4ur0`, {
-      method: 'POST',
-      headers: expectedHeaders,
-      body: JSON.stringify(organizationUser),
-      mode: 'cors'
-    });
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2]}`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(organizationUser),
+        mode: 'cors'
+      })
+    );
   });
 
   it('should call endpoint on getOrganizationUsers', async () => {
@@ -118,22 +122,17 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest
-        .fn()
-        .mockResolvedValue([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }])
+      json: sinon.stub().resolves(mockApiResponseData.slice(0, 1))
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const orgUUID = 'cmas9gatu2rvqiev4ur0';
+    const endpoint = `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}`;
 
-    const endpoint = getOrganizationUsersEndpoint(orgUUID);
+    const users = await mainStore.getOrganizationUsers(mockApiResponseData[2].orgUUID);
 
-    const users = await mainStore.getOrganizationUsers(orgUUID);
-
-    expect(mockFetch).toBeCalledWith(endpoint, expect.anything());
-
-    expect(users).toEqual([{ uuid: 'cm3eulatu2rvqi9o75ug' }, { uuid: 'cldl1g04nncmf23du7kg' }]);
+    sinon.assert.calledWithMatch(fetchStub, endpoint, sinon.match.any);
+    expect(users).toEqual(mockApiResponseData.slice(0, 1));
   });
 
   it('should call endpoint on getOrganizationUser', async () => {
@@ -141,20 +140,19 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest.fn().mockResolvedValue({
-        uuid: 'cm3eulatu2rvqi9o75ug'
+      json: sinon.stub().resolves({
+        uuid: mockApiResponseData[0].uuid
       })
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const userUUID = 'cm3eulatu2rvqi9o75ug';
+    const organizationUser = await mainStore.getOrganizationUser(mockApiResponseData[0].uuid);
 
-    const organizationUser = await mainStore.getOrganizationUser(userUUID);
-
-    expect(mockFetch).toBeCalledWith(
-      `${TribesURL}/organizations/foruser/${userUUID}`,
-      expect.objectContaining({
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/foruser/${mockApiResponseData[0].uuid}`,
+      sinon.match({
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -165,7 +163,7 @@ describe('Main store', () => {
     );
 
     expect(organizationUser).toEqual({
-      uuid: 'cm3eulatu2rvqi9o75ug'
+      uuid: mockApiResponseData[0].uuid
     });
   });
 
@@ -174,20 +172,21 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest.fn().mockResolvedValue({
+      json: sinon.stub().resolves({
         count: 2
       })
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const orgUUID = 'cmas9gatu2rvqiev4ur0';
+    const organizationsCount = await mainStore.getOrganizationUsersCount(
+      mockApiResponseData[2].orgUUID
+    );
 
-    const organizationsCount = await mainStore.getOrganizationUsersCount(orgUUID);
-
-    expect(mockFetch).toBeCalledWith(
-      `${TribesURL}/organizations/users/${orgUUID}/count`,
-      expect.objectContaining({
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}/count`,
+      sinon.match({
         method: 'GET',
         mode: 'cors'
       })
@@ -201,19 +200,19 @@ describe('Main store', () => {
 
     const mockApiResponse = {
       status: 200,
-      json: jest.fn().mockResolvedValue({
+      json: sinon.stub().resolves({
         message: 'success'
       })
     };
 
-    mockFetch.mockReturnValueOnce(Promise.resolve(mockApiResponse));
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
 
-    const orgUserUUID = 'cldl1g04nncmf23du7kg';
+    const orgUserUUID = mockApiResponseData[1].uuid;
     const deleteRequestBody = {
-      org_uuid: 'cmas9gatu2rvqiev4ur0',
+      org_uuid: mockApiResponseData[2].orgUUID,
       user_created: '2024-01-03T22:07:39.504494Z',
       id: 263,
-      uuid: 'cm3eulatu2rvqi9o75ug',
+      uuid: mockApiResponseData[0].uuid,
       owner_pubkey: '02af1ea854c7dc8634d08732d95c6057e6e08e01723da4f561d711a60aea708c00',
       owner_alias: 'Nayan',
       unique_name: 'nayan',
@@ -238,13 +237,14 @@ describe('Main store', () => {
 
     const deleteResponse = await mainStore.deleteOrganizationUser(deleteRequestBody, orgUserUUID);
 
-    expect(mockFetch).toBeCalledWith(
+    sinon.assert.calledWithMatch(
+      fetchStub,
       `${TribesURL}/organizations/users/${orgUserUUID}`,
-      expect.objectContaining({
+      sinon.match({
         method: 'DELETE',
         mode: 'cors',
         body: JSON.stringify(deleteRequestBody),
-        headers: expect.objectContaining({
+        headers: sinon.match({
           'x-jwt': 'test_jwt',
           'Content-Type': 'application/json'
         })
@@ -461,5 +461,242 @@ describe('Main store', () => {
 
     expect(fetchStub.withArgs(url, sinon.match.any).calledOnce).toEqual(true);
     expect(res).toEqual(0);
+  });
+
+  it('should set all query params, page, limit, search when fetching bounties, user logged out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bounties = await store.getPeopleBounties({
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 1,
+      sortBy: 'updatedat'
+    });
+
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(bounties).toEqual([expectedBountyResponses[0]]);
+  });
+
+  it('should reset exisiting bounty if reset flag is passed, signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=2&resetPage=true`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    store.setPeopleBounties([expectedBountyResponses[0] as any]);
+    expect(store.peopleBounties.length).toEqual(1);
+
+    const bounties = await store.getPeopleBounties({
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedResponse]);
+    expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should add to exisiting bounty if next page is fetched, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=2&resetPage=false`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bountyAlreadyPresent = { ...expectedBountyResponses[0] } as any;
+    bountyAlreadyPresent.body.id = 1;
+    store.setPeopleBounties([bountyAlreadyPresent]);
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties[0].body.id).not.toEqual(2);
+
+    const bounties = await store.getPeopleBounties({
+      resetPage: false,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(2);
+    expect(store.peopleBounties[1]).toEqual(expectedResponse);
+    expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should successfully fetch people, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/people?resetPage=true&search=&limit=500&page=1&sortBy=last_login`;
+    const mockPeople = { ...people[1] };
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockPeople }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    store.setPeople([people[0]]);
+    expect(store._people.length).toEqual(1);
+    expect(store._people[0]).toEqual(people[0]);
+
+    const res = await store.getPeople({
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 1,
+      sortBy: 'updatedat'
+    });
+
+    expect(store._people.length).toEqual(1);
+    expect(store._people[0]).toEqual(mockPeople);
+    expect(res[0]).toEqual(mockPeople);
+  });
+
+  it('should hide current user, user signed in', async () => {
+    const allBountiesUrl = `http://${getHost()}/people?resetPage=false&search=&limit=500&page=2&sortBy=last_login`;
+    const mockPeople = { ...people[0] };
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockPeople }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const res = await store.getPeople({
+      resetPage: false,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    expect(store._people.length).toEqual(1);
+    expect(store._people[0].hide).toEqual(true);
+    expect(res).toBeTruthy();
+  });
+
+  it('should fetch and store organization bounties successfully, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([mockBounties[0]])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bounties = await store.getOrganizationBounties('1111', {
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(bounties).toEqual([expectedBountyResponses[0]]);
+  });
+
+  it('should reset exisiting organization bounty if reset flag is passed, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    store.setPeopleBounties([expectedBountyResponses[0] as any]);
+    expect(store.peopleBounties.length).toEqual(1);
+
+    const bounties = await store.getOrganizationBounties('1111', {
+      resetPage: true,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedResponse]);
+    expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should add to exisiting bounty if reset flag is not passed, user signed out', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const allBountiesUrl = `http://${getHost()}/organizations/bounties/1111`;
+    const mockBounty = { ...mockBounties[0] };
+    mockBounty.bounty.id = 2;
+    fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        json: (): Promise<any> => Promise.resolve([{ ...mockBounty }])
+      }) as any
+    );
+
+    const store = new MainStore();
+    const bountyAlreadyPresent = { ...expectedBountyResponses[0] } as any;
+    bountyAlreadyPresent.body.id = 1;
+    store.setPeopleBounties([bountyAlreadyPresent]);
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties[0].body.id).not.toEqual(2);
+
+    const bounties = await store.getOrganizationBounties('1111', {
+      resetPage: false,
+      search: 'random',
+      limit: 11,
+      page: 2,
+      sortBy: 'updatedat'
+    });
+
+    const expectedResponse = { ...expectedBountyResponses[0] };
+    expectedResponse.body.id = 2;
+    expect(store.peopleBounties.length).toEqual(2);
+    expect(store.peopleBounties[1]).toEqual(expectedResponse);
+    expect(bounties).toEqual([expectedResponse]);
   });
 });
