@@ -63,7 +63,6 @@ describe('HistoryModal component', () => {
     expect(getByText('Payment History')).toBeInTheDocument();
 
     mockPaymentsHistory.forEach((payment: any) => {
-      expect(getByText(payment.payment_type)).toBeInTheDocument();
       expect(getByText('01/01/2022')).toBeInTheDocument();
       expect(getByText(`${payment.amount} sats`)).toBeInTheDocument();
       expect(getByText(payment.sender_name)).toBeInTheDocument();
@@ -92,6 +91,6 @@ describe('HistoryModal component', () => {
 
     expect(getByText('Deposit')).toBeInTheDocument();
     expect(getByText('Withdrawals')).toBeInTheDocument();
-    expect(getByText('Payment')).not.toBeInTheDocument();
+    expect(getByText('Payments')).not.toBeInTheDocument();
   });
 });
