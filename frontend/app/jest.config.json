@@ -59,7 +59,8 @@
   ],
   "modulePaths": ["<rootDir>/src"],
   "moduleNameMapper": {
-    "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
+    "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js",
+    "\\.css$": "<rootDir>/src/pages/superadmin/tableComponent/__mocks__/style-mock.js"
   },
   "moduleDirectories": ["node_modules", "<rootDir>"],
   "globals": {
