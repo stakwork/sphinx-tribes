@@ -199,5 +199,5 @@ it('it renders with filter status states', async () => {
   fireEvent.select(dropdown);
   await userEvent.click(getByText('Open'));
   const openText = getByText('Open');
-  expect(openText).toBeInTheDocument()
+  expect(openText).toBeInTheDocument();
 });
