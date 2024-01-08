@@ -4,7 +4,7 @@ import { createMemoryHistory } from 'history';
 import userEvent from '@testing-library/user-event';
 import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
-import { MyTable } from './index.tsx';
+import { MyTable } from '../index.tsx';
 import { BountyStatus } from 'store/main.ts';
 
 const mockBounties = [
