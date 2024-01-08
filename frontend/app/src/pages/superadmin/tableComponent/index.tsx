@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useStores } from 'store';
 import { BountyStatus, defaultBountyStatus } from 'store/main';
 import moment from 'moment';
@@ -7,6 +6,7 @@ import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';
 import copygray from '../header/icons/copygray.svg';
+import { Bounty } from './interfaces.ts';
 
 import {
   TableContainer,
@@ -34,24 +34,12 @@ import {
   TableHeaderDataAlternative,
   TableDataRow,
   TableDataAlternative,
-  BountyData
+  BountyData,
+  Paragraph,
+  BoxImage
 } from './TableStyle';
 
 //import './styles.css';
-
-interface Bounty {
-  id: number;
-  title: string;
-  date: string;
-  dtgp: number;
-  assignee: string;
-  assigneeImage: string;
-  provider: string;
-  providerImage: string;
-  organization: string;
-  organizationImage: string;
-  status: string;
-}
 
 interface TableProps {
   bounties: Bounty[];
@@ -70,20 +58,6 @@ interface ImageWithTextProps {
 }
 
 export const ImageWithText = ({ image, text }: ImageWithTextProps) => {
-  const BoxImage = styled.div`
-    display: flex;
-    width: 162px;
-    align-items: center;
-    text-align: center;
-    gap: 6px;
-  `;
-  const Paragraph = styled.div`
-    margin-top: 2px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 200px;
-  `;
   return (
     <>
       <BoxImage>
@@ -116,7 +90,7 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
       }}
     >
       <p
-				data-testid="bounty-status"
+        data-testid="bounty-status"
         style={{
           color: '#fff',
           textTransform: 'uppercase',
