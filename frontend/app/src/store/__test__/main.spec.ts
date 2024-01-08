@@ -9,13 +9,24 @@ import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
 
 let fetchStub: sinon.SinonStub;
+let mockApiResponseData: any[];
+
+const origFetch = global.fetch;
 
 beforeAll(() => {
   fetchStub = sinon.stub(global, 'fetch');
+  fetchStub.returns(Promise.resolve({ status: 200, json: () => Promise.resolve({}) })); // Mock a default behavior
+  mockApiResponseData = [
+    { uuid: 'cm3eulatu2rvqi9o75ug' },
+    { uuid: 'cldl1g04nncmf23du7kg' },
+    { orgUUID: 'cmas9gatu2rvqiev4ur0' }
+  ];
 });
 
 afterAll(() => {
-  jest.clearAllMocks();
+  global.fetch = origFetch;
+
+  sinon.restore();
 });
 
 describe('Main store', () => {
@@ -73,6 +84,174 @@ describe('Main store', () => {
 
     expect(toJS(uiStore.meInfo)).toEqual(user);
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+  });
+
+  it('should call endpoint on addOrganizationUser', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = {
+      owner_pubkey: user.owner_pubkey || '',
+      org_uuid: mockApiResponseData[2]
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.addOrganizationUser(organizationUser);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2]}`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(organizationUser),
+        mode: 'cors'
+      })
+    );
+  });
+
+  it('should call endpoint on getOrganizationUsers', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves(mockApiResponseData.slice(0, 1))
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const endpoint = `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}`;
+
+    const users = await mainStore.getOrganizationUsers(mockApiResponseData[2].orgUUID);
+
+    sinon.assert.calledWithMatch(fetchStub, endpoint, sinon.match.any);
+    expect(users).toEqual(mockApiResponseData.slice(0, 1));
+  });
+
+  it('should call endpoint on getOrganizationUser', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves({
+        uuid: mockApiResponseData[0].uuid
+      })
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = await mainStore.getOrganizationUser(mockApiResponseData[0].uuid);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/foruser/${mockApiResponseData[0].uuid}`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': 'test_jwt',
+          'Content-Type': 'application/json'
+        }
+      })
+    );
+
+    expect(organizationUser).toEqual({
+      uuid: mockApiResponseData[0].uuid
+    });
+  });
+
+  it('should call endpoint on getOrganizationUsersCount', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves({
+        count: 2
+      })
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationsCount = await mainStore.getOrganizationUsersCount(
+      mockApiResponseData[2].orgUUID
+    );
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}/count`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors'
+      })
+    );
+
+    expect(organizationsCount).toEqual({ count: 2 });
+  });
+
+  it('should call endpoint on deleteOrganizationUser', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves({
+        message: 'success'
+      })
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const orgUserUUID = mockApiResponseData[1].uuid;
+    const deleteRequestBody = {
+      org_uuid: mockApiResponseData[2].orgUUID,
+      user_created: '2024-01-03T22:07:39.504494Z',
+      id: 263,
+      uuid: mockApiResponseData[0].uuid,
+      owner_pubkey: '02af1ea854c7dc8634d08732d95c6057e6e08e01723da4f561d711a60aea708c00',
+      owner_alias: 'Nayan',
+      unique_name: 'nayan',
+      description: 'description',
+      tags: [],
+      img: '',
+      created: '2023-12-23T14:31:49.963009Z',
+      updated: '2023-12-23T14:31:49.963009Z',
+      unlisted: false,
+      deleted: false,
+      last_login: 1704289377,
+      owner_route_hint:
+        '03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099519819777',
+      owner_contact_key:
+        'MIIBCgKCAQEAugvVYqgIIBmpLCjmaBhLi6GfxssrdM74diTlKpr+Qr/0Er1ND9YQ3HUveaI6V5DrBunulbSEZlIXIqVSLm2wobN4iAqvoGGx1aZ13ByOJLjINjD5nA9FnfAJpvcMV/gTDQzQL9NHojAeMx1WyAlhIILdiDm9zyCJeYj1ihC660xr6MyVjWn9brJv47P+Bq2x9AWPufYMMgPH7GV1S7KkjEPMbGCdUvUZLs8tzzKtNcABCHBQKOcBNG/D4HZcCREMP90zj8/NUzz9x92Z5zuvJ0/eZVF91XwyMtThrJ+AnrXWv7AEVy63mu9eAO3UYiUXq2ioayKBgalyos2Mcs9DswIDAQAB',
+      price_to_meet: 0,
+      new_ticket_time: 0,
+      twitter_confirmed: false,
+      extras: {},
+      github_issues: {}
+    };
+
+    const deleteResponse = await mainStore.deleteOrganizationUser(deleteRequestBody, orgUserUUID);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/users/${orgUserUUID}`,
+      sinon.match({
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify(deleteRequestBody),
+        headers: sinon.match({
+          'x-jwt': 'test_jwt',
+          'Content-Type': 'application/json'
+        })
+      })
+    );
+
+    expect(deleteResponse.status).toBe(200);
   });
 
   it('should send request delete request with correct body and url', async () => {
