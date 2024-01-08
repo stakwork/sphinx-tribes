@@ -290,7 +290,7 @@ export const MyTable = ({
           </BountyHeader>
           <Options>
             <FlexDiv>
-              <Label>Sorting By:</Label>
+              <Label>Sort By:</Label>
               <StyledSelect id="sortBy">
                 <option value="date">Date</option>
                 <option value="assignee">Assignee</option>
