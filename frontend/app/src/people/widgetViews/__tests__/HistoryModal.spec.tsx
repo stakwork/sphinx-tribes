@@ -83,7 +83,9 @@ describe('HistoryModal component', () => {
       <HistoryModal
         isOpen
         paymentsHistory={mockPaymentsHistory}
-        close={() => {jest.fn()}}
+        close={() => {
+          jest.fn();
+        }}
         url=""
       />
     );
@@ -95,7 +97,7 @@ describe('HistoryModal component', () => {
     expect(getByText('Withdrawals')).toBeInTheDocument();
 
     // Check for each transaction type
-    mockPaymentsHistory.forEach((payment:PaymentHistory) => {
+    mockPaymentsHistory.forEach((payment: PaymentHistory) => {
       expect(getByText(`${payment.amount} sats`)).toBeInTheDocument();
       expect(getByText('01/01/2022')).toBeInTheDocument(); // Using the mocked date format
       expect(getByText(payment.sender_name)).toBeInTheDocument();
@@ -109,8 +111,12 @@ describe('HistoryModal component', () => {
     const { queryByText } = render(
       <HistoryModal
         isOpen
-        paymentsHistory={mockPaymentsHistory.filter((payment: PaymentHistory) => payment.payment_type === 'deposit')}
-        close={() => {jest.fn()}}
+        paymentsHistory={mockPaymentsHistory.filter(
+          (payment: PaymentHistory) => payment.payment_type === 'deposit'
+        )}
+        close={() => {
+          jest.fn();
+        }}
         url=""
       />
     );
@@ -124,8 +130,12 @@ describe('HistoryModal component', () => {
     const { getByText } = render(
       <HistoryModal
         isOpen
-        paymentsHistory={mockPaymentsHistory.filter((payment: PaymentHistory) => payment.payment_type === 'payment')}
-        close={() => {jest.fn()}}
+        paymentsHistory={mockPaymentsHistory.filter(
+          (payment: PaymentHistory) => payment.payment_type === 'payment'
+        )}
+        close={() => {
+          jest.fn();
+        }}
         url=""
       />
     );
