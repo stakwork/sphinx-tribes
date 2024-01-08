@@ -10,6 +10,11 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 var Host string
@@ -24,6 +29,8 @@ var SuperAdmins []string = []string{""}
 var InvoiceList = "INVOICELIST"
 var BudgetInvoiceList = "BUDGETINVOICELIST"
 
+var S3Client *s3.S3
+
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
@@ -31,8 +38,27 @@ func InitConfig() {
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
 	AdminStrings := os.Getenv("ADMINS")
+	AwsSecret := os.Getenv("AWS_SECRET_ACCESS")
+	AwsAccess := os.Getenv("AWS_ACCESS_KEY_ID")
+	AwsRegion := os.Getenv("AWS_REGION")
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
+
+	awsConfig := aws.Config{
+		Credentials: credentials.NewStaticCredentials(AwsAccess, AwsSecret, ""),
+		Region:      aws.String(AwsRegion),
+	}
+
+	awsSession, err := session.NewSessionWithOptions(session.Options{
+		Config: awsConfig,
+	})
+
+	if err != nil {
+		fmt.Println("Could not setup AWS session", err)
+	}
+
+	// create a s3 client session
+	S3Client = s3.New(awsSession)
 
 	// only make this call if there is a Relay auth key
 	if RelayAuthKey != "" {
