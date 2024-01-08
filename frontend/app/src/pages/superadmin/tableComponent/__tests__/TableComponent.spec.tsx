@@ -158,7 +158,8 @@ it('should navigate to the correct URL when a bounty is clicked', () => {
       <MyTable bounties={mockBounties} />
     </Router>
   );
-  fireEvent.click(mockBounties[0].title);
+  const bountyTitle = getByText(mockBounties[0].title);
+  fireEvent.click(bountyTitle);
   expect(history.location.pathname).toBe('/bounty/1');
 });
 
