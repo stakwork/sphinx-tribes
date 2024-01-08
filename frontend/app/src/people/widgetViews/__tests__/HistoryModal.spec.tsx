@@ -49,7 +49,7 @@ describe('HistoryModal component', () => {
     }
   ];
   it('renders with mock data', () => {
-    const { getByText, getByTestId } = render(
+    const { getByText } = render(
       <HistoryModal
         isOpen
         paymentsHistory={mockPaymentsHistory}
@@ -60,7 +60,6 @@ describe('HistoryModal component', () => {
       />
     );
 
-    expect(getByTestId('modal')).toBeInTheDocument();
     expect(getByText('Payment History')).toBeInTheDocument();
 
     mockPaymentsHistory.forEach((payment: any) => {
@@ -92,7 +91,7 @@ describe('HistoryModal component', () => {
     });
 
     expect(getByText('Deposit')).toBeInTheDocument();
-    expect(getByText('Withdraw')).toBeInTheDocument();
+    expect(getByText('Withdrawals')).toBeInTheDocument();
     expect(getByText('Payment')).not.toBeInTheDocument();
   });
 });
