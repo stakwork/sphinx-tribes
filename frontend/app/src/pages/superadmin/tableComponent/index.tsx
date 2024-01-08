@@ -37,7 +37,7 @@ import {
   BountyData
 } from './TableStyle';
 
-import './styles.css';
+//import './styles.css';
 
 interface Bounty {
   id: number;
