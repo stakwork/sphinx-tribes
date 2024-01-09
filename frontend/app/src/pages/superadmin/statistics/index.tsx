@@ -28,11 +28,12 @@ import {
 
 interface StatisticsProps {
   metrics: BountyMetrics | undefined;
+  freezeHeaderRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
-export const Statistics = ({ metrics }: StatisticsProps) => (
+export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
   <>
-    <Wrapper>
+    <Wrapper ref={freezeHeaderRef}>
       <Card>
         <TitleWrapper>
           <img className="BountiesSvg" src={copy} alt="" width="16.508px" height="20px" />

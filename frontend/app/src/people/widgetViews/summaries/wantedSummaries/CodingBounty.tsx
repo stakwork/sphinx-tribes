@@ -18,6 +18,7 @@ import BountyPrice from '../../../../bounties/BountyPrice';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { CodingBountiesProps } from '../../../interfaces';
 import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
+import { paidString, unpaidString } from '../constants';
 import Invoice from './Invoice';
 import {
   AssigneeProfile,
@@ -107,6 +108,10 @@ function MobileView(props: CodingBountiesProps) {
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
   const [userBountyRole, setUserBountyRole] = useState(false);
+
+  const [paidStatus, setPaidStatus] = useState(paid);
+
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   const userPubkey = ui.meInfo?.owner_pubkey;
 
@@ -228,7 +233,12 @@ function MobileView(props: CodingBountiesProps) {
     };
   }, [main, startPolling]);
 
+  const recallBounties = async () => {
+    await main.getPeopleBounties({ resetPage: true, ...main.bountiesStatus });
+  };
+
   const makePayment = async () => {
+    setPaymentLoading(true);
     // If the bounty has a commitment fee, add the fee to the user payment
     const price = Number(props.price);
     // if there is an organization and the organization's
@@ -237,17 +247,26 @@ function MobileView(props: CodingBountiesProps) {
     if (org_uuid) {
       const organizationBudget = await main.getOrganizationBudget(org_uuid);
       const budget = organizationBudget.total_budget;
-      if (Number(budget) >= Number(price)) {
-        // make keysend payment
-        const body = {
-          id: id || 0,
-          websocket_token: ui.meInfo?.websocketToken || '',
-          receiver_pubkey: assignee.owner_pubkey,
-          route_hint: assignee.owner_route_hint ?? ''
-        };
 
-        await main.makeBountyPayment(body);
+      const bounty = await main.getBountyById(id ?? 0);
+      if (bounty.length && Number(budget) >= Number(price)) {
+        const b = bounty[0];
+
+        if (!b.body.paid) {
+          // make keysend payment
+          const body = {
+            id: id || 0,
+            websocket_token: ui.meInfo?.websocketToken || '',
+            receiver_pubkey: assignee.owner_pubkey,
+            route_hint: assignee.owner_route_hint ?? ''
+          };
+
+          await main.makeBountyPayment(body);
+          setPaymentLoading(false);
+          recallBounties();
+        }
       } else {
+        setPaymentLoading(false);
         return setToasts([
           {
             id: `${Math.random()}`,
@@ -264,12 +283,13 @@ function MobileView(props: CodingBountiesProps) {
 
   const updatePaymentStatus = async (created: number) => {
     await main.updateBountyPaymentStatus(created);
-    await main.getPeopleBounties();
+    recallBounties();
   };
 
   const handleSetAsPaid = async (e: any) => {
     e.stopPropagation();
     setUpdatingPayment(true);
+    setPaidStatus(!paidStatus);
     await updatePaymentStatus(created || 0);
     await setExtrasPropertyAndSaveMultiple('paid', {
       award: awardDetails.name
@@ -291,6 +311,8 @@ function MobileView(props: CodingBountiesProps) {
     await updatePaymentStatus(created || 0);
     setLocalPaid('UNPAID');
     setUpdatingPayment(false);
+    setPaidStatus(!paidStatus);
+    recallBounties();
   };
 
   const twitterHandler = () => {
@@ -368,10 +390,15 @@ function MobileView(props: CodingBountiesProps) {
   const hasAccess = isOwner || userBountyRole;
   const payBountyDisable = !isOwner && !userBountyRole;
 
+  useEffect(() => {
+    setPaidStatus(paid);
+  }, [paid]);
+
   if (isMobile) {
     return (
       <CodingMobile
         {...props}
+        paid={paidStatus}
         labels={labels}
         nametag={nametag}
         actionButtons={actionButtons}
@@ -381,36 +408,38 @@ function MobileView(props: CodingBountiesProps) {
         isCopied={isCopied}
         titleString={titleString}
         showPayBounty={showPayBounty}
-        markUnpaid={
-          <IconButton
-            width={'100%'}
-            height={48}
-            style={{
-              bottom: '10px',
-              border: `1px solid ${color.primaryColor.P400}`,
-              background: color.pureWhite,
-              color: color.borderGreen1
-            }}
-            text={'Mark Unpaid'}
-            loading={saving === 'paid' || updatingPayment}
-            endingImg={'/static/mark_unpaid.svg'}
-            textStyle={{
-              width: '130px',
-              display: 'flex',
-              justifyContent: 'center',
-              fontFamily: 'Barlow',
-              marginLeft: '30px',
-              fontSize: '15px'
-            }}
-            onClick={handleSetAsUnpaid}
-          />
-        }
-        payBounty={
-          <>
+        markPaidOrUnpaid={
+          hasAccess && (
             <IconButton
               width={'100%'}
               height={48}
-              disabled={payBountyDisable}
+              style={{
+                bottom: '10px',
+                border: `1px solid ${color.primaryColor.P400}`,
+                background: paidStatus ? color.green1 : color.pureWhite,
+                color: paidStatus ? color.white100 : color.borderGreen1
+              }}
+              text={paidStatus ? unpaidString : paidString}
+              loading={saving === 'paid' || updatingPayment}
+              endingImg={'/static/mark_unpaid.svg'}
+              textStyle={{
+                width: '130px',
+                display: 'flex',
+                justifyContent: 'center',
+                fontFamily: 'Barlow',
+                marginLeft: '30px',
+                fontSize: '15px'
+              }}
+              onClick={paidStatus ? handleSetAsUnpaid : handleSetAsPaid}
+            />
+          )
+        }
+        payBounty={
+          hasAccess && (
+            <IconButton
+              width={'100%'}
+              height={48}
+              disabled={paymentLoading || payBountyDisable}
               style={{
                 bottom: '10px'
               }}
@@ -427,7 +456,7 @@ function MobileView(props: CodingBountiesProps) {
               shadowcolor={color.button_secondary.shadow}
               onClick={makePayment}
             />
-          </>
+          )
         }
       />
     );
@@ -712,7 +741,7 @@ function MobileView(props: CodingBountiesProps) {
                     {showPayBounty && (
                       <>
                         <Button
-                          disabled={payBountyDisable}
+                          disabled={paymentLoading || payBountyDisable}
                           iconSize={14}
                           width={220}
                           height={48}
@@ -756,7 +785,7 @@ function MobileView(props: CodingBountiesProps) {
                           background: color.pureWhite,
                           color: color.borderGreen1
                         }}
-                        text={'Mark Unpaid'}
+                        text={isMarkPaidSaved ? unpaidString : paidString}
                         loading={saving === 'paid' || updatingPayment}
                         endingImg={'/static/mark_unpaid.svg'}
                         textStyle={{
@@ -777,7 +806,7 @@ function MobileView(props: CodingBountiesProps) {
                           bottom: '0',
                           marginLeft: '36px'
                         }}
-                        text={'Mark Paid'}
+                        text={paidString}
                         loading={saving === 'paid'}
                         endingImg={'/static/mark_paid.svg'}
                         textStyle={{
@@ -960,7 +989,7 @@ function MobileView(props: CodingBountiesProps) {
                     bottom: '0',
                     marginLeft: '36px'
                   }}
-                  text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark Paid'}
+                  text={selectedAward === '' ? 'Skip and Mark Paid' : paidString}
                   loading={isMarkPaidSaved || updatingPayment}
                   endingImg={'/static/mark_paid.svg'}
                   textStyle={{
