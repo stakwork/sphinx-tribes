@@ -785,7 +785,7 @@ function MobileView(props: CodingBountiesProps) {
                           background: color.pureWhite,
                           color: color.borderGreen1
                         }}
-                        text={isMarkPaidSaved ? unpaidString : paidString}
+                        text={paid ? unpaidString : paidString}
                         loading={saving === 'paid' || updatingPayment}
                         endingImg={'/static/mark_unpaid.svg'}
                         textStyle={{
