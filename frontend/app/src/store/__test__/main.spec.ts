@@ -167,6 +167,90 @@ describe('Main store', () => {
     expect(users).toEqual(mockApiResponseData.slice(0, 1));
   });
 
+  it('should call endpoint on getUserOrganizations', async () => {
+    const mainStore = new MainStore();
+    const userId = 232;
+    const mockOrganizations =
+      [{
+          id: 42,
+          uuid: "clic8k04nncuuf32kgr0",
+          name: "TEST",
+          owner_pubkey: "035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce",
+          img: "https://memes.sphinx.chat/public/NVhwFqDqHKAC-_Sy9pR4RNy8_cgYuOVWgohgceAs-aM=",
+          created: "2023-11-27T16:31:12.699355Z",
+          updated: "2023-11-27T16:31:12.699355Z",
+          show: false,
+          deleted: false,
+          bounty_count: 1
+        },
+        {
+          id: 55,
+          uuid: "cmen35itu2rvqicrm020",
+          name: "Orgination name test",
+          owner_pubkey: "035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce",
+          img: "",
+          created: "2024-01-09T16:17:26.202555Z",
+          updated: "2024-01-09T16:17:26.202555Z",
+          show: false,
+          deleted: false
+        },
+        {
+          id: 56,
+          uuid: "cmen38itu2rvqicrm02g",
+          name: "New Orgination test",
+          owner_pubkey: "035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce",
+          img: "",
+          created: "2024-01-09T16:17:38.652072Z",
+          updated: "2024-01-09T16:17:38.652072Z",
+          show: false,
+          deleted: false
+        },
+        {
+          id: 49,
+          uuid: "cm7c24itu2rvqi9o7620",
+          name: "TESTing",
+          owner_pubkey: "02af1ea854c7dc8634d08732d95c6057e6e08e01723da4f561d711a60aea708c00",
+          img: "",
+          created: "2023-12-29T12:52:34.62057Z",
+          updated: "2023-12-29T12:52:34.62057Z",
+          show: false,
+          deleted: false
+        },
+        {
+          id: 51,
+          uuid: "cmas9gatu2rvqiev4ur0",
+          name: "TEST_NEW",
+          owner_pubkey: "03cbb9c01cdcf91a3ac3b543a556fbec9c4c3c2a6ed753e19f2706012a26367ae3",
+          img: "",
+          created: "2024-01-03T20:34:09.585609Z",
+          updated: "2024-01-03T20:34:09.585609Z",
+          show: false,
+          deleted: false
+        }
+      ];
+      const mockApiResponse = {
+        status: 200,
+        json: sinon.stub().resolves(mockOrganizations)
+      };
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = await mainStore.getUserOrganizations(userId);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/user/${userId}`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    );
+
+    expect(organizationUser).toEqual(mockOrganizations);
+  });
+  
   it('should call endpoint on getOrganizationUser', async () => {
     const mainStore = new MainStore();
 
