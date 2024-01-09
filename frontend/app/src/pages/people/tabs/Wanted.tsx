@@ -10,7 +10,6 @@ import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
-import { sortBy } from 'lodash';
 const config = widgetConfigs.wanted;
 
 const Container = styled.div`
