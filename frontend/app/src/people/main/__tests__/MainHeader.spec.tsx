@@ -3,9 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import Header from './Header';
+import Header from '../Header';
 
-jest.mock('../../store', () => ({
+jest.mock('../../../store', () => ({
   useStores: jest.fn(() => ({
     main: {
       getIsAdmin: jest.fn(),

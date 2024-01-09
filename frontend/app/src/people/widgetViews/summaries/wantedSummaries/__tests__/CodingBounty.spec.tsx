@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { CodingBountiesProps } from 'people/interfaces';
 import React from 'react';
-import MobileView from './CodingBounty';
+import MobileView from '../CodingBounty';
 
 describe('MobileView component', () => {
   beforeEach(() => {
