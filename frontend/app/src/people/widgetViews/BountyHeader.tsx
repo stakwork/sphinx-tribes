@@ -201,7 +201,7 @@ const MobileFilterCount = styled.div<styledProps>`
 
 const EuiPopOverCheckboxLeft = styled.div<styledProps>`
   width: 147px;
-  height: 312px;
+  height: auto;
   padding: 15px 18px;
   border-right: 1px solid ${(p: any) => p.color && p.color.grayish.G700};
   user-select: none;
@@ -256,7 +256,7 @@ const EuiPopOverCheckboxLeft = styled.div<styledProps>`
 const PopOverRightBox = styled.div<styledProps>`
   display: flex;
   flex-direction: column;
-  max-height: 304px;
+  max-height: auto;
   padding: 15px 0px 20px 21px;
   .rightBoxHeading {
     font-family: 'Barlow';
@@ -272,7 +272,7 @@ const PopOverRightBox = styled.div<styledProps>`
 const EuiPopOverCheckboxRight = styled.div<styledProps>`
   min-width: 285px;
   max-width: 285px;
-  height: 240px;
+  height: auto;
   user-select: none;
 
   &.CheckboxOuter > div {
