@@ -38,7 +38,7 @@ const Users = (props: UserListProps) => {
           <User key={i}>
             <UserImage src={user.img || avatarIcon} />
             <UserDetails>
-              <UserName>{user.unique_name}</UserName>
+              <UserName>{user.owner_alias}</UserName>
               <UserPubkey>{user.owner_pubkey}</UserPubkey>
             </UserDetails>
             <UserAction>

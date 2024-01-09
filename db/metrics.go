@@ -147,23 +147,12 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid = false"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid = false"
-		}
+		assignedQuery = "AND assignee != '' AND paid = false"
 	}
 	if paid != "" && paid == "true" {
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+		paidQuery = "AND paid = true"
 	}
 
 	if sortBy != "" && direction != "" {
@@ -177,8 +166,9 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 
 	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
 	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + orderQuery + " " + limitQuery
+
 	b := []Bounty{}
-	db.db.Raw(allQuery).Scan(&b)
+	db.db.Raw(allQuery).Find(&b)
 	return b
 }
 

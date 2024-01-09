@@ -27,7 +27,7 @@ require (
 	github.com/rs/cors v1.10.1
 	github.com/rs/xid v1.5.0
 	github.com/stretchr/testify v1.8.4
-	github.com/tuan78/jsonconv v1.0.2 // indirect
+	github.com/tuan78/jsonconv v1.0.2
 	golang.org/x/oauth2 v0.15.0
 	google.golang.org/api v0.153.0
 	gorm.io/driver/postgres v1.5.4

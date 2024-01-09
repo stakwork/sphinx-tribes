@@ -3,12 +3,13 @@ package routes
 import (
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
 
 func OrganizationRoutes() chi.Router {
 	r := chi.NewRouter()
-
+	organizationHandlers := handlers.NewOrganizationHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/", handlers.GetOrganizations)
 		r.Get("/count", handlers.GetOrganizationsCount)
@@ -17,7 +18,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/users/{uuid}/count", handlers.GetOrganizationUsersCount)
 		r.Get("/bounties/{uuid}", handlers.GetOrganizationBounties)
 		r.Get("/user/{userId}", handlers.GetUserOrganizations)
-		r.Get("/user/dropdown/{userId}", handlers.GetUserDropdownOrganizations)
+		r.Get("/user/dropdown/{userId}", organizationHandlers.GetUserDropdownOrganizations)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
