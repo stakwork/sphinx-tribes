@@ -3,12 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
-// import { mainStore } from '../../../store/main';
-import nock from 'nock';
-import { user } from '../../../__test__/__mockData__/user';
+import { mainStore } from '../../../store/main';
 
 const mockProps: BountyHeaderProps = {
-    selectedWidget: 'people',
+    selectedWidget: 'wanted',
     scrollValue: false,
     onChangeStatus: jest.fn(),
     onChangeLanguage: jest.fn(),
@@ -18,12 +16,8 @@ const mockProps: BountyHeaderProps = {
 
 describe('BountyHeader Component Tests', () => {
 
-    // beforeEach(() => {
-    //     jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
-    // });
-
     beforeEach(() => {
-        nock.disableNetConnect();
+        jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
     });
 
     test('renders Post a Bounty Button', async () => {
@@ -46,27 +40,14 @@ describe('BountyHeader Component Tests', () => {
         expect(screen.getByText(/Filter/i)).toBeInTheDocument();
     });
 
-    // test('shows total developer count from mock API', async () => {
-    //     const mockDeveloperCount = 100;
-    //     jest.spyOn(mainStore, 'getBountyHeaderData').mockResolvedValue({ developer_count: mockDeveloperCount });
-    //
-    //     render(<BountyHeader {...mockProps} />);
-    //
-    //     await waitFor(() => {
-    //         expect(screen.getByText(mockDeveloperCount.toString())).toBeInTheDocument();
-    //     });
-    // });
-
-    test('shows total developer count from API', async () => {
-        // Mock the network request
-        nock(user.url) // Replace with your actual API URL
-            .get('/people/wanteds/header') // Replace with your actual endpoint
-            .reply(200, { developer_count: 100 }); // Mocked response
+    test('shows total developer count from mock API', async () => {
+        const mockDeveloperCount = 100;
+        jest.spyOn(mainStore, 'getBountyHeaderData').mockResolvedValue({ developer_count: mockDeveloperCount });
 
         render(<BountyHeader {...mockProps} />);
 
         await waitFor(() => {
-            expect(screen.getByText('100')).toBeInTheDocument();
+            expect(screen.getByText(mockDeveloperCount.toString())).toBeInTheDocument();
         });
     });
 });
