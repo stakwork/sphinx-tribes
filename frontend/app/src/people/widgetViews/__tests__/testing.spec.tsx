@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
-import * as hooks from '../../../hooks';
+import { mainStore } from '../../../store/main';
 
 const mockProps: BountyHeaderProps = {
     selectedWidget: 'people',
@@ -14,21 +14,16 @@ const mockProps: BountyHeaderProps = {
     checkboxIdToSelectedMapLanguage: {}
 };
 
-jest.mock('../../../hooks', () => ({
-    useIsMobile: jest.fn(),
-    useBountyHeaderData: jest.fn(),
-}));
-
 describe('BountyHeader Component Tests', () => {
 
     beforeEach(() => {
-        (hooks.useIsMobile as jest.Mock).mockReturnValue(true);
-        (hooks.useBountyHeaderData as jest.Mock).mockReset();
+        // Spy on getBountyHeaderData method and reset mocks before each test
+        jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
     });
 
-    test('renders Post Bounty Button', () => {
+    test('renders Post Bounty Button', async () => {
         render(<BountyHeader {...mockProps} />);
-        expect(screen.getByRole('button', { name: /Post Bounty/i })).toBeInTheDocument();
+        expect(await screen.findByRole('button', { name: /Post Bounty/i })).toBeInTheDocument();
     });
 
     test('renders Leaderboard button', () => {
@@ -48,12 +43,12 @@ describe('BountyHeader Component Tests', () => {
 
     test('shows total developer count from mock API', async () => {
         const mockDeveloperCount = 100;
-        (hooks.useBountyHeaderData as jest.Mock).mockReturnValue({ developer_count: mockDeveloperCount });
+        jest.spyOn(mainStore, 'getBountyHeaderData').mockResolvedValue({ developer_count: mockDeveloperCount });
 
         render(<BountyHeader {...mockProps} />);
 
         await waitFor(() => {
-            expect(screen.getByText(Total Developers: ${mockDeveloperCount.toString()})).toBeInTheDocument();
+            expect(screen.getByText(mockDeveloperCount.toString())).toBeInTheDocument();
         });
     });
 });
