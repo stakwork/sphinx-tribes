@@ -24,6 +24,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const history = useHistory();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
+  // eslint-disable-next-line no-unused-vars
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
