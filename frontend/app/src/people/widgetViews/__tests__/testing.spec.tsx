@@ -17,13 +17,12 @@ const mockProps: BountyHeaderProps = {
 describe('BountyHeader Component Tests', () => {
 
     beforeEach(() => {
-        // Spy on getBountyHeaderData method and reset mocks before each test
         jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
     });
 
-    test('renders Post Bounty Button', async () => {
+    test('renders Post a Bounty Button', async () => {
         render(<BountyHeader {...mockProps} />);
-        expect(await screen.findByRole('button', { name: /Post Bounty/i })).toBeInTheDocument();
+        expect(await screen.findByRole('button', { name: /Post a Bounty/i })).toBeInTheDocument();
     });
 
     test('renders Leaderboard button', () => {
