@@ -329,6 +329,36 @@ const BountyHeader = ({
     getPeopleList();
   }, [main, selectedWidget]);
 
+  const [counts, setCounts] = useState({
+    open: 0,
+    assigned: 0,
+    paid: 0
+  });
+
+  useEffect(() => {
+    // Fetch counts from the API
+    async function fetchCounts() {
+      try {
+        // Fetch counts for Open, Assigned, and Paid
+        const [openCount, assignedCount, paidCount] = await Promise.all([
+          main.getTotalBountyCount(true, false, false), // Open
+          main.getTotalBountyCount(false, true, false), // Assigned
+          main.getTotalBountyCount(false, false, true) // Paid
+        ]);
+
+        setCounts({
+          open: openCount,
+          assigned: assignedCount,
+          paid: paidCount
+        });
+      } catch (error) {
+        console.error('Error fetching filter counts:', error);
+      }
+    }
+
+    fetchCounts();
+  }, [main]);
+
   useEffect(() => {
     setFilterCountNumber(
       filterCount(checkboxIdToSelectedMapLanguage) + filterCount(checkboxIdToSelectedMap)
@@ -449,7 +479,10 @@ const BountyHeader = ({
                   <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
                     <EuiText className="leftBoxHeading">STATUS</EuiText>
                     <EuiCheckboxGroup
-                      options={Status}
+                      options={status.map((status: any) => ({
+                        label: `${status} [${counts[status.toLowerCase()]}]`, // Use counts to display the corresponding count
+                        id: status
+                      }))}
                       idToSelectedMap={checkboxIdToSelectedMap}
                       onChange={(id: any) => {
                         onChangeStatus(id);
