@@ -100,11 +100,7 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetCreatedBounties(pubkey)
+	bounties, err := db.DB.GetCreatedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -116,11 +112,7 @@ func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetAssignedBounties(pubkey)
+	bounties, err := db.DB.GetAssignedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)

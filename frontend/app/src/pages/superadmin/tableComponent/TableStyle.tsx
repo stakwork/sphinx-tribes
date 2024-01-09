@@ -315,3 +315,19 @@ export const PageContainer = styled.div`
   display: flex;
   align-items: center;
 `;
+
+export const BoxImage = styled.div`
+  display: flex;
+  width: 162px;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+`;
+
+export const Paragraph = styled.div`
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 200px;
+`;
