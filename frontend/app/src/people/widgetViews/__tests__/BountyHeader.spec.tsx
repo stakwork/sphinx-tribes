@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
 import { mainStore } from '../../../store/main';
+import * as hooks from '../../../hooks';
 
 const mockProps: BountyHeaderProps = {
   selectedWidget: 'wanted',
@@ -17,6 +18,11 @@ const mockProps: BountyHeaderProps = {
 describe('BountyHeader Component', () => {
   beforeEach(() => {
     jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
+    jest.spyOn(hooks, 'useIsMobile').mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   test('should render the Post a Bounty button', async () => {
@@ -37,6 +43,19 @@ describe('BountyHeader Component', () => {
   test('should render the filters', () => {
     render(<BountyHeader {...mockProps} />);
     expect(screen.getByText(/Filter/i)).toBeInTheDocument();
+  });
+
+  test('should display the MobileFilterCount with correct number when filters are selected in mobile view', async () => {
+    jest.spyOn(hooks, 'useIsMobile').mockReturnValue(true);
+
+    const mockSelectedFilters = {
+      checkboxIdToSelectedMap: { filter1: true },
+      checkboxIdToSelectedMapLanguage: { lang1: true }
+    };
+
+    render(<BountyHeader {...mockProps} {...mockSelectedFilters} />);
+
+    expect(await screen.findByText('2')).toBeInTheDocument();
   });
 
   test('should display the total developer count from the mock API', async () => {
