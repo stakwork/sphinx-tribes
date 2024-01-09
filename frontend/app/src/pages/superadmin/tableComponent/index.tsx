@@ -258,12 +258,12 @@ export const MyTable = ({
             <LeadingTitle>
               {' '}
               {bounties.length}{' '}
-              <>
+              <div>
                 <AlternativeTitle>
                   {' '}
                   {bounties.length === 1 ? 'Bounty' : 'Bounties'}
                 </AlternativeTitle>{' '}
-              </>
+              </div>
             </LeadingTitle>
           </BountyHeader>
           <Options>
