@@ -250,7 +250,46 @@ describe('Main store', () => {
 
     expect(organizationUser).toEqual(mockOrganizations);
   });
-  
+
+  it('should call endpoint on getUserOrganizationsUuid', async () => {
+    const mainStore = new MainStore();
+    const uuid = 'ck1p7l6a5fdlqdgmmnpg';
+    const mockOrganizations =
+    {
+      id: 6,
+      uuid: "ck1p7l6a5fdlqdgmmnpg",
+      name: "Stakwork",
+      owner_pubkey: "021ae436bcd40ca21396e59be8cdb5a707ceacdb35c1d2c5f23be7584cab29c40b",
+      img: "https://memes.sphinx.chat/public/_IO8M0UXltb3mbK0qso63ux86AP-2nN2Ly9uHo37Ku4=",
+      created: "2023-09-14T23:14:28.821632Z",
+      updated: "2023-09-14T23:14:28.821632Z",
+      show: true,
+      deleted: false,
+      bounty_count: 8,
+      budget: 640060
+    }
+      const mockApiResponse = {
+        status: 200,
+        json: sinon.stub().resolves(mockOrganizations)
+      };
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = await mainStore.getUserOrganizationByUuid(uuid);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/${uuid}`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    );
+
+    expect(organizationUser).toEqual(mockOrganizations);
+  });
   it('should call endpoint on getOrganizationUser', async () => {
     const mainStore = new MainStore();
 
