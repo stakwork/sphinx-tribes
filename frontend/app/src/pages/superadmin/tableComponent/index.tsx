@@ -226,7 +226,12 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             <LeadingTitle>
               {' '}
               {bounties.length}{' '}
-              <AlternativeTitle> {bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
+              <>
+                <AlternativeTitle>
+                  {' '}
+                  {bounties.length === 1 ? 'Bounty' : 'Bounties'}
+                </AlternativeTitle>{' '}
+              </>
             </LeadingTitle>
           </BountyHeader>
           <Options>
