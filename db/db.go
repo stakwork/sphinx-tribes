@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
@@ -561,15 +562,55 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	return ms
 }
 
-func (db database) GetAssignedBounties(pubkey string) ([]Bounty, error) {
+func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
+	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
+	pubkey := chi.URLParam(r, "pubkey")
+
+	orderQuery := ""
+	limitQuery := ""
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + sortBy + " " + "DESC"
+	} else {
+		orderQuery = " ORDER BY paid DESC"
+	}
+	if offset != 0 && limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	}
+
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `' AND show != false ORDER BY id DESC`).Find(&ms).Error
+
+	query := `SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `' AND show != false`
+	allQuery := query + " " + orderQuery + " " + limitQuery
+	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
 }
 
-func (db database) GetCreatedBounties(pubkey string) ([]Bounty, error) {
+func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
+	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
+	pubkey := chi.URLParam(r, "pubkey")
+
+	orderQuery := ""
+	limitQuery := ""
+
+	fmt.Println("Sort BY", sortBy, limit)
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + sortBy + " " + "ASC"
+	} else {
+		orderQuery = "ORDER BY paid DESC"
+	}
+
+	if offset != 0 && limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	}
+
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE owner_id = '` + pubkey + `' ORDER BY id DESC`).Find(&ms).Error
+
+	query := `SELECT * FROM public.bounty WHERE owner_id = '` + pubkey + `'`
+	allQuery := query + " " + orderQuery + " " + limitQuery
+
+	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
 }
 
