@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import AdminAccessDenied from './index.tsx';
+import '@testing-library/jest-dom';
+import AdminAccessDenied from '../index.tsx';
 
 describe('AdminAccessDenied', () => {
   test("renders Access Denied message, You don't have access message, and Go Back button", () => {
