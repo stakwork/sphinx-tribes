@@ -5,7 +5,7 @@ import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
 // import { mainStore } from '../../../store/main';
 import nock from 'nock';
-import { user } from '../../../_test/mockData_/user';
+import { user } from '../../../__test__/__mockData__/user';
 
 const mockProps: BountyHeaderProps = {
     selectedWidget: 'people',
