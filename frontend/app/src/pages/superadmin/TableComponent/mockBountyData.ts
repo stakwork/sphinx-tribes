@@ -51,5 +51,22 @@ export const bounties = [
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4'
+  },
+  {
+    id: 4,
+    title:
+      'Create a new website for the company Doe Inc. in React. The website should be responsive and have a dark mode.',
+    date: '2023.08.05',
+    dtgp: 1,
+    assignee: 'John Doe',
+    provider: 'Jane Doe',
+    organization: 'Doe Inc.',
+    status: 'completed',
+    assigneeImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    providerImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    organizationImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4'
   }
 ];

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
+import { colors } from 'config';
 import paginationarrow1 from '../Header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../Header/icons/paginationarrow2.svg';
 
 import copygray from '../Header/icons/copygray.svg';
+import expand_more from '../Header/icons/expand_more.svg';
 import {
   TableContainer,
   HeaderContainer,
@@ -26,14 +29,16 @@ import {
   FlexDiv,
   PaginationButtons,
   PageContainer,
-  StyledSelect2,
   TableHeaderDataAlternative,
   TableDataRow,
   TableDataAlternative,
-  BountyData
+  BountyData,
 } from './TableStyle';
 
 import './styles.css';
+import { FilterContainer, FlexDivStatus, StatusCheckboxItem } from './StatusStyle';
+
+
 interface Bounty {
   id: number;
   title: string;
@@ -95,6 +100,7 @@ interface TextInColorBoxProps {
   status: string;
 }
 
+
 export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   <>
     <div
@@ -132,8 +138,25 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
 );
 
 export const MyTable = ({ bounties }: TableProps) => {
+
+  const options = [
+    { id: 'open', label: 'Open', value: 'Open'},
+    { id: 'assigned', label: 'Assigned', value: 'Assigned' },
+    { id: 'completed', label: 'Completed', value: 'Completed' },
+    { id: 'paid', label: 'Paid', value: 'Paid' }
+  ];
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({
+    open: false,
+    assigned: false,
+    completed: false,
+    paid: false
+  });
   const pageSize = 10;
+  const color = colors['light'];
 
   const dataNumber: number[] = [];
 
@@ -141,13 +164,18 @@ export const MyTable = ({ bounties }: TableProps) => {
     dataNumber.push(i);
   }
 
-  const currentPageData = () => {
-    const indexOfLastPost = currentPage * pageSize;
-    const indexOfFirstPost = indexOfLastPost - pageSize;
-    const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
-    return currentPosts;
-  };
+  const statusFilterMap = () => {
+    if (statusFilter.length === 0) {
+      return bounties;
+    }
+    return bounties.filter((bounty: any) => statusFilter.includes(bounty.status));
+  }
 
+  const currentPageData = () => {
+    const firstIndex = (currentPage - 1) * pageSize;
+    const lastIndex = firstIndex + pageSize;
+    return statusFilterMap().slice(firstIndex, lastIndex);
+  };
   const paginateNext = () => {
     console.log('clicked');
     if (currentPage < bounties?.length / pageSize) {
@@ -160,6 +188,31 @@ export const MyTable = ({ bounties }: TableProps) => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  const onButtonClick = () => {
+    setIsPopoverOpen(!isPopoverOpen);
+  };
+
+  const onChange = (optionId:any) => {
+    const newCheckboxIdToSelectedMap = {
+      ...checkboxIdToSelectedMap,
+      ...{
+        [optionId]: !checkboxIdToSelectedMap[optionId],
+      },
+    };
+  
+    setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
+  
+    // Check if the checkbox is being selected or deselected
+    if (newCheckboxIdToSelectedMap[optionId]) {
+      // If it's being selected, add the optionId to the statusFilter array
+      setStatusFilter([...statusFilter, optionId]);
+    } else {
+      // If it's being deselected, remove the optionId from the statusFilter array
+      setStatusFilter(statusFilter.filter((id : any) => id !== optionId));
+    }
+  };
+
 
   return (
     <>
@@ -183,13 +236,51 @@ export const MyTable = ({ bounties }: TableProps) => {
               </StyledSelect>
             </FlexDiv>
             <FlexDiv>
-              <Label>Status:</Label>
-              <StyledSelect2 id="statusFilter">
-                <option value="All">All</option>
-                <option value="open">Open</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-              </StyledSelect2>
+              <EuiPopover
+                button={
+                  <FilterContainer onClick={onButtonClick}>                                       
+                    <FlexDivStatus>
+                    <EuiText
+                      className="statusText"
+                    >
+                      Status:
+                    </EuiText>
+                    <EuiText
+                      className="subStatusText"
+                    >
+                      {statusFilter.length === 0 ? 'All' : statusFilter.length === 1 ? statusFilter : 'Multiple'}
+                    </EuiText>
+                    <img src={expand_more} alt="" width="20px" height="20px" />
+                    </FlexDivStatus>
+                    
+                  </FilterContainer>
+                }
+                panelStyle={{
+                  maxWidth: '162px',
+                  maxHeight: '168px',
+                  borderRadius: '6px',
+                  fontSize: '15px',
+                  lineHeight: '18px',
+                  fontWeight: '500',
+                  color: '#5F6368',
+                  fontFamily: 'Barlow',
+                  border: '1px solid #fff',
+
+                }}
+                isOpen={isPopoverOpen}
+                closePopover={() => setIsPopoverOpen(false)}
+                panelClassName="yourClassNameHere"
+                panelPaddingSize="none"
+                anchorPosition="downCenter"
+              >
+               <StatusCheckboxItem color={color}>
+               <EuiCheckboxGroup
+                  options={options}
+                  onChange={(id:any) => onChange(id)}
+                  idToSelectedMap={checkboxIdToSelectedMap}
+               />
+               </StatusCheckboxItem>
+              </EuiPopover>      
             </FlexDiv>
           </Options>
         </Header>
