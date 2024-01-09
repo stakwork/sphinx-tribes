@@ -18,8 +18,8 @@ export const bounties = [
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    bounty_created: '2024-01-01',
-    paid_date: '2024-01-02'
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z'
   },
   {
     id: 2,
@@ -38,8 +38,8 @@ export const bounties = [
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    bounty_created: '2024-01-01',
-    paid_date: '2024-01-02'
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z'
   },
   {
     id: 3,
@@ -58,7 +58,7 @@ export const bounties = [
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    bounty_created: '2024-01-01',
-    paid_date: '2024-01-02'
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z'
   }
 ];

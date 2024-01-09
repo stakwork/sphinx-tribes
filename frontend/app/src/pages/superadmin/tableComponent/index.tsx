@@ -249,7 +249,6 @@ export const MyTable = ({
     getActiveTabs();
   }, [getActiveTabs]);
 
-  const bountiesLength = bounties && bounties.length;
   return (
     <>
       <HeaderContainer freeze={!headerIsFrozen}>
@@ -265,7 +264,6 @@ export const MyTable = ({
                   {bounties.length === 1 ? 'Bounty' : 'Bounties'}
                 </AlternativeTitle>{' '}
               </>
-
             </LeadingTitle>
           </BountyHeader>
           <Options>
