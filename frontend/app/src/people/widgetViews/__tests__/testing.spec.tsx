@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
-import { mainStore } from '../../../store/main'; // Import the mainStore instance
+import * as hooks from '../../../hooks';
 
 const mockProps: BountyHeaderProps = {
     selectedWidget: 'people',
@@ -14,19 +14,21 @@ const mockProps: BountyHeaderProps = {
     checkboxIdToSelectedMapLanguage: {}
 };
 
-// Mock the specific method in the mainStore
-mainStore.getBountyHeaderData = jest.fn();
+jest.mock('../../../hooks', () => ({
+    useIsMobile: jest.fn(),
+    useBountyHeaderData: jest.fn(),
+}));
 
 describe('BountyHeader Component Tests', () => {
 
     beforeEach(() => {
-        // Reset the mock before each test
-        mainStore.getBountyHeaderData.mockReset();
+        (hooks.useIsMobile as jest.Mock).mockReturnValue(true);
+        (hooks.useBountyHeaderData as jest.Mock).mockReset();
     });
 
-    test('renders Post Bounty Button', async () => {
+    test('renders Post Bounty Button', () => {
         render(<BountyHeader {...mockProps} />);
-        expect(await screen.findByRole('button', { name: /Post Bounty/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Post Bounty/i })).toBeInTheDocument();
     });
 
     test('renders Leaderboard button', () => {
@@ -46,12 +48,12 @@ describe('BountyHeader Component Tests', () => {
 
     test('shows total developer count from mock API', async () => {
         const mockDeveloperCount = 100;
-        mainStore.getBountyHeaderData.mockResolvedValue({ developer_count: mockDeveloperCount });
+        (hooks.useBountyHeaderData as jest.Mock).mockReturnValue({ developer_count: mockDeveloperCount });
 
         render(<BountyHeader {...mockProps} />);
 
         await waitFor(() => {
-            expect(screen.getByText(mockDeveloperCount.toString())).toBeInTheDocument();
+            expect(screen.getByText(Total Developers: ${mockDeveloperCount.toString()})).toBeInTheDocument();
         });
     });
 });
