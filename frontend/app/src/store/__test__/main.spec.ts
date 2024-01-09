@@ -39,6 +39,38 @@ describe('Main store', () => {
     fetchStub.reset();
   });
 
+  it('should call endpoint on addOrganization', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const addOrganization = {
+      img:"",
+      name:"New Orgination test",
+      owner_pubkey:"035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce"
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.addOrganization(addOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(addOrganization),
+        mode: 'cors'
+      })
+    );
+  });
+
   it('should call endpoint on saveBounty', () => {
     const mainStore = new MainStore();
     mainStore.saveBounty = jest
