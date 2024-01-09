@@ -884,10 +884,11 @@ export class MainStore {
   async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, 20, {
       ...queryParams,
-      sortBy: 'created'
+      sortBy: 'paid'
     });
+
     try {
       const ps2 = await api.get(query);
       const ps3: any[] = [];
@@ -930,10 +931,11 @@ export class MainStore {
   async getPersonCreatedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, queryLimit, {
+    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, 20, {
       ...queryParams,
-      sortBy: 'created'
+      sortBy: 'paid'
     });
+
     try {
       const ps2 = await api.get(query);
       const ps3: any[] = [];

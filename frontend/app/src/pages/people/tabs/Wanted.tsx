@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
+import { sortBy } from 'lodash';
 const config = widgetConfigs.wanted;
 
 const Container = styled.div`
@@ -49,8 +50,8 @@ export const Wanted = observer(() => {
 
   async function getUserTickets() {
     setIsLoading(true);
-    await main.getPersonCreatedBounties({}, personPubkey);
-    await main.getPersonAssignedBounties({}, personPubkey);
+    await main.getPersonCreatedBounties({ page: 1 }, personPubkey);
+    await main.getPersonAssignedBounties({ page: 1 }, personPubkey);
     setIsLoading(false);
   }
 
