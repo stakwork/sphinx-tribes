@@ -131,4 +131,20 @@ describe('MobileView component', () => {
     const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
+
+  it('displays "Mark as Unpaid" when bounty is paid', () => {
+    const paidProps = {
+      ...defaultProps,
+      paid: true,
+      bountyPaid: true,
+      saving: 'not_paid',
+      updatingPayment: false,
+      handleSetAsUnpaid: jest.fn(),
+    };
+  
+    render(<MobileView {...paidProps} />);
+  
+    const button = screen.getByText('Mark as Unpaid');
+    expect(button).toBeInTheDocument();
+  });
 });
