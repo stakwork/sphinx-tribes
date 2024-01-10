@@ -423,7 +423,8 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-	bodyData := utils.BuildKeysendBodyData(amount, request.ReceiverPubKey, request.RouteHint)
+	assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+	bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 
 	jsonBody := []byte(bodyData)
 
@@ -453,7 +454,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		paymentHistory := db.PaymentHistory{
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
-			ReceiverPubKey: request.ReceiverPubKey,
+			ReceiverPubKey: assignee.OwnerPubKey,
 			OrgUuid:        bounty.OrgUuid,
 			BountyId:       id,
 			Created:        &now,
