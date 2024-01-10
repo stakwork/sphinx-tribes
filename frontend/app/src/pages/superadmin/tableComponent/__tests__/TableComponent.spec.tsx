@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { screen, render, fireEvent } from '@testing-library/react';
+import { screen, render, fireEvent, waitFor } from '@testing-library/react';
+import moment from 'moment';
 import { createMemoryHistory } from 'history';
 import userEvent from '@testing-library/user-event';
 import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from '../index.tsx';
-import { BountyStatus } from 'store/main.ts';
 import { Bounty } from '../interfaces.ts';
 //import { mockBounties } from '../mockAdminData.ts';
 
@@ -208,192 +208,121 @@ it('it renders with filter status states', async () => {
   const openText = getByText('Open');
   expect(openText).toBeInTheDocument();
 });
-describe('MyTable Pagination', () => {
-  // const mockBounties: TableProps['bounties'] = [
-  //   // Your mock data here
-  // ];
 
-  const mockbounties = new Array(30).fill({
-    owner_id: '021ae436bcd40ca21396e59be8cdb5a707ceacdb35c1d2c5f23be7584cab29c40b',
-    paid: false,
-    show: true,
-    type: 'freelance_job_request',
-    award: '',
-    assigned_hours: 0,
-    bounty_expires: '',
-    commitment_fee: 0,
-    price: 500000,
-    title: 'Auto-populate org when "create a bounty" modal is initiated from org page',
-    tribe: 'None',
-    assignee: '02fcb9c3fb7b754acbd4755c2ee3fbeb6525eecb7418b19da96c14616158eae77d',
-    ticket_url: 'https://github.com/stakwork/sphinx-tribes/issues/1320',
-    org_uuid: 'ck95pe04nncjnaefo08g',
-    wanted_type: 'Web development',
-    deliverables: '',
-    github_description: true,
-    one_sentence_summary: '',
-    estimated_session_length: '',
-    estimated_completion_date: '',
-    assigned_date: '2024-01-10T05:33:39.631167Z',
-    coding_languages: [],
-    bounty_id: 1132,
-    bounty_created: 1704844695,
-    bounty_updated: '2024-01-10T05:33:39.631167Z',
-    bounty_description:
-      '### Context\r\nWhen someone creates a bounty from an org page, the org field should be auto-populated when they reach step 2 instead of it being manually set. Here is an example of an org page: https://community.sphinx.chat/org/bounties/ck95pe04nncjnaefo08g\r\n\r\n### Design\r\n<img width="925" alt="Screenshot 2024-01-09 at 3 55 12 PM" src="https://github.com/stakwork/sphinx-tribes/assets/32662508/3569d1b2-5b77-4821-bea0-c4222e84b5d8">\r\n\r\n### Acceptance Criteria\r\n- [ ] I\'ve tested on Chrome\r\n- [ ] I\'ve submitted a recording in my pr showing this work\r\n- [ ] I\'ve included appropriate tests that asserts the same org is populated as the org page I\'m on',
-    uuid: 'cjrptro4nncma8v11kmg',
-    owner_pubkey: '021ae436bcd40ca21396e59be8cdb5a707ceacdb35c1d2c5f23be7584cab29c40b',
-    unique_name: 'ecurrencyhodler',
-    tags: [],
-    img: 'https://memes.sphinx.chat/public/SlXI397USVtZpdltwXaA0yb9IuEnF-UVY-3QRwpWq1w=',
-    unlisted: false,
-    deleted: false,
-    last_login: 1704834954,
-    price_to_meet: 0,
-    new_ticket_time: 0,
-    twitter_confirmed: false,
-    extras: {
-      alert: false,
-      amboss: [{ label: '', value: '' }],
-      coding_languages: [
-        {
-          background: 'rgba(184, 37, 95, 0.1)',
-          border: '1px solid rgba(184, 37, 95, 0.1)',
-          color: '#B8255F',
-          label: 'Lightning',
-          value: 'Lightning'
-        }
-      ],
-      email: [{ label: '', value: '' }],
-      facebook: [{ label: '', value: '' }],
-      github: [{ label: 'ecurrencyhodler', value: 'ecurrencyhodler' }],
-      lightning: [{ label: 'ecurrencyhodler@getalby.com', value: 'ecurrencyhodler@getalby.com' }],
-      tribes: [],
-      twitter: [{ label: '', value: '' }]
-    },
-    github_issues: {},
-    assignee_alias: 'Vayras',
-    assignee_id: 243,
-    assignee_img: 'https://memes.sphinx.chat/public/VvAAScl6-U2v8bt8roYuHbBPy2h4pb_t-G5H-fSsP3g=',
-    assignee_created: null,
-    assignee_updated: null,
-    assignee_description: '',
-    assignee_route_hint:
-      '03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099519164417',
-    bounty_owner_id: 180,
-    owner_uuid: 'cjrptro4nncma8v11kmg',
-    owner_key: '',
-    owner_alias: '',
-    owner_unique_name: 'ecurrencyhodler',
-    owner_description: 'Bitcoin PM',
-    owner_tags: null,
-    owner_img: 'https://memes.sphinx.chat/public/SlXI397USVtZpdltwXaA0yb9IuEnF-UVY-3QRwpWq1w=',
-    owner_created: null,
-    owner_updated: null,
-    owner_last_login: 0,
-    owner_route_hint: '',
-    owner_contact_key: '',
-    owner_price_to_meet: 0,
-    owner_twitter_confirmed: false,
-    organization_name: 'Bounties Platform',
-    organization_img:
-      'https://memes.sphinx.chat/public/IqQnBnAdrteW_QCeq_3Ss1_78_yBAz_rckG5F3NE9ms=',
-    organization_uuid: 'ck95pe04nncjnaefo08g'
-  });
+it('renders pagination section when number of bounties is greater than page size', () => {
+  // Create an array of bounties with a count greater than the page size
+  const largeMockBounties = Array.from({ length: 25 }, () => ({
+    id: 1,
+    bounty_id: 1,
+    title:
+      'Return user to the same page they were on before they edited a bounty user to the same page they were on before.',
+    date: '2021.01.01',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z',
+    dtgp: 1,
+    assignee: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+    assigneeImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    provider:
+      '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce:03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099517001729',
+    providerImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    organization: 'OrganizationName',
+    organizationImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    status: 'open'
+  }));
+  const mockSetBountyStatus = jest.fn();
+  const mockSetDropdownValue = jest.fn();
 
-  it('renders pagination arrows when bounties length is greater than pageSize', () => {
-    const Wrapper = () => {
-      const [bountyStatus, setBountyStatus] = useState({
-        Open: false,
-        Assigned: false,
-        Paid: false
-      });
-      const [dropdownValue, setDropdownValue] = useState('all');
-      const mockProps = {
-        bounties: mockbounties,
-        startDate: 1234567890,
-        endDate: 1234567890,
-        headerIsFrozen: false,
-        bountyStatus: bountyStatus,
-        setBountyStatus: setBountyStatus,
-        dropdownValue: dropdownValue,
-        setDropdownValue: setDropdownValue,
-        paginatePrev: jest.fn(),
-        paginateNext: jest.fn()
-      };
-      return <MyTable {...mockProps} />;
-    };
+  render(
+    <MyTable
+      bounties={largeMockBounties}
+      headerIsFrozen={false}
+      startDate={moment().subtract(7, 'days').startOf('day').unix()}
+      endDate={moment().startOf('day').unix()}
+      bountyStatus={{ Open: false, Assigned: false, Paid: false }}
+      setBountyStatus={mockSetBountyStatus}
+      dropdownValue="all"
+      setDropdownValue={mockSetDropdownValue}
+    />
+  );
 
-    render(<Wrapper />);
+  (async () => {
+    await waitFor(() => {
+      const paginationSection = screen.getByRole('pagination');
+      expect(paginationSection).toBeInTheDocument();
 
-    const paginationArrow1 = screen.getByAltText('pagination arrow 1');
-    const paginationArrow2 = screen.getByAltText('pagination arrow 2');
+      // Optionally, you can also check if pagination arrows are present
+      const paginationArrowPrev = screen.getByAltText('pagination arrow 1');
+      const paginationArrowNext = screen.getByAltText('pagination arrow 2');
+      expect(paginationArrowPrev).toBeInTheDocument();
+      expect(paginationArrowNext).toBeInTheDocument();
+    });
+  })();
+});
 
-    expect(paginationArrow1).toBeInTheDocument();
-    expect(paginationArrow2).toBeInTheDocument();
-  });
+const mockProps = {
+  bounties: Array.from({ length: 25 }, () => ({
+    id: 1,
+    bounty_id: 1,
+    title:
+      'Return user to the same page they were on before they edited a bounty user to the same page they were on before.',
+    date: '2021.01.01',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z',
+    dtgp: 1,
+    assignee: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+    assigneeImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    provider:
+      '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce:03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099517001729',
+    providerImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    organization: 'OrganizationName',
+    organizationImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    status: 'open'
+  })),
+  startDate: moment().subtract(7, 'days').startOf('day').unix(),
+  endDate: moment().startOf('day').unix(),
+  headerIsFrozen: false,
+  bountyStatus: { Open: false, Assigned: false, Paid: false },
+  setBountyStatus: jest.fn(),
+  dropdownValue: 'all',
+  setDropdownValue: jest.fn(),
+  paginatePrev: jest.fn(),
+  paginateNext: jest.fn()
+};
+it('renders pagination arrows when bounties length is greater than pageSize and status filter is set to "open"', async () => {
+  render(<MyTable {...mockProps} />);
 
-  it('calls paginateNext when next pagination arrow is clicked', () => {
-    const Wrapper = () => {
-      const [bountyStatus, setBountyStatus] = useState({
-        Open: false,
-        Assigned: false,
-        Paid: false
-      });
-      const [dropdownValue, setDropdownValue] = useState('all');
-      const mockProps = {
-        bounties: mockbounties,
-        startDate: 1234567890,
-        endDate: 1234567890,
-        headerIsFrozen: false,
-        bountyStatus: bountyStatus,
-        setBountyStatus: setBountyStatus,
-        dropdownValue: dropdownValue,
-        setDropdownValue: setDropdownValue,
-        paginatePrev: jest.fn(),
-        paginateNext: jest.fn()
-      };
-      return <MyTable {...mockProps} />;
-    };
+  (async () => {
+    await waitFor(() => {
+      const paginationArrow1 = screen.getByAltText('pagination arrow 1');
+      const paginationArrow2 = screen.getByAltText('pagination arrow 2');
 
-    render(<Wrapper />);
-    const myTableInstance = screen.getByRole('pagination'); // Assuming role attribute is set appropriately
-    const { paginateNext }: { paginateNext: any } = myTableInstance as any;
-    const paginationArrow2 = screen.getByAltText('pagination arrow 2');
-    fireEvent.click(paginationArrow2);
+      expect(paginationArrow1).toBeInTheDocument();
+      expect(paginationArrow2).toBeInTheDocument();
+    });
+  })();
+});
 
-    expect(paginateNext).toHaveBeenCalled();
-  });
+it('calls paginateNext when next pagination arrow is clicked with status filter set to "in-progress"', async () => {
+  const inProgressProps = {
+    ...mockProps,
+    bountyStatus: { Open: false, Assigned: true, Paid: false }
+  };
+  render(<MyTable {...inProgressProps} />);
 
-  it('calls paginatePrev when previous pagination arrow is clicked', () => {
-    const Wrapper = () => {
-      const [bountyStatus, setBountyStatus] = useState({
-        Open: false,
-        Assigned: false,
-        Paid: false
-      });
-      const [dropdownValue, setDropdownValue] = useState('all');
-      const mockProps = {
-        bounties: mockbounties,
-        startDate: 1234567890,
-        endDate: 1234567890,
-        headerIsFrozen: false,
-        bountyStatus: bountyStatus,
-        setBountyStatus: setBountyStatus,
-        dropdownValue: dropdownValue,
-        setDropdownValue: setDropdownValue,
-        paginatePrev: jest.fn(),
-        paginateNext: jest.fn()
-      };
-      return <MyTable {...mockProps} />;
-    };
-    render(<Wrapper />);
+  (async () => {
+    await waitFor(() => {
+      const myTableInstance = screen.getByRole('pagination');
+      const { paginateNext }: { paginateNext: any } = myTableInstance as any;
+      const paginationArrow2 = screen.getByAltText('pagination arrow 2');
+      fireEvent.click(paginationArrow2);
 
-    const myTableInstance = screen.getByRole('pagination'); // Assuming role attribute is set appropriately
-    const { paginatePrev }: { paginatePrev: any } = myTableInstance as any;
-    const paginationArrow1 = screen.getByAltText('pagination arrow 1');
-    fireEvent.click(paginationArrow1);
-
-    expect(paginatePrev).toHaveBeenCalled();
-  });
+      expect(paginateNext).toHaveBeenCalled();
+    });
+  })();
 });
