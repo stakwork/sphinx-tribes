@@ -3,12 +3,12 @@ import { Router } from 'react-router-dom';
 import { queryByText, render, screen } from '@testing-library/react';
 import nock from 'nock';
 import React from 'react';
-import { setupStore } from '../../__test__/__mockData__/setupStore';
-import { person } from '../../__test__/__mockData__/persons.ts';
-import { user } from '../../__test__/__mockData__/user';
-import { mockUsehistory } from '../../__test__/__mockFn__/useHistory';
-import Bounties from './AssignedUnassignedBounties';
-import history from '../../config/history';
+import { setupStore } from '../../../__test__/__mockData__/setupStore';
+import { person } from '../../../__test__/__mockData__/persons.ts';
+import { user } from '../../../__test__/__mockData__/user';
+import { mockUsehistory } from '../../../__test__/__mockFn__/useHistory';
+import Bounties from '../AssignedUnassignedBounties';
+import history from '../../../config/history';
 
 beforeAll(() => {
   nock.disableNetConnect();
