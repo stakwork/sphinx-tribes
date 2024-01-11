@@ -240,19 +240,6 @@ export const StyledSelect = styled.select`
   border: none;
 `;
 
-export const StyledSelect2 = styled.select`
-  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
-  font-family: Barlow;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  border-radius: 4px;
-  cursor: pointer;
-  outline: none;
-  width: 45px;
-  border: none;
-`;
 
 export const LeadingTitle = styled.h2`
   color: var(--Primary-Text-1, var(--Press-Icon-Color, #292c33));
