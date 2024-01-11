@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
-import { screen, render, fireEvent } from '@testing-library/react';
+import { screen, render, fireEvent, waitFor } from '@testing-library/react';
+import moment from 'moment';
 import { createMemoryHistory } from 'history';
 import userEvent from '@testing-library/user-event';
 import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from '../index.tsx';
-import { BountyStatus } from 'store/main.ts';
 import { Bounty } from '../interfaces.ts';
+//import { mockBounties } from '../mockAdminData.ts';
+
+jest.mock('../index.tsx', () => ({
+  ...jest.requireActual('../index.tsx'),
+  paginatePrev: jest.fn(),
+  paginateNext: jest.fn()
+}));
 
 const mockBounties = [
   {
@@ -200,4 +207,122 @@ it('it renders with filter status states', async () => {
   await userEvent.click(getByText('Open'));
   const openText = getByText('Open');
   expect(openText).toBeInTheDocument();
+});
+
+it('renders pagination section when number of bounties is greater than page size', () => {
+  // Create an array of bounties with a count greater than the page size
+  const largeMockBounties = Array.from({ length: 25 }, () => ({
+    id: 1,
+    bounty_id: 1,
+    title:
+      'Return user to the same page they were on before they edited a bounty user to the same page they were on before.',
+    date: '2021.01.01',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z',
+    dtgp: 1,
+    assignee: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+    assigneeImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    provider:
+      '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce:03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099517001729',
+    providerImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    organization: 'OrganizationName',
+    organizationImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    status: 'open'
+  }));
+  const mockSetBountyStatus = jest.fn();
+  const mockSetDropdownValue = jest.fn();
+
+  render(
+    <MyTable
+      bounties={largeMockBounties}
+      headerIsFrozen={false}
+      startDate={moment().subtract(7, 'days').startOf('day').unix()}
+      endDate={moment().startOf('day').unix()}
+      bountyStatus={{ Open: false, Assigned: false, Paid: false }}
+      setBountyStatus={mockSetBountyStatus}
+      dropdownValue="all"
+      setDropdownValue={mockSetDropdownValue}
+    />
+  );
+
+  (async () => {
+    await waitFor(() => {
+      const paginationSection = screen.getByRole('pagination');
+      expect(paginationSection).toBeInTheDocument();
+
+      // Optionally, you can also check if pagination arrows are present
+      const paginationArrowPrev = screen.getByAltText('pagination arrow 1');
+      const paginationArrowNext = screen.getByAltText('pagination arrow 2');
+      expect(paginationArrowPrev).toBeInTheDocument();
+      expect(paginationArrowNext).toBeInTheDocument();
+    });
+  })();
+});
+
+const mockProps = {
+  bounties: Array.from({ length: 25 }, () => ({
+    id: 1,
+    bounty_id: 1,
+    title:
+      'Return user to the same page they were on before they edited a bounty user to the same page they were on before.',
+    date: '2021.01.01',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z',
+    dtgp: 1,
+    assignee: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+    assigneeImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    provider:
+      '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce:03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099517001729',
+    providerImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    organization: 'OrganizationName',
+    organizationImage:
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    status: 'open'
+  })),
+  startDate: moment().subtract(7, 'days').startOf('day').unix(),
+  endDate: moment().startOf('day').unix(),
+  headerIsFrozen: false,
+  bountyStatus: { Open: false, Assigned: false, Paid: false },
+  setBountyStatus: jest.fn(),
+  dropdownValue: 'all',
+  setDropdownValue: jest.fn(),
+  paginatePrev: jest.fn(),
+  paginateNext: jest.fn()
+};
+it('renders pagination arrows when bounties length is greater than pageSize and status filter is set to "open"', async () => {
+  render(<MyTable {...mockProps} />);
+
+  (async () => {
+    await waitFor(() => {
+      const paginationArrow1 = screen.getByAltText('pagination arrow 1');
+      const paginationArrow2 = screen.getByAltText('pagination arrow 2');
+
+      expect(paginationArrow1).toBeInTheDocument();
+      expect(paginationArrow2).toBeInTheDocument();
+    });
+  })();
+});
+
+it('calls paginateNext when next pagination arrow is clicked with status filter set to "in-progress"', async () => {
+  const inProgressProps = {
+    ...mockProps,
+    bountyStatus: { Open: false, Assigned: true, Paid: false }
+  };
+  render(<MyTable {...inProgressProps} />);
+
+  (async () => {
+    await waitFor(() => {
+      const myTableInstance = screen.getByRole('pagination');
+      const { paginateNext }: { paginateNext: any } = myTableInstance as any;
+      const paginationArrow2 = screen.getByAltText('pagination arrow 2');
+      fireEvent.click(paginationArrow2);
+
+      expect(paginateNext).toHaveBeenCalled();
+    });
+  })();
 });
