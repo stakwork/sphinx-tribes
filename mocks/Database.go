@@ -3018,6 +3018,52 @@ func (_c *Database_GetOrganizationByName_Call) RunAndReturn(run func(string) db.
 	return _c
 }
 
+// GetOrganizationByUuid provides a mock function with given fields: uuid
+func (_m *Database) GetOrganizationByUuid(uuid string) db.Organization {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOrganizationByUuid")
+	}
+
+	var r0 db.Organization
+	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Organization)
+	}
+
+	return r0
+}
+
+// Database_GetOrganizationByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationByUuid'
+type Database_GetOrganizationByUuid_Call struct {
+	*mock.Call
+}
+
+// GetOrganizationByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetOrganizationByUuid(uuid interface{}) *Database_GetOrganizationByUuid_Call {
+	return &Database_GetOrganizationByUuid_Call{Call: _e.mock.On("GetOrganizationByUuid", uuid)}
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) Run(run func(uuid string)) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) Return(_a0 db.Organization) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) RunAndReturn(run func(string) db.Organization) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrganizationInvoices provides a mock function with given fields: org_uuid
 func (_m *Database) GetOrganizationInvoices(org_uuid string) []db.InvoiceList {
 	ret := _m.Called(org_uuid)
