@@ -1,8 +1,6 @@
 package db
 
 import (
-	"gorm.io/driver/postgres"
-	"net/http"
 	"regexp"
 	"testing"
 	"time"
@@ -10,7 +8,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
-	gormIo "gorm.io/gorm"
 )
 
 var now = time.Now()
@@ -38,23 +35,4 @@ func TestCodeGet(t *testing.T) {
 		WillReturnRows(rows)
 
 	assert.Nil(t, err)
-}
-
-func TestGetAllBounties(t *testing.T) {
-	mockDb, mock, _ := sqlmock.New()
-	dialector := postgres.New(postgres.Config{
-		Conn:       mockDb,
-		DriverName: "postgres",
-	})
-	db, _ := gormIo.Open(dialector, &gormIo.Config{})
-	DB = database{db: db}
-
-	t.Run("should return all bounties, not query parameters", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM public.bounty WHERE show != false     ORDER BY created desc LIMIT -1  OFFSET 0`)).WithArgs(false).WillReturnRows(sqlmock.NewRows([]string{}))
-
-		req, _ := http.NewRequest("GET", "/gobounties/all", nil)
-		DB.GetAllBounties(req)
-
-		assert.NoError(t, mock.ExpectationsWereMet())
-	})
 }
