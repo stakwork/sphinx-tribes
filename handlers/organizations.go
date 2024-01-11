@@ -22,7 +22,7 @@ func NewOrganizationHandler(db db.Database) *organizationHandler {
 	return &organizationHandler{db: db}
 }
 
-func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	now := time.Now()
@@ -44,6 +44,13 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(org.Name) == 0 || len(org.Name) > 20 {
+		fmt.Printf("invalid organization name %s\n", org.Name)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("organization name length must be greater than 1 and less than 20")
+		return
+	}
+
 	if pubKeyFromAuth != org.OwnerPubKey {
 		hasRole := db.UserHasAccess(pubKeyFromAuth, org.Uuid, db.EditOrg)
 		if !hasRole {
@@ -56,7 +63,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	existing := db.DB.GetOrganizationByUuid(org.Uuid)
+	existing := oh.db.GetOrganizationByUuid(org.Uuid)
 	if existing.ID == 0 { // new!
 		if org.ID != 0 { // can't try to "edit" if it does not exist already
 			fmt.Println("cant edit non existing")
@@ -67,7 +74,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		name := org.Name
 
 		// check if the organization name already exists
-		orgName := db.DB.GetOrganizationByName(name)
+		orgName := oh.db.GetOrganizationByName(name)
 
 		if orgName.Name == name {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -94,7 +101,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	p, err := db.DB.CreateOrEditOrganization(org)
+	p, err := oh.db.CreateOrEditOrganization(org)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
