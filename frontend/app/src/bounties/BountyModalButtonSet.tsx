@@ -77,7 +77,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
           </div>
         </ButtonContainer>
       )}
-      {props.tribe && (
+      {props.tribe ? (
         <ButtonContainer
           topMargin={'16px'}
           onClick={() => {
@@ -101,6 +101,41 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
           </div>
           <EuiText className="ButtonText">
             {props.tribe.slice(0, 14)} {props.tribe.length > 14 && '...'}
+          </EuiText>
+          <div className="ImageContainer">
+            <img
+              className="buttonImage"
+              src={'/static/github_ticket.svg'}
+              alt={'github_ticket'}
+              height={'14px'}
+              width={'14px'}
+            />
+          </div>
+        </ButtonContainer>
+      ) : (
+        <ButtonContainer
+          topMargin={'16px'}
+          color={color}
+          style={{ pointerEvents: 'none', opacity: 0.5 }}
+        >
+          <div
+            className="LeadingImageContainer"
+            style={{
+              marginLeft: '6px',
+              marginRight: '12px'
+            }}
+          >
+            <img
+              src={'/static/tribe_demo.svg'}
+              alt={'github_ticket'}
+              height={'32px'}
+              width={'32px'}
+            />
+          </div>
+          <EuiText className="ButtonText">
+            {props.tribe
+              ? props.tribe.slice(0, 14) + (props.tribe.length > 14 ? '...' : '')
+              : 'No Tribe'}
           </EuiText>
           <div className="ImageContainer">
             <img
