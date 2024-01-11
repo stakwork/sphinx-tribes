@@ -2,6 +2,7 @@ import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import FirstTimeScreen from 'people/main/FirstTimeScreen';
 import BountyHeader from 'people/widgetViews/BountyHeader';
+import { OrgBounty } from 'pages/orgBounty';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
@@ -9,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import { useStores } from '../../../store';
-import { Body, Backdrop } from '../style';
+import {OrgBody, Body, Backdrop } from '../style';
 
 function OrgBodyComponent() {
   const { main, ui } = useStores();
@@ -141,7 +142,7 @@ function OrgBodyComponent() {
 
   return (
     !loading && (
-      <Body
+      <OrgBody
         onScroll={(e: any) => {
           setScrollValue(e?.currentTarget?.scrollTop >= 20);
         }}
@@ -150,21 +151,7 @@ function OrgBodyComponent() {
           height: 'calc(100% - 65px)'
         }}
       >
-        <div
-          style={{
-            minHeight: '32px'
-          }}
-        />
-
-        <BountyHeader
-          selectedWidget={selectedWidget}
-          scrollValue={scrollValue}
-          onChangeStatus={onChangeStatus}
-          onChangeLanguage={onChangeLanguage}
-          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-        />
-
+        <OrgBounty/>
         <>
           <div
             style={{
@@ -198,7 +185,7 @@ function OrgBodyComponent() {
           </div>
         </>
         {toastsEl}
-      </Body>
+      </OrgBody>
     )
   );
 }
