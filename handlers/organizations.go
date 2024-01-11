@@ -47,7 +47,7 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 	if len(org.Name) == 0 || len(org.Name) > 20 {
 		fmt.Printf("invalid organization name %s\n", org.Name)
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("organization name length must be greater than 1 and less than 20")
+		json.NewEncoder(w).Encode("Error: organization name must be present and should not exceed 20 character")
 		return
 	}
 
