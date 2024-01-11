@@ -656,6 +656,16 @@ type BountyMetrics struct {
 	AverageCompleted       uint  `json:"average_completed"`
 }
 
+type MetricsBountyCsv struct {
+	DatePosted   *time.Time `json:"date_posted"`
+	DatePaid     *time.Time `json:"date_paid"`
+	DateAssigned *time.Time `json:"date_assigned"`
+	BountyTitle  string     `json:"bounty_title"`
+	Provider     string     `json:"provider"`
+	Hunter       string     `json:"hunter"`
+	BountyAmount uint       `json:"bounty_amount"`
+}
+
 type FilterStattuCount struct {
 	Open     int64 `json:"open"`
 	Assigned int64 `json:"assigned"`
