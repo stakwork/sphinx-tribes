@@ -1,13 +1,23 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
+	"math/rand"
 	"net/http"
+	"os"
+	"path"
+	"time"
 
 	"github.com/ambelovsky/go-structs"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/tuan78/jsonconv"
 )
@@ -234,8 +244,14 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metricBounties := db.DB.GetBountiesByDateRange(request, r)
-	metricBountiesData := GetMetricsBountiesData(metricBounties)
-	result := ConvertMetricsToCSV(metricBountiesData)
+	metricsCsv := getMetricsBountyCsv(metricBounties)
+	result := ConvertMetricsToCSV(metricsCsv)
+
+	err, _ = UploadMetricsCsv(result)
+
+	if err != nil {
+		fmt.Println("Error CSV ===", err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -274,7 +290,26 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 	return metricBountiesData
 }
 
-func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
+func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
+	var metricBountiesCsv []db.MetricsBountyCsv
+	for _, bounty := range metricBounties {
+		tm := time.Unix(bounty.Created, 0)
+		bountyCsv := db.MetricsBountyCsv{
+			DatePosted:   &tm,
+			BountyAmount: bounty.Price,
+			DateAssigned: bounty.AssignedDate,
+			DatePaid:     bounty.PaidDate,
+			BountyTitle:  bounty.Title,
+			Hunter:       bounty.Assignee,
+			Provider:     bounty.OwnerID,
+		}
+		metricBountiesCsv = append(metricBountiesCsv, bountyCsv)
+	}
+
+	return metricBountiesCsv
+}
+
+func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
 	var metricsData []map[string]interface{}
 	data, err := json.Marshal(metricBountiesData)
 	if err != nil {
@@ -284,4 +319,49 @@ func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
 	err = json.Unmarshal(data, &metricsData)
 	result := jsonconv.ToCsv(metricsData, nil)
 	return result
+}
+
+func UploadMetricsCsv(data [][]string) (error, string) {
+	dirName := "uploads"
+	CreateUploadsDirectory(dirName)
+
+	filePath := path.Join("./uploads", "metrics.csv")
+	csvFile, err := os.Create(filePath)
+	if err != nil {
+		log.Fatalf("failed creating file: %s", err)
+	}
+
+	w := csv.NewWriter(csvFile)
+	err = w.WriteAll(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	csvFile.Close()
+
+	upFile, _ := os.Open(filePath)
+	defer upFile.Close()
+
+	upFileInfo, _ := upFile.Stat()
+	var fileSize int64 = upFileInfo.Size()
+	fileBuffer := make([]byte, fileSize)
+	upFile.Read(fileBuffer)
+
+	randKey := rand.Intn(40000000)
+	key := fmt.Sprintf("metrics%d", randKey)
+	_, err = config.S3Client.PutObject(&s3.PutObjectInput{
+		Bucket:               aws.String("metrics"),
+		Key:                  aws.String(key),
+		ACL:                  aws.String("private"),
+		Body:                 bytes.NewReader(fileBuffer),
+		ContentLength:        aws.Int64(fileSize),
+		ContentType:          aws.String(http.DetectContentType(fileBuffer)),
+		ContentDisposition:   aws.String("attachment"),
+		ServerSideEncryption: aws.String("AES256"),
+	})
+
+	// Delete image from uploads folder
+	DeleteFileFromUploadsFolder(filePath)
+
+	return err, ""
 }
