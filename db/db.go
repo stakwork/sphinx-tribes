@@ -693,7 +693,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
 	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery + " " + orgQuery
-	fmt.Println(allQuery)
+
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
