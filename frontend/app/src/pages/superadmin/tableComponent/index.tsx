@@ -50,6 +50,8 @@ interface TableProps {
   setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
   dropdownValue?: string;
   setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
+  paginatePrev?: () => void;
+  paginateNext?: () => void;
 }
 
 interface ImageWithTextProps {
@@ -57,25 +59,23 @@ interface ImageWithTextProps {
   text: string;
 }
 
-export const ImageWithText = ({ image, text }: ImageWithTextProps) => {
-  return (
-    <>
-      <BoxImage>
-        <img
-          src={image}
-          style={{
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            marginRight: '10px'
-          }}
-          alt={text}
-        />
-        <Paragraph>{text}</Paragraph>
-      </BoxImage>
-    </>
-  );
-};
+export const ImageWithText = ({ image, text }: ImageWithTextProps) => (
+  <>
+    <BoxImage>
+      <img
+        src={image}
+        style={{
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          marginRight: '10px'
+        }}
+        alt={text}
+      />
+      <Paragraph>{text}</Paragraph>
+    </BoxImage>
+  </>
+);
 
 interface TextInColorBoxProps {
   status: string;
@@ -256,13 +256,9 @@ export const MyTable = ({
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {' '}
-              {bounties.length}{' '}
+              {bounties.length}
               <div>
-                <AlternativeTitle>
-                  {' '}
-                  {bounties.length === 1 ? 'Bounty' : 'Bounties'}
-                </AlternativeTitle>{' '}
+                <AlternativeTitle>{bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
               </div>
             </LeadingTitle>
           </BountyHeader>
@@ -356,7 +352,7 @@ export const MyTable = ({
       <PaginatonSection>
         <FlexDiv>
           {totalBounties > pageSize ? (
-            <PageContainer>
+            <PageContainer role="pagination">
               <img src={paginationarrow1} alt="pagination arrow 1" onClick={() => paginatePrev()} />
               {activeTabs.map((page: number) => (
                 <PaginationButtons
