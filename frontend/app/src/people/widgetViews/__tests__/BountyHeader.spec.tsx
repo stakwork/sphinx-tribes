@@ -15,10 +15,13 @@ const mockProps: BountyHeaderProps = {
   checkboxIdToSelectedMapLanguage: {}
 };
 
+jest.mock('../../../hooks', () => ({
+  useIsMobile: jest.fn()
+}));
 describe('BountyHeader Component', () => {
   beforeEach(() => {
     jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
-    jest.spyOn(hooks, 'useIsMobile').mockReturnValue(false);
+    (hooks.useIsMobile as jest.Mock).mockReturnValue(false);
   });
 
   afterEach(() => {
