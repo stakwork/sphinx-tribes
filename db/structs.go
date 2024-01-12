@@ -556,9 +556,7 @@ type PaymentData struct {
 }
 
 type BountyPayRequest struct {
-	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
-	RouteHint       string `json:"route_hint,omitempty"`
 }
 
 type InvoiceType string
