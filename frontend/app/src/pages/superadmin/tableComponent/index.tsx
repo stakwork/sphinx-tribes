@@ -174,7 +174,7 @@ export const MyTable = ({ bounties }: TableProps) => {
     const lastIndex = firstIndex + pageSize;
     return statusFilterMap().slice(firstIndex, lastIndex);
   };
-
+  
 
   const paginateNext = () => {
     console.log('clicked');
@@ -200,9 +200,9 @@ export const MyTable = ({ bounties }: TableProps) => {
         [optionId]: !checkboxIdToSelectedMap[optionId],
       },
     };
-
+  
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
-
+  
     // Check if the checkbox is being selected or deselected
     if (newCheckboxIdToSelectedMap[optionId]) {
       // If it's being selected, add the optionId to the statusFilter array
@@ -252,7 +252,7 @@ export const MyTable = ({ bounties }: TableProps) => {
                     </EuiText>
                     <img src={expand_more} alt="" width="20px" height="20px" />
                     </FlexDivStatus>
-
+                    
                   </FilterContainer>
                 }
                 panelStyle={{
