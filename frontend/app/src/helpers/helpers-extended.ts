@@ -4,6 +4,9 @@ import { getHost } from '../config/host';
 
 export const filterCount = (filterValues: any) => {
   let count = 0;
+  if (!filterValues || typeof filterValues !== 'object') {
+    return count;
+  }
   for (const [, value] of Object.entries(filterValues)) {
     if (value) {
       count += 1;
