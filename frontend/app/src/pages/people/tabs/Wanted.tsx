@@ -49,8 +49,8 @@ export const Wanted = observer(() => {
 
   async function getUserTickets() {
     setIsLoading(true);
-    await main.getPersonCreatedBounties({}, personPubkey);
-    await main.getPersonAssignedBounties({}, personPubkey);
+    await main.getPersonCreatedBounties({ page: 1 }, personPubkey);
+    await main.getPersonAssignedBounties({ page: 1 }, personPubkey);
     setIsLoading(false);
   }
 
@@ -113,7 +113,8 @@ export const Wanted = observer(() => {
               href={`${url}/${w.body.id}/${i}`}
               key={w.body.id}
               isMobile={false}
-              onClick={() => {
+              onClick={(e: any) => {
+                e.preventDefault();
                 ui.setBountyPerson(person?.id);
                 history.push({
                   pathname: `${url}/${w.body.id}/${i}`

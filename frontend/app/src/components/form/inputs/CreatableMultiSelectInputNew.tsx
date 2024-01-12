@@ -177,7 +177,7 @@ export default function CreatableMultiSelectInputNew({ error, label, handleChang
               borderBottom: !isPopoverOpen ? '' : `1px solid ${color?.grayish.G700}`,
               borderRadius: !isPopoverOpen ? '4px' : '4px 4px 0px 0px',
               display: 'flex',
-              justifyContent: 'flex-start',
+              justifyContent: 'space-between',
               paddingLeft: '18px',
               marginRight: '2px',
               marginTop: isPopoverOpen ? '0.9px' : '0px',
