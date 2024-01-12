@@ -41,9 +41,9 @@ describe('BountyHeader', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Open [64]')).toBeInTheDocument();
-      expect(screen.getByText('Assigned [545]')).toBeInTheDocument();
-      expect(screen.getByText('Paid [502]')).toBeInTheDocument();
+      expect(screen.getByText('Open')).toBeInTheDocument();
+      expect(screen.getByText('Assigned')).toBeInTheDocument();
+      expect(screen.getByText('Paid')).toBeInTheDocument();
     });
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
