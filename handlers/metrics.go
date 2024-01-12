@@ -245,15 +245,20 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	metricBounties := db.DB.GetBountiesByDateRange(request, r)
 	metricsCsv := getMetricsBountyCsv(metricBounties)
 	result := ConvertMetricsToCSV(metricsCsv)
+	resultLength := len(result)
 
-	err, url := UploadMetricsCsv(result, request)
+	if resultLength > 0 {
+		err, url := UploadMetricsCsv(result, request)
 
-	if err != nil {
-		fmt.Println("Error uploading csv ===", err)
+		if err != nil {
+			fmt.Println("Error uploading csv ===", err)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(url)
+	} else {
+		w.WriteHeader(http.StatusNoContent)
 	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(url)
 }
 
 func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
