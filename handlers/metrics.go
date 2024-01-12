@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -247,14 +246,14 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	metricsCsv := getMetricsBountyCsv(metricBounties)
 	result := ConvertMetricsToCSV(metricsCsv)
 
-	err, _ = UploadMetricsCsv(result)
+	err, url := UploadMetricsCsv(result, request)
 
 	if err != nil {
-		fmt.Println("Error CSV ===", err)
+		fmt.Println("Error uploading csv ===", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(url)
 }
 
 func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
@@ -321,7 +320,7 @@ func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
 	return result
 }
 
-func UploadMetricsCsv(data [][]string) (error, string) {
+func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, string) {
 	dirName := "uploads"
 	CreateUploadsDirectory(dirName)
 
@@ -347,21 +346,22 @@ func UploadMetricsCsv(data [][]string) (error, string) {
 	fileBuffer := make([]byte, fileSize)
 	upFile.Read(fileBuffer)
 
-	randKey := rand.Intn(40000000)
-	key := fmt.Sprintf("metrics%d", randKey)
+	key := fmt.Sprintf("metrics%s-%s.csv", request.StartDate, request.EndDate)
+	path := fmt.Sprintf("metrics/%s", key)
 	_, err = config.S3Client.PutObject(&s3.PutObjectInput{
-		Bucket:               aws.String("metrics"),
-		Key:                  aws.String(key),
-		ACL:                  aws.String("private"),
+		Bucket:               aws.String("sphinx-tribes"),
+		Key:                  aws.String(path),
 		Body:                 bytes.NewReader(fileBuffer),
 		ContentLength:        aws.Int64(fileSize),
-		ContentType:          aws.String(http.DetectContentType(fileBuffer)),
+		ContentType:          aws.String("application/csv"),
 		ContentDisposition:   aws.String("attachment"),
 		ServerSideEncryption: aws.String("AES256"),
 	})
 
+	url := fmt.Sprintf("https://sphinx-tribes.s3.amazonaws.com/metrics/%s", key)
+
 	// Delete image from uploads folder
 	DeleteFileFromUploadsFolder(filePath)
 
-	return err, ""
+	return err, url
 }
