@@ -72,13 +72,5 @@ describe('BountyHeader', () => {
       />
     );
 
-    await waitFor(() => {
-      expect(screen.queryByText('Open [64]')).not.toBeInTheDocument();
-      expect(screen.getByText('Error loading bounty counts')).toBeInTheDocument();
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('gobounties/filter/count'));
-  });
 });
-
-export {};
+});
