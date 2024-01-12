@@ -27,7 +27,7 @@ describe('BountyHeader', () => {
   it('fetches and displays the status counts correctly', async () => {
     render(
       <BountyHeader
-        selectedWidget={'people'}
+        selectedWidget={'wanted'}
         scrollValue={false}
         onChangeStatus={function (number: any): void {
           throw new Error('Function not implemented.');
@@ -55,7 +55,7 @@ describe('BountyHeader', () => {
 
     render(
       <BountyHeader
-        selectedWidget={'people'}
+        selectedWidget={'wanted'}
         scrollValue={false}
         onChangeStatus={function (number: any): void {
           throw new Error('Function not implemented.');
