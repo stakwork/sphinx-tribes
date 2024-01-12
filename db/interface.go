@@ -79,6 +79,7 @@ type Database interface {
 	GetBountiesLeaderboard() []LeaderData
 	GetOrganizations(r *http.Request) []Organization
 	GetOrganizationsCount() int64
+	GetOrganizationByUuid(uuid string) Organization
 	GetOrganizationByName(name string) Organization
 	CreateOrEditOrganization(m Organization) (Organization, error)
 	GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error)
