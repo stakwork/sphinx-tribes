@@ -347,9 +347,9 @@ func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, stri
 	upFile.Read(fileBuffer)
 
 	key := fmt.Sprintf("metrics%s-%s.csv", request.StartDate, request.EndDate)
-	path := fmt.Sprintf("metrics/%s", key)
+	path := fmt.Sprintf("%s/%s", config.S3FolderName, key)
 	_, err = config.S3Client.PutObject(&s3.PutObjectInput{
-		Bucket:               aws.String("sphinx-tribes"),
+		Bucket:               aws.String(config.S3BucketName),
 		Key:                  aws.String(path),
 		Body:                 bytes.NewReader(fileBuffer),
 		ContentLength:        aws.Int64(fileSize),
@@ -358,7 +358,7 @@ func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, stri
 		ServerSideEncryption: aws.String("AES256"),
 	})
 
-	url := fmt.Sprintf("https://sphinx-tribes.s3.amazonaws.com/metrics/%s", key)
+	url := fmt.Sprintf("%s/%s/%s", config.S3Url, config.S3FolderName, key)
 
 	// Delete image from uploads folder
 	DeleteFileFromUploadsFolder(filePath)
