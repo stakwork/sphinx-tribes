@@ -343,9 +343,9 @@ const BountyHeader = ({
         const response = await api.get('gobounties/filter/count');
         console.log('Response:', response);
         setCounts({
-          open: response.open || 0, 
-          assigned: response.assigned || 0, 
-          paid: response.paid || 0 
+          open: response.open || 0,
+          assigned: response.assigned || 0,
+          paid: response.paid || 0
         });
       } catch (error) {
         console.error('Error fetching filter counts:', error);
@@ -353,7 +353,7 @@ const BountyHeader = ({
     }
 
     fetchCounts();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     setFilterCountNumber(
