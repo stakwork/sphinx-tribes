@@ -267,10 +267,16 @@ function FocusedView(props: FocusViewProps) {
   }
 
   const [orgName, setOrgName] = useState<string | undefined>();
-
   const getOrganization = async () => {
+    const urlParts = window.location.href.split('/bounties/');
+    const uuid = urlParts.length > 1 ? urlParts[1] : null;
+
+    if (!uuid) {
+      console.error('No UUID found in the URL');
+      return;
+    }
     try {
-      const response = await main.getUserOrganizationByUuid('ck95pe04nncjnaefo08g');
+      const response = await main.getUserOrganizationByUuid(uuid);
       if (response && typeof response.name === 'string') {
         setOrgName(response.name);
       }
