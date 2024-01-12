@@ -885,7 +885,7 @@ export class MainStore {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
     const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
-      sortBy: 'created',
+      sortBy: 'paid',
       ...queryParams
     });
 
