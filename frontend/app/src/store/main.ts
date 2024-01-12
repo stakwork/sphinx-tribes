@@ -884,9 +884,9 @@ export class MainStore {
   async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, 20, {
-      ...queryParams,
-      sortBy: 'paid'
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+      sortBy: 'paid',
+      ...queryParams
     });
 
     try {
