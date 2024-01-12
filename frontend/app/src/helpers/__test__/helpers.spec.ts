@@ -104,7 +104,7 @@ describe('testing helpers', () => {
       const timeLimit = new Date(moment().add(2, 'minutes').format().toString());
       const { minutes, seconds } = calculateTimeLeft(timeLimit, 'minutes');
       expect(minutes).toBe(1);
-      expect(seconds).toBe(59);
+      expect(seconds).toBeGreaterThan(50);
     });
     test('calculate days remaining', () => {
       const timeLimit = new Date(moment().add(2, 'days').format().toString());

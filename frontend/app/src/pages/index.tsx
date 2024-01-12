@@ -19,41 +19,43 @@ import { SuperAdmin } from './superadmin/index';
 
 const modeDispatchPages: Record<AppMode, () => React.ReactElement> = {
   community: () => (
-    <MainLayout header={<PeopleHeader />}>
+    <>
       <TokenRefresh />
-      <Switch>
-        <Route path="/t/">
-          <Body />
-        </Route>
-        <Route path="/b/">
-          <BotsBody />
-        </Route>
-        <Route path="/p/">
-          <People />
-        </Route>
-        <Route path="/bounties/">
-          <TicketsPage />
-        </Route>
-        <Route path="/tickets/">
-          <TicketsPage />
-        </Route>
-        <Route path="/bounty/:bountyId">
-          <TicketsPage />
-        </Route>
-        <Route path="/org/bounties/:uuid">
-          <OrgTicketsPage />
-        </Route>
-        <Route path="/leaderboard">
-          <LeaderboardPage />
-        </Route>
-        <Route path="/admin">
-          <SuperAdmin />
-        </Route>
-        <Route path="*">
-          <Body />
-        </Route>
-      </Switch>
-    </MainLayout>
+      <MainLayout header={<PeopleHeader />}>
+        <Switch>
+          <Route path="/t/">
+            <Body />
+          </Route>
+          <Route path="/b/">
+            <BotsBody />
+          </Route>
+          <Route path="/p/">
+            <People />
+          </Route>
+          <Route path="/bounties/">
+            <TicketsPage />
+          </Route>
+          <Route path="/tickets/">
+            <TicketsPage />
+          </Route>
+          <Route path="/bounty/:bountyId">
+            <TicketsPage />
+          </Route>
+          <Route path="/org/bounties/:uuid">
+            <OrgTicketsPage />
+          </Route>
+          <Route path="/leaderboard">
+            <LeaderboardPage />
+          </Route>
+          <Route path="/admin">
+            <SuperAdmin />
+          </Route>
+          <Route path="*">
+            <Body />
+          </Route>
+        </Switch>
+      </MainLayout>
+    </>
   ),
   people: () => <></>,
   tribes: () => (

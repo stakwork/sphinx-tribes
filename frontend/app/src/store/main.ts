@@ -257,7 +257,7 @@ export interface FilterStatusCount {
 export interface BountyMetrics {
   bounties_posted: number;
   bounties_paid: number;
-  bounties_paid_percentage: number;
+  bounties_paid_average: number;
   sats_posted: number;
   sats_paid: number;
   sats_paid_percentage: number;
@@ -884,10 +884,11 @@ export class MainStore {
   async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, 20, {
       ...queryParams,
-      sortBy: 'created'
+      sortBy: 'paid'
     });
+
     try {
       const ps2 = await api.get(query);
       const ps3: any[] = [];
@@ -930,10 +931,11 @@ export class MainStore {
   async getPersonCreatedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, queryLimit, {
+    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, 20, {
       ...queryParams,
-      sortBy: 'created'
+      sortBy: 'paid'
     });
+
     try {
       const ps2 = await api.get(query);
       const ps3: any[] = [];
@@ -2178,12 +2180,7 @@ export class MainStore {
     }
   }
 
-  async makeBountyPayment(body: {
-    id: number;
-    receiver_pubkey: string;
-    websocket_token: string;
-    route_hint: string;
-  }): Promise<any> {
+  async makeBountyPayment(body: { id: number; websocket_token: string }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
@@ -2396,7 +2393,7 @@ export class MainStore {
     }
   }
 
-  async getBountyMetrics(start_date: number, end_date: number): Promise<BountyMetrics | undefined> {
+  async getBountyMetrics(start_date: string, end_date: string): Promise<BountyMetrics | undefined> {
     try {
       if (!uiStore.meInfo) return undefined;
       const info = uiStore.meInfo;
@@ -2416,24 +2413,37 @@ export class MainStore {
         }
       });
 
-      return r;
+      return r.json();
     } catch (e) {
       console.error('getBountyMetrics', e);
       return undefined;
     }
   }
 
-  async getBountiesByRange(start_date: number, end_date: number): Promise<any | undefined> {
+  async getBountiesByRange(
+    date_range: {
+      start_date: string;
+      end_date: string;
+    },
+    params?: QueryParams
+  ): Promise<any | undefined> {
     try {
       if (!uiStore.meInfo) return undefined;
       const info = uiStore.meInfo;
 
-      const body = {
-        start_date,
-        end_date
+      const queryParams: QueryParams = {
+        ...params
       };
 
-      const r: any = await fetch(`${TribesURL}/metrics/bounties`, {
+      // if we don't pass the params, we should use previous params for invalidate query
+      const query = this.appendQueryParams('metrics/bounties', 20, queryParams);
+
+      const body = {
+        start_date: date_range.start_date,
+        end_date: date_range.end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/${query}`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(body),
@@ -2443,10 +2453,89 @@ export class MainStore {
         }
       });
 
-      return r;
+      return r.json();
     } catch (e) {
       console.error('getBountyMetrics', e);
       return undefined;
+    }
+  }
+
+  async getBountiesCountByRange(start_date: string, end_date: string): Promise<number> {
+    try {
+      if (!uiStore.meInfo) return 0;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date,
+        end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/bounties/count`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.error('getBountyMetrics', e);
+      return 0;
+    }
+  }
+
+  async exportMetricsBountiesCsv(date_range: {
+    start_date: string;
+    end_date: string;
+  }): Promise<string | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date: date_range.start_date,
+        end_date: date_range.end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/csv`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.error('exportMetricsBountiesCsv', e);
+      return undefined;
+    }
+  }
+
+  async getIsAdmin(): Promise<any> {
+    try {
+      if (!uiStore.meInfo) return false;
+      const info = uiStore.meInfo;
+      const r: any = await fetch(`${TribesURL}/admin/auth`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (r.status === 200) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Error pollInvoice', e);
     }
   }
 }

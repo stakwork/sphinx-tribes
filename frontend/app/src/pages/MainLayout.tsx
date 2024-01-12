@@ -14,7 +14,6 @@ export const MainLayout: FC<MainLayoutProps> = ({
   children?: React.ReactNode;
 }) => {
   const c = colors['light'];
-  const location = useLocation();
 
   return (
     <>

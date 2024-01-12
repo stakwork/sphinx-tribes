@@ -74,7 +74,7 @@ const OrganizationDetails = (props: {
   const isOrganizationAdmin = props.org?.owner_pubkey === ui.meInfo?.owner_pubkey;
 
   const editOrgDisabled =
-    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'ADD USER');
+    !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'EDIT ORGANIZATION');
   const viewReportDisabled =
     !isOrganizationAdmin && !userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
   const addBudgetDisabled =

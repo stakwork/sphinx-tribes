@@ -1,13 +1,22 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"path"
+	"time"
 
 	"github.com/ambelovsky/go-structs"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/tuan78/jsonconv"
 )
@@ -234,11 +243,22 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	metricBounties := db.DB.GetBountiesByDateRange(request, r)
-	metricBountiesData := GetMetricsBountiesData(metricBounties)
-	result := ConvertMetricsToCSV(metricBountiesData)
+	metricsCsv := getMetricsBountyCsv(metricBounties)
+	result := ConvertMetricsToCSV(metricsCsv)
+	resultLength := len(result)
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	if resultLength > 0 {
+		err, url := UploadMetricsCsv(result, request)
+
+		if err != nil {
+			fmt.Println("Error uploading csv ===", err)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(url)
+	} else {
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
 
 func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
@@ -256,6 +276,7 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 			BountyDescription:   bounty.Description,
 			BountyUpdated:       bounty.Updated,
 			AssigneeId:          bountyAssignee.ID,
+			AssigneeImg:         bountyAssignee.Img,
 			AssigneeAlias:       bountyAssignee.OwnerAlias,
 			AssigneeDescription: bountyAssignee.Description,
 			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
@@ -273,7 +294,26 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 	return metricBountiesData
 }
 
-func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
+func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
+	var metricBountiesCsv []db.MetricsBountyCsv
+	for _, bounty := range metricBounties {
+		tm := time.Unix(bounty.Created, 0)
+		bountyCsv := db.MetricsBountyCsv{
+			DatePosted:   &tm,
+			BountyAmount: bounty.Price,
+			DateAssigned: bounty.AssignedDate,
+			DatePaid:     bounty.PaidDate,
+			BountyTitle:  bounty.Title,
+			Hunter:       bounty.Assignee,
+			Provider:     bounty.OwnerID,
+		}
+		metricBountiesCsv = append(metricBountiesCsv, bountyCsv)
+	}
+
+	return metricBountiesCsv
+}
+
+func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
 	var metricsData []map[string]interface{}
 	data, err := json.Marshal(metricBountiesData)
 	if err != nil {
@@ -283,4 +323,50 @@ func ConvertMetricsToCSV(metricBountiesData []db.BountyData) [][]string {
 	err = json.Unmarshal(data, &metricsData)
 	result := jsonconv.ToCsv(metricsData, nil)
 	return result
+}
+
+func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, string) {
+	dirName := "uploads"
+	CreateUploadsDirectory(dirName)
+
+	filePath := path.Join("./uploads", "metrics.csv")
+	csvFile, err := os.Create(filePath)
+	if err != nil {
+		log.Fatalf("failed creating file: %s", err)
+	}
+
+	w := csv.NewWriter(csvFile)
+	err = w.WriteAll(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	csvFile.Close()
+
+	upFile, _ := os.Open(filePath)
+	defer upFile.Close()
+
+	upFileInfo, _ := upFile.Stat()
+	var fileSize int64 = upFileInfo.Size()
+	fileBuffer := make([]byte, fileSize)
+	upFile.Read(fileBuffer)
+
+	key := fmt.Sprintf("metrics%s-%s.csv", request.StartDate, request.EndDate)
+	path := fmt.Sprintf("%s/%s", config.S3FolderName, key)
+	_, err = config.S3Client.PutObject(&s3.PutObjectInput{
+		Bucket:               aws.String(config.S3BucketName),
+		Key:                  aws.String(path),
+		Body:                 bytes.NewReader(fileBuffer),
+		ContentLength:        aws.Int64(fileSize),
+		ContentType:          aws.String("application/csv"),
+		ContentDisposition:   aws.String("attachment"),
+		ServerSideEncryption: aws.String("AES256"),
+	})
+
+	url := fmt.Sprintf("%s/%s/%s", config.S3Url, config.S3FolderName, key)
+
+	// Delete image from uploads folder
+	DeleteFileFromUploadsFolder(filePath)
+
+	return err, url
 }

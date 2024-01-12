@@ -19,6 +19,11 @@ export const AlternateWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  position: fixed;
+  top: 62px;
+  left: 0;
+  width: 100%;
+  z-index: 9999999;
 `;
 export const LeftWrapper = styled.div`
   display: flex;
@@ -135,6 +140,61 @@ export const Select = styled.select`
   border: none;
   width: 113px;
   color: var(--White, #fff);
+`;
+
+export const Option = styled.div`
+  position: absolute;
+  z-index: 1;
+  top: 130px;
+  right: 48px;
+  width: 169px;
+  height: 157px;
+  display: inline-flex;
+  padding: 12px 28px 12px 28px;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.25);
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: grey;
+  }
+
+  li {
+    padding: 4px;
+    cursor: pointer;
+    color: grey;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+
+    &:hover {
+      color: #3c3f41;
+    }
+  }
+`;
+
+export const CustomButton = styled.button`
+  display: flex;
+  width: 113px;
+  height: 40px;
+  padding: 8px 8px 8px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  background: var(--Primary-blue, #618aff);
+  box-shadow: 0px 2px 10px 0px rgba(97, 138, 255, 0.5);
+  color: white;
 `;
 
 export const Flex = styled.div`

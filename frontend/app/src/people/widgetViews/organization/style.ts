@@ -604,6 +604,10 @@ export const Username = styled.p`
   font-weight: 500;
   line-height: 1rem;
   margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 `;
 
 export const SmallBtn = styled.button<SmallBtnProps>`
