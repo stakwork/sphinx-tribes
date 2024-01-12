@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 import IconButton from 'components/common/IconButton2';
 import { useHistory } from 'react-router-dom';
 import { BountyHeaderProps } from 'people/interfaces';
+import api from 'api';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { SearchBar } from '../../components/common/index';
@@ -339,17 +340,12 @@ const BountyHeader = ({
     // Fetch counts from the API
     async function fetchCounts() {
       try {
-        // Fetch counts for Open, Assigned, and Paid
-        const [openCount, assignedCount, paidCount] = await Promise.all([
-          main.getTotalBountyCount(true, false, false), // Open
-          main.getTotalBountyCount(false, true, false), // Assigned
-          main.getTotalBountyCount(false, false, true) // Paid
-        ]);
-
+        const response = await api.get('gobounties/filter/count');
+        console.log('Response:', response);
         setCounts({
-          open: openCount,
-          assigned: assignedCount,
-          paid: paidCount
+          open: response.open || 0, 
+          assigned: response.assigned || 0, 
+          paid: response.paid || 0 
         });
       } catch (error) {
         console.error('Error fetching filter counts:', error);
@@ -357,7 +353,7 @@ const BountyHeader = ({
     }
 
     fetchCounts();
-  }, [main]);
+  }, []);  
 
   useEffect(() => {
     setFilterCountNumber(
