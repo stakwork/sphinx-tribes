@@ -54,15 +54,6 @@ interface Bounty {
 
 interface TableProps {
   bounties: Bounty[];
-  startDate?: number;
-  endDate?: number;
-  headerIsFrozen?: boolean;
-  bountyStatus?: BountyStatus;
-  setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
-  dropdownValue?: string;
-  setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
-  paginatePrev?: () => void;
-  paginateNext?: () => void;
 }
 
 interface ImageWithTextProps {
@@ -183,7 +174,7 @@ export const MyTable = ({ bounties }: TableProps) => {
     const lastIndex = firstIndex + pageSize;
     return statusFilterMap().slice(firstIndex, lastIndex);
   };
-  
+
 
   const paginateNext = () => {
     console.log('clicked');
@@ -209,9 +200,9 @@ export const MyTable = ({ bounties }: TableProps) => {
         [optionId]: !checkboxIdToSelectedMap[optionId],
       },
     };
-  
+
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
-  
+
     // Check if the checkbox is being selected or deselected
     if (newCheckboxIdToSelectedMap[optionId]) {
       // If it's being selected, add the optionId to the statusFilter array
@@ -229,10 +220,9 @@ export const MyTable = ({ bounties }: TableProps) => {
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {bounties.length}
-              <div>
-                <AlternativeTitle>{bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
-              </div>
+              {' '}
+              {bounties.length}{' '}
+              <AlternativeTitle> {bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
             </LeadingTitle>
           </BountyHeader>
           <Options>
@@ -262,7 +252,7 @@ export const MyTable = ({ bounties }: TableProps) => {
                     </EuiText>
                     <img src={expand_more} alt="" width="20px" height="20px" />
                     </FlexDivStatus>
-                    
+
                   </FilterContainer>
                 }
                 panelStyle={{
@@ -331,10 +321,10 @@ export const MyTable = ({ bounties }: TableProps) => {
       </TableContainer>
       <PaginatonSection>
         <FlexDiv>
-          {totalBounties > pageSize ? (
-            <PageContainer role="pagination">
-              <img src={paginationarrow1} alt="pagination arrow 1" onClick={() => paginatePrev()} />
-              {activeTabs.map((page: number) => (
+          {bounties.length > pageSize ? (
+            <PageContainer>
+              <img src={paginationarrow1} alt="" onClick={() => paginatePrev()} />
+              {dataNumber.map((number: number) => (
                 <PaginationButtons
                   key={number}
                   onClick={() => setCurrentPage(number)}
@@ -343,7 +333,7 @@ export const MyTable = ({ bounties }: TableProps) => {
                   {number}
                 </PaginationButtons>
               ))}
-              <img src={paginationarrow2} alt="pagination arrow 2" onClick={() => paginateNext()} />
+              <img src={paginationarrow2} alt="" onClick={() => paginateNext()} />
             </PageContainer>
           ) : null}
         </FlexDiv>
