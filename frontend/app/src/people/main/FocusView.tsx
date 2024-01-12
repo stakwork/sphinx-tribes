@@ -286,9 +286,13 @@ function FocusedView(props: FocusViewProps) {
 
   let initialValues: any = {};
 
-  const altInitialValue: any = {
-    org_uuid: orgName || 'Bounties Platform'
-  };
+  let altInitialValue = {};
+
+  if (window.location.href.includes('/org')) {
+    altInitialValue = {
+      org_uuid: orgName || 'Bounties Platform'
+    };
+  }
 
   const personInfo = canEdit ? ui.meInfo : person;
 
