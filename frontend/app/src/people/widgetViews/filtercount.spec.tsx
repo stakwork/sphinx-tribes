@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import BountyHeader from './BountyHeader'; 
+import BountyHeader from './BountyHeader';
 
 const mockApiResponse = {
   open: 64,
@@ -23,7 +23,7 @@ describe('BountyHeader', () => {
   beforeEach(() => {
     mockFetch.mockClear();
   });
-  
+
   it('fetches and displays the status counts correctly', async () => {
     render(
       <BountyHeader
@@ -72,10 +72,9 @@ describe('BountyHeader', () => {
       expect(screen.queryByText('Open [64]')).not.toBeInTheDocument();
       expect(screen.getByText('Error loading bounty counts')).toBeInTheDocument();
     });
-    
+
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('gobounties/filter/count'));
   });
-
 });
 
 export {};
