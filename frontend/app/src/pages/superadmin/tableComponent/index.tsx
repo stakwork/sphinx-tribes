@@ -55,6 +55,8 @@ interface TableProps {
   sortOrder?: string;
   setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
   onChangeFilterByDate?: (option: string) => void;
+  paginatePrev?: () => void;
+  paginateNext?: () => void;
 }
 
 interface ImageWithTextProps {
@@ -225,7 +227,6 @@ export const MyTable = ({
     getActiveTabs();
   }, [getActiveTabs]);
 
-  const bountiesLength = bounties && bounties.length;
   const color = colors['light'];
 
   return (
@@ -235,8 +236,10 @@ export const MyTable = ({
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {bountiesLength}
-              <AlternativeTitle>{bountiesLength === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
+              {bounties.length}
+              <div>
+                <AlternativeTitle>{bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
+              </div>
             </LeadingTitle>
           </BountyHeader>
           <Options>
@@ -372,8 +375,8 @@ export const MyTable = ({
       <PaginatonSection>
         <FlexDiv>
           {totalBounties > pageSize ? (
-            <PageContainer>
-              <img src={paginationarrow1} alt="" onClick={() => paginatePrev()} />
+            <PageContainer role="pagination">
+              <img src={paginationarrow1} alt="pagination arrow 1" onClick={() => paginatePrev()} />
               {activeTabs.map((page: number) => (
                 <PaginationButtons
                   key={page}
@@ -383,7 +386,7 @@ export const MyTable = ({
                   {page}
                 </PaginationButtons>
               ))}
-              <img src={paginationarrow2} alt="" onClick={() => paginateNext()} />
+              <img src={paginationarrow2} alt="pagination arrow 2" onClick={() => paginateNext()} />
             </PageContainer>
           ) : null}
         </FlexDiv>

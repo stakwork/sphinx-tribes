@@ -1,6 +1,7 @@
 export const bounties = [
   {
     id: 1,
+    bounty_id: 1,
     title:
       'Return user to the same page they were on before they edited a bounty user to the same page they were on before.',
     date: '2021.01.01',
@@ -16,10 +17,13 @@ export const bounties = [
     providerImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
-      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4'
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z'
   },
   {
     id: 2,
+    bounty_id: 2,
     title:
       'Create a new website for the company Doe Inc. in React. The website should be responsive and have a dark mode.',
     date: '2021.01.01',
@@ -33,10 +37,13 @@ export const bounties = [
     providerImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
-      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4'
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z'
   },
   {
     id: 3,
+    bounty_id: 3,
     title:
       'Create a new website for the company Doe Inc. in React. The website should be responsive and have a dark mode.',
     date: '2023.08.05',
@@ -50,6 +57,8 @@ export const bounties = [
     providerImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     organizationImage:
-      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4'
+      'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
+    bounty_created: '2023-10-04T14:58:50.441223Z',
+    paid_date: '2023-10-04T14:58:50.441223Z'
   }
 ];
