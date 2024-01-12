@@ -36,8 +36,8 @@ describe('BountyHeader', () => {
         onChangeLanguage={function (number: any): void {
           throw new Error('Function not implemented.');
         }}
-        checkboxIdToSelectedMap={undefined}
-        checkboxIdToSelectedMapLanguage={undefined}
+        checkboxIdToSelectedMap={jest.fn()}
+        checkboxIdToSelectedMapLanguage={jest.fn()}
       />
     );
 
@@ -51,7 +51,8 @@ describe('BountyHeader', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('gobounties/filter/count'));
+    const wasCalledWithUrl = mockFetch.mock.calls.some((call:any) => String(call[1]).includes('gobounties/filter/count'));
+    expect(wasCalledWithUrl).toBe(true);
   });
 
   it('handles API errors gracefully', async () => {
@@ -67,8 +68,8 @@ describe('BountyHeader', () => {
         onChangeLanguage={function (number: any): void {
           throw new Error('Function not implemented.');
         }}
-        checkboxIdToSelectedMap={undefined}
-        checkboxIdToSelectedMapLanguage={undefined}
+        checkboxIdToSelectedMap={jest.fn()}
+        checkboxIdToSelectedMapLanguage={jest.fn()}
       />
     );
   });
