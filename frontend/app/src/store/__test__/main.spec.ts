@@ -892,4 +892,22 @@ describe('Main store', () => {
     expect(store.peopleBounties[1]).toEqual(expectedResponse);
     expect(bounties).toEqual([expectedResponse]);
   });
+
+  it('should make a succcessful bounty payment', async () => {
+    const store = new MainStore();
+    uiStore.setMeInfo(emptyMeInfo);
+    const bounty = expectedBountyResponses[0];
+
+    store.makeBountyPayment = jest
+      .fn()
+      .mockReturnValueOnce(Promise.resolve({ status: 200, message: 'success' }));
+
+    const body = {
+      id: bounty.body.id,
+      websocket_token: 'test_websocket_token'
+    };
+
+    store.makeBountyPayment(body);
+    expect(store.makeBountyPayment).toBeCalledWith(body);
+  });
 });

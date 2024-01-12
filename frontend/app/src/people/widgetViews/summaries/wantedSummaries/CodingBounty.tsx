@@ -256,9 +256,7 @@ function MobileView(props: CodingBountiesProps) {
           // make keysend payment
           const body = {
             id: id || 0,
-            websocket_token: ui.meInfo?.websocketToken || '',
-            receiver_pubkey: assignee.owner_pubkey,
-            route_hint: assignee.owner_route_hint ?? ''
+            websocket_token: ui.meInfo?.websocketToken || ''
           };
 
           await main.makeBountyPayment(body);
