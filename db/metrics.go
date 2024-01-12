@@ -147,23 +147,12 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid = false"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid = false"
-		}
+		assignedQuery = "AND assignee != '' AND paid = false"
 	}
 	if paid != "" && paid == "true" {
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+		paidQuery = "AND paid = true"
 	}
 
 	if sortBy != "" && direction != "" {
@@ -177,13 +166,13 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 
 	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
 	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + orderQuery + " " + limitQuery
+
 	b := []Bounty{}
-	db.db.Raw(allQuery).Scan(&b)
+	db.db.Raw(allQuery).Find(&b)
 	return b
 }
 
 func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Request) int64 {
-	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(re)
 	keys := re.URL.Query()
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
@@ -192,8 +181,6 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	openQuery := ""
 	assignedQuery := ""
 	paidQuery := ""
-	orderQuery := ""
-	limitQuery := ""
 
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
@@ -216,19 +203,10 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 		}
 	}
 
-	if sortBy != "" && direction != "" {
-		orderQuery = "ORDER BY " + sortBy + " " + direction
-	} else {
-		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
-	}
-	if limit != 0 {
-		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
-	}
-
 	var count int64
 
-	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + orderQuery + " " + limitQuery
+	query := `SELECT COUNT(*) FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
