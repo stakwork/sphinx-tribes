@@ -60,12 +60,12 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  const userOrganizations = main.dropDownOrganizations.length
-    ? main.dropDownOrganizations.map((org: Organization) => ({
-        label: toCapitalize(org.name),
-        value: org.uuid
-      }))
-    : [];
+  // const userOrganizations = main.dropDownOrganizations.length
+  //   ? main.dropDownOrganizations.map((org: Organization) => ({
+  //       label: toCapitalize(org.name),
+  //       value: org.uuid
+  //     }))
+  //   : [];
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -266,7 +266,28 @@ function FocusedView(props: FocusViewProps) {
       props?.ReCallBounties();
   }
 
+  const [orgName, setOrgName] = useState<string | undefined>();
+
+  const getOrganization = async () => {
+    try {
+      const response = await main.getUserOrganizationByUuid('ck95pe04nncjnaefo08g');
+      if (response && typeof response.name === 'string') {
+        setOrgName(response.name);
+      }
+    } catch (error) {
+      console.error('Error fetching organization:', error);
+    }
+  };
+
+  useEffect(() => {
+    getOrganization();
+  });
+
   let initialValues: any = {};
+
+  const altInitialValue: any = {
+    org_uuid: orgName || 'Bounties Platform'
+  };
 
   const personInfo = canEdit ? ui.meInfo : person;
 
@@ -313,6 +334,8 @@ function FocusedView(props: FocusViewProps) {
           initialValues[s.name] = wanted[s.name];
         });
       }
+    } else {
+      initialValues = altInitialValue;
     }
   }
 
@@ -350,10 +373,9 @@ function FocusedView(props: FocusViewProps) {
     }
   }
 
-  // set user organizations
-  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
-    config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
-  }
+  // if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
+  //   config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
+  // }
 
   return (
     <div
