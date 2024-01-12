@@ -688,11 +688,11 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		}
 	}
 	if orgUuid != "" {
-		orgQuery = "AND org_uuid = " + orgUuid
+		orgQuery = "AND org_uuid = '" + orgUuid + "'"
 	}
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery + " " + orgQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + orderQuery + " " + limitQuery + " " + orgQuery
 
 	theQuery := db.db.Raw(allQuery)
 
