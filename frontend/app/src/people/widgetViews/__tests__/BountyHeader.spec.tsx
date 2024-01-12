@@ -62,7 +62,7 @@ describe('BountyHeader Component', () => {
   });
 
   test('should display the total developer count from the mock API', async () => {
-    jest.setTimeout(10000)
+    jest.setTimeout(10000);
     const mockDeveloperCount = 100;
     jest
       .spyOn(mainStore, 'getBountyHeaderData')

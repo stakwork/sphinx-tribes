@@ -934,4 +934,3 @@ describe('Main store', () => {
     expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
   });
 });
-
