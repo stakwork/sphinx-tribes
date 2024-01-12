@@ -4,7 +4,6 @@ import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
-import { Organization } from 'store/main';
 import { Box } from '@mui/system';
 import { useStores } from '../../store';
 import Form from '../../components/form/bounty';
@@ -17,11 +16,7 @@ import {
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
-import {
-  convertLocaleToNumber,
-  extractRepoAndIssueFromIssueUrl,
-  toCapitalize
-} from '../../helpers';
+import { convertLocaleToNumber, extractRepoAndIssueFromIssueUrl } from '../../helpers';
 import { B, BWrap } from './style';
 
 // selected bounty popup window
