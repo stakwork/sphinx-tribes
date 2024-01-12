@@ -14,7 +14,15 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
-func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
+type organizationHandler struct {
+	db db.Database
+}
+
+func NewOrganizationHandler(db db.Database) *organizationHandler {
+	return &organizationHandler{db: db}
+}
+
+func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	now := time.Now()
@@ -36,15 +44,26 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if pubKeyFromAuth != org.OwnerPubKey {
-		fmt.Println(pubKeyFromAuth)
-		fmt.Println(org.OwnerPubKey)
-		fmt.Println("mismatched pubkey")
-		w.WriteHeader(http.StatusUnauthorized)
+	if len(org.Name) == 0 || len(org.Name) > 20 {
+		fmt.Printf("invalid organization name %s\n", org.Name)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Error: organization name must be present and should not exceed 20 character")
 		return
 	}
 
-	existing := db.DB.GetOrganizationByUuid(org.Uuid)
+	if pubKeyFromAuth != org.OwnerPubKey {
+		hasRole := db.UserHasAccess(pubKeyFromAuth, org.Uuid, db.EditOrg)
+		if !hasRole {
+			fmt.Println(pubKeyFromAuth)
+			fmt.Println(org.OwnerPubKey)
+			fmt.Println("mismatched pubkey")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("Don't have access to Edit Org")
+			return
+		}
+	}
+
+	existing := oh.db.GetOrganizationByUuid(org.Uuid)
 	if existing.ID == 0 { // new!
 		if org.ID != 0 { // can't try to "edit" if it does not exist already
 			fmt.Println("cant edit non existing")
@@ -55,7 +74,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		name := org.Name
 
 		// check if the organization name already exists
-		orgName := db.DB.GetOrganizationByName(name)
+		orgName := oh.db.GetOrganizationByName(name)
 
 		if orgName.Name == name {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -82,7 +101,7 @@ func CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	p, err := db.DB.CreateOrEditOrganization(org)
+	p, err := oh.db.CreateOrEditOrganization(org)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -414,7 +433,7 @@ func GetUserOrganizations(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(organizations)
 }
 
-func GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
 
@@ -436,7 +455,7 @@ func GetUserDropdownOrganizations(w http.ResponseWriter, r *http.Request) {
 		organization := db.DB.GetOrganizationByUuid(uuid)
 		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
 		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-		hasBountyRoles := db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
+		hasBountyRoles := oh.db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted organizations to the list
 		if !organization.Deleted && hasBountyRoles {
