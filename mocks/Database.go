@@ -1390,9 +1390,9 @@ func (_c *Database_GetAllTribesByOwner_Call) RunAndReturn(run func(string) []db.
 	return _c
 }
 
-// GetAssignedBounties provides a mock function with given fields: pubkey
-func (_m *Database) GetAssignedBounties(pubkey string) ([]db.Bounty, error) {
-	ret := _m.Called(pubkey)
+// GetAssignedBounties provides a mock function with given fields: r
+func (_m *Database) GetAssignedBounties(r *http.Request) ([]db.Bounty, error) {
+	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAssignedBounties")
@@ -1400,19 +1400,19 @@ func (_m *Database) GetAssignedBounties(pubkey string) ([]db.Bounty, error) {
 
 	var r0 []db.Bounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Bounty, error)); ok {
-		return rf(pubkey)
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
-		r0 = rf(pubkey)
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Bounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(pubkey)
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1426,14 +1426,14 @@ type Database_GetAssignedBounties_Call struct {
 }
 
 // GetAssignedBounties is a helper method to define mock.On call
-//   - pubkey string
-func (_e *Database_Expecter) GetAssignedBounties(pubkey interface{}) *Database_GetAssignedBounties_Call {
-	return &Database_GetAssignedBounties_Call{Call: _e.mock.On("GetAssignedBounties", pubkey)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetAssignedBounties(r interface{}) *Database_GetAssignedBounties_Call {
+	return &Database_GetAssignedBounties_Call{Call: _e.mock.On("GetAssignedBounties", r)}
 }
 
-func (_c *Database_GetAssignedBounties_Call) Run(run func(pubkey string)) *Database_GetAssignedBounties_Call {
+func (_c *Database_GetAssignedBounties_Call) Run(run func(r *http.Request)) *Database_GetAssignedBounties_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(*http.Request))
 	})
 	return _c
 }
@@ -1443,7 +1443,7 @@ func (_c *Database_GetAssignedBounties_Call) Return(_a0 []db.Bounty, _a1 error) 
 	return _c
 }
 
-func (_c *Database_GetAssignedBounties_Call) RunAndReturn(run func(string) ([]db.Bounty, error)) *Database_GetAssignedBounties_Call {
+func (_c *Database_GetAssignedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetAssignedBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2131,9 +2131,9 @@ func (_c *Database_GetConnectionCode_Call) RunAndReturn(run func() db.Connection
 	return _c
 }
 
-// GetCreatedBounties provides a mock function with given fields: pubkey
-func (_m *Database) GetCreatedBounties(pubkey string) ([]db.Bounty, error) {
-	ret := _m.Called(pubkey)
+// GetCreatedBounties provides a mock function with given fields: r
+func (_m *Database) GetCreatedBounties(r *http.Request) ([]db.Bounty, error) {
+	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCreatedBounties")
@@ -2141,19 +2141,19 @@ func (_m *Database) GetCreatedBounties(pubkey string) ([]db.Bounty, error) {
 
 	var r0 []db.Bounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Bounty, error)); ok {
-		return rf(pubkey)
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
-		r0 = rf(pubkey)
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Bounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(pubkey)
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -2167,14 +2167,14 @@ type Database_GetCreatedBounties_Call struct {
 }
 
 // GetCreatedBounties is a helper method to define mock.On call
-//   - pubkey string
-func (_e *Database_Expecter) GetCreatedBounties(pubkey interface{}) *Database_GetCreatedBounties_Call {
-	return &Database_GetCreatedBounties_Call{Call: _e.mock.On("GetCreatedBounties", pubkey)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetCreatedBounties(r interface{}) *Database_GetCreatedBounties_Call {
+	return &Database_GetCreatedBounties_Call{Call: _e.mock.On("GetCreatedBounties", r)}
 }
 
-func (_c *Database_GetCreatedBounties_Call) Run(run func(pubkey string)) *Database_GetCreatedBounties_Call {
+func (_c *Database_GetCreatedBounties_Call) Run(run func(r *http.Request)) *Database_GetCreatedBounties_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(*http.Request))
 	})
 	return _c
 }
@@ -2184,7 +2184,7 @@ func (_c *Database_GetCreatedBounties_Call) Return(_a0 []db.Bounty, _a1 error) *
 	return _c
 }
 
-func (_c *Database_GetCreatedBounties_Call) RunAndReturn(run func(string) ([]db.Bounty, error)) *Database_GetCreatedBounties_Call {
+func (_c *Database_GetCreatedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetCreatedBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3014,6 +3014,52 @@ func (_c *Database_GetOrganizationByName_Call) Return(_a0 db.Organization) *Data
 }
 
 func (_c *Database_GetOrganizationByName_Call) RunAndReturn(run func(string) db.Organization) *Database_GetOrganizationByName_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetOrganizationByUuid provides a mock function with given fields: uuid
+func (_m *Database) GetOrganizationByUuid(uuid string) db.Organization {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOrganizationByUuid")
+	}
+
+	var r0 db.Organization
+	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Organization)
+	}
+
+	return r0
+}
+
+// Database_GetOrganizationByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationByUuid'
+type Database_GetOrganizationByUuid_Call struct {
+	*mock.Call
+}
+
+// GetOrganizationByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetOrganizationByUuid(uuid interface{}) *Database_GetOrganizationByUuid_Call {
+	return &Database_GetOrganizationByUuid_Call{Call: _e.mock.On("GetOrganizationByUuid", uuid)}
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) Run(run func(uuid string)) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) Return(_a0 db.Organization) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) RunAndReturn(run func(string) db.Organization) *Database_GetOrganizationByUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
