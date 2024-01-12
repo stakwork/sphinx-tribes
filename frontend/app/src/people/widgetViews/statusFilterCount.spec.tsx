@@ -71,6 +71,5 @@ describe('BountyHeader', () => {
         checkboxIdToSelectedMapLanguage={undefined}
       />
     );
-
-});
+  });
 });
