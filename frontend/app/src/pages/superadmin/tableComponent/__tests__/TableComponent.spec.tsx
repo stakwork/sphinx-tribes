@@ -72,9 +72,9 @@ it('renders "Sort By:" in the document', () => {
   expect(getByText('Sort By:')).toBeInTheDocument();
 });
 
-it('renders "Date" twice in the document', () => {
+it('renders "Newest" twice in the document', () => {
   const { getAllByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
-  expect(getAllByText('Date')).toHaveLength(2);
+  expect(getAllByText('Newest')).toHaveLength(2);
 });
 
 it('renders "Assignee" twice in the document', () => {

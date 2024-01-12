@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
-import { BountyStatus, defaultBountyStatus } from 'store/main';
+import { BountyStatus } from 'store/main';
 import moment from 'moment';
+import { EuiPopover, EuiText } from '@elastic/eui';
+import MaterialIcon from '@material/react-material-icon';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';
 import copygray from '../header/icons/copygray.svg';
+import { dateFilterOptions, getBountyStatus } from '../utils';
+import { colors } from './../../../config/colors';
 import { Bounty } from './interfaces.ts';
 
 import {
@@ -23,7 +27,6 @@ import {
   TableHeaderDataRight,
   BountyHeader,
   Options,
-  StyledSelect,
   LeadingTitle,
   AlternativeTitle,
   Label,
@@ -36,10 +39,10 @@ import {
   TableDataAlternative,
   BountyData,
   Paragraph,
-  BoxImage
+  BoxImage,
+  DateFilterWrapper,
+  DateFilterContent
 } from './TableStyle';
-
-//import './styles.css';
 
 interface TableProps {
   bounties: Bounty[];
@@ -49,7 +52,9 @@ interface TableProps {
   bountyStatus?: BountyStatus;
   setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
   dropdownValue?: string;
+  sortOrder?: string;
   setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
+  onChangeFilterByDate?: (option: string) => void;
 }
 
 interface ImageWithTextProps {
@@ -57,25 +62,23 @@ interface ImageWithTextProps {
   text: string;
 }
 
-export const ImageWithText = ({ image, text }: ImageWithTextProps) => {
-  return (
-    <>
-      <BoxImage>
-        <img
-          src={image}
-          style={{
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            marginRight: '10px'
-          }}
-          alt={text}
-        />
-        <Paragraph>{text}</Paragraph>
-      </BoxImage>
-    </>
-  );
-};
+export const ImageWithText = ({ image, text }: ImageWithTextProps) => (
+  <>
+    <BoxImage>
+      <img
+        src={image}
+        style={{
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          marginRight: '10px'
+        }}
+        alt={text}
+      />
+      <Paragraph>{text}</Paragraph>
+    </BoxImage>
+  </>
+);
 
 interface TextInColorBoxProps {
   status: string;
@@ -126,11 +129,16 @@ export const MyTable = ({
   setBountyStatus,
   dropdownValue,
   headerIsFrozen,
-  setDropdownValue
+  sortOrder,
+  setDropdownValue,
+  onChangeFilterByDate
 }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
   const [activeTabs, setActiveTabs] = useState<number[]>([]);
+  const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: any) => !isPopoverOpen);
+  const closePopover = () => setIsPopoverOpen(false);
   const pageSize = 20;
   const visibleTabs = 7;
 
@@ -148,42 +156,9 @@ export const MyTable = ({
   };
 
   const updateBountyStatus = (e: any) => {
-    const { value } = e.target;
     if (bountyStatus && setBountyStatus && setDropdownValue) {
-      switch (value) {
-        case 'open': {
-          const newStatus = { ...defaultBountyStatus, Open: true };
-          setBountyStatus(newStatus);
-          break;
-        }
-        case 'in-progress': {
-          const newStatus = {
-            ...defaultBountyStatus,
-            Open: false,
-            Assigned: true
-          };
-          setBountyStatus(newStatus);
-          break;
-        }
-        case 'completed': {
-          const newStatus = {
-            ...defaultBountyStatus,
-            Open: false,
-            Paid: true
-          };
-          setBountyStatus(newStatus);
-          break;
-        }
-        default: {
-          const newStatus = {
-            ...defaultBountyStatus,
-            Open: false
-          };
-          setBountyStatus(newStatus);
-          break;
-        }
-      }
-      setDropdownValue(value);
+      getBountyStatus(e.target.value);
+      setDropdownValue(e.target.value);
     }
   };
 
@@ -206,6 +181,7 @@ export const MyTable = ({
       dataNumber.shift();
     }
   };
+
   const paginatePrev = () => {
     const firtsTab = activeTabs[0];
     const lastTab = activeTabs[6];
@@ -250,6 +226,8 @@ export const MyTable = ({
   }, [getActiveTabs]);
 
   const bountiesLength = bounties && bounties.length;
+  const color = colors['light'];
+
   return (
     <>
       <HeaderContainer freeze={!headerIsFrozen}>
@@ -257,19 +235,61 @@ export const MyTable = ({
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {' '}
-              {bountiesLength}{' '}
-              <AlternativeTitle> {bountiesLength === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
+              {bountiesLength}
+              <AlternativeTitle>{bountiesLength === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
             </LeadingTitle>
           </BountyHeader>
           <Options>
             <FlexDiv>
-              <Label>Sort By:</Label>
-              <StyledSelect id="sortBy">
-                <option value="date">Date</option>
-                <option value="assignee">Assignee</option>
-                <option value="status">Status</option>
-              </StyledSelect>
+              <EuiPopover
+                button={
+                  <DateFilterWrapper onClick={onButtonClick} color={color}>
+                    <EuiText
+                      className="filterText"
+                      style={{
+                        color: isPopoverOpen ? color.grayish.G10 : ''
+                      }}
+                    >
+                      Sort By:
+                    </EuiText>
+                    <div className="image">
+                      {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+                      <MaterialIcon
+                        className="materialIconImage"
+                        icon="expand_more"
+                        style={{
+                          color: isPopoverOpen ? color.grayish.G10 : ''
+                        }}
+                      />
+                    </div>
+                  </DateFilterWrapper>
+                }
+                panelStyle={{
+                  border: 'none',
+                  left: '700px',
+                  maxWidth: '106px',
+                  boxShadow: `0px 1px 20px ${color.black90}`,
+                  background: `${color.pureWhite}`,
+                  borderRadius: '6px'
+                }}
+                isOpen={isPopoverOpen}
+                closePopover={closePopover}
+                panelPaddingSize="none"
+                anchorPosition="downRight"
+              >
+                <DateFilterContent className="CheckboxOuter" color={color}>
+                  {dateFilterOptions.map((val: { [key: string]: string }) => (
+                    <Options
+                      onClick={() => {
+                        onChangeFilterByDate?.(val.value);
+                      }}
+                      key={val.id}
+                    >
+                      {val.label}
+                    </Options>
+                  ))}
+                </DateFilterContent>
+              </EuiPopover>
             </FlexDiv>
             <FlexDiv>
               <Label>Status:</Label>
