@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import BountyHeader from './BountyHeader';
+import '@testing-library/jest-dom';
 
 const mockApiResponse = {
   open: 64,
@@ -41,9 +42,9 @@ describe('BountyHeader', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Open')).toBeInTheDocument();
-      expect(screen.getByText('Assigned')).toBeInTheDocument();
-      expect(screen.getByText('Paid')).toBeInTheDocument();
+      expect(screen.findByText('Open [64]')).resolves.toBeInTheDocument();
+      expect(screen.findByText('Assigned [545]')).resolves.toBeInTheDocument();
+      expect(screen.findByText('Paid [502]')).resolves.toBeInTheDocument();
     });
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
