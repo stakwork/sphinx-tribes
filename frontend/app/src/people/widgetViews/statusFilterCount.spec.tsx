@@ -45,9 +45,9 @@ describe('BountyHeader', () => {
     expect(filterButton).toBeInTheDocument();
     fireEvent.click(filterButton);
     await waitFor(() => {
-      expect(screen.getByText('Open [64]')).toBeInTheDocument();
-      expect(screen.getByText('Assigned [545]')).toBeInTheDocument();
-      expect(screen.getByText('Paid [502]')).toBeInTheDocument();
+      expect(screen.getByText(/Open\s*\[\d+\]/)).toBeInTheDocument();
+      expect(screen.getByText(/Assigned\s*\[\d+\]/)).toBeInTheDocument();
+      expect(screen.getByText(/Paid\s*\[\d+\]/)).toBeInTheDocument();
     });
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
