@@ -121,7 +121,8 @@ const UserTickets = () => {
             <WantedView
               colors={color}
               showName
-              onPanelClick={() => {
+              onPanelClick={(e: any) => {
+                e.preventDefault();
                 onPanelClick(body.id, i);
                 ui.setBountyPerson(person?.id);
                 setBountyOwner(person);

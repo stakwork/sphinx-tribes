@@ -7,7 +7,6 @@ import { observer } from 'mobx-react-lite';
 import { useStores } from '../../store';
 import { useIsMobile } from '../../hooks';
 import { Modal, Button } from '../../components/common';
-
 import SignIn from '../../components/auth/SignIn';
 import api from '../../api';
 import TorSaveQR from '../utils/TorSaveQR';
@@ -300,7 +299,7 @@ function Header() {
 
   const clickHandler = () => {
     if (ui.meInfo && ui.meInfo?.owner_alias) {
-      setIsOpenPostModal(true);
+      window.open('https://buy.sphinx.chat/');
     } else {
       showSignIn();
     }
@@ -340,7 +339,7 @@ function Header() {
   }, []);
 
   function goToEditSelf() {
-    if (ui.meInfo?.id) {
+    if (ui.meInfo?.id && !location.pathname.includes(`/p/${ui.meInfo.owner_pubkey}`)) {
       history.push(`/p/${ui.meInfo.owner_pubkey}/organizations`);
       ui.setSelectedPerson(ui.meInfo.id);
       ui.setSelectingPerson(ui.meInfo.id);

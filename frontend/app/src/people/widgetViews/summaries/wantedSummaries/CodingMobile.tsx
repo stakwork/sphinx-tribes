@@ -34,7 +34,7 @@ export default function MobileView(props: CodingViewProps) {
     showPayBounty,
     owner_id,
     created,
-    markUnpaid,
+    markPaidOrUnpaid,
     paid
   } = props;
 
@@ -161,8 +161,7 @@ export default function MobileView(props: CodingViewProps) {
             />
           </ButtonRow>
 
-          {!!paid ? markUnpaid : null}
-
+          {markPaidOrUnpaid}
           <LoomViewerRecorder readOnly loomEmbedUrl={loomEmbedUrl} style={{ marginBottom: 20 }} />
 
           <Divider />
