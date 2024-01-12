@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import BountyHeader from './BountyHeader';
 import '@testing-library/jest-dom';
 
@@ -25,7 +25,7 @@ describe('BountyHeader', () => {
     mockFetch.mockClear();
   });
 
-  it('fetches and displays the status counts correctly', async () => {
+  it('displays the filter button and shows status count on click', async () => {
     render(
       <BountyHeader
         selectedWidget={'wanted'}
@@ -41,10 +41,13 @@ describe('BountyHeader', () => {
       />
     );
 
+    const filterButton = screen.getByText('Filter');
+    expect(filterButton).toBeInTheDocument();
+    fireEvent.click(filterButton);
     await waitFor(() => {
-      expect(screen.findByText('Open [64]')).resolves.toBeInTheDocument();
-      expect(screen.findByText('Assigned [545]')).resolves.toBeInTheDocument();
-      expect(screen.findByText('Paid [502]')).resolves.toBeInTheDocument();
+      expect(screen.getByText('Open [64]')).toBeInTheDocument();
+      expect(screen.getByText('Assigned [545]')).toBeInTheDocument();
+      expect(screen.getByText('Paid [502]')).toBeInTheDocument();
     });
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
