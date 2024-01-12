@@ -32,8 +32,8 @@ type Database interface {
 	GetUserBountiesCount(personKey string, tabType string) int64
 	GetBountiesCount(r *http.Request) int64
 	GetOrganizationBounties(r *http.Request, org_uuid string) []Bounty
-	GetAssignedBounties(pubkey string) ([]Bounty, error)
-	GetCreatedBounties(pubkey string) ([]Bounty, error)
+	GetAssignedBounties(r *http.Request) ([]Bounty, error)
+	GetCreatedBounties(r *http.Request) ([]Bounty, error)
 	GetBountyById(id string) ([]Bounty, error)
 	GetBountyIndexById(id string) int64
 	GetBountyDataByCreated(created string) ([]Bounty, error)
@@ -79,6 +79,7 @@ type Database interface {
 	GetBountiesLeaderboard() []LeaderData
 	GetOrganizations(r *http.Request) []Organization
 	GetOrganizationsCount() int64
+	GetOrganizationByUuid(uuid string) Organization
 	GetOrganizationByName(name string) Organization
 	CreateOrEditOrganization(m Organization) (Organization, error)
 	GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error)
