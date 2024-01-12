@@ -6,6 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.1
 	github.com/ambelovsky/go-structs v1.1.0
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
+	github.com/aws/aws-sdk-go v1.49.16 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.3
 	github.com/fiatjaf/go-lnurl v1.13.1
@@ -27,7 +28,7 @@ require (
 	github.com/rs/cors v1.10.1
 	github.com/rs/xid v1.5.0
 	github.com/stretchr/testify v1.8.4
-	github.com/tuan78/jsonconv v1.0.2 // indirect
+	github.com/tuan78/jsonconv v1.0.2
 	golang.org/x/oauth2 v0.15.0
 	google.golang.org/api v0.153.0
 	gorm.io/driver/postgres v1.5.4
