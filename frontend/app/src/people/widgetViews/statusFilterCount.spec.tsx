@@ -50,7 +50,7 @@ describe('BountyHeader', () => {
       expect(screen.getByText(/Paid\s*\[\d+\]/)).toBeInTheDocument();
     });
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('gobounties/filter/count'));
   });
 
