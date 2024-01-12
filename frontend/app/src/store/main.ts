@@ -2180,12 +2180,7 @@ export class MainStore {
     }
   }
 
-  async makeBountyPayment(body: {
-    id: number;
-    receiver_pubkey: string;
-    websocket_token: string;
-    route_hint: string;
-  }): Promise<any> {
+  async makeBountyPayment(body: { id: number; websocket_token: string }): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;
