@@ -176,6 +176,7 @@
     "@craco/craco": "^7.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.2",
+    "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^7.1.2",
     "@types/dateformat": "^3.0.1",
     "@types/jest": "^24.9.1",

@@ -24,6 +24,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const history = useHistory();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
+  // eslint-disable-next-line no-unused-vars
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
@@ -86,17 +87,23 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     }
   };
 
-  const prevArrHandler = () => {
-    if (activeListIndex === 0) return;
+  const getBountyIndex = () => {
+    const id = parseInt(bountyId, 10);
+    const index = main.peopleBounties.findIndex((bounty: any) => id === bounty.body.id);
+    return index;
+  };
 
-    const { person, body } = main.peopleBounties[activeListIndex - 1];
+  const prevArrHandler = () => {
+    const index = getBountyIndex();
+    if (index <= 0 || index >= main.peopleBounties.length) return;
+    const { person, body } = main.peopleBounties[index - 1];
     directionHandler(person, body);
   };
 
   const nextArrHandler = () => {
-    if (activeListIndex + 1 > main.peopleBounties?.length) return;
-
-    const { person, body } = main.peopleBounties[activeListIndex + 1];
+    const index = getBountyIndex();
+    if (index + 1 >= main.peopleBounties?.length) return;
+    const { person, body } = main.peopleBounties[index + 1];
     directionHandler(person, body);
   };
 

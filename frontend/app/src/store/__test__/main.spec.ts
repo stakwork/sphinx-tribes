@@ -7,15 +7,27 @@ import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
+import moment from 'moment';
 
 let fetchStub: sinon.SinonStub;
+let mockApiResponseData: any[];
+
+const origFetch = global.fetch;
 
 beforeAll(() => {
   fetchStub = sinon.stub(global, 'fetch');
+  fetchStub.returns(Promise.resolve({ status: 200, json: () => Promise.resolve({}) })); // Mock a default behavior
+  mockApiResponseData = [
+    { uuid: 'cm3eulatu2rvqi9o75ug' },
+    { uuid: 'cldl1g04nncmf23du7kg' },
+    { orgUUID: 'cmas9gatu2rvqiev4ur0' }
+  ];
 });
 
 afterAll(() => {
-  jest.clearAllMocks();
+  global.fetch = origFetch;
+
+  sinon.restore();
 });
 
 describe('Main store', () => {
@@ -26,6 +38,77 @@ describe('Main store', () => {
 
   afterEach(() => {
     fetchStub.reset();
+  });
+
+  it('should call endpoint on addOrganization', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const addOrganization = {
+      img: '',
+      name: 'New Orgination test',
+      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce'
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.addOrganization(addOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(addOrganization),
+        mode: 'cors'
+      })
+    );
+  });
+
+  it('should call endpoint on UpdateOrganization Name', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const updateOrganization = {
+      id: '42',
+      uuid: 'clic8k04nncuuf32kgr0',
+      name: 'TEST1',
+      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+      img: 'https://memes.sphinx.chat/public/NVhwFqDqHKAC-_Sy9pR4RNy8_cgYuOVWgohgceAs-aM=',
+      created: '2023-11-27T16:31:12.699355Z',
+      updated: '2023-11-27T16:31:12.699355Z',
+      show: false,
+      deleted: false,
+      bounty_count: 1
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.updateOrganization(updateOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(updateOrganization),
+        mode: 'cors'
+      })
+    );
   });
 
   it('should call endpoint on saveBounty', () => {
@@ -73,6 +156,296 @@ describe('Main store', () => {
 
     expect(toJS(uiStore.meInfo)).toEqual(user);
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+  });
+
+  it('should call endpoint on addOrganizationUser', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = {
+      owner_pubkey: user.owner_pubkey || '',
+      org_uuid: mockApiResponseData[2]
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.addOrganizationUser(organizationUser);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2]}`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(organizationUser),
+        mode: 'cors'
+      })
+    );
+  });
+
+  it('should call endpoint on getOrganizationUsers', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves(mockApiResponseData.slice(0, 1))
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const endpoint = `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}`;
+
+    const users = await mainStore.getOrganizationUsers(mockApiResponseData[2].orgUUID);
+
+    sinon.assert.calledWithMatch(fetchStub, endpoint, sinon.match.any);
+    expect(users).toEqual(mockApiResponseData.slice(0, 1));
+  });
+
+  it('should call endpoint on getUserOrganizations', async () => {
+    const mainStore = new MainStore();
+    const userId = 232;
+    const mockOrganizations = [
+      {
+        id: 42,
+        uuid: 'clic8k04nncuuf32kgr0',
+        name: 'TEST',
+        owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+        img: 'https://memes.sphinx.chat/public/NVhwFqDqHKAC-_Sy9pR4RNy8_cgYuOVWgohgceAs-aM=',
+        created: '2023-11-27T16:31:12.699355Z',
+        updated: '2023-11-27T16:31:12.699355Z',
+        show: false,
+        deleted: false,
+        bounty_count: 1
+      },
+      {
+        id: 55,
+        uuid: 'cmen35itu2rvqicrm020',
+        name: 'Orgination name test',
+        owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+        img: '',
+        created: '2024-01-09T16:17:26.202555Z',
+        updated: '2024-01-09T16:17:26.202555Z',
+        show: false,
+        deleted: false
+      },
+      {
+        id: 56,
+        uuid: 'cmen38itu2rvqicrm02g',
+        name: 'New Orgination test',
+        owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+        img: '',
+        created: '2024-01-09T16:17:38.652072Z',
+        updated: '2024-01-09T16:17:38.652072Z',
+        show: false,
+        deleted: false
+      },
+      {
+        id: 49,
+        uuid: 'cm7c24itu2rvqi9o7620',
+        name: 'TESTing',
+        owner_pubkey: '02af1ea854c7dc8634d08732d95c6057e6e08e01723da4f561d711a60aea708c00',
+        img: '',
+        created: '2023-12-29T12:52:34.62057Z',
+        updated: '2023-12-29T12:52:34.62057Z',
+        show: false,
+        deleted: false
+      },
+      {
+        id: 51,
+        uuid: 'cmas9gatu2rvqiev4ur0',
+        name: 'TEST_NEW',
+        owner_pubkey: '03cbb9c01cdcf91a3ac3b543a556fbec9c4c3c2a6ed753e19f2706012a26367ae3',
+        img: '',
+        created: '2024-01-03T20:34:09.585609Z',
+        updated: '2024-01-03T20:34:09.585609Z',
+        show: false,
+        deleted: false
+      }
+    ];
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves(mockOrganizations)
+    };
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = await mainStore.getUserOrganizations(userId);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/user/${userId}`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    );
+
+    expect(organizationUser).toEqual(mockOrganizations);
+  });
+
+  it('should call endpoint on getUserOrganizationsUuid', async () => {
+    const mainStore = new MainStore();
+    const uuid = 'ck1p7l6a5fdlqdgmmnpg';
+    const mockOrganizations = {
+      id: 6,
+      uuid: 'ck1p7l6a5fdlqdgmmnpg',
+      name: 'Stakwork',
+      owner_pubkey: '021ae436bcd40ca21396e59be8cdb5a707ceacdb35c1d2c5f23be7584cab29c40b',
+      img: 'https://memes.sphinx.chat/public/_IO8M0UXltb3mbK0qso63ux86AP-2nN2Ly9uHo37Ku4=',
+      created: '2023-09-14T23:14:28.821632Z',
+      updated: '2023-09-14T23:14:28.821632Z',
+      show: true,
+      deleted: false,
+      bounty_count: 8,
+      budget: 640060
+    };
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves(mockOrganizations)
+    };
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = await mainStore.getUserOrganizationByUuid(uuid);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/${uuid}`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    );
+
+    expect(organizationUser).toEqual(mockOrganizations);
+  });
+  it('should call endpoint on getOrganizationUser', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves({
+        uuid: mockApiResponseData[0].uuid
+      })
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationUser = await mainStore.getOrganizationUser(mockApiResponseData[0].uuid);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/foruser/${mockApiResponseData[0].uuid}`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'x-jwt': 'test_jwt',
+          'Content-Type': 'application/json'
+        }
+      })
+    );
+
+    expect(organizationUser).toEqual({
+      uuid: mockApiResponseData[0].uuid
+    });
+  });
+
+  it('should call endpoint on getOrganizationUsersCount', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves({
+        count: 2
+      })
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const organizationsCount = await mainStore.getOrganizationUsersCount(
+      mockApiResponseData[2].orgUUID
+    );
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/users/${mockApiResponseData[2].orgUUID}/count`,
+      sinon.match({
+        method: 'GET',
+        mode: 'cors'
+      })
+    );
+
+    expect(organizationsCount).toEqual({ count: 2 });
+  });
+
+  it('should call endpoint on deleteOrganizationUser', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = {
+      status: 200,
+      json: sinon.stub().resolves({
+        message: 'success'
+      })
+    };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const orgUserUUID = mockApiResponseData[1].uuid;
+    const deleteRequestBody = {
+      org_uuid: mockApiResponseData[2].orgUUID,
+      user_created: '2024-01-03T22:07:39.504494Z',
+      id: 263,
+      uuid: mockApiResponseData[0].uuid,
+      owner_pubkey: '02af1ea854c7dc8634d08732d95c6057e6e08e01723da4f561d711a60aea708c00',
+      owner_alias: 'Nayan',
+      unique_name: 'nayan',
+      description: 'description',
+      tags: [],
+      img: '',
+      created: '2023-12-23T14:31:49.963009Z',
+      updated: '2023-12-23T14:31:49.963009Z',
+      unlisted: false,
+      deleted: false,
+      last_login: 1704289377,
+      owner_route_hint:
+        '03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099519819777',
+      owner_contact_key:
+        'MIIBCgKCAQEAugvVYqgIIBmpLCjmaBhLi6GfxssrdM74diTlKpr+Qr/0Er1ND9YQ3HUveaI6V5DrBunulbSEZlIXIqVSLm2wobN4iAqvoGGx1aZ13ByOJLjINjD5nA9FnfAJpvcMV/gTDQzQL9NHojAeMx1WyAlhIILdiDm9zyCJeYj1ihC660xr6MyVjWn9brJv47P+Bq2x9AWPufYMMgPH7GV1S7KkjEPMbGCdUvUZLs8tzzKtNcABCHBQKOcBNG/D4HZcCREMP90zj8/NUzz9x92Z5zuvJ0/eZVF91XwyMtThrJ+AnrXWv7AEVy63mu9eAO3UYiUXq2ioayKBgalyos2Mcs9DswIDAQAB',
+      price_to_meet: 0,
+      new_ticket_time: 0,
+      twitter_confirmed: false,
+      extras: {},
+      github_issues: {}
+    };
+
+    const deleteResponse = await mainStore.deleteOrganizationUser(deleteRequestBody, orgUserUUID);
+
+    sinon.assert.calledWithMatch(
+      fetchStub,
+      `${TribesURL}/organizations/users/${orgUserUUID}`,
+      sinon.match({
+        method: 'DELETE',
+        mode: 'cors',
+        body: JSON.stringify(deleteRequestBody),
+        headers: sinon.match({
+          'x-jwt': 'test_jwt',
+          'Content-Type': 'application/json'
+        })
+      })
+    );
+
+    expect(deleteResponse.status).toBe(200);
   });
 
   it('should send request delete request with correct body and url', async () => {
@@ -519,5 +892,45 @@ describe('Main store', () => {
     expect(store.peopleBounties.length).toEqual(2);
     expect(store.peopleBounties[1]).toEqual(expectedResponse);
     expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should make a succcessful bounty payment', async () => {
+    const store = new MainStore();
+    uiStore.setMeInfo(emptyMeInfo);
+    const bounty = expectedBountyResponses[0];
+
+    store.makeBountyPayment = jest
+      .fn()
+      .mockReturnValueOnce(Promise.resolve({ status: 200, message: 'success' }));
+
+    const body = {
+      id: bounty.body.id,
+      websocket_token: 'test_websocket_token'
+    };
+
+    store.makeBountyPayment(body);
+    expect(store.makeBountyPayment).toBeCalledWith(body);
+  });
+
+  it('it should get a s3 URL afer a successful metrics url call', async () => {
+    const store = new MainStore();
+    uiStore.setMeInfo(emptyMeInfo);
+
+    store.exportMetricsBountiesCsv = jest
+      .fn()
+      .mockReturnValueOnce(
+        Promise.resolve({ status: 200, body: 'https://test-s3url.com/metrics.csv' })
+      );
+
+    const start_date = moment().subtract(30, 'days').unix().toString();
+    const end_date = moment().unix().toString();
+
+    const body = {
+      start_date,
+      end_date
+    };
+
+    store.exportMetricsBountiesCsv(body);
+    expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
   });
 });
