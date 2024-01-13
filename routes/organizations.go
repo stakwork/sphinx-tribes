@@ -23,7 +23,7 @@ func OrganizationRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
-		r.Post("/", handlers.CreateOrEditOrganization)
+		r.Post("/", organizationHandlers.CreateOrEditOrganization)
 		r.Post("/users/{uuid}", handlers.CreateOrganizationUser)
 		r.Delete("/users/{uuid}", handlers.DeleteOrganizationUser)
 		r.Post("/users/role/{uuid}/{user}", handlers.AddUserRoles)
