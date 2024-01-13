@@ -18,6 +18,7 @@ import {
 import arrowback from './icons/arrowback.svg';
 import arrowforward from './icons/arrowforward.svg';
 import expand_more from './icons/expand_more.svg';
+import App from './components/Calendar/App';
 interface HeaderProps {
   startDate?: number;
   endDate?: number;
@@ -28,6 +29,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   const [showSelector, setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
   const [exportLoading, setExportLoading] = useState(false);
+  const [showCalendar,setShowCalendar] = useState(false);
   const formatUnixDate = (unixDate: number, includeYear: boolean = true) => {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
     return moment.unix(unixDate).format(formatString);
@@ -156,7 +158,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
                   <li onClick={() => handleDropDownChange(30)}>30 Days</li>
                   <li onClick={() => handleDropDownChange(90)}>90 Days</li>
                   <li>
-                    <CustomButton>Custom</CustomButton>
+                    <CustomButton onClick={()=>setShowCalendar(!showCalendar)}>Custom</CustomButton>
                   </li>
                 </ul>
               </Option>
@@ -164,6 +166,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
           </DropDown>
         </RightWrapper>
       </AlternateWrapper>
+      {showCalendar &&<App filterStartDate={setStartDate} filterEndDate={setEndDate}/>}
     </Container>
   );
 };

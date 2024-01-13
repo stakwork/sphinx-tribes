@@ -52,6 +52,7 @@ export const SuperAdmin = () => {
   const [endDate, setEndDate] = useState(moment().unix());
   const [startDate, setStartDate] = useState(moment().subtract(30, 'days').unix());
 
+  
   const [inView, ref] = useInViewPort({
     rootMargin: '0px',
     threshold: 0.25
