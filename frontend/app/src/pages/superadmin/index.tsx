@@ -13,6 +13,7 @@ import { MyTable } from './tableComponent';
 import { Header } from './header';
 import { Statistics } from './statistics';
 import AdminAccessDenied from './accessDenied';
+import { bounties as mockBountyData } from './tableComponent/mockBountyData';
 
 const Container = styled.body`
   height: 100vh; /* Set a fixed height for the container */
@@ -135,14 +136,14 @@ export const SuperAdmin = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
-          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />
+          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />          
           {loading ? (
             <LoaderContainer>
               <EuiLoadingSpinner size="l" />
             </LoaderContainer>
           ) : (
             <MyTable
-              bounties={bounties}
+              bounties={mockBountyData}
               startDate={startDate}
               endDate={endDate}
               headerIsFrozen={inView}
