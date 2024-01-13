@@ -1,7 +1,8 @@
+import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import AddOrganization from '../organization/AddOrganization';
+import { mainStore } from 'store/main';
 const mockCloseHandler = jest.fn();
 const mockGetUserOrganizations = jest.fn();
 const mockOwnerPubKey = 'somePublicKey';
@@ -15,8 +16,7 @@ describe('AddOrganization Component Tests', () => {
         owner_pubkey={mockOwnerPubKey}
       />
     );
-    const org = screen.getByPlaceholderText(/My Organization.../i);
-    expect(org).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('My Organization...')).toBeInTheDocument();
   });
 
   test('Website text field appears', () => {
@@ -78,6 +78,10 @@ describe('AddOrganization Component Tests', () => {
     const mockCloseHandler = jest.fn();
     const mockGetUserOrganizations = jest.fn();
     const mockOwnerPubKey = 'somePublicKey';
+    jest.spyOn(mainStore, 'addOrganization').mockReturnValueOnce(Promise.resolve({
+        status: 200,
+        json: () => Promise.resolve({})
+    }));
 
     render(
       <AddOrganization
@@ -89,6 +93,8 @@ describe('AddOrganization Component Tests', () => {
 
     const addButton = screen.getByText('Add Organization');
     expect(addButton).toBeInTheDocument();
+    const orgNameInput = screen.getByPlaceholderText(/My Organization.../i);
+    fireEvent.change(orgNameInput, { target: { value: 'My Org' } });
 
     fireEvent.click(addButton);
 
