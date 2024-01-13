@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import { useStores } from '../../../store';
-import {OrgBody, Body, Backdrop } from '../style';
+import { OrgBody, Body, Backdrop } from '../style';
 
 function OrgBodyComponent() {
   const { main, ui } = useStores();
@@ -151,7 +151,7 @@ function OrgBodyComponent() {
           height: 'calc(100% - 65px)'
         }}
       >
-        <OrgBounty/>
+        <OrgBounty />
         <>
           <div
             style={{

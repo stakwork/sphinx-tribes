@@ -10,11 +10,13 @@ export const Body = styled.div`
 `;
 
 export const OrgBody = styled.div`
-  display:flex;
-  flex-direction:column;
-  background: var(--Search-bar-background, #F2F3F5);
+  display: flex;
+  flex-direction: column;
+  background: var(--Search-bar-background, #f2f3f5);
   height: 100vh;
-`
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
 
 export const Backdrop = styled.div`
   position: fixed;
