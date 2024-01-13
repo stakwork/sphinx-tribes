@@ -18,6 +18,7 @@ import BountyPrice from '../../../../bounties/BountyPrice';
 import InvitePeopleSearch from '../../../../components/form/inputs/widgets/PeopleSearch';
 import { CodingBountiesProps } from '../../../interfaces';
 import LoomViewerRecorder from '../../../utils/LoomViewerRecorder';
+import { paidString, unpaidString } from '../constants';
 import Invoice from './Invoice';
 import {
   AssigneeProfile,
@@ -107,6 +108,9 @@ function MobileView(props: CodingBountiesProps) {
   const [toasts, setToasts]: any = useState([]);
   const [updatingPayment, setUpdatingPayment] = useState<boolean>(false);
   const [userBountyRole, setUserBountyRole] = useState(false);
+
+  const [paidStatus, setPaidStatus] = useState(paid);
+
   const [paymentLoading, setPaymentLoading] = useState(false);
 
   const userPubkey = ui.meInfo?.owner_pubkey;
@@ -252,9 +256,7 @@ function MobileView(props: CodingBountiesProps) {
           // make keysend payment
           const body = {
             id: id || 0,
-            websocket_token: ui.meInfo?.websocketToken || '',
-            receiver_pubkey: assignee.owner_pubkey,
-            route_hint: assignee.owner_route_hint ?? ''
+            websocket_token: ui.meInfo?.websocketToken || ''
           };
 
           await main.makeBountyPayment(body);
@@ -285,6 +287,7 @@ function MobileView(props: CodingBountiesProps) {
   const handleSetAsPaid = async (e: any) => {
     e.stopPropagation();
     setUpdatingPayment(true);
+    setPaidStatus(!paidStatus);
     await updatePaymentStatus(created || 0);
     await setExtrasPropertyAndSaveMultiple('paid', {
       award: awardDetails.name
@@ -306,6 +309,7 @@ function MobileView(props: CodingBountiesProps) {
     await updatePaymentStatus(created || 0);
     setLocalPaid('UNPAID');
     setUpdatingPayment(false);
+    setPaidStatus(!paidStatus);
     recallBounties();
   };
 
@@ -384,10 +388,15 @@ function MobileView(props: CodingBountiesProps) {
   const hasAccess = isOwner || userBountyRole;
   const payBountyDisable = !isOwner && !userBountyRole;
 
+  useEffect(() => {
+    setPaidStatus(paid);
+  }, [paid]);
+
   if (isMobile) {
     return (
       <CodingMobile
         {...props}
+        paid={paidStatus}
         labels={labels}
         nametag={nametag}
         actionButtons={actionButtons}
@@ -397,32 +406,34 @@ function MobileView(props: CodingBountiesProps) {
         isCopied={isCopied}
         titleString={titleString}
         showPayBounty={showPayBounty}
-        markUnpaid={
-          <IconButton
-            width={'100%'}
-            height={48}
-            style={{
-              bottom: '10px',
-              border: `1px solid ${color.primaryColor.P400}`,
-              background: color.pureWhite,
-              color: color.borderGreen1
-            }}
-            text={'Mark Unpaid'}
-            loading={saving === 'paid' || updatingPayment}
-            endingImg={'/static/mark_unpaid.svg'}
-            textStyle={{
-              width: '130px',
-              display: 'flex',
-              justifyContent: 'center',
-              fontFamily: 'Barlow',
-              marginLeft: '30px',
-              fontSize: '15px'
-            }}
-            onClick={handleSetAsUnpaid}
-          />
+        markPaidOrUnpaid={
+          hasAccess && (
+            <IconButton
+              width={'100%'}
+              height={48}
+              style={{
+                bottom: '10px',
+                border: `1px solid ${color.primaryColor.P400}`,
+                background: paidStatus ? color.green1 : color.pureWhite,
+                color: paidStatus ? color.white100 : color.borderGreen1
+              }}
+              text={paidStatus ? unpaidString : paidString}
+              loading={saving === 'paid' || updatingPayment}
+              endingImg={'/static/mark_unpaid.svg'}
+              textStyle={{
+                width: '130px',
+                display: 'flex',
+                justifyContent: 'center',
+                fontFamily: 'Barlow',
+                marginLeft: '30px',
+                fontSize: '15px'
+              }}
+              onClick={paidStatus ? handleSetAsUnpaid : handleSetAsPaid}
+            />
+          )
         }
         payBounty={
-          <>
+          hasAccess && (
             <IconButton
               width={'100%'}
               height={48}
@@ -443,7 +454,7 @@ function MobileView(props: CodingBountiesProps) {
               shadowcolor={color.button_secondary.shadow}
               onClick={makePayment}
             />
-          </>
+          )
         }
       />
     );
@@ -772,7 +783,7 @@ function MobileView(props: CodingBountiesProps) {
                           background: color.pureWhite,
                           color: color.borderGreen1
                         }}
-                        text={'Mark Unpaid'}
+                        text={paid ? unpaidString : paidString}
                         loading={saving === 'paid' || updatingPayment}
                         endingImg={'/static/mark_unpaid.svg'}
                         textStyle={{
@@ -793,7 +804,7 @@ function MobileView(props: CodingBountiesProps) {
                           bottom: '0',
                           marginLeft: '36px'
                         }}
-                        text={'Mark Paid'}
+                        text={paidString}
                         loading={saving === 'paid'}
                         endingImg={'/static/mark_paid.svg'}
                         textStyle={{
@@ -976,7 +987,7 @@ function MobileView(props: CodingBountiesProps) {
                     bottom: '0',
                     marginLeft: '36px'
                   }}
-                  text={selectedAward === '' ? 'Skip and Mark Paid' : 'Mark Paid'}
+                  text={selectedAward === '' ? 'Skip and Mark Paid' : paidString}
                   loading={isMarkPaidSaved || updatingPayment}
                   endingImg={'/static/mark_paid.svg'}
                   textStyle={{

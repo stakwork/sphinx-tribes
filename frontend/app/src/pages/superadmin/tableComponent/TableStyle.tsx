@@ -1,16 +1,49 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+type FreezeProps = {
+  freeze: boolean;
+};
+
+const applyFreezeHeaderStyles = ({ freeze = false }: FreezeProps) =>
+  freeze &&
+  css`
+    position: fixed;
+    top: 124px;
+    left: 0;
+    padding: 0 2.5rem 0 1rem;
+    background-color: #fff;
+    z-index: 99999999;
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  `;
+
+const applyFreezeTableHeaderStyles = ({ freeze = false }: FreezeProps) =>
+  freeze &&
+  css`
+    position: sticky;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    z-index: 99999999;
+    box-shadow:
+      inset 0 1px 0 #ddd,
+      inset 0 -1px 0 #ddd;
+  `;
 
 export const TableContainer = styled.div`
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-export const HeaderContainer = styled.div`
+export const HeaderContainer = styled.div<FreezeProps>`
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding-right: 40px;
   padding-left: 20px;
+  ${applyFreezeHeaderStyles}
 `;
 
 export const PaginatonSection = styled.div`
@@ -33,11 +66,12 @@ export const Table = styled.table`
   border-collapse: collapse;
 `;
 
-export const TableRow = styled.tr`
+export const TableRow = styled.tr<FreezeProps>`
   border: 1px solid #ddd;
   &:nth-child(even) {
     background-color: #f9f9f9;
   }
+  ${applyFreezeTableHeaderStyles}
 `;
 
 export const TableDataRow = styled.tr`
@@ -280,4 +314,20 @@ export const PaginationButtons = styled.button<PaginationButtonsProps>`
 export const PageContainer = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const BoxImage = styled.div`
+  display: flex;
+  width: 162px;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+`;
+
+export const Paragraph = styled.div`
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 200px;
 `;

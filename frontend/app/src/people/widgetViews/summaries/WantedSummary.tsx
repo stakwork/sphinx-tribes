@@ -16,6 +16,7 @@ import { CodingLanguageLabel, WantedSummaryProps, LocalPaymeentState } from '../
 import CodingBounty from './wantedSummaries/CodingBounty';
 import CodingDesktop from './wantedSummaries/CodingDesktop';
 import { ButtonRow, Img, Assignee } from './wantedSummaries/style';
+import { paidString, unpaidString } from './constants';
 
 function useQuery() {
   const { search } = useLocation();
@@ -152,7 +153,8 @@ function WantedSummary(props: WantedSummaryProps) {
         estimated_session_length: estimated_session_length,
         show: show,
         type: type,
-        created: created
+        created: created,
+        org_uuid
       };
 
       formSubmit && formSubmit(newValue, true);
@@ -192,7 +194,8 @@ function WantedSummary(props: WantedSummaryProps) {
       estimated_session_length: estimated_session_length,
       show: show,
       type: type,
-      created: created
+      created: created,
+      org_uuid
     };
     formSubmit && formSubmit(newValue, true);
   }, [
@@ -397,7 +400,7 @@ function WantedSummary(props: WantedSummaryProps) {
       iconSize={14}
       style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
       endingIcon={'paid'}
-      text={paid ? 'Mark Unpaid' : 'Mark Paid'}
+      text={paid ? unpaidString : paidString}
       loading={saving === 'paid'}
       onClick={(e: any) => {
         e.stopPropagation();
