@@ -100,11 +100,7 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetCreatedBounties(pubkey)
+	bounties, err := db.DB.GetCreatedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -116,11 +112,7 @@ func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetAssignedBounties(pubkey)
+	bounties, err := db.DB.GetAssignedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -431,7 +423,8 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-	bodyData := utils.BuildKeysendBodyData(amount, request.ReceiverPubKey, request.RouteHint)
+	assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+	bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 
 	jsonBody := []byte(bodyData)
 
@@ -461,7 +454,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		paymentHistory := db.PaymentHistory{
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
-			ReceiverPubKey: request.ReceiverPubKey,
+			ReceiverPubKey: assignee.OwnerPubKey,
 			OrgUuid:        bounty.OrgUuid,
 			BountyId:       id,
 			Created:        &now,
