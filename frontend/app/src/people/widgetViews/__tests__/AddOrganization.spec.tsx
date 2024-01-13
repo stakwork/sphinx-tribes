@@ -78,10 +78,12 @@ describe('AddOrganization Component Tests', () => {
     const mockCloseHandler = jest.fn();
     const mockGetUserOrganizations = jest.fn();
     const mockOwnerPubKey = 'somePublicKey';
-    jest.spyOn(mainStore, 'addOrganization').mockReturnValueOnce(Promise.resolve({
+    jest.spyOn(mainStore, 'addOrganization').mockReturnValueOnce(
+      Promise.resolve({
         status: 200,
         json: () => Promise.resolve({})
-    }));
+      })
+    );
 
     render(
       <AddOrganization
