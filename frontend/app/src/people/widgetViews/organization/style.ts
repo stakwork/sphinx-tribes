@@ -498,7 +498,7 @@ export const OrgLabel = styled.label`
   margin-bottom: 0.75rem;
 `;
 
-export const OrgInput = styled.input`
+export const TextInput = styled.input`
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   border: 2px solid #82b4ff;
@@ -511,6 +511,7 @@ export const OrgInput = styled.input`
   font-weight: 500;
   line-height: 2.1875rem;
   width: 100%;
+  margin-bottom: 20px;
 
   ::placeholder {
     color: #b0b7bc;
@@ -520,6 +521,40 @@ export const OrgInput = styled.input`
     font-weight: 400;
     line-height: 2.1875rem;
   }
+`;
+
+export const TextAreaInput = styled.textarea`
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 2px solid #82b4ff;
+  outline: none;
+  caret-color: #618aff;
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 2.1875rem;
+  width: 100%;
+  margin-bottom: 20px;
+  resize: none;
+
+  ::placeholder {
+    color: #b0b7bc;
+    font-family: 'Barlow';
+    font-size: 0.9375rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 2.1875rem;
+  }
+`;
+export const SecondaryText = styled.p`
+  color: #b0b7bc;
+  font-family: 'Barlow';
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 2.1875rem;
 `;
 export const RouteHintText = styled.p`
   font-size: 0.9rem;
