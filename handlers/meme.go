@@ -201,7 +201,7 @@ func UploadMemeImage(file multipart.File, token string, fileName string) (error,
 	res, err := client.Do(req)
 
 	// Delete image from uploads folder
-	DeleteImageFromUploadsFolder(filePath)
+	DeleteFileFromUploadsFolder(filePath)
 
 	if err != nil {
 		fmt.Println("meme request Error ===", err)
@@ -225,7 +225,7 @@ func UploadMemeImage(file multipart.File, token string, fileName string) (error,
 	return err, ""
 }
 
-func DeleteImageFromUploadsFolder(filePath string) {
+func DeleteFileFromUploadsFolder(filePath string) {
 	e := os.Remove(filePath)
 	if e != nil {
 		log.Printf("Could not delete Image %s %s", filePath, e)
