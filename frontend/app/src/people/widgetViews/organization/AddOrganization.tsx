@@ -273,7 +273,7 @@ const AddOrganization = (props: {
             value={websiteName}
             onChange={handleWebsiteNameChange}
           />
-          <OrgLabel>Github repo</OrgLabel>
+          <OrgLabel>Github Repo</OrgLabel>
           <TextInput
             placeholder="Github link..."
             value={githubRepo}
