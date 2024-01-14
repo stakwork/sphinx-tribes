@@ -2,7 +2,6 @@ import { EuiGlobalToastList, EuiLoadingSpinner } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import FirstTimeScreen from 'people/main/FirstTimeScreen';
 import BountyHeader from 'people/widgetViews/BountyHeader';
-import { OrgBounty } from 'pages/orgBounty';
 import WidgetSwitchViewer from 'people/widgetViews/WidgetSwitchViewer';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
@@ -11,6 +10,7 @@ import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import { useStores } from '../../../store';
 import { OrgBody, Body, Backdrop } from '../style';
+import { OrgHeader } from './orgHeader';
 
 function OrgBodyComponent() {
   const { main, ui } = useStores();
@@ -151,7 +151,7 @@ function OrgBodyComponent() {
           height: 'calc(100% - 65px)'
         }}
       >
-        <OrgBounty />
+        <OrgHeader />
         <>
           <div
             style={{
