@@ -13,10 +13,10 @@ describe('OrgHeader Component', () => {
     expect(screen.getByText(/Bounties/i)).toBeInTheDocument();
   });
 
-  it('opens the PostModal on "Post a Bounty" button click', () => {
+  it('opens the PostModal on "Post a Bounty" button click', async () => {
     render(<OrgHeader />);
     fireEvent.click(screen.getByText('Post a Bounty'));
-    const modalTitle = screen.getByText('Choose Bounty type');
+    const modalTitle = await screen.findByText('Choose Bounty type', {}, { timeout: 1000 });
     expect(modalTitle).toBeInTheDocument();
   });
 
