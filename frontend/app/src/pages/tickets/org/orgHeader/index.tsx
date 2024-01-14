@@ -6,9 +6,9 @@ import searchIcon from './Icons/searchIcon.svg';
 import file from './Icons/file.svg';
 
 const Header = styled.div`
-  width: 100vw;
+  width: 1366px;
   height: 130px;
-  padding: 45px 132px 45px 1129px;
+  padding: 45px 132px 45px 1089px;
   justify-content: flex-end;
   align-items: center;
   align-self: stretch;
@@ -17,10 +17,17 @@ const Header = styled.div`
   margin-left: auto;
   margin-right: auto;
 `;
+
+const FillContainer = styled.div`
+  width: 100vw;
+  align-self: stretch;
+  background: #fff;
+`;
+
 const Filters = styled.div`
   display: flex;
-  width: 100vw;
-  padding: 10px 170px;
+  width: 1366px;
+  padding: 10px 130px;
   justify-content: center;
   align-items: center;
   gap: 198px;
@@ -44,6 +51,7 @@ const StatusContainer = styled.span`
   gap: 4px;
 `;
 const Status = styled.select`
+  background-color: transparent;
   border: none;
 `;
 const SkillContainer = styled.span`
@@ -53,6 +61,7 @@ const SkillContainer = styled.span`
 `;
 const Skill = styled.select`
   border: none;
+  background-color: transparent;
 `;
 
 const Button = styled.button`
@@ -122,6 +131,7 @@ const SoryByContainer = styled.span`
   gap: 4px;
 `;
 const SortBy = styled.select`
+  background-color: transparent;
   border: none;
 `;
 const NumberOfBounties = styled.div`
@@ -160,7 +170,7 @@ const Img = styled.img`
   padding-bottom: 10px;
 `;
 
-export const OrgBounty = () => {
+export const OrgHeader = () => {
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
   const selectedWidget = 'wanted';
   const handlePostBountyClick = () => {
@@ -172,32 +182,36 @@ export const OrgBounty = () => {
 
   return (
     <>
-      <Header>
-        <Button onClick={handlePostBountyClick}>
-          <img src={addBounty} alt="" />
-          Post a Bounty
-        </Button>
-      </Header>
-      <Filters>
-        <FiltersRight>
-          <StatusContainer>
-            <Label htmlFor="statusSelect">Status</Label>
-            <Status id="statusSelect" />
-          </StatusContainer>
-          <SkillContainer>
-            <Label htmlFor="statusSelect">Skill</Label>
-            <Skill id="statusSelect" />
-          </SkillContainer>
-          <SearchWrapper>
-            <SearchBar placeholder="Search" disabled />
-            <Icon src={searchIcon} alt="Search" />
-          </SearchWrapper>
-        </FiltersRight>
-        <SoryByContainer>
-          <Label htmlFor="statusSelect">Sort by:Newest First</Label>
-          <SortBy id="statusSelect" />
-        </SoryByContainer>
-      </Filters>
+      <FillContainer>
+        <Header>
+          <Button onClick={handlePostBountyClick}>
+            <img src={addBounty} alt="" />
+            Post a Bounty
+          </Button>
+        </Header>
+      </FillContainer>
+      <FillContainer>
+        <Filters>
+          <FiltersRight>
+            <StatusContainer>
+              <Label htmlFor="statusSelect">Status</Label>
+              <Status id="statusSelect" />
+            </StatusContainer>
+            <SkillContainer>
+              <Label htmlFor="statusSelect">Skill</Label>
+              <Skill id="statusSelect" />
+            </SkillContainer>
+            <SearchWrapper>
+              <SearchBar placeholder="Search" disabled />
+              <Icon src={searchIcon} alt="Search" />
+            </SearchWrapper>
+          </FiltersRight>
+          <SoryByContainer>
+            <Label htmlFor="statusSelect">Sort by:Newest First</Label>
+            <SortBy id="statusSelect" />
+          </SoryByContainer>
+        </Filters>
+      </FillContainer>
       <NumberOfBounties>
         <BountyNumber>
           <Img src={file} alt="" />
