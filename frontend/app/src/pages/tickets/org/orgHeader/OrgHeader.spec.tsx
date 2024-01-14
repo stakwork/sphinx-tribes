@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { OrgHeader } from '../orgHeader/index';
+import { OrgHeader } from '.';
 
 // Mocking external dependencies
 jest.mock('people/widgetViews/postBounty/PostModal', () => ({
