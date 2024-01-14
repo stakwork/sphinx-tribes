@@ -16,9 +16,10 @@ describe('OrgHeader Component', () => {
   it('opens the PostModal on "Post a Bounty" button click', () => {
     render(<OrgHeader />);
     fireEvent.click(screen.getByText('Post a Bounty'));
-
-    expect(screen.getByText('Choose Bounty type')).toBeInTheDocument();
+    const modalTitle = screen.getByText('Choose Bounty type');
+    expect(modalTitle).toBeInTheDocument();
   });
+  
 
   it('displays the correct number of bounties', () => {
     render(<OrgHeader />);
