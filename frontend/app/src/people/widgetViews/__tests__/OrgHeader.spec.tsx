@@ -17,7 +17,7 @@ describe('OrgHeader Component', () => {
     render(<OrgHeader />);
     fireEvent.click(screen.getByText('Post a Bounty'));
 
-    expect(screen.getByText('Your Modal Title')).toBeInTheDocument();
+    expect(screen.getByText('Choose Bounty type')).toBeInTheDocument();
   });
 
   it('displays the correct number of bounties', () => {
