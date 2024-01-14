@@ -19,7 +19,6 @@ describe('OrgHeader Component', () => {
     const modalTitle = screen.getByText('Choose Bounty type');
     expect(modalTitle).toBeInTheDocument();
   });
-  
 
   it('displays the correct number of bounties', () => {
     render(<OrgHeader />);
