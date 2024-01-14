@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -19,11 +20,13 @@ import (
 
 type bountyHandler struct {
 	httpClient HttpClient
+	db         db.Database
 }
 
-func NewBountyHandler(httpClient HttpClient) *bountyHandler {
+func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
 		httpClient: httpClient,
+		db:         db,
 	}
 }
 
@@ -97,11 +100,7 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetCreatedBounties(pubkey)
+	bounties, err := db.DB.GetCreatedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -113,11 +112,7 @@ func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
-	pubkey := chi.URLParam(r, "pubkey")
-	if pubkey == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetAssignedBounties(pubkey)
+	bounties, err := db.DB.GetAssignedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -128,7 +123,7 @@ func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -179,22 +174,22 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if bounty.Show == false && bounty.ID != 0 {
-		db.DB.UpdateBountyBoolColumn(bounty, "show")
+		h.db.UpdateBountyBoolColumn(bounty, "show")
 	}
 
 	if bounty.Title != "" && bounty.Assignee == "" {
-		db.DB.UpdateBountyNullColumn(bounty, "assignee")
+		h.db.UpdateBountyNullColumn(bounty, "assignee")
 	}
 
 	if bounty.Title != "" && bounty.ID != 0 {
 		// get bounty from DB
-		dbBounty := db.DB.GetBounty(bounty.ID)
+		dbBounty := h.db.GetBounty(bounty.ID)
 
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
 			if bounty.OrgUuid != "" {
-				hasBountyRoles := db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+				hasBountyRoles := h.db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
 				if !hasBountyRoles {
 					msg := "You don't have a=the right permission ton update bounty"
 					fmt.Println(msg)
@@ -212,7 +207,7 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	b, err := db.DB.CreateOrEditBounty(bounty)
+	b, err := h.db.CreateOrEditBounty(bounty)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -223,7 +218,7 @@ func CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(b)
 }
 
-func DeleteBounty(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -247,8 +242,13 @@ func DeleteBounty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b, _ := db.DB.DeleteBounty(pubkey, created)
-
+	b, err := h.db.DeleteBounty(pubkey, created)
+	if err != nil {
+		fmt.Println("failed to delete bounty", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("failed to delete bounty")
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(b)
 }
@@ -358,6 +358,9 @@ func generateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 }
 
 func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
+	var m sync.Mutex
+	m.Lock()
+
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	idParam := chi.URLParam(r, "id")
@@ -384,7 +387,6 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if the bounty has been paid already to avoid double payment
-
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
@@ -421,7 +423,8 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-	bodyData := utils.BuildKeysendBodyData(amount, request.ReceiverPubKey, request.RouteHint)
+	assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+	bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 
 	jsonBody := []byte(bodyData)
 
@@ -451,7 +454,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		paymentHistory := db.PaymentHistory{
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
-			ReceiverPubKey: request.ReceiverPubKey,
+			ReceiverPubKey: assignee.OwnerPubKey,
 			OrgUuid:        bounty.OrgUuid,
 			BountyId:       id,
 			Created:        &now,
@@ -482,6 +485,8 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 			socket.Conn.WriteJSON(msg)
 		}
 	}
+
+	m.Unlock()
 }
 
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {

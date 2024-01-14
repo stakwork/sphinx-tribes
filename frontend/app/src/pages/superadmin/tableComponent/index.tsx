@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useStores } from 'store';
+import { BountyStatus, defaultBountyStatus } from 'store/main';
 import moment from 'moment';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';
 import copygray from '../header/icons/copygray.svg';
+import { Bounty } from './interfaces.ts';
 
 import {
   TableContainer,
@@ -33,29 +34,24 @@ import {
   TableHeaderDataAlternative,
   TableDataRow,
   TableDataAlternative,
-  BountyData
+  BountyData,
+  Paragraph,
+  BoxImage
 } from './TableStyle';
 
-import './styles.css';
-
-interface Bounty {
-  id: number;
-  title: string;
-  date: string;
-  dtgp: number;
-  assignee: string;
-  assigneeImage: string;
-  provider: string;
-  providerImage: string;
-  organization: string;
-  organizationImage: string;
-  status: string;
-}
+//import './styles.css';
 
 interface TableProps {
   bounties: Bounty[];
   startDate?: number;
   endDate?: number;
+  headerIsFrozen?: boolean;
+  bountyStatus?: BountyStatus;
+  setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
+  dropdownValue?: string;
+  setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
+  paginatePrev?: () => void;
+  paginateNext?: () => void;
 }
 
 interface ImageWithTextProps {
@@ -63,39 +59,23 @@ interface ImageWithTextProps {
   text: string;
 }
 
-export const ImageWithText = ({ image, text }: ImageWithTextProps) => {
-  const BoxImage = styled.div`
-    display: flex;
-    width: 162px;
-    align-items: center;
-    text-align: center;
-    gap: 6px;
-  `;
-  const Paragraph = styled.div`
-    margin-top: 2px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 200px;
-  `;
-  return (
-    <>
-      <BoxImage>
-        <img
-          src={image}
-          style={{
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            marginRight: '10px'
-          }}
-          alt={text}
-        />
-        <Paragraph>{text}</Paragraph>
-      </BoxImage>
-    </>
-  );
-};
+export const ImageWithText = ({ image, text }: ImageWithTextProps) => (
+  <>
+    <BoxImage>
+      <img
+        src={image}
+        style={{
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          marginRight: '10px'
+        }}
+        alt={text}
+      />
+      <Paragraph>{text}</Paragraph>
+    </BoxImage>
+  </>
+);
 
 interface TextInColorBoxProps {
   status: string;
@@ -110,6 +90,7 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
       }}
     >
       <p
+        data-testid="bounty-status"
         style={{
           color: '#fff',
           textTransform: 'uppercase',
@@ -137,7 +118,16 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   </>
 );
 
-export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
+export const MyTable = ({
+  bounties,
+  startDate,
+  endDate,
+  bountyStatus,
+  setBountyStatus,
+  dropdownValue,
+  headerIsFrozen,
+  setDropdownValue
+}: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
   const [activeTabs, setActiveTabs] = useState<number[]>([]);
@@ -151,8 +141,50 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
   const currentPageData = () => {
     const indexOfLastPost = currentPage * pageSize;
     const indexOfFirstPost = indexOfLastPost - pageSize;
-    const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
-    return currentPosts;
+    if (bounties) {
+      const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
+      return currentPosts;
+    }
+  };
+
+  const updateBountyStatus = (e: any) => {
+    const { value } = e.target;
+    if (bountyStatus && setBountyStatus && setDropdownValue) {
+      switch (value) {
+        case 'open': {
+          const newStatus = { ...defaultBountyStatus, Open: true };
+          setBountyStatus(newStatus);
+          break;
+        }
+        case 'in-progress': {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false,
+            Assigned: true
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+        case 'completed': {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false,
+            Paid: true
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+        default: {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+      }
+      setDropdownValue(value);
+    }
   };
 
   const paginateNext = () => {
@@ -219,14 +251,15 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
 
   return (
     <>
-      <HeaderContainer>
+      <HeaderContainer freeze={!headerIsFrozen}>
         <Header>
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {' '}
-              {bounties.length}{' '}
-              <AlternativeTitle> {bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>{' '}
+              {bounties.length}
+              <div>
+                <AlternativeTitle>{bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
+              </div>
             </LeadingTitle>
           </BountyHeader>
           <Options>
@@ -240,8 +273,8 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             </FlexDiv>
             <FlexDiv>
               <Label>Status:</Label>
-              <StyledSelect2 id="statusFilter">
-                <option value="All">All</option>
+              <StyledSelect2 id="statusFilter" value={dropdownValue} onChange={updateBountyStatus}>
+                <option value="all">All</option>
                 <option value="open">Open</option>
                 <option value="in-progress">In Progress</option>
                 <option value="completed">Completed</option>
@@ -252,7 +285,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
       </HeaderContainer>
       <TableContainer>
         <Table>
-          <TableRow>
+          <TableRow freeze={!headerIsFrozen}>
             <TableHeaderData>Bounty</TableHeaderData>
             <TableHeaderData>Date</TableHeaderData>
             <TableHeaderDataCenter>#DTGP</TableHeaderDataCenter>
@@ -265,7 +298,7 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
             {currentPageData()?.map((bounty: any) => {
               const bounty_status =
                 bounty?.paid && bounty.assignee
-                  ? 'completed'
+                  ? 'paid'
                   : bounty.assignee && !bounty.paid
                   ? 'assigned'
                   : 'open';
@@ -277,7 +310,16 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
 
               return (
                 <TableDataRow key={bounty?.id}>
-                  <BountyData className="avg">{bounty?.title}</BountyData>
+                  <BountyData className="avg">
+                    <a
+                      style={{ textDecoration: 'inherit', color: 'inherit' }}
+                      href={`/bounty/${bounty.bounty_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {bounty?.title}
+                    </a>
+                  </BountyData>
                   <TableData>{created}</TableData>
                   <TableDataCenter>{time_to_pay}</TableDataCenter>
                   <TableDataAlternative>
@@ -310,7 +352,9 @@ export const MyTable = ({ bounties, startDate, endDate }: TableProps) => {
       <PaginatonSection>
         <FlexDiv>
           {totalBounties > pageSize ? (
-            <PageContainer>
+
+            <PageContainer role="pagination">
+
               <img src={paginationarrow1} alt="pagination arrow 1" onClick={() => paginatePrev()} />
               {activeTabs.map((page: number) => (
                 <PaginationButtons

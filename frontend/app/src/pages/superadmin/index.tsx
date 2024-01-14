@@ -2,13 +2,13 @@
  * Commented out all superadmin restrictions for now
  * To enable colaborations
  */
-
 import React, { useCallback, useEffect, useState } from 'react';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
-import { BountyMetrics } from 'store/main';
+import { BountyMetrics, BountyStatus } from 'store/main';
 import { useStores } from 'store';
 import moment from 'moment';
+import { useInViewPort } from 'hooks';
 import { MyTable } from './tableComponent';
 import { Header } from './header';
 import { Statistics } from './statistics';
@@ -19,6 +19,7 @@ const Container = styled.body`
   overflow-y: auto; /* Enable vertical scrolling */
   align-items: center;
   margin: 0px auto;
+  padding: 4.5rem 0;
 `;
 
 const LoaderContainer = styled.div`
@@ -35,6 +36,12 @@ export const SuperAdmin = () => {
   const [isSuperAdmin] = useState(true);
   const [bounties, setBounties] = useState<any[]>([]);
   const [bountyMetrics, setBountyMetrics] = useState<BountyMetrics | undefined>(undefined);
+  const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
+    Open: false,
+    Assigned: false,
+    Paid: false
+  });
+  const [dropdownValue, setDropdownValue] = useState('all');
   const [loading, setLoading] = useState(false);
 
   /**
@@ -43,7 +50,12 @@ export const SuperAdmin = () => {
    * */
 
   const [endDate, setEndDate] = useState(moment().unix());
-  const [startDate, setStartDate] = useState(moment().subtract(7, 'days').unix());
+  const [startDate, setStartDate] = useState(moment().subtract(30, 'days').unix());
+
+  const [inView, ref] = useInViewPort({
+    rootMargin: '0px',
+    threshold: 0.25
+  });
 
   // const getIsSuperAdmin = useCallback(async () => {
   //   const admin = await main.getSuperAdmin();
@@ -59,7 +71,16 @@ export const SuperAdmin = () => {
     setLoading(true);
     if (startDate && endDate) {
       try {
-        const bounties = await main.getBountiesByRange(String(startDate), String(endDate));
+        const bounties = await main.getBountiesByRange(
+          {
+            start_date: String(startDate),
+            end_date: String(endDate)
+          },
+          {
+            resetPage: true,
+            ...bountyStatus
+          }
+        );
         setBounties(bounties);
       } catch (error) {
         // Handle errors if any
@@ -69,7 +90,7 @@ export const SuperAdmin = () => {
         setLoading(false);
       }
     }
-  }, [main, startDate, endDate]);
+  }, [main, startDate, endDate, bountyStatus]);
 
   useEffect(() => {
     getBounties();
@@ -114,14 +135,22 @@ export const SuperAdmin = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
-
-          <Statistics metrics={bountyMetrics} />
+          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />
           {loading ? (
             <LoaderContainer>
               <EuiLoadingSpinner size="l" />
             </LoaderContainer>
           ) : (
-            <MyTable bounties={bounties} startDate={startDate} endDate={endDate} />
+            <MyTable
+              bounties={bounties}
+              startDate={startDate}
+              endDate={endDate}
+              headerIsFrozen={inView}
+              bountyStatus={bountyStatus}
+              setBountyStatus={setBountyStatus}
+              dropdownValue={dropdownValue}
+              setDropdownValue={setDropdownValue}
+            />
           )}
         </Container>
       )}
