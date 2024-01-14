@@ -444,7 +444,7 @@ function Form(props: FormProps) {
                           .map((item: FormField) => (
                             <Input
                               {...item}
-                              type={item.name === 'description' ? 'textarea' : item.type}
+                              type={item.type}
                               key={item.name}
                               newDesign={item.name === 'description' ? false : true}
                               values={values}
@@ -487,7 +487,7 @@ function Form(props: FormProps) {
                               }
                               label={
                                 item.name === 'description' && !values.ticket_url
-                                  ? 'Description'
+                                  ? 'Description *'
                                   : item.label
                               }
                               placeholder={

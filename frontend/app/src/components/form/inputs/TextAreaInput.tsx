@@ -6,7 +6,7 @@ import type { Props } from './propsType';
 import { FieldEnv, FieldTextArea, Note } from './index';
 
 const StyleOnText = {
-  Description: {
+  'Description *': {
     height: '172px',
     width: '292px'
   },
@@ -97,7 +97,7 @@ export default function TextAreaInput({
         }}
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
-        label={labeltext === 'Description' ? `${labeltext} *` : labeltext}
+        label={label}
         height={StyleOnText[label].height}
         width={StyleOnText[label].width}
       >
