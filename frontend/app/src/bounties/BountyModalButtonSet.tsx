@@ -77,7 +77,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
           </div>
         </ButtonContainer>
       )}
-      {props.tribe ? (
+      {props.tribe !== 'None' ? (
         <ButtonContainer
           topMargin={'16px'}
           onClick={() => {

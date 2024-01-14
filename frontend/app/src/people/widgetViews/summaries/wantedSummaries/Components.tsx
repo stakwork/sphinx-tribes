@@ -122,34 +122,31 @@ export const ShareOnTwitter = ({
 export const ViewTribe = (props: any) => {
   const { tribe, tribeInfo } = props;
 
-  // Check if tribeInfo is present and tribe is not 'none'
-  if (tribeInfo && tribe && tribe !== 'none') {
-    return (
-      <Button
-        text={'View Tribe'}
-        color={'white'}
-        leadingImgUrl={tribeInfo.img || ' '}
-        endingIcon={'launch'}
-        iconSize={14}
-        imgStyle={{ position: 'absolute', left: 10 }}
-        style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20 }}
-        onClick={() => {
+  const isTribeValid = tribe && tribe.toLowerCase() !== 'none';
+
+  return (
+    <Button
+      text={'View Tribe'}
+      color={'white'}
+      leadingImgUrl={tribeInfo && isTribeValid ? tribeInfo.img : ' '}
+      endingIcon={'launch'}
+      iconSize={14}
+      imgStyle={{ position: 'absolute', left: 10 }}
+      style={{
+        fontSize: 14,
+        height: 48,
+        width: '100%',
+        marginBottom: 20,
+        opacity: isTribeValid ? 1 : 0.5,
+        pointerEvents: isTribeValid ? 'auto' : 'none'
+      }}
+      onClick={() => {
+        if (isTribeValid) {
           const profileUrl = `https://community.sphinx.chat/t/${tribe}`;
           sendToRedirect(profileUrl);
-        }}
-      />
-    );
-  } else {
-    return (
-      <Button
-        text={'View Tribe'}
-        color={'white'}
-        disabled={true}
-        endingIcon={'launch'}
-        iconSize={14}
-        imgStyle={{ position: 'absolute', left: 10 }}
-        style={{ fontSize: 14, height: 48, width: '100%', marginBottom: 20, opacity: 0.5 }}
-      />
-    );
-  }
+        }
+      }}
+      disabled={!isTribeValid}
+    />
+  );
 };
