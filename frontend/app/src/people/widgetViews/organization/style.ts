@@ -501,7 +501,7 @@ export const OrgLabel = styled.label`
 export const TextInput = styled.input`
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
-  border: 2px solid #82b4ff;
+  border: 2px solid #dde1e5;
   outline: none;
   caret-color: #618aff;
   color: #3c3f41;
@@ -521,12 +521,16 @@ export const TextInput = styled.input`
     font-weight: 400;
     line-height: 2.1875rem;
   }
+
+  :focus {
+    border: 1px solid #82b4ff;
+  }
 `;
 
 export const TextAreaInput = styled.textarea`
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
-  border: 2px solid #82b4ff;
+  border: 1px solid #dde1e5;
   outline: none;
   caret-color: #618aff;
   color: #3c3f41;
@@ -547,6 +551,9 @@ export const TextAreaInput = styled.textarea`
     font-weight: 400;
     line-height: 2.1875rem;
   }
+  :focus {
+    border: 1px solid #82b4ff;
+  }
 `;
 export const SecondaryText = styled.p`
   color: #b0b7bc;
@@ -554,7 +561,6 @@ export const SecondaryText = styled.p`
   font-size: 0.9375rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 2.1875rem;
 `;
 export const RouteHintText = styled.p`
   font-size: 0.9rem;

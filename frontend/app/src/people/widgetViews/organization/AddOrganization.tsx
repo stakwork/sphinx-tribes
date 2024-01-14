@@ -107,6 +107,12 @@ const OrgButton = styled.button`
   }
 `;
 
+const LabelRowContainer = styled.div`
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+`;
+
 const AddOrganization = (props: {
   closeHandler: () => void;
   getUserOrganizations: () => void;
@@ -252,7 +258,10 @@ const AddOrganization = (props: {
           </ImgTextContainer>
         </OrgImgOutterContainer>
         <OrgInputContainer>
-          <OrgLabel>Organization Name *</OrgLabel>
+          <LabelRowContainer>
+            <OrgLabel>Organization Name *</OrgLabel>
+            <SecondaryText>{orgName.length}/20</SecondaryText>
+          </LabelRowContainer>
           <TextInput
             placeholder="My Organization..."
             value={orgName}
@@ -272,7 +281,10 @@ const AddOrganization = (props: {
           />
         </OrgInputContainer>
         <OrgInputContainer>
-          <OrgLabel>Description</OrgLabel>
+          <LabelRowContainer>
+            <OrgLabel>Description</OrgLabel>
+            <SecondaryText>{description.length}/120</SecondaryText>
+          </LabelRowContainer>
           <TextAreaInput
             placeholder="Description Text..."
             rows={7}
