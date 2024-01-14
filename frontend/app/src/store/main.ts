@@ -266,8 +266,8 @@ export interface BountyMetrics {
 }
 
 export interface MockHunterMetrics {
-  hunters_total_paid: number,
-  hunters_first_bounty_paid: number,
+  hunters_total_paid: number;
+  hunters_first_bounty_paid: number;
 }
 
 export interface BountyStatus {
@@ -346,35 +346,35 @@ export class MainStore {
 
     // hide test bots and set images
     b &&
-    b.forEach((bb: any, i: any) => {
-      if (bb.unique_name === 'btc') {
-        // bb.img = "/static/bots_bitcoin.png";
-        b.splice(i, 1);
-        b.unshift(bb);
-      }
-      if (bb.unique_name === 'bet') {
-        // bb.img = "/static/bots_betting.png";
-        b.splice(i, 1);
-        b.unshift(bb);
-      }
-      if (bb.unique_name === 'hello' || bb.unique_name === 'welcome') {
-        // bb.img = "/static/bots_welcome.png";
-        b.splice(i, 1);
-        b.unshift(bb);
-      }
-      if (
-        bb.unique_name &&
-        (bb.unique_name.includes('test') || hideBots.includes(bb.unique_name))
-      ) {
-        // hide all test bots
-        bb.hide = true;
-      }
+      b.forEach((bb: any, i: any) => {
+        if (bb.unique_name === 'btc') {
+          // bb.img = "/static/bots_bitcoin.png";
+          b.splice(i, 1);
+          b.unshift(bb);
+        }
+        if (bb.unique_name === 'bet') {
+          // bb.img = "/static/bots_betting.png";
+          b.splice(i, 1);
+          b.unshift(bb);
+        }
+        if (bb.unique_name === 'hello' || bb.unique_name === 'welcome') {
+          // bb.img = "/static/bots_welcome.png";
+          b.splice(i, 1);
+          b.unshift(bb);
+        }
+        if (
+          bb.unique_name &&
+          (bb.unique_name.includes('test') || hideBots.includes(bb.unique_name))
+        ) {
+          // hide all test bots
+          bb.hide = true;
+        }
 
-      if (bb.owner_pubkey === info?.owner_pubkey) {
-        // hide my own bots
-        bb.hide = true;
-      }
-    });
+        if (bb.owner_pubkey === info?.owner_pubkey) {
+          // hide my own bots
+          bb.hide = true;
+        }
+      });
 
     this.bots = b;
     return b;

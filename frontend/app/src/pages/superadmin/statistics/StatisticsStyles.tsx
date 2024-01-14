@@ -1,10 +1,9 @@
 import styled from 'styled-components';
 interface SubheadingProps {
-    marginTop?: string;
-    marginLeft?:string;
-    width?:string;
+  marginTop?: string;
+  marginLeft?: string;
+  width?: string;
 }
-
 
 export const Wrapper = styled.section`
   background: var(--Search-bar-background, #f2f3f5);
@@ -50,7 +49,6 @@ export const CardHunter = styled.div`
   margin-left: 11px;
 `;
 
-
 export const VerticaGrayLine = styled.div`
   width: 2px;
   height: 32px;
@@ -78,7 +76,7 @@ export const HorizontalGrayLine = styled.div`
 export const UpperCardWrapper = styled.div`
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr  1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 3em;
   padding-top: 15px;
 `;
@@ -147,11 +145,11 @@ export const TitleGreen = styled.div`
   line-height: normal;
 `;
 
-export const Subheading= styled.h3`
+export const Subheading = styled.h3`
   color: var(--Secondary-Text-4, #6b7a8d);
-  margin-top: ${(props:SubheadingProps) => props.marginTop?props.marginTop:''};
-  margin-left: ${(props:SubheadingProps) => props.marginLeft?props.marginLeft:''};
-  width: ${(props:SubheadingProps) => props.width?props.width:''};
+  margin-top: ${(props: SubheadingProps) => (props.marginTop ? props.marginTop : '')};
+  margin-left: ${(props: SubheadingProps) => (props.marginLeft ? props.marginLeft : '')};
+  width: ${(props: SubheadingProps) => (props.width ? props.width : '')};
   font-family: Barlow;
   font-size: 14px;
   font-style: normal;
@@ -166,7 +164,6 @@ export const TitleWrapper = styled.div`
   display: flex;
   margin-top: 1em;
   margin-bottom: 10px;
-  
 `;
 
 export const InfoFrame = styled.div`

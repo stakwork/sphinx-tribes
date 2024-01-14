@@ -25,13 +25,13 @@ const mockMetrics = {
   bounties_paid_average: 78,
   sats_paid_percentage: 50,
   average_paid: 10,
-  average_completed: 1,
+  average_completed: 1
 };
 
 const mockHunter = {
   hunters_total_paid: 125,
-  hunters_first_bounty_paid: 16,
-}
+  hunters_first_bounty_paid: 16
+};
 
 describe('Statistics Component', () => {
   nock(user.url).get('/person/id/1').reply(200, {});
