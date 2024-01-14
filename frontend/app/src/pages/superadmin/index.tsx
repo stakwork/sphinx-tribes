@@ -5,7 +5,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { EuiLoadingSpinner } from '@elastic/eui';
 import styled from 'styled-components';
-import { BountyMetrics, BountyStatus } from 'store/main';
+import { BountyMetrics, BountyStatus, MockHunterMetrics } from 'store/main';
 import { useStores } from 'store';
 import moment from 'moment';
 import { useInViewPort } from 'hooks';
@@ -36,6 +36,10 @@ export const SuperAdmin = () => {
   const [isSuperAdmin] = useState(true);
   const [bounties, setBounties] = useState<any[]>([]);
   const [bountyMetrics, setBountyMetrics] = useState<BountyMetrics | undefined>(undefined);
+  const mockHunterMetrics:MockHunterMetrics = {
+    hunters_total_paid: 145,
+    hunters_first_bounty_paid: 12,
+  }
   const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
     Open: false,
     Assigned: false,
@@ -72,14 +76,14 @@ export const SuperAdmin = () => {
     if (startDate && endDate) {
       try {
         const bounties = await main.getBountiesByRange(
-          {
-            start_date: String(startDate),
-            end_date: String(endDate)
-          },
-          {
-            resetPage: true,
-            ...bountyStatus
-          }
+            {
+              start_date: String(startDate),
+              end_date: String(endDate)
+            },
+            {
+              resetPage: true,
+              ...bountyStatus
+            }
         );
         setBounties(bounties);
       } catch (error) {
@@ -124,36 +128,36 @@ export const SuperAdmin = () => {
   }, [getMetrics]);
 
   return (
-    <>
-      {!isSuperAdmin ? (
-        <AdminAccessDenied />
-      ) : (
-        <Container>
-          <Header
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-          />
-          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />
-          {loading ? (
-            <LoaderContainer>
-              <EuiLoadingSpinner size="l" />
-            </LoaderContainer>
-          ) : (
-            <MyTable
-              bounties={bounties}
-              startDate={startDate}
-              endDate={endDate}
-              headerIsFrozen={inView}
-              bountyStatus={bountyStatus}
-              setBountyStatus={setBountyStatus}
-              dropdownValue={dropdownValue}
-              setDropdownValue={setDropdownValue}
-            />
-          )}
-        </Container>
-      )}
-    </>
+      <>
+        {!isSuperAdmin ? (
+            <AdminAccessDenied />
+        ) : (
+            <Container>
+              <Header
+                  startDate={startDate}
+                  endDate={endDate}
+                  setStartDate={setStartDate}
+                  setEndDate={setEndDate}
+              />
+              <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} mockHunter={mockHunterMetrics} />
+              {loading ? (
+                  <LoaderContainer>
+                    <EuiLoadingSpinner size="l" />
+                  </LoaderContainer>
+              ) : (
+                  <MyTable
+                      bounties={bounties}
+                      startDate={startDate}
+                      endDate={endDate}
+                      headerIsFrozen={inView}
+                      bountyStatus={bountyStatus}
+                      setBountyStatus={setBountyStatus}
+                      dropdownValue={dropdownValue}
+                      setDropdownValue={setDropdownValue}
+                  />
+              )}
+            </Container>
+        )}
+      </>
   );
 };
