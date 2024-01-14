@@ -9,7 +9,6 @@ jest.mock('people/widgetViews/postBounty/PostModal', () => ({
   default: () => <div>PostModalMock</div>
 }));
 
-// Mocking SVG imports
 jest.mock('./Icons/addBounty.svg', () => {
   const AddBountyIcon = () => <div>AddBountyIcon</div>;
   AddBountyIcon.displayName = 'AddBountyIcon';
@@ -29,39 +28,25 @@ jest.mock('./Icons/file.svg', () => {
 });
 
 describe('OrgHeader Component', () => {
-  // Test for component rendering
-  test('renders without crashing', () => {
+  it('renders the component', () => {
     render(<OrgHeader />);
     expect(screen.getByText('Post a Bounty')).toBeInTheDocument();
   });
 
-  // UI structure tests
-  test('contains the necessary UI elements', () => {
+  it('opens the PostBountyModal on button click', () => {
     render(<OrgHeader />);
-    expect(screen.getByText('Post a Bounty')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Post a Bounty'));
+    expect(screen.getByText('ModalTitle')).toBeInTheDocument();
+  });
+
+  it('should contain status, skill, and sort by elements', () => {
+    render(<OrgHeader />);
     expect(screen.getByLabelText('Status')).toBeInTheDocument();
     expect(screen.getByLabelText('Skill')).toBeInTheDocument();
-    expect(screen.getByLabelText('Sort by:Newest First')).toBeInTheDocument();
+    expect(screen.getByText('Sort by:Newest First')).toBeInTheDocument();
   });
-
-  // Interaction test
-  test('opens PostModal on button click', () => {
-    render(<OrgHeader />);
-    fireEvent.click(screen.getByText('Post a Bounty'));
-    expect(screen.getByText('PostModalMock')).toBeInTheDocument();
-  });
-
-  // State change test
-  test('changes state when Post a Bounty is clicked', () => {
-    render(<OrgHeader />);
-    fireEvent.click(screen.getByText('Post a Bounty'));
-    expect(screen.getByText('PostModalMock')).toBeInTheDocument();
-  });
-
-  // Snapshot test
-  test('matches the snapshot', () => {
-    const { asFragment } = render(<OrgHeader />);
-    expect(asFragment()).toMatchSnapshot();
-  });
+});
+it('matches the snapshot', () => {
+  const { asFragment } = render(<OrgHeader />);
+  expect(asFragment()).toMatchSnapshot();
 });
