@@ -263,6 +263,8 @@ export interface BountyMetrics {
   sats_paid_percentage: number;
   average_paid: number;
   average_completed: number;
+  unique_hunters_paid: number;
+  new_hunters_paid: number;
 }
 
 export interface BountyStatus {
@@ -884,9 +886,9 @@ export class MainStore {
   async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, 20, {
-      ...queryParams,
-      sortBy: 'paid'
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, queryLimit, {
+      sortBy: 'paid',
+      ...queryParams
     });
 
     try {
@@ -2484,6 +2486,36 @@ export class MainStore {
     } catch (e) {
       console.error('getBountyMetrics', e);
       return 0;
+    }
+  }
+
+  async exportMetricsBountiesCsv(date_range: {
+    start_date: string;
+    end_date: string;
+  }): Promise<string | undefined> {
+    try {
+      if (!uiStore.meInfo) return undefined;
+      const info = uiStore.meInfo;
+
+      const body = {
+        start_date: date_range.start_date,
+        end_date: date_range.end_date
+      };
+
+      const r: any = await fetch(`${TribesURL}/metrics/csv`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(body),
+        headers: {
+          'x-jwt': info.tribe_jwt,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return r.json();
+    } catch (e) {
+      console.error('exportMetricsBountiesCsv', e);
+      return undefined;
     }
   }
 

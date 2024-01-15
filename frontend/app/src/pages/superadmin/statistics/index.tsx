@@ -1,19 +1,15 @@
 import React from 'react';
 import { BountyMetrics } from 'store/main';
 import copy from '../header/icons/copy.svg';
-import copygray from '../header/icons/copygray.svg';
-import bountiesposted from '../header/icons/bountiesposted.svg';
-import bountiespaid from '../header/icons/bountiespaid.svg';
-import clockloader from '../header/icons/clockloder.svg';
+import hunter from '../header/icons/hunter.svg';
 import coin from '../header/icons/coin.svg';
-import satoshiesposted from '../header/icons/satoshiesposted.svg';
-import satoshiespaid from '../header/icons/satoshiespaid.svg';
-import calendar from '../header/icons/calendar.svg';
+
 import {
   Wrapper,
   Card,
   VerticaGrayLine,
   DivWrapper,
+  StatusWrapper,
   LeadingText,
   Title,
   TitleBlue,
@@ -21,96 +17,145 @@ import {
   Subheading,
   TitleWrapper,
   CardGreen,
+  UpperCardWrapper,
+  BelowCardWrapper,
   VerticaGrayLineSecondary,
-  VerticaGrayLineAleternative
+  HorizontalGrayLine,
+  CardHunter
 } from './StatisticsStyles';
 // import './StatStyles.css';
+export interface MockHunterMetrics {
+  hunters_total_paid: number;
+  hunters_first_bounty_paid: number;
+}
 
 interface StatisticsProps {
   metrics: BountyMetrics | undefined;
   freezeHeaderRef?: React.MutableRefObject<HTMLElement | null>;
+  mockHunter?: MockHunterMetrics;
 }
 
 export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
   <>
     <Wrapper ref={freezeHeaderRef}>
       <Card>
-        <TitleWrapper>
-          <img className="BountiesSvg" src={copy} alt="" width="16.508px" height="20px" />
-          <LeadingText>Bounties</LeadingText>
-        </TitleWrapper>
-
-        <DivWrapper>
-          <VerticaGrayLine />
-          <img className="logoAlign" src={bountiesposted} alt="" width="27.09px" height="20px" />
-          <div>
-            <Title>{metrics?.bounties_posted}</Title>
-            <Subheading>Total Bounties Posted</Subheading>
-          </div>
-        </DivWrapper>
-        <DivWrapper>
-          <VerticaGrayLineAleternative />
-          <img className="logoAlign" src={copygray} alt="" width="27.09px" height="20px" />
-          <div>
-            <Title>78</Title>
-            <Subheading className="BounA">Bounties Assigned</Subheading>
-          </div>
-        </DivWrapper>
-        <DivWrapper>
-          <VerticaGrayLine />
-          <img className="logoAlign" src={bountiespaid} alt="" width="20" height="20" />
-          <div>
-            <Title>{metrics?.bounties_paid}</Title>
-            <Subheading>Bounties Paid</Subheading>
-          </div>
-        </DivWrapper>
-        <DivWrapper>
-          <VerticaGrayLineSecondary />
-          <img className="ClocklogoAlign" src={clockloader} alt="" width="24px" height="24px" />
-          <div>
+        <UpperCardWrapper>
+          <TitleWrapper>
+            <img
+              style={{ marginTop: '4px', marginRight: '10px' }}
+              src={copy}
+              alt=""
+              width="16.508px"
+              height="20px"
+            />
+            <LeadingText>Bounties</LeadingText>
+          </TitleWrapper>
+          <StatusWrapper>
+            <Subheading marginTop="5px" marginLeft="0px">
+              Completed
+            </Subheading>
             <TitleBlue>{metrics?.bounties_paid_average}%</TitleBlue>
-            <Subheading>Completed</Subheading>
-          </div>
-        </DivWrapper>
+          </StatusWrapper>
+        </UpperCardWrapper>
+        <HorizontalGrayLine />
+        <BelowCardWrapper>
+          <DivWrapper>
+            <div>
+              <Title>{metrics?.bounties_posted}</Title>
+              <Subheading width="80px" data-testid="total_bounties_posted">
+                Total Posted
+              </Subheading>
+            </div>
+            <VerticaGrayLine />
+          </DivWrapper>
+          <DivWrapper>
+            <div>
+              <Title>78</Title>
+              <Subheading>Assigned</Subheading>
+            </div>
+            <VerticaGrayLineSecondary />
+          </DivWrapper>
+          <DivWrapper>
+            <div>
+              <Title>{metrics?.bounties_paid}</Title>
+              <Subheading data-testid="total_bounties_paid">Paid</Subheading>
+            </div>
+          </DivWrapper>
+        </BelowCardWrapper>
       </Card>
       <CardGreen>
-        <TitleWrapper>
-          <img className="SatoshieSvg" src={coin} alt="" width="23px" height="17px" />
-          <LeadingText>Satoshis</LeadingText>
-        </TitleWrapper>
-        <DivWrapper>
-          <VerticaGrayLine />
-          <img className="logoAlign" src={satoshiesposted} alt="" width="23px" height="17" />
-          <div>
-            <Title>{metrics?.sats_posted}</Title>
-            <Subheading>Total Sats Posted</Subheading>
-          </div>
-        </DivWrapper>
-        <DivWrapper>
-          <VerticaGrayLineAleternative />
-          <img className="logoAlign" src={satoshiespaid} alt="" width="23px" height="17px" />
-          <div>
-            <Title>{metrics?.sats_paid}</Title>
-            <Subheading>Sats Paid</Subheading>
-          </div>
-        </DivWrapper>
-        <DivWrapper>
-          <VerticaGrayLine />
-          <img className="logoAlignSecondary" src={calendar} alt="" width="23px" height="17px" />
-          <div>
-            <Title>3 Days</Title>
-            <Subheading>Avg Time to Paid</Subheading>
-          </div>
-        </DivWrapper>
-        <DivWrapper>
-          <VerticaGrayLineSecondary />
-          <img className="ClocklogoAlign" src={clockloader} alt="" width="24px" height="24px" />
-          <div>
+        <UpperCardWrapper>
+          <TitleWrapper>
+            <img
+              style={{ marginTop: '4px', marginRight: '10px' }}
+              src={coin}
+              alt=""
+              width="23px"
+              height="17px"
+            />
+            <LeadingText>Satoshis</LeadingText>
+          </TitleWrapper>
+          <StatusWrapper>
+            <Subheading marginTop="5px" marginLeft="0px" data-testid="total_satoshis_paid">
+              Paid
+            </Subheading>
             <TitleGreen>{metrics?.sats_paid_percentage}%</TitleGreen>
-            <Subheading>Paid</Subheading>
-          </div>
-        </DivWrapper>
+          </StatusWrapper>
+        </UpperCardWrapper>
+        <HorizontalGrayLine />
+        <BelowCardWrapper>
+          <DivWrapper>
+            <div>
+              <Title>{metrics?.sats_posted}</Title>
+              <Subheading data-testid="total_satoshis_posted">Total Posted</Subheading>
+            </div>
+            <VerticaGrayLine />
+          </DivWrapper>
+          <DivWrapper>
+            <div>
+              <Title>{metrics?.sats_paid}</Title>
+              <Subheading>Paid</Subheading>
+            </div>
+            <VerticaGrayLineSecondary />
+          </DivWrapper>
+          <DivWrapper>
+            <div>
+              <Title>3 Days</Title>
+              <Subheading width="120px">Avg Time to Paid</Subheading>
+            </div>
+          </DivWrapper>
+        </BelowCardWrapper>
       </CardGreen>
+      <CardHunter>
+        <UpperCardWrapper>
+          <TitleWrapper>
+            <img
+              style={{ marginTop: '2px', marginRight: '10px' }}
+              src={hunter}
+              alt=""
+              width="25px"
+              height="25px"
+            />
+            <LeadingText>Hunters</LeadingText>
+          </TitleWrapper>
+        </UpperCardWrapper>
+        <HorizontalGrayLine />
+        <BelowCardWrapper>
+          <DivWrapper>
+            <div>
+              <Title>{metrics?.unique_hunters_paid}</Title>
+              <Subheading width="80px">Total Paid</Subheading>
+            </div>
+            <VerticaGrayLine />
+          </DivWrapper>
+          <DivWrapper>
+            <div>
+              <Title>{metrics?.new_hunters_paid}</Title>
+              <Subheading width="120px">First Bounty Paid</Subheading>
+            </div>
+          </DivWrapper>
+        </BelowCardWrapper>
+      </CardHunter>
     </Wrapper>
   </>
 );
