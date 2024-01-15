@@ -268,6 +268,7 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 			OrganizationName:    organization.Name,
 			OrganizationImg:     organization.Img,
 			OrganizationUuid:    organization.Uuid,
+			OrganizationDescription:  organization.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
