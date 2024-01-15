@@ -23,7 +23,7 @@ import {
   HorizontalGrayLine,
   CardHunter
 } from './StatisticsStyles';
-import './StatStyles.css';
+// import './StatStyles.css';
 export interface MockHunterMetrics {
   hunters_total_paid: number;
   hunters_first_bounty_paid: number;
@@ -41,7 +41,13 @@ export const Statistics = ({ freezeHeaderRef, metrics, mockHunter }: StatisticsP
       <Card>
         <UpperCardWrapper>
           <TitleWrapper>
-            <img className="BountiesSvg" src={copy} alt="" width="16.508px" height="20px" />
+            <img
+              style={{ marginTop: '4px', marginRight: '10px' }}
+              src={copy}
+              alt=""
+              width="16.508px"
+              height="20px"
+            />
             <LeadingText>Bounties</LeadingText>
           </TitleWrapper>
           <StatusWrapper>
@@ -80,7 +86,13 @@ export const Statistics = ({ freezeHeaderRef, metrics, mockHunter }: StatisticsP
       <CardGreen>
         <UpperCardWrapper>
           <TitleWrapper>
-            <img className="SatoshieSvg" src={coin} alt="" width="23px" height="17px" />
+            <img
+              style={{ marginTop: '4px', marginRight: '10px' }}
+              src={coin}
+              alt=""
+              width="23px"
+              height="17px"
+            />
             <LeadingText>Satoshis</LeadingText>
           </TitleWrapper>
           <StatusWrapper>
@@ -117,7 +129,13 @@ export const Statistics = ({ freezeHeaderRef, metrics, mockHunter }: StatisticsP
       <CardHunter>
         <UpperCardWrapper>
           <TitleWrapper>
-            <img className="HunterSvg" src={hunter} alt="" width="25px" height="25px" />
+            <img
+              style={{ marginTop: '2px', marginRight: '10px' }}
+              src={hunter}
+              alt=""
+              width="25px"
+              height="25px"
+            />
             <LeadingText>Hunters</LeadingText>
           </TitleWrapper>
         </UpperCardWrapper>
