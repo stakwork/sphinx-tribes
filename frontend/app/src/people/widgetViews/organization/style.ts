@@ -480,6 +480,7 @@ export const ImgDetailInfo = styled.p`
 
 export const OrgInputContainer = styled.div`
   width: 16rem;
+  height: 223px;
   display: flex;
   flex-direction: column;
   @media only screen and (max-width: 500px) {
@@ -491,14 +492,44 @@ export const OrgInputContainer = styled.div`
 export const OrgLabel = styled.label`
   color: #5f6368;
   font-family: 'Barlow';
-  font-size: 0.8125rem;
+  font-size: 13px;
   font-style: normal;
   font-weight: 500;
-  /* line-height: 2.1875rem; */
   margin-bottom: 0.75rem;
+  height: 0.5625rem;
 `;
 
 export const TextInput = styled.input`
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 2px solid #dde1e5;
+  outline: none;
+  caret-color: #618aff;
+  color: #3c3f41;
+  font-family: 'Barlow';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  width: 16rem;
+  margin-bottom: 1.25rem;
+  height: 2.4rem;
+
+  ::placeholder {
+    color: #b0b7bc;
+    font-family: 'Barlow';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+  }
+
+  :focus {
+    border: 2px solid #82b4ff;
+  }
+`;
+
+export const TextAreaInput = styled.textarea`
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   border: 2px solid #dde1e5;
@@ -506,53 +537,25 @@ export const TextInput = styled.input`
   caret-color: #618aff;
   color: #3c3f41;
   font-family: 'Barlow';
-  font-size: 0.9375rem;
+  font-size: 13px;
   font-style: normal;
   font-weight: 500;
-  line-height: 2.1875rem;
-  width: 100%;
-  margin-bottom: 20px;
-
-  ::placeholder {
-    color: #b0b7bc;
-    font-family: 'Barlow';
-    font-size: 0.9375rem;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 2.1875rem;
-  }
-
-  :focus {
-    border: 1px solid #82b4ff;
-  }
-`;
-
-export const TextAreaInput = styled.textarea`
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  border: 1px solid #dde1e5;
-  outline: none;
-  caret-color: #618aff;
-  color: #3c3f41;
-  font-family: 'Barlow';
-  font-size: 0.9375rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 2.1875rem;
-  width: 100%;
-  margin-bottom: 20px;
+  line-height: 20px;
+  width: 16rem;
+  margin-bottom: 12px;
   resize: none;
+  height: 13.9375rem;
 
   ::placeholder {
     color: #b0b7bc;
     font-family: 'Barlow';
-    font-size: 0.9375rem;
+    font-size: 13px;
     font-style: normal;
     font-weight: 400;
-    line-height: 2.1875rem;
+    line-height: 20px;
   }
   :focus {
-    border: 1px solid #82b4ff;
+    border: 2px solid #82b4ff;
   }
 `;
 export const SecondaryText = styled.p`
@@ -561,6 +564,8 @@ export const SecondaryText = styled.p`
   font-size: 0.9375rem;
   font-style: normal;
   font-weight: 400;
+  margin-bottom: 0.75rem;
+  height: 0.5625rem;
 `;
 export const RouteHintText = styled.p`
   font-size: 0.9rem;
