@@ -6,7 +6,7 @@ import React from 'react';
 import { setupStore } from '../../../../__test__/__mockData__/setupStore';
 import { user } from '../../../../__test__/__mockData__/user';
 import { mockUsehistory } from '../../../../__test__/__mockFn__/useHistory';
-import { Header } from '../';
+import { Header } from '..';
 
 beforeAll(() => {
   nock.disableNetConnect();

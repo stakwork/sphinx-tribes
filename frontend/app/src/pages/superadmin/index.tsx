@@ -136,7 +136,7 @@ export const SuperAdmin = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
-          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />          
+          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />
           {loading ? (
             <LoaderContainer>
               <EuiLoadingSpinner size="l" />

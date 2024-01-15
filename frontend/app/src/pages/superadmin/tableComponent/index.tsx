@@ -45,7 +45,6 @@ import {
 
 import { FilterContainer, FlexDivStatus, StatusCheckboxItem } from './StatusStyle';
 
-
 interface TableProps {
   bounties: Bounty[];
   startDate?: number;
@@ -122,16 +121,16 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
   </>
 );
 
-export const MyTable = ({ 
-  bounties, 
-  startDate, 
-  endDate, 
-  headerIsFrozen = false, 
-  bountyStatus, 
-  setBountyStatus, 
-  dropdownValue, 
-  setDropdownValue,
- }: TableProps) => {
+export const MyTable = ({
+  bounties,
+  startDate,
+  endDate,
+  headerIsFrozen = false,
+  bountyStatus,
+  setBountyStatus,
+  dropdownValue,
+  setDropdownValue
+}: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
   const visibleTabs = 7;
@@ -149,7 +148,7 @@ export const MyTable = ({
   const color = colors['light'];
   const paginationLimit = Math.floor(totalBounties / pageSize) + 1;
   const options = [
-    { id: 'Open', label: 'Open', value: 'Open'},
+    { id: 'Open', label: 'Open', value: 'Open' },
     { id: 'Assigned', label: 'Assigned', value: 'Assigned' },
     { id: 'Completed', label: 'Completed', value: 'Completed' },
     { id: 'Paid', label: 'Paid', value: 'Paid' }
@@ -166,7 +165,7 @@ export const MyTable = ({
       return bounties;
     }
     return bounties.filter((bounty: any) => statusFilter.includes(bounty.status));
-  }
+  };
 
   const currentPageData = () => {
     const firstIndex = (currentPage - 1) * pageSize;
@@ -178,23 +177,23 @@ export const MyTable = ({
     setIsPopoverOpen(!isPopoverOpen);
   };
 
-  const onChange = (optionId:any) => {
+  const onChange = (optionId: any) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
       ...{
-        [optionId]: !checkboxIdToSelectedMap[optionId],
-      },
+        [optionId]: !checkboxIdToSelectedMap[optionId]
+      }
     };
-  
+
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
-  
+
     // Check if the checkbox is being selected or deselected
     if (newCheckboxIdToSelectedMap[optionId]) {
       // If it's being selected, add the optionId to the statusFilter array
       setStatusFilter([...statusFilter, optionId]);
     } else {
       // If it's being deselected, remove the optionId from the statusFilter array
-      setStatusFilter(statusFilter.filter((id : any) => id !== optionId));
+      setStatusFilter(statusFilter.filter((id: any) => id !== optionId));
     }
   };
 
@@ -312,7 +311,7 @@ export const MyTable = ({
   return (
     <>
       <HeaderContainer>
-      <Header>
+        <Header>
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
@@ -334,21 +333,18 @@ export const MyTable = ({
             <FlexDiv>
               <EuiPopover
                 button={
-                  <FilterContainer onClick={onButtonClick}>                                       
+                  <FilterContainer onClick={onButtonClick}>
                     <FlexDivStatus>
-                    <EuiText
-                      className="statusText"
-                    >
-                      Status:
-                    </EuiText>
-                    <EuiText
-                      className="subStatusText"
-                    >
-                      {statusFilter?.length === 0 ? 'All' : statusFilter?.length === 1 ? statusFilter : 'Multiple'}
-                    </EuiText>
-                    <img src={expand_more} alt="" width="20px" height="20px" />
+                      <EuiText className="statusText">Status:</EuiText>
+                      <EuiText className="subStatusText">
+                        {statusFilter?.length === 0
+                          ? 'All'
+                          : statusFilter?.length === 1
+                          ? statusFilter
+                          : 'Multiple'}
+                      </EuiText>
+                      <img src={expand_more} alt="" width="20px" height="20px" />
                     </FlexDivStatus>
-                    
                   </FilterContainer>
                 }
                 panelStyle={{
@@ -360,8 +356,7 @@ export const MyTable = ({
                   fontWeight: '500',
                   color: '#5F6368',
                   fontFamily: 'Barlow',
-                  border: '1px solid #fff',
-
+                  border: '1px solid #fff'
                 }}
                 isOpen={isPopoverOpen}
                 closePopover={() => setIsPopoverOpen(false)}
@@ -369,19 +364,19 @@ export const MyTable = ({
                 panelPaddingSize="none"
                 anchorPosition="downCenter"
               >
-               <StatusCheckboxItem color={color}>
-               <EuiCheckboxGroup
-                  options={options}
-                  onChange={(id:any) => onChange(id)}
-                  idToSelectedMap={checkboxIdToSelectedMap}
-               />
-               </StatusCheckboxItem>
-              </EuiPopover>      
+                <StatusCheckboxItem color={color}>
+                  <EuiCheckboxGroup
+                    options={options}
+                    onChange={(id: any) => onChange(id)}
+                    idToSelectedMap={checkboxIdToSelectedMap}
+                  />
+                </StatusCheckboxItem>
+              </EuiPopover>
             </FlexDiv>
           </Options>
-      </Header>
+        </Header>
       </HeaderContainer>
-      
+
       <TableContainer>
         <Table>
           <TableRow>

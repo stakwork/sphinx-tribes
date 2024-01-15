@@ -1,4 +1,3 @@
-
 export const bounties = [
   {
     id: 1,
@@ -20,7 +19,7 @@ export const bounties = [
     organization: 'OrganizationName',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    status: 'Open',
+    status: 'Open'
   },
   {
     id: 2,
@@ -40,7 +39,7 @@ export const bounties = [
     organization: 'Doe Inc.',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    status: 'Paid',
+    status: 'Paid'
   },
   {
     id: 3,
@@ -60,7 +59,7 @@ export const bounties = [
     organization: 'Doe Inc.',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    status: 'Assigned',
+    status: 'Assigned'
   },
   {
     id: 4,
@@ -80,6 +79,6 @@ export const bounties = [
     organization: 'Doe Inc.',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    status: 'Completed',
-  },
+    status: 'Completed'
+  }
 ];
